@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2011 Israel Jacques
+ * See LICENSE for details.
+ *
+ * Israel Jacques <mrko@eecs.berkeley.edu>
+ */
+
+#ifndef _VDP2_H_
+#define _VDP2_H_
+
+#include <vdp2/scrn.h>
+#include <vdp2/tvmd.h>
+#include <vdp2/vram.h>
+
+extern void vdp2_init(void);
+
+#endif

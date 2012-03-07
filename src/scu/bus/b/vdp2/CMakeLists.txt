@@ -1,0 +1,19 @@
+SET(scu_bus_b_vdp2_SRC
+  vdp2_init.c
+  vdp2_scrn_bm_format_set.c
+  vdp2_scrn_ch_color_set.c
+  vdp2_scrn_ch_format_set.c
+  vdp2_scrn_display_set.c
+  vdp2_scrn_priority_set.c
+  vdp2_scrn_rp_mode_set.c
+  vdp2_tvmd_dd_set.c
+  vdp2_tvmd_ed_set.c
+  vdp2_tvmd_vblank_status_get.c
+  vdp2_vram_cycle_pattern_set.c
+)
+
+SET(scu_bus_b_vdp2_INSTALL_FILES
+  vdp2.h
+  vdp2/scrn.h
+  vdp2/tvmd.h
+)

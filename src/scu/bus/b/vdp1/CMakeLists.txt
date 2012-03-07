@@ -1,0 +1,19 @@
+SET(scu_bus_b_vdp1_SRC
+  vdp1_fbcr_bpp_set.c
+  vdp1_fbcr_change_set.c
+  vdp1_fbcr_erase_coordinates_set.c
+  vdp1_fbcr_erase_set.c
+  vdp1_fbcr_erase_mode_set.c
+  vdp1_fbcr_interlace_set.c
+  vdp1_fbcr_rotate_set.c
+  vdp1_init.c
+  vdp1_ptmr_plot_draw_set.c
+  vdp1_ptmr_plot_idle_set.c
+)
+
+SET(scu_bus_b_vdp1_INSTALL_FILES
+  vdp1.h
+  vdp1/cmdt.h
+  vdp1/fbcr.h
+  vdp1/ptmr.h
+)
