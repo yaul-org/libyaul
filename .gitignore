@@ -1,2 +1,4 @@
 build/
+cscope/
+tmp/
 config.h.cmake
