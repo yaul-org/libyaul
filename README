@@ -4,6 +4,22 @@
 |__|__|_____|___  |___._|_____|__|
             |_____|
 
+AUTHORS
+  See AUTHORS
+
 INTRODUCTION
+  A SEGA Saturn programming library
+
+LICENSE
+  See LICENSE
 
 INSTALLATION
+  CMake ver. 2.6 (a Cross-Platform Makefile Generator) or greater is required
+  A working SH7604 cross-compiler toolchain is required
+
+  As a normal user
+    $ cd libyaul/
+    $ mkdir build
+    $ cd build/
+    $ cmake .. -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
+    $ make
