@@ -1,4 +1,5 @@
 SET(SRC_DIRS
+  common
   scu
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs2/cd-block
@@ -8,6 +9,8 @@ SET(SRC_DIRS
   scu/bus/cpu
   scu/bus/cpu/smpc
   scu/dsp
+  scu/dma
+  scu/ic
 )
 
 # Macro that prepends a given string onto the beginning of each string in a list.

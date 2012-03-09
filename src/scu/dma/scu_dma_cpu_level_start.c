@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <scu/dma.h>
+#include <dma/dma.h>
 
 #include "dma_internal.h"
 
@@ -25,5 +25,6 @@ scu_dma_cpu_level_start(enum dma_level lvl)
                 return;
         default:
                 /* Panic */
+                return;
         }
 }

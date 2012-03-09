@@ -27,4 +27,4 @@ extern void vdp1_fbcr_erase_set();
 extern void vdp1_fbcr_interlace_set(enum fbcr_interlace_type);
 extern void vdp1_fbcr_rotate_set(void);
 
-#endif
+#endif /* !_FBCR_H_ */

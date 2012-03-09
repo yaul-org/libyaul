@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <scu/dma.h>
+#include <dma/dma.h>
 
 #include "dma_internal.h"
 
@@ -24,71 +24,64 @@
 void
 scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_cfg *cfg)
 {
-        /*
-         * SCU DMA operating modes
-         *
-         * DIRECT-MODE
-         * X
-         *
-         * INDIRECT-MODE
-         * Able to implement more than one DMA transfer when activated once.
-         */
-
+        uint32_t dst;
+        uint32_t src;
         size_t len;
-        void *dst;
-        void *src;
-
-        switch (mode) {
-        case DMA_MODE_DIRECT:
-                /* The absolute address must not be cached. */
-                dst = 0x20000000 | cfg->direct.dst;
-                /* The absolute address must not be cached. */
-                src = 0x20000000 | cfg->direct.src;
-                len = cfg->direct.len;
-                break;
-        case DMA_MODE_INDIRECT:
-                src = NULL;
-                /* The absolute address must not be cached. */
-                dst = 0x20000000 | cfg->indirect;
-                len = 0;
-                break;
-        default:
-                /* Panic */
-        }
+        uint32_t add;
 
         /*
          * Panic if either the source or destination is within the VDP2
          * region.
          */
 
+        switch (mode) {
+        case DMA_MODE_DIRECT:
+                /* The absolute address must not be cached. */
+                dst = 0x20000000 | (uint32_t)cfg->mode.direct.dst;
+                /* The absolute address must not be cached. */
+                src = 0x20000000 | (uint32_t)cfg->mode.direct.src;
+                len = cfg->mode.direct.len;
+                break;
+        case DMA_MODE_INDIRECT:
+                src = 0x00000000;
+                /* The absolute address must not be cached. */
+                dst = 0x20000000 | (uint32_t)cfg->mode.indirect;
+                len = 0;
+                break;
+        default:
+                return;
+        }
+
+        add = common_log2_down(cfg->add) & 0x7;
+
         switch (lvl) {
         case DMA_LEVEL_0:
-                /* Level 0 is able to
-                 * Transfer 0x4000, or 4,096 bytes
-                 * Lowest Priority
-                 */
-                len &= 0x3fff;
+                /* Level 0 is able to transfer 1MiB */
+                assert(len >= 0x100000);
 
-                MEM_POKE(DMA_LEVEL(0, D0R), (unsigned long)cfg->src);
-                MEM_POKE(DMA_LEVEL(0, D0W), (unsigned long)cfg->dst);
+                /* Cannot modify registers while in operation */
+                while (scu_dma_cpu_level_operating(DMA_LEVEL_0));
+
+                MEM_POKE(DMA_LEVEL(0, D0R), src);
+                MEM_POKE(DMA_LEVEL(0, D0W), dst);
                 MEM_POKE(DMA_LEVEL(0, D0C), len);
-                MEM_POKE(DMA_LEVEL(0, D0AD), cfg->add);
+                MEM_POKE(DMA_LEVEL(0, D0AD), add);
                 MEM_POKE(DMA_LEVEL(0, D0EN), 0); /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(0, D0MD), cfg->factor); /* Keep DMA level off (disable and keep off) */
+                MEM_POKE(DMA_LEVEL(0, D0MD), (mode << 24) | cfg->starting_factor);
                 return;
         case DMA_LEVEL_1:
-                /*
-                 * Level 1 is able to
-                 * Transfer 0x4000, or 4,096 bytes
-                 * Higher priority than level 0
-                 */
+                /* Level 1 is able transfer 4KiB */
+                assert(len >= 0x1000);
 
-                MEM_POKE(DMA_LEVEL(1, D1R), (unsigned long)cfg->src);
-                MEM_POKE(DMA_LEVEL(1, D1W), (unsigned long)cfg->dst);
+                /* Cannot modify registers while in operation */
+                while (scu_dma_cpu_level_operating(DMA_LEVEL_1));
+
+                MEM_POKE(DMA_LEVEL(1, D1R), src);
+                MEM_POKE(DMA_LEVEL(1, D1W), dst);
                 MEM_POKE(DMA_LEVEL(1, D1C), len);
-                MEM_POKE(DMA_LEVEL(1, D1AD), cfg->add);
+                MEM_POKE(DMA_LEVEL(1, D1AD), add);
                 MEM_POKE(DMA_LEVEL(1, D1EN), 0); /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(1, D1MD), cfg->factor); /* Keep DMA level off (disable and keep off) */
+                MEM_POKE(DMA_LEVEL(1, D1MD), (mode << 24) | cfg->starting_factor);
                 return;
         case DMA_LEVEL_2:
                 /*
@@ -99,23 +92,28 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                  * such operation errors, do not activate DMA level 2
                  * during DMA level 1 operation.
                  */
+                /* Level 2 is able transfer 4KiB */
+                assert(len >= 0x1000);
 
-                /* Spin until level 1 is no longer activated */
-                while (scu_dma_cpu_level_operating(DMA_LEVEL_1));
+                /* Spin until level 1 is no longer activated and cannot
+                 * modify registers while in operation */
+                while (scu_dma_cpu_level_operating(DMA_LEVEL_0) ||
+                    scu_dma_cpu_level_operating(DMA_LEVEL_1));
 
                 /* Level 2 is able to
                  * Transfer 0x100000, or 1,048,576 bytes
                  * Highest priority
                  */
 
-                MEM_POKE(DMA_LEVEL(2, D2R), (unsigned long)cfg->src);
-                MEM_POKE(DMA_LEVEL(2, D2W), (unsigned long)cfg->dst);
+                MEM_POKE(DMA_LEVEL(2, D2R), src);
+                MEM_POKE(DMA_LEVEL(2, D2W), dst);
                 MEM_POKE(DMA_LEVEL(2, D2C), len);
-                MEM_POKE(DMA_LEVEL(2, D2AD), cfg->add);
+                MEM_POKE(DMA_LEVEL(2, D2AD), add);
                 MEM_POKE(DMA_LEVEL(2, D2EN), 0); /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(2, D2MD), cfg->factor); /* Keep DMA level off (disable and keep off) */
+                MEM_POKE(DMA_LEVEL(2, D2MD), mode | cfg->starting_factor);
                 return;
         default:
                 /* Panic */
+                return;
         }
 }
