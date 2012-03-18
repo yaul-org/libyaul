@@ -6,4 +6,4 @@ CONFIGURE_FILE(config.h.cmake config.h)
 
 SET(CMAKE_CONFIGURATION_TYPES Release)
 
-SUBDIRS(src)
+SUBDIRS(libyaul)
