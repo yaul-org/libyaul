@@ -2,7 +2,7 @@ PROJECT= dma
 AS= sh-elf-as
 AFLAGS+= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
 CC= sh-elf-gcc
-CFLAGS= -nostdlib -ansi -W -Wall -Wno-unused -m2 -mb -O2 -ffast-math -fomit-frame-pointer \
+CFLAGS= -nostdlib -ansi -W -Wall -Werror -Wno-unused -m2 -mb -O2 -ffast-math -fomit-frame-pointer \
 	-I../../../libyaul/common \
 	-I../../../libyaul/scu \
 	-I../../../libyaul/scu/bus/cpu \
@@ -23,7 +23,9 @@ OBJECTS= ../../../libyaul/common/crt0.o ../../../libyaul/common/crt0-init.o dma.
 .s:
 	${AS} ${AFLAGS} -o ${@} ${<}
 
-${PROJECT}.elf:${OBJECTS}
+all: clean ${PROJECT}.elf
+
+${PROJECT}.elf: ${OBJECTS}
 	${LD} ${LDFLAGS} -T ../../../libyaul/common/ldscripts/shelf.x ${?} -o ${@} -L../../../build/libyaul -lyaul
 	$(OB) -O binary ${@} ${PROJECT}.bin
 

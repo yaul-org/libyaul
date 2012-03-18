@@ -9,8 +9,8 @@
 #define _DMA_INTERNAL_H_
 
 /* Write and read directly to specified address. */
-#define MEM_POKE(x, y)  (*(volatile unsigned long *)(x) = (y))
-#define MEM_READ(x)     (*(volatile unsigned long *)(x))
+#define MEM_POKE(x, y)  (*(volatile uint32_t *)(x) = (y))
+#define MEM_READ(x)     (*(volatile uint32_t *)(x))
 
 /* Macros specific for processor. */
 #define DMA(x)          (0x25fe0000 + (x))

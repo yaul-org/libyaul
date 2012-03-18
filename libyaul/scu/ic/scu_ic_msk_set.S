@@ -10,11 +10,12 @@
 .GLOBAL _scu_ic_msk_set
 
 _scu_ic_msk_set:
-	MOV.L IMM_00,r1 ! 0x26000340
-	JMP @r1
-	NOP
+        MOV.L IMM_00,r2
+        MOV.L @r2,r2
+        JMP @r2
+        NOP
 
-.ALIGN 4
+.ALIGN 2
 
 IMM_00:
-	.LONG 0x060007b0
+        .LONG 0x26000340

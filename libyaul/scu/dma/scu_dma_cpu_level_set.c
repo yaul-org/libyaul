@@ -58,10 +58,10 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
         case DMA_LEVEL_0:
                 /* Highest priority */
                 /* Level 0 is able to transfer 1MiB */
-                assert(len >= 0x100000);
+                assert(len < 0x100000);
 
                 /* Cannot modify registers while in operation */
-                while (scu_dma_cpu_level_operating(DMA_LEVEL_0));
+                /* while (scu_dma_cpu_level_operating(DMA_LEVEL_0)); */
 
                 MEM_POKE(DMA_LEVEL(0, D0R), src);
                 MEM_POKE(DMA_LEVEL(0, D0W), dst);
@@ -72,7 +72,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 return;
         case DMA_LEVEL_1:
                 /* Level 1 is able transfer 4KiB */
-                assert(len >= 0x1000);
+                assert(len < 0x1000);
 
                 /* Cannot modify registers while in operation */
                 while (scu_dma_cpu_level_operating(DMA_LEVEL_1));
@@ -94,7 +94,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                  * during DMA level 1 operation.
                  */
                 /* Level 1 is able transfer 4KiB */
-                assert(len >= 0x1000);
+                assert(len < 0x1000);
 
                 /* Spin until level 1 is no longer activated and cannot
                  * modify registers while in operation */
