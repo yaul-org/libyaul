@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012
  * See LICENSE for details.
  *
- * Chilly Willy
+ * Joe Fenton <jlfenton65@gmail.com>
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
