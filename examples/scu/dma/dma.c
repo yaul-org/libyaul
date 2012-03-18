@@ -97,7 +97,7 @@ scu_dma_level_0(void)
 {
         struct dma_level_cfg cfg;
 
-        cfg.mode.direct.src = (void *)0x05c00000;
+        cfg.mode.direct.src = (void *)0x00200000;
         cfg.mode.direct.dst = (void *)0x05c00000;
         cfg.mode.direct.len = 0x1000;
         cfg.starting_factor = DMA_STRT_FACTOR_ENABLE;

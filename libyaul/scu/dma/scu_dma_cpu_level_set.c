@@ -52,7 +52,8 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 return;
         }
 
-        add = common_log2_down(cfg->add) & 0x7;
+        /* 4 bytes are added iff not accessing CS2 space on the A-bus. */
+        add = 0x100 | (common_log2_down(cfg->add) & 0x7);
 
         switch (lvl) {
         case DMA_LEVEL_0:
