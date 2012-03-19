@@ -29,4 +29,10 @@ vdp2_scrn_blcs_set(bool lcclmd, uint8_t bank, uint32_t offset, uint16_t *color)
                 return;
         }
         MEM_POKE(VRAM_BANK(bank, offset), *color);
+
+        /*
+         * Force display ON. If BDCLMD is set and DISP has never been
+         * set, the back screen will not display properly
+         */
+        MEM_POKE(VDP2(TVMD), MEM_READ(VDP2(TVMD)) | 0x8100);
 }

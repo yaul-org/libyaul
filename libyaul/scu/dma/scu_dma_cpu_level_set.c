@@ -62,7 +62,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 assert(len < 0x100000);
 
                 /* Cannot modify registers while in operation */
-                /* while (scu_dma_cpu_level_operating(DMA_LEVEL_0)); */
+                while (scu_dma_cpu_level_operating(DMA_LEVEL_0));
 
                 MEM_POKE(DMA_LEVEL(0, D0R), src);
                 MEM_POKE(DMA_LEVEL(0, D0W), dst);

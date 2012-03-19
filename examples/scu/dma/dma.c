@@ -44,7 +44,7 @@ main(void)
                 RGB(0, 0, 0)
         };
 
-        uint32_t mask;
+        uint16_t mask;
 
         vdp2_init();
         vdp2_tvmd_ed_set(); /* Turn display ON */

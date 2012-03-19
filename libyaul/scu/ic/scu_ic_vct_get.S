@@ -15,7 +15,7 @@ _scu_ic_vct_get:
         RTS
         NOP
 
-.ALIGN 4
+.ALIGN 2
 
 IMM_00:
         .LONG 0x26000304
