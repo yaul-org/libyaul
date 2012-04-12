@@ -12,5 +12,6 @@
 void
 vdp2_tvmd_ed_set(void)
 {
-	MEM_POKE(VDP2(TVMD), MEM_READ(VDP2(TVMD)) | 0x8000);
+        /* Make sure to wait for vertical-blank before enabling display */
+        MEM_POKE(VDP2(TVMD), MEM_READ(VDP2(TVMD)) | 0x8000);
 }

@@ -8,8 +8,10 @@
 #ifndef _TVMD_H_
 #define _TVMD_H_
 
+#include <stdbool.h>
+
 extern void vdp2_tvmd_dd_set(void);
 extern void vdp2_tvmd_ed_set(void);
-extern unsigned char vdp2_tvmd_vblank_status_get(void);
+extern bool vdp2_tvmd_vblank_status_get(void);
 
 #endif

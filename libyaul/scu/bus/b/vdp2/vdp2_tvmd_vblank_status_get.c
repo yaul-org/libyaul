@@ -9,7 +9,7 @@
 
 #include "vdp2_internal.h"
 
-unsigned char
+bool
 vdp2_tvmd_vblank_status_get(void)
 {
         return (MEM_READ(VDP2(TVSTAT)) & 0x8) >> 3;
