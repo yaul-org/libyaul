@@ -57,8 +57,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 return;
         }
 
-        add = 0x00000100 | cfg->add;
-        add = 0x0100 | (common_log2_down(cfg->add) & 0x7);
+        add = 0x00000100 | (common_log2_down(cfg->add) & 0x7);
 
         switch (lvl) {
         case DMA_LEVEL_0:
@@ -135,20 +134,20 @@ scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
                 uint32_t nelems; /* Upper bound of elements in a boundry */
                 uint32_t boundry; /* Actual byte boundry */
         } tbl_nboundries[] = {
-                {0x00000002, 0x0000001f},  {0x00000005, 0x0000003f},
-                {0x0000000a, 0x0000007f},  {0x00000015, 0x000000ff},
-                {0x0000002a, 0x000001ff},  {0x00000055, 0x000003ff},
-                {0x000000aa, 0x000007ff},  {0x00000155, 0x00000fff},
-                {0x000002aa, 0x00001fff},  {0x00000555, 0x00003fff},
-                {0x00000aaa, 0x00007fff},  {0x00001555, 0x0000ffff},
-                {0x00002aaa, 0x0001ffff},  {0x00005555, 0x0003ffff},
-                {0x0000aaaa, 0x0007ffff},  {0x00015555, 0x000fffff},
-                {0x0002aaaa, 0x001fffff},  {0x00055555, 0x003fffff},
-                {0x000aaaaa, 0x007fffff},  {0x00155555, 0x00ffffff},
-                {0x002aaaaa, 0x01ffffff},  {0x00555555, 0x03ffffff},
-                {0x00aaaaaa, 0x07ffffff},  {0x01555555, 0x0fffffff},
-                {0x02aaaaaa, 0x1fffffff},  {0x05555555, 0x3fffffff},
-                {0x0aaaaaaa, 0x7fffffff},  {0x15555555, 0xffffffff},
+                {0x00000002, 0x0000001F},  {0x00000005, 0x0000003F},
+                {0x0000000A, 0x0000007F},  {0x00000015, 0x000000FF},
+                {0x0000002A, 0x000001FF},  {0x00000055, 0x000003FF},
+                {0x000000AA, 0x000007FF},  {0x00000155, 0x00000FFF},
+                {0x000002AA, 0x00001FFF},  {0x00000555, 0x00003FFF},
+                {0x00000AAA, 0x00007FFF},  {0x00001555, 0x0000FFFF},
+                {0x00002AAA, 0x0001FFFF},  {0x00005555, 0x0003FFFF},
+                {0x0000AAAA, 0x0007FFFF},  {0x00015555, 0x000FFFFF},
+                {0x0002AAAA, 0x001FFFFF},  {0x00055555, 0x003FFFFF},
+                {0x000AAAAA, 0x007FFFFF},  {0x00155555, 0x00FFFFFF},
+                {0x002AAAAA, 0x01FFFFFF},  {0x00555555, 0x03FFFFFF},
+                {0x00AAAAAA, 0x07FFFFFF},  {0x01555555, 0x0FFFFFFF},
+                {0x02AAAAAA, 0x1FFFFFFF},  {0x05555555, 0x3FFFFFFF},
+                {0x0AAAAAAA, 0x7FFFFFFF},  {0x15555555, 0xFFFFFFFF},
                 {0x00000000, 0x00000000}
         };
 
