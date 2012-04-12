@@ -9,11 +9,6 @@
 
 #include "dma_internal.h"
 
-/*
- * Items related to the entire SCU DMA
- * 01 02 04 08 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 35
- */
-
 static int scu_dma_cpu_level_sanitize(struct dma_level_cfg *, enum dma_mode);
 
 /*
@@ -63,7 +58,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
         }
 
         add = 0x00000100 | cfg->add;
-        /* add = 0x0100 | (common_log2_down(cfg->add) & 0x7); */
+        add = 0x0100 | (common_log2_down(cfg->add) & 0x7);
 
         switch (lvl) {
         case DMA_LEVEL_0:
@@ -80,7 +75,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 MEM_POKE(DMA_LEVEL(0, D0AD), add);
                 /* Keep DMA level off (disable and keep off) */
                 MEM_POKE(DMA_LEVEL(0, D0EN), 0);
-                MEM_POKE(DMA_LEVEL(0, D0MD), (mode << 24) | cfg->starting_factor);
+                MEM_POKE(DMA_LEVEL(0, D0MD), (mode << 24) | cfg->starting_factor | cfg->update);
                 return;
         case DMA_LEVEL_1:
                 /* Level 1 is able transfer 4KiB */
@@ -95,7 +90,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 MEM_POKE(DMA_LEVEL(1, D1AD), add);
                 /* Keep DMA level off (disable and keep off) */
                 MEM_POKE(DMA_LEVEL(1, D1EN), 0x00000000);
-                MEM_POKE(DMA_LEVEL(1, D1MD), (mode << 24) | cfg->starting_factor);
+                MEM_POKE(DMA_LEVEL(1, D1MD), (mode << 24) | cfg->starting_factor | cfg->update);
                 return;
         case DMA_LEVEL_2:
                 /*
@@ -122,7 +117,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 MEM_POKE(DMA_LEVEL(2, D2AD), add);
                 /* Keep DMA level off (disable and keep off) */
                 MEM_POKE(DMA_LEVEL(2, D2EN), 0x00000000);
-                MEM_POKE(DMA_LEVEL(2, D2MD), (mode << 24) | cfg->starting_factor);
+                MEM_POKE(DMA_LEVEL(2, D2MD), (mode << 24) | cfg->starting_factor | cfg->update);
                 return;
         default:
                 return;
@@ -132,6 +127,10 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
 static int
 scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
 {
+        /*
+         * Items related to the entire SCU DMA
+         * 01 02 04 08 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 35
+         */
         struct {
                 uint32_t nelems; /* Upper bound of elements in a boundry */
                 uint32_t boundry; /* Actual byte boundry */
@@ -179,7 +178,8 @@ scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
                 src = (uint32_t)cfg->mode.direct.src & 0x0FFFFFFF;
                 dst = (uint32_t)cfg->mode.direct.dst & 0x0FFFFFFF;
 
-                if (((dst >= 0x00200000) && (dst <= 0x002FFFFF)) || /* WORKRAM-L */
+                if (((src >= 0x00200000) && (src <= 0x002FFFFF)) || /* WORKRAM-L */
+                    ((dst >= 0x00200000) && (dst <= 0x002FFFFF)) ||
                     ((src >= 0x05E00000) && (src <= 0x05FBFFFF)) || /* VDP2 area */
                     ((dst >= 0x02000000) && (dst <= 0x058FFFFF))) /* A-Bus CS0/1/dummy/2 regions */
                         return -1;
@@ -206,8 +206,9 @@ scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
                 }
                 return 0;
         default:
+                /* NOTREACHED */
                 break;
         }
 
-        return -1;
+        return 0;
 }
