@@ -38,6 +38,8 @@ enum dma_strt_factor_type {
         DMA_STRT_FACTOR_ENABLE
 };
 
+#define DMA_MODE_INDIRECT_END 0x8000000
+
 struct dma_level_cfg {
         union {
                 struct dma_mode_direct {
@@ -47,11 +49,13 @@ struct dma_level_cfg {
                 } direct;
 
                 struct dma_mode_indirect {
-                        void *dst;
-                        const void *src;
-                        size_t len:30;
-                        unsigned int end:1;
-                } __attribute ((__packed__)) *indirect;
+                        struct dma_mode_indirect_table {
+                                size_t len;
+                                void *dst;
+                                const void *src;
+                        } __attribute ((__packed__)) *tbl;
+                        uint32_t nelems;
+                } indirect;
         } mode;
 
         uint32_t add;
