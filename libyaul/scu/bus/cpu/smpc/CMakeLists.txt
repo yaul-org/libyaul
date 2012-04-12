@@ -1,4 +1,17 @@
 SET(scu_bus_cpu_smpc_SRC
+  smpc_cmd_cdoff_call.c
+  smpc_cmd_cdon_call.c
+  smpc_cmd_ckchg320_call.c
+  smpc_cmd_ckchg352_call.c
+  smpc_cmd_intback_call.c
+  smpc_cmd_nmireq_call.c
+  smpc_cmd_resdisa_call.c
+  smpc_cmd_resenab_call.c
+  smpc_cmd_sndoff_call.c
+  smpc_cmd_sndon_call.c
+  smpc_cmd_sshoff_call.c
+  smpc_cmd_sshon_call.c
+  smpc_cmd_sysres_call.c
   smpc_init.c
 )
 

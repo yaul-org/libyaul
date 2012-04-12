@@ -10,4 +10,8 @@
 void
 smpc_init(void)
 {
+        /* Set the "SMPC" control mode. */
+        MEM_POKE(DDR1, 0x00);
+        MEM_POKE(EXLE1, 0x00);
+        MEM_POKE(IOSEL1, 0x00);
 }
