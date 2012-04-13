@@ -17,27 +17,27 @@
 
 /*-
  * Parameter
- *      1. A string of zero or more decimal characters which represent a
+ *   1. A string of zero or more decimal characters which represent a
  *      single value. Leading zeroes are ignored. The decimal characters
  *      have a range of 0 (\60) to 9 (\71).
- *      2. The value so represented.
+ *   2. The value so represented.
  *
  * Numeric Parameter
- *      1. A parameter that represents a number, designated by Pn.
+ *   1. A parameter that represents a number, designated by Pn.
  *
  * Selective Parameter
- *      1. A parameter that selects a subfunction from a specified list
- *      of subfunctions, designated by Ps. In general, a control sequence
+ *   1. A parameter that selects a subfunction from a specified list of
+ *      subfunctions, designated by Ps. In general, a control sequence
  *      with more than one selective parameter causes the same effect as
- *      several control sequences, each with one selective
- *      parameter, e.g., CSI Psa; Psb; Psc F is identical
- *      to CSI Psa F CSI Psb F CSI Psc F.
+ *      several control sequences, each with one selective parameter,
+ *      e.g., CSI Psa; Psb; Psc F is identical to CSI Psa F CSI Psb F
+ *      CSI Psc F.
  *
  * Parameter String
- *      1. A string of parameters separated by a semicolon (\73).
+ *   1. A string of parameters separated by a semicolon (\73).
  *
  * Default
- *      1. A function-dependent value that is assumed when no explicit
+ *   1. A function-dependent value that is assumed when no explicit
  *      value, or a value of 0, is specified.
  */
 
@@ -86,7 +86,7 @@ cha_at_set(uint32_t param, struct cha *cha_opt)
                 CHA_AT_HIDDEN
         };
 
-        int tmp;
+        int color;
 
         switch (param) {
         case CHA_AT_RESET:
@@ -108,9 +108,9 @@ cha_at_set(uint32_t param, struct cha *cha_opt)
                 break;
         case CHA_AT_REVERSE:
                 /* Swap the colors. */
-                tmp = cha_opt->fg;
+                color = cha_opt->fg;
                 cha_opt->fg = cha_opt->bg;
-                cha_opt->bg = tmp;
+                cha_opt->bg = color;
                 break;
         case CHA_AT_HIDDEN:
                 cha_opt->fg = 0;
@@ -315,8 +315,10 @@ is_delimiter(char **buf, int *c)
 }
 
 int
-vt100_write(const char *s, mwrite write_to)
+vt100_write(write_hdl write_to, const char *s)
 {
+        struct cha cha_opt;
+
         int c;
         uint32_t i;
         uint32_t j;
@@ -326,10 +328,11 @@ vt100_write(const char *s, mwrite write_to)
         char *k;
         size_t len;
 
-        struct cha cha_opt;
-
         k = (char *)s;
         len = strlen(k);
+
+        if (write_to == NULL)
+                return 0;
 
         for (i = 0; (*k != '\0') && (i <= len); i++) {
                 if ((tag = is_csi(&k)) != CSI_ESC_INVALID) {
@@ -346,7 +349,7 @@ vt100_write(const char *s, mwrite write_to)
                                         k++;
                         }
                 } else
-                        write_to(*k++, &cha_opt, 0);
+                        write_to(*k++, &cha_opt);
         }
 
         return i;

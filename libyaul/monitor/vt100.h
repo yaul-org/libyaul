@@ -14,10 +14,8 @@ struct cha {
         bool is_trans;
 };
 
-#define TERM_TAB_WIDTH 4
+typedef void (*write_hdl)(int, struct cha *);
 
-typedef void (*mwrite)(int, struct cha *, int);
-
-extern int vt100_write(const char *, mwrite);
+extern int vt100_write(write_hdl, const char *);
 
 #endif /* !_SMPC_H_ */
