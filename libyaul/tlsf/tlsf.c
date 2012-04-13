@@ -29,13 +29,8 @@ enum tlsf_public
 /* Private constants: do not modify. */
 enum tlsf_private
 {
-#if defined (TLSF_64BIT)
-        /* All allocation sizes and addresses are aligned to 8 bytes. */
-        ALIGN_SIZE_LOG2 = 3,
-#else
         /* All allocation sizes and addresses are aligned to 4 bytes. */
         ALIGN_SIZE_LOG2 = 2,
-#endif
         ALIGN_SIZE = (1 << ALIGN_SIZE_LOG2),
 
         /*
@@ -49,15 +44,7 @@ enum tlsf_private
         ** blocks below that size into the 0th first-level list.
         */
 
-#if defined (TLSF_64BIT)
-        /*
-        ** TODO: We can increase this to support larger sizes, at the expense
-        ** of more overhead in the TLSF structure.
-        */
-        FL_INDEX_MAX = 32,
-#else
         FL_INDEX_MAX = 30,
-#endif
         SL_INDEX_COUNT = (1 << SL_INDEX_COUNT_LOG2),
         FL_INDEX_SHIFT = (SL_INDEX_COUNT_LOG2 + ALIGN_SIZE_LOG2),
         FL_INDEX_COUNT = (FL_INDEX_MAX - FL_INDEX_SHIFT + 1),
@@ -330,7 +317,7 @@ static void mapping_insert(size_t size, int* fli, int* sli)
         }
         else
         {
-                fl = tlsf_fls_sizet(size);
+                fl = tlsf_fls(size);
                 sl = tlsf_cast(int, size >> (fl - SL_INDEX_COUNT_LOG2)) ^ (1 << SL_INDEX_COUNT_LOG2);
                 fl -= (FL_INDEX_SHIFT - 1);
         }
@@ -343,7 +330,7 @@ static void mapping_search(size_t size, int* fli, int* sli)
 {
         if (size >= (1 << SL_INDEX_COUNT_LOG2))
         {
-                const size_t round = (1 << (tlsf_fls_sizet(size) - SL_INDEX_COUNT_LOG2)) - 1;
+                const size_t round = (1 << (tlsf_fls(size) - SL_INDEX_COUNT_LOG2)) - 1;
                 size += round;
         }
         mapping_insert(size, fli, sli);
@@ -631,6 +618,7 @@ static void integrity_walker(void* ptr, size_t size, int used, void* user)
         const size_t this_block_size = block_size(block);
 
         int status = 0;
+        used = used;
         tlsf_insist(integ->prev_status == this_prev_status && "prev status incorrect");
         tlsf_insist(size == this_block_size && "block size incorrect");
 
@@ -700,6 +688,10 @@ int tlsf_check_heap(tlsf_pool tlsf)
 
 static void default_walker(void* ptr, size_t size, int used, void* user)
 {
+        ptr = ptr;
+        size = size;
+        used = used;
+        user = user;
 }
 
 void tlsf_walk_heap(tlsf_pool pool, tlsf_walker walker, void* user)
@@ -768,15 +760,6 @@ tlsf_pool tlsf_create(void* mem, size_t bytes)
         rv += (tlsf_fls(0x80000008) == 31) ? 0 : 0x40;
         rv += (tlsf_fls(0x7FFFFFFF) == 30) ? 0 : 0x80;
 
-#if defined (TLSF_64BIT)
-        rv += (tlsf_fls_sizet(0x80000000) == 31) ? 0 : 0x100;
-        rv += (tlsf_fls_sizet(0x100000000) == 32) ? 0 : 0x200;
-        rv += (tlsf_fls_sizet(0xffffffffffffffff) == 63) ? 0 : 0x400;
-        if (rv)
-        {
-                return 0;
-        }
-#endif
 #endif
 
         if (pool_bytes < block_size_min || pool_bytes > block_size_max)
