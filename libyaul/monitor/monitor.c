@@ -10,9 +10,11 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <assert.h>
 
 #include <vdp2/cram.h>
 #include <vdp2/vram.h>
+#include <vdp2/pn.h>
 #include <vdp2.h>
 
 #include <monitor.h>
@@ -26,13 +28,13 @@
 #define TAB_WIDTH       2
 
 struct {
-        uint16_t *map[4];
-        uint32_t *tile;
+        uint16_t *pnt[4];
+        uint32_t *character;
 
         uint16_t col; /* Current column position in tile memory */
         uint16_t row; /* Current row position in tile memory */
 
-        uint32_t character;
+        uint32_t character_no;
         uint16_t x; /* Current column position in map memory */
         uint16_t y; /* Current row position in map memory */
 } info;
@@ -250,8 +252,9 @@ static const uint16_t palette[] = {
 
 static bool bounds(uint32_t);
 static uint32_t column(void);
-static void advance(uint16_t);
-static void draw(int, struct cha *, int);
+static void advance_row(uint16_t);
+static void advance_column(uint16_t);
+static void draw(int, struct cha *);
 static void map_init(void);
 static void newline(void);
 
@@ -271,30 +274,34 @@ monitor(int c, struct cha *cha_opt)
         int16_t tab;
 
         switch (c) {
-        case '\n':
+        case '\n': /* New line */
                 newline();
                 break;
-        case '\r':
-        case '\t':
+        case '\r': /* Form feed */
+                break;
+        case '\t': /* Horizontal tab */
                 tab = TAB_WIDTH;
                 if (bounds(TAB_WIDTH)) {
                         if ((tab = COLS - column() - 1) < 0)
                                 break;
                 }
 
-                advance(tab);
+                advance_column(tab);
+                break;
+        case '\v': /* Vertical tab */
+                advance_row(1);
                 break;
         default:
                 if (bounds(0))
                         newline();
 
-                draw(c, cha_opt, 1);
+                draw(c, cha_opt);
                 break;
         }
 }
 
 static void
-draw(int c, struct cha *cha_opt, int repeat)
+draw(int c, struct cha *cha_opt)
 {
         uint32_t c_off;
         uint32_t t_off;
@@ -310,25 +317,28 @@ draw(int c, struct cha *cha_opt, int repeat)
                 0xCCCCCCCC, 0xDDDDDDDD, 0xEEEEEEEE, 0xFFFFFFFF
         };
 
-        for (; repeat > 0; repeat--) {
-                t_off = c << 3;
-                c_off = info.col << 3;
-
-                /* Expand tile. */
-                for (y = FONT_H - 1; y >= 0; y--) {
-                        row = tile[font[y + t_off]];
-                        fg = color_tbl[cha_opt->fg];
-                        bg = color_tbl[cha_opt->bg];
-
-                        info.tile[y + c_off] = (row & fg) | ((row & bg) ^ bg);
-                }
-
-                info.map[0][info.x + (info.y << 6)] = info.character;
-                info.character++;
-
-                info.col++;
+        if (isspace(c) && (cha_opt->bg == BACKGROUND)) {
                 info.x++;
+                return;
         }
+
+        t_off = c << 3;
+        c_off = info.col << 3;
+
+        /* Expand tile. */
+        for (y = FONT_H - 1; y >= 0; y--) {
+                row = tile[font[y + t_off]];
+                fg = color_tbl[cha_opt->fg];
+                bg = color_tbl[cha_opt->bg];
+
+                info.character[y + c_off] = (row & fg) | ((row & bg) ^ bg);
+        }
+
+        info.pnt[0][info.x + (info.y << 6)] = PN_CHARACTER_NO((uint32_t)info.character) | info.character_no;
+        info.character_no++;
+
+        info.col++;
+        info.x++;
 }
 
 static void
@@ -339,29 +349,29 @@ map_init(void)
         uint32_t x;
         uint32_t y;
 
-        /* VRAM B0 */
-        info.tile = (uint32_t *)VRAM_BANK_4MBIT(2, 0x000000);
-        /* VRAM B0 */
-        info.map[0] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x018000);
-        /* VRAM B0 */
-        info.map[1] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x019000);
-        /* VRAM B0 */
-        info.map[2] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x01A000);
-        /* VRAM B0 */
-        info.map[3] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x01B000);
+        /* VRAM B1 */
+        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
+        /* VRAM B1 */
+        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
+        /* VRAM B1 */
+        info.pnt[2] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
+        /* VRAM B1 */
+        info.pnt[3] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
+        /* VRAM B1 */
+        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x1C000);
 
         cfg.ch_cs = 0;
         cfg.ch_pnds = 1; /* 1 word */
-        cfg.ch_cnsm = false;
-        cfg.ch_sp = false;
-        cfg.ch_scc = false;
+        cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
+        cfg.ch_sp = 0;
+        cfg.ch_scc = 0;
         cfg.ch_spn = 0;
-        cfg.ch_scn = 2; /* VRAM B0 */
+        cfg.ch_scn = (uint32_t)info.character; /* VRAM B0 */
         cfg.ch_pls = 0;
-        cfg.ch_map[0] = (uint32_t)info.map[0];
-        cfg.ch_map[1] = (uint32_t)info.map[1];
-        cfg.ch_map[2] = (uint32_t)info.map[2];
-        cfg.ch_map[3] = (uint32_t)info.map[3];
+        cfg.ch_map[0] = (uint32_t)info.pnt[0];
+        cfg.ch_map[1] = (uint32_t)info.pnt[1];
+        cfg.ch_map[2] = (uint32_t)info.pnt[2];
+        cfg.ch_map[3] = (uint32_t)info.pnt[3];
 
         vdp2_scrn_ch_color_set(SCRN_NBG2, SCRN_CHC_16);
         vdp2_scrn_ch_format_set(SCRN_NBG2, &cfg);
@@ -369,13 +379,13 @@ map_init(void)
 
         tmrs[0] = 0xFFFFFFFF;
         tmrs[1] = 0xFFFFFFFF;
-        tmrs[2] = 0xEEEEE662;
-        tmrs[3] = 0xFFFFFFFF;
+        tmrs[2] = 0xFFFFFFFF;
+        tmrs[3] = 0xEEEEE662;
 
         vdp2_vram_cycle_pattern_set(tmrs);
 
-        /* The first 'character' is reserved as whitespace */
-        info.character = 1;
+        /* The first character is reserved as whitespace */
+        info.character_no = 1;
 
         /* Wait until we can draw */
         while (vdp2_tvmd_vblank_status_get() == 0);
@@ -383,7 +393,7 @@ map_init(void)
 
         /* Clear the first tile */
         for (y = 0; y < FONT_H; y++)
-                info.tile[y] = tile[0];
+                info.character[y] = tile[0];
 
         info.col = 1;
         info.row = 0;
@@ -398,7 +408,7 @@ map_init(void)
         /* Clear map */
         for (y = 0; y < ROWS; y++) {
                 for (x = 0; x < COLS; x++)
-                        info.map[0][x + (y << 6)] = 0x0000;
+                        info.pnt[0][x + (y << 6)] = PN_CHARACTER_NO((uint32_t)info.character);
         }
 
         memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
@@ -413,7 +423,7 @@ map_init(void)
 static uint32_t
 column(void)
 {
-        return info.col - (info.row * COLS);
+        return info.x;
 }
 
 /*
@@ -423,6 +433,7 @@ column(void)
 static bool
 bounds(uint32_t x)
 {
+
         return (column() + x) >= COLS;
 }
 
@@ -432,21 +443,27 @@ bounds(uint32_t x)
 static void
 newline(void)
 {
-        info.col = (++info.row) * COLS;
 
-        info.character = info.col;
         info.x = 0;
         info.y++;
+}
+
+/*
+ * Advance an X amount of rows.
+ */
+static void
+advance_row(uint16_t x)
+{
+
+        info.y += x;
 }
 
 /*
  * Advance an X amount of columns.
  */
 static void
-advance(uint16_t x)
+advance_column(uint16_t x)
 {
-        info.col += x;
 
-        info.character = info.col;
         info.x += x;
 }
