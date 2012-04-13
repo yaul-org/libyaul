@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include <monitor/vt100.h>
+#include "vt100.h"
 
 void monitor_init(void);
 void monitor(int, struct cha *);

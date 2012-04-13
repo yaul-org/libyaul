@@ -258,10 +258,6 @@ void
 monitor_init(void)
 {
         memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
-
-        info.tile = (uint32_t *)VRAM_BANK_4MBIT(2, 0x000000);
-        info.map = (uint16_t *)VRAM_BANK_4MBIT(2, 0x018000);
-
         map_init();
 }
 
@@ -333,27 +329,30 @@ draw(int c, int repeat)
 static void
 map_init(void)
 {
-        struct scrn_ch_format c;
+        struct scrn_ch_format cfg;
         uint32_t tmrs[4];
         uint32_t x;
         uint32_t y;
         uint16_t nextline;
 
-        c.ch_cs = 0;
-        c.ch_pnds = 1; /* 1 word */
-        c.ch_cnsm = false;
-        c.ch_sp = false;
-        c.ch_scc = false;
-        c.ch_spn = 0;
-        c.ch_scn = 2; /* VRAM B0 */
-        c.ch_pls = 0;
-        c.ch_map[0] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        c.ch_map[1] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        c.ch_map[2] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        c.ch_map[3] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
+        info.tile = (uint32_t *)VRAM_BANK_4MBIT(2, 0x000000);
+        info.map = (uint16_t *)VRAM_BANK_4MBIT(2, 0x018000);
+
+        cfg.ch_cs = 0;
+        cfg.ch_pnds = 1; /* 1 word */
+        cfg.ch_cnsm = false;
+        cfg.ch_sp = false;
+        cfg.ch_scc = false;
+        cfg.ch_spn = 0;
+        cfg.ch_scn = 2; /* VRAM B0 */
+        cfg.ch_pls = 0;
+        cfg.ch_map[0] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
+        cfg.ch_map[1] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
+        cfg.ch_map[2] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
+        cfg.ch_map[3] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
 
         vdp2_scrn_ch_color_set(SCRN_NBG2, SCRN_CHC_16);
-        vdp2_scrn_ch_format_set(SCRN_NBG2, &c);
+        vdp2_scrn_ch_format_set(SCRN_NBG2, &cfg);
         vdp2_scrn_priority_set(SCRN_NBG2, 1);
 
         tmrs[0] = 0xFFFFFFFF;
