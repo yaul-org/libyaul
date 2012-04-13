@@ -243,7 +243,7 @@ static const uint32_t tile[] = {
         0x00FFFFFF, 0xF0FFFFFF, 0x0FFFFFFF, 0xFFFFFFFF
 };
 
-static const unsigned short palette[] = {
+static const uint16_t palette[] = {
         0x0000, 0x800F, 0x81E0, 0x81EF, 0xBC00, 0xBC0F, 0xBDE0, 0xBDEF,
         0x0000, 0x801F, 0x83E0, 0x83FF, 0xFC00, 0xFC1F, 0xFFE0, 0xFFFF
 };
@@ -258,6 +258,7 @@ static void newline(void);
 void
 monitor_init(void)
 {
+
         map_init();
 }
 
@@ -295,9 +296,9 @@ monitor(int c, struct cha *cha_opt)
 static void
 draw(int c, struct cha *cha_opt, int repeat)
 {
-        unsigned int c_off;
-        unsigned int t_off;
-        uint32_t cur_row;
+        uint32_t c_off;
+        uint32_t t_off;
+        uint32_t row;
         int y;
         uint32_t fg;
         uint32_t bg;
@@ -315,10 +316,11 @@ draw(int c, struct cha *cha_opt, int repeat)
 
                 /* Expand tile. */
                 for (y = FONT_H - 1; y >= 0; y--) {
-                        cur_row = tile[font[y + t_off]];
+                        row = tile[font[y + t_off]];
                         fg = color_tbl[cha_opt->fg];
                         bg = color_tbl[cha_opt->bg];
-                        info.tile[y + c_off] = (cur_row & fg) | ((cur_row & bg) ^ bg);
+
+                        info.tile[y + c_off] = (row & fg) | ((row & bg) ^ bg);
                 }
 
                 info.map[0][info.x + (info.y << 6)] = info.character;
@@ -401,6 +403,7 @@ map_init(void)
 
         memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
 
+        /* Hopefully it won't glitch */
         vdp2_scrn_display_set(SCRN_NBG2);
 }
 
@@ -415,7 +418,7 @@ column(void)
 
 /*
  * Return true if the current column position plus an X amount of
- * columns is out of bounds
+ * columns is out of bounds.
  */
 static bool
 bounds(uint32_t x)
@@ -423,21 +426,27 @@ bounds(uint32_t x)
         return (column() + x) >= COLS;
 }
 
+/*
+ * Move to a new row and reset the cursor back to the leftmost column.
+ */
 static void
 newline(void)
 {
-        info.col = (++info.row * COLS);
+        info.col = (++info.row) * COLS;
 
         info.character = info.col;
         info.x = 0;
         info.y++;
 }
 
+/*
+ * Advance an X amount of columns.
+ */
 static void
-advance(uint16_t amt)
+advance(uint16_t x)
 {
-        info.col += amt;
+        info.col += x;
 
         info.character = info.col;
-        info.x += amt;
+        info.x += x;
 }

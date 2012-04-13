@@ -13,6 +13,7 @@
 #define MEM_POKE(x, y)  (*(volatile uint8_t *)(x) = (y))
 #define MEM_READ(x)     (*(volatile uint8_t *)(x))
 
+/* Macros specific for processor. */
 #define IREG(x)         (0x20100001 + ((x) << 1))
 #define OREG(x)         (0x20100021 + ((x) << 1))
 #define SMPC(x)         (0x20100000 + (x))

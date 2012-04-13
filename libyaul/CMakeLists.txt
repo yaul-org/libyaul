@@ -1,6 +1,7 @@
 SET(SRC_DIRS
   common
   monitor
+  tlsf
   scu
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs2/cd-block

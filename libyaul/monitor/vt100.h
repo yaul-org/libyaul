@@ -12,8 +12,8 @@
 #define FOREGROUND      7
 
 struct cha {
-        int fg;
-        int bg;
+        uint8_t fg;
+        uint8_t bg;
         bool is_trans; /* Is it transparent */
 };
 
