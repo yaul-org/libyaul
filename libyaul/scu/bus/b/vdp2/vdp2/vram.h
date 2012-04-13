@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -13,4 +13,4 @@
 
 extern void vdp2_vram_cycle_pattern_set(unsigned long *);
 
-#endif
+#endif /* !_VRAM_H_ */

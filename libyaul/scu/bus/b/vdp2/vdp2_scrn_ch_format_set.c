@@ -26,19 +26,50 @@ comp_map(struct scrn_ch_format *c, unsigned short *b, unsigned short *p)
 static void
 comp_pnc(struct scrn_ch_format *c, enum scrn_type scrn)
 {
-        unsigned short pnc;
+        uint16_t pnc;
+        uint16_t scn;
 
         pnc = 0;
+        switch (c->ch_pnds) {
+        case 1:
+                /* Character number supplement mode */
+                switch (c->ch_cnsm) {
+                case 0:
+                        /* Auxiliary mode 0 */
 
-        if (c->ch_pnds == 1) {
-                pnc |= (c->ch_scn & 0x1f) << 0;
-                pnc |= (c->ch_spn & 0x7) << 5;
-                pnc |= (c->ch_scc & 0x1) << 8;
-                pnc |= (c->ch_sp & 0x1) << 9;
-                pnc |= (c->ch_cnsm & 0x1) << 14;
-                pnc |= 0x8000;
+                        /* Character number in pattern name data is
+                         * 10-bits. The flip function be used. */
+                        scn = 0x1F;
+                        break;
+                case 1:
+                        /* Auxiliary mode 1 */
+
+                        /* Character number in pattern name data is
+                         * 12-bits. The flip function cannot be used. */
+                        scn = 0x1C;
+                        pnc |= 0x4000;
+                        break;
+                default:
+                        scn = 0;
+                }
+                /* Calculate the supplementary character number from the
+                 * character lead address */
+                scn = (((c->ch_scn & 0xFFFFF) >> 5) >> 10) & scn;
+
+                pnc |= 0x8000 | /* Pattern name data size: 1-word */
+                    scn |
+                    /* Supplementary palette number */
+                    ((c->ch_spn & 0x07) << 5) |
+                    /* Special color calculation (for pattern name supplement data) */
+                    ((c->ch_scc & 0x01) << 8) |
+                    ((c->ch_sp & 0x01) << 9);
+                break;
+        case 2:
+                /* Pattern name data size: 2-words */
+                break;
         }
 
+        /* Write to memory. */
         MEM_POKE(VDP2(PNCN0 + scrn), pnc);
 }
 
@@ -51,25 +82,25 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         unsigned short i;
         unsigned short p;
 
-	/* Pattern Name Data Size */
+        /* Pattern Name Data Size */
         comp_pnc(c, scrn);
 
-	/* Map */
+        /* Map */
         comp_map(c, &b, &p);
 
         ab = (((c->ch_map[0] >> p) & b) << 8) | ((c->ch_map[1] >> p) & b);
         cd = (((c->ch_map[1] >> p) & b) << 8) | ((c->ch_map[2] >> p) & b);
 
         switch (scrn) {
-	case SCRN_RBG1:
+        case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Character Size */
                 vdp2_regs.chctla &= 0xfffe;
-                vdp2_regs.chctla |= (c->ch_cs & 0x1) << 0;
+                vdp2_regs.chctla |= c->ch_cs & 0x1;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xfffc;
-                vdp2_regs.plsz |= c->ch_pls << 0;
+                vdp2_regs.plsz |= c->ch_pls;
 
                 /* Write to memory. */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
@@ -94,7 +125,7 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         case SCRN_NBG2:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xfffe;
-                vdp2_regs.chctlb |= (c->ch_cs & 0x1) << 0;
+                vdp2_regs.chctlb |= c->ch_cs & 0x1;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xffcf;
@@ -147,7 +178,7 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 break;
-	default:
+        default:
                 break;
         }
 }
