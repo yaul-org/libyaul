@@ -8,10 +8,13 @@
 #ifndef _VT100_H_
 #define _VT100_H_
 
+#define BACKGROUND      0
+#define FOREGROUND      7
+
 struct cha {
         int fg;
         int bg;
-        bool is_trans;
+        bool is_trans; /* Is it transparent */
 };
 
 typedef void (*write_hdl)(int, struct cha *);

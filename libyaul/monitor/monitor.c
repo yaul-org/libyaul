@@ -17,9 +17,6 @@
 
 #include <monitor.h>
 
-#define BACKGROUND      0
-#define FOREGROUND      15
-
 #define FONT_H          8
 #define FONT_W          8
 
@@ -254,28 +251,23 @@ static const unsigned short palette[] = {
 static bool bounds(uint32_t);
 static uint32_t column(void);
 static void advance(uint16_t);
-static void draw(int, int);
+static void draw(int, struct cha *, int);
 static void map_init(void);
 static void newline(void);
 
 void
 monitor_init(void)
 {
-        /* The first 'character' is reserved as whitespace */
-        info.character = 1;
-
         map_init();
 }
 
 /*
- * The "driver" for info.
+ * The "driver" for the terminal.
  */
 void
-monitor(int c, struct cha *ch)
+monitor(int c, struct cha *cha_opt)
 {
         int16_t tab;
-
-        ch = ch;
 
         switch (c) {
         case '\n':
@@ -295,13 +287,13 @@ monitor(int c, struct cha *ch)
                 if (bounds(0))
                         newline();
 
-                draw(c, 1);
+                draw(c, cha_opt, 1);
                 break;
         }
 }
 
 static void
-draw(int c, int repeat)
+draw(int c, struct cha *cha_opt, int repeat)
 {
         unsigned int c_off;
         unsigned int t_off;
@@ -324,8 +316,8 @@ draw(int c, int repeat)
                 /* Expand tile. */
                 for (y = FONT_H - 1; y >= 0; y--) {
                         cur_row = tile[font[y + t_off]];
-                        fg = color_tbl[FOREGROUND];
-                        bg = color_tbl[BACKGROUND];
+                        fg = color_tbl[cha_opt->fg];
+                        bg = color_tbl[cha_opt->bg];
                         info.tile[y + c_off] = (cur_row & fg) | ((cur_row & bg) ^ bg);
                 }
 
@@ -379,6 +371,9 @@ map_init(void)
         tmrs[3] = 0xFFFFFFFF;
 
         vdp2_vram_cycle_pattern_set(tmrs);
+
+        /* The first 'character' is reserved as whitespace */
+        info.character = 1;
 
         /* Wait until we can draw */
         while (vdp2_tvmd_vblank_status_get() == 0);

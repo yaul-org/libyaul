@@ -41,9 +41,6 @@
  *      value, or a value of 0, is specified.
  */
 
-#define DEFAULT_FONT_BG 0
-#define DEFAULT_FONT_FG 7
-
 enum fc_23 {
         IND = 'D',      /* IND -- Index */
         NEL = 'E',      /* NEL -- Next Line */
@@ -260,8 +257,8 @@ is_tag_58_fc(char **buf, int tag, int *pn, size_t len, struct cha *cha_opt)
         case CHA:
                 (*buf)++;
                 /* ESC [ Ps;Ps;Ps;...;Ps m */
-                cha_opt->fg = DEFAULT_FONT_FG;
-                cha_opt->bg = DEFAULT_FONT_BG;
+                cha_opt->fg = FOREGROUND;
+                cha_opt->bg = BACKGROUND;
                 cha_opt->is_trans = true;
 
                 /* Obtain character attributes. */
@@ -275,7 +272,7 @@ is_tag_58_fc(char **buf, int tag, int *pn, size_t len, struct cha *cha_opt)
                 for (i = 0; i < len; i++)
                         cha_at_set(pn[i], cha_opt);
 
-                if ((cha_opt->bg & 0x7) != DEFAULT_FONT_BG)
+                if ((cha_opt->bg & 0x7) != BACKGROUND)
                         cha_opt->is_trans = false;
 
                 return true;
@@ -317,7 +314,11 @@ is_delimiter(char **buf, int *c)
 int
 vt100_write(write_hdl write_to, const char *s)
 {
-        struct cha cha_opt;
+        static struct cha cha_opt = {
+                FOREGROUND,
+                BACKGROUND,
+                false
+        };
 
         int c;
         uint32_t i;
