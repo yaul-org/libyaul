@@ -17,23 +17,27 @@
 
 #include <monitor.h>
 
-#define BACKGROUND      1
+#define BACKGROUND      0
 #define FOREGROUND      15
 
 #define FONT_H          8
 #define FONT_W          8
 
-/* Half the normal size, 80x25 should be used */ 
-#define ROWS            12
+/* Half the normal size, 80x25 should be used */
+#define ROWS            28
 #define COLS            40
 #define TAB_WIDTH       2
 
 struct {
-        uint16_t *map;
+        uint16_t *map[4];
         uint32_t *tile;
 
-        uint16_t col; /* Position in console; current column. */
-        uint16_t row; /* Position in console; current row. */
+        uint16_t col; /* Current column position in tile memory */
+        uint16_t row; /* Current row position in tile memory */
+
+        uint32_t character;
+        uint16_t x; /* Current column position in map memory */
+        uint16_t y; /* Current row position in map memory */
 } info;
 
 static const uint32_t font[] = {
@@ -257,7 +261,9 @@ static void newline(void);
 void
 monitor_init(void)
 {
-        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
+        /* The first 'character' is reserved as whitespace */
+        info.character = 1;
+
         map_init();
 }
 
@@ -307,8 +313,8 @@ draw(int c, int repeat)
         uint32_t color_tbl[] = {
                 0x00000000, 0x11111111, 0x22222222, 0x33333333,
                 0x44444444, 0x55555555, 0x66666666, 0x77777777,
-                0x88888888, 0x99999999, 0xaaaaaaaa, 0xbbbbbbbb,
-                0xcccccccc, 0xdddddddd, 0xeeeeeeee, 0xffffffff
+                0x88888888, 0x99999999, 0xAAAAAAAA, 0xBBBBBBBB,
+                0xCCCCCCCC, 0xDDDDDDDD, 0xEEEEEEEE, 0xFFFFFFFF
         };
 
         for (; repeat > 0; repeat--) {
@@ -322,7 +328,12 @@ draw(int c, int repeat)
                         bg = color_tbl[BACKGROUND];
                         info.tile[y + c_off] = (cur_row & fg) | ((cur_row & bg) ^ bg);
                 }
+
+                info.map[0][info.x + (info.y << 6)] = info.character;
+                info.character++;
+
                 info.col++;
+                info.x++;
         }
 }
 
@@ -333,10 +344,17 @@ map_init(void)
         uint32_t tmrs[4];
         uint32_t x;
         uint32_t y;
-        uint16_t nextline;
 
+        /* VRAM B0 */
         info.tile = (uint32_t *)VRAM_BANK_4MBIT(2, 0x000000);
-        info.map = (uint16_t *)VRAM_BANK_4MBIT(2, 0x018000);
+        /* VRAM B0 */
+        info.map[0] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x018000);
+        /* VRAM B0 */
+        info.map[1] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x019000);
+        /* VRAM B0 */
+        info.map[2] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x01A000);
+        /* VRAM B0 */
+        info.map[3] = (uint16_t *)VRAM_BANK_4MBIT(2, 0x01B000);
 
         cfg.ch_cs = 0;
         cfg.ch_pnds = 1; /* 1 word */
@@ -346,10 +364,10 @@ map_init(void)
         cfg.ch_spn = 0;
         cfg.ch_scn = 2; /* VRAM B0 */
         cfg.ch_pls = 0;
-        cfg.ch_map[0] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        cfg.ch_map[1] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        cfg.ch_map[2] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
-        cfg.ch_map[3] = VRAM_BANK_4MBIT(2, 0x018000); /* VRAM B0 */
+        cfg.ch_map[0] = (uint32_t)info.map[0];
+        cfg.ch_map[1] = (uint32_t)info.map[1];
+        cfg.ch_map[2] = (uint32_t)info.map[2];
+        cfg.ch_map[3] = (uint32_t)info.map[3];
 
         vdp2_scrn_ch_color_set(SCRN_NBG2, SCRN_CHC_16);
         vdp2_scrn_ch_format_set(SCRN_NBG2, &cfg);
@@ -362,15 +380,31 @@ map_init(void)
 
         vdp2_vram_cycle_pattern_set(tmrs);
 
-        nextline = 0;
-        for (y = 0, x = 0; y < 0x4000; y++, x++) {
-                if ((y > 0) && ((y % COLS) == 0)) {
-                        x = 0;
-                        nextline++;
-                }
+        /* Wait until we can draw */
+        while (vdp2_tvmd_vblank_status_get() == 0);
+        while (vdp2_tvmd_vblank_status_get());
 
-                info.map[x + (nextline << 6)] = y;
+        /* Clear the first tile */
+        for (y = 0; y < FONT_H; y++)
+                info.tile[y] = tile[0];
+
+        info.col = 1;
+        info.row = 0;
+
+        info.x = 0;
+        info.y = 0;
+
+        /* Wait until we can draw */
+        while (vdp2_tvmd_vblank_status_get() == 0);
+        while (vdp2_tvmd_vblank_status_get());
+
+        /* Clear map */
+        for (y = 0; y < ROWS; y++) {
+                for (x = 0; x < COLS; x++)
+                        info.map[0][x + (y << 6)] = 0x0000;
         }
+
+        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
 
         vdp2_scrn_display_set(SCRN_NBG2);
 }
@@ -398,10 +432,17 @@ static void
 newline(void)
 {
         info.col = (++info.row * COLS);
+
+        info.character = info.col;
+        info.x = 0;
+        info.y++;
 }
 
 static void
 advance(uint16_t amt)
 {
         info.col += amt;
+
+        info.character = info.col;
+        info.x += amt;
 }
