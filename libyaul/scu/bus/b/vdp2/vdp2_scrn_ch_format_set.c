@@ -60,7 +60,7 @@ pattern_name_control(struct scrn_ch_format *cfg)
 }
 
 void
-vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
+vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
 {
         uint16_t i;
         uint16_t pnc;
@@ -71,24 +71,24 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         uint16_t cd;
 
         /* Pattern name control */
-        pnc = pattern_name_control(c);
+        pnc = pattern_name_control(cfg);
 
         /* Calculate map value from map lead address */
         mapsz = 64 * 64 * 2; /* in bytes */
-        amt = common_log2_down((mapsz / c->ch_cs) * c->ch_pnds);
-        ab = ((c->ch_map[0] & 0xFFFFF) >> (amt - 8)) | ((c->ch_map[1] & 0xFFFFF) >> amt);
-        cd = ((c->ch_map[2] & 0xFFFFF) >> (amt - 8)) | ((c->ch_map[3] & 0xFFFFF) >> amt);
+        amt = common_log2_down((mapsz / cfg->ch_cs) * cfg->ch_pnds);
+        ab = ((cfg->ch_map[0] & 0xFFFFF) >> (amt - 8)) | ((cfg->ch_map[1] & 0xFFFFF) >> amt);
+        cd = ((cfg->ch_map[2] & 0xFFFFF) >> (amt - 8)) | ((cfg->ch_map[3] & 0xFFFFF) >> amt);
 
-        switch (scrn) {
+        switch (cfg->ch_scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Character size */
                 vdp2_regs.chctla &= 0xFFFE;
-                vdp2_regs.chctla |= c->ch_cs >> 2;
+                vdp2_regs.chctla |= cfg->ch_cs >> 2;
 
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFFC;
-                vdp2_regs.plsz |= c->ch_pls - 1;
+                vdp2_regs.plsz |= cfg->ch_pls - 1;
 
                 /* Write to memory. */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
@@ -100,11 +100,11 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         case SCRN_NBG1:
                 /* Character size */
                 vdp2_regs.chctla &= 0xFFEF;
-                vdp2_regs.chctla |= c->ch_cs << 6;
+                vdp2_regs.chctla |= cfg->ch_cs << 6;
 
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFF3;
-                vdp2_regs.plsz |= (c->ch_pls - 1) << 2;
+                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 2;
 
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
@@ -115,11 +115,11 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         case SCRN_NBG2:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFFE;
-                vdp2_regs.chctlb |= c->ch_cs >> 2;
+                vdp2_regs.chctlb |= cfg->ch_cs >> 2;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xFFCF;
-                vdp2_regs.plsz |= (c->ch_pls - 1) << 4;
+                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 4;
 
                 /* Write to memory. */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
@@ -131,11 +131,11 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         case SCRN_NBG3:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFEF;
-                vdp2_regs.chctlb |= c->ch_cs << 2;
+                vdp2_regs.chctlb |= cfg->ch_cs << 2;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xFF3F;
-                vdp2_regs.plsz |= (c->ch_pls - 1) << 6;
+                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
 
                 /* Write to memory. */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
@@ -147,20 +147,20 @@ vdp2_scrn_ch_format_set(enum scrn_type scrn, struct scrn_ch_format *c)
         case SCRN_RBG0:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xfeff;
-                vdp2_regs.chctlb |= (c->ch_cs & 0x1) << 8;
+                vdp2_regs.chctlb |= (cfg->ch_cs & 0x1) << 8;
 
                 /* Plane Size */
                 if ((vdp2_regs.rpmd & 0x1) == 0) {
                         /* Rotation Parameter A */
                         vdp2_regs.plsz &= 0xfcff;
-                        vdp2_regs.plsz |= (c->ch_pls - 1) << 8;
+                        vdp2_regs.plsz |= (cfg->ch_pls - 1) << 8;
 
                         for (i = 0; i < 0x10; i++)
                                 MEM_POKE(VDP2(MPABRA + i), ab);
                 } else {
                         /* Rotation Parameter B */
                         vdp2_regs.plsz &= 0xcfff;
-                        vdp2_regs.plsz |= (c->ch_pls - 1) << 12;
+                        vdp2_regs.plsz |= (cfg->ch_pls - 1) << 12;
 
                         for (i = 0; i < 0x10; i++)
                                 MEM_POKE(VDP2(MPABRB + i), ab);

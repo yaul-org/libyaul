@@ -37,7 +37,7 @@ BRA_00:
         MOV.L r1,@-r2
 BRA_01:
         /* Initializers */
-        MOV.L fini,r0
+        MOV.L init,r0
         JSR @r0
         NOP
         /* Enable interrupts */
