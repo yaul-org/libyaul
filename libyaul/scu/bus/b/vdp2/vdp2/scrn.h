@@ -43,16 +43,15 @@ struct scrn_bm_format {
 };
 
 struct scrn_ch_format {
-	unsigned char ch_cs;	/* Character size */
-	unsigned char ch_pnds;	/* Pattern name data size */
-	uint8_t ch_cnsm;        /* Character number supplementary mode */
-	unsigned char ch_sp;	/* Special priority */
-	unsigned char ch_scc;	/* Special color calculation */
-	unsigned char ch_spn;	/* Supplementary palette number */
-	uint32_t ch_scn;        /* Supplementary character number (lead addr.) */
-	unsigned char ch_pls;	/* Plane size */
-	uint32_t ch_map[4];     /* Map lead addresses */
-	unsigned long ch_ms;	/* Map size */
+        unsigned char ch_cs;	/* Character size: (1 * 1) or (2 * 2) cells */
+        unsigned char ch_pnds;	/* Pattern name data size: (1)-word or (2)-words */
+        uint8_t ch_cnsm;        /* Character number supplementary mode: mode (0) or mode (1) */
+        unsigned char ch_sp;	/* Special priority */
+        unsigned char ch_scc;	/* Special color calculation */
+        unsigned char ch_spn;	/* Supplementary palette number */
+        uint32_t ch_scn;        /* Supplementary character number (lead addr.) */
+        unsigned char ch_pls;	/* Plane size */
+        uint32_t ch_map[4];     /* Map lead addresses */
 };
 
 extern void vdp2_scrn_blcs_set(bool, uint8_t, uint32_t, uint16_t *);

@@ -255,14 +255,82 @@ static uint32_t column(void);
 static void advance_row(uint16_t);
 static void advance_column(uint16_t);
 static void draw(int, struct cha *);
-static void map_init(void);
 static void newline(void);
 
 void
 monitor_init(void)
 {
+        struct scrn_ch_format cfg;
+        uint32_t tmrs[4];
+        uint32_t x;
+        uint32_t y;
 
-        map_init();
+        /* VRAM B1 */
+        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        /* VRAM B1 */
+        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        /* VRAM B1 */
+        info.pnt[2] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        /* VRAM B1 */
+        info.pnt[3] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        /* VRAM B1 */
+        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x1C000);
+
+        cfg.ch_cs = 1 * 1; /* 1x1 cells */
+        cfg.ch_pnds = 1; /* 1 word */
+        cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
+        cfg.ch_sp = 0;
+        cfg.ch_scc = 0;
+        cfg.ch_spn = 0;
+        cfg.ch_scn = (uint32_t)info.character;
+        cfg.ch_pls = 2 * 2; /* 2x2 plane size */
+        cfg.ch_map[0] = (uint32_t)info.pnt[0];
+        cfg.ch_map[1] = (uint32_t)info.pnt[1];
+        cfg.ch_map[2] = (uint32_t)info.pnt[2];
+        cfg.ch_map[3] = (uint32_t)info.pnt[3];
+
+        vdp2_scrn_ch_color_set(SCRN_NBG2, SCRN_CHC_16);
+        vdp2_scrn_ch_format_set(SCRN_NBG2, &cfg);
+        vdp2_scrn_priority_set(SCRN_NBG2, 1);
+
+        tmrs[0] = 0xFFFFFFFF;
+        tmrs[1] = 0xFFFFFFFF;
+        tmrs[2] = 0xFFFFFFFF;
+        tmrs[3] = 0xEEEEE662;
+
+        vdp2_vram_cycle_pattern_set(tmrs);
+
+        /* The first character is reserved as whitespace */
+        info.character_no = 1;
+
+        /* Wait until we can draw */
+        while (vdp2_tvmd_vblank_status_get() == 0);
+        while (vdp2_tvmd_vblank_status_get());
+
+        /* Clear the first tile */
+        for (y = 0; y < FONT_H; y++)
+                info.character[y] = tile[0];
+
+        info.col = 1;
+        info.row = 0;
+
+        info.x = 0;
+        info.y = 0;
+
+        /* Wait until we can draw */
+        while (vdp2_tvmd_vblank_status_get() == 0);
+        while (vdp2_tvmd_vblank_status_get());
+
+        /* Clear map */
+        for (y = 0; y < ROWS; y++) {
+                for (x = 0; x < COLS; x++)
+                        info.pnt[0][x + (y << 6)] = PN_CHARACTER_NO((uint32_t)info.character);
+        }
+
+        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
+
+        /* Hopefully it won't glitch */
+        vdp2_scrn_display_set(SCRN_NBG2);
 }
 
 /*
@@ -339,82 +407,6 @@ draw(int c, struct cha *cha_opt)
 
         info.col++;
         info.x++;
-}
-
-static void
-map_init(void)
-{
-        struct scrn_ch_format cfg;
-        uint32_t tmrs[4];
-        uint32_t x;
-        uint32_t y;
-
-        /* VRAM B1 */
-        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
-        /* VRAM B1 */
-        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
-        /* VRAM B1 */
-        info.pnt[2] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
-        /* VRAM B1 */
-        info.pnt[3] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x1A000);
-        /* VRAM B1 */
-        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x1C000);
-
-        cfg.ch_cs = 0;
-        cfg.ch_pnds = 1; /* 1 word */
-        cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
-        cfg.ch_sp = 0;
-        cfg.ch_scc = 0;
-        cfg.ch_spn = 0;
-        cfg.ch_scn = (uint32_t)info.character; /* VRAM B0 */
-        cfg.ch_pls = 0;
-        cfg.ch_map[0] = (uint32_t)info.pnt[0];
-        cfg.ch_map[1] = (uint32_t)info.pnt[1];
-        cfg.ch_map[2] = (uint32_t)info.pnt[2];
-        cfg.ch_map[3] = (uint32_t)info.pnt[3];
-
-        vdp2_scrn_ch_color_set(SCRN_NBG2, SCRN_CHC_16);
-        vdp2_scrn_ch_format_set(SCRN_NBG2, &cfg);
-        vdp2_scrn_priority_set(SCRN_NBG2, 1);
-
-        tmrs[0] = 0xFFFFFFFF;
-        tmrs[1] = 0xFFFFFFFF;
-        tmrs[2] = 0xFFFFFFFF;
-        tmrs[3] = 0xEEEEE662;
-
-        vdp2_vram_cycle_pattern_set(tmrs);
-
-        /* The first character is reserved as whitespace */
-        info.character_no = 1;
-
-        /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
-
-        /* Clear the first tile */
-        for (y = 0; y < FONT_H; y++)
-                info.character[y] = tile[0];
-
-        info.col = 1;
-        info.row = 0;
-
-        info.x = 0;
-        info.y = 0;
-
-        /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
-
-        /* Clear map */
-        for (y = 0; y < ROWS; y++) {
-                for (x = 0; x < COLS; x++)
-                        info.pnt[0][x + (y << 6)] = PN_CHARACTER_NO((uint32_t)info.character);
-        }
-
-        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
-
-        /* Hopefully it won't glitch */
-        vdp2_scrn_display_set(SCRN_NBG2);
 }
 
 /*
