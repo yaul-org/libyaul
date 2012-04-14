@@ -19,28 +19,31 @@
 #define SMPC(x)         (0x20100000 + (x))
 
 enum smpc_regs_type {
-        COMREG = 0x01f,
+        COMREG = 0x01F,
         SR = 0x061,
         SF = 0x063,
         PDR1 = 0x075,
         PDR2 = 0x077,
         DDR1 = 0x079,
         DDR2 = 0x07b,
-        IOSEL1 = 0x07d,
-        IOSEL2 = 0x07d,
-        EXLE1 = 0x07f,
-        EXLE2 = 0x07f
+        IOSEL1 = 0x07D,
+        IOSEL2 = 0x07D,
+        EXLE1 = 0x07F,
+        EXLE2 = 0x07F
 };
 
 static inline void
 smpc_cmd_call(uint8_t cmd)
 {
-        /* Wait until the command has finished executing. */
+        /* Wait it's OK to continue */
         for (; (MEM_READ(SMPC(SF)) & 0x01) == 0x01; );
 
-        /* Execute the command. */
+        /* Execute the command */
         MEM_POKE(SMPC(SF), 0x01);
         MEM_POKE(SMPC(COMREG), cmd);
+
+        /* Wait until the command has finished executing */
+        for (; (MEM_READ(SMPC(SF)) & 0x01) == 0x01; );
 }
 
 #endif /* !_SMPC_INTERNAL_H_ */

@@ -10,9 +10,13 @@
 #include <string.h>
 
 #include <vdp2/tvmd.h>
+#include <vdp2/scrn.h>
+#include <vdp2.h>
 
 #include "exception.h"
 #include "monitor.h"
+
+#define BLCS_COL(x) (0x0001FFFE + (x))
 
 static void spin(void);
 static void format(struct cpu_registers *, const char *);
@@ -21,9 +25,7 @@ void __attribute__ ((noreturn))
 exception_handler_illegal_instruction(struct cpu_registers *regs)
 {
 
-        monitor_init();
         format(regs, "Illegal instruction");
-
         spin();
 }
 
@@ -31,9 +33,7 @@ void __attribute__ ((noreturn))
 exception_handler_illegal_slot(struct cpu_registers *regs)
 {
 
-        monitor_init();
         format(regs, "Illegal slot");
-
         spin();
 }
 
@@ -41,9 +41,7 @@ void __attribute__ ((noreturn))
 exception_handler_cpu_address_error(struct cpu_registers *regs)
 {
 
-        monitor_init();
         format(regs, "CPU address error");
-
         spin();
 }
 
@@ -51,9 +49,7 @@ void __attribute__ ((noreturn))
 exception_handler_dma_address_error(struct cpu_registers *regs)
 {
 
-        monitor_init();
         format(regs, "DMA address error");
-
         spin();
 }
 
@@ -70,6 +66,10 @@ static void
 format(struct cpu_registers *regs, const char *exception_name)
 {
         char buf[1024];
+
+        uint16_t blcs_color[] = {
+                0x80E0 /* Green */
+        };
 
         (void)sprintf(buf, "[01;44mException occurred:[00;00m\n\t[01;44m%s[00;00m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
@@ -97,5 +97,16 @@ format(struct cpu_registers *regs, const char *exception_name)
             (unsigned int)regs->r[9], (unsigned int)regs->macl,
             (unsigned int)regs->r[10], (unsigned int)regs->pr,
             (unsigned int)regs->pc);
+
+        /* Reset the VDP2 */
+        vdp2_init();
+        vdp2_tvmd_ed_set(); /* Turn display ON */
+        vdp2_scrn_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color);
+
+        monitor_init();
+
+        /* Wait until we can draw */
+        while (vdp2_tvmd_vblank_status_get() == 0);
+        while (vdp2_tvmd_vblank_status_get());
         vt100_write(monitor, buf);
 }
