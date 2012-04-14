@@ -10,5 +10,12 @@
 .GLOBAL _cpu_intc_vct_get
 
 _cpu_intc_vct_get:
-        RTS
-        STC vbr,r0
+        MOV.L IMM_00,r2
+        MOV.L @r2,r2
+        JMP @r2
+        NOP
+
+.ALIGN 2
+
+IMM_00:
+        .LONG 0x26000314

@@ -82,7 +82,8 @@ format(struct cpu_registers *regs, const char *exception_name)
             "\t r7 = 0x%08X  vbr = 0x%08X\n"
             "\t r8 = 0x%08X mach = 0x%08X\n"
             "\t r9 = 0x%08X macl = 0x%08X\n"
-            "\tr10 = 0x%08X   pr = 0x%08X",
+            "\tr10 = 0x%08X   pr = 0x%08X\n"
+            "                     pc = 0x%08X",
             exception_name,
             (unsigned int)regs->r[0], (unsigned int)regs->r[11],
             (unsigned int)regs->r[1], (unsigned int)regs->r[12],
@@ -94,6 +95,7 @@ format(struct cpu_registers *regs, const char *exception_name)
             (unsigned int)regs->r[7], (unsigned int)regs->vbr,
             (unsigned int)regs->r[8], (unsigned int)regs->mach,
             (unsigned int)regs->r[9], (unsigned int)regs->macl,
-            (unsigned int)regs->r[10], (unsigned int)regs->pr);
+            (unsigned int)regs->r[10], (unsigned int)regs->pr,
+            (unsigned int)regs->pc);
         vt100_write(monitor, buf);
 }

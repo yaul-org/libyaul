@@ -7,7 +7,6 @@
 
 .MACRO EXCEPTION_STUB handler
         STS.L pr, @-r15
-        STC.L sr, @-r15
         STC.L gbr, @-r15
         STC.L vbr, @-r15
         STS.L mach, @-r15
@@ -28,7 +27,7 @@
         MOV.L r1, @-r15
         MOV.L r0, @-r15
         MOV r15, r0
-        ADD #0x5C, r0           ! Restore the stack to what it was before
+        ADD #0x58, r0           ! Restore the stack to what it was before
         MOV.L r0, @-r15
         MOV r15, r4
         MOV.L \handler,r0

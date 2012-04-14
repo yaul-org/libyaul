@@ -14,7 +14,7 @@
 #include <bus/b/vdp2/vdp2.h>
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x1f) | (((g) & 0x1f)  << 5) | (((b) & 0x1f) << 10))
-#define BLCS_COL(x)     (0x0001fffe + (x))
+#define BLCS_COL(x)     (0x0001FFFE + (x))
 
 #define STATUS_ERROR       1
 #define STATUS_WAIT        2
@@ -66,7 +66,9 @@ main(void)
 
         dma_level[0]();
 
-        for (;;) {
+        while (true) {
+                while (vdp2_tvmd_vblank_status_get() == 0);
+                while (vdp2_tvmd_vblank_status_get());
         }
 
         return 0;
@@ -97,10 +99,10 @@ scu_dma_level_0(void)
 {
         struct dma_level_cfg cfg;
 
-        cfg.mode.direct.src = (void *)0x00200000;
+        cfg.mode.direct.src = (void *)0x06040000;
         cfg.mode.direct.dst = (void *)0x05c00000;
         cfg.mode.direct.len = 0x1000;
-        cfg.starting_factor = DMA_STRT_FACTOR_ENABLE;
+        cfg.starting_factor = DMA_MODE_START_FACTOR_ENABLE;
         cfg.add = 4;
 
         set_status(STATUS_WAIT);

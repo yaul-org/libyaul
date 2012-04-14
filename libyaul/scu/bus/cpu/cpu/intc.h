@@ -11,7 +11,9 @@
 extern unsigned char    cpu_intc_lvl_get(void);
 extern void             cpu_intc_lvl_set(unsigned char);
 extern unsigned long    cpu_intc_vct_get(void);
-extern void             cpu_intc_vct_set(unsigned long);
+extern void             cpu_intc_vct_set(unsigned long, unsigned long);
+extern unsigned long    cpu_intc_vct_base_get(void);
+extern void             cpu_intc_vct_base_set(unsigned long);
 extern void             cpu_intc_vct_enable(void);
 extern void             cpu_intc_vct_disable(void);
 

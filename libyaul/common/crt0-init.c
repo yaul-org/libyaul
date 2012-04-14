@@ -9,7 +9,7 @@
 #include <inttypes.h>
 
 #include <cpu/intc.h>
-#include <exceptions.h>
+#include <exception.h>
 
 typedef void (*function)(void);
 
