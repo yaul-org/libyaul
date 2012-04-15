@@ -61,11 +61,11 @@ enum tlsf_private
 #define tlsf_max(a, b)          ((a) > (b) ? (a) : (b))
 
 /*
-** Set assert macro, if it has not been provided by the user.
+ * Set assert macro, if it has not been provided by the user.
 */
-#if !defined (tlsf_assert)
+#ifndef tlsf_assert
 #define tlsf_assert assert
-#endif
+#endif /* !tlsf_assert */
 
 /*
 ** Static assertion mechanism.
@@ -239,7 +239,7 @@ static block_header_t* block_next(const block_header_t* block)
 {
         block_header_t* next = offset_to_block(block_to_ptr(block),
                 block_size(block) - block_header_overhead);
-        tlsf_assert(!block_is_last(block));
+        tlsf_assert(!block_is_last(block), "");
         return next;
 }
 
@@ -268,13 +268,13 @@ static void block_mark_as_used(block_header_t* block)
 
 static size_t align_up(size_t x, size_t align)
 {
-        tlsf_assert(0 == (align & (align - 1)) && "must align to a power of two");
+        tlsf_assert(0 == (align & (align - 1)), "must align to a power of two");
         return (x + (align - 1)) & ~(align - 1);
 }
 
 static size_t align_down(size_t x, size_t align)
 {
-        tlsf_assert(0 == (align & (align - 1)) && "must align to a power of two");
+        tlsf_assert(0 == (align & (align - 1)), "must align to a power of two");
         return x - (x & (align - 1));
 }
 
@@ -282,7 +282,7 @@ static void* align_ptr(const void* ptr, size_t align)
 {
         const tlsfptr_t aligned =
                 (tlsf_cast(tlsfptr_t, ptr) + (align - 1)) & ~(align - 1);
-        tlsf_assert(0 == (align & (align - 1)) && "must align to a power of two");
+        tlsf_assert(0 == (align & (align - 1)), "must align to a power of two");
         return tlsf_cast(void*, aligned);
 }
 
@@ -360,7 +360,7 @@ static block_header_t* search_suitable_block(pool_t* pool, int* fli, int* sli)
                 *fli = fl;
                 sl_map = pool->sl_bitmap[fl];
         }
-        tlsf_assert(sl_map && "internal error - second level bitmap is null");
+        tlsf_assert(sl_map, "internal error - second level bitmap is NULL");
         sl = tlsf_ffs(sl_map);
         *sli = sl;
 
@@ -373,8 +373,8 @@ static void remove_free_block(pool_t* pool, block_header_t* block, int fl, int s
 {
         block_header_t* prev = block->prev_free;
         block_header_t* next = block->next_free;
-        tlsf_assert(prev && "prev_free field can not be null");
-        tlsf_assert(next && "next_free field can not be null");
+        tlsf_assert(prev, "'prev_free' field can not be NULL");
+        tlsf_assert(next, "'next_free' field can not be NULL");
         next->prev_free = prev;
         prev->next_free = next;
 
@@ -401,14 +401,14 @@ static void remove_free_block(pool_t* pool, block_header_t* block, int fl, int s
 static void insert_free_block(pool_t* pool, block_header_t* block, int fl, int sl)
 {
         block_header_t* current = pool->blocks[fl][sl];
-        tlsf_assert(current && "free list cannot have a null entry");
-        tlsf_assert(block && "cannot insert a null entry into the free list");
+        tlsf_assert(current, "free list cannot have a NULL entry");
+        tlsf_assert(block, "cannot insert a NULL entry into the free list");
         block->next_free = current;
         block->prev_free = &pool->block_null;
         current->prev_free = block;
 
-        tlsf_assert(block_to_ptr(block) == align_ptr(block_to_ptr(block), ALIGN_SIZE)
-                && "block not aligned properly");
+        tlsf_assert(block_to_ptr(block) == align_ptr(block_to_ptr(block), ALIGN_SIZE),
+            "block not aligned properly");
         /*
         ** Insert the new block at the head of the list, and mark the first-
         ** and second-level bitmaps appropriately.
@@ -448,12 +448,12 @@ static block_header_t* block_split(block_header_t* block, size_t size)
 
         const size_t remain_size = block_size(block) - (size + block_header_overhead);
 
-        tlsf_assert(block_to_ptr(remaining) == align_ptr(block_to_ptr(remaining), ALIGN_SIZE)
-                && "remaining block not aligned properly");
+        tlsf_assert(block_to_ptr(remaining) == align_ptr(block_to_ptr(remaining), ALIGN_SIZE),
+            "remaining block not aligned properly");
 
-        tlsf_assert(block_size(block) == remain_size + size + block_header_overhead);
+        tlsf_assert(block_size(block) == remain_size + size + block_header_overhead, "");
         block_set_size(remaining, remain_size);
-        tlsf_assert(block_size(remaining) >= block_size_min && "block split with invalid size");
+        tlsf_assert(block_size(remaining) >= block_size_min, "block split with invalid size");
 
         block_set_size(block, size);
         block_mark_as_free(remaining);
@@ -464,7 +464,7 @@ static block_header_t* block_split(block_header_t* block, size_t size)
 /* Absorb a free block's storage into an adjacent previous free block. */
 static block_header_t* block_absorb(block_header_t* prev, block_header_t* block)
 {
-        tlsf_assert(!block_is_last(prev) && "previous block can't be last!");
+        tlsf_assert(!block_is_last(prev), "previous block can't be last!");
         /* Note: Leaves flags untouched. */
         prev->size += block_size(block) + block_header_overhead;
         block_link_next(prev);
@@ -477,8 +477,8 @@ static block_header_t* block_merge_prev(pool_t* pool, block_header_t* block)
         if (block_is_prev_free(block))
         {
                 block_header_t* prev = block_prev(block);
-                tlsf_assert(prev && "prev physical block can't be null");
-                tlsf_assert(block_is_free(prev) && "prev block is not free though marked as such");
+                tlsf_assert(prev, "prev physical block can't be NULL");
+                tlsf_assert(block_is_free(prev), "prev block is not free though marked as such");
                 block_remove(pool, prev);
                 block = block_absorb(prev, block);
         }
@@ -490,11 +490,11 @@ static block_header_t* block_merge_prev(pool_t* pool, block_header_t* block)
 static block_header_t* block_merge_next(pool_t* pool, block_header_t* block)
 {
         block_header_t* next = block_next(block);
-        tlsf_assert(next && "next physical block can't be null");
+        tlsf_assert(next, "next physical block can't be NULL");
 
         if (block_is_free(next))
         {
-                tlsf_assert(!block_is_last(block) && "previous block can't be last!");
+                tlsf_assert(!block_is_last(block), "previous block can't be last!");
                 block_remove(pool, next);
                 block = block_absorb(block, next);
         }
@@ -505,7 +505,7 @@ static block_header_t* block_merge_next(pool_t* pool, block_header_t* block)
 /* Trim any trailing block space off the end of a block, return to pool. */
 static void block_trim_free(pool_t* pool, block_header_t* block, size_t size)
 {
-        tlsf_assert(block_is_free(block) && "block must be free");
+        tlsf_assert(block_is_free(block), "block must be free");
         if (block_can_split(block, size))
         {
                 block_header_t* remaining_block = block_split(block, size);
@@ -518,7 +518,7 @@ static void block_trim_free(pool_t* pool, block_header_t* block, size_t size)
 /* Trim any trailing block space off the end of a used block, return to pool. */
 static void block_trim_used(pool_t* pool, block_header_t* block, size_t size)
 {
-        tlsf_assert(!block_is_free(block) && "block must be used");
+        tlsf_assert(!block_is_free(block), "block must be used");
         if (block_can_split(block, size))
         {
                 /* If the next block is free, we must coalesce. */
@@ -559,7 +559,7 @@ static block_header_t* block_locate_free(pool_t* pool, size_t size)
 
         if (block)
         {
-                tlsf_assert(block_size(block) >= size);
+                tlsf_assert(block_size(block) >= size, "");
                 remove_free_block(pool, block, fl, sl);
         }
 
@@ -607,7 +607,7 @@ typedef struct integrity_t
         int status;
 } integrity_t;
 
-#define tlsf_insist(x) { tlsf_assert(x); if (!(x)) { status--; } }
+#define tlsf_insist(x, s) { tlsf_assert(x, s); if (!(x)) { status--; } }
 
 static void integrity_walker(void* ptr, size_t size, int used, void* user)
 {
@@ -619,8 +619,8 @@ static void integrity_walker(void* ptr, size_t size, int used, void* user)
 
         int status = 0;
         used = used;
-        tlsf_insist(integ->prev_status == this_prev_status && "prev status incorrect");
-        tlsf_insist(size == this_block_size && "block size incorrect");
+        tlsf_insist(integ->prev_status == this_prev_status, "prev status incorrect");
+        tlsf_insist(size == this_block_size, "block size incorrect");
 
         integ->prev_status = this_status;
         integ->status += status;
@@ -652,30 +652,36 @@ int tlsf_check_heap(tlsf_pool tlsf)
                         /* Check that first- and second-level lists agree. */
                         if (!fl_map)
                         {
-                                tlsf_insist(!sl_map && "second-level map must be null");
+                                tlsf_insist(!sl_map, "second-level map must be null");
                         }
 
                         if (!sl_map)
                         {
-                                tlsf_insist(block == &pool->block_null && "block list must be null");
+                                tlsf_insist(block == &pool->block_null,
+                                    "block list must be null");
                                 continue;
                         }
 
                         /* Check that there is at least one free block. */
-                        tlsf_insist(sl_list && "no free blocks in second-level map");
-                        tlsf_insist(block != &pool->block_null && "block should not be null");
+                        tlsf_insist(sl_list, "no free blocks in second-level map");
+                        tlsf_insist(block != &pool->block_null, "block should not be NULL");
 
                         while (block != &pool->block_null)
                         {
                                 int fli, sli;
-                                tlsf_insist(block_is_free(block) && "block should be free");
-                                tlsf_insist(!block_is_prev_free(block) && "blocks should have coalesced");
-                                tlsf_insist(!block_is_free(block_next(block)) && "blocks should have coalesced");
-                                tlsf_insist(block_is_prev_free(block_next(block)) && "block should be free");
-                                tlsf_insist(block_size(block) >= block_size_min && "block not minimum size");
+                                tlsf_insist(block_is_free(block), "block should be free");
+                                tlsf_insist(!block_is_prev_free(block),
+                                    "blocks should have coalesced");
+                                tlsf_insist(!block_is_free(block_next(block)),
+                                    "blocks should have coalesced");
+                                tlsf_insist(block_is_prev_free(block_next(block)),
+                                    "block should be free");
+                                tlsf_insist(block_size(block) >= block_size_min,
+                                    "block not minimum size");
 
                                 mapping_insert(block_size(block), &fli, &sli);
-                                tlsf_insist(fli == i && sli == j && "block size indexed in wrong list");
+                                tlsf_insist((fli == i) && (sli == j),
+                                    "block size indexed in wrong list");
                                 block = block->next_free;
                         }
                 }
@@ -827,7 +833,8 @@ void* tlsf_memalign(tlsf_pool tlsf, size_t align, size_t size)
         block_header_t* block = block_locate_free(pool, aligned_size);
 
         /* This can't be a static assert. */
-        tlsf_assert(sizeof(block_header_t) == block_size_min + block_header_overhead);
+        tlsf_assert(sizeof(block_header_t) == block_size_min + block_header_overhead,
+            "");
 
         if (block)
         {
@@ -851,7 +858,7 @@ void* tlsf_memalign(tlsf_pool tlsf, size_t align, size_t size)
 
                 if (gap)
                 {
-                        tlsf_assert(gap >= gap_minimum && "gap size too small");
+                        tlsf_assert(gap >= gap_minimum, "gap size too small");
                         block = block_trim_free_leading(pool, block, gap);
                 }
         }
@@ -862,15 +869,16 @@ void* tlsf_memalign(tlsf_pool tlsf, size_t align, size_t size)
 void tlsf_free(tlsf_pool tlsf, void* ptr)
 {
         /* Don't attempt to free a NULL pointer. */
-        if (ptr)
-        {
-                pool_t* pool = tlsf_cast(pool_t*, tlsf);
-                block_header_t* block = block_from_ptr(ptr);
-                block_mark_as_free(block);
-                block = block_merge_prev(pool, block);
-                block = block_merge_next(pool, block);
-                block_insert(pool, block);
-        }
+        if (ptr == NULL)
+                return;
+
+        pool_t* pool = tlsf_cast(pool_t*, tlsf);
+        block_header_t* block = block_from_ptr(ptr);
+
+        block_mark_as_free(block);
+        block = block_merge_prev(pool, block);
+        block = block_merge_next(pool, block);
+        block_insert(pool, block);
 }
 
 /*
