@@ -17,4 +17,6 @@ SET(scu_bus_b_vdp2_INSTALL_FILES
   vdp2.h
   vdp2/scrn.h
   vdp2/tvmd.h
+  vdp2/vram.h
+  vdp2/cram.h
 )

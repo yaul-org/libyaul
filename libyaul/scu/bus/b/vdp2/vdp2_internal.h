@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -15,9 +15,9 @@
 #define MEM_READ(x)     (*(volatile uint16_t *)(x))
 
 /* Macros specific for processor. */
-#define VRAM_BANK(x, y) (0x25e00000 + (((x) & 0x3) << 18) + ((y) << 1))
-#define CRAM_BANK(x, y) (0x25f00000 + ((x) << 4) + ((y) << 1))
-#define VDP2(x)         (0x25f80000 + ((x) << 1))
+#define VRAM_BANK(x, y) (0x25E00000 + ((x) << 18) + ((y) << 1))
+#define CRAM_BANK(x, y) (0x25F00000 + ((x) << 4) + ((y) << 1))
+#define VDP2(x)         (0x25F80000 + ((x) << 1))
 
 enum vdp2_regs_type {
         TVMD,
@@ -167,10 +167,10 @@ enum vdp2_regs_type {
 };
 
 struct vdp2_regs {
-        unsigned short chctla;  /* Register Offset: 0x180028 */
-        unsigned short chctlb;  /* Register Offset: 0x18002a */
-        unsigned short plsz;    /* Register Offset: 0x18003a */
-        unsigned short rpmd;    /* Register Offset: 0x1800b0 */
+        uint16_t chctla; /* Register Offset: 0x180028 */
+        uint16_t chctlb; /* Register Offset: 0x18002A */
+        uint16_t plsz; /* Register Offset: 0x18003A */
+        uint16_t rpmd; /* Register Offset: 0x1800B0 */
 } vdp2_regs;
 
 #endif

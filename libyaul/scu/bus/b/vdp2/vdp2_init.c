@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -14,7 +14,6 @@
 void
 vdp2_init(void)
 {
-        uint16_t i;
 
         /* Initialize the processor to sane values. */
         MEM_POKE(VDP2(TVMD), 0x0000);
@@ -22,14 +21,14 @@ vdp2_init(void)
         /* RAM */
         /* Partition both VRAM bank A and B by default */
         MEM_POKE(VDP2(RAMCTL), 0x0300);
-        MEM_POKE(VDP2(CYCA0L), 0xffff);
-        MEM_POKE(VDP2(CYCA0U), 0xffff);
-        MEM_POKE(VDP2(CYCA1L), 0xffff);
-        MEM_POKE(VDP2(CYCA1U), 0xffff);
-        MEM_POKE(VDP2(CYCB0L), 0xffff);
-        MEM_POKE(VDP2(CYCB0U), 0xffff);
-        MEM_POKE(VDP2(CYCB1L), 0xffff);
-        MEM_POKE(VDP2(CYCB1U), 0xffff);
+        MEM_POKE(VDP2(CYCA0L), 0xFFFF);
+        MEM_POKE(VDP2(CYCA0U), 0xFFFF);
+        MEM_POKE(VDP2(CYCA1L), 0xFFFF);
+        MEM_POKE(VDP2(CYCA1U), 0xFFFF);
+        MEM_POKE(VDP2(CYCB0L), 0xFFFF);
+        MEM_POKE(VDP2(CYCB0U), 0xFFFF);
+        MEM_POKE(VDP2(CYCB1L), 0xFFFF);
+        MEM_POKE(VDP2(CYCB1U), 0xFFFF);
 
         /* Scroll screen */
         MEM_POKE(VDP2(BGON), 0x0000);
@@ -45,13 +44,14 @@ vdp2_init(void)
         MEM_POKE(VDP2(MPOFN), 0x0000);
         MEM_POKE(VDP2(MPOFR), 0x0000);
 
-        for (i = 0; i < 0x08; i++)
-                MEM_POKE(VDP2(MPABN0 + i), 0x0000);
-
-        for (i = 0; i < 0x10; i++) {
-                MEM_POKE(VDP2(MPABRA + i), 0x0000);
-                MEM_POKE(VDP2(MPABRB + i), 0x0000);
-        }
+        MEM_POKE(VDP2(MPABN0), 0x0000);
+        MEM_POKE(VDP2(MPCDN0), 0x0000);
+        MEM_POKE(VDP2(MPABN1), 0x0000);
+        MEM_POKE(VDP2(MPCDN1), 0x0000);
+        MEM_POKE(VDP2(MPABN2), 0x0000);
+        MEM_POKE(VDP2(MPCDN2), 0x0000);
+        MEM_POKE(VDP2(MPABN3), 0x0000);
+        MEM_POKE(VDP2(MPCDN3), 0x0000);
 
         MEM_POKE(VDP2(SCXIN0), 0x0000);
         MEM_POKE(VDP2(SCYIN0), 0x0000);
@@ -64,6 +64,23 @@ vdp2_init(void)
 
         /* Rotation scroll screen */
         MEM_POKE(VDP2(RPMD), 0x0000);
+
+        MEM_POKE(VDP2(MPABRA), 0x0000);
+        MEM_POKE(VDP2(MPCDRA), 0x0000);
+        MEM_POKE(VDP2(MPEFRA), 0x0000);
+        MEM_POKE(VDP2(MPGHRA), 0x0000);
+        MEM_POKE(VDP2(MPIJRA), 0x0000);
+        MEM_POKE(VDP2(MPKLRA), 0x0000);
+        MEM_POKE(VDP2(MPMNRA), 0x0000);
+        MEM_POKE(VDP2(MPOPRA), 0x0000);
+        MEM_POKE(VDP2(MPABRB), 0x0000);
+        MEM_POKE(VDP2(MPCDRB), 0x0000);
+        MEM_POKE(VDP2(MPEFRB), 0x0000);
+        MEM_POKE(VDP2(MPGHRB), 0x0000);
+        MEM_POKE(VDP2(MPIJRB), 0x0000);
+        MEM_POKE(VDP2(MPKLRB), 0x0000);
+        MEM_POKE(VDP2(MPMNRB), 0x0000);
+        MEM_POKE(VDP2(MPOPRB), 0x0000);
 
         /* Line screen */
         /* Back screen */
