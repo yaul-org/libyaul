@@ -305,8 +305,8 @@ monitor_init(void)
         info.character_no = 1;
 
         /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
+        vdp2_tvmd_vblank_in_wait();
+        vdp2_tvmd_vblank_out_wait();
 
         /* Clear the first tile */
         for (y = 0; y < FONT_H; y++)
@@ -319,8 +319,8 @@ monitor_init(void)
         info.y = 0;
 
         /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
+        vdp2_tvmd_vblank_in_wait();
+        vdp2_tvmd_vblank_out_wait();
 
         /* Clear map */
         for (y = 0; y < ROWS; y++) {

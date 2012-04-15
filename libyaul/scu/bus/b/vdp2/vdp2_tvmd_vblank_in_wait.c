@@ -9,8 +9,9 @@
 
 #include "vdp2_internal.h"
 
-bool
-vdp2_tvmd_vblank_status_get(void)
+void
+vdp2_tvmd_vblank_in_wait(void)
 {
-        return (MEM_READ(VDP2(TVSTAT)) & 0x8) >> 3;
+
+        for (; (MEM_READ(VDP2(TVSTAT)) & 0x0008) == 0x0000; );
 }

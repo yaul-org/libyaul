@@ -41,8 +41,8 @@ panic(const char *s, const char *cond, const char *file, uint32_t line, const ch
         monitor_init();
 
         /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
+        vdp2_tvmd_vblank_in_wait();
+        vdp2_tvmd_vblank_out_wait();
         vt100_write(monitor, buf);
 
         spin();
@@ -52,7 +52,7 @@ static void __attribute__ ((noreturn))
 spin(void)
 {
         while (true) {
-                while (vdp2_tvmd_vblank_status_get() == 0);
-                while (vdp2_tvmd_vblank_status_get());
+                vdp2_tvmd_vblank_in_wait();
+                vdp2_tvmd_vblank_out_wait();
         }
 }

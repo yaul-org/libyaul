@@ -9,7 +9,8 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_scrn_rp_mode_set.c
   vdp2_tvmd_dd_set.c
   vdp2_tvmd_ed_set.c
-  vdp2_tvmd_vblank_status_get.c
+  vdp2_tvmd_vblank_in_wait.c
+  vdp2_tvmd_vblank_out_wait.c
   vdp2_vram_cycle_pattern_set.c
 )
 

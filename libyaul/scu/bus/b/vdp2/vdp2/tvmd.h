@@ -13,5 +13,7 @@
 extern void vdp2_tvmd_dd_set(void);
 extern void vdp2_tvmd_ed_set(void);
 extern bool vdp2_tvmd_vblank_status_get(void);
+extern void vdp2_tvmd_vblank_in_wait(void);
+extern void vdp2_tvmd_vblank_out_wait(void);
 
 #endif

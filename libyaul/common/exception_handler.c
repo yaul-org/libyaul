@@ -57,8 +57,8 @@ static void __attribute__ ((noreturn))
 spin(void)
 {
         while (true) {
-                while (vdp2_tvmd_vblank_status_get() == 0);
-                while (vdp2_tvmd_vblank_status_get());
+                vdp2_tvmd_vblank_in_wait();
+                vdp2_tvmd_vblank_out_wait();
         }
 }
 
@@ -106,7 +106,7 @@ format(struct cpu_registers *regs, const char *exception_name)
         monitor_init();
 
         /* Wait until we can draw */
-        while (vdp2_tvmd_vblank_status_get() == 0);
-        while (vdp2_tvmd_vblank_status_get());
+        vdp2_tvmd_vblank_in_wait();
+        vdp2_tvmd_vblank_out_wait();
         vt100_write(monitor, buf);
 }
