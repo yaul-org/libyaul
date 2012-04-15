@@ -8,10 +8,10 @@
 #include "smpc_internal.h"
 
 uint8_t
-smpc_cmd_sshon_call(void)
+smpc_cmd_cdoff_call(void)
 {
-        /* Enable the "SH-2" slave CPU. */
-        smpc_cmd_call(0x02);
+        /* Disable the "SH-1" CD block. */
+        smpc_cmd_call(SMPC_SMC_CDOFF, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEM_READ(OREG(31));
 }

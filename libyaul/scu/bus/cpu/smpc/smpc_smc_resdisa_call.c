@@ -8,10 +8,10 @@
 #include "smpc_internal.h"
 
 uint8_t
-smpc_cmd_intback_call(void)
+smpc_cmd_resdisa_call(void)
 {
-        /* Retreive the SMPC status and peripheral data. */
-        smpc_cmd_call(0x10);
+        /* Disable the user from pressing the reset button. */
+        smpc_cmd_call(SMPC_SMC_RESDISA, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEM_READ(OREG(31));
 }

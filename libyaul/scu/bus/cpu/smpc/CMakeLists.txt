@@ -1,20 +1,27 @@
 SET(scu_bus_cpu_smpc_SRC
-  smpc_cmd_cdoff_call.c
-  smpc_cmd_cdon_call.c
-  smpc_cmd_ckchg320_call.c
-  smpc_cmd_ckchg352_call.c
-  smpc_cmd_intback_call.c
-  smpc_cmd_nmireq_call.c
-  smpc_cmd_resdisa_call.c
-  smpc_cmd_resenab_call.c
-  smpc_cmd_sndoff_call.c
-  smpc_cmd_sndon_call.c
-  smpc_cmd_sshoff_call.c
-  smpc_cmd_sshon_call.c
-  smpc_cmd_sysres_call.c
+  smpc_rtc_settime_call.c
+  smpc_smc_cdoff_call.c
+  smpc_smc_cdon_call.c
+  smpc_smc_ckchg320_call.c
+  smpc_smc_ckchg352_call.c
+  smpc_smc_intback_call.c
+  smpc_smc_mshon_call.c
+  smpc_smc_nmireq_call.c
+  smpc_smc_resdisa_call.c
+  smpc_smc_resenab_call.c
+  smpc_smc_setsmem_call.c
+  smpc_smc_sndoff_call.c
+  smpc_smc_sndon_call.c
+  smpc_smc_sshoff_call.c
+  smpc_smc_sshon_call.c
+  smpc_smc_sysres_call.c
+  smpc_peripheral_parse.c
+  smpc_peripheral_system_manger.c
   smpc_init.c
 )
 
 SET(scu_bus_cpu_smpc_INSTALL_FILES
   smpc.h
+  smpc/rtc.h
+  smpc/smc.h
 )

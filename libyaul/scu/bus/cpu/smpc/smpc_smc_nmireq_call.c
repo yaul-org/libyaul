@@ -8,10 +8,10 @@
 #include "smpc_internal.h"
 
 uint8_t
-smpc_cmd_cdon_call(void)
+smpc_cmd_nmireq_call(void)
 {
-	/* Enable the SH-1 CD block. */
-        smpc_cmd_call(0x08);
+        /* Send "NMI" request to master "SH-2." */
+        smpc_cmd_call(SMPC_SMC_NMIREQ, SMPC_CMD_ISSUE_TYPE_A, NULL);
 
         return MEM_READ(OREG(31));
 }

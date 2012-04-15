@@ -10,8 +10,9 @@
 uint8_t
 smpc_cmd_ckchg352_call(void)
 {
-        /* ??? */
-        smpc_cmd_call(0x0E);
+        /* Switch the SATURN system clock from 320 mode to 352 mode iff
+         * not called from slave "SH-2." */
+        smpc_cmd_call(SMPC_SMC_CKCHG352, SMPC_CMD_ISSUE_TYPE_A, NULL);
 
         return MEM_READ(OREG(31));
 }

@@ -8,10 +8,10 @@
 #include "smpc_internal.h"
 
 uint8_t
-smpc_cmd_sndon_call(void)
+smpc_cmd_cdon_call(void)
 {
-	/* Enable the "Motorola MC68EC000." */
-        smpc_cmd_call(0x06);
+        /* Enable the SH-1 CD block. */
+        smpc_cmd_call(SMPC_SMC_CDON, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEM_READ(OREG(31));
 }

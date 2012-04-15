@@ -8,10 +8,10 @@
 #include "smpc_internal.h"
 
 uint8_t
-smpc_cmd_resdisa_call(void)
+smpc_cmd_sshon_call(void)
 {
-        /* Disable the user from pressing the reset button. */
-        smpc_cmd_call(0x1A);
+        /* Enable the "SH-2" slave CPU iff not called from slave "SH-2." */
+        smpc_cmd_call(SMPC_SMC_SSHON, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEM_READ(OREG(31));
 }
