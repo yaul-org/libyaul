@@ -8,6 +8,8 @@
 #ifndef _IC_H_
 #define _IC_H_
 
+#include <inttypes.h>
+
 enum ic_vct_type {
         IC_VCT_VBLANK_IN = 0x40,        /* Interrupt Source: VDP2 */
         IC_VCT_VBLANK_OUT = 0x41,       /* Interrupt Source: VDP2 */
@@ -48,6 +50,6 @@ extern void             scu_ic_lvl_set(unsigned char);
 extern void             scu_ic_msk_chg(enum ic_msk_type, enum ic_msk_type);
 extern void             scu_ic_msk_set(enum ic_msk_type, enum ic_msk_type);
 extern unsigned long    scu_ic_vct_get(void);
-extern void             scu_ic_vct_set(enum ic_vct_type, void *);
+extern void             scu_ic_vct_set(enum ic_vct_type, void(*)(void));
 
 #endif /* !_IC_H_ */
