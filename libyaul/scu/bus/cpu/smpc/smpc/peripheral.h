@@ -22,7 +22,7 @@ struct smpc_peripheral_info {
         uint8_t port_no;
         uint8_t type;
         uint8_t size;
-        uint8_t data[MAX_PORT_DATA_SIZE]; /* Raw data */
+        uint8_t data[MAX_PORT_DATA_SIZE]; /* Peripheral data table */
 };
 
 struct smpc_peripheral {

@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <smpc/peripheral.h>
 
@@ -21,6 +22,9 @@ static void peripheral_children_fetch(struct smpc_peripheral_port *, uint8_t);
 static void peripheral_parent_add(struct smpc_peripheral_port *, uint8_t);
 static void peripheral_populate(struct smpc_peripheral_info *);
 static void port_build(struct smpc_peripheral_port *, uint8_t);
+static char *dump_registers(void);
+
+static uint8_t offset = 0;
 
 struct smpc_peripheral_port smpc_peripheral_port1;
 struct smpc_peripheral_port smpc_peripheral_port2;
@@ -72,13 +76,12 @@ port_status(void)
                         nconnected = 0;
 
                 offset++;
-                break;
+                return nconnected;
         default:
                 nconnected = 0;
                 offset++;
+                return nconnected;
         }
-
-        return nconnected;
 }
 
 static uint8_t
@@ -90,10 +93,11 @@ peripheral_data_size(void)
 static struct smpc_peripheral *
 peripheral_alloc(void)
 {
-        /* XXX Remove */
-        static struct smpc_peripheral entries[100];
-        static int entry_counter = 0;
-        return &entries[entry_counter++];
+        /* XXX Remove and replace with TLSF */
+        static struct smpc_peripheral peripheral[32];
+        static int count = 0;
+
+        return &peripheral[count++];
 }
 
 static void
@@ -101,12 +105,12 @@ peripheral_populate(struct smpc_peripheral_info *info)
 {
         uint8_t size;
 
-        if (!peripheral_type())
-                return;
+        /* Type cannot be invalid at this point */
+        assert((peripheral_type()), "invalid peripheral type");
 
         /* Non-extended size cannot exceed 15B */
         size = peripheral_data_size();
-        assert(size >= 15, "invalid size of peripheral");
+        assert(size <= 15, "invalid size of peripheral");
 
         /* XXX Not yet supported */
         assert(size > 0, "255B configuration header not yet supported");
@@ -123,6 +127,7 @@ peripheral_populate(struct smpc_peripheral_info *info)
         offset++;
 
         memcpy(info->data, PC_GET_DATA(offset), size);
+        offset += size;
 }
 
 static void
@@ -154,8 +159,10 @@ peripheral_children_fetch(struct smpc_peripheral_port *port, uint8_t nconnected)
         uint8_t total;
 
         if (nconnected < 2)
+                /* No children */
                 return;
 
+        /* XXX Initialize queue of children */
         TAILQ_INIT(port->children);
 
         for (total = nconnected; nconnected > 0; nconnected--) {
@@ -178,4 +185,47 @@ port_build(struct smpc_peripheral_port *port, uint8_t port_no)
         /* Build a list all the children peripherals */
         peripheral_parent_add(port, port_no);
         peripheral_children_fetch(port, nconnected);
+}
+
+static char * __attribute__ ((used))
+dump_registers(void)
+{
+        static char buf[2048];
+
+        /* XXX There's a nasty bug where half of the screen is corrupted */
+        (void)sprintf(buf, "\n\n"
+            " OREG[0] = 0x%02X OREG[16] = 0x%02X\n"
+            " OREG[1] = 0x%02X OREG[17] = 0x%02X\n"
+            " OREG[2] = 0x%02X OREG[18] = 0x%02X\n"
+            " OREG[3] = 0x%02X OREG[19] = 0x%02X\n"
+            " OREG[4] = 0x%02X OREG[20] = 0x%02X\n"
+            " OREG[5] = 0x%02X OREG[21] = 0x%02X\n"
+            " OREG[6] = 0x%02X OREG[22] = 0x%02X\n"
+            " OREG[7] = 0x%02X OREG[23] = 0x%02X\n"
+            " OREG[8] = 0x%02X OREG[24] = 0x%02X\n"
+            " OREG[9] = 0x%02X OREG[25] = 0x%02X\n"
+            "OREG[10] = 0x%02X OREG[26] = 0x%02X\n"
+            "OREG[11] = 0x%02X OREG[27] = 0x%02X\n"
+            "OREG[12] = 0x%02X OREG[28] = 0x%02X\n"
+            "OREG[13] = 0x%02X OREG[29] = 0x%02X\n"
+            "OREG[14] = 0x%02X OREG[30] = 0x%02X\n"
+            "OREG[15] = 0x%02X OREG[31] = 0x%02X\n",
+            OREG_GET(0), OREG_GET(16),
+            OREG_GET(1), OREG_GET(17),
+            OREG_GET(2), OREG_GET(18),
+            OREG_GET(3), OREG_GET(19),
+            OREG_GET(4), OREG_GET(20),
+            OREG_GET(5), OREG_GET(21),
+            OREG_GET(6), OREG_GET(22),
+            OREG_GET(7), OREG_GET(23),
+            OREG_GET(8), OREG_GET(24),
+            OREG_GET(9), OREG_GET(25),
+            OREG_GET(10), OREG_GET(26),
+            OREG_GET(11), OREG_GET(27),
+            OREG_GET(12), OREG_GET(28),
+            OREG_GET(13), OREG_GET(29),
+            OREG_GET(14), OREG_GET(30),
+            OREG_GET(15), OREG_GET(31));
+
+        return buf;
 }

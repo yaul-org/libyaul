@@ -119,7 +119,6 @@ smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
         return 0;
 }
 
-extern uint8_t offset;
 extern uint8_t oreg_buf[];
 
 #endif /* !_SMPC_INTERNAL_H_ */
