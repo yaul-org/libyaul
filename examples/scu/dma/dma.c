@@ -47,8 +47,8 @@ main(void)
         uint16_t mask;
 
         vdp2_init();
-        vdp2_tvmd_ed_set(); /* Turn display ON */
-        vdp2_scrn_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color);
+        vdp2_tvmd_display_set(); /* Turn display ON */
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color);
 
         scu_dma_cpu_init();
 
@@ -67,8 +67,8 @@ main(void)
         dma_level[0]();
 
         while (true) {
-                while (vdp2_tvmd_vblank_status_get() == 0);
-                while (vdp2_tvmd_vblank_status_get());
+                vdp2_vblank_in_wait();
+                vdp2_vblank_out_wait();
         }
 
         return 0;
@@ -85,7 +85,7 @@ set_status(int no)
                 RGB(0, 31, 0) /* Green */
         };
 
-        vdp2_scrn_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), &blcs_color[no]);
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), &blcs_color[no]);
 }
 
 static void

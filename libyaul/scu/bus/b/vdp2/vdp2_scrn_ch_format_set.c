@@ -89,7 +89,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFFFC;
                 vdp2_regs.plsz |= cfg->ch_pls - 1;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 MEM_POKE(VDP2(MPABN0), ab);
@@ -120,7 +120,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFFCF;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 4;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 MEM_POKE(VDP2(MPABN2), ab);
@@ -136,7 +136,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFF3F;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 MEM_POKE(VDP2(MPABN3), ab);
@@ -149,7 +149,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctlb |= cfg->ch_cs << 6;
 
                 /* Plane size */
-                if ((vdp2_regs.rpmd & 0x0001) == 0) {
+                if ((vdp2_regs.rpmd & 0x0001) == 0x000) {
                         /* Rotation Parameter A */
                         vdp2_regs.plsz &= 0xFCFF;
                         vdp2_regs.plsz |= (cfg->ch_pls - 1) << 8;
@@ -177,7 +177,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                         MEM_POKE(VDP2(MPOPRB), 0x0000);
                 }
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 MEM_POKE(VDP2(PNCN3), pnc);

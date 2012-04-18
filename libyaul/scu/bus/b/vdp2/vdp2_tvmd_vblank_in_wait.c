@@ -13,5 +13,7 @@ void
 vdp2_tvmd_vblank_in_wait(void)
 {
 
-        for (; (MEM_READ(VDP2(TVSTAT)) & 0x0008) == 0x0000; );
+        /* Spin if we're in VBLANK-OUT (scan). Wait for VBLANK-IN
+         * (retrace) */
+        for (; (MEM_READ(VDP2(TVSTAT)) & 0x0008) == 0; );
 }

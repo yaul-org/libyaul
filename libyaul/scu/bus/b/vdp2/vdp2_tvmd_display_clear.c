@@ -10,7 +10,12 @@
 #include "vdp2_internal.h"
 
 void
-vdp2_tvmd_dd_set(void)
+vdp2_tvmd_display_clear(void)
 {
-	MEM_POKE(VDP2(TVMD), MEM_READ(VDP2(TVMD)) & ~0x8000);
+        uint16_t tvmd;
+
+        tvmd = MEM_READ(VDP2(TVMD));
+        tvmd &= 0x7FFF;
+
+        MEM_POKE(VDP2(TVMD), tvmd);
 }

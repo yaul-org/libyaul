@@ -12,8 +12,8 @@
 void
 vdp2_scrn_rp_mode_set(enum scrn_rp_mode_type mode)
 {
-        vdp2_regs.rpmd &= 0xfffe;
-        vdp2_regs.rpmd |= mode << 0;
+        vdp2_regs.rpmd &= 0xFFFE;
+        vdp2_regs.rpmd |= mode;
 
         /* Write to memory. */
         MEM_POKE(VDP2(RPMD), vdp2_regs.rpmd);

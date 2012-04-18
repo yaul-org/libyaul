@@ -10,10 +10,12 @@
 #include "vdp2_internal.h"
 
 void
-vdp2_tvmd_vblank_out_wait(void)
+vdp2_tvmd_display_set(void)
 {
+        uint16_t tvmd;
 
-        /* Spin if we're in VBLANK-IN (retrace). Wait for VBLANK-OUT
-         * (scan) */
-        for (; MEM_READ(VDP2(TVSTAT)) & 0x0008; );
+        tvmd = MEM_READ(VDP2(TVMD));
+        tvmd |= 0x8000;
+
+        MEM_POKE(VDP2(TVMD), tvmd);
 }

@@ -10,8 +10,10 @@
 #include "vdp2_internal.h"
 
 void
-vdp2_tvmd_ed_set(void)
+vdp2_tvmd_hblank_in_wait(void)
 {
-        /* Make sure to wait for vertical-blank before enabling display */
-        MEM_POKE(VDP2(TVMD), MEM_READ(VDP2(TVMD)) | 0x8000);
+
+        /* Spin if we're in HBLANK-OUT (scan). Wait for HBLANK-IN
+         * (retrace) */
+        for (; (MEM_READ(VDP2(TVSTAT)) & 0x0004) == 0; );
 }

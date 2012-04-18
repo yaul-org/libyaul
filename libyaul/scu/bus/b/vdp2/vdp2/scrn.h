@@ -56,7 +56,6 @@ struct scrn_ch_format {
         uint32_t ch_map[4];     /* Map lead addresses */
 };
 
-extern void vdp2_scrn_blcs_set(bool, uint8_t, uint32_t, uint16_t *);
 extern void vdp2_scrn_bm_format_set(enum scrn_type, struct scrn_bm_format *);
 extern void vdp2_scrn_ch_color_set(enum scrn_type, enum scrn_ch_color_type);
 extern void vdp2_scrn_ch_format_set(struct scrn_ch_format *);
