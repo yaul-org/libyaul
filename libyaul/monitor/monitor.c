@@ -256,6 +256,7 @@ static void advance_row(uint16_t);
 static void advance_column(uint16_t);
 static void draw(int, struct cha *);
 static void newline(void);
+static void reset(void);
 
 void
 monitor_init(void)
@@ -265,16 +266,19 @@ monitor_init(void)
         uint32_t x;
         uint32_t y;
 
+        /* We want to be in VBLANK-IN (retrace) */
+        vdp2_tvmd_display_clear();
+
         /* VRAM B1 */
-        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x10000);
         /* VRAM B1 */
-        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x10000);
         /* VRAM B1 */
         info.pnt[2] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
         /* VRAM B1 */
         info.pnt[3] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
         /* VRAM B1 */
-        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x1C000);
+        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x00000);
 
         cfg.ch_scrn = SCRN_NBG2;
         cfg.ch_cs = 1 * 1; /* 1x1 cells */
@@ -284,7 +288,7 @@ monitor_init(void)
         cfg.ch_scc = 0;
         cfg.ch_spn = 0;
         cfg.ch_scn = (uint32_t)info.character;
-        cfg.ch_pls = 1 * 1; /* 1x1 plane size */
+        cfg.ch_pls = 2 * 2; /* 1x1 plane size */
         cfg.ch_map[0] = (uint32_t)info.pnt[0];
         cfg.ch_map[1] = (uint32_t)info.pnt[1];
         cfg.ch_map[2] = (uint32_t)info.pnt[2];
@@ -304,10 +308,6 @@ monitor_init(void)
         /* The first character is reserved as whitespace */
         info.character_no = 1;
 
-        /* Wait until we can draw */
-        vdp2_tvmd_vblank_in_wait();
-        vdp2_tvmd_vblank_out_wait();
-
         /* Clear the first tile */
         for (y = 0; y < FONT_H; y++)
                 info.character[y] = tile[0];
@@ -317,10 +317,6 @@ monitor_init(void)
 
         info.x = 0;
         info.y = 0;
-
-        /* Wait until we can draw */
-        vdp2_tvmd_vblank_in_wait();
-        vdp2_tvmd_vblank_out_wait();
 
         /* Clear map */
         for (y = 0; y < ROWS; y++) {
@@ -332,6 +328,7 @@ monitor_init(void)
 
         /* Hopefully it won't glitch */
         vdp2_scrn_display_set(SCRN_NBG2);
+        vdp2_tvmd_display_set();
 }
 
 /*
@@ -343,6 +340,9 @@ monitor(int c, struct cha *cha_opt)
         int16_t tab;
 
         switch (c) {
+        case '\a':
+                reset();
+                break;
         case '\n': /* New line */
                 newline();
                 break;
@@ -439,6 +439,20 @@ newline(void)
 
         info.x = 0;
         info.y++;
+}
+
+/*
+ * Reset the terminal.
+ */
+static void
+reset(void)
+{
+        info.x = 0;
+        info.y = 0;
+
+        info.col = 1;
+        info.row = 0;
+        info.character_no = 1;
 }
 
 /*
