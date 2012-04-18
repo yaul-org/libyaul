@@ -122,6 +122,7 @@ peripheral_alloc(void)
 static void
 peripheral_populate(struct smpc_peripheral_info *info)
 {
+        uint8_t *data;
         uint8_t size;
 
         /* Type cannot be invalid at this point */
@@ -145,6 +146,8 @@ peripheral_populate(struct smpc_peripheral_info *info)
         info->size = size;
         offset++;
 
+        data = &info->data[size];
+        memset(data, 0xFF, MAX_PORT_DATA_SIZE - size);
         memcpy(info->data, PC_GET_DATA(offset), size);
         offset += size;
 }

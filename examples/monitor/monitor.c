@@ -46,18 +46,62 @@ main(void)
                 vdp2_tvmd_vblank_out_wait();
                 smpc_peripheral_parse();
 
-                sprintf(buf,
-                    "PORT: %d       PORT: %d\n"
-                    "TYPE: 0x%02X    TYPE: 0x%02X\n"
-                    "SIZE: %dB      SIZE: %dB\n"
-                    "DATA[0]: 0x%02X DATA[0]: 0x%02X\n"
-                    "DATA[1]: 0x%02X DATA[1]: 0x%02X\a",
-                    smpc_peripheral_port1.info.port_no, smpc_peripheral_port2.info.port_no,
-                    smpc_peripheral_port1.info.type, smpc_peripheral_port2.info.type,
-                    smpc_peripheral_port1.info.size, smpc_peripheral_port2.info.size,
-                    smpc_peripheral_port1.info.data[0], smpc_peripheral_port2.info.data[0],
-                    smpc_peripheral_port1.info.data[1], smpc_peripheral_port2.info.data[1]);
-                vt100_write(monitor, buf);
+                (void)sprintf(buf,
+                    "PORT: %d        PORT: %d\n"
+                    "TYPE: 0x%02X     TYPE: 0x%02X\n"
+                    "SIZE: %dB       SIZE: %dB\n"
+                    "DATA[ 0]: 0x%02X DATA[ 0]: 0x%02X\n"
+                    "DATA[ 1]: 0x%02X DATA[ 1]: 0x%02X\n"
+                    "DATA[ 2]: 0x%02X DATA[ 2]: 0x%02X\n"
+                    "DATA[ 3]: 0x%02X DATA[ 3]: 0x%02X\n"
+                    "DATA[ 4]: 0x%02X DATA[ 4]: 0x%02X\n"
+                    "DATA[ 5]: 0x%02X DATA[ 5]: 0x%02X\n"
+                    "DATA[ 6]: 0x%02X DATA[ 6]: 0x%02X\n"
+                    "DATA[ 7]: 0x%02X DATA[ 7]: 0x%02X\n"
+                    "DATA[ 8]: 0x%02X DATA[ 8]: 0x%02X\n"
+                    "DATA[ 9]: 0x%02X DATA[ 9]: 0x%02X\n"
+                    "DATA[10]: 0x%02X DATA[10]: 0x%02X\n"
+                    "DATA[11]: 0x%02X DATA[11]: 0x%02X\n"
+                    "DATA[12]: 0x%02X DATA[12]: 0x%02X\n"
+                    "DATA[13]: 0x%02X DATA[13]: 0x%02X\n"
+                    "DATA[14]: 0x%02X DATA[14]: 0x%02X\a",
+                    smpc_peripheral_port1.info.port_no,
+                    smpc_peripheral_port2.info.port_no,
+                    smpc_peripheral_port1.info.type,
+                    smpc_peripheral_port2.info.type,
+                    smpc_peripheral_port1.info.size,
+                    smpc_peripheral_port2.info.size,
+                    smpc_peripheral_port1.info.data[0],
+                    smpc_peripheral_port2.info.data[0],
+                    smpc_peripheral_port1.info.data[1],
+                    smpc_peripheral_port2.info.data[1],
+                    smpc_peripheral_port1.info.data[2],
+                    smpc_peripheral_port2.info.data[2],
+                    smpc_peripheral_port1.info.data[3],
+                    smpc_peripheral_port2.info.data[3],
+                    smpc_peripheral_port1.info.data[4],
+                    smpc_peripheral_port2.info.data[4],
+                    smpc_peripheral_port1.info.data[5],
+                    smpc_peripheral_port2.info.data[5],
+                    smpc_peripheral_port1.info.data[6],
+                    smpc_peripheral_port2.info.data[6],
+                    smpc_peripheral_port1.info.data[7],
+                    smpc_peripheral_port2.info.data[7],
+                    smpc_peripheral_port1.info.data[8],
+                    smpc_peripheral_port2.info.data[8],
+                    smpc_peripheral_port1.info.data[9],
+                    smpc_peripheral_port2.info.data[9],
+                    smpc_peripheral_port1.info.data[10],
+                    smpc_peripheral_port2.info.data[10],
+                    smpc_peripheral_port1.info.data[11],
+                    smpc_peripheral_port2.info.data[11],
+                    smpc_peripheral_port1.info.data[12],
+                    smpc_peripheral_port2.info.data[12],
+                    smpc_peripheral_port1.info.data[13],
+                    smpc_peripheral_port2.info.data[13],
+                    smpc_peripheral_port1.info.data[14],
+                    smpc_peripheral_port2.info.data[14]);
+                    vt100_write(monitor, buf);
         }
 
         return 0;
