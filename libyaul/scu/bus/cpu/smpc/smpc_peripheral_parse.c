@@ -13,6 +13,24 @@
 
 #include "smpc_internal.h"
 
+#define	ID_UNCONNECTED  0xFF
+#define	ID_MD3B         0xE1
+#define	ID_MD6B         0xE2
+#define	ID_MDMOUSE      0xE3
+#define	ID_DIGITAL      0x02
+#define	ID_RACING       0x13
+#define	ID_ANALOG       0x15
+#define	ID_MOUSE        0x23
+#define	ID_KEYBOARD     0x34
+#define	ID_GUN          0xFA
+
+#define	TYPE_DIGITAL    0x00
+#define	TYPE_ANALOG     0x10
+#define	TYPE_POINTER    0x20
+#define	TYPE_KEYBOARD   0x30
+#define	TYPE_MD         0xE0
+#define	TYPE_UNKNOWN	0xF0
+
 static bool peripheral_type(void);
 static struct smpc_peripheral *peripheral_alloc(void);
 static uint8_t peripheral_data_size(void);
@@ -24,7 +42,7 @@ static void peripheral_populate(struct smpc_peripheral_info *);
 static void port_build(struct smpc_peripheral_port *, uint8_t);
 static char *dump_registers(void);
 
-static uint8_t offset = 0;
+uint8_t offset = 0;
 
 struct smpc_peripheral_port smpc_peripheral_port1;
 struct smpc_peripheral_port smpc_peripheral_port2;
@@ -76,12 +94,13 @@ port_status(void)
                         nconnected = 0;
 
                 offset++;
-                return nconnected;
+                break;
         default:
                 nconnected = 0;
                 offset++;
-                return nconnected;
         }
+
+        return nconnected;
 }
 
 static uint8_t
