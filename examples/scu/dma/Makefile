@@ -3,9 +3,11 @@ AS= sh-elf-as
 AFLAGS+= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
 CC= sh-elf-gcc
 CFLAGS= -nostdlib -ansi -W -Wall -Werror -Wno-unused -m2 -mb -O2 -ffast-math -fomit-frame-pointer \
+	-I../../../libyaul \
 	-I../../../libyaul/common \
 	-I../../../libyaul/scu \
 	-I../../../libyaul/scu/bus/cpu \
+	-I../../../libyaul/scu/bus/cpu/smpc \
 	-I../../../libyaul/scu/bus/b/vdp1 \
 	-I../../../libyaul/scu/bus/b/vdp2
 LD= sh-elf-gcc

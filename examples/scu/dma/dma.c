@@ -10,29 +10,62 @@
 #include <ic/ic.h>
 #include <bus/cpu/cpu.h>
 #include <dma/dma.h>
-#include <bus/b/vdp1/vdp1.h>
+
 #include <bus/b/vdp2/vdp2.h>
+#include <bus/b/vdp2/vdp2/tvmd.h>
+#include <smpc.h>
+#include <smpc/smc.h>
+#include <smpc/peripheral.h>
+
+#include <monitor/monitor.h>
+
+#include <stdio.h>
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x1f) | (((g) & 0x1f)  << 5) | (((b) & 0x1f) << 10))
 #define BLCS_COL(x)     (0x0001FFFE + (x))
 
-#define STATUS_ERROR       1
-#define STATUS_WAIT        2
-#define STATUS_WARNING     3
-#define STATUS_OK          4
+static struct {
+        bool st_begin;
+#define ST_STATUS_WAIT          0
+#define ST_STATUS_END           1
+#define ST_STATUS_ILLEGAL       2
+        int st_status;
+#define ST_LEVEL_0              0
+#define ST_LEVEL_1              1
+#define ST_LEVEL_2              2
+        struct {
+#define ST_LEVEL_SF_DISABLE     0
+#define ST_LEVEL_SF_ENABLE      1
+#define ST_LEVEL_SF_VBLANK_IN   2
+#define ST_LEVEL_SF_VBLANK_OUT  3
+#define ST_LEVEL_SF_HBLANK_IN   4
+                int level_sf;
 
-static void scu_dma_level_0(void);
-static void scu_dma_level_1(void);
-static void scu_dma_level_2(void);
-
-static void (*dma_level[])(void) = {
-        scu_dma_level_0,
-        scu_dma_level_1,
-        scu_dma_level_2
+#define ST_LEVEL_MODE_DIRECT    0
+#define ST_LEVEL_MODE_INDIRECT  1
+                int level_mode;
+        } st_level[3];
+} state = {
+        .st_begin = false,
+        .st_status = ST_STATUS_WAIT,
+        .st_level = {
+                {
+                        .level_sf = ST_LEVEL_SF_DISABLE,
+                        .level_mode = ST_LEVEL_MODE_DIRECT
+                }, {
+                        .level_sf = ST_LEVEL_SF_DISABLE,
+                        .level_mode = ST_LEVEL_MODE_DIRECT
+                }, {
+                        .level_sf = ST_LEVEL_SF_DISABLE,
+                        .level_mode = ST_LEVEL_MODE_DIRECT
+                }
+        }
 };
 
-static void set_status(int);
+static void display_menu(void);
+
 static void scu_dma_illegal(void);
+static void scu_dma_level(int);
 static void scu_dma_level_0_end(void);
 static void scu_dma_level_1_end(void);
 static void scu_dma_level_2_end(void);
@@ -41,16 +74,22 @@ int
 main(void)
 {
         uint16_t blcs_color[] = {
-                RGB(0, 0, 0)
+                RGB(0, 7, 7)
         };
 
         uint16_t mask;
 
+        struct smpc_peripheral_digital *port1;
+        int level;
+
         vdp2_init();
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color);
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color, 0);
 
+        smpc_init();
         scu_dma_cpu_init();
+
+        monitor_init();
 
         mask = IC_MSK_LEVEL_0_DMA_END | IC_MSK_LEVEL_1_DMA_END | IC_MSK_LEVEL_2_DMA_END | IC_MSK_DMA_ILLEGAL;
         /* Disable interrupts */
@@ -64,38 +103,103 @@ main(void)
         /* Enable interrupts */
         cpu_intc_vct_enable();
 
-        dma_level[0]();
+        port1 = (struct smpc_peripheral_digital *)&smpc_peripheral_port1.info;
 
         while (true) {
-                vdp2_vblank_in_wait();
-                vdp2_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
+                smpc_smc_intback_call(0x00, 0x0A);
+                vdp2_tvmd_vblank_out_wait();
+                smpc_peripheral_parse();
+
+                if (!state.st_begin) {
+                        if (!port1->connected)
+                                continue;
+
+                        display_menu();
+
+                        if (!port1->button.a_trg)
+                                level = ST_LEVEL_0;
+                        else if (!port1->button.b_trg)
+                                level = ST_LEVEL_1;
+                        else if (!port1->button.c_trg)
+                                level = ST_LEVEL_2;
+                        else if (!port1->button.start) {
+                                state.st_begin = true;
+                                continue;
+                        } else {
+                                level = -1;
+                                continue;
+                        }
+
+                        if (!port1->button.l_trg)
+                                state.st_level[level].level_mode = ST_LEVEL_MODE_DIRECT;
+                        else if (!port1->button.r_trg)
+                                state.st_level[level].level_mode = ST_LEVEL_MODE_INDIRECT;
+                        else if (!port1->button.x_trg)
+                                state.st_level[level].level_sf = ST_LEVEL_SF_VBLANK_IN;
+                        else if (!port1->button.y_trg)
+                                state.st_level[level].level_sf = ST_LEVEL_SF_VBLANK_OUT;
+                        else if (!port1->button.z_trg)
+                                state.st_level[level].level_sf = ST_LEVEL_SF_HBLANK_IN;
+                        else
+                                state.st_level[level].level_sf = ST_LEVEL_SF_ENABLE;
+
+                        continue;
+                }
+
+                scu_dma_level(level);
+
+                switch (state.st_status) {
+                case ST_STATUS_WAIT:
+                        continue;
+                case ST_STATUS_ILLEGAL:
+                        assert(state.st_status != ST_STATUS_ILLEGAL,
+                            "SCU DMA transfer failed");
+                        continue;
+                case ST_STATUS_END:
+                        state.st_begin = true;
+                        state.st_status = ST_STATUS_WAIT;
+                        break;
+                }
         }
 
         return 0;
 }
 
 static void
-set_status(int no)
-{
-        static uint16_t blcs_color[] = {
-                RGB(0, 0, 0), /* Black */
-                RGB(31, 0, 0), /* Red */
-                RGB(31, 15, 0), /* Orange */
-                RGB(31, 31, 0), /* Yellow */
-                RGB(0, 31, 0) /* Green */
-        };
-
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), &blcs_color[no]);
-}
-
-static void
 scu_dma_illegal(void)
 {
-        set_status(STATUS_ERROR);
 }
 
 static void
-scu_dma_level_0(void)
+display_menu(void)
+{
+        /* Menu */
+        vt100_write(monitor, "SCU DMA Level 0\n"
+            "\tA+L - Mode: Direct\n"
+            "\tA+R - Mode: Indirect\n"
+            "\tA+X - SF: VBLANK-IN\n"
+            "\tA+Y - SF: VBLANK-OUT\n"
+            "\tA+Z - SF: HBLANK-IN\n"
+            "\n"
+            "SCU DMA Level 1\n"
+            "\tB+L - Mode: Direct\n"
+            "\tB+R - Mode: Indirect\n"
+            "\tB+X - SF: VBLANK-IN\n"
+            "\tB+Y - SF: VBLANK-OUT\n"
+            "\tB+Z - SF: HBLANK-IN\n"
+            "\n"
+            "SCU DMA Level 2\n"
+            "\tC+L - Mode: Direct\n"
+            "\tC+R - Mode: Indirect\n"
+            "\tC+X - SF: VBLANK-IN\n"
+            "\tC+Y - SF: VBLANK-OUT\n"
+            "\tC+Z - SF: HBLANK-IN\n"
+            "\a");
+}
+
+static void
+scu_dma_level(int level)
 {
         struct dma_level_cfg cfg;
 
@@ -105,7 +209,6 @@ scu_dma_level_0(void)
         cfg.starting_factor = DMA_MODE_START_FACTOR_ENABLE;
         cfg.add = 4;
 
-        set_status(STATUS_WAIT);
         scu_dma_cpu_level_set(DMA_LEVEL_0, DMA_MODE_DIRECT, &cfg);
         scu_dma_cpu_level_start(DMA_LEVEL_0);
 }
@@ -113,29 +216,20 @@ scu_dma_level_0(void)
 static void
 scu_dma_level_0_end(void)
 {
-        set_status(STATUS_OK);
-}
 
-static void
-scu_dma_level_1(void)
-{
-        set_status(STATUS_WAIT);
+        state.st_status = ST_STATUS_END;
 }
 
 static void
 scu_dma_level_1_end(void)
 {
-        set_status(STATUS_OK);
-}
 
-static void
-scu_dma_level_2(void)
-{
-        set_status(STATUS_WAIT);
+        state.st_status = ST_STATUS_END;
 }
 
 static void
 scu_dma_level_2_end(void)
 {
-        set_status(STATUS_OK);
+
+        state.st_status = ST_STATUS_END;
 }
