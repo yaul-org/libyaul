@@ -15,6 +15,7 @@ SET(scu_bus_cpu_smpc_SRC
   smpc_smc_sshoff_call.c
   smpc_smc_sshon_call.c
   smpc_smc_sysres_call.c
+  smpc_peripheral_data.c
   smpc_peripheral_parse.c
   smpc_peripheral_system_manger.c
   smpc_init.c

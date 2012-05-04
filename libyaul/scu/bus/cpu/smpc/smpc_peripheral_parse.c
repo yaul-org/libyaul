@@ -9,38 +9,42 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <ic.h>
 #include <smpc/peripheral.h>
 
 #include "smpc_internal.h"
 
-#define	ID_UNCONNECTED  0xFF
+#define	ID_DIGITAL      0x02
+#define	ID_RACING       0x13
+#define	ID_ANALOG       0x16
+#define	ID_MOUSE        0x23
+#define	ID_KEYBOARD     0x34
 #define	ID_MD3B         0xE1
 #define	ID_MD6B         0xE2
 #define	ID_MDMOUSE      0xE3
-#define	ID_DIGITAL      0x02
-#define	ID_RACING       0x13
-#define	ID_ANALOG       0x15
-#define	ID_MOUSE        0x23
-#define	ID_KEYBOARD     0x34
 #define	ID_GUN          0xFA
+#define	ID_UNCONNECTED  0xFF
 
 #define	TYPE_DIGITAL    0x00
-#define	TYPE_ANALOG     0x10
-#define	TYPE_POINTER    0x20
-#define	TYPE_KEYBOARD   0x30
-#define	TYPE_MD         0xE0
-#define	TYPE_UNKNOWN	0xF0
+#define	TYPE_ANALOG     0x01
+#define	TYPE_POINTER    0x02
+#define	TYPE_KEYBOARD   0x03
+#define	TYPE_MD         0x0E
+#define	TYPE_UNKNOWN	0x0F
 
+static bool peripheral_id(void);
 static bool peripheral_type(void);
+static char *dump_registers(void);
+static int peripheral_populate_info(struct smpc_peripheral_info *, uint8_t);
 static struct smpc_peripheral *peripheral_alloc(void);
 static uint8_t peripheral_data_size(void);
 static uint8_t port_status(void);
 static void peripheral_child_add(struct smpc_peripheral_port *, uint8_t);
 static void peripheral_children_fetch(struct smpc_peripheral_port *, uint8_t);
+static void peripheral_free(struct smpc_peripheral *);
 static void peripheral_parent_add(struct smpc_peripheral_port *, uint8_t);
-static void peripheral_populate(struct smpc_peripheral_info *);
 static void port_build(struct smpc_peripheral_port *, uint8_t);
-static char *dump_registers(void);
+static void port_reset(struct smpc_peripheral_port *);
 
 uint8_t offset = 0;
 
@@ -50,26 +54,58 @@ struct smpc_peripheral_port smpc_peripheral_port2;
 void
 smpc_peripheral_parse(void)
 {
+        uint32_t ist;
+
+        /* Could this help? */
+        ist = scu_ic_status_get();
+        if ((ist & IC_IST_SYSTEM_MANAGER) == IC_IST_SYSTEM_MANAGER)
+                return;
 
         port_build(&smpc_peripheral_port1, 1);
         port_build(&smpc_peripheral_port2, 2);
 }
 
 static bool
+peripheral_id(void)
+{
+
+        switch (PC_GET_ID(offset)) {
+        case ID_MD3B:
+        case ID_MD6B:
+        case ID_MDMOUSE:
+        case ID_DIGITAL:
+        case ID_RACING:
+        case ID_ANALOG:
+        case ID_MOUSE:
+        case ID_KEYBOARD:
+        case ID_GUN:
+                return true;
+        default:
+                return false;
+        }
+}
+
+static bool
 peripheral_type(void)
 {
         switch (PC_GET_TYPE(offset)) {
-        case 0x00:
-        case 0x01:
-        case 0x02:
-        case 0x03:
-        case 0x0E:
+        case TYPE_DIGITAL:
+        case TYPE_ANALOG:
+        case TYPE_POINTER:
+        case TYPE_KEYBOARD:
+        case TYPE_MD:
                 return true;
-        case 0x0F:
+        case TYPE_UNKNOWN:
         default:
                 /* Unknown or disconnected peripheral */
                 return false;
         }
+}
+
+static uint8_t
+peripheral_data_size(void)
+{
+        return PC_GET_SIZE(offset);
 }
 
 /*
@@ -103,43 +139,61 @@ port_status(void)
         return nconnected;
 }
 
-static uint8_t
-peripheral_data_size(void)
-{
-        return PC_GET_SIZE(offset);
-}
-
 static struct smpc_peripheral *
 peripheral_alloc(void)
 {
-        /* XXX Remove and replace with TLSF */
+        /* FIXME
+         * Remove and replace with TLSF
+         */
         static struct smpc_peripheral peripheral[32];
         static int count = 0;
 
-        return &peripheral[count++];
+        return &peripheral[(count++) & 0x1F];
 }
 
 static void
-peripheral_populate(struct smpc_peripheral_info *info)
+peripheral_free(struct smpc_peripheral *peripheral)
+{
+        peripheral = peripheral;
+}
+
+static int
+peripheral_populate_info(struct smpc_peripheral_info *info, uint8_t port_no)
 {
         uint8_t *data;
         uint8_t size;
 
-        /* Type cannot be invalid at this point */
-        assert((peripheral_type()), "invalid peripheral type");
+        if (!(peripheral_type()))
+                /* Possibly corrupted data */
+                return 1;
 
-        /* Non-extended size cannot exceed 15B */
-        size = peripheral_data_size();
-        assert(size <= 15, "invalid size of peripheral");
+        if ((size = peripheral_data_size()) > 15)
+                /* Non-extended size cannot exceed 15B */
+                return 1;
 
-        /* XXX Not yet supported */
-        assert(size > 0, "255B configuration header not yet supported");
-
-        if (size == 0) {
-                /* 255B configuration header */
+        /* Check if what data configuration we're using */
+        if (size > 0) {
+                /* data Configuration 1 */
+                if (!(peripheral_id()))
+                        /* Invalid ID (type and size) */
+                        return 1;
+        } else if (size == 0) {
                 size = PC_GET_EXT_SIZE(offset);
+                /*
+                 * FIXME
+                 * What do we do when it's 255B mode?
+                 */
+                assert(size < 16, "255B mode not yet supported");
+
+                if (size < 15)
+                        /* Invalid peripheral data configuration (2 or 3) */
+                        return 1;
                 offset++;
         }
+
+        /* Set to port number if parent, otherwise, set to port number
+         * within the multi-terminal peripheral */
+        info->port_no = port_no;
 
         info->connected = true;
         info->type = PC_GET_TYPE(offset);
@@ -150,14 +204,16 @@ peripheral_populate(struct smpc_peripheral_info *info)
         memset(data, 0xFF, MAX_PORT_DATA_SIZE - size);
         memcpy(info->data, PC_GET_DATA(offset), size);
         offset += size;
+
+        return 0;
 }
 
 static void
 peripheral_parent_add(struct smpc_peripheral_port *port, uint8_t port_no)
 {
-        peripheral_populate(&port->info);
-        /* Set to port number */
-        port->info.port_no = port_no;
+
+        if ((peripheral_populate_info(&port->info, port_no)))
+                port_reset(port);
 }
 
 static void
@@ -166,10 +222,12 @@ peripheral_child_add(struct smpc_peripheral_port *port, uint8_t port_no)
         struct smpc_peripheral *peripheral;
 
         peripheral = peripheral_alloc();
-        peripheral_populate(&peripheral->info);
+        if ((peripheral_populate_info(&peripheral->info, port_no))) {
+                port_reset(port);
+                peripheral_free(peripheral);
+                return;
+        }
         peripheral->parent = port;
-        /* Set to port number within the multi-terminal peripheral */
-        peripheral->info.port_no = port_no;
 
         TAILQ_INSERT_TAIL(port->children, peripheral, peripherals);
 }
@@ -184,7 +242,9 @@ peripheral_children_fetch(struct smpc_peripheral_port *port, uint8_t nconnected)
                 /* No children */
                 return;
 
-        /* XXX Initialize queue of children */
+        /* FIXME
+         * Initialize queue of children
+         */
         TAILQ_INIT(port->children);
 
         for (total = nconnected; nconnected > 0; nconnected--) {
@@ -194,12 +254,19 @@ peripheral_children_fetch(struct smpc_peripheral_port *port, uint8_t nconnected)
 }
 
 static void
+port_reset(struct smpc_peripheral_port *port)
+{
+
+        memset(port, 0, sizeof(*port));
+        memset(&port->info, 0, sizeof(port->info));
+}
+
+static void
 port_build(struct smpc_peripheral_port *port, uint8_t port_no)
 {
         uint8_t nconnected;
 
-        memset(port, 0, sizeof(*port));
-        memset(&port->info, 0, sizeof(port->info));
+        port_reset(port);
 
         if ((nconnected = port_status()) == 0)
                 return;
@@ -210,12 +277,12 @@ port_build(struct smpc_peripheral_port *port, uint8_t port_no)
 }
 
 static char * __attribute__ ((used))
-dump_registers(void)
+        dump_registers(void)
 {
         static char buf[2048];
 
-        /* XXX There's a nasty bug where half of the screen is corrupted */
-        (void)sprintf(buf, "\n\n"
+        (void)sprintf(buf, "\n\nDump of SMPC registers:\n"
+            "offset = %d\n"
             " OREG[0] = 0x%02X OREG[16] = 0x%02X\n"
             " OREG[1] = 0x%02X OREG[17] = 0x%02X\n"
             " OREG[2] = 0x%02X OREG[18] = 0x%02X\n"
@@ -232,6 +299,7 @@ dump_registers(void)
             "OREG[13] = 0x%02X OREG[29] = 0x%02X\n"
             "OREG[14] = 0x%02X OREG[30] = 0x%02X\n"
             "OREG[15] = 0x%02X OREG[31] = 0x%02X\n",
+            offset,
             OREG_GET(0), OREG_GET(16),
             OREG_GET(1), OREG_GET(17),
             OREG_GET(2), OREG_GET(18),

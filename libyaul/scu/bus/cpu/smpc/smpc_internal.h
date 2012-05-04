@@ -47,9 +47,10 @@
 #define PC_GET_MULTITAP_ID(x)           ((OREG_GET((x)) >> 4) & 0x0F)
 #define PC_GET_NUM_CONNECTIONS(x)       (OREG_GET((x)) & 0x0F)
 /* 2nd data byte. */
+#define PC_GET_ID(x)                    (OREG_GET((x)) & 0xFF)
+#define PC_GET_TYPE(x)                  ((OREG_GET((x)) >> 4) & 0x0F)
 #define PC_GET_SIZE(x)                  (OREG_GET((x)) & 0x0F)
 #define PC_GET_EXT_SIZE(x)              (OREG_GET((x) + 1) & 0xFF)
-#define PC_GET_TYPE(x)                  ((OREG_GET((x)) >> 4) & 0x0F)
 /* 3rd (or 4th) data byte */
 #define PC_GET_DATA(x)                  (OREG_OFFSET((x)))
 
@@ -73,7 +74,6 @@ enum smpc_regs_type {
         EXLE1 = 0x07F,
         EXLE2 = 0x07F
 };
-
 
 static inline uint8_t
 smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
