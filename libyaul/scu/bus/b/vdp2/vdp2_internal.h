@@ -15,7 +15,7 @@
 #define MEM_READ(x)     (*(volatile uint16_t *)(x))
 
 /* Macros specific for processor. */
-#define VRAM_BANK(x, y) (0x25E00000 + ((x) << 18) + ((y) << 1))
+#define VRAM_BANK(x, y) (0x25E00000 + ((x) << 17) + ((y) << 1))
 #define CRAM_BANK(x, y) (0x25F00000 + ((x) << 4) + ((y) << 1))
 #define VDP2(x)         (0x25F80000 + ((x) << 1))
 
@@ -167,10 +167,15 @@ enum vdp2_regs_type {
 };
 
 struct vdp2_regs {
-        uint16_t chctla; /* Register Offset: 0x180028 */
-        uint16_t chctlb; /* Register Offset: 0x18002A */
-        uint16_t plsz; /* Register Offset: 0x18003A */
-        uint16_t rpmd; /* Register Offset: 0x1800B0 */
+        uint16_t bgon; /* Register offset: 0x180020 */
+        uint16_t chctla; /* Register offset: 0x180028 */
+        uint16_t chctlb; /* Register offset: 0x18002A */
+        uint16_t plsz; /* Register offset: 0x18003A */
+        uint16_t scrctl; /* Register offset: 0x18009A */
+        uint16_t rpmd; /* Register offset: 0x1800B0 */
+        uint16_t prina; /* Register offset: 0x1800F8 */
+        uint16_t prinb; /* Register offset: 0x1800FA */
+        uint16_t prir; /* Register offset: 0x1800FC */
 } vdp2_regs;
 
-#endif
+#endif /* !_VDP2_INTERNAL_H_ */

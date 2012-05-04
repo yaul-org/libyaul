@@ -12,16 +12,14 @@
 void
 vdp2_tvmd_blcs_set(bool lcclmd, uint8_t bank, uint32_t offset, uint16_t *color, uint16_t len)
 {
-        static uint16_t bktau = 0;
-        static uint16_t bktal = 0;
+        uint16_t bktau;
 
         uint16_t i;
 
         bktau = (VRAM_BANK(bank, offset) >> 17) & 0x7;
-        bktal = (VRAM_BANK(bank, offset) >> 1) & 0xFFFF;
 
         MEM_POKE(VDP2(BKTAU), bktau | (lcclmd ? 0x8000 : 0x0000));
-        MEM_POKE(VDP2(BKTAL), bktal);
+        MEM_POKE(VDP2(BKTAL), (VRAM_BANK(bank, offset) >> 1) & 0xFFFF);
 
         /*
          * Force display ON. If BDCLMD is set and DISP has never been
