@@ -16,27 +16,24 @@
 
 #include "monitor.h"
 
-#define BLCS_COL(x) (0x0001FFFE + (x))
-
 static void spin(void);
 
 void __attribute__ ((noreturn))
 panic(const char *s, const char *cond, const char *file, uint32_t line, const char *function)
 {
-        char *buf;
+        static char buf[16384];
 
         uint16_t blcs_color[] = {
-                0x80E0 /* Green */
+                0x8018 /* Green */
         };
 
-        buf = alloca(1024 + strlen(s) + 1);
         (void)sprintf(buf, "%s:%lu: %s: Assertion `%s' failed: %s",
             file, line, function, cond, s);
 
         /* Reset the VDP2 */
         vdp2_init();
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 0, 0x00000000, blcs_color, 0);
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color, 0);
 
         monitor_init();
 
