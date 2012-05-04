@@ -5,6 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -20,36 +21,37 @@
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x001F) | (((g) & 0x001F)  << 5) | (((b) & 0x001F) << 10))
 
+static uint32_t *line_scroll_tb = (uint32_t *)VRAM_BANK_4MBIT(0, 0x00000);
+
 static void
-copper_bar(void)
+line_scroll(void)
 {
+        static uint16_t ofs = 0;
+
         struct scrn_ls_format ls;
 
         ls.ls_scrn = SCRN_NBG1;
-        ls.ls_bank = 1;
-        ls.ls_ofs &= 1024 - 1;
+        ls.ls_lsta = (uint32_t)line_scroll_tb | (ofs & (2048 - 1));
         ls.ls_int = 0;
         ls.ls_fun = SCRN_LS_N1SCX;
 
         vdp2_scrn_ls_set(&ls);
-        ls.ls_ofs += 4;
+        ofs += 4;
 }
 
 static void
-line_screen(void)
+line_scroll_screen(void)
 {
         struct scrn_ch_format cfg;
         uint32_t tmrs[4];
 
         uint16_t *pnt;
         uint32_t *character;
-        uint32_t *line_scroll;
         uint32_t x;
         uint32_t y;
 
         character = (uint32_t *)VRAM_BANK_4MBIT(2, 0x00000);
-        pnt = (uint16_t *)VRAM_BANK_4MBIT(0, 0x02000);
-        line_scroll = (uint32_t *)VRAM_BANK_4MBIT(1, 0x00000);
+        pnt = (uint16_t *)VRAM_BANK_4MBIT(2, 0x04000);
 
         cfg.ch_scrn = SCRN_NBG1;
         cfg.ch_cs = 1 * 1; /* 1x1 cells */
@@ -69,9 +71,9 @@ line_screen(void)
 
         vdp2_scrn_ch_format_set(&cfg);
 
-        tmrs[0] = 0xEEEEEE55;
-        tmrs[1] = 0xEEEEEE55;
-        tmrs[2] = 0xFFFFFFF1;
+        tmrs[0] = 0xEEEEEEED;
+        tmrs[1] = 0xFFFFFFFF;
+        tmrs[2] = 0xEEEEE551;
         tmrs[3] = 0xEEEEE662;
 
         vdp2_vram_cycle_pattern_set(tmrs);
@@ -93,8 +95,8 @@ line_screen(void)
         }
 
         for (y = 0; y < 512; y++) {
-                line_scroll[y] = (lut_sin[y]) << 16;
-                line_scroll[y + 512] = (lut_sin[y]) << 16;
+                line_scroll_tb[y] = (lut_sin[y]) << 16;
+                line_scroll_tb[y + 512] = (lut_sin[y]) << 16;
         }
 
         vdp2_scrn_display_set(SCRN_NBG1, /* no_trans = */ false);
@@ -165,23 +167,21 @@ main(void)
                 RGB(0x0E, 0x08, 0x1C), RGB(0x0E, 0x08, 0x1D), RGB(0x0F, 0x08, 0x1E), RGB(0x0F, 0x08, 0x1F)
         };
 
+        uint32_t mask;
+
         vdp2_init();
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ true, 0, 0x00000, blcs_color, sizeof(blcs_color));
+        vdp2_tvmd_blcs_set(/* lcclmd = */ true, 1, 0x00000, blcs_color, sizeof(blcs_color));
         smpc_init();
 
         monitor_init();
-        line_screen();
+        line_scroll_screen();
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
-                /* Send "INTBACK" "SMPC" command (300us after
-                 * VBLANK-IN). Set to 15-byte mode; optimized. */
-                smpc_smc_intback_call(0x00, 0x0A);
                 vdp2_tvmd_vblank_out_wait();
-                smpc_peripheral_parse();
 
-                copper_bar();
+                line_scroll();
 
                 (void)sprintf(text,
                     "[1;41mPORT: %d        PORT: %d\n"
@@ -194,8 +194,8 @@ main(void)
                     "DATA[ 4]: 0x%02X DATA[ 4]: 0x%02X\n"
                     "DATA[ 5]: 0x%02X DATA[ 5]: 0x%02X\n"
                     "DATA[ 6]: 0x%02X DATA[ 6]: 0x%02X\n"
-                    "[1;32mDATA[ 7]: 0x%02X DATA[ 7]: 0x%02X[0;0m\n"
-                    "[1;31mDATA[ 8]: 0x%02X DATA[ 8]: 0x%02X[0;0m\n"
+                    "[1;42mDATA[ 7]: 0x%02X DATA[ 7]: 0x%02X[0;0m\n"
+                    "[1;41mDATA[ 8]: 0x%02X DATA[ 8]: 0x%02X[0;0m\n"
                     "[1;41mDATA[ 9]: 0x%02X DATA[ 9]: 0x%02X[0;0m\n"
                     "[1;43mDATA[10]: 0x%02X DATA[10]: 0x%02X[0;0m\n"
                     "[1;46mDATA[11]: 0x%02X DATA[11]: 0x%02X[0;0m\n"
