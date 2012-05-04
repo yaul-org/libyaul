@@ -13,6 +13,7 @@ SET(SRC_DIRS
   scu/dsp
   scu/dma
   scu/ic
+  scu/timer
 )
 
 # Macro that prepends a given string onto the beginning of each string in a list.

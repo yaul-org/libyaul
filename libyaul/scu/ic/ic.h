@@ -43,13 +43,30 @@ enum ic_msk_type {
         IC_MSK_LEVEL_0_DMA_END = 0x0800,
         IC_MSK_DMA_ILLEGAL = 0x1000,
         IC_MSK_SPRITE_END = 0x2000,
-        IC_MSK_ALL = 0xbfff
+        IC_MSK_ALL = 0xBFFF
 };
 
-extern void             scu_ic_lvl_set(unsigned char);
-extern void             scu_ic_msk_chg(enum ic_msk_type, enum ic_msk_type);
-extern void             scu_ic_msk_set(enum ic_msk_type, enum ic_msk_type);
-extern unsigned long    scu_ic_vct_get(void);
-extern void             scu_ic_vct_set(enum ic_vct_type, void(*)(void));
+#define IC_IST_VBLANK_IN        0x00000001
+#define IC_IST_VBLANK_OUT       0x00000002
+#define IC_IST_HBLANK_IN        0x00000004
+#define IC_IST_TIMER_0          0x00000008
+#define IC_IST_TIMER_1          0x00000010
+#define IC_IST_DSP_END          0x00000020
+#define IC_IST_SOUND_REQUEST    0x00000040
+#define IC_IST_SYSTEM_MANAGER   0x00000080
+#define IC_IST_PAD_INTERRUPT    0x00000100
+#define IC_IST_LEVEL_2_DMA_END  0x00000200
+#define IC_IST_LEVEL_1_DMA_END  0x00000400
+#define IC_IST_LEVEL_0_DMA_END  0x00000800
+#define IC_IST_DMA_ILLEGAL      0x00001000
+#define IC_IST_SPRITE_END       0x00002000
+/* Missing is external interrupt status bits */
+
+extern uint32_t scu_ic_status_get(void);
+extern uint32_t scu_ic_vct_get(void);
+extern void     scu_ic_lvl_set(uint8_t);
+extern void     scu_ic_msk_chg(enum ic_msk_type, enum ic_msk_type);
+extern void     scu_ic_msk_set(enum ic_msk_type, enum ic_msk_type);
+extern void     scu_ic_vct_set(enum ic_vct_type, void(*)(void));
 
 #endif /* !_IC_H_ */
