@@ -90,7 +90,9 @@ cha_at_set(uint32_t param, struct cha *cha_opt)
                 break;
         case CHA_AT_BRIGHT:
                 cha_opt->fg += 8;
-                cha_opt->bg += 8;
+
+                if (cha_opt->bg)
+                        cha_opt->bg += 8;
                 break;
         case CHA_AT_DIM:
                 if (cha_opt->fg >= 8)
