@@ -108,9 +108,6 @@ peripheral_data_size(void)
         return PC_GET_SIZE(offset);
 }
 
-/*
- * Returns the number of connected peripherals under the port
- */
 static uint8_t
 port_status(void)
 {
@@ -123,19 +120,22 @@ port_status(void)
                 /* ID: SATURN 6P Multi-Tap (6 connectors) */
         case 0x02:
                 /* ID: Clocked serial */
+        case 0x03:
+        case 0x0E:
+                nconnected = PC_GET_NUM_CONNECTIONS(offset);
+                /* At least two peripheral ports are required */
+                nconnected = (nconnected < 2) ? 0 : nconnected;
+                break;
         case 0x0F:
-                /* Peripheral is directly connected to the peripheral
-                 * port, or none is connected is connected at all */
-                if ((nconnected = PC_GET_NUM_CONNECTIONS(offset)) >= 15)
-                        nconnected = 0;
-
-                offset++;
+                nconnected = PC_GET_NUM_CONNECTIONS(offset);
+                /* Only a single peripheral can be directly connected */
+                nconnected = (nconnected > 1) ? 0 : nconnected;
                 break;
         default:
                 nconnected = 0;
-                offset++;
         }
 
+        offset++;
         return nconnected;
 }
 

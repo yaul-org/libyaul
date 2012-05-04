@@ -28,6 +28,7 @@ uint8_t oreg_buf[MAX_PORT_DEVICES * MAX_PORT_DATA_SIZE];
 void
 smpc_peripheral_system_manager(void)
 {
+
         /* Fetch but no parsing */
         fetch_output_regs();
 
