@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -10,14 +10,14 @@
 #include "vdp2_internal.h"
 
 void
-vdp2_scrn_display_clear(enum scrn_type scrn, bool no_trans)
+vdp2_scrn_display_clear(uint8_t scrn, bool no_trans)
 {
         uint16_t trans_scrn;
 
         /* Enable and disable scroll screens. */
-        vdp2_regs.bgon &= ~(1 << (uint8_t)scrn);
+        vdp2_regs.bgon &= ~(1 << scrn);
         if (no_trans) {
-                trans_scrn = (uint8_t)scrn + 8;
+                trans_scrn = scrn + 8;
                 vdp2_regs.bgon &= ~(1 << trans_scrn);
         }
 

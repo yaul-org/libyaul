@@ -11,6 +11,8 @@
 
 #include "vdp2_internal.h"
 
+struct vdp2_regs vdp2_regs;
+
 void
 vdp2_init(void)
 {
@@ -104,5 +106,5 @@ vdp2_init(void)
         MEM_POKE(VDP2(CLOFSL), 0x0000);
 
         /* Reset all buffer registers. */
-        memset(&vdp2_regs, 0, sizeof(struct vdp2_regs));
+        memset(&vdp2_regs, 0x0000, sizeof(struct vdp2_regs));
 }

@@ -87,9 +87,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctla &= 0xFFFE;
                 vdp2_regs.chctla |= cfg->ch_cs >> 2;
 
-                vdp2_regs.chctla &= 0xCFFF;
-                vdp2_regs.chctla |= cfg->ch_chc << 12;
-
                 vdp2_regs.prina &= 0x0F00;
                 vdp2_regs.prina |= cfg->ch_pri;
 
@@ -110,9 +107,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctla &= 0xFEFF;
                 vdp2_regs.chctla |= (cfg->ch_cs >> 2) << 6;
 
-                vdp2_regs.chctla &= 0xCFFF;
-                vdp2_regs.chctla |= cfg->ch_chc << 12;
-
                 /* Priority */
                 vdp2_regs.prina &= 0x000F;
                 vdp2_regs.prina |= cfg->ch_pri << 8;
@@ -132,9 +126,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFFE;
                 vdp2_regs.chctlb |= cfg->ch_cs >> 2;
-
-                vdp2_regs.chctlb &= 0xFFFD;
-                vdp2_regs.chctlb |= cfg->ch_chc << 1;
 
                 /* Priority */
                 vdp2_regs.prinb &= 0x0F00;
@@ -157,9 +148,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctlb &= 0xFFEF;
                 vdp2_regs.chctlb |= cfg->ch_cs << 2;
 
-                vdp2_regs.chctlb &= 0xFFDF;
-                vdp2_regs.chctlb |= cfg->ch_chc << 5;
-
                 /* Priority */
                 vdp2_regs.prinb &= 0x000F;
                 vdp2_regs.prinb |= cfg->ch_pri << 8;
@@ -180,9 +168,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFEFF;
                 vdp2_regs.chctlb |= cfg->ch_cs << 6;
-
-                vdp2_regs.chctlb &= 0x8FFF;
-                vdp2_regs.chctlb |= cfg->ch_chc << 12;
 
                 vdp2_regs.prir &= 0x0F00;
                 vdp2_regs.prir |= cfg->ch_pri;

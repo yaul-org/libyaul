@@ -11,14 +11,12 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-enum scrn_type {
-        SCRN_NBG0,
-        SCRN_NBG1,
-        SCRN_NBG2,
-        SCRN_NBG3,
-        SCRN_RBG0,
-        SCRN_RBG1
-};
+#define SCRN_NBG0       0       /* Normal background (NBG0) */
+#define SCRN_RBG1       5       /* Rotational background (RBG1) */
+#define SCRN_NBG1       1       /* Normal background (NBG1) */
+#define SCRN_NBG2       2       /* Normal background (NBG2) */
+#define SCRN_NBG3       3       /* Normal background (NBG3) */
+#define SCRN_RBG0       4       /* Rotational background (RBG0) */
 
 enum scrn_rp_mode_type {
         SCRN_RP_MODE_0,         /* Rotation Parameter A */
@@ -27,8 +25,14 @@ enum scrn_rp_mode_type {
         SCRN_RP_MODE_3          /* Swap via Rotation Parameter Window */
 };
 
+#define SCRN_CCC_CHC_16         0 /* Palette Format */
+#define SCRN_CCC_CHC_256        1 /* Palette Format */
+#define SCRN_CCC_CHC_2048       2 /* Palette Format */
+#define SCRN_CCC_CHC_32768      3 /* RGB Format */
+#define SCRN_CCC_CHC_16770000   4 /* RGB Format */
+
 struct scrn_bm_format {
-        enum scrn_type ch_scrn; /* Normal background */
+        uint8_t ch_scrn;        /* Normal/rotational background */
         uint8_t bm_bs;          /* Bitmap size */
         uint8_t bm_sp;          /* Special priority */
         uint8_t bm_scc;         /* Supplementary character number */
@@ -36,7 +40,7 @@ struct scrn_bm_format {
 };
 
 struct scrn_ch_format {
-        enum scrn_type ch_scrn; /* Normal background */
+        uint8_t ch_scrn;        /* Normal/rotational background */
         uint8_t ch_cs;          /* Character size: (1 * 1) or (2 * 2) cells */
         uint8_t ch_pnds;        /* Pattern name data size: (1)-word or (2)-words */
         uint8_t ch_cnsm;        /* Character number supplementary mode: mode (0) or mode (1) */
@@ -48,17 +52,10 @@ struct scrn_ch_format {
         uint32_t ch_map[4];     /* Map lead addresses */
         uint8_t ch_mapofs;      /* Map offset */
         uint8_t ch_pri;         /* Priority [0..7] When priority is zero, scroll screen is transparent. */
-
-#define SCRN_CH_CHC_16          0 /* Palette Format */
-#define SCRN_CH_CHC_256         1 /* Palette Format */
-#define SCRN_CH_CHC_2048        2 /* Palette Format */
-#define SCRN_CH_CHC_32768       3 /* RGB Format */
-#define SCRN_CH_CHC_16770000    4 /* RGB Format */
-        uint8_t ch_chc;         /* Character color */
 };
 
 struct scrn_ls_format {
-        enum scrn_type ls_scrn; /* Normal background */
+        uint8_t ls_scrn;        /* Normal background */
         uint32_t ls_lsta;       /* Line scroll table (lead addr.) */
         uint8_t ls_int;         /* Dependent on the interlace setting */
 
@@ -70,15 +67,19 @@ struct scrn_ls_format {
 };
 
 struct scrn_vcs_format {
-        enum scrn_type vcs_scrn; /* Normal background */
+        uint8_t vcs_scrn;       /* Normal background */
         uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
 };
 
-extern void vdp2_scrn_bm_format_set(enum scrn_type, struct scrn_bm_format *);
+extern void vdp2_scrn_bm_format_set(uint8_t, struct scrn_bm_format *);
+extern void vdp2_scrn_ccc_set(uint8_t, uint8_t);
 extern void vdp2_scrn_ch_format_set(struct scrn_ch_format *);
+extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
+extern void vdp2_scrn_mosaic_set(uint8_t, uint8_t, uint8_t);
+extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
+extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
 
-extern void vdp2_scrn_display_set(enum scrn_type, bool);
 extern void vdp2_scrn_rp_mode_set(enum scrn_rp_mode_type);
 
 #endif /* !_SCRN_H_ */

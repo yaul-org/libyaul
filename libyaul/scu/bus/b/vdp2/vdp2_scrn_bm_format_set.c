@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -9,87 +9,84 @@
 
 #include "vdp2_internal.h"
 
-static unsigned short bmpna = 0;
-static unsigned short bmpnb = 0;
-
 void
-vdp2_scrn_bm_format_set(enum scrn_type scrn, struct scrn_bm_format *c)
+vdp2_scrn_bm_format_set(uint8_t scrn, struct scrn_bm_format *c)
 {
         switch (scrn) {
         case SCRN_NBG0:
-                /* Screen Display Format */
-                vdp2_regs.chctla &= 0xfffd;
+                /* Screen display format */
+                vdp2_regs.chctla &= 0xFFFD;
                 vdp2_regs.chctla |= 0x0002;
 
-                /* Bitmap Size */
-                vdp2_regs.chctla &= 0xfff3;
+                /* Bitmap size */
+                vdp2_regs.chctla &= 0xFFF3;
                 vdp2_regs.chctla |= c->bm_bs << 2;
 
-                /* Special Priority */
-                bmpna &= 0xffdf;
-                bmpna |= c->bm_sp << 5;
+                /* Special priority */
+                vdp2_regs.bmpna &= 0xFFDF;
+                vdp2_regs.bmpna |= c->bm_sp << 5;
 
-                /* Supplementary Color Number */
-                bmpna &= 0xffef;
-                bmpna |= c->bm_scc << 4;
+                /* Supplementary color number */
+                vdp2_regs.bmpna &= 0xFFEF;
+                vdp2_regs.bmpna |= c->bm_scc << 4;
 
-                /* Supplementary Palette Number */
-                bmpna &= 0xfff8;
-                bmpna |= (c->bm_spn & 0x7) << 0;
+                /* Supplementary palette number */
+                vdp2_regs.bmpna &= 0xFFF8;
+                vdp2_regs.bmpna |= (c->bm_spn & 0x7) << 0;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(BMPNA), bmpna);
+                MEM_POKE(VDP2(BMPNA), vdp2_regs.bmpna);
                 break;
         case SCRN_NBG1:
-                /* Screen Display Format */
-                vdp2_regs.chctla &= 0xfdff;
+                /* Screen display format */
+                vdp2_regs.chctla &= 0xFDFF;
                 vdp2_regs.chctla |= 0x0200;
 
-                /* Bitmap Size */
-                vdp2_regs.chctla &= 0xfeff;
+                /* Bitmap size */
+                vdp2_regs.chctla &= 0xFEFF;
                 vdp2_regs.chctla |= c->bm_bs << 10;
 
-                /* Special Priority */
-                bmpna &= 0xdfff;
-                bmpna |= c->bm_sp << 13;
+                /* Special priority */
+                vdp2_regs.bmpna &= 0xDFFF;
+                vdp2_regs.bmpna |= c->bm_sp << 13;
 
-                /* Supplementary Color Number */
-                bmpna &= 0xefff;
-                bmpna |= c->bm_scc << 12;
+                /* Supplementary color number */
+                vdp2_regs.bmpna &= 0xEFFF;
+                vdp2_regs.bmpna |= c->bm_scc << 12;
 
-                /* Supplementary Palette Number */
-                bmpna &= 0xf8ff;
-                bmpna |= (c->bm_spn & 0x7) << 8;
+                /* Supplementary palette number */
+                vdp2_regs.bmpna &= 0xF8FF;
+                vdp2_regs.bmpna |= (c->bm_spn & 0x7) << 8;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(BMPNA), bmpna);
+                MEM_POKE(VDP2(BMPNA), vdp2_regs.bmpna);
                 break;
         case SCRN_RBG0:
-                /* Screen Display Format */
-                vdp2_regs.chctlb &= 0xfdff;
+                /* Screen display format */
+                vdp2_regs.chctlb &= 0xFDFF;
                 vdp2_regs.chctlb |= 0x0200;
 
-                /* Bitmap Size */
-                vdp2_regs.chctla &= 0xfbff;
+                /* Bitmap size */
+                vdp2_regs.chctla &= 0xFBFF;
                 vdp2_regs.chctla |= (c->bm_bs & 0x1) << 10;
 
-                /* Special Priority */
-                bmpnb &= 0xffdf;
-                bmpnb |= c->bm_sp << 5;
+                /* Special priority */
+                vdp2_regs.bmpnb &= 0xFFDF;
+                vdp2_regs.bmpnb |= c->bm_sp << 5;
 
-                /* Supplementary Color Number */
-                bmpnb &= 0xffef;
-                bmpnb |= c->bm_scc << 4;
+                /* Supplementary color number */
+                vdp2_regs.bmpnb &= 0xFFEF;
+                vdp2_regs.bmpnb |= c->bm_scc << 4;
 
-                /* Supplementary Palette Number */
-                bmpnb &= 0xfff8;
-                bmpnb |= (c->bm_spn & 0x7) << 0;
+                /* Supplementary palette number */
+                vdp2_regs.bmpnb &= 0xFFF8;
+                vdp2_regs.bmpnb |= (c->bm_spn & 0x7) << 0;
 
-                /* Write to memory. */
+                /* Write to memory */
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEM_POKE(VDP2(BMPNB), bmpnb);
+                MEM_POKE(VDP2(BMPNB), vdp2_regs.bmpnb);
                 break;
         default:
                 break;

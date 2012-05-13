@@ -421,9 +421,9 @@ monitor_init(void)
         cfg.ch_map[1] = (uint32_t)info.pnt[1];
         cfg.ch_map[2] = (uint32_t)info.pnt[2];
         cfg.ch_map[3] = (uint32_t)info.pnt[3];
-        cfg.ch_chc = SCRN_CH_CHC_16;
         cfg.ch_pri = 7;
 
+        vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
         vdp2_scrn_ch_format_set(&cfg);
 
         tmrs[0] = 0xFFFFFFFF;

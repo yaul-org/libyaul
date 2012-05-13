@@ -10,7 +10,7 @@
 #include "vdp2_internal.h"
 
 void
-vdp2_scrn_display_set(enum scrn_type scrn, bool no_trans)
+vdp2_scrn_display_set(uint8_t scrn, bool no_trans)
 {
         uint16_t trans_scrn;
 

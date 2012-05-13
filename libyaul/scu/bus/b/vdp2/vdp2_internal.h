@@ -19,7 +19,7 @@
 #define CRAM_BANK(x, y) (0x25F00000 + ((x) << 4) + ((y) << 1))
 #define VDP2(x)         (0x25F80000 + ((x) << 1))
 
-enum vdp2_regs_type {
+enum {
         TVMD,
         EXTEN,
         TVSTAT, /* RO */
@@ -27,7 +27,7 @@ enum vdp2_regs_type {
         HCNT, /* RO */
         VCNT, /* RO */
         /* RESERVE */
-        RAMCTL = 0x007,
+        RAMCTL = 0x0007,
         CYCA0L,
         CYCA0U,
         CYCA1L,
@@ -148,7 +148,7 @@ enum vdp2_regs_type {
         PRINB,
         PRIR,
         /* RESERVE */
-        CCRSA = 0x080,
+        CCRSA = 0x0080,
         CCRSB,
         CCRSC,
         CCRSD,
@@ -168,14 +168,19 @@ enum vdp2_regs_type {
 
 struct vdp2_regs {
         uint16_t bgon; /* Register offset: 0x180020 */
+        uint16_t mzctl; /* Register offset: 0x180022 */
         uint16_t chctla; /* Register offset: 0x180028 */
         uint16_t chctlb; /* Register offset: 0x18002A */
+        uint16_t bmpna; /* Register offset: 0x18002C */
+        uint16_t bmpnb; /* Register offset: 0x18002E */
         uint16_t plsz; /* Register offset: 0x18003A */
         uint16_t scrctl; /* Register offset: 0x18009A */
         uint16_t rpmd; /* Register offset: 0x1800B0 */
         uint16_t prina; /* Register offset: 0x1800F8 */
         uint16_t prinb; /* Register offset: 0x1800FA */
         uint16_t prir; /* Register offset: 0x1800FC */
-} vdp2_regs;
+};
+
+extern struct vdp2_regs vdp2_regs;
 
 #endif /* !_VDP2_INTERNAL_H_ */
