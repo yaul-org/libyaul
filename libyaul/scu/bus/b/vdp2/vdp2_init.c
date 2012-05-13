@@ -15,7 +15,45 @@ struct vdp2_regs vdp2_regs;
 
 struct vram_ctl vram_ctl = {
         .vram_size = VRAM_CTL_SIZE_4MBIT,
-        .vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B
+        .vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B,
+        .vram_cycp.pt = {
+                /* VRAM-A0 */
+                {VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS},
+                /* VRAM-A1 */
+                {VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS},
+                /* VRAM-B0 */
+                {VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS},
+                /* VRAM-B1 */
+                {VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS,
+                 VRAM_CTL_CYCP_NO_ACCESS}
+        }
 };
 
 void

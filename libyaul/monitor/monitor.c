@@ -390,7 +390,8 @@ void
 monitor_init(void)
 {
         struct scrn_ch_format cfg;
-        uint32_t tmrs[4];
+        struct vram_ctl *vram_ctl;
+
         uint32_t x;
         uint32_t y;
 
@@ -426,12 +427,16 @@ monitor_init(void)
         vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
         vdp2_scrn_ch_format_set(&cfg);
 
-        tmrs[0] = 0xFFFFFFFF;
-        tmrs[1] = 0xFFFFFFFF;
-        tmrs[2] = 0xFFFFFFFF;
-        tmrs[3] = 0xEEEEE662;
-
-        vdp2_vram_cycle_pattern_set(tmrs);
+        vram_ctl = vdp2_vram_control_get();
+        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_PNDR_NBG2;
+        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_VCSTDR_NBG1;
+        vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_VCSTDR_NBG1;
+        vram_ctl->vram_cycp.pt[3].t4 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t3 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t2 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t1 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t0 = VRAM_CTL_CYCP_CPU_RW;
+        vdp2_vram_control_set(vram_ctl);
 
         /* Clear the first tile */
         for (y = 0; y < FONT_H; y++)
