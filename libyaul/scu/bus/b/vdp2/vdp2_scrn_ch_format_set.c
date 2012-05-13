@@ -45,6 +45,7 @@ pattern_name_control(struct scrn_ch_format *cfg)
                 scn = (((cfg->ch_scn & 0xFFFFF) >> 5) >> 10) & scn_bits;
 
                 pnc |= 0x8000 | /* Pattern name data size: 1-word */
+                    /* Supplementary character number */
                     scn |
                     /* Supplementary palette number */
                     ((cfg->ch_spn & 0x07) << 5) |

@@ -17,7 +17,7 @@ vdp2_scrn_ls_set(struct scrn_ls_format *ls)
         uint16_t lstau;
         uint16_t lstal;
 
-        lstau = (ls->ls_lsta >> 17) & 0x7;
+        lstau = (ls->ls_lsta >> 17) & 0x0007;
         lstal = (ls->ls_lsta >> 1) & 0xFFFF;
 
         switch (ls->ls_scrn) {
