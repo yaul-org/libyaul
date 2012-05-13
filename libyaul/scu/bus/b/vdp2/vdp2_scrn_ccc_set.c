@@ -50,5 +50,6 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 break;
         default:
+                break;
         }
 }

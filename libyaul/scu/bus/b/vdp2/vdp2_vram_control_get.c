@@ -13,5 +13,5 @@ struct vram_ctl *
 vdp2_vram_control_get(void)
 {
 
-        return vram_ctl;
+        return &vram_ctl;
 }

@@ -16,8 +16,6 @@
 #include "exception.h"
 #include "monitor.h"
 
-#define BLCS_COL(x) (0x0001FFFE + (x))
-
 static void spin(void);
 static void format(struct cpu_registers *, const char *);
 
@@ -101,7 +99,7 @@ format(struct cpu_registers *regs, const char *exception_name)
         /* Reset the VDP2 */
         vdp2_init();
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color, 0);
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x00000), blcs_color, 0);
 
         monitor_init();
 

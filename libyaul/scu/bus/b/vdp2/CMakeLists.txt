@@ -1,6 +1,7 @@
 SET(scu_bus_b_vdp2_SRC
   vdp2_init.c
   vdp2_scrn_bm_format_set.c
+  vdp2_scrn_ccc_set.c
   vdp2_scrn_ch_format_set.c
   vdp2_scrn_display_set.c
   vdp2_scrn_ls_set.c
@@ -17,6 +18,7 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_tvmd_vblank_in_wait.c
   vdp2_tvmd_vblank_out_wait.c
   vdp2_tvmd_vcount_get.c
+  vdp2_vram_control_get.c
   vdp2_vram_control_set.c
 )
 

@@ -10,13 +10,19 @@
 
 #include <inttypes.h>
 
-/* Write and read directly to specified address. */
+/* Write and read directly to specified address */
 #define MEM_POKE(x, y)  (*(volatile uint16_t *)(x) = (y))
 #define MEM_READ(x)     (*(volatile uint16_t *)(x))
 
-/* Macros specific for processor. */
+/* Macros specific for processor */
 #define CRAM_BANK(x, y) (0x25F00000 + ((x) << 4) + ((y) << 1))
 #define VDP2(x)         (0x25F80000 + ((x) << 1))
+
+/* Helpers specific to this processor */
+#define VRAM_BANK_4MBIT(x)      (((x) >> 1) & 0xFFFF)
+#define VRAM_OFFSET_4MBIT(x)    (((x) >> 17) & 0x0007)
+#define VRAM_BANK_8MBIT(x)      (((x) >> 1) & 0xFFFF)
+#define VRAM_OFFSET_8MBIT(x)    (((x) >> 18) & 0x0007)
 
 enum {
         TVMD,
@@ -181,5 +187,6 @@ struct vdp2_regs {
 };
 
 extern struct vdp2_regs vdp2_regs;
+extern struct vram_ctl vram_ctl;
 
 #endif /* !_VDP2_INTERNAL_H_ */

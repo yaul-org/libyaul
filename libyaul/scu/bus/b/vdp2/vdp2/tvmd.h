@@ -14,7 +14,7 @@
 extern bool vdp2_tvmd_vblank_status_get(void);
 extern uint16_t vdp2_tvmd_hcount_get(void);
 extern uint16_t vdp2_tvmd_vcount_get(void);
-extern void vdp2_tvmd_blcs_set(bool, uint8_t, uint32_t, uint16_t *, uint16_t);
+extern void vdp2_tvmd_blcs_set(bool, uint32_t, uint16_t *, uint16_t );
 extern void vdp2_tvmd_display_clear(void);
 extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_vblank_in_wait(void);

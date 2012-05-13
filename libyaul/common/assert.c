@@ -32,7 +32,7 @@ panic(const char *s, const char *cond, const char *file, uint32_t line, const ch
 
         /* Reset the VDP2 */
         vdp2_init();
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 0, 0x00000000, blcs_color, 0);
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(0, 0x00000), blcs_color, 0);
         vdp2_tvmd_display_set(); /* Turn display ON */
 
         monitor_init();

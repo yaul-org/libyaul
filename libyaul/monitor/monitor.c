@@ -399,15 +399,15 @@ monitor_init(void)
         vdp2_tvmd_display_clear();
 
         /* VRAM B1 */
-        info.pnt[0] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x10000);
+        info.pnt[0] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x10000);
         /* VRAM B1 */
-        info.pnt[1] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x10000);
+        info.pnt[1] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x10000);
         /* VRAM B1 */
-        info.pnt[2] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        info.pnt[2] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x18000);
         /* VRAM B1 */
-        info.pnt[3] = (uint16_t *)VRAM_BANK_4MBIT(3, 0x18000);
+        info.pnt[3] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x18000);
         /* VRAM B1 */
-        info.character = (uint32_t *)VRAM_BANK_4MBIT(3, 0x00000);
+        info.character = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
 
         cfg.ch_scrn = SCRN_NBG2;
         cfg.ch_cs = 1 * 1; /* 1x1 cells */
