@@ -17,10 +17,10 @@ vdp2_scrn_mosaic_set(uint8_t scrn, uint8_t x, uint8_t y)
          * cell-scroll vertically */
 
         vdp2_regs.mzctl &= 0x0FFF;
-        vdp2_regs.mzctl |= x & 0xF;
+        vdp2_regs.mzctl |= (x & 0xF) << 12;
 
         vdp2_regs.mzctl &= 0xF0FF;
-        vdp2_regs.mzctl |= y & 0xF;
+        vdp2_regs.mzctl |= (y & 0xF) << 8;
 
         switch (scrn) {
         case SCRN_RBG1:
