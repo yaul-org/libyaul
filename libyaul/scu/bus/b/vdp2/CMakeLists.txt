@@ -4,8 +4,11 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_scrn_ch_format_set.c
   vdp2_scrn_display_set.c
   vdp2_scrn_ls_set.c
-  vdp2_scrn_vcs_set.c
+  vdp2_scrn_mosaic_set.c
   vdp2_scrn_rp_mode_set.c
+  vdp2_scrn_scv_x_set.c
+  vdp2_scrn_scv_y_set.c
+  vdp2_scrn_vcs_set.c
   vdp2_tvmd_blcs_set.c
   vdp2_tvmd_display_clear.c
   vdp2_tvmd_display_set.c
@@ -14,7 +17,7 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_tvmd_vblank_in_wait.c
   vdp2_tvmd_vblank_out_wait.c
   vdp2_tvmd_vcount_get.c
-  vdp2_vram_cycle_pattern_set.c
+  vdp2_vram_control_set.c
 )
 
 SET(scu_bus_b_vdp2_INSTALL_FILES

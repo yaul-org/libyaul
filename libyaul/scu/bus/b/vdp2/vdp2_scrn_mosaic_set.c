@@ -45,6 +45,7 @@ vdp2_scrn_mosaic_set(uint8_t scrn, uint8_t x, uint8_t y)
                 vdp2_regs.mzctl |= 0x0010;
                 break;
         default:
+                return;
         }
 
         /* Write to memory */

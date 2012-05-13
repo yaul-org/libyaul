@@ -13,6 +13,11 @@
 
 struct vdp2_regs vdp2_regs;
 
+struct vram_ctl vram_ctl = {
+        .vram_size = VRAM_CTL_SIZE_4MBIT,
+        .vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B
+};
+
 void
 vdp2_init(void)
 {

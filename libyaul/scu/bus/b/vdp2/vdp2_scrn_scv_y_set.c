@@ -41,5 +41,6 @@ vdp2_scrn_scv_y_set(uint8_t scrn, uint16_t in, uint8_t dn)
                 MEM_POKE(VDP2(SCYN3), in);
                 break;
         default:
+                return;
         }
 }
