@@ -87,9 +87,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctla &= 0xFFFE;
                 vdp2_regs.chctla |= cfg->ch_cs >> 2;
 
-                vdp2_regs.prina &= 0x0F00;
-                vdp2_regs.prina |= cfg->ch_pri;
-
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFFC;
                 vdp2_regs.plsz |= cfg->ch_pls - 1;
@@ -107,10 +104,6 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.chctla &= 0xFEFF;
                 vdp2_regs.chctla |= (cfg->ch_cs >> 2) << 6;
 
-                /* Priority */
-                vdp2_regs.prina &= 0x000F;
-                vdp2_regs.prina |= cfg->ch_pri << 8;
-
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFF3;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 2;
@@ -120,16 +113,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEM_POKE(VDP2(MPABN1), ab);
                 MEM_POKE(VDP2(MPCDN1), cd);
                 MEM_POKE(VDP2(PNCN1), pnc);
-                MEM_POKE(VDP2(PRINA), vdp2_regs.prina);
                 break;
         case SCRN_NBG2:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFFE;
                 vdp2_regs.chctlb |= cfg->ch_cs >> 2;
-
-                /* Priority */
-                vdp2_regs.prinb &= 0x0F00;
-                vdp2_regs.prinb |= cfg->ch_pri;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xFFCF;
@@ -141,18 +129,13 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEM_POKE(VDP2(MPABN2), ab);
                 MEM_POKE(VDP2(MPCDN2), cd);
                 MEM_POKE(VDP2(PNCN2), pnc);
-                MEM_POKE(VDP2(PRINB), vdp2_regs.prinb);
                 break;
         case SCRN_NBG3:
-                /* Character Size */
+                /* Character size */
                 vdp2_regs.chctlb &= 0xFFEF;
                 vdp2_regs.chctlb |= cfg->ch_cs << 2;
 
-                /* Priority */
-                vdp2_regs.prinb &= 0x000F;
-                vdp2_regs.prinb |= cfg->ch_pri << 8;
-
-                /* Plane Size */
+                /* Plane size */
                 vdp2_regs.plsz &= 0xFF3F;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
 
@@ -162,15 +145,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEM_POKE(VDP2(MPABN3), ab);
                 MEM_POKE(VDP2(MPCDN3), cd);
                 MEM_POKE(VDP2(PNCN3), pnc);
-                MEM_POKE(VDP2(PRINB), vdp2_regs.prinb);
                 break;
         case SCRN_RBG0:
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFEFF;
                 vdp2_regs.chctlb |= cfg->ch_cs << 6;
-
-                vdp2_regs.prir &= 0x0F00;
-                vdp2_regs.prir |= cfg->ch_pri;
 
                 /* Plane size */
                 if ((vdp2_regs.rpmd & 0x0001) == 0x000) {
@@ -205,9 +184,8 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
                 MEM_POKE(VDP2(PNCN3), pnc);
-                MEM_POKE(VDP2(PRIR), vdp2_regs.prir);
                 break;
         default:
-                break;
+                return;
         }
 }

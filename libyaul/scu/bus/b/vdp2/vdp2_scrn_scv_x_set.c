@@ -14,20 +14,17 @@ vdp2_scrn_scv_x_set(uint8_t scrn, uint16_t in, uint8_t dn)
 {
         in &= 0x07FF;
 
+        dn &= 0xFF;
+        dn <<= 8;
+
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                dn &= 0xFF;
-                dn <<= 8;
-
                 /* Write to memory */
                 MEM_POKE(VDP2(SCXIN0), in);
                 MEM_POKE(VDP2(SCXDN0), dn);
                 break;
         case SCRN_NBG1:
-                dn &= 0xFF;
-                dn <<= 8;
-
                 /* Write to memory */
                 MEM_POKE(VDP2(SCXIN1), in);
                 MEM_POKE(VDP2(SCXDN1), dn);

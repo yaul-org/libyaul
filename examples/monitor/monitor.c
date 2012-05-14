@@ -21,7 +21,7 @@
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x001F) | (((g) & 0x001F)  << 5) | (((b) & 0x001F) << 10))
 
-static uint32_t *line_scroll_tb = (uint32_t *)VRAM_BANK_4MBIT(0, 0x00000);
+static uint32_t *line_scroll_tb = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x1F000);
 
 static void
 line_scroll(void)
@@ -40,18 +40,76 @@ line_scroll(void)
 }
 
 static void
+bitmap_screen(void)
+{
+        struct scrn_bm_format cfg;
+        struct vram_ctl *vram_ctl;
+
+        cfg.bm_scrn = SCRN_NBG0;
+        cfg.bm_bs = SCRN_BM_BMSZ_512_256;
+        cfg.bm_sp = 0;
+        cfg.bm_scc = 0;
+        cfg.bm_spn = 0;
+
+        vdp2_scrn_ccc_set(SCRN_NBG0, SCRN_CCC_CHC_32768);
+        vdp2_scrn_bm_format_set(&cfg);
+        vdp2_priority_spn_set(SCRN_NBG0, 1);
+
+        vram_ctl = vdp2_vram_control_get();
+        vram_ctl->vram_cycp.pt[1].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t6 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t5 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[1].t4 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[1].t3 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[1].t2 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[1].t1 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[1].t0 = VRAM_CTL_CYCP_CPU_RW;
+        vdp2_vram_control_set(vram_ctl);
+
+        vdp2_scrn_display_set(SCRN_NBG0, /* no_trans = */ false);
+}
+
+static void
+bitmap_update_screen(void)
+{
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+
+        uint32_t x;
+        uint32_t y;
+        static uint32_t z = 0;
+
+        uint16_t *bitmap;
+
+        bitmap = (uint16_t *)VRAM_ADDR_4MBIT(0, 0x00000);
+        for (y = 0; y < 256; y++) {
+                for (x = 0; x < 512; x++) {
+                        r = lut_sin[(0) & 0x1FF];
+                        g = lut_sin[(0) & 0x1FF];
+                        b = lut_sin[(0) & 0x1FF];
+                        bitmap[x + (y << 9)] = RGB((x * y) % 15, x % 15, x % 15);
+                }
+        }
+        z++;
+        z &= 16;
+}
+
+static void
 line_scroll_screen(void)
 {
         struct scrn_ch_format cfg;
-        uint32_t tmrs[4];
+        struct vram_ctl *vram_ctl;
 
         uint16_t *pnt;
         uint32_t *character;
         uint32_t x;
         uint32_t y;
+        uint32_t character_ofs;
 
-        character = (uint32_t *)VRAM_BANK_4MBIT(2, 0x00000);
-        pnt = (uint16_t *)VRAM_BANK_4MBIT(2, 0x04000);
+        character_ofs = 0x1EFC0;
+        character = (uint32_t *)VRAM_ADDR_4MBIT(2, character_ofs);
+        pnt = (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000);
 
         cfg.ch_scrn = SCRN_NBG1;
         cfg.ch_cs = 1 * 1; /* 1x1 cells */
@@ -66,17 +124,21 @@ line_scroll_screen(void)
         cfg.ch_map[1] = (uint32_t)pnt;
         cfg.ch_map[2] = (uint32_t)pnt;
         cfg.ch_map[3] = (uint32_t)pnt;
-        cfg.ch_chc = SCRN_CH_CHC_16;
-        cfg.ch_pri = 1;
 
+        vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
+        vdp2_priority_spn_set(SCRN_NBG1, 1);
         vdp2_scrn_ch_format_set(&cfg);
 
-        tmrs[0] = 0xEEEEEEED;
-        tmrs[1] = 0xFFFFFFFF;
-        tmrs[2] = 0xEEEEE551;
-        tmrs[3] = 0xEEEEE662;
-
-        vdp2_vram_cycle_pattern_set(tmrs);
+        vram_ctl = vdp2_vram_control_get();
+        vram_ctl->vram_cycp.pt[2].t7 = VRAM_CTL_CYCP_PNDR_NBG1;
+        vram_ctl->vram_cycp.pt[2].t6 = VRAM_CTL_CYCP_CHPNDR_NBG1;
+        vram_ctl->vram_cycp.pt[2].t5 = VRAM_CTL_CYCP_CHPNDR_NBG1;
+        vram_ctl->vram_cycp.pt[2].t4 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[2].t3 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[2].t2 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[2].t1 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[2].t0 = VRAM_CTL_CYCP_CPU_RW;
+        vdp2_vram_control_set(vram_ctl);
 
         /* Draw two tiles */
         y = 0;
@@ -86,7 +148,7 @@ line_scroll_screen(void)
         *character++ = 0xFFFFFFFF;
         for (y = 0; y < 8; y++)
                 *character++ = 0x00000000;
-        character = (uint32_t *)VRAM_BANK_4MBIT(0, 0x00000);
+        character = (uint32_t *)VRAM_ADDR_4MBIT(2, character_ofs);
 
         /* Set up the map */
         for (y = 0; y < 64; y++) {
@@ -170,18 +232,21 @@ main(void)
         uint32_t mask;
 
         vdp2_init();
-        vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ true, 1, 0x00000, blcs_color, sizeof(blcs_color));
-        smpc_init();
+        /* smpc_init(); */
+
+        vdp2_tvmd_blcs_set(/* lcclmd = */ true, VRAM_ADDR_4MBIT(2, 0x1BE40),
+            blcs_color, sizeof(blcs_color));
 
         monitor_init();
         line_scroll_screen();
+        bitmap_screen();
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
 
                 line_scroll();
+                bitmap_update_screen();
 
                 (void)sprintf(text,
                     "[1;41mPORT: %d        PORT: %d\n"

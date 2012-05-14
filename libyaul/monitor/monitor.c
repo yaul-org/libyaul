@@ -14,8 +14,10 @@
 
 #include <vdp2/cram.h>
 #include <vdp2/vram.h>
+#include <vdp2/priority.h>
 #include <vdp2/pn.h>
-#include <vdp2.h>
+#include <vdp2/scrn.h>
+#include <vdp2/tvmd.h>
 
 #include <monitor.h>
 
@@ -422,9 +424,9 @@ monitor_init(void)
         cfg.ch_map[1] = (uint32_t)info.pnt[1];
         cfg.ch_map[2] = (uint32_t)info.pnt[2];
         cfg.ch_map[3] = (uint32_t)info.pnt[3];
-        cfg.ch_pri = 7;
 
         vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
+        vdp2_priority_spn_set(SCRN_NBG2, 7);
         vdp2_scrn_ch_format_set(&cfg);
 
         vram_ctl = vdp2_vram_control_get();

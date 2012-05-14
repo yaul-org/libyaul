@@ -1,5 +1,6 @@
 SET(scu_bus_b_vdp2_SRC
   vdp2_init.c
+  vdp2_priority_spn_set.c
   vdp2_scrn_bm_format_set.c
   vdp2_scrn_ccc_set.c
   vdp2_scrn_ch_format_set.c

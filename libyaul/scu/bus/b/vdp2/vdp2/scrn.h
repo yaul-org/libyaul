@@ -32,7 +32,12 @@ enum scrn_rp_mode_type {
 #define SCRN_CCC_CHC_16770000   4 /* RGB Format */
 
 struct scrn_bm_format {
-        uint8_t ch_scrn;        /* Normal/rotational background */
+        uint8_t bm_scrn;        /* Normal/rotational background */
+
+#define SCRN_BM_BMSZ_512_256    0 /* Bitmap size 512x256 */ 
+#define SCRN_BM_BMSZ_512_512    1 /* Bitmap size 512x512 */ 
+#define SCRN_BM_BMSZ_1024_256   2 /* Bitmap size 1024x256 */ 
+#define SCRN_BM_BMSZ_1024_512   3 /* Bitmap size 1024x512 */ 
         uint8_t bm_bs;          /* Bitmap size */
         uint8_t bm_sp;          /* Special priority */
         uint8_t bm_scc;         /* Supplementary character number */
@@ -51,7 +56,6 @@ struct scrn_ch_format {
         uint8_t ch_pls;         /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
         uint32_t ch_map[4];     /* Map lead addresses */
         uint8_t ch_mapofs;      /* Map offset */
-        uint8_t ch_pri;         /* Priority [0..7] When priority is zero, scroll screen is transparent. */
 };
 
 struct scrn_ls_format {
@@ -71,14 +75,14 @@ struct scrn_vcs_format {
         uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
 };
 
-extern void vdp2_scrn_bm_format_set(uint8_t, struct scrn_bm_format *);
+extern void vdp2_scrn_bm_format_set(struct scrn_bm_format *);
 extern void vdp2_scrn_ccc_set(uint8_t, uint8_t);
 extern void vdp2_scrn_ch_format_set(struct scrn_ch_format *);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
-extern void vdp2_scrn_mosaic_set(uint8_t, uint8_t, uint8_t);
 extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
+extern void vdp2_scrn_mosaic_set(uint8_t, uint8_t, uint8_t);
 
 extern void vdp2_scrn_rp_mode_set(enum scrn_rp_mode_type);
 

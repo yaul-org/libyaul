@@ -15,7 +15,6 @@
 #define MEM_READ(x)     (*(volatile uint16_t *)(x))
 
 /* Macros specific for processor */
-#define CRAM_BANK(x, y) (0x25F00000 + ((x) << 4) + ((y) << 1))
 #define VDP2(x)         (0x25F80000 + ((x) << 1))
 
 /* Helpers specific to this processor */
