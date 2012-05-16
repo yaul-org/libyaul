@@ -22,6 +22,9 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
                 break;
         case SCRN_NBG1:
+                if (chc > SCRN_CCC_CHC_16770000)
+                        return;
+
                 vdp2_regs.chctla &= 0xCFFF;
                 vdp2_regs.chctla |= chc << 12;
 

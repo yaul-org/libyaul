@@ -20,6 +20,7 @@ pattern_name_control(struct scrn_ch_format *cfg)
 
         switch (cfg->ch_pnds) {
         case 1:
+                /* Pattern name data size: 1-word */
                 /* Character number supplement mode */
                 switch (cfg->ch_cnsm) {
                 case 0:
@@ -39,6 +40,7 @@ pattern_name_control(struct scrn_ch_format *cfg)
                         break;
                 default:
                         scn_bits = 0;
+                        break;
                 }
                 /* Calculate the supplementary character number from the
                  * character lead address */

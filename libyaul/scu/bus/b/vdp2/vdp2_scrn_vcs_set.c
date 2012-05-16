@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <vdp2/scrn.h>
-
 #include <assert.h>
+
+#include <vdp2/scrn.h>
 
 #include "vdp2_internal.h"
 

@@ -27,7 +27,6 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
         }
 
         switch (b->bm_scrn) {
-        case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Screen display format */
                 vdp2_regs.chctla &= 0xFFFD;
