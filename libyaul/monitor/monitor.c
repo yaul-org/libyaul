@@ -419,20 +419,20 @@ monitor_init(void)
         cfg.ch_scc = 0;
         cfg.ch_spn = 0;
         cfg.ch_scn = (uint32_t)info.character;
-        cfg.ch_pls = 2 * 2; /* 1x1 plane size */
+        cfg.ch_pls = 1 * 1; /* 1x1 plane size */
         cfg.ch_map[0] = (uint32_t)info.pnt[0];
         cfg.ch_map[1] = (uint32_t)info.pnt[1];
         cfg.ch_map[2] = (uint32_t)info.pnt[2];
         cfg.ch_map[3] = (uint32_t)info.pnt[3];
 
         vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
-        vdp2_priority_spn_set(SCRN_NBG2, 7);
         vdp2_scrn_ch_format_set(&cfg);
+        vdp2_priority_spn_set(SCRN_NBG2, 7);
 
         vram_ctl = vdp2_vram_control_get();
-        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_PNDR_NBG2;
-        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_VCSTDR_NBG1;
-        vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_VCSTDR_NBG1;
+        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CHPNDR_NBG2;
+        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_PNDR_NBG2;
+        vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t4 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t3 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t2 = VRAM_CTL_CYCP_CPU_RW;
