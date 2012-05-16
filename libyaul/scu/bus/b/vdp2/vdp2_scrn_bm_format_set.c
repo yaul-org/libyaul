@@ -5,8 +5,6 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <assert.h>
-
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
@@ -47,7 +45,7 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
                 vdp2_regs.bmpna &= 0xFFDF;
                 vdp2_regs.bmpna |= b->bm_sp << 5;
 
-                /* Supplementary color number */
+                /* special color calculation */
                 vdp2_regs.bmpna &= 0xFFEF;
                 vdp2_regs.bmpna |= b->bm_scc << 4;
 
@@ -83,7 +81,7 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
 
                 /* Supplementary palette number */
                 vdp2_regs.bmpna &= 0xF8FF;
-                vdp2_regs.bmpna |= (b->bm_spn & 0x7) << 8;
+                vdp2_regs.bmpna |= (b->bm_spn & 0x07) << 8;
 
                 /* Write to memory */
                 MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);

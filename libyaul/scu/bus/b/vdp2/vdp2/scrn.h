@@ -39,10 +39,10 @@ struct scrn_bm_format {
 #define SCRN_BM_BMSZ_1024_256   2 /* Bitmap size 1024x256 */ 
 #define SCRN_BM_BMSZ_1024_512   3 /* Bitmap size 1024x512 */ 
         uint8_t bm_bs;          /* Bitmap size */
-        uint32_t bm_pb;         /* Bitmap pattern boundry (lead addr.) */
         uint8_t bm_sp;          /* Special priority */
-        uint8_t bm_scc;         /* Supplementary character number */
+        uint8_t bm_scc;         /* Special color calculation */
         uint8_t bm_spn;         /* Supplementary palette number */
+        uint32_t bm_pb;         /* Bitmap pattern boundry (lead addr.) */
 };
 
 struct scrn_ch_format {
