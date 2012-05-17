@@ -1,39 +1,24 @@
+include ../common.mk
+
 PROJECT= monitor
-AS= sh-elf-as
-AFLAGS+= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
-CC= sh-elf-gcc
-NM= sh-elf-nm
-CFLAGS= -nostdlib -ansi -W -Wall -Werror -Wno-unused -m2 -mb -O2 -ffast-math -fomit-frame-pointer \
-	-I../../libyaul \
-	-I../../libyaul/common \
-	-I../../libyaul/scu \
-	-I../../libyaul/scu/bus/cpu \
-	-I../../libyaul/scu/bus/cpu/smpc \
-	-I../../libyaul/scu/bus/b/vdp1 \
-	-I../../libyaul/scu/bus/b/vdp2
-LD= sh-elf-gcc
-LDFLAGS+= -Wl,-Map,${PROJECT}.map -nostartfiles  -L.
-OB= sh-elf-objcopy
-OD= sh-elf-objdump
-
-OBJECTS= ../../libyaul/common/crt0.o ../../libyaul/common/crt0-init.o lut.o monitor.o
-
-.SUFFIXES: .c .o
+OBJECTS+= monitor.o
 
 .PHONY: clean
 
+.SUFFIXES: .c .o
+
 .c.o:
-	${CC} ${CFLAGS} -c -o ${@} ${<}
+	$(CC) $(CFLAGS) -c -o $(@) $(<)
 .s:
-	${AS} ${AFLAGS} -o ${@} ${<}
+	$(AS) $(AFLAGS) -o $(@) $(<)
 
-all: clean ${PROJECT}.elf
-
-${PROJECT}.elf: ${OBJECTS}
-	${LD} ${LDFLAGS} -T ../../libyaul/common/ldscripts/shelf.x ${?} -o ${@} -L../../build/libyaul -lyaul
-	$(OB) -O binary ${@} ${PROJECT}.bin
-	$(NM) ${PROJECT}.elf > ${PROJECT}.sym 
-	$(OD) -S ${PROJECT}.elf > ${PROJECT}.asm
+$(PROJECT).elf: $(OBJECTS)
+	$(LD) $(LDFLAGS) $(OBJECTS) \
+		-o $(@) -L. -L../../build/libyaul -lyaul
+	$(OB) -O binary $(@) $(PROJECT).bin
+	$(NM) $(PROJECT).elf > $(PROJECT).sym
+	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
 
 clean:
-	-rm -f ${OBJECTS} ${PROJECT}.bin ${PROJECT}.elf ${PROJECT}.map
+	-rm -f $(OBJECTS) \
+	$(PROJECT).asm $(PROJECT).bin $(PROJECT).elf $(PROJECT).map $(PROJECT).sym
