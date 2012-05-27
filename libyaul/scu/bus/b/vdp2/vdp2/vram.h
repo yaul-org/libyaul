@@ -25,6 +25,16 @@ struct vram_ctl {
 #define VRAM_CTL_MODE_PART_BANK_B 0x0200 /* Partition VRAM-B into two banks */
         uint16_t vram_mode;     /* VRAM mode bank partitions */
 
+/*
+ * Number of accesses required:
+ * 1 - Pattern name data (1-word or 2-word)
+ * 1 - 16-color character pattern or bitmapped data
+ * 2 - 256-color character pattern or bitmapped data
+ * 4 - 2048-color character pattern or bitmapped data
+ * 4 - 32K-color character pattern or bitmapped data
+ * 8 - 16M-color character pattern or bitmapped data
+ * 1 - Vertical cell scroll table data
+ */
 #define VRAM_CTL_CYCP_PNDR_NBG0 0x0 /* NBG0 pattern name data read */
 #define VRAM_CTL_CYCP_PNDR_NBG1 0x1 /* NBG1 pattern name data read */
 #define VRAM_CTL_CYCP_PNDR_NBG2 0x2 /* NBG2 pattern name data read */

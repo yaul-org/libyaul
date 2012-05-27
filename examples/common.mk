@@ -21,8 +21,9 @@ CFLAGS= -ansi \
         -I../../libyaul/scu/bus/b/scsp \
         -I../../libyaul/scu/bus/b/vdp1 \
         -I../../libyaul/scu/bus/b/vdp2 \
-	-I../../libyaul/scu/bus/cpu \
+        -I../../libyaul/scu/bus/cpu \
         -I../../libyaul/scu/bus/cpu/smpc
 LDFLAGS= -Wl,-Map,${PROJECT}.map -nostartfiles -T $(ROOTDIR)/common/ldscripts/shelf.x
 
+# All programs must link this as the first object (crt0.o)
 OBJECTS= $(ROOTDIR)/common/crt0.o $(ROOTDIR)/common/crt0-init.o

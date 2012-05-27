@@ -27,6 +27,8 @@ vdp2_vram_control_set(struct vram_ctl *ctl)
         MEM_POKE(VDP2(RAMCTL), ramctl);
 
         /* Cycle patterns */
+        /* The VDP2 is not smart enough to direct all of this VRAM
+         * traffic automatically; you must do it yourself */
         MEM_POKE(VDP2(CYCA0L), ctl->vram_cycp.pv[0] & 0xFFFF);
         MEM_POKE(VDP2(CYCA0U), (ctl->vram_cycp.pv[0] >> 16) & 0xFFFF);
 

@@ -13,8 +13,6 @@
 
 #include <monitor.h>
 
-#include "lut.h"
-
 int
 main(void)
 {

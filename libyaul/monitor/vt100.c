@@ -291,13 +291,13 @@ is_delimiter(char **buf, int *c)
         uint32_t i;
 
         for (i = 0, tmp = num; *(*buf) != '\0'; i++) {
-                if (!(isdigit(*(*buf))))
+                if (!(isdigit((int)**buf)))
                         break;
 
                 /* Stop at the second to last element. */
                 if (i == (sizeof(num) - 2)) {
                         /* Truncate all the discarded digits. */
-                        while (isdigit(*(*buf)))
+                        while (isdigit((int)**buf))
                                 (*buf)++;
                         break;
                 }
