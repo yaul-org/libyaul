@@ -1,0 +1,149 @@
+#!/bin/sh
+
+# Copyright (c) 2012
+# See LICENSE for details.
+#
+# Dave Murphy <davem@devkitpro.org>
+# Israel Jacques <mrko@eecs.berkeley.edu>
+
+# Look for automated configuration file to bypass prompts
+[ -f 'config' ] && . './config' || panic "Configuration file 'config' not found" 1
+[ -f 'utils' ] && . './utils' || exit 1
+
+TARGET='sh-elf'
+PREFIX="${BUILD_INSTALL_DIR}/${TARGET}"
+
+# Sane defaults for building toolchain
+CFLAGS="-O2 -pipe"
+export "CFLAGS"
+CXXFLAGS="${CFLAGS}"
+export "CXXFLAGS"
+unset "LDFLAGS"
+
+# Add installed devkit to the path, adjusting path on minsys
+PATH="${BUILD_INSTALL_DIR}/${TARGET}/bin:${PATH}"
+export "PATH"
+
+# Ask whether to download the source packages or not
+GCC_VER='4.6.3'
+GCC_CORE="gcc-core-${GCC_VER}.tar.bz2"
+GNU_URL="ftp://ftp.gnu.org/gnu"
+GCC_CORE_URL="${GNU_URL}/gcc/gcc-${GCC_VER}/${GCC_CORE}"
+GCC_GPP="gcc-g++-${GCC_VER}.tar.bz2"
+GCC_GPP_URL="${GNU_URL}/gcc/gcc-${GCC_VER}/${GCC_GPP}"
+GCC_SRC_DIR="gcc-${GCC_VER}"
+
+BINUTILS_VER='2.22'
+BINUTILS="binutils-${BINUTILS_VER}.tar.bz2"
+BINUTILS_URL="$GNU_URL/binutils/${BINUTILS}"
+BINUTILS_SRC_DIR="binutils-${BINUTILS_VER}"
+
+GDB_VER='7.4'
+GDB="gdb-${GDB_VER}.tar.bz2"
+GDB_URL="${GNU_URL}/gdb/${GDB}"
+GDB_SRC_DIR="gdb-${GDB_VER}"
+
+NEWLIB_VER='1.20.0'
+NEWLIB_URL="ftp://sources.redhat.com/pub/newlib"
+NEWLIB="newlib-${NEWLIB_VER}.tar.gz"
+NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
+NEWLIB_SRC_DIR="newlib-${NEWLIB_VER}"
+
+# Get preferred installation directory and set paths to the sources
+[ ! -z "${BUILD_INSTALL_DIR}" ] && \
+    mkdir -p "${BUILD_INSTALL_DIR}" && \
+    # Make sure we have the proper permissions
+    touch "${BUILD_INSTALL_DIR}/non-existent-file" && \
+    rm "${BUILD_INSTALL_DIR}/non-existent-file" || \
+    panic "Invalid install path" 1
+
+cd "${BUILD_SRC_DIR}/"
+if [ "${BUILD_DOWNLOAD}" = "yes" ]; then
+    [ ! -f "${BINUTILS}" ] && \
+        panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
+
+    [ ! -f "${GCC_GPP}" ] && \
+        panic "'${GCC_GPP}' not found in ${BUILD_SRC_DIR}" 1
+
+    [ ! -f "${GCC_CORE}" ] && \
+        panic "'${GCC_CORE}' not found in ${BUILD_SRC_DIR}" 1
+
+    [ ! -f "${NEWLIB}" ] && \
+        panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
+
+    [ ! -f "${GDB}" ] && \
+        panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
+else
+    "${FETCH}" "${BINUTILS_URL}" || panic "Failed to download ${BINUTILS}" 1
+    "${FETCH}" "${GCC_CORE_URL}" || panic "Failed to download ${GCC_CORE}" 1
+    "${FETCH}" "${GCC_GPP_URL}" || panic "Failed to download ${GCC_GPP}" 1
+    "${FETCH}" "${GDB_URL}" || panic "Failed to download ${GDB}" 1
+    "${FETCH}" "${NEWLIB_URL}" || panic "Failed to download ${NEWLIB}" 1
+    touch "${BUILD_SRC_DIR}/downloaded_sources"
+fi
+cd "${OLDPWD}"
+
+# Find proper 'make'
+[ -z "${MAKE}" -a -x "`which 'gnumake'`" ] && MAKE="`which 'gnumake'`"
+[ -z "${MAKE}" -a -x "`which 'gmake'`" ] && MAKE="`which 'gmake'`"
+[ -z "${MAKE}" -a -x "`which 'make'`" ] && MAKE="`which 'make'`"
+[ -z "${MAKE}" ] && panic "'make' not found in \$PATH" 1
+export "MAKE"
+
+# Find proper 'awk'
+[ -z "${GAWK}" -a -x "`which 'gawk'`" ] && GAWK="`which 'gawk'`"
+[ -z "${GAWK}" -a -x "`which 'awk'`" ] && GAWK="`which 'awk'`"
+[ -z "${GAWK}" ] && panic "'awk' not found in \$PATH" 1
+export "GAWK"
+
+# Find 'makeinfo' (needed for Newlib)
+[ ! -x "`which 'makeinfo'`" ] && panic "'makeinfo' not found in \$PATH" 1
+
+# Extract source packages
+cd "${BUILD_SRC_DIR}"
+if [ ! -f 'extracted_archives' ]; then
+    message "Extracting '${BINUTILS}'"
+    tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
+
+    message "Extracting '$GCC_CORE'"
+    tar -xjf "${BUILD_SRC_DIR}/${GCC_CORE}" || panic "Extracting ${GCC_CORE}" 1
+
+    message "Extracting '${GCC_GPP}'"
+    tar -xjf "${BUILD_SRC_DIR}/${GCC_GPP}" || panic "Extracting ${GCC_GPP}" 1
+
+    message "Extracting '${NEWLIB}'"
+    tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
+
+    message "Extracting '${GDB}'"
+    tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GPP}" 1
+
+    touch "${BUILD_SRC_DIR}/extracted_archives"
+fi
+cd "${OLDPWD}"
+
+# Build and install devkit components
+if [ -f "${TARGET}/scripts/build-gcc" ]; then
+    . "${TARGET}/scripts/build-gcc" || panic "Error building cross-compiler" 1
+fi
+cd "${OLDPWD}"
+
+# Strip debug info from libraries
+find "${BUILD_INSTALL_DIR}/${TARGET}/lib/gcc/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
+find "${BUILD_INSTALL_DIR}/${TARGET}/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
+
+# Clean up temporary files and source directories
+rm -r -f "${TARGET}/binutils" \
+    "${TARGET}/gcc" \
+    "${TARGET}/newlib" \
+    "${BUILD_SRC_DIR}/built-binutils" \
+    "${BUILD_SRC_DIR}/built-gcc" \
+    "${BUILD_SRC_DIR}/built-newlib" \
+    "${BUILD_SRC_DIR}/configured-binutils" \
+    "${BUILD_SRC_DIR}/configured-gcc" \
+    "${BUILD_SRC_DIR}/configured-newlib" \
+    "${BUILD_SRC_DIR}/extracted_archives" \
+    "${BUILD_SRC_DIR}/installed-binutils" \
+    "${BUILD_SRC_DIR}/installed-gcc" \
+    "${BUILD_SRC_DIR}/installed-newlib"
+
+message "Add path '${BUILD_INSTALL_DIR}/${TARGET}/bin' to your \$PATH environment variable"

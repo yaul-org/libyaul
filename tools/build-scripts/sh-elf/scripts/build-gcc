@@ -1,0 +1,190 @@
+#!/bin/sh
+
+# Copyright (c) 2012
+# See LICENSE for details.
+#
+# Dave Murphy <davem@devkitpro.org>
+# Israel Jacques <mrko@eecs.berkeley.edu>
+
+# Build and install Binutils
+mkdir -p "${BUILD_SRC_DIR}/binutils"
+cd "${BUILD_SRC_DIR}/binutils"
+rm -f "../binutils.log"
+if [ ! -f 'configured-binutils' ]; then
+    message "Configuring Binutils"
+    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${BINUTILS_SRC_DIR}"/configure \
+        --prefix="${PREFIX}" \
+        --target="${TARGET}" \
+        --disable-nls \
+        --disable-shared \
+        --disable-debug \
+        --disable-threads \
+        --with-gcc \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-stabs) 1>> "../binutils.log" 2>&1 \
+        || panic "Couldn't configure Binutils, see '${BUILD_SRC_DIR}/binutils.log'" 1
+    touch "${BUILD_SRC_DIR}/configured-binutils"
+fi
+
+if [ ! -f 'built-binutils' ]; then
+    message "Building Binutils"
+    ("${MAKE}") 1>> "../binutils.log" 2>&1 || \
+        panic "Couldn't build Binutils, see '${BUILD_SRC_DIR}/binutils.log'" 1
+    touch "${BUILD_SRC_DIR}/built-binutils"
+fi
+
+if [ ! -f 'installed-binutils' ]; then
+    message "Installing Binutils"
+    ("${MAKE}" install) 1>> "../binutils.log" 2>&1 || \
+        panic "Couldn't install Binutils, see '${BUILD_SRC_DIR}/binutils.log'" 1
+    touch "${BUILD_SRC_DIR}/installed-binutils"
+fi
+cd "${OLDPWD}"
+
+
+# Build and install just the C compiler
+mkdir -p "${BUILD_SRC_DIR}/gcc"
+cd "${BUILD_SRC_DIR}/gcc"
+rm -f "../gcc.log"
+if [ ! -f 'configured-gcc' ]; then
+    message "Configuring GCC"
+    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" CFLAGS_FOR_TARGET="-O2" LDFLAGS_FOR_TARGET="" \
+        ../"${GCC_SRC_DIR}"/configure \
+        --with-newlib \
+        --enable-languages=c,c++ \
+        --disable-multilib \
+        --with-gcc --with-gnu-ld --with-gnu-as \
+        --disable-shared --disable-win32-registry --disable-nls \
+        --enable-static \
+        --disable-libstdcxx-pch \
+        --target="${TARGET}" \
+        --program-prefix="${TARGET}-" \
+        --prefix="${PREFIX}") 1>> "../gcc.log" 2>&1 \
+        || panic "Couldn't configure GCC, see '${BUILD_SRC_DIR}/gcc.log'" 1
+    touch "${BUILD_SRC_DIR}/configured-gcc"
+fi
+
+if [ ! -f 'built-gcc' ]; then
+    message "Building GCC"
+    ("${MAKE}" all-gcc) 1>> "../gcc.log" 2>&1 \
+        || panic "Couldn't build GCC, see '${BUILD_SRC_DIR}/gcc.log'" 1
+    touch "${BUILD_SRC_DIR}/built-gcc"
+fi
+
+if [ ! -f 'installed-gcc' ]; then
+    message "Installing GCC"
+    ("${MAKE}" install-gcc) 1>> "../gcc.log" 2>&1 \
+        || panic "Couldn't install GCC, see '${BUILD_SRC_DIR}/gcc.log'" 1
+    touch "${BUILD_SRC_DIR}/installed-gcc"
+fi
+unset "CFLAGS"
+cd "${OLDPWD}"
+
+
+# Build and install newlib
+mkdir -p "${BUILD_SRC_DIR}/newlib"
+cd "${BUILD_SRC_DIR}/newlib"
+rm -f "../newlib.log"
+if [ ! -f 'configured-newlib' ]; then
+    message "Configuring Newlib"
+    (../"${NEWLIB_SRC_DIR}"/configure \
+        --target="${TARGET}" \
+        --prefix="${PREFIX}" \
+        --disable-bootstrap \
+        --disable-build-poststage1-with-cxx \
+        --disable-build-with-cxx \
+        --disable-cloog-version-check \
+        --disable-dependency-tracking \
+        --disable-libada \
+        --disable-libquadmath \
+        --disable-libquadmath-support \
+        --disable-libssp \
+        --disable-maintainer-mode \
+        --disable-malloc-debugging \
+        --disable-multilib \
+        --disable-newlib-atexit-alloc \
+        --disable-newlib-hw-fp \
+        --disable-newlib-iconv \
+        --disable-newlib-io-float \
+        --disable-newlib-io-long-double \
+        --disable-newlib-io-long-long \
+        --disable-newlib-mb \
+        --disable-newlib-multithread \
+        --disable-newlib-supplied-syscalls \
+        --disable-objc-gc \
+        --enable-lto \
+        --enable-newlib-io-c99-formats \
+        --enable-newlib-io-pos-args \
+        --enable-newlib-reent-small \
+        --enable-newlib-register-fini \
+        --without-cloog \
+        --without-gmp \
+        --without-mpc \
+        --without-mpfr) 1>> "../newlib.log" 2>&1 \
+        || panic "Couldn't configure Newlib, see '${BUILD_SRC_DIR}/newlib.log'" 1
+        touch "${BUILD_SRC_DIR}/configured-newlib"
+fi
+
+if [ ! -f 'built-newlib' ]; then
+    message "Building Newlib"
+    ("${MAKE}") 1>> "../newlib.log" 2>&1 || \
+        panic "Couldn't build Newlib, see '${BUILD_SRC_DIR}/newlib.log'" 1
+    touch "${BUILD_SRC_DIR}/built-newlib"
+fi
+
+if [ ! -f 'installed-newlib' ]; then
+    message "Installing Newlib"
+    ("${MAKE}" install) 1>> "../newlib.log" 2>&1 || \
+        panic "Couldn't install Newlib, see '${BUILD_SRC_DIR}/newlib.log'" 1
+    touch "${BUILD_SRC_DIR}/installed-newlib"
+fi
+cd "${OLDPWD}"
+
+
+# Build and install the final compiler
+cd "${BUILD_SRC_DIR}/gcc"
+if [ ! -f 'built-g++' ]; then
+    message "Building GCC"
+    ("${MAKE}") 1>> "../gcc.log" 2>&1 || \
+        panic "Couldn't build GCC, see '${BUILD_SRC_DIR}/gcc.log'" 1
+    touch "${BUILD_SRC_DIR}/built-g++"
+fi
+
+if [ ! -f 'installed-g++' ]; then
+    message "Installing GCC"
+    ("${MAKE}" install) 1>> "../gcc.log" 2>&1 || \
+        panic "Couldn't install GCC, see '${BUILD_SRC_DIR}/gcc.log'" 1
+    touch "${BUILD_SRC_DIR}/installed-g++"
+fi
+cd "${OLDPWD}"
+
+
+# Build and install GDB
+mkdir -p "${BUILD_SRC_DIR}/gdb"
+cd "${BUILD_SRC_DIR}/gdb"
+rm -f "../gdb.log"
+if [ ! -f 'configured-gdb' ]; then
+    message "Configuring GDB"
+    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${GDB_SRC_DIR}"/configure \
+        --disable-nls \
+        --prefix="${PREFIX}" \
+        --target="${TARGET}" \
+        --disable-werror) 1>> "../gdb.log" 2>&1 \
+        || panic "Couldn't configure GDB, , see '${BUILD_SRC_DIR}/gdb.log'" 1
+    touch "${BUILD_SRC_DIR}/configured-gdb"
+fi
+
+if [ ! -f 'built-gdb' ]; then
+    message "Building GDB"
+    ("${MAKE}") 1>> "../gdb.log" 2>&1 || \
+        panic "Couldn't build GDB, see '${BUILD_SRC_DIR}/gdb.log'" 1
+    touch "${BUILD_SRC_DIR}/built-gdb"
+fi
+
+if [ ! -f 'installed-gdb' ]; then
+    message "Installing GDB"
+    ("${MAKE}" install) 1>> "../gdb.log" 2>&1 || \
+        panic "Couldn't install GDB, see '${BUILD_SRC_DIR}/gdb.log'" 1
+    touch "${BUILD_SRC_DIR}/installed-gdb"
+fi
