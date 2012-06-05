@@ -58,27 +58,53 @@ NEWLIB_SRC_DIR="newlib-${NEWLIB_VER}"
     panic "Invalid install path" 1
 
 cd "${BUILD_SRC_DIR}/"
-if [ "${BUILD_DOWNLOAD}" = "yes" ]; then
+rm -f "binutils.log" \
+    "gcc.log" \
+    "gdb.log" \
+    "newlib.log"
+if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${BINUTILS}" ] && \
         panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
-
-    [ ! -f "${GCC_GPP}" ] && \
-        panic "'${GCC_GPP}' not found in ${BUILD_SRC_DIR}" 1
 
     [ ! -f "${GCC_CORE}" ] && \
         panic "'${GCC_CORE}' not found in ${BUILD_SRC_DIR}" 1
 
-    [ ! -f "${NEWLIB}" ] && \
-        panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
+    [ ! -f "${GCC_GPP}" ] && \
+        panic "'${GCC_GPP}' not found in ${BUILD_SRC_DIR}" 1
 
     [ ! -f "${GDB}" ] && \
         panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
+
+    [ ! -f "${NEWLIB}" ] && \
+        panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
 else
-    "${FETCH}" "${BINUTILS_URL}" || panic "Failed to download ${BINUTILS}" 1
-    "${FETCH}" "${GCC_CORE_URL}" || panic "Failed to download ${GCC_CORE}" 1
-    "${FETCH}" "${GCC_GPP_URL}" || panic "Failed to download ${GCC_GPP}" 1
-    "${FETCH}" "${GDB_URL}" || panic "Failed to download ${GDB}" 1
-    "${FETCH}" "${NEWLIB_URL}" || panic "Failed to download ${NEWLIB}" 1
+    ! FETCH="`command -v "wget"`" && panic "Cannot find 'wget'" 1
+
+    if [ ! -f "${BINUTILS}" ]; then
+        message "Downloading '${BINUTILS}'"
+        ("${FETCH}" "${BINUTILS_URL}") 1>> "binutils.log" 2>&1 || panic "Failed to download ${BINUTILS}" 1
+    fi
+
+    if [ ! -f "${GCC_CORE}" ]; then
+        message "Downloading '${GCC_CORE}'"
+        ("${FETCH}" "${GCC_CORE_URL}")  1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC_CORE}" 1
+    fi
+
+    if [ ! -f "${GCC_GPP}" ]; then
+        message "Downloading '${GCC_GPP}'"
+        ("${FETCH}" "${GCC_GPP_URL}") 1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC_GPP}" 1
+    fi
+
+    if [ ! -f "${GDB}" ]; then
+        message "Downloading '${GDB}'"
+        ("${FETCH}" "${GDB_URL}") 1>> "gdb.log" 2>&1 || panic "Failed to download ${GDB}" 1
+    fi
+
+    if [ ! -f "${NEWLIB}" ]; then
+        message "Downloading '${NEWLIB}'"
+        ("${FETCH}" "${NEWLIB_URL}") 1>> "newlib.log" 2>&1 || panic "Failed to download ${NEWLIB}" 1
+    fi
+
     touch "${BUILD_SRC_DIR}/downloaded_sources"
 fi
 cd "${OLDPWD}"

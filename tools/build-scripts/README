@@ -1,0 +1,7 @@
+INSTALLATION
+  GNU Wget is required
+
+  As a normal user
+    $ cp config{.in,}
+    $ # Change the appropriate fields before you compile the cross-compiler
+    $ ./build-compiler

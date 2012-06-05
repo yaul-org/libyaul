@@ -9,7 +9,6 @@
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/binutils"
 cd "${BUILD_SRC_DIR}/binutils"
-rm -f "../binutils.log"
 if [ ! -f 'configured-binutils' ]; then
     message "Configuring Binutils"
     (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${BINUTILS_SRC_DIR}"/configure \
@@ -46,7 +45,6 @@ cd "${OLDPWD}"
 # Build and install just the C compiler
 mkdir -p "${BUILD_SRC_DIR}/gcc"
 cd "${BUILD_SRC_DIR}/gcc"
-rm -f "../gcc.log"
 if [ ! -f 'configured-gcc' ]; then
     message "Configuring GCC"
     (CFLAGS="${cflags}" LDFLAGS="${ldflags}" CFLAGS_FOR_TARGET="-O2" LDFLAGS_FOR_TARGET="" \
@@ -85,7 +83,6 @@ cd "${OLDPWD}"
 # Build and install newlib
 mkdir -p "${BUILD_SRC_DIR}/newlib"
 cd "${BUILD_SRC_DIR}/newlib"
-rm -f "../newlib.log"
 if [ ! -f 'configured-newlib' ]; then
     message "Configuring Newlib"
     (../"${NEWLIB_SRC_DIR}"/configure \
@@ -163,7 +160,6 @@ cd "${OLDPWD}"
 # Build and install GDB
 mkdir -p "${BUILD_SRC_DIR}/gdb"
 cd "${BUILD_SRC_DIR}/gdb"
-rm -f "../gdb.log"
 if [ ! -f 'configured-gdb' ]; then
     message "Configuring GDB"
     (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${GDB_SRC_DIR}"/configure \

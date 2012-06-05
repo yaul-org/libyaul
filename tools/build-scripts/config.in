@@ -11,7 +11,7 @@
 BUILD_DOWNLOAD="yes"
 
 # Absolute path to tool-chain installation directory
-BUILD_INSTALL_DIR="${HOME}/work/"
+BUILD_INSTALL_DIR="${HOME}/libyaul"
 
 # Absolute path to previously downloaded source packages
-BUILD_SRC_DIR="${HOME}/work/libyaul/tools/build-scripts/tmp"
+BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
