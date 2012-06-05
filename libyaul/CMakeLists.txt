@@ -1,6 +1,6 @@
 SET(SRC_DIRS
   common
-  monitor
+  cons
   tlsf
   scu
   scu/bus/a/cs0/dram-cartridge
@@ -14,6 +14,19 @@ SET(SRC_DIRS
   scu/dma
   scu/ic
   scu/timer
+)
+
+SET(INCLUDE_DIRS
+  .
+  common
+  scu
+  scu/bus/a/cs0/dram-cartridge
+  scu/bus/a/cs2/cd-block
+  scu/bus/b/scsp
+  scu/bus/b/vdp1
+  scu/bus/b/vdp2
+  scu/bus/cpu
+  scu/bus/cpu/smpc
 )
 
 # Macro that prepends a given string onto the beginning of each string in a list.
@@ -64,7 +77,7 @@ IF(WITH_DEBUG)
 ENDIF(WITH_DEBUG)
 
 # Default include directories.
-INCLUDE_DIRECTORIES(AFTER ${SRC_DIRS})
+INCLUDE_DIRECTORIES(AFTER ${INCLUDE_DIRS})
 
 # Build the library.
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${SRC})

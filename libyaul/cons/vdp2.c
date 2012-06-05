@@ -141,6 +141,10 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
         tofs = c << 3;
         cofs = cons_vdp2->character_no << 3;
 
+        /* Wait until we can draw */
+        vdp2_tvmd_vblank_in_wait();
+        vdp2_tvmd_vblank_out_wait();
+
         /* Expand cell */
         for (y = FONT_H - 1; y >= 0; y--) {
                 row = font_unpacked[font[y + tofs]];

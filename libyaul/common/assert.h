@@ -10,11 +10,11 @@
 
 #include <inttypes.h>
 
-void panic(const char *, const char *, const char *, uint32_t, const char *);
+void _assert(const char *, const char *, const char *, uint32_t, const char *);
 
 #define assert(c, s) do {                                                       \
                 if (!(c)) {                                                     \
-                        panic(s, #c, __FILE__, __LINE__, __FUNCTION__);         \
+                        _assert(s, #c, __FILE__, __LINE__, __FUNCTION__);       \
                 }                                                               \
         } while (0)
 

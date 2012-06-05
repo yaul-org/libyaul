@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <ic.h>
+#include <ic/ic.h>
 #include <smpc/peripheral.h>
 
 #include "smpc_internal.h"

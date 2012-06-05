@@ -5,9 +5,11 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#ifndef _VDP2_H_
-#define _VDP2_H_
+#ifndef _CONS_VDP2_H_
+#define _CONS_VDP2_H_
+
+#include "cons.h"
 
 void cons_vdp2_init(struct cons *);
 
-#endif /* !_VDP2_H_ */
+#endif /* !_CONS_VDP2_H_ */

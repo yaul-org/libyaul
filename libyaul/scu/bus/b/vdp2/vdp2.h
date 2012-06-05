@@ -17,4 +17,4 @@
 
 extern void vdp2_init(void);
 
-#endif
+#endif /* !_VDP2_H_ */

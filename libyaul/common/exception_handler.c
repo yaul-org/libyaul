@@ -11,10 +11,12 @@
 
 #include <vdp2/tvmd.h>
 #include <vdp2/scrn.h>
+#include <vdp2/vram.h>
 #include <vdp2.h>
 
+#include <cons/vdp2.h>
+
 #include "exception.h"
-#include "monitor.h"
 
 static void spin(void);
 static void format(struct cpu_registers *, const char *);
@@ -69,6 +71,8 @@ format(struct cpu_registers *regs, const char *exception_name)
                 0x80E0 /* Green */
         };
 
+        struct cons cons;
+
         (void)sprintf(buf, "[01;44mException occurred:[00;00m\n\t[01;44m%s[00;00m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"
@@ -98,13 +102,10 @@ format(struct cpu_registers *regs, const char *exception_name)
 
         /* Reset the VDP2 */
         vdp2_init();
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x00000),
+            blcs_color, 0);
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x00000), blcs_color, 0);
 
-        monitor_init();
-
-        /* Wait until we can draw */
-        vdp2_tvmd_vblank_in_wait();
-        vdp2_tvmd_vblank_out_wait();
-        vt100_write(monitor, buf);
+        cons_vdp2_init(&cons);
+        cons_write(&cons, buf);
 }
