@@ -1,7 +1,0 @@
-*.elf
-*.bin
-*.map
-*.sym
-*.asm
-*.a
-*.o
