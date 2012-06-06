@@ -8,6 +8,7 @@
 #ifndef _CONS_H_
 #define _CONS_H_
 
+#include "font.h"
 #include "vt_parse/vt_parse.h"
 
 /* Half the normal size */
@@ -27,6 +28,7 @@ struct cons {
         void *driver;
 };
 
-void cons_write(struct cons *, const char *);
+void cons_write(struct cons *, const uint8_t *);
+void cons_reset(struct cons *);
 
 #endif /* !_CONS_H_ */

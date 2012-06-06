@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <cons.h>
+#include "cons.h"
 
 typedef struct {
 } cons_vdp1_t;

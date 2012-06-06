@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 2012 Israel Jacques
+ * Copyright (c) 2012 Joshua Haberman
  * See LICENSE for details.
  *
  * Joshua Haberman <joshua@reverberate.org>
- * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
 #ifndef _VT_PARSE_TABLE_H_
@@ -31,7 +30,7 @@ typedef struct vt_parse {
         void *user_data;
 } vt_parse_t;
 
-void vt_parse_init(vt_parse_t *, vt_parse_callback_t);
-void vt_parse(vt_parse_t *, unsigned char *, int);
+void vt_parse_init(vt_parse_t *, vt_parse_callback_t, void *user_data);
+void vt_parse(vt_parse_t *, const uint8_t *, int);
 
 #endif /* !_VT_PARSE_TABLE_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Israel Jacques
+ * Copyright (c) 2012 Joshua Haberman
  * See LICENSE for details.
  *
  * Joshua Haberman <joshua@reverberate.org>
@@ -12,13 +12,15 @@
 #include "vt_parse.h"
 
 void
-vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb)
+vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb, void *user_data)
 {
+
         parser->state = VT_PARSE_STATE_GROUND;
         parser->intermediate_chars[0] = '\0';
         parser->num_params = 0;
         parser->ignore_flagged = 0;
         parser->cb = cb;
+        parser->user_data = user_data;
 }
 
 static
@@ -118,7 +120,7 @@ do_state_change(vt_parse_t *parser, state_change_t change, char ch)
 }
 
 void
-vt_parse(vt_parse_t *parser, uint8_t *data, int len)
+vt_parse(vt_parse_t *parser, const uint8_t *data, int len)
 {
         int i;
         uint8_t ch;

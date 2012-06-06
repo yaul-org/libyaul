@@ -10,14 +10,14 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <cons.h>
-
 #include <vdp2/cram.h>
 #include <vdp2/pn.h>
 #include <vdp2/priority.h>
 #include <vdp2/scrn.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
+
+#include "cons.h"
 
 typedef struct {
         uint16_t *pnt[4];
@@ -26,7 +26,7 @@ typedef struct {
         uint32_t character_no;
 } cons_vdp2_t;
 
-static struct cons_vdp2_t *cons_vdp2_new(void);
+static cons_vdp2_t *cons_vdp2_new(void);
 static void cons_vdp2_write(struct cons *, int, uint8_t, uint8_t);
 
 void
@@ -41,7 +41,7 @@ cons_vdp2_init(struct cons *cons)
         uint32_t x;
         uint32_t y;
 
-        cons_vdp2 = cons_vdp2_new;
+        cons_vdp2 = cons_vdp2_new();
 
         cons->driver = cons_vdp2;
         cons->write = cons_vdp2_write;
@@ -104,23 +104,27 @@ cons_vdp2_init(struct cons *cons)
                         cons_vdp2->pnt[0][x + (y << 6)] = ofs;
         }
 
-        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, sizeof(palette));
+        memcpy((uint16_t *)CRAM_BANK(0, 0), palette,
+            FONT_NCOLORS * sizeof(uint16_t));
 
         /* Hopefully it won't glitch */
         vdp2_scrn_display_set(SCRN_NBG2, /* no_trans = */ false);
         vdp2_tvmd_display_set();
 }
 
-static struct cons_vdp2_t *
+static cons_vdp2_t *
 cons_vdp2_new(void)
 {
-        static struct cons_vdp2_t cons_vdp2;
+        /* XXX Replace with TLSF */
+        static cons_vdp2_t cons_vdp2;
         return &cons_vdp2;
 }
 
 static void
 cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
 {
+        cons_vdp2_t *cons_vdp2;
+
         uint32_t cofs;
         uint32_t tofs;
         uint32_t row;
@@ -138,12 +142,10 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
                 0xCCCCCCCC, 0xDDDDDDDD, 0xEEEEEEEE, 0xFFFFFFFF
         };
 
+        cons_vdp2 = cons->driver;
+
         tofs = c << 3;
         cofs = cons_vdp2->character_no << 3;
-
-        /* Wait until we can draw */
-        vdp2_tvmd_vblank_in_wait();
-        vdp2_tvmd_vblank_out_wait();
 
         /* Expand cell */
         for (y = FONT_H - 1; y >= 0; y--) {

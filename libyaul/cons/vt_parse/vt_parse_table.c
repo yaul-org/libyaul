@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2012 Joshua Haberman
+ * See LICENSE for details.
+ *
+ * Joshua Haberman <joshua@reverberate.org>
+ */
+
 #include "vt_parse_table.h"
 
 char *ACTION_NAMES[] = {
