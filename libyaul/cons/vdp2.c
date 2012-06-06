@@ -27,6 +27,7 @@ typedef struct {
 } cons_vdp2_t;
 
 static cons_vdp2_t *cons_vdp2_new(void);
+static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *, int, uint8_t, uint8_t);
 
 void
@@ -44,7 +45,9 @@ cons_vdp2_init(struct cons *cons)
         cons_vdp2 = cons_vdp2_new();
 
         cons->driver = cons_vdp2;
+
         cons->write = cons_vdp2_write;
+        cons->reset = cons_vdp2_reset;
 
         cons_reset(cons);
 
@@ -95,8 +98,6 @@ cons_vdp2_init(struct cons *cons)
         for (y = 0; y < FONT_H; y++)
                 cons_vdp2->character[y] = font_unpacked[0];
 
-        cons_vdp2->character_no = 1;
-
         /* Clear map */
         ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character);
         for (y = 0; y < ROWS; y++) {
@@ -118,6 +119,17 @@ cons_vdp2_new(void)
         /* XXX Replace with TLSF */
         static cons_vdp2_t cons_vdp2;
         return &cons_vdp2;
+}
+
+static void
+cons_vdp2_reset(struct cons *cons)
+{
+        cons_vdp2_t *cons_vdp2;
+
+        cons_vdp2 = cons->driver;
+
+        /* Reset */
+        cons_vdp2->character_no = 1;
 }
 
 static void

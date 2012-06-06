@@ -27,6 +27,7 @@ struct cons {
         vt_parse_t vt_parser;
 
         void (*write)(struct cons *, int, uint8_t, uint8_t);
+        void (*reset)(struct cons *);
         void *driver;
 };
 

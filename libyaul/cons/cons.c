@@ -38,6 +38,8 @@ cons_reset(struct cons *cons)
 
         vt_parse_init(&cons->vt_parser, vt_parser_callback, cons);
 
+        cons->reset(cons);
+
         cons->cursor.col = 0;
         cons->cursor.row = 0;
 }
