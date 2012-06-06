@@ -14,7 +14,7 @@ CFLAGS= -ansi \
         -m2 -mb -O2 \
         -ffast-math -fomit-frame-pointer \
         -I../../libyaul/common \
-        -I../../libyaul/monitor \
+        -I../../libyaul/cons \
         -I../../libyaul/scu/bus/a/cs0 \
         -I../../libyaul/scu/bus/a/cs1 \
         -I../../libyaul/scu/bus/a/cs2 \
