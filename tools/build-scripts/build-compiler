@@ -161,15 +161,21 @@ find "${BUILD_INSTALL_DIR}/${TARGET}/${TARGET}" -name "*.a" -exec "${TARGET}"-st
 rm -r -f "${TARGET}/binutils" \
     "${TARGET}/gcc" \
     "${TARGET}/newlib" \
+    "${TARGET}/gdb" \
     "${BUILD_SRC_DIR}/built-binutils" \
     "${BUILD_SRC_DIR}/built-gcc" \
+    "${BUILD_SRC_DIR}/built-g++" \
     "${BUILD_SRC_DIR}/built-newlib" \
+    "${BUILD_SRC_DIR}/built-gdb" \
     "${BUILD_SRC_DIR}/configured-binutils" \
     "${BUILD_SRC_DIR}/configured-gcc" \
     "${BUILD_SRC_DIR}/configured-newlib" \
-    "${BUILD_SRC_DIR}/extracted_archives" \
+    "${BUILD_SRC_DIR}/configured-gdb" \
     "${BUILD_SRC_DIR}/installed-binutils" \
     "${BUILD_SRC_DIR}/installed-gcc" \
-    "${BUILD_SRC_DIR}/installed-newlib"
+    "${BUILD_SRC_DIR}/installed-g++" \
+    "${BUILD_SRC_DIR}/installed-newlib" \
+    "${BUILD_SRC_DIR}/installed-gdb" \
+    "${BUILD_SRC_DIR}/extracted_archives"
 
 message "Add path '${BUILD_INSTALL_DIR}/${TARGET}/bin' to your \$PATH environment variable"
