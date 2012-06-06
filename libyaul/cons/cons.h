@@ -8,6 +8,8 @@
 #ifndef _CONS_H_
 #define _CONS_H_
 
+#include <inttypes.h>
+
 #include "font.h"
 #include "vt_parse/vt_parse.h"
 
@@ -28,7 +30,7 @@ struct cons {
         void *driver;
 };
 
-void cons_write(struct cons *, const uint8_t *);
+void cons_write(struct cons *, const char *);
 void cons_reset(struct cons *);
 
 #endif /* !_CONS_H_ */

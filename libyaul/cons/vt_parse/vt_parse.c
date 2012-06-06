@@ -120,7 +120,7 @@ do_state_change(vt_parse_t *parser, state_change_t change, char ch)
 }
 
 void
-vt_parse(vt_parse_t *parser, const uint8_t *data, int len)
+vt_parse(vt_parse_t *parser, const char *data, int len)
 {
         int i;
         uint8_t ch;

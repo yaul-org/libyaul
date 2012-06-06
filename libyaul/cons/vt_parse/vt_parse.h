@@ -8,8 +8,6 @@
 #ifndef _VT_PARSE_TABLE_H_
 #define _VT_PARSE_TABLE_H_
 
-#include <inttypes.h>
-
 #include "vt_parse_table.h"
 
 #define MAX_INTERMEDIATE_CHARS  2
@@ -18,7 +16,7 @@
 
 struct vt_parse;
 
-typedef void (*vt_parse_callback_t)(struct vt_parse *, vt_parse_action_t, unsigned char);
+typedef void (*vt_parse_callback_t)(struct vt_parse *, vt_parse_action_t, int);
 
 typedef struct vt_parse {
         vt_parse_state_t state;
@@ -31,6 +29,6 @@ typedef struct vt_parse {
 } vt_parse_t;
 
 void vt_parse_init(vt_parse_t *, vt_parse_callback_t, void *user_data);
-void vt_parse(vt_parse_t *, const uint8_t *, int);
+void vt_parse(vt_parse_t *, const char *, int);
 
 #endif /* !_VT_PARSE_TABLE_H_ */

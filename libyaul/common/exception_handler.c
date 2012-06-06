@@ -65,7 +65,7 @@ spin(void)
 static void
 format(struct cpu_registers *regs, const char *exception_name)
 {
-        char buf[1024];
+        static char buf[1024];
 
         uint16_t blcs_color[] = {
                 0x80E0 /* Green */

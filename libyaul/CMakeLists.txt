@@ -19,6 +19,7 @@ SET(SRC_DIRS
 SET(INCLUDE_DIRS
   .
   common
+  cons
   scu
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs2/cd-block

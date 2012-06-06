@@ -19,14 +19,14 @@ static void cursor_newline_make(struct cons *);
 static void cursor_row_advance(struct cons *, uint16_t);
 static void terminal_reset(struct cons *);
 
-static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, uint8_t);
+static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
 void
-cons_write(struct cons *cons, const uint8_t *s)
+cons_write(struct cons *cons, const char *s)
 {
         size_t slen;
 
-        if ((slen = strlen((char *)s)) == 0)
+        if ((slen = strlen(s)) == 0)
                 return;
 
         vt_parse(&cons->vt_parser, s, slen);
@@ -43,7 +43,7 @@ cons_reset(struct cons *cons)
 }
 
 static void
-vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, uint8_t ch)
+vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 {
         struct cons *cons;
 
@@ -54,7 +54,7 @@ vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, uint8_t ch)
                 if ((cursor_column_exceeded(cons, 0)))
                         cursor_newline_make(cons);
 
-                cons->write(cons, ch, 15, 0);
+                cons->write(cons, (char)ch, 15, 0);
                 cursor_column_advance(cons, 1);
                 break;
         case VT_PARSE_ACTION_EXECUTE:
