@@ -13,11 +13,10 @@
 #include "cons.h"
 
 static bool cursor_column_exceeded(struct cons *, uint32_t);
-static bool cursor_rows_exceeded(struct cons *, uint32_t);
+static bool cursor_row_exceeded(struct cons *, uint32_t);
 static void cursor_column_advance(struct cons *, uint16_t);
-static void cursor_newline_make(struct cons *);
 static void cursor_row_advance(struct cons *, uint16_t);
-static void terminal_reset(struct cons *);
+static void cursor_row_newline_make(struct cons *);
 
 static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
@@ -54,7 +53,7 @@ vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
         case VT_PARSE_ACTION_PRINT:
                 /* XXX Provisional code */
                 if ((cursor_column_exceeded(cons, 0)))
-                        cursor_newline_make(cons);
+                        cursor_row_newline_make(cons);
 
                 cons->write(cons, (char)ch, 15, 0);
                 cursor_column_advance(cons, 1);
@@ -84,7 +83,7 @@ cursor_column_exceeded(struct cons *cons, uint32_t x)
  * is out of bounds.
  */
 static bool __attribute__ ((unused))
-cursor_rows_exceeded(struct cons *cons, uint32_t x)
+cursor_row_exceeded(struct cons *cons, uint32_t x)
 {
 
         return (cons->cursor.col + x) >= COLS;
@@ -95,22 +94,11 @@ cursor_rows_exceeded(struct cons *cons, uint32_t x)
  * leftmost column.
  */
 static void __attribute__ ((unused))
-cursor_newline_make(struct cons *cons)
+cursor_row_newline_make(struct cons *cons)
 {
 
         cons->cursor.col = 0;
         cons->cursor.row++;
-}
-
-/*
- * Reset the terminal.
- */
-static void __attribute__ ((unused))
-terminal_reset(struct cons *cons)
-{
-
-        cons->cursor.col = 0;
-        cons->cursor.row = 0;
 }
 
 /*
