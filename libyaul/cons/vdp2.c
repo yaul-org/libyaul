@@ -29,6 +29,7 @@ typedef struct {
 static cons_vdp2_t *cons_vdp2_new(void);
 static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *, int, uint8_t, uint8_t);
+static void cons_vdp2_scroll(struct cons *, int16_t);
 
 void
 cons_vdp2_init(struct cons *cons)
@@ -48,6 +49,7 @@ cons_vdp2_init(struct cons *cons)
 
         cons->write = cons_vdp2_write;
         cons->reset = cons_vdp2_reset;
+        cons->scroll = cons_vdp2_scroll;
 
         cons_reset(cons);
 
@@ -130,6 +132,15 @@ cons_vdp2_reset(struct cons *cons)
 
         /* Reset */
         cons_vdp2->character_no = 1;
+}
+
+static void
+cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)), int16_t y)
+{
+        static int16_t scvy = 0;
+
+        scvy += y * FONT_H;
+        vdp2_scrn_scv_y_set(SCRN_NBG2, scvy, 0);
 }
 
 static void

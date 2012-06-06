@@ -28,6 +28,7 @@ struct cons {
 
         void (*write)(struct cons *, int, uint8_t, uint8_t);
         void (*reset)(struct cons *);
+        void (*scroll)(struct cons *, int16_t);
         void *driver;
 };
 
