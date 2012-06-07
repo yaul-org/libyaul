@@ -7,43 +7,7 @@
 
 #include "vt_parse_table.h"
 
-char *ACTION_NAMES[] = {
-        "<no action>",
-        "CLEAR",
-        "COLLECT",
-        "CSI_DISPATCH",
-        "ESC_DISPATCH",
-        "EXECUTE",
-        "HOOK",
-        "IGNORE",
-        "OSC_END",
-        "OSC_PUT",
-        "OSC_START",
-        "PARAM",
-        "PRINT",
-        "PUT",
-        "UNHOOK",
-};
-
-char *STATE_NAMES[] = {
-        "ANYWHERE",
-        "CSI_ENTRY",
-        "CSI_IGNORE",
-        "CSI_INTERMEDIATE",
-        "CSI_PARAM",
-        "DCS_ENTRY",
-        "DCS_IGNORE",
-        "DCS_INTERMEDIATE",
-        "DCS_PARAM",
-        "DCS_PASSTHROUGH",
-        "ESCAPE",
-        "ESCAPE_INTERMEDIATE",
-        "GROUND",
-        "OSC_STRING",
-        "SOS_PM_APC_STRING",
-};
-
-state_change_t STATE_TABLE[15][256] = {
+state_change_t state_table[15][256] = {
         {
                 0,
                 0,
@@ -2173,7 +2137,7 @@ state_change_t STATE_TABLE[15][256] = {
         }
 };
 
-vt_parse_action_t ENTRY_ACTIONS[] = {
+vt_parse_action_t entry_actions[] = {
         0, /* None for ANYWHERE */
         VT_PARSE_ACTION_CLEAR, /* CSI_ENTRY */
         0, /* None for CSI_IGNORE */
@@ -2191,7 +2155,7 @@ vt_parse_action_t ENTRY_ACTIONS[] = {
         0 /* None for SOS_PM_APC_STRING */
 };
 
-vt_parse_action_t EXIT_ACTIONS[] = {
+vt_parse_action_t exit_actions[] = {
         0, /* None for ANYWHERE */
         0, /* None for CSI_ENTRY */
         0, /* None for CSI_IGNORE */

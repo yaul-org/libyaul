@@ -7,6 +7,9 @@
 
 #include <inttypes.h>
 
+#ifndef _VT_PARSE_TABLE_H_
+#define _VT_PARSE_TABLE_H_
+
 typedef enum {
         VT_PARSE_STATE_ANYWHERE = 0,
         VT_PARSE_STATE_CSI_ENTRY = 1,
@@ -44,8 +47,8 @@ typedef enum {
 
 typedef uint8_t state_change_t;
 
-extern state_change_t STATE_TABLE[15][256];
-extern vt_parse_action_t ENTRY_ACTIONS[15];
-extern vt_parse_action_t EXIT_ACTIONS[15];
-extern char *ACTION_NAMES[15];
-extern char *STATE_NAMES[15];
+extern state_change_t state_table[15][256];
+extern vt_parse_action_t entry_actions[15];
+extern vt_parse_action_t exit_actions[15];
+
+#endif /* _VT_PARSE_TABLE_H_ */

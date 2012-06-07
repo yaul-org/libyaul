@@ -102,8 +102,8 @@ do_state_change(vt_parse_t *parser, state_change_t change, char ch)
                 vt_parse_action_t exit_action;
                 vt_parse_action_t entry_action;
 
-                exit_action = EXIT_ACTIONS[parser->state];
-                entry_action = ENTRY_ACTIONS[new_state];
+                exit_action = exit_actions[parser->state];
+                entry_action = entry_actions[new_state];
 
                 if (exit_action)
                         do_action(parser, exit_action, 0);
@@ -133,9 +133,9 @@ vt_parse(vt_parse_t *parser, const char *data, int len)
                  * always use that.  Otherwise use the transition from
                  * the current state */
 
-                change = STATE_TABLE[VT_PARSE_STATE_ANYWHERE][ch];
+                change = state_table[VT_PARSE_STATE_ANYWHERE][ch];
                 if (!change)
-                        change = STATE_TABLE[parser->state][ch];
+                        change = state_table[parser->state][ch];
                 do_state_change(parser, change, data[i]);
         }
 }
