@@ -293,6 +293,7 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 row = (params[0] == 0) ? 1 : params[0];
                 if (cursor_row_exceeded(cons, -row))
                         row = cons->cursor.row;
+
                 cursor_row_advance(cons, -row);
                 break;
         case 'B':
@@ -306,6 +307,7 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 row = (params[0] == 0) ? 1 : params[0];
                 if (cursor_row_exceeded(cons, row))
                         row = ROWS - cons->cursor.row - 1;
+
                 cursor_row_advance(cons, row);
                 break;
         case 'C':
@@ -322,6 +324,7 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 col = (params[0] == 0) ? 1 : params[0];
                 if (cursor_column_exceeded(cons, col))
                         col = COLS - cons->cursor.col - 1;
+
                 cursor_column_advance(cons, col);
                 break;
         case 'D':
@@ -338,6 +341,7 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 col = (params[0] == 0) ? 1 : params[0];
                 if (cursor_column_exceeded(cons, -col))
                         col = cons->cursor.col;
+
                 cursor_column_advance(cons, -col);
                 break;
         case 'H':
@@ -374,15 +378,18 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 case 0:
                         /* Erase from the active position to the end of
                          * the screen, inclusive (default) */
+                        cons->clear(cons, cons->cursor.col, COLS, cons->cursor.row, ROWS);
                         break;
                 case 1:
                         /* Erase from start of the screen to the active
                          * position, inclusive */
+                        cons->clear(cons, 0, cons->cursor.col, 0, cons->cursor.row);
                         break;
                 case 2:
                         /* Erase all of the display –- all lines are
                          * erased, changed to single-width, and the
                          * cursor does not move. */
+                        cons->clear(cons, 0, COLS, 0, ROWS);
                         break;
                 default:
                         break;
@@ -397,13 +404,19 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 case 0:
                         /* Erase from the active position to the end of
                          * the line, inclusive (default) */
+                        cons->clear(cons, cons->cursor.col, COLS,
+                            cons->cursor.row, cons->cursor.row + 1);
                         break;
                 case 1:
                         /* Erase from the start of the screen to the
                          * active position, inclusive */
+                        cons->clear(cons, 0, cons->cursor.col,
+                            cons->cursor.row, cons->cursor.row + 1);
                         break;
                 case 2:
                         /* Erase all of the line, inclusive */
+                        cons->clear(cons, 0, COLS,
+                            cons->cursor.row, cons->cursor.row + 1);
                         break;
                 default:
                         break;

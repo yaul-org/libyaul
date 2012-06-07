@@ -26,9 +26,11 @@ typedef struct {
 } cons_vdp2_t;
 
 static cons_vdp2_t *cons_vdp2_new(void);
+
+static void cons_vdp2_clear(struct cons *, int32_t, int32_t, int32_t, int32_t);
 static void cons_vdp2_reset(struct cons *);
+static void cons_vdp2_scroll(struct cons *);
 static void cons_vdp2_write(struct cons *, int, uint8_t, uint8_t);
-static void cons_vdp2_scroll(struct cons *, int32_t);
 
 void
 cons_vdp2_init(struct cons *cons)
@@ -36,19 +38,18 @@ cons_vdp2_init(struct cons *cons)
         struct scrn_ch_format cfg;
         struct vram_ctl *vram_ctl;
 
-        cons_vdp2_t *cons_vdp2;
-
-        uint16_t ofs;
-        uint32_t x;
         uint32_t y;
+
+        cons_vdp2_t *cons_vdp2;
 
         cons_vdp2 = cons_vdp2_new();
 
         cons->driver = cons_vdp2;
 
-        cons->write = cons_vdp2_write;
+        cons->clear = cons_vdp2_clear;
         cons->reset = cons_vdp2_reset;
         cons->scroll = cons_vdp2_scroll;
+        cons->write = cons_vdp2_write;
 
         cons_reset(cons);
 
@@ -99,15 +100,10 @@ cons_vdp2_init(struct cons *cons)
         for (y = 0; y < FONT_H; y++)
                 cons_vdp2->character[y] = font_unpacked[0];
 
-        /* Clear map */
-        ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character);
-        for (y = 0; y < 512; y++) {
-                for (x = 0; x < COLS; x++)
-                        cons_vdp2->pnt[0][x + (y << 6)] = ofs;
-        }
-
         memcpy((uint16_t *)CRAM_BANK(0, 0), palette,
             FONT_NCOLORS * sizeof(uint16_t));
+
+        cons->clear(cons, 0, COLS, 0, ROWS);
 
         /* Hopefully it won't glitch */
         vdp2_scrn_display_set(SCRN_NBG2, /* no_trans = */ false);
@@ -123,20 +119,39 @@ cons_vdp2_new(void)
 }
 
 static void
-cons_vdp2_reset(struct cons *cons __attribute__ ((unused)))
+cons_vdp2_clear(struct cons *cons, int32_t col_start, int32_t col_end,
+    int32_t row_start, int32_t row_end)
+{
+        cons_vdp2_t *cons_vdp2;
+        int32_t col;
+        int32_t row;
+        uint16_t ofs;
+
+        cons_vdp2 = cons->driver;
+
+        /* Clear map */
+        ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character);
+        for (row = row_start; row < row_end; row++) {
+                for (col = col_start; col < col_end; col++)
+                        cons_vdp2->pnt[0][col + (row << 6)] = ofs;
+        }
+}
+
+static void
+cons_vdp2_reset(struct cons *cons)
 {
         cons_vdp2_t *cons_vdp2;
 
         cons_vdp2 = cons->driver;
-        cons_vdp2->character_no = (cons->cursor.row * COLS) + cons->cursor.col + 1;
+        cons_vdp2->character_no = ((cons->cursor.row % ROWS) * COLS) + cons->cursor.col + 1;
 }
 
 static void
-cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)), int32_t y)
+cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)))
 {
         static int32_t scvy = 0;
 
-        scvy += y * FONT_H;
+        scvy += FONT_H;
         vdp2_scrn_scv_y_set(SCRN_NBG2, scvy, 0);
 }
 
@@ -167,16 +182,19 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
         tofs = c << 3;
         cofs = cons_vdp2->character_no << 3;
 
+        fg_mask = color_tbl[fg];
+        bg_mask = color_tbl[bg];
+
         /* Expand cell */
         for (y = FONT_H - 1; y >= 0; y--) {
                 row = font_unpacked[font[y + tofs]];
-                fg_mask = color_tbl[fg];
-                bg_mask = color_tbl[bg];
-
                 cons_vdp2->character[y + cofs] = (row & fg_mask) | ((row & bg_mask) ^ bg_mask);
         }
 
         ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character) | cons_vdp2->character_no;
         cons_vdp2->pnt[0][cons->cursor.col + (cons->cursor.row << 6)] = ofs;
+
         cons_vdp2->character_no++;
+        if ((cons_vdp2->character_no % (ROWS * COLS)) == 0)
+                cons_vdp2->character_no = 1;
 }
