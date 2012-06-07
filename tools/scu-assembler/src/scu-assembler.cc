@@ -5,11 +5,11 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <string>
-#include <fstream>
+#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
+#include <fstream>
+#include <string>
 
 #include "scu-assembler.hh"
 #include "driver.hh"
@@ -22,7 +22,6 @@ static int usage(char *argv[])
     progname = progname.substr(1 + progname.find_last_of("/\\"));
 
     std::cerr << "usage:" << " " << progname << " "
-              << "[-s]" << " "
               << "[file]" << std::endl;
 
     return EXIT_FAILURE;
@@ -38,8 +37,8 @@ static int compile(const std::string& file)
     err_no = 0;
 
     driver->parse();
-
     delete driver;
+
     return err_no;
 }
 
@@ -48,7 +47,7 @@ int main(int argc, char* argv[])
     int ch;
     std::string file;
 
-    while ((ch = getopt(argc, argv, "s:")) != -1) {
+    while ((ch = getopt(argc, argv, "")) != -1) {
         switch(ch) {
         default:
             return usage(argv);

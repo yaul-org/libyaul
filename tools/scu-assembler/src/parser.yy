@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2012 Israel Jacques
+ * See LICENSE for details.
+ *
+ * Israel Jacques <mrko@eecs.berkeley.edu>
+ */
+
 %skeleton "lalr1.cc"
 %defines
 %name-prefix "Lexer"
