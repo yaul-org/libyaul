@@ -122,8 +122,11 @@ cursor_column_exceeded(struct cons *cons, int16_t x)
 static bool __attribute__ ((unused))
 cursor_row_exceeded(struct cons *cons, uint32_t y)
 {
+        int16_t row;
 
-        return (cons->cursor.col + y) >= ROWS;
+        row = cons->cursor.row + y;
+
+        return (row < 0) || (row >= ROWS);
 }
 
 /*
@@ -287,6 +290,10 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
         case 'H':
                 /* ESC [ Pn ; Pn H */
 
+                /* Both parameters are absolute: [0..COLS] and
+                 * [0..ROWS]. However, relative to the user, the values
+                 * range from (0..COLS] and (0..ROWS]. */
+
                 /* This sequence has two parameter values, the first
                  * specifying the line position and the second
                  * specifying the column position */
@@ -378,15 +385,10 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                                 attribute = 8;
                                 break;
                         case CONS_ATTRIBUTE_DIM:
-                                return;
                         case CONS_ATTRIBUTE_UNDERSCORE:
-                                return;
                         case CONS_ATTRIBUTE_BLINK:
-                                return;
                         case CONS_ATTRIBUTE_REVERSE:
-                                return;
                         case CONS_ATTRIBUTE_HIDDEN:
-                                return;
                         default:
                                 attribute = CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
                                 break;
@@ -415,7 +417,7 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                                 bg = params[ofs + 1] + attribute;
                                 break;
                         }
-                        break;
                 }
+                break;
         }
 }

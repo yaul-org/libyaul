@@ -25,7 +25,7 @@ _assert(const char *s, const char *cond, const char *file, uint32_t line, const 
         static char buf[16384];
 
         uint16_t blcs_color[] = {
-                0x8018 /* Green */
+                0x80E0 /* Green */
         };
 
         struct cons cons;
