@@ -22,14 +22,13 @@
 typedef struct {
         uint16_t *pnt[4];
         uint32_t *character;
+        uint32_t character_no;
 } cons_vdp2_t;
 
 static cons_vdp2_t *cons_vdp2_new(void);
 static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *, int, uint8_t, uint8_t);
-static void cons_vdp2_scroll(struct cons *, int16_t);
-
-static uint32_t character_no(struct cons *);
+static void cons_vdp2_scroll(struct cons *, int32_t);
 
 void
 cons_vdp2_init(struct cons *cons)
@@ -102,7 +101,7 @@ cons_vdp2_init(struct cons *cons)
 
         /* Clear map */
         ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character);
-        for (y = 0; y < ROWS; y++) {
+        for (y = 0; y < 512; y++) {
                 for (x = 0; x < COLS; x++)
                         cons_vdp2->pnt[0][x + (y << 6)] = ofs;
         }
@@ -126,12 +125,16 @@ cons_vdp2_new(void)
 static void
 cons_vdp2_reset(struct cons *cons __attribute__ ((unused)))
 {
+        cons_vdp2_t *cons_vdp2;
+
+        cons_vdp2 = cons->driver;
+        cons_vdp2->character_no = (cons->cursor.row * COLS) + cons->cursor.col + 1;
 }
 
 static void
-cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)), int16_t y)
+cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)), int32_t y)
 {
-        static int16_t scvy = 0;
+        static int32_t scvy = 0;
 
         scvy += y * FONT_H;
         vdp2_scrn_scv_y_set(SCRN_NBG2, scvy, 0);
@@ -162,7 +165,7 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
         cons_vdp2 = cons->driver;
 
         tofs = c << 3;
-        cofs = character_no(cons) << 3;
+        cofs = cons_vdp2->character_no << 3;
 
         /* Expand cell */
         for (y = FONT_H - 1; y >= 0; y--) {
@@ -173,13 +176,7 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
                 cons_vdp2->character[y + cofs] = (row & fg_mask) | ((row & bg_mask) ^ bg_mask);
         }
 
-        ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character) | character_no(cons);
+        ofs = PN_CHARACTER_NO((uint32_t)cons_vdp2->character) | cons_vdp2->character_no;
         cons_vdp2->pnt[0][cons->cursor.col + (cons->cursor.row << 6)] = ofs;
-}
-
-static uint32_t
-character_no(struct cons *cons)
-{
-
-        return (cons->cursor.row * COLS) + cons->cursor.col + 1;
+        cons_vdp2->character_no++;
 }

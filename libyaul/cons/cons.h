@@ -20,15 +20,15 @@
 
 struct cons {
         struct {
-                int16_t col;
-                int16_t row;
+                int32_t col;
+                int32_t row;
         } cursor;
 
         vt_parse_t vt_parser;
 
         void (*write)(struct cons *, int, uint8_t, uint8_t);
         void (*reset)(struct cons *);
-        void (*scroll)(struct cons *, int16_t);
+        void (*scroll)(struct cons *, int32_t);
         void *driver;
 };
 

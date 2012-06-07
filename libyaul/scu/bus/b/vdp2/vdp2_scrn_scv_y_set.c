@@ -12,6 +12,7 @@
 void
 vdp2_scrn_scv_y_set(uint8_t scrn, uint16_t in, uint8_t dn)
 {
+        /* Wraps around */
         in &= 0x07FF;
 
         switch (scrn) {

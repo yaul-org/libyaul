@@ -44,12 +44,15 @@ static void print_character(struct cons *, int);
 static void print_escape_character(struct cons *, int);
 static void print_csi_dispatch(struct cons *, int, int *, int);
 
-static bool cursor_column_exceeded(struct cons *, int16_t);
+static bool cursor_column_exceeded(struct cons *, int32_t);
 static bool cursor_row_exceeded(struct cons *, uint32_t);
-static void cursor_column_advance(struct cons *, int16_t);
-static void cursor_column_set(struct cons *, int16_t);
+static void cursor_column_advance(struct cons *, int32_t);
+static bool cursor_column_cond_set(struct cons *, int32_t);
+static void cursor_column_set(struct cons *, int32_t);
 static void cursor_row_advance(struct cons *, uint16_t);
-static void cursor_row_set(struct cons *, int16_t);
+static bool cursor_row_cond_set(struct cons *, int32_t);
+static void cursor_row_set(struct cons *, int32_t);
+static bool cursor_cond_set(struct cons *, int32_t, int32_t);
 
 static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
@@ -107,9 +110,9 @@ vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
  * columns is out of bounds.
  */
 static bool __attribute__ ((unused))
-cursor_column_exceeded(struct cons *cons, int16_t x)
+cursor_column_exceeded(struct cons *cons, int32_t x)
 {
-        int16_t col;
+        int32_t col;
 
         col = cons->cursor.col + x;
         return (col < 0) || (col >= COLS);
@@ -122,15 +125,14 @@ cursor_column_exceeded(struct cons *cons, int16_t x)
 static bool __attribute__ ((unused))
 cursor_row_exceeded(struct cons *cons, uint32_t y)
 {
-        int16_t row;
+        int32_t row;
 
         row = cons->cursor.row + y;
-
         return (row < 0) || (row >= ROWS);
 }
 
 /*
- * Advance the cursor an X amount of rows.
+ * Advance the cursor an Y amount of rows.
  */
 static void __attribute__ ((unused))
 cursor_row_advance(struct cons *cons, uint16_t y)
@@ -140,19 +142,36 @@ cursor_row_advance(struct cons *cons, uint16_t y)
 }
 
 /*
- * Set the cursor an X amount of rows.
+ * Set the cursor an Y amount of rows.
  */
 static void __attribute__ ((unused))
-cursor_row_set(struct cons *cons, int16_t y)
+cursor_row_set(struct cons *cons, int32_t y)
 {
+
         cons->cursor.row = y;
+}
+
+/*
+ * Set the cursor to ROW and return TRUE iff the ROW has not been
+ * exceeded.
+ */
+static bool __attribute__ ((unused))
+cursor_row_cond_set(struct cons *cons, int32_t row)
+{
+
+        if ((row >= 0) && (row <= ROWS)) {
+                cons->cursor.row = row;
+                return true;
+        }
+
+        return false;
 }
 
 /*
  * Advance the cursor an X amount of columns.
  */
 static void __attribute__ ((unused))
-cursor_column_advance(struct cons *cons, int16_t x)
+cursor_column_advance(struct cons *cons, int32_t x)
 {
 
         cons->cursor.col += x;
@@ -162,10 +181,44 @@ cursor_column_advance(struct cons *cons, int16_t x)
  * Set the cursor an X amount of columns iff it does not exceed COLS.
  */
 static void __attribute__ ((unused))
-cursor_column_set(struct cons *cons, int16_t x)
+cursor_column_set(struct cons *cons, int32_t x)
 {
 
         cons->cursor.col = x;
+}
+
+/*
+ * Set the cursor to COL and return TRUE iff the COL has not been
+ * exceeded.
+ */
+static bool __attribute__ ((unused))
+cursor_column_cond_set(struct cons *cons, int32_t col)
+{
+
+        if ((col >= 0) && (col <= COLS)) {
+                cons->cursor.col = col;
+                return true;
+        }
+
+        return false;
+}
+
+/*
+ * Set both the COL and ROW of the cursor and return TRUE iff the COL
+ * and ROW both have not been exceeded.
+ */
+static bool __attribute__ ((unused))
+cursor_cond_set(struct cons *cons, int32_t col, int32_t row)
+{
+
+        if (((col >= 0) && (col <= COLS)) &&
+            ((row >= 0) && (row <= ROWS))) {
+                cons->cursor.col = col;
+                cons->cursor.row = row;
+                return true;
+        }
+
+        return false;
 }
 
 static void
@@ -186,7 +239,7 @@ print_character(struct cons *cons, int ch)
 static void
 print_escape_character(struct cons *cons, int ch)
 {
-        int16_t tab;
+        int32_t tab;
 
         switch (ch) {
         case '\0':
@@ -223,8 +276,8 @@ print_escape_character(struct cons *cons, int ch)
 static void
 print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
 {
-        int16_t col;
-        int16_t row;
+        int32_t col;
+        int32_t row;
 
         uint16_t ofs;
 
@@ -297,25 +350,20 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 /* This sequence has two parameter values, the first
                  * specifying the line position and the second
                  * specifying the column position */
-                if (((num_params & 1) != 0) && (num_params > 2))
-                        break;
-
-                col = ((params[1] - 1) < 0) ? 0 : params[1];
-                row = ((params[0] - 1) < 0) ? 0 : params[0];
-
                 if (num_params == 0) {
-                        col = 0;
-                        row = 0;
+                        cursor_column_set(cons, 0);
+                        cursor_row_set(cons, 0);
+                        break;
                 }
 
-                if (cursor_column_exceeded(cons, col))
-                        col = COLS - 1;
+                if (((num_params & 1) != 0) || (num_params > 2))
+                        break;
 
-                if (cursor_row_exceeded(cons, row))
-                        row = ROWS - 1;
+                col = ((params[1] - 1) < 0) ? 0 : params[1] - 1;
+                row = ((params[0] - 1) < 0) ? 0 : params[0] - 1;
 
-                cursor_column_set(cons, col);
-                cursor_row_set(cons, row);
+                if (cursor_cond_set(cons, col, row))
+                        cons->reset(cons);
                 break;
         case 'J':
                 /* ESC [ Ps J */
