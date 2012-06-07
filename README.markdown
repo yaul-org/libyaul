@@ -3,7 +3,7 @@ About
   A SEGA Saturn programming library that provides a _flexible_ and yet high-level library along with a suite of development tools to ease the burden in developing programs and games.
 
 ### Authors
- * Israel Jacques <[mrkotfw@eecs.berkeley.edu][1]>
+ * Israel Jacques <mrkotfw@eecs.berkeley.edu>
 
  For others, see the `CONTRIBUTORS` file.
 
@@ -32,7 +32,7 @@ Want to contribute? Great! I could always use some extra help!
 
 ### Found a bug or do you have a suggestion?
 
-If so, I'd love to hear it. Create an issue [here][2].
+If so, I'd love to hear it. Create an issue [here][1].
 
 ### Getting started
 
@@ -44,5 +44,4 @@ If so, I'd love to hear it. Create an issue [here][2].
 5. ???
 6. Profit!
 
-[1]: mailto:mrkotfw@eecs.berkeley.edu
-[2]: https://github.com/mrkotfw/libyaul/issues
+[1]: https://github.com/mrkotfw/libyaul/issues
