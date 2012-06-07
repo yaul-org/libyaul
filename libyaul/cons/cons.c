@@ -187,14 +187,12 @@ print_escape_character(struct cons *cons, int ch)
 
         switch (ch) {
         case '\0':
-                break;
         case '\a':
+        case '\f':
                 break;
         case '\b':
                 if (!cursor_column_exceeded(cons, -1))
                         cursor_column_advance(cons, -1);
-                break;
-        case '\f':
                 break;
         case '\n':
                 cursor_column_set(cons, 0);
@@ -295,8 +293,8 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                 if (((num_params & 1) != 0) && (num_params > 2))
                         break;
 
-                col = params[1];
-                row = params[0];
+                col = ((params[1] - 1) < 0) ? 0 : params[1];
+                row = ((params[0] - 1) < 0) ? 0 : params[0];
 
                 if (num_params == 0) {
                         col = 0;
