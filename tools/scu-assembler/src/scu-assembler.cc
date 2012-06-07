@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2012 Israel Jacques
+ * See LICENSE for details.
+ *
+ * Israel Jacques <mrko@eecs.berkeley.edu>
+ */
+
+#include <string>
+#include <fstream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+
+#include "scu-assembler.hh"
+#include "driver.hh"
+
+static int usage(char *argv[])
+{
+    std::string progname;
+
+    progname = argv[0];
+    progname = progname.substr(1 + progname.find_last_of("/\\"));
+
+    std::cerr << "usage:" << " " << progname << " "
+              << "[-s]" << " "
+              << "[file]" << std::endl;
+
+    return EXIT_FAILURE;
+}
+
+static int compile(const std::string& file)
+{
+    int err_no;
+    Lexer::Driver* driver;
+    std::ifstream ifs;
+
+    driver = new Lexer::Driver(file);
+    err_no = 0;
+
+    driver->parse();
+
+    delete driver;
+    return err_no;
+}
+
+int main(int argc, char* argv[])
+{
+    int ch;
+    std::string file;
+
+    while ((ch = getopt(argc, argv, "s:")) != -1) {
+        switch(ch) {
+        default:
+            return usage(argv);
+        }
+    }
+
+    int arg_offset;
+    arg_offset = argc - 1;
+
+    file = argv[arg_offset];
+    if (file.empty() || (argc == 1))
+        return usage(argv);
+
+    return compile(file);
+}
