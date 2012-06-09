@@ -1,22 +1,25 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
 .TEXT
+.ALIGN 1
 
 .GLOBAL _scu_int_lvl_set
+.TYPE _scu_int_lvl_set, @function
 
 _scu_int_lvl_set:
-        MOV #0x0f,r0
+        MOV.L .LC1,r2
+        MOV.L @r2,r2
+        MOV #0x0F,r0
         AND r0,r4
-        MOV.L IMM_00,r1 ! 0x26000280
-        JMP @r1
+        JMP @r2
         NOP
 
-.ALIGN 4
+.ALIGN 2
 
-IMM_00:
-	.LONG 0x06000810
+.LC1:
+        .LONG 0x26000280

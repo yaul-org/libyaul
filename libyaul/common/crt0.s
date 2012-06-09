@@ -7,70 +7,79 @@
  */
 
 .TEXT
+.ALIGN 1
 
 .GLOBAL _start
+.TYPE _start, @function
 
 _start:
-        MOV.L stack,sp
+        MOV.L .LC5,r15
+        MOV #0x00,r0
+        LDS r0,pr
+        MOV.L r14,@-r15
+        STS.L pr,@-r15
+        MOV r15,r14
         /* Disable interrupts */
         /* Purge and turn cache off */
-        MOV.L CCTL,r3
+        MOV.L .LC6,r3
         MOV #0x10,r1
         MOV.B r1,@r3
         /* Clear 'BSS' section */
-        MOV.L end,r0
-        MOV.L bss,r1
+        MOV.L .LC1,r0
+        MOV.L .LC0,r1
         MOV r0,r2
         SUB r1,r0
         SHLR2 r0
         SHLR2 r0
         MOV #0x00,r1
         CMP/GT r1,r0
-        BF BRA_01
+        BF .L2
         NOP
-BRA_00:
+.L1:
         MOV.L r1,@-r2
         MOV.L r1,@-r2
         MOV.L r1,@-r2
         DT r0
-        BF/S BRA_00
+        BF/S .L1
         MOV.L r1,@-r2
-BRA_01:
+.L2:
         /* Initializers */
-        MOV.L init,r0
-        JSR @r0
+        MOV.L .LC3,r8
+        MOV.L .LC4,r9
+        MOV.L .LC2,r10
+        JSR @r8
         NOP
         /* Enable interrupts */
         /* Purge and turn cache on */
-        MOV #0x11,r1
-        MOV.B r1,@r3
-        /* Jump */
-        MOV.L main,r1
-        JSR @r1
+        MOV.L .LC6,r1
+        MOV #0x11,r0
+        MOV.B r0,@r1
+        JSR @r9
         NOP
         /* Finishers */
-        MOV.L fini,r0
-        JSR @r0
+        JSR @r10
         NOP
-BRA_02:
+        MOV r14,r15
+        LDS.L @r15+,pr
+        MOV.L @r15+,r14
+.L02:
         /* Disable interrupts */
-        BRA BRA_02
+        BRA .L02
         NOP
 
 .ALIGN 2
 
-bss:
+.LC0:
         .LONG __bss_start
-end:
+.LC1:
         .LONG _end
-fini:
+.LC2:
         .LONG __FINI_SECTION__
-init:
+.LC3:
         .LONG __INIT_SECTION__
-main:
+.LC4:
         .LONG _main
-stack:
+.LC5:
         .LONG _stack
-
-CCTL:
-        .LONG 0xfffffe92
+.LC6:
+        .LONG 0xFFFFFE92
