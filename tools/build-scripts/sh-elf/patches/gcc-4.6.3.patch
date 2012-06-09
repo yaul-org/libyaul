@@ -1,0 +1,11 @@
+--- gcc-4.6.3/gcc/config/sh/sh.h.orig	2012-06-09 13:03:03.000000000 -0700
++++ gcc-4.6.3/gcc/config/sh/sh.h	2012-06-09 13:03:11.000000000 -0700
+@@ -103,7 +103,7 @@
+    via the stack pointer) in functions that seem suitable.  */
+ 
+ #ifndef SUBTARGET_FRAME_POINTER_REQUIRED
+-#define SUBTARGET_FRAME_POINTER_REQUIRED 0
++#define SUBTARGET_FRAME_POINTER_REQUIRED 1
+ #endif
+ 
+ 

@@ -1,0 +1,21 @@
+# -*- mode: sh -*-
+
+apply_patch () {
+    test -f "${TARGET}/patches/${1}" \
+        && (patch -d "${BUILD_SRC_DIR}" --dry-run -p 0 < \
+        "${TARGET}/patches/${1}")  1> /dev/null 2>&1 \
+        || panic "Couldn't apply patch" 1
+
+    message "Applying patch '${1}'"
+
+    patch -d "${BUILD_SRC_DIR}" -p 0 < \
+        "${TARGET}/patches/${1}" 1> /dev/null 2>&1
+}
+
+if [ ! -f "${BUILD_SRC_DIR}/applied-patches" ]; then
+    message "Applying patches"
+
+    apply_patch "gcc-${GCC_VER}.patch"
+fi
+
+touch "${BUILD_SRC_DIR}/applied-patches"
