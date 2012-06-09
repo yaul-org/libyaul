@@ -17,6 +17,8 @@
 
 #include <cons/vdp2.h>
 
+#include "stack.h"
+
 static void spin(void);
 
 void __attribute__ ((noreturn))
@@ -30,8 +32,9 @@ _assert(const char *s, const char *cond, const char *file, uint32_t line, const 
 
         struct cons cons;
 
-        (void)sprintf(buf, "%s:%lu: %s: Assertion `%s' failed: %s",
-            file, line, function, cond, s);
+        (void)sprintf(buf, "%s:%lu: %s: Assertion `%s' failed: %s\n"
+            "[1B[1;44mStack backtrace[m\n%s",
+            file, line, function, cond, s, stack_backtrace());
 
         /* Reset the VDP2 */
         vdp2_init();

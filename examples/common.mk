@@ -9,10 +9,9 @@ OB= $(CC_PREFIX)-objcopy
 OD= $(CC_PREFIX)-objdump
 
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
-CFLAGS= -ansi \
-        -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
-        -m2 -mb -O2 \
-        -ffast-math -fomit-frame-pointer \
+CFLAGS= -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
+	-ansi -m2 -mb -O2 -fno-omit-frame-pointer \
+	-ffast-math  -fno-strict-aliasing  \
         -I../../libyaul/common \
         -I../../libyaul/cons \
         -I../../libyaul/scu/bus/a/cs0 \
