@@ -439,9 +439,8 @@ print_csi_dispatch(struct cons *cons, int ch, int *params, int num_params)
                         /* Attribute */
                         switch (params[ofs]) {
                         case CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES:
-                                fg = CONS_PALETTE_FG_WHITE;
-                                bg = CONS_PALETTE_BG_BLACK;
-                                return;
+                                attribute = 0;
+                                break;
                         case CONS_ATTRIBUTE_BRIGHT:
                                 attribute = 8;
                                 break;
