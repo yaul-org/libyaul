@@ -122,13 +122,13 @@ if [ ! -f "${BUILD_SRC_DIR}/configured-newlib" ]; then
         --disable-newlib-io-long-long \
         --disable-newlib-mb \
         --disable-newlib-multithread \
+        --disable-newlib-register-fini \
         --disable-newlib-supplied-syscalls \
         --disable-objc-gc \
         --enable-lto \
         --enable-newlib-io-c99-formats \
         --enable-newlib-io-pos-args \
         --enable-newlib-reent-small \
-        --enable-newlib-register-fini \
         --prefix="${PREFIX}" \
         --target="${TARGET}" \
         --without-cloog \

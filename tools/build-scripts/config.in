@@ -10,8 +10,9 @@
 #  'no': Download packages for building the compiler
 BUILD_DOWNLOAD="yes"
 
-# Absolute path to tool-chain installation directory
+# ABSOLUTE path to tool-chain installation directory
 BUILD_INSTALL_DIR="${HOME}/libyaul"
 
-# Absolute path to previously downloaded source packages
+# ABSOLUTE path to previously downloaded source packages as well as
+# the location for temporary files
 BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
