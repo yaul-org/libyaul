@@ -6,10 +6,10 @@
 # Israel Jacques <mrko@eecs.berkeley.edu>
 
 panic () {
-    echo "[1;41merror[0;0m: [1;44m${1}[0;0m" 1>&2
-    exit "${2}"
+    printf "[1;37;1;41merror[m: [1;37;1;44m%s[m\n" "${1}" 1>&2
+    exit ${2}
 }
 
 message () {
-    echo "[1;44m${1}[0;0m"
+    printf "[1;37;1;44m%s[m\n" "${1}"
 }
