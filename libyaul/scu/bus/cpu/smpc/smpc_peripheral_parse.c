@@ -34,7 +34,6 @@
 
 static bool peripheral_id(void);
 static bool peripheral_type(void);
-static char *dump_registers(void);
 static int peripheral_populate_info(struct smpc_peripheral_info *, uint8_t);
 static struct smpc_peripheral *peripheral_alloc(void);
 static uint8_t peripheral_data_size(void);
@@ -45,6 +44,10 @@ static void peripheral_free(struct smpc_peripheral *);
 static void peripheral_parent_add(struct smpc_peripheral_port *, uint8_t);
 static void port_build(struct smpc_peripheral_port *, uint8_t);
 static void port_reset(struct smpc_peripheral_port *);
+
+#ifdef DEBUG
+static char *dump_registers(void);
+#endif /* DEBUG */
 
 uint8_t offset = 0;
 
@@ -276,12 +279,13 @@ port_build(struct smpc_peripheral_port *port, uint8_t port_no)
         peripheral_children_fetch(port, nconnected);
 }
 
-static char * __attribute__ ((used))
-        dump_registers(void)
+#ifdef DEBUG
+static char *
+dump_registers(void)
 {
         static char buf[2048];
 
-        (void)sprintf(buf, "\n\nDump of SMPC registers:\n"
+        (void)sprintf(buf, "\n\nDump of SMPC Registers:\n"
             "offset = %d\n"
             " OREG[0] = 0x%02X OREG[16] = 0x%02X\n"
             " OREG[1] = 0x%02X OREG[17] = 0x%02X\n"
@@ -319,3 +323,4 @@ static char * __attribute__ ((used))
 
         return buf;
 }
+#endif /* DEBUG */
