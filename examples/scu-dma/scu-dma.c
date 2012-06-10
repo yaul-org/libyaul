@@ -17,12 +17,11 @@
 #include <smpc/smc.h>
 #include <smpc/peripheral.h>
 
-#include <monitor/monitor.h>
+#include <cons/vdp2.h>
 
 #include <stdio.h>
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x1f) | (((g) & 0x1f)  << 5) | (((b) & 0x1f) << 10))
-#define BLCS_COL(x)     (0x0001FFFE + (x))
 
 static struct {
         bool st_begin;
@@ -70,6 +69,8 @@ static void scu_dma_level_0_end(void);
 static void scu_dma_level_1_end(void);
 static void scu_dma_level_2_end(void);
 
+static struct cons cons;
+
 int
 main(void)
 {
@@ -84,12 +85,13 @@ main(void)
 
         vdp2_init();
         vdp2_tvmd_display_set(); /* Turn display ON */
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, 3, BLCS_COL(0), blcs_color, 0);
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
+            blcs_color, 0);
 
         smpc_init();
         scu_dma_cpu_init();
 
-        monitor_init();
+        cons_vdp2_init(&cons);
 
         mask = IC_MSK_LEVEL_0_DMA_END | IC_MSK_LEVEL_1_DMA_END | IC_MSK_LEVEL_2_DMA_END | IC_MSK_DMA_ILLEGAL;
         /* Disable interrupts */
@@ -107,9 +109,7 @@ main(void)
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
-                smpc_smc_intback_call(0x00, 0x0A);
                 vdp2_tvmd_vblank_out_wait();
-                smpc_peripheral_parse();
 
                 if (!state.st_begin) {
                         if (!port1->connected)
@@ -175,31 +175,32 @@ static void
 display_menu(void)
 {
         /* Menu */
-        vt100_write(monitor, "SCU DMA Level 0\n"
+        cons_write(&cons, "\n[1;44m       *** SCU DMA Test Menu ***        [m\n\n"
+            "[1;44mSCU DMA Level 0[m\n"
             "\tA+L - Mode: Direct\n"
             "\tA+R - Mode: Indirect\n"
             "\tA+X - SF: VBLANK-IN\n"
             "\tA+Y - SF: VBLANK-OUT\n"
             "\tA+Z - SF: HBLANK-IN\n"
             "\n"
-            "SCU DMA Level 1\n"
+            "[1;44mSCU DMA Level 1[m\n"
             "\tB+L - Mode: Direct\n"
             "\tB+R - Mode: Indirect\n"
             "\tB+X - SF: VBLANK-IN\n"
             "\tB+Y - SF: VBLANK-OUT\n"
             "\tB+Z - SF: HBLANK-IN\n"
             "\n"
-            "SCU DMA Level 2\n"
+            "[1;44mSCU DMA Level 2[m\n"
             "\tC+L - Mode: Direct\n"
             "\tC+R - Mode: Indirect\n"
             "\tC+X - SF: VBLANK-IN\n"
             "\tC+Y - SF: VBLANK-OUT\n"
             "\tC+Z - SF: HBLANK-IN\n"
-            "\a");
+            "[H");
 }
 
 static void
-scu_dma_level(int level)
+scu_dma_level(int level __attribute__ ((unused)))
 {
         struct dma_level_cfg cfg;
 

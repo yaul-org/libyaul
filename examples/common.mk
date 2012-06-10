@@ -14,6 +14,7 @@ CFLAGS= -g -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
 	-ffast-math  -fno-strict-aliasing \
 	-I../../libyaul/common \
 	-I../../libyaul/cons \
+	-I../../libyaul/scu \
 	-I../../libyaul/scu/bus/a/cs0 \
 	-I../../libyaul/scu/bus/a/cs1 \
 	-I../../libyaul/scu/bus/a/cs2 \
