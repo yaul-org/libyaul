@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 
 #include <cons/vdp2.h>
@@ -17,27 +16,32 @@
 char *
 stack_backtrace(void)
 {
-        extern void start(void);
+        extern void *_text_start;
+        extern void *_text_end;
 
         static char buf[1024];
 
         uintptr_t fp;
         uintptr_t pr;
-        int call;
 
-        memset(buf, '\0', sizeof(buf));
+        int level;
 
-        call = 0;
+        /* Obtain address of the caller and its frame pointer before it
+         * is clobbered by any subsequent calls */
+        STACK_RET_ADDRESS(pr);
         STACK_FPTR(fp);
-        do {
-                pr = STACK_FPTR_RET_ADDRESS_GET(fp);
-                if (pr < (uint32_t)start)
-                        return buf;
 
-                (void)sprintf(buf, "%s #%i 0x%08X in ??? ()\n", buf, call, (uintptr_t)pr);
+        level = 0;
+        *buf = '\0';
+        do {
+                (void)sprintf(buf, "%s #%i 0x%08X in ??? ()\n",
+                    buf, level, (uintptr_t)pr);
+
+                pr = STACK_FPTR_RET_ADDRESS_GET(fp);
                 fp = STACK_FPTR_NEXT_GET(fp);
-                call++;
-        } while (true);
+
+                level++;
+        } while (((pr >= (uint32_t)&_text_start)) && (pr < ((uint32_t)&_text_end)));
 
         return buf;
 }
