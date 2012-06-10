@@ -26,6 +26,7 @@ main(void)
         };
 
         struct smpc_peripheral_digital *pad;
+
         struct cons cons;
 
         vdp2_init();
@@ -43,7 +44,7 @@ main(void)
                 vdp2_tvmd_vblank_out_wait();
 
                 (void)sprintf(text,
-                    "[1;32;1;45mConsole (cons) example[m\n"
+                    "[1;32;1;45m    *** Console (cons component) ***    [m\n"
                     "\n"
                     "PORT: %d        PORT: %d\n"
                     "TYPE: 0x%02X     TYPE: 0x%02X\n"
