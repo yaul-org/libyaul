@@ -64,7 +64,7 @@ ENDFOREACH(DIR_LIST)
 OPTION(WITH_DEBUG "Build the project using debugging code" OFF)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
-  SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C COMPILE_FLAGS "-ansi -std=c99 -pedantic -W -Wall -Wshadow -Werror -Wunused -O2 -fno-omit-frame-pointer -ffast-math -fstrict-aliasing")
+  SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C COMPILE_FLAGS "-g -ansi -std=c99 -pedantic -W -Wall -Wshadow -Werror -Wunused -O2 -fno-omit-frame-pointer -ffast-math -fstrict-aliasing")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 IF(CMAKE_HOST_UNIX)

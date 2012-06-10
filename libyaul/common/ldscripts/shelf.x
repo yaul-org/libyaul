@@ -70,7 +70,7 @@ SECTIONS
     *(.rodata.*)
     *(.gnu.linkonce.r.*)
     . = ALIGN (16);
-    __text_end = .;
+    PROVIDE_HIDDEN (__text_end = .);
   } > ram
   __text_size = __text_end - __text_start;
 
@@ -104,9 +104,9 @@ SECTIONS
     *(.gnu.linkonce.sb.*)
     *(.scommon)
     *(COMMON)
-    end = .;
-    _end = ALIGN (16);
-    __end = _end;
+    PROVIDE_HIDDEN (end = .);
+    PROVIDE_HIDDEN (_end = ALIGN (16));
+    PROVIDE_HIDDEN (__end = _end);
     __bss_end = .;
   } AT > ram
   __bss_size = __bss_end - __bss_start;

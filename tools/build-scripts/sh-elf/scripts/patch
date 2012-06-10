@@ -15,7 +15,10 @@ apply_patch () {
 if [ ! -f "${BUILD_SRC_DIR}/applied-patches" ]; then
     message "Applying patches"
 
-    apply_patch "gcc-${GCC_VER}.patch"
+    # XXX Temporary fix
+    if [ "${GCC_VERSION}" != "4.6.3" ]; then
+        apply_patch "gcc-${GCC_VERSION}.patch"
+    fi
 fi
 
 touch "${BUILD_SRC_DIR}/applied-patches"
