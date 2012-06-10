@@ -12,21 +12,21 @@ EXTERN (_start)
 ENTRY (_start)
 
 MEMORY {
-  /* 0x06004000-0x7fffffff */
-  ram (wx) : ORIGIN = 0x06004000, LENGTH = 0x01ffc000
+  /* 0x06004000-0x7FFFFFFF */
+  ram (wx) : ORIGIN = 0x06004000, LENGTH = 0x01FFC000
 }
 
 /* 0x06001000 */
-PROVIDE (_stack = ORIGIN (ram) - 0x3000);
-/* 0x06000e00 */
-PROVIDE (_sstack = ORIGIN (ram) - 0x3200);
+PROVIDE_HIDDEN (_stack = ORIGIN (ram) - 0x3000);
+/* 0x06000E00 */
+PROVIDE_HIDDEN (_sstack = ORIGIN (ram) - 0x3200);
 
 SECTIONS
 {
   .text ORIGIN (ram) :
   AT (0x00000000)
   {
-    __text_start = .;
+    PROVIDE_HIDDEN (__text_start = .);
     *(.text)
     *(.text.*)
     *(.gnu.linkonce.t.*)
