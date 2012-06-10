@@ -115,6 +115,8 @@ cons_vdp2_new(void)
 {
         /* XXX Replace with TLSF */
         static cons_vdp2_t cons_vdp2;
+
+        memset(&cons_vdp2, 0, sizeof(cons_vdp2_t));
         return &cons_vdp2;
 }
 
