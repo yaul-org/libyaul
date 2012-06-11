@@ -25,7 +25,7 @@ main(void)
                 0x9C00
         };
 
-        struct smpc_peripheral_digital *pad;
+        struct smpc_peripheral_digital *port1;
 
         struct cons cons;
 
@@ -37,7 +37,7 @@ main(void)
 
         cons_vdp2_init(&cons);
 
-        pad = (struct smpc_peripheral_digital *)&smpc_peripheral_port1.info;
+        port1 = smpc_peripheral_digital_port(1);
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
@@ -101,22 +101,22 @@ main(void)
                     smpc_peripheral_port1.info.data[14],
                     smpc_peripheral_port2.info.data[14]);
 
-                if (pad->type == 0) {
+                if (port1->type == 0) {
                         (void)sprintf(text, "%s[2B%s%s%s%s%s%s%s%s%s%s%s%s%s",
                             text,
-                            IS_BUTTON_PRESSED(!pad->button.left, "L"),
-                            IS_BUTTON_PRESSED(!pad->button.up, "U"),
-                            IS_BUTTON_PRESSED(!pad->button.right, "R"),
-                            IS_BUTTON_PRESSED(!pad->button.down, "D"),
-                            IS_BUTTON_PRESSED(!pad->button.x_trg, "X"),
-                            IS_BUTTON_PRESSED(!pad->button.y_trg, "Y"),
-                            IS_BUTTON_PRESSED(!pad->button.z_trg, "Z"),
-                            IS_BUTTON_PRESSED(!pad->button.a_trg, "A"),
-                            IS_BUTTON_PRESSED(!pad->button.b_trg, "B"),
-                            IS_BUTTON_PRESSED(!pad->button.c_trg, "C"),
-                            IS_BUTTON_PRESSED(!pad->button.start, "S"),
-                            IS_BUTTON_PRESSED(!pad->button.l_trg, "L"),
-                            IS_BUTTON_PRESSED(!pad->button.r_trg, "R"));
+                            IS_BUTTON_PRESSED(!port1->button.left, "L"),
+                            IS_BUTTON_PRESSED(!port1->button.up, "U"),
+                            IS_BUTTON_PRESSED(!port1->button.right, "R"),
+                            IS_BUTTON_PRESSED(!port1->button.down, "D"),
+                            IS_BUTTON_PRESSED(!port1->button.x_trg, "X"),
+                            IS_BUTTON_PRESSED(!port1->button.y_trg, "Y"),
+                            IS_BUTTON_PRESSED(!port1->button.z_trg, "Z"),
+                            IS_BUTTON_PRESSED(!port1->button.a_trg, "A"),
+                            IS_BUTTON_PRESSED(!port1->button.b_trg, "B"),
+                            IS_BUTTON_PRESSED(!port1->button.c_trg, "C"),
+                            IS_BUTTON_PRESSED(!port1->button.start, "S"),
+                            IS_BUTTON_PRESSED(!port1->button.l_trg, "L"),
+                            IS_BUTTON_PRESSED(!port1->button.r_trg, "R"));
                 }
 
                 (void)sprintf(text, "%s[H", text);
