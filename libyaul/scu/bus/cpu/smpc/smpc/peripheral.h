@@ -8,7 +8,10 @@
 #ifndef _PERIPHERAL_H_
 #define _PERIPHERAL_H_
 
+#include <inttypes.h>
 #include <stdbool.h>
+#include <stddef.h>
+
 #include <sys/queue.h>
 
 #define MAX_PORT_DEVICES        6
@@ -92,11 +95,12 @@ struct smpc_peripheral_port {
         struct multi_terminal *children;
 };
 
-extern struct smpc_peripheral_port smpc_peripheral_port1;
-extern struct smpc_peripheral_port smpc_peripheral_port2;
-
 extern void smpc_peripheral_data(void);
 extern void smpc_peripheral_parse(void);
 extern void smpc_peripheral_system_manager(void);
+struct smpc_peripheral_digital *smpc_peripheral_digital_port(uint8_t);
+
+extern struct smpc_peripheral_port smpc_peripheral_port1;
+extern struct smpc_peripheral_port smpc_peripheral_port2;
 
 #endif /* !_PERIPHERAL_H_ */
