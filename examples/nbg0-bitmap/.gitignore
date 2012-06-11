@@ -1,6 +1,6 @@
-/*.asm
-/*.bin
 /*.elf
+/*.bin
 /*.map
-/*.o
 /*.sym
+/*.asm
+/*.o
