@@ -8,6 +8,6 @@
 #ifndef _CD_BLOCK_H_
 #define _CD_BLOCK_H_
 
-extern unsigned char cd_block_init(void);
+extern void cd_block_init(void);
 
 #endif
