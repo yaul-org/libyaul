@@ -1,7 +1,7 @@
-SET(scu_bus_a_dram_SRC
-  dram_init.c
+SET(scu_bus_a_cs0_dram-cartridge_SRC
+  dram-cartridge_init.c
 )
 
-SET(scu_bus_a_dram_INSTALL_FILES
-  dram.h
+SET(scu_bus_a_cs0_dram-cartridge_INSTALL_FILES
+  dram-cartridge.h
 )
