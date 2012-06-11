@@ -8,7 +8,6 @@
 #ifndef _CPU_H_
 #define _CPU_H_
 
-#include <cpu/bc.h>
 #include <cpu/intc.h>
 
 #endif /* !_CPU_H_ */
