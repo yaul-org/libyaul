@@ -10,6 +10,44 @@
 [ -f 'config' ] && . './config' || panic "Configuration file 'config' not found" 1
 [ -f 'scripts/utils' ] && . './scripts/utils' || exit 1
 
+clean_up () {
+    ! test -z "${BUILD_SRC_DIR}" \
+        || exit 1
+
+    message "Cleaning up '${BUILD_SRC_DIR}'"
+
+    rm -r -f \
+        "${BUILD_SRC_DIR}/binutils" \
+        "${BUILD_SRC_DIR}/gcc" \
+        "${BUILD_SRC_DIR}/newlib" \
+        "${BUILD_SRC_DIR}/gdb" \
+        "${BUILD_SRC_DIR}/${BINUTILS_SRC_DIR}" \
+        "${BUILD_SRC_DIR}/${GCC_SRC_DIR}" \
+        "${BUILD_SRC_DIR}/${NEWLIB_SRC_DIR}" \
+        "${BUILD_SRC_DIR}/${GDB_SRC_DIR}" \
+        "${BUILD_SRC_DIR}/built-binutils" \
+        "${BUILD_SRC_DIR}/built-gcc" \
+        "${BUILD_SRC_DIR}/built-g++" \
+        "${BUILD_SRC_DIR}/built-newlib" \
+        "${BUILD_SRC_DIR}/built-gdb" \
+        "${BUILD_SRC_DIR}/configured-binutils" \
+        "${BUILD_SRC_DIR}/configured-gcc" \
+        "${BUILD_SRC_DIR}/configured-newlib" \
+        "${BUILD_SRC_DIR}/configured-gdb" \
+        "${BUILD_SRC_DIR}/installed-binutils" \
+        "${BUILD_SRC_DIR}/installed-gcc" \
+        "${BUILD_SRC_DIR}/installed-g++" \
+        "${BUILD_SRC_DIR}/installed-newlib" \
+        "${BUILD_SRC_DIR}/installed-gdb" \
+        "${BUILD_SRC_DIR}/extracted" \
+        "${BUILD_SRC_DIR}/applied-patches"
+
+    exit ${1}
+}
+
+trap 'clean_up 0' 0
+trap 'clean_up 1' 2 3 15
+
 TARGET='sh-elf'
 PREFIX="${BUILD_INSTALL_DIR}/${TARGET}"
 
@@ -100,8 +138,6 @@ else
         message "Downloading '${NEWLIB}'"
         ("${FETCH}" "${NEWLIB_URL}") 1>> "newlib.log" 2>&1 || panic "Failed to download ${NEWLIB}" 1
     fi
-
-    touch "${BUILD_SRC_DIR}/downloaded_sources"
 fi
 cd "${OLDPWD}"
 
@@ -123,7 +159,7 @@ export "GAWK"
 
 # Extract source packages
 cd "${BUILD_SRC_DIR}"
-if [ ! -f 'extracted_archives' ]; then
+if [ ! -f 'extracted' ]; then
     message "Extracting '${BINUTILS}'"
     tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
 
@@ -139,7 +175,7 @@ if [ ! -f 'extracted_archives' ]; then
     message "Extracting '${GDB}'"
     tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GPP}" 1
 
-    touch "${BUILD_SRC_DIR}/extracted_archives"
+    touch "${BUILD_SRC_DIR}/extracted"
 fi
 cd "${OLDPWD}"
 
@@ -159,30 +195,5 @@ find "${BUILD_INSTALL_DIR}/${TARGET}/lib/gcc/${TARGET}" -name "*.a" -exec "${TAR
 find "${BUILD_INSTALL_DIR}/${TARGET}/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
 
 # Clean up temporary files and source directories
-rm -r -f \
-    "${BUILD_SRC_DIR}/binutils" \
-    "${BUILD_SRC_DIR}/gcc" \
-    "${BUILD_SRC_DIR}/newlib" \
-    "${BUILD_SRC_DIR}/gdb" \
-    "${BUILD_SRC_DIR}/${BINUTILS_SRC_DIR}" \
-    "${BUILD_SRC_DIR}/${GCC_SRC_DIR}" \
-    "${BUILD_SRC_DIR}/${NEWLIB_SRC_DIR}" \
-    "${BUILD_SRC_DIR}/${GDB_SRC_DIR}" \
-    "${BUILD_SRC_DIR}/built-binutils" \
-    "${BUILD_SRC_DIR}/built-gcc" \
-    "${BUILD_SRC_DIR}/built-g++" \
-    "${BUILD_SRC_DIR}/built-newlib" \
-    "${BUILD_SRC_DIR}/built-gdb" \
-    "${BUILD_SRC_DIR}/configured-binutils" \
-    "${BUILD_SRC_DIR}/configured-gcc" \
-    "${BUILD_SRC_DIR}/configured-newlib" \
-    "${BUILD_SRC_DIR}/configured-gdb" \
-    "${BUILD_SRC_DIR}/installed-binutils" \
-    "${BUILD_SRC_DIR}/installed-gcc" \
-    "${BUILD_SRC_DIR}/installed-g++" \
-    "${BUILD_SRC_DIR}/installed-newlib" \
-    "${BUILD_SRC_DIR}/installed-gdb" \
-    "${BUILD_SRC_DIR}/extracted_archives" \
-    "${BUILD_SRC_DIR}/applied-patches"
 
 message "Add path '${BUILD_INSTALL_DIR}/${TARGET}/bin' to your \$PATH environment variable"

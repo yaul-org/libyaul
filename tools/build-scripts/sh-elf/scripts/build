@@ -11,7 +11,7 @@ mkdir -p "${BUILD_SRC_DIR}/binutils"
 cd "${BUILD_SRC_DIR}/binutils"
 if [ ! -f "${BUILD_SRC_DIR}/configured-binutils" ]; then
     message "Configuring Binutils"
-    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${BINUTILS_SRC_DIR}"/configure \
+    (CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
         --disable-debug \
         --disable-nls \
         --disable-shared \
@@ -47,7 +47,10 @@ mkdir -p "${BUILD_SRC_DIR}/gcc"
 cd "${BUILD_SRC_DIR}/gcc"
 if [ ! -f "${BUILD_SRC_DIR}/configured-gcc" ]; then
     message "Configuring GCC"
-    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" CFLAGS_FOR_TARGET="-O2" LDFLAGS_FOR_TARGET="" \
+    (CFLAGS="" \
+        LDFLAGS="" \
+        CFLAGS_FOR_TARGET="-O2 -m2 -fno-omit-frame-pointer" \
+        LDFLAGS_FOR_TARGET="" \
         SUBTARGET_FRAME_POINTER_REQUIRED=1 \
         ../"${GCC_SRC_DIR}"/configure \
         --disable-cld \
@@ -101,7 +104,8 @@ mkdir -p "${BUILD_SRC_DIR}/newlib"
 cd "${BUILD_SRC_DIR}/newlib"
 if [ ! -f "${BUILD_SRC_DIR}/configured-newlib" ]; then
     message "Configuring Newlib"
-    (../"${NEWLIB_SRC_DIR}"/configure \
+    (CFLAGS="-O2 -fno-omit-frame-pointer" \
+        ../"${NEWLIB_SRC_DIR}"/configure \
         --disable-bootstrap \
         --disable-build-poststage1-with-cxx \
         --disable-build-with-cxx \
@@ -178,7 +182,9 @@ mkdir -p "${BUILD_SRC_DIR}/gdb"
 cd "${BUILD_SRC_DIR}/gdb"
 if [ ! -f "${BUILD_SRC_DIR}/configured-gdb" ]; then
     message "Configuring GDB"
-    (CFLAGS="${cflags}" LDFLAGS="${ldflags}" ../"${GDB_SRC_DIR}"/configure \
+    (CFLAGS="" \
+        LDFLAGS="" \
+        ../"${GDB_SRC_DIR}"/configure \
         --disable-nls \
         --disable-werror \
         --prefix="${PREFIX}" \
