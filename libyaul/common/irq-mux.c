@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2012 Israel Jacques
+ * See LICENSE for details.
+ *
+ * Israel Jacques <mrko@eecs.berkeley.edu>
+ */
+
+#include <stddef.h>
+#include <inttypes.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "irq-mux.h"
+
+void
+irq_mux_init(irq_mux_t *irq_mux)
+{
+        TAILQ_INIT(&irq_mux->im_tq);
+
+        irq_mux->im_total = 0;
+}
+
+void
+irq_mux_handle(irq_mux_t *irq_mux)
+{
+        irq_mux_handle_t *hdl_np;
+
+        if (TAILQ_EMPTY(&irq_mux->im_tq))
+                return;
+
+        TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
+                hdl_np->imh_hdl(hdl_np);
+        }
+}
+
+void
+irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *user_data)
+{
+        irq_mux_handle_t *n_hdl;
+
+        /* XXX
+         * Replace with TLSF */
+        n_hdl = (irq_mux_handle_t *)malloc(sizeof(irq_mux_handle_t));
+
+        n_hdl->imh_hdl = hdl;
+        n_hdl->imh_user_ptr = user_data;
+        n_hdl->imh = irq_mux;
+
+        irq_mux->im_total++;
+        TAILQ_INSERT_TAIL(&irq_mux->im_tq, n_hdl, handles);
+}
+
+void
+irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
+{
+        irq_mux_handle_t *hdl_np;
+
+        if (TAILQ_EMPTY(&irq_mux->im_tq))
+                return;
+
+        TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
+                if (hdl_np->imh_hdl == hdl) {
+                        TAILQ_REMOVE(&irq_mux->im_tq, hdl_np, handles);
+                        /* XXX
+                         * Replace with TLSF */
+                        free(hdl_np);
+                        return;
+                }
+        }
+}
