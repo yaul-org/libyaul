@@ -1,6 +1,6 @@
 About
 =====
-  A SEGA Saturn programming library that provides a _flexible_ and yet high-level library along with a suite of development tools to ease the burden in developing programs and games.
+  `libyaul` is an awesome open source SEGA Saturn software development kit that provides flexible low-level routines that are easily able to be composed to produce higher-level abstractions to further ease the burden of developing applications.
 
 ### Authors
  * Israel Jacques <mrkotfw@eecs.berkeley.edu>
