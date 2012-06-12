@@ -5,6 +5,8 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
+#include <bus/cpu/cpu.h>
+#include <ic/ic.h>
 #include <vdp2.h>
 
 #include <string.h>
@@ -17,48 +19,61 @@ struct vram_ctl vram_ctl = {
         .vram_size = VRAM_CTL_SIZE_4MBIT,
         .vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B,
         .vram_cycp.pt = {
-                /* VRAM-A0 */
-                {VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS},
-                /* VRAM-A1 */
-                {VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS},
-                /* VRAM-B0 */
-                {VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS},
-                /* VRAM-B1 */
-                {VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS,
-                 VRAM_CTL_CYCP_NO_ACCESS}
+                {
+                        /* VRAM-A0 */
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS
+                }, {/* VRAM-A1 */
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS
+                }, {
+                        /* VRAM-B0 */
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS
+                }, {
+                        /* VRAM-B1 */
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS,
+                        VRAM_CTL_CYCP_NO_ACCESS}
         }
 };
+
+irq_mux_t vdp2_vblank_in_irq_mux;
+irq_mux_t vdp2_vblank_out_irq_mux;
+
+static void vdp2_vblank_in(void);
+static void vdp2_vblank_out(void);
 
 void
 vdp2_init(void)
 {
+        /* Avoid re-initializing */
+        static bool initialized = false;
+
+        uint32_t mask;
 
         /* Initialize the processor to sane values. */
         MEM_POKE(VDP2(TVMD), 0x0000);
@@ -150,4 +165,40 @@ vdp2_init(void)
 
         /* Reset all buffer registers. */
         memset(&vdp2_regs, 0x0000, sizeof(struct vdp2_regs));
+
+        if (initialized)
+                return;
+
+        irq_mux_init(&vdp2_vblank_in_irq_mux);
+        irq_mux_init(&vdp2_vblank_out_irq_mux);
+
+        /* Disable interrupts */
+        cpu_intc_vct_disable();
+
+        mask = IC_MSK_VBLANK_IN | IC_MSK_VBLANK_OUT;
+        scu_ic_msk_chg(IC_MSK_ALL, mask);
+
+        scu_ic_vct_set(IC_VCT_VBLANK_IN, &vdp2_vblank_in);
+        scu_ic_vct_set(IC_VCT_VBLANK_OUT, &vdp2_vblank_out);
+        scu_ic_msk_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
+
+        /* Enable interrupts */
+        cpu_intc_vct_enable();
+
+        /* Initialized */
+        initialized = true;
+}
+
+static void
+vdp2_vblank_in(void)
+{
+
+        irq_mux_handle(&vdp2_vblank_in_irq_mux);
+}
+
+static void
+vdp2_vblank_out(void)
+{
+
+        irq_mux_handle(&vdp2_vblank_out_irq_mux);
 }

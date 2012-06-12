@@ -7,6 +7,7 @@
 
 #include <assert.h>
 
+#include <bus/cpu/cpu.h>
 #include <smpc/peripheral.h>
 
 #include "smpc_internal.h"
@@ -29,6 +30,9 @@ void
 smpc_peripheral_system_manager(void)
 {
 
+        /* Disable interrupts */
+        cpu_intc_vct_disable();
+
         /* Fetch but no parsing */
         fetch_output_regs();
 
@@ -36,7 +40,7 @@ smpc_peripheral_system_manager(void)
         if (((MEM_READ(SMPC(SR))) & NPE) == 0x00) {
                 /* Issue a "BREAK" for the "INTBACK" command */
                 MEM_POKE(IREG(0), 0x40);
-                return;
+                goto exit;
         }
 
         /* Let's not yet cover this case yet */
@@ -44,6 +48,9 @@ smpc_peripheral_system_manager(void)
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
         MEM_POKE(IREG(0), 0x80);
+exit:
+        /* Enable interrupts */
+        cpu_intc_vct_enable();
 }
 
 static void

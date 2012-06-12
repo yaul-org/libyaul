@@ -7,9 +7,10 @@
 
 #include <stddef.h>
 #include <inttypes.h>
-
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <bus/cpu/cpu.h>
 
 #include "irq-mux.h"
 
@@ -26,22 +27,42 @@ irq_mux_handle(irq_mux_t *irq_mux)
 {
         irq_mux_handle_t *hdl_np;
 
+        /* Disable interrupts */
+        cpu_intc_vct_disable();
+
         if (TAILQ_EMPTY(&irq_mux->im_tq))
-                return;
+                goto exit;
 
         TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
                 hdl_np->imh_hdl(hdl_np);
         }
+exit:
+        /* Enable interrupts */
+        cpu_intc_vct_enable();
 }
 
 void
 irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *user_data)
 {
+#ifndef TLSF
+        /* XXX
+         * Replace with TLSF */
+        static uint32_t pool_i = 0;
+        static irq_mux_handle_t pool[64];
+#endif /* !TLSF */
+
         irq_mux_handle_t *n_hdl;
 
+        /* Disable interrupts */
+        cpu_intc_vct_disable();
+
+#ifdef TLSF
         /* XXX
          * Replace with TLSF */
         n_hdl = (irq_mux_handle_t *)malloc(sizeof(irq_mux_handle_t));
+#else
+        n_hdl = &pool[pool_i++];
+#endif /* TLSF */
 
         n_hdl->imh_hdl = hdl;
         n_hdl->imh_user_ptr = user_data;
@@ -49,6 +70,9 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
 
         irq_mux->im_total++;
         TAILQ_INSERT_TAIL(&irq_mux->im_tq, n_hdl, handles);
+
+        /* Enable interrupts */
+        cpu_intc_vct_enable();
 }
 
 void
@@ -64,7 +88,11 @@ irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
                         TAILQ_REMOVE(&irq_mux->im_tq, hdl_np, handles);
                         /* XXX
                          * Replace with TLSF */
+#ifdef TLSF
+                        /* XXX
+                         * Replace with TLSF */
                         free(hdl_np);
+#endif /* TLSF */
                         return;
                 }
         }

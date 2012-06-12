@@ -14,6 +14,8 @@
 
 #include <sys/queue.h>
 
+#include <irq-mux.h>
+
 #define MAX_PORT_DEVICES        6
 #define MAX_PORT_DATA_SIZE      255
 
@@ -96,7 +98,7 @@ struct smpc_peripheral_port {
 };
 
 extern void smpc_peripheral_data(void);
-extern void smpc_peripheral_parse(void);
+extern void smpc_peripheral_parse(irq_mux_handle_t *);
 extern void smpc_peripheral_system_manager(void);
 struct smpc_peripheral_digital *smpc_peripheral_digital_port(uint8_t);
 

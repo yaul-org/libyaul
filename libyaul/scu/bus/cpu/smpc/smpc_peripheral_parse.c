@@ -55,7 +55,7 @@ struct smpc_peripheral_port smpc_peripheral_port1;
 struct smpc_peripheral_port smpc_peripheral_port2;
 
 void
-smpc_peripheral_parse(void)
+smpc_peripheral_parse(irq_mux_handle_t *hdl __attribute__ ((unused)))
 {
         uint32_t ist;
 
