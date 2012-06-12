@@ -38,16 +38,23 @@
  * Some compilers masquerade as gcc; patchlevel test filters them
  * out.
 */
-#if defined (__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)) \
-        && defined (__GNUC_PATCHLEVEL__)
-TLSF_DECL int tlsf_ffs(unsigned int word)
+#if defined (__GNUC__) &&                                                     \
+        (__GNUC__ > 3 ||                                                      \
+        (__GNUC__ == 3 &&                                                     \
+        __GNUC_MINOR__ >= 4)) &&                                              \
+        defined (__GNUC_PATCHLEVEL__)
+TLSF_DECL int
+tlsf_ffs(uint32_t word)
 {
         return __builtin_ffs(word) - 1;
 }
 
-TLSF_DECL int tlsf_fls(unsigned int word)
+TLSF_DECL int
+tlsf_fls(uint32_t word)
 {
-        const int bit = word ? 32 - __builtin_clz(word) : 0;
+        const int bit;
+
+        bit = word ? 32 - __builtin_clz(word) : 0;
         return bit - 1;
 }
 #endif

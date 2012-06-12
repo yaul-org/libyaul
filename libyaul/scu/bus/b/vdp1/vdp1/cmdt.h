@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -8,27 +8,28 @@
 #ifndef _CMDT_H_
 #define _CMDT_H_
 
+#include <inttypes.h>
+
 struct cmdt_cmd {
-        unsigned short  ctrl;
-        unsigned short  link;
-        unsigned short  pmod;
-        unsigned short  colr;
-        unsigned short  srca;
-        unsigned short  size;
-        signed short    xa;
-        signed short    ya;
-        signed short    xb;
-        signed short    yb;
-        signed short    xc;
-        signed short    yc;
-        signed short    xd;
-        signed short    yd;
-        unsigned short  grda;
-        unsigned short  reserved;
-};
+        uint16_t ctrl;
+        uint16_t link;
+        uint16_t pmod;
+        uint16_t colr;
+        uint16_t srca;
+        uint16_t size;
+        int16_t xa;
+        int16_t ya;
+        int16_t xb;
+        int16_t yb;
+        int16_t xc;
+        int16_t yc;
+        int16_t xd;
+        int16_t yd;
+        uint16_t grda;
+} __attribute__ ((packed, aligned (32)));
 
 struct cmdt_grd {
-        unsigned short  entry[4];
-};
+        uint16_t entry[4];
+} __attribute__ ((packed, aligned (8)));
 
-#endif
+#endif /* !_CMDT_H_ */

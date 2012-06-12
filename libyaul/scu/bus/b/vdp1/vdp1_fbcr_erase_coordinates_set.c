@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -10,9 +10,9 @@
 #include "vdp1_internal.h"
 
 void
-vdp1_fbcr_erase_coordinates_set(unsigned short x1, unsigned short y1, unsigned short x3, unsigned short y3, unsigned short color)
+vdp1_fbcr_erase_coordinates_set(uint16_t x1, uint16_t y1, uint16_t x3, uint16_t y3, uint16_t color)
 {
-        unsigned short bpp;
+        uint16_t bpp;
 
         /* Obtain the bit depth of the frame buffer. */
         bpp = (MEM_READ(VDP1(MODR)) & 0x1) ? 4 : 3;

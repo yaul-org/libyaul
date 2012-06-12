@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -12,7 +12,7 @@
 void
 vdp1_fbcr_erase_mode_set(enum fbcr_erase_mode_type mode)
 {
-        unsigned short tvmr;
+        uint16_t tvmr;
 
         tvmr = MEM_READ(VDP1(MODR));
 

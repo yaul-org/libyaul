@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -12,10 +12,10 @@
 void
 vdp1_fbcr_rotate_set(void)
 {
-        unsigned short tvmr;
+        uint16_t tvmr;
 
         tvmr = MEM_READ(VDP1(MODR));
 
         /* Write to memory. */
-        MEM_POKE(VDP1(TVMR), (tvmr & 0x7) | 0x0002);
+        MEM_POKE(VDP1(TVMR), (tvmr & 0x0007) | 0x0002);
 }

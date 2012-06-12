@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -12,10 +12,12 @@
 void
 vdp1_fbcr_change_set(void)
 {
-        unsigned short fbcr;
+        uint16_t fbcr;
 
-        fbcr = (MEM_READ(VDP1(MODR)) & 0xe0) >> 3;
+        fbcr = (MEM_READ(VDP1(MODR)) & 0x00E0);
+        fbcr >>= 3;
 
-        /* Write to the FBCR register after VBLANK-OUT interrupt. */
-        MEM_POKE(VDP1(FBCR), fbcr | 0x0008);
+        /* Write to the FBCR register after VBLANK-OUT interrupt */
+        fbcr |= 0x0008;
+        MEM_POKE(VDP1(FBCR), fbcr);
 }

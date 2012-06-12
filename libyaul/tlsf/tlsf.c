@@ -6,6 +6,7 @@
  */
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -79,7 +80,7 @@ tlsf_static_assert(sizeof(size_t) * CHAR_BIT >= 32);
 tlsf_static_assert(sizeof(size_t) * CHAR_BIT <= 64);
 
 /* SL_INDEX_COUNT must be <= number of bits in sl_bitmap's storage type. */
-tlsf_static_assert(sizeof(unsigned int) * CHAR_BIT >= SL_INDEX_COUNT);
+tlsf_static_assert(sizeof(uint32_t) * CHAR_BIT >= SL_INDEX_COUNT);
 
 /* Ensure we've properly tuned our sizes. */
 tlsf_static_assert(ALIGN_SIZE == SMALL_BLOCK_SIZE / SL_INDEX_COUNT);
@@ -145,8 +146,8 @@ static const size_t block_start_offset =
                                            block_header_t block_null;
 
                                            /* Bitmaps for free lists. */
-                                           unsigned int fl_bitmap;
-                                           unsigned int sl_bitmap[FL_INDEX_COUNT];
+                                           uint32_t fl_bitmap;
+                                           uint32_t sl_bitmap[FL_INDEX_COUNT];
 
                                            /* Head of free lists. */
                                            block_header_t *blocks[FL_INDEX_COUNT][SL_INDEX_COUNT];
@@ -218,14 +219,14 @@ static block_header_t *
 block_from_ptr(const void *ptr)
 {
         return tlsf_cast(block_header_t *,
-            tlsf_cast(unsigned char *, ptr) - block_start_offset);
+            tlsf_cast(uint8_t *, ptr) - block_start_offset);
 }
 
 static void *
 block_to_ptr(const block_header_t *block)
 {
         return tlsf_cast(void *,
-            tlsf_cast(unsigned char *, block) + block_start_offset);
+            tlsf_cast(uint8_t *, block) + block_start_offset);
 }
 
 /* Return location of next block after block of given size. */
@@ -373,11 +374,11 @@ search_suitable_block(pool_t *pool, int *fli, int *sli)
          * First, search for a block in the list associated with the given
          * fl/sl index.
          */
-        unsigned int sl_map = pool->sl_bitmap[fl] & (~0 << sl);
+        uint32_t sl_map = pool->sl_bitmap[fl] & (~0 << sl);
 
         if (!sl_map) {
                 /* No block exists. Search in the next largest first-level list. */
-                const unsigned int fl_map = pool->fl_bitmap & (~0 << (fl + 1));
+                const uint32_t fl_map = pool->fl_bitmap & (~0 << (fl + 1));
 
                 if (!fl_map) {
                         /* No free blocks available, memory has been exhausted. */

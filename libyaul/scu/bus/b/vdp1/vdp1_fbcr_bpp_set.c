@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -10,9 +10,9 @@
 #include "vdp1_internal.h"
 
 void
-vdp1_fbcr_bpp_set(unsigned char bpp)
+vdp1_fbcr_bpp_set(uint8_t bpp)
 {
-        unsigned short tvmr;
+        uint16_t tvmr;
 
         tvmr = MEM_READ(VDP1(MODR));
 

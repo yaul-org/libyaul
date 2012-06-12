@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -11,4 +11,4 @@
 extern void vdp1_ptmr_plot_draw_set(void);
 extern void vdp1_ptmr_plot_idle_set(void);
 
-#endif
+#endif /* !_PTMR_H_ */
