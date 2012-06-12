@@ -8,6 +8,6 @@
 #ifndef _DRAM_CARTRIDGE_H__
 #define _DRAM_CARTRIDGE_H__
 
-extern void dram_init(void);
+extern void dram_cartridge_init(void);
 
 #endif /* !_DRAM_CARTRIDGE_H_
