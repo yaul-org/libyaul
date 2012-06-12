@@ -52,9 +52,7 @@ tlsf_ffs(uint32_t word)
 TLSF_DECL int
 tlsf_fls(uint32_t word)
 {
-        const int bit;
-
-        bit = word ? 32 - __builtin_clz(word) : 0;
+        const int bit = word ? 32 - __builtin_clz(word) : 0;
         return bit - 1;
 }
 #endif
