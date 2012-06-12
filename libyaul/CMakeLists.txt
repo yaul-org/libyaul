@@ -1,7 +1,7 @@
 SET(SRC_DIRS
   common
   cons
-  tlsf
+  fs/iso9660
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
@@ -12,16 +12,18 @@ SET(SRC_DIRS
   scu/bus/b/vdp2
   scu/bus/cpu
   scu/bus/cpu/smpc
-  scu/dsp
   scu/dma
+  scu/dsp
   scu/ic
   scu/timer
+  tlsf
 )
 
 SET(INCLUDE_DIRS
   .
   common
   cons
+  fs/iso9660
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
