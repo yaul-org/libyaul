@@ -1,9 +1,10 @@
 SET(scu_bus_a_cs0_arp_SRC
   arp_busy_status.c
-  arp_init.c
+  arp_function.c
   arp_read_byte.c
   arp_read_long.c
   arp_send_long.c
+  arp_sync.c
   arp_xchg_byte.c
 )
 

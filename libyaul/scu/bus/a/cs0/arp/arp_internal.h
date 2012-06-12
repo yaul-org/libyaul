@@ -15,11 +15,9 @@
 #define MEM_READ(x)     (*(volatile uint8_t *)(x))
 
 /* Macros specific for processor */
-#define ARP(x)         (0x22000001 + ((x) << 16))
+#define ARP(x)          (0x22000001 + ((x) << 16))
 
-/* Helpers specific to this processor */
-
-enum {
+enum arp_regs {
         OUTPUT = 0x08,
         STATUS = 0x10,
         INPUT = 0x18
