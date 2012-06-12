@@ -3,6 +3,7 @@ SET(SRC_DIRS
   cons
   tlsf
   scu
+  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs2/cd-block
   scu/bus/b/scsp
@@ -21,6 +22,7 @@ SET(INCLUDE_DIRS
   common
   cons
   scu
+  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs2/cd-block
   scu/bus/b/scsp
