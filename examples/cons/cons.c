@@ -101,7 +101,7 @@ main(void)
                     smpc_peripheral_port1.info.data[14],
                     smpc_peripheral_port2.info.data[14]);
 
-                if (port1->type == 0) {
+                if (port1->connected && (port1->type == 0)) {
                         (void)sprintf(text, "%s[2B%s%s%s%s%s%s%s%s%s%s%s%s%s",
                             text,
                             IS_BUTTON_PRESSED(!port1->button.left, "L"),
@@ -117,7 +117,8 @@ main(void)
                             IS_BUTTON_PRESSED(!port1->button.start, "S"),
                             IS_BUTTON_PRESSED(!port1->button.l_trg, "L"),
                             IS_BUTTON_PRESSED(!port1->button.r_trg, "R"));
-                }
+                } else
+                        (void)sprintf(text, "%s[0J", text);
 
                 (void)sprintf(text, "%s[H", text);
                 cons_write(&cons, text);
