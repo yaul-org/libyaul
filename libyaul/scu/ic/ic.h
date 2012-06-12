@@ -21,10 +21,10 @@ enum ic_vct_type {
         IC_VCT_SYSTEM_MANAGER = 0x47,   /* Interrupt Source: SM */
         IC_VCT_PAD_INTERRUPT = 0x48,    /* Interrupt Source: PAD */
         IC_VCT_LEVEL_2_DMA_END = 0x49,  /* Interrupt Source: A-BUS */
-        IC_VCT_LEVEL_1_DMA_END = 0x4a,  /* Interrupt Source: A-BUS */
-        IC_VCT_LEVEL_0_DMA_END = 0x4b,  /* Interrupt Source: A-BUS */
-        IC_VCT_DMA_ILLEGAL = 0x4c,      /* Interrupt Source: SCU */
-        IC_VCT_SPRITE_END = 0x4d        /* Interrupt Source: VDP1 */
+        IC_VCT_LEVEL_1_DMA_END = 0x4A,  /* Interrupt Source: A-BUS */
+        IC_VCT_LEVEL_0_DMA_END = 0x4B,  /* Interrupt Source: A-BUS */
+        IC_VCT_DMA_ILLEGAL = 0x4C,      /* Interrupt Source: SCU */
+        IC_VCT_SPRITE_END = 0x4D        /* Interrupt Source: VDP1 */
 };
 
 enum ic_msk_type {

@@ -17,7 +17,7 @@ vdp1_init(void)
         MEM_POKE(VDP1(ENDR), 0x0000);
         MEM_POKE(VDP1(FBCR), 0x0000);
         MEM_POKE(VDP1(EWLR), 0x0000);
-        MEM_POKE(VDP1(EWRR), 0x50df);
+        MEM_POKE(VDP1(EWRR), 0x50DF);
         MEM_POKE(VDP1(EWDR), 0x8000);
         MEM_POKE(VDP1(PTMR), 0x0002);
 

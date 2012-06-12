@@ -68,7 +68,7 @@ enum smpc_regs_type {
         PDR1 = 0x075,
         PDR2 = 0x077,
         DDR1 = 0x079,
-        DDR2 = 0x07b,
+        DDR2 = 0x07B,
         IOSEL1 = 0x07D,
         IOSEL2 = 0x07D,
         EXLE1 = 0x07F,

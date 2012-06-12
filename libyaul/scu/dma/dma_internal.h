@@ -13,7 +13,7 @@
 #define MEM_READ(x)     (*(volatile uint32_t *)(x))
 
 /* Macros specific for processor. */
-#define DMA(x)          (0x25fe0000 + (x))
+#define DMA(x)          (0x25FE0000 + (x))
 #define DMA_LEVEL(x, y) (DMA(((x) << 5) + ((y) << 2)))
 
 enum dma_regs {
@@ -35,7 +35,7 @@ enum dma_regs {
         D2AD,
         D2EN,
         D2MD,
-        DSTA = 0x7c
+        DSTA = 0x7C
 };
 
 #endif /* !_DMA_INTERNAL_H_ */

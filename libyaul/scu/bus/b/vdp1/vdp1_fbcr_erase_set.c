@@ -14,7 +14,7 @@ vdp1_fbcr_erase_set(void)
 {
         uint16_t fbcr;
 
-        fbcr = (MEM_READ(VDP1(MODR)) & 0xe0) >> 3;
+        fbcr = (MEM_READ(VDP1(MODR)) & 0xE0) >> 3;
 
         /* Write to the FBCR register after VBLANK-OUT interrupt. */
         MEM_POKE(VDP1(FBCR), fbcr | 0x0002);

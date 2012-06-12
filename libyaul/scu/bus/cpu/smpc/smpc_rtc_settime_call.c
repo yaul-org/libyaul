@@ -16,8 +16,8 @@ smpc_rtc_settime_call(struct smpc_time *time)
 
         time->month = (time->month) ? time->month : 0x1;
 
-        MEM_POKE(IREG(0), time->year & 0x7f);
-        MEM_POKE(IREG(1), (time->year >> 8) & 0x7f);
+        MEM_POKE(IREG(0), time->year & 0x7F);
+        MEM_POKE(IREG(1), (time->year >> 8) & 0x7F);
         MEM_POKE(IREG(2), time->day << 4);
         MEM_POKE(IREG(2), time->month);
         MEM_POKE(IREG(3), time->days);
