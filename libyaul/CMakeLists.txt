@@ -5,6 +5,7 @@ SET(SRC_DIRS
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
+  scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
   scu/bus/b/scsp
   scu/bus/b/vdp1
@@ -24,6 +25,7 @@ SET(INCLUDE_DIRS
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
+  scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
   scu/bus/b/scsp
   scu/bus/b/vdp1
