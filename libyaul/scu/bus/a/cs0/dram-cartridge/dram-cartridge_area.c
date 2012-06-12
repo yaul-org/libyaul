@@ -15,7 +15,8 @@ dram_cartridge_area(void)
         void *addr;
 
         addr = (void *)((id != 0x00000000)
-            ? CS1(0x00000000)
+            ? CS0(0x00000000)
             : 0x00000000);
+
         return addr;
 }

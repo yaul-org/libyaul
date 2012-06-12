@@ -16,6 +16,7 @@
 
 /* Macros specific for processor. */
 #define SCU(x)          (0x25FE0000 + (x))
+#define CS0(x)          (0x22400000 + (x))
 #define CS1(x)          (0x24000000 + (x))
 #define DUMMY(x)        (0x25000000 + (x))
 
@@ -23,7 +24,7 @@ enum dram_cartridge_regs {
         ASR0 = 0xB0,
         ASR1 = 0xB4,
         AREF = 0xB8,
-        ID = 0x00FFFFFF,
+        ID = 0x00FFFFFC,
         UNKNOWN = 0x007EFFFC
 };
 

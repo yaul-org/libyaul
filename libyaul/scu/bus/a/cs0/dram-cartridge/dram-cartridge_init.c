@@ -19,6 +19,7 @@ dram_cartridge_init(void)
 
         /* Check the ID */
         id = MEM_READ(CS1(ID));
+        id &= 0x000000FF;
         switch (id) {
         case 0x5A:
                 /* 16-Mbit (1MiB) */
