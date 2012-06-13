@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Israel Jacques
+ * Copyright (c) 2012 Israel Jacques
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#define RGB(r, g, b)    (0x8000 | ((r) & 0x1f) | (((g) & 0x1f)  << 5) | (((b) & 0x1f) << 10))
+#define RGB(r, g, b)    (0x8000 | ((r) & 0x1F) | (((g) & 0x1F)  << 5) | (((b) & 0x1F) << 10))
 
 static struct {
         bool st_begin;
@@ -205,7 +205,7 @@ scu_dma_level(int level __attribute__ ((unused)))
         struct dma_level_cfg cfg;
 
         cfg.mode.direct.src = (void *)0x06040000;
-        cfg.mode.direct.dst = (void *)0x05c00000;
+        cfg.mode.direct.dst = (void *)0x05C00000;
         cfg.mode.direct.len = 0x1000;
         cfg.starting_factor = DMA_MODE_START_FACTOR_ENABLE;
         cfg.add = 4;
