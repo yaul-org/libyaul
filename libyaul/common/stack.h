@@ -2,7 +2,7 @@
  * Copyright (c) 2001 Dan Potter
  * See LICENSE for details.
  *
- * Dan Potter <bard-dcdev@allusion.net>
+ * Dan Potter
  */
 
 #ifndef _STACK_H_
