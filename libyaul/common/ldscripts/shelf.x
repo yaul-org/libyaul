@@ -12,8 +12,8 @@ EXTERN (_start)
 ENTRY (_start)
 
 MEMORY {
-  /* 0x06004000-0x7FFFFFFF */
-  ram (wx) : ORIGIN = 0x06004000, LENGTH = 0x01FFC000
+  /* 0x06004000-0x060FFFFF */
+  ram (wx) : ORIGIN = 0x06004000, LENGTH = 0x000FBFFF
 }
 
 /* 0x06001000 */
@@ -107,7 +107,7 @@ SECTIONS
     PROVIDE_HIDDEN (end = .);
     PROVIDE_HIDDEN (_end = ALIGN (16));
     PROVIDE_HIDDEN (__end = _end);
-    __bss_end = .;
+    PROVIDE_HIDDEN (__bss_end = .);
   } AT > ram
   __bss_size = __bss_end - __bss_start;
 
