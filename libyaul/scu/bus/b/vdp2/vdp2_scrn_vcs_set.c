@@ -28,8 +28,8 @@ vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
                 vdp2_regs.scrctl |= 0x0100;
                 break;
         default:
-                assert((vcs->vcs_scrn == SCRN_NBG0) || (vcs->vcs_scrn == SCRN_NBG1),
-                    "invalid scroll screen");
+                assert((vcs->vcs_scrn == SCRN_NBG0) ||
+                    (vcs->vcs_scrn == SCRN_NBG1));
         }
 
         /* Write to memory */

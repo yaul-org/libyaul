@@ -187,7 +187,7 @@ peripheral_populate_info(struct smpc_peripheral_info *info, uint8_t port_no)
                  * FIXME
                  * What do we do when it's 255B mode?
                  */
-                assert(size < 16, "255B mode not yet supported");
+                assert(size < 16);
 
                 if (size < 15)
                         /* Invalid peripheral data configuration (2 or 3) */

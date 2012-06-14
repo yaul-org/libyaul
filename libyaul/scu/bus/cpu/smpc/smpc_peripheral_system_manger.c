@@ -43,8 +43,8 @@ smpc_peripheral_system_manager(void)
                 goto exit;
         }
 
-        /* Let's not yet cover this case yet */
-        assert(0, "we can't fetch more data");
+        /* Let's not yet cover this case yet since we can't fetch more data */
+        assert(((MEM_READ(SMPC(SR))) & NPE) == 0x00);
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
         MEM_POKE(IREG(0), 0x80);
@@ -65,8 +65,8 @@ fetch_output_regs(void)
         if (((MEM_READ(SMPC(SR))) & PDL) == PDL)
                 oboffset = 0;
 
-        /* What if we exceed our capacity? */
-        assert(oboffset <= 255, "buffer overflow");
+        /* What if we exceed our capacity? Buffer overflow */
+        assert(oboffset <= 255);
 
         for (ooffset = 0; ooffset < SMPC_OREGS; ooffset++, oboffset++) {
                 /* We don't have much time in the critical section. Just

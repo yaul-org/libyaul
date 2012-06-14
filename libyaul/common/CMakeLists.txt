@@ -1,4 +1,5 @@
 SET(common_SRC
+  abort.c
   assert.c
   exception.S
   exception_handler.c

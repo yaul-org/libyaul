@@ -36,8 +36,9 @@ vdp2_scrn_ls_set(struct scrn_ls_format *ls)
                 MEM_POKE(VDP2(LSTA1L), lstal);
                 break;
         default:
-                assert((ls->ls_scrn == SCRN_NBG0) || (ls->ls_scrn == SCRN_NBG1),
-                    "invalid scroll screen");
+                assert((ls->ls_scrn == SCRN_NBG0) ||
+                    (ls->ls_scrn == SCRN_NBG1));
+                /* NOTREACHED */
         }
 
         /* Write to memory */
