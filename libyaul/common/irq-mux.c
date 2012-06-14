@@ -14,7 +14,8 @@
 
 #include "irq-mux.h"
 
-static irq_mux_handle_t *irq_mux_handle_new(void);
+static irq_mux_handle_t *irq_mux_handle_alloc(void);
+static void irq_mux_handle_free(irq_mux_handle_t *);
 
 void
 irq_mux_init(irq_mux_t *irq_mux)
@@ -52,7 +53,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         /* Disable interrupts */
         cpu_intc_vct_disable();
 
-        n_hdl = irq_mux_handle_new();
+        n_hdl = irq_mux_handle_alloc();
         n_hdl->imh_hdl = hdl;
         n_hdl->imh_user_ptr = user_data;
         n_hdl->imh = irq_mux;
@@ -75,14 +76,14 @@ irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
         TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
                 if (hdl_np->imh_hdl == hdl) {
                         TAILQ_REMOVE(&irq_mux->im_tq, hdl_np, handles);
-                        free(hdl_np);
+                        irq_mux_handle_free(hdl_np);
                         return;
                 }
         }
 }
 
 static irq_mux_handle_t *
-irq_mux_handle_new(void)
+irq_mux_handle_alloc(void)
 {
         irq_mux_handle_t *n_hdl;
 
@@ -90,4 +91,11 @@ irq_mux_handle_new(void)
                 return NULL;
 
         return n_hdl;
+}
+
+static void
+irq_mux_handle_free(irq_mux_handle_t *hdl)
+{
+
+        free(hdl);
 }
