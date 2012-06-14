@@ -37,9 +37,13 @@ cons_vdp1_init(struct cons *cons)
 static cons_vdp1_t *
 cons_vdp1_new(void)
 {
-        /* XXX Replace with TLSF */
-        static cons_vdp1_t cons_vdp1;
-        return &cons_vdp1;
+        cons_vdp1_t *cons_vdp1;
+
+        if ((cons_vdp1 = (cons_vdp1_t *)malloc(sizeof(cons_vdp1_t))) == NULL)
+                return NULL;
+
+        memset(cons_vdp1, 0, sizeof(cons_vdp1_t));
+        return cons_vdp1;
 }
 
 static void

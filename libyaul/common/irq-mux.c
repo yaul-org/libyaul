@@ -14,6 +14,8 @@
 
 #include "irq-mux.h"
 
+static irq_mux_handle_t *irq_mux_handle_new(void);
+
 void
 irq_mux_init(irq_mux_t *irq_mux)
 {
@@ -44,26 +46,13 @@ exit:
 void
 irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *user_data)
 {
-#ifndef TLSF
-        /* XXX
-         * Replace with TLSF */
-        static uint32_t pool_i = 0;
-        static irq_mux_handle_t pool[64];
-#endif /* !TLSF */
 
         irq_mux_handle_t *n_hdl;
 
         /* Disable interrupts */
         cpu_intc_vct_disable();
 
-#ifdef TLSF
-        /* XXX
-         * Replace with TLSF */
-        n_hdl = (irq_mux_handle_t *)malloc(sizeof(irq_mux_handle_t));
-#else
-        n_hdl = &pool[pool_i++];
-#endif /* TLSF */
-
+        n_hdl = irq_mux_handle_new();
         n_hdl->imh_hdl = hdl;
         n_hdl->imh_user_ptr = user_data;
         n_hdl->imh = irq_mux;
@@ -86,14 +75,19 @@ irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
         TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
                 if (hdl_np->imh_hdl == hdl) {
                         TAILQ_REMOVE(&irq_mux->im_tq, hdl_np, handles);
-                        /* XXX
-                         * Replace with TLSF */
-#ifdef TLSF
-                        /* XXX
-                         * Replace with TLSF */
                         free(hdl_np);
-#endif /* TLSF */
                         return;
                 }
         }
+}
+
+static irq_mux_handle_t *
+irq_mux_handle_new(void)
+{
+        irq_mux_handle_t *n_hdl;
+
+        if ((n_hdl = (irq_mux_handle_t *)malloc(sizeof(irq_mux_handle_t))) == NULL)
+                return NULL;
+
+        return n_hdl;
 }

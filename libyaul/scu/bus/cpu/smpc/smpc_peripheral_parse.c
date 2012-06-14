@@ -6,8 +6,9 @@
  */
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <ic/ic.h>
 #include <smpc/peripheral.h>
@@ -145,13 +146,13 @@ port_status(void)
 static struct smpc_peripheral *
 peripheral_alloc(void)
 {
-        /* FIXME
-         * Remove and replace with TLSF
-         */
-        static struct smpc_peripheral peripheral[32];
-        static int count = 0;
+        struct smpc_peripheral *peripheral;
 
-        return &peripheral[(count++) & 0x1F];
+        peripheral = (struct smpc_peripheral *)malloc(sizeof(struct smpc_peripheral));
+        if (peripheral == NULL)
+                return NULL;
+
+        return peripheral;
 }
 
 static void

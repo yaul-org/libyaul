@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <vdp2/cram.h>
 #include <vdp2/pn.h>
@@ -113,11 +114,13 @@ cons_vdp2_init(struct cons *cons)
 static cons_vdp2_t *
 cons_vdp2_new(void)
 {
-        /* XXX Replace with TLSF */
-        static cons_vdp2_t cons_vdp2;
+        cons_vdp2_t *cons_vdp2;
 
-        memset(&cons_vdp2, 0, sizeof(cons_vdp2_t));
-        return &cons_vdp2;
+        if ((cons_vdp2 = (cons_vdp2_t *)malloc(sizeof(cons_vdp2_t))) == NULL)
+                return NULL;
+
+        memset(cons_vdp2, 0, sizeof(cons_vdp2_t));
+        return cons_vdp2;
 }
 
 static void
