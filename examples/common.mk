@@ -27,8 +27,10 @@ CFLAGS= -g -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
 	-I../../libyaul/scu/bus/cpu/smpc
 LDFLAGS= -Wl,-Map,${PROJECT}.map \
 	-L$(ROOTDIR)/../build/libyaul \
-	-Wl,--start-group -lyaul -lc -lgcc -Wl,--end-group \
-	-nostartfiles -T $(ROOTDIR)/common/ldscripts/shelf.x
+	-Wl,--start-group -lyaul -lc -lgcc \
+	-Wl,--end-group \
+	-Wl,--gc-sections \
+	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x
 
 # All programs must link this as the first object (crt0.o)
 OBJECTS= $(ROOTDIR)/common/crt0.o \

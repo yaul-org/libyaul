@@ -13,7 +13,7 @@ OBJECTS+= cons.o
 	$(AS) $(AFLAGS) -o $(@) $(<)
 
 $(PROJECT).elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) $(OBJECTS) \
+	$(LD) $(OBJECTS) $(LDFLAGS) \
 		-o $(@) -L. -L../../build/libyaul -lyaul
 	$(OB) -O binary $(@) $(PROJECT).bin
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
