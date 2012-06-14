@@ -8,4 +8,6 @@
 #ifndef _ROMDISK_H_
 #define _ROMDISK_H_
 
+void romdisk_init(void);
+
 #endif /* _ROMDISK_H_ */
