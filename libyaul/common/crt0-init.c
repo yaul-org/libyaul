@@ -63,9 +63,6 @@ __std_startup(void)
         cpu_intc_vct_set(0x06, (uint32_t)&exception_illegal_slot);
         cpu_intc_vct_set(0x09, (uint32_t)&exception_cpu_address_error);
         cpu_intc_vct_set(0x0A, (uint32_t)&exception_dma_address_error);
-
-        /* Disable buffering */
-        setvbuf(stdout, NULL, _IONBF, 0);
 }
 
 /* Add function to .fini section */
