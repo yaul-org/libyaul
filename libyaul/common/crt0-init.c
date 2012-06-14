@@ -28,9 +28,16 @@ void *__dso_handle = NULL;
 static void __attribute__ ((used))
 __do_global_ctors(void)
 {
+        /*
+         * See <http://gcc.gnu.org/onlinedocs/gccint/Initialization.html>
+         */
 
         do {
-                uint32_t i, n = (uint32_t)__CTOR_LIST__[0];
+                uint32_t i;
+                uint32_t n;
+
+                n = (uint32_t)__CTOR_LIST__[0];
+                /* Constructors are called in reverse order of the list */
                 for (i = n; i >= 1; i--)
                         __CTOR_LIST__[i]();
         } while (false);
@@ -45,6 +52,7 @@ __do_global_dtors(void)
 
         do {
                 n = (uint32_t)__DTOR_LIST__[0];
+                /* Destructors in forward order */
                 for (i = 0; i < n; i++)
                         __DTOR_LIST__[i + 1]();
         } while (false);

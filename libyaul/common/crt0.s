@@ -46,7 +46,6 @@ _start:
         /* Initializers */
         MOV.L .LC3,r8
         MOV.L .LC4,r9
-        MOV.L .LC2,r10
         JSR @r8
         NOP
         /* Enable interrupts */
@@ -55,9 +54,6 @@ _start:
         MOV #0x11,r0
         MOV.B r0,@r1
         JSR @r9
-        NOP
-        /* Finishers */
-        JSR @r10
         NOP
         MOV r14,r15
         LDS.L @r15+,pr
@@ -72,14 +68,12 @@ _start:
 .LC0:
         .LONG __bss_start
 .LC1:
-        .LONG _end
-.LC2:
-        .LONG __FINI_SECTION__
+        .LONG __bss_end
 .LC3:
         .LONG __INIT_SECTION__
 .LC4:
         .LONG _main
 .LC5:
-        .LONG _stack
+        .LONG __stack
 .LC6:
         .LONG 0xFFFFFE92
