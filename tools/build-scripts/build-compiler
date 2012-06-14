@@ -45,8 +45,7 @@ clean_up () {
     exit ${1}
 }
 
-trap 'clean_up 0' 0
-trap 'clean_up 1' 2 3 15
+trap 'clean_up 1' 2 9 15
 
 TARGET='sh-elf'
 PREFIX="${BUILD_INSTALL_DIR}/${TARGET}"
@@ -195,5 +194,6 @@ find "${BUILD_INSTALL_DIR}/${TARGET}/lib/gcc/${TARGET}" -name "*.a" -exec "${TAR
 find "${BUILD_INSTALL_DIR}/${TARGET}/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
 
 # Clean up temporary files and source directories
+clean_up 0
 
 message "Add path '${BUILD_INSTALL_DIR}/${TARGET}/bin' to your \$PATH environment variable"
