@@ -12,12 +12,18 @@
 .TYPE _cpu_intc_vct_set, @function
 
 _cpu_intc_vct_set:
+        MOV.L r14,@-r15
+        STS.L pr,@-r15
         MOV.L .LC1,r2
         MOV.L @r2,r2
         JMP @r2
+        NOP
+        LDS.L @r15+,pr
+        MOV.L @r15+,r14
+        RTS
         NOP
 
 .ALIGN 2
 
 .LC1:
-        .LONG 0x26000310
+        .LONG 0x06000310
