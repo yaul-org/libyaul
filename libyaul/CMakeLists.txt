@@ -2,6 +2,8 @@ SET(SRC_DIRS
   common
   cons
   fs/iso9660
+  fs/romdisk
+  newlib
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
@@ -24,6 +26,7 @@ SET(INCLUDE_DIRS
   common
   cons
   fs/iso9660
+  fs/romdisk
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
