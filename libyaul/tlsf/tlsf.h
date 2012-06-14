@@ -20,10 +20,10 @@ typedef void *tlsf_pool;
 tlsf_pool tlsf_create(void *, size_t);
 void tlsf_destroy(tlsf_pool);
 
-void *tlsf_malloc(tlsf_pool pool, size_t bytes);
-void *tlsf_memalign(tlsf_pool pool, size_t align, size_t bytes);
-void *tlsf_realloc(tlsf_pool pool, void* ptr, size_t size);
-void tlsf_free(tlsf_pool pool, void* ptr);
+void *tlsf_malloc(tlsf_pool, size_t);
+void *tlsf_memalign(tlsf_pool, size_t, size_t);
+void *tlsf_realloc(tlsf_pool, void *, size_t);
+void tlsf_free(tlsf_pool, void *);
 
 void tlsf_walk_heap(tlsf_pool, tlsf_walker, void *);
 int tlsf_check_heap(tlsf_pool);
