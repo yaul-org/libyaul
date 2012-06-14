@@ -7,19 +7,17 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <vdp2/tvmd.h>
-#include <vdp2/scrn.h>
-#include <vdp2/vram.h>
 #include <vdp2.h>
+#include <vdp2/tvmd.h>
+#include <vdp2/vram.h>
 
 #include <cons/vdp2.h>
 
 #include "exception.h"
-#include "stack.h"
 
-static void spin(void);
 static void format(struct cpu_registers *, const char *);
 
 void __attribute__ ((noreturn, visibility ("hidden")))
@@ -27,7 +25,7 @@ exception_handler_illegal_instruction(struct cpu_registers *regs)
 {
 
         format(regs, "Illegal instruction");
-        spin();
+        abort();
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
@@ -35,7 +33,7 @@ exception_handler_illegal_slot(struct cpu_registers *regs)
 {
 
         format(regs, "Illegal slot");
-        spin();
+        abort();
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
@@ -43,7 +41,7 @@ exception_handler_cpu_address_error(struct cpu_registers *regs)
 {
 
         format(regs, "CPU address error");
-        spin();
+        abort();
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
@@ -51,16 +49,7 @@ exception_handler_dma_address_error(struct cpu_registers *regs)
 {
 
         format(regs, "DMA address error");
-        spin();
-}
-
-static void __attribute__ ((noreturn))
-spin(void)
-{
-        while (true) {
-                vdp2_tvmd_vblank_in_wait();
-                vdp2_tvmd_vblank_out_wait();
-        }
+        abort();
 }
 
 static void
@@ -86,8 +75,7 @@ format(struct cpu_registers *regs, const char *exception_name)
             "\t r8 = 0x%08X mach = 0x%08X\n"
             "\t r9 = 0x%08X macl = 0x%08X\n"
             "\tr10 = 0x%08X   pr = 0x%08X\n"
-            "                     pc = 0x%08X\n"
-            "[1B[1;44mStack backtrace[m\n%s",
+            "                     pc = 0x%08X\n",
             exception_name,
             (uintptr_t)regs->r[0], (uintptr_t)regs->r[11],
             (uintptr_t)regs->r[1], (uintptr_t)regs->r[12],
@@ -100,8 +88,7 @@ format(struct cpu_registers *regs, const char *exception_name)
             (uintptr_t)regs->r[8], (uintptr_t)regs->mach,
             (uintptr_t)regs->r[9], (uintptr_t)regs->macl,
             (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
-            (uintptr_t)regs->pc,
-            stack_backtrace());
+            (uintptr_t)regs->pc);
 
         /* Reset the VDP2 */
         vdp2_init();
