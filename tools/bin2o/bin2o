@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Copyright (c) 2000
+# See LICENSE for details.
+#
+# Dan Potter
+# Israel Jacques <mrko@eecs.berkeley.edu>
+
+TMPDIR="${TMPDIR:-/tmp}"
+
+panic () {
+    echo "error: ${0##*/}: ${1}" 1>&2
+    exit ${2}
+}
+
+temp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+temp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+temp3="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+
+clean_up () {
+    rm -f "${temp1}" "${temp2}" "${temp3}"
+    exit 0
+}
+
+trap clean_up 0 1 2 9 15
+
+if [ $# != 3 ]; then
+    echo "usage: ${0##*/} input-file symbol-name output-file" 1>&2
+    exit 1
+fi
+
+input="${1}"
+symbol="${2}"
+output="${3}"
+
+# Gotta do a different binary target here depending on the target
+(sh-elf-as --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
+    -o "${temp3}" || \
+    panic "Couldn't assemble file" ${?}) << EOF
+.SECTION ".rodata"
+.ALIGN 2
+EOF
+
+cat > "${temp1}" << EOF
+SECTIONS
+{
+  .rodata :
+  {
+     _${symbol} = .;
+     *(.data);
+     _${symbol}_end = .;
+  }
+}
+EOF
+sh-elf-ld --no-warn-mismatch --format binary --oformat elf32-sh "${input}" \
+    --format 'elf32-sh' "${temp3}" \
+    -o "${temp2}" -r -T "${temp1}" || panic "Couldn't link file" ${?}
+
+sh-elf-objcopy --set-section-flags ".rodata=alloc,load,data,readonly" \
+    "${temp2}" "${output}" || panic "Couldn't translate object file" ${?}
