@@ -12,8 +12,10 @@
 
 #include <cons/vdp2.h>
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 static void delay(uint16_t);
 static bool xchg(uint32_t, uint32_t);
@@ -21,8 +23,6 @@ static bool xchg(uint32_t, uint32_t);
 int
 main(void)
 {
-        static char buf[1024];
-
         uint16_t blcs_color[] = {
                 0x9C00
         };
@@ -31,6 +31,7 @@ main(void)
 
         char *result;
         uint32_t x;
+        char *buf;
 
         uint32_t *cart;
         size_t cart_len;
@@ -66,6 +67,9 @@ main(void)
                 }
         }
 
+        buf = (char *)malloc(1024);
+        assert(buf != NULL);
+
         cart_len = dram_cartridge_size();
         (void)sprintf(buf, "%s DRAM Cartridge detected\n",
             ((cart_len == 0x00080000)
@@ -86,13 +90,9 @@ main(void)
         }
 
         cons_write(&cons, "\nTest is complete!");
+        free(buf);
 
-        while (true) {
-                vdp2_tvmd_vblank_in_wait();
-                vdp2_tvmd_vblank_out_wait();
-        }
-
-        return 0;
+        abort();
 }
 
 static void
