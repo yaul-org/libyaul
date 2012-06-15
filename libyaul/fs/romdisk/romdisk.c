@@ -6,26 +6,28 @@
  * Lawrence Sebald
  */
 
-#include <assert.h>
-#include <errno.h>
-#include <inttypes.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include "romdisk.h"
 
-/* XXX
- * Only temporary solution
- */
-#define __unused        __attribute__ ((unused))
+#define MAX_RD_FILES            16
+
+#define TYPE_HARD_LINK          0
+#define TYPE_DIRECTORY          1
+#define TYPE_REGULAR_FILE       2
+#define TYPE_SYMBOLIC_LINK      3
+#define TYPE_BLOCK_DEVICE       4
+#define TYPE_CHAR_DEVICE        5
+
+#define IS_TYPE(x)              ((x) & 0x03)
+#define TYPE_GET(x)             ((x) & 0x0F)
 
 typedef struct {
         char magic[8];          /* Should be "-rom1fs-" */
         uint32_t full_size;     /* Full size of the file system */
         uint32_t checksum;      /* Checksum */
         char volume_name[16];   /* Volume name (zero-terminated) */
-} romdisk_hdr_t;
+}  romdisk_hdr_t;
 
 /* File header info; note that this header plus filename must be a
  * multiple of 16 bytes, and the following file data must also be a
@@ -36,74 +38,292 @@ typedef struct {
         uint32_t size;          /* Data size */
         uint32_t checksum;      /* File checksum */
         char filename[16];      /* File name (zero-terminated) */
-} __attribute__ ((aligned (16))) romdisk_file_t;
+} romdisk_file_t;
 
-typedef struct  {
-        const uint8_t *image;     /* The actual image */
+typedef struct {
+        const uint8_t *image;   /* The actual image */
         const romdisk_hdr_t *hdr; /* Pointer to the header */
-        uint32_t files;      /* Offset in the image to the files area */
+        uint32_t files;         /* Offset in the image to the files area */
 } rd_image_t;
 
-static uint32_t romdisk_find_object(rd_image_t *, const char *, int, int, uint32_t);
-static void *romdisk_open(const char *, int);
+static uint32_t romdisk_find(rd_image_t *, const char *, bool);
+static uint32_t romdisk_find_object(rd_image_t *, const char *, size_t, bool, uint32_t);
+
+/* XXX Provisional */
+static rd_file_handle_t *romdisk_fd_alloc(void);
+static void romdisk_fd_free(rd_file_handle_t *);
+/* XXX Provisional */
+static rd_file_t fhs;
 
 void
 romdisk_init(void)
 {
+        TAILQ_INIT(&fhs);
 }
 
-static void * __attribute__ ((used))
-romdisk_open(const char *fn __unused, int mode __unused)
+void *
+romdisk_mount(const char *mnt_point __attribute__ ((unused)),
+    const uint8_t *image)
 {
-        return NULL;
+        romdisk_hdr_t *hdr;
+        rd_image_t *mnt;
+
+        if (strncmp((char *)image, "-rom1fs-", 8))
+                return NULL;
+
+        hdr = (romdisk_hdr_t *)image;
+        if ((mnt = (rd_image_t *)malloc(sizeof(rd_image_t))) == NULL)
+                return NULL;
+
+        mnt->image = image;
+        mnt->hdr = hdr;
+        mnt->files = sizeof(romdisk_hdr_t) + ((strlen(hdr->volume_name) >> 4) << 4);
+
+        return mnt;
 }
 
-static void __unused
-romdisk_close(void *h __unused)
+void *
+romdisk_open(void *p, const char *fn,
+    int mode __attribute__ ((unused)))
 {
+        rd_image_t *mnt;
+        rd_file_handle_t *fh;
+
+        const romdisk_file_t *f_hdr;
+        uint32_t f_idx;
+        bool directory;
+
+        mnt = (rd_image_t *)p;
+        directory = false;
+        if ((f_idx = romdisk_find(mnt, fn, directory)) == 0) {
+                errno = ENOENT;
+                return NULL;
+        }
+
+        f_hdr = (const romdisk_file_t *)(mnt->image + f_idx);
+        printf("\"%s\"\n", f_hdr->filename);
+        fh = romdisk_fd_alloc();
+        fh->rdh = &fhs;
+        fh->index = f_idx + mnt->files;
+        fh->dir = directory;
+        fh->ptr = 0;
+        fh->len = f_hdr->size;
+        fh->mnt = mnt;
+
+        return fh;
 }
 
-static ssize_t __unused
-romdisk_read(void *h __unused, void *buf __unused, size_t bytes __unused)
+void
+romdisk_close(void *fh)
 {
-        return 0;
+        romdisk_fd_free(fh);
 }
 
-static off_t __unused
-romdisk_seek(void *h __unused, off_t offset __unused, int whence __unused)
+ssize_t
+romdisk_read(void *p, void *buf, size_t bytes)
 {
-        return 0;
+        rd_file_handle_t *fh;
+        rd_image_t *mnt;
+        uint8_t *ofs;
+
+        fh = (rd_file_handle_t *)p;
+        mnt = (rd_image_t *)fh->mnt;
+
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
+                errno = EINVAL;
+                return -1;
+        }
+
+        /* Is there enough left? */
+        if ((fh->ptr + bytes) > fh->len)
+                bytes = fh->len - fh->ptr;
+
+        ofs = (uint8_t *)(mnt->image + fh->index + fh->ptr);
+        memcpy(buf, ofs, bytes);
+        fh->ptr += bytes;
+
+        return bytes;
 }
 
-static off_t __unused
-romdisk_tell(void *h __unused)
+off_t
+romdisk_seek(void *p, off_t offset, int whence)
 {
-        return 0;
+        rd_file_handle_t *fh;
+
+        fh = (rd_file_handle_t *)p;
+
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
+                errno = EINVAL;
+                return -1;
+        }
+
+        /* Update current position according to arguments */
+        switch(whence) {
+        case SEEK_SET:
+                fh->ptr = offset;
+                break;
+        case SEEK_CUR:
+                fh->ptr += offset;
+                break;
+        case SEEK_END:
+                fh->ptr = fh->len + offset;
+                break;
+        default:
+                return -1;
+        }
+
+        /* Check bounds */
+        if(fh->ptr < 0)
+                fh->ptr = 0;
+
+        if(fh->ptr > (int32_t)fh->len)
+                fh->ptr = fh->len;
+
+        return fh->ptr;
 }
 
-static size_t __unused
-romdisk_total(void *h __unused)
+off_t
+romdisk_tell(void *p)
 {
-        return 0;
+        rd_file_handle_t *fh;
+
+        fh = (rd_file_handle_t *)p;
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
+                errno = EINVAL;
+                return -1;
+        }
+
+        return fh->ptr;
 }
 
-/* Given a filename and a starting romdisk directory listing (byte
+size_t
+romdisk_total(void *p)
+{
+        rd_file_handle_t *fh;
+
+        fh = (rd_file_handle_t *)p;
+
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
+                errno = EINVAL;
+                return -1;
+        }
+
+        return fh->len;
+}
+
+/* Given a file name and a starting ROMDISK directory listing (byte
  * offset), search for the entry in the directory and return the byte
  * offset to its entry */
-static uint32_t __unused
-romdisk_find_object(rd_image_t *mnt __unused,
-    const char *fn __unused,
-    int fnlen __unused,
-    int dir __unused,
-    uint32_t offset __unused)
+static uint32_t
+romdisk_find_object(rd_image_t *mnt,
+    const char *fn,
+    size_t fn_len,
+    bool directory,
+    uint32_t offset)
 {
+        uint32_t next_ofs;
+        uint32_t type;
+
+        const romdisk_file_t *f_hdr;
+
+        do {
+                f_hdr = (const romdisk_file_t *)(mnt->image + offset);
+                next_ofs = f_hdr->next_header;
+
+                /* Since the file headers begin always at a 16 byte
+                 * boundary, the lowest 4 bits would be always zero in
+                 * the next filehdr pointer
+                 *
+                 * These four bits are used for the mode information */
+
+                /* Bits 0..2 specify the type of the file; while bit 4
+                 * shows if the file is executable or not */
+                type = TYPE_GET(next_ofs);
+                next_ofs &= 0xFFFFFFF0;
+
+                /* Check filename */
+                if ((strlen(f_hdr->filename) == fn_len) &&
+                    ((strncmp(f_hdr->filename, fn, fn_len)) == 0)) {
+                        if (directory && (IS_TYPE(type) == TYPE_DIRECTORY))
+                                return offset;
+
+                        if (!directory && (IS_TYPE(type) == TYPE_REGULAR_FILE))
+                                return offset;
+
+                        return 0;
+                }
+
+                /* Not found */
+                offset = next_ofs;
+        } while (offset);
+
         return 0;
 }
 
-static uint32_t __unused
-romdisk_find(rd_image_t *mnt __unused,
-    const char *fn __unused,
-    int dir __unused)
+static uint32_t
+romdisk_find(rd_image_t *mnt, const char *fn, bool directory)
 {
+        const char *fn_cur;
+        uint32_t ofs;
+        int fn_len;
+        const romdisk_file_t *f_hdr;
+
+        ofs = mnt->files;
+
+        /* Traverse directories */
+        while ((fn_cur = strchr(fn, '/'))) {
+                if (fn_cur != fn) {
+                        fn_len = fn_cur - fn;
+                        if ((ofs = romdisk_find_object(mnt,
+                                    fn, fn_len, /* directory = */ true, ofs)) == 0)
+                                return 0;
+
+                        f_hdr = (const romdisk_file_t *)(mnt->image + ofs);
+                        ofs = f_hdr->spec_info;
+                }
+
+                fn = fn_cur + 1;
+        }
+
+        /* Locate the file under the resultant directory */
+        if (*fn != '\0') {
+                ofs = romdisk_find_object(mnt, fn, strlen(fn), directory, ofs);
+                return ofs;
+        }
+
         return 0;
+}
+
+static rd_file_handle_t *
+romdisk_fd_alloc(void)
+{
+        rd_file_handle_t *fh;
+
+        if ((fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t))) == NULL)
+                return NULL;
+
+        TAILQ_INSERT_TAIL(&fhs, fh, handles);
+
+        return fh;
+}
+
+static void
+romdisk_fd_free(rd_file_handle_t *fd)
+{
+        rd_file_handle_t *fh;
+
+        if (fd != NULL)
+                return;
+
+        TAILQ_FOREACH(fh, &fhs, handles) {
+                if (fh == fd) {
+                        TAILQ_REMOVE(&fhs, fh, handles);
+                        free(fh);
+                        return;
+                }
+        }
 }
