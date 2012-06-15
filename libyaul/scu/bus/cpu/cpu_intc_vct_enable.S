@@ -14,11 +14,13 @@
 _cpu_intc_vct_enable:
         MOV.L r14,@-r15
         STS.L pr,@-r15
-        STC sr,r0
-        MOV #0xF0,r1
-        NOT r1,r1
-        AND r1,r0
-        LDC r0,sr
+        MOV #0xFF,r2
+        MOV #0x0F,r1
+        SHLL8 r2
+        STC sr,r3
+        OR r2,r1
+        AND r1,r3
+        LDC r3,sr
         LDS.L @r15+,pr
         MOV.L @r15+,r14
         RTS
