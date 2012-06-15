@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2012 Israel Jacques
+ * See LICENSE for details.
+ *
+ * Israel Jacques <mrko@eecs.berkeley.edu>
+ */
+
+#include <vdp2.h>
+#include <smpc.h>
+#include <smpc/peripheral.h>
+#include <dram-cartridge.h>
+
+#include <cons/vdp2.h>
+
+#include <romdisk/romdisk.h>
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static void delay(uint16_t);
+
+extern uint8_t root_romdisk[];
+struct cons cons;
+int
+main(void)
+{
+        static char buf[1024];
+
+        uint16_t blcs_color[] = {
+                0x9C00
+        };
+
+
+        void *romdisk;
+
+        char *msg; /* Buffer for file */
+        ssize_t msg_len;
+        void *fh; /* File handle */
+
+        uint32_t *cart;
+        size_t cart_len;
+
+        vdp2_init();
+        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
+            blcs_color, 0);
+
+        smpc_init();
+
+        cons_vdp2_init(&cons);
+        cons_write(&cons, "\n[1;44m          *** ROMDISK Test ***          [m\n\n");
+
+        cons_write(&cons, "Initializing DRAM cartridge...\n");
+        dram_cartridge_init();
+
+        delay(0);
+
+        cart = (uint32_t *)dram_cartridge_area();
+        if (cart == NULL) {
+                cons_write(&cons, "[4;1H[2K[11CThe extended RAM\n"
+                    "[11Ccartridge is not\n"
+                    "[11Cinsert properly.\n"
+                    "\n"
+                    "[11CPlease turn off\n"
+                    "[11Cpower and reinsert\n"
+                    "[11Cthe extended RAM\n"
+                    "[11Ccartridge.\n");
+
+                abort();
+        }
+
+        cart_len = dram_cartridge_size();
+        (void)sprintf(buf, "%s DRAM Cartridge detected\n",
+            ((cart_len == 0x00080000)
+                ? "16-Mbit"
+                : "32-Mbit"));
+        cons_write(&cons, buf);
+
+        cons_write(&cons, "Mounting ROMDISK... ");
+        romdisk_init();
+        romdisk = romdisk_mount("/", root_romdisk);
+        delay(0);
+        if (romdisk != NULL)
+                cons_write(&cons, "OK!\n");
+
+        cons_write(&cons, "Opening \"/hello.world\" ");
+        if ((fh = romdisk_open(romdisk, "/hello.world", O_RDONLY)) == NULL) {
+                cons_write(&cons, "FAILED\n");
+                abort();
+        }
+        cons_write(&cons, "OK!\n");
+
+        msg_len = romdisk_total(fh);
+        msg = (char *)malloc(msg_len + 1);
+        assert(msg != NULL);
+        memset(msg, '\0', msg_len + 1);
+
+        cons_write(&cons, "Reading... ");
+        msg_len = romdisk_read(fh, msg, romdisk_total(fh));
+        if (msg_len == 0) {
+                cons_write(&cons, "FAILED\n");
+                abort();
+        }
+
+        cons_write(&cons, "\n[1;33m");
+        cons_write(&cons, msg);
+        cons_write(&cons, "[m");
+
+        cons_write(&cons, "\nTest complete!\n");
+
+        abort();
+}
+
+static void
+delay(uint16_t t)
+{
+        uint16_t frame;
+
+        for (frame = 0; frame < (60 * t); frame++) {
+                vdp2_tvmd_vblank_in_wait();
+                vdp2_tvmd_vblank_out_wait();
+        }
+}
