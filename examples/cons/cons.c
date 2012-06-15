@@ -11,19 +11,21 @@
 
 #include <cons/vdp2.h>
 
-#include <stdio.h>
+#include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int
 main(void)
 {
 #define IS_BUTTON_PRESSED(p, s) ((p) ? "[1;37;0;42m"s"[m" : "*")
 
-        static char text[2048];
-
         uint16_t blcs_color[] = {
                 0x9C00
         };
+
+        char *text;
 
         struct smpc_peripheral_digital *port1;
 
@@ -38,6 +40,9 @@ main(void)
         cons_vdp2_init(&cons);
 
         port1 = smpc_peripheral_digital_port(1);
+
+        text = (char *)malloc(8192);
+        assert(text != NULL);
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
