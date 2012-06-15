@@ -13,12 +13,15 @@ OBJECTS+= arp-comm.o
 	$(AS) $(AFLAGS) -o $(@) $(<)
 
 $(PROJECT).elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) $(OBJECTS) \
-		-o $(@) -L. -L../../build/libyaul -lyaul
+	$(LD) $(OBJECTS) $(LDFLAGS) -o $(@)
 	$(OB) -O binary $(@) $(PROJECT).bin
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
 
 clean:
 	-rm -f $(OBJECTS) \
-	$(PROJECT).asm $(PROJECT).bin $(PROJECT).elf $(PROJECT).map $(PROJECT).sym
+	$(PROJECT).asm \
+	$(PROJECT).bin \
+	$(PROJECT).elf \
+	$(PROJECT).map \
+	$(PROJECT).sym
