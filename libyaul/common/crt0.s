@@ -15,8 +15,8 @@
 _start:
         /* Set stack pointer for master CPU */
         mov.l .LC5, r15
-        mov #0x00, r0
-        lds r0, pr
+        mov #0x00, r1
+        lds r1, pr
         mov.l r14, @-r15
         sts.l pr, @-r15
         mov r15, r14
@@ -31,14 +31,14 @@ _start:
         mov.b r1, @r3
 
         /* Clear 'BSS' section */
-        mov.l .LC1, r0
+        mov.l .LC1, r3
         mov.l .LC0, r1
-        mov r0, r2
-        sub r1, r0
-        shlr2 r0
-        shlr2 r0
+        mov r3, r2
+        sub r1, r3
+        shlr2 r3
+        shlr2 r3
         mov #0x00, r1
-        cmp/gt r1, r0
+        cmp/gt r1, r3
         bf .L2
         nop
 .L1:
@@ -46,7 +46,7 @@ _start:
         mov.l r1, @-r2
         mov.l r1, @-r2
         mov.l r1, @-r2
-        dt r0
+        dt r3
         bf/s .L1
         nop
 .L2:
