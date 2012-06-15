@@ -10,7 +10,7 @@ OUTPUT_FORMAT ("elf32-sh")
 OUTPUT_ARCH (sh)
 EXTERN (_start)
 ENTRY (_start)
-SEARCH_DIR ("/home/mrko/work/other/tool-chain/sh-elf/sh-elf/lib");
+SEARCH_DIR ("/path/to/sh-elf/sh-elf/lib");
 
 MEMORY {
   /* 0x06004000-0x060FFFFF */
