@@ -14,11 +14,9 @@
 _cpu_intc_vct_disable:
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov r15, r14
-        mov #0xF0, r0
-        mov r14, r15
+        mov #0xF0, r1
+        ldc r1, sr
         lds.l @r15+, pr
         mov.l @r15+, r14
-        ldc r0, sr
         rts
         nop
