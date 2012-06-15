@@ -10,6 +10,7 @@
 
 #include "romdisk.h"
 
+#define ROMFS_MAGIC             "-rom1fs-"
 #define MAX_RD_FILES            16
 
 #define TYPE_HARD_LINK          0
@@ -21,6 +22,8 @@
 
 #define IS_TYPE(x)              ((x) & 0x03)
 #define TYPE_GET(x)             ((x) & 0x0F)
+
+#define HEADER
 
 typedef struct {
         char magic[8];          /* Should be "-rom1fs-" */
@@ -47,7 +50,8 @@ typedef struct {
 } rd_image_t;
 
 static uint32_t romdisk_find(rd_image_t *, const char *, bool);
-static uint32_t romdisk_find_object(rd_image_t *, const char *, size_t, bool, uint32_t);
+static uint32_t romdisk_find_object(rd_image_t *, const char *, size_t, bool,
+    uint32_t);
 
 /* XXX Provisional */
 static rd_file_handle_t *romdisk_fd_alloc(void);
@@ -58,6 +62,7 @@ static rd_file_t fhs;
 void
 romdisk_init(void)
 {
+
         TAILQ_INIT(&fhs);
 }
 
@@ -68,7 +73,7 @@ romdisk_mount(const char *mnt_point __attribute__ ((unused)),
         romdisk_hdr_t *hdr;
         rd_image_t *mnt;
 
-        if (strncmp((char *)image, "-rom1fs-", 8))
+        if (strncmp((char *)image, ROMFS_MAGIC, 8))
                 return NULL;
 
         hdr = (romdisk_hdr_t *)image;
@@ -130,8 +135,15 @@ romdisk_read(void *p, void *buf, size_t bytes)
         mnt = (rd_image_t *)fh->mnt;
 
         /* Sanity checks */
-        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
-                errno = EINVAL;
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                errno = EBADF;
+                return -1;
+        }
+
+        if (fh->dir) {
+                errno = EISDIR;
                 return -1;
         }
 
@@ -154,8 +166,15 @@ romdisk_seek(void *p, off_t offset, int whence)
         fh = (rd_file_handle_t *)p;
 
         /* Sanity checks */
-        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
-                errno = EINVAL;
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                errno = EBADF;
+                return -1;
+        }
+
+        if (fh->dir) {
+                errno = EISDIR;
                 return -1;
         }
 
@@ -171,6 +190,9 @@ romdisk_seek(void *p, off_t offset, int whence)
                 fh->ptr = fh->len + offset;
                 break;
         default:
+                /* The whence argument to fseek() was not 'SEEK_SET',
+                 * 'SEEK_END', or 'SEEK_CUR' */
+                errno = EINVAL;
                 return -1;
         }
 
@@ -191,8 +213,15 @@ romdisk_tell(void *p)
 
         fh = (rd_file_handle_t *)p;
         /* Sanity checks */
-        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
-                errno = EINVAL;
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                errno = EBADF;
+                return -1;
+        }
+
+        if (fh->dir) {
+                errno = EISDIR;
                 return -1;
         }
 
@@ -207,8 +236,15 @@ romdisk_total(void *p)
         fh = (rd_file_handle_t *)p;
 
         /* Sanity checks */
-        if ((fh == NULL) || (fh->index == 0) || fh->dir) {
-                errno = EINVAL;
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                errno = EBADF;
+                return -1;
+        }
+
+        if (fh->dir) {
+                errno = EISDIR;
                 return -1;
         }
 
