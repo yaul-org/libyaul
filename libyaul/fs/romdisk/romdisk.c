@@ -101,7 +101,7 @@ romdisk_open(void *p, const char *fn,
         }
 
         f_hdr = (const romdisk_file_t *)(mnt->image + f_idx);
-        printf("\"%s\"\n", f_hdr->filename);
+
         fh = romdisk_fd_alloc();
         fh->rdh = &fhs;
         fh->index = f_idx + mnt->files;
