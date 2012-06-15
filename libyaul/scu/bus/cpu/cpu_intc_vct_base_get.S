@@ -5,19 +5,19 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _cpu_intc_vct_base_get
-.TYPE _cpu_intc_vct_base_get, @function
+.global _cpu_intc_vct_base_get
+.type _cpu_intc_vct_base_get, @function
 
 _cpu_intc_vct_base_get:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        MOV r15,r14
-        STC vbr,r0
-        MOV r14,r15
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        mov r15, r14
+        stc vbr, r0
+        mov r14, r15
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop

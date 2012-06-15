@@ -5,17 +5,17 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _cpu_intc_vct_base_set
-.TYPE _cpu_intc_vct_base_set, @function
+.global _cpu_intc_vct_base_set
+.type _cpu_intc_vct_base_set, @function
 
 _cpu_intc_vct_base_set:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        LDC r4,vbr
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        ldc r4, vbr
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop

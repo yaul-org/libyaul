@@ -5,27 +5,27 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _scu_int_lvl_set
-.TYPE _scu_int_lvl_set, @function
+.global _scu_int_lvl_set
+.type _scu_int_lvl_set, @function
 
 _scu_int_lvl_set:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        MOV.L .LC1,r2
-        MOV.L @r2,r2
-        MOV #0x0F,r0
-        AND r0,r4
-        JMP @r2
-        NOP
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        mov.l .LC1, r2
+        mov.l @r2, r2
+        mov #0x0F, r0
+        and r0, r4
+        jmp @r2
+        nop
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop
 
-.ALIGN 2
+.align 2
 
 .LC1:
-        .LONG 0x06000280
+        .long 0x06000280

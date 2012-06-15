@@ -5,19 +5,19 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
+.text
 
-.GLOBAL _cpu_intc_lvl_get
-.TYPE _cpu_intc_lvl_get, @function
+.global _cpu_intc_lvl_get
+.type _cpu_intc_lvl_get, @function
 
 _cpu_intc_lvl_get:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        STC sr,r0
-        SHLR2 r0
-        SHLR2 r0
-        AND #0x0F,r0
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        stc sr, r0
+        shlr2 r0
+        shlr2 r0
+        and #0x0F, r0
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop

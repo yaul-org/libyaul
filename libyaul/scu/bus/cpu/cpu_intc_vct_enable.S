@@ -5,23 +5,23 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _cpu_intc_vct_enable
-.TYPE _cpu_intc_vct_enable, @function
+.global _cpu_intc_vct_enable
+.type _cpu_intc_vct_enable, @function
 
 _cpu_intc_vct_enable:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        MOV #0xFF,r2
-        MOV #0x0F,r1
-        SHLL8 r2
-        STC sr,r3
-        OR r2,r1
-        AND r1,r3
-        LDC r3,sr
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        mov #0xFF, r2
+        mov #0x0F, r1
+        shll8 r2
+        stc sr, r3
+        or r2, r1
+        and r1, r3
+        ldc r3, sr
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop

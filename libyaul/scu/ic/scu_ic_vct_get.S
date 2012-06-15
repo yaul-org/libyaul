@@ -5,25 +5,25 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _scu_ic_vct_get
-.TYPE _scu_ic_vct_get, @function
+.global _scu_ic_vct_get
+.type _scu_ic_vct_get, @function
 
 _scu_ic_vct_get:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        MOV.L .LC1,r0
-        MOV.L @r0,r0
-        RTS
-        NOP
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        mov.l .LC1, r0
+        mov.l @r0, r0
+        rts
+        nop
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop
 
-.ALIGN 2
+.align 2
 
 .LC1:
-        .LONG 0x06000304
+        .long 0x06000304

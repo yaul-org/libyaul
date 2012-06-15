@@ -5,21 +5,21 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _cpu_intc_lvl_set
-.TYPE _cpu_intc_lvl_set, @function
+.global _cpu_intc_lvl_set
+.type _cpu_intc_lvl_set, @function
 
 _cpu_intc_lvl_set:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        SHLL2 r4
-        SHLL2 r4
-        STC sr,r0
-        OR r4,r0
-        LDC r0,sr
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        shll2 r4
+        shll2 r4
+        stc sr, r0
+        or r4, r0
+        ldc r0, sr
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        rts
+        nop

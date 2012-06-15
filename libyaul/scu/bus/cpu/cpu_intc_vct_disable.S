@@ -5,20 +5,20 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.TEXT
-.ALIGN 1
+.text
+.align 1
 
-.GLOBAL _cpu_intc_vct_disable
-.TYPE _cpu_intc_vct_disable, @function
+.global _cpu_intc_vct_disable
+.type _cpu_intc_vct_disable, @function
 
 _cpu_intc_vct_disable:
-        MOV.L r14,@-r15
-        STS.L pr,@-r15
-        MOV r15,r14
-        MOV #0xF0,r0
-        MOV r14,r15
-        LDS.L @r15+,pr
-        MOV.L @r15+,r14
-        LDC r0,sr
-        RTS
-        NOP
+        mov.l r14, @-r15
+        sts.l pr, @-r15
+        mov r15, r14
+        mov #0xF0, r0
+        mov r14, r15
+        lds.l @r15+, pr
+        mov.l @r15+, r14
+        ldc r0, sr
+        rts
+        nop
