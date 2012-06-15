@@ -54,7 +54,7 @@ main(void)
         cons_write(&cons, "Initializing DRAM cartridge...\n");
         dram_cartridge_init();
 
-        delay(0);
+        delay(2);
 
         cart = (uint32_t *)dram_cartridge_area();
         if (cart == NULL) {
@@ -80,7 +80,7 @@ main(void)
         cons_write(&cons, "Mounting ROMDISK... ");
         romdisk_init();
         romdisk = romdisk_mount("/", root_romdisk);
-        delay(0);
+        delay(1);
         if (romdisk != NULL)
                 cons_write(&cons, "OK!\n");
 
