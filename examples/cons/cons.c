@@ -27,7 +27,9 @@ main(void)
 
         char *text;
 
-        struct smpc_peripheral_digital *port1;
+        struct smpc_peripheral_digital *digital;
+        struct smpc_peripheral_port *port1;
+        struct smpc_peripheral_port *port2;
 
         struct cons cons;
 
@@ -39,7 +41,9 @@ main(void)
 
         cons_vdp2_init(&cons);
 
-        port1 = smpc_peripheral_digital_port(1);
+        port1 = smpc_peripheral_raw_port(1);
+        port2 = smpc_peripheral_raw_port(2);
+        digital = smpc_peripheral_digital_port(1);
 
         text = (char *)malloc(8192);
         assert(text != NULL);
@@ -69,59 +73,41 @@ main(void)
                     "DATA[12]: [1;31;1;44m0x%02X[m DATA[12]: [1;31;1;44m0x%02X[m\n"
                     "DATA[13]: [1;31;1;44m0x%02X[m DATA[13]: [1;31;1;44m0x%02X[m\n"
                     "DATA[14]: [1;31;1;44m0x%02X[m DATA[14]: [1;31;1;44m0x%02X[m\n",
-                    smpc_peripheral_port1.info.port_no,
-                    smpc_peripheral_port2.info.port_no,
-                    smpc_peripheral_port1.info.type,
-                    smpc_peripheral_port2.info.type,
-                    smpc_peripheral_port1.info.size,
-                    smpc_peripheral_port2.info.size,
-                    smpc_peripheral_port1.info.data[0],
-                    smpc_peripheral_port2.info.data[0],
-                    smpc_peripheral_port1.info.data[1],
-                    smpc_peripheral_port2.info.data[1],
-                    smpc_peripheral_port1.info.data[2],
-                    smpc_peripheral_port2.info.data[2],
-                    smpc_peripheral_port1.info.data[3],
-                    smpc_peripheral_port2.info.data[3],
-                    smpc_peripheral_port1.info.data[4],
-                    smpc_peripheral_port2.info.data[4],
-                    smpc_peripheral_port1.info.data[5],
-                    smpc_peripheral_port2.info.data[5],
-                    smpc_peripheral_port1.info.data[6],
-                    smpc_peripheral_port2.info.data[6],
-                    smpc_peripheral_port1.info.data[7],
-                    smpc_peripheral_port2.info.data[7],
-                    smpc_peripheral_port1.info.data[8],
-                    smpc_peripheral_port2.info.data[8],
-                    smpc_peripheral_port1.info.data[9],
-                    smpc_peripheral_port2.info.data[9],
-                    smpc_peripheral_port1.info.data[10],
-                    smpc_peripheral_port2.info.data[10],
-                    smpc_peripheral_port1.info.data[11],
-                    smpc_peripheral_port2.info.data[11],
-                    smpc_peripheral_port1.info.data[12],
-                    smpc_peripheral_port2.info.data[12],
-                    smpc_peripheral_port1.info.data[13],
-                    smpc_peripheral_port2.info.data[13],
-                    smpc_peripheral_port1.info.data[14],
-                    smpc_peripheral_port2.info.data[14]);
+                    port1->info.port_no, port2->info.port_no,
+                    port1->info.type, port2->info.type,
+                    port1->info.size, port2->info.size,
+                    port1->info.data[0], port2->info.data[0],
+                    port1->info.data[1], port2->info.data[1],
+                    port1->info.data[2], port2->info.data[2],
+                    port1->info.data[3], port2->info.data[3],
+                    port1->info.data[4], port2->info.data[4],
+                    port1->info.data[5], port2->info.data[5],
+                    port1->info.data[6], port2->info.data[6],
+                    port1->info.data[7], port2->info.data[7],
+                    port1->info.data[8], port2->info.data[8],
+                    port1->info.data[9], port2->info.data[9],
+                    port1->info.data[10], port2->info.data[10],
+                    port1->info.data[11], port2->info.data[11],
+                    port1->info.data[12],port2->info.data[12],
+                    port1->info.data[13], port2->info.data[13],
+                    port1->info.data[14], port2->info.data[14]);
 
-                if (port1->connected && (port1->type == 0)) {
+                if (digital->connected && (digital->type == 0)) {
                         (void)sprintf(text, "%s[2B%s%s%s%s%s%s%s%s%s%s%s%s%s",
                             text,
-                            IS_BUTTON_PRESSED(!port1->button.left, "L"),
-                            IS_BUTTON_PRESSED(!port1->button.up, "U"),
-                            IS_BUTTON_PRESSED(!port1->button.right, "R"),
-                            IS_BUTTON_PRESSED(!port1->button.down, "D"),
-                            IS_BUTTON_PRESSED(!port1->button.x_trg, "X"),
-                            IS_BUTTON_PRESSED(!port1->button.y_trg, "Y"),
-                            IS_BUTTON_PRESSED(!port1->button.z_trg, "Z"),
-                            IS_BUTTON_PRESSED(!port1->button.a_trg, "A"),
-                            IS_BUTTON_PRESSED(!port1->button.b_trg, "B"),
-                            IS_BUTTON_PRESSED(!port1->button.c_trg, "C"),
-                            IS_BUTTON_PRESSED(!port1->button.start, "S"),
-                            IS_BUTTON_PRESSED(!port1->button.l_trg, "L"),
-                            IS_BUTTON_PRESSED(!port1->button.r_trg, "R"));
+                            IS_BUTTON_PRESSED(!digital->button.left, "L"),
+                            IS_BUTTON_PRESSED(!digital->button.up, "U"),
+                            IS_BUTTON_PRESSED(!digital->button.right, "R"),
+                            IS_BUTTON_PRESSED(!digital->button.down, "D"),
+                            IS_BUTTON_PRESSED(!digital->button.x_trg, "X"),
+                            IS_BUTTON_PRESSED(!digital->button.y_trg, "Y"),
+                            IS_BUTTON_PRESSED(!digital->button.z_trg, "Z"),
+                            IS_BUTTON_PRESSED(!digital->button.a_trg, "A"),
+                            IS_BUTTON_PRESSED(!digital->button.b_trg, "B"),
+                            IS_BUTTON_PRESSED(!digital->button.c_trg, "C"),
+                            IS_BUTTON_PRESSED(!digital->button.start, "S"),
+                            IS_BUTTON_PRESSED(!digital->button.l_trg, "L"),
+                            IS_BUTTON_PRESSED(!digital->button.r_trg, "R"));
                 } else
                         (void)sprintf(text, "%s[0J", text);
 

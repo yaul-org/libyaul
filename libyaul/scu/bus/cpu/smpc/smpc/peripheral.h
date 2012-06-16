@@ -8,13 +8,12 @@
 #ifndef _PERIPHERAL_H_
 #define _PERIPHERAL_H_
 
+#include <irq-mux.h>
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-
 #include <sys/queue.h>
-
-#include <irq-mux.h>
 
 #define MAX_PORT_DEVICES        6
 #define MAX_PORT_DATA_SIZE      255
@@ -180,7 +179,8 @@ struct smpc_peripheral_digital {
 
 struct smpc_peripheral_info {
         bool connected;
-        /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
+        /* If no children, port is 1 or 2. Otherwise, port is under
+         * multi-terminal */
         uint8_t port_no;
         uint8_t type;
         uint8_t size;
@@ -199,12 +199,11 @@ struct smpc_peripheral_port {
         struct multi_terminal *children;
 };
 
+extern struct smpc_peripheral_analog *smpc_peripheral_analog_port(uint8_t);
+extern struct smpc_peripheral_digital *smpc_peripheral_digital_port(uint8_t);
+extern struct smpc_peripheral_port *smpc_peripheral_raw_port(uint8_t);
 extern void smpc_peripheral_data(void);
 extern void smpc_peripheral_parse(irq_mux_handle_t *);
 extern void smpc_peripheral_system_manager(void);
-struct smpc_peripheral_digital *smpc_peripheral_digital_port(uint8_t);
-
-extern struct smpc_peripheral_port smpc_peripheral_port1;
-extern struct smpc_peripheral_port smpc_peripheral_port2;
 
 #endif /* !_PERIPHERAL_H_ */

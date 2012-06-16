@@ -1,8 +1,10 @@
 SET(scu_bus_cpu_smpc_SRC
   smpc_init.c
+  smpc_peripheral_analog_port.c
   smpc_peripheral_data.c
   smpc_peripheral_digital_port.c
   smpc_peripheral_parse.c
+  smpc_peripheral_raw_port.c
   smpc_peripheral_system_manger.c
   smpc_rtc_settime_call.c
   smpc_smc_cdoff_call.c

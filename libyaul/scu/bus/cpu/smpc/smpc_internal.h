@@ -75,6 +75,8 @@ enum smpc_regs_type {
         EXLE2 = 0x07F
 };
 
+struct smpc_peripheral_port;
+
 static inline uint8_t
 smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
 {
@@ -121,5 +123,8 @@ smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
 
 extern uint8_t offset;
 extern uint8_t oreg_buf[];
+
+extern struct smpc_peripheral_port smpc_peripheral_port1;
+extern struct smpc_peripheral_port smpc_peripheral_port2;
 
 #endif /* !_SMPC_INTERNAL_H_ */
