@@ -98,7 +98,7 @@ SECTIONS
      *(.sdata)
      *(.sdata.*)
      *(.gnu.linkonce.s.*)
-     . = ALIGN (16);
+     . = ALIGN (0x10);
   } > ram
 
   .bss (NOLOAD) :
@@ -112,7 +112,8 @@ SECTIONS
      *(.gnu.linkonce.sb.*)
      *(.scommon)
      *(COMMON)
-     . = ALIGN((. != 0) ? 0x04 : 0x01);
+     . = ALIGN (0x10);
+
      PROVIDE (__bss_end = .);
      __bss_end__ = .;
   } AT > ram
