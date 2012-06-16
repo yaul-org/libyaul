@@ -31,10 +31,12 @@ local_arp_cb(arp_callback_t *arp_cb)
         (void)sprintf(buf, "Callback\n"
             "ptr: %p\n"
             "len: 0x%04X\n"
-            "function: 0x%02X\n\n",
+            "function: 0x%02X\n"
+            "execute: %s\n\n",
             arp_cb->ptr,
             arp_cb->len,
-            arp_cb->function);
+            arp_cb->function,
+            (arp_cb->exec ? "yes" : "no"));
 
         cons_write(&cons, buf);
 
