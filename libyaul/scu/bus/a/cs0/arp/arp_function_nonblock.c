@@ -14,7 +14,6 @@
 #include "arp_internal.h"
 
 static void arp_function_01(void);
-static void arp_function_08(void);
 static void arp_function_09(void);
 
 void
@@ -29,18 +28,12 @@ arp_function_nonblock(void)
         switch (b) {
         case 0x01:
                 arp_function_01();
-                break;
-        case 0x08:
-                arp_function_08();
-                break;
+                return;
         case 0x09:
                 arp_function_09();
         default:
                 return;
         }
-
-        /* Call ARP user callback */
-        USER_VECTOR_CALL(32);
 }
 
 /* Read byte from memory and send to client (download
@@ -53,9 +46,6 @@ arp_function_01(void)
         uint32_t len;
         uint8_t checksum;
 
-        /* Set for ARP callback */
-        arp_callback.function = 0x01;
-
         /* Send some bogus value? */
         arp_send_long(0x00000000);
 
@@ -66,18 +56,23 @@ arp_function_01(void)
                 address = arp_read_long();
                 /* Read length */
                 len = arp_read_long();
-
-                /* Set for ARP callback */
-                if (arp_callback.ptr == NULL)
-                        arp_callback.ptr = (void *)address;
-                arp_callback.len += len;
-
+                /* Check if we're done with transfer */
                 if (len == 0) {
                         /* ACK */
                         arp_xchg_byte('O');
                         arp_xchg_byte('K');
-                        break;
+
+                        /* Call ARP user callback */
+                        USER_VECTOR_CALL(32);
+                        return;
                 }
+
+                /* Set for ARP callback */
+                if (arp_callback.ptr == NULL)
+                        arp_callback.ptr = (void *)address;
+                arp_callback.function = 0x01;
+                arp_callback.exec = false;
+                arp_callback.len += len;
 
                 checksum = 0;
                 for (; len > 0; len--, address++) {
@@ -92,57 +87,43 @@ arp_function_01(void)
         }
 }
 
-/* Write byte from client to memory (upload from
- * client's perspective) */
-static void
-arp_function_08(void)
-{
-        uint32_t b;
-        uint32_t address;
-
-        /* Read address */
-        address = arp_read_long();
-
-        /* Set for ARP callback */
-        arp_callback.function = 0x08;
-        arp_callback.ptr = (void *)address;
-        arp_callback.len = 1;
-
-        b = arp_xchg_byte(0x00);
-        MEM_POKE(address, b);
-
-}
-
-/* Upload memory and jump */
+/* Upload memory and jump (if requested) */
 static void
 arp_function_09(void)
 {
         uint32_t b;
-        uint32_t address;
+        uint32_t addr;
+        uint32_t this_addr;
         uint32_t len;
-        bool execute;
+        bool exec;
 
-        /* Read address */
-        address = arp_read_long();
+        /* Read addr */
+        addr = arp_read_long();
+        this_addr = addr;
         /* Read length */
         len = arp_read_long();
         /* Execute? */
-        execute = arp_xchg_byte(0x00) == 0x01;
+        b = arp_xchg_byte(0x00);
+        exec = (b == 0x01);
 
         /* Set for ARP callback */
+        if (arp_callback.ptr == NULL)
+                arp_callback.ptr = (void *)(addr - len);
         arp_callback.function = 0x09;
-        arp_callback.ptr = (void *)address;
+        arp_callback.exec = exec;
         arp_callback.len += len;
 
-        /* XXX Still blocking */
-        for (; len > 0; len--, address++) {
+        /* XXX
+         * Blocking */
+        for (; len > 0; len--, addr++) {
                 b = arp_xchg_byte(b);
-                MEM_POKE(address, b);
+                /* Write to memory */
+                MEM_POKE(addr, b);
         }
 
         /* Only call the ARP user callback for when we get the last
-         * chunk of data */
-        if (execute) {
+         * chunk of data which just happens to be the start address */
+        if ((uint32_t)arp_callback.ptr == this_addr) {
                 /* Call ARP user callback */
                 USER_VECTOR_CALL(32);
         }

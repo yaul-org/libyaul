@@ -1,7 +1,7 @@
 SET(scu_bus_a_cs0_arp_SRC
   arp_busy_status.c
   arp_function_callback.c
-  arp_function_handle.S
+  arp_function_trampoline.S
   arp_function_nonblock.c
   arp_read_byte.c
   arp_read_long.c

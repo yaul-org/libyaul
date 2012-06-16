@@ -27,8 +27,7 @@ arp_function_callback(void (*cb)(arp_callback_t *))
 
         assert(cb != NULL);
         arp_cb = cb;
-        cpu_intc_vct_set(USER_VECTOR(32),
-            (uint32_t)&arp_function_handle);
+        cpu_intc_vct_set(USER_VECTOR(32), (uint32_t)&arp_function_trampoline);
 
         /* Enable interrupts */
         cpu_intc_vct_enable();

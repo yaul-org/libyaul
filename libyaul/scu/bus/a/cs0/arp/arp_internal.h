@@ -30,7 +30,7 @@ enum arp_regs {
         INPUT = 0x18
 };
 
-void arp_function_handle(void);
+void arp_function_trampoline(void);
 
 /* ARP user callback */
 arp_callback_t arp_callback;

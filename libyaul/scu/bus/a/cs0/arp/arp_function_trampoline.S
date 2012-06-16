@@ -8,10 +8,10 @@
 .text
 .align 1
 
-.global _arp_function_handle
-.type _arp_function_handle, @function
+.global _arp_function_trampoline
+.type _arp_function_trampoline, @function
 
-_arp_function_handle:
+_arp_function_trampoline:
         /* Disable interrupts */
         mov #0xF0, r1
         ldc r1, sr
@@ -29,6 +29,7 @@ _arp_function_handle:
         mov.l r1, @(0x00, r4)
         mov.l r1, @(0x04, r4)
         mov.l r1, @(0x08, r4)
+        mov.l r1, @(0x0C, r4)
 
         /* Enable interrupts */
         stc sr, r2

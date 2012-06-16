@@ -13,9 +13,10 @@
 #include <stddef.h>
 
 typedef struct {
-        void *ptr;      /* Address */
-        size_t len;     /* Length of transfer */
         uint8_t function; /* Function recently executed */
+        void *ptr;      /* Address */
+        bool exec;      /* Whether or not it's executable */
+        size_t len;     /* Length of transfer */
 } __attribute__ ((aligned (4))) arp_callback_t;
 
 extern bool arp_busy_status(void);
