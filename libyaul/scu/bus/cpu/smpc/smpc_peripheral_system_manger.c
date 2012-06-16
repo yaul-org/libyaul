@@ -31,7 +31,7 @@ smpc_peripheral_system_manager(void)
 {
 
         /* Disable interrupts */
-        cpu_intc_vct_disable();
+        cpu_intc_disable();
 
         /* Fetch but no parsing */
         fetch_output_regs();
@@ -50,7 +50,7 @@ smpc_peripheral_system_manager(void)
         MEM_POKE(IREG(0), 0x80);
 exit:
         /* Enable interrupts */
-        cpu_intc_vct_enable();
+        cpu_intc_enable();
 }
 
 static void

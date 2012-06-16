@@ -14,7 +14,7 @@ void __attribute__ ((noreturn))
 abort(void)
 {
         /* Disable interrupts */
-        cpu_intc_vct_disable();
+        cpu_intc_disable();
 
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */

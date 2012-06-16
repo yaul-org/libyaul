@@ -6,17 +6,21 @@
  */
 
 .text
+.align 1
 
-.global _cpu_intc_lvl_get
-.type _cpu_intc_lvl_get, @function
+.global _cpu_intc_enable
+.type _cpu_intc_enable, @function
 
-_cpu_intc_lvl_get:
+_cpu_intc_enable:
         mov.l r14, @-r15
         sts.l pr, @-r15
-        stc sr, r0
-        shlr2 r0
-        shlr2 r0
-        and #0x0F, r0
+        mov #0xFF, r2
+        mov #0x0F, r1
+        shll8 r2
+        stc sr, r3
+        or r2, r1
+        and r1, r3
+        ldc r3, sr
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts

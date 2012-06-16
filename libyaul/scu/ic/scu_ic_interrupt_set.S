@@ -8,15 +8,14 @@
 .text
 .align 1
 
-.global _scu_ic_vct_get
-.type _scu_ic_vct_get, @function
+.global _scu_ic_interrupt_set
+.type _scu_ic_interrupt_set, @function
 
-_scu_ic_vct_get:
+_scu_ic_interrupt_set:
+        mov.l .LC1, r1
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov.l .LC1, r0
-        mov.l @r0, r0
-        rts
+        jsr @r1
         nop
         lds.l @r15+, pr
         mov.l @r15+, r14
@@ -26,4 +25,4 @@ _scu_ic_vct_get:
 .align 2
 
 .LC1:
-        .long 0x06000304
+        .long 0x06000794

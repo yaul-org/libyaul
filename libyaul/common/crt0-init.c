@@ -62,15 +62,17 @@ __do_global_dtors(void)
 static void __attribute__ ((used, section (".init")))
 __std_startup(void)
 {
-        atexit(__do_global_dtors); /* First added, last called */
+        /* First added, last called */
+        atexit(__do_global_dtors);
 
-        __do_global_ctors(); /* Do all constructors. */
+        /* Do all constructors */
+        __do_global_ctors();
 
         /* Set hardware exception handlers */
-        cpu_intc_vct_set(0x04, (uint32_t)&exception_illegal_instruction);
-        cpu_intc_vct_set(0x06, (uint32_t)&exception_illegal_slot);
-        cpu_intc_vct_set(0x09, (uint32_t)&exception_cpu_address_error);
-        cpu_intc_vct_set(0x0A, (uint32_t)&exception_dma_address_error);
+        cpu_intc_interrupt_set(0x04, (uint32_t)&exception_illegal_instruction);
+        cpu_intc_interrupt_set(0x06, (uint32_t)&exception_illegal_slot);
+        cpu_intc_interrupt_set(0x09, (uint32_t)&exception_cpu_address_error);
+        cpu_intc_interrupt_set(0x0A, (uint32_t)&exception_dma_address_error);
 }
 
 /* Add function to .fini section */

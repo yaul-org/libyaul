@@ -8,22 +8,17 @@
 .text
 .align 1
 
-.global _scu_ic_msk_set
-.type _scu_ic_msk_set, @function
+.global _cpu_intc_mask_get
+.type _cpu_intc_mask_get, @function
 
-_scu_ic_msk_set:
+_cpu_intc_mask_get:
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov.l .LC1, r2
-        mov.l @r2, r2
-        jmp @r2
-        nop
+        stc sr, r0
+        shlr2 r0
+        shlr2 r0
+        and #0x0F, r0
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts
         nop
-
-.align 2
-
-.LC1:
-        .long 0x06000340

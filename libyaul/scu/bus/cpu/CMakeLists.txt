@@ -1,10 +1,12 @@
 SET(scu_bus_cpu_SRC
-  cpu_intc_lvl_get.S
-  cpu_intc_lvl_set.S
-  cpu_intc_vct_disable.S
-  cpu_intc_vct_enable.S
-  cpu_intc_vct_get.S
-  cpu_intc_vct_set.S
+  cpu_intc_disable.S
+  cpu_intc_enable.S
+  cpu_intc_interrupt_get.S
+  cpu_intc_interrupt_set.S
+  cpu_intc_mask_get.S
+  cpu_intc_mask_set.S
+  cpu_intc_vector_base_get.S
+  cpu_intc_vector_base_set.S
 )
 
 SET(scu_bus_cpu_INSTALL_FILES

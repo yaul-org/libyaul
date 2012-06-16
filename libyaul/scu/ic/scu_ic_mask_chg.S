@@ -8,15 +8,21 @@
 .text
 .align 1
 
-.global _cpu_intc_vct_disable
-.type _cpu_intc_vct_disable, @function
+.global _scu_ic_mask_chg
+.type _scu_ic_mask_chg, @function
 
-_cpu_intc_vct_disable:
+_scu_ic_mask_chg:
+        mov.l .LC1, r1
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov #0xF0, r1
-        ldc r1, sr
+        jsr @r1
+        nop
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts
         nop
+
+.align 2
+
+.LC1:
+        .long 0x060007C0

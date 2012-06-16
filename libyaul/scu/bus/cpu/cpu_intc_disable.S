@@ -8,17 +8,14 @@
 .text
 .align 1
 
-.global _cpu_intc_lvl_set
-.type _cpu_intc_lvl_set, @function
+.global _cpu_intc_disable
+.type _cpu_intc_disable, @function
 
-_cpu_intc_lvl_set:
+_cpu_intc_disable:
         mov.l r14, @-r15
         sts.l pr, @-r15
-        shll2 r4
-        shll2 r4
-        stc sr, r0
-        or r4, r0
-        ldc r0, sr
+        mov #0xF0, r1
+        ldc r1, sr
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts

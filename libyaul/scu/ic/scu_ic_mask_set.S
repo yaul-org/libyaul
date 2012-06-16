@@ -8,20 +8,21 @@
 .text
 .align 1
 
-.global _cpu_intc_vct_enable
-.type _cpu_intc_vct_enable, @function
+.global _scu_ic_mask_set
+.type _scu_ic_mask_set, @function
 
-_cpu_intc_vct_enable:
+_scu_ic_mask_set:
+        mov.l .LC1, r1
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov #0xFF, r2
-        mov #0x0F, r1
-        shll8 r2
-        stc sr, r3
-        or r2, r1
-        and r1, r3
-        ldc r3, sr
+        jsr @r1
+        nop
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts
         nop
+
+.align 2
+
+.LC1:
+        .long 0x060007B0

@@ -8,24 +8,14 @@
 .text
 .align 1
 
-.global _scu_int_lvl_set
-.type _scu_int_lvl_set, @function
+.global _cpu_intc_vector_base_set
+.type _cpu_intc_vector_base_set, @function
 
-_scu_int_lvl_set:
+_cpu_intc_vector_base_set:
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov.l .LC1, r2
-        mov.l @r2, r2
-        mov #0x0F, r0
-        and r0, r4
-        jmp @r2
-        nop
+        ldc r4, vbr
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts
         nop
-
-.align 2
-
-.LC1:
-        .long 0x06000280

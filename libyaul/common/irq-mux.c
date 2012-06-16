@@ -31,7 +31,7 @@ irq_mux_handle(irq_mux_t *irq_mux)
         irq_mux_handle_t *hdl_np;
 
         /* Disable interrupts */
-        cpu_intc_vct_disable();
+        cpu_intc_disable();
 
         if (TAILQ_EMPTY(&irq_mux->im_tq))
                 goto exit;
@@ -41,7 +41,7 @@ irq_mux_handle(irq_mux_t *irq_mux)
         }
 exit:
         /* Enable interrupts */
-        cpu_intc_vct_enable();
+        cpu_intc_enable();
 }
 
 void
@@ -51,7 +51,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         irq_mux_handle_t *n_hdl;
 
         /* Disable interrupts */
-        cpu_intc_vct_disable();
+        cpu_intc_disable();
 
         n_hdl = irq_mux_handle_alloc();
         n_hdl->imh_hdl = hdl;
@@ -62,7 +62,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         TAILQ_INSERT_TAIL(&irq_mux->im_tq, n_hdl, handles);
 
         /* Enable interrupts */
-        cpu_intc_vct_enable();
+        cpu_intc_enable();
 }
 
 void

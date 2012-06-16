@@ -173,17 +173,17 @@ vdp2_init(void)
         irq_mux_init(&vdp2_vblank_out_irq_mux);
 
         /* Disable interrupts */
-        cpu_intc_vct_disable();
+        cpu_intc_disable();
 
         mask = IC_MSK_VBLANK_IN | IC_MSK_VBLANK_OUT;
-        scu_ic_msk_chg(IC_MSK_ALL, mask);
+        scu_ic_mask_chg(IC_MSK_ALL, mask);
 
-        scu_ic_vct_set(IC_VCT_VBLANK_IN, &vdp2_vblank_in);
-        scu_ic_vct_set(IC_VCT_VBLANK_OUT, &vdp2_vblank_out);
-        scu_ic_msk_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
+        scu_ic_interrupt_set(IC_VCT_VBLANK_IN, &vdp2_vblank_in);
+        scu_ic_interrupt_set(IC_VCT_VBLANK_OUT, &vdp2_vblank_out);
+        scu_ic_mask_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
 
         /* Enable interrupts */
-        cpu_intc_vct_enable();
+        cpu_intc_enable();
 
         /* Initialized */
         initialized = true;

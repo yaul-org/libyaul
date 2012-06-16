@@ -8,16 +8,14 @@
 .text
 .align 1
 
-.global _cpu_intc_vct_get
-.type _cpu_intc_vct_get, @function
+.global _scu_ic_mask_get
+.type _scu_ic_mask_get, @function
 
-_cpu_intc_vct_get:
+_scu_ic_mask_get:
+        mov.l .LC1, r0
         mov.l r14, @-r15
         sts.l pr, @-r15
-        mov.l .LC1, r2
-        mov.l @r2, r2
-        jmp @r2
-        nop
+        mov.l @r0, r0
         lds.l @r15+, pr
         mov.l @r15+, r14
         rts
@@ -26,4 +24,4 @@ _cpu_intc_vct_get:
 .align 2
 
 .LC1:
-        .long 0x06000314
+        .long 0x06000348

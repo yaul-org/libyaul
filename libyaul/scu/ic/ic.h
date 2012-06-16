@@ -60,13 +60,11 @@ enum ic_msk_type {
 #define IC_IST_LEVEL_0_DMA_END  0x00000800
 #define IC_IST_DMA_ILLEGAL      0x00001000
 #define IC_IST_SPRITE_END       0x00002000
-/* Missing is external interrupt status bits */
 
 extern uint32_t scu_ic_status_get(void);
-extern uint32_t scu_ic_vct_get(void);
-extern void     scu_ic_lvl_set(uint8_t);
-extern void     scu_ic_msk_chg(enum ic_msk_type, enum ic_msk_type);
-extern void     scu_ic_msk_set(enum ic_msk_type, enum ic_msk_type);
-extern void     scu_ic_vct_set(enum ic_vct_type, void(*)(void));
+extern uint32_t scu_ic_interrupt_get(void);
+extern void scu_ic_mask_chg(enum ic_msk_type, enum ic_msk_type);
+extern void scu_ic_mask_set(enum ic_msk_type, enum ic_msk_type);
+extern void scu_ic_interrupt_set(enum ic_vct_type, void(*)(void));
 
 #endif /* !_IC_H_ */
