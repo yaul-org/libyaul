@@ -1,8 +1,7 @@
 include ../common.mk
 
 PROJECT= romdisk
-OBJECTS+= romdisk.o root.o
-ROMDISK= root.romdisk
+OBJECTS+= romdisk.o
 
 .PHONY: clean
 
@@ -12,9 +11,6 @@ ROMDISK= root.romdisk
 	$(CC) $(CFLAGS) -c -o $(@) $(<)
 .s:
 	$(AS) $(AFLAGS) -o $(@) $(<)
-
-.romdisk.o:
-	../../tools/bin2o/bin2o $< 'root_romdisk' $@
 
 $(PROJECT).elf: $(OBJECTS)
 	$(LD) $(OBJECTS) $(LDFLAGS) \

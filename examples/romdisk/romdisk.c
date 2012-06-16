@@ -9,6 +9,7 @@
 #include <smpc.h>
 #include <smpc/peripheral.h>
 #include <dram-cartridge.h>
+#include <arp.h>
 
 #include <cons/vdp2.h>
 
@@ -21,8 +22,17 @@
 
 static void delay(uint16_t);
 
-extern uint8_t root_romdisk[];
-struct cons cons;
+/* Address of ROMDISK root */
+static void *root_romdisk = NULL;
+
+static void
+local_arp_cb(arp_callback_t *arp_cb)
+{
+
+        if (arp_cb->function == 0x09)
+                root_romdisk = arp_cb->ptr;
+}
+
 int
 main(void)
 {
@@ -32,6 +42,7 @@ main(void)
                 0x9C00
         };
 
+        struct cons cons;
 
         void *romdisk;
 
@@ -77,8 +88,16 @@ main(void)
                 : "32-Mbit"));
         cons_write(&cons, buf);
 
+        cons_write(&cons, "Initializing ARP... ");
+        arp_function_callback(&local_arp_cb);
+        cons_write(&cons, "OK!\n");
+
         cons_write(&cons, "Mounting ROMDISK... ");
         romdisk_init();
+
+        /* Wait until it's fully transferred */
+        while (root_romdisk == NULL)
+                arp_function_nonblock();
         romdisk = romdisk_mount("/", root_romdisk);
         delay(1);
         if (romdisk != NULL)
