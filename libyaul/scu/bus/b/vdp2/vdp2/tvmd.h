@@ -11,7 +11,10 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-extern bool vdp2_tvmd_vblank_status_get(void);
+#include <irq-mux.h>
+
+extern irq_mux_t *vdp2_tvmd_vblank_in_irq_get(void);
+extern irq_mux_t *vdp2_tvmd_vblank_out_irq_get(void);
 extern uint16_t vdp2_tvmd_hcount_get(void);
 extern uint16_t vdp2_tvmd_vcount_get(void);
 extern void vdp2_tvmd_blcs_set(bool, uint32_t, uint16_t *, uint16_t );

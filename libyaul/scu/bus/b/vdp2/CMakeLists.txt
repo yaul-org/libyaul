@@ -16,7 +16,9 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_tvmd_display_set.c
   vdp2_tvmd_hblank_in_wait.c
   vdp2_tvmd_hcount_get.c
+  vdp2_tvmd_vblank_in_irq_get.c
   vdp2_tvmd_vblank_in_wait.c
+  vdp2_tvmd_vblank_out_irq_get.c
   vdp2_tvmd_vblank_out_wait.c
   vdp2_tvmd_vcount_get.c
   vdp2_vram_control_get.c

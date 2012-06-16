@@ -19,7 +19,4 @@
 
 extern void vdp2_init(void);
 
-extern irq_mux_t vdp2_vblank_in_irq_mux;
-extern irq_mux_t vdp2_vblank_out_irq_mux;
-
 #endif /* !_VDP2_H_ */

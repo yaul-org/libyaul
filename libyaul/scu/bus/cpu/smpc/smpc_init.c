@@ -17,6 +17,7 @@
 void
 smpc_init(void)
 {
+        irq_mux_t *vbo;
         uint32_t mask;
 
         /* Set both ports to "SMPC" control mode. */
@@ -40,8 +41,8 @@ smpc_init(void)
         scu_timer_1_mode_set(/* sp_line = */ true);
 
         /* Add to VDP2 VBLANK-OUT mux */
-        irq_mux_handle_add(&vdp2_vblank_out_irq_mux,
-            smpc_peripheral_parse, NULL);
+        vbo = vdp2_tvmd_vblank_out_irq_get();
+        irq_mux_handle_add(vbo, smpc_peripheral_parse, NULL);
 
         /* Enable interrupts */
         cpu_intc_enable();
