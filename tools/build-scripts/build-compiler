@@ -62,11 +62,9 @@ PATH="${BUILD_INSTALL_DIR}/${TARGET}/bin:${PATH}"
 export "PATH"
 
 # Ask whether to download the source packages or not
-GCC_CORE="gcc-core-${GCC_VERSION}.tar.bz2"
+GCC="gcc-${GCC_VERSION}.tar.bz2"
 GNU_URL="ftp://ftp.gnu.org/gnu"
-GCC_CORE_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_CORE}"
-GCC_GPP="gcc-g++-${GCC_VERSION}.tar.bz2"
-GCC_GPP_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_GPP}"
+GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
 BINUTILS="binutils-${BINUTILS_VERSION}.tar.bz2"
@@ -99,11 +97,8 @@ if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${BINUTILS}" ] && \
         panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
 
-    [ ! -f "${GCC_CORE}" ] && \
-        panic "'${GCC_CORE}' not found in ${BUILD_SRC_DIR}" 1
-
-    [ ! -f "${GCC_GPP}" ] && \
-        panic "'${GCC_GPP}' not found in ${BUILD_SRC_DIR}" 1
+    [ ! -f "${GCC}" ] && \
+        panic "'${GCC}' not found in ${BUILD_SRC_DIR}" 1
 
     [ ! -f "${GDB}" ] && \
         panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
@@ -118,14 +113,9 @@ else
         ("${FETCH}" "${BINUTILS_URL}") 1>> "binutils.log" 2>&1 || panic "Failed to download ${BINUTILS}" 1
     fi
 
-    if [ ! -f "${GCC_CORE}" ]; then
-        message "Downloading '${GCC_CORE}'"
-        ("${FETCH}" "${GCC_CORE_URL}")  1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC_CORE}" 1
-    fi
-
-    if [ ! -f "${GCC_GPP}" ]; then
-        message "Downloading '${GCC_GPP}'"
-        ("${FETCH}" "${GCC_GPP_URL}") 1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC_GPP}" 1
+    if [ ! -f "${GCC}" ]; then
+        message "Downloading '${GCC}'"
+        ("${FETCH}" "${GCC_URL}")  1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC}" 1
     fi
 
     if [ ! -f "${GDB}" ]; then
@@ -162,17 +152,14 @@ if [ ! -f 'extracted' ]; then
     message "Extracting '${BINUTILS}'"
     tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
 
-    message "Extracting '$GCC_CORE'"
-    tar -xjf "${BUILD_SRC_DIR}/${GCC_CORE}" || panic "Extracting ${GCC_CORE}" 1
-
-    message "Extracting '${GCC_GPP}'"
-    tar -xjf "${BUILD_SRC_DIR}/${GCC_GPP}" || panic "Extracting ${GCC_GPP}" 1
+    message "Extracting '$GCC'"
+    tar -xjf "${BUILD_SRC_DIR}/${GCC}" || panic "Extracting ${GCC}" 1
 
     message "Extracting '${NEWLIB}'"
     tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
 
     message "Extracting '${GDB}'"
-    tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GPP}" 1
+    tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GDB}" 1
 
     touch "${BUILD_SRC_DIR}/extracted"
 fi

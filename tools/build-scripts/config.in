@@ -17,7 +17,7 @@ BUILD_INSTALL_DIR="${HOME}/libyaul"
 # the location for temporary files
 BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
 
-GCC_VERSION="4.5.3"
+GCC_VERSION="4.7.1"
 BINUTILS_VERSION="2.22"
 GDB_VERSION="7.4"
 NEWLIB_VERSION="1.20"
