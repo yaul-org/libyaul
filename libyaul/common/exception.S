@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.macro EXCEPTION_STUB handler
+.macro EXCEPTION_FUNCTION_TRAMPOLINE handler
         sts.l pr, @-r15
         stc.l gbr, @-r15
         stc.l vbr, @-r15
@@ -27,7 +27,8 @@
         mov.l r1, @-r15
         mov.l r0, @-r15
         mov r15, r0
-        add #0x58, r0 ! restore the stack to what it was before
+        /* Restore the stack to what it was before */
+        add #0x58, r0
         mov.l r0, @-r15
         mov r15, r4
         mov.l \handler, r0
@@ -42,36 +43,33 @@
 .type _exception_illegal_instruction, @function
 
 _exception_illegal_instruction:
-        EXCEPTION_STUB .LC1
+        EXCEPTION_FUNCTION_TRAMPOLINE .LC1
 
 .global _exception_illegal_slot
 .type _exception_illegal_slot, @function
 
 _exception_illegal_slot:
-        EXCEPTION_STUB .LC2
+        EXCEPTION_FUNCTION_TRAMPOLINE .LC2
 
 .global _exception_cpu_address_error
 .type _exception_cpu_address_error, @function
 
 _exception_cpu_address_error:
-        EXCEPTION_STUB .LC3
+        EXCEPTION_FUNCTION_TRAMPOLINE .LC3
 
 .global _exception_dma_address_error
 .type _exception_dma_address_error, @function
 
 _exception_dma_address_error:
-        EXCEPTION_STUB .LC4
+        EXCEPTION_FUNCTION_TRAMPOLINE .LC4
 
 .align 2
 
 .LC1:
         .long _exception_handler_illegal_instruction
-
 .LC2:
         .long _exception_handler_illegal_slot
-
 .LC3:
         .long _exception_handler_cpu_address_error
-
 .LC4:
         .long _exception_handler_dma_address_error
