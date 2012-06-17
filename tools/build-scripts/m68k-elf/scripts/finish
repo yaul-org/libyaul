@@ -1,0 +1,6 @@
+#!/bin/sh
+
+touch "${BUILD_SRC_DIR}/${M68K_TARGET}/build-complete"
+
+# Closing message
+message "Add '${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin' to the \$PATH environment variable"

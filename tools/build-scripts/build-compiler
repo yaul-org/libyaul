@@ -8,47 +8,33 @@
 
 # Look for automated configuration file to bypass prompts
 [ -f 'config' ] && . './config' || panic "Configuration file 'config' not found" 1
-[ -f 'scripts/utils' ] && . './scripts/utils' || exit 1
+
+panic () {
+    printf "[1;37;1;41merror[m: [1;37;1;44m%s[m\n" "${1}" 1>&2
+    exit ${2}
+}
+
+message () {
+    printf "[1;37;1;44m%s[m\n" "${1}"
+}
 
 clean_up () {
-    ! test -z "${BUILD_SRC_DIR}" \
-        || exit 1
+    ! test -z "${BUILD_SRC_DIR}" || exit 1
 
     message "Cleaning up '${BUILD_SRC_DIR}'"
 
     rm -r -f \
-        "${BUILD_SRC_DIR}/binutils" \
-        "${BUILD_SRC_DIR}/gcc" \
-        "${BUILD_SRC_DIR}/newlib" \
-        "${BUILD_SRC_DIR}/gdb" \
-        "${BUILD_SRC_DIR}/${BINUTILS_SRC_DIR}" \
-        "${BUILD_SRC_DIR}/${GCC_SRC_DIR}" \
-        "${BUILD_SRC_DIR}/${NEWLIB_SRC_DIR}" \
-        "${BUILD_SRC_DIR}/${GDB_SRC_DIR}" \
-        "${BUILD_SRC_DIR}/built-binutils" \
-        "${BUILD_SRC_DIR}/built-gcc" \
-        "${BUILD_SRC_DIR}/built-g++" \
-        "${BUILD_SRC_DIR}/built-newlib" \
-        "${BUILD_SRC_DIR}/built-gdb" \
-        "${BUILD_SRC_DIR}/configured-binutils" \
-        "${BUILD_SRC_DIR}/configured-gcc" \
-        "${BUILD_SRC_DIR}/configured-newlib" \
-        "${BUILD_SRC_DIR}/configured-gdb" \
-        "${BUILD_SRC_DIR}/installed-binutils" \
-        "${BUILD_SRC_DIR}/installed-gcc" \
-        "${BUILD_SRC_DIR}/installed-g++" \
-        "${BUILD_SRC_DIR}/installed-newlib" \
-        "${BUILD_SRC_DIR}/installed-gdb" \
+        "${BUILD_SRC_DIR}/${SH_TARGET}" \
+        "${BUILD_SRC_DIR}/${M68K_TARGET}" \
         "${BUILD_SRC_DIR}/extracted" \
-        "${BUILD_SRC_DIR}/applied-patches"
 
     exit ${1}
 }
 
 trap 'clean_up 1' 2 9 15
 
-TARGET='sh-elf'
-PREFIX="${BUILD_INSTALL_DIR}/${TARGET}"
+SH_TARGET='sh-elf'
+M68K_TARGET='m68k-elf'
 
 # Sane defaults for building toolchain
 CFLAGS="-O2 -pipe"
@@ -58,7 +44,7 @@ export "CXXFLAGS"
 unset "LDFLAGS"
 
 # Add installed devkit to the path, adjusting path on minsys
-PATH="${BUILD_INSTALL_DIR}/${TARGET}/bin:${PATH}"
+PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
 export "PATH"
 
 # Ask whether to download the source packages or not
@@ -81,18 +67,16 @@ NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
 NEWLIB_SRC_DIR="newlib-${NEWLIB_VERSION}"
 
 # Get preferred installation directory and set paths to the sources
-[ ! -z "${BUILD_INSTALL_DIR}" ] && \
-    mkdir -p "${BUILD_INSTALL_DIR}" && \
-    # Make sure we have the proper permissions
-    touch "${BUILD_INSTALL_DIR}/non-existent-file" && \
-    rm "${BUILD_INSTALL_DIR}/non-existent-file" || \
-    panic "Invalid install path" 1
+[ ! -z "${BUILD_INSTALL_DIR}" ] || panic "Invalid install path"
+
+# Make sure we have the proper permissions
+mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
+    test -x "${BUILD_INSTALL_DIR}" && \
+    test -w "${BUILD_INSTALL_DIR}" && \
+    test -r "${BUILD_INSTALL_DIR}" || \
+    panic "Couldn't create install directory"
 
 cd "${BUILD_SRC_DIR}/"
-rm -f "binutils.log" \
-    "gcc.log" \
-    "gdb.log" \
-    "newlib.log"
 if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${BINUTILS}" ] && \
         panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
@@ -110,77 +94,40 @@ else
 
     if [ ! -f "${BINUTILS}" ]; then
         message "Downloading '${BINUTILS}'"
-        ("${FETCH}" "${BINUTILS_URL}") 1>> "binutils.log" 2>&1 || panic "Failed to download ${BINUTILS}" 1
+        ("${FETCH}" "${BINUTILS_URL}") 1>> "binutils-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${BINUTILS}" 1
     fi
 
     if [ ! -f "${GCC}" ]; then
         message "Downloading '${GCC}'"
-        ("${FETCH}" "${GCC_URL}")  1>> "gcc.log" 2>&1 || panic "Failed to download ${GCC}" 1
+        ("${FETCH}" "${GCC_URL}")  1>> "gcc-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${GCC}" 1
     fi
 
     if [ ! -f "${GDB}" ]; then
         message "Downloading '${GDB}'"
-        ("${FETCH}" "${GDB_URL}") 1>> "gdb.log" 2>&1 || panic "Failed to download ${GDB}" 1
+        ("${FETCH}" "${GDB_URL}") 1>> "gdb-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${GDB}" 1
     fi
 
     if [ ! -f "${NEWLIB}" ]; then
         message "Downloading '${NEWLIB}'"
-        ("${FETCH}" "${NEWLIB_URL}") 1>> "newlib.log" 2>&1 || panic "Failed to download ${NEWLIB}" 1
+        ("${FETCH}" "${NEWLIB_URL}") 1>> "newlib-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${NEWLIB}" 1
     fi
 fi
 cd "${OLDPWD}"
 
-# Find proper 'make'
-[ -z "${MAKE}" -a -x "`which 'gnumake'`" ] && MAKE="`which 'gnumake'`"
-[ -z "${MAKE}" -a -x "`which 'gmake'`" ] && MAKE="`which 'gmake'`"
-[ -z "${MAKE}" -a -x "`which 'make'`" ] && MAKE="`which 'make'`"
-[ -z "${MAKE}" ] && panic "'make' not found in \$PATH" 1
-export "MAKE"
+for target in "${M68K_TARGET}" "${SH_TARGET}"; do
+    if [ -f "${BUILD_SRC_DIR}/${target}/build-complete" ]; then
+        continue
+    fi
 
-# Find proper 'awk'
-[ -z "${GAWK}" -a -x "`which 'gawk'`" ] && GAWK="`which 'gawk'`"
-[ -z "${GAWK}" -a -x "`which 'awk'`" ] && GAWK="`which 'awk'`"
-[ -z "${GAWK}" ] && panic "'awk' not found in \$PATH" 1
-export "GAWK"
+    message "${target}"
 
-# Find 'makeinfo' (needed for Newlib)
-[ ! -x "`which 'makeinfo'`" ] && panic "'makeinfo' not found in \$PATH" 1
-
-# Extract source packages
-cd "${BUILD_SRC_DIR}"
-if [ ! -f 'extracted' ]; then
-    message "Extracting '${BINUTILS}'"
-    tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
-
-    message "Extracting '$GCC'"
-    tar -xjf "${BUILD_SRC_DIR}/${GCC}" || panic "Extracting ${GCC}" 1
-
-    message "Extracting '${NEWLIB}'"
-    tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
-
-    message "Extracting '${GDB}'"
-    tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GDB}" 1
-
-    touch "${BUILD_SRC_DIR}/extracted"
-fi
-cd "${OLDPWD}"
-
-# Apply patches
-if [ -f "${TARGET}/scripts/patch" ]; then
-    . "${TARGET}/scripts/patch" || panic "Error building cross-compiler" 1
-fi
-
-# Build and install cross-compiler components
-if [ -f "${TARGET}/scripts/build" ]; then
-    . "${TARGET}/scripts/build" || panic "Error building cross-compiler" 1
-fi
-cd "${OLDPWD}"
-
-# Strip debug info from libraries
-find "${BUILD_INSTALL_DIR}/${TARGET}/lib/gcc/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
-find "${BUILD_INSTALL_DIR}/${TARGET}/${TARGET}" -name "*.a" -exec "${TARGET}"-strip -d {} \;
+    # Begin building
+    [ -f "${target}/scripts/extract" ] && . "${target}/scripts/extract"
+    [ -f "${target}/scripts/patch" ] && . "${target}/scripts/patch"
+    [ -f "${target}/scripts/build" ] && . "${target}/scripts/build"
+    [ -f "${target}/scripts/strip" ] && . "${target}/scripts/strip"
+    [ -f "${target}/scripts/finish" ] && . "${target}/scripts/finish"
+done
 
 # Clean up temporary files and source directories
 clean_up 0
-
-message "Add path '${BUILD_INSTALL_DIR}/${TARGET}/bin' to your \$PATH environment variable"

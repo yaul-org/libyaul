@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Strip debug info from libraries
+find "${BUILD_INSTALL_DIR}/${M68K_TARGET}/${M68K_TARGET}" \
+    -name "*.a" -exec "${M68K_TARGET}"-strip -d {} \;

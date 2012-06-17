@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Strip debug info from libraries
+find "${BUILD_INSTALL_DIR}/${SH_TARGET}/${SH_TARGET}" \
+    -name "*.a" -exec "${SH_TARGET}"-strip -d {} \;
+find "${BUILD_INSTALL_DIR}/${SH_TARGET}/lib/gcc/${SH_TARGET}" \
+    -name "*.a" -exec "${SH_TARGET}"-strip -d {} \;

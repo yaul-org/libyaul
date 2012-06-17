@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Extract source packages
+mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}"
+
+cd "${BUILD_SRC_DIR}/${M68K_TARGET}"
+if [ ! -f 'extracted' ]; then
+    message "Extracting '${BINUTILS}'"
+    tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
+
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/extracted"
+fi
+cd "${OLDPWD}"
