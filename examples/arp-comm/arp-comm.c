@@ -32,7 +32,7 @@ local_arp_cb(arp_callback_t *arp_cb)
             "ptr: %p\n"
             "len: 0x%04X\n"
             "function: 0x%02X\n"
-            "execute: %s\n\n",
+            "execute: %s[5;1H;",
             arp_cb->ptr,
             arp_cb->len,
             arp_cb->function,
@@ -46,6 +46,9 @@ local_arp_cb(arp_callback_t *arp_cb)
 int
 main(void)
 {
+        char *text;
+        char *arp_ver;
+
         uint16_t blcs_color[] = {
                 0x9C00
         };
@@ -57,11 +60,26 @@ main(void)
         smpc_init();
 
         cons_vdp2_init(&cons);
+
+        if ((text = (char *)malloc(1024)) == NULL)
+                abort();
+
         cons_write(&cons, "\n[1;44m     *** ARP Communication test ***     [m\n\n");
+
+        cons_write(&cons, "Initializing ARP...\n");
+        arp_ver = arp_version();
+
+        if (*arp_ver == '\0') {
+                cons_write(&cons, "No ARP cartridge detected!\n");
+                abort();
+        }
+
+        (void)sprintf(text, "ARP version \"%s\" detected!\n", arp_ver);
+        cons_write(&cons, text);
+        free(arp_ver);
 
         /* Register callback */
         arp_function_callback(&local_arp_cb);
-
         cons_write(&cons, "Ready...\n\n");
 
         while (true) {

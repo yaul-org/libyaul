@@ -28,5 +28,6 @@ extern void arp_function_callback(void (*)(arp_callback_t *));
 extern void arp_function_nonblock(void);
 extern void arp_send_long(uint32_t);
 extern void arp_sync(void);
+extern char *arp_version(void);
 
 #endif /* !_ARP_H_ */
