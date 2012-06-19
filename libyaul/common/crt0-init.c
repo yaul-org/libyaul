@@ -69,10 +69,10 @@ __std_startup(void)
         __do_global_ctors();
 
         /* Set hardware exception handlers */
-        cpu_intc_interrupt_set(0x04, (uint32_t)&exception_illegal_instruction);
-        cpu_intc_interrupt_set(0x06, (uint32_t)&exception_illegal_slot);
-        cpu_intc_interrupt_set(0x09, (uint32_t)&exception_cpu_address_error);
-        cpu_intc_interrupt_set(0x0A, (uint32_t)&exception_dma_address_error);
+        cpu_intc_interrupt_set(0x04, exception_illegal_instruction);
+        cpu_intc_interrupt_set(0x06, exception_illegal_slot);
+        cpu_intc_interrupt_set(0x09, exception_cpu_address_error);
+        cpu_intc_interrupt_set(0x0A, exception_dma_address_error);
 }
 
 /* Add function to .fini section */
