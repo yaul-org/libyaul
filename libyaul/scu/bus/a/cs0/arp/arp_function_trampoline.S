@@ -47,6 +47,6 @@ _arp_function_trampoline:
 .align 2
 
 .LC0:
-        .long _arp_cb
+.long _arp_cb
 .LC1:
-        .long _arp_callback
+.long _arp_callback

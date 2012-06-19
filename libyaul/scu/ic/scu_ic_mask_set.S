@@ -25,4 +25,4 @@ _scu_ic_mask_set:
 .align 2
 
 .LC1:
-        .long 0x060007B0
+.long 0x060007B0

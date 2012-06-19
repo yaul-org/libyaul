@@ -25,4 +25,4 @@ _cpu_intc_interrupt_set:
 .align 2
 
 .LC1:
-        .long 0x06000784
+.long 0x06000784

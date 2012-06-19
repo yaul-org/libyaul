@@ -66,10 +66,10 @@ _exception_dma_address_error:
 .align 2
 
 .LC1:
-        .long _exception_handler_illegal_instruction
+.long _exception_handler_illegal_instruction
 .LC2:
-        .long _exception_handler_illegal_slot
+.long _exception_handler_illegal_slot
 .LC3:
-        .long _exception_handler_cpu_address_error
+.long _exception_handler_cpu_address_error
 .LC4:
-        .long _exception_handler_dma_address_error
+.long _exception_handler_dma_address_error

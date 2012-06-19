@@ -25,4 +25,4 @@ _scu_ic_interrupt_get:
 .align 2
 
 .LC1:
-        .long 0x0600077C
+.long 0x0600077C

@@ -24,4 +24,4 @@ _scu_ic_mask_get:
 .align 2
 
 .LC1:
-        .long 0x06000348
+.long 0x06000348
