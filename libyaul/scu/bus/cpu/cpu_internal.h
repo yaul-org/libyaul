@@ -16,8 +16,16 @@
 #define CPU(x)          (0xFFFFF000 + (x))
 
 enum cpu_regs {
+        IPRB = 0x0E60,
+        VCRA = 0x0E62,
+        VCRB = 0x0E64,
+        VCRC = 0x0E66,
+        VCRD = 0x0E68,
+        IPRA = 0x0EE2,
+        VCRWDT = 0x0EE4,
         DRCR0 = 0x0E71,
         DRCR1 = 0x0E72,
+        VCRDIV = 0x0F0C,
         SAR0 = 0x0F80,
         DAR0 = 0x0F84,
         TCR0 = 0x0F88,

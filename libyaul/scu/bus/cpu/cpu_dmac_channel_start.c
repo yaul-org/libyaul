@@ -22,8 +22,12 @@ cpu_dmac_channel_start(uint8_t ch)
         dmaor = MEMORY_READ(32, CPU(DMAOR));
         /* When the AE bit is set to 1, DMA transfer cannot be enabled
          * even if the DE bit in the DMA channel control register is
+         * set
+         *
+         * When the NMIF bit is set to 1, DMA transfer cannot be enabled
+         * even if the DE bit in the DMA channel control register is
          * set */
-        dmaor &= ~0x00000004;
+        dmaor &= ~0x00000006;
 
         switch (ch) {
         case CPU_DMAC_CHANNEL(0):

@@ -20,7 +20,7 @@ struct cpu_channel_cfg {
 #define CPU_DMAC_DESTINATION_FIXED 0x00000000
 #define CPU_DMAC_DESTINATION_INCREMENT 0x00004000
 #define CPU_DMAC_DESTINATION_DECREMENT 0x00008000
-                uint8_t mode;
+                uint32_t mode;
                 void *ptr;
         } dst;
 
@@ -28,14 +28,14 @@ struct cpu_channel_cfg {
 #define CPU_DMAC_SOURCE_FIXED 0x00000000
 #define CPU_DMAC_SOURCE_INCREMENT 0x00001000
 #define CPU_DMAC_SOURCE_DECREMENT 0x00002000
-                uint8_t mode;
+                uint32_t mode;
                 const void *ptr;
         } src;
 
         size_t len;
         uint32_t xfer_size;
 
-        uint32_t vector;
+        uint8_t vector;
         void (*ihr)(void);
 };
 
