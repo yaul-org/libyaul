@@ -19,32 +19,13 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
         uint32_t len;
         uint32_t chcr;
         uint32_t vcrdma;
+        uint32_t ipra;
 
-        chcr = 0x00000000;
-        switch (cfg->ch) {
-        case CPU_DMAC_CHANNEL(0):
-                /* Wait until a previous transfer has ended */
-                while (((MEMORY_READ(32, CPU(CHCR0)) & 0x00000002) == 0x00000000) &&
-                    (MEMORY_READ(32, CPU(TCR1)) != 0x00000000));
-
-                /* Immediately disable channel */
-                MEMORY_WRITE(32, CPU(CHCR0), chcr);
-                break;
-        case CPU_DMAC_CHANNEL(1):
-                /* Wait until a previous transfer has ended */
-                while (((MEMORY_READ(32, CPU(CHCR1)) & 0x00000002) == 0x00000000) &&
-                    (MEMORY_READ(32, CPU(TCR1)) == 0x00000000));
-
-                /* Immediately disable channel */
-                MEMORY_WRITE(32, CPU(CHCR1), chcr);
-                break;
-        default:
-                assert((cfg->ch == CPU_DMAC_CHANNEL(0)) ||
-                    (cfg->ch == CPU_DMAC_CHANNEL(1)));
-        }
+        assert((cfg->ch == CPU_DMAC_CHANNEL(0)) ||
+            (cfg->ch == CPU_DMAC_CHANNEL(1)));
 
         /* Source and destination address modes */
-        chcr |= cfg->src.mode | cfg->dst.mode;
+        chcr = cfg->src.mode | cfg->dst.mode;
 
         /* Able to transfer at most 16MiB exclusive when TCR0 is
          * 0x00FFFFFF, 16MliB inclusive when TCR0 is 0x00000000 */
@@ -85,9 +66,18 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 vcrdma = cfg->vector;
                 /* Interrupt enable */
                 chcr |= 0x00000004;
-
                 /* Set interrupt handling routine */
                 cpu_intc_interrupt_set(cfg->vector, cfg->ihr);
+
+                /* Set priority */
+                assert(cfg->priority <= 15);
+
+                ipra = MEMORY_READ(16, CPU(IPRA));
+                ipra &= 0x00FF;
+                ipra |= cfg->priority << 8;
+
+                /* Write to memory */
+                MEMORY_WRITE(16, CPU(IPRA), ipra);
         }
 
         switch (cfg->ch) {
@@ -96,9 +86,7 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 MEMORY_WRITE(32, CPU(SAR0), (uint32_t)cfg->src.ptr);
                 MEMORY_WRITE(32, CPU(TCR0), len);
                 MEMORY_WRITE(8, CPU(DRCR0), 0x00);
-                /* Set DMA vector number */
                 MEMORY_WRITE(32, CPU(VCRDMA0), vcrdma);
-                MEMORY_WRITE(32, CPU(IPRA), 0x00000000);
                 MEMORY_WRITE(32, CPU(CHCR0), chcr);
                 return;
         case CPU_DMAC_CHANNEL(1):
@@ -106,7 +94,6 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 MEMORY_WRITE(32, CPU(SAR1), (uint32_t)cfg->src.ptr);
                 MEMORY_WRITE(32, CPU(TCR1), len);
                 MEMORY_WRITE(8, CPU(DRCR1), 0x00);
-                /* Set DMA vector number */
                 MEMORY_WRITE(32, CPU(VCRDMA1), vcrdma);
                 MEMORY_WRITE(32, CPU(CHCR1), chcr);
                 return;

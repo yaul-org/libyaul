@@ -19,20 +19,15 @@ cpu_dmac_channel_start(uint8_t ch)
         uint32_t chcr1;
         uint32_t dmaor;
 
+        cpu_dmac_channel_stop();
+
+        /* Read after stopping all DMA channels */
         dmaor = MEMORY_READ(32, CPU(DMAOR));
-        /* When the AE bit is set to 1, DMA transfer cannot be enabled
-         * even if the DE bit in the DMA channel control register is
-         * set
-         *
-         * When the NMIF bit is set to 1, DMA transfer cannot be enabled
-         * even if the DE bit in the DMA channel control register is
-         * set */
-        dmaor &= ~0x00000006;
 
         switch (ch) {
         case CPU_DMAC_CHANNEL(0):
                 chcr0 = MEMORY_READ(32, CPU(CHCR0));
-                chcr0 |= 0x00000001;
+                chcr0 |= 0x00000201;
 
                 /* DMA transfers enabled on all channels */
                 dmaor |= 0x00000001;
@@ -42,7 +37,7 @@ cpu_dmac_channel_start(uint8_t ch)
                 break;
         case CPU_DMAC_CHANNEL(1):
                 chcr1 = MEMORY_READ(32, CPU(CHCR1));
-                chcr1 |= 0x00000001;
+                chcr1 |= 0x00000201;
 
                 /* Write to memory */
                 MEMORY_WRITE(32, CPU(CHCR1), chcr1);

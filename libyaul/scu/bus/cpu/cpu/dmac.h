@@ -11,9 +11,8 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#define CPU_DMAC_CHANNEL(x)     ((x))
-
 struct cpu_channel_cfg {
+#define CPU_DMAC_CHANNEL(x)     ((x))
         uint32_t ch;
 
         struct {
@@ -36,10 +35,12 @@ struct cpu_channel_cfg {
         uint32_t xfer_size;
 
         uint8_t vector;
+        uint8_t priority;
         void (*ihr)(void);
 };
 
 extern void cpu_dmac_channel_set(struct cpu_channel_cfg *);
 extern void cpu_dmac_channel_start(uint8_t);
+extern void cpu_dmac_channel_stop(void);
 
 #endif /* !_DMAC_H */
