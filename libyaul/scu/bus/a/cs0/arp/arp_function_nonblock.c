@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 static void arp_function_01(void);
 static void arp_function_09(void);
@@ -76,7 +76,7 @@ arp_function_01(void)
 
                 checksum = 0;
                 for (; len > 0; len--, address++) {
-                        b = MEM_READ(address);
+                        b = MEMORY_READ(8, address);
                         arp_xchg_byte(b);
 
                         /* Checksum allow overflow */
@@ -118,7 +118,7 @@ arp_function_09(void)
         for (; len > 0; len--, addr++) {
                 b = arp_xchg_byte(b);
                 /* Write to memory */
-                MEM_POKE(addr, b);
+                MEMORY_WRITE(8, addr, b);
         }
 
         /* Only call the ARP user callback for when we get the last

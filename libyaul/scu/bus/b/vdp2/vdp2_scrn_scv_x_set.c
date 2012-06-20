@@ -7,7 +7,7 @@
 
 #include <vdp2/scrn.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_scv_x_set(uint8_t scrn, uint16_t in, uint8_t dn)
@@ -21,21 +21,21 @@ vdp2_scrn_scv_x_set(uint8_t scrn, uint16_t in, uint8_t dn)
         case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Write to memory */
-                MEM_POKE(VDP2(SCXIN0), in);
-                MEM_POKE(VDP2(SCXDN0), dn);
+                MEMORY_WRITE(16, VDP2(SCXIN0), in);
+                MEMORY_WRITE(16, VDP2(SCXDN0), dn);
                 break;
         case SCRN_NBG1:
                 /* Write to memory */
-                MEM_POKE(VDP2(SCXIN1), in);
-                MEM_POKE(VDP2(SCXDN1), dn);
+                MEMORY_WRITE(16, VDP2(SCXIN1), in);
+                MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
                 /* Write to memory */
-                MEM_POKE(VDP2(SCXN2), in);
+                MEMORY_WRITE(16, VDP2(SCXN2), in);
                 break;
         case SCRN_NBG3:
                 /* Write to memory */
-                MEM_POKE(VDP2(SCXN3), in);
+                MEMORY_WRITE(16, VDP2(SCXN3), in);
                 break;
         default:
                 return;

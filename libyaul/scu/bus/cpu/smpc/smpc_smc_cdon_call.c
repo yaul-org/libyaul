@@ -5,13 +5,13 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
 uint8_t
 smpc_cmd_cdon_call(void)
 {
-        /* Enable the SH-1 CD block. */
+        /* Enable the SH-1 CD block */
         smpc_cmd_call(SMPC_SMC_CDON, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
-        return MEM_READ(OREG(31));
+        return MEMORY_READ(8, OREG(31));
 }

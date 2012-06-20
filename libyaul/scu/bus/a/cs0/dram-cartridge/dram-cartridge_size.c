@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "dram-cartridge_internal.h"
+#include <dram-cartridge.h>
 
-#include "dram-cartridge.h"
+#include "dram-cartridge-internal.h"
 
 size_t
 dram_cartridge_size(void)

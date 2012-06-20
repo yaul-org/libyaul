@@ -11,7 +11,7 @@
 
 #include <assert.h>
 
-#include "cpu_internal.h"
+#include "cpu-internal.h"
 
 void
 cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)

@@ -7,11 +7,11 @@
 
 #include <vdp1/ptmr.h>
 
-#include "vdp1_internal.h"
+#include "vdp1-internal.h"
 
 void
 vdp1_ptmr_plot_idle_set(void)
 {
         /* Stop drawing. */
-        MEM_POKE(VDP1(PTMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
 }

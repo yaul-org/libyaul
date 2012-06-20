@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "arp.h"
+#include <arp.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 void
 arp_send_long(uint32_t w)

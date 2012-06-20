@@ -5,14 +5,14 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
-/* Command type: resetable system management commands. */
+/* Command type: Resetable system management commands */
 uint8_t
 smpc_cmd_sndoff_call(void)
 {
-        /* Disable the "Motorola MC68EC000." */
+        /* Disable the "Motorola MC68EC000" */
         smpc_cmd_call(SMPC_SMC_SNDOFF, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
-        return MEM_READ(OREG(31));
+        return MEMORY_READ(8, OREG(31));
 }

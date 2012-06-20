@@ -7,7 +7,7 @@
 
 #include <vdp2/scrn.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
@@ -19,7 +19,7 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 vdp2_regs.chctla |= chc << 4;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 break;
         case SCRN_NBG1:
                 if (chc > SCRN_CCC_CHC_16770000)
@@ -29,7 +29,7 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 vdp2_regs.chctla |= chc << 12;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 break;
         case SCRN_NBG2:
                 if (chc > SCRN_CCC_CHC_256)
@@ -39,7 +39,7 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 vdp2_regs.chctlb |= chc << 1;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 break;
         case SCRN_NBG3:
                 if (chc > SCRN_CCC_CHC_256)
@@ -49,15 +49,14 @@ vdp2_scrn_ccc_set(uint8_t scrn, uint8_t chc)
                 vdp2_regs.chctlb |= chc << 5;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 break;
         case SCRN_RBG0:
                 vdp2_regs.chctlb &= 0x8FFF;
                 vdp2_regs.chctlb |= chc << 12;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                break;
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
         default:
                 break;
         }

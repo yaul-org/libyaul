@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 char *
 arp_version(void)

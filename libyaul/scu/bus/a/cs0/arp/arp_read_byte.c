@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "arp.h"
+#include <arp.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 uint8_t
 arp_read_byte(void)
@@ -16,9 +16,9 @@ arp_read_byte(void)
 
         while ((arp_busy_status()));
 
-        b = MEM_READ(ARP(INPUT));
+        b = MEMORY_READ(8, ARP(INPUT));
         /* Write back? */
-        MEM_POKE(ARP(OUTPUT), b);
+        MEMORY_WRITE(8, ARP(OUTPUT), b);
 
         return b;
 }

@@ -5,12 +5,12 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <assert.h>
-
 #include <bus/cpu/cpu.h>
 #include <smpc/peripheral.h>
 
-#include "smpc_internal.h"
+#include <assert.h>
+
+#include "smpc-internal.h"
 
 #define P1MD0   0x00 /* 15B mode */
 #define P1MD1   0x02 /* 255B mode */
@@ -37,17 +37,17 @@ smpc_peripheral_system_manager(void)
         fetch_output_regs();
 
         /* Check if there is any remaining peripheral data */
-        if (((MEM_READ(SMPC(SR))) & NPE) == 0x00) {
+        if (((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00) {
                 /* Issue a "BREAK" for the "INTBACK" command */
-                MEM_POKE(IREG(0), 0x40);
+                MEMORY_WRITE(8, IREG(0), 0x40);
                 goto exit;
         }
 
         /* Let's not yet cover this case yet since we can't fetch more data */
-        assert(((MEM_READ(SMPC(SR))) & NPE) == 0x00);
+        assert(((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00);
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
-        MEM_POKE(IREG(0), 0x80);
+        MEMORY_WRITE(8, IREG(0), 0x80);
 exit:
         /* Enable interrupts */
         cpu_intc_enable();
@@ -62,7 +62,7 @@ fetch_output_regs(void)
         offset = 0;
 
         /* Is this the first time fetching peripheral data? */
-        if (((MEM_READ(SMPC(SR))) & PDL) == PDL)
+        if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL)
                 oboffset = 0;
 
         /* What if we exceed our capacity? Buffer overflow */
@@ -71,6 +71,6 @@ fetch_output_regs(void)
         for (ooffset = 0; ooffset < SMPC_OREGS; ooffset++, oboffset++) {
                 /* We don't have much time in the critical section. Just
                  * buffer the registers */
-                OREG_SET(oboffset, MEM_READ(OREG(ooffset)));
+                OREG_SET(oboffset, MEMORY_READ(8, OREG(ooffset)));
         }
 }

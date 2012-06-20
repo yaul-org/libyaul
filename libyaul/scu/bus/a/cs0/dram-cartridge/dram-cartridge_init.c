@@ -1,13 +1,14 @@
 /*
  * Copyright (c) 2012 Israel Jacques
+ *
  * See LICENSE for details.
  *
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "dram-cartridge_internal.h"
+#include <dram-cartridge.h>
 
-#include "dram-cartridge.h"
+#include "dram-cartridge-internal.h"
 
 uint32_t id;
 
@@ -18,7 +19,7 @@ dram_cartridge_init(void)
         uint32_t unknown;
 
         /* Check the ID */
-        id = MEM_READ(CS1(ID));
+        id = MEMORY_READ(32, CS1(ID));
         id &= 0x000000FF;
         switch (id) {
         case 0x5A:
@@ -35,17 +36,17 @@ dram_cartridge_init(void)
         }
 
         /* Write to A-Bus "dummy" area */
-        unknown = MEM_READ(DUMMY(UNKNOWN));
+        unknown = MEMORY_READ(32, DUMMY(UNKNOWN));
         unknown &= 0xFFFF0000;
         unknown |= 0x0001;
-        MEM_POKE(DUMMY(UNKNOWN), unknown);
+        MEMORY_WRITE(32, DUMMY(UNKNOWN), unknown);
 
         /* Set the SCU wait */
         /* Don't ask about this magic constant */
         asr0 = 0x23301FF0;
-        MEM_POKE(SCU(ASR0), asr0);
+        MEMORY_WRITE(32, SCU(ASR0), asr0);
         /* Write to A-Bus refresh */
-        MEM_POKE(SCU(AREF), 0x00000013);
+        MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
         /* Add values starting at offset 0x100 to the end of the address
          * space in 16-bit half word unit strides.

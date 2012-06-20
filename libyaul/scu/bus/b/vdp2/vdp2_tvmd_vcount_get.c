@@ -7,13 +7,13 @@
 
 #include <vdp2/tvmd.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 uint16_t
 vdp2_tvmd_vcount_get(void)
 {
 
-        for (; ((MEM_READ(VDP2(EXTEN)) & 0x0200) == 0x0200); );
+        for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
 
-        return MEM_READ(VDP2(VCNT));
+        return MEMORY_READ(16, VDP2(VCNT));
 }

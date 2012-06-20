@@ -7,7 +7,7 @@
 
 #include <vdp2/scrn.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_display_set(uint8_t scrn, bool no_trans)
@@ -22,5 +22,5 @@ vdp2_scrn_display_set(uint8_t scrn, bool no_trans)
         }
 
         /* Write to register. */
-        MEM_POKE(VDP2(BGON), vdp2_regs.bgon);
+        MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
 }

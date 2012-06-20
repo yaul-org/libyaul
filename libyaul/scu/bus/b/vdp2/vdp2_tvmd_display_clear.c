@@ -7,15 +7,15 @@
 
 #include <vdp2/tvmd.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_tvmd_display_clear(void)
 {
         uint16_t tvmd;
 
-        tvmd = MEM_READ(VDP2(TVMD));
+        tvmd = MEMORY_READ(16, VDP2(TVMD));
         tvmd &= 0x7FFF;
 
-        MEM_POKE(VDP2(TVMD), tvmd);
+        MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 }

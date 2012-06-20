@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_ls_set(struct scrn_ls_format *ls)
@@ -25,15 +25,15 @@ vdp2_scrn_ls_set(struct scrn_ls_format *ls)
                 vdp2_regs.scrctl &= 0xFFF9;
                 vdp2_regs.scrctl |= ls->ls_fun;
 
-                MEM_POKE(VDP2(LSTA0U), lstau);
-                MEM_POKE(VDP2(LSTA0L), lstal);
+                MEMORY_WRITE(16, VDP2(LSTA0U), lstau);
+                MEMORY_WRITE(16, VDP2(LSTA0L), lstal);
                 break;
         case SCRN_NBG1:
                 vdp2_regs.scrctl &= 0xF9FD;
                 vdp2_regs.scrctl |= ls->ls_fun;
 
-                MEM_POKE(VDP2(LSTA1U), lstau);
-                MEM_POKE(VDP2(LSTA1L), lstal);
+                MEMORY_WRITE(16, VDP2(LSTA1U), lstau);
+                MEMORY_WRITE(16, VDP2(LSTA1L), lstal);
                 break;
         default:
                 assert((ls->ls_scrn == SCRN_NBG0) ||
@@ -42,5 +42,5 @@ vdp2_scrn_ls_set(struct scrn_ls_format *ls)
         }
 
         /* Write to memory */
-        MEM_POKE(VDP2(SCRCTL), vdp2_regs.scrctl);
+        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_regs.scrctl);
 }

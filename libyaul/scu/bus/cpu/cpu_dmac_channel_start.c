@@ -10,7 +10,7 @@
 
 #include <assert.h>
 
-#include "cpu_internal.h"
+#include "cpu-internal.h"
 
 void
 cpu_dmac_channel_start(uint8_t ch)

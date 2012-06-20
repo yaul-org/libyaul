@@ -5,15 +5,15 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
+#include <ic/ic.h>
+#include <smpc/peripheral.h>
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <ic/ic.h>
-#include <smpc/peripheral.h>
-
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
 #define	ID_DIGITAL      0x02
 #define	ID_RACING       0x13

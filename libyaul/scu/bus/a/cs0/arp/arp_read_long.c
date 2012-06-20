@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "arp.h"
+#include <arp.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 uint32_t
 arp_read_long(void)

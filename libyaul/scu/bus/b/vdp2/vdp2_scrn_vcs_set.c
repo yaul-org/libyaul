@@ -9,14 +9,14 @@
 
 #include <vdp2/scrn.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
 {
 
-        MEM_POKE(VDP2(VCSTAU), (vcs->vcs_vcsta >> 17) & 0x0007);
-        MEM_POKE(VDP2(VCSTAL), (vcs->vcs_vcsta >> 1) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(VCSTAU), (vcs->vcs_vcsta >> 17) & 0x0007);
+        MEMORY_WRITE(16, VDP2(VCSTAL), (vcs->vcs_vcsta >> 1) & 0xFFFF);
 
         switch (vcs->vcs_scrn) {
         case SCRN_NBG0:
@@ -33,5 +33,5 @@ vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
         }
 
         /* Write to memory */
-        MEM_POKE(VDP2(SCRCTL), vdp2_regs.scrctl);
+        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_regs.scrctl);
 }

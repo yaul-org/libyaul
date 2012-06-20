@@ -5,7 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#ifndef _CD_BLOCK_INTERNAL_H_
-#define _CD_BLOCK_INTERNAL_H_
+#ifndef _SCSP_INTERNAL_H_
+#define _SCSP_INTERNAL_H_
 
-#endif
+#include <scu-internal.h>
+
+#endif /* !_SCSP_INTERNAL_H_ */

@@ -8,7 +8,7 @@
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
@@ -53,9 +53,9 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
                 vdp2_regs.bmpna |= b->bm_spn & 0x07;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(BMPNA), vdp2_regs.bmpna);
-                MEM_POKE(VDP2(MPOFN), vdp2_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(BMPNA), vdp2_regs.bmpna);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 break;
         case SCRN_NBG1:
                 /* Screen display format */
@@ -83,8 +83,8 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
                 vdp2_regs.bmpna |= (b->bm_spn & 0x07) << 8;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(BMPNA), vdp2_regs.bmpna);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(BMPNA), vdp2_regs.bmpna);
                 break;
         case SCRN_RBG0:
                 /* Screen display format */
@@ -108,9 +108,9 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
                 vdp2_regs.bmpnb |= b->bm_spn & 0x07;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEM_POKE(VDP2(BMPNB), vdp2_regs.bmpnb);
-                MEM_POKE(VDP2(MPOFN), vdp2_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(BMPNB), vdp2_regs.bmpnb);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 break;
         default:
                 return;

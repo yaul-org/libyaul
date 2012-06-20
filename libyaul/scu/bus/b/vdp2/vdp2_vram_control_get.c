@@ -7,7 +7,7 @@
 
 #include <vdp2/vram.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 struct vram_ctl *
 vdp2_vram_control_get(void)

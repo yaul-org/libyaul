@@ -8,11 +8,7 @@
 #ifndef _ARP_INTERNAL_H_
 #define _ARP_INTERNAL_H_
 
-#include <inttypes.h>
-
-/* Write and read directly to specified address */
-#define MEM_POKE(x, y)  (*(volatile uint8_t *)(x) = (y))
-#define MEM_READ(x)     (*(volatile uint8_t *)(x))
+#include <scu-internal.h>
 
 /* Macros specific for processor */
 #define ARP(x)          (0x22000000 + (x))
@@ -20,16 +16,13 @@
 /* Helpers specific to this processor */
 #define USER_VECTOR(x)  ((x))
 #define USER_VECTOR_CALL(x) do {                                              \
-        __asm__ __volatile__ ("trapa #" # x "\n"                              \
-                "tst #0,r0");                                                 \
+        __asm__ __volatile__ ("trapa #" # x "\n");                            \
 } while (false)
 
-enum arp_regs {
-        OUTPUT = 0x00080001,
-        STATUS = 0x00100001,
-        INPUT = 0x00180001,
-        VERSION = 0x00004AF0
-};
+#define OUTPUT          0x00080001
+#define STATUS          0x00100001
+#define INPUT           0x00180001
+#define VERSION         0x00004AF0
 
 void arp_function_trampoline(void);
 

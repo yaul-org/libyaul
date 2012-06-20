@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 arp_callback_t arp_callback;
 void (*arp_cb)(arp_callback_t *) = NULL;

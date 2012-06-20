@@ -9,7 +9,7 @@
 
 #include <common.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 static uint16_t
 pattern_name_control(struct scrn_ch_format *cfg)
@@ -94,12 +94,12 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz |= cfg->ch_pls - 1;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
-                MEM_POKE(VDP2(MPABN0), ab);
-                MEM_POKE(VDP2(MPCDN0), cd);
-                MEM_POKE(VDP2(PNCN0), pnc);
-                MEM_POKE(VDP2(PRINA), vdp2_regs.prina);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPABN0), ab);
+                MEMORY_WRITE(16, VDP2(MPCDN0), cd);
+                MEMORY_WRITE(16, VDP2(PNCN0), pnc);
+                MEMORY_WRITE(16, VDP2(PRINA), vdp2_regs.prina);
                 break;
         case SCRN_NBG1:
                 /* Character size */
@@ -110,11 +110,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFFF3;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 2;
 
-                MEM_POKE(VDP2(CHCTLA), vdp2_regs.chctla);
-                MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
-                MEM_POKE(VDP2(MPABN1), ab);
-                MEM_POKE(VDP2(MPCDN1), cd);
-                MEM_POKE(VDP2(PNCN1), pnc);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPABN1), ab);
+                MEMORY_WRITE(16, VDP2(MPCDN1), cd);
+                MEMORY_WRITE(16, VDP2(PNCN1), pnc);
                 break;
         case SCRN_NBG2:
                 /* Character Size */
@@ -126,11 +126,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 4;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
-                MEM_POKE(VDP2(MPABN2), ab);
-                MEM_POKE(VDP2(MPCDN2), cd);
-                MEM_POKE(VDP2(PNCN2), pnc);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPABN2), ab);
+                MEMORY_WRITE(16, VDP2(MPCDN2), cd);
+                MEMORY_WRITE(16, VDP2(PNCN2), pnc);
                 break;
         case SCRN_NBG3:
                 /* Character size */
@@ -142,11 +142,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
-                MEM_POKE(VDP2(MPABN3), ab);
-                MEM_POKE(VDP2(MPCDN3), cd);
-                MEM_POKE(VDP2(PNCN3), pnc);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPABN3), ab);
+                MEMORY_WRITE(16, VDP2(MPCDN3), cd);
+                MEMORY_WRITE(16, VDP2(PNCN3), pnc);
                 break;
         case SCRN_RBG0:
                 /* Character size */
@@ -159,33 +159,33 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                         vdp2_regs.plsz &= 0xFCFF;
                         vdp2_regs.plsz |= (cfg->ch_pls - 1) << 8;
 
-                        MEM_POKE(VDP2(MPABRA), ab);
-                        MEM_POKE(VDP2(MPCDRA), cd);
-                        MEM_POKE(VDP2(MPEFRA), 0x0000);
-                        MEM_POKE(VDP2(MPGHRA), 0x0000);
-                        MEM_POKE(VDP2(MPIJRA), 0x0000);
-                        MEM_POKE(VDP2(MPKLRA), 0x0000);
-                        MEM_POKE(VDP2(MPMNRA), 0x0000);
-                        MEM_POKE(VDP2(MPOPRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPABRA), ab);
+                        MEMORY_WRITE(16, VDP2(MPCDRA), cd);
+                        MEMORY_WRITE(16, VDP2(MPEFRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPGHRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPIJRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPKLRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPMNRA), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPOPRA), 0x0000);
                 } else {
                         /* Rotation Parameter B */
                         vdp2_regs.plsz &= 0xCFFF;
                         vdp2_regs.plsz |= (cfg->ch_pls - 1) << 12;
 
-                        MEM_POKE(VDP2(MPABRB), ab);
-                        MEM_POKE(VDP2(MPCDRB), cd);
-                        MEM_POKE(VDP2(MPEFRB), 0x0000);
-                        MEM_POKE(VDP2(MPGHRB), 0x0000);
-                        MEM_POKE(VDP2(MPIJRB), 0x0000);
-                        MEM_POKE(VDP2(MPKLRB), 0x0000);
-                        MEM_POKE(VDP2(MPMNRB), 0x0000);
-                        MEM_POKE(VDP2(MPOPRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPABRB), ab);
+                        MEMORY_WRITE(16, VDP2(MPCDRB), cd);
+                        MEMORY_WRITE(16, VDP2(MPEFRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPGHRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPIJRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPKLRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPMNRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPOPRB), 0x0000);
                 }
 
                 /* Write to memory */
-                MEM_POKE(VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEM_POKE(VDP2(PLSZ), vdp2_regs.plsz);
-                MEM_POKE(VDP2(PNCN3), pnc);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(PNCN3), pnc);
                 break;
         default:
                 return;

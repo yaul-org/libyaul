@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "scsp_internal.h"
+#include "scsp-internal.h"
 
 void
 scsp_init(void)

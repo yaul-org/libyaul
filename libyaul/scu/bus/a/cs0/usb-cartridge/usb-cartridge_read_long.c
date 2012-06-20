@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "usb-cartridge.h"
+#include <usb-cartridge.h>
 
-#include "usb-cartridge_internal.h"
+#include "usb-cartridge-internal.h"
 
 uint32_t
 usb_cartridge_read_long(void)

@@ -7,7 +7,7 @@
 
 #include <smpc/peripheral.h>
 
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
 struct smpc_peripheral_digital *
 smpc_peripheral_digital_port(uint8_t port)

@@ -7,15 +7,17 @@
 
 #include <vdp1/fbcr.h>
 
-#include "vdp1_internal.h"
+#include "vdp1-internal.h"
 
 void
 vdp1_fbcr_erase_set(void)
 {
         uint16_t fbcr;
+        uint16_t modr;
 
-        fbcr = (MEM_READ(VDP1(MODR)) & 0xE0) >> 3;
+        modr = MEMORY_READ(16, VDP1(MODR));
+        fbcr = (modr & 0x00E0) >> 3;
 
         /* Write to the FBCR register after VBLANK-OUT interrupt. */
-        MEM_POKE(VDP1(FBCR), fbcr | 0x0002);
+        MEMORY_WRITE(16, VDP1(FBCR), fbcr | 0x0002);
 }

@@ -7,7 +7,7 @@
 
 #include "arp.h"
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 bool
 arp_busy_status(void)
@@ -15,7 +15,7 @@ arp_busy_status(void)
         uint8_t status;
         bool busy;
 
-        status = MEM_READ(ARP(STATUS));
+        status = MEMORY_READ(8, ARP(STATUS));
         status &= 0x01;
         /* Busy? */
         busy = (status == 0x00);

@@ -8,13 +8,9 @@
 #ifndef _SMPC_INTERNAL_H_
 #define _SMPC_INTERNAL_H_
 
-#include <stddef.h>
-#include <inttypes.h>
+#include <scu-internal.h>
 
-#define MEM_POKE(x, y)  (*(volatile uint8_t *)(x) = (y))
-#define MEM_READ(x)     (*(volatile uint8_t *)(x))
-
-/* Macros specific for processor. */
+/* Macros specific for processor */
 #define IREG(x)         (0x20100001 + ((x) << 1))
 #define OREG(x)         (0x20100021 + ((x) << 1))
 #define SMPC(x)         (0x20100000 + (x))
@@ -39,63 +35,60 @@
 #define SMPC_SMC_SETSMEM        0x17
 #define SMPC_RTC_SETTIME        0x16
 
-#define OREG_SET(x, y)                  (oreg_buf[x] = (y))
-#define OREG_GET(x)                     (oreg_buf[x])
-#define OREG_OFFSET(x)                  (&oreg_buf[x])
+#define OREG_SET(x, y)          (oreg_buf[x] = (y))
+#define OREG_GET(x)             (oreg_buf[x])
+#define OREG_OFFSET(x)          (&oreg_buf[x])
 
 /* 1st data byte */
-#define PC_GET_MULTITAP_ID(x)           ((OREG_GET((x)) >> 4) & 0x0F)
-#define PC_GET_NUM_CONNECTIONS(x)       (OREG_GET((x)) & 0x0F)
+#define PC_GET_MULTITAP_ID(x)   ((OREG_GET((x)) >> 4) & 0x0F)
+#define PC_GET_NUM_CONNECTIONS(x) (OREG_GET((x)) & 0x0F)
 /* 2nd data byte. */
-#define PC_GET_ID(x)                    (OREG_GET((x)) & 0xFF)
-#define PC_GET_TYPE(x)                  ((OREG_GET((x)) >> 4) & 0x0F)
-#define PC_GET_SIZE(x)                  (OREG_GET((x)) & 0x0F)
-#define PC_GET_EXT_SIZE(x)              (OREG_GET((x) + 1) & 0xFF)
+#define PC_GET_ID(x)            (OREG_GET((x)) & 0xFF)
+#define PC_GET_TYPE(x)          ((OREG_GET((x)) >> 4) & 0x0F)
+#define PC_GET_SIZE(x)          (OREG_GET((x)) & 0x0F)
+#define PC_GET_EXT_SIZE(x)      (OREG_GET((x) + 1) & 0xFF)
 /* 3rd (or 4th) data byte */
-#define PC_GET_DATA(x)                  (OREG_OFFSET((x)))
+#define PC_GET_DATA(x)          (OREG_OFFSET((x)))
 
-enum cmd_type {
-        SMPC_CMD_ISSUE_TYPE_A,
-        SMPC_CMD_ISSUE_TYPE_B,
-        SMPC_CMD_ISSUE_TYPE_C,
-        SMPC_CMD_ISSUE_TYPE_D
-};
+#define SMPC_CMD_ISSUE_TYPE_A   0
+#define SMPC_CMD_ISSUE_TYPE_B   1
+#define SMPC_CMD_ISSUE_TYPE_C   2
+#define SMPC_CMD_ISSUE_TYPE_D   3
 
-enum smpc_regs_type {
-        COMREG = 0x01F,
-        SR = 0x061,
-        SF = 0x063,
-        PDR1 = 0x075,
-        PDR2 = 0x077,
-        DDR1 = 0x079,
-        DDR2 = 0x07B,
-        IOSEL1 = 0x07D,
-        IOSEL2 = 0x07D,
-        EXLE1 = 0x07F,
-        EXLE2 = 0x07F
-};
+/* SMPC */
+#define COMREG          0x01F
+#define SR              0x061
+#define SF              0x063
+#define PDR1            0x075
+#define PDR2            0x077
+#define DDR1            0x079
+#define DDR2            0x07B
+#define IOSEL1          0x07D
+#define IOSEL2          0x07D
+#define EXLE1           0x07F
+#define EXLE2           0x07F
 
 struct smpc_peripheral_port;
 
 static inline uint8_t
-smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
+smpc_cmd_call(uint8_t cmd, uint8_t cmd_type, uint8_t *cmd_parameters)
 {
         /* Wait until the command has finished executing. */
-        for (; ((MEM_READ(SMPC(SF)) & 0x01) == 0x01); );
+        for (; ((MEMORY_READ(8, SMPC(SF)) & 0x01) == 0x01); );
 
         /* Set the busy flag */
-        MEM_POKE(SMPC(SF), 0x01);
+        MEMORY_WRITE(8, SMPC(SF), 0x01);
 
         switch (cmd_type) {
         case SMPC_CMD_ISSUE_TYPE_A:
                 /* Write command code */
-                MEM_POKE(SMPC(COMREG), cmd);
+                MEMORY_WRITE(8, SMPC(COMREG), cmd);
 
                 /* Wait for exception handling */
                 break;
         case SMPC_CMD_ISSUE_TYPE_B:
                 /* Write command code. */
-                MEM_POKE(SMPC(COMREG), cmd);
+                MEMORY_WRITE(8, SMPC(COMREG), cmd);
                 break;
         case SMPC_CMD_ISSUE_TYPE_C:
         case SMPC_CMD_ISSUE_TYPE_D:
@@ -106,17 +99,17 @@ smpc_cmd_call(uint8_t cmd, enum cmd_type cmd_type, uint8_t *cmd_parameters)
                 }
 
                 /* Write command parameters. */
-                MEM_POKE(IREG(0), cmd_parameters[0]);
-                MEM_POKE(IREG(1), cmd_parameters[1]);
-                MEM_POKE(IREG(2), cmd_parameters[2]);
+                MEMORY_WRITE(8, IREG(0), cmd_parameters[0]);
+                MEMORY_WRITE(8, IREG(1), cmd_parameters[1]);
+                MEMORY_WRITE(8, IREG(2), cmd_parameters[2]);
 
                 /* Write command code. */
-                MEM_POKE(SMPC(COMREG), cmd);
+                MEMORY_WRITE(8, SMPC(COMREG), cmd);
                 break;
         }
 
         /* Wait until the command has finished executing. */
-        for (; ((MEM_READ(SMPC(SF)) & 0x01) == 0x01); );
+        for (; ((MEMORY_READ(8, SMPC(SF)) & 0x01) == 0x01); );
 
         return 0;
 }

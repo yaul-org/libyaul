@@ -7,7 +7,7 @@
 
 #include <vdp2/scrn.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_scrn_mosaic_set(uint8_t scrn, uint8_t x, uint8_t y)
@@ -49,5 +49,5 @@ vdp2_scrn_mosaic_set(uint8_t scrn, uint8_t x, uint8_t y)
         }
 
         /* Write to memory */
-        MEM_POKE(VDP2(MZCTL), vdp2_regs.mzctl);
+        MEMORY_WRITE(16, VDP2(MZCTL), vdp2_regs.mzctl);
 }

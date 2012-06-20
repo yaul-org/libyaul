@@ -7,7 +7,7 @@
 
 #include <arp.h>
 
-#include "arp_internal.h"
+#include "arp-internal.h"
 
 bool
 arp_sync_nonblock(void)

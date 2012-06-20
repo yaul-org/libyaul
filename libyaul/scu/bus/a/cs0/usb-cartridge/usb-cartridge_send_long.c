@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "usb-cartridge.h"
+#include <usb-cartridge.h>
 
-#include "usb-cartridge_internal.h"
+#include "usb-cartridge-internal.h"
 
 void
 usb_cartridge_send_long(uint32_t w)

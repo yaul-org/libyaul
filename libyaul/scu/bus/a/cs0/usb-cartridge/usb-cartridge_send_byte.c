@@ -6,9 +6,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "usb-cartridge.h"
+#include <usb-cartridge.h>
 
-#include "usb-cartridge_internal.h"
+#include "usb-cartridge-internal.h"
 
 #define USB_TXE         0x02
 
@@ -16,6 +16,6 @@ void
 usb_cartridge_send_byte(uint8_t c)
 {
 
-        while ((MEM_READ(8, USB_CARTRIDGE(FLAG)) & USB_TXE));
-        MEM_POKE(8, USB_CARTRIDGE(FIFO), c);
+        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_TXE));
+        MEMORY_WRITE(8, USB_CARTRIDGE(FIFO), c);
 }

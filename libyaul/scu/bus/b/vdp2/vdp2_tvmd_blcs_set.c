@@ -8,7 +8,7 @@
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 void
 vdp2_tvmd_blcs_set(bool lcclmd, uint32_t vram, uint16_t *color, uint16_t len)
@@ -34,23 +34,23 @@ vdp2_tvmd_blcs_set(bool lcclmd, uint32_t vram, uint16_t *color, uint16_t len)
 
         bktau |= lcclmd ? 0x8000 : 0x0000;
 
-        MEM_POKE(VDP2(BKTAU), bktau);
-        MEM_POKE(VDP2(BKTAL), bktal);
+        MEMORY_WRITE(16, VDP2(BKTAU), bktau);
+        MEMORY_WRITE(16, VDP2(BKTAL), bktal);
 
         /*
          * Force display ON. If BDCLMD is set and DISP has never been
          * set, the back screen will not display properly
          */
-        tvmd = MEM_READ(VDP2(TVMD));
+        tvmd = MEMORY_READ(16, VDP2(TVMD));
         tvmd &= 0x7EFF;
         tvmd |= 0x8100;
-        MEM_POKE(VDP2(TVMD), tvmd);
+        MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 
         if (lcclmd) {
                 for (ofs = 0; ofs < len; ofs++)
-                        MEM_POKE(vram + (ofs << 1), *color++);
+                        MEMORY_WRITE(16, vram + (ofs << 1), *color++);
                 return;
         }
 
-        MEM_POKE(vram, *color);
+        MEMORY_WRITE(16, vram, *color);
 }

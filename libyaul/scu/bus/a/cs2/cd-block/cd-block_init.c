@@ -7,7 +7,7 @@
 
 #include <cd-block.h>
 
-#include "cd-block_internal.h"
+#include "cd-block-internal.h"
 
 void
 cd_block_init(void)

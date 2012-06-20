@@ -6,9 +6,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "usb-cartridge.h"
+#include <usb-cartridge.h>
 
-#include "usb-cartridge_internal.h"
+#include "usb-cartridge-internal.h"
 
 #define USB_RXF         0x01
 
@@ -17,8 +17,8 @@ usb_cartridge_read_byte(void)
 {
         uint8_t b;
 
-        while ((MEM_READ(8, USB_CARTRIDGE(FLAG)) & USB_RXF));
-        b = MEM_READ(8, USB_CARTRIDGE(FIFO));
+        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_RXF));
+        b = MEMORY_READ(8, USB_CARTRIDGE(FIFO));
 
         return b;
 }

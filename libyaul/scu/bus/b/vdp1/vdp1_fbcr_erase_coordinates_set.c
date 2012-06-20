@@ -7,21 +7,23 @@
 
 #include <vdp1/fbcr.h>
 
-#include "vdp1_internal.h"
+#include "vdp1-internal.h"
 
 void
 vdp1_fbcr_erase_coordinates_set(uint16_t x1, uint16_t y1, uint16_t x3, uint16_t y3, uint16_t color)
 {
         uint16_t bpp;
+        uint16_t modr;
 
         /* Obtain the bit depth of the frame buffer. */
-        bpp = (MEM_READ(VDP1(MODR)) & 0x1) ? 4 : 3;
+        modr = MEMORY_READ(16, VDP1(MODR));
+        bpp = ((modr & 0x0001) == 0x0001) ? 4 : 3;
 
         /* Upper-left coordinates. */
-        MEM_POKE(VDP1(EWLR), ((x1 >> bpp) << 9) | (y1 - 1));
+        MEMORY_WRITE(16, VDP1(EWLR), ((x1 >> bpp) << 9) | (y1 - 1));
 
         /* Lower-right coordinates. */
-        MEM_POKE(VDP1(EWLR), ((x3 >> bpp) << 9) | (y3 - 1));
+        MEMORY_WRITE(16, VDP1(EWLR), ((x3 >> bpp) << 9) | (y3 - 1));
 
-        MEM_POKE(VDP1(EWDR), color);
+        MEMORY_WRITE(16, VDP1(EWDR), color);
 }

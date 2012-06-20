@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
-/* Command type: non-resetable system management commands. */
+/* Command type: Non-resetable system management commands */
 uint8_t
 smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
 {
@@ -20,7 +20,7 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
          */
         uint8_t cmd_parameters[3];
 
-        /* Fetch peripheral data "SMPC" status. */
+        /* Fetch peripheral data "SMPC" status */
         cmd_parameters[0] = ireg0 & 0x01;
         cmd_parameters[1] = ireg1 & 0x7F;
 
@@ -28,7 +28,7 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
         cmd_parameters[2] = 0xF0;
 
         /* Retreive the "SMPC" status and or peripheral data iff not
-         * called from slave "SH-2." */
+         * called from slave "SH-2" */
         smpc_cmd_call(SMPC_SMC_INTBACK, SMPC_CMD_ISSUE_TYPE_D, cmd_parameters);
 
         return 0;

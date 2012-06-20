@@ -7,7 +7,7 @@
 
 #include <vdp2/tvmd.h>
 
-#include "vdp2_internal.h"
+#include "vdp2-internal.h"
 
 irq_mux_t vdp2_vblank_in_irq_mux;
 

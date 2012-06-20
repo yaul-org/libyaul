@@ -5,9 +5,9 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include "usb-cartridge.h"
+#include <usb-cartridge.h>
 
-#include "usb-cartridge_internal.h"
+#include "usb-cartridge-internal.h"
 
 uint8_t
 usb_cartridge_xchg_byte(uint8_t c)

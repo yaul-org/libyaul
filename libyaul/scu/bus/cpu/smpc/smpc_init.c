@@ -12,7 +12,7 @@
 #include <timer/timer.h>
 #include <vdp2.h>
 
-#include "smpc_internal.h"
+#include "smpc-internal.h"
 
 void
 smpc_init(void)
@@ -21,10 +21,10 @@ smpc_init(void)
         uint32_t mask;
 
         /* Set both ports to "SMPC" control mode. */
-        MEM_POKE(SMPC(EXLE1), 0x00);
-        MEM_POKE(SMPC(IOSEL1), 0x00);
-        MEM_POKE(SMPC(DDR1), 0x00);
-        MEM_POKE(SMPC(PDR1), 0x00);
+        MEMORY_WRITE(8, SMPC(EXLE1), 0x00);
+        MEMORY_WRITE(8, SMPC(IOSEL1), 0x00);
+        MEMORY_WRITE(8, SMPC(DDR1), 0x00);
+        MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
         /* Disable interrupts */
         cpu_intc_disable();
