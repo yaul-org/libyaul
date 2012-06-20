@@ -11,7 +11,7 @@ OD= $(CC_PREFIX)-objdump
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
 CFLAGS= -g -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
 	-ansi -m2 -mb -O2 -fno-omit-frame-pointer \
-	-ffast-math -fno-strict-aliasing \
+	-ffast-math -fstrict-aliasing \
 	-I../../libyaul/common \
 	-I../../libyaul/cons \
 	-I../../libyaul/fs \
