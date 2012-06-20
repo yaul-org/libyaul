@@ -37,10 +37,12 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
         case 2:
                 /* Word (2-byte) unit */
                 chcr |= 0x00000400;
+                len >>= 1;
                 break;
         case 4:
                 /* Long (4-byte) unit */
                 chcr |= 0x00000800;
+                len >>= 2;
                 break;
         case 16:
                 /* 16-byte unit */
