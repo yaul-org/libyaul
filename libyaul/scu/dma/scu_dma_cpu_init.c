@@ -7,7 +7,7 @@
 
 #include <dma/dma.h>
 
-#include "dma_internal.h"
+#include <scu-internal.h>
 
 void
 scu_dma_cpu_init(void)

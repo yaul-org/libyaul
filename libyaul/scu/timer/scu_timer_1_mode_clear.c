@@ -7,11 +7,11 @@
 
 #include <timer/timer.h>
 
-#include "timer_internal.h"
+#include <scu-internal.h>
 
 void
 scu_timer_1_mode_clear(void)
 {
 
-        MEM_POKE(TIMER(T1MD), 0x00000000);
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
 }

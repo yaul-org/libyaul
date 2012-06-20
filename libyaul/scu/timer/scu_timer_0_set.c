@@ -7,11 +7,11 @@
 
 #include <timer/timer.h>
 
-#include "timer_internal.h"
+#include <scu-internal.h>
 
 void
 scu_timer_0_set(uint16_t cmp)
 {
 
-        MEM_POKE(TIMER(T0C), cmp);
+        MEMORY_WRITE(32, SCU(T0C), cmp);
 }

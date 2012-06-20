@@ -7,7 +7,7 @@
 
 #include <dma/dma.h>
 
-#include "dma_internal.h"
+#include <scu-internal.h>
 
 static int scu_dma_cpu_level_sanitize(struct dma_level_cfg *, enum dma_mode);
 
@@ -67,14 +67,14 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
 
                 /* Cannot modify registers while in operation */
 
-                MEM_POKE(DMA_LEVEL(0, D0R), src);
-                MEM_POKE(DMA_LEVEL(0, D0W), dst);
+                MEMORY_WRITE(32, SCU(D0R), src);
+                MEMORY_WRITE(32, SCU(D0W), dst);
                 /* Read of transfer byte count in DMA transfer register prohibited */
-                MEM_POKE(DMA_LEVEL(0, D0C), len);
-                MEM_POKE(DMA_LEVEL(0, D0AD), add);
+                MEMORY_WRITE(32, SCU(D0C), len);
+                MEMORY_WRITE(32, SCU(D0AD), add);
                 /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(0, D0EN), 0);
-                MEM_POKE(DMA_LEVEL(0, D0MD), (mode << 24) | cfg->starting_factor | cfg->update);
+                MEMORY_WRITE(32, SCU(D0EN), 0);
+                MEMORY_WRITE(32, SCU(D0MD), (mode << 24) | cfg->starting_factor | cfg->update);
                 return;
         case DMA_LEVEL_1:
                 /* Level 1 is able transfer 4KiB */
@@ -82,14 +82,14 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
 
                 /* Cannot modify registers while in operation */
 
-                MEM_POKE(DMA_LEVEL(1, D1R), src);
-                MEM_POKE(DMA_LEVEL(1, D1W), dst);
+                MEMORY_WRITE(32, SCU(D1R), src);
+                MEMORY_WRITE(32, SCU(D1W), dst);
                 /* Read of transfer byte count in DMA transfer register prohibited */
-                MEM_POKE(DMA_LEVEL(1, D1C), len);
-                MEM_POKE(DMA_LEVEL(1, D1AD), add);
+                MEMORY_WRITE(32, SCU(D1C), len);
+                MEMORY_WRITE(32, SCU(D1AD), add);
                 /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(1, D1EN), 0x00000000);
-                MEM_POKE(DMA_LEVEL(1, D1MD), (mode << 24) | cfg->starting_factor | cfg->update);
+                MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
+                MEMORY_WRITE(32, SCU(D1MD), (mode << 24) | cfg->starting_factor | cfg->update);
                 return;
         case DMA_LEVEL_2:
                 /*
@@ -109,15 +109,14 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                  *
                  * Level 2 cannot modify registers while in operation */
 
-                MEM_POKE(DMA_LEVEL(2, D2R), src);
-                MEM_POKE(DMA_LEVEL(2, D2W), dst);
+                MEMORY_WRITE(32, SCU(D2R), src);
+                MEMORY_WRITE(32, SCU(D2W), dst);
                 /* Read of transfer byte count in DMA transfer register prohibited */
-                MEM_POKE(DMA_LEVEL(2, D2C), len);
-                MEM_POKE(DMA_LEVEL(2, D2AD), add);
+                MEMORY_WRITE(32, SCU(D2C), len);
+                MEMORY_WRITE(32, SCU(D2AD), add);
                 /* Keep DMA level off (disable and keep off) */
-                MEM_POKE(DMA_LEVEL(2, D2EN), 0x00000000);
-                MEM_POKE(DMA_LEVEL(2, D2MD), (mode << 24) | cfg->starting_factor | cfg->update);
-                return;
+                MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
+                MEMORY_WRITE(32, SCU(D2MD), (mode << 24) | cfg->starting_factor | cfg->update);
         default:
                 return;
         }
