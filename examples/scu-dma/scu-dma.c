@@ -7,15 +7,14 @@
 
 #include <stdbool.h>
 
-#include <ic/ic.h>
 #include <bus/cpu/cpu.h>
 #include <dma/dma.h>
-
-#include <bus/b/vdp2/vdp2.h>
-#include <bus/b/vdp2/vdp2/tvmd.h>
+#include <ic/ic.h>
 #include <smpc.h>
-#include <smpc/smc.h>
 #include <smpc/peripheral.h>
+#include <smpc/smc.h>
+#include <vdp2.h>
+#include <vdp2/tvmd.h>
 
 #include <cons/vdp2.h>
 
@@ -80,7 +79,7 @@ main(void)
 
         uint16_t mask;
 
-        struct smpc_peripheral_digital *port1;
+        struct smpc_peripheral_digital *digital;
         int level;
 
         vdp2_init();
@@ -95,35 +94,35 @@ main(void)
 
         mask = IC_MSK_LEVEL_0_DMA_END | IC_MSK_LEVEL_1_DMA_END | IC_MSK_LEVEL_2_DMA_END | IC_MSK_DMA_ILLEGAL;
         /* Disable interrupts */
-        cpu_intc_vct_disable();
-        scu_ic_msk_chg(IC_MSK_ALL, mask);
-        scu_ic_vct_set(IC_VCT_LEVEL_0_DMA_END, scu_dma_level_0_end);
-        scu_ic_vct_set(IC_VCT_LEVEL_1_DMA_END, scu_dma_level_1_end);
-        scu_ic_vct_set(IC_VCT_LEVEL_2_DMA_END, scu_dma_level_2_end);
-        scu_ic_vct_set(IC_VCT_DMA_ILLEGAL, scu_dma_illegal);
-        scu_ic_msk_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
+        cpu_intc_disable();
+        scu_ic_mask_chg(IC_MSK_ALL, mask);
+        scu_ic_interrupt_set(IC_VCT_LEVEL_0_DMA_END, scu_dma_level_0_end);
+        scu_ic_interrupt_set(IC_VCT_LEVEL_1_DMA_END, scu_dma_level_1_end);
+        scu_ic_interrupt_set(IC_VCT_LEVEL_2_DMA_END, scu_dma_level_2_end);
+        scu_ic_interrupt_set(IC_VCT_DMA_ILLEGAL, scu_dma_illegal);
+        scu_ic_mask_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
         /* Enable interrupts */
-        cpu_intc_vct_enable();
+        cpu_intc_enable();
 
-        port1 = (struct smpc_peripheral_digital *)&smpc_peripheral_port1.info;
+        digital = smpc_peripheral_digital_port(1);
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
 
                 if (!state.st_begin) {
-                        if (!port1->connected)
+                        if (!digital->connected)
                                 continue;
 
                         display_menu();
 
-                        if (!port1->button.a_trg)
+                        if (!digital->button.a_trg)
                                 level = ST_LEVEL_0;
-                        else if (!port1->button.b_trg)
+                        else if (!digital->button.b_trg)
                                 level = ST_LEVEL_1;
-                        else if (!port1->button.c_trg)
+                        else if (!digital->button.c_trg)
                                 level = ST_LEVEL_2;
-                        else if (!port1->button.start) {
+                        else if (!digital->button.start) {
                                 state.st_begin = true;
                                 continue;
                         } else {
@@ -131,15 +130,15 @@ main(void)
                                 continue;
                         }
 
-                        if (!port1->button.l_trg)
+                        if (!digital->button.l_trg)
                                 state.st_level[level].level_mode = ST_LEVEL_MODE_DIRECT;
-                        else if (!port1->button.r_trg)
+                        else if (!digital->button.r_trg)
                                 state.st_level[level].level_mode = ST_LEVEL_MODE_INDIRECT;
-                        else if (!port1->button.x_trg)
+                        else if (!digital->button.x_trg)
                                 state.st_level[level].level_sf = ST_LEVEL_SF_VBLANK_IN;
-                        else if (!port1->button.y_trg)
+                        else if (!digital->button.y_trg)
                                 state.st_level[level].level_sf = ST_LEVEL_SF_VBLANK_OUT;
-                        else if (!port1->button.z_trg)
+                        else if (!digital->button.z_trg)
                                 state.st_level[level].level_sf = ST_LEVEL_SF_HBLANK_IN;
                         else
                                 state.st_level[level].level_sf = ST_LEVEL_SF_ENABLE;
@@ -153,8 +152,7 @@ main(void)
                 case ST_STATUS_WAIT:
                         continue;
                 case ST_STATUS_ILLEGAL:
-                        assert(state.st_status != ST_STATUS_ILLEGAL,
-                            "SCU DMA transfer failed");
+                        assert(state.st_status != ST_STATUS_ILLEGAL);
                         continue;
                 case ST_STATUS_END:
                         state.st_begin = true;

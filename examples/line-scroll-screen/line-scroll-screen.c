@@ -10,8 +10,6 @@
 #include <vdp2.h>
 #include <vdp2/pn.h>
 
-#include <monitor.h>
-
 #include "lut_sin.h"
 
 #define RGB(r, g, b) (0x8000 | ((r) & 0x001F) | (((g) & 0x001F)  << 5) | (((b) & 0x001F) << 10))
