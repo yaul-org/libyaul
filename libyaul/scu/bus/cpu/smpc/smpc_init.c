@@ -5,11 +5,11 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <bus/cpu/cpu.h>
-#include <ic/ic.h>
+#include <cpu.h>
 #include <irq-mux.h>
+#include <scu/ic.h>
+#include <scu/timer.h>
 #include <smpc/peripheral.h>
-#include <timer/timer.h>
 #include <vdp2.h>
 
 #include "smpc-internal.h"
@@ -29,12 +29,14 @@ smpc_init(void)
         /* Disable interrupts */
         cpu_intc_disable();
 
-        mask = IC_MSK_SYSTEM_MANAGER | IC_MSK_TIMER_0;
-        scu_ic_mask_chg(IC_MSK_ALL, mask);
+        mask = IC_MASK_SYSTEM_MANAGER | IC_MASK_TIMER_0;
+        scu_ic_mask_chg(IC_MASK_ALL, mask);
 
-        scu_ic_interrupt_set(IC_VCT_TIMER_0, &smpc_peripheral_data);
-        scu_ic_interrupt_set(IC_VCT_SYSTEM_MANAGER, &smpc_peripheral_system_manager);
-        scu_ic_mask_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
+        scu_ic_interrupt_set(IC_INTERRUPT_TIMER_0,
+            &smpc_peripheral_data);
+        scu_ic_interrupt_set(IC_INTERRUPT_SYSTEM_MANAGER,
+            &smpc_peripheral_system_manager);
+        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         scu_timer_0_set(5);
         scu_timer_1_set(0);

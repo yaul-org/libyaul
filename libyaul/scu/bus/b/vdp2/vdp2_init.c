@@ -5,8 +5,8 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <bus/cpu/cpu.h>
-#include <ic/ic.h>
+#include <cpu.h>
+#include <scu/ic.h>
 #include <vdp2.h>
 
 #include <string.h>
@@ -175,12 +175,14 @@ vdp2_init(void)
         /* Disable interrupts */
         cpu_intc_disable();
 
-        mask = IC_MSK_VBLANK_IN | IC_MSK_VBLANK_OUT;
-        scu_ic_mask_chg(IC_MSK_ALL, mask);
+        mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT;
+        scu_ic_mask_chg(IC_MASK_ALL, mask);
 
-        scu_ic_interrupt_set(IC_VCT_VBLANK_IN, &vdp2_vblank_in);
-        scu_ic_interrupt_set(IC_VCT_VBLANK_OUT, &vdp2_vblank_out);
-        scu_ic_mask_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
+        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_IN,
+            &vdp2_vblank_in);
+        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_OUT,
+            &vdp2_vblank_out);
+        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
         cpu_intc_enable();

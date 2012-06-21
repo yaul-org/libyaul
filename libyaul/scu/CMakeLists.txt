@@ -1,6 +1,25 @@
 SET(scu_SRC
+  scu_dma_cpu_init.c
+  scu_dma_cpu_level_set.c
+  scu_dma_cpu_level_start.c
+  scu_dma_cpu_level_stop.c
+  scu_dsp_init.c
+  scu_ic_interrupt_get.S
+  scu_ic_interrupt_set.S
+  scu_ic_mask_chg.S
+  scu_ic_mask_get.S
+  scu_ic_mask_set.S
+  scu_ic_status_get.c
+  scu_timer_0_set.c
+  scu_timer_1_mode_clear.c
+  scu_timer_1_mode_set.c
+  scu_timer_1_set.c
 )
 
 SET(scu_INSTALL_FILES
+  scu/ic.h
+  scu/dma.h
+  scu/dsp.h
+  scu/timer.h
   scu.h
 )

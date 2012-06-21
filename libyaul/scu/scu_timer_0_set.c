@@ -5,13 +5,13 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <timer/timer.h>
+#include <scu/timer.h>
 
 #include <scu-internal.h>
 
 void
-scu_timer_1_set(uint16_t set)
+scu_timer_0_set(uint16_t cmp)
 {
 
-        MEMORY_WRITE(32, SCU(T1S), set);
+        MEMORY_WRITE(32, SCU(T0C), cmp);
 }

@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <dma/dma.h>
+#include <scu/dma.h>
 
 #include <scu-internal.h>
 

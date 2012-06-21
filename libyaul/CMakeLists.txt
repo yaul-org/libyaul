@@ -14,10 +14,6 @@ SET(SRC_DIRS
   scu/bus/b/vdp2
   scu/bus/cpu
   scu/bus/cpu/smpc
-  scu/dma
-  scu/dsp
-  scu/ic
-  scu/timer
   tlsf
 )
 

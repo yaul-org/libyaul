@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <timer/timer.h>
+#include <scu/timer.h>
 
 #include <scu-internal.h>
 

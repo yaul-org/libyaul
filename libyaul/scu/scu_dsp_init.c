@@ -5,13 +5,11 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <timer/timer.h>
+#include <scu/dsp.h>
 
 #include <scu-internal.h>
 
 void
-scu_timer_0_set(uint16_t cmp)
+scu_dsp_init(void)
 {
-
-        MEMORY_WRITE(32, SCU(T0C), cmp);
 }

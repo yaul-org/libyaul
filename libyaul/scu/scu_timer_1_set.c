@@ -5,15 +5,13 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <ic/ic.h>
+#include <scu/timer.h>
 
 #include <scu-internal.h>
 
-uint32_t
-scu_ic_status_get(void)
+void
+scu_timer_1_set(uint16_t set)
 {
-        uint32_t ist;
 
-        ist = MEMORY_READ(32, SCU(IST));
-        return ist;
+        MEMORY_WRITE(32, SCU(T1S), set);
 }

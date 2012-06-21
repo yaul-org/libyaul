@@ -5,11 +5,13 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#ifndef _SCU_H_
-#define _SCU_H_
-
-#include <scu/dma.h>
-#include <scu/ic.h>
 #include <scu/timer.h>
 
-#endif /* !_SCU_H_ */
+#include <scu-internal.h>
+
+void
+scu_timer_1_mode_clear(void)
+{
+
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
+}

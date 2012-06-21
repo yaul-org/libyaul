@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-#include <ic/ic.h>
+#include <scu/ic.h>
 #include <smpc/peripheral.h>
 
 #include <assert.h>

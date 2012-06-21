@@ -7,7 +7,7 @@
 
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
-#include <ic/ic.h>
+#include <scu/ic.h>
 
 #include <assert.h>
 
