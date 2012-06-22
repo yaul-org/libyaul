@@ -63,7 +63,7 @@ __do_global_dtors(void)
 static void __attribute__ ((used, section (".init")))
 __std_startup(void)
 {
-        void (*vbr[CPU_INTC_VECTORS])(void);
+        void (**vbr)(void);
 
         /* First added, last called */
         atexit(__do_global_dtors);
@@ -72,7 +72,8 @@ __std_startup(void)
         __do_global_ctors();
 
         /* Set hardware exception handling routines */
-        *vbr = cpu_intc_vector_base_get();
+        vbr = cpu_intc_vector_base_get();
+
         vbr[0x04] = exception_illegal_instruction;
         vbr[0x06] = exception_illegal_slot;
         vbr[0x09] = exception_cpu_address_error;

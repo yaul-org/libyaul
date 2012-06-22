@@ -10,15 +10,13 @@
 
 #include <inttypes.h>
 
-#define CPU_INTC_VECTORS        256
-
 extern void (*cpu_intc_interrupt_get(uint8_t))(void);
-extern void (*cpu_intc_vector_base_get(void))(void);
+extern void (**cpu_intc_vector_base_get(void))(void);
 extern uint8_t cpu_intc_mask_get(void);
 extern void cpu_intc_disable(void);
 extern void cpu_intc_enable(void);
 extern void cpu_intc_interrupt_set(uint8_t, void (*)(void));
 extern void cpu_intc_mask_set(uint8_t);
-extern void cpu_intc_vector_base_set(void *);
+extern void cpu_intc_vector_base_set(void (**)(void));
 
 #endif /* !_INTC_H */
