@@ -49,9 +49,8 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
     message "Configuring GCC"
     (CFLAGS="" \
         LDFLAGS="" \
-        CFLAGS_FOR_TARGET="-O2 -m2 -fno-omit-frame-pointer" \
+        CFLAGS_FOR_TARGET="-O2 -m2 -fomit-frame-pointer" \
         LDFLAGS_FOR_TARGET="" \
-        SUBTARGET_FRAME_POINTER_REQUIRED=1 \
         ../"${GCC_SRC_DIR}"/configure \
         --disable-cld \
         --disable-initfini-array \
@@ -67,7 +66,7 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
         --disable-tls \
         --disable-win32-registry \
         --enable-decimal-float=no \
-        --enable-frame-pointer \
+        --disable-frame-pointer \
         --enable-languages=c,c++ \
         --enable-static \
         --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
@@ -104,7 +103,7 @@ mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/newlib"
 cd "${BUILD_SRC_DIR}/${SH_TARGET}/newlib"
 if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-newlib" ]; then
     message "Configuring Newlib"
-    (CFLAGS="-O2 -fno-omit-frame-pointer" \
+    (CFLAGS="-O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing" \
         ../"${NEWLIB_SRC_DIR}"/configure \
         --disable-bootstrap \
         --disable-build-poststage1-with-cxx \
