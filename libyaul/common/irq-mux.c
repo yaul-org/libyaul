@@ -30,18 +30,12 @@ irq_mux_handle(irq_mux_t *irq_mux)
 {
         irq_mux_handle_t *hdl_np;
 
-        /* Disable interrupts */
-        cpu_intc_disable();
-
         if (TAILQ_EMPTY(&irq_mux->im_tq))
-                goto exit;
+                return;
 
         TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
                 hdl_np->imh_hdl(hdl_np);
         }
-exit:
-        /* Enable interrupts */
-        cpu_intc_enable();
 }
 
 void

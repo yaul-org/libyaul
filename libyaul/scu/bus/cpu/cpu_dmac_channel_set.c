@@ -13,6 +13,11 @@
 
 #include "cpu-internal.h"
 
+/* IHR */
+static void (*ihr)(void);
+
+static void trampoline(void);
+
 void
 cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
 {
@@ -69,7 +74,8 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 /* Interrupt enable */
                 chcr |= 0x00000004;
                 /* Set interrupt handling routine */
-                cpu_intc_interrupt_set(cfg->vector, cfg->ihr);
+                ihr = cfg->ihr;
+                cpu_intc_interrupt_set(cfg->vector, trampoline);
 
                 /* Set priority */
                 assert(cfg->priority <= 15);
@@ -100,4 +106,17 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 MEMORY_WRITE(32, CPU(CHCR1), chcr);
                 return;
         }
+}
+
+static void
+trampoline(void)
+{
+        uint16_t ipra;
+
+        ipra = MEMORY_READ(16, CPU(IPRA));
+        ipra &= 0x00FF;
+        MEMORY_WRITE(16, CPU(IPRA), ipra);
+
+        /* Call user IHR */
+        ihr();
 }

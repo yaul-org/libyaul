@@ -5,7 +5,7 @@
  * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
-.macro EXCEPTION_FUNCTION_TRAMPOLINE handler
+.macro MACRO_EXCEPTION_TRAMPOLINE handler
         sts.l pr, @-r15
         stc.l gbr, @-r15
         stc.l vbr, @-r15
@@ -43,33 +43,33 @@
 .type _exception_illegal_instruction, @function
 
 _exception_illegal_instruction:
-        EXCEPTION_FUNCTION_TRAMPOLINE .LC1
+        MACRO_EXCEPTION_TRAMPOLINE .LC1
 
 .global _exception_illegal_slot
 .type _exception_illegal_slot, @function
 
 _exception_illegal_slot:
-        EXCEPTION_FUNCTION_TRAMPOLINE .LC2
+        MACRO_EXCEPTION_TRAMPOLINE .LC2
 
 .global _exception_cpu_address_error
 .type _exception_cpu_address_error, @function
 
 _exception_cpu_address_error:
-        EXCEPTION_FUNCTION_TRAMPOLINE .LC3
+        MACRO_EXCEPTION_TRAMPOLINE .LC3
 
 .global _exception_dma_address_error
 .type _exception_dma_address_error, @function
 
 _exception_dma_address_error:
-        EXCEPTION_FUNCTION_TRAMPOLINE .LC4
+        MACRO_EXCEPTION_TRAMPOLINE .LC4
 
 .align 2
 
 .LC1:
-.long _exception_handler_illegal_instruction
+.long _exception_ihr_illegal_instruction
 .LC2:
-.long _exception_handler_illegal_slot
+.long _exception_ihr_illegal_slot
 .LC3:
-.long _exception_handler_cpu_address_error
+.long _exception_ihr_cpu_address_error
 .LC4:
-.long _exception_handler_dma_address_error
+.long _exception_ihr_dma_address_error

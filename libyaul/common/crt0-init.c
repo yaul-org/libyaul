@@ -6,13 +6,14 @@
  * Joe Fenton <jlfenton65@gmail.com>
  */
 
+#include <cpu/intc.h>
+
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdbool.h>
 
-#include <cpu/intc.h>
-#include <exception.h>
+#include "exception.h"
 
 typedef void (*fptr)(void);
 
@@ -62,17 +63,20 @@ __do_global_dtors(void)
 static void __attribute__ ((used, section (".init")))
 __std_startup(void)
 {
+        fptr *vbr;
+
         /* First added, last called */
         atexit(__do_global_dtors);
 
         /* Do all constructors */
         __do_global_ctors();
 
-        /* Set hardware exception handlers */
-        cpu_intc_interrupt_set(0x04, exception_illegal_instruction);
-        cpu_intc_interrupt_set(0x06, exception_illegal_slot);
-        cpu_intc_interrupt_set(0x09, exception_cpu_address_error);
-        cpu_intc_interrupt_set(0x0A, exception_dma_address_error);
+        /* Set hardware exception handling routines */
+        vbr = cpu_intc_vector_base_get();
+        vbr[0x04] = exception_illegal_instruction;
+        vbr[0x06] = exception_illegal_slot;
+        vbr[0x09] = exception_cpu_address_error;
+        vbr[0x0A] = exception_dma_address_error;
 }
 
 /* Add function to .fini section */

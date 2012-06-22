@@ -30,9 +30,6 @@ void
 smpc_peripheral_system_manager(void)
 {
 
-        /* Disable interrupts */
-        cpu_intc_disable();
-
         /* Fetch but no parsing */
         fetch_output_regs();
 
@@ -40,7 +37,7 @@ smpc_peripheral_system_manager(void)
         if (((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00) {
                 /* Issue a "BREAK" for the "INTBACK" command */
                 MEMORY_WRITE(8, IREG(0), 0x40);
-                goto exit;
+                return;
         }
 
         /* Let's not yet cover this case yet since we can't fetch more data */
@@ -48,9 +45,6 @@ smpc_peripheral_system_manager(void)
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
         MEMORY_WRITE(8, IREG(0), 0x80);
-exit:
-        /* Enable interrupts */
-        cpu_intc_enable();
 }
 
 static void

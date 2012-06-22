@@ -12,13 +12,13 @@
 
 #include <cpu/registers.h>
 
-void exception_illegal_instruction(void);
-void exception_handler_illegal_instruction(struct cpu_registers *);
-void exception_illegal_slot(void);
-void exception_handler_illegal_slot(struct cpu_registers *);
 void exception_cpu_address_error(void);
-void exception_handler_cpu_address_error(struct cpu_registers *);
 void exception_dma_address_error(void);
-void exception_handler_dma_address_error(struct cpu_registers *);
+void exception_ihr_cpu_address_error(struct cpu_registers *);
+void exception_ihr_dma_address_error(struct cpu_registers *);
+void exception_ihr_illegal_instruction(struct cpu_registers *);
+void exception_ihr_illegal_slot(struct cpu_registers *);
+void exception_illegal_instruction(void);
+void exception_illegal_slot(void);
 
 #endif /* !_EXCEPTION_H_ */

@@ -13,12 +13,10 @@
 
 _scu_ic_mask_chg:
         mov.l .LC1, r1
-        mov.l r14, @-r15
         sts.l pr, @-r15
         jsr @r1
         nop
         lds.l @r15+, pr
-        mov.l @r15+, r14
         rts
         nop
 

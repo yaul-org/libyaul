@@ -12,10 +12,6 @@
 .type _cpu_intc_vector_base_set, @function
 
 _cpu_intc_vector_base_set:
-        mov.l r14, @-r15
-        sts.l pr, @-r15
         ldc r4, vbr
-        lds.l @r15+, pr
-        mov.l @r15+, r14
         rts
         nop

@@ -24,8 +24,6 @@
 #define INPUT           0x00180001
 #define VERSION         0x00004AF0
 
-void arp_function_trampoline(void);
-
 /* ARP user callback */
 extern arp_callback_t arp_callback;
 

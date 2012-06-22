@@ -10,6 +10,7 @@ SET(scu_bus_cpu_SRC
   cpu_intc_mask_set.S
   cpu_intc_vector_base_get.S
   cpu_intc_vector_base_set.S
+  cpu_intc_vector_table.S
 )
 
 SET(scu_bus_cpu_INSTALL_FILES

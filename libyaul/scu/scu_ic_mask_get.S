@@ -13,11 +13,7 @@
 
 _scu_ic_mask_get:
         mov.l .LC1, r0
-        mov.l r14, @-r15
-        sts.l pr, @-r15
         mov.l @r0, r0
-        lds.l @r15+, pr
-        mov.l @r15+, r14
         rts
         nop
 

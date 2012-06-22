@@ -21,7 +21,7 @@
 static void format(struct cpu_registers *, const char *);
 
 void __attribute__ ((noreturn, visibility ("hidden")))
-exception_handler_illegal_instruction(struct cpu_registers *regs)
+exception_ihr_illegal_instruction(struct cpu_registers *regs)
 {
 
         format(regs, "Illegal instruction");
@@ -29,7 +29,7 @@ exception_handler_illegal_instruction(struct cpu_registers *regs)
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
-exception_handler_illegal_slot(struct cpu_registers *regs)
+exception_ihr_illegal_slot(struct cpu_registers *regs)
 {
 
         format(regs, "Illegal slot");
@@ -37,7 +37,7 @@ exception_handler_illegal_slot(struct cpu_registers *regs)
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
-exception_handler_cpu_address_error(struct cpu_registers *regs)
+exception_ihr_cpu_address_error(struct cpu_registers *regs)
 {
 
         format(regs, "CPU address error");
@@ -45,7 +45,7 @@ exception_handler_cpu_address_error(struct cpu_registers *regs)
 }
 
 void __attribute__ ((noreturn, visibility ("hidden")))
-exception_handler_dma_address_error(struct cpu_registers *regs)
+exception_ihr_dma_address_error(struct cpu_registers *regs)
 {
 
         format(regs, "DMA address error");
