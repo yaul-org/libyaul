@@ -22,6 +22,7 @@ Usage
 
     mkdir -p build
     cd build/
+    cp config.h.cmake{.in,}
     cmake .. -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
     make
 
