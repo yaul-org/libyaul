@@ -6,8 +6,8 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacques <mrko@eecs.berkeley.edu>
 
-# 'yes': Already downloaded
-#  'no': Download packages for building the compiler
+# 'yes': Download packages for building the compiler
+#  'no': Already downloaded
 BUILD_DOWNLOAD="yes"
 
 # ABSOLUTE path to tool-chain installation directory
@@ -20,8 +20,10 @@ BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
 GCC_VERSION="4.7.1"
 BINUTILS_VERSION="2.22"
 GDB_VERSION="7.4"
-NEWLIB_VERSION="1.20"
+NEWLIB_VERSION="1.20.0"
 
 # Tools for host
 MAKE="make"
 AWK="awk"
+FETCH="wget"
+FETCH_FLAGS=""

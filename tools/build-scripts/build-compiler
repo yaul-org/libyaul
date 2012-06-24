@@ -90,26 +90,28 @@ if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${NEWLIB}" ] && \
         panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
 else
-    ! FETCH="`command -v "wget"`" && panic "Cannot find 'wget'" 1
-
     if [ ! -f "${BINUTILS}" ]; then
         message "Downloading '${BINUTILS}'"
-        ("${FETCH}" "${BINUTILS_URL}") 1>> "binutils-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${BINUTILS}" 1
+        ("${FETCH}" "${FETCH_FLAGS}" "${BINUTILS_URL}") 1>> "binutils-${SH_TARGET}.log" 2>&1 \
+            || panic "Failed to download ${BINUTILS}" 1
     fi
 
     if [ ! -f "${GCC}" ]; then
         message "Downloading '${GCC}'"
-        ("${FETCH}" "${GCC_URL}")  1>> "gcc-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${GCC}" 1
+        ("${FETCH}" "${FETCH_FLAGS}" "${GCC_URL}")  1>> "gcc-${SH_TARGET}.log" 2>&1 \
+            || panic "Failed to download ${GCC}" 1
     fi
 
     if [ ! -f "${GDB}" ]; then
         message "Downloading '${GDB}'"
-        ("${FETCH}" "${GDB_URL}") 1>> "gdb-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${GDB}" 1
+        ("${FETCH}" "${FETCH_FLAGS}" "${GDB_URL}") 1>> "gdb-${SH_TARGET}.log" 2>&1 \
+            || panic "Failed to download ${GDB}" 1
     fi
 
     if [ ! -f "${NEWLIB}" ]; then
         message "Downloading '${NEWLIB}'"
-        ("${FETCH}" "${NEWLIB_URL}") 1>> "newlib-${SH_TARGET}.log" 2>&1 || panic "Failed to download ${NEWLIB}" 1
+        ("${FETCH}" "${FETCH_FLAGS}" "${NEWLIB_URL}") 1>> "newlib-${SH_TARGET}.log" 2>&1 \
+            || panic "Failed to download ${NEWLIB}" 1
     fi
 fi
 cd "${OLDPWD}"
