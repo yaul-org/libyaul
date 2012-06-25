@@ -10,7 +10,10 @@
 
 #include "dram-cartridge-internal.h"
 
-uint32_t id;
+uint8_t id = 0x00;
+void *base = NULL;
+
+static bool detected(void);
 
 void
 dram_cartridge_init(void)
@@ -18,22 +21,9 @@ dram_cartridge_init(void)
         uint32_t asr0;
         uint32_t unknown;
 
-        /* Check the ID */
-        id = MEMORY_READ(32, CS1(ID));
-        id &= 0x000000FF;
-        switch (id) {
-        case 0x5A:
-                /* 16-Mbit (1MiB) */
-                id = 0x00080000;
-                break;
-        case 0x5C:
-                /* 32-Mbit (4MiB) */
-                id = 0x00200000;
-                break;
-        default:
-                id = 0x00000000;
+        /* Determine ID and base address */
+        if (detected())
                 return;
-        }
 
         /* Write to A-Bus "dummy" area */
         unknown = MEMORY_READ(32, DUMMY(UNKNOWN));
@@ -48,9 +38,75 @@ dram_cartridge_init(void)
         /* Write to A-Bus refresh */
         MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
-        /* Add values starting at offset 0x100 to the end of the address
+        /* XXX
+         *
+         * Add values starting at offset 0x100 to the end of the address
          * space in 16-bit half word unit strides.
          *
          * The checksum is a 32-bit value that is compared against the
          * data cartridge's system ID */
+}
+
+static bool
+detected(void)
+{
+        uint32_t read;
+        uint32_t write;
+        uint32_t b;
+
+        /*               8-Mbit DRAM            32-Mbit DRAM
+         *             +--------------------+ +--------------------+
+         * 0x224000000 | DRAM #0            | | DRAM #0            |
+         *             +--------------------+ |                    |
+         * 0x224800000 | DRAM #0 (mirrored) | |                    |
+         *             +--------------------+ |                    |
+         * 0x225000000 | DRAM #0 (mirrored) | |                    |
+         *             +--------------------+ |                    |
+         * 0x225800000 | DRAM #0 (mirrored) | |                    |
+         *             +--------------------+ +--------------------+
+         * 0x226000000 | DRAM #1            | | DRAM #1            |
+         *             +--------------------+ |                    |
+         * 0x226800000 | DRAM #1 (mirrored) | |                    |
+         *             +--------------------+ |                    |
+         * 0x227000000 | DRAM #1 (mirrored) | |                    |
+         *             +--------------------+ |                    |
+         * 0x227800000 | DRAM #1 (mirrored) | |                    |
+         * 0x227FFFFFF +--------------------+ +--------------------+
+         */
+
+        /* Check the ID */
+        id = MEMORY_READ(8, CS1(ID));
+        id &= 0xFF;
+
+        if ((id != DRAM_CARTRIDGE_ID_1MIB) &&
+            (id != DRAM_CARTRIDGE_ID_4MIB)) {
+                id = 0x00;
+                return false;
+        }
+
+        /* Check DRAM #0 for mirrored banks */
+        write = 0x5A5A5A5A;
+        MEMORY_WRITE(32, DRAM0(0, 0x00000000), write);
+        for (b = 1; b < DRAM_CARTRIDGE_BANKS; b++) {
+                read = MEMORY_READ(32, DRAM0(b, 0x00000000));
+
+                /* Is it mirrored? */
+                if (read != write)
+                        continue;
+
+                /* Thanks to Joe Fenton or the suggestion to return the
+                 * last mirrored DRAM #0 bank in order to get a
+                 * contiguous address space */
+                if (id != DRAM_CARTRIDGE_ID_1MIB)
+                        id = DRAM_CARTRIDGE_ID_1MIB;
+                base = (void *)DRAM0(3, 0x00000000);
+                return true;
+        }
+
+        /* 32-Mbit */
+        if (id != DRAM_CARTRIDGE_ID_4MIB)
+                id = DRAM_CARTRIDGE_ID_4MIB;
+        base = (void *)DRAM0(0, 0x00000000);
+
+        return true;
 }

@@ -9,9 +9,9 @@
 
 #include "dram-cartridge-internal.h"
 
-void *
-dram_cartridge_area(void)
+uint8_t
+dram_cartridge_id(void)
 {
 
-        return base;
+        return id;
 }
