@@ -19,6 +19,11 @@ Before you begin building the tool-chain, be sure to double-check your changes i
 
     ./build-compiler
 
+After a successful build, be sure to add the following paths to `$PATH`
+
+    PATH="${BUILD_INSTALL_DIR}/sh-elf/bin:${BUILD_INSTALL_DIR}/m68k-elf/bin:${PATH}"
+    export PATH
+
 ### Errors
 
    Be sure to check out the log files in the `${BUILD_SRC_DIR}/` directory.
