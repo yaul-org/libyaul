@@ -35,6 +35,7 @@ main(void)
 
         uint32_t *cart;
         size_t cart_len;
+        uint32_t id;
 
         vdp2_init();
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
@@ -50,8 +51,8 @@ main(void)
 
         delay(2);
 
-        cart = (uint32_t *)dram_cartridge_area();
-        if (cart == NULL) {
+        id = dram_cartridge_id();
+        if ((id != DRAM_CARTRIDGE_ID_1MIB) && (id != DRAM_CARTRIDGE_ID_4MIB)) {
                 cons_write(&cons, "[4;1H[2K[11CThe extended RAM\n"
                     "[11Ccartridge is not\n"
                     "[11Cinsert properly.\n"
@@ -61,19 +62,17 @@ main(void)
                     "[11Cthe extended RAM\n"
                     "[11Ccartridge.\n");
 
-                while (true) {
-                        vdp2_tvmd_vblank_in_wait();
-                        vdp2_tvmd_vblank_out_wait();
-                }
+                abort();
         }
 
         buf = (char *)malloc(1024);
         assert(buf != NULL);
 
+        cart = (uint32_t *)dram_cartridge_area();
         cart_len = dram_cartridge_size();
         (void)sprintf(buf, "%s DRAM Cartridge detected\n",
-            ((cart_len == 0x00080000)
-                ? "16-Mbit"
+            ((id == DRAM_CARTRIDGE_ID_1MIB)
+                ? "8-Mbit"
                 : "32-Mbit"));
         cons_write(&cons, buf);
 
