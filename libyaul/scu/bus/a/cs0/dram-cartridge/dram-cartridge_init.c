@@ -18,33 +18,35 @@ static bool detected(void);
 void
 dram_cartridge_init(void)
 {
-        uint32_t asr0;
-        uint32_t unknown;
+        static bool initialized = false;
 
-        /* Determine ID and base address */
-        if (detected())
+        uint32_t asr0;
+        uint32_t aref;
+
+        if (initialized)
                 return;
 
         /* Write to A-Bus "dummy" area */
-        unknown = MEMORY_READ(32, DUMMY(UNKNOWN));
-        unknown &= 0xFFFF0000;
-        unknown |= 0x0001;
-        MEMORY_WRITE(32, DUMMY(UNKNOWN), unknown);
+        MEMORY_WRITE(16, DUMMY(UNKNOWN), 0x0001);
 
         /* Set the SCU wait */
         /* Don't ask about this magic constant */
-        asr0 = 0x23301FF0;
-        MEMORY_WRITE(32, SCU(ASR0), asr0);
+        asr0 = MEMORY_READ(32, SCU(ASR0));
+        MEMORY_WRITE(32, SCU(ASR0), 0x23301FF0);
         /* Write to A-Bus refresh */
+        aref = MEMORY_READ(32, SCU(AREF));
         MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
-        /* XXX
-         *
-         * Add values starting at offset 0x100 to the end of the address
-         * space in 16-bit half word unit strides.
-         *
-         * The checksum is a 32-bit value that is compared against the
-         * data cartridge's system ID */
+        /* Determine ID and base address */
+        if (!(detected())) {
+                /* Restore values in case we can't detect DRAM
+                 * cartridge */
+                MEMORY_WRITE(32, SCU(ASR0), asr0);
+                MEMORY_WRITE(32, SCU(AREF), aref);
+                return;
+        }
+
+        initialized = true;
 }
 
 static bool
@@ -81,14 +83,20 @@ detected(void)
         if ((id != DRAM_CARTRIDGE_ID_1MIB) &&
             (id != DRAM_CARTRIDGE_ID_4MIB)) {
                 id = 0x00;
+                base = NULL;
                 return false;
+        }
+
+        for (b = 0; b < DRAM_CARTRIDGE_BANKS; b++) {
+                MEMORY_WRITE(32, DRAM(0, b, 0x00000000), 0x00000000);
+                MEMORY_WRITE(32, DRAM(1, b, 0x00000000), 0x00000000);
         }
 
         /* Check DRAM #0 for mirrored banks */
         write = 0x5A5A5A5A;
-        MEMORY_WRITE(32, DRAM0(0, 0x00000000), write);
+        MEMORY_WRITE(32, DRAM(0, 0, 0x00000000), write);
         for (b = 1; b < DRAM_CARTRIDGE_BANKS; b++) {
-                read = MEMORY_READ(32, DRAM0(b, 0x00000000));
+                read = MEMORY_READ(32, DRAM(0, b, 0x00000000));
 
                 /* Is it mirrored? */
                 if (read != write)
@@ -99,14 +107,13 @@ detected(void)
                  * contiguous address space */
                 if (id != DRAM_CARTRIDGE_ID_1MIB)
                         id = DRAM_CARTRIDGE_ID_1MIB;
-                base = (void *)DRAM0(3, 0x00000000);
+                base = (void *)DRAM(0, 3, 0x00000000);
                 return true;
         }
 
-        /* 32-Mbit */
         if (id != DRAM_CARTRIDGE_ID_4MIB)
                 id = DRAM_CARTRIDGE_ID_4MIB;
-        base = (void *)DRAM0(0, 0x00000000);
+        base = (void *)DRAM(0, 0, 0x00000000);
 
         return true;
 }

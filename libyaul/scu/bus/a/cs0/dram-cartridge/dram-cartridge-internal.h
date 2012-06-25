@@ -10,12 +10,13 @@
 
 #include <scu-internal.h>
 
+/* DRAM cartridge registers */
 #define ID              0x00FFFFFF
-#define UNKNOWN         0x007EFFFC
+#define UNKNOWN         0x007EFFFE
 
 /* Specific macros */
-#define DRAM0(b, x)     (CS0((x) + (((b) & 0x03) << 19)))
-#define DRAM1(b, x)     (CS0((x) + (((b) & 0x03) << 19) + 0x00200000))
+#define DRAM(t, b, x)   (CS0((x) + ((((b) & 0x03) +                           \
+        (((t) & 0x01) << 2)) << 19)))
 
 extern uint8_t id;
 extern void *base;
