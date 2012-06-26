@@ -1,4 +1,4 @@
-ROOTDIR?= $(dir $(lastword $(MAKEFILE_LIST)))
+ROOTDIR:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 CC_PREFIX?= sh-elf
 
 AS= $(CC_PREFIX)-as
@@ -9,8 +9,8 @@ OB= $(CC_PREFIX)-objcopy
 OD= $(CC_PREFIX)-objdump
 
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
-CFLAGS= -g -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
-	-ansi -m2 -mb -O2 -fno-omit-frame-pointer \
+CFLAGS= -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
+	-ansi -m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
 	-I../../libyaul/common \
 	-I../../libyaul/cons \
@@ -19,6 +19,7 @@ CFLAGS= -g -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
 	-I../../libyaul/scu/bus/a/cs0 \
 	-I../../libyaul/scu/bus/a/cs0/arp \
 	-I../../libyaul/scu/bus/a/cs0/dram-cartridge \
+	-I../../libyaul/scu/bus/a/cs0/usb-cartridge \
 	-I../../libyaul/scu/bus/a/cs1 \
 	-I../../libyaul/scu/bus/a/cs2 \
 	-I../../libyaul/scu/bus/b/scsp \
@@ -34,5 +35,12 @@ LDFLAGS= -Wl,-Map,${PROJECT}.map \
 	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x
 
 # All programs must link this as the first object (crt0.o)
-OBJECTS= $(ROOTDIR)/common/crt0.o \
+OBJECTS:= $(ROOTDIR)/common/crt0.o \
 	$(ROOTDIR)/common/crt0-init.o
+
+all: example
+
+bootstrap: bootstrap.o
+	$(CC) -nostdlib -m2 -mb -nostartfiles \
+		-T $(ROOTDIR)/common/ldscripts/bootstrap.x \
+		$< -o $@

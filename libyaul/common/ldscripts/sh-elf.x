@@ -121,9 +121,33 @@ SECTIONS
   __end = .;
   PROVIDE (_end = .);
 
-  /DISCARD/ :
-  {
-    *(.comment)
+  .stab 0 : { *(.stab) }
+  .stabstr 0 : { *(.stabstr) }
+  .stab.excl 0 : { *(.stab.excl) }
+  .stab.exclstr 0 : { *(.stab.exclstr) }
+  .stab.index 0 : { *(.stab.index) }
+  .stab.indexstr 0 : { *(.stab.indexstr) }
+  .comment 0 : { *(.comment) }
+  .line 0 : { *(.line) }
+  .debug 0 : { *(.debug) }
+  .debug_abbrev 0 : { *(.debug_abbrev) }
+  .debug_aranges 0 : { *(.debug_aranges) }
+  .debug_frame 0 : { *(.debug_frame) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_info 0 : { *(.debug_info) }
+  .debug_line 0 : { *(.debug_line) }
+  .debug_loc 0 : { *(.debug_loc) }
+  .debug_macinfo 0 : { *(.debug_macinfo) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  .debug_sfnames 0 : { *(.debug_sfnames) }
+  .debug_srcinfo 0 : { *(.debug_srcinfo) }
+  .debug_str 0 : { *(.debug_str) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames 0 : { *(.debug_varnames) }
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+
+ /DISCARD/ :
+ {
     *(.rela.*)
-  }
+ }
 }
