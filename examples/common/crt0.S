@@ -1,0 +1,1 @@
+../../libyaul/common/crt0.S

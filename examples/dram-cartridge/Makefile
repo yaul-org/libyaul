@@ -1,24 +1,35 @@
 include ../common.mk
 
-PROJECT= dram-cartridge
+PROJECT:= dram-cartridge
 OBJECTS+= dram-cartridge.o
+DEPENDS:= $(OBJECTS:.o=.d)
 
-.PHONY: clean
+.PHONY: bootstrap clean
 
-.SUFFIXES: .c .o
+.SUFFIXES: .c .S .o .bin
 
-.c.o:
-	$(CC) $(CFLAGS) -c -o $(@) $(<)
-.s:
-	$(AS) $(AFLAGS) -o $(@) $(<)
+example: $(PROJECT).bin
+
+$(PROJECT).bin: $(PROJECT).elf
+	$(OB) -O binary $< $@
 
 $(PROJECT).elf: $(OBJECTS)
-	$(LD) $(OBJECTS) $(LDFLAGS) \
-		-o $(@) -L. -L../../build/libyaul -lyaul
-	$(OB) -O binary $(@) $(PROJECT).bin
+	$(LD) $(OBJECTS) $(LDFLAGS) -o $@
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
 
+.c.o:
+	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
+.S.o:
+	$(AS) $(AFLAGS) -o $@ $<
+
 clean:
-	-rm -f $(OBJECTS) \
-	$(PROJECT).asm $(PROJECT).bin $(PROJECT).elf $(PROJECT).map $(PROJECT).sym
+	-rm -f $(OBJECTS) bootstrap.o \
+$(DEPENDS) \
+$(PROJECT).asm \
+$(PROJECT).bin \
+$(PROJECT).elf \
+$(PROJECT).map \
+$(PROJECT).sym
+
+-include $(DEPENDS)
