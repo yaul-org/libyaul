@@ -17,12 +17,10 @@ CFLAGS= -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter -Wstrict-aliasing \
 	-I../../libyaul/cons \
 	-I../../libyaul/fs \
 	-I../../libyaul/scu \
-	-I../../libyaul/scu/bus/a/cs0 \
 	-I../../libyaul/scu/bus/a/cs0/arp \
 	-I../../libyaul/scu/bus/a/cs0/dram-cartridge \
 	-I../../libyaul/scu/bus/a/cs0/usb-cartridge \
-	-I../../libyaul/scu/bus/a/cs1 \
-	-I../../libyaul/scu/bus/a/cs2 \
+	-I../../libyaul/scu/bus/a/cs2/cd-block \
 	-I../../libyaul/scu/bus/b/scsp \
 	-I../../libyaul/scu/bus/b/vdp1 \
 	-I../../libyaul/scu/bus/b/vdp2 \
