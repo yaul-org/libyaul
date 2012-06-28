@@ -29,7 +29,7 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
 
         /* Retreive the "SMPC" status and or peripheral data iff not
          * called from slave "SH-2" */
-        smpc_cmd_call(SMPC_SMC_INTBACK, SMPC_CMD_ISSUE_TYPE_D, cmd_parameters);
+        smpc_smc_call(SMPC_SMC_INTBACK, SMPC_CMD_ISSUE_TYPE_D, cmd_parameters);
 
         return 0;
 }

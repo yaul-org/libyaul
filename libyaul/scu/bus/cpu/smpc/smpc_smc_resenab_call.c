@@ -9,10 +9,10 @@
 
 /* Command type: Resetable system management commands */
 uint8_t
-smpc_cmd_resenab_call(void)
+smpc_smc_resenab_call(void)
 {
         /* Allow the user to press the reset button */
-        smpc_cmd_call(SMPC_SMC_RESENAB, SMPC_CMD_ISSUE_TYPE_B, NULL);
+        smpc_smc_call(SMPC_SMC_RESENAB, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEMORY_READ(8, OREG(31));
 }

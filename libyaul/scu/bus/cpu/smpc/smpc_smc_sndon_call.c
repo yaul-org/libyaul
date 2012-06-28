@@ -9,10 +9,10 @@
 
 /* Command type: Resetable system management commands */
 uint8_t
-smpc_cmd_sndon_call(void)
+smpc_smc_sndon_call(void)
 {
         /* Enable the "Motorola MC68EC000" */
-        smpc_cmd_call(SMPC_SMC_SNDON, SMPC_CMD_ISSUE_TYPE_B, NULL);
+        smpc_smc_call(SMPC_SMC_SNDON, SMPC_CMD_ISSUE_TYPE_B, NULL);
 
         return MEMORY_READ(8, OREG(31));
 }

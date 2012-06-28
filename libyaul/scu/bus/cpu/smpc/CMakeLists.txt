@@ -7,6 +7,7 @@ SET(scu_bus_cpu_smpc_SRC
   smpc_peripheral_raw_port.c
   smpc_peripheral_system_manger.c
   smpc_rtc_settime_call.c
+  smpc_smc_call.c
   smpc_smc_cdoff_call.c
   smpc_smc_cdon_call.c
   smpc_smc_ckchg320_call.c
