@@ -17,6 +17,10 @@
 
 #include <sys/queue.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct rd_file_handle;
 
 typedef TAILQ_HEAD(rd_file, rd_file_handle) rd_file_t;
@@ -43,4 +47,7 @@ off_t romdisk_seek(void *, off_t, int);
 off_t romdisk_tell(void *);
 size_t romdisk_total(void *);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* _ROMDISK_H_ */

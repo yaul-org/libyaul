@@ -3,17 +3,16 @@
  * See LICENSE for details.
  *
  * Matthew Conte <matt@baisoku.org>
- * Israel Jacques <mrko@eecs.berkeley.edu>
  */
 
 #ifndef _TLSF_BITS_H_
 #define _TLSF_BITS_H_
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 #define TLSF_DECL inline
 #else
 #define TLSF_DECL static
-#endif
+#endif /* __cplusplus */
 
 /*
  * Architecture-specific bit manipulation routines.

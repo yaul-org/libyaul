@@ -11,6 +11,10 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define SCRN_NBG0       0       /* Normal background (NBG0) */
 #define SCRN_RBG1       5       /* Rotational background (RBG1) */
 #define SCRN_NBG1       1       /* Normal background (NBG1) */
@@ -34,10 +38,10 @@ enum scrn_rp_mode_type {
 struct scrn_bm_format {
         uint8_t bm_scrn;        /* Normal/rotational background */
 
-#define SCRN_BM_BMSZ_512_256    0 /* Bitmap size 512x256 */ 
-#define SCRN_BM_BMSZ_512_512    1 /* Bitmap size 512x512 */ 
-#define SCRN_BM_BMSZ_1024_256   2 /* Bitmap size 1024x256 */ 
-#define SCRN_BM_BMSZ_1024_512   3 /* Bitmap size 1024x512 */ 
+#define SCRN_BM_BMSZ_512_256    0 /* Bitmap size 512x256 */
+#define SCRN_BM_BMSZ_512_512    1 /* Bitmap size 512x512 */
+#define SCRN_BM_BMSZ_1024_256   2 /* Bitmap size 1024x256 */
+#define SCRN_BM_BMSZ_1024_512   3 /* Bitmap size 1024x512 */
         uint8_t bm_bs;          /* Bitmap size */
         uint8_t bm_sp;          /* Special priority */
         uint8_t bm_scc;         /* Special color calculation */
@@ -87,4 +91,7 @@ extern void vdp2_scrn_mosaic_set(uint8_t, uint8_t, uint8_t);
 
 extern void vdp2_scrn_rp_mode_set(enum scrn_rp_mode_type);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_SCRN_H_ */

@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 enum fbcr_interlace_type {
         FBCR_DID = 0x00,        /* Double Interlace Disable */
         FBCR_DIL = 0x04,        /* Double Interlace Line */
@@ -29,4 +33,7 @@ extern void vdp1_fbcr_erase_set();
 extern void vdp1_fbcr_interlace_set(enum fbcr_interlace_type);
 extern void vdp1_fbcr_rotate_set(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_FBCR_H_ */

@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define IC_INTERRUPT_VBLANK_IN          0x40
 #define IC_INTERRUPT_VBLANK_OUT         0x41
 #define IC_INTERRUPT_HBLANK_IN          0x42
@@ -57,10 +61,13 @@
 #define IC_IST_DMA_ILLEGAL      0x00001000
 #define IC_IST_SPRITE_END       0x00002000
 
-extern uint32_t scu_ic_status_get(void);
 extern uint32_t scu_ic_interrupt_get(void);
+extern uint32_t scu_ic_status_get(void);
+extern void scu_ic_interrupt_set(uint8_t, void (*)(void));
 extern void scu_ic_mask_chg(uint16_t, uint16_t);
 extern void scu_ic_mask_set(uint16_t, uint16_t);
-extern void scu_ic_interrupt_set(uint8_t, void (*)(void));
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_IC_H_ */

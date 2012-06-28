@@ -11,8 +11,12 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define VRAM_ADDR_4MBIT(x, y)   (0x25E00000 + (((x) & 0x3) << 17) + (y))
-#define VRAM_ADDR_8MBIT(x, y)   (0x25E00000 + (((x) & 0x3) << 18) + (y))
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+#define VRAM_ADDR_4MBIT(x, y)   (0x25E00000 + (((x) & 0x03) << 17) + (y))
+#define VRAM_ADDR_8MBIT(x, y)   (0x25E00000 + (((x) & 0x03) << 18) + (y))
 
 struct vram_ctl {
 #define VRAM_CTL_SIZE_4MBIT     0x0000
@@ -62,7 +66,10 @@ struct vram_ctl {
         } vram_cycp;
 };
 
-extern void vdp2_vram_control_set(struct vram_ctl *);
 extern struct vram_ctl *vdp2_vram_control_get(void);
+extern void vdp2_vram_control_set(struct vram_ctl *);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_VRAM_H_ */

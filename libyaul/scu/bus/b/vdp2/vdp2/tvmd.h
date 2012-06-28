@@ -13,6 +13,10 @@
 
 #include <irq-mux.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 extern irq_mux_t *vdp2_tvmd_vblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_out_irq_get(void);
 extern uint16_t vdp2_tvmd_hcount_get(void);
@@ -23,4 +27,7 @@ extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_vblank_in_wait(void);
 extern void vdp2_tvmd_vblank_out_wait(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_TVMD_H_ */

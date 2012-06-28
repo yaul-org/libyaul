@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*
  * Return the return address (the caller) of the current function
  */
@@ -43,4 +47,7 @@
 
 char *stack_backtrace(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_STACK_H_ */

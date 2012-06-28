@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 extern uint8_t smpc_smc_cdoff_call(void);
 extern uint8_t smpc_smc_cdon_call(void);
 extern uint8_t smpc_smc_ckchg320_call(void);
@@ -26,4 +30,7 @@ extern uint8_t smpc_smc_sshoff_call(void);
 extern uint8_t smpc_smc_sshon_call(void);
 extern uint8_t smpc_smc_sysres_call(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_SMC_H_ */

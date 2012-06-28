@@ -11,9 +11,12 @@ SET(scu_bus_cpu_SRC
   cpu_intc_vector_base_get.S
   cpu_intc_vector_base_set.S
   cpu_intc_vector_table.S
+  cpu_ubc_init.c
 )
 
 SET(scu_bus_cpu_INSTALL_FILES
   cpu.h
+  cpu/dmac.h
   cpu/intc.h
+  cpu/ubc.h
 )

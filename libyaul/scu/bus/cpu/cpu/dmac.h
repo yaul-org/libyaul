@@ -11,6 +11,10 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct cpu_channel_cfg {
 #define CPU_DMAC_CHANNEL(x)     ((x))
         uint32_t ch;
@@ -43,4 +47,7 @@ extern void cpu_dmac_channel_set(struct cpu_channel_cfg *);
 extern void cpu_dmac_channel_start(uint8_t);
 extern void cpu_dmac_channel_stop(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_DMAC_H */

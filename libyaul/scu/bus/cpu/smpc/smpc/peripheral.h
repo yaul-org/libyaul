@@ -15,6 +15,10 @@
 #include <stddef.h>
 #include <sys/queue.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define MAX_PORT_DEVICES        6
 #define MAX_PORT_DATA_SIZE      255
 
@@ -206,4 +210,7 @@ extern void smpc_peripheral_data(void);
 extern void smpc_peripheral_parse(irq_mux_handle_t *);
 extern void smpc_peripheral_system_manager(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_PERIPHERAL_H_ */

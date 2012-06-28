@@ -8,4 +8,11 @@
 #ifndef _ISO9660_H_
 #define _ISO9660_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* _ISO9660_H_ */

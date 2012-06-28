@@ -17,6 +17,13 @@
 
 #include <irq-mux.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 extern void vdp2_init(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_VDP2_H_ */

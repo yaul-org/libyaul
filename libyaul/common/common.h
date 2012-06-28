@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 static __inline__ uint32_t
 common_log2_down(uint32_t value)
 {
@@ -22,4 +26,7 @@ common_log2_down(uint32_t value)
         return l;
 }
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_COMMON_H_ */

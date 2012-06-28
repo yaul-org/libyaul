@@ -10,4 +10,11 @@
 
 #include <cpu/intc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_CPU_H_ */

@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct cmdt_cmd {
         uint16_t ctrl;
         uint16_t link;
@@ -32,4 +36,7 @@ struct cmdt_grd {
         uint16_t entry[4];
 } __attribute__ ((packed, aligned (8)));
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_CMDT_H_ */

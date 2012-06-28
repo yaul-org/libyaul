@@ -16,6 +16,10 @@
 
 #include <common.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 enum dma_level {
         DMA_LEVEL_0,
         DMA_LEVEL_1,
@@ -68,9 +72,12 @@ struct dma_level_cfg {
         enum dma_mode_update_type update;
 };
 
-extern void     scu_dma_cpu_init(void);
-extern void     scu_dma_cpu_level_set(enum dma_level, enum dma_mode, struct dma_level_cfg *);
-extern void     scu_dma_cpu_level_start(enum dma_level);
-extern void     scu_dma_cpu_level_stop(enum dma_level);
+extern void scu_dma_cpu_init(void);
+extern void scu_dma_cpu_level_set(enum dma_level, enum dma_mode, struct dma_level_cfg *);
+extern void scu_dma_cpu_level_start(enum dma_level);
+extern void scu_dma_cpu_level_stop(enum dma_level);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_SCU_DMA_H_ */

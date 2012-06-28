@@ -8,6 +8,13 @@
 #ifndef _CD_BLOCK_H_
 #define _CD_BLOCK_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 extern void cd_block_init(void);
 
-#endif
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+#endif /* !_CD_BLOCK_H_ */

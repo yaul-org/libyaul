@@ -13,6 +13,10 @@
 #include "font.h"
 #include "vt_parse/vt_parse.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* Half the normal size */
 #define COLS            40
 #define ROWS            28
@@ -36,4 +40,7 @@ struct cons {
 void cons_write(struct cons *, const char *);
 void cons_reset(struct cons *);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_CONS_H_ */

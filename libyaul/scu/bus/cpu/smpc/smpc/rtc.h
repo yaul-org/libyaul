@@ -10,6 +10,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct smpc_time {
         uint16_t year;
         uint8_t day;
@@ -20,4 +24,7 @@ struct smpc_time {
         uint8_t seconds;
 };
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_RTC_H_ */

@@ -12,6 +12,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define DRAM_CARTRIDGE_ID_1MIB  0x5A
 #define DRAM_CARTRIDGE_ID_4MIB  0x5C
 
@@ -22,4 +26,7 @@ extern uint8_t dram_cartridge_id(void);
 extern void *dram_cartridge_area(void);
 extern void dram_cartridge_init(void);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_DRAM_CARTRIDGE_H_ */
