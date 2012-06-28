@@ -5,16 +5,33 @@
 #
 # Israel Jacques <mrko@eecs.berkeley.edu>
 
+panic () {
+    echo "error: ${0##*/}: ${1}" 1>&2
+    exit ${2}
+}
+
+if [ $# != 1 ]; then
+    echo "usage: ${0##*/} file-list output-file" 1>&2
+    exit 1
+fi
+
+image="${1}"
+
 genisoimage \
+    -quiet \
     -sysid "SEGA SEGASATURN" \
     -volid "" \
     -volset "" \
     -publisher "SEGA ENTERPRISES, LTD." \
     -preparer "SEGA ENTERPRISES, LTD." \
-    -appid "" \
+    -appid "SEGA ENTERPRISES, LTD." \
     -abstract "ABS.TXT" \
     -copyright "CPY.TXT" \
     -biblio "BIB.TXT" \
     -generic-boot 'ip.bin' \
-    -full-iso9660-filenames \
-    -o "${1}.iso" cd
+    -iso-level 1 \
+    -input-charset iso8859-1  \
+    -no-bak \
+    -m '.*' \
+    -o "${image}.iso" \
+    cd

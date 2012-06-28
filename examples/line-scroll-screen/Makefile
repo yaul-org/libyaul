@@ -4,7 +4,7 @@ PROJECT:= line-scroll-screen
 OBJECTS+= lut_sin.o line-scroll-screen.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
-.PHONY: bootstrap clean
+.PHONY: ip clean
 
 .SUFFIXES: .c .S .o .bin
 
@@ -24,12 +24,13 @@ $(PROJECT).elf: $(OBJECTS)
 	$(AS) $(AFLAGS) -o $@ $<
 
 clean:
-	-rm -f $(OBJECTS) bootstrap.o \
+	-rm -f $(OBJECTS) ip.o \
 $(DEPENDS) \
 $(PROJECT).asm \
 $(PROJECT).bin \
 $(PROJECT).elf \
 $(PROJECT).map \
+ip.bin.map \
 $(PROJECT).sym
 
 -include $(DEPENDS)

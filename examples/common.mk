@@ -8,8 +8,9 @@ NM= $(CC_PREFIX)-nm
 OB= $(CC_PREFIX)-objcopy
 OD= $(CC_PREFIX)-objdump
 
-AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
-CFLAGS= -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter \
+AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
+	-I$(ROOTDIR)/common
+CFLAGS= -W -Wall -Wextra -Werror -Wshadow -Wunused-parameter -Wstrict-aliasing \
 	-ansi -m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
 	-I../../libyaul/common \
@@ -40,7 +41,11 @@ OBJECTS:= $(ROOTDIR)/common/crt0.o \
 
 all: example
 
-bootstrap: bootstrap.o
-	$(CC) -nostdlib -m2 -mb -nostartfiles \
-		-T $(ROOTDIR)/common/ldscripts/bootstrap.x \
+ip.bin: ip.o
+	$(CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
+		-T $(ROOTDIR)/common/ldscripts/ip.x \
 		$< -o $@
+
+image: ip.bin example
+	cp $(PROJECT).bin cd/a.bin
+	sh ../../tools/make-iso/make-iso $(PROJECT)
