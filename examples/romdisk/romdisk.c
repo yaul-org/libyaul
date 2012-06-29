@@ -84,7 +84,7 @@ main(void)
         cart_len = dram_cartridge_size();
         (void)sprintf(buf, "%s DRAM Cartridge detected\n",
             ((cart_len == 0x00080000)
-                ? "16-Mbit"
+                ? "8-Mbit"
                 : "32-Mbit"));
         cons_write(&cons, buf);
 
