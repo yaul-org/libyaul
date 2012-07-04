@@ -255,10 +255,7 @@ romdisk_total(void *p)
  * offset), search for the entry in the directory and return the byte
  * offset to its entry */
 static uint32_t
-romdisk_find_object(rd_image_t *mnt,
-    const char *fn,
-    size_t fn_len,
-    bool directory,
+romdisk_find_object(rd_image_t *mnt, const char *fn, size_t fn_len, bool directory,
     uint32_t offset)
 {
         uint32_t next_ofs;
@@ -308,6 +305,7 @@ romdisk_find(rd_image_t *mnt, const char *fn, bool directory)
         int fn_len;
         const romdisk_file_t *f_hdr;
 
+        fn_cur = NULL;
         ofs = mnt->files;
 
         /* Traverse directories */
@@ -327,7 +325,8 @@ romdisk_find(rd_image_t *mnt, const char *fn, bool directory)
 
         /* Locate the file under the resultant directory */
         if (*fn != '\0') {
-                ofs = romdisk_find_object(mnt, fn, strlen(fn), directory, ofs);
+                fn_len = strlen(fn);
+                ofs = romdisk_find_object(mnt, fn, fn_len, directory, ofs);
                 return ofs;
         }
 
