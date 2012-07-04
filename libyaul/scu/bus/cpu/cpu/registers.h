@@ -10,10 +10,6 @@
 
 #include <inttypes.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #define SP      0x00
 #define R0      0x04
 #define R1      0x08
@@ -52,7 +48,4 @@ struct cpu_registers {
         uint32_t sr;
 } __attribute__ ((packed));
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 #endif /* !_REGISTERS_H_ */
