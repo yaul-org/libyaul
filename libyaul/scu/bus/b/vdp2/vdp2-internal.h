@@ -10,10 +10,10 @@
 
 #include <scu-internal.h>
 
-/* Macros specific for processor */
+/* Specific macros */
 #define VDP2(x)         (0x25F80000 + (x))
 
-/* Helpers specific to this processor */
+/* Helpers */
 #define VRAM_BANK_4MBIT(x)      (((x) >> 1) & 0xFFFF)
 #define VRAM_OFFSET_4MBIT(x)    (((x) >> 17) & 0x0007)
 #define VRAM_BANK_8MBIT(x)      (((x) >> 1) & 0xFFFF)
