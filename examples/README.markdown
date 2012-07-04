@@ -1,7 +1,7 @@
 About
 =====
 
-Thurough examples (and tests) using different features of `libyaul`
+Thorough examples (and tests) using different features of `libyaul`
 
 Usage
 =====
