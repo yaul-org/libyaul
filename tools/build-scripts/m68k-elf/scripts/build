@@ -4,7 +4,7 @@
 # See LICENSE for details.
 #
 # Dave Murphy <davem@devkitpro.org>
-# Israel Jacques <mrko@eecs.berkeley.edu>
+# Israel Jacquez <mrkotfw@gmail.com>
 
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2012 Israel Jacques
+ * Copyright (c) 2012 Israel Jacquez
  * See LDSPENSE for details.
  *
- * Israel Jacques <mrko@eecs.berkeley.edu>
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 #ifndef _DSP_H_

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2012 Israel Jacques
+ * Copyright (c) 2012 Israel Jacquez
  * See LICENSE for details.
  *
- * Israel Jacques <mrko@eecs.berkeley.edu>
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 #include <smpc/peripheral.h>

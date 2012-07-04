@@ -2,7 +2,7 @@
  * Copyright (c) 2012
  * See LICENSE for details.
  *
- * Israel Jacques <mrko@eecs.berkeley.edu
+ * Israel Jacquez <mrkotfw@gmail.com
  * Joe Fenton <jlfenton65@gmail.com>
  */
 
