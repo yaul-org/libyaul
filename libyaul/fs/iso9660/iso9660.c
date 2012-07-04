@@ -48,12 +48,12 @@ iso9660_open(void *p, const char *fn,
 }
 
 void
-romdisk_close(void *fh __unused)
+iso9660_close(void *fh __unused)
 {
 }
 
 ssize_t
-iso9660_read(void *p, void *buf, size_t bytes)
+iso9660_read(void *p __unused, void *buf __unused, size_t bytes __unused)
 {
         iso9660_mnt_t *mnt __unused;
         iso9660_dirent_t *xp __unused;
@@ -161,7 +161,7 @@ iso9660_find_object(iso9660_mnt_t *mnt, const char *fn, size_t fn_len, bool dire
                         }
 
                         /* Find the next directory entry */
-                        xp = (iso9660_dirent_t *)((void *)xp + isonum_711(xp->length));
+                        xp = (iso9660_dirent_t *)((uint32_t)xp + isonum_711(xp->length));
                 } while (isonum_711(xp->length) > 0);
         }
 
