@@ -16,6 +16,6 @@ void
 usb_cartridge_send_byte(uint8_t c)
 {
 
-        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_TXE));
+        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_TXE) == USB_TXE);
         MEMORY_WRITE(8, USB_CARTRIDGE(FIFO), c);
 }

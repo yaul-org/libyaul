@@ -11,7 +11,7 @@
 #include "usb-cartridge-internal.h"
 
 void
-usb_cartridge_int(void)
+usb_cartridge_init(void)
 {
 
         MEMORY_WRITE(32, SCU(ASR0), 0x00000000);
