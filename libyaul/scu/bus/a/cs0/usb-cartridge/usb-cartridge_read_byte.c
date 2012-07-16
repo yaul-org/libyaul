@@ -17,7 +17,9 @@ usb_cartridge_read_byte(void)
 {
         uint8_t b;
 
-        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_RXF) == USB_RXF);
+        /* Blocks */
+        while ((MEMORY_READ(8, USB_CARTRIDGE(FLAG)) & USB_RXF));
+
         b = MEMORY_READ(8, USB_CARTRIDGE(FIFO));
 
         return b;

@@ -1,5 +1,6 @@
 SET(SRC_DIRS
   common
+  common/gdb
   cons
   fs/iso9660
   fs/romdisk
@@ -20,6 +21,7 @@ SET(SRC_DIRS
 SET(INCLUDE_DIRS
   .
   common
+  common/gdb
   cons
   fs/iso9660
   fs/romdisk
