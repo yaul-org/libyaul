@@ -3,7 +3,7 @@
  * See LICENSE for details.
  *
  * William A. Gatliff <bgat@billgatliff.com>
- * Israel Jacques <mrko@eecs.berkeley.edu>
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 #include <usb-cartridge.h>

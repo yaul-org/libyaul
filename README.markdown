@@ -3,7 +3,7 @@ About
   `libyaul` is an awesome open source SEGA Saturn software development kit that provides flexible low-level routines that are easily able to be composed to produce higher-level abstractions to further ease the burden of developing applications.
 
 ### Authors
- * Israel Jacques <mrkotfw@eecs.berkeley.edu>
+ * Israel Jacquez <mrkotfw@gmail.com>
 
  For others, see the `CONTRIBUTORS` file.
 

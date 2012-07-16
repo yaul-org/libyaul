@@ -3,7 +3,7 @@
  * See LICENSE for details.
  *
  * Joe Fenton <jlfenton65@gmail.com>
- * Israel Jacques <mrko@eecs.berkeley.edu>
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 OUTPUT_FORMAT ("elf32-sh")
