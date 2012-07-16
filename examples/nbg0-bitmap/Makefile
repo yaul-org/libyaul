@@ -1,7 +1,7 @@
 include ../common.mk
 
 PROJECT:= nbg0-bitmap
-OBJECTS+= nbg0-bitmap.o
+OBJECTS+= image.o nbg0-bitmap.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
 .PHONY: ip clean
