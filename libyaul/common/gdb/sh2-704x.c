@@ -2,7 +2,6 @@
  * Copyright (c) 2001-2012
  * See LICENSE for details.
  *
- * William A. Gatliff <bgat@billgatliff.com>
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
@@ -11,7 +10,12 @@
 #include <cpu/intc.h>
 #include <cpu/registers.h>
 
+#include <smpc/smc.h>
+
+#include <assert.h>
 #include <stddef.h>
+#include <sys/queue.h>
+#include <stdlib.h>
 
 #include "gdb.h"
 #include "ihr.h"
@@ -56,7 +60,7 @@
 #define OPCODE_12_DISP(op) ((((op) & 0x0800) == 0x0000)                       \
                 ? ((op) & 0x0FFF)                                             \
                 /* Sign-extend */                                             \
-                : ((op) & 0x0FFF) | 0xFFFF0000)
+                : ((op) & 0x0FFF) | 0xFFFFF000)
 #define OPCODE_BRAF(op)         (((op) & 0xF0FF) == 0x0023)
 #define OPCODE_BRAF_M(op)       (((op) & 0x0F00) >> 8)
 #define OPCODE_BSRF(op)         (((op) & 0xF0FF) == 0x0003)
@@ -70,11 +74,35 @@
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t next_pc(struct cpu_registers *);
+static uint32_t calculate_pc(struct cpu_registers *);
+
+typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
+
+typedef struct bp bp_t;
+
+struct bp {
+        void *addr;
+        uint16_t instruction;
+
+        TAILQ_ENTRY(bp) entries;
+};
+
+static bp_list_t *bp_list_alloc(void);
+static bool bp_list_empty(bp_list_t *);
+static void bp_list_free(bp_list_t **) __attribute__ ((unused));
+static bp_t *bp_list_breakpoint_alloc(void);
+static void bp_list_breakpoint_free(bp_list_t *, bp_t *);
+static int bp_list_breakpoint_add(bp_list_t *, void *);
+static bp_t *bp_list_breakpoint_find(bp_list_t *, void *);
 
 /* Overwritten instruction meant to allow stepping through */
-static uint16_t step_instrn = 0x0000;
-static uint32_t step_pc = 0x00000000;
+static bool stepping = false;
+static bp_t bp_step = {
+        .addr = NULL,
+        .instruction = 0x0000
+};
+
+static bp_list_t *bp_list = NULL;
 
 void
 gdb_init(void)
@@ -86,8 +114,12 @@ gdb_init(void)
         /* Disable interrupts */
         cpu_intc_disable();
 
-        step_pc = 0x00000000;
-        step_instrn = 0x0000;
+        bp_list = bp_list_alloc();
+
+        /* Clear */
+        bp_step.addr = 0x00000000;
+        bp_step.instruction = 0x0000;
+        stepping = false;
 
         vbr = cpu_intc_vector_base_get();
         vbr[0x04] = ihr_illegal_instruction;
@@ -109,7 +141,7 @@ gdb_init(void)
         cpu_intc_enable();
 
         /* Cause a breakpoint to sync with GDB */
-        gdb_break();
+        gdb_sync();
 }
 
 void
@@ -132,19 +164,72 @@ gdb_getc(void)
 }
 
 void
-gdb_step(struct cpu_registers *reg_file, uint32_t pc)
+gdb_step(struct cpu_registers *reg_file, uint32_t addr)
 {
         uint16_t *p;
 
-        if (pc != 0x00000000)
-                reg_file->pc = pc;
+        if (addr != 0x00000000)
+                p = (uint16_t *)addr;
+        else
+                /* Determine where we'll be going */
+                p = (uint16_t *)calculate_pc(reg_file);
 
-        /* Determine where we'll be going */
-        p = (uint16_t *)next_pc(reg_file);
-
-        step_pc = (uint32_t)p;
-        step_instrn = *p;
+        bp_step.addr = (void *)p;
+        bp_step.instruction = *p;
         *p = INSTRN_TRAPA(0x20);
+
+        /* We're stepping, be aware of breakpoints and watchpoints */
+        stepping = true;
+}
+
+int
+gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind)
+{
+        bp_t *bp;
+
+        kind = kind;
+
+        if (addr == 0x00000000)
+                return -1;
+
+        switch (type) {
+        case 0x00:
+                if ((bp = bp_list_breakpoint_find(bp_list, (void *)addr)) == NULL)
+                        return -1;
+                bp_list_breakpoint_free(bp_list, bp);
+                return 0;
+        default:
+                return -1;
+        }
+}
+
+int
+gdb_break(uint32_t type, uint32_t addr, uint32_t kind)
+{
+
+        kind = kind;
+
+        if (addr == 0x00000000)
+                return -1;
+
+        switch (type) {
+        case 0x00:
+                if ((bp_list_breakpoint_add(bp_list, (void *)addr)) < 0)
+                        return -1;
+
+                return 0;
+        default:
+                return -1;
+        }
+}
+
+void
+gdb_kill(void)
+{
+
+        smpc_smc_resenab_call();
+        cpu_intc_enable();
+        smpc_smc_sysres_call();
 }
 
 void
@@ -153,32 +238,35 @@ gdb_monitor_entry(struct cpu_registers *reg_file)
         uint16_t *p;
         uint32_t *pc;
 
-        /* Upon GDB monitor entry */
-        if (step_instrn == 0x0000)
+        bp_t *bp;
+
+        if (!stepping && bp_list_empty(bp_list))
                 return;
 
-        /* Overwrite TRAPA instruction */
-        p = (uint16_t *)step_pc;
-        *p = step_instrn;
-        step_instrn = 0x0000;
-
-        /* Example after clobbering PC + 2 with a TRAPA instruction
-         *   <PC - 2>: nop
-         *   <PC    >: xor r1, r1      !
-         *   <PC + 2>: trapa #0x20     ! Pushes PC + 2 - 2 onto stack
-         *   <PC + 4>: nop             ! Branch delay slot of clobbered
-         *                             ! instruction
-         *   <PC + 8>: nop             ! We need to restore the instruction
-         *                             ! at PC + 2
-         *                             !
-         *                             ! When returning from exception, PC will
-         *                             ! change to PC + 4, thus the need to
-         *                             ! subtract by 0x0002 by resulting in
-         *                             ! re-executing the instruction */
-
-        /* Jump back by one instruction */
+        /* Clobber what TRAPA stored on the stack and jump back by one
+         * instruction because of the TRAPA instruction */
         pc = (uint32_t *)&reg_file->pc;
         *pc = reg_file->pc - 0x00000002;
+
+        /* Determine if we're stepping into/over a breakpoint */
+        p = (uint16_t *)reg_file->pc;
+        if ((bp = bp_list_breakpoint_find(bp_list, (void *)p)) != NULL) {
+                p = (uint16_t *)bp->addr;
+                *p = bp->instruction;
+        }
+
+        /* Upon GDB monitor entry */
+        if (stepping) {
+                /* Overwrite TRAPA instruction */
+                p = (uint16_t *)bp_step.addr;
+                *p = bp_step.instruction;
+
+                /* Clear */
+                bp_step.addr = 0x00000000;
+                bp_step.instruction = 0x0000;
+
+                stepping = false;
+        }
 }
 
 bool
@@ -293,7 +381,7 @@ gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
  *
  * Returns the destination address */
 static uint32_t
-next_pc(struct cpu_registers *reg_file)
+calculate_pc(struct cpu_registers *reg_file)
 {
         uint16_t opcode;
         uint32_t pc;
@@ -303,20 +391,20 @@ next_pc(struct cpu_registers *reg_file)
 
         /* Opcode at PC */
         opcode = *(uint16_t *)reg_file->pc;
-        pc = reg_file->pc + 0x00000002;
 
-        /* BT, BT/S (untested!), BF and BF/S (untested!)
-           TODO: test delay-slot branches */
-        if ((OPCODE_BTS(opcode) && (reg_file->sr & SR_T_BIT_MASK)) ||
-            (OPCODE_BFS(opcode) && ((reg_file->sr & SR_T_BIT_MASK) == 0x00000000))) {
-                /* Branch instruction with delay slot */
-                disp = OPCODE_8_DISP(opcode);
-                pc = reg_file->pc + (disp << 1) + 0x00000004;
-        } else if ((OPCODE_BT(opcode) && (reg_file->sr & SR_T_BIT_MASK)) ||
-            (OPCODE_BF(opcode) && ((reg_file->sr & SR_T_BIT_MASK) == 0x00000000))) {
-                /* Branch instruction with no delay-slot */
-                disp = OPCODE_8_DISP(opcode);
-                pc = reg_file->pc + (disp << 1) + 0x00000004;
+        pc = reg_file->pc + 0x00000002;
+        disp = 0x00000000;
+
+        if (OPCODE_BT(opcode) || OPCODE_BTS(opcode)) {
+                if (reg_file->sr & SR_T_BIT_MASK) {
+                        disp = OPCODE_8_DISP(opcode);
+                        pc = reg_file->pc + (disp << 1) + 0x00000004;
+                }
+        } else if (OPCODE_BF(opcode) || OPCODE_BFS(opcode)) {
+                if ((reg_file->sr & SR_T_BIT_MASK) == 0x00000000) {
+                        disp = OPCODE_8_DISP(opcode);
+                        pc = reg_file->pc + (disp << 1) + 0x00000004;
+                }
         } else if ((OPCODE_BRA(opcode)) || (OPCODE_BSR(opcode))) {
                 disp = OPCODE_12_DISP(opcode);
                 pc = reg_file->pc + (disp << 1) + 0x00000004;
@@ -332,12 +420,119 @@ next_pc(struct cpu_registers *reg_file)
         } else if (OPCODE_JSR(opcode)) {
                 m = OPCODE_JSR_M(opcode);
                 pc = reg_file->r[m];
-        } else if (OPCODE_RTS(opcode))
+        } else if (OPCODE_RTS(opcode)) {
                 pc = reg_file->pr;
-        else if (OPCODE_RTE(opcode))
+        } else if (OPCODE_RTE(opcode))
                 pc = *(uint32_t *)reg_file->sp;
         else if (OPCODE_TRAPA(opcode))
                 pc = *(uint32_t *)(reg_file->vbr + (OPCODE_TRAPA_IMM(opcode) << 1));
 
         return pc;
+}
+
+static bp_list_t *
+bp_list_alloc(void)
+{
+        bp_list_t *bpl;
+
+        if ((bpl = (bp_list_t *)malloc(sizeof(bp_list_t))) == NULL)
+                return NULL;
+
+        /* Initialize queue */
+        TAILQ_INIT(bpl);
+
+        return bpl;
+}
+
+static bool
+bp_list_empty(bp_list_t *bpl)
+{
+
+        if (TAILQ_EMPTY(bpl))
+                return true;
+
+        return false;
+}
+
+static void
+bp_list_free(bp_list_t **bplp)
+{
+
+        assert(*bplp != NULL);
+
+        free(*bplp);
+        *bplp = NULL;
+}
+
+static bp_t *
+bp_list_breakpoint_alloc(void)
+{
+        bp_t *bp;
+
+        if ((bp = (bp_t *)malloc(sizeof(bp_t))) == NULL)
+                return NULL;
+
+        bp->addr = NULL;
+        bp->instruction = 0x0000;
+
+        return bp;
+}
+
+static void
+bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
+{
+        uint16_t *p;
+
+        assert(bp != NULL);
+
+        if (TAILQ_EMPTY(bpl))
+                return;
+
+        p = (uint16_t *)bp->addr;
+        *p = bp->instruction;
+
+        TAILQ_REMOVE(bpl, bp, entries);
+        free(bp);
+}
+
+static int
+bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
+{
+        bp_t *bp;
+
+        assert(bpl != NULL);
+
+        /* Check if we have a breakpoint of the same address already present */
+        if ((bp_list_breakpoint_find(bp_list, (void *)addr)) != NULL)
+                return 0;
+
+        if ((bp = bp_list_breakpoint_alloc()) == NULL)
+                return -1;
+
+        bp->addr = addr;
+        bp->instruction = *(uint16_t *)addr;
+        *(uint16_t *)addr = INSTRN_TRAPA(0x20);
+
+        /* Insert */
+        TAILQ_INSERT_TAIL(bpl, bp, entries);
+
+        return 0;
+}
+
+static bp_t *
+bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
+{
+        bp_t *bp_np;
+
+        assert(bpl != NULL);
+
+        if (TAILQ_EMPTY(bpl))
+                return NULL;
+
+        TAILQ_FOREACH (bp_np, bpl, entries) {
+                if (bp_np->addr == addr)
+                        return bp_np;
+        }
+
+        return NULL;
 }

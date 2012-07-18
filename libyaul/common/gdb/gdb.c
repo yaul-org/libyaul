@@ -59,7 +59,11 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
         uint32_t r;
         uint32_t addr;
         uint32_t length;
+        uint32_t kind;
+        uint32_t type;
         char *data;
+
+        int err;
 
         gdb_last_signal(sigval);
         gdb_monitor_entry(reg_file);
@@ -92,11 +96,6 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 
                         put_packet('\0', "OK", 2);
                         return;
-                case 'F':
-                        /* 'F RC,EE,CF;XX'
-                         * This is part of the File-I/O protocol
-                         * extension */
-                        break;
                 case 'g':
                         /* 'g'
                          * Read general registers */
@@ -121,6 +120,8 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 
                         /* Send OK back to GDB */
                         put_packet('\0', "OK", 2);
+
+                        gdb_kill();
                         return;
                 case 'm':
                         /* 'm addr,length'
@@ -163,7 +164,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                          * Single step */
                         addr = 0x00000000;
                         parse_unsigned_long(hargs, &addr, '\0');
-                        gdb_step(reg_file, 0x00000000);
+                        gdb_step(reg_file, addr);
                         return;
                 case 'S':
                         /* 'S sig[;addr]'
@@ -173,14 +174,41 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                         /* 't addr:PP,MM'
                          * Search backwards */
                         break;
-                /* case 'z': */
-                /*         /\* 'z type,addr,kind' */
-                /*          * Remove breakpoint or watchpoint *\/ */
-                /*         break; */
-                /* case 'Z': */
-                /*         /\* 'Z type,addr,kind' */
-                /*          * Insert breakpoint or watchpoint *\/ */
-                /*         break; */
+                case 'z':
+                        /* 'z type,addr,kind'
+                         * Remove breakpoint or watchpoint */
+
+                        type = 0x00000000;
+                        addr = 0x00000000;
+                        hargs = parse_unsigned_long(hargs, &type, ',');
+                        hargs = parse_unsigned_long(hargs, &addr, ',');
+                        parse_unsigned_long(hargs, &kind, '\0');
+
+                        if ((err = gdb_remove_break(type, addr, kind)) < 0) {
+                                put_packet('E', "01", 2);
+                                break;
+                        }
+
+                        put_packet('\0', "OK", 2);
+                        break;
+                case 'Z':
+                        /* 'Z type,addr,kind'
+                         * Insert breakpoint or watchpoint */
+
+                        type = 0x00000000;
+                        addr = 0x00000000;
+                        hargs = parse_unsigned_long(hargs, &type, ',');
+                        hargs = parse_unsigned_long(hargs, &addr, ',');
+                        parse_unsigned_long(hargs, &kind, '\0');
+
+                        if ((err = gdb_break(type, addr, kind)) < 0) {
+                                put_packet('E', "01", 2);
+                                break;
+                        }
+
+                        /* Send OK back to GDB */
+                        put_packet('\0', "OK", 2);
+                        break;
                 default:
                         /* Invalid */
                         put_packet('\0', NULL, 0);
