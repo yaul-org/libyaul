@@ -2,8 +2,11 @@ SET(SRC_DIRS
   common
   common/gdb
   cons
-  fs/iso9660
-  fs/romdisk
+  kernel/lib
+  kernel/mm
+  kernel/vfs
+  kernel/vfs/fs/iso9660
+  kernel/vfs/fs/romdisk
   newlib
   scu
   scu/bus/a/cs0/arp
@@ -15,7 +18,6 @@ SET(SRC_DIRS
   scu/bus/b/vdp2
   scu/bus/cpu
   scu/bus/cpu/smpc
-  tlsf
 )
 
 SET(INCLUDE_DIRS
@@ -23,8 +25,7 @@ SET(INCLUDE_DIRS
   common
   common/gdb
   cons
-  fs/iso9660
-  fs/romdisk
+  kernel
   scu
   scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
@@ -73,12 +74,6 @@ OPTION(WITH_DEBUG "Build the project using debugging code" OFF)
 IF(CMAKE_COMPILER_IS_GNUCC)
   SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C COMPILE_FLAGS "-g -ansi -std=c99 -pedantic -W -Wall -Wshadow -Werror -Wunused -O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
-
-IF(CMAKE_HOST_UNIX)
-  SET(CMAKE_C_OUTPUT_EXTENSION .o)
-ELSE(CMAKE_HOST_UNIX)
-  SET(CMAKE_C_OUTPUT_EXTENSION .obj)
-ENDIF(CMAKE_HOST_UNIX)
 
 IF(WITH_DEBUG)
   ADD_DEFINITIONS(-DDEBUG)
