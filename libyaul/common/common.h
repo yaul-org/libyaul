@@ -10,6 +10,21 @@
 
 #include <inttypes.h>
 
+/*
+ * A C preprocessing macro for concatenating to strings.
+ *
+ * We need use two macros (CC_CONCAT and CC_CONCAT_S) in order to allow
+ * concatenation of two defined macros.
+ */
+#define CC_CONCAT_S(s1, s2)     s1 ## s2
+#define CC_CONCAT(s1, s2)       CC_CONCAT_S(s1, s2)
+
+#ifdef __GNUC__
+#define STATIC_ASSERT(exp)                                                     \
+        typedef char CC_CONCAT(STATIC_ASSERT_AT_LINE,                          \
+                CC_CONCAT(_, __LINE__))[(exp) ? 1 : -1]
+#endif /* __GNUC__ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

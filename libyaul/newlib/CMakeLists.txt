@@ -6,20 +6,15 @@ SET(newlib_SRC
   execve_r.c
   exit.c
   fork_r.c
-  free.c
-  free_r.c
   fstat_r.c
   getpid_r.c
   isatty_r.c
   kill_r.c
   lseek_r.c
-  malloc.c
-  malloc_r.c
   open_r.c
   pipe_r.c
   raise_r.c
   read_r.c
-  realloc_r.c
   sbrk_r.c
   stat_r.c
   unlink_r.c
