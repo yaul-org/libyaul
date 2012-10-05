@@ -14,9 +14,9 @@
  * Restrictions
  *
  *   1. Allocation requests bigger than SLOB_PAGE_BREAK_2ND cannot be
- *      serviced. This is due to the memory block manager does not
- *      guarantee that sequential allocations of SLOB pages to service
- *      the requested allocation will be contiguous.
+ *      serviced. This is due to the memory block manager not able to
+ *      guarantee that sequential allocations of SLOB pages will be
+ *      contiguous.
  */
 
 /*
