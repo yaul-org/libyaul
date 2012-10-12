@@ -1,7 +1,7 @@
-#include <inttypes.h>
-#include <stddef.h>
+#include "slob.h"
 
 void
-free(void *addr __attribute__ ((unused)))
+free(void *addr)
 {
+        slob_free(addr);
 }

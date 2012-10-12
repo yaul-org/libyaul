@@ -187,7 +187,7 @@ slob_free(void *addr)
                                 bnext = slob_block_list_next(block);
                         }
 
-                        if ((block + slob_block_units(block)) == sb) {
+                        if ((block + bunits) == sb) {
                                 /* Coelesce adjacent block from the left. */
                                 slob_block_list_set(block, bnext,
                                     slob_block_units(block) +
