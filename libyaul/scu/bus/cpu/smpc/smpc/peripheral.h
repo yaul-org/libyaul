@@ -13,6 +13,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+
 #include <sys/queue.h>
 
 #ifdef __cplusplus
@@ -90,8 +91,10 @@ extern "C" {
 #define KEY_LEFT_ARROW          0x86
 #define KEY_LEFT_BRACKET        0x54
 #define KEY_LEFT_CTRL           0x14
+#define KEY_LEFT_META           0x1F
 #define KEY_LEFT_SHIFT          0x12
 #define KEY_M                   0x3A
+#define KEY_MENU                0x2F
 #define KEY_MINUS               0x4E
 #define KEY_N                   0x31
 #define KEY_NUM_LOCK            0x77
@@ -109,6 +112,7 @@ extern "C" {
 #define KEY_RIGHT_ARROW         0x8D
 #define KEY_RIGHT_BRACKET       0x5B
 #define KEY_RIGHT_CTRL          0x18
+#define KEY_RIGHT_META          0x27
 #define KEY_RIGHT_SHIFT         0x59
 #define KEY_S                   0x1B
 #define KEY_SCROLL_LOCK         0x7E
@@ -124,11 +128,96 @@ extern "C" {
 #define KEY_Y                   0x35
 #define KEY_Z                   0x1A
 
+#define WHEEL_LEFT      0x00
+#define WHEEL_CENTER    0x80
+#define WHEEL_RIGHT     0xFF
+
+#define ID_DIGITAL      0x02
+#define ID_RACING       0x13
+#define ID_ANALOG       0x16
+#define ID_MOUSE        0x23
+#define ID_KEYBOARD     0x34
+#define ID_MD3B         0xE1
+#define ID_MD6B         0xE2
+#define ID_MDMOUSE      0xE3
+#define ID_GUN          0xFA
+#define ID_UNCONNECTED  0xFF
+
+#define TYPE_DIGITAL    0x00
+#define TYPE_ANALOG     0x01
+#define TYPE_POINTER    0x02
+#define TYPE_KEYBOARD   0x03
+#define TYPE_MD         0x0E
+#define TYPE_UNKNOWN    0x0F
+
 TAILQ_HEAD(multi_terminal, smpc_peripheral);
+
+struct smpc_peripheral_keyboard {
+        bool connected;
+        /* If no children, port is 1 or 2. Otherwise, port is under
+         * multi-terminal */
+        uint8_t port_no;
+        uint8_t type;
+        uint8_t size;
+
+        struct {
+                unsigned int right:1; /* Right cursor */
+                unsigned int left:1;  /* Left cursor */
+                unsigned int down:1;  /* Down cursor */
+                unsigned int up:1;    /* Up cursor */
+                unsigned int start:1; /* Escape */
+                unsigned int a_trg:1; /* Z */
+                unsigned int c_trg:1; /* C */
+                unsigned int b_trg:1; /* X */
+
+                unsigned int r_trg:1; /* E */
+                unsigned int x_trg:1; /* A */
+                unsigned int y_trg:1; /* S */
+                unsigned int z_trg:1; /* D */
+                unsigned int l_trg:1; /* Q */
+                unsigned int kbt_2:1; /* Always 0 */
+                unsigned int kbt_1:1; /* Always 0 */
+                unsigned int kbt_0:1; /* Always 0 */
+
+                unsigned int rsrv_0:1; /* Always 0 */
+                unsigned int caps_lock:1;
+                unsigned int num_lock:1;
+                unsigned int scr_lock:1;
+                unsigned int mak_flag:1;
+                unsigned int rsrv_1:1; /* Always 1 */
+                unsigned int rsrv_2:1; /* Always 1 */
+                unsigned int brk_flag:1;
+
+                uint8_t keycode;
+        } __attribute__ ((packed)) button;
+} __attribute__ ((packed, __may_alias__));
+
+struct smpc_peripheral_mouse {
+        bool connected;
+        /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
+        uint8_t port_no;
+        uint8_t type;
+        uint8_t size;
+
+        struct {
+                unsigned int y_ovr:1;
+                unsigned int x_ovr:1;
+                unsigned int y_sgn:1;
+                unsigned int x_sgn:1;
+                unsigned int start:1;
+                unsigned int m_btn:1;
+                unsigned int r_btn:1;
+                unsigned int l_btn:1;
+
+                uint8_t x;
+                uint8_t y;
+        } __attribute__ ((packed)) button;
+} __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral_analog {
         bool connected;
-        /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
+        /* If no children, port is 1 or 2. Otherwise, port is under
+         * multi-terminal */
         uint8_t port_no;
         uint8_t type;
         uint8_t size;
@@ -156,9 +245,38 @@ struct smpc_peripheral_analog {
         } __attribute__ ((packed)) button;
 } __attribute__ ((packed, __may_alias__));
 
+struct smpc_peripheral_racing {
+        bool connected;
+        /* If no children, port is 1 or 2. Otherwise, port is under
+         * multi-terminal */
+        uint8_t port_no;
+        uint8_t type;
+        uint8_t size;
+
+        struct {
+                unsigned int right:1;
+                unsigned int left:1;
+                unsigned int down:1;
+                unsigned int up:1;
+                unsigned int start:1;
+                unsigned int a_trg:1;
+                unsigned int c_trg:1;
+                unsigned int b_trg:1;
+
+                unsigned int r_trg:1;
+                unsigned int x_trg:1;
+                unsigned int y_trg:1;
+                unsigned int z_trg:1;
+                unsigned int l_trg:1;
+
+                uint8_t wheel;
+        } __attribute__ ((packed)) button;
+} __attribute__ ((packed, __may_alias__));
+
 struct smpc_peripheral_digital {
         bool connected;
-        /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
+        /* If no children, port is 1 or 2. Otherwise, port is under
+         * multi-terminal */
         uint8_t port_no;
         uint8_t type;
         uint8_t size;

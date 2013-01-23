@@ -15,24 +15,6 @@
 
 #include "smpc-internal.h"
 
-#define	ID_DIGITAL      0x02
-#define	ID_RACING       0x13
-#define	ID_ANALOG       0x16
-#define	ID_MOUSE        0x23
-#define	ID_KEYBOARD     0x34
-#define	ID_MD3B         0xE1
-#define	ID_MD6B         0xE2
-#define	ID_MDMOUSE      0xE3
-#define	ID_GUN          0xFA
-#define	ID_UNCONNECTED  0xFF
-
-#define	TYPE_DIGITAL    0x00
-#define	TYPE_ANALOG     0x01
-#define	TYPE_POINTER    0x02
-#define	TYPE_KEYBOARD   0x03
-#define	TYPE_MD         0x0E
-#define	TYPE_UNKNOWN	0x0F
-
 static bool peripheral_id(void);
 static bool peripheral_type(void);
 static int peripheral_populate_info(struct smpc_peripheral_info *, uint8_t);
