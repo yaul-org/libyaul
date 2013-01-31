@@ -13,10 +13,10 @@
 /*-
  * Restrictions
  *
- *   1. Allocation requests bigger than SLOB_PAGE_BREAK_2ND cannot be
- *      serviced. This is due to the memory block manager not able to
- *      guarantee that sequential allocations of SLOB pages will be
- *      contiguous.
+ *   1. Heap size limit: Allocation requests bigger than
+ *      SLOB_PAGE_BREAK_2ND cannot be serviced. This is due to the
+ *      memory block manager not able to guarantee that sequential
+ *      allocations of SLOB pages will be contiguous.
  */
 
 /*
@@ -27,7 +27,7 @@
 #define SLOB_PAGE_COUNT 4
 #endif /* !SLOB_PAGE_COUNT */
 
-#define SLOB_PAGE_SIZE  0x1000
+#define SLOB_PAGE_SIZE  0x4000
 #define SLOB_PAGE_MASK  (~(SLOB_PAGE_SIZE - 1))
 
 #define SLOB_PAGE_BREAK_1ST 0x0100
