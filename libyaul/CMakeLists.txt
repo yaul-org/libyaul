@@ -6,7 +6,6 @@ SET(SRC_DIRS
   fs/romdisk
   newlib
   scu
-  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
@@ -26,7 +25,6 @@ SET(INCLUDE_DIRS
   fs/iso9660
   fs/romdisk
   scu
-  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
