@@ -9,7 +9,6 @@ SET(SRC_DIRS
   kernel/vfs/fs/romdisk
   newlib
   scu
-  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
@@ -27,7 +26,6 @@ SET(INCLUDE_DIRS
   cons
   kernel
   scu
-  scu/bus/a/cs0/arp
   scu/bus/a/cs0/dram-cartridge
   scu/bus/a/cs0/usb-cartridge
   scu/bus/a/cs2/cd-block
