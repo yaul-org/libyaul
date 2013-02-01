@@ -5,6 +5,7 @@
 #
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
+# Joe Fenton <jlfenton65@gmail.com>
 
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
@@ -38,5 +39,141 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils" ]; then
     ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils"
+fi
+cd "${OLDPWD}"
+
+
+# Build and install just the C compiler
+mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
+cd "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
+    message "Configuring GCC"
+    (CFLAGS="" \
+        LDFLAGS="" \
+        CFLAGS_FOR_TARGET="-O2 -m68000 -fomit-frame-pointer" \
+        LDFLAGS_FOR_TARGET="" \
+        ../"${GCC_SRC_DIR}"/configure \
+        --disable-cld \
+        --disable-initfini-array \
+        --disable-largefile \
+        --disable-libstdcxx-pch \
+        --disable-multilib \
+        --disable-multilib \
+        --disable-nls \
+        --disable-objc-gc \
+        --disable-rpath \
+        --disable-shared \
+        --disable-threads \
+        --disable-tls \
+        --disable-win32-registry \
+        --enable-decimal-float=no \
+        --disable-frame-pointer \
+        --enable-languages=c,c++ \
+        --enable-static \
+        --prefix="${BUILD_INSTALL_DIR}/${M68K_TARGET}" \
+        --program-prefix="${M68K_TARGET}-" \
+        --target="${M68K_TARGET}" \
+        --with-cpu=m68000 \
+        --with-gcc \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --without-dwarf2 \
+        --with-newlib) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc"
+fi
+
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-gcc" ]; then
+    message "Building GCC"
+    ("${MAKE}" all-gcc) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-gcc"
+fi
+
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-gcc" ]; then
+    message "Installing GCC"
+    ("${MAKE}" install-gcc) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-gcc"
+fi
+unset "CFLAGS"
+cd "${OLDPWD}"
+
+
+# Build and install newlib
+mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/newlib"
+cd "${BUILD_SRC_DIR}/${M68K_TARGET}/newlib"
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-newlib" ]; then
+    message "Configuring Newlib"
+    (CFLAGS="-O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing" \
+        ../"${NEWLIB_SRC_DIR}"/configure \
+        --disable-bootstrap \
+        --disable-build-poststage1-with-cxx \
+        --disable-build-with-cxx \
+        --disable-cloog-version-check \
+        --disable-dependency-tracking \
+        --disable-libada \
+        --disable-libquadmath \
+        --disable-libquadmath-support \
+        --disable-libssp \
+        --disable-maintainer-mode \
+        --disable-malloc-debugging \
+        --disable-multilib \
+        --disable-newlib-atexit-alloc \
+        --disable-newlib-hw-fp \
+        --disable-newlib-iconv \
+        --disable-newlib-io-float \
+        --disable-newlib-io-long-double \
+        --disable-newlib-io-long-long \
+        --disable-newlib-mb \
+        --disable-newlib-multithread \
+        --disable-newlib-register-fini \
+        --disable-newlib-supplied-syscalls \
+        --disable-objc-gc \
+        --enable-lto \
+        --enable-newlib-io-c99-formats \
+        --enable-newlib-io-pos-args \
+        --enable-newlib-reent-small \
+        --prefix="${BUILD_INSTALL_DIR}/${M68K_TARGET}" \
+        --target="${M68K_TARGET}" \
+        --with-cpu=m68000 \
+        --without-cloog \
+        --without-gmp \
+        --without-mpc \
+        --without-mpfr) 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
+        touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-newlib"
+fi
+
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-newlib" ]; then
+    message "Building Newlib"
+    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-newlib"
+fi
+
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-newlib" ]; then
+    message "Installing Newlib"
+    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-newlib"
+fi
+cd "${OLDPWD}"
+
+
+# Build and install the final compiler
+cd "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-g++" ]; then
+    message "Building GCC"
+    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-g++"
+fi
+
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-g++" ]; then
+    message "Installing GCC"
+    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
+    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-g++"
 fi
 cd "${OLDPWD}"

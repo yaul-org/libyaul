@@ -8,6 +8,12 @@ if [ ! -f 'extracted' ]; then
     message "Extracting '${BINUTILS}'"
     tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
 
+    message "Extracting '${GCC}'"
+    tar -xjf "${BUILD_SRC_DIR}/${GCC}" || panic "Extracting ${GCC}" 1
+
+    message "Extracting '${NEWLIB}'"
+    tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
+
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/extracted"
 fi
 cd "${OLDPWD}"

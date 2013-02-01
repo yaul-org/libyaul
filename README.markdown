@@ -21,8 +21,8 @@ Usage
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
 
     mkdir -p build
-    cd build/
     cp config.h.cmake{.in,}
+    cd build/
     cmake .. -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
     make
 
