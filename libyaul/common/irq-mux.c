@@ -5,10 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <stddef.h>
+#include <assert.h>
 #include <inttypes.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <bus/cpu/cpu.h>
 
@@ -48,6 +49,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         cpu_intc_disable();
 
         n_hdl = irq_mux_handle_alloc();
+        assert(n_hdl != NULL);
         n_hdl->imh_hdl = hdl;
         n_hdl->imh_user_ptr = user_data;
         n_hdl->imh = irq_mux;
