@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <sys/init.h>
+
 #include "exception.h"
 
 typedef void (*fptr)(void);
@@ -78,6 +80,8 @@ __std_startup(void)
         vbr[0x06] = exception_illegal_slot;
         vbr[0x09] = exception_cpu_address_error;
         vbr[0x0A] = exception_dma_address_error;
+
+        init();
 }
 
 /* Add function to .fini section */

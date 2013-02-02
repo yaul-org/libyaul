@@ -18,6 +18,7 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing \
 	-I../../libyaul/common/gdb \
 	-I../../libyaul/cons \
 	-I../../libyaul/fs \
+	-I../../libyaul/kernel \
 	-I../../libyaul/scu \
 	-I../../libyaul/scu/bus/a/cs0/dram-cartridge \
 	-I../../libyaul/scu/bus/a/cs0/usb-cartridge \

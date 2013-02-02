@@ -2,6 +2,7 @@ SET(SRC_DIRS
   common
   common/gdb
   cons
+  kernel
   kernel/lib
   kernel/mm
   kernel/vfs
