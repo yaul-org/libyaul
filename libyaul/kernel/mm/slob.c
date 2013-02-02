@@ -23,7 +23,10 @@ STATIC_ASSERT(SLOB_PAGE_SIZE >= SLOB_PAGE_BREAK_2ND);
 
 struct slob_block {
         union {
-                int16_t sb_bunits;
+                /* The start of the address of the request returned to
+                 * the requestor must be on a 4 byte boundary due to
+                 * alignment issues. */
+                int32_t sb_bunits;
                 /* Next "member" is a link to the next block relative to
                  * the starting address of the SLOB page. */
                 int16_t sb_bnext;
