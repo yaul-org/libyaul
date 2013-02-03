@@ -1,12 +1,12 @@
 include ../common.mk
 
 PROJECT:= romdisk
-OBJECTS+= romdisk.o
+OBJECTS+= root.o romdisk.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
 .PHONY: ip clean
 
-.SUFFIXES: .c .S .o .bin
+.SUFFIXES: .c .S .o .bin .romdisk
 
 example: $(PROJECT).bin
 
@@ -17,6 +17,9 @@ $(PROJECT).elf: $(OBJECTS)
 	$(LD) $(OBJECTS) $(LDFLAGS) -o $@
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
+
+.romdisk.o:
+	sh ../../tools/bin2o/bin2o $< `echo "$<" | sed -e 's/\./_/g'` $@
 
 .c.o:
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<

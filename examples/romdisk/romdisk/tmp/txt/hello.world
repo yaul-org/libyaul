@@ -1,0 +1,8 @@
+[1;34m****************************************[1;33m
+If you're seeing this, then it means you
+were able to read the contents of
+'hello.world'! [1;31mThis[m
+[1;33mmessage was copied from a
+ROMDISK FS which itself was linked into
+a binary
+[1;34m****************************************
