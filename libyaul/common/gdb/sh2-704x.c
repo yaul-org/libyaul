@@ -417,10 +417,10 @@ calculate_pc(struct cpu_registers *reg_file)
         } else if (OPCODE_JMP(opcode)) {
                 m = OPCODE_JMP_M(opcode);
                 pc = reg_file->r[m];
-        } else if (OPCODE_JSR(opcode))
+        } else if (OPCODE_JSR(opcode)) {
                 m = OPCODE_JSR_M(opcode);
-        pc = reg_file->r[m];
-        else if (OPCODE_RTS(opcode))
+                pc = reg_file->r[m];
+        } else if (OPCODE_RTS(opcode))
                 pc = reg_file->pr;
         else if (OPCODE_RTE(opcode))
                 pc = *(uint32_t *)reg_file->sp;
