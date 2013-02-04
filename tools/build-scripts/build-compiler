@@ -61,6 +61,10 @@ GDB="gdb-${GDB_VERSION}.tar.bz2"
 GDB_URL="${GNU_URL}/gdb/${GDB}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
 
+DDD="ddd-${DDD_VERSION}.tar.gz"
+DDD_URL="${GNU_URL}/ddd/${DDD}"
+DDD_SRC_DIR="ddd-${DDD_VERSION}"
+
 NEWLIB_URL="ftp://sources.redhat.com/pub/newlib"
 NEWLIB="newlib-${NEWLIB_VERSION}.tar.gz"
 NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
@@ -87,6 +91,9 @@ if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${GDB}" ] && \
         panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
 
+    [ ! -f "${DDD}" ] && \
+        panic "'${DDD}' not found in ${BUILD_SRC_DIR}" 1
+
     [ ! -f "${NEWLIB}" ] && \
         panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
 else
@@ -106,6 +113,12 @@ else
         message "Downloading '${GDB}'"
         ("${FETCH}" "${FETCH_FLAGS}" "${GDB_URL}") 1>> "gdb-${SH_TARGET}.log" 2>&1 \
             || panic "Failed to download ${GDB}" 1
+    fi
+
+    if [ ! -f "${DDD}" ]; then
+        message "Downloading '${DDD}'"
+        ("${FETCH}" "${FETCH_FLAGS}" "${DDD_URL}") 1>> "ddd-${SH_TARGET}.log" 2>&1 \
+            || panic "Failed to download ${DDD}" 1
     fi
 
     if [ ! -f "${NEWLIB}" ]; then

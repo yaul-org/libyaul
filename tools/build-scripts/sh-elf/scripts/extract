@@ -16,6 +16,9 @@ if [ ! -f 'extracted' ]; then
     message "Extracting '${GDB}'"
     tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GDB}" 1
 
+    message "Extracting '${DDD}'"
+    tar -xjf "${BUILD_SRC_DIR}/${DDD}" || panic "Extracting ${GCC_DDD}" 1
+
     touch "${BUILD_SRC_DIR}/${SH_TARGET}/extracted"
 fi
 cd "${OLDPWD}"
