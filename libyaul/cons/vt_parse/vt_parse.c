@@ -50,7 +50,7 @@ void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
         case VT_PARSE_ACTION_COLLECT:
                 /* Append the character to the intermediate params */
                 num_intermediate_chars = strlen((char *)parser->intermediate_chars);
-                if(num_intermediate_chars + 1 > MAX_INTERMEDIATE_CHARS)
+                if (num_intermediate_chars + 1 > MAX_INTERMEDIATE_CHARS)
                         parser->ignore_flagged = 1;
                 else
                         parser->intermediate_chars[num_intermediate_chars++] = ch;
@@ -59,7 +59,7 @@ void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                 /* Process the param character */
                 if (ch == ';') {
                         parser->num_params++;
-                        parser->params[parser->num_params-1] = 0;
+                        parser->params[parser->num_params - 1] = 0;
                 } else {
                         /* The character is a digit */
                         int current_param;
@@ -91,7 +91,7 @@ do_state_change(vt_parse_t *parser, state_change_t change, char ch)
         vt_parse_state_t  new_state = STATE(change);
         vt_parse_action_t action = ACTION(change);
 
-        if(new_state) {
+        if (new_state) {
                 /*
                  * Perform up to three actions:
                  *   1. the exit action of the old state

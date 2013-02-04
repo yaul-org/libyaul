@@ -69,7 +69,7 @@ irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
         if (TAILQ_EMPTY(&irq_mux->im_tq))
                 return;
 
-        TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
+        TAILQ_FOREACH (hdl_np, &irq_mux->im_tq, handles) {
                 if (hdl_np->imh_hdl == hdl) {
                         TAILQ_REMOVE(&irq_mux->im_tq, hdl_np, handles);
                         irq_mux_handle_free(hdl_np);
