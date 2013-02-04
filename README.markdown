@@ -45,5 +45,5 @@ If so, I'd love to hear it. Create an issue [here][1].
 5. ???
 6. Profit!
 
-[1]: https://github.com/mrkotfw/libyaul/issues
+[1]: https://github.com/ijacquez/libyaul/issues
 [2]: http://www.youtube.com/mrkotfw
