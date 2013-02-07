@@ -14,16 +14,15 @@ Usage
 =====
 
 ### Requirements
- - CMake ver. 2.6 or greater (a Cross-Platform Makefile Generator)
+ - CMake ver. 2.8 or greater (a Cross-Platform Makefile Generator)
  - GCC 4.6.3 or greater SH7604 cross-compiler tool-chain (see `tools/build-scripts/`)
 
 ### Installation
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
 
     mkdir -p build
-    cp config.h.cmake{.in,}
     cd build/
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
     make
 
 Contributing
