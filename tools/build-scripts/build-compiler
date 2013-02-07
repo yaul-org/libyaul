@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2012
 # See LICENSE for details.
@@ -6,16 +6,39 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
-# Look for automated configuration file to bypass prompts
-[ -f 'config' ] && . './config' || panic "Configuration file 'config' not found" 1
-
 panic () {
-    printf "[1;37;1;41merror[m: [1;37;1;44m%s[m\n" "${1}" 1>&2
+    printf "${0##*/}: error: %s\n" "${1}" 1>&2
     exit ${2}
 }
 
+# Look for automated configuration file
+[ -f 'config' ] && . './config' || panic "Configuration file 'config' not found; see config.in" 1
+
+is_set() {
+    if [[ ! "${!1}" && "${!1-_}" ]]; then
+        panic "Variable \"${1}\" does not exist in your config file" 1
+    fi
+}
+
+check_boolean() {
+    if [[ "${!1}" != "no" && "${!1}" != "yes" ]]; then
+        panic "Variable \"${1}\" has an invalid value in your config file" 1
+    fi
+}
+
+for var in "OPTION_DOWNLOAD_TARBALLS" "OPTION_ENABLE_DDD"; do
+    is_set "${var}"
+    check_boolean "${var}"
+done
+
+for var in "BUILD_INSTALL_DIR" "BUILD_SRC_DIR" \
+    "BINUTILS_VERSION" "DDD_VERSION" "GCC_VERSION" "GDB_VERSION" "NEWLIB_VERSION" \
+    "MAKE" "AWK" "FETCH" "FETCH_FLAGS"; do
+    is_set "${var}"
+done
+
 message () {
-    printf "[1;37;1;44m%s[m\n" "${1}"
+    printf "${0##*/}: notice: %s\n" "${1}"
 }
 
 clean_up () {
@@ -71,17 +94,15 @@ NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
 NEWLIB_SRC_DIR="newlib-${NEWLIB_VERSION}"
 
 # Get preferred installation directory and set paths to the sources
-[ ! -z "${BUILD_INSTALL_DIR}" ] || panic "Invalid install path"
-
 # Make sure we have the proper permissions
 mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
     test -x "${BUILD_INSTALL_DIR}" && \
     test -w "${BUILD_INSTALL_DIR}" && \
     test -r "${BUILD_INSTALL_DIR}" || \
-    panic "Couldn't create install directory"
+    panic "Couldn't create install directory" 1
 
 cd "${BUILD_SRC_DIR}/"
-if [ "${BUILD_DOWNLOAD}" = "no" ]; then
+if [ "${OPTION_DOWNLOAD_TARBALLS}" = "no" ]; then
     [ ! -f "${BINUTILS}" ] && \
         panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
 
@@ -91,8 +112,10 @@ if [ "${BUILD_DOWNLOAD}" = "no" ]; then
     [ ! -f "${GDB}" ] && \
         panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
 
-    [ ! -f "${DDD}" ] && \
-        panic "'${DDD}' not found in ${BUILD_SRC_DIR}" 1
+    if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
+        [ ! -f "${DDD}" ] && \
+            panic "'${DDD}' not found in ${BUILD_SRC_DIR}" 1
+    fi
 
     [ ! -f "${NEWLIB}" ] && \
         panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
@@ -115,10 +138,12 @@ else
             || panic "Failed to download ${GDB}" 1
     fi
 
-    if [ ! -f "${DDD}" ]; then
-        message "Downloading '${DDD}'"
-        ("${FETCH}" "${FETCH_FLAGS}" "${DDD_URL}") 1>> "ddd-${SH_TARGET}.log" 2>&1 \
-            || panic "Failed to download ${DDD}" 1
+    if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
+        if [ ! -f "${DDD}" ]; then
+            message "Downloading '${DDD}'"
+            ("${FETCH}" "${FETCH_FLAGS}" "${DDD_URL}") 1>> "ddd-${SH_TARGET}.log" 2>&1 \
+                || panic "Failed to download ${DDD}" 1
+        fi
     fi
 
     if [ ! -f "${NEWLIB}" ]; then
@@ -134,7 +159,7 @@ for target in "${M68K_TARGET}" "${SH_TARGET}"; do
         continue
     fi
 
-    message "${target}"
+    message "Building ${target} target"
 
     # Begin building
     [ -f "${target}/scripts/extract" ] && . "${target}/scripts/extract"

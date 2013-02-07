@@ -213,30 +213,32 @@ cd "${OLDPWD}"
 
 
 # Build and install DDD
-mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/ddd"
-cd "${BUILD_SRC_DIR}/${SH_TARGET}/ddd"
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-ddd" ]; then
-    message "Configuring DDD"
-    (CFLAGS="" \
-        LDFLAGS="" \
-        ../"${DDD_SRC_DIR}"/configure \
-        --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
-        --target="${SH_TARGET}") 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/configured-ddd"
-fi
+if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
+    mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/ddd"
+    cd "${BUILD_SRC_DIR}/${SH_TARGET}/ddd"
+    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-ddd" ]; then
+        message "Configuring DDD"
+        (CFLAGS="" \
+            LDFLAGS="" \
+            ../"${DDD_SRC_DIR}"/configure \
+            --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
+            --target="${SH_TARGET}") 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 \
+            || panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
+        touch "${BUILD_SRC_DIR}/${SH_TARGET}/configured-ddd"
+    fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-ddd" ]; then
-    message "Building DDD"
-    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-ddd"
-fi
+    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-ddd" ]; then
+        message "Building DDD"
+        ("${MAKE}") 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
+        touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-ddd"
+    fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-ddd" ]; then
-    message "Installing DDD"
-    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-ddd"
+    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-ddd" ]; then
+        message "Installing DDD"
+        ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log'" 1
+        touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-ddd"
+    fi
+    cd "${OLDPWD}"
 fi
-cd "${OLDPWD}"

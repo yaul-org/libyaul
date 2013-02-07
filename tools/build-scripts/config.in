@@ -6,19 +6,20 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
-# 'yes': Download packages for building the compiler
-#  'no': Already downloaded
-BUILD_DOWNLOAD="yes"
+# Build paths
+# Only ABSOLUTE paths are to be used!
 
-# ABSOLUTE path to tool-chain installation directory
+# Path to tool-chain installation directory
 BUILD_INSTALL_DIR="${HOME}/libyaul"
 
-# ABSOLUTE path to previously downloaded source packages as well as
-# the location for temporary files
+# Path to previously downloaded source packages as well as the
+# location for temporary files
 BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
 
-GCC_VERSION="4.7.1"
+# Versions
 BINUTILS_VERSION="2.22"
+DDD_VERSION="3.3.12"
+GCC_VERSION="4.7.1"
 GDB_VERSION="7.4"
 NEWLIB_VERSION="1.20.0"
 
@@ -27,3 +28,16 @@ MAKE="make"
 AWK="awk"
 FETCH="wget"
 FETCH_FLAGS=""
+
+# Miscellaneous Options
+# Only valid values are either 'yes' or 'no' -- anything else is
+# ignored
+
+# 'yes': Download packages for building the compiler
+#  'no': Already downloaded
+OPTION_DOWNLOAD_TARBALLS="yes"
+
+# 'yes': Download and build DDD for the sh-elf target
+#        Be aware dependencies not covered
+#  'no': Do not build
+OPTION_ENABLE_DDD="yes"
