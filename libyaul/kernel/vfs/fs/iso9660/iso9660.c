@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Israel Jacquez
+ * Copyright (c) 2012
  * See LICENSE for details.
  *
  * Dan Potter
