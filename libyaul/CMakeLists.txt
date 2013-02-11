@@ -64,19 +64,17 @@ FOREACH(DIR_LIST ${SRC_DIRS})
   PREPEND(${DIR_LIST}_INSTALL_FILES "${_TMP_DIR_LIST}/")
 
   SET(SRC ${SRC} ${${DIR_LIST}_SRC})
+
   SET(INSTALL_FILES ${INSTALL_FILES} ${${DIR_LIST}_INSTALL_FILES})
 ENDFOREACH(DIR_LIST)
 
-# Build options for library.
-OPTION(WITH_DEBUG "Build the project using debugging code" OFF)
+SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
-  SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C COMPILE_FLAGS "-g -ansi -std=c99 -pedantic -W -Wall -Wshadow -Werror -Wunused -O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing")
+  SET(CMAKE_C_FLAGS "-std=c99 -O2 -ffast-math -fstrict-aliasing -fomit-frame-pointer")
+  SET(CMAKE_C_FLAGS_DEBUG "-Wall -Werror -Wshadow -Wextra -Wunused -DDEBUG")
+  SET(CMAKE_C_FLAGS_RELEASE "")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
-
-IF(WITH_DEBUG)
-  ADD_DEFINITIONS(-DDEBUG)
-ENDIF(WITH_DEBUG)
 
 # Default include directories.
 INCLUDE_DIRECTORIES(AFTER ${INCLUDE_DIRS})

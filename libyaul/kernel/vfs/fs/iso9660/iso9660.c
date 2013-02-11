@@ -15,7 +15,6 @@
 
 #include "iso9660.h"
 
-#define DEBUG
 #define __unused __attribute__ ((unused))
 
 typedef struct {

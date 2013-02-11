@@ -1,7 +1,0 @@
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
-
-/* Allow debug code to be used. */
-#cmakedefine WITH_DEBUG
-
-#endif
