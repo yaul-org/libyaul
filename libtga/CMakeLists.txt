@@ -1,0 +1,3 @@
+SET(SRCO tga.c)
+
+ADD_LIBRARY(tga STATIC ${SRCO})
