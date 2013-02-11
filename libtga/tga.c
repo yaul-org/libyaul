@@ -152,9 +152,9 @@ tga_cmap_rgb555_decode(const uint8_t *cmap_buf, size_t cmap_len, uint8_t cmap_bp
         uint8_t g;
         uint8_t b;
 
-        if (cmap_bpp == 8) {
+        if (cmap_bpp == 8)
                 return NULL;
-        } else if (cmap_bpp == 16) {
+        else if (cmap_bpp == 16) {
                 for (cmap_idx = 0; cmap_idx < cmap_len; cmap_idx++) {
                         uint16_t color;
 
