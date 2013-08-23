@@ -8,31 +8,31 @@
 extern "C" {
 #endif
 
-#define FILE_OK                 0
-#define FILE_UNKNOWN_FORMAT     1
-#define FILE_CORRUPTED          2
-#define FILE_NOT_SUPPORTED      3
+#define TGA_FILE_OK                     0
+#define TGA_FILE_UNKNOWN_FORMAT         1
+#define TGA_FILE_CORRUPTED              2
+#define TGA_FILE_NOT_SUPPORTED          3
+#define TGA_MEMORY_ERROR                4
 
 typedef struct {
-#define TGA_IMAGE_TYPE_NONE             0x00
-#define TGA_IMAGE_TYPE_CMAP             0x01
-#define TGA_IMAGE_TYPE_TRUE_COLOR       0x02
-#define TGA_IMAGE_TYPE_GRAYSCALE        0x03
-#define TGA_IMAGE_TYPE_RLE_CMAP         0x09
-#define TGA_IMAGE_TYPE_RLE_TRUE_COLOR   0x10
-#define TGA_IMAGE_TYPE_RLE_GRAYSCALE    0x11
+#define TGA_IMAGE_TYPE_NONE             0
+#define TGA_IMAGE_TYPE_CMAP             1
+#define TGA_IMAGE_TYPE_TRUE_COLOR       2
+#define TGA_IMAGE_TYPE_GRAYSCALE        3
+#define TGA_IMAGE_TYPE_RLE_CMAP         9
+#define TGA_IMAGE_TYPE_RLE_TRUE_COLOR   10
+#define TGA_IMAGE_TYPE_RLE_GRAYSCALE    11
         uint8_t tga_type;
+
+        uint8_t tga_cmapbpp;
+        uint8_t tga_cmaplen;
+
         uint8_t tga_bpp;
         uint16_t tga_width;
         uint16_t tga_height;
-
-        uint8_t tga_cmap;
-        uint8_t tga_cmapbpp;
-        const uint16_t *tga_cmapbuf;
-        uint8_t tga_cmaplen;
-
-        const uint8_t *tga_imagebuf;
 } tga_t;
+
+int tga_load(tga_t *, const uint8_t *, uint16_t *, uint16_t *);
 
 #ifdef __cplusplus
 }
