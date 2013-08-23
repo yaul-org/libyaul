@@ -1,12 +1,12 @@
 include ../common.mk
 
 PROJECT:= nbg0-bitmap
-OBJECTS+= image.o nbg0-bitmap.o
+OBJECTS+= root.o nbg0-bitmap.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
 .PHONY: ip clean
 
-.SUFFIXES: .c .S .o .bin
+.SUFFIXES: .c .S .o .bin .romdisk
 
 example: $(PROJECT).bin
 
@@ -18,6 +18,8 @@ $(PROJECT).elf: $(OBJECTS)
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
 
+.romdisk.o:
+	sh ../../tools/bin2o/bin2o $< `echo "$<" | sed -e 's/\./_/g'` $@
 .c.o:
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
 .S.o:
