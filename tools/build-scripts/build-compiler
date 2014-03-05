@@ -6,24 +6,61 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
-panic () {
-    printf "${0##*/}: error: %s\n" "${1}" 1>&2
-    exit ${2}
+# Function panic:
+#   ${1} => Message
+#   ${2} => Exit status code
+panic() {
+    local _message="${1}"
+    local _exit_code=${2}
+
+    printf "${0##*/}: error: %s\n" "${_message}" 1>&2
+    exit ${_exit_code}
 }
 
 # Look for automated configuration file
-[ -f 'config' ] && . './config' || panic "Configuration file 'config' not found; see config.in" 1
+if [ -f 'config' ]; then
+    source './config'
+else
+    panic "Configuration file 'config' not found; see config.in" 1
+fi
 
+# Function is_set:
+#   ${1} => Variable
 is_set() {
     if [[ ! "${!1}" && "${!1-_}" ]]; then
         panic "Variable \"${1}\" does not exist in your config file" 1
     fi
 }
 
+# Function check_boolean:
+#   ${1} => Value
 check_boolean() {
     if [[ "${!1}" != "no" && "${!1}" != "yes" ]]; then
         panic "Variable \"${1}\" has an invalid value in your config file" 1
     fi
+}
+
+# Function fetch:
+#   ${1} => URL
+fetch() {
+    local _url="${1}"
+
+    "${FETCH}" "${FETCH_FLAGS}" "${_url}"
+
+    local _fetch_exit_code=${?}
+
+    case "${FETCH}" in
+        wget)
+            # Kludge: It looks like GNU Wget doesn't return the
+            # correct exit status code.
+            if [ ${_fetch_exit_code} -ge 2 ] && [ ${_fetch_exit_code} -le 8 ]; then
+                return 1
+            fi
+            return 0
+            ;;
+        *)
+            return ${_fetch_exit_code}
+    esac
 }
 
 for var in "OPTION_DOWNLOAD_TARBALLS" "OPTION_ENABLE_DDD"; do
@@ -77,7 +114,7 @@ GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
 BINUTILS="binutils-${BINUTILS_VERSION}.tar.bz2"
-BINUTILS_URL="$GNU_URL/binutils/${BINUTILS}"
+BINUTILS_URL="${GNU_URL}/binutils/${BINUTILS}"
 BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
 
 GDB="gdb-${GDB_VERSION}.tar.bz2"
@@ -101,6 +138,7 @@ mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
     test -r "${BUILD_INSTALL_DIR}" || \
     panic "Couldn't create install directory" 1
 
+
 cd "${BUILD_SRC_DIR}/"
 if [ "${OPTION_DOWNLOAD_TARBALLS}" = "no" ]; then
     [ ! -f "${BINUTILS}" ] && \
@@ -121,38 +159,43 @@ if [ "${OPTION_DOWNLOAD_TARBALLS}" = "no" ]; then
         panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
 else
     if [ ! -f "${BINUTILS}" ]; then
-        message "Downloading '${BINUTILS}'"
-        ("${FETCH}" "${FETCH_FLAGS}" "${BINUTILS_URL}") 1>> "binutils-${SH_TARGET}.log" 2>&1 \
-            || panic "Failed to download ${BINUTILS}" 1
+        message "Downloading \`${BINUTILS}'"
+        if ! fetch "${BINUTILS_URL}" 1>> "binutils-${SH_TARGET}.log" 2>&1; then
+            panic "Failed to download ${BINUTILS} (see \`${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log')" 1
+        fi
     fi
 
     if [ ! -f "${GCC}" ]; then
-        message "Downloading '${GCC}'"
-        ("${FETCH}" "${FETCH_FLAGS}" "${GCC_URL}")  1>> "gcc-${SH_TARGET}.log" 2>&1 \
-            || panic "Failed to download ${GCC}" 1
+        message "Downloading \`${GCC}'"
+        if ! fetch "${GCC_URL}"  1>> "gcc-${SH_TARGET}.log" 2>&1; then
+            panic "Failed to download ${GCC} (see \`${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log')" 1
+        fi
     fi
 
     if [ ! -f "${GDB}" ]; then
-        message "Downloading '${GDB}'"
-        ("${FETCH}" "${FETCH_FLAGS}" "${GDB_URL}") 1>> "gdb-${SH_TARGET}.log" 2>&1 \
-            || panic "Failed to download ${GDB}" 1
+        message "Downloading \`${GDB}'"
+        if ! fetch "${GDB_URL}" 1>> "gdb-${SH_TARGET}.log" 2>&1; then
+            panic "Failed to download ${GDB} (see \`${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log')" 1
+        fi
     fi
 
     if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
         if [ ! -f "${DDD}" ]; then
-            message "Downloading '${DDD}'"
-            ("${FETCH}" "${FETCH_FLAGS}" "${DDD_URL}") 1>> "ddd-${SH_TARGET}.log" 2>&1 \
-                || panic "Failed to download ${DDD}" 1
+            message "Downloading \`${DDD}'"
+            if ! fetch "${DDD_URL}" 1>> "ddd-${SH_TARGET}.log" 2>&1; then
+                panic "Failed to download ${DDD} (see \`${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log')" 1
+            fi
         fi
     fi
 
     if [ ! -f "${NEWLIB}" ]; then
-        message "Downloading '${NEWLIB}'"
-        ("${FETCH}" "${FETCH_FLAGS}" "${NEWLIB_URL}") 1>> "newlib-${SH_TARGET}.log" 2>&1 \
-            || panic "Failed to download ${NEWLIB}" 1
+        message "Downloading \`${NEWLIB}'"
+        if ! fetch "${NEWLIB_URL}" 1>> "newlib-${SH_TARGET}.log" 2>&1; then
+            panic "Failed to download ${NEWLIB} (see \`${BUILD_SRC_DIR}/newlib-${SH_TARGET}.log')" 1
+        fi
     fi
 fi
-cd "${OLDPWD}"
+cd - 1> /dev/null
 
 for target in "${M68K_TARGET}" "${SH_TARGET}"; do
     if [ -f "${BUILD_SRC_DIR}/${target}/build-complete" ]; then
