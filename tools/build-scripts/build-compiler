@@ -6,6 +6,14 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
+# Function message:
+#   ${1} => Message
+message () {
+    local _message="${1}"
+
+    printf "${0##*/}: %s\n" "${_message}"
+}
+
 # Function panic:
 #   ${1} => Message
 #   ${2} => Exit status code
@@ -21,7 +29,7 @@ panic() {
 if [ -f 'config' ]; then
     source './config'
 else
-    panic "Configuration file 'config' not found; see config.in" 1
+    panic "Configuration file \`config' not found; see \`config.in'" 1
 fi
 
 # Function is_set:
@@ -74,12 +82,12 @@ for var in "BUILD_INSTALL_DIR" "BUILD_SRC_DIR" \
     is_set "${var}"
 done
 
-message () {
-    printf "${0##*/}: notice: %s\n" "${1}"
-}
-
+# Function clean_up:
+#
 clean_up () {
-    ! test -z "${BUILD_SRC_DIR}" || exit 1
+    if [ ! - z"${BUILD_SRC_DIR}" ]; then
+        exit 1
+    fi
 
     message "Cleaning up '${BUILD_SRC_DIR}'"
 
@@ -97,15 +105,13 @@ SH_TARGET='sh-elf'
 M68K_TARGET='m68k-elf'
 
 # Sane defaults for building toolchain
-CFLAGS="-O2 -pipe"
-export "CFLAGS"
-CXXFLAGS="${CFLAGS}"
-export "CXXFLAGS"
+export CFLAGS="-O2 -pipe"
+export CXXFLAGS="${CFLAGS}"
+
 unset "LDFLAGS"
 
 # Add installed devkit to the path, adjusting path on minsys
-PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
-export "PATH"
+export PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
 
 # Ask whether to download the source packages or not
 GCC="gcc-${GCC_VERSION}.tar.bz2"
@@ -205,11 +211,21 @@ for target in "${M68K_TARGET}" "${SH_TARGET}"; do
     message "Building ${target} target"
 
     # Begin building
-    [ -f "${target}/scripts/extract" ] && . "${target}/scripts/extract"
-    [ -f "${target}/scripts/patch" ] && . "${target}/scripts/patch"
-    [ -f "${target}/scripts/build" ] && . "${target}/scripts/build"
-    [ -f "${target}/scripts/strip" ] && . "${target}/scripts/strip"
-    [ -f "${target}/scripts/finish" ] && . "${target}/scripts/finish"
+    if [ -f "${target}/scripts/extract" ]; then
+        source "${target}/scripts/extract"
+    fi
+    if [ -f "${target}/scripts/patch" ]; then
+        source "${target}/scripts/patch"
+    fi
+    if [ -f "${target}/scripts/build" ]; then
+        source "${target}/scripts/build"
+    fi
+    if [ -f "${target}/scripts/strip" ]; then
+        source "${target}/scripts/strip"
+    fi
+    if [ -f "${target}/scripts/finish" ]; then
+        source "${target}/scripts/finish"
+    fi
 done
 
 # Clean up temporary files and source directories
