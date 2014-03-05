@@ -14,7 +14,7 @@ BUILD_INSTALL_DIR="${HOME}/libyaul"
 
 # Path to previously downloaded source packages as well as the
 # location for temporary files
-BUILD_SRC_DIR="${HOME}/libyaul/tools/build-scripts/tmp"
+BUILD_SRC_DIR="/tmp"
 
 # Versions
 BINUTILS_VERSION="2.22"
