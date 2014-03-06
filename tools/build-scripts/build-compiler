@@ -54,21 +54,30 @@ fetch() {
     local _url="${1}"
 
     "${FETCH}" "${FETCH_FLAGS}" "${_url}"
-
-    local _fetch_exit_code=${?}
+    local _exit_code=${?}
 
     case "${FETCH}" in
         wget)
             # Kludge: It looks like GNU Wget doesn't return the
             # correct exit status code.
-            if [ ${_fetch_exit_code} -ge 2 ] && [ ${_fetch_exit_code} -le 8 ]; then
+            if [ ${_exit_code} -ge 2 ] && [ ${_exit_code} -le 8 ]; then
                 return 1
             fi
             return 0
             ;;
         *)
-            return ${_fetch_exit_code}
+            return ${_exit_code}
     esac
+}
+
+# Function checksum_gpg:
+#   ${1} => File (.sig file)
+checksum_gpg() {
+    local _file="${1}"
+
+    "${GPG}" --verify --keyring "${BUILD_SRC_DIR}/gnu-keyring.gpg" "${_file}"
+    local _exit_code=${?}
+    return ${_exit_code}
 }
 
 for var in "OPTION_DOWNLOAD_TARBALLS" "OPTION_ENABLE_DDD"; do
@@ -76,16 +85,27 @@ for var in "OPTION_DOWNLOAD_TARBALLS" "OPTION_ENABLE_DDD"; do
     check_boolean "${var}"
 done
 
-for var in "BUILD_INSTALL_DIR" "BUILD_SRC_DIR" \
-    "BINUTILS_VERSION" "DDD_VERSION" "GCC_VERSION" "GDB_VERSION" "NEWLIB_VERSION" \
-    "MAKE" "AWK" "FETCH" "FETCH_FLAGS"; do
+for var in \
+    "BUILD_INSTALL_DIR" \
+    "BUILD_SRC_DIR" \
+    "BINUTILS_VERSION" \
+    "DDD_VERSION" \
+    "GCC_VERSION" \
+    "GDB_VERSION" \
+    "NEWLIB_VERSION" \
+    "MAKE" \
+    "AWK" \
+    "GPG" \
+    "MD5" \
+    "FETCH" \
+    "FETCH_FLAGS"; do
     is_set "${var}"
 done
 
 # Function clean_up:
 #
 clean_up () {
-    if [ ! - z"${BUILD_SRC_DIR}" ]; then
+    if [ ! -z "${BUILD_SRC_DIR}" ]; then
         exit 1
     fi
 
@@ -99,7 +119,7 @@ clean_up () {
     exit ${1}
 }
 
-trap 'clean_up 1' 2 9 15
+trap 'clean_up 1' 0 1 2 9 15
 
 SH_TARGET='sh-elf'
 M68K_TARGET='m68k-elf'
@@ -113,27 +133,36 @@ unset "LDFLAGS"
 # Add installed devkit to the path, adjusting path on minsys
 export PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
 
-# Ask whether to download the source packages or not
 GCC="gcc-${GCC_VERSION}.tar.bz2"
 GNU_URL="ftp://ftp.gnu.org/gnu"
 GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
+GCC_SIG="${GCC}.sig"
+GCC_SIG_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_SIG}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
 BINUTILS="binutils-${BINUTILS_VERSION}.tar.bz2"
 BINUTILS_URL="${GNU_URL}/binutils/${BINUTILS}"
+BINUTILS_SIG="${BINUTILS}.sig"
+BINUTILS_SIG_URL="${GNU_URL}/binutils/${BINUTILS_SIG}"
 BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
 
 GDB="gdb-${GDB_VERSION}.tar.bz2"
 GDB_URL="${GNU_URL}/gdb/${GDB}"
+GDB_SIG="${GDB}.sig"
+GDB_SIG_URL="${GNU_URL}/gdb/${GDB_SIG}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
 
 DDD="ddd-${DDD_VERSION}.tar.gz"
 DDD_URL="${GNU_URL}/ddd/${DDD}"
+DDD_SIG="${DDD}.sig"
+DDD_SIG_URL="${GNU_URL}/ddd/${DDD_SIG}"
 DDD_SRC_DIR="ddd-${DDD_VERSION}"
 
 NEWLIB_URL="ftp://sources.redhat.com/pub/newlib"
 NEWLIB="newlib-${NEWLIB_VERSION}.tar.gz"
 NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
+NEWLIB_MD5="md5.sum"
+NEWLIB_MD5_URL="${NEWLIB_URL}/${NEWLIB_MD5}"
 NEWLIB_SRC_DIR="newlib-${NEWLIB_VERSION}"
 
 # Get preferred installation directory and set paths to the sources
@@ -144,61 +173,158 @@ mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
     test -r "${BUILD_INSTALL_DIR}" || \
     panic "Couldn't create install directory" 1
 
-
 cd "${BUILD_SRC_DIR}/"
-if [ "${OPTION_DOWNLOAD_TARBALLS}" = "no" ]; then
-    [ ! -f "${BINUTILS}" ] && \
-        panic "'${BINUTILS}' not found in ${BUILD_SRC_DIR}" 1
+# Ask whether to download the source packages or not
+if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
+    message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
+    printf "\n\t 1. gnu-keyring.gpg"
+    printf "\n\t 2. ${BINUTILS}"
+    printf "\n\t 3. ${BINUTILS_SIG}"
+    printf "\n\t 4. ${GCC}"
+    printf "\n\t 5. ${GCC_SIG}"
+    printf "\n\t 6. ${NEWLIB}"
+    printf "\n\t 7. ${NEWLIB_MD5}"
+    printf "\n\t 8. ${GDB}"
+    printf "\n\t 9. ${GDB_SIG}"
+    if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
+        printf "\n\t10. ${DDD}"
+        printf "\n\t11. ${DDD_SIG}"
+    fi
+    printf "\n"
+    printf "\n"
 
-    [ ! -f "${GCC}" ] && \
-        panic "'${GCC}' not found in ${BUILD_SRC_DIR}" 1
-
-    [ ! -f "${GDB}" ] && \
-        panic "'${GDB}' not found in ${BUILD_SRC_DIR}" 1
-
-    if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
-        [ ! -f "${DDD}" ] && \
-            panic "'${DDD}' not found in ${BUILD_SRC_DIR}" 1
+    if [ ! -f "gnu-keyring.gpg" ]; then
+        panic "\`gnu-keyring.gpg' not found"
     fi
 
-    [ ! -f "${NEWLIB}" ] && \
-        panic "'${NEWLIB}' not found in ${BUILD_SRC_DIR}" 1
+    if [ ! -f "${BINUTILS}" ]; then
+        panic "\`${BINUTILS}' not found" 1
+    fi
+    if [ ! -f "${BINUTILS_SIG}" ]; then
+        panic "\`${BINUTILS_SIG}' not found" 1
+    fi
+
+    if [ ! -f "${GCC}" ]; then
+        panic "\`${GCC}' not found" 1
+    fi
+    if [ ! -f "${GCC_SIG}" ]; then
+        panic "\`${GCC_SIG}' not found" 1
+    fi
+
+    if [ ! -f "${NEWLIB}" ]; then
+        panic "'${NEWLIB}' not found" 1
+    fi
+    if [ ! -f "${NEWLIB_MD5}" ]; then
+        panic "'${NEWLIB_MD5}' not found" 1
+    fi
+
+    if [ ! -f "${GDB}" ]; then
+        panic "\`${GDB}' not found" 1
+    fi
+    if [ ! -f "${GDB_SIG}" ]; then
+        panic "\`${GDB_SIG}' not found" 1
+    fi
+
+    if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
+        if [ ! -f "${DDD}" ]; then
+            panic "\`${DDD}' not found" 1
+        fi
+        if [ ! -f "${DDD_SIG}" ]; then
+            panic "\`${DDD_SIG}' not found" 1
+        fi
+    fi
 else
+    message "Downloading files..."
+
     if [ ! -f "${BINUTILS}" ]; then
         message "Downloading \`${BINUTILS}'"
-        if ! fetch "${BINUTILS_URL}" 1>> "binutils-${SH_TARGET}.log" 2>&1; then
-            panic "Failed to download ${BINUTILS} (see \`${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log')" 1
+        if ! fetch "${BINUTILS_URL}" 1>> "binutils.log" 2>&1; then
+            panic "Failed to download ${BINUTILS} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+        fi
+        if ! fetch "${BINUTILS_SIG_URL}" 1>> "binutils.log" 2>&1; then
+            panic "Failed to download ${BINUTILS_SIG} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
         fi
     fi
 
     if [ ! -f "${GCC}" ]; then
         message "Downloading \`${GCC}'"
-        if ! fetch "${GCC_URL}"  1>> "gcc-${SH_TARGET}.log" 2>&1; then
-            panic "Failed to download ${GCC} (see \`${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log')" 1
+        if ! fetch "${GCC_URL}"  1>> "gcc.log" 2>&1; then
+            panic "Failed to download ${GCC} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+        fi
+        if ! fetch "${GCC_SIG_URL}"  1>> "gcc.log" 2>&1; then
+            panic "Failed to download ${GCC_SIG} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
         fi
     fi
 
     if [ ! -f "${GDB}" ]; then
         message "Downloading \`${GDB}'"
-        if ! fetch "${GDB_URL}" 1>> "gdb-${SH_TARGET}.log" 2>&1; then
-            panic "Failed to download ${GDB} (see \`${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log')" 1
+        if ! fetch "${GDB_SIG_URL}" 1>> "gdb.log" 2>&1; then
+            panic "Failed to download ${GDB_SIG} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
         fi
     fi
 
-    if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
+    if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
         if [ ! -f "${DDD}" ]; then
             message "Downloading \`${DDD}'"
-            if ! fetch "${DDD_URL}" 1>> "ddd-${SH_TARGET}.log" 2>&1; then
-                panic "Failed to download ${DDD} (see \`${BUILD_SRC_DIR}/ddd-${SH_TARGET}.log')" 1
+            if ! fetch "${DDD_URL}" 1>> "ddd.log" 2>&1; then
+                panic "Failed to download ${DDD} (see \`${BUILD_SRC_DIR}/ddd.log')" 1
+            fi
+            if ! fetch "${DDD_SIG_URL}" 1>> "ddd.log" 2>&1; then
+                panic "Failed to download ${DDD_SIG} (see \`${BUILD_SRC_DIR}/ddd.log')" 1
             fi
         fi
     fi
 
     if [ ! -f "${NEWLIB}" ]; then
         message "Downloading \`${NEWLIB}'"
-        if ! fetch "${NEWLIB_URL}" 1>> "newlib-${SH_TARGET}.log" 2>&1; then
-            panic "Failed to download ${NEWLIB} (see \`${BUILD_SRC_DIR}/newlib-${SH_TARGET}.log')" 1
+        if ! fetch "${NEWLIB_URL}" 1>> "newlib.log" 2>&1; then
+            panic "Failed to download ${NEWLIB} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
         fi
+        if ! fetch "${NEWLIB_MD5_URL}" 1>> "newlib.log" 2>&1; then
+            panic "Failed to download ${NEWLIB_MD5} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
+        fi
+    fi
+fi
+
+message "Checking integrity..."
+
+# Check integrity
+message "Checking integrity of \`${BINUTILS}'"
+if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
+    panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+fi
+
+message "Checking integrity of \`${GCC}'"
+if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
+    panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+fi
+
+message "Checking integrity of \`${GDB}'"
+if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
+    panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+fi
+
+# The md5.sum is a special (annoying) case
+message "Checking integrity of \`${NEWLIB}'"
+md5=`cat "${NEWLIB_MD5}" 2> /dev/null | grep "${NEWLIB}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
+case "${MD5}" in
+    "md5")
+        calculated_md5=`"${MD5}" "${NEWLIB}"`
+        ;;
+    "md5sum")
+        calculated_md5=`"${MD5}" --tag "${NEWLIB}"`
+        ;;
+esac
+calculated_md5=`echo "${calculated_md5}" | sed -n 's/MD5 (.*) = \([a-f0-9][a-f0-9]*\)/\1/pg'`
+if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
+    panic "Integrity check for ${NEWLIB} failed" 1
+fi
+unset "calculated_md5"
+
+if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
+    message "Checking integrity of \`${DDD}'"
+    if ! checksum_gpg "${DDD_SIG}" 1>> "ddd.log" 2>&1; then
+        panic "Integrity check for ${DDD} failed (see \`${BUILD_SRC_DIR}/ddd.log')" 1
     fi
 fi
 cd - 1> /dev/null
