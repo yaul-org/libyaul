@@ -12,7 +12,7 @@ mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils" ]; then
     message "Configuring Binutils"
-    (CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+    CFLAGS="-Wno-error=deprecated-declarations" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
         --disable-debug \
         --disable-nls \
         --disable-shared \
@@ -22,21 +22,21 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils" ]; then
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs) 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 \
+        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-binutils" ]; then
     message "Building Binutils"
-    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-binutils"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils" ]; then
     message "Installing Binutils"
-    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils"
 fi
