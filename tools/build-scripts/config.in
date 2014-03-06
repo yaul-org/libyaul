@@ -1,4 +1,4 @@
-#!/bin/sh
+# -*- mode: config -*-
 
 # Copyright (c) 2012
 # See LICENSE for details.
@@ -28,6 +28,8 @@ MAKE="make"
 AWK="awk"
 FETCH="wget"
 FETCH_FLAGS=""
+GPG="gpg"
+MD5="md5sum"
 
 # Miscellaneous Options
 # Only valid values are either 'yes' or 'no' -- anything else is

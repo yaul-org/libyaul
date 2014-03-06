@@ -27,7 +27,11 @@ panic() {
 
 # Look for automated configuration file
 if [ -f 'config' ]; then
-    source './config'
+    if ! bash -n './config' > /dev/null 2>&1; then
+        panic "Syntax error in configuration file \`config'" 1
+    fi
+
+    source './config' > /dev/null 2>&1
 else
     panic "Configuration file \`config' not found; see \`config.in'" 1
 fi
@@ -319,6 +323,7 @@ calculated_md5=`echo "${calculated_md5}" | sed -n 's/MD5 (.*) = \([a-f0-9][a-f0-
 if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
     panic "Integrity check for ${NEWLIB} failed" 1
 fi
+unset "md5"
 unset "calculated_md5"
 
 if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
@@ -334,7 +339,7 @@ for target in "${M68K_TARGET}" "${SH_TARGET}"; do
         continue
     fi
 
-    message "Building ${target} target"
+    message "Building ${target} target..."
 
     # Begin building
     if [ -f "${target}/scripts/extract" ]; then
