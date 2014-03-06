@@ -27,7 +27,21 @@ panic() {
 
 # Look for automated configuration file
 if [ -f 'config' ]; then
-    if ! bash -n './config' > /dev/null 2>&1; then
+    /usr/bin/env python <<- EOF
+	import sys
+	import re
+
+	line = 0
+	with open("./config", "r") as f:
+	    line += 1
+	    for line in f.readlines():
+	        # Ignore comments and empty lines
+	        if re.match(r"^\s*#.*$|^\s*$", line):
+	            continue
+	        if not re.match(r"^[A-Z_][A-Z_0-9]+=\"[^\"]*\"$", line):
+	            sys.exit(1)
+EOF
+    if [ ${?} -ne 0 ]; then
         panic "Syntax error in configuration file \`config'" 1
     fi
 
