@@ -3,24 +3,36 @@
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}"
 cd "${BUILD_SRC_DIR}/${SH_TARGET}"
-if [ ! -f 'extracted' ]; then
+if [ ! -f "extracted" ]; then
     message "Extracting '${BINUTILS}'"
-    tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
+    if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
+        panic "Extracting ${BINUTILS}" 1
+    fi
 
     message "Extracting '$GCC'"
-    tar -xjf "${BUILD_SRC_DIR}/${GCC}" || panic "Extracting ${GCC}" 1
+    if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
+        panic "Extracting ${GCC}" 1
+    fi
 
     message "Extracting '${NEWLIB}'"
-    tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
+    if ! tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" > /dev/null 2>&1; then
+        panic "Extracting ${NEWLIB}" 1
+    fi
 
-    message "Extracting '${GDB}'"
-    tar -xjf "${BUILD_SRC_DIR}/${GDB}" || panic "Extracting ${GCC_GDB}" 1
+    if [ "${OPTION_ENABLE_GDB}" = "yes" ]; then
+        message "Extracting '${GDB}'"
+        if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then
+            panic "Extracting ${GCC_GDB}" 1
+        fi
+    fi
 
     if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
         message "Extracting '${DDD}'"
-        tar -xzf "${BUILD_SRC_DIR}/${DDD}" || panic "Extracting ${GCC_DDD}" 1
+        if ! tar -xzf "${BUILD_SRC_DIR}/${DDD}" > /dev/null 2>&1; then
+            panic "Extracting ${GCC_DDD}" 1
+        fi
     fi
 
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/extracted"
+    touch "extracted"
 fi
 cd "${OLDPWD}"

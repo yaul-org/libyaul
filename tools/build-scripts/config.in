@@ -10,7 +10,7 @@
 # Only ABSOLUTE paths are to be used!
 
 # Path to tool-chain installation directory
-BUILD_INSTALL_DIR="${HOME}/libyaul"
+BUILD_INSTALL_DIR="${HOME}/tool-chains"
 
 # Path to previously downloaded source packages as well as the
 # location for temporary files
@@ -24,6 +24,7 @@ GDB_VERSION="7.7"
 NEWLIB_VERSION="1.20.0"
 
 # Tools for host
+# The variables below might need to change depending on your OS
 MAKE="make"
 AWK="awk"
 FETCH="wget"
@@ -31,13 +32,18 @@ FETCH_FLAGS=""
 GPG="gpg"
 MD5="md5sum"
 
-# Miscellaneous Options
+# Options
 # Only valid values are either 'yes' or 'no' -- anything else is
 # ignored
 
 # 'yes': Download packages for building the compiler
 #  'no': Already downloaded
 OPTION_DOWNLOAD_TARBALLS="yes"
+
+# 'yes': Download and build GDB for the sh-elf target
+#        Be aware dependencies not covered
+#  'no': Do not build
+OPTION_ENABLE_GDB="yes"
 
 # 'yes': Download and build DDD for the sh-elf target
 #        Be aware dependencies not covered

@@ -48,11 +48,8 @@ mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
     message "Configuring GCC"
-    (CFLAGS="" \
-        LDFLAGS="" \
-        CFLAGS_FOR_TARGET="-O2 -m68000 -fomit-frame-pointer" \
-        LDFLAGS_FOR_TARGET="" \
-        ../"${GCC_SRC_DIR}"/configure \
+    CFLAGS="" LDFLAGS="" CFLAGS_FOR_TARGET="-O2 -m68000 -fomit-frame-pointer" \
+    LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
         --disable-cld \
         --disable-initfini-array \
         --disable-largefile \
@@ -78,21 +75,21 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
         --with-gnu-as \
         --with-gnu-ld \
         --without-dwarf2 \
-        --with-newlib) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+        --with-newlib 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-gcc" ]; then
     message "Building GCC"
-    ("${MAKE}" all-gcc) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+    "${MAKE}" all-gcc 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-gcc"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-gcc" ]; then
     message "Installing GCC"
-    ("${MAKE}" install-gcc) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+    "${MAKE}" install-gcc 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-gcc"
 fi
@@ -105,8 +102,7 @@ mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/newlib"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/newlib"
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-newlib" ]; then
     message "Configuring Newlib"
-    (CFLAGS="-O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing" \
-        ../"${NEWLIB_SRC_DIR}"/configure \
+    CFLAGS="-O2 -fomit-frame-pointer -ffast-math -fstrict-aliasing" ../"${NEWLIB_SRC_DIR}"/configure \
         --disable-bootstrap \
         --disable-build-poststage1-with-cxx \
         --disable-build-with-cxx \
@@ -140,21 +136,21 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-newlib" ]; then
         --without-cloog \
         --without-gmp \
         --without-mpc \
-        --without-mpfr) 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 \
+        --without-mpfr 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
         touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-newlib"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-newlib" ]; then
     message "Building Newlib"
-    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-newlib"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-newlib" ]; then
     message "Installing Newlib"
-    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-newlib"
 fi
@@ -165,14 +161,14 @@ cd "${OLDPWD}"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-g++" ]; then
     message "Building GCC"
-    ("${MAKE}") 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-g++"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-g++" ]; then
     message "Installing GCC"
-    ("${MAKE}" install) 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
+    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-g++"
 fi

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Copyright (c) 2012
+# See LICENSE for details.
+#
+# Israel Jacquez <mrkotfw@gmail.com>
+
+> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log"
+> "${BUILD_SRC_DIR}/ddd-${M68K_TARGET}.log"
+> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log"
+> "${BUILD_SRC_DIR}/gdb-${M68K_TARGET}.log"
+> "${BUILD_SRC_DIR}/newlib-${M68K_TARGET}.log"
