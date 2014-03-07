@@ -3,7 +3,6 @@ Usage
 
 ### Requirements
  - POSIX Bourne shell
- - GNU Wget
  - Time and especially patience
 
 ### Installation
