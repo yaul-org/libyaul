@@ -73,6 +73,12 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
         --target="${SH_TARGET}" \
         --with-endian=big \
         --with-cpu=m2 \
+        --disable-libquadmath \
+        --disable-libquadmath-support \
+        --disable-libvtv \
+        --disable-libgomp \
+        --disable-libssp \
+        --disable-libada \
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
