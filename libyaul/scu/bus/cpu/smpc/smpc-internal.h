@@ -75,7 +75,7 @@ uint8_t smpc_smc_call(uint8_t, uint8_t, uint8_t *);
 extern uint8_t offset;
 extern uint8_t oreg_buf[];
 
-extern struct smpc_peripheral_port smpc_peripheral_port1;
-extern struct smpc_peripheral_port smpc_peripheral_port2;
+extern struct smpc_peripheral_port smpc_peripheral_port_1;
+extern struct smpc_peripheral_port smpc_peripheral_port_2;
 
 #endif /* !_SMPC_INTERNAL_H_ */

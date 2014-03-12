@@ -12,17 +12,17 @@
 struct smpc_peripheral_digital *
 smpc_peripheral_digital_port(uint8_t port)
 {
-        struct smpc_peripheral_digital *port1;
-        struct smpc_peripheral_digital *port2;
+        struct smpc_peripheral_digital *port_1;
+        struct smpc_peripheral_digital *port_2;
 
-        port1 = (struct smpc_peripheral_digital *)&smpc_peripheral_port1.info;
-        port2 = (struct smpc_peripheral_digital *)&smpc_peripheral_port2.info;
+        port_1 = (struct smpc_peripheral_digital *)smpc_peripheral_port_1.peripheral;
+        port_2 = (struct smpc_peripheral_digital *)smpc_peripheral_port_2.peripheral;
 
         switch (port) {
         case 1:
-                return port1;
+                return port_1;
         case 2:
-                return port2;
+                return port_2;
         default:
                 return NULL;
         }

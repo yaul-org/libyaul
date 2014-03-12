@@ -22,8 +22,6 @@
 #define NPE     0x20
 #define PDL     0x40
 
-static void fetch_output_regs(void);
-
 uint8_t oreg_buf[MAX_PORT_DEVICES * MAX_PORT_DATA_SIZE];
 
 void
@@ -31,7 +29,24 @@ smpc_peripheral_system_manager(void)
 {
 
         /* Fetch but no parsing */
-        fetch_output_regs();
+        static uint16_t oboffset = 0;
+        uint8_t ooffset;
+
+        offset = 0;
+
+        /* Is this the first time fetching peripheral data? */
+        if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL) {
+                oboffset = 0;
+        }
+
+        /* What if we exceed our capacity? Buffer overflow */
+        assert(oboffset <= 255);
+
+        for (ooffset = 0; ooffset < SMPC_OREGS; ooffset++, oboffset++) {
+                /* We don't have much time in the critical section. Just
+                 * buffer the registers */
+                OREG_SET(oboffset, MEMORY_READ(8, OREG(ooffset)));
+        }
 
         /* Check if there is any remaining peripheral data */
         if (((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00) {
@@ -45,26 +60,4 @@ smpc_peripheral_system_manager(void)
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
         MEMORY_WRITE(8, IREG(0), 0x80);
-}
-
-static void
-fetch_output_regs(void)
-{
-        static uint16_t oboffset = 0;
-        uint8_t ooffset;
-
-        offset = 0;
-
-        /* Is this the first time fetching peripheral data? */
-        if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL)
-                oboffset = 0;
-
-        /* What if we exceed our capacity? Buffer overflow */
-        assert(oboffset <= 255);
-
-        for (ooffset = 0; ooffset < SMPC_OREGS; ooffset++, oboffset++) {
-                /* We don't have much time in the critical section. Just
-                 * buffer the registers */
-                OREG_SET(oboffset, MEMORY_READ(8, OREG(ooffset)));
-        }
 }

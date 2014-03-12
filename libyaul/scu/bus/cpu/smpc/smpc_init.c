@@ -26,6 +26,8 @@ smpc_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
+        smpc_peripheral_parse_init();
+
         /* Disable interrupts */
         cpu_intc_disable();
 

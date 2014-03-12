@@ -150,7 +150,7 @@ extern "C" {
 #define TYPE_MD         0x0E
 #define TYPE_UNKNOWN    0x0F
 
-TAILQ_HEAD(multi_terminal, smpc_peripheral);
+TAILQ_HEAD(smpc_peripherals, smpc_peripheral);
 
 struct smpc_peripheral_keyboard {
         bool connected;
@@ -296,29 +296,27 @@ struct smpc_peripheral_digital {
                 unsigned int y_trg:1;
                 unsigned int z_trg:1;
                 unsigned int l_trg:1;
-        } __attribute__ ((packed)) button;
+        } __attribute__ ((aligned(MAX_PORT_DATA_SIZE + 1))) button;
+        struct smpc_peripheral *parent;
 } __attribute__ ((packed, __may_alias__));
 
-struct smpc_peripheral_info {
+struct smpc_peripheral {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
-        uint8_t port_no;
+        uint8_t port; /* 1 or 2 */
         uint8_t type;
         uint8_t size;
-        uint8_t data[MAX_PORT_DATA_SIZE]; /* Peripheral data table */
-} __attribute__ ((packed));
-
-struct smpc_peripheral {
-        struct smpc_peripheral_info info;
-        struct smpc_peripheral_port *parent;
+        uint8_t data[MAX_PORT_DATA_SIZE + 1]; /* Peripheral data table */
+        uint8_t previous_data[MAX_PORT_DATA_SIZE + 1]; /* Previous frame data table */
+        struct smpc_peripheral *parent; /* NULL if parent (directly connected to port) */
 
         TAILQ_ENTRY(smpc_peripheral) peripherals;
-};
+} __attribute__ ((packed));
 
 struct smpc_peripheral_port {
-        struct smpc_peripheral_info info;
-        struct multi_terminal *children;
+        struct smpc_peripheral *peripheral;
+        struct smpc_peripherals peripherals;
 };
 
 extern struct smpc_peripheral_analog *smpc_peripheral_analog_port(uint8_t);

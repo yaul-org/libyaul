@@ -15,9 +15,9 @@ smpc_peripheral_raw_port(uint8_t port)
 
         switch (port) {
         case 1:
-                return &smpc_peripheral_port1;
+                return &smpc_peripheral_port_1;
         case 2:
-                return &smpc_peripheral_port2;
+                return &smpc_peripheral_port_2;
         default:
                 return NULL;
         }
