@@ -22,7 +22,7 @@ Usage
 
     mkdir -p build
     cd build/
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../SegaSaturn-compiler-SH7604.cmake
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../Sega-Saturn-compiler-SH7604.cmake
     make
 
 Contributing
