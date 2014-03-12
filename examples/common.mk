@@ -11,7 +11,7 @@ OD= $(CC_PREFIX)-objdump
 
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
 	-I$(ROOTDIR)/common
-CFLAGS= -W -Wall -Wextra -Wunused-parameter -Wstrict-aliasing \
+CFLAGS= -W -Wall -Wextra -Wunused-parameter -Wstrict-aliasing -Wno-main \
 	-ansi -m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
 	-I../../libtga \
