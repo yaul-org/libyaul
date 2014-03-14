@@ -19,14 +19,14 @@
 
 #include "smpc-internal.h"
 
-uint8_t offset = 0;
-
 struct smpc_peripheral_port smpc_peripheral_port_1;
 struct smpc_peripheral_port smpc_peripheral_port_2;
 
+static int offset = 0;
+
+static void port_peripherals_free(struct smpc_peripheral_port *);
 static struct smpc_peripheral *peripheral_alloc(void);
 static void peripheral_free(struct smpc_peripheral *);
-
 static int peripheral_update(struct smpc_peripheral *, uint8_t);
 
 MEMB(peripherals, struct smpc_peripheral, 2, 2);
@@ -63,19 +63,9 @@ smpc_peripheral_parse(irq_mux_handle_t *hdl __attribute__ ((unused)))
 
         int port_idx;
 
+        offset = 0;
         for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
                 port = ports[port_idx];
-
-                struct smpc_peripheral *peripheral;
-                struct smpc_peripheral *tmp_peripheral;
-
-                for (peripheral = TAILQ_FIRST(&port->peripherals);
-                     peripheral != NULL;
-                     peripheral = tmp_peripheral) {
-                        tmp_peripheral = TAILQ_NEXT(peripheral, peripherals);
-                        TAILQ_REMOVE(&port->peripherals, peripheral, peripherals);
-                        peripheral_free(peripheral);
-                }
 
                 uint32_t connected_count;
 
@@ -105,14 +95,40 @@ smpc_peripheral_parse(irq_mux_handle_t *hdl __attribute__ ((unused)))
                 if (connected_count == 0) {
                         /* Nothing connected at the port */
                         port->peripheral->connected = false;
+                        port_peripherals_free(port);
                         continue;
                 }
 
                 /* Update peripheral connected directly to the port */
-                peripheral_update(port->peripheral, port_idx + 1);
+                if ((peripheral_update(port->peripheral, port_idx + 1)) < 0) {
+                        /* Couldn't parse data; invalid peripheral */
+                        port->peripheral->connected = false;
+                        port_peripherals_free(port);
+                        continue;
+                }
                 connected_count--;
 
+                /* For now, assume that only standard digital pads can be connected */
                 assert(connected_count == 0);
+        }
+}
+
+static void
+port_peripherals_free(struct smpc_peripheral_port *port)
+{
+        assert(port != NULL);
+
+        if (!(TAILQ_EMPTY(&port->peripherals))) {
+                struct smpc_peripheral *peripheral;
+                struct smpc_peripheral *tmp_peripheral;
+
+                for (peripheral = TAILQ_FIRST(&port->peripherals);
+                     peripheral != NULL;
+                     peripheral = tmp_peripheral) {
+                        tmp_peripheral = TAILQ_NEXT(peripheral, peripherals);
+                        TAILQ_REMOVE(&port->peripherals, peripheral, peripherals);
+                        peripheral_free(peripheral);
+                }
         }
 }
 
@@ -126,6 +142,9 @@ peripheral_alloc(void)
 
         /* Ignore all other fields if peripheral is not connected */
         peripheral->connected = false;
+        /* Clear data */
+        memset(peripheral->data, 0x00, MAX_PORT_DATA_SIZE + 1);
+        memset(peripheral->previous_data, 0x00, MAX_PORT_DATA_SIZE + 1);
 
         return peripheral;
 }
@@ -153,13 +172,13 @@ peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
         default:
                 /* Possibly corrupted data */
                 /* Unknown or disconnected peripheral */
-                return 1;
+                return -1;
         }
 
         size = PC_GET_SIZE(offset);
         if (size > 15) {
                 /* Non-extended size cannot exceed 15B */
-                return 1;
+                return -1;
         }
 
         /* Check if what data configuration we're using */
@@ -178,7 +197,7 @@ peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
                         break;
                 default:
                         /* Invalid ID (type and size) */
-                        return 1;
+                        return -1;
                 }
         } else if (size == 0) {
                 size = PC_GET_EXT_SIZE(offset);
@@ -190,73 +209,39 @@ peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
 
                 if (size < 15) {
                         /* Invalid peripheral data configuration (2 or 3) */
-                        return 1;
+                        return -1;
                 }
                 offset++;
         }
 
+        peripheral->connected = true;
+
         /* Set to port number if parent, otherwise, set to port number
          * within the multi-terminal peripheral */
         peripheral->port = port;
-
-        peripheral->connected = true;
         peripheral->type = PC_GET_TYPE(offset);
         peripheral->size = size;
         offset++;
 
-        /* Copy previous frame's data capture */
-        memcpy(peripheral->previous_data, peripheral->data, MAX_PORT_DATA_SIZE + 1);
-        /* Clear data with 0xFF values, excluding what is going to be overwritten */
-        memset(peripheral->data, 0xFF, MAX_PORT_DATA_SIZE + 1);
-        /* Update data from current frame */
-        memcpy(peripheral->data, PC_GET_DATA(offset), size);
+        switch (size) {
+        case 0x02:
+                peripheral->previous_data[0] = peripheral->data[0];
+                peripheral->previous_data[1] = peripheral->data[1];
 
-        uint8_t *data;
-        int data_idx;
-
-        for (data_idx = 0; data_idx < (MAX_PORT_DATA_SIZE + 1); data_idx += 32) {
-                data = &peripheral->data[data_idx];
-
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
-                *data++ ^= 0xFF;
+                peripheral->data[0] = PC_GET_DATA_BYTE(offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(offset, 1) ^ 0xFF;
+                break;
+        default:
+                /* XXX
+                 * Currently not supporting other sizes */
+                assert(false);
         }
+        /* Move onto the next peripheral */
+        offset += size;
 
         /* Find the parent by determining what kind of peripheral is
          * connected directly to the port */
         peripheral->parent = NULL;
-
-        /* Move onto the next peripheral */
-        offset += size;
 
         return 0;
 }

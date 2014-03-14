@@ -49,6 +49,7 @@
 #define PC_GET_EXT_SIZE(x)      (OREG_GET((x) + 1) & 0xFF)
 /* 3rd (or 4th) data byte */
 #define PC_GET_DATA(x)          (OREG_OFFSET((x)))
+#define PC_GET_DATA_BYTE(x, y)  (((uint8_t *)OREG_OFFSET((x)))[(y)])
 
 #define SMPC_CMD_ISSUE_TYPE_A   0
 #define SMPC_CMD_ISSUE_TYPE_B   1
@@ -72,7 +73,6 @@ struct smpc_peripheral_port;
 
 uint8_t smpc_smc_call(uint8_t, uint8_t, uint8_t *);
 
-extern uint8_t offset;
 extern uint8_t oreg_buf[];
 
 extern struct smpc_peripheral_port smpc_peripheral_port_1;

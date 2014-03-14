@@ -32,8 +32,6 @@ smpc_peripheral_system_manager(void)
         static uint16_t oboffset = 0;
         uint8_t ooffset;
 
-        offset = 0;
-
         /* Is this the first time fetching peripheral data? */
         if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL) {
                 oboffset = 0;

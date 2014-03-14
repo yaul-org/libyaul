@@ -156,7 +156,7 @@ struct smpc_peripheral_keyboard {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
-        uint8_t port_no;
+        uint8_t port;
         uint8_t type;
         uint8_t size;
 
@@ -195,7 +195,7 @@ struct smpc_peripheral_keyboard {
 struct smpc_peripheral_mouse {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
-        uint8_t port_no;
+        uint8_t port;
         uint8_t type;
         uint8_t size;
 
@@ -218,7 +218,7 @@ struct smpc_peripheral_analog {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
-        uint8_t port_no;
+        uint8_t port;
         uint8_t type;
         uint8_t size;
 
@@ -249,7 +249,7 @@ struct smpc_peripheral_racing {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
-        uint8_t port_no;
+        uint8_t port;
         uint8_t type;
         uint8_t size;
 
@@ -277,27 +277,60 @@ struct smpc_peripheral_digital {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
-        uint8_t port_no;
+        uint8_t port;
         uint8_t type;
         uint8_t size;
 
-        struct {
-                unsigned int right:1;
-                unsigned int left:1;
-                unsigned int down:1;
-                unsigned int up:1;
-                unsigned int start:1;
-                unsigned int a_trg:1;
-                unsigned int c_trg:1;
-                unsigned int b_trg:1;
+#define DATA(x)                                                                \
+        struct {                                                               \
+                unsigned int right:1;                                          \
+                unsigned int left:1;                                           \
+                unsigned int down:1;                                           \
+                unsigned int up:1;                                             \
+                unsigned int start:1;                                          \
+                unsigned int a:1;                                              \
+                unsigned int c:1;                                              \
+                unsigned int b:1;                                              \
+                unsigned int r:1;                                              \
+                unsigned int x:1;                                              \
+                unsigned int y:1;                                              \
+                unsigned int z:1;                                              \
+                unsigned int l:1;                                              \
+        } __attribute__ ((aligned(2))) x
 
-                unsigned int r_trg:1;
-                unsigned int x_trg:1;
-                unsigned int y_trg:1;
-                unsigned int z_trg:1;
-                unsigned int l_trg:1;
-        } __attribute__ ((aligned(MAX_PORT_DATA_SIZE + 1))) button;
-        struct smpc_peripheral *parent;
+#define REPR(x, y)                                                             \
+        union {                                                                \
+                uint16_t raw;                                                  \
+                DATA(y);                                                       \
+        } x
+
+#define PERIPHERAL_DIGITAL_L            0x0008
+#define PERIPHERAL_DIGITAL_Z            0x0010
+#define PERIPHERAL_DIGITAL_Y            0x0020
+#define PERIPHERAL_DIGITAL_X            0x0040
+#define PERIPHERAL_DIGITAL_R            0x0080
+#define PERIPHERAL_DIGITAL_B            0x0100
+#define PERIPHERAL_DIGITAL_C            0x0200
+#define PERIPHERAL_DIGITAL_A            0x0400
+#define PERIPHERAL_DIGITAL_START        0x0800
+#define PERIPHERAL_DIGITAL_UP           0x1000
+#define PERIPHERAL_DIGITAL_DOWN         0x2000
+#define PERIPHERAL_DIGITAL_LEFT         0x4000
+#define PERIPHERAL_DIGITAL_RIGHT        0x8000
+
+        struct {
+                REPR(pressed, button);
+        } previous;
+
+        struct {
+                REPR(pressed, button);
+                REPR(held, button);
+                REPR(released, button);
+        } current;
+
+#undef DATA
+#undef REPR
+        struct smpc_peripheral *parent; /* NULL if parent (directly connected to port) */
 } __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral {
@@ -319,9 +352,8 @@ struct smpc_peripheral_port {
         struct smpc_peripherals peripherals;
 };
 
-extern struct smpc_peripheral_analog *smpc_peripheral_analog_port(uint8_t);
-extern struct smpc_peripheral_digital *smpc_peripheral_digital_port(uint8_t);
-extern struct smpc_peripheral_port *smpc_peripheral_raw_port(uint8_t);
+extern void smpc_peripheral_digital_port(uint8_t, struct smpc_peripheral_digital * const);
+extern void smpc_peripheral_parse_init(void);
 extern void smpc_peripheral_data(void);
 extern void smpc_peripheral_parse(irq_mux_handle_t *);
 extern void smpc_peripheral_system_manager(void);
