@@ -17,6 +17,9 @@
 void
 smpc_init(void)
 {
+        /* Disable interrupts */
+        cpu_intc_disable();
+
         irq_mux_t *vbo;
         uint32_t mask;
 
@@ -27,9 +30,6 @@ smpc_init(void)
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
         smpc_peripheral_parse_init();
-
-        /* Disable interrupts */
-        cpu_intc_disable();
 
         mask = IC_MASK_SYSTEM_MANAGER | IC_MASK_TIMER_0;
         scu_ic_mask_chg(IC_MASK_ALL, mask);
