@@ -89,6 +89,7 @@ smpc_peripheral_parse(irq_mux_handle_t *hdl __attribute__ ((unused)))
                         break;
                 default:
                         connected_count = 0;
+                        break;
                 }
                 offset++;
 

@@ -84,6 +84,7 @@ extern void vdp2_scrn_bm_format_set(struct scrn_bm_format *);
 extern void vdp2_scrn_ccc_set(uint8_t, uint8_t);
 extern void vdp2_scrn_ch_format_set(struct scrn_ch_format *);
 extern void vdp2_scrn_display_set(uint8_t, bool);
+extern void vdp2_scrn_display_clear(uint8_t, bool);
 extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
 extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
