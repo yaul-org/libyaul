@@ -34,15 +34,5 @@ Want to contribute? Great! I could always use some extra help!
 
 If so, I'd love to hear it. Create an issue [here][1].
 
-### Getting started
-
-1. Fork it.
-2. Create a branch (`git checkout -b 'libyaul-add-foo-bar'`)
-3. Commit and changes (`git commit -am "Add foo bar"`)
-4. When content with your work, push your changes (`git push origin 'libyaul-add-foo-bar'`)
-4. Contact me with a link to your branch.
-5. ???
-6. Profit!
-
 [1]: https://github.com/ijacquez/libyaul/issues
 [2]: http://www.youtube.com/mrkotfw
