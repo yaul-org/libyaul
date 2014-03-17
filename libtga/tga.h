@@ -24,15 +24,15 @@ typedef struct {
 #define TGA_IMAGE_TYPE_RLE_GRAYSCALE    11
         uint8_t tga_type;
 
-        uint8_t tga_cmapbpp;
-        uint8_t tga_cmaplen;
+        uint8_t tga_cmap_bpp;
+        uint8_t tga_cmap_len;
 
         uint8_t tga_bpp;
         uint16_t tga_width;
         uint16_t tga_height;
-} tga_t;
+} tga_t __attribute__ ((aligned(4)));
 
-int tga_load(tga_t *, const uint8_t *, uint16_t *, uint16_t *);
+int tga_read(tga_t *, const uint8_t *, uint16_t *, uint16_t *);
 
 #ifdef __cplusplus
 }
