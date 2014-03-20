@@ -31,10 +31,11 @@ irq_mux_handle(irq_mux_t *irq_mux)
 {
         irq_mux_handle_t *hdl_np;
 
-        if (TAILQ_EMPTY(&irq_mux->im_tq))
+        if (TAILQ_EMPTY(&irq_mux->im_tq)) {
                 return;
+        }
 
-        TAILQ_FOREACH(hdl_np, &irq_mux->im_tq, handles) {
+        TAILQ_FOREACH (hdl_np, &irq_mux->im_tq, handles) {
                 hdl_np->imh_hdl(hdl_np);
         }
 }
@@ -42,7 +43,6 @@ irq_mux_handle(irq_mux_t *irq_mux)
 void
 irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *user_data)
 {
-
         irq_mux_handle_t *n_hdl;
 
         /* Disable interrupts */
@@ -64,10 +64,11 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
 void
 irq_mux_handle_remove(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *))
 {
-        irq_mux_handle_t *hdl_np;
 
         if (TAILQ_EMPTY(&irq_mux->im_tq))
                 return;
+
+        irq_mux_handle_t *hdl_np;
 
         TAILQ_FOREACH (hdl_np, &irq_mux->im_tq, handles) {
                 if (hdl_np->imh_hdl == hdl) {
