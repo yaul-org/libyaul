@@ -29,7 +29,8 @@ struct vram_ctl vram_ctl = {
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS
-                }, {/* VRAM-A1 */
+                }, {
+                        /* VRAM-A1 */
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS,
@@ -61,9 +62,11 @@ struct vram_ctl vram_ctl = {
         }
 };
 
+irq_mux_t vdp2_hblank_in_irq_mux;
 irq_mux_t vdp2_vblank_in_irq_mux;
 irq_mux_t vdp2_vblank_out_irq_mux;
 
+static void vdp2_hblank_in(void);
 static void vdp2_vblank_in(void);
 static void vdp2_vblank_out(void);
 
@@ -166,22 +169,23 @@ vdp2_init(void)
         /* Reset all buffer registers. */
         memset(&vdp2_regs, 0x0000, sizeof(struct vdp2_regs));
 
-        if (initialized)
+        if (initialized) {
                 return;
+        }
 
+        irq_mux_init(&vdp2_hblank_in_irq_mux);
         irq_mux_init(&vdp2_vblank_in_irq_mux);
         irq_mux_init(&vdp2_vblank_out_irq_mux);
 
         /* Disable interrupts */
         cpu_intc_disable();
 
-        mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT;
+        mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_HBLANK_IN;
         scu_ic_mask_chg(IC_MASK_ALL, mask);
 
-        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_IN,
-            &vdp2_vblank_in);
-        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_OUT,
-            &vdp2_vblank_out);
+        scu_ic_interrupt_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);
+        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_IN, &vdp2_vblank_in);
+        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_OUT, &vdp2_vblank_out);
         scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
@@ -189,6 +193,12 @@ vdp2_init(void)
 
         /* Initialized */
         initialized = true;
+}
+
+static void
+vdp2_hblank_in(void)
+{
+        irq_mux_handle(&vdp2_hblank_in_irq_mux);
 }
 
 static void

@@ -17,6 +17,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
+extern irq_mux_t *vdp2_tvmd_hblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_out_irq_get(void);
 extern uint16_t vdp2_tvmd_hcount_get(void);

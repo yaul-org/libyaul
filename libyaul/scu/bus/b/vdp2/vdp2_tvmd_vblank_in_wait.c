@@ -20,7 +20,7 @@ vdp2_tvmd_vblank_in_wait(void)
         exten &= 0xFDFF;
         MEMORY_WRITE(16, VDP2(EXTEN), exten);
 
-        /* Spin if we're in VBLANK-OUT (scan). Wait for VBLANK-IN
-         * (retrace) */
+        /* Spin if we're in VBLANK-OUT (re-trace/blank). Wait for VBLANK-IN
+         * (scan/draw) */
         for (; (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000; );
 }

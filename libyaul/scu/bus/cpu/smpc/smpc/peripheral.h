@@ -353,10 +353,7 @@ struct smpc_peripheral_port {
 };
 
 extern void smpc_peripheral_digital_port(uint8_t, struct smpc_peripheral_digital * const);
-extern void smpc_peripheral_parse_init(void);
-extern void smpc_peripheral_data(void);
-extern void smpc_peripheral_parse(irq_mux_handle_t *);
-extern void smpc_peripheral_system_manager(void);
+extern void smpc_peripheral_init(void);
 
 #ifdef __cplusplus
 }

@@ -38,6 +38,7 @@ hardware_init(void)
 
         /* SMPC */
         smpc_init();
+        smpc_peripheral_init();
 
         /* Disable interrupts */
         cpu_intc_disable();
@@ -50,6 +51,9 @@ hardware_init(void)
 
         vblank_out = vdp2_tvmd_vblank_out_irq_get();
         irq_mux_handle_add(vblank_out, vblank_out_handler, NULL);
+
+        /* Enable interrupts */
+        cpu_intc_enable();
 }
 
 int
