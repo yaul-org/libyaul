@@ -92,7 +92,7 @@ tutorial_update(void)
                 return;
         }
 
-        if (g_digital.connected && (g_digital.type == TYPE_DIGITAL)) {
+        if (g_digital.connected == 1) {
                 if (g_digital.current.held.button.start) {
                         _changed = true;
                         scene_load("game");

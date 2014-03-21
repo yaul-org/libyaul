@@ -258,7 +258,7 @@ _grid_init(void)
 static void
 _grid_update(void)
 {
-        if (g_digital.connected) {
+        if (g_digital.connected == 1) {
                 if (g_digital.current.held.button.a) {
                         _grid_flood_fill(GRID_CELL_COLOR_YELLOW);
                         _tries++;

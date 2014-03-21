@@ -95,7 +95,7 @@ title_update(void)
                 return;
         }
 
-        if (g_digital.connected && (g_digital.type == TYPE_DIGITAL)) {
+        if (g_digital.connected == 1) {
                 if (g_digital.current.held.button.start) {
                         changed = true;
                         scene_load("tutorial");
