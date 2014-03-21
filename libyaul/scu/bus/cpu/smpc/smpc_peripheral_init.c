@@ -416,7 +416,10 @@ irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
         /* Send "INTBACK" "SMPC" command (300us after VBLANK-IN) */
         if ((vdp2_tvmd_vcount_get()) == (224 + 8)) {
                 /* Set to 255-byte mode for both ports; not time
-                 * optimized */
+                 * optimized.
+                 *
+                 * Return peripheral data and time, cartridge code, area
+                 * code, etc.*/
                 smpc_smc_intback_call(0x00, P1MD1 | P2MD1 | PEN);
         }
 }

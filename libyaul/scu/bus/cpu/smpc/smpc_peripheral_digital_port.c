@@ -27,20 +27,5 @@ smpc_peripheral_digital_port(uint8_t port, struct smpc_peripheral_digital * cons
                 break;
         }
 
-        peripheral->connected = port_peripheral->connected;
-        peripheral->port = port_peripheral->port;
-        peripheral->type = port_peripheral->type;
-        peripheral->size = port_peripheral->size;
-
-        peripheral->previous.pressed.raw = *(uint16_t *)&port_peripheral->previous_data[0];
-        peripheral->current.pressed.raw = *(uint16_t *)&port_peripheral->data[0];
-
-        uint32_t diff;
-
-        diff = peripheral->current.pressed.raw ^ peripheral->previous.pressed.raw;
-
-        peripheral->current.held.raw = diff & peripheral->current.pressed.raw;
-        peripheral->current.released.raw = diff & peripheral->previous.pressed.raw;
-
-        peripheral->parent = port_peripheral->parent;
+        smpc_peripheral_digital_get(port_peripheral, peripheral);
 }

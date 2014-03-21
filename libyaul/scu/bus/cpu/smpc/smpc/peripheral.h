@@ -274,7 +274,7 @@ struct smpc_peripheral_racing {
 } __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral_digital {
-        bool connected;
+        bool connected; /* Number of peripherals connected */
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
         uint8_t port;
@@ -334,7 +334,7 @@ struct smpc_peripheral_digital {
 } __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral {
-        uint8_t connected;
+        uint8_t connected; /* Number of peripherals connected */
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
         uint8_t port; /* 1 or 2 */
@@ -352,6 +352,8 @@ struct smpc_peripheral_port {
         struct smpc_peripherals peripherals;
 };
 
+extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
+    struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_digital_port(uint8_t, struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_init(void);
 

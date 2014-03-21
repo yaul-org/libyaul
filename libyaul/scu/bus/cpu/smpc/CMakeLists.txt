@@ -2,6 +2,7 @@ SET(scu_bus_cpu_smpc_SRC
   smpc_init.c
   smpc_peripheral_analog_port.c
   smpc_peripheral_digital_port.c
+  smpc_peripheral_digital_get.c
   smpc_peripheral_init.c
   smpc_peripheral_keyboard_port.c
   smpc_peripheral_mouse_port.c
