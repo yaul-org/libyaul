@@ -330,11 +330,11 @@ struct smpc_peripheral_digital {
 
 #undef DATA
 #undef REPR
-        struct smpc_peripheral *parent; /* NULL if parent (directly connected to port) */
+        struct smpc_peripheral_port *parent;
 } __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral {
-        bool connected;
+        uint8_t connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
         uint8_t port; /* 1 or 2 */
@@ -342,7 +342,7 @@ struct smpc_peripheral {
         uint8_t size;
         uint8_t data[MAX_PORT_DATA_SIZE + 1]; /* Peripheral data table */
         uint8_t previous_data[MAX_PORT_DATA_SIZE + 1]; /* Previous frame data table */
-        struct smpc_peripheral *parent; /* NULL if parent (directly connected to port) */
+        struct smpc_peripheral_port *parent; /* NULL if this peripheral is directly connected */
 
         TAILQ_ENTRY(smpc_peripheral) peripherals;
 } __attribute__ ((packed));

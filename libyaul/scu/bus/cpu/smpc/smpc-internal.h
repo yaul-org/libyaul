@@ -35,22 +35,6 @@
 #define SMPC_SMC_SETSMEM        0x17
 #define SMPC_RTC_SETTIME        0x16
 
-#define OREG_SET(x, y)  (oreg_buf[(x)] = (y))
-#define OREG_GET(x)     (oreg_buf[(x)])
-#define OREG_OFFSET(x)  (&oreg_buf[(x)])
-
-/* 1st data byte */
-#define PC_GET_MULTITAP_ID(x)   ((OREG_GET((x)) >> 4) & 0x0F)
-#define PC_GET_NUM_CONNECTIONS(x) (OREG_GET((x)) & 0x0F)
-/* 2nd data byte. */
-#define PC_GET_ID(x)            (OREG_GET((x)) & 0xFF)
-#define PC_GET_TYPE(x)          ((OREG_GET((x)) >> 4) & 0x0F)
-#define PC_GET_SIZE(x)          (OREG_GET((x)) & 0x0F)
-#define PC_GET_EXT_SIZE(x)      (OREG_GET((x) + 1) & 0xFF)
-/* 3rd (or 4th) data byte */
-#define PC_GET_DATA(x)          (OREG_OFFSET((x)))
-#define PC_GET_DATA_BYTE(x, y)  (((uint8_t *)OREG_OFFSET((x)))[(y)])
-
 #define SMPC_CMD_ISSUE_TYPE_A   0
 #define SMPC_CMD_ISSUE_TYPE_B   1
 #define SMPC_CMD_ISSUE_TYPE_C   2

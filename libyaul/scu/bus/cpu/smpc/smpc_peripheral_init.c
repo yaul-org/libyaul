@@ -23,34 +23,57 @@
 
 #include "smpc-internal.h"
 
-#define P1MD0   0x00 /* 15B mode */
-#define P1MD1   0x02 /* 255B mode */
-#define P1MD2   0x03 /* 0B mode (port is not accessed) */
-#define P2MD0   0x00
-#define P2MD1   0x04
-#define P2MD2   0x0C
-#define RESB    0x10
-#define NPE     0x20
-#define PDL     0x40
+#define OPE     0x02 /* Acquisition Time Optimization */
+#define PEN     0x08 /* Peripheral Data Enable */
+#define P1MD0   0x10 /* 15-byte mode */
+#define P1MD1   0x20 /* 255-byte mode */
+#define P1MD2   (P1MD0 | P1MD1) /* Port #1 0B mode (port is not accessed) */
+#define P2MD0   0x40 /* 15-byte mode */
+#define P2MD1   0x80 /* 255-byte mode */
+#define P2MD2   (P2MD0 | P2MD1) /* Port #2 0B mode (port is not accessed) */
+
+/* SR */
+#define NPE     0x20 /* Remaining Peripheral Existence */
+#define PDL     0x40 /* Peripheral Data Location */
+
+#define OREG_SET(x, y) do {                                                    \
+        _oreg_buf[(x)] = (y);                                                  \
+} while(0)
+
+#define OREG_GET(x)     (_oreg_buf[(x)])
+#define OREG_OFFSET(x)  (&_oreg_buf[(x)])
+
+/* 1st data byte */
+#define PC_GET_MULTITAP_ID(x)   ((OREG_GET((x)) >> 4) & 0x0F)
+#define PC_GET_NUM_CONNECTIONS(x) (OREG_GET((x)) & 0x0F)
+/* 2nd data byte */
+#define PC_GET_ID(x)            (OREG_GET((x)) & 0xFF)
+#define PC_GET_TYPE(x)          ((OREG_GET((x)) >> 4) & 0x0F)
+#define PC_GET_SIZE(x)          (OREG_GET((x)) & 0x0F)
+/* 3rd data byte */
+#define PC_GET_EXT_SIZE(x)      (OREG_GET((x)) & 0xFF)
+/* 3rd (or 4th) data byte */
+#define PC_GET_DATA(x)          (OREG_OFFSET((x)))
+#define PC_GET_DATA_BYTE(x, y)  (((uint8_t *)OREG_OFFSET((x)))[(y)])
 
 struct smpc_peripheral_port smpc_peripheral_port_1;
 struct smpc_peripheral_port smpc_peripheral_port_2;
 
-uint8_t oreg_buf[MAX_PORT_DEVICES * (MAX_PORT_DATA_SIZE + 1)];
-
-static int offset = 0;
+static uint32_t _offset = 0;
+static uint8_t _oreg_buf[MAX_PORT_DEVICES * (MAX_PORT_DATA_SIZE + 1)];
 
 static void port_peripherals_free(struct smpc_peripheral_port *);
 static struct smpc_peripheral *peripheral_alloc(void);
 static void peripheral_free(struct smpc_peripheral *);
-static int peripheral_update(struct smpc_peripheral *, uint8_t);
+static int32_t peripheral_update(struct smpc_peripheral_port *,
+    struct smpc_peripheral *, uint8_t);
 
 static void handler_system_manager(void);
 
-static void irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)));
-static void irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)));
+static void irq_mux_vblank_in(irq_mux_handle_t * __attribute__ ((unused)));
+static void irq_mux_hblank_in(irq_mux_handle_t * __attribute__ ((unused)));
 
-MEMB(peripherals, struct smpc_peripheral, 2, 2);
+MEMB(peripherals, struct smpc_peripheral, MAX_PORT_DEVICES + 2, 4);
 
 void
 smpc_peripheral_init(void)
@@ -99,19 +122,18 @@ smpc_peripheral_init(void)
 static void
 port_peripherals_free(struct smpc_peripheral_port *port)
 {
+
         assert(port != NULL);
 
-        if (!(TAILQ_EMPTY(&port->peripherals))) {
-                struct smpc_peripheral *peripheral;
-                struct smpc_peripheral *tmp_peripheral;
+        struct smpc_peripheral *peripheral;
+        struct smpc_peripheral *tmp_peripheral;
 
-                for (peripheral = TAILQ_FIRST(&port->peripherals);
-                     peripheral != NULL;
-                     peripheral = tmp_peripheral) {
-                        tmp_peripheral = TAILQ_NEXT(peripheral, peripherals);
-                        TAILQ_REMOVE(&port->peripherals, peripheral, peripherals);
-                        peripheral_free(peripheral);
-                }
+        for (peripheral = TAILQ_FIRST(&port->peripherals);
+             (peripheral != NULL) && (tmp_peripheral = TAILQ_NEXT(peripheral, peripherals), 1);
+             peripheral = tmp_peripheral) {
+                TAILQ_REMOVE(&port->peripherals, peripheral, peripherals);
+
+                peripheral_free(peripheral);
         }
 }
 
@@ -124,10 +146,7 @@ peripheral_alloc(void)
         assert(peripheral != NULL);
 
         /* Ignore all other fields if peripheral is not connected */
-        peripheral->connected = false;
-        /* Clear data */
-        memset(peripheral->data, 0x00, MAX_PORT_DATA_SIZE + 1);
-        memset(peripheral->previous_data, 0x00, MAX_PORT_DATA_SIZE + 1);
+        peripheral->connected = 0;
 
         return peripheral;
 }
@@ -135,16 +154,69 @@ peripheral_alloc(void)
 static void
 peripheral_free(struct smpc_peripheral *peripheral)
 {
-        assert(peripheral == NULL);
-        assert(memb_free(&peripherals, peripheral));
+        assert(peripheral != NULL);
+        assert((memb_free(&peripherals, peripheral)) == 0);
 }
 
-static int
-peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
+static int32_t
+peripheral_update(struct smpc_peripheral_port *parent,
+    struct smpc_peripheral *peripheral,
+    uint8_t port)
 {
+        uint8_t multitap_id;
+        uint32_t connected;
+
+        if (parent != NULL) {
+                connected = 1;
+        } else {
+                multitap_id = PC_GET_MULTITAP_ID(_offset);
+                switch (multitap_id) {
+                case 0x00:
+                        /* ID: SEGA Tap (4 connectors) */
+                case 0x01:
+                        /* ID: SATURN 6P Multi-Tap (6 connectors) */
+                case 0x02:
+                        /* ID: Clocked serial */
+                case 0x03:
+                case 0x0E:
+                        connected = PC_GET_NUM_CONNECTIONS(_offset);
+                        /* At least two peripheral ports are required */
+                        connected = (connected < 2) ? 0 : connected;
+                        break;
+                case 0x0F:
+                        connected = PC_GET_NUM_CONNECTIONS(_offset);
+                        /* Only a single peripheral can be directly connected */
+                        connected = (connected > 1) ? 0 : connected;
+                        break;
+                default:
+                        connected = 0;
+                }
+
+                _offset++;
+        }
+
+        if (connected == 0) {
+                /* Nothing directly connected to the port */
+                return -1;
+        }
+
+        peripheral->connected = connected;
+        peripheral->port = port;
+        peripheral->parent = parent;
+
+        uint8_t type;
         uint8_t size;
 
-        switch (PC_GET_TYPE(offset)) {
+        if (connected > 1) {
+                peripheral->type = multitap_id;
+                peripheral->size = 0x00;
+
+                return connected;
+        }
+
+        /* Check if the type is valid */
+        type = PC_GET_TYPE(_offset);
+        switch (type) {
         case TYPE_DIGITAL:
         case TYPE_ANALOG:
         case TYPE_POINTER:
@@ -158,16 +230,11 @@ peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
                 return -1;
         }
 
-        size = PC_GET_SIZE(offset);
-        if (size > 15) {
-                /* Non-extended size cannot exceed 15B */
-                return -1;
-        }
-
-        /* Check if what data configuration we're using */
+        size = PC_GET_SIZE(_offset);
         if (size > 0) {
+                /* Peripheral data collection #1 */
                 /* Check if the ID is valid */
-                switch (PC_GET_ID(offset)) {
+                switch (PC_GET_ID(_offset)) {
                 case ID_MD3B:
                 case ID_MD6B:
                 case ID_MDMOUSE:
@@ -183,72 +250,70 @@ peripheral_update(struct smpc_peripheral *peripheral, uint8_t port)
                         return -1;
                 }
         } else if (size == 0) {
-                size = PC_GET_EXT_SIZE(offset);
-                /*
-                 * FIXME
-                 * What do we do when it's 255B mode?
-                 */
-                assert(size < 16);
+                /* Peripheral data collection #2 is not supported as
+                 * we're always in 255-byte mode.
+                 *
+                 * Peripheral data collection #3 */
+                _offset++;
+                size = PC_GET_EXT_SIZE(_offset);
 
-                if (size < 15) {
-                        /* Invalid peripheral data configuration (2 or 3) */
-                        return -1;
-                }
-                offset++;
+                /* With a multi-tap, it is possible to mix the
+                 * connection of peripherals of 15-bytes or less and
+                 * 16-bytes or more. */
         }
+        _offset++;
 
-        peripheral->connected = true;
-
-        /* Set to port number if parent, otherwise, set to port number
-         * within the multi-terminal peripheral */
-        peripheral->port = port;
-        peripheral->type = PC_GET_TYPE(offset);
-        peripheral->size = size;
-        offset++;
+        uint32_t data_idx;
 
         switch (size) {
         case 0x02:
                 peripheral->previous_data[0] = peripheral->data[0];
                 peripheral->previous_data[1] = peripheral->data[1];
 
-                peripheral->data[0] = PC_GET_DATA_BYTE(offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(offset, 1) ^ 0xFF;
+                peripheral->data[0] = PC_GET_DATA_BYTE(_offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(_offset, 1) ^ 0xFF;
+                break;
+        case 0x06:
+                memset(&peripheral->previous_data[0], peripheral->data[0], size);
+
+                peripheral->data[0] = PC_GET_DATA_BYTE(_offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(_offset, 1) ^ 0xFF;
                 break;
         default:
                 /* XXX
                  * Currently not supporting other sizes */
                 assert(false);
         }
+
+        peripheral->type = type;
+        peripheral->size = size;
+
         /* Move onto the next peripheral */
-        offset += size;
+        _offset += size;
 
-        /* Find the parent by determining what kind of peripheral is
-         * connected directly to the port */
-        peripheral->parent = NULL;
-
-        return 0;
+        return connected;
 }
 
 static void
 handler_system_manager(void)
 {
         /* Fetch but no parsing */
-        static uint16_t oreg_buf_idx = 0;
+        static uint32_t offset = 0;
 
         /* Is this the first time fetching peripheral data? */
         if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL) {
-                oreg_buf_idx = 0;
+                offset = 0;
         }
 
         /* What if we exceed our capacity? Buffer overflow */
-        assert(oreg_buf_idx <= MAX_PORT_DATA_SIZE);
+        assert(offset <= MAX_PORT_DATA_SIZE);
 
-        uint32_t ooffset;
+        uint32_t oreg_idx;
 
-        for (ooffset = 0; ooffset < SMPC_OREGS; ooffset++, oreg_buf_idx++) {
+        for (oreg_idx = 0; oreg_idx < SMPC_OREGS; oreg_idx++, offset++) {
                 /* We don't have much time in the critical section. Just
                  * buffer the registers */
-                OREG_SET(oreg_buf_idx, MEMORY_READ(8, OREG(ooffset)));
+                OREG_SET(offset, MEMORY_READ(8, OREG(oreg_idx)));
         }
 
         /* Check if there is any remaining peripheral data */
@@ -269,71 +334,61 @@ handler_system_manager(void)
 static void
 irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
 {
-        uint32_t ist;
-
-        /* Could this help? */
-        ist = scu_ic_status_get();
-        if ((ist & IC_IST_SYSTEM_MANAGER) == IC_IST_SYSTEM_MANAGER) {
-                return;
-        }
-
-        struct smpc_peripheral_port *port;
-        struct smpc_peripheral_port *ports[] = {
+        static struct smpc_peripheral_port *ports[] = {
                 &smpc_peripheral_port_1,
                 &smpc_peripheral_port_2,
                 NULL
         };
 
-        int port_idx;
+        /* Could this help? */
+        if (((scu_ic_status_get()) & IC_IST_SYSTEM_MANAGER) == IC_IST_SYSTEM_MANAGER) {
+                return;
+        }
 
-        offset = 0;
+        int32_t port_idx;
+
+        _offset = 0;
         for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
+                struct smpc_peripheral_port *port;
+
                 port = ports[port_idx];
 
-                uint32_t connected_count;
-
-                switch (PC_GET_MULTITAP_ID(offset)) {
-                case 0x00:
-                        /* ID: SEGA Tap (4 connectors) */
-                case 0x01:
-                        /* ID: SATURN 6P Multi-Tap (6 connectors) */
-                case 0x02:
-                        /* ID: Clocked serial */
-                case 0x03:
-                case 0x0E:
-                        connected_count = PC_GET_NUM_CONNECTIONS(offset);
-                        /* At least two peripheral ports are required */
-                        connected_count = (connected_count < 2) ? 0 : connected_count;
-                        break;
-                case 0x0F:
-                        connected_count = PC_GET_NUM_CONNECTIONS(offset);
-                        /* Only a single peripheral can be directly connected */
-                        connected_count = (connected_count > 1) ? 0 : connected_count;
-                        break;
-                default:
-                        connected_count = 0;
-                        break;
-                }
-                offset++;
-
-                if (connected_count == 0) {
-                        /* Nothing connected at the port */
-                        port->peripheral->connected = false;
-                        port_peripherals_free(port);
-                        continue;
-                }
+                int32_t previous_connected; /* Previous connected peripherals */
+                int32_t connected;
 
                 /* Update peripheral connected directly to the port */
-                if ((peripheral_update(port->peripheral, port_idx + 1)) < 0) {
+                previous_connected = port->peripheral->connected;
+                if ((connected = peripheral_update(/* parent = */ NULL,
+                            port->peripheral, port_idx + 1)) < 0) {
                         /* Couldn't parse data; invalid peripheral */
-                        port->peripheral->connected = false;
+                        port->peripheral->connected = 0;
                         port_peripherals_free(port);
                         continue;
                 }
-                connected_count--;
 
-                /* For now, assume that only standard digital pads can be connected */
-                assert(connected_count == 0);
+                port_peripherals_free(port);
+
+                if (connected > 1) {
+                        int32_t sub_port;
+
+                        port->peripheral->connected = 0;
+                        for (sub_port = 1; connected > 0; connected--, sub_port++) {
+                                struct smpc_peripheral *peripheral;
+
+                                peripheral = peripheral_alloc();
+                                assert(peripheral != NULL);
+
+                                if ((peripheral_update(/* parent = */ port, peripheral, sub_port)) < 0) {
+                                        peripheral_free(peripheral);
+                                        continue;
+                                }
+
+                                /* Add peripheral */
+                                TAILQ_INSERT_TAIL(&port->peripherals, peripheral, peripherals);
+
+                                port->peripheral->connected++;
+                        }
+                }
         }
 }
 
@@ -358,13 +413,10 @@ irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
         /* Make the assumption that we're on a NTSC console and it's set
          * at a default 224 scanlines */
 
-        /*
-         * Send "INTBACK" "SMPC" command (300us after VBLANK-IN)
-         * Fetch both
-         * Set to 15-byte mode; optimized
-         */
-
+        /* Send "INTBACK" "SMPC" command (300us after VBLANK-IN) */
         if ((vdp2_tvmd_vcount_get()) == (224 + 8)) {
-                smpc_smc_intback_call(0x00, 0x0A);
+                /* Set to 255-byte mode for both ports; not time
+                 * optimized */
+                smpc_smc_intback_call(0x00, P1MD1 | P2MD1 | PEN);
         }
 }
