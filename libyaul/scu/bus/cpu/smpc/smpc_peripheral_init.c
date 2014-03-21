@@ -166,9 +166,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
         uint8_t multitap_id;
         uint32_t connected;
 
-        if (parent != NULL) {
-                connected = 1;
-        } else {
+        if (parent == NULL) {
                 multitap_id = PC_GET_MULTITAP_ID(_offset);
                 switch (multitap_id) {
                 case 0x00:
@@ -200,16 +198,15 @@ peripheral_update(struct smpc_peripheral_port *parent,
                 return -1;
         }
 
-        peripheral->connected = connected;
-        peripheral->port = port;
-        peripheral->parent = parent;
-
         uint8_t type;
         uint8_t size;
 
         if (connected > 1) {
+                peripheral->connected = connected;
+                peripheral->port = port;
                 peripheral->type = multitap_id;
                 peripheral->size = 0x00;
+                peripheral->parent = parent;
 
                 return connected;
         }
@@ -285,8 +282,11 @@ peripheral_update(struct smpc_peripheral_port *parent,
                 assert(false);
         }
 
-        peripheral->type = type;
-        peripheral->size = size;
+        peripheral->connected = 1;
+        peripheral->port = port;
+        peripheral->type = multitap_id;
+        peripheral->size = 0x00;
+        peripheral->parent = parent;
 
         /* Move onto the next peripheral */
         _offset += size;
