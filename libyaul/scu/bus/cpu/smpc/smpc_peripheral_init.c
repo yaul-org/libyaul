@@ -12,6 +12,8 @@
 #include <smpc/smc.h>
 #include <vdp2.h>
 
+#include <gdb.h>
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +27,10 @@
 
 #define OPE     0x02 /* Acquisition Time Optimization */
 #define PEN     0x08 /* Peripheral Data Enable */
-#define P1MD0   0x10 /* 15-byte mode */
-#define P1MD1   0x20 /* 255-byte mode */
-#define P1MD2   (P1MD0 | P1MD1) /* Port #1 0B mode (port is not accessed) */
-#define P2MD0   0x40 /* 15-byte mode */
-#define P2MD1   0x80 /* 255-byte mode */
-#define P2MD2   (P2MD0 | P2MD1) /* Port #2 0B mode (port is not accessed) */
+#define P1MD0   0x10 /* 255-byte mode */
+#define P1MD1   0x30 /* 0-byte mode (port is not accessed) */
+#define P2MD0   0x40 /* 255-byte mode */
+#define P2MD1   0xC0 /* 0-byte mode (port is not accessed) */
 
 /* SR */
 #define NPE     0x20 /* Remaining Peripheral Existence */
@@ -95,6 +95,15 @@ smpc_peripheral_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
+        uint32_t mask;
+
+        mask = IC_MASK_SYSTEM_MANAGER;
+        scu_ic_mask_chg(IC_MASK_ALL, mask);
+
+        scu_ic_interrupt_set(IC_INTERRUPT_SYSTEM_MANAGER,
+            &handler_system_manager);
+        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
+
         /* Acquisition at start (+ 5 scanlines) of HBLANK-IN */
         irq_mux_t *hblank_in;
         hblank_in = vdp2_tvmd_hblank_in_irq_get();
@@ -105,15 +114,6 @@ smpc_peripheral_init(void)
 
         vblank_in = vdp2_tvmd_vblank_in_irq_get();
         irq_mux_handle_add(vblank_in, irq_mux_vblank_in, NULL);
-
-        uint32_t mask;
-
-        mask = IC_MASK_SYSTEM_MANAGER;
-        scu_ic_mask_chg(IC_MASK_ALL, mask);
-
-        scu_ic_interrupt_set(IC_INTERRUPT_SYSTEM_MANAGER,
-            &handler_system_manager);
-        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
         cpu_intc_enable();
@@ -414,12 +414,12 @@ irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
          * at a default 224 scanlines */
 
         /* Send "INTBACK" "SMPC" command (300us after VBLANK-IN) */
-        if ((vdp2_tvmd_vcount_get()) == (224 + 8)) {
+        if ((vdp2_tvmd_vcount_get()) == 218) {
                 /* Set to 255-byte mode for both ports; not time
                  * optimized.
                  *
                  * Return peripheral data and time, cartridge code, area
                  * code, etc.*/
-                smpc_smc_intback_call(0x00, P1MD1 | P2MD1 | PEN);
+                smpc_smc_intback_call(0x00, P1MD0 | P2MD0 | PEN);
         }
 }
