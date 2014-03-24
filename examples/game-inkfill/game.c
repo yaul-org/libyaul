@@ -99,7 +99,7 @@ game_update(void)
                 _grid_randomize();
         }
 
-        if (g_digital.current.held.button.start) {
+        if (g_digital.held.button.start) {
                 _tries = 0;
                 _grid_randomize();
         }
@@ -259,16 +259,16 @@ static void
 _grid_update(void)
 {
         if (g_digital.connected == 1) {
-                if (g_digital.current.held.button.a) {
+                if (g_digital.held.button.a) {
                         _grid_flood_fill(GRID_CELL_COLOR_YELLOW);
                         _tries++;
-                }  else if (g_digital.current.held.button.b) {
+                }  else if (g_digital.held.button.b) {
                         _grid_flood_fill(GRID_CELL_COLOR_BLUE);
                         _tries++;
-                } else if (g_digital.current.held.button.c) {
+                } else if (g_digital.held.button.c) {
                         _grid_flood_fill(GRID_CELL_COLOR_ORANGE);
                         _tries++;
-                } else if (g_digital.current.held.button.r) {
+                } else if (g_digital.held.button.r) {
                         _grid_flood_fill(GRID_CELL_COLOR_RED);
                         _tries++;
                 }

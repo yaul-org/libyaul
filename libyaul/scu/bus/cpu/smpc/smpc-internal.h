@@ -16,7 +16,7 @@
 #define SMPC(x)         (0x20100000 + (x))
 
 #define SMPC_IREGS      7
-#define SMPC_OREGS      31
+#define SMPC_OREGS      32
 
 #define SMPC_SMC_MSHON          0x00
 #define SMPC_SMC_SSHON          0x02

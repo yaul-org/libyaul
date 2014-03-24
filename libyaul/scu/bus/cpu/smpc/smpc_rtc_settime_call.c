@@ -21,8 +21,8 @@ smpc_rtc_settime_call(struct smpc_time *time)
         MEMORY_WRITE(8, IREG(2), time->day << 4);
         MEMORY_WRITE(8, IREG(2), time->month);
         MEMORY_WRITE(8, IREG(3), time->days);
-        MEMORY_WRITE(8, IREG(4), time->hour);
-        MEMORY_WRITE(8, IREG(5), time->minute);
+        MEMORY_WRITE(8, IREG(4), time->hours);
+        MEMORY_WRITE(8, IREG(5), time->minutes);
         MEMORY_WRITE(8, IREG(6), time->seconds);
 
         smpc_smc_call(SMPC_RTC_SETTIME, SMPC_CMD_ISSUE_TYPE_C, NULL);

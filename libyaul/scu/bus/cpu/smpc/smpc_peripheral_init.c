@@ -9,10 +9,9 @@
 #include <irq-mux.h>
 #include <scu/ic.h>
 #include <smpc/peripheral.h>
+#include <smpc/rtc.h>
 #include <smpc/smc.h>
 #include <vdp2.h>
-
-#include <gdb.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -25,6 +24,7 @@
 
 #include "smpc-internal.h"
 
+
 #define OPE     0x02 /* Acquisition Time Optimization */
 #define PEN     0x08 /* Peripheral Data Enable */
 #define P1MD0   0x10 /* 255-byte mode */
@@ -34,7 +34,12 @@
 
 /* SR */
 #define NPE     0x20 /* Remaining Peripheral Existence */
+#define PDE     NPE /* Same as NPE; possibly an error in the documentation? */
 #define PDL     0x40 /* Peripheral Data Location */
+
+/* IREG0 for INTBACK */
+#define BR      0x40
+#define CONT    0x80
 
 #define OREG_SET(x, y) do {                                                    \
         _oreg_buf[(x)] = (y);                                                  \
@@ -59,8 +64,12 @@
 struct smpc_peripheral_port smpc_peripheral_port_1;
 struct smpc_peripheral_port smpc_peripheral_port_2;
 
-static uint32_t _offset = 0;
-static uint8_t _oreg_buf[MAX_PORT_DEVICES * (MAX_PORT_DATA_SIZE + 1)];
+static volatile uint32_t _offset = 0;
+
+/* OREG buffer that can hold a maximum of 6 peripherals with a data size
+ * of 255-bytes (+1 for alignment) as well as an entire buffer for SMPC
+ * status (time, cartridge code, area code, etc.) */
+static uint8_t _oreg_buf[(MAX_PERIPHERALS * (MAX_PERIPHERAL_DATA_SIZE + 1)) + SMPC_OREGS];
 
 static void port_peripherals_free(struct smpc_peripheral_port *);
 static struct smpc_peripheral *peripheral_alloc(void);
@@ -73,7 +82,10 @@ static void handler_system_manager(void);
 static void irq_mux_vblank_in(irq_mux_handle_t * __attribute__ ((unused)));
 static void irq_mux_hblank_in(irq_mux_handle_t * __attribute__ ((unused)));
 
-MEMB(peripherals, struct smpc_peripheral, MAX_PORT_DEVICES + 2, 4);
+/* A memory pool that holds two peripherals directly connected to each
+ * port that also hold MAX_PERIPHERALS (6) each making a total of 14
+ * possible peripherals connected at one time */
+MEMB(peripherals, struct smpc_peripheral, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
 
 void
 smpc_peripheral_init(void)
@@ -95,15 +107,6 @@ smpc_peripheral_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
-        uint32_t mask;
-
-        mask = IC_MASK_SYSTEM_MANAGER;
-        scu_ic_mask_chg(IC_MASK_ALL, mask);
-
-        scu_ic_interrupt_set(IC_INTERRUPT_SYSTEM_MANAGER,
-            &handler_system_manager);
-        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
-
         /* Acquisition at start (+ 5 scanlines) of HBLANK-IN */
         irq_mux_t *hblank_in;
         hblank_in = vdp2_tvmd_hblank_in_irq_get();
@@ -114,6 +117,15 @@ smpc_peripheral_init(void)
 
         vblank_in = vdp2_tvmd_vblank_in_irq_get();
         irq_mux_handle_add(vblank_in, irq_mux_vblank_in, NULL);
+
+        uint32_t mask;
+
+        mask = IC_MASK_SYSTEM_MANAGER;
+        scu_ic_mask_chg(IC_MASK_ALL, mask);
+
+        scu_ic_interrupt_set(IC_INTERRUPT_SYSTEM_MANAGER,
+            &handler_system_manager);
+        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
         cpu_intc_enable();
@@ -297,38 +309,31 @@ peripheral_update(struct smpc_peripheral_port *parent,
 static void
 handler_system_manager(void)
 {
-        /* Fetch but no parsing */
         static uint32_t offset = 0;
 
-        /* Is this the first time fetching peripheral data? */
-        if (((MEMORY_READ(8, SMPC(SR))) & PDL) == PDL) {
-                offset = 0;
+        /* We don't have much time in the critical section. Just
+         * buffer the registers */
+        uint32_t oreg;
+
+        for (oreg = 0; oreg < SMPC_OREGS; oreg++, offset++) {
+                OREG_SET(offset, MEMORY_READ(8, OREG(oreg)));
         }
 
-        /* What if we exceed our capacity? Buffer overflow */
-        assert(offset <= MAX_PORT_DATA_SIZE);
+        uint8_t sr;
 
-        uint32_t oreg_idx;
+        sr = MEMORY_READ(8, SMPC(SR));
+        if ((sr & 0x80) == 0x80) {
+                if ((sr & NPE) == 0x00) {
+                        offset = 0;
 
-        for (oreg_idx = 0; oreg_idx < SMPC_OREGS; oreg_idx++, offset++) {
-                /* We don't have much time in the critical section. Just
-                 * buffer the registers */
-                OREG_SET(offset, MEMORY_READ(8, OREG(oreg_idx)));
+                        /* Issue a "BREAK" for the "INTBACK" command */
+                        MEMORY_WRITE(8, IREG(0), BR);
+                        return;
+                }
         }
-
-        /* Check if there is any remaining peripheral data */
-        if (((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00) {
-                /* Issue a "BREAK" for the "INTBACK" command */
-                MEMORY_WRITE(8, IREG(0), 0x40);
-                return;
-        }
-
-        /* Is there remaining peripheral data? */
-        /* Let's not yet cover this case yet since we can't fetch more data */
-        assert(((MEMORY_READ(8, SMPC(SR))) & NPE) == 0x00);
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
-        MEMORY_WRITE(8, IREG(0), 0x80);
+        MEMORY_WRITE(8, IREG(0), CONT);
 }
 
 static void
@@ -345,9 +350,44 @@ irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
                 return;
         }
 
+        _offset = 0;
+
+        /* Ignore OREG0 */
+        _offset++;
+
+        struct smpc_time time;
+
+        time.year = (OREG_GET(_offset) << 8) | OREG_GET(_offset + 1);
+        _offset++;
+        _offset++;
+
+        time.day = OREG_GET(_offset) & 0xF0;
+        time.month = OREG_GET(_offset) & 0x0F;
+        _offset++;
+
+        time.days = OREG_GET(_offset);
+        _offset++;
+
+        time.hours = OREG_GET(_offset);
+        _offset++;
+
+        time.minutes = OREG_GET(_offset);
+        _offset++;
+
+        time.seconds = OREG_GET(_offset);
+        _offset++;
+
+        /* Ignore OREG8
+         * Ignore OREG9
+         * Ignore OREG10
+         * Ignore OREG11
+         * ... */
+
         int32_t port_idx;
 
-        _offset = 0;
+        /* Peripheral data starts at offset 32 (OREG0) in the OREG buffer */
+        _offset = SMPC_OREGS;
+
         for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
                 struct smpc_peripheral_port *port;
 
@@ -410,16 +450,13 @@ irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
          *    3 scanlines for the vertical sync area
          */
 
-        /* Make the assumption that we're on a NTSC console and it's set
-         * at a default 224 scanlines */
-
         /* Send "INTBACK" "SMPC" command (300us after VBLANK-IN) */
-        if ((vdp2_tvmd_vcount_get()) == 218) {
+        if ((vdp2_tvmd_vcount_get()) == (224 + 8)) {
                 /* Set to 255-byte mode for both ports; not time
                  * optimized.
                  *
                  * Return peripheral data and time, cartridge code, area
                  * code, etc.*/
-                smpc_smc_intback_call(0x00, P1MD0 | P2MD0 | PEN);
+                smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN);
         }
 }

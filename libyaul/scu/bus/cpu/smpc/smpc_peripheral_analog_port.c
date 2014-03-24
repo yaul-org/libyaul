@@ -7,23 +7,25 @@
 
 #include <smpc/peripheral.h>
 
+#include <assert.h>
+
 #include "smpc-internal.h"
 
-struct smpc_peripheral_analog *
-smpc_peripheral_analog_port(uint8_t port)
+void
+smpc_peripheral_analog_port(uint8_t port, struct smpc_peripheral_analog * const peripheral)
 {
-        struct smpc_peripheral_analog *port_1;
-        struct smpc_peripheral_analog *port_2;
+        struct smpc_peripheral *port_peripheral;
 
-        port_1 = (struct smpc_peripheral_analog *)smpc_peripheral_port_1.peripheral;
-        port_2 = (struct smpc_peripheral_analog *)smpc_peripheral_port_2.peripheral;
+        assert((port == 1) || (port == 2));
 
         switch (port) {
         case 1:
-                return port_1;
+                port_peripheral = smpc_peripheral_port_1.peripheral;
+                break;
         case 2:
-                return port_2;
-        default:
-                return NULL;
+                port_peripheral = smpc_peripheral_port_2.peripheral;
+                break;
         }
+
+        smpc_peripheral_analog_get(port_peripheral, peripheral);
 }

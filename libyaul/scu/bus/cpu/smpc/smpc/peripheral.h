@@ -8,8 +8,6 @@
 #ifndef _PERIPHERAL_H_
 #define _PERIPHERAL_H_
 
-#include <irq-mux.h>
-
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -20,8 +18,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define MAX_PORT_DEVICES        6
-#define MAX_PORT_DATA_SIZE      255
+#define MAX_PORTS       2
+#define MAX_PERIPHERALS 6 /* Max number of peripherals connected to a single port */
+#define MAX_PERIPHERAL_DATA_SIZE 255
 
 #define KEY_0                   0x45
 #define KEY_1                   0x16
@@ -215,40 +214,114 @@ struct smpc_peripheral_mouse {
 } __attribute__ ((packed, __may_alias__));
 
 struct smpc_peripheral_analog {
-        bool connected;
-        /* If no children, port is 1 or 2. Otherwise, port is under
-         * multi-terminal */
+        bool connected; /* Number of peripherals connected */
         uint8_t port;
         uint8_t type;
         uint8_t size;
 
+#define DATA(x)                                                                \
+        struct {                                                               \
+                /* Byte #1 */                                                  \
+                unsigned int right:1;                                          \
+                unsigned int left:1;                                           \
+                unsigned int down:1;                                           \
+                unsigned int up:1;                                             \
+                unsigned int start:1;                                          \
+                unsigned int a:1;                                              \
+                unsigned int c:1;                                              \
+                unsigned int b:1;                                              \
+                /* Byte #2 */                                                  \
+                unsigned int r:1;                                              \
+                unsigned int x:1;                                              \
+                unsigned int y:1;                                              \
+                unsigned int z:1;                                              \
+                unsigned int l:1;                                              \
+                /* 3 bits for extensions data */                               \
+                struct {                                                       \
+                        /* Byte #3 */                                          \
+                        uint8_t x_axis;                                        \
+                        /* Byte #4 */                                          \
+                        uint8_t y_axis;                                        \
+                } __attribute__ ((packed)) axis;                               \
+                struct {                                                       \
+                        /* Byte #5 */                                          \
+                        uint8_t l;                                             \
+                        /* Byte #6 */                                          \
+                        uint8_t r;                                             \
+                } __attribute__ ((packed)) trigger;                            \
+        } __attribute__ ((packed)) x
+
+#define DATA_DIGITAL(x)                                                        \
+        struct {                                                               \
+                /* Byte #1 */                                                  \
+                unsigned int right:1;                                          \
+                unsigned int left:1;                                           \
+                unsigned int down:1;                                           \
+                unsigned int up:1;                                             \
+                unsigned int start:1;                                          \
+                unsigned int a:1;                                              \
+                unsigned int c:1;                                              \
+                unsigned int b:1;                                              \
+                /* Byte #2 */                                                  \
+                unsigned int r:1;                                              \
+                unsigned int x:1;                                              \
+                unsigned int y:1;                                              \
+                unsigned int z:1;                                              \
+                unsigned int l:1;                                              \
+                /* 3 bits for extensions data */                               \
+        } __attribute__ ((packed)) x
+
+#define REPR(x, y)                                                             \
+        union {                                                                \
+                uint8_t raw[6];                                                \
+                DATA(y);                                                       \
+        } x
+
+#define REPR_DIGITAL(x, y)                                                     \
+        union {                                                                \
+                uint16_t raw;                                                  \
+                DATA_DIGITAL(y);                                               \
+        } x
+
+#define PERIPHERAL_ANALOG_L             0x08
+#define PERIPHERAL_ANALOG_Z             0x10
+#define PERIPHERAL_ANALOG_Y             0x20
+#define PERIPHERAL_ANALOG_X             0x40
+#define PERIPHERAL_ANALOG_R             0x80
+#define PERIPHERAL_ANALOG_B             0x01
+#define PERIPHERAL_ANALOG_C             0x02
+#define PERIPHERAL_ANALOG_A             0x04
+#define PERIPHERAL_ANALOG_START         0x08
+#define PERIPHERAL_ANALOG_UP            0x10
+#define PERIPHERAL_ANALOG_DOWN          0x20
+#define PERIPHERAL_ANALOG_LEFT          0x40
+#define PERIPHERAL_ANALOG_RIGHT         0x80
+
+#define PERIPHERAL_ANALOG_X_AXIS_LEFT   0
+#define PERIPHERAL_ANALOG_X_AXIS_CENTER 127
+#define PERIPHERAL_ANALOG_X_AXIS_RIGTH  255
+#define PERIPHERAL_ANALOG_Y_AXIS_TOP    0
+#define PERIPHERAL_ANALOG_Y_AXIS_CENTER 127
+#define PERIPHERAL_ANALOG_Y_AXIS_BOTTOM 255
+
         struct {
-                unsigned int right:1;
-                unsigned int left:1;
-                unsigned int down:1;
-                unsigned int up:1;
-                unsigned int start:1;
-                unsigned int a_trg:1;
-                unsigned int c_trg:1;
-                unsigned int b_trg:1;
+                REPR(pressed, button);
+        } previous;
 
-                unsigned int r_trg:1;
-                unsigned int x_trg:1;
-                unsigned int y_trg:1;
-                unsigned int z_trg:1;
-                unsigned int l_trg:1;
+        REPR(pressed, button);
+        REPR_DIGITAL(held, button);
+        REPR_DIGITAL(released, button);
 
-                uint8_t x;
-                uint8_t y;
-                uint8_t l_pdl;
-                uint8_t r_pdl;
-        } __attribute__ ((packed)) button;
-} __attribute__ ((packed, __may_alias__));
+#undef DATA
+#undef DATA_DIGITAL
+#undef REPR
+#undef REPR_DIGITAL
+
+        struct smpc_peripheral_port *parent;
+} __attribute__ ((packed));
 
 struct smpc_peripheral_racing {
         bool connected;
-        /* If no children, port is 1 or 2. Otherwise, port is under
-         * multi-terminal */
         uint8_t port;
         uint8_t type;
         uint8_t size;
@@ -275,8 +348,6 @@ struct smpc_peripheral_racing {
 
 struct smpc_peripheral_digital {
         bool connected; /* Number of peripherals connected */
-        /* If no children, port is 1 or 2. Otherwise, port is under
-         * multi-terminal */
         uint8_t port;
         uint8_t type;
         uint8_t size;
@@ -322,26 +393,23 @@ struct smpc_peripheral_digital {
                 REPR(pressed, button);
         } previous;
 
-        struct {
-                REPR(pressed, button);
-                REPR(held, button);
-                REPR(released, button);
-        } current;
+        REPR(pressed, button);
+        REPR(held, button);
+        REPR(released, button);
 
 #undef DATA
 #undef REPR
+
         struct smpc_peripheral_port *parent;
-} __attribute__ ((packed, __may_alias__));
+} __attribute__ ((packed));
 
 struct smpc_peripheral {
         uint8_t connected; /* Number of peripherals connected */
-        /* If no children, port is 1 or 2. Otherwise, port is under
-         * multi-terminal */
         uint8_t port; /* 1 or 2 */
         uint8_t type;
         uint8_t size;
-        uint8_t data[MAX_PORT_DATA_SIZE + 1]; /* Peripheral data table */
-        uint8_t previous_data[MAX_PORT_DATA_SIZE + 1]; /* Previous frame data table */
+        uint8_t data[MAX_PERIPHERAL_DATA_SIZE + 1]; /* Peripheral data table */
+        uint8_t previous_data[MAX_PERIPHERAL_DATA_SIZE + 1]; /* Previous frame peripheral data table */
         struct smpc_peripheral_port *parent; /* NULL if this peripheral is directly connected */
 
         TAILQ_ENTRY(smpc_peripheral) peripherals;
@@ -352,6 +420,9 @@ struct smpc_peripheral_port {
         struct smpc_peripherals peripherals;
 };
 
+extern void smpc_peripheral_analog_get(struct smpc_peripheral const *,
+    struct smpc_peripheral_analog * const);
+extern void smpc_peripheral_analog_port(uint8_t port, struct smpc_peripheral_analog * const);
 extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
     struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_digital_port(uint8_t, struct smpc_peripheral_digital * const);

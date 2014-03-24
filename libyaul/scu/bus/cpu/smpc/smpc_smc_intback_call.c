@@ -23,8 +23,6 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
         /* Fetch peripheral data "SMPC" status */
         cmd_parameters[0] = ireg0 & 0x01;
         cmd_parameters[1] = ireg1 & 0x7F;
-
-        /* When issuing the "INTBACK" command, set this value. */
         cmd_parameters[2] = 0xF0;
 
         /* Retreive the "SMPC" status and or peripheral data iff not

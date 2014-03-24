@@ -71,8 +71,8 @@ ENDFOREACH(DIR_LIST)
 SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES LANGUAGE C)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
-  SET(CMAKE_C_FLAGS "-std=c99 -O2 -ffast-math -fstrict-aliasing -fomit-frame-pointer")
-  SET(CMAKE_C_FLAGS_DEBUG "-Wall -Werror -Wshadow -Wextra -Wunused -DDEBUG")
+  SET(CMAKE_C_FLAGS "-std=c99 -O2 -ffast-math -fstrict-aliasing -fomit-frame-pointer -g")
+  SET(CMAKE_C_FLAGS_DEBUG "-Wall -Werror -Wshadow -Wextra -Wunused -DDEBUG -g")
   SET(CMAKE_C_FLAGS_RELEASE "")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 

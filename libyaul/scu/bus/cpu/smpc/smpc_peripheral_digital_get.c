@@ -24,14 +24,14 @@ smpc_peripheral_digital_get(struct smpc_peripheral const *peripheral,
         digital->size = peripheral->size;
 
         digital->previous.pressed.raw = *(uint16_t *)&peripheral->previous_data[0];
-        digital->current.pressed.raw = *(uint16_t *)&peripheral->data[0];
+        digital->pressed.raw = *(uint16_t *)&peripheral->data[0];
 
         uint32_t diff;
 
-        diff = digital->current.pressed.raw ^ digital->previous.pressed.raw;
+        diff = digital->pressed.raw ^ digital->previous.pressed.raw;
 
-        digital->current.held.raw = diff & digital->current.pressed.raw;
-        digital->current.released.raw = diff & digital->previous.pressed.raw;
+        digital->held.raw = diff & digital->pressed.raw;
+        digital->released.raw = diff & digital->previous.pressed.raw;
 
         digital->parent = peripheral->parent;
 }
