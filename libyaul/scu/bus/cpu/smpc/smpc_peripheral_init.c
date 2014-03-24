@@ -64,7 +64,8 @@
 struct smpc_peripheral_port smpc_peripheral_port_1;
 struct smpc_peripheral_port smpc_peripheral_port_2;
 
-static volatile uint32_t _offset = 0;
+static volatile bool _collection_complete = false;
+static volatile uint32_t _oreg_offset = 0;
 
 /* OREG buffer that can hold a maximum of 6 peripherals with a data size
  * of 255-bytes (+1 for alignment) as well as an entire buffer for SMPC
@@ -80,7 +81,7 @@ static int32_t peripheral_update(struct smpc_peripheral_port *,
 static void handler_system_manager(void);
 
 static void irq_mux_vblank_in(irq_mux_handle_t * __attribute__ ((unused)));
-static void irq_mux_hblank_in(irq_mux_handle_t * __attribute__ ((unused)));
+static void irq_mux_vblank_out(irq_mux_handle_t * __attribute__ ((unused)));
 
 /* A memory pool that holds two peripherals directly connected to each
  * port that also hold MAX_PERIPHERALS (6) each making a total of 14
@@ -107,16 +108,17 @@ smpc_peripheral_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
-        /* Acquisition at start (+ 5 scanlines) of HBLANK-IN */
-        irq_mux_t *hblank_in;
-        hblank_in = vdp2_tvmd_hblank_in_irq_get();
-        irq_mux_handle_add(hblank_in, irq_mux_hblank_in, NULL);
-
-        /* Parse at start of VBLANK-IN */
+        /* Send INTBACK at start of VBLANK-IN */
         irq_mux_t *vblank_in;
 
         vblank_in = vdp2_tvmd_vblank_in_irq_get();
         irq_mux_handle_add(vblank_in, irq_mux_vblank_in, NULL);
+
+        /* Parse at start of VBLANK-OUT */
+        irq_mux_t *vblank_out;
+
+        vblank_out = vdp2_tvmd_vblank_out_irq_get();
+        irq_mux_handle_add(vblank_out, irq_mux_vblank_out, NULL);
 
         uint32_t mask;
 
@@ -179,7 +181,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
         uint32_t connected;
 
         if (parent == NULL) {
-                multitap_id = PC_GET_MULTITAP_ID(_offset);
+                multitap_id = PC_GET_MULTITAP_ID(_oreg_offset);
                 switch (multitap_id) {
                 case 0x00:
                         /* ID: SEGA Tap (4 connectors) */
@@ -189,12 +191,12 @@ peripheral_update(struct smpc_peripheral_port *parent,
                         /* ID: Clocked serial */
                 case 0x03:
                 case 0x0E:
-                        connected = PC_GET_NUM_CONNECTIONS(_offset);
+                        connected = PC_GET_NUM_CONNECTIONS(_oreg_offset);
                         /* At least two peripheral ports are required */
                         connected = (connected < 2) ? 0 : connected;
                         break;
                 case 0x0F:
-                        connected = PC_GET_NUM_CONNECTIONS(_offset);
+                        connected = PC_GET_NUM_CONNECTIONS(_oreg_offset);
                         /* Only a single peripheral can be directly connected */
                         connected = (connected > 1) ? 0 : connected;
                         break;
@@ -202,7 +204,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
                         connected = 0;
                 }
 
-                _offset++;
+                _oreg_offset++;
         }
 
         if (connected == 0) {
@@ -224,7 +226,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
         }
 
         /* Check if the type is valid */
-        type = PC_GET_TYPE(_offset);
+        type = PC_GET_TYPE(_oreg_offset);
         switch (type) {
         case TYPE_DIGITAL:
         case TYPE_ANALOG:
@@ -239,11 +241,11 @@ peripheral_update(struct smpc_peripheral_port *parent,
                 return -1;
         }
 
-        size = PC_GET_SIZE(_offset);
+        size = PC_GET_SIZE(_oreg_offset);
         if (size > 0) {
                 /* Peripheral data collection #1 */
                 /* Check if the ID is valid */
-                switch (PC_GET_ID(_offset)) {
+                switch (PC_GET_ID(_oreg_offset)) {
                 case ID_MD3B:
                 case ID_MD6B:
                 case ID_MDMOUSE:
@@ -263,14 +265,14 @@ peripheral_update(struct smpc_peripheral_port *parent,
                  * we're always in 255-byte mode.
                  *
                  * Peripheral data collection #3 */
-                _offset++;
-                size = PC_GET_EXT_SIZE(_offset);
+                _oreg_offset++;
+                size = PC_GET_EXT_SIZE(_oreg_offset);
 
                 /* With a multi-tap, it is possible to mix the
                  * connection of peripherals of 15-bytes or less and
                  * 16-bytes or more. */
         }
-        _offset++;
+        _oreg_offset++;
 
         uint32_t data_idx;
 
@@ -279,14 +281,14 @@ peripheral_update(struct smpc_peripheral_port *parent,
                 peripheral->previous_data[0] = peripheral->data[0];
                 peripheral->previous_data[1] = peripheral->data[1];
 
-                peripheral->data[0] = PC_GET_DATA_BYTE(_offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(_offset, 1) ^ 0xFF;
+                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
                 break;
         case 0x06:
                 memset(&peripheral->previous_data[0], peripheral->data[0], size);
 
-                peripheral->data[0] = PC_GET_DATA_BYTE(_offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(_offset, 1) ^ 0xFF;
+                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
                 break;
         default:
                 /* XXX
@@ -301,7 +303,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
         peripheral->parent = parent;
 
         /* Move onto the next peripheral */
-        _offset += size;
+        _oreg_offset += size;
 
         return connected;
 }
@@ -324,6 +326,10 @@ handler_system_manager(void)
         sr = MEMORY_READ(8, SMPC(SR));
         if ((sr & 0x80) == 0x80) {
                 if ((sr & NPE) == 0x00) {
+                        /* Mark that SMPC status and peripheral data
+                         * collection is complete */
+                        _collection_complete = true;
+
                         offset = 0;
 
                         /* Issue a "BREAK" for the "INTBACK" command */
@@ -339,43 +345,56 @@ handler_system_manager(void)
 static void
 irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
 {
+
+        /* Send "INTBACK" "SMPC" command */
+        /* Set to 255-byte mode for both ports; time optimized
+         *
+         * Return peripheral data and time, cartridge code, area
+         * code, etc.*/
+        smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN | OPE);
+}
+
+static void
+irq_mux_vblank_out(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+{
         static struct smpc_peripheral_port *ports[] = {
                 &smpc_peripheral_port_1,
                 &smpc_peripheral_port_2,
                 NULL
         };
 
-        /* Could this help? */
-        if (((scu_ic_status_get()) & IC_IST_SYSTEM_MANAGER) == IC_IST_SYSTEM_MANAGER) {
+        if (!_collection_complete) {
                 return;
         }
 
-        _offset = 0;
+        _collection_complete = false;
+
+        _oreg_offset = 0;
 
         /* Ignore OREG0 */
-        _offset++;
+        _oreg_offset++;
 
         struct smpc_time time;
 
-        time.year = (OREG_GET(_offset) << 8) | OREG_GET(_offset + 1);
-        _offset++;
-        _offset++;
+        time.year = (OREG_GET(_oreg_offset) << 8) | OREG_GET(_oreg_offset + 1);
+        _oreg_offset++;
+        _oreg_offset++;
 
-        time.day = OREG_GET(_offset) & 0xF0;
-        time.month = OREG_GET(_offset) & 0x0F;
-        _offset++;
+        time.day = OREG_GET(_oreg_offset) & 0xF0;
+        time.month = OREG_GET(_oreg_offset) & 0x0F;
+        _oreg_offset++;
 
-        time.days = OREG_GET(_offset);
-        _offset++;
+        time.days = OREG_GET(_oreg_offset);
+        _oreg_offset++;
 
-        time.hours = OREG_GET(_offset);
-        _offset++;
+        time.hours = OREG_GET(_oreg_offset);
+        _oreg_offset++;
 
-        time.minutes = OREG_GET(_offset);
-        _offset++;
+        time.minutes = OREG_GET(_oreg_offset);
+        _oreg_offset++;
 
-        time.seconds = OREG_GET(_offset);
-        _offset++;
+        time.seconds = OREG_GET(_oreg_offset);
+        _oreg_offset++;
 
         /* Ignore OREG8
          * Ignore OREG9
@@ -386,7 +405,7 @@ irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
         int32_t port_idx;
 
         /* Peripheral data starts at offset 32 (OREG0) in the OREG buffer */
-        _offset = SMPC_OREGS;
+        _oreg_offset = SMPC_OREGS;
 
         for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
                 struct smpc_peripheral_port *port;
@@ -429,34 +448,5 @@ irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
                                 port->peripheral->connected++;
                         }
                 }
-        }
-}
-
-static void
-irq_mux_hblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
-{
-        /*
-         * From Charles MacDonald's hardware notes:
-         *
-         * NTSC (224 scanlines)
-         *  224 scanlines for the active display area
-         *
-         *    8 scanlines for the top border area
-         *   15 scanlines for the top blanking area
-         *
-         *    8 scanlines for the bottom border area
-         *    5 scanlines for the bottom blanking area
-         *
-         *    3 scanlines for the vertical sync area
-         */
-
-        /* Send "INTBACK" "SMPC" command (300us after VBLANK-IN) */
-        if ((vdp2_tvmd_vcount_get()) == (224 + 8)) {
-                /* Set to 255-byte mode for both ports; not time
-                 * optimized.
-                 *
-                 * Return peripheral data and time, cartridge code, area
-                 * code, etc.*/
-                smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN);
         }
 }

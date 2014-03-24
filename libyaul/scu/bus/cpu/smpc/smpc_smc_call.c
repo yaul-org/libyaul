@@ -57,3 +57,5 @@ smpc_smc_call(uint8_t cmd, uint8_t cmd_type, uint8_t *cmd_parameters)
                 return 0;
         }
 }
+
+#undef WAIT
