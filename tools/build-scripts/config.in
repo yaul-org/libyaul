@@ -25,11 +25,11 @@ NEWLIB_VERSION="1.20.0"
 
 # Tools for host
 # The variables below might need to change depending on your OS
-MAKE="make"
 AWK="awk"
 FETCH="wget"
 FETCH_FLAGS=""
 GPG="gpg"
+MAKE="make"
 MD5="md5sum"
 
 # Options
