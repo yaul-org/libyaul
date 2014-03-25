@@ -285,7 +285,12 @@ peripheral_update(struct smpc_peripheral_port *parent,
                 peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
                 break;
         case 0x06:
-                memset(&peripheral->previous_data[0], peripheral->data[0], size);
+                peripheral->previous_data[0] = peripheral->data[0];
+                peripheral->previous_data[1] = peripheral->data[1];
+                peripheral->previous_data[2] = peripheral->data[2];
+                peripheral->previous_data[3] = peripheral->data[3];
+                peripheral->previous_data[4] = peripheral->data[4];
+                peripheral->previous_data[5] = peripheral->data[5];
 
                 peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
                 peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
