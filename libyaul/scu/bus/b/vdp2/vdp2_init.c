@@ -205,13 +205,11 @@ vdp2_hblank_in(void)
 static void
 vdp2_vblank_in(void)
 {
-
         irq_mux_handle(&vdp2_vblank_in_irq_mux);
 }
 
 static void
 vdp2_vblank_out(void)
 {
-
         irq_mux_handle(&vdp2_vblank_out_irq_mux);
 }

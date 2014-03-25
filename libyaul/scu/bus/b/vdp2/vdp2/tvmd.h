@@ -51,12 +51,14 @@ vdp2_tvmd_vblank_out_wait(void)
 static __inline__ uint16_t
 vdp2_tvmd_hcount_get(void)
 {
+        for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
         return MEMORY_READ(16, VDP2(HCNT));
 }
 
 static __inline__ uint16_t
 vdp2_tvmd_vcount_get(void)
 {
+        for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
         return MEMORY_READ(16, VDP2(VCNT));
 }
 
