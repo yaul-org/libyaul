@@ -17,5 +17,8 @@ vdp2_tvmd_display_clear(void)
         tvmd = MEMORY_READ(16, VDP2(TVMD));
         tvmd &= 0x7FFF;
 
+        /* Change the DISP bit during VBLANK */
+        vdp2_tvmd_vblank_in_wait();
+
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 }

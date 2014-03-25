@@ -9,13 +9,18 @@
 
 #include "vdp2-internal.h"
 
+#define DISP 0x8000
+
 void
 vdp2_tvmd_display_set(void)
 {
         uint16_t tvmd;
 
         tvmd = MEMORY_READ(16, VDP2(TVMD));
-        tvmd |= 0x8000;
+        tvmd |= DISP;
+
+        /* Change the DISP bit during VBLANK */
+        vdp2_tvmd_vblank_in_wait();
 
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 }
