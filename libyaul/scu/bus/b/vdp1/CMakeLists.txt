@@ -15,5 +15,6 @@ SET(scu_bus_b_vdp1_INSTALL_FILES
   vdp1.h
   vdp1/cmdt.h
   vdp1/fbcr.h
+  vdp1/map.h
   vdp1/ptmr.h
 )

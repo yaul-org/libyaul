@@ -17,9 +17,10 @@ SET(scu_SRC
 )
 
 SET(scu_INSTALL_FILES
-  scu/ic.h
+  scu.h
   scu/dma.h
   scu/dsp.h
+  scu/ic.h
+  scu/map.h
   scu/timer.h
-  scu.h
 )

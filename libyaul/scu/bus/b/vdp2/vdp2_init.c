@@ -58,7 +58,8 @@ struct vram_ctl vram_ctl = {
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS,
                         VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS}
+                        VRAM_CTL_CYCP_NO_ACCESS
+                }
         }
 };
 

@@ -16,21 +16,17 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_tvmd_display_clear.c
   vdp2_tvmd_display_set.c
   vdp2_tvmd_hblank_in_irq_get.c
-  vdp2_tvmd_hblank_in_wait.c
-  vdp2_tvmd_hcount_get.c
   vdp2_tvmd_vblank_in_irq_get.c
-  vdp2_tvmd_vblank_in_wait.c
   vdp2_tvmd_vblank_out_irq_get.c
-  vdp2_tvmd_vblank_out_wait.c
-  vdp2_tvmd_vcount_get.c
   vdp2_vram_control_get.c
   vdp2_vram_control_set.c
 )
 
 SET(scu_bus_b_vdp2_INSTALL_FILES
   vdp2.h
+  vdp2/cram.h
+  vdp2/map.h
   vdp2/scrn.h
   vdp2/tvmd.h
   vdp2/vram.h
-  vdp2/cram.h
 )
