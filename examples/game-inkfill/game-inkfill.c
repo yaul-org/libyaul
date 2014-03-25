@@ -72,12 +72,11 @@ main(void)
         scene_load("title");
 
         while (true) {
-                vdp2_tvmd_vblank_in_wait();
-                /* Start of VBLANK-IN, End of VBLANK-OUT */
+                vdp2_tvmd_vblank_out_wait();
                 scene_update();
 
-                vdp2_tvmd_vblank_out_wait();
-                /* End of VBLANK-IN, Start of VBLANK-OUT */
+                vdp2_tvmd_vblank_in_wait();
+                /* VBLANK */
                 scene_draw();
         }
 
