@@ -24,7 +24,6 @@
 
 #include "smpc-internal.h"
 
-
 #define OPE     0x02 /* Acquisition Time Optimization */
 #define PEN     0x08 /* Peripheral Data Enable */
 #define P1MD0   0x10 /* 255-byte mode */

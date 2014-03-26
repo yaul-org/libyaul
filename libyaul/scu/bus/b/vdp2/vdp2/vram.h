@@ -15,8 +15,10 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define VRAM_ADDR_4MBIT(x, y)   (0x25E00000 + (((x) & 0x03) << 17) + (y))
-#define VRAM_ADDR_8MBIT(x, y)   (0x25E00000 + (((x) & 0x03) << 18) + (y))
+#define VRAM_ADDR_4MBIT(x, y)   (0x25E00000 + ((x) << 17) + (y))
+#define VRAM_ADDR_8MBIT(x, y)   (0x25E00000 + ((x) << 18) + (y))
+
+#define VRAM_ADDR_BANK(x)       (((x) >> 16) & 0xF)
 
 struct vram_ctl {
 #define VRAM_CTL_SIZE_4MBIT     0x0000
