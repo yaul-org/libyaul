@@ -28,24 +28,21 @@
 #define GRID_CELL_COLOR_YELLOW  2
 #define GRID_CELL_COLOR_BLUE    3
 
-#define GRID_WIDTH      34
-#define GRID_HEIGHT     24
-
-#define GRID_X_OFFSET   4
-#define GRID_Y_OFFSET   2
+#define GRID_WIDTH      18
+#define GRID_HEIGHT     12
 
 static bool _changed = false;
 static uint32_t _tries = 0;
 
 static uint16_t *_pnt[4] = {
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x10000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x0800),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x10000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x0800),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x18000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x0800),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x18000)
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x0800)
 };
 
 /* VRAM B0 */
@@ -133,10 +130,10 @@ _grid_init(void)
 
         static uint16_t palette[] = {
                 0x0000,
-                0x8000 | RGB888_TO_RGB555(0xFF, 0x00, 0x00),
-                0x8000 | RGB888_TO_RGB555(0xFF, 0xA5, 0x00),
-                0x8000 | RGB888_TO_RGB555(0xFF, 0xFF, 0x00),
-                0x8000 | RGB888_TO_RGB555(0x00, 0x00, 0xFF),
+                0x8000 | RGB888_TO_RGB555(0xFF, 0x00, 0x00), /* Red */
+                0x8000 | RGB888_TO_RGB555(0xFF, 0xA5, 0x00), /* Orange */
+                0x8000 | RGB888_TO_RGB555(0xFF, 0xFF, 0x00), /* Yellow */
+                0x8000 | RGB888_TO_RGB555(0x00, 0x00, 0xFF), /* Blue */
                 0x0000,
                 0x0000,
                 0x0000,
@@ -157,7 +154,7 @@ _grid_init(void)
         vdp2_tvmd_display_clear();
 
         nbg1_cfg.ch_scrn = SCRN_NBG1;
-        nbg1_cfg.ch_cs = 1 * 1; /* 1x1 cells */
+        nbg1_cfg.ch_cs = 2 * 2; /* 2x2 cells */
         nbg1_cfg.ch_pnds = 1; /* 1 word */
         nbg1_cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
         nbg1_cfg.ch_sp = 0;
@@ -205,19 +202,59 @@ _grid_init(void)
 
         /* Draw the tiles */
         uint32_t tile_idx;
-        for (tile_idx = 0; tile_idx < 8; tile_idx++) {
-                _character[0 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[1 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[2 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[3 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[4 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[5 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[6 + (tile_idx << 3)] = tiles[tile_idx];
-                _character[7 + (tile_idx << 3)] = tiles[tile_idx];
+
+        for (tile_idx = 0; tile_idx < 6; tile_idx++) {
+                uint32_t row;
+
+                row = tiles[tile_idx];
+
+                _character[0x00 + (tile_idx << 5)] = row;
+                _character[0x01 + (tile_idx << 5)] = row;
+                _character[0x02 + (tile_idx << 5)] = row;
+                _character[0x03 + (tile_idx << 5)] = row;
+                _character[0x04 + (tile_idx << 5)] = row;
+                _character[0x05 + (tile_idx << 5)] = row;
+                _character[0x06 + (tile_idx << 5)] = row;
+                _character[0x07 + (tile_idx << 5)] = row;
+
+                _character[0x08 + (tile_idx << 5)] = row;
+                _character[0x09 + (tile_idx << 5)] = row;
+                _character[0x0A + (tile_idx << 5)] = row;
+                _character[0x0B + (tile_idx << 5)] = row;
+                _character[0x0C + (tile_idx << 5)] = row;
+                _character[0x0D + (tile_idx << 5)] = row;
+                _character[0x0E + (tile_idx << 5)] = row;
+                _character[0x0F + (tile_idx << 5)] = row;
+
+                _character[0x10 + (tile_idx << 5)] = row;
+                _character[0x11 + (tile_idx << 5)] = row;
+                _character[0x12 + (tile_idx << 5)] = row;
+                _character[0x13 + (tile_idx << 5)] = row;
+                _character[0x14 + (tile_idx << 5)] = row;
+                _character[0x15 + (tile_idx << 5)] = row;
+                _character[0x16 + (tile_idx << 5)] = row;
+                _character[0x17 + (tile_idx << 5)] = row;
+
+                _character[0x18 + (tile_idx << 5)] = row;
+                _character[0x19 + (tile_idx << 5)] = row;
+                _character[0x1A + (tile_idx << 5)] = row;
+                _character[0x1B + (tile_idx << 5)] = row;
+                _character[0x1C + (tile_idx << 5)] = row;
+                _character[0x1D + (tile_idx << 5)] = row;
+                _character[0x1E + (tile_idx << 5)] = row;
+                _character[0x1F + (tile_idx << 5)] = row;
         }
 
         /* Clear the entire map */
-        memset((uint8_t *)_pnt[0], 0x00, 0x10000);
+        uint16_t x;
+        uint16_t y;
+
+        for (y = 0; y < 32; y++) {
+                for (x = 0; x < 32; x++) {
+                        _pnt[0][x + (y << 5)] =
+                            VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_character);
+                }
+        }
 
         /* Copy palette */
         memcpy((uint16_t *)CRAM_BANK(0, 0), palette, 16 * sizeof(uint16_t));
@@ -287,18 +324,9 @@ _grid_draw(void)
                         uint8_t color;
 
                         color = _grid_color_get(x, y) + 1;
-                        _pnt[0][(x + GRID_X_OFFSET) + ((y + GRID_Y_OFFSET) << 6)] =
-                            PN_CHARACTER_NO((uint32_t)_character) | color;
+                        _pnt[0][x + (y << 5)] =
+                            VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_character) + color;
                 }
-        }
-
-        /* Draw number of tries */
-        for (y = 0; y < TRIES_MAX; y++) {
-                _pnt[0][(1) + ((y + 1) << 6)] = GRID_CELL_COLOR_BLUE + 1;
-        }
-
-        for (y = 0; y < _tries; y++) {
-                _pnt[0][(1) + ((y + 1) << 6)] = GRID_CELL_COLOR_RED + 1;
         }
 }
 

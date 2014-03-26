@@ -12,13 +12,41 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* Given a VRAM address X, calculate the character number in the pattern
- * name table for 1-word. */
-#define PN_CHARACTER_NO(x)      (((x) >> 5) & 0x0FFF)
+/* Configuration #0
+ * Word size: 1
+ * Character size: 1x1
+ * Character number supplement mode: 0 */
+#define VDP2_PN_CONFIG_0_CHARACTER_NUMBER(x)                                   \
+        /* First convert the address into a character number; each cell
+         * is on a 20-byte boundary */                                         \
+        (((x) >> 5) & 0x03FF)
 
-/* Given a VRAM address X, calculate the character number in the pattern
- * name table for 2-word. */
-#define PN_CHARACTER_NO_2WORD(x) (((x) >> 5) & 0x7FFF)
+/* Configuration #1
+ * Word size: 1
+ * Character size: 1x1
+ * Character number supplement mode: 1 */
+#define VDP2_PN_CONFIG_1_CHARACTER_NUMBER(x)                                   \
+        /* First convert the address into a character number; each cell
+         * is on a 20-byte boundary */                                         \
+        (((x) >> 5) & 0x0FFF)
+
+/* Configuration #2
+ * Word size: 1
+ * Character size: 2x2
+ * Character number supplement mode: 0 */
+#define VDP2_PN_CONFIG_2_CHARACTER_NUMBER(x)                                   \
+        /* First convert the address into a character number; each cell
+         * is on a 20-byte boundary */                                         \
+        ((((x) >> 5) & 0x0FFC) >> 2)
+
+/* Configuration #3
+ * Word size: 1
+ * Character size: 2x2
+ * Character number supplement mode: 1 */
+#define VDP2_PN_CONFIG_3_CHARACTER_NUMBER(x)                                   \
+        /* First convert the address into a character number; each cell
+         * is on a 20-byte boundary */                                         \
+        ((((x) >> 5) & 0x3FFC) >> 2)
 
 #ifdef __cplusplus
 }

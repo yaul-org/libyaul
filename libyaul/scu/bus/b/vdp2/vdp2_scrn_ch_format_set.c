@@ -22,59 +22,11 @@
 static uint16_t
 pattern_name_control(struct scrn_ch_format *cfg)
 {
-        uint16_t pnc;
-        uint16_t scn;
-        uint8_t scn_bits;
-
-        switch (cfg->ch_pnds) {
-        case 1:
-                /* Pattern name data size: 1-word */
-                /* Character number supplement mode */
-                switch (cfg->ch_cnsm) {
-                case 0:
-                        /* Auxiliary mode 0 */
-
-                        /* Character number in pattern name data is
-                         * 10-bits. The flip function be used. */
-                        scn_bits = 0x1F;
-                        break;
-                case 1:
-                        /* Auxiliary mode 1 */
-
-                        /* Character number in pattern name data is
-                         * 12-bits. The flip function cannot be used. */
-                        scn_bits = 0x1C;
-                        pnc = 0x4000;
-                        break;
-                default:
-                        scn_bits = 0;
-                        break;
-                }
-                /* Calculate the supplementary character number from the
-                 * character lead address */
-                scn = (((cfg->ch_scn & 0xFFFFF) >> 5) >> 10) & scn_bits;
-
-                pnc |= 0x8000 | /* Pattern name data size: 1-word */
-                    /* Supplementary character number */
-                    scn |
-                    /* Supplementary palette number */
-                    ((cfg->ch_spn & 0x07) << 5) |
-                    /* Special color calculation (for pattern name supplement data) */
-                    ((cfg->ch_scc & 0x01) << 8) |
-                    ((cfg->ch_sp & 0x01) << 9);
-                return pnc;
-        case 2:
-                /* Pattern name data size: 2-words */
-                return 0;
-        }
-
-        return 0;
 }
 
 void
 vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
 {
-        uint16_t pnc;
 
         assert(cfg != NULL);
 
@@ -106,7 +58,58 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
             (cfg->ch_pls - 1);
 
         /* Pattern name control */
-        pnc = pattern_name_control(cfg);
+        uint16_t pncnx;
+
+#ifdef DEBUG
+        /* Character number supplement mode */
+        assert((cfg->ch_cnsm == 0) || (cfg->ch_cnsm == 1));
+
+        /* Pattern name data size */
+        assert((cfg->ch_pnds == 1) || (cfg->ch_pnds == 2));
+#endif /* DEBUG */
+
+        switch (cfg->ch_pnds) {
+        case 1:
+                /* Pattern name data size: 1-word */
+
+                /* Character number supplement mode */
+                switch (cfg->ch_cnsm) {
+                case 0:
+                        /* Auxiliary mode 0; flip function can be
+                         * used */
+
+                        /* Supplementary character number */
+                        switch (cfg->ch_cs) {
+                        case (1 * 1):
+                                pncnx = (0x8000 | (((cfg->ch_scn >> 5) & 0x7C00) >> 10));
+                                break;
+                        case (2 * 2):
+                                pncnx = (0x8000 | (((cfg->ch_scn >> 5) & 0x7000) >> 10) |
+                                    ((cfg->ch_scn >> 5) & 0x03));
+                                break;
+                        }
+                        break;
+                case 1:
+                        /* Auxiliary mode 1; flip function cannot be
+                         * used */
+
+                        /* Supplementary character number */
+                        switch (cfg->ch_cs) {
+                        case (1 * 1):
+                                pncnx = (0xC000 | ((cfg->ch_scn >> 5) & 0x7000) >> 10);
+                                break;
+                        case (2 * 2):
+                                pncnx = (0xC000 | (((cfg->ch_scn >> 5) & 0x4000) >> 10) |
+                                    (cfg->ch_scn & 0x03));
+                                break;
+                        }
+                }
+                break;
+        case 2:
+                /* Pattern name data size: 2-words */
+                pncnx = 0x0000;
+                break;
+        }
 
         switch (cfg->ch_scrn) {
         case SCRN_RBG1:
@@ -128,7 +131,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                MEMORY_WRITE(16, VDP2(PNCN0), pnc);
+                MEMORY_WRITE(16, VDP2(PNCN0), pncnx);
                 MEMORY_WRITE(16, VDP2(PRINA), vdp2_regs.prina);
                 break;
         case SCRN_NBG1:
@@ -156,7 +159,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
 
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                MEMORY_WRITE(16, VDP2(PNCN1), pnc);
+                MEMORY_WRITE(16, VDP2(PNCN1), pncnx);
                 break;
         case SCRN_NBG2:
                 /* Character Size */
@@ -172,7 +175,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 /* MEMORY_WRITE(16, VDP2(MPABN2), ab); */
                 /* MEMORY_WRITE(16, VDP2(MPCDN2), cd); */
-                MEMORY_WRITE(16, VDP2(PNCN2), pnc);
+                MEMORY_WRITE(16, VDP2(PNCN2), pncnx);
                 break;
         case SCRN_NBG3:
                 /* Character size */
@@ -188,7 +191,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 /* MEMORY_WRITE(16, VDP2(MPABN3), ab); */
                 /* MEMORY_WRITE(16, VDP2(MPCDN3), cd); */
-                MEMORY_WRITE(16, VDP2(PNCN3), pnc);
+                MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         case SCRN_RBG0:
                 /* Character size */
@@ -227,7 +230,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                MEMORY_WRITE(16, VDP2(PNCN3), pnc);
+                MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         default:
                 return;
