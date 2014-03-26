@@ -48,6 +48,19 @@ extern "C" {
          * is on a 20-byte boundary */                                         \
         ((((x) >> 5) & 0x3FFC) >> 2)
 
+/* Configuration #4
+ * Word size: 2
+ * Character size: 1x1 */
+#define VDP2_PN_CONFIG_4_CHARACTER_NUMBER(x)                                   \
+        /* First convert the address into a character number; each cell
+         * is on a 20-byte boundary */                                         \
+        (((x) >> 5) & 0x7FFF)
+
+/* Configuration #5
+ * Word size: 2
+ * Character size: 2x2 */
+#define VDP2_PN_CONFIG_5_CHARACTER_NUMBER(x) VDP2_PN_CONFIG_4_CHARACTER_NUMBER(x)
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

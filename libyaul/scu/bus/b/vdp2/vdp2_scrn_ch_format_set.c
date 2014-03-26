@@ -103,7 +103,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                                 break;
                         case (2 * 2):
                                 pncnx = (0xC000 | (((cfg->ch_scn >> 5) & 0x4000) >> 10) |
-                                    (cfg->ch_scn & 0x03));
+                                    ((cfg->ch_scn >> 5) & 0x03));
                                 break;
                         }
                 }
