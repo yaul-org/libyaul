@@ -68,7 +68,7 @@ cons_vdp2_init(struct cons *cons)
         /* VRAM B1 */
         cons_vdp2->character = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
 
-        cfg.ch_scrn = SCRN_NBG1;
+        cfg.ch_scrn = SCRN_NBG2;
         cfg.ch_cs = 1 * 1; /* 1x1 cells */
         cfg.ch_pnds = 1; /* 1 word */
         cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
@@ -82,13 +82,13 @@ cons_vdp2_init(struct cons *cons)
         cfg.ch_map[2] = (uint32_t)cons_vdp2->pnt[2];
         cfg.ch_map[3] = (uint32_t)cons_vdp2->pnt[3];
 
-        vdp2_scrn_ccc_set(SCRN_NBG1, SCRN_CCC_CHC_16);
+        vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
         vdp2_scrn_ch_format_set(&cfg);
-        vdp2_priority_spn_set(SCRN_NBG1, 7);
+        vdp2_priority_spn_set(SCRN_NBG2, 7);
 
         vram_ctl = vdp2_vram_control_get();
-        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CHPNDR_NBG1;
-        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_PNDR_NBG1;
+        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CHPNDR_NBG2;
+        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_PNDR_NBG2;
         vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t4 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t3 = VRAM_CTL_CYCP_CPU_RW;
@@ -107,7 +107,7 @@ cons_vdp2_init(struct cons *cons)
         cons->clear(cons, 0, COLS, 0, ROWS);
 
         /* Hopefully it won't glitch */
-        vdp2_scrn_display_set(SCRN_NBG1, /* no_trans = */ false);
+        vdp2_scrn_display_set(SCRN_NBG2, /* no_trans = */ false);
         vdp2_tvmd_display_set();
 }
 
@@ -157,7 +157,7 @@ cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)))
         static int32_t scvy = 0;
 
         scvy += FONT_H;
-        vdp2_scrn_scv_y_set(SCRN_NBG1, scvy, 0);
+        vdp2_scrn_scv_y_set(SCRN_NBG2, scvy, 0);
 }
 
 static void

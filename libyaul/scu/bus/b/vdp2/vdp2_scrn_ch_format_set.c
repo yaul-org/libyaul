@@ -19,11 +19,6 @@
 #define SCRN_NBGX_MAP_SIZE(cfg)                                                \
         (((cfg)->pls) * SCRN_NBGX_PLANE_SIZE(cfg))
 
-static uint16_t
-pattern_name_control(struct scrn_ch_format *cfg)
-{
-}
-
 void
 vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
 {
@@ -46,16 +41,24 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
 #ifdef DEBUG
 #endif /* DEBUG */
 
+        /* Map */
+        uint16_t map_offset;
+        uint16_t map_mask;
         uint16_t plane_a;
         uint16_t plane_b;
         uint16_t plane_c;
         uint16_t plane_d;
 
-        uint16_t map_mask;
-
         /* Calculate the starting map (plane A) address mask bits */
         map_mask = (((0x0080 << (cfg->ch_cs >> 2)) - 1) / cfg->ch_pnds) -
             (cfg->ch_pls - 1);
+
+        plane_a = (cfg->ch_map[0] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
+        plane_b = (cfg->ch_map[1] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
+        plane_c = (cfg->ch_map[2] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
+        plane_d = (cfg->ch_map[3] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
+
+        map_offset = (plane_a & 0x01C0) >> 6;
 
         /* Pattern name control */
         uint16_t pncnx;
@@ -123,12 +126,12 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz |= cfg->ch_pls - 1;
 
                 /* Map */
-#ifdef DEBUG
-#endif /* DEBUG */
-                /* MEMORY_WRITE(16, VDP2(MPABN0), ab); */
-                /* MEMORY_WRITE(16, VDP2(MPCDN0), cd); */
+                vdp2_regs.mpofn &= 0xFFF8;
+                vdp2_regs.mpofn |= map_offset;
 
                 /* Write to memory */
+                MEMORY_WRITE(16, VDP2(MPABN1), (plane_b << 8) | plane_a);
+                MEMORY_WRITE(16, VDP2(MPCDN1), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN0), pncnx);
@@ -144,19 +147,12 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 2;
 
                 /* Map */
-                plane_a = (cfg->ch_map[0] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-                plane_b = (cfg->ch_map[1] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-                plane_c = (cfg->ch_map[2] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-                plane_d = (cfg->ch_map[3] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-
-                vdp2_regs.mpofn &= 0xFFFB;
-                /* Mask off the topmost 3 bits */
-                vdp2_regs.mpofn |= (plane_a & 0x01C0) >> 6;
+                vdp2_regs.mpofn &= 0xFF8F;
+                vdp2_regs.mpofn |= map_offset << 4;
 
                 MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(MPABN1), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN1), (plane_d << 8) | plane_c);
-
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN1), pncnx);
@@ -170,11 +166,15 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFFCF;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 4;
 
+                /* Map */
+                vdp2_regs.mpofn &= 0xF8FF;
+                vdp2_regs.mpofn |= map_offset << 8;
+
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                /* MEMORY_WRITE(16, VDP2(MPABN2), ab); */
-                /* MEMORY_WRITE(16, VDP2(MPCDN2), cd); */
+                MEMORY_WRITE(16, VDP2(MPABN2), (plane_b << 8) | plane_a);
+                MEMORY_WRITE(16, VDP2(MPCDN2), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(PNCN2), pncnx);
                 break;
         case SCRN_NBG3:
@@ -186,11 +186,15 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 vdp2_regs.plsz &= 0xFF3F;
                 vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
 
+                /* Map */
+                vdp2_regs.mpofn &= 0x8FFF;
+                vdp2_regs.mpofn |= map_offset << 12;
+
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                /* MEMORY_WRITE(16, VDP2(MPABN3), ab); */
-                /* MEMORY_WRITE(16, VDP2(MPCDN3), cd); */
+                MEMORY_WRITE(16, VDP2(MPABN3), (plane_b << 8) | plane_a);
+                MEMORY_WRITE(16, VDP2(MPCDN3), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         case SCRN_RBG0:
@@ -204,8 +208,8 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                         vdp2_regs.plsz &= 0xFCFF;
                         vdp2_regs.plsz |= (cfg->ch_pls - 1) << 8;
 
-                        /* MEMORY_WRITE(16, VDP2(MPABRA), ab); */
-                        /* MEMORY_WRITE(16, VDP2(MPCDRA), cd); */
+                        MEMORY_WRITE(16, VDP2(MPABRA), (plane_b << 8) | plane_a);
+                        MEMORY_WRITE(16, VDP2(MPCDRA), (plane_d << 8) | plane_c);
                         MEMORY_WRITE(16, VDP2(MPEFRA), 0x0000);
                         MEMORY_WRITE(16, VDP2(MPGHRA), 0x0000);
                         MEMORY_WRITE(16, VDP2(MPIJRA), 0x0000);
@@ -217,8 +221,8 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                         vdp2_regs.plsz &= 0xCFFF;
                         vdp2_regs.plsz |= (cfg->ch_pls - 1) << 12;
 
-                        /* MEMORY_WRITE(16, VDP2(MPABRB), ab); */
-                        /* MEMORY_WRITE(16, VDP2(MPCDRB), cd); */
+                        MEMORY_WRITE(16, VDP2(MPABRB), (plane_b << 8) | plane_a);
+                        MEMORY_WRITE(16, VDP2(MPCDRB), (plane_d << 8) | plane_c);
                         MEMORY_WRITE(16, VDP2(MPEFRB), 0x0000);
                         MEMORY_WRITE(16, VDP2(MPGHRB), 0x0000);
                         MEMORY_WRITE(16, VDP2(MPIJRB), 0x0000);
