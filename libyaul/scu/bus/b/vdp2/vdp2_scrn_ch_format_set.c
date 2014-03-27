@@ -13,32 +13,47 @@
 
 #define SCRN_NBGX_PAGE_SIZE(cfg)                                               \
         /* 1-word with a 64x64 cell page is the smallest page size */          \
-        (((64 * 64 * 2) / ((cfg)->ch_cs)) * ((cfg)->ch_pnds))
+        (((64 * 64 * 2) / ((cfg)->scf_character_size)) * ((cfg)->scf_pnd_size))
 #define SCRN_NBGX_PLANE_SIZE(cfg)                                              \
         (4 * SCRN_NBGX_PAGE_SIZE(cfg))
 #define SCRN_NBGX_MAP_SIZE(cfg)                                                \
         (((cfg)->pls) * SCRN_NBGX_PLANE_SIZE(cfg))
 
 void
-vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
+vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 {
 
-        assert(cfg != NULL);
-
-        /* Character size */
 #ifdef DEBUG
-        assert((cfg->ch_cs == (1 * 1)) || (cfg->ch_cs == (2 * 2)));
-#endif /* DEBUG */
+        assert(format != NULL);
 
-        /* Plane size */
-#ifdef DEBUG
-        assert((cfg->ch_pls == (1 * 1)) ||
-               (cfg->ch_pls == (2 * 1)) ||
-               (cfg->ch_pls == (2 * 2)));
-#endif /* DEBUG */
+        /* Check if the background passed is valid */
+        assert((format->scf_scrn == SCRN_NBG0) ||
+               (format->scf_scrn == SCRN_RBG1) ||
+               (format->scf_scrn == SCRN_NBG1) ||
+               (format->scf_scrn == SCRN_NBG2) ||
+               (format->scf_scrn == SCRN_NBG3) ||
+               (format->scf_scrn == SCRN_RBG0));
 
-        /* Map */
-#ifdef DEBUG
+        /* Make sure that the lead address to character pattern table in
+         * VRAM is on a 20-byte boundary */
+        assert((format->scf_cp_table & 0x1F) == 0x00);
+
+        /* Check the character number supplement mode */
+        assert((format->scf_auxiliary_mode == 0) ||
+               (format->scf_auxiliary_mode == 1));
+
+        /* Check the character size */
+        assert((format->scf_character_size == (1 * 1)) ||
+               (format->scf_character_size == (2 * 2)));
+
+        /* Check the plane size */
+        assert((format->scf_plane_size == (1 * 1)) ||
+               (format->scf_plane_size == (2 * 1)) ||
+               (format->scf_plane_size == (2 * 2)));
+
+        /* Check the pattern name data size */
+        assert((format->scf_pnd_size == 1) ||
+               (format->scf_pnd_size == 2));
 #endif /* DEBUG */
 
         /* Map */
@@ -50,45 +65,40 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
         uint16_t plane_d;
 
         /* Calculate the starting map (plane A) address mask bits */
-        map_mask = (((0x0080 << (cfg->ch_cs >> 2)) - 1) / cfg->ch_pnds) -
-            (cfg->ch_pls - 1);
+        map_mask = (((0x0080 << (format->scf_character_size >> 2)) - 1) / format->scf_pnd_size) -
+            (format->scf_plane_size - 1);
 
-        plane_a = (cfg->ch_map[0] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-        plane_b = (cfg->ch_map[1] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-        plane_c = (cfg->ch_map[2] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
-        plane_d = (cfg->ch_map[3] / SCRN_NBGX_PAGE_SIZE(cfg)) & map_mask;
+        plane_a = (format->scf_map.plane_a / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+        plane_b = (format->scf_map.plane_b / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+        plane_c = (format->scf_map.plane_c / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+        plane_d = (format->scf_map.plane_d / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
 
+        /* Mask the upper 3-bits */
         map_offset = (plane_a & 0x01C0) >> 6;
 
         /* Pattern name control */
         uint16_t pncnx;
+        uint16_t character_number;
 
-#ifdef DEBUG
-        /* Character number supplement mode */
-        assert((cfg->ch_cnsm == 0) || (cfg->ch_cnsm == 1));
-
-        /* Pattern name data size */
-        assert((cfg->ch_pnds == 1) || (cfg->ch_pnds == 2));
-#endif /* DEBUG */
-
-        switch (cfg->ch_pnds) {
+        character_number = format->scf_cp_table >> 5;
+        switch (format->scf_pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
 
                 /* Character number supplement mode */
-                switch (cfg->ch_cnsm) {
+                switch (format->scf_auxiliary_mode) {
                 case 0:
                         /* Auxiliary mode 0; flip function can be
                          * used */
 
                         /* Supplementary character number */
-                        switch (cfg->ch_cs) {
+                        switch (format->scf_character_size) {
                         case (1 * 1):
-                                pncnx = (0x8000 | (((cfg->ch_scn >> 5) & 0x7C00) >> 10));
+                                pncnx = (0x8000 | ((character_number & 0x7C00) >> 10));
                                 break;
                         case (2 * 2):
-                                pncnx = (0x8000 | (((cfg->ch_scn >> 5) & 0x7000) >> 10) |
-                                    ((cfg->ch_scn >> 5) & 0x03));
+                                pncnx = (0x8000 | ((character_number & 0x7000) >> 10) |
+                                    (character_number & 0x03));
                                 break;
                         }
                         break;
@@ -97,13 +107,13 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                          * used */
 
                         /* Supplementary character number */
-                        switch (cfg->ch_cs) {
+                        switch (format->scf_character_size) {
                         case (1 * 1):
-                                pncnx = (0xC000 | ((cfg->ch_scn >> 5) & 0x7000) >> 10);
+                                pncnx = (0xC000 | ((character_number & 0x7000) >> 10));
                                 break;
                         case (2 * 2):
-                                pncnx = (0xC000 | (((cfg->ch_scn >> 5) & 0x4000) >> 10) |
-                                    ((cfg->ch_scn >> 5) & 0x03));
+                                pncnx = (0xC000 | ((character_number & 0x4000) >> 10) |
+                                    (character_number & 0x03));
                                 break;
                         }
                 }
@@ -114,16 +124,16 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 break;
         }
 
-        switch (cfg->ch_scrn) {
+        switch (format->scf_scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Character size */
                 vdp2_regs.chctla &= 0xFFFE;
-                vdp2_regs.chctla |= cfg->ch_cs >> 2;
+                vdp2_regs.chctla |= format->scf_character_size >> 2;
 
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFFC;
-                vdp2_regs.plsz |= cfg->ch_pls - 1;
+                vdp2_regs.plsz |= format->scf_plane_size - 1;
 
                 /* Map */
                 vdp2_regs.mpofn &= 0xFFF8;
@@ -140,11 +150,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
         case SCRN_NBG1:
                 /* Character size */
                 vdp2_regs.chctla &= 0xFEFF;
-                vdp2_regs.chctla |= (cfg->ch_cs >> 2) << 8;
+                vdp2_regs.chctla |= (format->scf_character_size >> 2) << 8;
 
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFFF3;
-                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 2;
+                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 2;
 
                 /* Map */
                 vdp2_regs.mpofn &= 0xFF8F;
@@ -160,11 +170,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
         case SCRN_NBG2:
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFFE;
-                vdp2_regs.chctlb |= cfg->ch_cs >> 2;
+                vdp2_regs.chctlb |= format->scf_character_size >> 2;
 
                 /* Plane Size */
                 vdp2_regs.plsz &= 0xFFCF;
-                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 4;
+                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 4;
 
                 /* Map */
                 vdp2_regs.mpofn &= 0xF8FF;
@@ -180,11 +190,11 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
         case SCRN_NBG3:
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFFEF;
-                vdp2_regs.chctlb |= cfg->ch_cs << 2;
+                vdp2_regs.chctlb |= format->scf_character_size << 2;
 
                 /* Plane size */
                 vdp2_regs.plsz &= 0xFF3F;
-                vdp2_regs.plsz |= (cfg->ch_pls - 1) << 6;
+                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 6;
 
                 /* Map */
                 vdp2_regs.mpofn &= 0x8FFF;
@@ -200,13 +210,13 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
         case SCRN_RBG0:
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFEFF;
-                vdp2_regs.chctlb |= cfg->ch_cs << 6;
+                vdp2_regs.chctlb |= format->scf_character_size << 6;
 
                 /* Plane size */
                 if ((vdp2_regs.rpmd & 0x0001) == 0x000) {
                         /* Rotation Parameter A */
                         vdp2_regs.plsz &= 0xFCFF;
-                        vdp2_regs.plsz |= (cfg->ch_pls - 1) << 8;
+                        vdp2_regs.plsz |= (format->scf_plane_size - 1) << 8;
 
                         MEMORY_WRITE(16, VDP2(MPABRA), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRA), (plane_d << 8) | plane_c);
@@ -219,7 +229,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 } else {
                         /* Rotation Parameter B */
                         vdp2_regs.plsz &= 0xCFFF;
-                        vdp2_regs.plsz |= (cfg->ch_pls - 1) << 12;
+                        vdp2_regs.plsz |= (format->scf_plane_size - 1) << 12;
 
                         MEMORY_WRITE(16, VDP2(MPABRB), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRB), (plane_d << 8) | plane_c);
@@ -236,7 +246,7 @@ vdp2_scrn_ch_format_set(struct scrn_ch_format *cfg)
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
-        default:
-                return;
         }
+
+        vdp2_scrn_character_color_count_set(format->scf_scrn, format->scf_cc_count);
 }

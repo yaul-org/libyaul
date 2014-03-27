@@ -25,7 +25,7 @@
 
 #define GRID_CELL_COLOR_RED     0
 #define GRID_CELL_COLOR_ORANGE  1
-#define GRID_CELL_COLOR_YELLOW  2
+#define GRID_CELL_COLOR_GREEN   2
 #define GRID_CELL_COLOR_BLUE    3
 
 #define GRID_WIDTH      18
@@ -34,7 +34,7 @@
 static bool _changed = false;
 static uint32_t _tries = 0;
 
-static uint16_t *_nbg1_pnt[4] = {
+static uint16_t *_nbg1_planes[4] = {
         /* VRAM B0 */
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x00800),
         /* VRAM B0 */
@@ -47,7 +47,7 @@ static uint16_t *_nbg1_pnt[4] = {
 /* VRAM B0 */
 static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
-static uint16_t *_nbg2_pnt[4] = {
+static uint16_t *_nbg3_planes[4] = {
         /* VRAM B0 */
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000),
         /* VRAM B0 */
@@ -58,7 +58,7 @@ static uint16_t *_nbg2_pnt[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000)
 };
 /* VRAM B0 */
-static uint32_t *_nbg2_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x01800);
+static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x01800);
 
 static uint8_t _grid[GRID_WIDTH * GRID_HEIGHT];
 
@@ -144,7 +144,7 @@ _grid_init(void)
                 0x0000,
                 0x8000 | RGB888_TO_RGB555(0xFF, 0x00, 0x00), /* Red */
                 0x8000 | RGB888_TO_RGB555(0xFF, 0xA5, 0x00), /* Orange */
-                0x8000 | RGB888_TO_RGB555(0xFF, 0xFF, 0x00), /* Yellow */
+                0x8000 | RGB888_TO_RGB555(0x00, 0xFF, 0x00), /* Green */
                 0x8000 | RGB888_TO_RGB555(0x00, 0x00, 0xFF), /* Blue */
                 0x0000,
                 0x0000,
@@ -159,28 +159,25 @@ _grid_init(void)
                 0x0000
         };
 
-        struct scrn_ch_format nbg1_cfg;
+        struct scrn_cell_format nbg1_format;
         struct vram_ctl *vram_ctl;
 
         /* We want to be in VBLANK-IN (retrace) */
         vdp2_tvmd_display_clear();
 
-        nbg1_cfg.ch_scrn = SCRN_NBG1;
-        nbg1_cfg.ch_cs = 2 * 2; /* 2x2 cells */
-        nbg1_cfg.ch_pnds = 1; /* 1 word */
-        nbg1_cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
-        nbg1_cfg.ch_sp = 0;
-        nbg1_cfg.ch_scc = 0;
-        nbg1_cfg.ch_spn = 0;
-        nbg1_cfg.ch_scn = (uint32_t)_nbg1_character;
-        nbg1_cfg.ch_pls = 1 * 1; /* 1x1 plane size */
-        nbg1_cfg.ch_map[0] = (uint32_t)_nbg1_pnt[0];
-        nbg1_cfg.ch_map[1] = (uint32_t)_nbg1_pnt[1];
-        nbg1_cfg.ch_map[2] = (uint32_t)_nbg1_pnt[2];
-        nbg1_cfg.ch_map[3] = (uint32_t)_nbg1_pnt[3];
+        nbg1_format.scf_scrn = SCRN_NBG1;
+        nbg1_format.scf_cc_count = 16;
+        nbg1_format.scf_character_size = 2 * 2;
+        nbg1_format.scf_pnd_size = 1; /* 1 word */
+        nbg1_format.scf_auxiliary_mode = 1;
+        nbg1_format.scf_cp_table = (uint32_t)_nbg1_character;
+        nbg1_format.scf_plane_size = 1 * 1;
+        nbg1_format.scf_map.plane_a = (uint32_t)_nbg1_planes[0];
+        nbg1_format.scf_map.plane_b = (uint32_t)_nbg1_planes[1];
+        nbg1_format.scf_map.plane_c = (uint32_t)_nbg1_planes[2];
+        nbg1_format.scf_map.plane_d = (uint32_t)_nbg1_planes[3];
 
-        vdp2_scrn_ccc_set(SCRN_NBG1, SCRN_CCC_CHC_16);
-        vdp2_scrn_ch_format_set(&nbg1_cfg);
+        vdp2_scrn_cell_format_set(&nbg1_format);
         vdp2_priority_spn_set(SCRN_NBG1, 6);
 
         vdp2_scrn_scv_x_set(SCRN_NBG1, -24, 0);
@@ -208,8 +205,8 @@ _grid_init(void)
 
         vram_ctl->vram_cycp.pt[2].t7 = VRAM_CTL_CYCP_CHPNDR_NBG1;
         vram_ctl->vram_cycp.pt[2].t6 = VRAM_CTL_CYCP_PNDR_NBG1;
-        vram_ctl->vram_cycp.pt[2].t5 = VRAM_CTL_CYCP_CHPNDR_NBG2;
-        vram_ctl->vram_cycp.pt[2].t4 = VRAM_CTL_CYCP_PNDR_NBG2;
+        vram_ctl->vram_cycp.pt[2].t5 = VRAM_CTL_CYCP_CHPNDR_NBG3;
+        vram_ctl->vram_cycp.pt[2].t4 = VRAM_CTL_CYCP_PNDR_NBG3;
         vram_ctl->vram_cycp.pt[2].t3 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[2].t2 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[2].t1 = VRAM_CTL_CYCP_NO_ACCESS;
@@ -270,10 +267,10 @@ _grid_init(void)
 
                         character_number =
                             VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
-                        _nbg1_pnt[0][x + (y << 5)] = character_number;
-                        _nbg1_pnt[1][x + (y << 5)] = character_number;
-                        _nbg1_pnt[2][x + (y << 5)] = character_number;
-                        _nbg1_pnt[3][x + (y << 5)] = character_number;
+                        _nbg1_planes[0][x + (y << 5)] = character_number;
+                        _nbg1_planes[1][x + (y << 5)] = character_number;
+                        _nbg1_planes[2][x + (y << 5)] = character_number;
+                        _nbg1_planes[3][x + (y << 5)] = character_number;
                 }
         }
 
@@ -282,39 +279,36 @@ _grid_init(void)
 
         _grid_randomize();
 
-        struct scrn_ch_format nbg2_cfg;
+        struct scrn_cell_format nbg3_format;
 
-        nbg2_cfg.ch_scrn = SCRN_NBG2;
-        nbg2_cfg.ch_cs = 1 * 1; /* 1x1 cells */
-        nbg2_cfg.ch_pnds = 1; /* 1 word */
-        nbg2_cfg.ch_cnsm = 1; /* Character number supplement mode: 1 */
-        nbg2_cfg.ch_sp = 0;
-        nbg2_cfg.ch_scc = 0;
-        nbg2_cfg.ch_spn = 0;
-        nbg2_cfg.ch_scn = (uint32_t)_nbg2_character;
-        nbg2_cfg.ch_pls = 1 * 1; /* 1x1 plane size */
-        nbg2_cfg.ch_map[0] = (uint32_t)_nbg2_pnt[0];
-        nbg2_cfg.ch_map[1] = (uint32_t)_nbg2_pnt[1];
-        nbg2_cfg.ch_map[2] = (uint32_t)_nbg2_pnt[2];
-        nbg2_cfg.ch_map[3] = (uint32_t)_nbg2_pnt[3];
+        nbg3_format.scf_scrn = SCRN_NBG3;
+        nbg3_format.scf_cc_count = 16;
+        nbg3_format.scf_character_size = 1 * 1;
+        nbg3_format.scf_pnd_size = 1; /* 1 word */
+        nbg3_format.scf_auxiliary_mode = 1;
+        nbg3_format.scf_cp_table = (uint32_t)_nbg3_character;
+        nbg3_format.scf_plane_size = 1 * 1;
+        nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
+        nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
+        nbg3_format.scf_map.plane_c = (uint32_t)_nbg3_planes[2];
+        nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
 
-        vdp2_scrn_ccc_set(SCRN_NBG2, SCRN_CCC_CHC_16);
-        vdp2_scrn_ch_format_set(&nbg2_cfg);
-        vdp2_priority_spn_set(SCRN_NBG2, 7);
+        vdp2_scrn_cell_format_set(&nbg3_format);
+        vdp2_priority_spn_set(SCRN_NBG3, 7);
 
         for (tile_idx = 0; tile_idx < 6; tile_idx++) {
                 uint32_t row;
 
                 row = tiles[tile_idx];
 
-                _nbg2_character[0x00 + (tile_idx << 3)] = row;
-                _nbg2_character[0x01 + (tile_idx << 3)] = row;
-                _nbg2_character[0x02 + (tile_idx << 3)] = row;
-                _nbg2_character[0x03 + (tile_idx << 3)] = row;
-                _nbg2_character[0x04 + (tile_idx << 3)] = row;
-                _nbg2_character[0x05 + (tile_idx << 3)] = row;
-                _nbg2_character[0x06 + (tile_idx << 3)] = row;
-                _nbg2_character[0x07 + (tile_idx << 3)] = row;
+                _nbg3_character[0x00 + (tile_idx << 3)] = row;
+                _nbg3_character[0x01 + (tile_idx << 3)] = row;
+                _nbg3_character[0x02 + (tile_idx << 3)] = row;
+                _nbg3_character[0x03 + (tile_idx << 3)] = row;
+                _nbg3_character[0x04 + (tile_idx << 3)] = row;
+                _nbg3_character[0x05 + (tile_idx << 3)] = row;
+                _nbg3_character[0x06 + (tile_idx << 3)] = row;
+                _nbg3_character[0x07 + (tile_idx << 3)] = row;
         }
 
         /* Clear the entire map */
@@ -323,25 +317,25 @@ _grid_init(void)
                         uint16_t character_number;
 
                         character_number =
-                            VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg2_character);
-                        _nbg2_pnt[0][x + (y << 6)] = character_number;
-                        _nbg2_pnt[1][x + (y << 6)] = character_number;
-                        _nbg2_pnt[2][x + (y << 6)] = character_number;
-                        _nbg2_pnt[3][x + (y << 6)] = character_number;
+                            VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
+                        _nbg3_planes[0][x + (y << 6)] = character_number;
+                        _nbg3_planes[1][x + (y << 6)] = character_number;
+                        _nbg3_planes[2][x + (y << 6)] = character_number;
+                        _nbg3_planes[3][x + (y << 6)] = character_number;
                 }
         }
 
-        struct scrn_bm_format nbg0_cfg;
+        struct scrn_bm_format nbg0_format;
 
-        nbg0_cfg.bm_scrn = SCRN_NBG0;
-        nbg0_cfg.bm_bs = SCRN_BM_BMSZ_512_256;
-        nbg0_cfg.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
-        nbg0_cfg.bm_sp = 0;
-        nbg0_cfg.bm_spn = 0;
-        nbg0_cfg.bm_scc = 0;
+        nbg0_format.bm_scrn = SCRN_NBG0;
+        nbg0_format.bm_ccc = 32768;
+        nbg0_format.bm_bs = SCRN_BM_BMSZ_512_256;
+        nbg0_format.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
+        nbg0_format.bm_sp = 0;
+        nbg0_format.bm_spn = 0;
+        nbg0_format.bm_scc = 0;
 
-        vdp2_scrn_ccc_set(SCRN_NBG0, SCRN_CCC_CHC_32768);
-        vdp2_scrn_bm_format_set(&nbg0_cfg);
+        vdp2_scrn_bm_format_set(&nbg0_format);
         vdp2_priority_spn_set(SCRN_NBG0, 5);
 
         void *fh;
@@ -357,8 +351,9 @@ _grid_init(void)
         assert(ret == TGA_FILE_OK);
 
         vdp2_vram_control_set(vram_ctl);
+        vdp2_scrn_display_set(SCRN_NBG0, /* no_trans = */ false);
         vdp2_scrn_display_set(SCRN_NBG1, /* no_trans = */ false);
-        vdp2_scrn_display_set(SCRN_NBG2, /* no_trans = */ false);
+        vdp2_scrn_display_set(SCRN_NBG3, /* no_trans = */ false);
         vdp2_tvmd_display_set();
 }
 
@@ -367,7 +362,7 @@ _grid_update(void)
 {
         if (g_digital.connected == 1) {
                 if (g_digital.held.button.a) {
-                        _grid_flood_fill(GRID_CELL_COLOR_YELLOW);
+                        _grid_flood_fill(GRID_CELL_COLOR_GREEN);
                         _tries++;
                 }  else if (g_digital.held.button.b) {
                         _grid_flood_fill(GRID_CELL_COLOR_BLUE);
@@ -396,19 +391,19 @@ _grid_draw(void)
                         uint8_t color;
 
                         color = _grid_color_get(x, y) + 1;
-                        _nbg1_pnt[0][x + (y << 5)] = character_number + color;
+                        _nbg1_planes[0][x + (y << 5)] = character_number + color;
                 }
         }
 
         /* Draw number of tries */
-        character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg2_character);
+        character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
         for (y = 0; y < TRIES_MAX; y++) {
-                _nbg2_pnt[0][(1) + ((y + 1) << 6)] =
+                _nbg3_planes[0][(1) + ((y + 1) << 6)] =
                     character_number + GRID_CELL_COLOR_BLUE + 1;
         }
 
         for (y = 0; y < _tries; y++) {
-                _nbg2_pnt[0][(1) + ((y + 1) << 6)] =
+                _nbg3_planes[0][(1) + ((y + 1) << 6)] =
                     character_number + GRID_CELL_COLOR_RED + 1;
         }
 }
@@ -421,6 +416,7 @@ _grid_exit(void)
 
         vdp2_scrn_display_clear(SCRN_NBG0, /* no_trans = */ false);
         vdp2_scrn_display_clear(SCRN_NBG1, /* no_trans = */ false);
+        vdp2_scrn_display_clear(SCRN_NBG3, /* no_trans = */ false);
 }
 
 static void

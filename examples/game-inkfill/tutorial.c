@@ -38,13 +38,13 @@ tutorial_init(void)
         vdp2_tvmd_display_clear();
 
         cfg.bm_scrn = SCRN_NBG0;
+        cfg.bm_ccc = 32768;
         cfg.bm_bs = SCRN_BM_BMSZ_512_256;
         cfg.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
         cfg.bm_sp = 0;
         cfg.bm_spn = 0;
         cfg.bm_scc = 0;
 
-        vdp2_scrn_ccc_set(SCRN_NBG0, SCRN_CCC_CHC_32768);
         vdp2_scrn_bm_format_set(&cfg);
         vdp2_priority_spn_set(SCRN_NBG0, 7);
 

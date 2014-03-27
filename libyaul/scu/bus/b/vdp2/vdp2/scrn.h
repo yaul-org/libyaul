@@ -29,14 +29,9 @@ enum scrn_rp_mode_type {
         SCRN_RP_MODE_3          /* Swap via Rotation Parameter Window */
 };
 
-#define SCRN_CCC_CHC_16         0 /* Palette Format */
-#define SCRN_CCC_CHC_256        1 /* Palette Format */
-#define SCRN_CCC_CHC_2048       2 /* Palette Format */
-#define SCRN_CCC_CHC_32768      3 /* RGB Format */
-#define SCRN_CCC_CHC_16770000   4 /* RGB Format */
-
 struct scrn_bm_format {
         uint8_t bm_scrn;        /* Normal/rotational background */
+        uint32_t bm_ccc;        /* Character color count */
 
 #define SCRN_BM_BMSZ_512_256    0 /* Bitmap size 512x256 */
 #define SCRN_BM_BMSZ_512_512    1 /* Bitmap size 512x512 */
@@ -49,18 +44,22 @@ struct scrn_bm_format {
         uint32_t bm_pb;         /* Bitmap pattern boundry (lead addr.) */
 };
 
-struct scrn_ch_format {
-        uint8_t ch_scrn;        /* Normal/rotational background */
-        uint8_t ch_cs;          /* Character size: (1 * 1) or (2 * 2) cells */
-        uint8_t ch_pnds;        /* Pattern name data size: (1)-word or (2)-words */
-        uint8_t ch_cnsm;        /* Character number supplementary mode: mode (0) or mode (1) */
-        uint8_t ch_sp;          /* Special priority */
-        uint8_t ch_scc;         /* Special color calculation */
-        uint8_t ch_spn;         /* Supplementary palette number */
-        uint32_t ch_scn;        /* Supplementary character number (lead addr.) */
-        uint8_t ch_pls;         /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
-        uint32_t ch_map[4];     /* Map lead addresses */
-        uint8_t ch_mapofs;      /* Map offset */
+struct scrn_cell_format {
+        uint8_t scf_scrn;       /* Normal/rotational background */
+        uint32_t scf_cc_count;  /* Character color count */
+        uint8_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
+        uint8_t scf_pnd_size;   /* Pattern name data size: (1)-word or (2)-words */
+        uint8_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
+                                     * auxiliary mode #1 (no flip function) */
+        uint32_t scf_cp_table;  /* Character pattern table */
+        uint8_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
+
+        struct {
+                uint32_t plane_a;
+                uint32_t plane_b;
+                uint32_t plane_c;
+                uint32_t plane_d;
+        } scf_map;              /* Map lead addresses */
 };
 
 struct scrn_ls_format {
@@ -81,8 +80,7 @@ struct scrn_vcs_format {
 };
 
 extern void vdp2_scrn_bm_format_set(struct scrn_bm_format *);
-extern void vdp2_scrn_ccc_set(uint8_t, uint8_t);
-extern void vdp2_scrn_ch_format_set(struct scrn_ch_format *);
+extern void vdp2_scrn_cell_format_set(struct scrn_cell_format *);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_clear(uint8_t, bool);
 extern void vdp2_scrn_ls_set(struct scrn_ls_format *);

@@ -33,21 +33,25 @@ title_init(void)
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
             blcs_color, 0);
 
-        struct scrn_bm_format cfg;
+        struct scrn_bm_format format;
         struct vram_ctl *vram_ctl;
 
         /* We want to be in VBLANK-IN (retrace) */
         vdp2_tvmd_display_clear();
 
-        cfg.bm_scrn = SCRN_NBG0;
-        cfg.bm_bs = SCRN_BM_BMSZ_512_256;
-        cfg.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
-        cfg.bm_sp = 0;
-        cfg.bm_spn = 0;
-        cfg.bm_scc = 0;
+        vdp2_scrn_display_clear(SCRN_NBG0, /* no_trans = */ false);
+        vdp2_scrn_display_clear(SCRN_NBG1, /* no_trans = */ false);
+        vdp2_scrn_display_clear(SCRN_NBG3, /* no_trans = */ false);
 
-        vdp2_scrn_ccc_set(SCRN_NBG0, SCRN_CCC_CHC_32768);
-        vdp2_scrn_bm_format_set(&cfg);
+        format.bm_scrn = SCRN_NBG0;
+        format.bm_ccc = 32768;
+        format.bm_bs = SCRN_BM_BMSZ_512_256;
+        format.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
+        format.bm_sp = 0;
+        format.bm_spn = 0;
+        format.bm_scc = 0;
+
+        vdp2_scrn_bm_format_set(&format);
         vdp2_priority_spn_set(SCRN_NBG0, 7);
 
         vram_ctl = vdp2_vram_control_get();

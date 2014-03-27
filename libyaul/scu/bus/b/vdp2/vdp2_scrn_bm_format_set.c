@@ -112,7 +112,7 @@ vdp2_scrn_bm_format_set(struct scrn_bm_format *b)
                 MEMORY_WRITE(16, VDP2(BMPNB), vdp2_regs.bmpnb);
                 MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 break;
-        default:
-                return;
         }
+
+        vdp2_scrn_character_color_count_set(b->bm_scrn, b->bm_ccc);
 }
