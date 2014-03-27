@@ -77,8 +77,6 @@ vdp2_init(void)
         /* Avoid re-initializing */
         static bool initialized = false;
 
-        uint32_t mask;
-
         /* Initialize the processor to sane values. */
         MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
 
@@ -180,6 +178,8 @@ vdp2_init(void)
 
         /* Disable interrupts */
         cpu_intc_disable();
+
+        uint32_t mask;
 
         mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_HBLANK_IN;
         scu_ic_mask_chg(IC_MASK_ALL, mask);

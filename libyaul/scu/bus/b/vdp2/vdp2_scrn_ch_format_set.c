@@ -34,9 +34,13 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                (format->scf_scrn == SCRN_NBG3) ||
                (format->scf_scrn == SCRN_RBG0));
 
-        /* Make sure that the lead address to character pattern table in
+        /* Assert that the lead address to character pattern table in
          * VRAM is on a 20-byte boundary */
         assert((format->scf_cp_table & 0x1F) == 0x00);
+
+        /* Assert that the lead address to the color palette in CRAM is
+         * on a 10-byte boundary */
+        assert((format->scf_color_palette & 0x0F) == 0x00);
 
         /* Check the character number supplement mode */
         assert((format->scf_auxiliary_mode == 0) ||
@@ -79,11 +83,25 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         /* Pattern name control */
         uint16_t pncnx;
         uint16_t character_number;
+        uint16_t palette_number;
+        uint16_t sc_number; /* Supplementary palette number bits */
+        uint16_t sp_number; /* Supplementary character number bits */
 
-        character_number = format->scf_cp_table >> 5;
         switch (format->scf_pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
+
+                character_number = format->scf_cp_table >> 5;
+                palette_number = format->scf_color_palette >> 5;
+                switch (format->scf_cc_count) {
+                case 16:
+                        sp_number = ((palette_number & 0x70) >> 4) << 5;
+                        break;
+                case 256:
+                case 2048:
+                        sp_number = 0x0000;
+                        break;
+                }
 
                 /* Character number supplement mode */
                 switch (format->scf_auxiliary_mode) {
@@ -94,13 +112,15 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
-                                pncnx = (0x8000 | ((character_number & 0x7C00) >> 10));
+                                sc_number = (character_number & 0x7C00) >> 10;
                                 break;
                         case (2 * 2):
-                                pncnx = (0x8000 | ((character_number & 0x7000) >> 10) |
-                                    (character_number & 0x03));
+                                sc_number = ((character_number & 0x7000) >> 10) |
+                                    (character_number & 0x03);
                                 break;
                         }
+
+                        pncnx = 0x8000 | sc_number | sp_number;
                         break;
                 case 1:
                         /* Auxiliary mode 1; flip function cannot be
@@ -109,13 +129,15 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
-                                pncnx = (0xC000 | ((character_number & 0x7000) >> 10));
+                                sc_number = (character_number & 0x7000) >> 10;
                                 break;
                         case (2 * 2):
-                                pncnx = (0xC000 | ((character_number & 0x4000) >> 10) |
-                                    (character_number & 0x03));
+                                sc_number = ((character_number & 0x4000) >> 10) |
+                                    (character_number & 0x03);
                                 break;
                         }
+
+                        pncnx = 0xC000 | sc_number | sp_number;
                 }
                 break;
         case 2:

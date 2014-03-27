@@ -51,7 +51,8 @@ struct scrn_cell_format {
         uint8_t scf_pnd_size;   /* Pattern name data size: (1)-word or (2)-words */
         uint8_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
                                      * auxiliary mode #1 (no flip function) */
-        uint32_t scf_cp_table;  /* Character pattern table */
+        uint32_t scf_cp_table;  /* Character pattern table lead address*/
+        uint32_t scf_color_palette; /* Color palette lead address */
         uint8_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
 
         struct {
