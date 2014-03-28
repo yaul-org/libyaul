@@ -11,12 +11,6 @@
 #include <scu-internal.h>
 #include <vdp2/map.h>
 
-#define SCRN_CCC_PALETTE_16     0
-#define SCRN_CCC_PALETTE_256    1
-#define SCRN_CCC_PALETTE_2048   2
-#define SCRN_CCC_RGB_32768      3
-#define SCRN_CCC_RGB_16770000   4
-
 struct vdp2_regs {
         uint16_t bgon;          /* Register offset: 0x180020 */
         uint16_t mzctl;         /* Register offset: 0x180022 */

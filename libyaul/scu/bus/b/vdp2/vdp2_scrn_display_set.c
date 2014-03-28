@@ -12,15 +12,23 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_display_set(uint8_t scrn, bool no_trans)
+vdp2_scrn_display_set(uint8_t scrn, bool transparent)
 {
-        /* Enable and disable scroll screens. */
-        vdp2_regs.bgon |= 1 << (uint8_t)scrn;
-        if (no_trans) {
-                uint16_t trans_scrn;
+#ifdef DEBUG
+        /* Check if the background passed is valid */
+        assert((scrn == SCRN_NBG0) ||
+               (scrn == SCRN_RBG1) ||
+               (scrn == SCRN_NBG1) ||
+               (scrn == SCRN_NBG2) ||
+               (scrn == SCRN_NBG3) ||
+               (scrn == SCRN_RBG0));
+#endif /* DEBUG */
 
-                trans_scrn = (uint8_t)scrn + 8;
-                vdp2_regs.bgon |= 1 << trans_scrn;
+        /* Enable and disable scroll screens */
+        vdp2_regs.bgon |= 1 << scrn;
+
+        if (!transparent) {
+                vdp2_regs.bgon |= 1 << (scrn + 8);
         }
 
 #ifdef DEBUG
@@ -58,6 +66,6 @@ vdp2_scrn_display_set(uint8_t scrn, bool no_trans)
         }
 #endif /* DEBUG */
 
-        /* Write to register. */
+        /* Write to register */
         MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
 }

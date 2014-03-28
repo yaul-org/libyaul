@@ -31,21 +31,19 @@ game_over_init(void)
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
             blcs_color, 0);
 
-        struct scrn_bm_format cfg;
+        struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;
 
         /* We want to be in VBLANK-IN (retrace) */
         vdp2_tvmd_display_clear();
 
-        cfg.bm_scrn = SCRN_NBG0;
-        cfg.bm_ccc = 32768;
-        cfg.bm_bs = SCRN_BM_BMSZ_512_256;
-        cfg.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
-        cfg.bm_sp = 0;
-        cfg.bm_spn = 0;
-        cfg.bm_scc = 0;
+        nbg0_format.sbf_scroll_screen = SCRN_NBG0;
+        nbg0_format.sbf_cc_count = SCRN_CCC_RGB_32768;
+        nbg0_format.sbf_bitmap_size.width = 512;
+        nbg0_format.sbf_bitmap_size.height = 256;
+        nbg0_format.sbf_bitmap_pattern = VRAM_ADDR_4MBIT(0, 0x00000);
 
-        vdp2_scrn_bm_format_set(&cfg);
+        vdp2_scrn_bitmap_format_set(&nbg0_format);
         vdp2_priority_spn_set(SCRN_NBG0, 7);
 
         vram_ctl = vdp2_vram_control_get();
@@ -79,7 +77,7 @@ game_over_init(void)
         ret = tga_read(&tga, (uint8_t *)0x00201000, (uint16_t *)VRAM_ADDR_4MBIT(0, 0x00000), NULL);
         assert(ret == TGA_FILE_OK);
 
-        vdp2_scrn_display_set(SCRN_NBG0, /* no_trans = */ false);
+        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ true);
         vdp2_tvmd_display_set();
 
         changed = false;
@@ -106,5 +104,5 @@ game_over_draw(void)
 void
 game_over_exit(void)
 {
-        vdp2_scrn_display_clear(SCRN_NBG0, /* no_trans = */ false);
+        vdp2_scrn_display_clear();
 }

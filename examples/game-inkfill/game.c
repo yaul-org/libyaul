@@ -44,6 +44,8 @@ static uint16_t *_nbg1_planes[4] = {
         /* VRAM B0 */
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x01000)
 };
+/* CRAM */
+static uint32_t *_nbg1_color_palette = (uint32_t *)CRAM_BANK(32, 0);
 /* VRAM B0 */
 static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
@@ -57,6 +59,8 @@ static uint16_t *_nbg3_planes[4] = {
         /* VRAM B0 */
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000)
 };
+/* CRAM */
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(63, 0);
 /* VRAM B0 */
 static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x01800);
 
@@ -146,17 +150,17 @@ _grid_init(void)
                 0x8000 | RGB888_TO_RGB555(0xFF, 0xA5, 0x00), /* Orange */
                 0x8000 | RGB888_TO_RGB555(0x00, 0xFF, 0x00), /* Green */
                 0x8000 | RGB888_TO_RGB555(0x00, 0x00, 0xFF), /* Blue */
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000,
-                0x0000
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF,
+                0xFFFF
         };
 
         struct scrn_cell_format nbg1_format;
@@ -166,11 +170,12 @@ _grid_init(void)
         vdp2_tvmd_display_clear();
 
         nbg1_format.scf_scrn = SCRN_NBG1;
-        nbg1_format.scf_cc_count = 16;
+        nbg1_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg1_format.scf_character_size = 2 * 2;
         nbg1_format.scf_pnd_size = 1; /* 1 word */
         nbg1_format.scf_auxiliary_mode = 1;
         nbg1_format.scf_cp_table = (uint32_t)_nbg1_character;
+        nbg1_format.scf_color_palette = (uint32_t)_nbg1_color_palette;
         nbg1_format.scf_plane_size = 1 * 1;
         nbg1_format.scf_map.plane_a = (uint32_t)_nbg1_planes[0];
         nbg1_format.scf_map.plane_b = (uint32_t)_nbg1_planes[1];
@@ -275,18 +280,19 @@ _grid_init(void)
         }
 
         /* Copy palette */
-        memcpy((uint16_t *)CRAM_BANK(0, 0), palette, 16 * sizeof(uint16_t));
+        memcpy(_nbg1_color_palette, palette, 16 * sizeof(uint16_t));
 
         _grid_randomize();
 
         struct scrn_cell_format nbg3_format;
 
         nbg3_format.scf_scrn = SCRN_NBG3;
-        nbg3_format.scf_cc_count = 16;
+        nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg3_format.scf_character_size = 1 * 1;
         nbg3_format.scf_pnd_size = 1; /* 1 word */
         nbg3_format.scf_auxiliary_mode = 1;
         nbg3_format.scf_cp_table = (uint32_t)_nbg3_character;
+        nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
         nbg3_format.scf_plane_size = 1 * 1;
         nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
         nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
@@ -325,17 +331,18 @@ _grid_init(void)
                 }
         }
 
-        struct scrn_bm_format nbg0_format;
+        /* Copy palette */
+        memcpy(_nbg3_color_palette, palette, 16 * sizeof(uint16_t));
 
-        nbg0_format.bm_scrn = SCRN_NBG0;
-        nbg0_format.bm_ccc = 32768;
-        nbg0_format.bm_bs = SCRN_BM_BMSZ_512_256;
-        nbg0_format.bm_pb = VRAM_ADDR_4MBIT(0, 0x00000);
-        nbg0_format.bm_sp = 0;
-        nbg0_format.bm_spn = 0;
-        nbg0_format.bm_scc = 0;
+        struct scrn_bitmap_format nbg0_format;
 
-        vdp2_scrn_bm_format_set(&nbg0_format);
+        nbg0_format.sbf_scroll_screen = SCRN_NBG0;
+        nbg0_format.sbf_cc_count = SCRN_CCC_RGB_32768;
+        nbg0_format.sbf_bitmap_size.width = 512;
+        nbg0_format.sbf_bitmap_size.height = 256;
+        nbg0_format.sbf_bitmap_pattern = VRAM_ADDR_4MBIT(0, 0x00000);
+
+        vdp2_scrn_bitmap_format_set(&nbg0_format);
         vdp2_priority_spn_set(SCRN_NBG0, 5);
 
         void *fh;
@@ -351,9 +358,9 @@ _grid_init(void)
         assert(ret == TGA_FILE_OK);
 
         vdp2_vram_control_set(vram_ctl);
-        vdp2_scrn_display_set(SCRN_NBG0, /* no_trans = */ false);
-        vdp2_scrn_display_set(SCRN_NBG1, /* no_trans = */ false);
-        vdp2_scrn_display_set(SCRN_NBG3, /* no_trans = */ false);
+        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
+        vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
+        vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
         vdp2_tvmd_display_set();
 }
 
@@ -381,42 +388,41 @@ static void
 _grid_draw(void)
 {
         uint16_t character_number;
+        uint16_t palette_number;
         uint32_t x;
         uint32_t y;
 
         /* Draw actual grid */
         character_number = VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
+        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
         for (y = 0; y < GRID_HEIGHT; y++) {
                 for (x = 0; x < GRID_WIDTH; x++) {
                         uint8_t color;
 
                         color = _grid_color_get(x, y) + 1;
-                        _nbg1_planes[0][x + (y << 5)] = character_number + color;
+                        _nbg1_planes[0][x + (y << 5)] =
+                            palette_number | (character_number + color);
                 }
         }
 
         /* Draw number of tries */
         character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
+        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
         for (y = 0; y < TRIES_MAX; y++) {
                 _nbg3_planes[0][(1) + ((y + 1) << 6)] =
-                    character_number + GRID_CELL_COLOR_BLUE + 1;
+                    palette_number | (character_number + GRID_CELL_COLOR_BLUE + 1);
         }
 
         for (y = 0; y < _tries; y++) {
                 _nbg3_planes[0][(1) + ((y + 1) << 6)] =
-                    character_number + GRID_CELL_COLOR_RED + 1;
+                    palette_number | (character_number + GRID_CELL_COLOR_RED + 1);
         }
 }
 
 static void
 _grid_exit(void)
 {
-        /* We want to be in VBLANK-IN (retrace) */
-        vdp2_tvmd_display_clear();
-
-        vdp2_scrn_display_clear(SCRN_NBG0, /* no_trans = */ false);
-        vdp2_scrn_display_clear(SCRN_NBG1, /* no_trans = */ false);
-        vdp2_scrn_display_clear(SCRN_NBG3, /* no_trans = */ false);
+        vdp2_scrn_display_clear();
 }
 
 static void

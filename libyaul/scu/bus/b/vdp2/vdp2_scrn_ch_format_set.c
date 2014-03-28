@@ -39,8 +39,12 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         assert((format->scf_cp_table & 0x1F) == 0x00);
 
         /* Assert that the lead address to the color palette in CRAM is
-         * on a 10-byte boundary */
-        assert((format->scf_color_palette & 0x0F) == 0x00);
+         * on a 20-byte boundary */
+        assert((format->scf_color_palette & 0x1F) == 0x00);
+
+        assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
+               (format->scf_cc_count == SCRN_CCC_PALETTE_256) ||
+               (format->scf_cc_count == SCRN_CCC_PALETTE_2048));
 
         /* Check the character number supplement mode */
         assert((format->scf_auxiliary_mode == 0) ||
@@ -93,12 +97,21 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 
                 character_number = format->scf_cp_table >> 5;
                 palette_number = format->scf_color_palette >> 5;
+#ifdef DEBUG
+                /* Depending on the Color RAM mode, there are "invalid"
+                 * CRAM banks.
+                 *
+                 * Mode 0 (1024 colors, mirrored, 64 banks)
+                 * Mode 1 (2048 colors, 128 banks)
+                 * Mode 2 (1024 colors) */
+#endif /* DEBUG */
+
                 switch (format->scf_cc_count) {
-                case 16:
+                case SCRN_CCC_PALETTE_16:
                         sp_number = ((palette_number & 0x70) >> 4) << 5;
                         break;
-                case 256:
-                case 2048:
+                case SCRN_CCC_PALETTE_256:
+                case SCRN_CCC_PALETTE_2048:
                         sp_number = 0x0000;
                         break;
                 }
@@ -149,6 +162,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         switch (format->scf_scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
+                /* Character color count */
+                vdp2_regs.chctla &= 0xFF8F;
+                vdp2_regs.chctla |= format->scf_cc_count << 4;
+
                 /* Character size */
                 vdp2_regs.chctla &= 0xFFFE;
                 vdp2_regs.chctla |= format->scf_character_size >> 2;
@@ -170,6 +187,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PRINA), vdp2_regs.prina);
                 break;
         case SCRN_NBG1:
+                /* Character color count */
+                vdp2_regs.chctla &= 0xCFFF;
+                vdp2_regs.chctla |= format->scf_cc_count << 12;
+
                 /* Character size */
                 vdp2_regs.chctla &= 0xFEFF;
                 vdp2_regs.chctla |= (format->scf_character_size >> 2) << 8;
@@ -190,6 +211,15 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN1), pncnx);
                 break;
         case SCRN_NBG2:
+#ifdef DEBUG
+                assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
+                       (format->scf_cc_count == SCRN_CCC_PALETTE_256));
+#endif /* DEBUG */
+
+                /* Character color count */
+                vdp2_regs.chctlb &= 0xFFFD;
+                vdp2_regs.chctlb |= format->scf_cc_count << 1;
+
                 /* Character Size */
                 vdp2_regs.chctlb &= 0xFFFE;
                 vdp2_regs.chctlb |= format->scf_character_size >> 2;
@@ -210,6 +240,15 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN2), pncnx);
                 break;
         case SCRN_NBG3:
+#ifdef DEBUG
+                assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
+                       (format->scf_cc_count == SCRN_CCC_PALETTE_256));
+#endif /* DEBUG */
+
+                /* Character color count */
+                vdp2_regs.chctlb &= 0xFFDF;
+                vdp2_regs.chctlb |= format->scf_cc_count << 5;
+
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFFEF;
                 vdp2_regs.chctlb |= format->scf_character_size << 2;
@@ -230,6 +269,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         case SCRN_RBG0:
+                /* Character color count */
+                vdp2_regs.chctlb &= 0x8FFF;
+                vdp2_regs.chctlb |= format->scf_cc_count << 12;
+
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFEFF;
                 vdp2_regs.chctlb |= format->scf_character_size << 6;
@@ -269,6 +312,4 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         }
-
-        vdp2_scrn_character_color_count_set(format->scf_scrn, format->scf_cc_count);
 }

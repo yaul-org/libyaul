@@ -10,17 +10,10 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_display_clear(uint8_t scrn, bool no_trans)
+vdp2_scrn_display_clear(void)
 {
-        uint16_t trans_scrn;
+        vdp2_regs.bgon = 0x0000;
 
-        /* Enable and disable scroll screens. */
-        vdp2_regs.bgon &= ~(1 << scrn);
-        if (no_trans) {
-                trans_scrn = scrn + 8;
-                vdp2_regs.bgon &= ~(1 << trans_scrn);
-        }
-
-        /* Write to register. */
+        /* Write to register */
         MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
 }
