@@ -20,13 +20,25 @@
 
 #include "cons.h"
 
-typedef struct {
-        uint16_t *planes[4];
-        uint32_t *character;
-        uint32_t character_no;
-} cons_vdp2_t;
+/* The dimensions of cons is 40x28. Each cell is 32-bytes. Therefore,
+ * 40*28*(32-bytes) (0x8C00 bytes) is needed for the character pattern
+ * data. So, offset 0xA000 is on a 0x2000 byte boundary. */
+static uint16_t *_nbg3_planes[4] = {
+        /* VRAM B1 */
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x0A000),
+        /* VRAM B1 */
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x0A000),
+        /* VRAM B1 */
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x0A000),
+        /* VRAM B1 */
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x0A000)
+};
+/* CRAM */
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(63, 0);
+/* VRAM B1 */
+static uint32_t *_nbg3_character_pattern = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
-static cons_vdp2_t *cons_vdp2_new(void);
+static uint32_t _character_no = 0;
 
 static void cons_vdp2_clear(struct cons *, int32_t, int32_t, int32_t, int32_t);
 static void cons_vdp2_reset(struct cons *);
@@ -41,12 +53,6 @@ cons_vdp2_init(struct cons *cons)
 
         uint32_t y;
 
-        cons_vdp2_t *cons_vdp2;
-
-        cons_vdp2 = cons_vdp2_new();
-
-        cons->driver = cons_vdp2;
-
         cons->clear = cons_vdp2_clear;
         cons->reset = cons_vdp2_reset;
         cons->scroll = cons_vdp2_scroll;
@@ -54,31 +60,21 @@ cons_vdp2_init(struct cons *cons)
 
         cons_reset(cons);
 
-        /* We want to be in VBLANK-IN (retrace) */
+        /* We want to be in VBLANK */
         vdp2_tvmd_display_clear();
 
-        /* VRAM B1 */
-        cons_vdp2->planes[0] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000);
-        /* VRAM B1 */
-        cons_vdp2->planes[1] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000);
-        /* VRAM B1 */
-        cons_vdp2->planes[2] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000);
-        /* VRAM B1 */
-        cons_vdp2->planes[3] = (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000);
-        /* VRAM B1 */
-        cons_vdp2->character = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
-
         nbg3_format.scf_scrn = SCRN_NBG3;
-        nbg3_format.scf_cc_count = 16;
+        nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg3_format.scf_character_size = 1 * 1;
         nbg3_format.scf_pnd_size = 1; /* 1-word */
         nbg3_format.scf_auxiliary_mode = 1;
-        nbg3_format.scf_cp_table = (uint32_t)cons_vdp2->character;
+        nbg3_format.scf_cp_table = (uint32_t)_nbg3_character_pattern;
+        nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
         nbg3_format.scf_plane_size = 1 * 1;
-        nbg3_format.scf_map.plane_a = (uint32_t)cons_vdp2->planes[0];
-        nbg3_format.scf_map.plane_b = (uint32_t)cons_vdp2->planes[1];
-        nbg3_format.scf_map.plane_c = (uint32_t)cons_vdp2->planes[2];
-        nbg3_format.scf_map.plane_d = (uint32_t)cons_vdp2->planes[3];
+        nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
+        nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
+        nbg3_format.scf_map.plane_c = (uint32_t)_nbg3_planes[2];
+        nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
 
         vdp2_scrn_cell_format_set(&nbg3_format);
         vdp2_priority_spn_set(SCRN_NBG3, 7);
@@ -96,57 +92,43 @@ cons_vdp2_init(struct cons *cons)
 
         /* Clear the first unpacked cell of the font */
         for (y = 0; y < FONT_H; y++) {
-                cons_vdp2->character[y] = font_unpacked[0];
+                _nbg3_character_pattern[y] = font_unpacked[0];
         }
 
-        memcpy((uint16_t *)CRAM_BANK(0, 0), palette,
-            FONT_NCOLORS * sizeof(uint16_t));
+        memcpy(_nbg3_color_palette, palette, FONT_NCOLORS * sizeof(uint16_t));
 
+        /* Clear */
         cons->clear(cons, 0, COLS, 0, ROWS);
 
-        /* Hopefully it won't glitch */
-        vdp2_scrn_display_set(SCRN_NBG3, /* no_trans = */ false);
+        vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
         vdp2_tvmd_display_set();
-}
-
-static cons_vdp2_t *
-cons_vdp2_new(void)
-{
-        cons_vdp2_t *cons_vdp2;
-
-        if ((cons_vdp2 = (cons_vdp2_t *)malloc(sizeof(cons_vdp2_t))) == NULL)
-                return NULL;
-
-        memset(cons_vdp2, 0, sizeof(cons_vdp2_t));
-        return cons_vdp2;
 }
 
 static void
 cons_vdp2_clear(struct cons *cons, int32_t col_start, int32_t col_end,
     int32_t row_start, int32_t row_end)
 {
-        cons_vdp2_t *cons_vdp2;
+        uint16_t character_number;
+        uint16_t palette_number;
+
+        character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character_pattern);
+        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
+
         int32_t col;
         int32_t row;
-        uint16_t ofs;
 
-        cons_vdp2 = cons->driver;
-
-        /* Clear map */
-        ofs = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)cons_vdp2->character);
         for (row = row_start; row < row_end; row++) {
-                for (col = col_start; col < col_end; col++)
-                        cons_vdp2->planes[0][col + (row << 6)] = ofs;
+                for (col = col_start; col < col_end; col++) {
+                        _nbg3_planes[0][col + (row << 6)] =
+                            character_number | palette_number;
+                }
         }
 }
 
 static void
 cons_vdp2_reset(struct cons *cons)
 {
-        cons_vdp2_t *cons_vdp2;
-
-        cons_vdp2 = cons->driver;
-        cons_vdp2->character_no = ((cons->cursor.row % ROWS) * COLS) + cons->cursor.col + 1;
+        _character_no = ((cons->cursor.row % ROWS) * COLS) + cons->cursor.col + 1;
 }
 
 static void
@@ -161,18 +143,6 @@ cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)))
 static void
 cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
 {
-        cons_vdp2_t *cons_vdp2;
-
-        uint32_t cofs;
-        uint32_t tofs;
-        uint32_t row;
-        uint32_t fg_mask;
-        uint32_t bg_mask;
-
-        uint32_t ofs;
-
-        int y;
-
         static const uint32_t color_tbl[] = {
                 0x00000000, 0x11111111, 0x22222222, 0x33333333,
                 0x44444444, 0x55555555, 0x66666666, 0x77777777,
@@ -180,25 +150,36 @@ cons_vdp2_write(struct cons *cons, int c, uint8_t fg, uint8_t bg)
                 0xCCCCCCCC, 0xDDDDDDDD, 0xEEEEEEEE, 0xFFFFFFFF
         };
 
-        cons_vdp2 = cons->driver;
-
-        tofs = c << 3;
-        cofs = cons_vdp2->character_no << 3;
+        uint32_t fg_mask;
+        uint32_t bg_mask;
 
         fg_mask = color_tbl[fg];
         bg_mask = color_tbl[bg];
 
         /* Expand cell */
+        int32_t y;
+
         for (y = FONT_H - 1; y >= 0; y--) {
-                row = font_unpacked[font[y + tofs]];
-                cons_vdp2->character[y + cofs] = (row & fg_mask) | ((row & bg_mask) ^ bg_mask);
+                uint32_t row;
+
+                row = font_unpacked[font[y + (c << 3)]];
+
+                _nbg3_character_pattern[y + (_character_no << 3)] =
+                    (row & fg_mask) | ((row & bg_mask) ^ bg_mask);
         }
 
-        ofs = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)cons_vdp2->character) |
-            cons_vdp2->character_no;
-        cons_vdp2->planes[0][cons->cursor.col + (cons->cursor.row << 6)] = ofs;
+        uint16_t character_number;
+        uint16_t palette_number;
 
-        cons_vdp2->character_no++;
-        if ((cons_vdp2->character_no % (ROWS * COLS)) == 0)
-                cons_vdp2->character_no = 1;
+        character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character_pattern);
+        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
+
+        _nbg3_planes[0][cons->cursor.col + (cons->cursor.row << 6)] =
+            (character_number + _character_no) | palette_number;
+
+        _character_no++;
+
+        if ((_character_no % (ROWS * COLS)) == 0) {
+                _character_no = 1;
+        }
 }
