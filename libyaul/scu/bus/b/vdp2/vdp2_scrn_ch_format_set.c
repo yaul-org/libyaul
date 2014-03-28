@@ -11,13 +11,13 @@
 
 #include "vdp2-internal.h"
 
-#define SCRN_NBGX_PAGE_SIZE(cfg)                                               \
+#define SCRN_NBGX_PAGE_SIZE(format)                                            \
         /* 1-word with a 64x64 cell page is the smallest page size */          \
-        (((64 * 64 * 2) / ((cfg)->scf_character_size)) * ((cfg)->scf_pnd_size))
-#define SCRN_NBGX_PLANE_SIZE(cfg)                                              \
-        (4 * SCRN_NBGX_PAGE_SIZE(cfg))
-#define SCRN_NBGX_MAP_SIZE(cfg)                                                \
-        (((cfg)->pls) * SCRN_NBGX_PLANE_SIZE(cfg))
+        (((64 * 64 * 2) / ((format)->scf_character_size)) *                    \
+            ((format)->scf_pnd_size))
+
+#define SCRN_NBGX_PLANE_SIZE(format)                                           \
+        (((format)->scf_plane_size) * SCRN_NBGX_PAGE_SIZE(format))
 
 void
 vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
@@ -62,6 +62,19 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         /* Check the pattern name data size */
         assert((format->scf_pnd_size == 1) ||
                (format->scf_pnd_size == 2));
+
+        /* Check the lead address for each plane */
+        /* The lead address must be on a boundary dependent on the size
+         * of the plane. For example, if NBG0 is configured to use 2x2
+         * cells, the dimensions of its page(s) will be 32x32 cells
+         * (0x800 bytes).
+         *
+         * If the dimension of the plane is 2x1, then the lead address
+         * must be on 0x1000 byte boundary. */
+        assert((format->scf_map.plane_a & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_b & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_c & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_d & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
 #endif /* DEBUG */
 
         /* Map */
@@ -72,7 +85,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_c;
         uint16_t plane_d;
 
-        /* Calculate the starting map (plane A) address mask bits */
+        /* Calculate the lead map (plane A) address mask bits */
         map_mask = (((0x0080 << (format->scf_character_size >> 2)) - 1) / format->scf_pnd_size) -
             (format->scf_plane_size - 1);
 
