@@ -12,7 +12,6 @@
 #include "vdp2-internal.h"
 
 #define SCRN_NBGX_PAGE_SIZE(format)                                            \
-        /* 1-word with a 64x64 cell page is the smallest page size */          \
         (((64 * 64 * 2) / ((format)->scf_character_size)) *                    \
             ((format)->scf_pnd_size))
 
