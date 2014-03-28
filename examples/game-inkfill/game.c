@@ -36,13 +36,13 @@ static uint32_t _tries = 0;
 
 static uint16_t *_nbg1_planes[4] = {
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x00800),
-        /* VRAM B0 */
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x01000),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x01000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x01000)
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x03000),
+        /* VRAM B0 */
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x04000)
 };
 /* CRAM */
 static uint32_t *_nbg1_color_palette = (uint32_t *)CRAM_BANK(32, 0);
@@ -51,18 +51,18 @@ static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
 static uint16_t *_nbg3_planes[4] = {
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
         /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x02000)
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
 };
 /* CRAM */
 static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(63, 0);
 /* VRAM B0 */
-static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x01800);
+static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
 
 static uint8_t _grid[GRID_WIDTH * GRID_HEIGHT];
 
@@ -176,7 +176,7 @@ _grid_init(void)
         nbg1_format.scf_auxiliary_mode = 1;
         nbg1_format.scf_cp_table = (uint32_t)_nbg1_character;
         nbg1_format.scf_color_palette = (uint32_t)_nbg1_color_palette;
-        nbg1_format.scf_plane_size = 1 * 1;
+        nbg1_format.scf_plane_size = 2 * 1;
         nbg1_format.scf_map.plane_a = (uint32_t)_nbg1_planes[0];
         nbg1_format.scf_map.plane_b = (uint32_t)_nbg1_planes[1];
         nbg1_format.scf_map.plane_c = (uint32_t)_nbg1_planes[2];
@@ -187,35 +187,6 @@ _grid_init(void)
 
         vdp2_scrn_scv_x_set(SCRN_NBG1, -24, 0);
         vdp2_scrn_scv_y_set(SCRN_NBG1, -8, 0);
-
-        vram_ctl = vdp2_vram_control_get();
-
-        vram_ctl->vram_cycp.pt[0].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[0].t6 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[0].t5 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[0].t4 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[0].t3 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[0].t2 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[0].t1 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[0].t0 = VRAM_CTL_CYCP_NO_ACCESS;
-
-        vram_ctl->vram_cycp.pt[1].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[1].t6 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[1].t5 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[1].t4 = VRAM_CTL_CYCP_CHPNDR_NBG0;
-        vram_ctl->vram_cycp.pt[1].t3 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[1].t2 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[1].t1 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[1].t0 = VRAM_CTL_CYCP_NO_ACCESS;
-
-        vram_ctl->vram_cycp.pt[2].t7 = VRAM_CTL_CYCP_CHPNDR_NBG1;
-        vram_ctl->vram_cycp.pt[2].t6 = VRAM_CTL_CYCP_PNDR_NBG1;
-        vram_ctl->vram_cycp.pt[2].t5 = VRAM_CTL_CYCP_CHPNDR_NBG3;
-        vram_ctl->vram_cycp.pt[2].t4 = VRAM_CTL_CYCP_PNDR_NBG3;
-        vram_ctl->vram_cycp.pt[2].t3 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[2].t2 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[2].t1 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[2].t0 = VRAM_CTL_CYCP_NO_ACCESS;
 
         /* Draw the tiles */
         uint32_t tile_idx;
@@ -267,15 +238,15 @@ _grid_init(void)
         uint16_t y;
 
         for (y = 0; y < 32; y++) {
-                for (x = 0; x < 32; x++) {
+                for (x = 0; x < 64; x++) {
                         uint16_t character_number;
 
                         character_number =
                             VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
-                        _nbg1_planes[0][x + (y << 5)] = character_number;
-                        _nbg1_planes[1][x + (y << 5)] = character_number;
-                        _nbg1_planes[2][x + (y << 5)] = character_number;
-                        _nbg1_planes[3][x + (y << 5)] = character_number;
+                        _nbg1_planes[0][x + (y << 6)] = character_number;
+                        _nbg1_planes[1][x + (y << 6)] = character_number;
+                        _nbg1_planes[2][x + (y << 6)] = character_number;
+                        _nbg1_planes[3][x + (y << 6)] = character_number;
                 }
         }
 
@@ -319,15 +290,15 @@ _grid_init(void)
 
         /* Clear the entire map */
         for (y = 0; y < 64; y++) {
-                for (x = 0; x < 64; x++) {
+                for (x = 0; x < 32; x++) {
                         uint16_t character_number;
 
                         character_number =
                             VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
-                        _nbg3_planes[0][x + (y << 6)] = character_number;
-                        _nbg3_planes[1][x + (y << 6)] = character_number;
-                        _nbg3_planes[2][x + (y << 6)] = character_number;
-                        _nbg3_planes[3][x + (y << 6)] = character_number;
+                        _nbg3_planes[0][x + (y << 5)] = character_number;
+                        _nbg3_planes[1][x + (y << 5)] = character_number;
+                        _nbg3_planes[2][x + (y << 5)] = character_number;
+                        _nbg3_planes[3][x + (y << 5)] = character_number;
                 }
         }
 
@@ -357,10 +328,39 @@ _grid_init(void)
             (uint16_t *)VRAM_ADDR_4MBIT(0, 0x00000), NULL);
         assert(ret == TGA_FILE_OK);
 
+        vram_ctl = vdp2_vram_control_get();
+        vram_ctl->vram_cycp.pt[0].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[0].t6 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[0].t5 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[0].t4 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[0].t3 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[0].t2 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[0].t1 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[0].t0 = VRAM_CTL_CYCP_NO_ACCESS;
+
+        vram_ctl->vram_cycp.pt[1].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t6 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t5 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t4 = VRAM_CTL_CYCP_CHPNDR_NBG0;
+        vram_ctl->vram_cycp.pt[1].t3 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t2 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t1 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t0 = VRAM_CTL_CYCP_NO_ACCESS;
+
+        vram_ctl->vram_cycp.pt[2].t7 = VRAM_CTL_CYCP_CHPNDR_NBG1;
+        vram_ctl->vram_cycp.pt[2].t6 = VRAM_CTL_CYCP_PNDR_NBG1;
+        vram_ctl->vram_cycp.pt[2].t5 = VRAM_CTL_CYCP_CHPNDR_NBG3;
+        vram_ctl->vram_cycp.pt[2].t4 = VRAM_CTL_CYCP_PNDR_NBG3;
+        vram_ctl->vram_cycp.pt[2].t3 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[2].t2 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[2].t1 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[2].t0 = VRAM_CTL_CYCP_NO_ACCESS;
         vdp2_vram_control_set(vram_ctl);
+
         vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
         vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
         vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
+
         vdp2_tvmd_display_set();
 }
 
