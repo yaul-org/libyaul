@@ -36,7 +36,7 @@ static uint16_t *_nbg3_planes[4] = {
 /* CRAM */
 static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(63, 0);
 /* VRAM B1 */
-static uint32_t *_nbg3_character_pattern = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
+static uint32_t *_nbg3_character_pattern = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00020);
 
 static uint32_t _character_no = 0;
 
