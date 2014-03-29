@@ -14,10 +14,6 @@
 #define VDP2(x)         (0x25F80000 + (x))
 
 /* Helpers */
-#define VRAM_BANK_4MBIT(x)      (((x) >> 1) & 0xFFFF)
-#define VRAM_OFFSET_4MBIT(x)    (((x) >> 17) & 0x0007)
-#define VRAM_BANK_8MBIT(x)      (((x) >> 1) & 0xFFFF)
-#define VRAM_OFFSET_8MBIT(x)    (((x) >> 18) & 0x0007)
 
 /* VDP2 */
 #define TVMD            0x0000

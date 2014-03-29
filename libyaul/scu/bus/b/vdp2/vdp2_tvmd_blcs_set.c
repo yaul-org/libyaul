@@ -13,44 +13,28 @@
 void
 vdp2_tvmd_blcs_set(bool lcclmd, uint32_t vram, uint16_t *color, uint16_t len)
 {
-        uint16_t bktau;
-        uint16_t bktal;
+        /* Force display. If BDCLMD is set and DISP has never been set,
+         * the back screen will not display properly. */
+        vdp2_tvmd_vblank_in_wait();
+
+        MEMORY_WRITE(16, VDP2(BKTAU), (lcclmd ? 0x8000 : 0x0000) | ((vram >> 17) & 0x03));
+        MEMORY_WRITE(16, VDP2(BKTAL), (vram >> 1) & 0xFFFF);
+
         uint16_t tvmd;
 
-        uint16_t ofs;
-
-        switch (vram_ctl.vram_size) {
-        case VRAM_CTL_SIZE_4MBIT:
-                bktal = VRAM_BANK_4MBIT(vram);
-                bktau = VRAM_OFFSET_4MBIT(vram);
-                break;
-        case VRAM_CTL_SIZE_8MBIT:
-                bktal = VRAM_BANK_8MBIT(vram);
-                bktau = VRAM_OFFSET_8MBIT(vram);
-                break;
-        default:
-                return;
-        }
-
-        bktau |= lcclmd ? 0x8000 : 0x0000;
-
-        MEMORY_WRITE(16, VDP2(BKTAU), bktau);
-        MEMORY_WRITE(16, VDP2(BKTAL), bktal);
-
-        /*
-         * Force display ON. If BDCLMD is set and DISP has never been
-         * set, the back screen will not display properly
-         */
         tvmd = MEMORY_READ(16, VDP2(TVMD));
         tvmd &= 0x7EFF;
         tvmd |= 0x8100;
+
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 
-        if (lcclmd) {
-                for (ofs = 0; ofs < len; ofs++)
-                        MEMORY_WRITE(16, vram + (ofs << 1), *color++);
-                return;
-        }
+        if (!lcclmd) {
+                MEMORY_WRITE(16, vram, *color);
+        } else {
+                uint16_t ofs;
 
-        MEMORY_WRITE(16, vram, *color);
+                for (ofs = 0; ofs < len; ofs++) {
+                        MEMORY_WRITE(16, vram + (ofs << 1), *color++);
+                }
+        }
 }

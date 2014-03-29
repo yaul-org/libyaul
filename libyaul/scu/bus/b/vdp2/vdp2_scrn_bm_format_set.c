@@ -37,14 +37,14 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                (format->sbf_bitmap_size.height == 512));
 #endif /* DEBUG */
 
-        uint8_t bank;
+        uint32_t bank;
 
         switch (vram_ctl.vram_size) {
         case VRAM_CTL_SIZE_4MBIT:
                 bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
                 break;
         case VRAM_CTL_SIZE_8MBIT:
-                bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+                bank = VRAM_BANK_8MBIT(format->sbf_bitmap_pattern);
                 break;
         }
 
@@ -115,6 +115,7 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(BMPNA), vdp2_regs.bmpna);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 break;
         case SCRN_RBG0:
 #ifdef DEBUG

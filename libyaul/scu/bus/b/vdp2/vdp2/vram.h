@@ -18,7 +18,8 @@ extern "C" {
 #define VRAM_ADDR_4MBIT(x, y)   (0x25E00000 + ((x) << 17) + (y))
 #define VRAM_ADDR_8MBIT(x, y)   (0x25E00000 + ((x) << 18) + (y))
 
-#define VRAM_ADDR_BANK(x)       (((x) >> 16) & 0xF)
+#define VRAM_BANK_4MBIT(x)      (((x) >> 17) & 0x0007)
+#define VRAM_BANK_8MBIT(x)      (((x) >> 18) & 0x0007)
 
 struct vram_ctl {
 #define VRAM_CTL_SIZE_4MBIT     0x0000
