@@ -28,13 +28,6 @@ extern "C" {
 #define SCRN_CCC_RGB_32768      3
 #define SCRN_CCC_RGB_16770000   4
 
-enum scrn_rp_mode_type {
-        SCRN_RP_MODE_0,         /* Rotation Parameter A */
-        SCRN_RP_MODE_1,         /* Rotation Parameter B */
-        SCRN_RP_MODE_2,         /* Swap Coefficient Data Read */
-        SCRN_RP_MODE_3          /* Swap via Rotation Parameter Window */
-};
-
 struct scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */
         uint32_t sbf_cc_count; /* Character color count */
@@ -65,7 +58,25 @@ struct scrn_cell_format {
                 uint32_t plane_b;
                 uint32_t plane_c;
                 uint32_t plane_d;
+                uint32_t plane_e; /* For RBG0 and RBG1 use only */
+                uint32_t plane_f; /* For RBG0 and RBG1 use only */
+                uint32_t plane_g; /* For RBG0 and RBG1 use only */
+                uint32_t plane_h; /* For RBG0 and RBG1 use only */
+                uint32_t plane_i; /* For RBG0 and RBG1 use only */
+                uint32_t plane_j; /* For RBG0 and RBG1 use only */
+                uint32_t plane_k; /* For RBG0 and RBG1 use only */
+                uint32_t plane_l; /* For RBG0 and RBG1 use only */
+                uint32_t plane_m; /* For RBG0 and RBG1 use only */
+                uint32_t plane_n; /* For RBG0 and RBG1 use only */
+                uint32_t plane_o; /* For RBG0 and RBG1 use only */
+                uint32_t plane_p; /* For RBG0 and RBG1 use only */
         } scf_map; /* Map lead addresses */
+
+        uint8_t scf_rp_mode; /* Rotation parameter mode
+                              * Mode 0: Rotation Parameter A
+                              * Mode 1: Rotation Parameter B
+                              * Mode 2: Swap Coefficient Data Read
+                              * Mode 3: Swap via Rotation Parameter Window */
 };
 
 struct scrn_ls_format {
@@ -94,8 +105,6 @@ extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
 extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_mosaic_set(uint8_t, uint8_t, uint8_t);
-
-extern void vdp2_scrn_rp_mode_set(enum scrn_rp_mode_type);
 
 #ifdef __cplusplus
 }

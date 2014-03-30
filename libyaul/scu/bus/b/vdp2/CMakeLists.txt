@@ -9,7 +9,6 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_scrn_display_set.c
   vdp2_scrn_ls_set.c
   vdp2_scrn_mosaic_set.c
-  vdp2_scrn_rp_mode_set.c
   vdp2_scrn_scv_x_set.c
   vdp2_scrn_scv_y_set.c
   vdp2_scrn_vcs_set.c

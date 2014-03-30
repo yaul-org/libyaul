@@ -125,7 +125,10 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(SCYN3), 0x0000);
 
         /* Rotation scroll screen */
+        MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
         MEMORY_WRITE(16, VDP2(RPMD), 0x0000);
+        MEMORY_WRITE(16, VDP2(OVPNRA), 0x0000);
+        MEMORY_WRITE(16, VDP2(OVPNRB), 0x0000);
 
         MEMORY_WRITE(16, VDP2(MPABRA), 0x0000);
         MEMORY_WRITE(16, VDP2(MPCDRA), 0x0000);

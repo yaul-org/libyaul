@@ -83,6 +83,18 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_b;
         uint16_t plane_c;
         uint16_t plane_d;
+        uint16_t plane_e;
+        uint16_t plane_f;
+        uint16_t plane_g;
+        uint16_t plane_h;
+        uint16_t plane_i;
+        uint16_t plane_j;
+        uint16_t plane_k;
+        uint16_t plane_l;
+        uint16_t plane_m;
+        uint16_t plane_n;
+        uint16_t plane_o;
+        uint16_t plane_p;
 
         /* Calculate the lead map (plane A) address mask bits */
         map_mask = (((0x0080 << (format->scf_character_size >> 2)) - 1) / format->scf_pnd_size) -
@@ -172,7 +184,6 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         }
 
         switch (format->scf_scrn) {
-        case SCRN_RBG1:
         case SCRN_NBG0:
                 /* Character color count */
                 vdp2_regs.chctla &= 0xFF8F;
@@ -245,6 +256,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 vdp2_regs.mpofn |= map_offset << 8;
 
                 /* Write to memory */
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(MPABN2), (plane_b << 8) | plane_a);
@@ -274,6 +286,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 vdp2_regs.mpofn |= map_offset << 12;
 
                 /* Write to memory */
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(MPABN3), (plane_b << 8) | plane_a);
@@ -281,47 +294,96 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
                 break;
         case SCRN_RBG0:
+#ifdef DEBUG
+                assert((format->scf_rp_mode == 0) ||
+                       (format->scf_rp_mode == 1) ||
+                       (format->scf_rp_mode == 2) ||
+                       (format->scf_rp_mode == 3));
+#endif /* DEBUG */
+
+                plane_e = (format->scf_map.plane_e / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_f = (format->scf_map.plane_f / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_g = (format->scf_map.plane_g / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_h = (format->scf_map.plane_h / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_i = (format->scf_map.plane_i / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_j = (format->scf_map.plane_j / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_k = (format->scf_map.plane_k / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_l = (format->scf_map.plane_l / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_m = (format->scf_map.plane_m / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_n = (format->scf_map.plane_n / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_o = (format->scf_map.plane_o / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+                plane_p = (format->scf_map.plane_p / SCRN_NBGX_PAGE_SIZE(format)) & map_mask;
+
                 /* Character color count */
                 vdp2_regs.chctlb &= 0x8FFF;
                 vdp2_regs.chctlb |= format->scf_cc_count << 12;
 
                 /* Character size */
                 vdp2_regs.chctlb &= 0xFEFF;
-                vdp2_regs.chctlb |= format->scf_character_size << 6;
+                vdp2_regs.chctlb |= (format->scf_character_size >> 2) << 8;
 
-                /* Plane size */
-                if ((vdp2_regs.rpmd & 0x0001) == 0x000) {
-                        /* Rotation Parameter A */
+                /* Rotation parameter mode */
+                vdp2_regs.rpmd &= 0xFFFE;
+                vdp2_regs.rpmd |= format->scf_rp_mode;
+
+                switch (format->scf_rp_mode) {
+                case 0:
+                        /* Mode 0: Rotation Parameter A */
+
+                        /* Plane size */
                         vdp2_regs.plsz &= 0xFCFF;
                         vdp2_regs.plsz |= (format->scf_plane_size - 1) << 8;
 
+                        /* Screen over process */
+
+                        /* Map */
+                        vdp2_regs.mpofr &= 0xFFF8;
+                        vdp2_regs.mpofr |= map_offset;
+
                         MEMORY_WRITE(16, VDP2(MPABRA), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRA), (plane_d << 8) | plane_c);
-                        MEMORY_WRITE(16, VDP2(MPEFRA), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPGHRA), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPIJRA), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPKLRA), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPMNRA), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPOPRA), 0x0000);
-                } else {
-                        /* Rotation Parameter B */
+                        MEMORY_WRITE(16, VDP2(MPEFRA), (plane_e << 8) | plane_f);
+                        MEMORY_WRITE(16, VDP2(MPGHRA), (plane_g << 8) | plane_h);
+                        MEMORY_WRITE(16, VDP2(MPIJRA), (plane_i << 8) | plane_j);
+                        MEMORY_WRITE(16, VDP2(MPKLRA), (plane_k << 8) | plane_l);
+                        MEMORY_WRITE(16, VDP2(MPMNRA), (plane_m << 8) | plane_n);
+                        MEMORY_WRITE(16, VDP2(MPOPRA), (plane_o << 8) | plane_p);
+                        break;
+                case 1:
+                        /* Mode 1: Rotation Parameter B */
+
+                        /* Plane size */
                         vdp2_regs.plsz &= 0xCFFF;
                         vdp2_regs.plsz |= (format->scf_plane_size - 1) << 12;
 
+                        /* Screen over process */
+
+                        /* Map */
+                        vdp2_regs.mpofr &= 0xFF8F;
+                        vdp2_regs.mpofr |= map_offset << 4;
+
                         MEMORY_WRITE(16, VDP2(MPABRB), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRB), (plane_d << 8) | plane_c);
-                        MEMORY_WRITE(16, VDP2(MPEFRB), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPGHRB), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPIJRB), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPKLRB), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPMNRB), 0x0000);
-                        MEMORY_WRITE(16, VDP2(MPOPRB), 0x0000);
+                        MEMORY_WRITE(16, VDP2(MPEFRB), (plane_e << 8) | plane_f);
+                        MEMORY_WRITE(16, VDP2(MPGHRB), (plane_g << 8) | plane_h);
+                        MEMORY_WRITE(16, VDP2(MPIJRB), (plane_i << 8) | plane_j);
+                        MEMORY_WRITE(16, VDP2(MPKLRB), (plane_k << 8) | plane_l);
+                        MEMORY_WRITE(16, VDP2(MPMNRB), (plane_m << 8) | plane_n);
+                        MEMORY_WRITE(16, VDP2(MPOPRB), (plane_o << 8) | plane_p);
+                        break;
+                case 2:
+                        break;
+                case 3:
+                        /* Set both Rotation parameter A and Rotation parameter B */
+                        break;
                 }
 
                 /* Write to memory */
+                MEMORY_WRITE(16, VDP2(MPOFR), vdp2_regs.mpofr);
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-                MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
+                MEMORY_WRITE(16, VDP2(PNCR), pncnx);
+                MEMORY_WRITE(16, VDP2(RPMD), vdp2_regs.rpmd);
                 break;
         }
 }

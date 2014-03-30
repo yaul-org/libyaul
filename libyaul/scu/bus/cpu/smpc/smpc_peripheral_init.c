@@ -357,7 +357,7 @@ irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
          * code, etc.*/
         smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN | OPE);
 }
-
+struct smpc_time time;
 static void
 irq_mux_vblank_out(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
 {
@@ -377,8 +377,6 @@ irq_mux_vblank_out(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
 
         /* Ignore OREG0 */
         _oreg_offset++;
-
-        struct smpc_time time;
 
         time.year = (OREG_GET(_oreg_offset) << 8) | OREG_GET(_oreg_offset + 1);
         _oreg_offset++;
