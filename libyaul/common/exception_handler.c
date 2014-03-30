@@ -95,6 +95,12 @@ format(struct cpu_registers *regs, const char *exception_name)
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x01FFFE),
             blcs_color, 0);
 
-        cons_vdp2_init(&cons);
-        cons_write(&cons, buf);
+        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_buffer(&cons, buf);
+
+        /* Wait for VBLANK */
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
+
+        cons_write(&cons);
 }

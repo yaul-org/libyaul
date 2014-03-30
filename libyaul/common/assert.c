@@ -15,7 +15,7 @@
 #include <vdp2/vram.h>
 #include <vdp2.h>
 
-#include <cons/vdp2.h>
+#include <cons.h>
 
 void __attribute__ ((noreturn))
 __assert_func(const char *file, int line, const char *func,
@@ -39,8 +39,14 @@ __assert_func(const char *file, int line, const char *func,
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
             blcs_color, 0);
 
-        cons_vdp2_init(&cons);
-        cons_write(&cons, buf);
+        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_buffer(&cons, buf);
+
+        /* Wait for VBLANK */
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
+
+        cons_write(&cons);
 
         abort();
 }

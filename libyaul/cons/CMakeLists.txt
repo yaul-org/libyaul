@@ -1,6 +1,7 @@
 SET(cons_SRC
   cons.c
   font.c
+  vdp1.c
   vdp2.c
   vt_parse/vt_parse.c
   vt_parse/vt_parse_table.c

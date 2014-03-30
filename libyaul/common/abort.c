@@ -19,7 +19,7 @@ abort(void)
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */
         while (true) {
-                vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
         }
 }

@@ -22,6 +22,8 @@ extern "C" {
 #define ROWS            28
 #define TAB_WIDTH       2
 
+struct cons_buffer;
+
 struct cons {
         struct {
                 int32_t col;
@@ -30,15 +32,22 @@ struct cons {
 
         vt_parse_t vt_parser;
 
-        void (*clear)(struct cons *, int32_t, int32_t, int32_t, int32_t);
-        void (*reset)(struct cons *);
         void (*scroll)(struct cons *);
-        void (*write)(struct cons *, int, uint8_t, uint8_t);
-        void *driver;
+        void (*write)(struct cons *);
+
+        struct cons_buffer *buffer;
 };
 
-void cons_write(struct cons *, const char *);
-void cons_reset(struct cons *);
+struct cons_buffer {
+        uint8_t glyph;
+};
+
+#define CONS_DRIVER_VDP1        0
+#define CONS_DRIVER_VDP2        1
+
+extern void cons_init(struct cons *, uint8_t);
+extern void cons_buffer(struct cons *, const char *);
+extern void cons_write(struct cons *);
 
 #ifdef __cplusplus
 }
