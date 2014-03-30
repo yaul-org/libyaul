@@ -32,7 +32,6 @@ struct cons {
 
         vt_parse_t vt_parser;
 
-        void (*scroll)(struct cons *);
         void (*write)(struct cons *);
 
         struct cons_buffer *buffer;

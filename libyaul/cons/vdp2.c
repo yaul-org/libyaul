@@ -41,7 +41,6 @@ static uint32_t *_nbg3_character_pattern = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x0000
 static uint16_t _nbg3_palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER(CRAM_BANK(0, 0));
 
 static void cons_vdp2_reset(struct cons *);
-static void cons_vdp2_scroll(struct cons *);
 static void cons_vdp2_write(struct cons *);
 
 void
@@ -49,7 +48,6 @@ cons_vdp2_init(struct cons *cons)
 {
 
         cons->write = cons_vdp2_write;
-        cons->scroll = cons_vdp2_scroll;
 
         /* We want to be in VBLANK */
         vdp2_tvmd_display_clear();
@@ -107,11 +105,6 @@ cons_vdp2_init(struct cons *cons)
 
         vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
         vdp2_tvmd_display_set();
-}
-
-static void
-cons_vdp2_scroll(struct cons *cons __attribute__ ((unused)))
-{
 }
 
 static void
