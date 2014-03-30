@@ -40,6 +40,12 @@ struct scrn_bitmap_format {
         uint32_t sbf_color_palette; /* Color palette lead address (if
                                      * applicable) */
         uint32_t sbf_bitmap_pattern; /* Bitmap pattern lead address */
+        uint8_t sbf_rp_mode; /* RBG0 and RBG1 only
+                              * Rotation parameter mode
+                              *   Mode 0: Rotation Parameter A
+                              *   Mode 1: Rotation Parameter B
+                              *   Mode 2: Swap Coefficient Data Read
+                              *   Mode 3: Swap via Rotation Parameter Window */
 };
 
 struct scrn_cell_format {
@@ -72,11 +78,12 @@ struct scrn_cell_format {
                 uint32_t plane_p; /* For RBG0 and RBG1 use only */
         } scf_map; /* Map lead addresses */
 
-        uint8_t scf_rp_mode; /* Rotation parameter mode
-                              * Mode 0: Rotation Parameter A
-                              * Mode 1: Rotation Parameter B
-                              * Mode 2: Swap Coefficient Data Read
-                              * Mode 3: Swap via Rotation Parameter Window */
+        uint8_t scf_rp_mode; /* RBG0 and RBG1 only
+                              * Rotation parameter mode
+                              *   Mode 0: Rotation Parameter A
+                              *   Mode 1: Rotation Parameter B
+                              *   Mode 2: Swap Coefficient Data Read
+                              *   Mode 3: Swap via Rotation Parameter Window */
 };
 
 struct scrn_ls_format {
@@ -101,6 +108,7 @@ extern void vdp2_scrn_cell_format_set(struct scrn_cell_format *);
 extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
+
 extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
 extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);

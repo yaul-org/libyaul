@@ -17,10 +17,11 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->scf_scrn == SCRN_NBG0) ||
-               (format->scf_scrn == SCRN_NBG1));
+        assert((format->sbf_scroll_screen == SCRN_NBG0) ||
+               (format->sbf_scroll_screen == SCRN_NBG1) ||
+               (format->sbf_scroll_screen == SCRN_RBG0));
 
-        /* Assert that the lead address to the color palette in CRAM is
+        /* assert that the lead address to the color palette in CRAM is
          * on a 20-byte boundary */
         assert((format->sbf_color_palette & 0x1F) == 0x00);
 
@@ -120,6 +121,11 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
         case SCRN_RBG0:
 #ifdef DEBUG
                 assert((format->sbf_bitmap_size.width == 512));
+
+                assert((format->sbf_rp_mode == 0) ||
+                       (format->sbf_rp_mode == 1) ||
+                       (format->sbf_rp_mode == 2) ||
+                       (format->sbf_rp_mode == 3));
 #endif /* DEBUG */
 
                 /* Screen display format */
@@ -131,8 +137,8 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                 vdp2_regs.chctlb |= format->sbf_cc_count << 12;
 
                 /* Bitmap size */
-                vdp2_regs.chctla &= 0xFBFF;
-                vdp2_regs.chctla |= (format->sbf_bitmap_size.height >> 9) << 10;
+                vdp2_regs.chctlb &= 0xFBFF;
+                vdp2_regs.chctlb |= (format->sbf_bitmap_size.height >> 9) << 10;
 
                 /* Supplementary palette number */
                 vdp2_regs.bmpnb &= 0xFFF8;
@@ -143,10 +149,31 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                         break;
                 }
 
+                /* Rotation parameter mode */
+                vdp2_regs.rpmd &= 0xFFFE;
+                vdp2_regs.rpmd |= format->sbf_rp_mode;
+
+                switch (format->sbf_rp_mode) {
+                case 0:
+                        /* Mode 0: Rotation Parameter A */
+
+                        /* Map */
+                        vdp2_regs.mpofr &= 0xFF8F;
+                        vdp2_regs.mpofr |= bank << 4;
+                        break;
+                case 1:
+                        /* Mode 1: Rotation Parameter B */
+
+                        /* Map */
+                        vdp2_regs.mpofr &= 0xFF8F;
+                        vdp2_regs.mpofr |= bank << 4;
+                        break;
+                }
+
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
                 MEMORY_WRITE(16, VDP2(BMPNB), vdp2_regs.bmpnb);
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(MPOFR), vdp2_regs.mpofr);
                 break;
         }
 }
