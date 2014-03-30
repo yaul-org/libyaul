@@ -10,11 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <cons.h>
 #include <vdp2.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
-
-#include <cons/vdp2.h>
 
 #include "exception.h"
 

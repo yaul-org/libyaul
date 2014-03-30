@@ -9,8 +9,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <cons/vdp2.h>
-
 #include "stack.h"
 
 char *

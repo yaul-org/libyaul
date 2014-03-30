@@ -11,9 +11,7 @@
 #include <string.h>
 
 #include "cons.h"
-
-#include "cons/vdp1.h"
-#include "cons/vdp2.h"
+#include "drivers.h"
 
 #define CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES 0
 #define CONS_ATTRIBUTE_BRIGHT   1

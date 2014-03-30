@@ -110,7 +110,6 @@ cons_vdp2_init(struct cons *cons)
 static void
 cons_vdp2_write(struct cons *cons)
 {
-
         uint32_t col;
         uint32_t row;
 
