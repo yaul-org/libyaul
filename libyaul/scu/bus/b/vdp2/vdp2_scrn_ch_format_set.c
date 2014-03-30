@@ -26,12 +26,12 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->scf_scrn == SCRN_NBG0) ||
-               (format->scf_scrn == SCRN_RBG1) ||
-               (format->scf_scrn == SCRN_NBG1) ||
-               (format->scf_scrn == SCRN_NBG2) ||
-               (format->scf_scrn == SCRN_NBG3) ||
-               (format->scf_scrn == SCRN_RBG0));
+        assert((format->scf_scroll_screen == SCRN_NBG0) ||
+               (format->scf_scroll_screen == SCRN_RBG1) ||
+               (format->scf_scroll_screen == SCRN_NBG1) ||
+               (format->scf_scroll_screen == SCRN_NBG2) ||
+               (format->scf_scroll_screen == SCRN_NBG3) ||
+               (format->scf_scroll_screen == SCRN_RBG0));
 
         /* Assert that the lead address to character pattern table in
          * VRAM is on a 20-byte boundary */
@@ -183,7 +183,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 break;
         }
 
-        switch (format->scf_scrn) {
+        switch (format->scf_scroll_screen) {
         case SCRN_NBG0:
                 /* Character color count */
                 vdp2_regs.chctla &= 0xFF8F;

@@ -49,7 +49,7 @@ struct scrn_bitmap_format {
 };
 
 struct scrn_cell_format {
-        uint8_t scf_scrn; /* Normal/rotational background */
+        uint8_t scf_scroll_screen; /* Normal/rotational background */
         uint32_t scf_cc_count; /* Character color count */
         uint8_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
         uint8_t scf_pnd_size; /* Pattern name data size: (1)-word or (2)-words */

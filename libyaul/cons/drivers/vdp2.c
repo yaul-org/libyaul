@@ -54,7 +54,7 @@ cons_vdp2_init(struct cons *cons)
 
         struct scrn_cell_format nbg3_format;
 
-        nbg3_format.scf_scrn = SCRN_NBG3;
+        nbg3_format.scf_scroll_screen = SCRN_NBG3;
         nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg3_format.scf_character_size = 1 * 1;
         nbg3_format.scf_pnd_size = 1; /* 1-word */

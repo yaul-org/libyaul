@@ -169,7 +169,7 @@ _grid_init(void)
         /* We want to be in VBLANK-IN (retrace) */
         vdp2_tvmd_display_clear();
 
-        nbg1_format.scf_scrn = SCRN_NBG1;
+        nbg1_format.scf_scroll_screen = SCRN_NBG1;
         nbg1_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg1_format.scf_character_size = 2 * 2;
         nbg1_format.scf_pnd_size = 1; /* 1 word */
@@ -257,7 +257,7 @@ _grid_init(void)
 
         struct scrn_cell_format nbg3_format;
 
-        nbg3_format.scf_scrn = SCRN_NBG3;
+        nbg3_format.scf_scroll_screen = SCRN_NBG3;
         nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg3_format.scf_character_size = 1 * 1;
         nbg3_format.scf_pnd_size = 1; /* 1 word */
