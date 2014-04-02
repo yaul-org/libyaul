@@ -2,17 +2,17 @@ SET(scu_bus_b_vdp2_SRC
   vdp2-internal.c
   vdp2_init.c
   vdp2_priority_spn_set.c
+  vdp2_scrn_back_screen_set.c
   vdp2_scrn_bm_format_set.c
   vdp2_scrn_ch_format_set.c
   vdp2_scrn_display_clear.c
-  vdp2_scrn_display_unset.c
   vdp2_scrn_display_set.c
+  vdp2_scrn_display_unset.c
   vdp2_scrn_ls_set.c
   vdp2_scrn_mosaic_set.c
   vdp2_scrn_scv_x_set.c
   vdp2_scrn_scv_y_set.c
   vdp2_scrn_vcs_set.c
-  vdp2_tvmd_blcs_set.c
   vdp2_tvmd_display_clear.c
   vdp2_tvmd_display_set.c
   vdp2_tvmd_hblank_in_irq_get.c
