@@ -31,6 +31,4 @@ struct vdp2_regs {
 extern struct vdp2_regs vdp2_regs;
 extern struct vram_ctl vram_ctl;
 
-extern void vdp2_scrn_character_color_count_set(uint8_t, uint32_t);
-
 #endif /* !_VDP2_INTERNAL_H_ */
