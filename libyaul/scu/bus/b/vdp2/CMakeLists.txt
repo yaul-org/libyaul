@@ -9,7 +9,11 @@ SET(scu_bus_b_vdp2_SRC
   vdp2_scrn_display_set.c
   vdp2_scrn_display_unset.c
   vdp2_scrn_ls_set.c
+  vdp2_scrn_mosaic_clear.c
+  vdp2_scrn_mosaic_horizontal_set.c
   vdp2_scrn_mosaic_set.c
+  vdp2_scrn_mosaic_unset.c
+  vdp2_scrn_mosaic_vertical_set.c
   vdp2_scrn_scv_x_set.c
   vdp2_scrn_scv_y_set.c
   vdp2_scrn_vcs_set.c
