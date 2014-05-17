@@ -24,12 +24,12 @@ static bool _changed = false;
 void
 tutorial_init(void)
 {
-        static uint16_t blcs_color[] = {
+        static uint16_t back_screen_color[] = {
                 0x8000
         };
 
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            blcs_color, 0);
+        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
+            back_screen_color, 0);
 
         struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;

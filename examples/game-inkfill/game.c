@@ -81,12 +81,12 @@ static void _grid_flood_fill_helper(int32_t, int32_t, uint8_t, uint8_t);
 void
 game_init(void)
 {
-        static uint16_t blcs_color[] = {
+        static uint16_t back_screen_color[] = {
                 RGB888_TO_RGB555(0, 127, 63)
         };
 
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            blcs_color, 0);
+        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
+            back_screen_color, 0);
 
         _grid_init();
 
