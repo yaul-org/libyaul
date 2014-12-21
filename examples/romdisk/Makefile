@@ -4,14 +4,17 @@ PROJECT:= romdisk
 OBJECTS+= root.o romdisk.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
-.PHONY: ip clean
+.PHONY: romdisk example clean
 
 .SUFFIXES: .c .S .o .bin .romdisk
 
-example: $(PROJECT).bin
+all: example
+
+example: romdisk $(PROJECT).bin
 
 $(PROJECT).bin: $(PROJECT).elf
 	$(OB) -O binary $< $@
+	@sh -c "du -h -s $@ | cut -d '	' -f 1"
 
 $(PROJECT).elf: $(OBJECTS)
 	$(LD) $(OBJECTS) $(LDFLAGS) -o $@
@@ -20,11 +23,13 @@ $(PROJECT).elf: $(OBJECTS)
 
 .romdisk.o:
 	sh ../../tools/bin2o/bin2o $< `echo "$<" | sed -e 's/\./_/g'` $@
-
 .c.o:
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
 .S.o:
 	$(AS) $(AFLAGS) -o $@ $<
+
+romdisk:
+	-genromfs -d ./romdisk/ -f "root.romdisk"
 
 clean:
 	-rm -f $(OBJECTS) ip.o \
