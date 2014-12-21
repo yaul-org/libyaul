@@ -10,11 +10,23 @@
 #include <vdp2.h>
 #include <vdp2/pn.h>
 
-#include "lut_sin.h"
+#include "lut.h"
 
 #define RGB888_TO_RGB555(r, g, b) ((((b) >> 3) << 10) | (((g) >> 3) << 5) | ((r) >> 3))
 
 static uint32_t *line_scroll_tb = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x1F000);
+
+static uint16_t *_nbg1_planes[4] = {
+        /* VRAM B0 */
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
+        /* VRAM B0 */
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
+        /* VRAM B0 */
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
+        /* VRAM B0 */
+        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000)
+};
+static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x1EFC0);
 
 static void
 line_scroll(void)
@@ -31,18 +43,6 @@ line_scroll(void)
         vdp2_scrn_ls_set(&ls);
         ofs += 4;
 }
-
-static uint16_t *_nbg1_planes[4] = {
-        /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
-        /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
-        /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000),
-        /* VRAM B0 */
-        (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000)
-};
-static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x1EFC0);
 
 static void
 line_scroll_screen(void)
@@ -78,10 +78,10 @@ line_scroll_screen(void)
 
         /* Set palette */
         {
-                /* Black color #0 */
                 uint16_t *cram;
                 cram = (uint16_t *)CRAM_BANK(0, 0);
 
+                /* Black color #0 */
                 *cram++ = RGB888_TO_RGB555(0, 0, 0);
                 /* White color #1 */
                 *cram = RGB888_TO_RGB555(255, 255, 255);
@@ -109,13 +109,14 @@ line_scroll_screen(void)
                 uint16_t *pnt;
                 pnt = (uint16_t *)VRAM_ADDR_4MBIT(2, 0x1C000);
 
+                uint16_t number;
+                number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg1_character);
+
                 uint32_t x;
                 uint32_t y;
                 for (y = 0; y < 64; y++) {
                         for (x = 0; x < 64; x++) {
-                                uint16_t pntv;
-                                pntv = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg1_character);
-                                pnt[x + (y << 6)] = pntv | ((x + y) % 2);
+                                pnt[x + (y << 6)] = number | ((x + y) % 2);
                         }
                 }
         }
@@ -124,8 +125,8 @@ line_scroll_screen(void)
         {
                 uint32_t y;
                 for (y = 0; y < 512; y++) {
-                        line_scroll_tb[y] = (lut_sin[y]) << 16;
-                        line_scroll_tb[y + 512] = (lut_sin[y]) << 16;
+                        line_scroll_tb[y] = (lut[y]) << 16;
+                        line_scroll_tb[y + 512] = (lut[y]) << 16;
                 }
         }
 

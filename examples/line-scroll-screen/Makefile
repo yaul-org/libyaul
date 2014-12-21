@@ -1,7 +1,7 @@
 include ../common.mk
 
 PROJECT:= line-scroll-screen
-OBJECTS+= lut_sin.o line-scroll-screen.o
+OBJECTS+= lut.o line-scroll-screen.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
 .PHONY: ip clean
