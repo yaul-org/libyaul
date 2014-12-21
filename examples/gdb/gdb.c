@@ -20,7 +20,7 @@ main(void)
         };
 
         vdp2_init();
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x01FFFE),
+        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x01FFFE),
             blcs_color, 0);
 
         gdb_init();
