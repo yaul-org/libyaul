@@ -10,7 +10,7 @@
 #include <smpc/peripheral.h>
 #include <dram-cartridge.h>
 
-#include <cons/vdp2.h>
+#include <cons.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -18,42 +18,52 @@
 #include <stdlib.h>
 
 static void delay(uint16_t);
+static void sync(void);
 static bool xchg(uint32_t, uint32_t);
+
+static uint32_t *cart_area = NULL;
 
 int
 main(void)
 {
-        uint16_t blcs_color[] = {
+        static uint16_t back_screen_color[] = {
                 0x9C00
         };
 
         struct cons cons;
 
+        bool passed;
         char *result;
         uint32_t x;
         char *buf;
 
-        uint32_t *cart;
         size_t cart_len;
         uint32_t id;
 
         vdp2_init();
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            blcs_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true,
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 0);
 
         smpc_init();
 
-        cons_vdp2_init(&cons);
-        cons_write(&cons, "\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
+        cons_init(&cons, CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "Initializing DRAM cartridge...\n");
+        cons_buffer(&cons, "\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
+
+        cons_buffer(&cons, "Initializing DRAM cartridge... ");
+        sync();
+        cons_write(&cons);
         dram_cartridge_init();
 
+        sync();
+        cons_buffer(&cons, "OK!\n");
+        cons_write(&cons);
+        
         delay(2);
 
         id = dram_cartridge_id();
         if ((id != DRAM_CARTRIDGE_ID_1MIB) && (id != DRAM_CARTRIDGE_ID_4MIB)) {
-                cons_write(&cons, "[4;1H[2K[11CThe extended RAM\n"
+                cons_buffer(&cons, "[4;1H[2K[11CThe extended RAM\n"
                     "[11Ccartridge is not\n"
                     "[11Cinsert properly.\n"
                     "\n"
@@ -61,6 +71,8 @@ main(void)
                     "[11Cpower and reinsert\n"
                     "[11Cthe extended RAM\n"
                     "[11Ccartridge.\n");
+                sync();
+                cons_write(&cons);
 
                 abort();
         }
@@ -68,27 +80,36 @@ main(void)
         buf = (char *)malloc(1024);
         assert(buf != NULL);
 
-        cart = (uint32_t *)dram_cartridge_area();
+        cart_area = (uint32_t *)dram_cartridge_area();
         cart_len = dram_cartridge_size();
         (void)sprintf(buf, "%s DRAM Cartridge detected\n",
             ((id == DRAM_CARTRIDGE_ID_1MIB)
                 ? "8-Mbit"
                 : "32-Mbit"));
-        cons_write(&cons, buf);
+        cons_buffer(&cons, buf);
+        sync();
+        cons_write(&cons);
 
         for (x = 0; x < cart_len / sizeof(x); x++) {
-                vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
 
-                result = (xchg(x, x)) ? "OK" : "Failed!";
+                passed = xchg(x, x);
+                result = passed ? "OK!" : "FAILED!";
+                (void)sprintf(buf, "[7;1HWriting to 0x%08X (%d%%) %s\n",
+                    (uintptr_t)&cart_area[x], (int)(x / cart_len), result);
+                cons_buffer(&cons, buf);
 
-                (void)sprintf(buf, "[7;1HWriting 0x%08lX to 0x%08X %s\n",
-                    x, (uintptr_t)&cart[x], result);
+                vdp2_tvmd_vblank_in_wait();
+                cons_write(&cons);
 
-                cons_write(&cons, buf);
+                if (!passed) {
+                        break;
+                }
         }
 
-        cons_write(&cons, "\nTest is complete!");
+        cons_buffer(&cons, passed ? "Test is complete!" : "Test was aborted!");
+        cons_write(&cons);
+
         free(buf);
 
         abort();
@@ -100,22 +121,24 @@ delay(uint16_t t)
         uint16_t frame;
 
         for (frame = 0; frame < (60 * t); frame++) {
-                vdp2_tvmd_vblank_in_wait();
-                vdp2_tvmd_vblank_out_wait();
+                sync();
         }
+}
+
+static void
+sync(void)
+{
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
 }
 
 static bool
 xchg(uint32_t v, uint32_t ofs)
 {
         uint32_t w;
-        uint32_t *cart;
 
-        if ((cart = (uint32_t *)dram_cartridge_area()) == NULL)
-                return false;
-
-        cart[ofs] = v;
-        w = cart[ofs];
+        cart_area[ofs] = v;
+        w = cart_area[ofs];
 
         return (w == v);
 }
