@@ -85,8 +85,8 @@ game_init(void)
                 RGB888_TO_RGB555(0, 127, 63)
         };
 
-        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            back_screen_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ false,
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 0);
 
         _grid_init();
 
