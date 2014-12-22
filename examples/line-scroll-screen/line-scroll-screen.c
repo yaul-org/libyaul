@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <libyaul.h>
+#include <yaul.h>
 
 #include <stdbool.h>
 

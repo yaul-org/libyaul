@@ -1,4 +1,4 @@
-#include <libyaul.h>
+#include <yaul.h>
 
 #include <assert.h>
 

@@ -5,7 +5,7 @@
  * Israel Jacquez <mrko@gmail.com>
  */
 
-#include <libyaul.h>
+#include <yaul.h>
 
 #include <assert.h>
 
