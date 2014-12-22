@@ -1,7 +1,7 @@
 include ../common.mk
 
-PROJECT:= dmac
-OBJECTS+= dmac.o
+PROJECT:= cpu-dmac
+OBJECTS+= cpu-dmac.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
 .PHONY: ip clean
