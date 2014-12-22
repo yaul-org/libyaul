@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 2012 Israel Jacquez
+ * Copyright (c) 2001-2003, 2012-2014 
  * See LICENSE for details.
  *
- * Israel Jacquez <mrkotfw@gmail.com>
+ * Dan Potter
+ * Lawrence Sebald
  */
 
 #ifndef _ROMDISK_H_

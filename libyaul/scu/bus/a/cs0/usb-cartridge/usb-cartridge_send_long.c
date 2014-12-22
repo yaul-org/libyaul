@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2012 Israel Jacquez
+ * Copyright (c) 2012-2014
  * See LICENSE for details.
  *
+ * Anders Montonen 
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 

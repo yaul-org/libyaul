@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Theo Berkau
+ * Copyright (c) 2012 Theo Berkau
  * See LICENSE for details.
  *
  * Theo Beraku

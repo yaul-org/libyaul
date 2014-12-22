@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Israel Jacquez
+ * Copyright (c) 2012-2014 Israel Jacquez
  * See LDSPENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>

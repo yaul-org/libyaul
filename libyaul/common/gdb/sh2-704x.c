@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2001-2012
+ * Copyright (c) 2012-2014
  * See LICENSE for details.
  *
+ * William A. Gatliff <bgat@billgatliff.com> 
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2012 Israel Jacques
+ * Copyright (c) 2012-2014 Israel Jacquez
  * See LICENSE for details.
  *
- * Israel Jacquez <mrko@gmail.com>
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 #include <yaul.h>

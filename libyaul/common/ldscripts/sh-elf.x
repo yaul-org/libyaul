@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012
+ * Copyright (c) 2012-2014
  * See LICENSE for details.
  *
  * Joe Fenton <jlfenton65@gmail.com>
