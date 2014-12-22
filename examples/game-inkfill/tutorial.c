@@ -5,8 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <vdp2.h>
-#include <vdp2/pn.h>
+#include <libyaul.h>
 
 #include <tga.h>
 

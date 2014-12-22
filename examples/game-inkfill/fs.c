@@ -1,4 +1,4 @@
-#include <fs/romdisk/romdisk.h>
+#include <libyaul.h>
 
 #include <assert.h>
 

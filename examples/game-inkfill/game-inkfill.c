@@ -5,11 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <vdp2.h>
-#include <vdp2/pn.h>
-#include <smpc.h>
-#include <smpc/peripheral.h>
-#include <cpu.h>
+#include <libyaul.h>
 
 #include <assert.h>
 #include <stdio.h>

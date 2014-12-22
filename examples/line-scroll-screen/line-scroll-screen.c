@@ -5,10 +5,9 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <stdbool.h>
+#include <libyaul.h>
 
-#include <vdp2.h>
-#include <vdp2/pn.h>
+#include <stdbool.h>
 
 #include "lut.h"
 

@@ -39,4 +39,6 @@
 #include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
 
+#include <gdb.h>
+
 #endif /* !_LIBYAUL_H_ */

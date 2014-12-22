@@ -1,3 +1,5 @@
+#include <libyaul.h>
+
 #include "globals.h"
 
 struct smpc_peripheral_digital g_digital;

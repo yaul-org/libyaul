@@ -5,8 +5,7 @@
  * Israel Jacquez <mrko@gmail.com>
  */
 
-#include <vdp2.h>
-#include <gdb.h>
+#include <libyaul.h>
 
 #include <assert.h>
 

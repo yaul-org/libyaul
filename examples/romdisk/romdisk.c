@@ -5,12 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <vdp2.h>
-#include <smpc.h>
-#include <smpc/peripheral.h>
-
-#include <cons.h>
-#include <fs/romdisk/romdisk.h>
+#include <libyaul.h>
 
 #include <assert.h>
 #include <stdbool.h>

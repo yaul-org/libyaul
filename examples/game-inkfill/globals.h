@@ -8,8 +8,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <smpc.h>
-#include <smpc/peripheral.h>
+#include <inttypes.h>
 
 extern struct smpc_peripheral_digital g_digital;
 

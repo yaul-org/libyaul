@@ -5,13 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <vdp2.h>
-#include <smpc.h>
-#include <smpc/peripheral.h>
-
-#include <arp.h>
-
-#include <cons.h>
+#include <libyaul.h>
 
 #include <assert.h>
 #include <stdio.h>

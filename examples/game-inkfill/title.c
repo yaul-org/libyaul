@@ -5,10 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <irq-mux.h>
-#include <scu/ic.h>
-#include <vdp2.h>
-#include <vdp2/pn.h>
+#include <libyaul.h>
 
 #include <tga.h>
 

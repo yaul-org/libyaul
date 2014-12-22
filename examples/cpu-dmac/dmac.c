@@ -5,11 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <cpu/dmac.h>
-#include <cpu/intc.h>
-#include <vdp2.h>
-
-#include <cons/vdp2.h>
+#include <libyaul.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -17,12 +13,13 @@
 #include <stdlib.h>
 
 static struct cons cons;
+static bool complete = false;
 
 static void
 dma_complete(void)
 {
-        cons_write(&cons, "[6;1HDMA transfer on channel A is complete");
-        abort();
+        cons_write(&cons, "[7;1HDMA transfer on channel A is complete");
+        complete = true;
 }
 
 int
@@ -54,14 +51,14 @@ main(void)
                 .ihr = dma_complete
         };
 
-        if ((text = malloc(1024)) == NULL)
-                abort();
+        text = malloc(1024);
+        assert(text != NULL);
 
         vdp2_init();
-        vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x01FFFE),
+        vdp2_scrn_back_screen_set(/* lcclmd = */ true, VRAM_ADDR_4MBIT(3, 0x01FFFE),
             blcs_color, 0);
 
-        cons_vdp2_init(&cons);
+        cons_init(&cons, CONS_DRIVER_VDP2);
 
         cons_write(&cons, "\n[1;44m         *** CPU DMAC test ***          [m\n\n");
         cons_write(&cons, "Transferring 1MiB in 1-byte strides\n");
@@ -71,13 +68,20 @@ main(void)
         cpu_dmac_channel_set(&cfg);
         cpu_dmac_channel_start(CPU_DMAC_CHANNEL(0));
 
-        frame = 0;
+        frame = 1;
         while (true) {
-                vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
-                (void)sprintf(text, "[5;1HNumber of frames %i\n", frame);
-                cons_write(&cons, text);
+                (void)sprintf(text, "[6;1H%i frames have passed\n", frame);
+                cons_buffer(&cons, text);
+
+                vdp2_tvmd_vblank_in_wait();
+                cons_flush(&cons);
+
                 frame++;
+
+                if (complete) {
+                        abort();
+                }
         }
 
         return 0;
