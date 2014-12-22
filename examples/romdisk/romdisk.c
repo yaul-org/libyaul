@@ -20,7 +20,6 @@
 extern uint8_t root_romdisk[];
 
 static void delay(uint16_t);
-static void sync(void);
 
 int
 main(void)
@@ -45,42 +44,31 @@ main(void)
 
         cons_init(&cons, CONS_DRIVER_VDP2);
 
-        cons_buffer(&cons, "\n[1;44m          *** ROMDISK Test ***          [m\n\n");
+        cons_write(&cons, "\n[1;44m          *** ROMDISK Test ***          [m\n\n");
 
-        cons_buffer(&cons, "Mounting ROMDISK... ");
+        cons_write(&cons, "Mounting ROMDISK... ");
 
         romdisk_init();
 
         romdisk = romdisk_mount("/", root_romdisk);
 
-        sync();
-        cons_write(&cons);
-
         delay(1);
 
         if (romdisk != NULL) {
-                cons_buffer(&cons, "OK!\n");
-                sync();
-                cons_write(&cons);
+                cons_write(&cons, "OK!\n");
         }
 
         delay(1);
 
-        cons_buffer(&cons, "Opening \"/tmp/txt/hello.world\"... ");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "Opening \"/tmp/txt/hello.world\"... ");
         if ((fh = romdisk_open(romdisk, "/tmp/txt/hello.world", O_RDONLY)) == NULL) {
-                cons_buffer(&cons, "[1;31mFAILED[0m\n");
-                sync();
-                cons_write(&cons);
+                cons_write(&cons, "[1;31mFAILED[0m\n");
                 abort();
         }
 
         delay(1);
 
-        cons_buffer(&cons, "OK!\n");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "OK!\n");
 
         msg_len = romdisk_total(fh);
         msg = (char *)malloc(msg_len + 1);
@@ -89,31 +77,23 @@ main(void)
 
         delay(1);
 
-        cons_buffer(&cons, "Reading... ");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "Reading... ");
         msg_len = romdisk_read(fh, msg, romdisk_total(fh));
 
         delay(1);
 
-        cons_buffer(&cons, "OK!\n");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "OK!\n");
 
         if (msg_len == 0) {
-                cons_buffer(&cons, "FAILED\n");
-                sync();
-                cons_write(&cons);
+                cons_write(&cons, "FAILED\n");
                 abort();
         }
 
-        cons_buffer(&cons, "\n[1;33m");
-        cons_buffer(&cons, msg);
-        cons_buffer(&cons, "[m");
+        cons_write(&cons, "\n[1;32m");
+        cons_write(&cons, msg);
+        cons_write(&cons, "[m");
 
-        cons_buffer(&cons, "\nTest complete!\n");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "\nTest complete!\n");
 
         abort();
 }
@@ -124,13 +104,7 @@ delay(uint16_t t)
         uint16_t frame;
 
         for (frame = 0; frame < (60 * t); frame++) {
-                sync();
+                vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
         }
-}
-
-static void
-sync(void)
-{
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
 }

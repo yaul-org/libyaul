@@ -46,7 +46,8 @@ struct cons_buffer {
 
 extern void cons_init(struct cons *, uint8_t);
 extern void cons_buffer(struct cons *, const char *);
-extern void cons_write(struct cons *);
+extern void cons_flush(struct cons *);
+extern void cons_write(struct cons *, const char *);
 
 #ifdef __cplusplus
 }

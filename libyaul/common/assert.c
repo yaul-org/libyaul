@@ -41,13 +41,7 @@ __assert_func(const char *file, int line, const char *func,
             VRAM_ADDR_4MBIT(3, 0x01FFFE), single_color, 1);
 
         cons_init(&cons, CONS_DRIVER_VDP2);
-        cons_buffer(&cons, buf);
-
-        /* Wait for VBLANK */
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
-
-        cons_write(&cons);
+        cons_write(&cons, buf);
 
         abort();
 }

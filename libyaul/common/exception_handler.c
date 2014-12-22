@@ -10,10 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cons.h>
 #include <vdp2.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
+
+#include <cons.h>
 
 #include "exception.h"
 
@@ -95,11 +96,5 @@ format(struct cpu_registers *regs, const char *exception_name)
             VRAM_ADDR_4MBIT(3, 0x01FFFE), single_color, 1);
 
         cons_init(&cons, CONS_DRIVER_VDP2);
-        cons_buffer(&cons, buf);
-
-        /* Wait for VBLANK */
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
-
-        cons_write(&cons);
+        cons_write(&cons, buf);
 }

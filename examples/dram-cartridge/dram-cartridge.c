@@ -5,12 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <vdp2.h>
-#include <smpc.h>
-#include <smpc/peripheral.h>
-#include <dram-cartridge.h>
-
-#include <cons.h>
+#include <libyaul.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -18,7 +13,6 @@
 #include <stdlib.h>
 
 static void delay(uint16_t);
-static void sync(void);
 static bool xchg(uint32_t, uint32_t);
 
 static uint32_t *cart_area = NULL;
@@ -48,22 +42,18 @@ main(void)
 
         cons_init(&cons, CONS_DRIVER_VDP2);
 
-        cons_buffer(&cons, "\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
+        cons_write(&cons, "\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
 
-        cons_buffer(&cons, "Initializing DRAM cartridge... ");
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, "Initializing DRAM cartridge... ");
         dram_cartridge_init();
 
-        sync();
-        cons_buffer(&cons, "OK!\n");
-        cons_write(&cons);
-        
+        cons_write(&cons, "OK!\n");
+
         delay(2);
 
         id = dram_cartridge_id();
         if ((id != DRAM_CARTRIDGE_ID_1MIB) && (id != DRAM_CARTRIDGE_ID_4MIB)) {
-                cons_buffer(&cons, "[4;1H[2K[11CThe extended RAM\n"
+                cons_write(&cons, "[4;1H[2K[11CThe extended RAM\n"
                     "[11Ccartridge is not\n"
                     "[11Cinsert properly.\n"
                     "\n"
@@ -71,9 +61,6 @@ main(void)
                     "[11Cpower and reinsert\n"
                     "[11Cthe extended RAM\n"
                     "[11Ccartridge.\n");
-                sync();
-                cons_write(&cons);
-
                 abort();
         }
 
@@ -86,9 +73,7 @@ main(void)
             ((id == DRAM_CARTRIDGE_ID_1MIB)
                 ? "8-Mbit"
                 : "32-Mbit"));
-        cons_buffer(&cons, buf);
-        sync();
-        cons_write(&cons);
+        cons_write(&cons, buf);
 
         for (x = 0; x < cart_len / sizeof(x); x++) {
                 vdp2_tvmd_vblank_out_wait();
@@ -100,16 +85,14 @@ main(void)
                 cons_buffer(&cons, buf);
 
                 vdp2_tvmd_vblank_in_wait();
-                cons_write(&cons);
+                cons_flush(&cons);
 
                 if (!passed) {
                         break;
                 }
         }
 
-        cons_buffer(&cons, passed ? "Test is complete!" : "Test was aborted!");
-        cons_write(&cons);
-
+        cons_write(&cons, passed ? "Test is complete!" : "Test was aborted!");
         free(buf);
 
         abort();
@@ -121,15 +104,9 @@ delay(uint16_t t)
         uint16_t frame;
 
         for (frame = 0; frame < (60 * t); frame++) {
-                sync();
+                vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
         }
-}
-
-static void
-sync(void)
-{
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
 }
 
 static bool

@@ -107,9 +107,27 @@ cons_buffer(struct cons *cons, const char *buffer)
 }
 
 void
-cons_write(struct cons *cons)
+cons_write(struct cons *cons, const char *buffer)
 {
+        if (buffer == NULL) {
+                return;
+        }
 
+        size_t len;
+        if ((len = strlen(buffer)) == 0) {
+                return;
+        }
+
+        vdp2_tvmd_vblank_out_wait();
+        vt_parse(&cons->vt_parser, buffer, len);
+
+        vdp2_tvmd_vblank_in_wait();
+        cons->write(cons);
+}
+
+void
+cons_flush(struct cons *cons)
+{
         cons->write(cons);
 }
 
