@@ -9,6 +9,8 @@
 #define _CPU_H_
 
 #include <cpu/intc.h>
+#include <cpu/dmac.h>
+#include <cpu/registers.h>
 
 #ifdef __cplusplus
 extern "C" {

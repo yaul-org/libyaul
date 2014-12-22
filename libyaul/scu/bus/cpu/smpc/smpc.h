@@ -8,6 +8,10 @@
 #ifndef _SMPC_H_
 #define _SMPC_H_
 
+#include <smpc/peripheral.h>
+#include <smpc/rtc.h>
+#include <smpc/smc.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

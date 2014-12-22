@@ -9,6 +9,7 @@
 #define _SCU_H_
 
 #include <scu/dma.h>
+#include <scu/dsp.h>
 #include <scu/ic.h>
 #include <scu/timer.h>
 
