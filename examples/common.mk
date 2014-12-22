@@ -15,12 +15,14 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-ansi -m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
 	-I../../libtga \
+	-I../../libyaul \
 	-I../../libyaul/common \
 	-I../../libyaul/common/gdb \
 	-I../../libyaul/cons \
 	-I../../libyaul/kernel \
 	-I../../libyaul/kernel/vfs \
 	-I../../libyaul/scu \
+	-I../../libyaul/scu/bus/a/cs0/arp \
 	-I../../libyaul/scu/bus/a/cs0/dram-cartridge \
 	-I../../libyaul/scu/bus/a/cs0/usb-cartridge \
 	-I../../libyaul/scu/bus/a/cs2/cd-block \
