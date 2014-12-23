@@ -292,7 +292,7 @@ static int32_t
 true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
 {
         /* Check if address is unaligned */
-        if (((uint64_t)dst & 0x00000001) != 0) {
+        if (((uintptr_t)dst & 0x00000001) != 0) {
                 return -1;
         }
 
@@ -306,7 +306,7 @@ true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
         amt = length;
 
         /* If we're on a 2-byte boundary, write a single value */
-        if (((uint64_t)dst & 0x00000002) == 0x00000002) {
+        if (((uintptr_t)dst & 0x00000002) == 0x00000002) {
                 *dst++ = s;
                 amt -= sizeof(uint16_t);
         }
