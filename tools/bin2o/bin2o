@@ -6,10 +6,11 @@
 # Dan Potter
 # Israel Jacquez <mrkotfw@gmail.com>
 
+PROGNAME="${0##*/}"
 TMPDIR="${TMPDIR:-/tmp}"
 
-panic () {
-    echo "error: ${0##*/}: ${1}" 1>&2
+function panic () {
+    printf -- "${PROGNAME}: Error: ${1}" >&2
     exit ${2}
 }
 
@@ -24,9 +25,9 @@ clean_up () {
 
 trap clean_up 0 1 2 9 15
 
-if [ $# != 3 ]; then
-    echo "usage: ${0##*/} input-file symbol-name output-file" 1>&2
-    exit 1
+if [ ${#} != 3 ]; then
+    printf -- "Usage: ${PROGNAME} input-file symbol-name output-file\n" >&2
+    exit 2
 fi
 
 input="${1}"
@@ -36,7 +37,7 @@ output="${3}"
 # Gotta do a different binary target here depending on the target
 (sh-elf-as --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
     -o "${temp3}" || \
-    panic "Couldn't assemble file" ${?}) << EOF
+    panic "Couldn't assemble file" 1 << EOF
 .SECTION ".rodata"
 .ALIGN 2
 EOF
@@ -54,7 +55,7 @@ SECTIONS
 EOF
 sh-elf-ld --no-warn-mismatch --format binary --oformat elf32-sh "${input}" \
     --format 'elf32-sh' "${temp3}" \
-    -o "${temp2}" -r -T "${temp1}" || panic "Couldn't link file" ${?}
+    -o "${temp2}" -r -T "${temp1}" || panic "Couldn't link file" 1
 
 sh-elf-objcopy --set-section-flags ".rodata=alloc,load,data,readonly" \
-    "${temp2}" "${output}" || panic "Couldn't translate object file" ${?}
+    "${temp2}" "${output}" || panic "Couldn't translate object file" 1
