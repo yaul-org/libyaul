@@ -5,17 +5,23 @@
 #
 # Israel Jacquez <mrkotfw@gmail.com>
 
-panic () {
-    echo "error: ${0##*/}: ${1}" 1>&2
+PROGNAME="${0##*/}"
+
+function panic () {
+    printf -- "${PROGNAME}: Error: ${1}\n" >&2
     exit ${2}
 }
 
-if [ $# != 1 ]; then
-    echo "usage: ${0##*/} file-list output-file" 1>&2
-    exit 1
+if [ ${#} != 1 ]; then
+    echo "Usage: ${PROGNAME} file-list output-file\n" >&2
+    exit 2
 fi
 
 image="${1}"
+
+if [ ! -d "cd" ]; then
+    panic "Directory \`cd' does not exist" 1
+fi
 
 genisoimage \
     -quiet \
