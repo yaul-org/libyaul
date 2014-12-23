@@ -1,1 +1,11 @@
 /scu-assembler
+/scu-assembler.exe
+parser.ouput
+parser.cc
+parser.hh
+location.hh
+stack.hh
+position.hh
+lexer.cc
+*.o
+*.dd
