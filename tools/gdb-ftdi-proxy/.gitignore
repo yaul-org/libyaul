@@ -1,3 +1,4 @@
 /gdb-ftdi-proxy
-/src/*.o
-/src/*.d
+/gdb-ftdi-proxy.exe
+*.o
+*.d
