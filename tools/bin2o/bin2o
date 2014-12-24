@@ -37,7 +37,7 @@ output="${3}"
 # Gotta do a different binary target here depending on the target
 (sh-elf-as --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
     -o "${temp3}" || \
-    panic "Couldn't assemble file" 1 << EOF
+    panic "Couldn't assemble file" 1) << EOF
 .SECTION ".rodata"
 .ALIGN 2
 EOF
