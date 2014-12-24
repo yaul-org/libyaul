@@ -9,6 +9,7 @@
 #define _VDP1_INTERNAL_H_
 
 #include <scu-internal.h>
+
 #include <vdp1/map.h>
 
 #endif /* !_VDP1_INTERNAL_H_ */

@@ -10,6 +10,7 @@
 
 #include <vdp1/cmdt.h>
 #include <vdp1/fbcr.h>
+#include <vdp1/map.h>
 
 #ifdef __cplusplus
 extern "C" {

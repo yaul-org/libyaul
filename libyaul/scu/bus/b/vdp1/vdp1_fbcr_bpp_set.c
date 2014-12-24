@@ -16,6 +16,6 @@ vdp1_fbcr_bpp_set(uint8_t bpp)
 
         tvmr = MEMORY_READ(16, VDP1(MODR));
 
-        /* Write to memory. */
+        /* Write to memory */
         MEMORY_WRITE(16, VDP1(TVMR), (tvmr & 0x7) | ((bpp == 8) ? 1 : 0));
 }

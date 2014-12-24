@@ -14,27 +14,49 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct cmdt_cmd {
-        uint16_t ctrl;
-        uint16_t link;
-        uint16_t pmod;
-        uint16_t colr;
-        uint16_t srca;
-        uint16_t size;
-        int16_t xa;
-        int16_t ya;
-        int16_t xb;
-        int16_t yb;
-        int16_t xc;
-        int16_t yc;
-        int16_t xd;
-        int16_t yd;
-        uint16_t grda;
-} __attribute__ ((packed, aligned (32)));
+struct vdp1_cmdt {
+        uint16_t cmd_ctrl;
+        uint16_t cmd_link;
+        uint16_t cmd_pmod;
+        uint16_t cmd_colr;
+        uint16_t cmd_srca;
+        uint16_t cmd_size;
+        int16_t cmd_xa;
+        int16_t cmd_ya;
+        int16_t cmd_xb;
+        int16_t cmd_yb;
+        int16_t cmd_xc;
+        int16_t cmd_yc;
+        int16_t cmd_xd;
+        int16_t cmd_yd;
+        uint16_t cmd_grda;
+} __attribute__ ((packed, aligned(32)));
 
-struct cmdt_grd {
+struct vdp1_cmdt_grd {
         uint16_t entry[4];
-} __attribute__ ((packed, aligned (8)));
+} __attribute__ ((packed, aligned(8)));
+
+struct vdp1_cmdt_polygon {
+        uint16_t cmd_color;
+        int16_t cmd_x1;
+        int16_t cmd_y1;
+        int16_t cmd_x2;
+        int16_t cmd_y2;
+        int16_t cmd_x3;
+        int16_t cmd_y3;
+        int16_t cmd_x4;
+        int16_t cmd_y4;
+} __attribute__ ((packed, aligned(32)));
+
+extern void vdp1_cmdt_list_init(void);
+extern void vdp1_cmdt_list_begin(uint32_t);
+extern void vdp1_cmdt_list_end(uint32_t);
+extern void vdp1_cmdt_list_clear(uint32_t);
+
+extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *);
+extern void vdp1_cmdt_user_clip_coord_set(uint8_t, uint8_t, uint8_t, uint8_t);
+extern void vdp1_cmdt_sys_clip_coord_set(int16_t, int16_t);
+extern void vdp1_cmdt_local_coord_set(int16_t, int16_t);
 
 #ifdef __cplusplus
 }

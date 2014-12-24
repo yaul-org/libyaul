@@ -1,9 +1,10 @@
 SET(scu_bus_b_vdp1_SRC
+  vdp1_cmdt.c
   vdp1_fbcr_bpp_set.c
   vdp1_fbcr_change_set.c
   vdp1_fbcr_erase_coordinates_set.c
-  vdp1_fbcr_erase_set.c
   vdp1_fbcr_erase_mode_set.c
+  vdp1_fbcr_erase_set.c
   vdp1_fbcr_interlace_set.c
   vdp1_fbcr_rotate_set.c
   vdp1_init.c
