@@ -149,6 +149,7 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0004;
+        cur_cmdt->cmd_pmod = polygon->cmd_pmod;
         cur_cmdt->cmd_colr = polygon->cmd_color;
         /* CCW starting from vertex D */
         cur_cmdt->cmd_xd = polygon->cmd_x1;
@@ -159,6 +160,9 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
         cur_cmdt->cmd_yb = polygon->cmd_y3;
         cur_cmdt->cmd_xc = polygon->cmd_x4;
         cur_cmdt->cmd_yc = polygon->cmd_y4;
+        /* Gouraud shading processing is valid when a color calculation
+         * mode is specified */
+        cur_cmdt->cmd_grda = (polygon->cmd_grda >> 3) & 0xFFFF;
 }
 
 void vdp1_cmdt_user_clip_coord_set(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)

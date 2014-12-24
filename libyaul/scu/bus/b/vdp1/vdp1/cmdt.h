@@ -32,12 +32,13 @@ struct vdp1_cmdt {
         uint16_t cmd_grda;
 } __attribute__ ((packed, aligned(32)));
 
-struct vdp1_cmdt_grd {
+struct vdp1_cmdt_gst {
         uint16_t entry[4];
 } __attribute__ ((packed, aligned(8)));
 
 struct vdp1_cmdt_polygon {
         uint16_t cmd_color;
+        uint16_t cmd_pmod;
         int16_t cmd_x1;
         int16_t cmd_y1;
         int16_t cmd_x2;
@@ -46,6 +47,7 @@ struct vdp1_cmdt_polygon {
         int16_t cmd_y3;
         int16_t cmd_x4;
         int16_t cmd_y4;
+        uint32_t cmd_grda;
 } __attribute__ ((packed, aligned(32)));
 
 extern void vdp1_cmdt_list_init(void);
