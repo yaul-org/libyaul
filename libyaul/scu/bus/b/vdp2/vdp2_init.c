@@ -153,7 +153,7 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(BKTAU), 0x0000);
 
         /* Sprite data */
-        MEMORY_WRITE(16, VDP2(SPCTL), 0x0000);
+        MEMORY_WRITE(16, VDP2(SPCTL), 0x0020);
         MEMORY_WRITE(16, VDP2(PRISA), 0x0101);
         MEMORY_WRITE(16, VDP2(PRISB), 0x0101);
         MEMORY_WRITE(16, VDP2(PRISC), 0x0101);
