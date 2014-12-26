@@ -1,4 +1,4 @@
-SET(SRC tga.c )
+SET(SRC tga.c)
 
 SET(INCLUDE_DIRS
 )
