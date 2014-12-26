@@ -12,9 +12,10 @@ OD= $(CC_PREFIX)-objdump
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
 	-I$(ROOTDIR)/common
 CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main \
-	-ansi -m2 -mb -O2 -fomit-frame-pointer \
+	-m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
 	-I../../libtga \
+	-I../../libfixmath \
 	-I../../libyaul \
 	-I../../libyaul/common \
 	-I../../libyaul/common/gdb \
@@ -32,9 +33,10 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-I../../libyaul/scu/bus/cpu \
 	-I../../libyaul/scu/bus/cpu/smpc
 LDFLAGS= -Wl,-Map,${PROJECT}.map \
+	-L$(ROOTDIR)/../build/libfixmath \
 	-L$(ROOTDIR)/../build/libtga \
 	-L$(ROOTDIR)/../build/libyaul \
-	-Wl,--start-group -ltga -lyaul -lc -lgcc \
+	-Wl,--start-group -lfixmath -ltga -lyaul -lc -lgcc \
 	-Wl,--end-group \
 	-Wl,--gc-sections \
 	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x
@@ -42,7 +44,7 @@ CXXFLAGS= $(CFLAGS) -ffreestanding -fno-exceptions -fno-rtti
 LXXFLAGS= -Wl,-Map,${PROJECT}.map \
 	-L$(ROOTDIR)/../build/libtga \
 	-L$(ROOTDIR)/../build/libyaul \
-	-Wl,--start-group -ltga -lyaul -lstdc++ -lc -lgcc \
+	-Wl,--start-group -lfixmath -ltga -lyaul -lstdc++ -lc -lgcc \
 	-Wl,--end-group \
 	-Wl,--gc-sections \
 	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x \

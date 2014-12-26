@@ -1,9 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(yaul C)
-
 SUBDIRS(libyaul)
 
 PROJECT(tga C)
-
 SUBDIRS(libtga)
+
+PROJECT(fixmath C)
+SUBDIRS(libfixmath)
