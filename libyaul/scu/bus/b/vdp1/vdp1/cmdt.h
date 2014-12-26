@@ -52,25 +52,40 @@ struct vdp1_cmdt_normal_sprite {
 } __attribute__ ((packed, aligned(32)));
 
 struct vdp1_cmdt_polygon {
-        uint16_t cpd_mode;
-        uint16_t cpd_color;
+        uint16_t cp_mode;
+        uint16_t cp_color;
         struct {
                 struct {
                         int16_t x;
                         int16_t y;
                 } a, b, c, d;
-        } cpd_vertices;
+        } cp_vertices;
 
-        uint32_t cpd_grad_addr;
+        uint32_t cp_grad_addr;
+} __attribute__ ((packed, aligned(32)));
+
+struct vdp1_cmdt_polyline {
+        uint16_t cp_mode;
+        uint16_t cp_color;
+        struct {
+                struct {
+                        int16_t x;
+                        int16_t y;
+                } a, b, c, d;
+        } cp_vertices;
+
+        uint32_t cp_grad_addr;
 } __attribute__ ((packed, aligned(32)));
 
 extern void vdp1_cmdt_list_init(void);
 extern void vdp1_cmdt_list_begin(uint32_t);
 extern void vdp1_cmdt_list_end(uint32_t);
 extern void vdp1_cmdt_list_clear(uint32_t);
+extern void vdp1_cmdt_list_clear_all(void);
 
 extern void vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_normal_sprite *);
 extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *);
+extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *);
 extern void vdp1_cmdt_user_clip_coord_set(uint8_t, uint8_t, uint8_t, uint8_t);
 extern void vdp1_cmdt_sys_clip_coord_set(int16_t, int16_t);
 extern void vdp1_cmdt_local_coord_set(int16_t, int16_t);

@@ -50,8 +50,8 @@ vdp1_cmdt_list_init(void)
                 struct vdp1_cmdt_list *list;
                 list = &vdp1_cmdt_list_lists[id];
 
-                list->ctl_beg_cmdt = NULL;
-                list->ctl_cur_cmdt = NULL;
+                list->ctl_beg_cmdt = (struct vdp1_cmdt *)CMD_TABLE(0, 0);
+                list->ctl_cur_cmdt = list->ctl_beg_cmdt;
                 list->ctl_ref_cnt = 0;
         }
 }
@@ -75,25 +75,23 @@ vdp1_cmdt_list_begin(uint32_t id)
 
         state->cts_cur_id = id;
 
-        if (state->cts_last_id < 0) {
-                /* Case where this is the first time creating a list */
-                list->ctl_beg_cmdt = (struct vdp1_cmdt *)CMD_TABLE(0, 0);
-                list->ctl_cur_cmdt = list->ctl_beg_cmdt;
-        } else if ((list->ctl_beg_cmdt == NULL) && (list->ctl_cur_cmdt == NULL)) {
-                /* Case where this list has never been used */
-                struct vdp1_cmdt_list *last_list;
-                last_list = &vdp1_cmdt_list_lists[state->cts_last_id];
+        if (state->cts_last_id >= 0) {
+                if (list->ctl_ref_cnt == 0) {
+                        /* Case where this list has never been used */
+                        struct vdp1_cmdt_list *last_list;
+                        last_list = &vdp1_cmdt_list_lists[state->cts_last_id];
 
-                /* Undo draw end command from previous list */
-                struct vdp1_cmdt *last_cur_cmdt;
-                last_cur_cmdt = last_list->ctl_cur_cmdt;
-                last_cur_cmdt->cmd_ctrl &= ~0x8000;
+                        /* Undo draw end command from previous list */
+                        struct vdp1_cmdt *last_cur_cmdt;
+                        last_cur_cmdt = last_list->ctl_cur_cmdt;
+                        last_cur_cmdt->cmd_ctrl &= ~0x8000;
 
-                /* Set pointer to next command table */
-                list->ctl_beg_cmdt = last_cur_cmdt;
-                list->ctl_cur_cmdt = list->ctl_beg_cmdt;
-        } else {
-                list->ctl_cur_cmdt = list->ctl_beg_cmdt;
+                        /* Set pointer to next command table */
+                        list->ctl_beg_cmdt = last_cur_cmdt;
+                        list->ctl_cur_cmdt = list->ctl_beg_cmdt;
+                } else {
+                        list->ctl_cur_cmdt = list->ctl_beg_cmdt;
+                }
         }
 
         list->ctl_ref_cnt++;
@@ -144,6 +142,15 @@ vdp1_cmdt_list_clear(uint32_t id)
 }
 
 void
+vdp1_cmdt_list_clear_all(void)
+{
+        uint32_t id;
+        for (id = 0; id < VDP1_CMDT_LIST_CNT; id++) {
+                vdp1_cmdt_list_clear(id);
+        }
+}
+
+void
 vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_normal_sprite *sprite)
 {
         struct vdp1_cmdt *cur_cmdt;
@@ -169,21 +176,45 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0004;
-        cur_cmdt->cmd_pmod = polygon->cpd_mode;
+        cur_cmdt->cmd_pmod = polygon->cp_mode;
         cur_cmdt->cmd_link = 0x0000;
-        cur_cmdt->cmd_colr = polygon->cpd_color;
+        cur_cmdt->cmd_colr = polygon->cp_color;
         /* CCW starting from vertex D */
-        cur_cmdt->cmd_xd = polygon->cpd_vertices.d.x;
-        cur_cmdt->cmd_yd = polygon->cpd_vertices.d.y;
-        cur_cmdt->cmd_xa = polygon->cpd_vertices.a.x;
-        cur_cmdt->cmd_ya = polygon->cpd_vertices.a.y;
-        cur_cmdt->cmd_xb = polygon->cpd_vertices.b.x;
-        cur_cmdt->cmd_yb = polygon->cpd_vertices.b.y;
-        cur_cmdt->cmd_xc = polygon->cpd_vertices.c.x;
-        cur_cmdt->cmd_yc = polygon->cpd_vertices.c.y;
+        cur_cmdt->cmd_xd = polygon->cp_vertices.d.x;
+        cur_cmdt->cmd_yd = polygon->cp_vertices.d.y;
+        cur_cmdt->cmd_xa = polygon->cp_vertices.a.x;
+        cur_cmdt->cmd_ya = polygon->cp_vertices.a.y;
+        cur_cmdt->cmd_xb = polygon->cp_vertices.b.x;
+        cur_cmdt->cmd_yb = polygon->cp_vertices.b.y;
+        cur_cmdt->cmd_xc = polygon->cp_vertices.c.x;
+        cur_cmdt->cmd_yc = polygon->cp_vertices.c.y;
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
-        cur_cmdt->cmd_grda = (polygon->cpd_grad_addr >> 3) & 0xFFFF;
+        cur_cmdt->cmd_grda = (polygon->cp_grad_addr >> 3) & 0xFFFF;
+}
+
+void
+vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *polyline)
+{
+        struct vdp1_cmdt *cur_cmdt;
+        cur_cmdt = cmdt();
+
+        cur_cmdt->cmd_ctrl = 0x0005;
+        cur_cmdt->cmd_pmod = (polyline->cp_mode & 0x8F07) | 0x00C0;
+        cur_cmdt->cmd_link = 0x0000;
+        cur_cmdt->cmd_colr = polyline->cp_color;
+        /* CCW starting from vertex D */
+        cur_cmdt->cmd_xd = polyline->cp_vertices.d.x;
+        cur_cmdt->cmd_yd = polyline->cp_vertices.d.y;
+        cur_cmdt->cmd_xa = polyline->cp_vertices.a.x;
+        cur_cmdt->cmd_ya = polyline->cp_vertices.a.y;
+        cur_cmdt->cmd_xb = polyline->cp_vertices.b.x;
+        cur_cmdt->cmd_yb = polyline->cp_vertices.b.y;
+        cur_cmdt->cmd_xc = polyline->cp_vertices.c.x;
+        cur_cmdt->cmd_yc = polyline->cp_vertices.c.y;
+        /* Gouraud shading processing is valid when a color calculation
+         * mode is specified */
+        cur_cmdt->cmd_grda = (polyline->cp_grad_addr >> 3) & 0xFFFF;
 }
 
 void

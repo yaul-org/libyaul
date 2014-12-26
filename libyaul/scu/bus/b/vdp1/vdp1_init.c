@@ -38,4 +38,6 @@ vdp1_init(void)
                 cmdt = (struct vdp1_cmdt *)CMD_TABLE(cmdt_idx, 0);
                 cmdt->cmd_ctrl = 0x8000;
         }
+
+        vdp1_cmdt_list_init();
 }
