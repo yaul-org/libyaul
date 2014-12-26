@@ -15,12 +15,9 @@
 
 /* Helpers specific to this processor */
 #define CMD_TABLE(x, y) (0x25C00000 + ((x) << 5) + (((y) << 1) & 0x1F))
-#define VRAM(x, y)      (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +                  \
-    ((x) + ((y) << 1)))
-#define GOURAUD(x, y)   (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +                  \
-    VDP1_TEXURE_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
-#define CLUT(x, y)      (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +                  \
-    VDP1_TEXURE_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
+#define CLUT(x, y)      (0x25C00000 + VDP1_CMDT_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
+#define GOURAUD(x, y)   (0x25C00000 + VDP1_CMDT_MEMORY_SIZE + VDP1_CLUT_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
+#define VRAM(x)         (0x25C00000 + VDP1_CMDT_MEMORY_SIZE + VDP1_TEXURE_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE + ((x)))
 #define FRAME_BUFFER(x) (0x25C80000 + ((x)))
 
 #define TVMR		0x0000

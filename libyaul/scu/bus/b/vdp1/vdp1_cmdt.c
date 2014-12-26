@@ -12,7 +12,7 @@
 
 #include "vdp1-internal.h"
 
-#define VDP1_CMDT_LIST_CNT 31
+#define VDP1_CMDT_LIST_CNT 32
 
 static struct vdp1_cmdt_list_state {
         /* Has vdp1_cmdt_list_init() been called? */
@@ -143,29 +143,50 @@ vdp1_cmdt_list_clear(uint32_t id)
 }
 
 void
+vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_normal_sprite *sprite)
+{
+        struct vdp1_cmdt *cur_cmdt;
+        cur_cmdt = cmdt();
+
+        cur_cmdt->cmd_ctrl = 0x0000;
+        cur_cmdt->cmd_pmod = sprite->cns_mode;
+        cur_cmdt->cmd_link = 0x0000;
+        cur_cmdt->cmd_colr = (sprite->cns_clut_addr >> 3) & 0xFFFF;
+        cur_cmdt->cmd_srca = (sprite->cns_char_addr >> 3) & 0xFFFF;
+        cur_cmdt->cmd_size = (((sprite->cns_width >> 3) << 8) | sprite->cns_height) & 0x3FFF;
+        cur_cmdt->cmd_xa = sprite->cns_position.x;
+        cur_cmdt->cmd_ya = sprite->cns_position.y;
+        /* Gouraud shading processing is valid when a color calculation
+         * mode is specified */
+        cur_cmdt->cmd_grda = (sprite->cns_grad_addr >> 3) & 0xFFFF;
+}
+
+void
 vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
 {
         struct vdp1_cmdt *cur_cmdt;
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0004;
-        cur_cmdt->cmd_pmod = polygon->cmd_pmod;
-        cur_cmdt->cmd_colr = polygon->cmd_color;
+        cur_cmdt->cmd_pmod = polygon->cpd_mode;
+        cur_cmdt->cmd_link = 0x0000;
+        cur_cmdt->cmd_colr = polygon->cpd_color;
         /* CCW starting from vertex D */
-        cur_cmdt->cmd_xd = polygon->cmd_x1;
-        cur_cmdt->cmd_yd = polygon->cmd_y1;
-        cur_cmdt->cmd_xa = polygon->cmd_x2;
-        cur_cmdt->cmd_ya = polygon->cmd_y2;
-        cur_cmdt->cmd_xb = polygon->cmd_x3;
-        cur_cmdt->cmd_yb = polygon->cmd_y3;
-        cur_cmdt->cmd_xc = polygon->cmd_x4;
-        cur_cmdt->cmd_yc = polygon->cmd_y4;
+        cur_cmdt->cmd_xd = polygon->cpd_vertices.d.x;
+        cur_cmdt->cmd_yd = polygon->cpd_vertices.d.y;
+        cur_cmdt->cmd_xa = polygon->cpd_vertices.a.x;
+        cur_cmdt->cmd_ya = polygon->cpd_vertices.a.y;
+        cur_cmdt->cmd_xb = polygon->cpd_vertices.b.x;
+        cur_cmdt->cmd_yb = polygon->cpd_vertices.b.y;
+        cur_cmdt->cmd_xc = polygon->cpd_vertices.c.x;
+        cur_cmdt->cmd_yc = polygon->cpd_vertices.c.y;
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
-        cur_cmdt->cmd_grda = (polygon->cmd_grda >> 3) & 0xFFFF;
+        cur_cmdt->cmd_grda = (polygon->cpd_grad_addr >> 3) & 0xFFFF;
 }
 
-void vdp1_cmdt_user_clip_coord_set(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+void
+vdp1_cmdt_user_clip_coord_set(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 {
         struct vdp1_cmdt *cur_cmdt;
         cur_cmdt = cmdt();
@@ -188,6 +209,7 @@ vdp1_cmdt_sys_clip_coord_set(int16_t x, int16_t y)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0009;
+        cur_cmdt->cmd_link = 0x0000;
         cur_cmdt->cmd_xc = x;
         cur_cmdt->cmd_yc = y;
 }
@@ -199,13 +221,9 @@ vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x000A;
+        cur_cmdt->cmd_link = 0x0000;
         cur_cmdt->cmd_xa = x;
         cur_cmdt->cmd_ya = y;
-}
-
-void
-vdp1_cmdt_normal_sprite_draw(void)
-{
 }
 
 void
