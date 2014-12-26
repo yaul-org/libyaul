@@ -77,7 +77,7 @@ vdp2_init(void)
         /* Avoid re-initializing */
         static bool initialized = false;
 
-        /* Initialize the processor to sane values. */
+        /* Initialize the processor to sane values */
         MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
 
         /* RAM */

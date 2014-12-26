@@ -7,6 +7,8 @@
 
 #include <assert.h>
 
+#include <common.h>
+
 #include <vdp1.h>
 
 #include "vdp1-internal.h"
@@ -15,10 +17,10 @@ void
 vdp1_init(void)
 {
         /* Check if boundaries are correct */
-        uint32_t allocated;
-        allocated = VDP1_CMDT_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE +
-            VDP1_TEXURE_MEMORY_SIZE + VDP1_CLUT_MEMORY_SIZE;
-        assert(allocated == (512 * (1 << 10)));
+        STATIC_ASSERT((VDP1_CMDT_MEMORY_SIZE +
+                VDP1_GST_MEMORY_SIZE +
+                VDP1_TEXURE_MEMORY_SIZE +
+                VDP1_CLUT_MEMORY_SIZE) == (512 * (1 << 10)));
 
         /* Initialize the processor to sane values */
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
