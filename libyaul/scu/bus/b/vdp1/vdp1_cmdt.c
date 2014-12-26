@@ -9,6 +9,7 @@
 #include <stdbool.h>
 
 #include <vdp1/cmdt.h>
+#include <vdp1/vram.h>
 
 #include "vdp1-internal.h"
 

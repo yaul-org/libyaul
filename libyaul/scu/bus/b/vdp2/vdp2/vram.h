@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VRAM_H_
-#define _VRAM_H_
+#ifndef _VDP2_VRAM_H_
+#define _VDP2_VRAM_H_
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -79,4 +79,4 @@ extern void vdp2_vram_control_set(struct vram_ctl *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_VRAM_H_ */
+#endif /* !_VDP2_VRAM_H_ */
