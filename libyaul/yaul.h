@@ -8,8 +8,11 @@
 #ifndef _LIBYAUL_H_
 #define _LIBYAUL_H_
 
-/* CPU */
+/* CPU-bus CPU */
 #include <cpu.h>
+
+/* CPU-bus SMPC */
+#include <smpc.h>
 
 /* SCU */
 #include <scu.h>
@@ -22,14 +25,14 @@
 /* CS2 */
 #include <cd-block.h>
 
-/* VDP1 */
+/* B-bus VDP1 */
 #include <vdp1.h>
 
-/* VDP2 */
+/* B-bus VDP2 */
 #include <vdp2.h>
 
-/* SMPC */
-#include <smpc.h>
+/* B-bus SCSP */
+#include <scsp.h>
 
 /* Kernel */
 #include <common.h>
