@@ -15,12 +15,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define SCRN_NBG0       0       /* Normal background (NBG0) */
-#define SCRN_RBG1       5       /* Rotational background (RBG1) */
-#define SCRN_NBG1       1       /* Normal background (NBG1) */
-#define SCRN_NBG2       2       /* Normal background (NBG2) */
-#define SCRN_NBG3       3       /* Normal background (NBG3) */
-#define SCRN_RBG0       4       /* Rotational background (RBG0) */
+#define SCRN_NBG0               0 /* Normal background (NBG0) */
+#define SCRN_RBG1               5 /* Rotational background (RBG1) */
+#define SCRN_NBG1               1 /* Normal background (NBG1) */
+#define SCRN_NBG2               2 /* Normal background (NBG2) */
+#define SCRN_NBG3               3 /* Normal background (NBG3) */
+#define SCRN_RBG0               4 /* Rotational background (RBG0) */
 
 #define SCRN_CCC_PALETTE_16     0
 #define SCRN_CCC_PALETTE_256    1

@@ -35,8 +35,9 @@ common_log2_down(uint32_t value)
         uint32_t l;
 
         l = 0;
-        while ((value >> l) > 1)
+        while ((value >> l) > 1) {
                 ++l;
+        }
 
         return l;
 }
