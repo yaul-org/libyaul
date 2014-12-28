@@ -162,6 +162,25 @@ tga_read(tga_t *tga, const uint8_t *file, uint16_t *vram, uint16_t *cram)
         return TGA_FILE_OK;
 }
 
+const char *
+tga_error_stringify(int error)
+{
+        switch (error) {
+        case TGA_FILE_OK:
+                return "File OK";
+        case TGA_FILE_UNKNOWN_FORMAT:
+                return "File unknown format";
+        case TGA_FILE_CORRUPTED:
+                return "File corrupted";
+        case TGA_FILE_NOT_SUPPORTED:
+                return "File not supported";
+        case TGA_MEMORY_ERROR:
+                return "Memory error";
+        default:
+                return "Unknown error";
+        }
+}
+
 static void
 tga_cmap_decode(uint16_t *cram, const uint8_t *cmap_buf, size_t cmap_len,
     uint8_t cmap_bpp)
