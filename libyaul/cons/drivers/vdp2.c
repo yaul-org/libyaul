@@ -5,18 +5,13 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
-#include <ctype.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <vdp2/cram.h>
-#include <vdp2/pn.h>
-#include <vdp2/priority.h>
-#include <vdp2/scrn.h>
-#include <vdp2/tvmd.h>
-#include <vdp2/vram.h>
+#include <vdp2.h>
 
 #include "cons.h"
 
@@ -35,10 +30,13 @@ static uint16_t *_nbg3_planes[4] = {
 };
 /* CRAM */
 static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(0, 0);
-static uint16_t _nbg3_character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER(VRAM_ADDR_4MBIT(3, 0x00000));
+static uint16_t _nbg3_character_number =
+    VDP2_PN_CONFIG_1_CHARACTER_NUMBER(VRAM_ADDR_4MBIT(3, 0x00000));
 /* VRAM B1 */
-static uint32_t *_nbg3_character_pattern = (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
-static uint16_t _nbg3_palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER(CRAM_BANK(0, 0));
+static uint32_t *_nbg3_character_pattern =
+    (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
+static uint16_t _nbg3_palette_number =
+    VDP2_PN_CONFIG_1_PALETTE_NUMBER(CRAM_BANK(0, 0));
 
 static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *);
@@ -96,8 +94,8 @@ cons_vdp2_init(struct cons *cons)
         int32_t col;
         int32_t row;
 
-        for (row = 0; row < ROWS; row++) {
-                for (col = 0; col < COLS; col++) {
+        for (row = 0; row < CONS_ROWS; row++) {
+                for (col = 0; col < CONS_COLS; col++) {
                         _nbg3_planes[0][col + (row << 6)] =
                             _nbg3_character_number | _nbg3_palette_number;
                 }
@@ -113,14 +111,17 @@ cons_vdp2_write(struct cons *cons)
         uint32_t col;
         uint32_t row;
 
-        for (col = 0; col < COLS; col++) {
-                for (row = 0; row < ROWS; row++) {
+        for (col = 0; col < CONS_COLS; col++) {
+                for (row = 0; row < CONS_ROWS; row++) {
                         struct cons_buffer *cons_buffer;
 
-                        cons_buffer = &cons->buffer[col + (row * COLS)];
+                        cons_buffer = &cons->buffer[col + (row * CONS_COLS)];
 
+                        uint16_t character_number;
+                        character_number =
+                            _nbg3_character_number + cons_buffer->glyph;
                         _nbg3_planes[0][col + (row << 6)] =
-                            (_nbg3_character_number + cons_buffer->glyph) | _nbg3_palette_number;
+                            character_number | _nbg3_palette_number;
                 }
         }
 }

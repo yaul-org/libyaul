@@ -8,6 +8,7 @@
 #ifndef _CONS_H_
 #define _CONS_H_
 
+#include <stdbool.h>
 #include <inttypes.h>
 
 #include "font.h"
@@ -17,10 +18,10 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* Half the normal size */
-#define COLS            40
-#define ROWS            28
-#define TAB_WIDTH       2
+/* Practically half the normal size of a normal console */
+#define CONS_COLS       40
+#define CONS_ROWS       28
+#define CONS_TAB_WIDTH  2
 
 struct cons_buffer;
 
@@ -30,6 +31,7 @@ struct cons {
                 int32_t row;
         } cursor;
 
+        bool initialized;
         vt_parse_t vt_parser;
 
         void (*write)(struct cons *);
