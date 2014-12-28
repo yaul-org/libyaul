@@ -42,6 +42,19 @@ common_log2_down(uint32_t value)
         return l;
 }
 
+static __inline__ uint32_t
+common_round_pow2(uint32_t value)
+{
+        value--;
+        value |= value >> 1;
+        value |= value >> 2;
+        value |= value >> 4;
+        value |= value >> 8;
+        value |= value >> 16;
+        value++;
+        return value;
+}
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
