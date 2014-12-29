@@ -9,6 +9,7 @@
 #define _VDP2_INTERNAL_H_
 
 #include <scu-internal.h>
+
 #include <vdp2/map.h>
 
 struct vdp2_regs {
@@ -23,6 +24,13 @@ struct vdp2_regs {
         uint16_t mpofr;         /* Register offset: 0x18003E */
         uint16_t scrctl;        /* Register offset: 0x18009A */
         uint16_t rpmd;          /* Register offset: 0x1800B0 */
+        uint16_t spctl;         /* Register offset: 0x1800E0 */
+        uint16_t craofa;        /* Register offset: 0x1800E4 */
+        uint16_t craofb;        /* Register offset: 0x1800E6 */
+        uint16_t prisa;         /* Register offset: 0x1800F0 */
+        uint16_t prisb;         /* Register offset: 0x1800F2 */
+        uint16_t prisc;         /* Register offset: 0x1800F4 */
+        uint16_t prisd;         /* Register offset: 0x1800F6 */
         uint16_t prina;         /* Register offset: 0x1800F8 */
         uint16_t prinb;         /* Register offset: 0x1800FA */
         uint16_t prir;          /* Register offset: 0x1800FC */
