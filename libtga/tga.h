@@ -32,7 +32,7 @@ typedef struct {
         uint16_t tga_height;
 } tga_t __attribute__ ((aligned(4)));
 
-int tga_read(tga_t *, const uint8_t *, uint16_t *, uint16_t *);
+int tga_read(tga_t *, const uint8_t *, void *, uint16_t *);
 const char *tga_error_stringify(int);
 
 #ifdef __cplusplus
