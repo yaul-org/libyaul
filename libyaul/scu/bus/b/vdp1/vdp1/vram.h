@@ -31,7 +31,7 @@ extern "C" {
 
 #define CMD_TABLE(x, y)         (0x25C00000 + ((x) << 5) + (((y) << 1) & 0x1F))
 #define CLUT(x, y)              (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
-            ((x) << 4) + ((y) << 1))
+            ((x) << 5) + ((y) << 1))
 #define GOURAUD(x, y)           (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
             VDP1_CLUT_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
 #define CHAR(x)                 (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \

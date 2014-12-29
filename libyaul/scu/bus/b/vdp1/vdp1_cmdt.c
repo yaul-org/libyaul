@@ -157,9 +157,29 @@ vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_normal_sprite *sprite)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0000;
-        cur_cmdt->cmd_pmod = sprite->cns_mode;
+        cur_cmdt->cmd_pmod = (sprite->cns_mode.value & 0x9FFF) ^ 0x00C0;
         cur_cmdt->cmd_link = 0x0000;
-        cur_cmdt->cmd_colr = (sprite->cns_clut_addr >> 3) & 0xFFFF;
+
+        switch (sprite->cns_mode.color_mode) {
+        case 1:
+                cur_cmdt->cmd_colr =
+                    (uint16_t)((sprite->cns_clut_addr >> 3) & 0xFFFF);
+                break;
+        case 0:
+                cur_cmdt->cmd_colr = sprite->cns_color_bank << 4;
+                break;
+        case 2:
+                cur_cmdt->cmd_colr = sprite->cns_color_bank << 6;
+                break;
+        case 3:
+                cur_cmdt->cmd_colr = sprite->cns_color_bank << 7;
+        case 4:
+                cur_cmdt->cmd_colr = sprite->cns_color_bank << 8;
+                break;
+        case 5:
+                break;
+        }
+
         cur_cmdt->cmd_srca = (sprite->cns_char_addr >> 3) & 0xFFFF;
         cur_cmdt->cmd_size = (((sprite->cns_width >> 3) << 8) | sprite->cns_height) & 0x3FFF;
         cur_cmdt->cmd_xa = sprite->cns_position.x;
@@ -170,13 +190,32 @@ vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_normal_sprite *sprite)
 }
 
 void
+vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_scaled_sprite *sprite)
+{
+        struct vdp1_cmdt *cur_cmdt;
+        cur_cmdt = cmdt();
+
+        cur_cmdt->cmd_ctrl = 0x0001;
+        cur_cmdt->cmd_pmod = sprite->css_mode.value;
+        cur_cmdt->cmd_link = 0x0000;
+        cur_cmdt->cmd_colr = (sprite->css_clut_addr >> 3) & 0xFFFF;
+        cur_cmdt->cmd_srca = (sprite->css_char_addr >> 3) & 0xFFFF;
+        cur_cmdt->cmd_size = (((sprite->css_width >> 3) << 8) | sprite->css_height) & 0x3FFF;
+        cur_cmdt->cmd_xa = sprite->css_position.x;
+        cur_cmdt->cmd_ya = sprite->css_position.y;
+        /* Gouraud shading processing is valid when a color calculation
+         * mode is specified */
+        cur_cmdt->cmd_grda = (sprite->css_grad_addr >> 3) & 0xFFFF;
+}
+
+void
 vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
 {
         struct vdp1_cmdt *cur_cmdt;
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0004;
-        cur_cmdt->cmd_pmod = polygon->cp_mode;
+        cur_cmdt->cmd_pmod = polygon->cp_mode.value;
         cur_cmdt->cmd_link = 0x0000;
         cur_cmdt->cmd_colr = polygon->cp_color;
         /* CCW starting from vertex D */
@@ -200,7 +239,7 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *polyline)
         cur_cmdt = cmdt();
 
         cur_cmdt->cmd_ctrl = 0x0005;
-        cur_cmdt->cmd_pmod = (polyline->cp_mode & 0x8F07) | 0x00C0;
+        cur_cmdt->cmd_pmod = polyline->cp_mode.value | 0x00C0;
         cur_cmdt->cmd_link = 0x0000;
         cur_cmdt->cmd_colr = polyline->cp_color;
         /* CCW starting from vertex D */
@@ -256,11 +295,6 @@ vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
         cur_cmdt->cmd_link = 0x0000;
         cur_cmdt->cmd_xa = x;
         cur_cmdt->cmd_ya = y;
-}
-
-void
-vdp1_cmdt_scaled_sprite_draw(void)
-{
 }
 
 void

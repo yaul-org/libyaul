@@ -29,14 +29,14 @@ static uint16_t *_nbg3_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000)
 };
 /* CRAM */
-static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(0, 0);
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_NBG3_OFFSET(0, 0, 0);
 static uint16_t _nbg3_character_number =
     VDP2_PN_CONFIG_1_CHARACTER_NUMBER(VRAM_ADDR_4MBIT(3, 0x00000));
 /* VRAM B1 */
 static uint32_t *_nbg3_character_pattern =
     (uint32_t *)VRAM_ADDR_4MBIT(3, 0x00000);
 static uint16_t _nbg3_palette_number =
-    VDP2_PN_CONFIG_1_PALETTE_NUMBER(CRAM_BANK(0, 0));
+    VDP2_PN_CONFIG_1_PALETTE_NUMBER(CRAM_NBG3_OFFSET(0, 0, 0));
 
 static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *);
