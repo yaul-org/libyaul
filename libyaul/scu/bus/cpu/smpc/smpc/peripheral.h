@@ -388,6 +388,8 @@ struct smpc_peripheral_digital {
 #define PERIPHERAL_DIGITAL_DOWN         0x2000
 #define PERIPHERAL_DIGITAL_LEFT         0x4000
 #define PERIPHERAL_DIGITAL_RIGHT        0x8000
+#define PERIPHERAL_DIGITAL_DIRECTIONS   0xF000
+#define PERIPHERAL_DIGITAL_ALL          0xFFF8
 
         struct {
                 REPR(pressed, button);
