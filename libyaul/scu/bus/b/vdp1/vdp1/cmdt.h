@@ -188,8 +188,9 @@ extern void vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *);
 extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *);
 extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *);
 extern void vdp1_cmdt_line_draw(struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_set(uint8_t, uint8_t, uint8_t, uint8_t);
-extern void vdp1_cmdt_sys_clip_coord_set(int16_t, int16_t);
+extern void vdp1_cmdt_user_clip_coord_set(uint16_t, uint16_t, uint16_t,
+    uint16_t);
+extern void vdp1_cmdt_system_clip_coord_set(int16_t, int16_t);
 extern void vdp1_cmdt_local_coord_set(int16_t, int16_t);
 extern void vdp1_cmdt_end(void);
 

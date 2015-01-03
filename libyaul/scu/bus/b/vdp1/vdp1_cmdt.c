@@ -163,7 +163,7 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *sprite)
                 cmdt->cmd_ctrl = 0x0000;
 
                 cmdt->cmd_pmod = (sprite->cs_mode.raw & 0x9FFF) ^ 0x00C0;
-                
+
                 cmdt->cmd_xa = sprite->cs_position.x;
                 cmdt->cmd_ya = sprite->cs_position.y;
                 break;
@@ -306,7 +306,7 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_line *line)
 }
 
 void
-vdp1_cmdt_user_clip_coord_set(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+vdp1_cmdt_user_clip_coord_set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
         struct vdp1_cmdt *cmdt;
         cmdt = fetch_cmdt();
@@ -315,15 +315,15 @@ vdp1_cmdt_user_clip_coord_set(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 
         cmdt->cmd_ctrl = 0x0008;
         /* Upper-left (x1, y1) */
-        cmdt->cmd_xa = x1 & 0x00FF;
+        cmdt->cmd_xa = x1 & 0x01FF;
         cmdt->cmd_ya = y1 & 0x00FF;
         /* Lower-right (x1, y1) */
-        cmdt->cmd_xc = x2 & 0x00FF;
+        cmdt->cmd_xc = x2 & 0x01FF;
         cmdt->cmd_yc = y2 & 0x00FF;
 }
 
 void
-vdp1_cmdt_sys_clip_coord_set(int16_t x, int16_t y)
+vdp1_cmdt_system_clip_coord_set(int16_t x, int16_t y)
 {
         struct vdp1_cmdt *cmdt;
         cmdt = fetch_cmdt();
