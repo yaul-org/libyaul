@@ -10,9 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <vdp2/scrn.h>
-#include <vdp2/tvmd.h>
-#include <vdp2/vram.h>
+#include <vdp1.h>
 #include <vdp2.h>
 
 #include <cons.h>
@@ -33,6 +31,9 @@ __assert_func(const char *file, int line, const char *func,
             failed_expr, file, line,
             (func ? ", function: " : ""),
             (func ? func : ""));
+
+        /* Reset the VDP1 */
+        vdp1_init();
 
         /* Reset the VDP2 */
         vdp2_init();
