@@ -39,6 +39,8 @@
 #include <irq-mux.h>
 #include <cons.h>
 
+#include <lib/memb.h>
+
 #include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
 
