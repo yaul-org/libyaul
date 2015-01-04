@@ -74,6 +74,7 @@ test_01_draw(void)
         vdp1_cmdt_list_begin(0); {
                 vdp1_cmdt_local_coord_set(320 / 2, 224 / 2);
                 vdp1_cmdt_polyline_draw(&polyline[0]);
+                vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
 }
 
