@@ -7,7 +7,7 @@
 static struct cons cons;
 
 #define BUFFER_SIZE 128
-#define TIMEOUT 0x100
+#define TIMEOUT 0x200
 #define BYTE_INIT 0x21
 #define BYTE_NOT_INIT 0x12
 
@@ -38,6 +38,19 @@ static void to_reset(void){
     iobuf.mark[0]=BYTE_NOT_INIT;
 }
 
+static void write_poll(void){
+    unsigned timeout=0;
+    while(arp_busy_status() && timeout<(TIMEOUT)) {
+        do{
+            __asm__("nop");
+        }while(0);
+        timeout++;
+    }
+    if (timeout<(TIMEOUT)) {
+        arp_function_nonblock();
+    }
+}
+
 static void to_write_r(void *data, unsigned len){
     if (iobuf.mark[0]==BYTE_INIT) {
         unsigned ptr_w=iobuf.ptr_w;
@@ -46,7 +59,7 @@ static void to_write_r(void *data, unsigned len){
             {
                 register unsigned timeout=0;
                 while(ptr_r!=ptr_w) {
-                    arp_function_nonblock();
+                    write_poll();
                     ptr_r=iobuf.ptr_r;
                     if (timeout>=TIMEOUT) {
                         to_reset();
@@ -61,11 +74,11 @@ static void to_write_r(void *data, unsigned len){
             ptr_w=0;
             memcpy((void *)&iobuf.buf[0],data,len);
             iobuf.ptr_w=len;
-        }  else {
+        } else {
             {
                 register unsigned timeout=0;
                 while(ptr_r>ptr_w) {
-                    arp_function_nonblock();
+                    write_poll();
                     ptr_r=iobuf.ptr_r;
                     if (timeout>=TIMEOUT) {
                         to_reset();
@@ -96,12 +109,11 @@ main(void)
 {
         char *arp_ver;
         char *text;
-        unsigned n,k;
+        unsigned k;
         uint16_t single_color[] = { 0x9C00 };
 
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* single_color = */ true, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            single_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true, VRAM_ADDR_4MBIT(3, 0x1FFFE), single_color, 0);
 
         smpc_init();
 
@@ -125,20 +137,18 @@ main(void)
 
         cons_write(&cons, "\nReady...\n\n");
 
-        n=0;
         k=0;
         while (true) {
                 k++;
                 vdp2_tvmd_vblank_in_wait();
                 vdp2_tvmd_vblank_out_wait();
-
-                arp_function_nonblock();
-                if (!(k&1)) {
-                    sprintf(text,"MESSAGE %i\n",n++);
-                    to_write(text,strlen(text));
-                    cons_write(&cons, "[2;9H\n");
-                    cons_write(&cons, "\n\n\n\n\n\n");
-                    cons_write(&cons, text);
+                write_poll();
+                if (!(k&7)) {
+                        sprintf(text,"MESSAGE %i\n",k/8);
+                        to_write(text,strlen(text));
+                        cons_write(&cons, "[2;9H\n");
+                        cons_write(&cons, "\n\n\n\n\n\n");
+                        cons_write(&cons, text);
                 }
         }
         free(text);

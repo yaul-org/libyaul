@@ -51,6 +51,8 @@ int main(void)
 #ifdef UPLOAD_BINARY
         l=arp_write((void *)&binary_data,addr,binary_size,1);
         arp_close();
+        if (l!=binary_size)
+            return 2;
         sleep(1);
         if (arp_open())
 #else
@@ -59,6 +61,7 @@ int main(void)
         {
             unsigned char data[BUFFER_OFFSET];
             while(!toclose){
+                int times=0;
                 data[0]=BYTE_NOT_INIT;
                 l=arp_read((void *)&data[0],addr+offset,8);
 #ifdef DEBUG
@@ -82,6 +85,7 @@ int main(void)
                         printf("PTR_R=%i, PTR_W=%i\n",(int)ptr_r,(int)ptr_w);
 #endif
                         while(ptr_r!=ptr_w){
+                            times++;
                             memset((void *)&dst,0,sizeof(dst));
                             if (ptr_r<ptr_w){
                                 unsigned len=ptr_w-ptr_r;
@@ -112,7 +116,8 @@ int main(void)
 #endif
                     }
                 }
-                sleep(1);
+                if (!times)
+                    sleep(1);
             }
             arp_close();
         } else {
