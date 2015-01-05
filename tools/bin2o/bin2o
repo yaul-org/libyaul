@@ -9,7 +9,7 @@
 PROGNAME="${0##*/}"
 TMPDIR="${TMPDIR:-/tmp}"
 
-function panic () {
+panic () {
     printf -- "${PROGNAME}: Error: ${1}" >&2
     exit ${2}
 }
