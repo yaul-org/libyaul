@@ -92,6 +92,24 @@ static struct test {
                 test_06_draw,
                 test_06_exit
         }, {
+                "color-calculations",
+                NULL,
+                NULL,
+                NULL,
+                NULL
+        }, {
+                "framebuffer",
+                NULL,
+                NULL,
+                NULL,
+                NULL
+        }, {
+                "resolutions",
+                NULL,
+                NULL,
+                NULL,
+                NULL
+        }, {
                 '\0',
                 NULL,
                 NULL,
