@@ -17,9 +17,6 @@
 #include "test.h"
 #include "common.h"
 
-#include "math/vector2.h"
-#include "math/matrix.h"
-
 static struct vdp1_cmdt_sprite *sprite;
 
 static uint32_t angle = 0;

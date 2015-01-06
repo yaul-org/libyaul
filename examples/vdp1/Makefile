@@ -5,10 +5,6 @@ OBJECTS+= root.o \
 	test.o \
 	tests/common.o \
 	tests/state_machine.o \
-	tests/math/vector2.o \
-	tests/math/vector3.o \
-	tests/math/vector4.o \
-	tests/math/matrix.o \
 	tests/00.o \
 	tests/01.o \
 	tests/02.o \

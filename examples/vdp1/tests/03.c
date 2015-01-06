@@ -17,8 +17,6 @@
 #include "test.h"
 #include "common.h"
 
-#include "math/vector2.h"
-
 #include "state_machine.h"
 
 #define STATE_SHOW_LOOP                 0
