@@ -10,6 +10,8 @@
 
 #include <inttypes.h>
 
+#include <common.h>
+
 struct cpu_registers {
         uint32_t sp;
         uint32_t r[15]; /* Registers r0..r14 */
@@ -22,6 +24,6 @@ struct cpu_registers {
 
 #define SR_T_BIT_MASK   0x00000001
         uint32_t sr;
-} __attribute__ ((packed));
+} __packed;
 
 #endif /* !_REGISTERS_H_ */

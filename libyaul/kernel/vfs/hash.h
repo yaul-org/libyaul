@@ -28,7 +28,7 @@
 
 #include <sys/queue.h>
 
-#include <common/common.h>
+#include <common.h>
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -63,10 +63,10 @@
  * Hash table constructor.
  */
 #define HASH(head, structure)                                                  \
-static structure *head __attribute__ ((unused)) = NULL;                        \
-static struct hash_table CC_CONCAT(head, _table) __attribute__ ((unused));     \
+static structure *head __unused = NULL;                                        \
+static struct hash_table CC_CONCAT(head, _table) __unused;                     \
 static struct hash_bucket CC_CONCAT(head, _bucket)[HASH_INITIAL_NUM_BUCKETS]   \
-        __attribute__ ((unused))
+        __unused
 
 #define _HASH_MAKE_TABLE(hh, head) do {                                        \
         (head)->hh.hth_tbl = (struct hash_table *)&CC_CONCAT(head, _table);    \

@@ -33,17 +33,16 @@
 
 #include <inttypes.h>
 
-#include "common/common.h"
+#include <common.h>
 
 /*
  * Statically declare a block pool.
  */
 #define MEMB(name, structure, num, align)                                      \
-static enum memb_ref_type CC_CONCAT(name, _memb_refcnt)[(num)]                 \
-        __attribute__ ((unused));                                              \
-static __attribute__ ((aligned((align) == 0 ? 2 : (align))))                   \
-        structure CC_CONCAT(name, _memb_mem)[(num)] __attribute__ ((unused));  \
-static struct memb name __attribute__ ((unused)) = {                           \
+static enum memb_ref_type CC_CONCAT(name, _memb_refcnt)[(num)] __unused;       \
+static __aligned(((align) == 0) ? 2 : (align))                                 \
+        structure CC_CONCAT(name, _memb_mem)[(num)] __unused;                  \
+static struct memb name __unused = {                                           \
         sizeof(structure),                                                     \
         num,                                                                   \
         &CC_CONCAT(name, _memb_refcnt)[0],                                     \

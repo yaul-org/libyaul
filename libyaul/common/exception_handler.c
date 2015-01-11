@@ -20,7 +20,7 @@
 
 static void format(struct cpu_registers *, const char *);
 
-void __attribute__ ((noreturn, visibility ("hidden")))
+void __noreturn __visibility("hidden")
 exception_ihr_illegal_instruction(struct cpu_registers *regs)
 {
 
@@ -28,7 +28,7 @@ exception_ihr_illegal_instruction(struct cpu_registers *regs)
         abort();
 }
 
-void __attribute__ ((noreturn, visibility ("hidden")))
+void __noreturn __visibility("hidden")
 exception_ihr_illegal_slot(struct cpu_registers *regs)
 {
 
@@ -36,7 +36,7 @@ exception_ihr_illegal_slot(struct cpu_registers *regs)
         abort();
 }
 
-void __attribute__ ((noreturn, visibility ("hidden")))
+void __noreturn __visibility("hidden")
 exception_ihr_cpu_address_error(struct cpu_registers *regs)
 {
 
@@ -44,7 +44,7 @@ exception_ihr_cpu_address_error(struct cpu_registers *regs)
         abort();
 }
 
-void __attribute__ ((noreturn, visibility ("hidden")))
+void __noreturn __visibility("hidden")
 exception_ihr_dma_address_error(struct cpu_registers *regs)
 {
 

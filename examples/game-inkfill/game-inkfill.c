@@ -5,11 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <yaul.h>
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <yaul.h>
 
 #include "globals.h"
 #include "fs.h"
@@ -80,14 +80,14 @@ main(void)
 }
 
 static void
-vblank_in_handler(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+vblank_in_handler(irq_mux_handle_t *irq_mux __unused)
 {
         g_frame_counter = (tick > 0) ? (g_frame_counter + 1) : 0;
         smpc_peripheral_digital_port(1, &g_digital);
 }
 
 static void
-vblank_out_handler(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
 {
         tick = (tick & 0xFFFFFFFF) + 1;
 }

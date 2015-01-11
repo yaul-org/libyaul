@@ -6,6 +6,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
+#include <stddef.h>
+#include <sys/queue.h>
+#include <stdlib.h>
+
 #include <usb-cartridge.h>
 
 #include <cpu/intc.h>
@@ -13,10 +18,7 @@
 
 #include <smpc/smc.h>
 
-#include <assert.h>
-#include <stddef.h>
-#include <sys/queue.h>
-#include <stdlib.h>
+#include <common.h>
 
 #include "gdb.h"
 #include "ihr.h"
@@ -90,7 +92,7 @@ struct bp {
 
 static bp_list_t *bp_list_alloc(void);
 static bool bp_list_empty(bp_list_t *);
-static void bp_list_free(bp_list_t **) __attribute__ ((unused));
+static void bp_list_free(bp_list_t **) __unused;
 static bp_t *bp_list_breakpoint_alloc(void);
 static void bp_list_breakpoint_free(bp_list_t *, bp_t *);
 static int bp_list_breakpoint_add(bp_list_t *, void *);

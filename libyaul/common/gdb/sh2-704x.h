@@ -12,8 +12,8 @@
 
 #include <stdbool.h>
 
-#define gdb_sync() do {                                                       \
-        __asm__ __volatile__ ("trapa #0x20");                                 \
+#define gdb_sync() do {                                                        \
+        __asm__ __volatile__ ("trapa #0x20");                                  \
 } while (false)
 
 bool gdb_register_file_read(struct cpu_registers *, uint32_t, uint32_t *);

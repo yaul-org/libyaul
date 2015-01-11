@@ -29,7 +29,7 @@ extern "C" {
                         unsigned int transparent_pixel:1; /* Enable */         \
                         unsigned int color_mode:3;                             \
                         unsigned int cc_mode:3;                                \
-                } __attribute__ ((packed, aligned(2)));                        \
+                } __packed __aligned(2);                                       \
                                                                                \
                 uint16_t raw;                                                  \
         } CC_CONCAT(n, _mode)
@@ -50,11 +50,11 @@ struct vdp1_cmdt {
         int16_t cmd_xd;
         int16_t cmd_yd;
         uint16_t cmd_grda;
-} __attribute__ ((packed, aligned(32)));
+} __packed __aligned(32);
 
 struct vdp1_cmdt_gst {
         uint16_t entry[4];
-} __attribute__ ((packed, aligned(8)));
+} __packed __aligned(8);
 
 struct vdp1_cmdt_sprite {
 #define CMDT_TYPE_NORMAL_SPRITE         0x0000
@@ -86,7 +86,7 @@ struct vdp1_cmdt_sprite {
                         unsigned int upper_center:1;
                         unsigned int upper_left:1;
                         unsigned int enable:1;
-                } __attribute__ ((packed, aligned(2)));
+                } __packed __aligned(2);
 
                 uint16_t raw;
         } cs_zoom_point;
@@ -131,7 +131,7 @@ struct vdp1_cmdt_sprite {
         };
 
         uint32_t cs_grad;
-} __attribute__ ((packed, aligned(32)));
+} __packed __aligned(32);
 
 struct vdp1_cmdt_polygon {
         VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cp);
@@ -146,7 +146,7 @@ struct vdp1_cmdt_polygon {
         } cp_vertex;
 
         uint32_t cp_grad;
-} __attribute__ ((packed, aligned(32)));
+} __packed __aligned(32);
 
 struct vdp1_cmdt_polyline {
         VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cp);
@@ -161,7 +161,7 @@ struct vdp1_cmdt_polyline {
         } cp_vertex;
 
         uint32_t cp_grad;
-} __attribute__ ((packed, aligned(32)));
+} __packed __aligned(32);
 
 struct vdp1_cmdt_line {
         VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cl);
@@ -176,7 +176,7 @@ struct vdp1_cmdt_line {
         } cl_vertex;
 
         uint32_t cl_grad;
-} __attribute__ ((packed, aligned(32)));
+} __packed __aligned(32);
 
 extern void vdp1_cmdt_list_init(void);
 extern void vdp1_cmdt_list_begin(uint32_t);

@@ -86,8 +86,8 @@ pathname_cache_enter(const struct component_name *cnp, struct vnode *vnp)
  *   - Length of pathname is too long
  */
 int
-pathname_cache_lookup(const struct component_name *cnp __attribute__ ((unused)),
-    struct vnode **vnp __attribute__ ((unused)))
+pathname_cache_lookup(const struct component_name *cnp __unused,
+    struct vnode **vnp __unused)
 {
         return -1;
 }
@@ -99,7 +99,7 @@ pathname_cache_lookup(const struct component_name *cnp __attribute__ ((unused)),
  * a non-existant pathname (cache miss).
  */
 int
-pathname_cache_evict(const struct component_name *cnp __attribute__ ((unused)))
+pathname_cache_evict(const struct component_name *cnp __unused)
 {
         return 0;
 }

@@ -17,8 +17,6 @@
 #define SCREEN_WIDTH    320
 #define SCREEN_HEIGHT   224
 
-#define __unused__ __attribute__ ((unused))
-
 void init(void);
 
 void sleep(fix16_t);

@@ -5,12 +5,15 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <cpu/intc.h>
-#include <vdp2/tvmd.h>
-
 #include <stdbool.h>
 
-void __attribute__ ((noreturn))
+#include <common.h>
+
+#include <cpu/intc.h>
+
+#include <vdp2.h>
+
+void __noreturn
 abort(void)
 {
         /* Disable interrupts */

@@ -1,10 +1,10 @@
 #include <sys/reent.h>
 
+#include <common.h>
+
 int
-_lseek_r(struct _reent *r __attribute__ ((unused)),
-    int file __attribute__ ((unused)),
-    int ptr __attribute__ ((unused)),
-    int dir __attribute__ ((unused)))
+_lseek_r(struct _reent *r __unused, int file __unused, int ptr __unused,
+    int dir __unused)
 {
         return 0;
 }

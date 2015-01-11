@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 
+#include <common.h>
+
 #include "romdisk.h"
 
 #define ROMFS_MAGIC             "-rom1fs-"
@@ -67,29 +69,31 @@ romdisk_init(void)
 }
 
 void *
-romdisk_mount(const char *mnt_point __attribute__ ((unused)),
+romdisk_mount(const char *mnt_point __unused,
     const uint8_t *image)
 {
         romdisk_hdr_t *hdr;
         rd_image_t *mnt;
 
-        if (strncmp((char *)image, ROMFS_MAGIC, 8))
+        if (strncmp((char *)image, ROMFS_MAGIC, 8)) {
                 return NULL;
+        }
 
         hdr = (romdisk_hdr_t *)image;
-        if ((mnt = (rd_image_t *)malloc(sizeof(rd_image_t))) == NULL)
+        if ((mnt = (rd_image_t *)malloc(sizeof(rd_image_t))) == NULL) {
                 return NULL;
+        }
 
         mnt->image = image;
         mnt->hdr = hdr;
-        mnt->files = sizeof(romdisk_hdr_t) + ((strlen(hdr->volume_name) >> 4) << 4);
+        mnt->files = sizeof(romdisk_hdr_t) +
+            ((strlen(hdr->volume_name) >> 4) << 4);
 
         return mnt;
 }
 
 void *
-romdisk_open(void *p, const char *fn,
-    int mode __attribute__ ((unused)))
+romdisk_open(void *p, const char *fn, int mode __unused)
 {
         rd_image_t *mnt;
         rd_file_handle_t *fh;
@@ -337,9 +341,10 @@ static rd_file_handle_t *
 romdisk_fd_alloc(void)
 {
         rd_file_handle_t *fh;
-
-        if ((fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t))) == NULL)
+        fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t));
+        if (fh == NULL) {
                 return NULL;
+        }
 
         TAILQ_INSERT_TAIL(&fhs, fh, handles);
 
@@ -351,8 +356,9 @@ romdisk_fd_free(rd_file_handle_t *fd)
 {
         rd_file_handle_t *fh;
 
-        if (fd != NULL)
+        if (fd != NULL) {
                 return;
+        }
 
         TAILQ_FOREACH(fh, &fhs, handles) {
                 if (fh == fd) {

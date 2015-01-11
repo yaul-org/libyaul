@@ -5,11 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <arp.h>
-#include <cpu/intc.h>
-
 #include <assert.h>
 #include <string.h>
+
+#include <arp.h>
+#include <cpu/intc.h>
 
 #include "arp-internal.h"
 

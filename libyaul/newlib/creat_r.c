@@ -1,9 +1,10 @@
 #include <sys/reent.h>
 
+#include <common.h>
+
 int
-_creat_r(struct _reent *r __attribute__ ((unused)),
-    const char *path __attribute__ ((unused)),
-    int mode __attribute__ ((unused)))
+_creat_r(struct _reent *r __unused, const char *path __unused,
+    int mode __unused)
 {
         return 0;
 }

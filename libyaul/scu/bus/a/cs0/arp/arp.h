@@ -5,12 +5,14 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _ARP_H__
-#define _ARP_H__
+#ifndef _ARP_H_
+#define _ARP_H_
 
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+#include <common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,7 +23,7 @@ typedef struct {
         void *ptr;      /* Address */
         bool exec;      /* Whether or not it's executable */
         size_t len;     /* Length of transfer */
-} __attribute__ ((aligned (4))) arp_callback_t;
+} __aligned(4) arp_callback_t;
 
 extern bool arp_busy_status(void);
 extern bool arp_sync_nonblock(void);

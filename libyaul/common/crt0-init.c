@@ -6,14 +6,15 @@
  * Joe Fenton <jlfenton65@gmail.com>
  */
 
-#include <cpu/intc.h>
-
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <cpu/intc.h>
 #include <sys/init.h>
+
+#include <common.h>
 
 #include "exception.h"
 
@@ -28,7 +29,7 @@ extern fptr __DTOR_LIST__[];
 void *__dso_handle = NULL;
 
 /* Do all constructors. */
-static void __attribute__ ((used))
+static void __used
 __do_global_ctors(void)
 {
         /*
@@ -47,7 +48,7 @@ __do_global_ctors(void)
 }
 
 /* Do all destructors. */
-static void __attribute__ ((used))
+static void __used
 __do_global_dtors(void)
 {
         uint32_t i;
@@ -62,7 +63,7 @@ __do_global_dtors(void)
 }
 
 /* Add function to .init section */
-static void __attribute__ ((used, section (".init")))
+static void __used __section(".init")
 __std_startup(void)
 {
         void (**vbr)(void);
@@ -85,7 +86,7 @@ __std_startup(void)
 }
 
 /* Add function to .fini section */
-static void __attribute__ ((used, section (".fini")))
+static void __used __section(".fini")
 __std_cleanup(void)
 {
 

@@ -193,13 +193,13 @@ hardware_init(void)
 }
 
 static void
-vblank_in_handler(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+vblank_in_handler(irq_mux_handle_t *irq_mux __unused)
 {
         smpc_peripheral_digital_port(1, &digital_pad);
 }
 
 static void
-vblank_out_handler(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
 {
         tick = (tick & 0xFFFFFFFF) + 1;
 }

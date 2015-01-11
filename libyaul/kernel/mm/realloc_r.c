@@ -1,10 +1,12 @@
-#include <sys/reent.h>
 #include <stddef.h>
 
+#include <sys/reent.h>
+
+#include <common.h>
+
 void *
-_realloc_r(struct _reent *r __attribute__ ((unused)),
-    void *old __attribute__ ((unused)),
-    size_t new_len __attribute__ ((unused)))
+_realloc_r(struct _reent *r __unused, void *old __unused,
+    size_t new_len __unused)
 {
         return NULL;
 }

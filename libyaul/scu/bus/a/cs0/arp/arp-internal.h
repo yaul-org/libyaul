@@ -15,8 +15,8 @@
 
 /* Helpers specific to this processor */
 #define USER_VECTOR(x)  ((x))
-#define USER_VECTOR_CALL(x) do {                                              \
-        __asm__ __volatile__ ("trapa #" # x "\n");                            \
+#define USER_VECTOR_CALL(x) do {                                               \
+        __asm__ __volatile__ ("trapa #" # x "\n");                             \
 } while (false)
 
 #define OUTPUT          0x00080001

@@ -34,28 +34,28 @@
 extern "C" {
 #endif /* __cplusplus */
 
-static __inline__ void
+static __inline void
 vdp2_tvmd_vblank_in_wait(void)
 {
         for (; (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000; );
         /* Start of V-BLANK-IN */
 }
 
-static __inline__ void
+static __inline void
 vdp2_tvmd_vblank_out_wait(void)
 {
         for (; (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008; );
         /* Start of V-BLANK-OUT */
 }
 
-static __inline__ uint16_t
+static __inline uint16_t
 vdp2_tvmd_hcount_get(void)
 {
         for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
         return MEMORY_READ(16, VDP2(HCNT));
 }
 
-static __inline__ uint16_t
+static __inline uint16_t
 vdp2_tvmd_vcount_get(void)
 {
         for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );

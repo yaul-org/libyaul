@@ -6,19 +6,9 @@
  */
 
 #include <stdbool.h>
-
-#include <bus/cpu/cpu.h>
-#include <dma/dma.h>
-#include <ic/ic.h>
-#include <smpc.h>
-#include <smpc/peripheral.h>
-#include <smpc/smc.h>
-#include <vdp2.h>
-#include <vdp2/tvmd.h>
-
-#include <cons/vdp2.h>
-
 #include <stdio.h>
+
+#include <yaul.h>
 
 #define RGB(r, g, b)    (0x8000 | ((r) & 0x1F) | (((g) & 0x1F)  << 5) | (((b) & 0x1F) << 10))
 
@@ -198,7 +188,7 @@ display_menu(void)
 }
 
 static void
-scu_dma_level(int level __attribute__ ((unused)))
+scu_dma_level(int level __unused)
 {
         struct dma_level_cfg cfg;
 

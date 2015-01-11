@@ -44,7 +44,7 @@ struct slob_page {
         struct slob_block *sp_bfree; /* Pointer to first free block */
 
         TAILQ_ENTRY(slob_page) sp_list; /* Link to next page. */
-} __attribute__ ((aligned(SLOB_PAGE_SIZE)));
+} __aligned(SLOB_PAGE_SIZE);
 
 TAILQ_HEAD(slob_page_list, slob_page);
 
@@ -52,9 +52,10 @@ static struct slob_block *slob_block_alloc(struct slob_page *, int16_t);
 static int16_t slob_block_units(struct slob_block *);
 static void slob_block_units_set(struct slob_block *, int16_t);
 
-static void slob_block_list_set(struct slob_block *, struct slob_block *, int16_t);
+static void slob_block_list_set(struct slob_block *, struct slob_block *,
+    int16_t);
 static struct slob_block *slob_block_list_next(struct slob_block *);
-static int slob_block_list_last(struct slob_block *) __attribute__ ((unused));
+static int slob_block_list_last(struct slob_block *) __unused;
 
 static struct slob_page_list *slob_page_list_select(size_t);
 

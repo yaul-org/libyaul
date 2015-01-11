@@ -5,6 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <cpu.h>
 #include <irq-mux.h>
 #include <scu/ic.h>
@@ -12,11 +17,6 @@
 #include <smpc/rtc.h>
 #include <smpc/smc.h>
 #include <vdp2.h>
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <lib/memb.h>
 
@@ -79,8 +79,8 @@ static int32_t peripheral_update(struct smpc_peripheral_port *,
 
 static void handler_system_manager(void);
 
-static void irq_mux_vblank_in(irq_mux_handle_t * __attribute__ ((unused)));
-static void irq_mux_vblank_out(irq_mux_handle_t * __attribute__ ((unused)));
+static void irq_mux_vblank_in(irq_mux_handle_t * __unused);
+static void irq_mux_vblank_out(irq_mux_handle_t * __unused);
 
 /* A memory pool that holds two peripherals directly connected to each
  * port that also hold MAX_PERIPHERALS (6) each making a total of 14
@@ -347,7 +347,7 @@ handler_system_manager(void)
 }
 
 static void
-irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+irq_mux_vblank_in(irq_mux_handle_t *irq_mux __unused)
 {
 
         /* Send "INTBACK" "SMPC" command */
@@ -359,7 +359,7 @@ irq_mux_vblank_in(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
 }
 struct smpc_time time;
 static void
-irq_mux_vblank_out(irq_mux_handle_t *irq_mux __attribute__ ((unused)))
+irq_mux_vblank_out(irq_mux_handle_t *irq_mux __unused)
 {
         static struct smpc_peripheral_port *ports[] = {
                 &smpc_peripheral_port_1,

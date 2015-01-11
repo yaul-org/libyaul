@@ -5,9 +5,9 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <smpc/peripheral.h>
-
 #include <assert.h>
+
+#include <smpc/peripheral.h>
 
 #include "smpc-internal.h"
 

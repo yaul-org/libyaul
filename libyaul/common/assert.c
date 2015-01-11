@@ -10,12 +10,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <common.h>
+
 #include <vdp1.h>
 #include <vdp2.h>
 
 #include <cons.h>
 
-void __attribute__ ((noreturn))
+void __noreturn
 __assert_func(const char *file, int line, const char *func,
     const char *failed_expr)
 {

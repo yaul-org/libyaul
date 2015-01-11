@@ -11,7 +11,7 @@
 
 #include <inttypes.h>
 
-#include <common/endian.h>
+#include <common.h>
 
 #define ISODCL(from, to)        ((to) - (from) + 1)
 
@@ -156,22 +156,22 @@ isonum_711(const char *p)
 }
 
 /* 7.1.2: signed char */
-static __inline __attribute__ ((unused)) uint32_t
+static __inline __unused uint32_t
 isonum_712(const uint8_t *p)
 {
         return (uint32_t)*p;
 }
 
 /* 7.2.1: unsigned little-endian 16-bit value */
-static __inline __attribute__ ((unused)) uint16_t
-isonum_721(const uint8_t *p __attribute__ ((unused)))
+static __inline __unused uint16_t
+isonum_721(const uint8_t *p __unused)
 {
         return 0x0000;
 }
 
 /* 7.2.2: unsigned big-endian 16-bit value */
-static __inline __attribute__ ((unused)) uint16_t
-isonum_722(const uint8_t *p __attribute__ ((unused)))
+static __inline __unused uint16_t
+isonum_722(const uint8_t *p __unused)
 {
         return 0x0000;
 }
@@ -188,21 +188,21 @@ isonum_723(const uint8_t *p)
 }
 
 /* 7.3.1: unsigned little-endian 32-bit value */
-static __inline __attribute__ ((unused)) uint32_t
-isonum_731(const uint8_t *p __attribute__ ((unused)))
+static __inline __unused uint32_t
+isonum_731(const uint8_t *p __unused)
 {
         return 0;
 }
 
 /* 7.3.2: unsigned big-endian 32-bit value */
-static __inline __attribute__ ((unused)) uint32_t
-isonum_732(const uint8_t *p __attribute__ ((unused)))
+static __inline __unused uint32_t
+isonum_732(const uint8_t *p __unused)
 {
         return 0;
 }
 
 /* 7.3.3: unsigned both-endian (little, then big) 32-bit value */
-static __inline __attribute__ ((unused)) uint32_t
+static __inline __unused uint32_t
 isonum_733(const uint8_t *p)
 {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

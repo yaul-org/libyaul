@@ -43,7 +43,7 @@ static uint16_t *_nbg1_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x04000)
 };
 /* CRAM */
-static uint32_t *_nbg1_color_palette = (uint32_t *)CRAM_BANK(32, 0);
+static uint32_t *_nbg1_color_palette = (uint32_t *)CRAM_NBG1_OFFSET(0, 32, 0);
 /* VRAM B0 */
 static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
@@ -58,7 +58,7 @@ static uint16_t *_nbg3_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
 };
 /* CRAM */
-static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_BANK(63, 0);
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_NBG3_OFFSET(0, 63, 0);
 /* VRAM B0 */
 static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
 

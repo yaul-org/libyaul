@@ -15,21 +15,19 @@
 
 #include "iso9660.h"
 
-#define __unused __attribute__ ((unused))
-
 typedef struct {
         iso9660_dirent_t *root;
         uint16_t logical_block_size;
 } iso9660_mnt_t;
 
 static iso9660_dirent_t *iso9660_find(iso9660_mnt_t *, const char *, bool);
-static iso9660_dirent_t *iso9660_find_object(iso9660_mnt_t *, const char *, size_t, bool, iso9660_dirent_t *);
+static iso9660_dirent_t *iso9660_find_object(iso9660_mnt_t *, const char *,
+    size_t, bool, iso9660_dirent_t *);
 
 static void *bread(uint16_t);
 
 void *
-iso9660_open(void *p, const char *fn,
-    int mode __unused)
+iso9660_open(void *p, const char *fn, int mode __unused)
 {
         bool directory;
         iso9660_mnt_t *mnt;
@@ -63,8 +61,7 @@ iso9660_read(void *p __unused, void *buf __unused, size_t bytes __unused)
 }
 
 void *
-iso9660_mount(const char *mnt_point __unused,
-    const uint8_t *image __unused)
+iso9660_mount(const char *mnt_point __unused, const uint8_t *image __unused)
 {
         struct iso_primary_descriptor *pdp;
         struct iso_volume_descriptor *vdp;

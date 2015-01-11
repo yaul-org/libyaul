@@ -5,10 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
+
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
-
-#include <assert.h>
 
 #include "vdp2-internal.h"
 

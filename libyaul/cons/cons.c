@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <common.h>
+
 #include "cons.h"
 #include "drivers.h"
 
@@ -175,7 +177,7 @@ vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
  * Return true if the current cursor position plus an X amount of
  * columns is out of bounds.
  */
-static bool __attribute__ ((unused))
+static bool __unused
 cursor_column_exceeded(struct cons *cons, int32_t x)
 {
         int32_t col;
@@ -188,7 +190,7 @@ cursor_column_exceeded(struct cons *cons, int32_t x)
  * Return true if the current cursor position plus an Y amount of rows
  * is out of bounds.
  */
-static bool __attribute__ ((unused))
+static bool __unused
 cursor_row_exceeded(struct cons *cons, uint32_t y)
 {
         int32_t row;
@@ -200,7 +202,7 @@ cursor_row_exceeded(struct cons *cons, uint32_t y)
 /*
  * Advance the cursor an Y amount of rows.
  */
-static void __attribute__ ((unused))
+static void __unused
 cursor_row_advance(struct cons *cons, uint16_t y)
 {
 
@@ -210,7 +212,7 @@ cursor_row_advance(struct cons *cons, uint16_t y)
 /*
  * Set the cursor an Y amount of rows.
  */
-static void __attribute__ ((unused))
+static void __unused
 cursor_row_set(struct cons *cons, int32_t y)
 {
 
@@ -221,7 +223,7 @@ cursor_row_set(struct cons *cons, int32_t y)
  * Set the cursor to ROW and return TRUE iff the ROW has not been
  * exceeded.
  */
-static bool __attribute__ ((unused))
+static bool __unused
 cursor_row_cond_set(struct cons *cons, int32_t row)
 {
 
@@ -236,7 +238,7 @@ cursor_row_cond_set(struct cons *cons, int32_t row)
 /*
  * Advance the cursor an X amount of columns.
  */
-static void __attribute__ ((unused))
+static void __unused
 cursor_column_advance(struct cons *cons, int32_t x)
 {
 
@@ -247,7 +249,7 @@ cursor_column_advance(struct cons *cons, int32_t x)
  * Set the cursor an X amount of columns iff it does not exceed
  * CONS_COLS.
  */
-static void __attribute__ ((unused))
+static void __unused
 cursor_column_set(struct cons *cons, int32_t x)
 {
 
@@ -258,7 +260,7 @@ cursor_column_set(struct cons *cons, int32_t x)
  * Set the cursor to COL and return TRUE iff the COL has not been
  * exceeded.
  */
-static bool __attribute__ ((unused))
+static bool __unused
 cursor_column_cond_set(struct cons *cons, int32_t col)
 {
 
@@ -274,7 +276,7 @@ cursor_column_cond_set(struct cons *cons, int32_t col)
  * Set both the COL and ROW of the cursor and return TRUE iff the COL
  * and ROW both have not been exceeded.
  */
-static bool __attribute__ ((unused))
+static bool __unused
 cursor_cond_set(struct cons *cons, int32_t col, int32_t row)
 {
 

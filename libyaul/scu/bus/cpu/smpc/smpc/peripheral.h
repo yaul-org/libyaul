@@ -14,6 +14,8 @@
 
 #include <sys/queue.h>
 
+#include <common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -188,8 +190,8 @@ struct smpc_peripheral_keyboard {
                 unsigned int brk_flag:1;
 
                 uint8_t keycode;
-        } __attribute__ ((packed)) button;
-} __attribute__ ((packed, __may_alias__));
+        } __packed button;
+} __packed __may_alias;
 
 struct smpc_peripheral_mouse {
         bool connected;
@@ -210,8 +212,8 @@ struct smpc_peripheral_mouse {
 
                 uint8_t x;
                 uint8_t y;
-        } __attribute__ ((packed)) button;
-} __attribute__ ((packed, __may_alias__));
+        } __packed button;
+} __packed __may_alias;
 
 struct smpc_peripheral_analog {
         bool connected; /* Number of peripherals connected */
@@ -242,14 +244,14 @@ struct smpc_peripheral_analog {
                         uint8_t x_axis;                                        \
                         /* Byte #4 */                                          \
                         uint8_t y_axis;                                        \
-                } __attribute__ ((packed)) axis;                               \
+                } __packed axis;                                               \
                 struct {                                                       \
                         /* Byte #5 */                                          \
                         uint8_t l;                                             \
                         /* Byte #6 */                                          \
                         uint8_t r;                                             \
-                } __attribute__ ((packed)) trigger;                            \
-        } __attribute__ ((packed)) x
+                } __packed trigger;                                            \
+        } __packed x
 
 #define DATA_DIGITAL(x)                                                        \
         struct {                                                               \
@@ -269,7 +271,7 @@ struct smpc_peripheral_analog {
                 unsigned int z:1;                                              \
                 unsigned int l:1;                                              \
                 /* 3 bits for extensions data */                               \
-        } __attribute__ ((packed)) x
+        } __packed x
 
 #define REPR(x, y)                                                             \
         union {                                                                \
@@ -318,7 +320,7 @@ struct smpc_peripheral_analog {
 #undef REPR_DIGITAL
 
         struct smpc_peripheral_port *parent;
-} __attribute__ ((packed));
+} __packed;
 
 struct smpc_peripheral_racing {
         bool connected;
@@ -343,8 +345,8 @@ struct smpc_peripheral_racing {
                 unsigned int l_trg:1;
 
                 uint8_t wheel;
-        } __attribute__ ((packed)) button;
-} __attribute__ ((packed, __may_alias__));
+        } __packed button;
+} __packed __may_alias;
 
 struct smpc_peripheral_digital {
         bool connected; /* Number of peripherals connected */
@@ -367,7 +369,7 @@ struct smpc_peripheral_digital {
                 unsigned int y:1;                                              \
                 unsigned int z:1;                                              \
                 unsigned int l:1;                                              \
-        } __attribute__ ((aligned(2))) x
+        } __aligned(2) x
 
 #define REPR(x, y)                                                             \
         union {                                                                \
@@ -403,19 +405,22 @@ struct smpc_peripheral_digital {
 #undef REPR
 
         struct smpc_peripheral_port *parent;
-} __attribute__ ((packed));
+} __packed;
 
 struct smpc_peripheral {
         uint8_t connected; /* Number of peripherals connected */
         uint8_t port; /* 1 or 2 */
         uint8_t type;
         uint8_t size;
-        uint8_t data[MAX_PERIPHERAL_DATA_SIZE + 1]; /* Peripheral data table */
-        uint8_t previous_data[MAX_PERIPHERAL_DATA_SIZE + 1]; /* Previous frame peripheral data table */
-        struct smpc_peripheral_port *parent; /* NULL if this peripheral is directly connected */
+        /* Peripheral data table */
+        uint8_t data[MAX_PERIPHERAL_DATA_SIZE + 1];
+        /* Previous frame peripheral data table */
+        uint8_t previous_data[MAX_PERIPHERAL_DATA_SIZE + 1];
+        /* NULL if this peripheral is directly connected */
+        struct smpc_peripheral_port *parent;
 
         TAILQ_ENTRY(smpc_peripheral) peripherals;
-} __attribute__ ((packed));
+} __packed;
 
 struct smpc_peripheral_port {
         struct smpc_peripheral *peripheral;
@@ -424,10 +429,12 @@ struct smpc_peripheral_port {
 
 extern void smpc_peripheral_analog_get(struct smpc_peripheral const *,
     struct smpc_peripheral_analog * const);
-extern void smpc_peripheral_analog_port(uint8_t port, struct smpc_peripheral_analog * const);
+extern void smpc_peripheral_analog_port(uint8_t port,
+    struct smpc_peripheral_analog * const);
 extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
     struct smpc_peripheral_digital * const);
-extern void smpc_peripheral_digital_port(uint8_t, struct smpc_peripheral_digital * const);
+extern void smpc_peripheral_digital_port(uint8_t,
+    struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_init(void);
 
 #ifdef __cplusplus

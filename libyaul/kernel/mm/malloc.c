@@ -7,7 +7,6 @@ void *
 malloc(size_t n)
 {
         void *ret;
-
         ret = slob_alloc(n);
 
         return ret;

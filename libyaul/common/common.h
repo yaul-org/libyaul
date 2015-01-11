@@ -25,11 +25,40 @@
                 CC_CONCAT(_, __LINE__))[(exp) ? 1 : -1]
 #endif /* __GNUC__ */
 
+#ifndef __aligned
+#define __aligned(x)    __attribute__ ((aligned((x))))
+#endif /* !__aligned */
+
+#ifndef __always_inline
+#define __always_inline __attribute__ ((always_inline))
+#endif /* !__always_inline */
+
+#define __may_alias     __attribute__ ((__may_alias__))
+#define __noreturn      __attribute__ ((noreturn))
+
+#ifndef __packed
+#define __packed        __attribute__ ((packed))
+#endif /* !__packed */
+
+#ifndef __section
+#define __section(x)    __attribute__ ((section((x))))
+#endif /* !__section */
+
+#ifndef __unused
+#define __unused        __attribute__ ((unused))
+#endif /* !__unused */
+
+#ifndef __used
+#define __used          __attribute__ ((used))
+#endif /* !__used */
+
+#define __visibility(x) __attribute__ ((visibility((x))))
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-static __inline__ uint32_t
+static __inline uint32_t
 common_log2_down(uint32_t value)
 {
         uint32_t l;
@@ -42,7 +71,7 @@ common_log2_down(uint32_t value)
         return l;
 }
 
-static __inline__ uint32_t
+static __inline uint32_t
 common_round_pow2(uint32_t value)
 {
         value--;

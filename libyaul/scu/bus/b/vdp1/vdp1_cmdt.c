@@ -32,7 +32,7 @@ static struct vdp1_cmdt_list {
         uint32_t ctl_ref_cnt;
 } vdp1_cmdt_list_lists[VDP1_CMDT_LIST_CNT];
 
-static inline struct vdp1_cmdt *fetch_cmdt(void) __attribute__ ((always_inline));
+static inline struct vdp1_cmdt *fetch_cmdt(void) __always_inline;
 
 void
 vdp1_cmdt_list_init(void)

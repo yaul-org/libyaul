@@ -11,6 +11,8 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include <common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -69,7 +71,7 @@ struct vram_ctl {
                         unsigned int t5:4; /* Timing T5 */
                         unsigned int t6:4; /* Timing T6 */
                         unsigned int t7:4; /* Timing T7 */
-                } __attribute__ ((packed)) pt[4];
+                } __packed pt[4];
         } vram_cycp;
 };
 
