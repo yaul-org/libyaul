@@ -10,7 +10,8 @@ About
 ### License
   To see the full text of the license, see the `LICENSE` file.
 
-### Rebranding/forking
+Rebranding/forking
+===
 
 If you're interested into further porting/adapting/whatever, please don't fork off. I hate it, and so does everyone else.
 
