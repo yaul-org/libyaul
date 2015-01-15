@@ -155,12 +155,6 @@ test_06_update(void)
         sprite[4].cs_position.y = -112;
         sprite[4].cs_width = 256;
         sprite[4].cs_height = 64;
-}
-
-void
-test_06_draw(void)
-{
-        cons_flush(&cons);
 
         vdp1_cmdt_list_begin(0); {
                 vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
@@ -172,6 +166,14 @@ test_06_draw(void)
                 vdp1_cmdt_sprite_draw(&sprite[4]);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
+}
+
+void
+test_06_draw(void)
+{
+        cons_flush(&cons);
+
+        vdp1_cmdt_list_commit();
 }
 
 void

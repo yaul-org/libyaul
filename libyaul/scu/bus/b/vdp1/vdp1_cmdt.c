@@ -7,50 +7,50 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <vdp1/cmdt.h>
 #include <vdp1/vram.h>
 
 #include "vdp1-internal.h"
 
-#define VDP1_CMDT_LIST_CNT 16
+#define CMDT_LIST_CNT 16
 
-static struct vdp1_cmdt_list_state {
+static struct {
         /* Has vdp1_cmdt_list_init() been called? */
         bool cts_initialized;
         /* Are we currently inside a BEGIN/END block? */
-        bool cts_in_list;
+        bool cts_in_block;
         /* Current list ID (currently inside BEGIN/END block) */
         int32_t cts_cur_id;
         /* Last list ID */
         int32_t cts_last_id;
-} vdp1_cmdt_list_state;
+} list_state;
 
-static struct vdp1_cmdt_list {
+static struct cmdt_list {
         struct vdp1_cmdt *ctl_beg_cmdt;
         struct vdp1_cmdt *ctl_cur_cmdt;
         uint32_t ctl_ref_cnt;
-} vdp1_cmdt_list_lists[VDP1_CMDT_LIST_CNT];
+} cmdt_list_lists[CMDT_LIST_CNT];
 
-static inline struct vdp1_cmdt *fetch_cmdt(void) __always_inline;
+static inline struct vdp1_cmdt *fetch(void) __always_inline;
+
+static struct vdp1_cmdt cmdt_pool[VDP1_CMDT_COUNT_MAX];
 
 void
 vdp1_cmdt_list_init(void)
 {
-        struct vdp1_cmdt_list_state *state;
-        state = &vdp1_cmdt_list_state;
-
-        state->cts_initialized = true;
-        state->cts_in_list = false;
-        state->cts_cur_id = -1;
-        state->cts_last_id = -1;
+        list_state.cts_initialized = true;
+        list_state.cts_in_block = false;
+        list_state.cts_cur_id = -1;
+        list_state.cts_last_id = -1;
 
         uint32_t id;
-        for (id = 0; id < VDP1_CMDT_LIST_CNT; id++) {
-                struct vdp1_cmdt_list *list;
-                list = &vdp1_cmdt_list_lists[id];
+        for (id = 0; id < CMDT_LIST_CNT; id++) {
+                struct cmdt_list *list;
+                list = &cmdt_list_lists[id];
 
-                list->ctl_beg_cmdt = (struct vdp1_cmdt *)CMD_TABLE(0, 0);
+                list->ctl_beg_cmdt = &cmdt_pool[0];
                 list->ctl_cur_cmdt = list->ctl_beg_cmdt;
                 list->ctl_ref_cnt = 0;
         }
@@ -59,27 +59,24 @@ vdp1_cmdt_list_init(void)
 void
 vdp1_cmdt_list_begin(uint32_t id)
 {
-        assert((id >= 0) && (id < VDP1_CMDT_LIST_CNT));
+        assert((id >= 0) && (id < CMDT_LIST_CNT));
 
-        struct vdp1_cmdt_list_state *state;
-        state = &vdp1_cmdt_list_state;
+        struct cmdt_list *list;
+        list = &cmdt_list_lists[id];
 
-        struct vdp1_cmdt_list *list;
-        list = &vdp1_cmdt_list_lists[id];
-
-        assert(state->cts_initialized);
+        assert(list_state.cts_initialized);
 
         /* Check if we're not already in a list */
-        assert(!state->cts_in_list);
-        state->cts_in_list = !state->cts_in_list;
+        assert(!list_state.cts_in_block);
+        list_state.cts_in_block = !list_state.cts_in_block;
 
-        state->cts_cur_id = id;
+        list_state.cts_cur_id = id;
 
-        if (state->cts_last_id >= 0) {
+        if (list_state.cts_last_id >= 0) {
                 if (list->ctl_ref_cnt == 0) {
                         /* Case where this list has never been used */
-                        struct vdp1_cmdt_list *last_list;
-                        last_list = &vdp1_cmdt_list_lists[state->cts_last_id];
+                        struct cmdt_list *last_list;
+                        last_list = &cmdt_list_lists[list_state.cts_last_id];
 
                         /* Undo draw end command from previous list */
                         struct vdp1_cmdt *last_cur_cmdt;
@@ -106,36 +103,30 @@ vdp1_cmdt_list_begin(uint32_t id)
 void
 vdp1_cmdt_list_end(uint32_t id)
 {
-        assert((id >= 0) && (id < VDP1_CMDT_LIST_CNT));
+        assert((id >= 0) && (id < CMDT_LIST_CNT));
 
-        struct vdp1_cmdt_list_state *state;
-        state = &vdp1_cmdt_list_state;
-
-        struct vdp1_cmdt_list *list;
-        list = &vdp1_cmdt_list_lists[id];
+        struct cmdt_list *list;
+        list = &cmdt_list_lists[id];
 
         /* Check if we're in a list */
-        assert(state->cts_in_list);
-        state->cts_in_list = !state->cts_in_list;
+        assert(list_state.cts_in_block);
+        list_state.cts_in_block = !list_state.cts_in_block;
 
-        assert(state->cts_cur_id == id);
-        state->cts_last_id = state->cts_cur_id;
-        state->cts_cur_id = -1;
+        assert(list_state.cts_cur_id == id);
+        list_state.cts_last_id = list_state.cts_cur_id;
+        list_state.cts_cur_id = -1;
 }
 
 void
 vdp1_cmdt_list_clear(uint32_t id)
 {
-        assert((id >= 0) && (id < VDP1_CMDT_LIST_CNT));
+        assert((id >= 0) && (id < CMDT_LIST_CNT));
 
-        struct vdp1_cmdt_list_state *state;
-        state = &vdp1_cmdt_list_state;
+        struct cmdt_list *list;
+        list = &cmdt_list_lists[id];
 
-        struct vdp1_cmdt_list *list;
-        list = &vdp1_cmdt_list_lists[id];
-
-        assert(state->cts_initialized);
-        assert(!state->cts_in_list);
+        assert(list_state.cts_initialized);
+        assert(!list_state.cts_in_block);
 
         list->ctl_ref_cnt = 0;
 }
@@ -143,17 +134,28 @@ vdp1_cmdt_list_clear(uint32_t id)
 void
 vdp1_cmdt_list_clear_all(void)
 {
+        assert(!list_state.cts_in_block);
+
         uint32_t id;
-        for (id = 0; id < VDP1_CMDT_LIST_CNT; id++) {
+        for (id = 0; id < CMDT_LIST_CNT; id++) {
                 vdp1_cmdt_list_clear(id);
         }
 }
 
 void
+vdp1_cmdt_list_commit(void)
+{
+        memcpy((struct vdp1_cmdt *)CMD_TABLE(0, 0), &cmdt_pool[0],
+            VDP1_CMDT_COUNT_MAX * sizeof(struct vdp1_cmdt));
+}
+
+void
 vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *sprite)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         bool scale;
         uint16_t zp;
@@ -240,8 +242,10 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *sprite)
 void
 vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x0004;
         cmdt->cmd_pmod = polygon->cp_mode.raw;
@@ -264,32 +268,36 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
 void
 vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *polyline)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x0005;
-        cmdt->cmd_pmod = polyline->cp_mode.raw | 0x00C0;
+        cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_colr = polyline->cp_color;
+        cmdt->cmd_colr = polyline->cl_color;
         /* CCW starting from vertex D */
-        cmdt->cmd_xd = polyline->cp_vertex.d.x;
-        cmdt->cmd_yd = polyline->cp_vertex.d.y;
-        cmdt->cmd_xa = polyline->cp_vertex.a.x;
-        cmdt->cmd_ya = polyline->cp_vertex.a.y;
-        cmdt->cmd_xb = polyline->cp_vertex.b.x;
-        cmdt->cmd_yb = polyline->cp_vertex.b.y;
-        cmdt->cmd_xc = polyline->cp_vertex.c.x;
-        cmdt->cmd_yc = polyline->cp_vertex.c.y;
+        cmdt->cmd_xd = polyline->cl_vertex.d.x;
+        cmdt->cmd_yd = polyline->cl_vertex.d.y;
+        cmdt->cmd_xa = polyline->cl_vertex.a.x;
+        cmdt->cmd_ya = polyline->cl_vertex.a.y;
+        cmdt->cmd_xb = polyline->cl_vertex.b.x;
+        cmdt->cmd_yb = polyline->cl_vertex.b.y;
+        cmdt->cmd_xc = polyline->cl_vertex.c.x;
+        cmdt->cmd_yc = polyline->cl_vertex.c.y;
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
-        cmdt->cmd_grda = (polyline->cp_grad >> 3) & 0xFFFF;
+        cmdt->cmd_grda = (polyline->cl_grad >> 3) & 0xFFFF;
 }
 
 void
 vdp1_cmdt_line_draw(struct vdp1_cmdt_line *line)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
@@ -308,8 +316,10 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_line *line)
 void
 vdp1_cmdt_user_clip_coord_set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         assert((x1 <= x2) && (y1 <= y2));
 
@@ -325,8 +335,10 @@ vdp1_cmdt_user_clip_coord_set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2
 void
 vdp1_cmdt_system_clip_coord_set(int16_t x, int16_t y)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
@@ -337,8 +349,10 @@ vdp1_cmdt_system_clip_coord_set(int16_t x, int16_t y)
 void
 vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
@@ -349,22 +363,19 @@ vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
 void
 vdp1_cmdt_end(void)
 {
+        assert(list_state.cts_in_block);
+
         struct vdp1_cmdt *cmdt;
-        cmdt = fetch_cmdt();
+        cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x8000;
 }
 
 static inline struct vdp1_cmdt *
-fetch_cmdt(void)
+fetch(void)
 {
-        struct vdp1_cmdt_list_state *state;
-        state = &vdp1_cmdt_list_state;
-
-        assert(state->cts_in_list);
-
-        struct vdp1_cmdt_list *list;
-        list = &vdp1_cmdt_list_lists[state->cts_cur_id];
+        struct cmdt_list *list;
+        list = &cmdt_list_lists[list_state.cts_cur_id];
 
         return list->ctl_cur_cmdt++;
 }

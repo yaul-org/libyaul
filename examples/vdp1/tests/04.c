@@ -92,6 +92,12 @@ test_04_update(void)
         sprite[0].cs_color_bank = 1;
         sprite[0].cs_width = 64;
         sprite[0].cs_height = 64;
+
+        vdp1_cmdt_list_begin(0); {
+                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                vdp1_cmdt_sprite_draw(&sprite[0]);
+                vdp1_cmdt_end();
+        } vdp1_cmdt_list_end(0);
 }
 
 void
@@ -99,11 +105,7 @@ test_04_draw(void)
 {
         cons_flush(&cons);
 
-        vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-                vdp1_cmdt_sprite_draw(&sprite[0]);
-                vdp1_cmdt_end();
-        } vdp1_cmdt_list_end(0);
+        vdp1_cmdt_list_commit();
 }
 
 void

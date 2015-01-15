@@ -232,7 +232,7 @@ test_03_exit(void)
 }
 
 static void
-state_00_init(struct state_context *state_context __unused__)
+state_00_init(struct state_context *state_context __unused)
 {
         text[0] = '\0';
         cons_buffer(&cons, "[H[2J");
@@ -241,7 +241,7 @@ state_00_init(struct state_context *state_context __unused__)
 }
 
 static void
-state_00_update(struct state_context *state_context __unused__)
+state_00_update(struct state_context *state_context __unused)
 {
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
@@ -274,12 +274,6 @@ state_00_update(struct state_context *state_context __unused__)
         sprite[0].cs_vertex.c.y = -y;
         sprite[0].cs_width = 64;
         sprite[0].cs_height = 64;
-}
-
-static void
-state_00_draw(struct state_context *state_context __unused__)
-{
-        cons_flush(&cons);
 
         vdp1_cmdt_list_begin(0); {
                 vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
@@ -289,7 +283,15 @@ state_00_draw(struct state_context *state_context __unused__)
 }
 
 static void
-state_01_init(struct state_context *state_context __unused__)
+state_00_draw(struct state_context *state_context __unused)
+{
+        cons_flush(&cons);
+
+        vdp1_cmdt_list_commit();
+}
+
+static void
+state_01_init(struct state_context *state_context __unused)
 {
         text[0] = '\0';
         cons_buffer(&cons, "[H[2J");
@@ -298,7 +300,7 @@ state_01_init(struct state_context *state_context __unused__)
 }
 
 static void
-state_01_update(struct state_context *state_context __unused__)
+state_01_update(struct state_context *state_context __unused)
 {
         static uint16_t captured_buttons = 0xFFFF;
         static uint32_t delay_frames = 0;
@@ -518,12 +520,6 @@ state_01_update(struct state_context *state_context __unused__)
         polygon[0].cp_vertex.c.y = ZOOM_POINT_POINTER_SIZE + pointer.y - 1;
         polygon[0].cp_vertex.d.x = -ZOOM_POINT_POINTER_SIZE + pointer.x;
         polygon[0].cp_vertex.d.y = -ZOOM_POINT_POINTER_SIZE + pointer.y;
-}
-
-static void
-state_01_draw(struct state_context *state_context __unused__)
-{
-        cons_flush(&cons);
 
         vdp1_cmdt_list_begin(0); {
                 vdp1_cmdt_system_clip_coord_set(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -533,4 +529,12 @@ state_01_draw(struct state_context *state_context __unused__)
                 vdp1_cmdt_polygon_draw(&polygon[0]);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
+}
+
+static void
+state_01_draw(struct state_context *state_context __unused)
+{
+        cons_flush(&cons);
+
+        vdp1_cmdt_list_commit();
 }

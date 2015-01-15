@@ -149,18 +149,18 @@ struct vdp1_cmdt_polygon {
 } __packed __aligned(32);
 
 struct vdp1_cmdt_polyline {
-        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cp);
+        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cl);
 
-        uint16_t cp_color;
+        uint16_t cl_color;
 
         struct {
                 struct {
                         int16_t x;
                         int16_t y;
                 } a, b, c, d;
-        } cp_vertex;
+        } cl_vertex;
 
-        uint32_t cp_grad;
+        uint32_t cl_grad;
 } __packed __aligned(32);
 
 struct vdp1_cmdt_line {
@@ -183,6 +183,7 @@ extern void vdp1_cmdt_list_begin(uint32_t);
 extern void vdp1_cmdt_list_end(uint32_t);
 extern void vdp1_cmdt_list_clear(uint32_t);
 extern void vdp1_cmdt_list_clear_all(void);
+extern void vdp1_cmdt_list_commit(void);
 
 extern void vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *);
 extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *);
