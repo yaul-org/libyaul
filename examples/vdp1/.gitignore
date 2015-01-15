@@ -8,3 +8,4 @@
 *.romdisk
 *.sym
 /files
+/tmp
