@@ -23,7 +23,7 @@ PROVIDE (__stack_end = ORIGIN (ram) + LENGTH (ram) - 0x00004000);
 
 SECTIONS
 {
-  .text ORIGIN (ram) : AT (0x00000000)
+  .text ORIGIN (ram) :
   {
      PROVIDE_HIDDEN (__text_start = .);
      *(.text)
@@ -84,10 +84,9 @@ SECTIONS
 
      . = ALIGN (0x10);
      PROVIDE_HIDDEN (__text_end = .);
-  } > ram
+  }
 
-  .data :
-  AT (LOADADDR (.text) + SIZEOF (.text))
+  .data __text_end :
   {
      PROVIDE_HIDDEN (__data_start = .);
      *(.data)
@@ -99,9 +98,11 @@ SECTIONS
      *(.sdata.*)
      *(.gnu.linkonce.s.*)
      . = ALIGN (0x10);
-  } > ram
 
-  .bss (NOLOAD) :
+     PROVIDE_HIDDEN (__data_end = .);
+  }
+
+  .bss __data_end :
   {
      PROVIDE (__bss_start = .);
      *(.bss)
@@ -116,7 +117,7 @@ SECTIONS
 
      PROVIDE (__bss_end = .);
      __bss_end__ = .;
-  } AT > ram
+  }
 
   __end = .;
   PROVIDE (_end = .);

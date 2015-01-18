@@ -67,7 +67,7 @@ _start:
         jmp @r1
         nop
 
-.align 2
+.align 4
 
 .LC0:
 .long __bss_start

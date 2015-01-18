@@ -32,9 +32,7 @@ void *__dso_handle = NULL;
 static void __used
 __do_global_ctors(void)
 {
-        /*
-         * See <http://gcc.gnu.org/onlinedocs/gccint/Initialization.html>
-         */
+        /* See <http://gcc.gnu.org/onlinedocs/gccint/Initialization.html> */
 
         do {
                 uint32_t i;
