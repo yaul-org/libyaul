@@ -34,6 +34,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
+static __inline bool
+vdp2_tvmd_vblank_in(void)
+{
+        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008;
+}
+
+static __inline bool
+vdp2_tvmd_vblank_out(void)
+{
+        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000;
+}
+
 static __inline void
 vdp2_tvmd_vblank_in_wait(void)
 {
@@ -52,14 +64,15 @@ static __inline uint16_t
 vdp2_tvmd_hcount_get(void)
 {
         for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
-        return MEMORY_READ(16, VDP2(HCNT));
+        return MEMORY_READ(16, VDP2(HCNT)) & 0x03FF;
 }
 
 static __inline uint16_t
 vdp2_tvmd_vcount_get(void)
 {
-        for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
-        return MEMORY_READ(16, VDP2(VCNT));
+        MEMORY_WRITE(16, VDP2(EXTEN), MEMORY_READ(16, VDP2(EXTEN)) & ~0x0200);
+        for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) == 0x0200); );
+        return MEMORY_READ(16, VDP2(VCNT)) & 0x03FF;
 }
 
 extern irq_mux_t *vdp2_tvmd_hblank_in_irq_get(void);
