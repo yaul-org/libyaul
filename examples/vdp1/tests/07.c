@@ -43,15 +43,6 @@
         F16(elem2),                                                            \
         F16(elem3)
 
-#define RATIO   ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)
-
-#define L       -RATIO
-#define R        RATIO
-#define T        1.0f
-#define B       -1.0f
-#define N        1.0f
-#define F       10.0f
-
 #define CUBE_POLYGON_CNT 6
 
 static fix16_vector4_t __unused cube_vertices[] = {
@@ -477,31 +468,6 @@ static uint32_t __unused teapot_indices[TEAPOT_POLYGON_CNT * 4] = {
 
 static uint16_t colors[TEAPOT_POLYGON_CNT] __unused;
 
-static fix16_matrix4_t __unused matrix_model = {
-        FIX16_MATRIX4_INIT(
-                FIX16_MATRIX4_ROW(1.0f, 0.0f, 0.0f, 0.0f),
-                FIX16_MATRIX4_ROW(0.0f, 1.0f, 0.0f, 0.0f),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, 1.0f, 0.0f),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, 0.0f, 1.0f))
-};
-
-static fix16_matrix4_t __unused matrix_view = {
-        FIX16_MATRIX4_INIT(
-                FIX16_MATRIX4_ROW(1.0f, 0.0f, 0.0f,   0.0f),
-                FIX16_MATRIX4_ROW(0.0f, 1.0f, 0.0f,   0.0f),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, 1.0f,  10.0f),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, 0.0f,   1.0f))
-};
-
-static fix16_matrix4_t __unused matrix_projection = {
-        FIX16_MATRIX4_INIT(
-                FIX16_MATRIX4_ROW(2.0f / (R - L), 0.0f, 0.0f, -(R + L) / (R - L)),
-                FIX16_MATRIX4_ROW(0.0f, 2.0f / (T - B), 0.0f, -(T + B) / (T - B)),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, -2.0f / (F - N), -(F + N) / (F - N)),
-                FIX16_MATRIX4_ROW(0.0f, 0.0f, 0.0f, 1.0f))
-};
-
-
 #define SORT_PRIMITIVE_POOL_CNT VDP1_CMDT_COUNT_MAX
 
 struct sort_primitive {
@@ -569,6 +535,8 @@ static void matrix_stack_identity_load(void);
 static void matrix_stack_translate(fix16_t, fix16_t, fix16_t);
 static void matrix_stack_scale(fix16_t, fix16_t, fix16_t);
 static void matrix_stack_rotate(fix16_t, int32_t);
+static void matrix_stack_orthographic_project(fix16_t, fix16_t, fix16_t,
+    fix16_t, fix16_t, fix16_t);
 
 
 #define MODEL_TRANSFORMATIONS   1 /* 0: No transforms   1: Apply transforms */
@@ -619,10 +587,15 @@ test_07_init(void)
         matrix_stack_init();
 
         matrix_stack_mode(MATRIX_STACK_MODE_PROJECTION);
-        matrix_stack_load(&matrix_projection);
+
+        fix16_t ratio;
+        ratio = F16((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
+
+        matrix_stack_orthographic_project(-ratio, ratio, F16(1.0f), F16(-1.0f),
+            F16(1.0f), F16(1000.0f));
 
         matrix_stack_mode(MATRIX_STACK_MODE_MODEL_VIEW);
-        matrix_stack_load(&matrix_view);
+        matrix_stack_translate(F16(0.0f), F16(0.0f), F16(10.0f));
 
         vdp1_cmdt_list_begin(0); {
                 vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
@@ -1073,6 +1046,45 @@ matrix_stack_scale(fix16_t x, fix16_t y, fix16_t z)
         transform.frow[0][0] = x;
         transform.frow[1][1] = y;
         transform.frow[2][2] = z;
+
+        fix16_matrix4_t matrix;
+        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
+
+        matrix_stack_load(&matrix);
+}
+
+static void __unused
+matrix_stack_orthographic_project(fix16_t left, fix16_t right, fix16_t top,
+    fix16_t bottom, fix16_t near, fix16_t far)
+{
+#ifdef ASSERT
+        /* Make sure the correct state is set */
+        assert(matrix_stack_state.mss_initialized);
+        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
+#endif /* ASSERT */
+
+        struct matrix_stack *top_ms;
+        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
+
+#ifdef ASSERT
+        assert(top_ms != NULL);
+#endif /* ASSERT */
+
+        fix16_matrix4_t transform;
+        fix16_matrix4_identity(&transform);
+
+#ifdef ASSERT
+        assert(near > F16(0.0f));
+#endif /* ASSERT */
+
+        transform.frow[0][0] = fix16_div(F16(2.0f), fix16_sub(right, left));
+        transform.frow[0][3] = fix16_div(
+                -fix16_add(right, left), fix16_sub(right, left));
+        transform.frow[1][1] = fix16_div(F16(2.0f), fix16_sub(top, bottom));
+        transform.frow[1][3] = fix16_div(
+                -fix16_add(top, bottom), fix16_sub(top, bottom));
+        transform.frow[2][2] = fix16_div(F16(-2.0f), fix16_sub(far, near));
+        transform.frow[2][3] = fix16_add(-fix16_add(far, near), fix16_sub(far, near));
 
         fix16_matrix4_t matrix;
         fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
