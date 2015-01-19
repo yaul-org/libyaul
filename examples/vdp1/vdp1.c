@@ -26,6 +26,7 @@ extern uint8_t root_romdisk[];
 struct cons cons;
 struct smpc_peripheral_digital digital_pad;
 uint32_t tick = 0;
+uint32_t tick2 = 0;
 
 TEST_DECLARE_PROTOTYPE(00);
 TEST_DECLARE_PROTOTYPE(01);
@@ -92,11 +93,11 @@ static struct test {
                 test_06_draw,
                 test_06_exit
         }, {
-                "color-calculations",
-                NULL,
-                NULL,
-                NULL,
-                NULL
+                "3d",
+                test_07_init,
+                test_07_update,
+                test_07_draw,
+                test_07_exit
         }, {
                 "framebuffer",
                 NULL,
@@ -143,7 +144,7 @@ main(void)
                 assert(error >= 0);
         }
 
-        error = test_load("polygon");
+        error = test_load("3d");
         assert(error >= 0);
 
         while (true) {
@@ -201,5 +202,9 @@ vblank_in_handler(irq_mux_handle_t *irq_mux __unused)
 static void
 vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
 {
-        tick = (tick & 0xFFFFFFFF) + 1;
+        if ((vdp2_tvmd_vcount_get()) == 0) {
+                tick = (tick & 0xFFFFFFFF) + 1;
+        } else {
+                tick2 = (tick2 & 0xFFFFFFFF) + 1;
+        }
 }

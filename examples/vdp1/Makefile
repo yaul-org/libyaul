@@ -12,6 +12,7 @@ OBJECTS+= root.o \
 	tests/04.o \
 	tests/05.o \
 	tests/06.o \
+	tests/07.o \
 	vdp1.o
 DEPENDS:= $(OBJECTS:.o=.d)
 

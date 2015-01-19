@@ -28,6 +28,8 @@ size_t fs_size(void *);
 
 extern struct cons cons;
 extern struct smpc_peripheral_digital digital_pad;
+extern uint32_t tick;
+extern uint32_t tick2;
 
 extern char *text;
 extern size_t text_len;
