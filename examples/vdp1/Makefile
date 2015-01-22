@@ -5,6 +5,7 @@ OBJECTS+= root.o \
 	test.o \
 	tests/common.o \
 	tests/state_machine.o \
+	tests/matrix_stack.o \
 	tests/00.o \
 	tests/01.o \
 	tests/02.o \

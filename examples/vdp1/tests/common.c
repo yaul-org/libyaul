@@ -5,6 +5,9 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#define FIXMATH_NO_OVERFLOW     1
+#define FIXMATH_NO_ROUNDING     1
+
 #include <yaul.h>
 #include <fixmath.h>
 

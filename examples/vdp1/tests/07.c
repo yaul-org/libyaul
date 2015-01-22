@@ -7,6 +7,7 @@
 
 #define ASSERT                  1
 #define FIXMATH_NO_OVERFLOW     1
+#define FIXMATH_NO_ROUNDING     1
 
 #include <yaul.h>
 #include <fixmath.h>
@@ -21,27 +22,7 @@
 
 #include "test.h"
 #include "common.h"
-
-#define FIX16_VERTEX4(x, y, z, w)                                              \
-{                                                                              \
-            {                                                                  \
-                    F16((x)), F16((y)), F16((z)), F16((w))                     \
-            }                                                                  \
-}
-
-#define FIX16_MATRIX4_INIT(row0, row1, row2, row3)                             \
-.arr = {                                                                       \
-        row0,                                                                  \
-        row1,                                                                  \
-        row2,                                                                  \
-        row3                                                                   \
-}
-
-#define FIX16_MATRIX4_ROW(elem0, elem1, elem2, elem3)                          \
-        F16(elem0),                                                            \
-        F16(elem1),                                                            \
-        F16(elem2),                                                            \
-        F16(elem3)
+#include "matrix_stack.h"
 
 #define CUBE_POLYGON_CNT 6
 
@@ -468,75 +449,37 @@ static uint32_t __unused teapot_indices[TEAPOT_POLYGON_CNT * 4] = {
 
 static uint16_t colors[TEAPOT_POLYGON_CNT] __unused;
 
-#define SORT_PRIMITIVE_POOL_CNT VDP1_CMDT_COUNT_MAX
 
-struct sort_primitive {
-        int16_vector2_t sp_coords[4];
-        int16_t sp_avg;
-        uint32_t sp_idx;
-};
+#define OT_PRIMITIVE_BUCKETS    1024
+#define OT_PRIMITIVE_CNT        VDP1_CMDT_COUNT_MAX
 
-static struct sort_primitive __unused sort_primitive_pool[SORT_PRIMITIVE_POOL_CNT];
-static struct sort_primitive __unused *sort_primitive_ptr[SORT_PRIMITIVE_POOL_CNT];
+struct ot_primitive;
 
-static uint32_t sort_primitive_idx;
-static uint32_t sort_primitive_cnt;
+TAILQ_HEAD(ot_primitive_buckets, ot_primitive) ot_buckets;
 
-static void sort(void);
-static void sort_init(void);
-static void sort_polygon_add(const fix16_vector4_t *, uint32_t);
+struct ot_primitive {
+        uint16_t otp_color;
+        int16_vector2_t otp_coords[4];
+        fix16_t otp_avg;
+
+        TAILQ_ENTRY(ot_primitive) otp_entries;
+} __aligned(32);
+
+/* OT */
+static struct ot_primitive_buckets ot_primitive_buckets[OT_PRIMITIVE_BUCKETS] __unused;
+static struct ot_primitive ot_primitive_pool[OT_PRIMITIVE_CNT] __unused;
+
+static uint32_t ot_primitive_pool_idx;
+
+static void ot_init(void);
+void ot_primitive_add(const fix16_vector4_t *, uint16_t);
+static void ot_primitive_bucket_sort(int32_t);
 
 
 static inline void model_project(const fix16_vector4_t *, const uint32_t *,
     uint32_t, uint32_t);
 static void model_polygon_project(const fix16_vector4_t *, const uint32_t *,
     uint32_t);
-
-
-#define MATRIX_STACK_MODEL_VIEW_DEPTH   14
-#define MATRIX_STACK_PROJECTION_DEPTH   2
-#define MATRIX_STACK_DEPTH              (MATRIX_STACK_MODEL_VIEW_DEPTH +       \
-    MATRIX_STACK_PROJECTION_DEPTH)
-
-#define MATRIX_STACK_MODE_INVALID       -1
-#define MATRIX_STACK_MODE_PROJECTION    0
-#define MATRIX_STACK_MODE_MODEL_VIEW    1
-
-#define MATRIX_STACK_MODES              2
-
-struct matrix_stack;
-
-static SLIST_HEAD(matrix_stacks, matrix_stack) matrix_stacks[MATRIX_STACK_MODES];
-
-struct matrix_stack {
-        fix16_matrix4_t *ms_matrix;
-
-        SLIST_ENTRY(matrix_stack) ms_entries;
-} __aligned(8);
-
-static struct matrix_stack_state {
-        bool mss_initialized;
-        int32_t mss_mode;
-} matrix_stack_state;
-
-MEMB(matrix_stack_pool, struct matrix_stack, MATRIX_STACK_DEPTH,
-    sizeof(struct matrix_stack));
-MEMB(matrix_stack_matrix_pool, fix16_matrix4_t, MATRIX_STACK_DEPTH,
-    sizeof(fix16_matrix4_t));
-
-static void matrix_stack_init(void);
-static void matrix_stack_mode(int32_t);
-static void matrix_stack_push(void);
-static void matrix_stack_pop(void);
-static struct matrix_stack *matrix_stack_top(int32_t);
-static void matrix_stack_load(fix16_matrix4_t *);
-
-static void matrix_stack_identity_load(void);
-static void matrix_stack_translate(fix16_t, fix16_t, fix16_t);
-static void matrix_stack_scale(fix16_t, fix16_t, fix16_t);
-static void matrix_stack_rotate(fix16_t, int32_t);
-static void matrix_stack_orthographic_project(fix16_t, fix16_t, fix16_t,
-    fix16_t, fix16_t, fix16_t);
 
 
 #define MODEL_TRANSFORMATIONS   1 /* 0: No transforms   1: Apply transforms */
@@ -546,12 +489,12 @@ static void matrix_stack_orthographic_project(fix16_t, fix16_t, fix16_t,
 #define MATRIX_STACK            1 /* 0: No matrix stack 1: Matrix stack */
 
 
+static struct vdp1_cmdt_polygon __unused polygon;
+
 void
 test_07_init(void)
 {
         init();
-
-        STATIC_ASSERT(SORT_PRIMITIVE_POOL_CNT > TEAPOT_POLYGON_CNT);
 
         uint32_t color_idx;
         for (color_idx = 0; color_idx < TEAPOT_POLYGON_CNT; color_idx++) {
@@ -578,12 +521,12 @@ test_07_init(void)
                 uint16_t color;
                 color = fix16_to_int(fix16_add(
                             fix16_mul(fix16_abs(avg), F16(255.0f)),
-                            F16(64.0f)));
+                            F16(32.0f)));
 
                 colors[color_idx] = RGB888_TO_RGB555(color, color, color);
         }
 
-        sort_init();
+        ot_init();
         matrix_stack_init();
 
         matrix_stack_mode(MATRIX_STACK_MODE_PROJECTION);
@@ -601,6 +544,8 @@ test_07_init(void)
                 vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
+
+        memset(&polygon, 0x00, sizeof(polygon));
 }
 
 void
@@ -635,47 +580,58 @@ test_07_update(void)
                 matrix_stack_rotate(angle, 1);
                 matrix_stack_rotate(angle, 2);
                 matrix_stack_translate(F16(0.0f), F16(0.0f), F16(0.0f));
-#endif
+
                 angle = fix16_mod(fix16_add(angle, F16(-2.0f)), F16(360.0f));
                 angle = fix16_add(angle, F16(-2.0f));
-
+#endif
                 model_polygon_project(teapot_vertices, teapot_indices,
-                    TEAPOT_POLYGON_CNT * 4);
+                    TEAPOT_POLYGON_CNT);
 #if MATRIX_STACK == 1
         } matrix_stack_pop();
 #endif
 
-        sort();
+        int buckets;
+        buckets = 0;
 
-#if RENDER == 1
         vdp1_cmdt_list_begin(1); {
-                uint32_t idx;
-                for (idx = 0; idx < sort_primitive_cnt; idx++) {
-                        struct sort_primitive *sort_primitive;
-                        sort_primitive = sort_primitive_ptr[idx];
+                int32_t idx;
+                for (idx = OT_PRIMITIVE_BUCKETS - 1; idx >= 0; idx--) {
+                        /* Skip empty buckets */
+                        if (TAILQ_EMPTY(&ot_primitive_buckets[idx])) {
+                                continue;
+                        }
 
-                        uint16_t color;
-                        color = colors[sort_primitive->sp_idx];
+                        buckets++;
 
-                        struct vdp1_cmdt_polygon polygon;
-                        memset(&polygon, 0x00, sizeof(polygon));
-                        polygon.cp_color = color;
-                        polygon.cp_mode.transparent_pixel = true;
-                        polygon.cp_mode.end_code = true;
-                        polygon.cp_vertex.a.x = sort_primitive->sp_coords[0].x;
-                        polygon.cp_vertex.a.y = sort_primitive->sp_coords[0].y;
-                        polygon.cp_vertex.b.x = sort_primitive->sp_coords[1].x;
-                        polygon.cp_vertex.b.y = sort_primitive->sp_coords[1].y;
-                        polygon.cp_vertex.c.x = sort_primitive->sp_coords[2].x;
-                        polygon.cp_vertex.c.y = sort_primitive->sp_coords[2].y;
-                        polygon.cp_vertex.d.x = sort_primitive->sp_coords[3].x;
-                        polygon.cp_vertex.d.y = sort_primitive->sp_coords[3].y;
+#if POLYGON_SORT == 1
+                        ot_primitive_bucket_sort(idx);
+#endif
+#if RENDER == 1
+                        struct ot_primitive *otp __unused;
+                        TAILQ_FOREACH (otp, &ot_primitive_buckets[idx], otp_entries) {
+                                /* memset(&polygon, 0x00, sizeof(polygon)); */
 
-                        vdp1_cmdt_polygon_draw(&polygon);
+                                polygon.cp_color = otp->otp_color;
+                                polygon.cp_mode.transparent_pixel = true;
+
+                                polygon.cp_mode.end_code = true;
+                                polygon.cp_vertex.a.x = otp->otp_coords[0].x;
+                                polygon.cp_vertex.a.y = otp->otp_coords[0].y;
+                                polygon.cp_vertex.b.x = otp->otp_coords[1].x;
+                                polygon.cp_vertex.b.y = otp->otp_coords[1].y;
+                                polygon.cp_vertex.c.x = otp->otp_coords[2].x;
+                                polygon.cp_vertex.c.y = otp->otp_coords[2].y;
+                                polygon.cp_vertex.d.x = otp->otp_coords[3].x;
+                                polygon.cp_vertex.d.y = otp->otp_coords[3].y;
+
+                                vdp1_cmdt_polygon_draw(&polygon);
+                        }
+#endif
+                        /* Clear OT bucket */
+                        TAILQ_INIT(&ot_primitive_buckets[idx]);
                 }
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(1);
-#endif
 
         uint16_t end_tick;
         end_tick = tick;
@@ -683,7 +639,7 @@ test_07_update(void)
         uint16_t end_scanline;
         end_scanline = vdp2_tvmd_vcount_get();
 
-        (void)sprintf(text, "%i-%i=%i, vcnt: %i-%i=%i, tick: %i-%i=%i\n",
+        (void)sprintf(text, "%i-%i=%i, vcnt: %i-%i=%i, tick: %i-%i=%i (buckets used: %i)\n",
             (int)end_tick,
             (int)start_tick,
             (int)(end_tick - start_tick),
@@ -694,7 +650,8 @@ test_07_update(void)
                 : 0),
             (int)tick,
             (int)tick2,
-            (int)(tick - tick2));
+            (int)(tick - tick2),
+            buckets);
         cons_buffer(&cons, text);
 }
 
@@ -760,386 +717,120 @@ model_project(const fix16_vector4_t *vb __unused, const uint32_t *ib __unused,
 #endif
                 }
 
-                switch (vertex_cnt) {
-                case 4:
-                         sort_polygon_add(projected, primitive_idx);
-                         break;
-                }
+                ot_primitive_add(projected, colors[primitive_idx]);
         }
 }
 
 static void __unused
 model_polygon_project(const fix16_vector4_t *vb, const uint32_t *ib,
-    uint32_t ib_cnt)
+    uint32_t polygon_cnt)
 {
-        model_project(vb, ib, ib_cnt, 4);
+        model_project(vb, ib, polygon_cnt * 4, 4);
 }
 
 static void __unused
-sort_init(void)
+ot_init(void)
 {
-        sort_primitive_idx = 0;
-        sort_primitive_cnt = 0;
-}
-
-static void __unused
-sort_polygon_add(const fix16_vector4_t *polygon __unused, uint32_t idx __unused)
-{
-#ifdef ASSERT
-        assert(sort_primitive_idx < SORT_PRIMITIVE_POOL_CNT);
-#endif /* ASSERT */
-
-        struct sort_primitive *sort_primitive;
-        sort_primitive = &sort_primitive_pool[sort_primitive_idx];
-
-        uint32_t primitive_idx;
-        for (primitive_idx = 0; primitive_idx < 4; primitive_idx++) {
-                sort_primitive->sp_coords[primitive_idx].x =
-                    fix16_to_int(fix16_mul(polygon[primitive_idx].x,
-                            F16((float)SCREEN_WIDTH / 2.0f)));
-                sort_primitive->sp_coords[primitive_idx].y =
-                    fix16_to_int(fix16_mul(polygon[primitive_idx].y,
-                            F16((float)-SCREEN_HEIGHT / 2.0f)));
-                /* Screen coordinates */
+        int32_t bucket_idx;
+        for (bucket_idx = 0; bucket_idx < OT_PRIMITIVE_BUCKETS; bucket_idx++) {
+                TAILQ_INIT(&ot_primitive_buckets[bucket_idx]);
         }
+
+        ot_primitive_pool_idx = 0;
+}
+
+void __unused
+ot_primitive_add(const fix16_vector4_t *primitive __unused, uint16_t color)
+{
+        struct ot_primitive *otp;
+        otp = &ot_primitive_pool[ot_primitive_pool_idx];
+
+        ot_primitive_pool_idx++;
+        ot_primitive_pool_idx &= OT_PRIMITIVE_CNT - 1;
+
+        otp->otp_color = color;
 
         fix16_t avg;
-        avg = fix16_mul(fix16_add(fix16_add(polygon[0].z, polygon[1].z),
-                fix16_add(polygon[2].z, polygon[3].z)), F16(1.0 / 4.0f));
+        avg = fix16_mul(fix16_add(
+                    fix16_add(primitive[0].z, primitive[1].z),
+                    fix16_add(primitive[2].z, primitive[3].z)),
+            F16(1.0 / 4.0f));
+        otp->otp_avg = avg;
 
-        sort_primitive->sp_avg = avg;
-        sort_primitive->sp_idx = idx;
+        fix16_t half_width;
+        half_width = F16((float)SCREEN_WIDTH / 2.0f);
 
-        sort_primitive_ptr[sort_primitive_idx] = sort_primitive;
-        sort_primitive_idx++;
+        fix16_t half_height;
+        half_height = F16((float)-SCREEN_HEIGHT / 2.0f);
+
+        otp->otp_coords[0].x = fix16_to_int(fix16_mul(primitive[0].x,
+                half_width));
+        otp->otp_coords[0].y = fix16_to_int(fix16_mul(primitive[0].y,
+                half_height));
+        otp->otp_coords[1].x = fix16_to_int(fix16_mul(primitive[1].x,
+                half_width));
+        otp->otp_coords[1].y = fix16_to_int(fix16_mul(primitive[1].y,
+                half_height));
+        otp->otp_coords[2].x = fix16_to_int(fix16_mul(primitive[2].x,
+                half_width));
+        otp->otp_coords[2].y = fix16_to_int(fix16_mul(primitive[2].y,
+                half_height));
+        otp->otp_coords[3].x = fix16_to_int(fix16_mul(primitive[3].x,
+                half_width));
+        otp->otp_coords[3].y = fix16_to_int(fix16_mul(primitive[3].y,
+                half_height));
+        /* Screen coordinates */
+
+        /* Buckets are set up in the followin manner: floor(avg * 2)
+         *      0     1     2     3          n - 2   n - 1
+         *   +-----+-----+-----+-----+     +-------+---------------+
+         *   | 0.0 | 0.5 | 1.0 | 1.5 | ... | n / 2 | (n / 2) + 0.5 |
+         *   +-----+-----+-----+-----+     +-------+---------------+
+         *
+         * This should allow to have polygons to be more dispersed into
+         * more buckets allowing for smaller sets to be sorted */
+
+        int idx __unused;
+        idx = fix16_to_int(fix16_mul(fix16_abs(avg), F16(2.0f)));
+
+        TAILQ_INSERT_HEAD(&ot_primitive_buckets[idx], otp, otp_entries);
 }
 
 static void __unused
-sort(void)
+ot_primitive_bucket_sort(int32_t idx)
 {
-        sort_primitive_cnt = sort_primitive_idx;
+        struct ot_primitive *head;
+        head = NULL;
 
-#if POLYGON_SORT == 1
-        /* Bubble sort! */
-        if (sort_primitive_cnt > 1) {
-                bool swapped;
-                do {
-                        swapped = false;
+        struct ot_primitive *safe;
 
-                        uint32_t i;
-                        for (i = 0; i < sort_primitive_cnt - 1; i++) {
-                                struct sort_primitive *sp_i;
-                                sp_i = sort_primitive_ptr[i];
+        struct ot_primitive *otp;
+        for (otp = TAILQ_FIRST(&ot_primitive_buckets[idx]);
+             (otp != NULL) && (safe = TAILQ_NEXT(otp, otp_entries), 1);
+             otp = safe) {
+                struct ot_primitive *otp_current;
+                otp_current = otp;
+                if ((head == NULL) || (otp_current->otp_avg < head->otp_avg)) {
+                        TAILQ_NEXT(otp_current, otp_entries) = head;
+                        head = otp_current;
+                        TAILQ_FIRST(&ot_primitive_buckets[idx]) = head;
+                        continue;
+                }
 
-                                struct sort_primitive *sp_j;
-                                sp_j = sort_primitive_ptr[i + 1];
+                struct ot_primitive *otp_p;
+                for (otp_p = head; otp_p != NULL; ) {
+                        struct ot_primitive **otp_p_next;
+                        otp_p_next = &TAILQ_NEXT(otp_p, otp_entries);
 
-                                if (sp_j->sp_avg > sp_i->sp_avg) {
-                                        sort_primitive_ptr[i] = sp_j;
-                                        sort_primitive_ptr[i + 1] = sp_i;
-                                        swapped = true;
-                                }
+                        if ((*otp_p_next == NULL) ||
+                            (otp_current->otp_avg < (*otp_p_next)->otp_avg)) {
+                                TAILQ_NEXT(otp_current, otp_entries) =
+                                    *otp_p_next;
+                                *otp_p_next = otp_current;
+                                break;
                         }
-                } while (swapped);
+
+                        otp_p = *otp_p_next;
+                }
         }
-#endif
-
-        sort_primitive_idx = 0;
-}
-
-static void __unused
-matrix_stack_init(void)
-{
-        if (matrix_stack_state.mss_initialized) {
-                return;
-        }
-
-        SLIST_INIT(&matrix_stacks[MATRIX_STACK_MODE_PROJECTION]);
-        SLIST_INIT(&matrix_stacks[MATRIX_STACK_MODE_MODEL_VIEW]);
-
-        memb_init(&matrix_stack_pool);
-        memb_init(&matrix_stack_matrix_pool);
-
-        matrix_stack_state.mss_initialized = true;
-        matrix_stack_state.mss_mode = MATRIX_STACK_MODE_INVALID;
-
-        matrix_stack_mode(MATRIX_STACK_MODE_PROJECTION);
-        matrix_stack_push();
-        matrix_stack_identity_load();
-
-        matrix_stack_mode(MATRIX_STACK_MODE_MODEL_VIEW);
-        matrix_stack_push();
-        matrix_stack_identity_load();
-}
-
-static void __unused
-matrix_stack_mode(int32_t mode)
-{
-#ifdef ASSERT
-        assert(matrix_stack_state.mss_initialized);
-        assert((mode == MATRIX_STACK_MODE_PROJECTION) ||
-               (mode == MATRIX_STACK_MODE_MODEL_VIEW));
-#endif /* ASSERT */
-
-        matrix_stack_state.mss_mode = mode;
-}
-
-static void __unused
-matrix_stack_push(void)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *ms;
-        ms = (struct matrix_stack *)memb_alloc(&matrix_stack_pool);
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-
-        ms->ms_matrix = (fix16_matrix4_t *)memb_alloc(
-                &matrix_stack_matrix_pool);
-#ifdef ASSERT
-        assert(ms->ms_matrix != NULL);
-#endif /* ASSERT */
-
-        if (top_ms != NULL) {
-                memcpy(ms->ms_matrix, top_ms->ms_matrix,
-                    sizeof(fix16_matrix4_t));
-        }
-
-        SLIST_INSERT_HEAD(&matrix_stacks[matrix_stack_state.mss_mode], ms,
-            ms_entries);
-}
-
-static void __unused
-matrix_stack_pop(void)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        int error_code __unused;
-        error_code = memb_free(&matrix_stack_matrix_pool, top_ms->ms_matrix);
-#ifdef ASSERT
-        assert(error_code == 0);
-#endif /* ASSERT */
-        error_code = memb_free(&matrix_stack_pool, top_ms);
-#ifdef ASSERT
-        assert(error_code == 0);
-#endif
-        SLIST_REMOVE_HEAD(&matrix_stacks[matrix_stack_state.mss_mode],
-            ms_entries);
-
-        /* Make sure we didn't pop off the last matrix in the stack */
-#ifdef ASSERT
-        assert(!(SLIST_EMPTY(&matrix_stacks[matrix_stack_state.mss_mode])));
-#endif /* ASSERT */
-}
-
-static struct matrix_stack * __unused
-matrix_stack_top(int32_t mode)
-{
-        /* Make sure the correct state is set */
-#ifdef ASSERT
-        assert(matrix_stack_state.mss_initialized);
-        assert((mode == MATRIX_STACK_MODE_PROJECTION) ||
-               (mode == MATRIX_STACK_MODE_MODEL_VIEW));
-#endif /* ASSERT */
-
-        return SLIST_FIRST(&matrix_stacks[mode]);
-}
-
-static void __unused
-matrix_stack_load(fix16_matrix4_t *matrix)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        memcpy(top_ms->ms_matrix, matrix, sizeof(fix16_matrix4_t));
-}
-
-static void __unused
-matrix_stack_identity_load(void)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        fix16_matrix4_identity(top_ms->ms_matrix);
-}
-
-static void __unused
-matrix_stack_translate(fix16_t x, fix16_t y, fix16_t z)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        fix16_matrix4_t transform;
-        fix16_matrix4_identity(&transform);
-
-        transform.frow[0][3] = x;
-        transform.frow[1][3] = y;
-        transform.frow[2][3] = z;
-
-        fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
-
-        matrix_stack_load(&matrix);
-}
-
-static void __unused
-matrix_stack_scale(fix16_t x, fix16_t y, fix16_t z)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        fix16_matrix4_t transform;
-        fix16_matrix4_identity(&transform);
-
-        transform.frow[0][0] = x;
-        transform.frow[1][1] = y;
-        transform.frow[2][2] = z;
-
-        fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
-
-        matrix_stack_load(&matrix);
-}
-
-static void __unused
-matrix_stack_orthographic_project(fix16_t left, fix16_t right, fix16_t top,
-    fix16_t bottom, fix16_t near, fix16_t far)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        fix16_matrix4_t transform;
-        fix16_matrix4_identity(&transform);
-
-#ifdef ASSERT
-        assert(near > F16(0.0f));
-#endif /* ASSERT */
-
-        transform.frow[0][0] = fix16_div(F16(2.0f), fix16_sub(right, left));
-        transform.frow[0][3] = fix16_div(
-                -fix16_add(right, left), fix16_sub(right, left));
-        transform.frow[1][1] = fix16_div(F16(2.0f), fix16_sub(top, bottom));
-        transform.frow[1][3] = fix16_div(
-                -fix16_add(top, bottom), fix16_sub(top, bottom));
-        transform.frow[2][2] = fix16_div(F16(-2.0f), fix16_sub(far, near));
-        transform.frow[2][3] = fix16_add(-fix16_add(far, near), fix16_sub(far, near));
-
-        fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
-
-        matrix_stack_load(&matrix);
-}
-
-static void __unused
-matrix_stack_rotate(fix16_t angle, int32_t component)
-{
-#ifdef ASSERT
-        /* Make sure the correct state is set */
-        assert(matrix_stack_state.mss_initialized);
-        assert(matrix_stack_state.mss_mode != MATRIX_STACK_MODE_INVALID);
-
-        assert((component >= 0) && (component <= 2));
-#endif /* ASSERT */
-
-        struct matrix_stack *top_ms;
-        top_ms = matrix_stack_top(matrix_stack_state.mss_mode);
-#ifdef ASSERT
-        assert(top_ms != NULL);
-#endif /* ASSERT */
-
-        fix16_matrix4_t transform;
-        fix16_matrix4_identity(&transform);
-
-        fix16_t sin;
-        sin = fix16_sin(fix16_deg_to_rad(angle));
-        fix16_t cos;
-        cos = fix16_cos(fix16_deg_to_rad(angle));
-
-        switch (component) {
-        case 0: /* X */
-                transform.frow[1][1] = cos;
-                transform.frow[1][2] = -sin;
-                transform.frow[2][1] = sin;
-                transform.frow[2][2] = cos;
-                break;
-        case 1: /* Y */
-                transform.frow[0][0] = cos;
-                transform.frow[0][2] = sin;
-                transform.frow[2][0] = -sin;
-                transform.frow[2][2] = cos;
-                break;
-        case 2: /* Z */
-                transform.frow[0][0] = cos;
-                transform.frow[0][1] = -sin;
-                transform.frow[1][0] = sin;
-                transform.frow[1][1] = cos;
-                break;
-        }
-
-        fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
-
-        matrix_stack_load(&matrix);
 }
