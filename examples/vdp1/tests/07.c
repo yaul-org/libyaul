@@ -477,9 +477,9 @@ static void ot_primitive_bucket_sort(int32_t);
 
 
 static inline void model_project(const fix16_vector4_t *, const uint32_t *,
-    uint32_t, uint32_t);
+    const uint32_t, const uint32_t);
 static void model_polygon_project(const fix16_vector4_t *, const uint32_t *,
-    uint32_t);
+    const uint32_t);
 
 
 #define MODEL_TRANSFORMATIONS   1 /* 0: No transforms   1: Apply transforms */
@@ -582,7 +582,7 @@ test_07_update(void)
                 matrix_stack_translate(F16(0.0f), F16(0.0f), F16(0.0f));
 
                 angle = fix16_mod(fix16_add(angle, F16(-2.0f)), F16(360.0f));
-                angle = fix16_add(angle, F16(-2.0f));
+                angle = fix16_add(angle, F16(-1.0f));
 #endif
                 model_polygon_project(teapot_vertices, teapot_indices,
                     TEAPOT_POLYGON_CNT);
@@ -670,60 +670,61 @@ test_07_exit(void)
 
 static inline void __always_inline __unused
 model_project(const fix16_vector4_t *vb __unused, const uint32_t *ib __unused,
-    uint32_t ib_cnt, uint32_t vertex_cnt)
+    const uint32_t ib_cnt, const uint32_t vertex_cnt)
 {
+        fix16_vector4_t projected_polygon[vertex_cnt];
+
         /* How many primitives there are in the model */
         uint32_t primitives;
         primitives = ib_cnt / vertex_cnt;
 
+        fix16_matrix4_t *matrix_projection __unused;
+        matrix_projection = matrix_stack_top(
+                MATRIX_STACK_MODE_PROJECTION)->ms_matrix;
+
+        fix16_matrix4_t *matrix_model_view __unused;
+        matrix_model_view = matrix_stack_top(
+                MATRIX_STACK_MODE_MODEL_VIEW)->ms_matrix;
+
+        /* PVMv = (P(VM))v */
+        fix16_matrix4_t matrix_mvp __unused;
+        fix16_matrix4_multiply2(matrix_projection, matrix_model_view,
+            &matrix_mvp);
+
         uint32_t primitive_idx;
         for (primitive_idx = 0; primitive_idx < primitives; primitive_idx++) {
-                fix16_vector4_t projected[vertex_cnt];
-
                 uint32_t vertex_idx;
+
+                const fix16_vector4_t *vtx[4] __unused;
+                vtx[0] = &vb[ib[(vertex_cnt * primitive_idx)]];
+                vtx[1] = &vb[ib[(vertex_cnt * primitive_idx) + 1]];
+                vtx[2] = &vb[ib[(vertex_cnt * primitive_idx) + 2]];
+                vtx[3] = &vb[ib[(vertex_cnt * primitive_idx) + 3]];
+
                 for (vertex_idx = 0; vertex_idx < vertex_cnt; vertex_idx++) {
-#if MODEL_PROJECT
-                        fix16_vector4_t vtx4;
-                        memcpy(&vtx4, &vb[ib[(4 * primitive_idx) + vertex_idx]],
-                            sizeof(fix16_vector4_t));
+                        /* >>> Object space */
+                        fix16_vector4_matrix4_multiply2(&matrix_mvp,
+                            vtx[vertex_idx], &projected_polygon[vertex_idx]);
+                        /* Clip space >>> */
 
-                        fix16_matrix4_t *matrix_projection __unused;
-                        matrix_projection = matrix_stack_top(
-                                MATRIX_STACK_MODE_PROJECTION)->ms_matrix;
-
-                        fix16_matrix4_t *matrix_model_view __unused;
-                        matrix_model_view = matrix_stack_top(
-                                MATRIX_STACK_MODE_MODEL_VIEW)->ms_matrix;
-
-                        fix16_vector4_t *cur_projected;
-                        cur_projected = &projected[vertex_idx];
-
-                        /* PVMv = (P(VM))v */
-                        fix16_matrix4_t matrix_mvp __unused;
-                        fix16_matrix4_multiply(matrix_projection,
-                            matrix_model_view, &matrix_mvp);
-                        /* Object space */
-                        fix16_vector4_matrix4_multiply(&matrix_mvp, &vtx4,
-                            cur_projected);
-                        /* Clip space */
-                        fix16_vector4_scale(
-                                fix16_div(F16(1.0f), cur_projected->w),
-                                cur_projected);
+                        if (projected_polygon[vertex_idx].w != F16(1.0f)) {
+                                fix16_t inv_w;
+                                inv_w = fix16_div(F16(1.0f),
+                                    projected_polygon[vertex_idx].w);
+                                fix16_vector4_scale(
+                                        inv_w,
+                                        &projected_polygon[vertex_idx]);
+                        }
                         /* NDC */
-#else
-                        memcpy(&projected[vertex_idx],
-                            &vb[ib[(4 * primitive_idx) + vertex_idx]],
-                            sizeof(fix16_vector4_t));
-#endif
                 }
 
-                ot_primitive_add(projected, colors[primitive_idx]);
+                ot_primitive_add(projected_polygon, colors[primitive_idx]);
         }
 }
 
 static void __unused
 model_polygon_project(const fix16_vector4_t *vb, const uint32_t *ib,
-    uint32_t polygon_cnt)
+    const uint32_t polygon_cnt)
 {
         model_project(vb, ib, polygon_cnt * 4, 4);
 }

@@ -200,7 +200,7 @@ matrix_stack_translate(fix16_t x, fix16_t y, fix16_t z)
         transform.frow[2][3] = z;
 
         fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
+        fix16_matrix4_multiply2(top_ms->ms_matrix, &transform, &matrix);
 
         matrix_stack_load(&matrix);
 }
@@ -229,7 +229,7 @@ matrix_stack_scale(fix16_t x, fix16_t y, fix16_t z)
         transform.frow[2][2] = z;
 
         fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
+        fix16_matrix4_multiply2(top_ms->ms_matrix, &transform, &matrix);
 
         matrix_stack_load(&matrix);
 }
@@ -268,7 +268,7 @@ matrix_stack_orthographic_project(fix16_t left, fix16_t right, fix16_t top,
         transform.frow[2][3] = fix16_add(-fix16_add(far, near), fix16_sub(far, near));
 
         fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
+        fix16_matrix4_multiply2(top_ms->ms_matrix, &transform, &matrix);
 
         matrix_stack_load(&matrix);
 }
@@ -320,7 +320,7 @@ matrix_stack_rotate(fix16_t angle, int32_t component)
         }
 
         fix16_matrix4_t matrix;
-        fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
+        fix16_matrix4_multiply2(top_ms->ms_matrix, &transform, &matrix);
 
         matrix_stack_load(&matrix);
 }
