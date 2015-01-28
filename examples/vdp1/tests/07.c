@@ -1685,6 +1685,9 @@ static uint16_t colors[TEAPOT_POLYGON_CNT] __unused;
 #define OT_PRIMITIVE_BUCKETS    1024
 #define OT_PRIMITIVE_CNT        VDP1_CMDT_COUNT_MAX
 
+#define OT_PRIMITIVE_BUCKET_SORT_INSERTION      0
+#define OT_PRIMITIVE_BUCKET_SORT_BUBBLE         1
+
 struct ot_primitive;
 
 TAILQ_HEAD(ot_primitive_buckets, ot_primitive) ot_buckets;
@@ -1705,7 +1708,7 @@ static uint32_t ot_primitive_pool_idx;
 
 static void ot_init(void);
 static void ot_primitive_add(const fix16_vector4_t *, uint16_t);
-static void ot_primitive_bucket_sort(int32_t);
+static void ot_primitive_bucket_sort(int32_t, int32_t);
 
 
 static void model_polygon_project(const fix16_vector4_t *, const uint32_t *,
@@ -1714,7 +1717,7 @@ static void model_polygon_project(const fix16_vector4_t *, const uint32_t *,
 
 #define MODEL_TRANSFORMATIONS   1 /* 0: No transforms   1: Apply transforms */
 #define MODEL_PROJECT           1 /* 0: Upload          1: Upload and project */
-#define POLYGON_SORT            0 /* 0: No sort         1: Sort */
+#define POLYGON_SORT            1 /* 0: No sort         1: Sort */
 #define RENDER                  1 /* 0: No render       1: Render */
 
 
@@ -1809,13 +1812,10 @@ test_07_update(void)
                  * D=CR=V(MR)
                  * E=DS=V(MRS) */
 #if MODEL_TRANSFORMATIONS == 1
-                matrix_stack_translate(F16(0.5f), F16(0.0f), F16(-0.5f));
+                matrix_stack_translate(F16(0.0f), F16(0.0f), F16(0.0f));
                 matrix_stack_rotate(fix16_mul(F16(2.0f), angle), 0);
                 matrix_stack_rotate(angle, 1);
                 matrix_stack_rotate(angle, 2);
-                matrix_stack_translate(F16(0.0f), F16(0.0f), F16(0.0f));
-
-                angle = fix16_mod(fix16_add(angle, F16(-3.0f)), F16(360.0f));
 #endif
 
 #if MODEL_PROJECT == 1
@@ -1823,6 +1823,8 @@ test_07_update(void)
                     teapot_normals, TEAPOT_POLYGON_CNT);
 #endif
         } matrix_stack_pop();
+
+        angle = fix16_add(angle, F16(-2.0f));
 
         int32_t buckets;
         buckets = 0;
@@ -1841,7 +1843,8 @@ test_07_update(void)
                         buckets++;
 
 #if POLYGON_SORT == 1
-                        ot_primitive_bucket_sort(idx & (OT_PRIMITIVE_BUCKETS - 1));
+                        ot_primitive_bucket_sort(idx & (OT_PRIMITIVE_BUCKETS - 1),
+                                OT_PRIMITIVE_BUCKET_SORT_INSERTION);
 #endif
 #if RENDER == 1
                         struct ot_primitive *otp;
@@ -1877,7 +1880,7 @@ test_07_update(void)
         end_scanline = vdp2_tvmd_vcount_get();
 
         (void)sprintf(text, "Tick diff: %i-%i=%i\n"
-            "Scanline diff: %3i-%3i=%3i\n"
+            "Scanline diff: %i-%i=%i\n"
             "Buckets: %i\n"
             "Polygons: %i/%i",
             (int)end_tick,
@@ -1943,7 +1946,6 @@ model_polygon_project(const fix16_vector4_t *vb, const uint32_t *ib,
         uint32_t idx;
         for (idx = 0; idx < (ib_cnt * 4); idx += 4)
         {
-                /* idx = 1 * 4; */
                 uint16_t color;
                 color = colors[idx >> 2];
 
@@ -2035,7 +2037,6 @@ ot_primitive_add(const fix16_vector4_t *proj_vertex, uint16_t color)
         int32_t idx;
         /* XXX */
         idx = fix16_to_int(avg2);
-        idx = 0;
 
         struct ot_primitive_buckets *otp_bucket;
         otp_bucket = &ot_primitive_buckets[idx & (OT_PRIMITIVE_BUCKETS - 1)];
@@ -2044,40 +2045,83 @@ ot_primitive_add(const fix16_vector4_t *proj_vertex, uint16_t color)
 }
 
 static void __unused
-ot_primitive_bucket_sort(int32_t idx)
+ot_primitive_bucket_sort(int32_t idx, int32_t type)
 {
         struct ot_primitive *head;
         head = NULL;
 
         struct ot_primitive *safe;
-
         struct ot_primitive *otp;
-        for (otp = TAILQ_FIRST(&ot_primitive_buckets[idx]);
-             (otp != NULL) && (safe = TAILQ_NEXT(otp, otp_entries), 1);
-             otp = safe) {
-                struct ot_primitive *otp_current;
-                otp_current = otp;
-                if ((head == NULL) || (otp_current->otp_avg > head->otp_avg)) {
-                        TAILQ_NEXT(otp_current, otp_entries) = head;
-                        head = otp_current;
-                        TAILQ_FIRST(&ot_primitive_buckets[idx]) = head;
-                        continue;
-                }
 
-                struct ot_primitive *otp_p;
-                for (otp_p = head; otp_p != NULL; ) {
-                        struct ot_primitive **otp_p_next;
-                        otp_p_next = &TAILQ_NEXT(otp_p, otp_entries);
-
-                        if ((*otp_p_next == NULL) ||
-                            (otp_current->otp_avg > (*otp_p_next)->otp_avg)) {
-                                TAILQ_NEXT(otp_current, otp_entries) =
-                                    *otp_p_next;
-                                *otp_p_next = otp_current;
-                                break;
+        if (type == OT_PRIMITIVE_BUCKET_SORT_INSERTION) {
+                for (otp = TAILQ_FIRST(&ot_primitive_buckets[idx]);
+                     (otp != NULL) && (safe = TAILQ_NEXT(otp, otp_entries), 1);
+                     otp = safe) {
+                        struct ot_primitive *otp_current;
+                        otp_current = otp;
+                        if ((head == NULL) || (otp_current->otp_avg < head->otp_avg)) {
+                                TAILQ_NEXT(otp_current, otp_entries) = head;
+                                head = otp_current;
+                                TAILQ_FIRST(&ot_primitive_buckets[idx]) = head;
+                                continue;
                         }
 
-                        otp_p = *otp_p_next;
+                        struct ot_primitive *otp_p;
+                        for (otp_p = head; otp_p != NULL; ) {
+                                struct ot_primitive **otp_p_next;
+                                otp_p_next = &TAILQ_NEXT(otp_p, otp_entries);
+
+                                if ((*otp_p_next == NULL) ||
+                                    (otp_current->otp_avg < (*otp_p_next)->otp_avg)) {
+                                        TAILQ_NEXT(otp_current, otp_entries) =
+                                            *otp_p_next;
+                                        *otp_p_next = otp_current;
+                                        break;
+                                }
+
+                                otp_p = *otp_p_next;
+                        }
                 }
+        } else if (type == OT_PRIMITIVE_BUCKET_SORT_BUBBLE) {
+                bool swapped;
+                do {
+                        swapped = false;
+
+                        struct ot_primitive *otp_k __unused;
+                        otp_k = NULL;
+
+                        head = TAILQ_FIRST(&ot_primitive_buckets[idx]);
+                        for (otp = head;
+                             (otp != NULL) && (safe = TAILQ_NEXT(otp, otp_entries), 1);
+                             otp = safe) {
+                                struct ot_primitive *otp_i;
+                                otp_i = otp;
+
+                                struct ot_primitive *otp_j;
+                                otp_j = TAILQ_NEXT(otp, otp_entries);
+
+                                if (otp_j == NULL) {
+                                        continue;
+                                }
+
+                                if (otp_j->otp_avg < otp_i->otp_avg) {
+                                        if (otp_k == NULL) {
+                                                TAILQ_FIRST(&ot_primitive_buckets[idx]) =
+                                                    otp_j;
+                                        } else {
+                                                TAILQ_NEXT(otp_k, otp_entries) =
+                                                    otp_j;
+                                        }
+
+                                        TAILQ_NEXT(otp_i, otp_entries) =
+                                            TAILQ_NEXT(otp_j, otp_entries);
+                                        TAILQ_NEXT(otp_j, otp_entries) = otp_i;
+
+                                        swapped = true;
+                                }
+
+                                otp_k = otp_i;
+                        }
+                } while (swapped);
         }
 }
