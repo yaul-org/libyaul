@@ -1704,7 +1704,7 @@ static struct ot_primitive ot_primitive_pool[OT_PRIMITIVE_CNT] __unused;
 static uint32_t ot_primitive_pool_idx;
 
 static void ot_init(void);
-void ot_primitive_add(const fix16_vector4_t *, uint16_t);
+static void ot_primitive_add(const fix16_vector4_t *, uint16_t);
 static void ot_primitive_bucket_sort(int32_t);
 
 
@@ -1844,7 +1844,7 @@ test_07_update(void)
                         ot_primitive_bucket_sort(idx & (OT_PRIMITIVE_BUCKETS - 1));
 #endif
 #if RENDER == 1
-                        struct ot_primitive *otp __unused;
+                        struct ot_primitive *otp;
                         TAILQ_FOREACH (otp, &ot_primitive_buckets[idx], otp_entries) {
                                 polygons++;
 
@@ -1908,17 +1908,16 @@ test_07_exit(void)
 }
 
 static void __unused
-model_polygon_project(const fix16_vector4_t *vb __unused, const uint32_t *ib __unused,
-    const fix16_vector4_t *nb __unused,
-    const uint32_t ib_cnt __unused)
+model_polygon_project(const fix16_vector4_t *vb, const uint32_t *ib,
+    const fix16_vector4_t *nb, const uint32_t ib_cnt)
 {
         fix16_vector4_t projected_polygon[4];
 
-        fix16_matrix4_t *matrix_projection __unused;
+        fix16_matrix4_t *matrix_projection;
         matrix_projection = matrix_stack_top(
                 MATRIX_STACK_MODE_PROJECTION)->ms_matrix;
 
-        fix16_matrix4_t *matrix_model_view __unused;
+        fix16_matrix4_t *matrix_model_view;
         matrix_model_view = matrix_stack_top(
                 MATRIX_STACK_MODE_MODEL_VIEW)->ms_matrix;
 
@@ -1928,7 +1927,7 @@ model_polygon_project(const fix16_vector4_t *vb __unused, const uint32_t *ib __u
             &matrix_mvp);
 
         /* Get inverse matrix */
-        fix16_matrix4_t matrix_mv_inv __unused;
+        fix16_matrix4_t matrix_mv_inv;
         fix16_matrix4_inverse(matrix_model_view, &matrix_mv_inv);
 
         fix16_vector4_t view_forward;
@@ -1957,7 +1956,7 @@ model_polygon_project(const fix16_vector4_t *vb __unused, const uint32_t *ib __u
                 /* Vertex D */ vtx[3] = &vb[ib[idx + 3]];
 
                 /* Determine which to cull */
-                fix16_t dot __unused;
+                fix16_t dot;
                 dot = fix16_vector4_dot(&nb[idx >> 2], &view_forward_object);
 
                 if (dot < F16(0.0f)) {
@@ -1988,7 +1987,7 @@ ot_init(void)
         ot_primitive_pool_idx = 0;
 }
 
-void __unused
+static void __unused
 ot_primitive_add(const fix16_vector4_t *proj_vertex, uint16_t color)
 {
         struct ot_primitive *otp;
