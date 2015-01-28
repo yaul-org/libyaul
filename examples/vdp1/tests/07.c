@@ -24,6 +24,23 @@
 #include "common.h"
 #include "matrix_stack.h"
 
+#define PLANE_POLYGON_CNT 1
+
+static fix16_vector4_t __unused plane_vertices[] = {
+        FIX16_VERTEX4(-0.25f,  0.25f, -0.25f, 1.0f),
+        FIX16_VERTEX4( 0.25f,  0.25f, -0.25f, 1.0f),
+        FIX16_VERTEX4( 0.25f, -0.25f, -0.25f, 1.0f),
+        FIX16_VERTEX4(-0.25f, -0.25f, -0.25f, 1.0f),
+};
+
+static uint32_t __unused plane_indices[PLANE_POLYGON_CNT * 4] = {
+        0, 1, 2, 3
+};
+
+static fix16_vector4_t __unused plane_normals[PLANE_POLYGON_CNT] = {
+        FIX16_VERTEX4( 0.0f,  0.0f,  1.0f, 1.0f)
+};
+
 #define CUBE_POLYGON_CNT 6
 
 static fix16_vector4_t __unused cube_vertices[] = {
@@ -99,15 +116,6 @@ static fix16_vector4_t __unused cube_normals[CUBE_POLYGON_CNT] = {
         FIX16_VERTEX4( 1.0f,  0.0f,  0.0f, 1.0f),
         FIX16_VERTEX4( 0.0f,  1.0f,  0.0f, 1.0f),
         FIX16_VERTEX4( 0.0f, -1.0f,  0.0f, 1.0f)
-};
-
-static fix16_t __unused cube_cull_points[CUBE_POLYGON_CNT] = {
-        F16(0.0f),
-        F16(0.0f),
-        F16(0.0f),
-        F16(0.0f),
-        F16(0.0f),
-        F16(0.0f)
 };
 
 #define TEAPOT_POLYGON_CNT 514
