@@ -31,6 +31,7 @@ FETCH_FLAGS=""
 GPG="gpg"
 MAKE="make"
 MD5="md5sum"
+PATCH="patch"
 
 # Options
 # Only valid values are either 'yes' or 'no' -- anything else is
@@ -48,4 +49,4 @@ OPTION_ENABLE_GDB="yes"
 # 'yes': Download and build DDD for the sh-elf target
 #        Be aware dependencies not covered
 #  'no': Do not build
-OPTION_ENABLE_DDD="yes"
+OPTION_ENABLE_DDD="no"
