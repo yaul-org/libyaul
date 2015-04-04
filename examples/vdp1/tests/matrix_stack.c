@@ -258,14 +258,13 @@ matrix_stack_orthographic_project(fix16_t left, fix16_t right, fix16_t top,
         assert(near > F16(0.0f));
 #endif /* ASSERT */
 
+
         transform.frow[0][0] = fix16_div(F16(2.0f), fix16_sub(right, left));
-        transform.frow[0][3] = fix16_div(
-                -fix16_add(right, left), fix16_sub(right, left));
+        transform.frow[0][3] = fix16_div(-fix16_add(right, left), fix16_sub(right, left));
         transform.frow[1][1] = fix16_div(F16(2.0f), fix16_sub(top, bottom));
-        transform.frow[1][3] = fix16_div(
-                -fix16_add(top, bottom), fix16_sub(top, bottom));
+        transform.frow[1][3] = fix16_div(-fix16_add(top, bottom), fix16_sub(top, bottom));
         transform.frow[2][2] = fix16_div(F16(-2.0f), fix16_sub(far, near));
-        transform.frow[2][3] = fix16_add(-fix16_add(far, near), fix16_sub(far, near));
+        transform.frow[2][3] = fix16_div(-fix16_add(far, near), fix16_sub(far, near));
 
         fix16_matrix4_t matrix;
         fix16_matrix4_multiply(top_ms->ms_matrix, &transform, &matrix);
