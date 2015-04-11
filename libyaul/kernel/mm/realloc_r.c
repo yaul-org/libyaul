@@ -5,8 +5,8 @@
 #include <common.h>
 
 void *
-_realloc_r(struct _reent *r __unused, void *old __unused,
-    size_t new_len __unused)
+_realloc_r(struct _reent *r __unused, void *old,
+    size_t new_len)
 {
-        return NULL;
+        return realloc(old, new_len);
 }

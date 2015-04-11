@@ -3,6 +3,7 @@ SET(kernel_mm_SRC
   free_r.c
   malloc.c
   malloc_r.c
+  realloc.c
   realloc_r.c
   slob.c
 )

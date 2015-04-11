@@ -3,11 +3,13 @@
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
+ * Theo Berkau <cwx@cyberwarriorx.com>
  */
 
 #include <lib/memb.h>
 #include <sys/queue.h>
 
+#include <string.h>
 #include <inttypes.h>
 
 #include "slob.h"
@@ -50,6 +52,7 @@ TAILQ_HEAD(slob_page_list, slob_page);
 
 static struct slob_block *slob_block_alloc(struct slob_page *, int16_t);
 static int16_t slob_block_units(struct slob_block *);
+static int16_t slob_block_units_ptr(void *);
 static void slob_block_units_set(struct slob_block *, int16_t);
 
 static void slob_block_list_set(struct slob_block *, struct slob_block *,
@@ -129,6 +132,35 @@ slob_alloc(size_t size)
         }
 
         return block;
+}
+
+/*
+ * Change the size of the pre-allocated memory.
+ */
+void *
+slob_realloc(void *old, size_t new_len)
+{
+        void *result;
+        size_t real_len;
+        size_t new_real_len;
+
+        if (old == NULL)
+                return slob_alloc(new_len);
+
+        real_len = slob_block_units_ptr(old);
+        new_real_len = SLOB_BLOCK_UNITS(new_len) + 1;
+
+        if (new_real_len <= real_len)
+                return old;
+
+        result = slob_alloc(new_len);
+        if (result == NULL)
+                return NULL;
+
+        memcpy(result, old, (real_len - 1) * SLOB_BLOCK_UNIT);
+        slob_free(old);
+
+        return result;
 }
 
 /*
@@ -339,6 +371,18 @@ static int16_t
 slob_block_units(struct slob_block *sb)
 {
         return (sb->s.sb_bunits > 0) ? sb->s.sb_bunits : 1;
+}
+
+/*
+ * Given a pointer, return the the size of SB.
+ */
+static int16_t
+slob_block_units_ptr(void *addr)
+{
+        struct slob_block *sb;
+
+        sb = (struct slob_block *)addr - 1;
+        return slob_block_units(sb);
 }
 
 /*

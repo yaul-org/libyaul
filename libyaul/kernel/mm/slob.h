@@ -35,6 +35,7 @@
 
 void slob_init(void);
 void *slob_alloc(size_t);
+void *slob_realloc(void *, size_t);
 void slob_free(void *);
 
 #endif /* _SLOB_H_ */
