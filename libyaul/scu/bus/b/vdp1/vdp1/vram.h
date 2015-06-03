@@ -33,7 +33,7 @@ extern "C" {
 #define CLUT(x, y)              (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
             ((x) << 5) + ((y) << 1))
 #define GOURAUD(x, y)           (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
-            VDP1_CLUT_MEMORY_SIZE + ((x) << 4) + ((y) << 1))
+            VDP1_CLUT_MEMORY_SIZE + ((x) << 3) + ((y) << 1))
 #define CHAR(x)                 (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
             VDP1_CLUT_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE + ((x)))
 #define VDP1_FRAME_BUFFER(x)    (0x25C80000 + ((x)))
