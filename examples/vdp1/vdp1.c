@@ -35,8 +35,6 @@ TEST_DECLARE_PROTOTYPE(03);
 TEST_DECLARE_PROTOTYPE(04);
 TEST_DECLARE_PROTOTYPE(05);
 TEST_DECLARE_PROTOTYPE(06);
-TEST_DECLARE_PROTOTYPE(07);
-TEST_DECLARE_PROTOTYPE(08);
 
 static void vblank_in_handler(irq_mux_handle_t *);
 static void vblank_out_handler(irq_mux_handle_t *);
@@ -93,12 +91,6 @@ static struct test {
                 test_06_draw,
                 test_06_exit
         }, {
-                "3d",
-                test_07_init,
-                test_07_update,
-                test_07_draw,
-                test_07_exit
-        }, {
                 "framebuffer",
                 NULL,
                 NULL,
@@ -144,7 +136,7 @@ main(void)
                 assert(error >= 0);
         }
 
-        error = test_load("3d");
+        error = test_load("end-code");
         assert(error >= 0);
 
         while (true) {

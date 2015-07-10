@@ -5,7 +5,6 @@ OBJECTS+= root.o \
 	test.o \
 	tests/common.o \
 	tests/state_machine.o \
-	tests/matrix_stack.o \
 	tests/00.o \
 	tests/01.o \
 	tests/02.o \
@@ -13,7 +12,6 @@ OBJECTS+= root.o \
 	tests/04.o \
 	tests/05.o \
 	tests/06.o \
-	tests/07.o \
 	vdp1.o
 DEPENDS:= $(OBJECTS:.o=.d)
 
