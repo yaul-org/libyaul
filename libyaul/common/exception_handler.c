@@ -90,6 +90,9 @@ format(struct cpu_registers *regs, const char *exception_name)
             (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
             (uintptr_t)regs->pc);
 
+        /* Reset the VDP1 */
+        vdp1_init();
+
         /* Reset the VDP2 */
         vdp2_init();
         vdp2_scrn_back_screen_set(/* single_color = */ true,
