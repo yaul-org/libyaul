@@ -35,15 +35,9 @@ void init(void);
 
 void sleep(fix16_t);
 
-void *fs_open(const char *);
-void fs_close(void *);
-void fs_read(void *, void *);
-size_t fs_size(void *);
-
 extern struct cons cons;
 extern struct smpc_peripheral_digital digital_pad;
 extern uint32_t tick;
-extern uint32_t tick2;
 
 extern char *text;
 extern size_t text_len;

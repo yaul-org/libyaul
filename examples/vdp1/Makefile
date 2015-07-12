@@ -3,8 +3,9 @@ include ../common.mk
 PROJECT:= vdp1
 OBJECTS+= root.o \
 	test.o \
+	fs.o \
 	tests/common.o \
-	tests/state_machine.o \
+	state_machine.o \
 	tests/00.o \
 	tests/01.o \
 	tests/02.o \
