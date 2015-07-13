@@ -27,6 +27,8 @@ Usage
 ### Installation
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
 
+    git submodule init
+    git submodule update -f
     mkdir -p build
     cd build/
     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../Sega-Saturn-compiler-SH7604.cmake
