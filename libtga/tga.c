@@ -49,6 +49,12 @@ static int32_t true_color_image_fill(uint16_t *, uint16_t, size_t);
 int
 tga_read(tga_t *tga, const uint8_t *file, void *vram, uint16_t *cram)
 {
+#define TGA_IMAGE_ORIGIN_BOTTOM 0x00
+#define TGA_IMAGE_ORIGIN_TOP    0x20
+#define TGA_IMAGE_ORIGIN_LEFT   0x00
+#define TGA_IMAGE_ORIGIN_RIGHT  0x10
+#define TGA_IMAGE_ORIGIN_MASK   0x30
+
         const uint8_t *header;
         const uint8_t *image_buf;
 
@@ -58,6 +64,7 @@ tga_read(tga_t *tga, const uint8_t *file, void *vram, uint16_t *cram)
         uint8_t bytes_pp;
         uint16_t width;
         uint16_t height;
+        uint8_t origin;
 
         uint8_t have_cmap;
         uint8_t cmap_bpp;
@@ -77,6 +84,7 @@ tga_read(tga_t *tga, const uint8_t *file, void *vram, uint16_t *cram)
         bytes_pp = header[16] >> 3;
         width = READ_LITTLE_ENDIAN_16(header, 12);
         height = READ_LITTLE_ENDIAN_16(header, 14);
+        origin = header[17] & TGA_IMAGE_ORIGIN_MASK;
 
         have_cmap = header[1];
         cmap_offset = READ_LITTLE_ENDIAN_16(header, 3);
@@ -91,6 +99,12 @@ tga_read(tga_t *tga, const uint8_t *file, void *vram, uint16_t *cram)
          * pixels high. */
         if ((width == 0) || (height == 0) || (width > 512) || (height > 482)) {
                 return TGA_FILE_CORRUPTED;
+        }
+
+        /* Only support the origin being at the top-left */
+        if ((origin & TGA_IMAGE_ORIGIN_MASK) !=
+            (TGA_IMAGE_ORIGIN_TOP | TGA_IMAGE_ORIGIN_LEFT)) {
+                return TGA_FILE_NOT_SUPPORTED;
         }
 
         switch (image_type) {
