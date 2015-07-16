@@ -16,6 +16,7 @@
 
 #include "test.h"
 #include "common.h"
+#include "fs.h"
 
 static struct vdp1_cmdt_polygon *polygon = NULL;
 static struct vdp1_cmdt_sprite *sprite = NULL;

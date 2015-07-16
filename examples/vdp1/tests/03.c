@@ -16,6 +16,7 @@
 
 #include "test.h"
 #include "common.h"
+#include "fs.h"
 
 #include "state_machine.h"
 
