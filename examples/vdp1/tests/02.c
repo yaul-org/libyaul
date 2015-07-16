@@ -71,6 +71,14 @@ test_02_init(void)
                 status = tga_read(&tga, ptr, (void *)vram,
                     (uint16_t *)cram[mode_idx]);
                 assert(status == TGA_FILE_OK);
+                uint32_t amount;
+                amount = tga_image_decode(&tga, (void *)vram);
+                assert(amount > 0);
+                amount = tga_cmap_decode(&tga, (uint16_t *)cram[mode_idx]);
+                if ((tga.tga_type == TGA_IMAGE_TYPE_CMAP) ||
+                    (tga.tga_type == TGA_IMAGE_TYPE_RLE_CMAP)) {
+                        assert(amount > 0);
+                }
 
                 sprite[mode_idx].cs_char = vram;
 

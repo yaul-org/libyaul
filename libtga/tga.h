@@ -15,6 +15,8 @@ extern "C" {
 #define TGA_MEMORY_ERROR                4
 
 typedef struct {
+        const char *tga_file;
+
 #define TGA_IMAGE_TYPE_NONE             0
 #define TGA_IMAGE_TYPE_CMAP             1
 #define TGA_IMAGE_TYPE_TRUE_COLOR       2
@@ -25,14 +27,17 @@ typedef struct {
         uint8_t tga_type;
 
         uint8_t tga_cmap_bpp;
-        uint8_t tga_cmap_len;
+        uint16_t tga_cmap_len;
+        uint32_t tga_cmap_bytes;
 
         uint8_t tga_bpp;
         uint16_t tga_width;
         uint16_t tga_height;
 } tga_t __attribute__ ((aligned(4)));
 
-int tga_read(tga_t *, const uint8_t *, void *, uint16_t *);
+int tga_read(tga_t *, const uint8_t *);
+uint32_t tga_image_decode(const tga_t *, void *);
+uint32_t tga_cmap_decode(const tga_t *, uint16_t *);
 const char *tga_error_stringify(int);
 
 #ifdef __cplusplus

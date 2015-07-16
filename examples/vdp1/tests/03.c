@@ -186,10 +186,16 @@ test_03_init(void)
 
                 tga_t tga;
                 int status;
-                status = tga_read(&tga, ptr, (void *)vram_addr,
-                    (uint16_t *)cram[type_idx]);
+                status = tga_read(&tga, ptr);
                 assert(status == TGA_FILE_OK);
-
+                uint32_t amount;
+                amount = tga_image_decode(&tga, (void *)vram_addr);
+                assert(amount > 0);
+                amount = tga_cmap_decode(&tga, (uint16_t *)cram[type_idx]);
+                if ((tga.tga_type == TGA_IMAGE_TYPE_CMAP) ||
+                    (tga.tga_type == TGA_IMAGE_TYPE_RLE_CMAP)) {
+                        assert(amount > 0);
+                }
                 vram[type_idx] = vram_addr;
 
                 vram_addr += file_size;

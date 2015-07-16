@@ -362,8 +362,6 @@ menu_init(void)
 
                 void *fh;
                 fh = fs_open(button->button_texture_path);
-                size_t file_size;
-                file_size = common_round_pow2(fs_size(fh));
 
                 uint8_t *data_ptr;
                 data_ptr = (uint8_t *)0x00200000;
@@ -373,9 +371,7 @@ menu_init(void)
 
                 tga_t tga;
                 int status;
-                void *data_vram_ptr;
-                data_vram_ptr = (void *)(data_ptr + (256 * 2) + file_size);
-                status = tga_read(&tga, data_ptr, data_vram_ptr, NULL);
+                status = tga_read(&tga, data_ptr);
                 assert(status == TGA_FILE_OK);
 
                 uint16_t *vram_addr;
@@ -383,7 +379,9 @@ menu_init(void)
                 vram_bytes = common_round_pow2(
                         tga.tga_width * tga.tga_height * (tga.tga_bpp / 8));
                 vram_addr = (uint16_t *)CHAR(button_idx * vram_bytes);
-                memcpy(vram_addr, data_vram_ptr, vram_bytes);
+                uint32_t amount;
+                amount = tga_image_decode(&tga, (void *)vram_addr);
+                assert(amount > 0);
 
                 struct vdp1_cmdt_sprite *sprite;
                 sprite = (struct vdp1_cmdt_sprite *)malloc(

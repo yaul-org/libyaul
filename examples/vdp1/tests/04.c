@@ -46,9 +46,16 @@ test_04_init(void)
 
         tga_t tga;
         int status;
-        status = tga_read(&tga, ptr, (void *)CHAR(0),
-            (uint16_t *)CRAM_OFFSET(0, 1, 0));
+        status = tga_read(&tga, ptr);
         assert(status == TGA_FILE_OK);
+        uint32_t amount;
+        amount = tga_image_decode(&tga, (void *)CHAR(0));
+        assert(amount > 0);
+        amount = tga_cmap_decode(&tga, (uint16_t *)CRAM_OFFSET(0, 1, 0));
+        if ((tga.tga_type == TGA_IMAGE_TYPE_CMAP) ||
+            (tga.tga_type == TGA_IMAGE_TYPE_RLE_CMAP)) {
+                assert(amount > 0);
+        }
 
         angle = 0;
 
