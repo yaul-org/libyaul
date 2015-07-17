@@ -10,13 +10,6 @@ About
 ### License
   To see the full text of the license, see the `LICENSE` file.
 
-Rebranding/forking
-===
-
-If you're interested into further porting/adapting/whatever, please don't fork off. I hate it, and so does everyone else.
-
-Let's try to keep everything under a single project.
-
 Usage
 =====
 
@@ -42,6 +35,12 @@ Want to contribute? Great! I could always use some extra help!
 ### Found a bug or do you have a suggestion?
 
 If so, I'd love to hear it. Create an issue [here][1].
+
+### Rebranding/forking
+
+If you're interested into further porting/adapting/whatever, please don't fork off. I hate it, and so does everyone else.
+
+Let's try to keep everything under a single project.
 
 [1]: https://github.com/ijacquez/libyaul/issues
 [2]: http://www.youtube.com/mrkotfw
