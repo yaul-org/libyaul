@@ -347,6 +347,42 @@ state_00_init(struct state_context *state_context)
                 sprite->cs_width = button->button_width;
                 sprite->cs_height = button->button_height;
         }
+
+        uint16_t *nbg0_planes[4] = {
+                /* VRAM B0 */
+                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
+                /* VRAM B0 */
+                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
+                /* VRAM B0 */
+                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
+                /* VRAM B0 */
+                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
+        };
+        /* CRAM */
+        uint32_t *nbg0_color_palette = (uint32_t *)CRAM_NBG0_OFFSET(0, 63, 0);
+        /* VRAM B0 */
+        uint32_t *nbg0_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
+
+        struct scrn_cell_format nbg0_format;
+
+        nbg0_format.scf_scroll_screen = SCRN_NBG0;
+        nbg0_format.scf_cc_count = SCRN_CCC_PALETTE_16;
+        nbg0_format.scf_character_size = 2 * 2;
+        nbg0_format.scf_pnd_size = 1; /* 1 word */
+        nbg0_format.scf_auxiliary_mode = 1;
+        nbg0_format.scf_cp_table = (uint32_t)nbg0_character;
+        nbg0_format.scf_color_palette = (uint32_t)nbg0_color_palette;
+        nbg0_format.scf_plane_size = 1 * 1;
+        nbg0_format.scf_map.plane_a = (uint32_t)nbg0_planes[0];
+        nbg0_format.scf_map.plane_b = (uint32_t)nbg0_planes[1];
+        nbg0_format.scf_map.plane_c = (uint32_t)nbg0_planes[2];
+        nbg0_format.scf_map.plane_d = (uint32_t)nbg0_planes[3];
+
+        vdp2_tvmd_display_clear();
+        vdp2_scrn_cell_format_set(&nbg0_format);
+        vdp2_priority_spn_set(SCRN_NBG0, 1);
+        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
+        vdp2_tvmd_display_set();
 }
 
 static void
@@ -403,6 +439,7 @@ state_00_draw(struct state_context *state_context __unused)
 static void
 state_00_exit(struct state_context *state_context __unused)
 {
+        vdp2_scrn_display_unset(SCRN_NBG0);
 }
 
 static void
