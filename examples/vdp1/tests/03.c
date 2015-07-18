@@ -14,11 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
-#include "fs.h"
-
-#include "state_machine.h"
+#include "../common.h"
+#include "../fs.h"
+#include "../state_machine.h"
+#include "../test.h"
 
 #define STATE_SHOW_LOOP                 0
 #define STATE_SHOW_SCALED_SPRITE        1
@@ -151,7 +150,7 @@ static void state_01_draw(struct state_context *);
 void
 test_03_init(void)
 {
-        init();
+        test_init();
 
         sprite = (struct vdp1_cmdt_sprite *)malloc(
                 2 * sizeof(struct vdp1_cmdt_sprite));
@@ -208,12 +207,14 @@ test_03_init(void)
             state_00_init,
             state_00_update,
             state_00_draw,
+            NULL,
             NULL);
         state_machine_add_state(&state_machine, "show-zoomed-sprite",
             STATE_SHOW_ZOOMED_SPRITE,
             state_01_init,
             state_01_update,
             state_01_draw,
+            NULL,
             NULL);
 
         state_machine_transition(&state_machine, STATE_SHOW_SCALED_SPRITE);
@@ -234,8 +235,13 @@ test_03_draw(void)
 void
 test_03_exit(void)
 {
-        free(sprite);
-        free(polygon);
+        if (sprite != NULL) {
+                free(sprite);
+        }
+
+        if (polygon != NULL) {
+                free(polygon);
+        }
 }
 
 static void
@@ -252,7 +258,7 @@ state_00_update(struct state_context *state_context __unused)
 {
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
-                        return;
+                        test_exit();
                 } else if (digital_pad.held.button.l) {
                         state_machine_transition(&state_machine,
                             STATE_SHOW_ZOOMED_SPRITE);

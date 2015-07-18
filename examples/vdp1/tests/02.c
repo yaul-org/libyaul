@@ -14,16 +14,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
-#include "fs.h"
+#include "../test.h"
+#include "../common.h"
+#include "../fs.h"
 
 static struct vdp1_cmdt_sprite *sprite = NULL;
 
 /* File handles */
-static void *file_handle[32];
+static void *file_handle[32] __unused;
 
-static uint32_t cram[6] = {
+static uint32_t cram[6] __unused = {
         CRAM_OFFSET(0,  0, 0),
         CLUT(1, 0),
         CRAM_OFFSET(0,  4, 0),
@@ -35,7 +35,7 @@ static uint32_t cram[6] = {
 void
 test_02_init(void)
 {
-        init();
+        test_init();
 
         sprite = (struct vdp1_cmdt_sprite *)malloc(
                 5 * sizeof(struct vdp1_cmdt_sprite));
@@ -68,8 +68,7 @@ test_02_init(void)
 
                 tga_t tga;
                 int status;
-                status = tga_read(&tga, ptr, (void *)vram,
-                    (uint16_t *)cram[mode_idx]);
+                status = tga_read(&tga, ptr);
                 assert(status == TGA_FILE_OK);
                 uint32_t amount;
                 amount = tga_image_decode(&tga, (void *)vram);
@@ -91,7 +90,7 @@ test_02_update(void)
 {
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
-                        return;
+                        test_exit();
                 }
         }
 
@@ -175,5 +174,7 @@ test_02_draw(void)
 void
 test_02_exit(void)
 {
-        free(sprite);
+        if (sprite != NULL) {
+                free(sprite);
+        }
 }

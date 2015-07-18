@@ -1,22 +1,22 @@
 include ../common.mk
 
 PROJECT:= vdp1
-OBJECTS+= root.o \
+OBJECTS+= \
+	root.o \
 	test.o \
 	fs.o \
-	tests/common.o \
 	state_machine.o \
+	state.o \
+	globals.o \
+	vdp1.o \
 	tests/00.o \
 	tests/01.o \
 	tests/02.o \
 	tests/03.o \
 	tests/04.o \
 	tests/05.o \
-	tests/06.o \
-	vdp1.o
+	tests/06.o
 DEPENDS:= $(OBJECTS:.o=.d)
-
-CFLAGS+= -I.
 
 .PHONY: romdisk example clean
 

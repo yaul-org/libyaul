@@ -29,7 +29,8 @@ state_machine_add_state(struct state_machine *state_machine,
     void (*state_init)(struct state_context *),
     void (*state_update)(struct state_context *),
     void (*state_draw)(struct state_context *),
-    void (*state_exit)(struct state_context *))
+    void (*state_exit)(struct state_context *),
+    void *data)
 {
         struct state *state;
         state = (struct state *)malloc(sizeof(struct state));
@@ -44,6 +45,7 @@ state_machine_add_state(struct state_machine *state_machine,
 
         /* Initialize state context */
         state->state_context.sc_frames = 0;
+        state->state_context.sc_data = data;
 
         TAILQ_INSERT_TAIL(&state_machine->sm_states, state, entries);
 }

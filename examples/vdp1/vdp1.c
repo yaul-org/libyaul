@@ -13,21 +13,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
 #include "common.h"
 #include "fs.h"
-#include "state_machine.h"
+#include "globals.h"
+#include "state.h"
+#include "test.h"
 
 #define SCREEN_WIDTH    320
 #define SCREEN_HEIGHT   224
+
+extern uint8_t root_romdisk[];
+
+static void vblank_in_handler(irq_mux_handle_t *);
+static void vblank_out_handler(irq_mux_handle_t *);
+
+static void hardware_init(void);
+
+
+#define TESTS_CNT 9
 
 #define TEST_DECLARE_PROTOTYPE(n)                                              \
     void CC_CONCAT(CC_CONCAT(test_, n),_init(void));                           \
     void CC_CONCAT(CC_CONCAT(test_, n),_update(void));                         \
     void CC_CONCAT(CC_CONCAT(test_, n),_draw(void));                           \
     void CC_CONCAT(CC_CONCAT(test_, n),_exit(void))
-
-extern uint8_t root_romdisk[];
 
 TEST_DECLARE_PROTOTYPE(00);
 TEST_DECLARE_PROTOTYPE(01);
@@ -36,36 +45,16 @@ TEST_DECLARE_PROTOTYPE(03);
 TEST_DECLARE_PROTOTYPE(04);
 TEST_DECLARE_PROTOTYPE(05);
 TEST_DECLARE_PROTOTYPE(06);
-
-/* Globals */
-struct cons cons;
-struct smpc_peripheral_digital digital_pad;
-uint32_t tick = 0;
-
-static void vblank_in_handler(irq_mux_handle_t *);
-static void vblank_out_handler(irq_mux_handle_t *);
-
-static void hardware_init(void);
-static void tests_init(void);
-static void menu_init(void);
-static void menu_update(void);
-static void menu_draw(void);
-
-static void state_00_init(struct state_context *);
-static void state_00_update(struct state_context *);
-static void state_00_draw(struct state_context *);
-
-static void state_01_init(struct state_context *);
-static void state_01_update(struct state_context *);
-static void state_01_draw(struct state_context *);
+TEST_DECLARE_PROTOTYPE(07);
+TEST_DECLARE_PROTOTYPE(08);
 
 static struct test {
-        char *test_name;
-        void (*test_init)(void);
-        void (*test_update)(void);
-        void (*test_draw)(void);
-        void (*test_exit)(void);
-} tests[] = {
+        char *name;
+        void (*init)(void);
+        void (*update)(void);
+        void (*draw)(void);
+        void (*exit)(void);
+} tests[TESTS_CNT] = {
         {
                 "polygon",
                 test_00_init,
@@ -120,14 +109,9 @@ static struct test {
                 NULL,
                 NULL,
                 NULL
-        }, {
-                '\0',
-                NULL,
-                NULL,
-                NULL,
-                NULL
         }
 };
+
 
 #define MENU_BUTTONS_CNT 9
 
@@ -135,130 +119,62 @@ static struct menu_button {
         const char *button_texture_path;
         uint16_t button_width;
         uint16_t button_height;
-        int32_t button_action;
-
-        struct {
-                struct vdp1_cmdt_sprite *sprite;
-                void *vram_addr;
-                int16_t x;
-                int16_t y;
-        } button_data;
 } menu_buttons[MENU_BUTTONS_CNT] = {
         {
                 "/BUTTONS/POLYGON.TGA",
                 128,
-                32,
-                0,
-                {
-                        NULL,
-                        NULL,
-                        16,
-                        16
-                }
+                32
         }, {
                 "/BUTTONS/POLYLINE.TGA",
                 128,
-                32,
-                1,
-                {
-                        NULL,
-                        NULL,
-                        16,
-                        16 + 40
-                }
+                32
         }, {
                 "/BUTTONS/N_SPRITE.TGA",
                 128,
-                32,
-                2,
-                {
-                        NULL,
-                        NULL,
-                        16,
-                        16 + 40 + 40
-                }
-
+                32
         }, {
                 "/BUTTONS/S_SPRITE.TGA",
                 128,
-                32,
-                3,
-                {
-                        NULL,
-                        NULL,
-                        16,
-                        16 + 40 + 40 + 40
-                }
-
+                32
         }, {
                 "/BUTTONS/D_SPRITE.TGA",
                 128,
-                32,
-                4,
-                {
-                        NULL,
-                        NULL,
-                        16 + 100,
-                        16
-                }
-
+                32
         }, {
                 "/BUTTONS/LINE.TGA",
                 128,
-                32,
-                5,
-                {
-                        NULL,
-                        NULL,
-                        16 + 100,
-                        16 + 40
-                }
-
+                32
         }, {
                 "/BUTTONS/END_CODE.TGA",
                 128,
-                32,
-                6,
-                {
-                        NULL,
-                        NULL,
-                        16 + 100,
-                        16 + 40 + 40
-                }
-
+                32
         }, {
                 "/BUTTONS/FRAMEBUFFER.TGA",
                 128,
-                32,
-                7,
-                {
-                        NULL,
-                        NULL,
-                        16 + 100,
-                        16 + 40 + 40 + 40
-                }
-
+                32
         }, {
                 "/BUTTONS/RESOLUTION.TGA",
                 128,
-                32,
-                8,
-                {
-                        NULL,
-                        NULL,
-                        16 + 200,
-                        16
-                }
+                32
         }
 };
 
-static struct test *current_test = NULL;
-static int32_t current_button_idx = 0;
 
-#define STATE_VDP1_MENU         0
-#define STATE_VDP1_TESTING      1
+static struct state_data {
+        int32_t current_test_idx;
+        int32_t last_test_idx;
+        int32_t current_button_idx;
+        struct vdp1_cmdt_sprite button_sprites[MENU_BUTTONS_CNT];
+} state_data;
 
-static struct state_machine state_machine;
+static void state_00_init(struct state_context *);
+static void state_00_update(struct state_context *);
+static void state_00_draw(struct state_context *);
+static void state_00_exit(struct state_context *);
+
+static void state_01_init(struct state_context *);
+static void state_01_update(struct state_context *);
+static void state_01_draw(struct state_context *);
 
 int
 main(void)
@@ -267,28 +183,28 @@ main(void)
         fs_init();
         cons_init(&cons, CONS_DRIVER_VDP2);
 
-        tests_init();
-
-        state_machine_init(&state_machine);
-        state_machine_add_state(&state_machine, "menu",
+        state_machine_init(&state_vdp1);
+        state_machine_add_state(&state_vdp1, "menu",
             STATE_VDP1_MENU,
             state_00_init,
             state_00_update,
             state_00_draw,
-            NULL);
-        state_machine_add_state(&state_machine, "testing",
+            state_00_exit,
+            &state_data);
+        state_machine_add_state(&state_vdp1, "testing",
             STATE_VDP1_TESTING,
             state_01_init,
             state_01_update,
             state_01_draw,
-            NULL);
-        state_machine_transition(&state_machine, STATE_VDP1_MENU);
+            NULL,
+            &state_data);
+        state_machine_transition(&state_vdp1, STATE_VDP1_MENU);
 
         while (true) {
                 vdp2_tvmd_vblank_out_wait();
-                state_machine_handler_update(&state_machine);
+                state_machine_handler_update(&state_vdp1);
                 vdp2_tvmd_vblank_in_wait();
-                state_machine_handler_draw(&state_machine);
+                state_machine_handler_draw(&state_vdp1);
         }
 
         return 0;
@@ -331,30 +247,63 @@ hardware_init(void)
 }
 
 static void
-tests_init(void)
+vblank_in_handler(irq_mux_handle_t *irq_mux __unused)
 {
-        test_init();
+        smpc_peripheral_digital_port(1, &digital_pad);
+}
 
-        int error;
-
-        uint32_t test_idx;
-        for (test_idx = 0; ; test_idx++) {
-                struct test *test;
-                test = &tests[test_idx];
-
-                if (test->test_name == '\0') {
-                        break;
-                }
-
-                error = test_register(test->test_name, test->test_init,
-                    test->test_update, test->test_draw, test->test_exit);
-                assert(error >= 0);
+static void
+vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
+{
+        if ((vdp2_tvmd_vcount_get()) == 0) {
+                tick = (tick & 0xFFFFFFFF) + 1;
         }
 }
 
 static void
-menu_init(void)
+state_00_init(struct state_context *state_context)
 {
+        static struct {
+                int16_t x;
+                int16_t y;
+        } button_positions[MENU_BUTTONS_CNT] = {
+                {
+                        16,
+                        16
+                }, {
+                        16,
+                        16 + 40
+                }, {
+                        16,
+                        16 + 40 + 40
+                }, {
+                        16,
+                        16 + 40 + 40 + 40
+                }, {
+                        16 + 100,
+                        16
+                }, {
+                        16 + 100,
+                        16 + 40
+                }, {
+                        16 + 100,
+                        16 + 40 + 40
+                }, {
+                        16 + 100,
+                        16 + 40 + 40 + 40
+                }, {
+                        16 + 200,
+                        16
+                }
+        };
+
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
+
+        state_data->current_button_idx = 0;
+        state_data->current_test_idx = -1;
+        state_data->last_test_idx = -1;
+
         uint32_t button_idx;
         for (button_idx = 0; button_idx < MENU_BUTTONS_CNT; button_idx++) {
                 struct menu_button *button;
@@ -384,9 +333,7 @@ menu_init(void)
                 assert(amount > 0);
 
                 struct vdp1_cmdt_sprite *sprite;
-                sprite = (struct vdp1_cmdt_sprite *)malloc(
-                        sizeof(struct vdp1_cmdt_sprite));
-                assert(sprite != NULL);
+                sprite = &state_data->button_sprites[button_idx];
 
                 sprite->cs_type = CMDT_TYPE_NORMAL_SPRITE;
                 sprite->cs_mode.cc_mode = 2;
@@ -395,35 +342,32 @@ menu_init(void)
                 sprite->cs_mode.transparent_pixel = true;
                 sprite->cs_mode.high_speed_shrink = false;
                 sprite->cs_char = (uint32_t)vram_addr;
-                sprite->cs_position.x = button->button_data.x;
-                sprite->cs_position.y = button->button_data.y;
+                sprite->cs_position.x = button_positions[button_idx].x;
+                sprite->cs_position.y = button_positions[button_idx].y;
                 sprite->cs_width = button->button_width;
                 sprite->cs_height = button->button_height;
-
-                button->button_data.sprite = sprite;
-                button->button_data.vram_addr = vram_addr;
         }
 }
 
 static void
-menu_update(void)
+state_00_update(struct state_context *state_context)
 {
-        if (digital_pad.connected == 1) {
-                if (digital_pad.held.button.start) {
-                        return;
-                }
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
 
+        if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.down) {
-                        if (current_button_idx < (MENU_BUTTONS_CNT - 1)) {
-                                current_button_idx++;
+                        if (state_data->current_button_idx < (MENU_BUTTONS_CNT - 1)) {
+                                state_data->current_button_idx++;
                         }
                 } else if (digital_pad.held.button.up) {
-                        if (current_button_idx > 0) {
-                                current_button_idx--;
+                        if (state_data->current_button_idx > 0) {
+                                state_data->current_button_idx--;
                         }
                 } else if (digital_pad.held.button.a || digital_pad.held.button.c) {
-                        current_test = &tests[current_button_idx];
-                        state_machine_transition(&state_machine,
+                        state_data->last_test_idx = state_data->current_test_idx;
+                        state_data->current_test_idx = state_data->current_button_idx;
+                        state_machine_transition(&state_vdp1,
                             STATE_VDP1_TESTING);
                 }
         }
@@ -435,13 +379,10 @@ menu_update(void)
 
                 uint32_t button_idx;
                 for (button_idx = 0; button_idx < MENU_BUTTONS_CNT; button_idx++) {
-                        struct menu_button *button;
-                        button = &menu_buttons[button_idx];
-
                         struct vdp1_cmdt_sprite *sprite;
-                        sprite = button->button_data.sprite;
+                        sprite = &state_data->button_sprites[button_idx];
                         sprite->cs_mode.cc_mode = 2;
-                        if (button_idx == (uint32_t)current_button_idx) {
+                        if (button_idx == (uint32_t)state_data->current_button_idx) {
                                 sprite->cs_mode.cc_mode = 0;
                         }
 
@@ -454,59 +395,57 @@ menu_update(void)
 }
 
 static void
-menu_draw(void)
+state_00_draw(struct state_context *state_context __unused)
 {
         vdp1_cmdt_list_commit();
 }
 
 static void
-vblank_in_handler(irq_mux_handle_t *irq_mux __unused)
+state_00_exit(struct state_context *state_context __unused)
 {
-        smpc_peripheral_digital_port(1, &digital_pad);
 }
 
 static void
-vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
+state_01_init(struct state_context *state_context)
 {
-        if ((vdp2_tvmd_vcount_get()) == 0) {
-                tick = (tick & 0xFFFFFFFF) + 1;
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
+
+        struct test *current_test;
+        current_test = &tests[state_data->current_test_idx];
+
+        struct test *last_test;
+        last_test = (state_data->last_test_idx >= 0)
+            ? &tests[state_data->last_test_idx]
+            : NULL;
+
+        if (last_test != NULL) {
+                last_test->exit();
         }
+
+        current_test->init();
 }
 
 static void
-state_00_init(struct state_context *state_context __unused)
+state_01_update(struct state_context *state_context)
 {
-        menu_init();
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
+
+        struct test *current_test;
+        current_test = &tests[state_data->current_test_idx];
+
+        current_test->update();
 }
 
 static void
-state_00_update(struct state_context *state_context __unused)
+state_01_draw(struct state_context *state_context)
 {
-        menu_update();
-}
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
 
-static void
-state_00_draw(struct state_context *state_context __unused)
-{
-        menu_draw();
-}
+        struct test *current_test;
+        current_test = &tests[state_data->current_test_idx];
 
-static void
-state_01_init(struct state_context *state_context __unused)
-{
-       int error;
-       error = test_load(current_test->test_name);
-       assert(error >= 0);
-}
-
-static void
-state_01_update(struct state_context *state_context __unused)
-{
-        test_update();
-}
-
-static void
-state_01_draw(struct state_context *state_context __unused)
-{
-        test_draw();
+        current_test->draw();
 }

@@ -8,13 +8,20 @@
 #ifndef TEST_H
 #define TEST_H
 
-void test_nop(void);
-void test_init(void);
-int test_register(const char *, void (*)(void), void (*)(void), void (*)(void), void (*)(void));
-int test_load(const char *);
+#include <fixmath.h>
 
-extern void (*test_update)(void);
-extern void (*test_draw)(void);
-extern void (*test_exit)(void);
+#include "globals.h"
+
+extern int32_t lut_cos[512];
+extern int32_t lut_sin[512];
+
+extern char *text;
+extern size_t text_len;
+
+void test_init(void);
+void test_exit(void);
+
+/* Functions for tests */
+void sleep(fix16_t);
 
 #endif /* !TEST_H */

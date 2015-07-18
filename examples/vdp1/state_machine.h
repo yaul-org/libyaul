@@ -17,6 +17,7 @@ TAILQ_HEAD(states, state);
 
 struct state_context {
         uint32_t sc_frames;
+        void *sc_data;
 };
 
 struct state {
@@ -50,6 +51,7 @@ void state_machine_add_state(struct state_machine *, const char *, uint32_t,
     void (*)(struct state_context *),
     void (*)(struct state_context *),
     void (*)(struct state_context *),
-    void (*)(struct state_context *));
+    void (*)(struct state_context *),
+    void *);
 
 #endif /* !STATE_MACHINE_H */

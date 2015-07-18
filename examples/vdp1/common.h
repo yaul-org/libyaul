@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_H_
+#define COMMON_H_
 
 #define RGB888_TO_RGB555(r, g, b) (0x8000 | (((b) >> 3) << 10) |               \
     (((g) >> 3) << 5) | ((r) >> 3))
@@ -30,19 +30,5 @@
 
 #define SCREEN_WIDTH    320
 #define SCREEN_HEIGHT   224
-
-void init(void);
-
-void sleep(fix16_t);
-
-extern struct cons cons;
-extern struct smpc_peripheral_digital digital_pad;
-extern uint32_t tick;
-
-extern char *text;
-extern size_t text_len;
-
-extern int32_t lut_cos[];
-extern int32_t lut_sin[];
 
 #endif /* !COMMON_H */

@@ -14,15 +14,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
+#include "../test.h"
+#include "../common.h"
 
 static struct vdp1_cmdt_line *line = NULL;
 
 void
 test_05_init(void)
 {
-        init();
+        test_init();
 
         line = (struct vdp1_cmdt_line *)malloc(
                 sizeof(struct vdp1_cmdt_line));
@@ -34,6 +34,12 @@ test_05_init(void)
 void
 test_05_update(void)
 {
+        if (digital_pad.connected == 1) {
+                if (digital_pad.held.button.start) {
+                        test_exit();
+                }
+        }
+
         line[0].cl_color = RGB888_TO_RGB555(255, 255,   0);
         line[0].cl_mode.transparent_pixel = true;
         line[0].cl_mode.end_code = true;
@@ -60,5 +66,7 @@ test_05_draw(void)
 void
 test_05_exit(void)
 {
-        free(line);
+        if (line != NULL) {
+                free(line);
+        }
 }

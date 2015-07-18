@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
+#include "../test.h"
+#include "../common.h"
 
 static struct vdp1_cmdt_polygon *polygon = NULL;
 static uint32_t angle = 0;
@@ -23,8 +23,6 @@ static uint32_t angle = 0;
 void
 test_00_init(void)
 {
-        init();
-
         angle = 0;
 
         polygon = (struct vdp1_cmdt_polygon *)malloc(
@@ -37,7 +35,7 @@ test_00_update(void)
 {
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
-                        return;
+                        test_exit();
                 }
         }
 

@@ -5,94 +5,91 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#define FIXMATH_NO_OVERFLOW 1
+#define FIXMATH_NO_ROUNDING 1
+#include <fixmath.h>
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
-
-#include <sys/queue.h>
 
 #include "test.h"
+#include "state.h"
 
-void (*test_update)(void) = test_nop;
-void (*test_draw)(void) = test_nop;
-void (*test_exit)(void) = test_nop;
+int32_t lut_cos[512];
+int32_t lut_sin[512];
 
-TAILQ_HEAD(tests, test);
-
-struct test {
-        const char *name;
-        void (*init)(void);
-        void (*update)(void);
-        void (*draw)(void);
-        void (*exit)(void);
-
-        TAILQ_ENTRY(test) entries;
-};
-
-static struct tests tests;
-static bool initialized = false;
+char *text = NULL;
+size_t text_len = 0;
 
 void
 test_init(void)
 {
-        TAILQ_INIT(&tests);
+        static bool initialized = false;
 
-        test_update = test_nop;
-        test_draw = test_nop;
-        test_exit = test_nop;
-
+        if (initialized) {
+                return;
+        }
         initialized = true;
-}
 
-int
-test_register(const char *name, void (*init)(void), void (*update)(void),
-    void (*draw)(void), void (*exit)(void))
-{
-        assert(initialized);
+        fix16_t brad_const;
+        brad_const = fix16_from_float(360.0f / 512.0f);
 
-        struct test *test;
-        test = (struct test *)malloc(sizeof(struct test));
-        assert(test != NULL);
+        /* Build a sine wave table */
+        uint32_t angle_idx;
+        for (angle_idx = 0; angle_idx < 512; angle_idx++) {
+                fix16_t angle_deg;
+                angle_deg = fix16_from_int((int)angle_idx);
 
-        test->name = name;
-        test->init = init;
-        test->update = update;
-        test->draw = draw;
-        test->exit = exit;
+                fix16_t angle_brad;
+                angle_brad = fix16_mul(angle_deg, brad_const);
 
-        TAILQ_INSERT_TAIL(&tests, test, entries);
+                /*
+                 * angle_brad = angle * (360.0 / 512.0)
+                 * angle_rad = (angle_brad * pi) / 180.0 */
+                fix16_t angle_rad;
+                angle_rad = fix16_div(fix16_mul(angle_brad, fix16_pi),
+                    fix16_from_int(180));
 
-        return 0;
-}
+                lut_sin[angle_idx] = fix16_to_int(
+                        fix16_mul(fix16_sin(angle_rad), fix16_from_int(4096)));
+                lut_cos[angle_idx] = fix16_to_int(
+                        fix16_mul(fix16_cos(angle_rad), fix16_from_int(4096)));
 
-int
-test_load(const char *name)
-{
-        assert(initialized);
+#ifdef DEBUG
+                fix16_to_str(angle_rad, angle_str, 7);
+                (void)sprintf(str, "Deg. %3i - %s\n", (int)angle_idx,
+                    angle_str);
 
-        struct test *test;
-        TAILQ_FOREACH (test, &tests, entries) {
-                if ((strcmp(test->name, name)) == 0) {
-                        test_exit();
-
-                        test->init();
-
-                        test_update = test->update;
-                        test_draw = test->draw;
-                        test_exit = test->exit;
-                        return 0;
+                cons_write(&cons, str);
+                if (((angle_idx + 1) % 28) == 0) {
+                        cons_write(&cons, "[H[2J");
                 }
+#endif /* DEBUG */
         }
 
-        return -1;
+        text_len = common_round_pow2(CONS_COLS * CONS_ROWS);
+        text = (char *)malloc(text_len);
+        assert(text != NULL);
+        memset(text, '\0', text_len);
 }
 
 void
-test_nop(void)
+test_exit(void)
 {
-        assert(initialized);
+        state_machine_transition(&state_vdp1, STATE_VDP1_MENU);
+}
 
-        /* Do nothing */
+void
+sleep(fix16_t seconds)
+{
+        uint16_t frames;
+        frames = fix16_to_int(fix16_mul(fix16_from_int(60), seconds));
+
+        uint16_t t;
+        for (t = 0; t < frames; t++) {
+                vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
+        }
 }

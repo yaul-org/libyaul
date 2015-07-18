@@ -14,9 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
-#include "fs.h"
+#include "../test.h"
+#include "../common.h"
+#include "../fs.h"
 
 static struct vdp1_cmdt_polygon *polygon = NULL;
 static struct vdp1_cmdt_sprite *sprite = NULL;
@@ -33,7 +33,7 @@ static uint32_t vram[2];
 void
 test_06_init(void)
 {
-        init();
+        test_init();
 
         sprite = (struct vdp1_cmdt_sprite *)malloc(
                 5 * sizeof(struct vdp1_cmdt_sprite));
@@ -89,6 +89,12 @@ test_06_init(void)
 void
 test_06_update(void)
 {
+        if (digital_pad.connected == 1) {
+                if (digital_pad.held.button.start) {
+                        test_exit();
+                }
+        }
+
         polygon[0].cp_color = RGB888_TO_RGB555(255, 255,   0);
         polygon[0].cp_mode.transparent_pixel = true;
         polygon[0].cp_mode.end_code = true;
@@ -187,5 +193,7 @@ test_06_draw(void)
 void
 test_06_exit(void)
 {
-        free(sprite);
+        if (sprite != NULL) {
+                free(sprite);
+        }
 }

@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
+#include "../test.h"
+#include "../common.h"
 
 static struct vdp1_cmdt_polyline *polyline = NULL;
 static int angle = 0;
@@ -23,7 +23,7 @@ static int angle = 0;
 void
 test_01_init(void)
 {
-        init();
+        test_init();
 
         angle = 0;
 
@@ -37,7 +37,7 @@ test_01_update(void)
 {
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
-                        return;
+                        test_exit();
                 }
         }
 
@@ -59,10 +59,6 @@ test_01_update(void)
         polyline[0].cl_vertex.d.x = -24 + x;
         polyline[0].cl_vertex.d.y = -24 + y;
 
-        (void)sprintf(text, "[H[2Jx = %3i\ny = %3i\n",
-            (int)x, (int)y);
-        cons_buffer(&cons, text);
-
         angle++;
 
         vdp1_cmdt_list_begin(0); {
@@ -75,15 +71,13 @@ test_01_update(void)
 void
 test_01_draw(void)
 {
-        cons_flush(&cons);
-
         vdp1_cmdt_list_commit();
 }
 
 void
 test_01_exit(void)
 {
-        free(polyline);
-
-        cons_write(&cons, "[H[2J");
+        if (polyline != NULL) {
+                free(polyline);
+        }
 }

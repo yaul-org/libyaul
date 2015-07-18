@@ -14,9 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "common.h"
-#include "fs.h"
+#include "../test.h"
+#include "../common.h"
+#include "../fs.h"
 
 static struct vdp1_cmdt_sprite *sprite;
 
@@ -29,7 +29,7 @@ static void rotate_z(int16_vector2_t *, int16_vector2_t *);
 void
 test_04_init(void)
 {
-        init();
+        test_init();
 
         sprite = (struct vdp1_cmdt_sprite *)malloc(
                 sizeof(struct vdp1_cmdt_sprite));
@@ -75,6 +75,12 @@ test_04_init(void)
 void
 test_04_update(void)
 {
+        if (digital_pad.connected == 1) {
+                if (digital_pad.held.button.start) {
+                        test_exit();
+                }
+        }
+
         int16_vector2_t *out_vertex[4];
 
         out_vertex[0] = (int16_vector2_t *)&sprite[0].cs_vertex.a;
@@ -119,7 +125,9 @@ test_04_draw(void)
 void
 test_04_exit(void)
 {
-        free(sprite);
+        if (sprite != NULL) {
+                free(sprite);
+        }
 }
 
 static void
