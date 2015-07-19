@@ -36,19 +36,16 @@ vdp2_scrn_back_screen_set(bool single_color, uint32_t vram, uint16_t *color,
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 
         if (single_color) {
+                assert(len == 1);
                 MEMORY_WRITE(16, vram, *color);
         } else {
                 /* Make sure that the number of lines to draw is a
                  * multiple of 4 */
                 assert((len & 0x03) == 0x00);
 
-                uint16_t idx;
-
-                for (idx = 0; idx < (len / 4); ) {
-                        MEMORY_WRITE(16, vram + ((idx++) << 1), *color++);
-                        MEMORY_WRITE(16, vram + ((idx++) << 1), *color++);
-                        MEMORY_WRITE(16, vram + ((idx++) << 1), *color++);
-                        MEMORY_WRITE(16, vram + ((idx++) << 1), *color++);
+                uint32_t idx;
+                for (idx = 0; idx < len;) {
+                        MEMORY_WRITE(16, (vram + (idx << 1)), *color++);
                 }
         }
 }
