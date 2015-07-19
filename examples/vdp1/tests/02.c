@@ -18,29 +18,33 @@
 #include "../common.h"
 #include "../fs.h"
 
-static struct vdp1_cmdt_sprite *sprite = NULL;
+static struct vdp1_cmdt_sprite sprite[6];
 
 /* File handles */
 static void *file_handle[32] __unused;
 
 static uint32_t cram[6] __unused = {
-        CRAM_OFFSET(0,  0, 0),
-        CLUT(1, 0),
-        CRAM_OFFSET(0,  4, 0),
-        CRAM_OFFSET(0, 16, 0),
-        CRAM_OFFSET(2,  0, 0),
-        0
+        CRAM_VDP1_OFFSET(0,  0, 0), /* 16 colors, color mode 0 */
+        CLUT(1, 0), /* 16 colors, color mode 1 */
+        CRAM_VDP1_OFFSET(0,  4, 0), /* 64 colors, color mode 2 */
+        CRAM_VDP1_OFFSET(0,  8, 0), /* 128 colors, color mode 3 */
+        CRAM_VDP1_OFFSET(1,  0, 0), /* 256 colors, color mode 4 */
+        0 /* RGB (32,768 colors), color mode 5 */
+};
+
+static uint16_t color_banks[6] __unused = {
+        0, /* Color mode 0 */
+        0, /* Color mode 1 */
+        1, /* Color mode 2 */
+        1, /* Color mode 3 */
+        1, /* Color mode 4 */
+        0 /* Color mode 5 */
 };
 
 void
 test_02_init(void)
 {
         test_init();
-
-        sprite = (struct vdp1_cmdt_sprite *)malloc(
-                5 * sizeof(struct vdp1_cmdt_sprite));
-        assert(sprite != NULL);
-        memset(sprite, 0x00, 5 * sizeof(struct vdp1_cmdt_sprite));
 
         uint32_t vram;
         vram = CHAR(0);
@@ -61,7 +65,7 @@ test_02_init(void)
                 file_size = common_round_pow2(fs_size(fh));
 
                 uint8_t *ptr;
-                ptr = (uint8_t *)0x00200000;
+                ptr = (uint8_t *)0x00201000;
 
                 fs_read(fh, ptr);
                 fs_close(fh);
@@ -73,9 +77,9 @@ test_02_init(void)
                 uint32_t amount;
                 amount = tga_image_decode(&tga, (void *)vram);
                 assert(amount > 0);
-                amount = tga_cmap_decode(&tga, (uint16_t *)cram[mode_idx]);
                 if ((tga.tga_type == TGA_IMAGE_TYPE_CMAP) ||
                     (tga.tga_type == TGA_IMAGE_TYPE_RLE_CMAP)) {
+                        amount = tga_cmap_decode(&tga, (uint16_t *)cram[mode_idx]);
                         assert(amount > 0);
                 }
 
@@ -97,7 +101,7 @@ test_02_update(void)
         sprite[0].cs_type = CMDT_TYPE_NORMAL_SPRITE;
         sprite[0].cs_mode.cc_mode = 0;
         sprite[0].cs_mode.color_mode = 0;
-        sprite[0].cs_color_bank = 0;
+        sprite[0].cs_color_bank = color_banks[0];
         sprite[0].cs_mode.transparent_pixel = true;
         sprite[0].cs_position.x = -128;
         sprite[0].cs_position.y = -80;
@@ -118,7 +122,7 @@ test_02_update(void)
         sprite[2].cs_mode.cc_mode = 0;
         sprite[2].cs_mode.color_mode = 2;
         sprite[2].cs_mode.transparent_pixel = true;
-        sprite[2].cs_color_bank = 1;
+        sprite[2].cs_color_bank = color_banks[2];
         sprite[2].cs_position.x = 64;
         sprite[2].cs_position.y = -80;
         sprite[2].cs_width = 64;
@@ -128,7 +132,7 @@ test_02_update(void)
         sprite[3].cs_mode.cc_mode = 0;
         sprite[3].cs_mode.color_mode = 3;
         sprite[3].cs_mode.transparent_pixel = true;
-        sprite[3].cs_color_bank = 1;
+        sprite[3].cs_color_bank = color_banks[3];
         sprite[3].cs_position.x = -128;
         sprite[3].cs_position.y = 16;
         sprite[3].cs_width = 64;
@@ -138,7 +142,7 @@ test_02_update(void)
         sprite[4].cs_mode.cc_mode = 0;
         sprite[4].cs_mode.color_mode = 4;
         sprite[4].cs_mode.transparent_pixel = true;
-        sprite[4].cs_color_bank = 2;
+        sprite[4].cs_color_bank = color_banks[4];
         sprite[4].cs_position.x = -32;
         sprite[4].cs_position.y = 16;
         sprite[4].cs_width = 64;
@@ -174,7 +178,4 @@ test_02_draw(void)
 void
 test_02_exit(void)
 {
-        if (sprite != NULL) {
-                free(sprite);
-        }
 }

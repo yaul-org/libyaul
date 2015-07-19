@@ -17,17 +17,13 @@
 #include "../test.h"
 #include "../common.h"
 
-static struct vdp1_cmdt_polygon *polygon = NULL;
+static struct vdp1_cmdt_polygon polygon[1];
 static uint32_t angle = 0;
 
 void
 test_00_init(void)
 {
         angle = 0;
-
-        polygon = (struct vdp1_cmdt_polygon *)malloc(
-                sizeof(struct vdp1_cmdt_polygon));
-        assert(polygon != NULL);
 }
 
 void
@@ -75,7 +71,4 @@ test_00_draw(void)
 void
 test_00_exit(void)
 {
-        free(polygon);
-
-        cons_write(&cons, "[H[2J");
 }

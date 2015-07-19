@@ -18,8 +18,8 @@
 #include "../common.h"
 #include "../fs.h"
 
-static struct vdp1_cmdt_polygon *polygon = NULL;
-static struct vdp1_cmdt_sprite *sprite = NULL;
+static struct vdp1_cmdt_polygon polygon[1];
+static struct vdp1_cmdt_sprite sprite[5];
 
 static void *file_handle[2];
 
@@ -34,18 +34,6 @@ void
 test_06_init(void)
 {
         test_init();
-
-        sprite = (struct vdp1_cmdt_sprite *)malloc(
-                5 * sizeof(struct vdp1_cmdt_sprite));
-        assert(sprite != NULL);
-
-        polygon = (struct vdp1_cmdt_polygon *)malloc(
-                1 * sizeof(struct vdp1_cmdt_polygon));
-        assert(polygon != NULL);
-
-        memset(sprite, 0x00,
-            5 * sizeof(struct vdp1_cmdt_sprite));
-        memset(polygon, 0x00, sizeof(struct vdp1_cmdt_polygon));
 
         uint32_t vram_addr;
         vram_addr = CHAR(0);
@@ -193,7 +181,4 @@ test_06_draw(void)
 void
 test_06_exit(void)
 {
-        if (sprite != NULL) {
-                free(sprite);
-        }
 }

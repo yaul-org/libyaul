@@ -175,6 +175,7 @@ static void state_00_exit(struct state_context *);
 static void state_01_init(struct state_context *);
 static void state_01_update(struct state_context *);
 static void state_01_draw(struct state_context *);
+static void state_01_exit(struct state_context *);
 
 int
 main(void)
@@ -196,8 +197,13 @@ main(void)
             state_01_init,
             state_01_update,
             state_01_draw,
-            NULL,
+            state_01_exit,
             &state_data);
+
+        state_data.current_button_idx = 0;
+        state_data.current_test_idx = -1;
+        state_data.last_test_idx = -1;
+
         state_machine_transition(&state_vdp1, STATE_VDP1_MENU);
 
         while (true) {
@@ -243,7 +249,7 @@ hardware_init(void)
         cpu_intc_enable();
 
         vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(2, 0x1FFFE), blcs_color, 0);
+            VRAM_ADDR_4MBIT(2, 0x1FFFE), blcs_color, 1);
 }
 
 static void
@@ -297,12 +303,10 @@ state_00_init(struct state_context *state_context)
                 }
         };
 
+        static uint16_t blcs_color[SCREEN_HEIGHT];
+
         struct state_data *state_data;
         state_data = (struct state_data *)state_context->sc_data;
-
-        state_data->current_button_idx = 0;
-        state_data->current_test_idx = -1;
-        state_data->last_test_idx = -1;
 
         uint32_t button_idx;
         for (button_idx = 0; button_idx < MENU_BUTTONS_CNT; button_idx++) {
@@ -313,7 +317,7 @@ state_00_init(struct state_context *state_context)
                 fh = fs_open(button->button_texture_path);
 
                 uint8_t *data_ptr;
-                data_ptr = (uint8_t *)0x00200000;
+                data_ptr = (uint8_t *)0x00201000;
 
                 fs_read(fh, data_ptr);
                 fs_close(fh);
@@ -348,40 +352,17 @@ state_00_init(struct state_context *state_context)
                 sprite->cs_height = button->button_height;
         }
 
-        uint16_t *nbg0_planes[4] = {
-                /* VRAM B0 */
-                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
-                /* VRAM B0 */
-                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
-                /* VRAM B0 */
-                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000),
-                /* VRAM B0 */
-                (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
-        };
-        /* CRAM */
-        uint32_t *nbg0_color_palette = (uint32_t *)CRAM_NBG0_OFFSET(0, 63, 0);
-        /* VRAM B0 */
-        uint32_t *nbg0_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
-
-        struct scrn_cell_format nbg0_format;
-
-        nbg0_format.scf_scroll_screen = SCRN_NBG0;
-        nbg0_format.scf_cc_count = SCRN_CCC_PALETTE_16;
-        nbg0_format.scf_character_size = 2 * 2;
-        nbg0_format.scf_pnd_size = 1; /* 1 word */
-        nbg0_format.scf_auxiliary_mode = 1;
-        nbg0_format.scf_cp_table = (uint32_t)nbg0_character;
-        nbg0_format.scf_color_palette = (uint32_t)nbg0_color_palette;
-        nbg0_format.scf_plane_size = 1 * 1;
-        nbg0_format.scf_map.plane_a = (uint32_t)nbg0_planes[0];
-        nbg0_format.scf_map.plane_b = (uint32_t)nbg0_planes[1];
-        nbg0_format.scf_map.plane_c = (uint32_t)nbg0_planes[2];
-        nbg0_format.scf_map.plane_d = (uint32_t)nbg0_planes[3];
-
         vdp2_tvmd_display_clear();
-        vdp2_scrn_cell_format_set(&nbg0_format);
-        vdp2_priority_spn_set(SCRN_NBG0, 1);
-        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
+        uint32_t color_idx;
+        for (color_idx = 0; color_idx < SCREEN_HEIGHT; color_idx++) {
+                blcs_color[color_idx] = 0x8000 | RGB888_TO_RGB555(
+                        0,
+                        (SCREEN_HEIGHT - color_idx),
+                        0);
+        }
+
+        vdp2_scrn_back_screen_set(/* single_color = */ false,
+            VRAM_ADDR_4MBIT(2, 0), blcs_color, SCREEN_HEIGHT);
         vdp2_tvmd_display_set();
 }
 
@@ -403,6 +384,7 @@ state_00_update(struct state_context *state_context)
                 } else if (digital_pad.held.button.a || digital_pad.held.button.c) {
                         state_data->last_test_idx = state_data->current_test_idx;
                         state_data->current_test_idx = state_data->current_button_idx;
+
                         state_machine_transition(&state_vdp1,
                             STATE_VDP1_TESTING);
                 }
@@ -439,7 +421,6 @@ state_00_draw(struct state_context *state_context __unused)
 static void
 state_00_exit(struct state_context *state_context __unused)
 {
-        vdp2_scrn_display_unset(SCRN_NBG0);
 }
 
 static void
@@ -450,15 +431,6 @@ state_01_init(struct state_context *state_context)
 
         struct test *current_test;
         current_test = &tests[state_data->current_test_idx];
-
-        struct test *last_test;
-        last_test = (state_data->last_test_idx >= 0)
-            ? &tests[state_data->last_test_idx]
-            : NULL;
-
-        if (last_test != NULL) {
-                last_test->exit();
-        }
 
         current_test->init();
 }
@@ -485,4 +457,16 @@ state_01_draw(struct state_context *state_context)
         current_test = &tests[state_data->current_test_idx];
 
         current_test->draw();
+}
+
+static void
+state_01_exit(struct state_context *state_context)
+{
+        struct state_data *state_data;
+        state_data = (struct state_data *)state_context->sc_data;
+
+        struct test *current_test;
+        current_test = &tests[state_data->current_test_idx];
+
+        current_test->exit();
 }

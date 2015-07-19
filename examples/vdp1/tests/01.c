@@ -17,7 +17,7 @@
 #include "../test.h"
 #include "../common.h"
 
-static struct vdp1_cmdt_polyline *polyline = NULL;
+static struct vdp1_cmdt_polyline polyline[1];
 static int angle = 0;
 
 void
@@ -26,10 +26,6 @@ test_01_init(void)
         test_init();
 
         angle = 0;
-
-        polyline = (struct vdp1_cmdt_polyline *)malloc(
-                sizeof(struct vdp1_cmdt_polyline));
-        assert(polyline != NULL);
 }
 
 void
@@ -77,7 +73,4 @@ test_01_draw(void)
 void
 test_01_exit(void)
 {
-        if (polyline != NULL) {
-                free(polyline);
-        }
 }

@@ -17,16 +17,12 @@
 #include "../test.h"
 #include "../common.h"
 
-static struct vdp1_cmdt_line *line = NULL;
+static struct vdp1_cmdt_line line[1];
 
 void
 test_05_init(void)
 {
         test_init();
-
-        line = (struct vdp1_cmdt_line *)malloc(
-                sizeof(struct vdp1_cmdt_line));
-        assert(line != NULL);
 
         memset(line, 0x00, sizeof(struct vdp1_cmdt_line));
 }
@@ -66,7 +62,4 @@ test_05_draw(void)
 void
 test_05_exit(void)
 {
-        if (line != NULL) {
-                free(line);
-        }
 }

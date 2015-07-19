@@ -36,8 +36,8 @@
 #define ZOOM_POINT_COLOR_WAIT           RGB888_TO_RGB555(  0, 255,   0)
 #define ZOOM_POINT_COLOR_HIGHLIGHT      RGB888_TO_RGB555(255,   0,   0)
 
-static struct vdp1_cmdt_polygon *polygon = NULL;
-static struct vdp1_cmdt_sprite *sprite = NULL;
+static struct vdp1_cmdt_polygon polygon[1];
+static struct vdp1_cmdt_sprite sprite[2];
 
 static uint32_t angle = 0;
 
@@ -152,13 +152,6 @@ test_03_init(void)
 {
         test_init();
 
-        sprite = (struct vdp1_cmdt_sprite *)malloc(
-                2 * sizeof(struct vdp1_cmdt_sprite));
-        assert(sprite != NULL);
-        polygon = (struct vdp1_cmdt_polygon *)malloc(
-                1 * sizeof(struct vdp1_cmdt_polygon));
-        assert(polygon != NULL);
-
         memset(sprite, 0x00,
             2 * sizeof(struct vdp1_cmdt_sprite));
         memset(polygon, 0x00, sizeof(struct vdp1_cmdt_polygon));
@@ -235,13 +228,6 @@ test_03_draw(void)
 void
 test_03_exit(void)
 {
-        if (sprite != NULL) {
-                free(sprite);
-        }
-
-        if (polygon != NULL) {
-                free(polygon);
-        }
 }
 
 static void

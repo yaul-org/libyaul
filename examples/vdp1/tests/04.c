@@ -18,7 +18,7 @@
 #include "../common.h"
 #include "../fs.h"
 
-static struct vdp1_cmdt_sprite *sprite;
+static struct vdp1_cmdt_sprite sprite[1];
 
 static uint32_t angle = 0;
 
@@ -30,10 +30,6 @@ void
 test_04_init(void)
 {
         test_init();
-
-        sprite = (struct vdp1_cmdt_sprite *)malloc(
-                sizeof(struct vdp1_cmdt_sprite));
-        assert(sprite != NULL);
 
         void *fh;
         fh = fs_open("/TESTS/03/SCALE.TGA");
@@ -125,9 +121,6 @@ test_04_draw(void)
 void
 test_04_exit(void)
 {
-        if (sprite != NULL) {
-                free(sprite);
-        }
 }
 
 static void
