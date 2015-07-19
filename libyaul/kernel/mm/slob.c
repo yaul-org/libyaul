@@ -144,18 +144,21 @@ slob_realloc(void *old, size_t new_len)
         size_t real_len;
         size_t new_real_len;
 
-        if (old == NULL)
+        if (old == NULL) {
                 return slob_alloc(new_len);
+        }
 
         real_len = slob_block_units_ptr(old);
         new_real_len = SLOB_BLOCK_UNITS(new_len) + 1;
 
-        if (new_real_len <= real_len)
+        if (new_real_len <= real_len) {
                 return old;
+        }
 
         result = slob_alloc(new_len);
-        if (result == NULL)
+        if (result == NULL) {
                 return NULL;
+        }
 
         memcpy(result, old, (real_len - 1) * SLOB_BLOCK_UNIT);
         slob_free(old);
@@ -182,8 +185,9 @@ slob_free(void *addr)
 
         size_t size;
 
-        if (addr == NULL)
+        if (addr == NULL) {
                 return;
+        }
 
         sb = (struct slob_block *)addr - 1;
         sp = SLOB_PAGE(sb);
@@ -261,9 +265,9 @@ slob_block_list_set(struct slob_block *sb, struct slob_block *sb_next,
         sp = SLOB_PAGE(sb);
         bofs = sb_next - sp->sp_page;
 
-        if (units <= 0)
+        if (units <= 0) {
                 sb[0].s.sb_bunits = -bofs;
-        else {
+        } else {
                 sb[0].s.sb_bunits = units;
                 sb[1].s.sb_bnext = bofs;
         }
@@ -280,10 +284,11 @@ slob_block_list_next(struct slob_block *sb)
         uintptr_t bnext;
 
         sp = SLOB_PAGE(sb);
-        if (sb[0].s.sb_bunits < 0)
+        if (sb[0].s.sb_bunits < 0) {
                 bnext = -sb[0].s.sb_bunits;
-        else
+        } else {
                 bnext = sb[1].s.sb_bunits;
+        }
 
         return sp->sp_page + bnext;
 }
@@ -327,14 +332,16 @@ slob_block_alloc(struct slob_page *sp, int16_t bunits)
         for (; ; bprev = block, block = slob_block_list_next(block)) {
                 bavail = slob_block_units(block);
 
-                if (bunits > bavail)
+                if (bunits > bavail) {
                         continue;
+                }
 
                 bnext = slob_block_list_next(block);
                 if (bunits == bavail) {
                         /* No fragmentation (exact fit). */
-                        if (bprev != NULL)
+                        if (bprev != NULL) {
                                 slob_block_list_set(bprev, bnext, bunits);
+                        }
                         sp->sp_bfree = bnext;
                 } else if (bunits < bavail) {
                         /* Fragmentation. */
@@ -347,8 +354,9 @@ slob_block_alloc(struct slob_page *sp, int16_t bunits)
                                  * newly created block. */
                                 slob_block_list_set(bprev, block + bunits,
                                     slob_block_units(bprev));
-                        } else
+                        } else {
                                 sp->sp_bfree = block + bunits;
+                        }
                 }
 
                 sp->sp_bunits -= bunits;
@@ -391,10 +399,7 @@ slob_block_units_ptr(void *addr)
 static void
 slob_block_units_set(struct slob_block *sb, int16_t units)
 {
-        if (units < 0)
-                sb->s.sb_bunits = 1;
-        else
-                sb->s.sb_bunits = units;
+        sb->s.sb_bunits = (units < 0) ? 1 : units;
 }
 
 /*
@@ -406,12 +411,13 @@ slob_page_list_select(size_t size)
 {
         struct slob_page_list *spl;
 
-        if (size < SLOB_PAGE_BREAK_1ST)
+        if (size < SLOB_PAGE_BREAK_1ST) {
                 spl = &slob_small_page;
-        else if (size < SLOB_PAGE_BREAK_2ND)
+        } else if (size < SLOB_PAGE_BREAK_2ND) {
                 spl = &slob_medium_page;
-        else
+        } else {
                 spl = &slob_large_page;
+        }
 
         return spl;
 }
@@ -433,11 +439,13 @@ slob_page_alloc(struct slob_page_list *spl)
         struct slob_block *bbase;
         struct slob_block *blast;
 
-        if (spl == NULL)
+        if (spl == NULL) {
                 return -1;
+        }
 
-        if ((sp = (struct slob_page *)memb_alloc(&slob_pages)) == NULL)
+        if ((sp = (struct slob_page *)memb_alloc(&slob_pages)) == NULL) {
                 return -1;
+        }
 
         bbase = &sp->sp_page[0];
         sp->sp_bunits = SLOB_BLOCK_UNITS(SLOB_PAGE_SIZE);
@@ -464,20 +472,25 @@ slob_page_alloc(struct slob_page_list *spl)
 static int
 slob_page_free(struct slob_page_list *spl, struct slob_page *sp)
 {
-        if (spl == NULL)
+        if (spl == NULL) {
                 return -1;
+        }
 
-        if (sp == NULL)
+        if (sp == NULL) {
                 return -1;
+        }
 
-        if (sp->sp_bunits > 0)
+        if (sp->sp_bunits > 0) {
                 return -1;
+        }
 
-        if ((memb_free(&slob_pages, sp)) < 0)
+        if ((memb_free(&slob_pages, sp)) < 0) {
                 return -1;
+        }
 
-        if (!TAILQ_EMPTY(spl))
+        if (!TAILQ_EMPTY(spl)) {
                 TAILQ_REMOVE(spl, sp, sp_list);
+        }
 
         return 0;
 }
