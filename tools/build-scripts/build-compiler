@@ -412,7 +412,7 @@ for target in "${SH_TARGET}" "${M68K_TARGET}"; do
 
     # Begin building
     if [ -f "${target}/scripts/init" ]; then
-        source "${target}/scripts/extract"
+        source "${target}/scripts/init"
     fi
     if [ -f "${target}/scripts/extract" ]; then
         source "${target}/scripts/extract"
