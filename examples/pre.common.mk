@@ -54,13 +54,9 @@ LXXFLAGS= -Wl,-Map,${PROJECT}.map \
 OBJECTS:= $(ROOTDIR)/common/crt0.o \
 	$(ROOTDIR)/common/crt0-init.o
 
-all: example
+.PHONY: clean example romdisk image
 
-ip.bin: ip.o
-	$(CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
-		-T $(ROOTDIR)/common/ldscripts/ip.x \
-		$< -o $@
+.SUFFIXES:
+.SUFFIXES: .c .S .o .bin .elf .romdisk .romdisk.o
 
-image: ip.bin example
-	cp $(PROJECT).bin cd/a.bin
-	sh ../../tools/make-iso/make-iso $(PROJECT)
+PROJECT?=unknown
