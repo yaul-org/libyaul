@@ -116,8 +116,7 @@ checksum_gpg() {
 
 for var in \
     "OPTION_DOWNLOAD_TARBALLS" \
-    "OPTION_ENABLE_GDB" \
-    "OPTION_ENABLE_DDD"; do
+    "OPTION_ENABLE_GDB"; do
     is_set "${var}"
     check_boolean "${var}"
 done
@@ -126,7 +125,6 @@ for var in \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
-    "DDD_VERSION" \
     "GCC_VERSION" \
     "GDB_VERSION" \
     "NEWLIB_VERSION" \
@@ -192,12 +190,6 @@ GDB_SIG="${GDB}.sig"
 GDB_SIG_URL="${GNU_URL}/gdb/${GDB_SIG}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
 
-DDD="ddd-${DDD_VERSION}.tar.gz"
-DDD_URL="${GNU_URL}/ddd/${DDD}"
-DDD_SIG="${DDD}.sig"
-DDD_SIG_URL="${GNU_URL}/ddd/${DDD_SIG}"
-DDD_SRC_DIR="ddd-${DDD_VERSION}"
-
 GNU_KEYRING="gnu-keyring.gpg"
 GNU_KEYRING_URL="${GNU_URL}/${GNU_KEYRING}"
 
@@ -229,10 +221,6 @@ if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     printf "\n\t 7. ${NEWLIB_MD5}"
     printf "\n\t 8. ${GDB}"
     printf "\n\t 9. ${GDB_SIG}"
-    if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
-        printf "\n\t10. ${DDD}"
-        printf "\n\t11. ${DDD_SIG}"
-    fi
     printf "\n"
     printf "\n"
 else
@@ -267,18 +255,6 @@ else
                 fi
                 if ! fetch "${GDB_SIG_URL}" 1>> "gdb.log" 2>&1; then
                     panic "Failed to download ${GDB_SIG} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
-                fi
-            fi
-        fi
-
-        if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
-            if [ ! -f "${DDD}" ]; then
-                message "Downloading \`${DDD}'"
-                if ! fetch "${DDD_URL}" 1>> "ddd.log" 2>&1; then
-                    panic "Failed to download ${DDD} (see \`${BUILD_SRC_DIR}/ddd.log')" 1
-                fi
-                if ! fetch "${DDD_SIG_URL}" 1>> "ddd.log" 2>&1; then
-                    panic "Failed to download ${DDD_SIG} (see \`${BUILD_SRC_DIR}/ddd.log')" 1
                 fi
             fi
         fi
@@ -345,15 +321,6 @@ if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
     fi
 fi
 
-if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
-    if [ ! -f "${DDD}" ]; then
-        panic "\`${DDD}' not found" 1
-    fi
-    if [ ! -f "${DDD_SIG}" ]; then
-        panic "\`${DDD_SIG}' not found" 1
-    fi
-fi
-
 if [ ! -f "checked-integrity" ]; then
     message "Checking integrity..."
 
@@ -391,13 +358,6 @@ if [ ! -f "checked-integrity" ]; then
     fi
     unset "md5"
     unset "calculated_md5"
-
-    if [[ "${OPTION_ENABLE_DDD}" == "yes" ]]; then
-        message "Checking integrity of \`${DDD}'"
-        if ! checksum_gpg "${DDD_SIG}" 1>> "ddd.log" 2>&1; then
-            panic "Integrity check for ${DDD} failed (see \`${BUILD_SRC_DIR}/ddd.log')" 1
-        fi
-    fi
 
     touch "checked-integrity"
 fi

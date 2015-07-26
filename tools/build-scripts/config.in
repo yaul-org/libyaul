@@ -18,7 +18,6 @@ BUILD_SRC_DIR="/tmp"
 
 # Versions
 BINUTILS_VERSION="2.24"
-DDD_VERSION="3.3.12"
 GCC_VERSION="4.7.3"
 GDB_VERSION="7.7"
 NEWLIB_VERSION="1.20.0"
@@ -45,8 +44,3 @@ OPTION_DOWNLOAD_TARBALLS="yes"
 #        Be aware dependencies not covered
 #  'no': Do not build
 OPTION_ENABLE_GDB="yes"
-
-# 'yes': Download and build DDD for the sh-elf target
-#        Be aware dependencies not covered
-#  'no': Do not build
-OPTION_ENABLE_DDD="no"

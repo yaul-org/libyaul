@@ -26,13 +26,6 @@ if [ ! -f "extracted" ]; then
         fi
     fi
 
-    if [ "${OPTION_ENABLE_DDD}" = "yes" ]; then
-        message "Extracting '${DDD}'"
-        if ! tar -xzf "${BUILD_SRC_DIR}/${DDD}" > /dev/null 2>&1; then
-            panic "Extracting ${GCC_DDD}" 1
-        fi
-    fi
-
     touch "extracted"
 fi
 cd "${OLDPWD}"
