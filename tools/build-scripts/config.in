@@ -16,6 +16,11 @@ BUILD_INSTALL_DIR="${HOME}/tool-chains"
 # location for temporary files
 BUILD_SRC_DIR="/tmp"
 
+# Specifies the number of jobs (commands) to run simultaneously. If
+# BUILD_MAKE_JOBS is not set with a value, make(1) will not limit the
+# number of jobs that can run simultaneously
+BUILD_MAKE_JOBS=8
+
 # Versions
 BINUTILS_VERSION="2.24"
 GCC_VERSION="4.7.3"

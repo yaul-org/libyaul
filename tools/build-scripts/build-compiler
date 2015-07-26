@@ -1,5 +1,5 @@
 #!/bin/bash
-
+{
 # Copyright (c) 2012-2014
 # See LICENSE for details.
 #
@@ -8,12 +8,16 @@
 
 PROGNAME=`basename "${0}"`
 
+CONFIG_FILENAME="config"
+CONFIG_IN_FILENAME="config.in"
+CONFIG_PATH="./${CONFIG_FILENAME}"
+
 # Function message:
 #   ${1} => Message
 message () {
     local _message="${1}"
 
-    printf "${PROGNAME}: %s\n" "${_message}"
+    printf -- "${PROGNAME}: %s\n" "${_message}"
 }
 
 # Function panic:
@@ -23,7 +27,7 @@ panic() {
     local _message="${1}"
     local _exit_code=${2}
 
-    printf "${PROGNAME}: Error: %s\n" "${_message}" 1>&2
+    printf -- "${PROGNAME}: Error: %s\n" "${_message}" 1>&2
     exit ${_exit_code}
 }
 
@@ -42,28 +46,29 @@ if [[ "${ROOT}" != "`pwd`" ]]; then
 fi
 
 # Look for automated configuration file
-if [ -f 'config' ]; then
-    /usr/bin/env python << EOF
-import sys
-import re
+if [ -f "${CONFIG_PATH}" ]; then
+    error_line=$(/usr/bin/env python << EOF
+from re import match
 
-line = 0
-with open("./config", "r") as f:
-    line += 1
+line_no = 0
+with open("${CONFIG_PATH}", "r") as f:
     for line in f.readlines():
+        line_no += 1
         # Ignore comments and empty lines
-        if re.match(r"^\s*#.*$|^\s*$", line):
+        if match(r"^\s*#.*$|^\s*$", line.strip()):
             continue
-        if not re.match(r"^[A-Z_][A-Z_0-9]+=\"[^\"]*\"$", line):
-            sys.exit(1)
+        if not match(r"^[A-Z_][A-Z_0-9]+=(?:\"[^\"]*\"|[0-9]+)$", line.strip()):
+            print line_no,
+            raise SystemExit
 EOF
+)
     if [ ${?} -ne 0 ]; then
-        panic "Syntax error in configuration file \`config'" 1
+        panic "Syntax error in configuration file \`${CONFIG_FILENAME}' on line ${error_line}" 1
     fi
 
-    source './config' > /dev/null 2>&1
+    source "${CONFIG_PATH}" > /dev/null 2>&1
 else
-    panic "Configuration file \`config' not found; see \`config.in'" 1
+    panic "Configuration file \`${CONFIG_FILENAME}' not found; see \`${CONFIG_IN_FILENAME}'" 1
 fi
 
 # Function is_set:
@@ -125,6 +130,7 @@ for var in \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
+    "BUILD_MAKE_JOBS" \
     "GCC_VERSION" \
     "GDB_VERSION" \
     "NEWLIB_VERSION" \
@@ -212,17 +218,17 @@ cd "${BUILD_SRC_DIR}/"
 # Ask whether to download the source packages or not
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
-    printf "\n\t 1. ${GNU_KEYRING}"
-    printf "\n\t 2. ${BINUTILS}"
-    printf "\n\t 3. ${BINUTILS_SIG}"
-    printf "\n\t 4. ${GCC}"
-    printf "\n\t 5. ${GCC_SIG}"
-    printf "\n\t 6. ${NEWLIB}"
-    printf "\n\t 7. ${NEWLIB_MD5}"
-    printf "\n\t 8. ${GDB}"
-    printf "\n\t 9. ${GDB_SIG}"
-    printf "\n"
-    printf "\n"
+    printf -- "\n\t 1. ${GNU_KEYRING}"
+    printf -- "\n\t 2. ${BINUTILS}"
+    printf -- "\n\t 3. ${BINUTILS_SIG}"
+    printf -- "\n\t 4. ${GCC}"
+    printf -- "\n\t 5. ${GCC_SIG}"
+    printf -- "\n\t 6. ${NEWLIB}"
+    printf -- "\n\t 7. ${NEWLIB_MD5}"
+    printf -- "\n\t 8. ${GDB}"
+    printf -- "\n\t 9. ${GDB_SIG}"
+    printf -- "\n"
+    printf -- "\n"
 else
     if [ ! -f "${BUILD_SRC_DIR}/downloaded-tarballs" ]; then
         message "Downloading files..."
@@ -393,3 +399,4 @@ done
 
 # Clean up temporary files and source directories
 clean_up
+}
