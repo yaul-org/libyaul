@@ -2,18 +2,38 @@
 
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}"
-
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}"
-if [ ! -f 'extracted' ]; then
+if [ ! -f "extracted-binutils" ]; then
     message "Extracting '${BINUTILS}'"
-    tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" || panic "Extracting ${BINUTILS}" 1
+    if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
+        panic "Extracting ${BINUTILS}" 1
+    fi
+    touch "extracted-binutils"
+fi
 
-    message "Extracting '${GCC}'"
-    tar -xjf "${BUILD_SRC_DIR}/${GCC}" || panic "Extracting ${GCC}" 1
+if [ ! -f "extracted-gcc" ]; then
+    message "Extracting '$GCC'"
+    if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
+        panic "Extracting ${GCC}" 1
+    fi
+    touch "extracted-gcc"
+fi
 
+if [ ! -f "extracted-newlib" ]; then
     message "Extracting '${NEWLIB}'"
-    tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" || panic "Extracting ${NEWLIB}" 1
+    if ! tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" > /dev/null 2>&1; then
+        panic "Extracting ${NEWLIB}" 1
+    fi
+    touch "extracted-newlib"
+fi
 
-    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/extracted"
+if [ "${OPTION_ENABLE_GDB}" = "yes" ]; then
+    if [ ! -f "extracted-gdb" ]; then
+        message "Extracting '${GDB}'"
+        if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then
+            panic "Extracting ${GCC_GDB}" 1
+        fi
+        touch "extracted-gdb"
+    fi
 fi
 cd "${OLDPWD}"

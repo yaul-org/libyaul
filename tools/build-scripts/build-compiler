@@ -155,9 +155,7 @@ clean_up () {
 
     rm -r -f \
         "${BUILD_SRC_DIR}/${SH_TARGET}" \
-        "${BUILD_SRC_DIR}/${M68K_TARGET}" \
-        "${BUILD_SRC_DIR}/extracted" \
-
+        "${BUILD_SRC_DIR}/${M68K_TARGET}"
     exit 0
 }
 
