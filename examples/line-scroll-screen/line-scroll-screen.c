@@ -78,7 +78,7 @@ line_scroll_screen(void)
         /* Set palette */
         {
                 uint16_t *cram;
-                cram = (uint16_t *)CRAM_BANK(0, 0);
+                cram = (uint16_t *)CRAM_NBG1_OFFSET(0, 0, 0);
 
                 /* Black color #0 */
                 *cram++ = RGB888_TO_RGB555(0, 0, 0);
