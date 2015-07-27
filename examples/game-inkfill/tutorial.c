@@ -72,8 +72,14 @@ tutorial_init(void)
         tga_t tga;
         int ret;
 
-        ret = tga_read(&tga, (uint8_t *)0x00200000, (uint16_t *)VRAM_ADDR_4MBIT(0, 0x00000), NULL);
+        uint8_t *ptr;
+        ptr = (uint8_t *)0x00200000;
+
+        ret = tga_read(&tga, ptr);
         assert(ret == TGA_FILE_OK);
+        uint32_t amount;
+        amount = tga_image_decode(&tga, (void *)VRAM_ADDR_4MBIT(0, 0x00000));
+        assert(amount > 0);
 
         vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
         vdp2_tvmd_display_set();

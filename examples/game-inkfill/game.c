@@ -322,9 +322,14 @@ _grid_init(void)
         tga_t tga;
         int ret;
 
-        ret = tga_read(&tga, (uint8_t *)0x00201000,
-            (uint16_t *)VRAM_ADDR_4MBIT(0, 0x00000), NULL);
+        uint8_t *ptr;
+        ptr = (uint8_t *)0x00201000;
+
+        ret = tga_read(&tga, ptr);
         assert(ret == TGA_FILE_OK);
+        uint32_t amount;
+        amount = tga_image_decode(&tga, (void *)VRAM_ADDR_4MBIT(0, 0x00000));
+        assert(amount > 0);
 
         vram_ctl = vdp2_vram_control_get();
         vram_ctl->vram_cycp.pt[0].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;
