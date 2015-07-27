@@ -36,6 +36,7 @@ typedef struct {
 } tga_t __attribute__ ((aligned(4)));
 
 int tga_read(tga_t *, const uint8_t *);
+uint32_t tga_image_decode_tiled(const tga_t *, void *);
 uint32_t tga_image_decode(const tga_t *, void *);
 uint32_t tga_cmap_decode(const tga_t *, uint16_t *);
 const char *tga_error_stringify(int);

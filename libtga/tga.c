@@ -31,14 +31,17 @@
 #define TGA_HEADER_LEN  18
 #define TGA_FOOTER_LEN  26
 
+static uint32_t cmap_image_decode_tiled(uint8_t *, const tga_t *);
 static uint32_t cmap_image_decode(uint8_t *, const tga_t *);
 
 static uint32_t true_color_image_decode(uint16_t *, const tga_t *);
 static uint32_t true_color_rle_image_decode(uint16_t *, const tga_t *);
 
-static int32_t helper_true_color_image_fill(uint16_t *, uint16_t, size_t);
-static inline uint32_t helper_image_calculate_offset(const tga_t *);
-static inline uint32_t helper_cmap_calculate_offset(const tga_t *);
+static void inline _cmap_image_tile_draw(uint8_t *, uint16_t, uint16_t,
+    const tga_t *);
+static int32_t _true_color_image_fill(uint16_t *, uint16_t, size_t);
+static inline uint32_t _image_calculate_offset(const tga_t *);
+static inline uint32_t _cmap_calculate_offset(const tga_t *);
 
 /*
  *
@@ -168,12 +171,37 @@ tga_read(tga_t *tga, const uint8_t *file)
 }
 
 uint32_t
+tga_image_decode_tiled(const tga_t *tga, void *dst)
+{
+        /* XXX: Check if tga is valid */
+        const uint8_t *image_buf;
+        image_buf = (const uint8_t *)((uint32_t)tga->tga_file +
+            _image_calculate_offset(tga));
+
+        switch (tga->tga_type) {
+        case TGA_IMAGE_TYPE_GRAYSCALE:
+        case TGA_IMAGE_TYPE_RLE_GRAYSCALE:
+                return TGA_FILE_NOT_SUPPORTED;
+        case TGA_IMAGE_TYPE_CMAP:
+                return cmap_image_decode_tiled(dst, tga);
+        case TGA_IMAGE_TYPE_TRUE_COLOR:
+                return TGA_FILE_NOT_SUPPORTED;
+        case TGA_IMAGE_TYPE_RLE_TRUE_COLOR:
+                return TGA_FILE_NOT_SUPPORTED;
+        case TGA_IMAGE_TYPE_RLE_CMAP:
+                return TGA_FILE_NOT_SUPPORTED;
+        default:
+                return TGA_FILE_CORRUPTED;
+        }
+}
+
+uint32_t
 tga_image_decode(const tga_t *tga, void *dst)
 {
         /* XXX: Check if tga is valid */
         const uint8_t *image_buf;
         image_buf = (const uint8_t *)((uint32_t)tga->tga_file +
-            helper_image_calculate_offset(tga));
+            _image_calculate_offset(tga));
 
         switch (tga->tga_type) {
         case TGA_IMAGE_TYPE_GRAYSCALE:
@@ -204,7 +232,7 @@ tga_cmap_decode(const tga_t *tga, uint16_t *dst)
 
         const uint8_t *cmap_buf;
         cmap_buf = (const uint8_t *)((uint32_t)tga->tga_file +
-            helper_cmap_calculate_offset(tga));
+            _cmap_calculate_offset(tga));
 
         for (cmap_idx = 0; cmap_idx < tga->tga_cmap_len; cmap_idx++) {
                 switch (tga->tga_cmap_bpp >> 3) {
@@ -246,23 +274,44 @@ tga_error_stringify(int error)
 }
 
 static uint32_t
-cmap_image_decode(uint8_t *vram, const tga_t *tga)
+cmap_image_decode_tiled(uint8_t *dst, const tga_t *tga)
+{
+        uint16_t tx;
+        uint16_t ty;
+
+        if ((tga->tga_cmap_len - 1) <= 16) {
+                return 0;
+        } else {
+                for (tx = 0; tx < (tga->tga_width / 8); tx++) {
+                        for (ty = 0; ty < (tga->tga_height / 8); ty++) {
+                                _cmap_image_tile_draw(dst, tx, ty, tga);
+                        }
+                }
+        }
+
+        return 1;
+}
+
+static uint32_t
+cmap_image_decode(uint8_t *dst, const tga_t *tga)
 {
         uint32_t pixel_idx;
 
         const uint8_t *buf;
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
-            helper_image_calculate_offset(tga));
+            _image_calculate_offset(tga));
+
+        uint32_t pixels;
+        pixels = tga->tga_width * tga->tga_height;
 
         if ((tga->tga_cmap_len - 1) <= 16) {
-                for (pixel_idx = 0; pixel_idx < (tga->tga_width * tga->tga_height);
-                     pixel_idx += 2) {
-                        *vram++ = ((buf[pixel_idx] & 0x0F) << 4) |
+                for (pixel_idx = 0; pixel_idx < pixels; pixel_idx += 2) {
+                        *dst++ = ((buf[pixel_idx] & 0x0F) << 4) |
                             (buf[pixel_idx + 1] & 0x0F);
                 }
         } else {
-                for (pixel_idx = 0; pixel_idx < (tga->tga_width * tga->tga_height); pixel_idx++) {
-                        *vram++ = buf[pixel_idx];
+                for (pixel_idx = 0; pixel_idx < pixels; pixel_idx++) {
+                        *dst++ = buf[pixel_idx];
                 }
         }
 
@@ -273,22 +322,25 @@ cmap_image_decode(uint8_t *vram, const tga_t *tga)
  *
  */
 static uint32_t
-true_color_image_decode(uint16_t *vram, const tga_t *tga)
+true_color_image_decode(uint16_t *dst, const tga_t *tga)
 {
         uint32_t pixel_idx;
 
         const uint8_t *buf;
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
-            helper_image_calculate_offset(tga));
+            _image_calculate_offset(tga));
 
         uint16_t bytes_pp;
         bytes_pp = tga->tga_bpp >> 3;
 
-        for (pixel_idx = 0; pixel_idx < (tga->tga_width * tga->tga_height); pixel_idx++) {
-                const uint8_t *pixel_data;
-                uint16_t pixel;
+        uint32_t pixels;
+        pixels = tga->tga_width * tga->tga_height;
 
+        for (pixel_idx = 0; pixel_idx < pixels; pixel_idx++) {
+                const uint8_t *pixel_data;
                 pixel_data = &buf[bytes_pp * pixel_idx];
+
+                uint16_t pixel;
                 switch (bytes_pp) {
                 case 2:
                         pixel = BGR16_DATA_TO_RGB555(pixel_data);
@@ -305,7 +357,7 @@ true_color_image_decode(uint16_t *vram, const tga_t *tga)
                         pixel &= ~0x8000;
                 }
 
-                *vram++ = pixel;
+                *dst++ = pixel;
         }
 
         return pixel_idx;
@@ -315,7 +367,7 @@ true_color_image_decode(uint16_t *vram, const tga_t *tga)
  *
  */
 static uint32_t
-true_color_rle_image_decode(uint16_t *vram, const tga_t *tga)
+true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
 {
 #define TGA_PACKET_TYPE_RLE 1
 #define TGA_PACKET_TYPE_RAW 0
@@ -326,7 +378,7 @@ true_color_rle_image_decode(uint16_t *vram, const tga_t *tga)
 
         const uint8_t *buf;
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
-            helper_image_calculate_offset(tga));
+            _image_calculate_offset(tga));
 
         uint16_t bytes_pp;
         bytes_pp = tga->tga_bpp >> 3;
@@ -368,7 +420,7 @@ true_color_rle_image_decode(uint16_t *vram, const tga_t *tga)
                                         pixel &= ~0x8000;
                                 }
 
-                                *vram++ = pixel;
+                                *dst++ = pixel;
                         }
 
                         packet = (uint8_t *)(packet + (rcf * bytes_pp) + 1);
@@ -392,12 +444,12 @@ true_color_rle_image_decode(uint16_t *vram, const tga_t *tga)
                                 pixel &= ~0x8000;
                         }
 
-                        amt = helper_true_color_image_fill(vram, pixel,
+                        amt = _true_color_image_fill(dst, pixel,
                             rcf * sizeof(uint16_t));
-                        /* VRAM address is not on a 2-byte or 4-byte
+                        /* Memory address is not on a 2-byte or 4-byte
                          * boundary */
                         assert(amt >= 0);
-                        vram += rcf;
+                        dst += rcf;
 
                         packet = (uint8_t *)(packet + bytes_pp + 1);
                         break;
@@ -409,8 +461,38 @@ true_color_rle_image_decode(uint16_t *vram, const tga_t *tga)
         return pixel_idx;
 }
 
-static int32_t
-helper_true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
+static inline void
+_cmap_image_tile_draw(uint8_t *dst, uint16_t tx, uint16_t ty, const tga_t *tga)
+{
+        const uint8_t *buf;
+        buf = (const uint8_t *)((uint32_t)tga->tga_file +
+            _image_calculate_offset(tga));
+
+        uint32_t x;
+        uint32_t y;
+
+        uint16_t tile_pixels;
+        tile_pixels = 8 * 8;
+
+        uint16_t tile_base;
+        tile_base = tile_pixels * (tx + ((tga->tga_width / 8) * ty));
+
+        for (y = 0; y < 8; y++) {
+                for (x = 0; x < 8; x++) {
+                        uint32_t x_offset;
+                        x_offset = (8 * tx) + x;
+                        uint32_t y_offset;
+                        y_offset = ((8 * ty) + y) * tga->tga_width;
+                        uint32_t offset;
+                        offset = x_offset + y_offset;
+
+                        dst[tile_base + (x + (8 * y))] = buf[offset];
+                }
+        }
+}
+
+static inline int32_t
+_true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
 {
         /* Check if address is unaligned */
         if (((uintptr_t)dst & 0x00000001) != 0) {
@@ -464,7 +546,7 @@ helper_true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
 }
 
 static inline uint32_t
-helper_image_calculate_offset(const tga_t *tga)
+_image_calculate_offset(const tga_t *tga)
 {
         const uint8_t *header;
         header = &tga->tga_file[0];
@@ -475,7 +557,7 @@ helper_image_calculate_offset(const tga_t *tga)
 }
 
 static inline uint32_t
-helper_cmap_calculate_offset(const tga_t *tga)
+_cmap_calculate_offset(const tga_t *tga)
 {
         const uint8_t *header;
         header = &tga->tga_file[0];
