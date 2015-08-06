@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+# -*- mode: python -*-
+
+import json
+import os
+import re
+import struct
+import sys
+import base64
+
+for root, dirs, filenames in os.walk(os.path.join(os.getcwd(), "levels")):
+    json_filenames = [os.path.abspath(os.path.join(root, filename)) for filename in filenames if re.match(r".+\.json$", filename)]
+    for json_filename in json_filenames:
+        print "Processing `%s'..." % (os.path.relpath(json_filename)),
+        try:
+            with open(json_filename, "r") as file_object:
+                json_data = json.load(file_object)
+                # Make sure that the height is exactly 14 tiles
+                assert(json_data['height'] == 14)
+                # Make sure we have exactly three layers (Level, Collision, and Region)
+                assert(len(json_data['layers']) == 1)
+                layer_types = [str(layer['type']) for layer in json_data['layers']]
+                layer_names = [str(layer['name']) for layer in json_data['layers']]
+                assert(len([True for layer_type in layer_types if layer_type == 'tilelayer']) == 1)
+                assert(len(set(["Level"]) - set(layer_names)) == 0)
+                # Process tile layer
+                output_filename = os.path.join(os.getcwd(), "romdisk", os.path.basename(json_filename[0:json_filename.index(".json")].upper() + ".MAP"))
+                with open(output_filename, "wb+") as output_fo:
+                    layer_tile, = [layer for layer in json_data['layers'] if layer['type'] == 'tilelayer']
+                    decoded_map = base64.b64decode(layer_tile['data'])
+                    processed_map = []
+                    while decoded_map:
+                        byte, = struct.unpack("<L", decoded_map[0:4])
+                        processed_map.append(byte)
+                        decoded_map = decoded_map[4:]
+                    width = layer_tile['width']
+                    height = layer_tile['height']
+                    for x in range(width):
+                        for y in range(height):
+                            tile_number = processed_map[x + (width * y)]
+                            byte = max(0, tile_number - 1)
+                            output_fo.write(struct.pack("B", byte))
+        except:
+            print "FAILED"
+            raise SystemExit
+        print "OK"
+    break
