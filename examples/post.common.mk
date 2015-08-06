@@ -22,7 +22,7 @@ $(PROJECT).elf: $(OBJECTS)
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OD) -S $(PROJECT).elf > $(PROJECT).asm
 
-%.romdisk: $(shell find ./romdisk -type f 2> /dev/null)
+%.romdisk: $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
 	genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk

@@ -54,9 +54,11 @@ LXXFLAGS= -Wl,-Map,${PROJECT}.map \
 OBJECTS:= $(ROOTDIR)/common/crt0.o \
 	$(ROOTDIR)/common/crt0-init.o
 
+SUFFIXES:= .c .S .o .bin .elf .romdisk .romdisk.o
+
 .PHONY: clean example romdisk image
 
 .SUFFIXES:
-.SUFFIXES: .c .S .o .bin .elf .romdisk .romdisk.o
+.SUFFIXES: $(SUFFIXES)
 
 PROJECT?=unknown
