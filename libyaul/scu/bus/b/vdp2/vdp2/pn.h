@@ -63,20 +63,23 @@ extern "C" {
 
 /* Configuration #1
  * 1-word
- * 16 colors */
-#define VDP2_PN_CONFIG_1_PALETTE_NUMBER(x)                                     \
+ * 16 colors
+ * 128 banks, each 16 colors */
+#define VDP2_PN_CONFIG_0_PALETTE_NUMBER(x)                                     \
         ((((x) >> 5) & 0x0F) << 12)
 
 /* Configuration #2
  * 1-word
- * 256 and 2,048 colors */
-#define VDP2_PN_CONFIG_2_PALETTE_NUMBER(x)                                     \
-        ((((x) >> 5) & 0x70) << 12)
+ * 256 and 2,048 colors
+ * 8 banks, each of 256 colors */
+#define VDP2_PN_CONFIG_1_PALETTE_NUMBER(x)                                     \
+        ((((x) >> 9) & 0x07) << 12)
 
 /* Configuration #3
  * 2-words
- * 16, 256, and 2,048 colors */
-#define VDP2_PN_CONFIG_3_PALETTE_NUMBER(x)                                     \
+ * 16, 256, and 2,048 colors
+ * 16 banks, each of 16 colors */
+#define VDP2_PN_CONFIG_2_PALETTE_NUMBER(x)                                     \
         ((((x) >> 5) & 0x7F) << 16)
 
 #ifdef __cplusplus
