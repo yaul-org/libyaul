@@ -15,7 +15,7 @@
 
 #include <inttypes.h>
 
-#include "bounding_box.h"
+#include "aabb.h"
 
 struct object;
 
@@ -24,7 +24,12 @@ struct collider {
 
         uint32_t id;
         bool trigger;
-        struct bounding_box bb;
+        struct aabb aabb;
+};
+
+struct collider_info {
+        int16_t overlap;
+        int16_vector2_t smallest;
 };
 
 #endif /* !COLLIDER_H */

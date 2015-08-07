@@ -29,11 +29,13 @@
     void (*on_update)(struct object *);                                        \
     void (*on_draw)(struct object *);                                          \
     void (*on_destroy)(struct object *);                                       \
-    void (*on_collision)(struct object *, struct collider *);                  \
+    void (*on_collision)(struct object *, struct object *,                     \
+            struct collider_info *);                                           \
     void (*on_trigger)(struct object *, struct collider *);
 
-#define OBJECT_CALL_EVENT(x, name) do {                                        \
-        ((struct object *)(x))->CC_CONCAT(on_, name)((struct object *)(x));    \
+#define OBJECT_CALL_EVENT(x, name, args...) do {                               \
+        ((struct object *)(x))->CC_CONCAT(on_, name)((struct object *)(x),     \
+            ##args);                                                           \
 } while (false)
 
 struct object {

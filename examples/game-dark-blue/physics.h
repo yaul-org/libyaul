@@ -13,8 +13,9 @@
 
 #include <fixmath.h>
 
-#include "object.h"
+#include "aabb.h"
 #include "collider.h"
+#include "object.h"
 #include "rigid_body.h"
 
 void physics_init(void);

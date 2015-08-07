@@ -84,6 +84,22 @@ common_round_pow2(uint32_t value)
         return value;
 }
 
+#ifndef min
+#define min(a, b)                                                              \
+        ({ __typeof__ (a) _a = (a);                                            \
+           __typeof__ (b) _b = (b);                                            \
+           (_a < _b) ? _a : _b;                                                \
+        })
+#endif /* !min */
+
+#ifndef max
+#define max(a, b)                                                              \
+        ({ __typeof__ (a) _a = (a);                                            \
+           __typeof__ (b) _b = (b);                                            \
+           (_a > _b) ? _a : _b;                                                \
+        })
+#endif /* !max */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

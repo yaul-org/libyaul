@@ -111,6 +111,9 @@ on_update(struct object *this)
         struct object_camera *camera;
         camera = (struct object_camera *)this;
 
+        struct object_player *player;
+        player = (struct object_player *)&object_player;
+
         struct vdp1_cmdt_polygon *debug_polygon;
         debug_polygon = &camera->private_data.m_debug_polygon[0];
 
@@ -132,8 +135,20 @@ on_update(struct object *this)
 
         int16_t amount;
 
-        struct collider *player_collider;
-        player_collider = object_player.colliders[0];
+        struct bounding_box player_bb;
+        uint16_t player_width;
+        player_width = player->private_data.m_width;
+        uint16_t player_height;
+        player_height = player->private_data.m_height;
+
+        player_bb.point.a.x = 0;
+        player_bb.point.a.y = player_height - 1;
+        player_bb.point.b.x = player_width;
+        player_bb.point.b.y = player_height - 1;
+        player_bb.point.c.x = player_width;
+        player_bb.point.c.y = 0;
+        player_bb.point.d.x = 0;
+        player_bb.point.d.y = 0;
 
         switch (camera->private_data.m_state) {
         case STATE_ADJUST_BB:
@@ -141,7 +156,7 @@ on_update(struct object *this)
                 lbb->point.b.x = left_x;
                 lbb->point.c.x = left_x;
 
-                right_x = object_player.transform.position.x + object_player.private_data.m_width + camera->private_data.m_buffer;
+                right_x = object_player.transform.position.x + player_width + camera->private_data.m_buffer;
                 rbb->point.a.x = right_x;
                 rbb->point.d.x = right_x;
 
@@ -154,7 +169,7 @@ on_update(struct object *this)
                 right_x = rbb->point.a.x;
 
                 /* Right bounding box */
-                amount = (object_player.transform.position.x + player_collider->bb.point.b.x) - rbb->point.a.x;
+                amount = (object_player.transform.position.x + player_bb.point.b.x) - rbb->point.a.x;
                 if (amount > 0) {
                         left_x += amount;
                         lbb->point.b.x = left_x;
@@ -176,7 +191,7 @@ on_update(struct object *this)
                 }
 
                 /* Left bounding box */
-                amount = (object_player.transform.position.x + player_collider->bb.point.a.x) - lbb->point.b.x;
+                amount = (object_player.transform.position.x + player_bb.point.a.x) - lbb->point.b.x;
                 if (amount < 0) {
                         left_x += amount;
                         lbb->point.b.x = left_x;
@@ -196,7 +211,7 @@ on_update(struct object *this)
         case STATE_FIRST_RIGHT:
                 position = old_position + 1;
 
-                amount = (object_player.transform.position.x + player_collider->bb.point.b.x) - rbb->point.a.x;
+                amount = (object_player.transform.position.x + player_bb.point.b.x) - rbb->point.a.x;
                 if (amount < 0) {
                         camera->private_data.m_state = STATE_IDLE;
                 }

@@ -15,5 +15,6 @@
 #define OBJECT_CAMERA_ID        0
 #define OBJECT_PLAYER_ID        1
 #define OBJECT_WORLD_ID         2
+#define OBJECT_BLOCK_ID         3
 
 #endif /* !OBJECTS_H */

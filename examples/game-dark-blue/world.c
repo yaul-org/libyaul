@@ -37,6 +37,8 @@ static void on_world_draw(struct object *);
 static void on_block_init(struct object *);
 static void on_block_update(struct object *);
 static void on_block_draw(struct object *);
+static void on_block_collision(struct object *, struct object *,
+        struct collider_info *);
 
 static void _update_world_map(struct object *, uint32_t);
 static void _update_world_colliders(struct object *, uint32_t);
@@ -89,13 +91,14 @@ on_world_init(struct object *this)
                 block = &object_block_pool[block_idx];
 
                 block->active = true;
+                block->id = OBJECT_BLOCK_ID;
                 block->on_init = on_block_init;
                 block->rigid_body = NULL;
                 block->colliders[0] = &block->private_data.m_collider;
                 block->on_update = on_block_update;
                 block->on_draw = on_block_draw;
                 block->on_destroy = NULL;
-                block->on_collision = NULL;
+                block->on_collision = on_block_collision;
                 block->on_trigger = NULL;
 
                 OBJECT_CALL_EVENT(block, init);
@@ -333,10 +336,10 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
         bb.point.d.x = (-(BLOCKS / 2) * WORLD_BLOCK_WIDTH) + 1;
         bb.point.d.y = (-(BLOCKS / 2) * WORLD_BLOCK_WIDTH) + 1;
 
-        sprintf(text, "A (%i, %i)\n", bb.point.a.x, bb.point.a.y); cons_buffer(&cons, text);
-        sprintf(text, "B (%i, %i)\n", bb.point.b.x, bb.point.b.y); cons_buffer(&cons, text);
-        sprintf(text, "C (%i, %i)\n", bb.point.c.x, bb.point.c.y); cons_buffer(&cons, text);
-        sprintf(text, "D (%i, %i)\n", bb.point.d.x, bb.point.d.y); cons_buffer(&cons, text);
+        /* sprintf(text, "A (%i, %i)\n", bb.point.a.x, bb.point.a.y); cons_buffer(&cons, text); */
+        /* sprintf(text, "B (%i, %i)\n", bb.point.b.x, bb.point.b.y); cons_buffer(&cons, text); */
+        /* sprintf(text, "C (%i, %i)\n", bb.point.c.x, bb.point.c.y); cons_buffer(&cons, text); */
+        /* sprintf(text, "D (%i, %i)\n", bb.point.d.x, bb.point.d.y); cons_buffer(&cons, text); */
 
         int16_vector2_t block_points[4];
 
@@ -355,12 +358,12 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
                 block_points[point_idx].x = column;
                 block_points[point_idx].y = row;
 
-                sprintf(text, "%i'=%i,%i (%i,%i) (%i,%i)\n",
-                    (int)point_idx, (int)column, (int)row,
-                    (int)player->transform.position.x,
-                    (int)player->transform.position.y,
-                    (int)player->transform.position.x / 16,
-                    (int)player->transform.position.y / 16); cons_buffer(&cons, text);
+                /* sprintf(text, "%i'=%i,%i (%i,%i) (%i,%i)\n", */
+                /*     (int)point_idx, (int)column, (int)row, */
+                /*     (int)player->transform.position.x, */
+                /*     (int)player->transform.position.y, */
+                /*     (int)player->transform.position.x / 16, */
+                /*     (int)player->transform.position.y / 16); cons_buffer(&cons, text); */
         }
 
         uint32_t columns;
@@ -371,7 +374,7 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
         /* Make sure we don't cause a buffer overflow */
         assert(OBJECT_BLOCK_COUNT >= (columns * rows));
 
-        sprintf(text, "columns=%i, rows=%i\n", (int)columns, (int)rows); cons_buffer(&cons, text);
+        /* sprintf(text, "columns=%i, rows=%i\n", (int)columns, (int)rows); cons_buffer(&cons, text); */
 
         int16_t column_initial __unused;
         column_initial = block_points[3].x;
@@ -480,14 +483,14 @@ on_block_init(struct object *this)
         block->colliders[0]->object = (struct object *)block;
         block->colliders[0]->id = -1;
         block->colliders[0]->trigger = false;
-        block->colliders[0]->bb.point.a.x = 0;
-        block->colliders[0]->bb.point.a.y = WORLD_BLOCK_HEIGHT - 1;
-        block->colliders[0]->bb.point.b.x = WORLD_BLOCK_WIDTH - 1;
-        block->colliders[0]->bb.point.b.y = WORLD_BLOCK_HEIGHT - 1;
-        block->colliders[0]->bb.point.c.x = WORLD_BLOCK_WIDTH - 1;
-        block->colliders[0]->bb.point.c.y = 0;
-        block->colliders[0]->bb.point.d.x = 0;
-        block->colliders[0]->bb.point.d.y = 0;
+        block->colliders[0]->aabb.center.x = WORLD_BLOCK_WIDTH / 2;
+        block->colliders[0]->aabb.center.y = WORLD_BLOCK_HEIGHT / 2;
+        block->colliders[0]->aabb.min.x = 0;
+        block->colliders[0]->aabb.min.y = 0;
+        block->colliders[0]->aabb.max.x = WORLD_BLOCK_WIDTH - 1;
+        block->colliders[0]->aabb.max.y = WORLD_BLOCK_HEIGHT - 1;
+        block->colliders[0]->aabb.half.x = WORLD_BLOCK_WIDTH / 2;
+        block->colliders[0]->aabb.half.y = WORLD_BLOCK_HEIGHT / 2;
 }
 
 static void
@@ -518,10 +521,25 @@ on_block_update(struct object *this)
 
         /* XXX: This is not truly in world space */
         block->transform.position.x = column * WORLD_BLOCK_WIDTH;
-        block->transform.position.y = row * WORLD_BLOCK_HEIGHT;
+        block->transform.position.y = (WORLD_ROWS - row - 1) * WORLD_BLOCK_HEIGHT;
 }
 
 static void
 on_block_draw(struct object *this __unused)
 {
+}
+
+static void
+on_block_collision(struct object *this, struct object *other,
+    struct collider_info *info __unused)
+{
+        struct object_block *block __unused;
+        block = (struct object_block *)this;
+
+        if (other->id == OBJECT_BLOCK_ID) {
+                return;
+        }
+
+        (void)sprintf(text, "block, other->id=%i\n", (int)other->id);
+        cons_buffer(&cons, text);
 }
