@@ -7,5 +7,6 @@
 *.o
 *.romdisk
 *.sym
-/files
-/tmp
+/romdisk/*.MAP
+!/romdisk/*.TGA
+!/romdisk/*.PNG
