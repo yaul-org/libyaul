@@ -14,8 +14,8 @@ static void on_init(struct object *);
 static void on_update(struct object *);
 static void on_draw(struct object *);
 static void on_collision(struct object *, struct object *,
-    struct collider_info *);
-static void on_trigger(struct object *, struct collider *);
+    const struct collider_info *);
+static void on_trigger(struct object *, const struct collider *);
 
 static void _update_player(struct object *this);
 
@@ -164,7 +164,7 @@ on_draw(struct object *this)
 
 static void
 on_collision(struct object *this, struct object *other,
-    struct collider_info *info __unused)
+    const struct collider_info * info)
 {
         struct object_player *player __unused;
         player = (struct object_player *)this;
@@ -192,7 +192,7 @@ on_collision(struct object *this, struct object *other,
 }
 
 static void
-on_trigger(struct object *this, struct collider *collider __unused)
+on_trigger(struct object *this, const struct collider * collider __unused)
 {
         struct object_player *player __unused;
         player = (struct object_player *)this;

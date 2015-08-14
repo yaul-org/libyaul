@@ -38,7 +38,7 @@ static void on_block_init(struct object *);
 static void on_block_update(struct object *);
 static void on_block_draw(struct object *);
 static void on_block_collision(struct object *, struct object *,
-        struct collider_info *);
+    const struct collider_info *);
 
 static void _update_world_map(struct object *, uint32_t);
 static void _update_world_colliders(struct object *, uint32_t);
@@ -336,11 +336,6 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
         bb.point.d.x = (-(BLOCKS / 2) * WORLD_BLOCK_WIDTH) + 1;
         bb.point.d.y = (-(BLOCKS / 2) * WORLD_BLOCK_WIDTH) + 1;
 
-        /* sprintf(text, "A (%i, %i)\n", bb.point.a.x, bb.point.a.y); cons_buffer(&cons, text); */
-        /* sprintf(text, "B (%i, %i)\n", bb.point.b.x, bb.point.b.y); cons_buffer(&cons, text); */
-        /* sprintf(text, "C (%i, %i)\n", bb.point.c.x, bb.point.c.y); cons_buffer(&cons, text); */
-        /* sprintf(text, "D (%i, %i)\n", bb.point.d.x, bb.point.d.y); cons_buffer(&cons, text); */
-
         int16_vector2_t block_points[4];
 
         uint32_t point_idx;
@@ -357,13 +352,6 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
 
                 block_points[point_idx].x = column;
                 block_points[point_idx].y = row;
-
-                /* sprintf(text, "%i'=%i,%i (%i,%i) (%i,%i)\n", */
-                /*     (int)point_idx, (int)column, (int)row, */
-                /*     (int)player->transform.position.x, */
-                /*     (int)player->transform.position.y, */
-                /*     (int)player->transform.position.x / 16, */
-                /*     (int)player->transform.position.y / 16); cons_buffer(&cons, text); */
         }
 
         uint32_t columns;
@@ -373,8 +361,6 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
 
         /* Make sure we don't cause a buffer overflow */
         assert(OBJECT_BLOCK_COUNT >= (columns * rows));
-
-        /* sprintf(text, "columns=%i, rows=%i\n", (int)columns, (int)rows); cons_buffer(&cons, text); */
 
         int16_t column_initial __unused;
         column_initial = block_points[3].x;
@@ -531,7 +517,7 @@ on_block_draw(struct object *this __unused)
 
 static void
 on_block_collision(struct object *this, struct object *other,
-    struct collider_info *info __unused)
+    const struct collider_info *info __unused)
 {
         struct object_block *block __unused;
         block = (struct object_block *)this;
