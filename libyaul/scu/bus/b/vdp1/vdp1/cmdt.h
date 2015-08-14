@@ -178,6 +178,27 @@ struct vdp1_cmdt_line {
         uint32_t cl_grad;
 } __packed __aligned(32);
 
+struct vdp1_cmdt_local_coord {
+        struct {
+                int16_t x;
+                int16_t y;
+        } lc_coord;
+} __packed __aligned(32);
+
+struct vdp1_cmdt_system_clip_coord {
+        struct {
+                int16_t x;
+                int16_t y;
+        } scc_coord;
+} __packed __aligned(32);
+
+struct vdp1_cmdt_user_clip_coord {
+        struct {
+                int16_t x;
+                int16_t y;
+        } ucc_coords[2];
+} __packed __aligned(32);
+
 extern void vdp1_cmdt_list_init(void);
 extern void vdp1_cmdt_list_begin(uint32_t);
 extern void vdp1_cmdt_list_end(uint32_t);
@@ -189,10 +210,10 @@ extern void vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *);
 extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *);
 extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_polyline *);
 extern void vdp1_cmdt_line_draw(struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_set(uint16_t, uint16_t, uint16_t,
-    uint16_t);
-extern void vdp1_cmdt_system_clip_coord_set(int16_t, int16_t);
-extern void vdp1_cmdt_local_coord_set(int16_t, int16_t);
+extern void vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_user_clip_coord *);
+extern void vdp1_cmdt_system_clip_coord_set(
+        struct vdp1_cmdt_system_clip_coord *);
+extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(void);
 
 #undef VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT

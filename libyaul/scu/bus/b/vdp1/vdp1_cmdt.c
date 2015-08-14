@@ -314,26 +314,38 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_line *line)
 }
 
 void
-vdp1_cmdt_user_clip_coord_set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
+vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_user_clip_coord *user_clip)
 {
         assert(list_state.cts_in_block);
 
         struct vdp1_cmdt *cmdt;
         cmdt = fetch();
 
-        assert((x1 <= x2) && (y1 <= y2));
+        int16_t x0;
+        x0 = user_clip->ucc_coords[0].x;
+
+        int16_t y0;
+        y0 = user_clip->ucc_coords[0].y;
+
+        int16_t x1;
+        x1 = user_clip->ucc_coords[1].x;
+
+        int16_t y1;
+        y1 = user_clip->ucc_coords[1].y;
+
+        assert(((x0 <= x1) && (y0 <= y1)));
 
         cmdt->cmd_ctrl = 0x0008;
         /* Upper-left (x1, y1) */
-        cmdt->cmd_xa = x1 & 0x01FF;
-        cmdt->cmd_ya = y1 & 0x00FF;
-        /* Lower-right (x1, y1) */
-        cmdt->cmd_xc = x2 & 0x01FF;
-        cmdt->cmd_yc = y2 & 0x00FF;
+        cmdt->cmd_xa = x0 & 0x01FF;
+        cmdt->cmd_ya = y0 & 0x00FF;
+        /* Lower-right (x2, y2) */
+        cmdt->cmd_xc = x1 & 0x01FF;
+        cmdt->cmd_yc = y1 & 0x00FF;
 }
 
 void
-vdp1_cmdt_system_clip_coord_set(int16_t x, int16_t y)
+vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_system_clip_coord *system_clip)
 {
         assert(list_state.cts_in_block);
 
@@ -342,12 +354,12 @@ vdp1_cmdt_system_clip_coord_set(int16_t x, int16_t y)
 
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xc = x;
-        cmdt->cmd_yc = y;
+        cmdt->cmd_xc = system_clip->scc_coord.x;
+        cmdt->cmd_yc = system_clip->scc_coord.y;
 }
 
 void
-vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
+vdp1_cmdt_local_coord_set(struct vdp1_cmdt_local_coord *local)
 {
         assert(list_state.cts_in_block);
 
@@ -356,8 +368,8 @@ vdp1_cmdt_local_coord_set(int16_t x, int16_t y)
 
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xa = x;
-        cmdt->cmd_ya = y;
+        cmdt->cmd_xa = local->lc_coord.x;
+        cmdt->cmd_ya = local->lc_coord.y;
 }
 
 void
