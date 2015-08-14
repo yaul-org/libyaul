@@ -14,12 +14,12 @@ SEARCH_DIR ("/path/to/sh-elf/sh-elf/lib");
 
 MEMORY {
   /* 0x06004000-0x060FFFFF */
-  ram (Wx) : ORIGIN = 0x06004000, LENGTH = 0x000FC000
+  ram (Wx) : ORIGIN = 0x06004000, LENGTH = 0x000F4000
 }
 
-/* 0x06100000-0x060FC000 */
-PROVIDE (__stack = ORIGIN (ram) + LENGTH (ram));
-PROVIDE (__stack_end = ORIGIN (ram) + LENGTH (ram) - 0x00004000);
+/* 0x060F4000-0x06100000 */
+PROVIDE (__stack = ORIGIN (ram) + LENGTH (ram) + 0x00008000);
+PROVIDE (__stack_end = ORIGIN (ram) + LENGTH (ram));
 
 SECTIONS
 {
