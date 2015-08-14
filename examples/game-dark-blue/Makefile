@@ -3,16 +3,17 @@ include ../pre.common.mk
 PROJECT:= game-dark-blue
 OBJECTS+= \
 	root.romdisk.o \
+	camera.o \
+	cmd_groups.o \
+	dark-blue.o \
 	fs.o \
-	state_machine.o \
+	globals.o \
+	physics.o \
+	player.o \
 	state.o \
 	state_game.o \
-	globals.o \
-	player.o \
-	world.o \
-	camera.o \
-	physics.o \
-	dark-blue.o
+	state_machine.o \
+	world.o
 
 ROMDISK_DEPS:= levels/test.json
 

@@ -14,6 +14,7 @@
 #include <fixmath.h>
 
 #include "bounding_box.h"
+#include "cmd_groups.h"
 #include "common.h"
 #include "globals.h"
 #include "object.h"
@@ -38,6 +39,7 @@ struct object_player {
                 uint32_t m_state;
                 uint32_t m_last_state;
 
+                struct cmd_group m_cmd_group;
                 struct vdp1_cmdt_polygon m_polygon;
         } private_data;
 };

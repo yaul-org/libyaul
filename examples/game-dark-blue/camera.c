@@ -48,6 +48,10 @@ static char *states_str[] __unused = {
 static void
 on_init(struct object *this)
 {
+        /* XXX: There is some serious issues with having a "large" stack
+         * frame */
+        static struct vdp1_cmdt_local_coord local;
+
         struct object_camera *camera;
         camera = (struct object_camera *)this;
 
@@ -103,6 +107,21 @@ on_init(struct object *this)
         debug_polygon[1].cp_mode.transparent_pixel = true;
         debug_polygon[1].cp_mode.end_code = true;
         debug_polygon[1].cp_mode.cc_mode = 3;
+
+        struct cmd_group *cmd_group;
+        cmd_group = &camera->private_data.m_cmd_group;
+
+        cmd_group_init(cmd_group);
+
+        cmd_group->priority = 0;
+
+        local.lc_coord.x = 0;
+        local.lc_coord.y = SCREEN_HEIGHT - 1;
+
+        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LOCAL_COORD, &local);
+        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_POLYGON, &debug_polygon[0]);
+        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_POLYGON, &debug_polygon[1]);
+        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LINE, debug_line);
 }
 
 static void
@@ -242,18 +261,7 @@ on_update(struct object *this)
         debug_polygon[1].cp_vertex.d.x = rbb->point.a.x;
         debug_polygon[1].cp_vertex.d.y = -rbb->point.a.y + 1;
 
-        vdp1_cmdt_list_begin(2); {
-                vdp1_cmdt_local_coord_set(0, SCREEN_HEIGHT - 1);
-
-                vdp1_cmdt_polygon_draw(&debug_polygon[0]);
-                vdp1_cmdt_polygon_draw(&debug_polygon[1]);
-
-                struct vdp1_cmdt_line *debug_line;
-                debug_line = &camera->private_data.m_debug_line;
-                vdp1_cmdt_line_draw(debug_line);
-
-                vdp1_cmdt_end();
-        } vdp1_cmdt_list_end(2);
+        cmd_groups_add(&camera->private_data.m_cmd_group);
 }
 
 static void

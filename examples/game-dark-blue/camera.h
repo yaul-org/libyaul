@@ -14,6 +14,7 @@
 #include <fixmath.h>
 
 #include "bounding_box.h"
+#include "cmd_groups.h"
 #include "common.h"
 #include "globals.h"
 #include "object.h"
@@ -32,6 +33,7 @@ struct object_camera {
                 struct bounding_box m_lbb;
                 struct bounding_box m_rbb;
 
+                struct cmd_group m_cmd_group;
                 struct vdp1_cmdt_line m_debug_line;
                 struct vdp1_cmdt_polygon m_debug_polygon[2];
         } private_data;

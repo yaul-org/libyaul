@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cmd_groups.h"
 #include "common.h"
 #include "globals.h"
 #include "objects.h"
@@ -28,6 +29,7 @@ void
 state_game_init(struct state_context *state_context __unused)
 {
         physics_init();
+        cmd_groups_init();
 
         OBJECT_CALL_EVENT(&object_world, init);
         OBJECT_CALL_EVENT(&object_player, init);
@@ -42,56 +44,12 @@ state_game_update(struct state_context *state_context)
 
         cons_buffer(&cons, "[H[2J");
 
-        vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_system_clip_coord_set(SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
-                vdp1_cmdt_user_clip_coord_set(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
-                vdp1_cmdt_local_coord_set(0, SCREEN_HEIGHT - 1);
-                vdp1_cmdt_end();
-        } vdp1_cmdt_list_end(0);
-
-        int16_vector2_t old_position;
-        old_position.x = object_player.transform.position.x;
-        old_position.y = object_player.transform.position.y;
-
-        int16_vector2_t new_position;
-        memcpy(&new_position, &old_position, sizeof(int16_vector2_t));
-
-        if (digital_pad.connected == 1) {
-                if (digital_pad.pressed.button.left) {
-                        object_player.private_data.m_direction = -1;
-                        object_player.private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.x = object_player.transform.position.x +
-                            object_player.private_data.m_direction;
-                } else if (digital_pad.pressed.button.right) {
-                        object_player.private_data.m_direction = 1;
-                        object_player.private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.x = object_player.transform.position.x +
-                            object_player.private_data.m_direction;
-                } else {
-                        object_player.private_data.m_state = PLAYER_STATE_IDLE;
-                }
-
-                if (digital_pad.pressed.button.up) {
-                        object_player.private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.y = object_player.transform.position.y + 1;
-                } else if (digital_pad.pressed.button.down) {
-                        object_player.private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.y = object_player.transform.position.y - 1;
-                }
-        }
-
-        object_player.transform.position.x = new_position.x;
-        object_player.transform.position.y = new_position.y;
-
         OBJECT_CALL_EVENT(&object_player, update);
         OBJECT_CALL_EVENT(&object_camera, update);
         OBJECT_CALL_EVENT(&object_world, update);
 
         physics_update();
+        cmd_groups_update();
 }
 
 void
