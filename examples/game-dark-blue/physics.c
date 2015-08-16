@@ -21,21 +21,18 @@ static void physics_stage_simulate(void);
 static void physics_stage_detect(void);
 static void physics_stage_respond(void);
 
-static struct object *object_pool[OBJECT_POOL_MAX];
-static uint32_t object_pool_idx = 0;
-
-static struct collision_pool {
-        struct collision_pool_entry {
+static struct object_pool {
+        struct object_pool_entry {
                 struct object *object;
+
                 struct collision {
                         struct object *object;
                         struct collider_info info;
                 } collisions[OBJECT_POOL_MAX - 1];
                 uint32_t collisions_cnt;
         } entries[OBJECT_POOL_MAX];
-} collision_pool;
-
-static uint32_t collision_pool_entry_idx = 0;
+} object_pool;
+static uint32_t object_pool_entry_idx = 0;
 
 struct sat_projection {
         int16_t min;
@@ -54,9 +51,10 @@ static inline void sat_object_projection_calculate(const struct object *,
 void
 physics_init(void)
 {
-        object_pool_idx = 0;
+        object_pool_entry_idx = 0;
 
-        memset(&object_pool[0], 0x00, OBJECT_POOL_MAX * sizeof(struct object));
+        memset(&object_pool.entries[0], 0x00,
+            OBJECT_POOL_MAX * sizeof(struct object));
 }
 
 void
@@ -70,7 +68,7 @@ physics_update(void)
 void
 physics_object_add(struct object *object)
 {
-        assert((object_pool_idx + 1) < OBJECT_POOL_MAX);
+        assert((object_pool_entry_idx + 1) < OBJECT_POOL_MAX);
 
         assert(object != NULL);
         /* Make sure that the object is active */
@@ -78,8 +76,8 @@ physics_object_add(struct object *object)
         /* We need at least one collider */
         assert((object->colliders[0] != NULL) || (object->colliders[0] != NULL));
 
-        object_pool[object_pool_idx] = object;
-        object_pool_idx++;
+        object_pool.entries[object_pool_entry_idx].object = object;
+        object_pool_entry_idx++;
 }
 
 static inline int16_t
@@ -198,9 +196,9 @@ static void
 physics_stage_simulate(void)
 {
         uint32_t object_idx;
-        for (object_idx = 0; object_idx < object_pool_idx; object_idx++) {
+        for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
                 struct object *object;
-                object = object_pool[object_idx];
+                object = object_pool.entries[object_idx].object;
 
                 if (!object->active) {
                         continue;
@@ -209,113 +207,158 @@ physics_stage_simulate(void)
 }
 
 static void
+detected_collisions_sort(struct object_pool_entry *object_pool_entry)
+{
+        if (object_pool_entry->collisions_cnt <= 1) {
+                return;
+        }
+
+        bool swapped;
+        do {
+                swapped = false;
+
+                uint32_t ci;
+                for (ci = 0; ci < (object_pool_entry->collisions_cnt - 1); ci++) {
+                        struct collision *collision_i;
+                        collision_i =
+                            &object_pool_entry->collisions[ci];
+
+                        struct collision *collision_i_next;
+                        collision_i_next =
+                            &object_pool_entry->collisions[ci + 1];
+
+                        bool swap;
+                        swap = abs(collision_i->info.direction.x) <
+                            abs(collision_i_next->info.direction.x);
+
+                        swapped = true;
+
+                        if (!swap) {
+                                continue;
+                        }
+
+                        struct collision temp;
+                        (void)memcpy(&temp, collision_i,
+                            sizeof(struct collision));
+
+                        (void)memcpy(collision_i, collision_i_next,
+                            sizeof(struct collision));
+                        (void)memcpy(collision_i_next, &temp,
+                            sizeof(struct collision));
+                }
+        } while (!swapped);
+}
+
+static void
 physics_stage_detect(void)
 {
-        collision_pool_entry_idx = 0;
-
         uint32_t object_idx;
-        for (object_idx = 0; object_idx < object_pool_idx; object_idx++) {
+        for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
+                struct object_pool_entry *object_pool_entry;
+                object_pool_entry = &object_pool.entries[object_idx];
+
+                object_pool_entry->collisions_cnt = 0;
+        }
+
+        for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
+                struct object_pool_entry *object_pool_entry;
+                object_pool_entry = &object_pool.entries[object_idx];
+
                 struct object *object;
-                object = object_pool[object_idx];
+                object = object_pool_entry->object;
 
                 if (!object->active) {
                         continue;
                 }
 
-                struct collision_pool_entry *collision_pool_entry;
-                collision_pool_entry =
-                    &collision_pool.entries[collision_pool_entry_idx];
-
-                collision_pool_entry->object = object;
-                collision_pool_entry->collisions_cnt = 0;
-
-                uint32_t collision_idx;
-                collision_idx = 0;
-
                 uint32_t other_idx;
-                for (other_idx = object_idx + 1; other_idx < object_pool_idx;
+                for (other_idx = object_idx + 1; other_idx < object_pool_entry_idx;
                      other_idx++) {
+                        struct object_pool_entry *other_pool_entry;
+                        other_pool_entry = &object_pool.entries[other_idx];
+
                         struct object *other;
-                        other = object_pool[other_idx];
+                        other = other_pool_entry->object;
 
                         if (!other->active) {
                                 continue;
                         }
 
-                        struct collision *collision;
-                        collision =
-                            &collision_pool_entry->collisions[collision_idx];
+                        struct collision *object_collision;
+                        object_collision = &object_pool_entry->collisions[
+                                object_pool_entry->collisions_cnt];
 
-                        if ((sat_object_object_test(object, other, NULL, NULL))) {
-                                collision_pool_entry->collisions_cnt =
-                                    collision_idx + 1;
+                        struct collision *other_collision;
+                        other_collision = &other_pool_entry->collisions[
+                                other_pool_entry->collisions_cnt];
 
-                                collision->object = other;
+                        int16_t overlap;
+                        int16_vector2_t direction;
 
-                                collision_idx++;
+                        if ((sat_object_object_test(object, other, &overlap,
+                                    &direction))) {
+                                object_collision->object = other;
+                                object_collision->info.overlap = overlap;
+                                object_collision->info.direction.x = direction.x;
+                                object_collision->info.direction.y = direction.y;
+                                object_pool_entry->collisions_cnt++;
+
+                                other_collision->object = object;
+                                other_collision->info.overlap = overlap;
+                                other_collision->info.direction.x = direction.x;
+                                other_collision->info.direction.y = direction.y;
+                                other_pool_entry->collisions_cnt++;
                         }
                 }
 
-                collision_pool_entry_idx++;
+                detected_collisions_sort(object_pool_entry);
         }
 }
 
 static void
 physics_stage_respond(void)
 {
-        uint32_t cpe_idx;
-        for (cpe_idx = 0; cpe_idx < collision_pool_entry_idx; cpe_idx++) {
-                struct collision_pool_entry *collision_pool_entry;
-                collision_pool_entry = &collision_pool.entries[cpe_idx];
+        uint32_t object_idx;
+        for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
+                struct object_pool_entry *object_pool_entry;
+                object_pool_entry = &object_pool.entries[object_idx];
 
                 struct object *object;
-                object = collision_pool_entry->object;
+                object = object_pool_entry->object;
+
+                if (!object->active) {
+                        continue;
+                }
 
                 uint32_t collision_idx;
                 for (collision_idx = 0;
-                     collision_idx < collision_pool_entry->collisions_cnt;
+                     collision_idx < object_pool_entry->collisions_cnt;
                      collision_idx++) {
                         struct collision *collision;
                         collision =
-                            &collision_pool_entry->collisions[collision_idx];
+                            &object_pool_entry->collisions[collision_idx];
 
                         struct object *other;
                         other = collision->object;
 
-                        int16_t overlap;
-                        int16_vector2_t direction;
-
-                        if (!(sat_object_object_test(object, other, &overlap,
-                                    &direction))) {
+                        if (!(sat_object_object_test(object, other, NULL, NULL))) {
                                 continue;
                         }
 
-                        int16_vector2_t delta;
-                        delta.x = overlap * direction.x;
-                        delta.y = overlap * direction.y;
+                        int16_vector2_t position_delta;
+                        position_delta.x = collision->info.overlap *
+                            collision->info.direction.x;
+                        position_delta.y = collision->info.overlap *
+                            collision->info.direction.y;
 
                         if (!object->colliders[0]->fixed) {
                                 int16_vector2_add(&object->transform.position,
-                                    &delta,
+                                    &position_delta,
                                     &object->transform.position);
                         }
 
-                        if (!other->colliders[0]->fixed) {
-                                int16_vector2_add(&other->transform.position,
-                                    &delta,
-                                    &other->transform.position);
-                        }
-
-                        collision->info.overlap = overlap;
-                        collision->info.direction = direction;
-
                         if (object->on_collision != NULL) {
                                 OBJECT_CALL_EVENT(object, collision, other,
-                                    &collision->info);
-                        }
-
-                        if (other->on_collision != NULL) {
-                                OBJECT_CALL_EVENT(other, collision, object,
                                     &collision->info);
                         }
                 }
