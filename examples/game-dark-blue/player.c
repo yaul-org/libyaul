@@ -169,15 +169,15 @@ on_collision(struct object *this, struct object *other,
         struct object_player *player __unused;
         player = (struct object_player *)this;
 
-        int16_vector2_t delta;
-        delta.x = info->smallest.x;
-        delta.y = info->smallest.y;
+        /* int16_vector2_t delta; */
+        /* delta.x = info->smallest.x; */
+        /* delta.y = info->smallest.y; */
 
-        int16_vector2_scale(info->overlap, &delta);
+        /* int16_vector2_scale(info->overlap, &delta); */
 
-        int16_vector2_add(&player->transform.position,
-            &delta,
-            &player->transform.position);
+        /* int16_vector2_add(&player->transform.position, */
+        /*     &delta, */
+        /*     &player->transform.position); */
 
         (void)sprintf(text, "player, other->id=%i, o=%i, d=%i,%i, P=%i,%i\n",
             (int)other->id,
