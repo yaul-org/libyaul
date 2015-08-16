@@ -100,6 +100,22 @@ common_round_pow2(uint32_t value)
         })
 #endif /* !max */
 
+#ifndef sign
+#define sign(x)                                                                \
+        ({ __typeof__ (x) _x = (x);                                            \
+           (_x < 0) ? -1 : 1;                                                  \
+        })
+#endif /* !sign */
+
+#ifndef clamp
+#define clamp(x, y, z)                                                         \
+        ({ __typeof__ (x) _x = (x);                                            \
+           __typeof__ (y) _y = (y);                                            \
+           __typeof__ (z) _z = (z);                                            \
+           (_x <= _y) ? _y : ((_x >= _z) ? _z : _x);                           \
+        })
+#endif /* !clamp */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
