@@ -15,7 +15,7 @@
 #include "globals.h"
 #include "physics.h"
 
-#define OBJECT_POOL_MAX 64
+#define OBJECT_POOL_MAX 32
 
 static void physics_stage_simulate(void);
 static void physics_stage_detect(void);
@@ -24,14 +24,18 @@ static void physics_stage_respond(void);
 static struct object *object_pool[OBJECT_POOL_MAX];
 static uint32_t object_pool_idx = 0;
 
-static struct collision {
-        struct {
+static struct collision_pool {
+        struct collision_pool_entry {
                 struct object *object;
-                struct collider_info info;
-        } object, other;
-} collision_pool[OBJECT_POOL_MAX] __unused;
+                struct collision {
+                        struct object *object;
+                        struct collider_info info;
+                } collisions[OBJECT_POOL_MAX - 1];
+                uint32_t collisions_cnt;
+        } entries[OBJECT_POOL_MAX];
+} collision_pool;
 
-static uint32_t collision_pool_idx = 0;
+static uint32_t collision_pool_entry_idx = 0;
 
 struct sat_projection {
         int16_t min;
@@ -93,7 +97,7 @@ sat_overlap_test(const struct sat_projection *a, const struct sat_projection *b)
 
 static inline void
 sat_object_projection_calculate(const struct object *object,
-    struct sat_projection *projected)
+    struct sat_projection *project)
 {
         struct aabb aabb;
         aabb.min.x = object->transform.position.x +
@@ -106,25 +110,25 @@ sat_object_projection_calculate(const struct object *object,
             object->colliders[0]->aabb.max.y;
 
         /* dot(up_vector, vertex[0]) */
-        projected[0].min = aabb.min.y;
-        projected[0].max = aabb.max.y;
+        project[0].min = aabb.min.y;
+        project[0].max = aabb.max.y;
 
         /* dot(right_vector, vertex[1]) */
-        projected[1].min = aabb.min.x;
-        projected[1].max = aabb.max.x;
+        project[1].min = aabb.min.x;
+        project[1].max = aabb.max.x;
 
         /* dot(down_vector, vertex[2]) */
-        projected[2].min = -aabb.max.y;
-        projected[2].max = -aabb.min.y;
+        project[2].min = -aabb.max.y;
+        project[2].max = -aabb.min.y;
 
         /* dot(left_vector, vector[3]) */
-        projected[3].min = -aabb.max.x;
-        projected[3].max = -aabb.min.x;
+        project[3].min = -aabb.max.x;
+        project[3].max = -aabb.min.x;
 }
 
 static inline bool
 sat_object_object_test(const struct object *object, const struct object *other,
-    int16_t *overlap, int16_vector2_t *smallest)
+    int16_t *overlap, int16_vector2_t *direction)
 {
         static const int16_vector2_t axes[] = {
                 INT16_VECTOR2_INITIALIZER( 0,  1),
@@ -133,54 +137,59 @@ sat_object_object_test(const struct object *object, const struct object *other,
                 INT16_VECTOR2_INITIALIZER(-1,  0)
         };
 
-        struct sat_projection object_projected[4];
-        sat_object_projection_calculate(object, object_projected);
+        struct sat_projection object_project[4];
+        sat_object_projection_calculate(object, object_project);
 
-        struct sat_projection other_projected[4];
-        sat_object_projection_calculate(other, other_projected);
+        struct sat_projection other_project[4];
+        sat_object_projection_calculate(other, other_project);
 
-        const int16_vector2_t *smallest_copy;
-        smallest_copy = NULL;
+        const int16_vector2_t *smallest_axis;
+        smallest_axis = NULL;
 
-        int16_t overlap_copy;
-        overlap_copy = INT16_MAX;
+        int16_t overlapped;
+        overlapped = INT16_MAX;
 
         uint32_t axis;
         for (axis = 0; axis < 4; axis++) {
-                if (!(sat_overlap_test(&object_projected[axis],
-                            &other_projected[axis]))) {
+                if (!(sat_overlap_test(&object_project[axis],
+                            &other_project[axis]))) {
                         return false;
                 }
 
-                int16_t amount;
-                amount = sat_overlap(&object_projected[axis],
-                    &other_projected[axis]);
-
-                if (amount < overlap_copy) {
-                        overlap_copy = amount;
-                        smallest_copy = &axes[axis];
+                if ((overlap != NULL) || (direction != NULL)) {
+                        int16_t amount;
+                        amount = sat_overlap(&object_project[axis],
+                            &other_project[axis]);
+                        if (amount < overlapped) {
+                                overlapped = amount;
+                                smallest_axis = &axes[axis];
+                        }
                 }
         }
 
-        *overlap = overlap_copy;
+        if (overlap != NULL) {
+                *overlap = overlapped;
+        }
 
-        int16_vector2_t object_center;
-        object_center.x = object->transform.position.x +
-            object->colliders[0]->aabb.center.x - 1;
-        object_center.y = object->transform.position.y +
-            object->colliders[0]->aabb.center.y - 1;
+        if (direction != NULL) {
+                int16_vector2_t object_center;
+                object_center.x = object->transform.position.x +
+                    object->colliders[0]->aabb.center.x - 1;
+                object_center.y = object->transform.position.y +
+                    object->colliders[0]->aabb.center.y - 1;
 
-        int16_vector2_t other_center;
-        other_center.x = other->transform.position.x +
-            other->colliders[0]->aabb.center.x - 1;
-        other_center.y = other->transform.position.y +
-            other->colliders[0]->aabb.center.y - 1;
+                int16_vector2_t other_center;
+                other_center.x = other->transform.position.x +
+                    other->colliders[0]->aabb.center.x - 1;
+                other_center.y = other->transform.position.y +
+                    other->colliders[0]->aabb.center.y - 1;
 
-        int16_vector2_t center_diff;
-        int16_vector2_sub(&other_center, &object_center, &center_diff);
+                int16_vector2_t center_diff;
+                int16_vector2_sub(&other_center, &object_center, &center_diff);
 
-        smallest->x = sign(center_diff.x) * smallest_copy->x;
-        smallest->y = sign(center_diff.y) * smallest_copy->y;
+                direction->x = sign(center_diff.x) * smallest_axis->x;
+                direction->y = sign(center_diff.y) * smallest_axis->y;
+        }
 
         return true;
 }
@@ -202,7 +211,7 @@ physics_stage_simulate(void)
 static void
 physics_stage_detect(void)
 {
-        collision_pool_idx = 0;
+        collision_pool_entry_idx = 0;
 
         uint32_t object_idx;
         for (object_idx = 0; object_idx < object_pool_idx; object_idx++) {
@@ -212,6 +221,16 @@ physics_stage_detect(void)
                 if (!object->active) {
                         continue;
                 }
+
+                struct collision_pool_entry *collision_pool_entry;
+                collision_pool_entry =
+                    &collision_pool.entries[collision_pool_entry_idx];
+
+                collision_pool_entry->object = object;
+                collision_pool_entry->collisions_cnt = 0;
+
+                uint32_t collision_idx;
+                collision_idx = 0;
 
                 uint32_t other_idx;
                 for (other_idx = object_idx + 1; other_idx < object_pool_idx;
@@ -223,64 +242,82 @@ physics_stage_detect(void)
                                 continue;
                         }
 
-                        int16_t overlap;
-                        int16_vector2_t smallest;
+                        struct collision *collision;
+                        collision =
+                            &collision_pool_entry->collisions[collision_idx];
 
-                        if ((sat_object_object_test(object, other, &overlap,
-                                    &smallest))) {
-                                struct collision *collision;
-                                collision = &collision_pool[collision_pool_idx];
+                        if ((sat_object_object_test(object, other, NULL, NULL))) {
+                                collision_pool_entry->collisions_cnt =
+                                    collision_idx + 1;
 
-                                collision->object.object = object;
-                                collision->other.object = other;
+                                collision->object = other;
 
-                                collision->object.info.overlap = overlap;
-                                collision->object.info.smallest.x = smallest.x;
-                                collision->object.info.smallest.y = smallest.y;
-
-                                collision->other.info.overlap = overlap;
-                                collision->other.info.smallest.x = smallest.x;
-                                collision->other.info.smallest.y = smallest.y;
-
-                                collision_pool_idx++;
+                                collision_idx++;
                         }
                 }
+
+                collision_pool_entry_idx++;
         }
 }
 
 static void
 physics_stage_respond(void)
 {
-        uint32_t collision_idx;
-        for (collision_idx = 0;
-             collision_idx < collision_pool_idx; collision_idx++) {
-        /* int16_vector2_t delta; */
-        /* delta.x = info->smallest.x; */
-        /* delta.y = info->smallest.y; */
-
-        /* int16_vector2_scale(info->overlap, &delta); */
-
-        /* int16_vector2_add(&player->transform.position, */
-        /*     &delta, */
-        /*     &player->transform.position); */
-
-                struct collision *collision;
-                collision = &collision_pool[collision_idx];
+        uint32_t cpe_idx;
+        for (cpe_idx = 0; cpe_idx < collision_pool_entry_idx; cpe_idx++) {
+                struct collision_pool_entry *collision_pool_entry;
+                collision_pool_entry = &collision_pool.entries[cpe_idx];
 
                 struct object *object;
-                object = collision->object.object;
+                object = collision_pool_entry->object;
 
-                struct object *other;
-                other = collision->other.object;
+                uint32_t collision_idx;
+                for (collision_idx = 0;
+                     collision_idx < collision_pool_entry->collisions_cnt;
+                     collision_idx++) {
+                        struct collision *collision;
+                        collision =
+                            &collision_pool_entry->collisions[collision_idx];
 
-                if (object->on_collision != NULL) {
-                        OBJECT_CALL_EVENT(object, collision, other,
-                            &collision->other.info);
-                }
+                        struct object *other;
+                        other = collision->object;
 
-                if (other->on_collision != NULL) {
-                        OBJECT_CALL_EVENT(other, collision, object,
-                            &collision->object.info);
+                        int16_t overlap;
+                        int16_vector2_t direction;
+
+                        if (!(sat_object_object_test(object, other, &overlap,
+                                    &direction))) {
+                                continue;
+                        }
+
+                        int16_vector2_t delta;
+                        delta.x = overlap * direction.x;
+                        delta.y = overlap * direction.y;
+
+                        if (!object->colliders[0]->fixed) {
+                                int16_vector2_add(&object->transform.position,
+                                    &delta,
+                                    &object->transform.position);
+                        }
+
+                        if (!other->colliders[0]->fixed) {
+                                int16_vector2_add(&other->transform.position,
+                                    &delta,
+                                    &other->transform.position);
+                        }
+
+                        collision->info.overlap = overlap;
+                        collision->info.direction = direction;
+
+                        if (object->on_collision != NULL) {
+                                OBJECT_CALL_EVENT(object, collision, other,
+                                    &collision->info);
+                        }
+
+                        if (other->on_collision != NULL) {
+                                OBJECT_CALL_EVENT(other, collision, object,
+                                    &collision->info);
+                        }
                 }
         }
 }

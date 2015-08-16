@@ -43,6 +43,8 @@ state_game_update(struct state_context *state_context)
         state_data = (struct state_data *)state_context->sc_data;
 
         cons_buffer(&cons, "[H[2J");
+        (void)sprintf(text, "%i\n", (int)(end_scanline - start_scanline));
+        cons_buffer(&cons, text);
 
         OBJECT_CALL_EVENT(&object_player, update);
         OBJECT_CALL_EVENT(&object_camera, update);

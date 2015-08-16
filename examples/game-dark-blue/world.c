@@ -346,12 +346,15 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
                 bb_y = bb.points[point_idx].y;
 
                 int16_t column;
-                column = ((player->transform.position.x + bb_x) / WORLD_BLOCK_WIDTH);
+                column = ((player->transform.position.x + bb_x) /
+                    WORLD_BLOCK_WIDTH);
                 int16_t row;
-                row = (WORLD_ROWS - 1) - ((player->transform.position.y + bb_y) / WORLD_BLOCK_HEIGHT);
+                row = (WORLD_ROWS - 1) -
+                    ((player->transform.position.y + bb_y) /
+                        WORLD_BLOCK_HEIGHT);
 
-                block_points[point_idx].x = column;
-                block_points[point_idx].y = row;
+                block_points[point_idx].x = clamp(column, 0, WORLD_COLUMNS - 1);
+                block_points[point_idx].y = clamp(row, 0, WORLD_ROWS - 1);
         }
 
         uint32_t columns;
@@ -469,6 +472,7 @@ on_block_init(struct object *this)
         block->colliders[0]->object = (struct object *)block;
         block->colliders[0]->id = -1;
         block->colliders[0]->trigger = false;
+        block->colliders[0]->fixed = true;
         block->colliders[0]->aabb.center.x = WORLD_BLOCK_WIDTH / 2;
         block->colliders[0]->aabb.center.y = WORLD_BLOCK_HEIGHT / 2;
         block->colliders[0]->aabb.min.x = 0;

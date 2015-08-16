@@ -46,10 +46,12 @@ main(void)
         state_machine_transition(&state_game, STATE_GAME_GAME);
 
         while (true) {
+                start_scanline = tick;
                 vdp2_tvmd_vblank_out_wait();
                 state_machine_handler_update(&state_game);
                 vdp2_tvmd_vblank_in_wait();
                 state_machine_handler_draw(&state_game);
+                end_scanline = tick;
         }
 
         return 0;

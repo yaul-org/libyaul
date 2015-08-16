@@ -62,6 +62,10 @@ on_init(struct object *this)
         uint16_t height;
         height = player->private_data.m_height;
 
+        player->colliders[0]->object = (struct object *)player;
+        player->colliders[0]->id = -1;
+        player->colliders[0]->trigger = false;
+        player->colliders[0]->fixed = false;
         player->colliders[0]->aabb.center.x = width / 2;
         player->colliders[0]->aabb.center.y = height / 2;
         player->colliders[0]->aabb.min.x = 0;
@@ -179,11 +183,12 @@ on_collision(struct object *this, struct object *other,
         /*     &delta, */
         /*     &player->transform.position); */
 
-        (void)sprintf(text, "player, other->id=%i, o=%i, d=%i,%i, P=%i,%i\n",
+        (void)sprintf(text, "object->id=%i, other->id=%i, o=%i, d=%i,%i, P=%i,%i\n",
+            (int)this->id,
             (int)other->id,
             (int)info->overlap,
-            (int)info->smallest.x,
-            (int)info->smallest.y,
+            (int)info->direction.x,
+            (int)info->direction.y,
             (int)player->transform.position.x,
             (int)player->transform.position.y);
         cons_buffer(&cons, text);

@@ -24,12 +24,13 @@ struct collider {
 
         uint32_t id;
         bool trigger;
+        bool fixed;
         struct aabb aabb;
 };
 
 struct collider_info {
         int16_t overlap;
-        int16_vector2_t smallest;
+        int16_vector2_t direction;
 };
 
 #endif /* !COLLIDER_H */

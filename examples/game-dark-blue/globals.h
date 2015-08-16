@@ -15,6 +15,8 @@
 extern struct cons cons;
 extern struct smpc_peripheral_digital digital_pad;
 extern uint32_t tick;
+extern uint32_t start_scanline;
+extern uint32_t end_scanline;
 extern char text[];
 
 #endif /* !GLOBALS_H */
