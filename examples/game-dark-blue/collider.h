@@ -33,4 +33,6 @@ struct collider_info {
         int16_vector2_t direction;
 };
 
+void collider_init(struct collider *, uint32_t, uint16_t, uint16_t, bool, bool);
+
 #endif /* !COLLIDER_H */

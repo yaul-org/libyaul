@@ -8,6 +8,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <yaul.h>
+
 #define RGB888_TO_RGB555(r, g, b) (0x8000 | (((b) >> 3) << 10) |               \
     (((g) >> 3) << 5) | ((r) >> 3))
 

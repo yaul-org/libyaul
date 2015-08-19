@@ -49,7 +49,7 @@ cmd_groups_update(void)
                 system_clip.scc_coord.x = SCREEN_WIDTH - 1;
                 system_clip.scc_coord.y = SCREEN_HEIGHT - 1;
 
-                struct vdp1_cmdt_user_clip_coord user_clip;
+                static struct vdp1_cmdt_user_clip_coord user_clip;
                 user_clip.ucc_coords[0].x = 0;
                 user_clip.ucc_coords[0].y = 0;
                 user_clip.ucc_coords[1].x = SCREEN_WIDTH - 1;

@@ -62,18 +62,12 @@ on_init(struct object *this)
         uint16_t height;
         height = player->private_data.m_height;
 
-        player->colliders[0]->object = (struct object *)player;
-        player->colliders[0]->id = -1;
-        player->colliders[0]->trigger = false;
-        player->colliders[0]->fixed = false;
-        player->colliders[0]->aabb.center.x = width / 2;
-        player->colliders[0]->aabb.center.y = height / 2;
-        player->colliders[0]->aabb.min.x = 0;
-        player->colliders[0]->aabb.min.y = 0;
-        player->colliders[0]->aabb.max.x = width - 1;
-        player->colliders[0]->aabb.max.y = height - 1;
-        player->colliders[0]->aabb.half.x = width / 2;
-        player->colliders[0]->aabb.half.y = height / 2;
+        player->rigid_body->object = this;
+        rigid_body_init(player->rigid_body, /* kinematic = */ false);
+
+        player->colliders[0]->object = this;
+        collider_init(player->colliders[0], /* id = */ -1, width, height,
+            /* trigger = */ false, /* fixed = */ false);
 
         player->private_data.m_polygon.cp_color = PLAYER_COLOR;
         player->private_data.m_polygon.cp_mode.transparent_pixel = true;
@@ -102,7 +96,7 @@ on_update(struct object *this)
         struct object_player *player __unused;
         player = (struct object_player *)this;
 
-       int16_vector2_t old_position;
+        int16_vector2_t old_position;
         old_position.x = object_player.transform.position.x;
         old_position.y = player->transform.position.y;
 
@@ -126,14 +120,11 @@ on_update(struct object *this)
                         player->private_data.m_state = PLAYER_STATE_IDLE;
                 }
 
-                if (digital_pad.pressed.button.up) {
-                        player->private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.y = player->transform.position.y + 1;
-                } else if (digital_pad.pressed.button.down) {
-                        player->private_data.m_state = PLAYER_STATE_RUN;
-
-                        new_position.y = player->transform.position.y - 1;
+                if (digital_pad.held.button.a) {
+                        fix16_vector2_t up =
+                            FIX16_VECTOR2_INITIALIZER(0.0f, 2.0f * 300.0f);
+                        player->private_data.m_state = PLAYER_STATE_JUMP;
+                        rigid_body_forces_add(player->rigid_body, &up);
                 }
         }
 

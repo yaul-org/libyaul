@@ -5,11 +5,13 @@ OBJECTS+= \
 	root.romdisk.o \
 	camera.o \
 	cmd_groups.o \
+	collider.o \
 	dark-blue.o \
 	fs.o \
 	globals.o \
 	physics.o \
 	player.o \
+	rigid_body.o \
 	state.o \
 	state_game.o \
 	state_machine.o \

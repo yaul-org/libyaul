@@ -469,18 +469,9 @@ on_block_init(struct object *this)
         block->transform.position.x = 0;
         block->transform.position.y = 0;
 
-        block->colliders[0]->object = (struct object *)block;
-        block->colliders[0]->id = -1;
-        block->colliders[0]->trigger = false;
-        block->colliders[0]->fixed = true;
-        block->colliders[0]->aabb.center.x = WORLD_BLOCK_WIDTH / 2;
-        block->colliders[0]->aabb.center.y = WORLD_BLOCK_HEIGHT / 2;
-        block->colliders[0]->aabb.min.x = 0;
-        block->colliders[0]->aabb.min.y = 0;
-        block->colliders[0]->aabb.max.x = WORLD_BLOCK_WIDTH - 1;
-        block->colliders[0]->aabb.max.y = WORLD_BLOCK_HEIGHT - 1;
-        block->colliders[0]->aabb.half.x = WORLD_BLOCK_WIDTH / 2;
-        block->colliders[0]->aabb.half.y = WORLD_BLOCK_HEIGHT / 2;
+        collider_init(block->colliders[0], /* id = */ -1,
+            WORLD_BLOCK_WIDTH, WORLD_BLOCK_HEIGHT,
+            /* trigger = */ false, /* fixed = */ true);
 }
 
 static void

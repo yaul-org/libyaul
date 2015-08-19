@@ -17,10 +17,6 @@
 
 #define OBJECT_POOL_MAX 32
 
-static void physics_stage_simulate(void);
-static void physics_stage_detect(void);
-static void physics_stage_respond(void);
-
 static struct object_pool {
         struct object_pool_entry {
                 struct object *object;
@@ -33,6 +29,11 @@ static struct object_pool {
         } entries[OBJECT_POOL_MAX];
 } object_pool;
 static uint32_t object_pool_entry_idx = 0;
+
+static void stage_simulate(void);
+static void stage_detect(void);
+static void stage_detect_collisions_sort(struct object_pool_entry *);
+static void stage_respond(void);
 
 struct sat_projection {
         int16_t min;
@@ -60,9 +61,9 @@ physics_init(void)
 void
 physics_update(void)
 {
-        physics_stage_simulate();
-        physics_stage_detect();
-        physics_stage_respond();
+        stage_simulate();
+        stage_detect();
+        stage_respond();
 }
 
 void
@@ -193,7 +194,7 @@ sat_object_object_test(const struct object *object, const struct object *other,
 }
 
 static void
-physics_stage_simulate(void)
+stage_simulate(void)
 {
         uint32_t object_idx;
         for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
@@ -203,54 +204,80 @@ physics_stage_simulate(void)
                 if (!object->active) {
                         continue;
                 }
-        }
-}
 
-static void
-detected_collisions_sort(struct object_pool_entry *object_pool_entry)
-{
-        if (object_pool_entry->collisions_cnt <= 1) {
-                return;
-        }
-
-        bool swapped;
-        do {
-                swapped = false;
-
-                uint32_t ci;
-                for (ci = 0; ci < (object_pool_entry->collisions_cnt - 1); ci++) {
-                        struct collision *collision_i;
-                        collision_i =
-                            &object_pool_entry->collisions[ci];
-
-                        struct collision *collision_i_next;
-                        collision_i_next =
-                            &object_pool_entry->collisions[ci + 1];
-
-                        bool swap;
-                        swap = abs(collision_i->info.direction.x) <
-                            abs(collision_i_next->info.direction.x);
-
-                        swapped = true;
-
-                        if (!swap) {
-                                continue;
-                        }
-
-                        struct collision temp;
-                        (void)memcpy(&temp, collision_i,
-                            sizeof(struct collision));
-
-                        (void)memcpy(collision_i, collision_i_next,
-                            sizeof(struct collision));
-                        (void)memcpy(collision_i_next, &temp,
-                            sizeof(struct collision));
+                if (object->rigid_body == NULL) {
+                        continue;
                 }
-        } while (!swapped);
+
+                fix16_t dt;
+                dt = F16(1.0f / 60.0f);
+
+                fix16_t dt_2;
+                dt_2 = F16((1.0f / 60.0f) * (1.0f / 60.0f));
+
+                struct transform *transform;
+                transform = &object->transform;
+
+                struct rigid_body *rigid_body;
+                rigid_body = object->rigid_body;
+
+                if (!object->rigid_body->kinematic) {
+                        fix16_vector2_t gravity =
+                            FIX16_VECTOR2_INITIALIZER(0.0f, -30.0f);
+
+                        /* Add obligatory gravitational force */
+                        rigid_body_forces_add(rigid_body, &gravity);
+                }
+
+                /* Add up all forces */
+                fix16_vector2_t forces;
+                rigid_body_forces_sum(rigid_body, &forces);
+                fix16_vector2_scale(F16(1.0f / /* mass = */ 1.0f),
+                    &forces, &rigid_body->acceleration);
+
+                /* Velocity: v_n+1 = (a_n*dt) + v_n */
+                fix16_vector2_t scaled_a;
+                fix16_vector2_scale(dt, &rigid_body->acceleration, &scaled_a);
+                fix16_vector2_add(&rigid_body->velocity, &scaled_a,
+                    &rigid_body->velocity);
+
+                /* Displacement: 1/2*(a_n*(dt**2)) + (v_n*dt) + x_n */
+                fix16_vector2_t term_1;
+                fix16_vector2_scale(fix16_mul(F16(0.5f), dt_2),
+                    &rigid_body->acceleration, &term_1);
+                fix16_vector2_t term_2;
+                fix16_vector2_scale(dt, &rigid_body->velocity, &term_2);
+                fix16_vector2_add(&term_1, &term_2, &term_1);
+                fix16_vector2_add(&rigid_body->displacement, &term_1,
+                    &rigid_body->displacement);
+
+                cons_buffer(&cons, "*** acceleration=");
+                fix16_vector2_str(&rigid_body->acceleration, text, 2);
+                cons_buffer(&cons, text);
+                cons_buffer(&cons, "\n");
+                cons_buffer(&cons, "*** velocity=");
+                fix16_vector2_str(&rigid_body->velocity, text, 2);
+                cons_buffer(&cons, text);
+                cons_buffer(&cons, "\n");
+                cons_buffer(&cons, "*** displacement=");
+                fix16_vector2_str(&rigid_body->displacement, text, 2);
+                cons_buffer(&cons, text);
+                cons_buffer(&cons, "\n");
+
+                /* Clear its forces */
+                rigid_body_forces_clear(rigid_body);
+
+                int16_vector2_t displacement;
+                displacement.x = fix16_to_int(rigid_body->displacement.x);
+                displacement.y = fix16_to_int(rigid_body->displacement.y);
+
+                int16_vector2_add(&transform->position, &displacement,
+                    &transform->position);
+        }
 }
 
 static void
-physics_stage_detect(void)
+stage_detect(void)
 {
         uint32_t object_idx;
         for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
@@ -311,12 +338,55 @@ physics_stage_detect(void)
                         }
                 }
 
-                detected_collisions_sort(object_pool_entry);
+                stage_detect_collisions_sort(object_pool_entry);
         }
 }
 
 static void
-physics_stage_respond(void)
+stage_detect_collisions_sort(struct object_pool_entry *object_pool_entry)
+{
+        if (object_pool_entry->collisions_cnt <= 1) {
+                return;
+        }
+
+        bool swapped;
+        do {
+                swapped = false;
+
+                uint32_t ci;
+                for (ci = 0; ci < (object_pool_entry->collisions_cnt - 1); ci++) {
+                        struct collision *collision_i;
+                        collision_i =
+                            &object_pool_entry->collisions[ci];
+
+                        struct collision *collision_i_next;
+                        collision_i_next =
+                            &object_pool_entry->collisions[ci + 1];
+
+                        bool swap;
+                        swap = abs(collision_i->info.direction.x) <
+                            abs(collision_i_next->info.direction.x);
+
+                        swapped = true;
+
+                        if (!swap) {
+                                continue;
+                        }
+
+                        struct collision temp;
+                        (void)memcpy(&temp, collision_i,
+                            sizeof(struct collision));
+
+                        (void)memcpy(collision_i, collision_i_next,
+                            sizeof(struct collision));
+                        (void)memcpy(collision_i_next, &temp,
+                            sizeof(struct collision));
+                }
+        } while (!swapped);
+}
+
+static void
+stage_respond(void)
 {
         uint32_t object_idx;
         for (object_idx = 0; object_idx < object_pool_entry_idx; object_idx++) {
@@ -350,6 +420,12 @@ physics_stage_respond(void)
                             collision->info.direction.x;
                         position_delta.y = collision->info.overlap *
                             collision->info.direction.y;
+
+                        if (object->rigid_body != NULL) {
+                                fix16_vector2_zero(&object->rigid_body->velocity);
+                                fix16_vector2_zero(&object->rigid_body->acceleration);
+                                fix16_vector2_zero(&object->rigid_body->displacement);
+                        }
 
                         if (!object->colliders[0]->fixed) {
                                 int16_vector2_add(&object->transform.position,
