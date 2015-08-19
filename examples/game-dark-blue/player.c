@@ -15,9 +15,9 @@ static void on_update(struct object *);
 static void on_draw(struct object *);
 static void on_collision(struct object *, struct object *,
     const struct collider_info *);
-static void on_trigger(struct object *, const struct collider *);
+static void on_trigger(struct object *, struct object *);
 
-static void _update_player(struct object *this);
+static void _update_player(struct object *);
 
 static struct collider collider;
 static struct rigid_body rigid_body;
@@ -187,7 +187,7 @@ on_collision(struct object *this, struct object *other,
 }
 
 static void
-on_trigger(struct object *this, const struct collider * collider __unused)
+on_trigger(struct object *this, struct object *other __unused)
 {
         struct object_player *player __unused;
         player = (struct object_player *)this;
@@ -211,9 +211,6 @@ _update_player(struct object *this)
         x = player->transform.position.x;
         int16_t y;
         y = player->transform.position.y;
-
-        (void)sprintf(text, "P=%i,%i\n", (int)x, (int)y);
-        cons_buffer(&cons, text);
 
         polygon->cp_vertex.a.x = (width / 2) + x - 1;
         polygon->cp_vertex.a.y = -(height / 2) - y;

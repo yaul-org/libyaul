@@ -31,11 +31,13 @@
     void (*on_destroy)(struct object *);                                       \
     void (*on_collision)(struct object *, struct object *,                     \
         const struct collider_info *);                                         \
-    void (*on_trigger)(struct object *, const struct collider *);
+    void (*on_trigger)(struct object *, struct object *);
 
 #define OBJECT_CALL_EVENT(x, name, args...) do {                               \
-        ((struct object *)(x))->CC_CONCAT(on_, name)((struct object *)(x),     \
+        if (((struct object *)(x))->CC_CONCAT(on_, name) != NULL) {            \
+            ((struct object *)(x))->CC_CONCAT(on_, name)((struct object *)(x), \
             ##args);                                                           \
+        }                                                                      \
 } while (false)
 
 struct object {
