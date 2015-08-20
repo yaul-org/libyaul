@@ -44,7 +44,7 @@ vdp2_scrn_back_screen_set(bool single_color, uint32_t vram, uint16_t *color,
                 assert((len & 0x03) == 0x00);
 
                 uint32_t idx;
-                for (idx = 0; idx < len;) {
+                for (idx = 0; idx < len; idx++) {
                         MEMORY_WRITE(16, (vram + (idx << 1)), *color++);
                 }
         }
