@@ -275,7 +275,12 @@ state_00_update(struct state_context *state_context __unused)
         sprite[0].cs_height = 64;
 
         vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                struct vdp1_cmdt_local_coord local_coord;
+                local_coord.lc_coord.x = SCREEN_WIDTH / 2;
+                local_coord.lc_coord.y = SCREEN_HEIGHT / 2;
+
+                vdp1_cmdt_local_coord_set(&local_coord);
+
                 vdp1_cmdt_sprite_draw(&sprite[0]);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
@@ -521,9 +526,24 @@ state_01_update(struct state_context *state_context __unused)
         polygon[0].cp_vertex.d.y = -ZOOM_POINT_POINTER_SIZE + pointer.y;
 
         vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_system_clip_coord_set(SCREEN_WIDTH, SCREEN_HEIGHT);
-                vdp1_cmdt_user_clip_coord_set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                struct vdp1_cmdt_local_coord local_coord;
+                local_coord.lc_coord.x = SCREEN_WIDTH / 2;
+                local_coord.lc_coord.y = SCREEN_HEIGHT / 2;
+
+                struct vdp1_cmdt_system_clip_coord system_clip;
+                system_clip.scc_coord.x = SCREEN_WIDTH - 1;
+                system_clip.scc_coord.y = SCREEN_HEIGHT - 1;
+
+                struct vdp1_cmdt_user_clip_coord user_clip;
+                user_clip.ucc_coords[0].x = 0;
+                user_clip.ucc_coords[0].y = 0;
+                user_clip.ucc_coords[1].x = SCREEN_WIDTH - 1;
+                user_clip.ucc_coords[1].y = SCREEN_HEIGHT - 1;
+
+                vdp1_cmdt_system_clip_coord_set(&system_clip);
+                vdp1_cmdt_user_clip_coord_set(&user_clip);
+                vdp1_cmdt_local_coord_set(&local_coord);
+
                 vdp1_cmdt_sprite_draw(&sprite[1]);
                 vdp1_cmdt_polygon_draw(&polygon[0]);
                 vdp1_cmdt_end();

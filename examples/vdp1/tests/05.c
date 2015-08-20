@@ -45,7 +45,12 @@ test_05_update(void)
         line[0].cl_vertex.b.y = 0;
 
         vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                struct vdp1_cmdt_local_coord local_coord;
+                local_coord.lc_coord.x = SCREEN_WIDTH / 2;
+                local_coord.lc_coord.y = SCREEN_HEIGHT / 2;
+
+                vdp1_cmdt_local_coord_set(&local_coord);
+
                 vdp1_cmdt_line_draw(&line[0]);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);

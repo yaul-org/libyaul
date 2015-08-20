@@ -119,7 +119,7 @@ static struct menu_button {
         const char *button_texture_path;
         uint16_t button_width;
         uint16_t button_height;
-} menu_buttons[MENU_BUTTONS_CNT] = {
+} menu_buttons[MENU_BUTTONS_CNT] __unused = {
         {
                 "/BUTTONS/POLYGON.TGA",
                 128,
@@ -181,6 +181,7 @@ int
 main(void)
 {
         hardware_init();
+
         fs_init();
         cons_init(&cons, CONS_DRIVER_VDP2);
 
@@ -267,7 +268,7 @@ vblank_out_handler(irq_mux_handle_t *irq_mux __unused)
 }
 
 static void
-state_00_init(struct state_context *state_context)
+state_00_init(struct state_context *state_context __unused)
 {
         static struct {
                 int16_t x;
@@ -303,7 +304,7 @@ state_00_init(struct state_context *state_context)
                 }
         };
 
-        static uint16_t blcs_color[SCREEN_HEIGHT];
+        static uint16_t blcs_color[SCREEN_HEIGHT] __unused;
 
         struct state_data *state_data;
         state_data = (struct state_data *)state_context->sc_data;
@@ -362,14 +363,14 @@ state_00_init(struct state_context *state_context)
         }
 
         vdp2_scrn_back_screen_set(/* single_color = */ false,
-            VRAM_ADDR_4MBIT(2, 0), blcs_color, SCREEN_HEIGHT);
+            VRAM_ADDR_4MBIT(0, 0), blcs_color, SCREEN_HEIGHT);
         vdp2_tvmd_display_set();
 }
 
 static void
 state_00_update(struct state_context *state_context)
 {
-        struct state_data *state_data;
+        struct state_data *state_data __unused;
         state_data = (struct state_data *)state_context->sc_data;
 
         if (digital_pad.connected == 1) {
@@ -391,9 +392,23 @@ state_00_update(struct state_context *state_context)
         }
 
         vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_system_clip_coord_set(SCREEN_WIDTH, SCREEN_HEIGHT);
-                vdp1_cmdt_user_clip_coord_set(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-                vdp1_cmdt_local_coord_set(0, 0);
+                struct vdp1_cmdt_local_coord local_coord;
+                local_coord.lc_coord.x = 0;
+                local_coord.lc_coord.y = 0;
+
+                struct vdp1_cmdt_system_clip_coord system_clip;
+                system_clip.scc_coord.x = SCREEN_WIDTH - 1;
+                system_clip.scc_coord.y = SCREEN_HEIGHT - 1;
+
+                struct vdp1_cmdt_user_clip_coord user_clip;
+                user_clip.ucc_coords[0].x = 0;
+                user_clip.ucc_coords[0].y = 0;
+                user_clip.ucc_coords[1].x = SCREEN_WIDTH - 1;
+                user_clip.ucc_coords[1].y = SCREEN_HEIGHT - 1;
+
+                vdp1_cmdt_system_clip_coord_set(&system_clip);
+                vdp1_cmdt_user_clip_coord_set(&user_clip);
+                vdp1_cmdt_local_coord_set(&local_coord);
 
                 uint32_t button_idx;
                 for (button_idx = 0; button_idx < MENU_BUTTONS_CNT; button_idx++) {
@@ -407,7 +422,10 @@ state_00_update(struct state_context *state_context)
                         vdp1_cmdt_sprite_draw(sprite);
                 }
 
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                local_coord.lc_coord.x = SCREEN_WIDTH / 2;
+                local_coord.lc_coord.y = SCREEN_HEIGHT / 2;
+
+                vdp1_cmdt_local_coord_set(&local_coord);
                 vdp1_cmdt_end();
         } vdp1_cmdt_list_end(0);
 }

@@ -158,7 +158,12 @@ test_02_update(void)
         sprite[5].cs_height = 64;
 
         vdp1_cmdt_list_begin(0); {
-                vdp1_cmdt_local_coord_set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+                struct vdp1_cmdt_local_coord local_coord;
+                local_coord.lc_coord.x = SCREEN_WIDTH / 2;
+                local_coord.lc_coord.y = SCREEN_HEIGHT / 2;
+
+                vdp1_cmdt_local_coord_set(&local_coord);
+
                 vdp1_cmdt_sprite_draw(&sprite[0]);
                 vdp1_cmdt_sprite_draw(&sprite[1]);
                 vdp1_cmdt_sprite_draw(&sprite[2]);
