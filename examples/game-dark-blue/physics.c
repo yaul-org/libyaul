@@ -232,21 +232,21 @@ stage_simulate(void)
                 /* Add up all forces */
                 fix16_vector2_t forces;
                 rigid_body_forces_sum(rigid_body, &forces);
-                fix16_vector2_scale(F16(1.0f / /* mass = */ 1.0f),
+                fix16_vector2_scaled(F16(1.0f / /* mass = */ 1.0f),
                     &forces, &rigid_body->acceleration);
 
                 /* Velocity: v_n+1 = (a_n*dt) + v_n */
                 fix16_vector2_t scaled_a;
-                fix16_vector2_scale(dt, &rigid_body->acceleration, &scaled_a);
+                fix16_vector2_scaled(dt, &rigid_body->acceleration, &scaled_a);
                 fix16_vector2_add(&rigid_body->velocity, &scaled_a,
                     &rigid_body->velocity);
 
                 /* Displacement: 1/2*(a_n*(dt**2)) + (v_n*dt) + x_n */
                 fix16_vector2_t term_1;
-                fix16_vector2_scale(fix16_mul(F16(0.5f), dt_2),
+                fix16_vector2_scaled(fix16_mul(F16(0.5f), dt_2),
                     &rigid_body->acceleration, &term_1);
                 fix16_vector2_t term_2;
-                fix16_vector2_scale(dt, &rigid_body->velocity, &term_2);
+                fix16_vector2_scaled(dt, &rigid_body->velocity, &term_2);
                 fix16_vector2_add(&term_1, &term_2, &term_1);
                 fix16_vector2_add(&rigid_body->displacement, &term_1,
                     &rigid_body->displacement);
