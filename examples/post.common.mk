@@ -11,7 +11,7 @@ IP.BIN: ip.o
 
 image: IP.BIN example
 	cp $(PROJECT).bin cd/A.BIN
-	sh ../../tools/make-iso/make-iso $(PROJECT)
+	sh $(ROOTDIR)/../tools/make-iso/make-iso $(PROJECT)
 
 $(PROJECT).bin: $(PROJECT).elf
 	$(OB) -O binary $< $@
@@ -26,8 +26,8 @@ $(PROJECT).elf: $(OBJECTS)
 	genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
-	../../tools/fsck.genromfs/fsck.genromfs ./romdisk/
-	sh ../../tools/bin2o/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	$(ROOTDIR)/../tools/fsck.genromfs/fsck.genromfs ./romdisk/
+	sh $(ROOTDIR)/../tools/bin2o/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
@@ -42,8 +42,8 @@ clean:
 		$(PROJECT).bin \
 		$(PROJECT).elf \
 		$(PROJECT).map \
-		ip.bin \
-		ip.bin.map \
+		IP.BIN \
+		IP.BIN.map \
 		$(PROJECT).sym
 
 -include $(DEPENDS)

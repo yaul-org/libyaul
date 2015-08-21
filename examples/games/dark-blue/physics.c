@@ -223,7 +223,7 @@ stage_simulate(void)
 
                 if (!object->rigid_body->kinematic) {
                         fix16_vector2_t gravity =
-                            FIX16_VECTOR2_INITIALIZER(0.0f, -30.0f);
+                            FIX16_VECTOR2_INITIALIZER(0.0f, -60.0f);
 
                         /* Add obligatory gravitational force */
                         rigid_body_forces_add(rigid_body, &gravity);
@@ -235,11 +235,9 @@ stage_simulate(void)
                 fix16_vector2_scaled(F16(1.0f / /* mass = */ 1.0f),
                     &forces, &rigid_body->acceleration);
 
-                /* Velocity: v_n+1 = (a_n*dt) + v_n */
-                fix16_vector2_t scaled_a;
-                fix16_vector2_scaled(dt, &rigid_body->acceleration, &scaled_a);
-                fix16_vector2_add(&rigid_body->velocity, &scaled_a,
-                    &rigid_body->velocity);
+                fix16_vector2_t last_displacement;
+                fix16_vector2_dup(&rigid_body->displacement,
+                    &last_displacement);
 
                 /* Displacement: 1/2*(a_n*(dt**2)) + (v_n*dt) + x_n */
                 fix16_vector2_t term_1;
@@ -250,6 +248,16 @@ stage_simulate(void)
                 fix16_vector2_add(&term_1, &term_2, &term_1);
                 fix16_vector2_add(&rigid_body->displacement, &term_1,
                     &rigid_body->displacement);
+
+                /* Velocity: v_n+1 = (a_n*dt) + v_n */
+                fix16_vector2_t scaled_a;
+                fix16_vector2_scaled(dt, &rigid_body->acceleration, &scaled_a);
+                fix16_vector2_add(&rigid_body->velocity, &scaled_a,
+                    &rigid_body->velocity);
+
+                rigid_body->velocity.y = fix16_clamp(rigid_body->velocity.y,
+                    F16(-60.0f),
+                    F16(120.0f));
 
                 cons_buffer(&cons, "*** acceleration=");
                 fix16_vector2_str(&rigid_body->acceleration, text, 2);
@@ -264,15 +272,19 @@ stage_simulate(void)
                 cons_buffer(&cons, text);
                 cons_buffer(&cons, "\n");
 
-                /* Clear its forces */
-                rigid_body_forces_clear(rigid_body);
-
                 int16_vector2_t displacement;
                 displacement.x = fix16_to_int(rigid_body->displacement.x);
                 displacement.y = fix16_to_int(rigid_body->displacement.y);
 
-                int16_vector2_add(&transform->position, &displacement,
+                int16_vector2_t initial;
+                initial.x = transform->position.x;
+                initial.y = ((224 / 16) - 11) * 16;
+
+                int16_vector2_add(&initial, &displacement,
                     &transform->position);
+
+                /* Clear its forces */
+                rigid_body_forces_clear(rigid_body);
         }
 }
 
@@ -422,9 +434,14 @@ stage_respond(void)
                             collision->info.direction.y;
 
                         if (object->rigid_body != NULL) {
-                                fix16_vector2_zero(&object->rigid_body->velocity);
-                                fix16_vector2_zero(&object->rigid_body->acceleration);
-                                fix16_vector2_zero(&object->rigid_body->displacement);
+                                if (collision->info.direction.x == 0) {
+                                        //object->rigid_body->displacement.y = 0;
+                                        object->rigid_body->velocity.y = F16(0.0f);
+                                } else if (collision->info.direction.y == 0) {
+                                        //object->rigid_body->displacement.x = 0;
+                                        object->rigid_body->velocity.x = F16(0.0f);
+                                }
+                                
                         }
 
                         if (!object->colliders[0]->fixed) {

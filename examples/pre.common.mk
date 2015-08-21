@@ -1,4 +1,5 @@
 ROOTDIR:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
 CC_PREFIX?= sh-elf
 
 AS= $(CC_PREFIX)-as
@@ -14,24 +15,24 @@ AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
 CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main \
 	-m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
-	-I../../libtga \
-	-I../../libfixmath \
-	-I../../libyaul \
-	-I../../libyaul/common \
-	-I../../libyaul/common/gdb \
-	-I../../libyaul/cons \
-	-I../../libyaul/kernel \
-	-I../../libyaul/kernel/vfs \
-	-I../../libyaul/scu \
-	-I../../libyaul/scu/bus/a/cs0/arp \
-	-I../../libyaul/scu/bus/a/cs0/dram-cartridge \
-	-I../../libyaul/scu/bus/a/cs0/usb-cartridge \
-	-I../../libyaul/scu/bus/a/cs2/cd-block \
-	-I../../libyaul/scu/bus/b/scsp \
-	-I../../libyaul/scu/bus/b/vdp1 \
-	-I../../libyaul/scu/bus/b/vdp2 \
-	-I../../libyaul/scu/bus/cpu \
-	-I../../libyaul/scu/bus/cpu/smpc
+	-I$(ROOTDIR)/../libtga \
+	-I$(ROOTDIR)/../libfixmath \
+	-I$(ROOTDIR)/../libyaul \
+	-I$(ROOTDIR)/../libyaul/common \
+	-I$(ROOTDIR)/../libyaul/common/gdb \
+	-I$(ROOTDIR)/../libyaul/cons \
+	-I$(ROOTDIR)/../libyaul/kernel \
+	-I$(ROOTDIR)/../libyaul/kernel/vfs \
+	-I$(ROOTDIR)/../libyaul/scu \
+	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/arp \
+	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/dram-cartridge \
+	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/usb-cartridge \
+	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs2/cd-block \
+	-I$(ROOTDIR)/../libyaul/scu/bus/b/scsp \
+	-I$(ROOTDIR)/../libyaul/scu/bus/b/vdp1 \
+	-I$(ROOTDIR)/../libyaul/scu/bus/b/vdp2 \
+	-I$(ROOTDIR)/../libyaul/scu/bus/cpu \
+	-I$(ROOTDIR)/../libyaul/scu/bus/cpu/smpc
 LDFLAGS= -Wl,-Map,${PROJECT}.map \
 	-L$(ROOTDIR)/../build/libfixmath \
 	-L$(ROOTDIR)/../build/libtga \

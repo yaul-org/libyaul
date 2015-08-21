@@ -1,6 +1,6 @@
-include ../pre.common.mk
+include ../../pre.common.mk
 
-PROJECT:= game-dark-blue
+PROJECT:= dark-blue
 OBJECTS+= \
 	root.romdisk.o \
 	camera.o \
@@ -27,4 +27,4 @@ ROMDISK_DEPS:= levels/test.json
 	tools/tmx2map
 	rm -f $@
 
-include ../post.common.mk
+include ../../post.common.mk

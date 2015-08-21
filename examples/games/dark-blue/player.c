@@ -120,7 +120,7 @@ on_update(struct object *this)
                         player->private_data.m_state = PLAYER_STATE_IDLE;
                 }
 
-                if (digital_pad.held.button.a) {
+                if (digital_pad.pressed.button.a) {
                         fix16_vector2_t up =
                             FIX16_VECTOR2_INITIALIZER(0.0f, 2.0f * 300.0f);
                         player->private_data.m_state = PLAYER_STATE_JUMP;

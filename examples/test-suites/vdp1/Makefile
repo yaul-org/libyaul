@@ -1,10 +1,10 @@
-include ../pre.common.mk
+include ../../pre.common.mk
 
 PROJECT:= vdp1
 OBJECTS+= \
+	root.romdisk.o \
 	fs.o \
 	globals.o \
-	root.romdisk.o \
 	state.o \
 	state_machine.o \
 	test.o \
@@ -17,4 +17,4 @@ OBJECTS+= \
 	tests/06.o \
 	vdp1.o
 
-include ../post.common.mk
+include ../../post.common.mk

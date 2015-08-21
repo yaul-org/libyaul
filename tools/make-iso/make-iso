@@ -7,21 +7,29 @@
 
 PROGNAME="${0##*/}"
 
-function panic () {
+panic() {
     printf -- "${PROGNAME}: Error: ${1}\n" >&2
     exit ${2}
 }
 
 if [ ${#} != 1 ]; then
-    echo "Usage: ${PROGNAME} file-list output-file\n" >&2
+    printf -- "Usage: ${PROGNAME} image-output-name\n" >&2
     exit 2
 fi
 
 image="${1}"
 
-if [ ! -d "cd" ]; then
-    panic "Directory \`cd' does not exist" 1
+if [ ! -d "./cd" ]; then
+    panic "Directory \`cd' does not exist in \`.'" 1
 fi
+
+# Check if all the files are present
+for file in "./cd/ABS.TXT" "./cd/BIB.TXT" "./cd/CPY.TXT" "./IP.BIN"; do
+    if [ -f "${file}" ]; then
+        continue
+    fi
+    panic "File \``basename "${file}"`' does not exist in \``dirname "${file}"`'" 1
+done
 
 genisoimage \
     -quiet \
@@ -34,10 +42,10 @@ genisoimage \
     -abstract "ABS.TXT" \
     -copyright "CPY.TXT" \
     -biblio "BIB.TXT" \
-    -generic-boot 'ip.bin' \
+    -generic-boot "IP.BIN" \
     -iso-level 1 \
     -input-charset iso8859-1  \
     -no-bak \
     -m '.*' \
     -o "${image}.iso" \
-    cd
+    cd # CD directory
