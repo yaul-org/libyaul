@@ -22,9 +22,9 @@
 #define EWLR		0x0008
 #define EWRR		0x000A
 #define ENDR		0x000C
-#define EDSR		0x000E
-#define LOPR		0x0010
-#define COPR		0x0012
-#define MODR		0x0014
+#define EDSR		0x0010
+#define LOPR		0x0012
+#define COPR		0x0014
+#define MODR		0x0016
 
 #endif /* !_VDP1_MAP_H_ */
