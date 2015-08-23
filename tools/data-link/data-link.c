@@ -144,12 +144,12 @@ datalink_init(void)
 
         if ((ft_error = FT_ListDevices(devices_ptr_list, &devices_cnt,
                     FT_LIST_ALL | FT_OPEN_BY_SERIAL_NUMBER)) != FT_OK) {
-                return -1;
+                goto error;
         }
 
         if (devices_cnt == 0) {
                 ft_error = FT_DEVICE_NOT_FOUND;
-                return -1;
+                goto error;
         }
 
         for(idx = 0; ( (idx < MAX_DEVICES) && (idx < devices_cnt) ); idx++) {
@@ -157,19 +157,26 @@ datalink_init(void)
         }
 
         if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER, &ft_handle)) != FT_OK) {
-                return -1;
+                DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
+                goto error;
         }
         if((ft_error = FT_SetBaudRate(ft_handle, BAUD)) != FT_OK) {
-                return -1;
+                goto error;
         }
         if((ft_error = FT_SetDataCharacteristics(ft_handle, DATA_BITS, STOP_BITS, PARITY)) != FT_OK) {
-                return -1;
+                goto error;
         }
         if ((ft_error = FT_SetTimeouts(ft_handle, RX_TIMEOUT, TX_TIMEOUT)) != FT_OK) {
-                return -1;
+                goto error;
         }
 
+exit:
         return 0;
+
+error:
+        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+
+        return -1;
 }
 
 /*
