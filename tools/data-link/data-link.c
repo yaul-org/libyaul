@@ -185,7 +185,9 @@ error:
 static void
 datalink_close(void)
 {
-        FT_Close(ft_handle);
+        if (ft_handle != NULL) {
+                FT_Close(ft_handle);
+        }
 }
 
 /*
