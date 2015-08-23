@@ -245,7 +245,7 @@ state_00_update(struct state_context *state_context __unused)
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
                         test_exit();
-                } else if (digital_pad.held.button.l) {
+                } else if (digital_pad.held.button.r) {
                         state_machine_transition(&state_machine,
                             STATE_SHOW_ZOOMED_SPRITE);
                         return;
@@ -313,8 +313,8 @@ state_01_update(struct state_context *state_context __unused)
 
         if (digital_pad.connected == 1) {
                 if (digital_pad.held.button.start) {
-                        return;
-                } else if (digital_pad.held.button.l) {
+                        test_exit();
+                } else if (digital_pad.held.button.r) {
                         state_machine_transition(&state_machine,
                             STATE_SHOW_SCALED_SPRITE);
                         return;
