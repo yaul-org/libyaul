@@ -29,6 +29,9 @@ static void vblank_out_handler(irq_mux_handle_t *);
 static void
 hardware_init(void)
 {
+        /* VDP1 */
+        vdp1_init();
+
         /* VDP2 */
         vdp2_init();
 

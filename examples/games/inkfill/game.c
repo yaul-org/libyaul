@@ -43,7 +43,7 @@ static uint16_t *_nbg1_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x04000)
 };
 /* CRAM */
-static uint32_t *_nbg1_color_palette = (uint32_t *)CRAM_NBG1_OFFSET(0, 32, 0);
+static uint16_t *_nbg1_color_palette = (uint16_t *)CRAM_NBG1_OFFSET(1, 1, 0);
 /* VRAM B0 */
 static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
@@ -58,7 +58,7 @@ static uint16_t *_nbg3_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
 };
 /* CRAM */
-static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_NBG3_OFFSET(0, 63, 0);
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_NBG3_OFFSET(1, 0, 0);
 /* VRAM B0 */
 static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
 
@@ -240,7 +240,8 @@ _grid_init(void)
                         uint16_t character_number;
 
                         character_number =
-                            VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
+                            VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character) |
+                            VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
                         _nbg1_planes[0][x + (y << 6)] = character_number;
                         _nbg1_planes[1][x + (y << 6)] = character_number;
                         _nbg1_planes[2][x + (y << 6)] = character_number;
@@ -397,7 +398,7 @@ _grid_draw(void)
 
         /* Draw actual grid */
         character_number = VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
-        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
+        palette_number = VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
         for (y = 0; y < GRID_HEIGHT; y++) {
                 for (x = 0; x < GRID_WIDTH; x++) {
                         uint8_t color;
@@ -410,7 +411,7 @@ _grid_draw(void)
 
         /* Draw number of tries */
         character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
-        palette_number = VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
+        palette_number = VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
         for (y = 0; y < TRIES_MAX; y++) {
                 _nbg3_planes[0][(1) + ((y + 1) << 6)] =
                     palette_number | (character_number + GRID_CELL_COLOR_BLUE + 1);
