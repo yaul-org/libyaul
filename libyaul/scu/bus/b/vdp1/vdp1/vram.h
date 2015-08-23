@@ -36,7 +36,7 @@ extern "C" {
             VDP1_CLUT_MEMORY_SIZE + ((x) << 3) + ((y) << 1))
 #define CHAR(x)                 (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
             VDP1_CLUT_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE + ((x)))
-#define VDP1_FRAME_BUFFER(x)    (0x25C80000 + ((x)))
+#define VDP1_FRAME_BUFFER(x, y) (0x25C80000 + (((x) & 0x1) << 18) + (y))
 
 #define VDP1_VRAM_SIZE          0x80000 /* In bytes */
 
