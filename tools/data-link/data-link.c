@@ -452,10 +452,6 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
-                /* if (read_buffer[0] != 0xA5) { */
-                /*         DEBUG_PRINTF("ERROR\n"); */
-                /*         goto error; */
-                /* } */
 
                 len -= transfer_len;
                 address += transfer_len;
