@@ -4,10 +4,10 @@ PROJECT:= inkfill
 OBJECTS+= \
 	root.romdisk.o \
 	fs.o \
-	game-inkfill.o \
 	game-over.o \
 	game.o \
 	globals.o \
+	inkfill.o \
 	scene.o \
 	title.o \
 	tutorial.o
