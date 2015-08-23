@@ -354,7 +354,7 @@ true_color_image_decode(uint16_t *dst, const tga_t *tga)
                 }
 
                 if (pixel == RGB24_TO_RGB555(255, 0, 255)) {
-                        pixel &= ~0x8000;
+                        pixel = 0x0000;
                 }
 
                 *dst++ = pixel;
@@ -441,7 +441,7 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
                         }
 
                         if (pixel == RGB24_TO_RGB555(255, 0, 255)) {
-                                pixel &= ~0x8000;
+                                pixel = 0x0000;
                         }
 
                         amt = _true_color_image_fill(dst, pixel,
