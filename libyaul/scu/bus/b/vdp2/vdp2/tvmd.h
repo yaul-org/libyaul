@@ -19,11 +19,11 @@
  * VBLANK=1 | Top blanking    |
  *          +-----------------+
  * VBLANK=1 | Top border      | <--- scanline #262 (top border)
- *          +-----------------+ <--- scanline #0 (active display, V-BLANK-IN (scan))
- * VBLANK=0 | Active display  |
+ *          +-----------------+ <--- scanline #0 (active display,
+ * VBLANK=0 | Active display  |                   start of V-BLANK-OUT (scan))
  *          +-----------------+ <--- scanline #223
- * VBLANK=1 | Bottom border   | <--- scanline #224 (bottom border, V-BLANK-OUT (retrace))
- *          +-----------------+
+ * VBLANK=1 | Bottom border   | <--- scanline #224 (bottom border,
+ *          +-----------------+                     start of V-BLANK-IN (retrace))
  * VBLANK=1 | Bottom blanking |
  *          +-----------------+
  * VBLANK=1 | Vertical sync   |
@@ -49,14 +49,16 @@ vdp2_tvmd_vblank_out(void)
 static __inline void
 vdp2_tvmd_vblank_in_wait(void)
 {
-        for (; (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000; );
+        /* Wait until we're in V-BLANK-IN */
+        while (vdp2_tvmd_vblank_out());
         /* Start of V-BLANK-IN */
 }
 
 static __inline void
 vdp2_tvmd_vblank_out_wait(void)
 {
-        for (; (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008; );
+        /* Wait until we're in V-BLANK-OUT */
+        for (; vdp2_tvmd_vblank_in(); );
         /* Start of V-BLANK-OUT */
 }
 
