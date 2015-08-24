@@ -9,7 +9,6 @@
 #define _VDP1_H_
 
 #include <vdp1/cmdt.h>
-#include <vdp1/fbcr.h>
 #include <vdp1/map.h>
 #include <vdp1/vram.h>
 

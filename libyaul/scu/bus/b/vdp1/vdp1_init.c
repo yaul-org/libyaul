@@ -10,6 +10,7 @@
 #include <common.h>
 
 #include <vdp1.h>
+#include <vdp2.h>
 
 #include "vdp1-internal.h"
 
@@ -26,12 +27,14 @@ vdp1_init(void)
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
         MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
 
         MEMORY_WRITE(16, VDP1(EWDR), 0x0000);
         MEMORY_WRITE(16, VDP1(EWLR), 0x0000);
-        MEMORY_WRITE(16, VDP1(EWRR), 0x50DF);
+        MEMORY_WRITE(16, VDP1(EWRR), (uint16_t)(((320 / 8) << 9) | (223)));
 
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
 
         /* Stop processing command tables */
         uint32_t cmdt_idx;
@@ -42,4 +45,6 @@ vdp1_init(void)
         }
 
         vdp1_cmdt_list_init();
+
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0001);
 }
