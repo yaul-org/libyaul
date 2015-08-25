@@ -19,7 +19,7 @@ extern "C" {
 #define VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(n)                                  \
         union {                                                                \
                 struct {                                                       \
-                        unsigned int msb:1;                                    \
+                        unsigned int msb:1; /* Bit 15 */                       \
                         unsigned int reserved:2;                               \
                         unsigned int high_speed_shrink:1;                      \
                         unsigned int pre_clipping:1;                           \

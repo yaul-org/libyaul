@@ -47,7 +47,7 @@ test_04_init(void)
         uint32_t amount;
         amount = tga_image_decode(&tga, (void *)CHAR(0));
         assert(amount > 0);
-        amount = tga_cmap_decode(&tga, (uint16_t *)CRAM_OFFSET(0, 1, 0));
+        amount = tga_cmap_decode(&tga, (uint16_t *)CRAM_MODE_1_OFFSET(0, 1, 0));
         if ((tga.tga_type == TGA_IMAGE_TYPE_CMAP) ||
             (tga.tga_type == TGA_IMAGE_TYPE_RLE_CMAP)) {
                 assert(amount > 0);

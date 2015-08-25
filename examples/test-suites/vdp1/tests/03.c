@@ -45,8 +45,8 @@ static uint32_t angle = 0;
 static void *file_handle[2];
 
 static uint32_t cram[2] = {
-        CRAM_OFFSET(0, 1, 0),
-        CRAM_OFFSET(1, 0, 0)
+        CRAM_MODE_1_OFFSET(0, 1, 0),
+        CRAM_MODE_1_OFFSET(1, 0, 0)
 };
 
 static uint32_t vram[2];

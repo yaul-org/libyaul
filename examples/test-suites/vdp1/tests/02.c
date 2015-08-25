@@ -24,11 +24,11 @@ static struct vdp1_cmdt_sprite sprite[6];
 static void *file_handle[32] __unused;
 
 static uint32_t cram[6] __unused = {
-        CRAM_VDP1_OFFSET(0,  0, 0), /* 16 colors, color mode 0 */
+        CRAM_MODE_1_OFFSET(0, 0, 0), /* 16 colors, color mode 0 */
         CLUT(1, 0), /* 16 colors, color mode 1 */
-        CRAM_VDP1_OFFSET(0,  4, 0), /* 64 colors, color mode 2 */
-        CRAM_VDP1_OFFSET(0,  8, 0), /* 128 colors, color mode 3 */
-        CRAM_VDP1_OFFSET(1,  0, 0), /* 256 colors, color mode 4 */
+        CRAM_MODE_1_OFFSET(0, 4, 0), /* 64 colors, color mode 2 */
+        CRAM_MODE_1_OFFSET(0, 8, 0), /* 128 colors, color mode 3 */
+        CRAM_MODE_1_OFFSET(1, 0, 0), /* 256 colors, color mode 4 */
         0 /* RGB (32,768 colors), color mode 5 */
 };
 
