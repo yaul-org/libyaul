@@ -68,7 +68,7 @@ main(void)
             &state_data);
 
         state_data.test_type = TEST_TYPE_PRIMITIVES;
-        state_data.test_idx = 0;
+        state_data.test_idx = 1;
 
         state_machine_transition(&state_vdp1, STATE_VDP1_TESTING);
 

@@ -10,7 +10,8 @@ OBJECTS+= \
 	test.o \
 	tests.o \
 	vdp1.o \
-	tests/primitives/normal_sprite/00.o
+	tests/primitives/normal_sprite/00.o \
+	tests/primitives/scaled_sprite/00.o
 
 CFLAGS+=-I.
 

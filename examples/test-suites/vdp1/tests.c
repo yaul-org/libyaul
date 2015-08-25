@@ -35,6 +35,8 @@ TEST_PROTOTYPE_DECLARE(normal_sprite_03);
 TEST_PROTOTYPE_DECLARE(normal_sprite_04);
 TEST_PROTOTYPE_DECLARE(normal_sprite_05);
 
+TEST_PROTOTYPE_DECLARE(scaled_sprite_00);
+
 struct test tests_primitive[];
 struct test tests_color[];
 struct test tests_special_functions[];
@@ -46,7 +48,9 @@ struct test *tests[] = {
 };
 
 struct test tests_primitive[] = {
-        TEST_ENTRY_INITIALIZE(normal_sprite_00)
+        TEST_ENTRY_INITIALIZE(normal_sprite_00),
+        /* ... */
+        TEST_ENTRY_INITIALIZE(scaled_sprite_00)
 };
 
 struct test tests_color[] = {
