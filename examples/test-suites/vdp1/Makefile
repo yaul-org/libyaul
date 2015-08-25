@@ -8,14 +8,10 @@ OBJECTS+= \
 	state.o \
 	state_machine.o \
 	test.o \
-	tests/00.o \
-	tests/01.o \
-	tests/02.o \
-	tests/03.o \
-	tests/04.o \
-	tests/05.o \
-	tests/06.o \
-	tests/07.o \
-	vdp1.o
+	tests.o \
+	vdp1.o \
+	tests/primitives/normal_sprite/00.o
+
+CFLAGS+=-I.
 
 include ../../post.common.mk
