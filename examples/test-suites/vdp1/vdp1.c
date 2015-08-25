@@ -99,10 +99,10 @@ static struct test {
                 test_06_exit
         }, {
                 "framebuffer",
-                NULL,
-                NULL,
-                NULL,
-                NULL
+                test_07_init,
+                test_07_update,
+                test_07_draw,
+                test_07_exit
         }, {
                 "resolutions",
                 NULL,
@@ -202,10 +202,13 @@ main(void)
             &state_data);
 
         state_data.current_button_idx = 0;
-        state_data.current_test_idx = -1;
+        state_data.current_test_idx = 7;
         state_data.last_test_idx = -1;
 
-        state_machine_transition(&state_vdp1, STATE_VDP1_MENU);
+        state_machine_transition(&state_vdp1, STATE_VDP1_TESTING);
+
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
 
         while (true) {
                 vdp2_tvmd_vblank_out_wait();

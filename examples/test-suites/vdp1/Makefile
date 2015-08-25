@@ -15,6 +15,7 @@ OBJECTS+= \
 	tests/04.o \
 	tests/05.o \
 	tests/06.o \
+	tests/07.o \
 	vdp1.o
 
 include ../../post.common.mk
