@@ -19,6 +19,8 @@
 #define CC_CONCAT_S(s1, s2)     s1 ## s2
 #define CC_CONCAT(s1, s2)       CC_CONCAT_S(s1, s2)
 
+#define CC_STRINGIFY(s)         #s
+
 #ifdef __GNUC__
 #define STATIC_ASSERT(exp)                                                     \
         typedef char CC_CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                   \
