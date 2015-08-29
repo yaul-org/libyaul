@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2012-2014 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include <assert.h>
 #include <err.h>
 #include <fcntl.h>
@@ -12,16 +19,24 @@
 
 #define DEBUG
 
-#define BAUD            375000
-#define PARITY          FT_PARITY_NONE
-#define DATA_BITS       FT_BITS_8
-#define STOP_BITS       FT_STOP_BITS_2
 #define RX_TIMEOUT      5000
 #define TX_TIMEOUT      1000
 
-#define PACKET_HEADER_SIZE      9
-#define PACKET_DATA_SIZE        191
-#define PACKET_TOTAL_SIZE       (PACKET_HEADER_SIZE + PACKET_DATA_SIZE)
+/* Revision (green LED) */
+#define REV_GREEN_BAUD_RATE             288000
+
+#define PACKET_REV_GREEN_HEADER_SIZE    7
+#define PACKET_REV_GREEN_DATA_SIZE      79
+#define PACKET_REV_GREEN_TOTAL_SIZE     (PACKET_REV_GREEN_HEADER_SIZE +        \
+    PACKET_REV_GREEN_DATA_SIZE)
+
+/* Revision (red LED) */
+#define REV_RED_BAUD_RATE               375000
+
+#define PACKET_REV_RED_HEADER_SIZE      9
+#define PACKET_REV_RED_DATA_SIZE        191
+#define PACKET_REV_RED_TOTAL_SIZE       (PACKET_REV_RED_HEADER_SIZE +          \
+    PACKET_REV_RED_DATA_SIZE)
 
 #define PACKET_TYPE_RECEIVE_FIRST       0x01
 #define PACKET_TYPE_RECEIVE_MIDDLE      0x11
@@ -40,9 +55,9 @@
 #ifdef DEBUG
 #define CC_CONCAT_S(s1, s2)     s1 ## s2
 #define CC_CONCAT(s1, s2)       CC_CONCAT_S(s1, s2)
-#define DEBUG_PRINTF(fmt, ...) do {                                             \
-        (void)fprintf(stderr, "%s():L%i:" " " fmt, __FUNCTION__, __LINE__,      \
-            ##__VA_ARGS__);                                                     \
+#define DEBUG_PRINTF(fmt, ...) do {                                            \
+        (void)fprintf(stderr, "%s():L%i:" " " fmt, __FUNCTION__, __LINE__,     \
+            ##__VA_ARGS__);                                                    \
 } while(false)
 #else
 #define DEBUG_PRINTF(x...)
@@ -66,9 +81,6 @@ enum {
 
 static uint32_t datalink_error = DATALINK_OK;
 
-static FT_HANDLE ft_handle = NULL;
-static FT_STATUS ft_error = FT_OK;
-
 static const char *datalink_error_strings[] = {
         "DATALINK_OK",
         "DATALINK_DEVICE_ERROR",
@@ -84,6 +96,9 @@ static const char *datalink_error_strings[] = {
         "DATALINK_BAD_REQUEST",
         "DATALINK_INSUFFICIENT_MEMORY"
 };
+
+static FT_HANDLE ft_handle = NULL;
+static FT_STATUS ft_error = FT_OK;
 
 static const char *ft_error_strings[] = {
         "FT_OK",
@@ -106,6 +121,23 @@ static const char *ft_error_strings[] = {
         "FT_NOT_SUPPORTED",
         "FT_OTHER_ERROR",
         "FT_DEVICE_LIST_NOT_READY",
+};
+
+static struct {
+        DWORD baud_rate;
+
+        struct {
+                uint32_t header_size;
+                uint32_t data_size;
+                uint32_t total_size;
+        } packet;
+} datalink_device = {
+        .baud_rate = REV_RED_BAUD_RATE,
+        .packet = {
+                .header_size = PACKET_REV_RED_HEADER_SIZE,
+                .data_size = PACKET_REV_RED_DATA_SIZE,
+                .total_size = PACKET_REV_RED_TOTAL_SIZE
+        }
 };
 
 static int datalink_init(void);
@@ -137,6 +169,12 @@ datalink_init(void)
 
         DEBUG_PRINTF("Enter\n");
 
+        /* XXX: To detect later */
+        datalink_device.baud_rate = REV_RED_BAUD_RATE;
+        datalink_device.packet.header_size = PACKET_REV_RED_HEADER_SIZE;
+        datalink_device.packet.data_size = PACKET_REV_RED_DATA_SIZE;
+        datalink_device.packet.total_size = PACKET_REV_RED_TOTAL_SIZE;
+
         char *devices_ptr_list[MAX_DEVICES + 1];
         char devices_list[MAX_DEVICES][64];
 
@@ -166,10 +204,10 @@ datalink_init(void)
                 DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
                 goto error;
         }
-        if((ft_error = FT_SetBaudRate(ft_handle, BAUD)) != FT_OK) {
+        if((ft_error = FT_SetBaudRate(ft_handle, datalink_device.baud_rate)) != FT_OK) {
                 goto error;
         }
-        if((ft_error = FT_SetDataCharacteristics(ft_handle, DATA_BITS, STOP_BITS, PARITY)) != FT_OK) {
+        if((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8, FT_STOP_BITS_2, FT_PARITY_NONE)) != FT_OK) {
                 goto error;
         }
         if ((ft_error = FT_SetTimeouts(ft_handle, RX_TIMEOUT, TX_TIMEOUT)) != FT_OK) {
@@ -208,7 +246,7 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
 
         datalink_error = DATALINK_OK;
 
-        if (len > PACKET_TOTAL_SIZE) {
+        if (len > datalink_device.packet.total_size) {
                 datalink_error = DATALINK_IO_ERROR;
                 return -1;
         }
@@ -271,7 +309,7 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
 
 #ifdef DEBUG
                 uint32_t buffer_idx;
-                for (buffer_idx = 0; buffer_idx < PACKET_HEADER_SIZE; buffer_idx++) {
+                for (buffer_idx = 0; buffer_idx < datalink_device.packet.header_size; buffer_idx++) {
                         DEBUG_PRINTF("B[%i]:0x%02X (%3u)\n",
                             buffer_idx,
                             read_buffer[buffer_idx],
@@ -294,14 +332,14 @@ datalink_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
 
-        if (len > PACKET_TOTAL_SIZE) {
+        if (len > datalink_device.packet.total_size) {
                 datalink_error = DATALINK_IO_ERROR;
                 return -1;
         }
 
 #ifdef DEBUG
         uint32_t buffer_idx;
-        for (buffer_idx = 0; buffer_idx < PACKET_HEADER_SIZE; buffer_idx++) {
+        for (buffer_idx = 0; buffer_idx < datalink_device.packet.header_size; buffer_idx++) {
                 DEBUG_PRINTF("B[%i]:0x%02X (%3u)\n",
                     buffer_idx,
                     write_buffer[buffer_idx],
@@ -539,8 +577,8 @@ action_upload_buffer(void *buffer, uint32_t base_address,
         uint32_t address;
         address = base_address;
 
-        uint8_t execute_buffer[PACKET_TOTAL_SIZE];
-        memset(execute_buffer, 0x00, PACKET_TOTAL_SIZE);
+        uint8_t execute_buffer[datalink_device.packet.total_size];
+        memset(execute_buffer, 0x00, datalink_device.packet.total_size);
         execute_buffer[0] = 0x5A;
         execute_buffer[1] = 7 + 2;
         execute_buffer[2] = execute
@@ -553,20 +591,20 @@ action_upload_buffer(void *buffer, uint32_t base_address,
         execute_buffer[7] = 2;
         (void)memcpy(&execute_buffer[8], buffer, 2);
         buffer += 2;
-        execute_buffer[PACKET_HEADER_SIZE + 2 - 1] =
-            packet_checksum(execute_buffer, (PACKET_HEADER_SIZE + 2) - 1);
+        execute_buffer[datalink_device.packet.header_size + 2 - 1] =
+            packet_checksum(execute_buffer, (datalink_device.packet.header_size + 2) - 1);
 
         len -= 2;
         address += 2;
 
-        uint8_t read_buffer[PACKET_TOTAL_SIZE];
-        uint8_t tmp_buffer[PACKET_TOTAL_SIZE];
+        uint8_t read_buffer[datalink_device.packet.total_size];
+        uint8_t tmp_buffer[datalink_device.packet.total_size];
 
         do {
                 uint8_t transfer_len;
-                transfer_len = (((int32_t)len - PACKET_DATA_SIZE) < 0)
-                    ? len % PACKET_DATA_SIZE
-                    : PACKET_DATA_SIZE;
+                transfer_len = (((int32_t)len - (int32_t)datalink_device.packet.data_size) < 0)
+                    ? len % datalink_device.packet.data_size
+                    : datalink_device.packet.data_size;
 
                 uint8_t *write_buffer;
 
@@ -579,10 +617,10 @@ action_upload_buffer(void *buffer, uint32_t base_address,
                 } else {
                         write_buffer = tmp_buffer;
 
-                        memset(write_buffer, 0x00, PACKET_TOTAL_SIZE);
+                        memset(write_buffer, 0x00, datalink_device.packet.total_size);
                         write_buffer[0] = 0x5A;
-                        write_buffer[1] = (7 + transfer_len) > (PACKET_TOTAL_SIZE - 2)
-                            ? PACKET_TOTAL_SIZE - 2
+                        write_buffer[1] = (7 + transfer_len) > ((int32_t)datalink_device.packet.total_size - 2)
+                            ? (int32_t)datalink_device.packet.total_size - 2
                             : 7 + transfer_len;
                         write_buffer[2] = PACKET_TYPE_SEND;
                         write_buffer[3] = ADDRESS_MSB(address);
@@ -592,18 +630,19 @@ action_upload_buffer(void *buffer, uint32_t base_address,
                         write_buffer[7] = transfer_len;
                         (void)memcpy(&write_buffer[8], buffer, transfer_len);
                         buffer += transfer_len;
-                        write_buffer[PACKET_HEADER_SIZE + transfer_len - 1] =
-                            packet_checksum(write_buffer, (PACKET_HEADER_SIZE + transfer_len) - 1);
+                        write_buffer[datalink_device.packet.header_size + transfer_len - 1] =
+                            packet_checksum(write_buffer,
+                                (datalink_device.packet.header_size + transfer_len) - 1);
                 }
 
-                if ((datalink_write(write_buffer, PACKET_HEADER_SIZE + transfer_len)) < 0) {
+                if ((datalink_write(write_buffer, datalink_device.packet.header_size + transfer_len)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
-                memset(read_buffer, 0x00, PACKET_TOTAL_SIZE);
-                if ((datalink_read(read_buffer, PACKET_HEADER_SIZE)) < 0) {
+                memset(read_buffer, 0x00, datalink_device.packet.total_size);
+                if ((datalink_read(read_buffer, datalink_device.packet.header_size)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
@@ -691,7 +730,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 
         datalink_error = DATALINK_OK;
 
-        uint8_t buffer_first[PACKET_HEADER_SIZE] = {
+        uint8_t buffer_first[] = {
                 0x5A,
                 0x07,
                 PACKET_TYPE_RECEIVE_FIRST,
@@ -703,7 +742,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                 0 /* Checksum */
         };
 
-        uint8_t buffer_middle[PACKET_HEADER_SIZE] = {
+        uint8_t buffer_middle[] = {
                 0x5A,
                 0x07,
                 PACKET_TYPE_RECEIVE_MIDDLE,
@@ -715,7 +754,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                 0 /* Checksum */
         };
 
-        uint8_t buffer_final[PACKET_HEADER_SIZE] = {
+        uint8_t buffer_final[] = {
                 0x5A,
                 0x07,
                 PACKET_TYPE_RECEIVE_FINAL,
@@ -728,7 +767,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
         };
 
         uint8_t *read_buffer;
-        read_buffer = (uint8_t *)malloc(PACKET_TOTAL_SIZE);
+        read_buffer = (uint8_t *)malloc(datalink_device.packet.total_size);
         assert(read_buffer != NULL);
 
         int32_t state;
@@ -742,13 +781,13 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
         write_buffer = NULL;
 
         bool tier_1;
-        tier_1 = len <= PACKET_DATA_SIZE;
+        tier_1 = len <= datalink_device.packet.data_size;
 
         bool tier_2;
-        tier_2 = (len > PACKET_DATA_SIZE) && (len <= (2 * PACKET_DATA_SIZE));
+        tier_2 = (len > datalink_device.packet.data_size) && (len <= (2 * datalink_device.packet.data_size));
 
         bool tier_3;
-        tier_3 = len > (2 * PACKET_DATA_SIZE);
+        tier_3 = len > (2 * datalink_device.packet.data_size);
 
         while (true) {
                 switch (state) {
@@ -761,12 +800,12 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                                 write_buffer[7] = len - 1;
                                 state = STATE_RECEIVE_FINAL;
                         } else if (tier_2) {
-                                write_buffer[7] = PACKET_DATA_SIZE;
+                                write_buffer[7] = datalink_device.packet.data_size;
                                 state = STATE_RECEIVE_FINAL;
                         } else if (tier_3) {
-                                write_buffer[7] = PACKET_DATA_SIZE;
+                                write_buffer[7] = datalink_device.packet.data_size;
                                 /* The number of middle packets to send */
-                                count = (len - PACKET_DATA_SIZE - 1) / PACKET_DATA_SIZE;
+                                count = (len - datalink_device.packet.data_size - 1) / datalink_device.packet.data_size;
 
                                 state = STATE_RECEIVE_MIDDLE;
                         }
@@ -776,7 +815,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 
                         DEBUG_PRINTF("State STATE_RECEIVE_MIDDLE (%i)\n", count);
 
-                        write_buffer[7] = PACKET_DATA_SIZE;
+                        write_buffer[7] = datalink_device.packet.data_size;
 
                         count--;
 
@@ -792,11 +831,11 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                         if (tier_1) {
                                 write_buffer[7] = 1;
                         } else if (tier_2) {
-                                write_buffer[7] = len - PACKET_DATA_SIZE;
+                                write_buffer[7] = len - datalink_device.packet.data_size;
                         } else if (tier_3) {
-                                write_buffer[7] = (len - PACKET_DATA_SIZE) % PACKET_DATA_SIZE;
+                                write_buffer[7] = (len - datalink_device.packet.data_size) % datalink_device.packet.data_size;
                                 write_buffer[7] = (write_buffer[7] == 0)
-                                    ? PACKET_DATA_SIZE
+                                    ? datalink_device.packet.data_size
                                     : write_buffer[7];
                         }
 
@@ -812,16 +851,16 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                 write_buffer[6] = ADDRESS_LSB(address);
 
                 write_buffer[8] = packet_checksum(write_buffer,
-                    PACKET_HEADER_SIZE - 1);
+                    datalink_device.packet.header_size - 1);
 
-                if ((datalink_write(write_buffer, PACKET_HEADER_SIZE)) < 0) {
+                if ((datalink_write(write_buffer, datalink_device.packet.header_size)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
-                memset(read_buffer, 0x00, PACKET_TOTAL_SIZE);
-                if ((datalink_read(read_buffer, PACKET_HEADER_SIZE + write_buffer[7])) < 0) {
+                memset(read_buffer, 0x00, datalink_device.packet.total_size);
+                if ((datalink_read(read_buffer, datalink_device.packet.header_size + write_buffer[7])) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
@@ -835,7 +874,7 @@ action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 
                 address += read_buffer[7] + 1;
 
-                (void)memcpy(buffer, &read_buffer[PACKET_HEADER_SIZE - 1],
+                (void)memcpy(buffer, &read_buffer[datalink_device.packet.header_size - 1],
                     read_buffer[7]);
         }
 
@@ -932,7 +971,7 @@ packet_checksum(const uint8_t *buffer, uint32_t len)
 
         for (buffer_idx = 1; buffer_idx < len; buffer_idx++) {
 #ifdef DEBUG
-                if (buffer_idx < PACKET_HEADER_SIZE) {
+                if (buffer_idx < datalink_device.packet.header_size) {
                         DEBUG_PRINTF("B[%02i]\n", buffer_idx);
                 }
 #endif /* DEBUG */
@@ -953,7 +992,7 @@ packet_checksum(const uint8_t *buffer, uint32_t len)
 static int
 datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
 {
-        static const uint8_t packet_response_error[PACKET_HEADER_SIZE] = {
+        static const uint8_t packet_response_error[] = {
                 0xA5,
                 0x07,
                 0x00,
@@ -965,7 +1004,7 @@ datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
                 0x07
         };
 
-        static const uint8_t packet_response_send[PACKET_HEADER_SIZE] = {
+        static const uint8_t packet_response_send[] = {
                 0xA5,
                 0x07,
                 0xFF,
@@ -984,11 +1023,11 @@ datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
         bool bad_packet;
 
         for (buffer_idx = 0;
-             ((buffer_idx < PACKET_HEADER_SIZE) &&
+             ((buffer_idx < datalink_device.packet.header_size) &&
                  (buffer[buffer_idx] == packet_response_error[buffer_idx]));
              buffer_idx++);
 
-        bad_packet = buffer_idx == PACKET_HEADER_SIZE;
+        bad_packet = buffer_idx == datalink_device.packet.header_size;
         if (bad_packet) {
                 datalink_error = DATALINK_ERROR_PACKET;
                 return -1;
@@ -1000,8 +1039,8 @@ datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
         switch (response_type) {
         case PACKET_RESPONSE_TYPE_RECEIVE:
                 calc_checksum = packet_checksum(buffer,
-                    (PACKET_HEADER_SIZE - 1) + buffer[7]);
-                checksum = buffer[(PACKET_HEADER_SIZE) + buffer[7] - 1];
+                    (datalink_device.packet.header_size - 1) + buffer[7]);
+                checksum = buffer[(datalink_device.packet.header_size) + buffer[7] - 1];
 
                 if (checksum != calc_checksum) {
                         DEBUG_PRINTF("Checksum mismatch (0x%02X, 0x%02X)\n",
@@ -1013,10 +1052,10 @@ datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
                 break;
         case PACKET_RESPONSE_TYPE_SEND:
                 for (buffer_idx = 0;
-                     ((buffer_idx < PACKET_HEADER_SIZE) &&
+                     ((buffer_idx < datalink_device.packet.header_size) &&
                          (buffer[buffer_idx] == packet_response_send[buffer_idx]));
                      buffer_idx++);
-                bad_packet = buffer_idx != PACKET_HEADER_SIZE;
+                bad_packet = buffer_idx != datalink_device.packet.header_size;
                 if (bad_packet) {
                         datalink_error = DATALINK_ERROR_PACKET;
                         return -1;
