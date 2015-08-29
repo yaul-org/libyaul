@@ -29,8 +29,11 @@ static void vblank_out_handler(irq_mux_handle_t *);
 static void hardware_init(void);
 
 static struct state_data {
-        int32_t test_type;
-        int32_t test_idx;
+        struct {
+                int32_t type;
+                int32_t subtype;
+                int32_t idx;
+        } test;
 } state_data;
 
 static void state_00_init(struct state_context *);
@@ -67,8 +70,9 @@ main(void)
             state_01_exit,
             &state_data);
 
-        state_data.test_type = TEST_TYPE_PRIMITIVES;
-        state_data.test_idx = 1;
+        state_data.test.type = TEST_TYPE_PRIMITIVES;
+        state_data.test.subtype = TEST_SUBTYPE_SCALED_SPRITE;
+        state_data.test.idx = 0;
 
         state_machine_transition(&state_vdp1, STATE_VDP1_TESTING);
 
@@ -92,11 +96,11 @@ hardware_init(void)
                 0x9C00
         };
 
-        /* VDP1 */
-        vdp1_init();
-
         /* VDP2 */
         vdp2_init();
+
+        /* VDP1 */
+        vdp1_init();
 
         /* SMPC */
         smpc_init();
@@ -119,6 +123,9 @@ hardware_init(void)
 
         vdp2_scrn_back_screen_set(/* single_color = */ true,
             VRAM_ADDR_4MBIT(2, 0x1FFFE), blcs_color, 1);
+
+        /* Turn on display */
+        vdp2_tvmd_display_set();
 }
 
 static void
@@ -161,8 +168,10 @@ state_01_init(struct state_context *state_context)
         struct state_data *state_data;
         state_data = (struct state_data *)state_context->sc_data;
 
-        struct test *current_test;
-        current_test = &tests[state_data->test_type][state_data->test_idx];
+        const struct test *current_test;
+        current_test = tests_fetch(state_data->test.type,
+            state_data->test.subtype,
+            state_data->test.idx);
 
         current_test->init();
 }
@@ -170,11 +179,13 @@ state_01_init(struct state_context *state_context)
 static void
 state_01_update(struct state_context *state_context)
 {
-        struct state_data *state_data __unused;
+        struct state_data *state_data;
         state_data = (struct state_data *)state_context->sc_data;
 
-        struct test *current_test;
-        current_test = &tests[state_data->test_type][state_data->test_idx];
+        const struct test *current_test;
+        current_test = tests_fetch(state_data->test.type,
+            state_data->test.subtype,
+            state_data->test.idx);
 
         current_test->update();
 }
@@ -185,8 +196,10 @@ state_01_draw(struct state_context *state_context)
         struct state_data *state_data;
         state_data = (struct state_data *)state_context->sc_data;
 
-        struct test *current_test;
-        current_test = &tests[state_data->test_type][state_data->test_idx];
+        const struct test *current_test;
+        current_test = tests_fetch(state_data->test.type,
+            state_data->test.subtype,
+            state_data->test.idx);
 
         current_test->draw();
 }
@@ -197,8 +210,10 @@ state_01_exit(struct state_context *state_context)
         struct state_data *state_data __unused;
         state_data = (struct state_data *)state_context->sc_data;
 
-        struct test *current_test;
-        current_test = &tests[state_data->test_type][state_data->test_idx];
+        const struct test *current_test;
+        current_test = tests_fetch(state_data->test.type,
+            state_data->test.subtype,
+            state_data->test.idx);
 
         current_test->exit();
 }

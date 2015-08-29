@@ -7,9 +7,6 @@
 
 #include "test.h"
 
-/* Globals */
-static struct vdp1_cmdt_sprite normal_sprite;
-
 TEST_PROTOTYPE_DECLARE(normal_sprite_00, init)
 {
         void *file_handle;
@@ -28,20 +25,8 @@ TEST_PROTOTYPE_DECLARE(normal_sprite_00, init)
         uint32_t amount;
         amount = tga_image_decode(&tga, (void *)CHAR(0));
         assert(amount > 0);
-        amount = tga_cmap_decode(&tga, (uint16_t *)CLUT(1, 0));
+        amount = tga_cmap_decode(&tga, (uint16_t *)CLUT(16, 0));
         assert(amount > 0);
-
-        normal_sprite.cs_type = CMDT_TYPE_NORMAL_SPRITE;
-        normal_sprite.cs_mode.cc_mode = 0;
-        normal_sprite.cs_mode.color_mode = 1;
-        normal_sprite.cs_color_bank = 1;
-        normal_sprite.cs_clut = CLUT(1, 0);
-        normal_sprite.cs_char = (uint32_t)CHAR(0);
-        normal_sprite.cs_mode.transparent_pixel = true;
-        normal_sprite.cs_position.x = 0;
-        normal_sprite.cs_position.y = 0;
-        normal_sprite.cs_width = 64;
-        normal_sprite.cs_height = 64;
 }
 
 TEST_PROTOTYPE_DECLARE(normal_sprite_00, update)
@@ -60,6 +45,18 @@ TEST_PROTOTYPE_DECLARE(normal_sprite_00, update)
                 user_clip.ucc_coords[0].y = 0;
                 user_clip.ucc_coords[1].x = SCREEN_WIDTH - 1;
                 user_clip.ucc_coords[1].y = SCREEN_HEIGHT - 1;
+
+                static struct vdp1_cmdt_sprite normal_sprite;
+                normal_sprite.cs_type = CMDT_TYPE_NORMAL_SPRITE;
+                normal_sprite.cs_mode.cc_mode = 0;
+                normal_sprite.cs_mode.color_mode = 1;
+                normal_sprite.cs_mode.transparent_pixel = true;
+                normal_sprite.cs_clut = CLUT(16, 0);
+                normal_sprite.cs_char = CHAR(0);
+                normal_sprite.cs_width = 64;
+                normal_sprite.cs_height = 64;
+                normal_sprite.cs_position.x = 0;
+                normal_sprite.cs_position.y = 0;
 
                 vdp1_cmdt_system_clip_coord_set(&system_clip);
                 vdp1_cmdt_user_clip_coord_set(&user_clip);

@@ -20,6 +20,10 @@ struct test {
 #define TEST_TYPE_COLOR                 1
 #define TEST_TYPE_SPECIAL_FUNCTIONS     2
 
-extern struct test *tests[];
+#define TEST_SUBTYPE_NORMAL_SPRITE      0
+#define TEST_SUBTYPE_SCALED_SPRITE      1
+#define TEST_SUBTYPE_DISTORTED_SPRITE   2
+
+const struct test *tests_fetch(uint32_t, uint32_t, uint32_t);
 
 #endif /* !TESTS_H */
