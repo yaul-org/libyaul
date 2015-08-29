@@ -7,21 +7,21 @@
  */
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
-#define PROGNAME        "bin2c"
-
-#define SPACES          "        "
+#define PROGNAME "bin2c"
 
 int
 main(int argc, char **argv)
 {
         argc--;
 
-        if(argc != 3) {
-                fprintf(stderr, "Usage: %s input-file prefix output-file\n",
+        if (argc != 3) {
+                (void)fprintf(stderr,
+                    "Usage: %s input-file prefix output-file\n",
                     PROGNAME);
                 return 2;
         }
@@ -34,13 +34,15 @@ main(int argc, char **argv)
         prefix_len = strlen(prefix);
 
         if (prefix_len > (26 - 5 /* _data */)) {
-                fprintf(stderr, "%s: Error: Prefix is too long (26 characters)\n",
+                (void)fprintf(stderr,
+                    "%s: Error: Prefix is too long (26 characters)\n",
                     PROGNAME);
                 return 1;
         }
 
         if ((prefix[0] != '_') && (!isalpha((int)prefix[0]))) {
-                fprintf(stderr, "%s: Error: Invalid character in prefix\n",
+                (void)fprintf(stderr,
+                    "%s: Error: Invalid character in prefix\n",
                     PROGNAME);
                 return 1;
         }
@@ -50,32 +52,33 @@ main(int argc, char **argv)
                         continue;
                 }
 
-                fprintf(stderr, "%s: Error: Invalid character in prefix\n",
-                    PROGNAME);
+                (void)fprintf(stderr,
+                    "%s: Error: Invalid character in prefix\n", PROGNAME);
                 return 1;
         }
 
-        FILE *ifp;
-        if ((ifp = fopen(argv[1], "rb")) == NULL)  {
-                fprintf(stderr, "%s: Error: Can't open input file\n", PROGNAME);
+        FILE *iffp;
+        if ((iffp = fopen(argv[1], "rb")) == NULL)  {
+                (void)fprintf(stderr, "%s: Error: Can't open input file\n",
+                    PROGNAME);
                 return 1;
         }
         long left;
-        fseek(ifp, 0, SEEK_END);
-        left = ftell(ifp);
-        fseek(ifp, 0, SEEK_SET);
+        fseek(iffp, 0, SEEK_END);
+        left = ftell(iffp);
+        fseek(iffp, 0, SEEK_SET);
 
-        FILE *ofp;
-        if ((ofp = fopen(argv[3], "w")) == NULL)  {
-                fprintf(stderr, "%s: Error: Can't open output file\n",
+        FILE *offp;
+        if ((offp = fopen(argv[3], "w")) == NULL)  {
+                (void)fprintf(stderr, "%s: Error: Can't open output file\n",
                     PROGNAME);
                 return 1;
         }
 
-        fprintf(ofp, "#include <inttypes.h>\n\n");
-        fprintf(ofp, "const size_t %s_size = %li;\n", prefix, left);
-        fprintf(ofp, "const uint8_t %s_data[] =", prefix);
-        fprintf(ofp, "{\n\t");
+        (void)fprintf(offp, "#include <inttypes.h>\n\n");
+        (void)fprintf(offp, "const size_t %s_size = %li;\n", prefix, left);
+        (void)fprintf(offp, "const uint8_t %s_data[] =", prefix);
+        (void)fprintf(offp, "{\n\t");
 
         unsigned char buffer[2048];
         int column_cnt;
@@ -83,7 +86,7 @@ main(int argc, char **argv)
         column_cnt = 0;
         while (left > 0) {
                 int read;
-                read = fread(buffer, 1, 2048, ifp);
+                read = fread(buffer, 1, 2048, iffp);
                 left -= read;
 
                 int read_idx;
@@ -93,18 +96,20 @@ main(int argc, char **argv)
                             ? ","
                             : "";
 
-                        fprintf(ofp, "0x%02X%s ", buffer[read_idx], delimeter);
+                        (void)fprintf(offp, "0x%02X%s ", buffer[read_idx],
+                            delimeter);
 
                         if (((++column_cnt) % 8) == 0) {
-                                fprintf(ofp, "\n%s", SPACES);
+                                /* 8 spaces */
+                                (void)fprintf(offp, "\n%s", "        ");
                         }
                 }
         }
 
-        fprintf(ofp, "\n};\n");
+        (void)fprintf(offp, "\n};\n");
 
-        fclose(ifp);
-        fclose(ofp);
+        fclose(iffp);
+        fclose(offp);
 
         return 0;
 }
