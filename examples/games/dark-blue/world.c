@@ -141,9 +141,9 @@ on_world_init(struct object *this)
             (uint8_t *)VRAM_ADDR_4MBIT(0, 0x01000);
         /* CRAM */
         world->private_data.m_nbg1_color_palette =
-            (uint16_t *)CRAM_NBG1_OFFSET(1, 0, 0);
+            (uint16_t *)CRAM_MODE_1_OFFSET(1, 0, 0);
         world->private_data.m_nbg2_color_palette =
-            (uint16_t *)CRAM_NBG2_OFFSET(0, 1, 0);
+            (uint16_t *)CRAM_MODE_1_OFFSET(0, 1, 0);
 
         struct scrn_cell_format *nbg1_format;
         nbg1_format = &world->private_data.m_nbg1_format;
