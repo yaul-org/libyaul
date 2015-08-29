@@ -33,7 +33,6 @@ vdp1_init(void)
         MEMORY_WRITE(16, VDP1(EWLR), 0x0000);
         MEMORY_WRITE(16, VDP1(EWRR), (uint16_t)(((320 / 8) << 9) | (223)));
 
-        vdp2_tvmd_vblank_out_wait();
         vdp2_tvmd_vblank_in_wait();
 
         /* Stop processing command tables */
@@ -46,5 +45,5 @@ vdp1_init(void)
 
         vdp1_cmdt_list_init();
 
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0001);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
 }

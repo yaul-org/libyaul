@@ -34,11 +34,11 @@ __assert_func(const char *file, int line, const char *func,
             (func ? ", function: " : ""),
             (func ? func : ""));
 
-        /* Reset the VDP1 */
-        vdp1_init();
-
         /* Reset the VDP2 */
         vdp2_init();
+
+        /* Reset the VDP1 */
+        vdp1_init();
 
         vdp2_scrn_back_screen_set(/* single_color = */ true,
             VRAM_ADDR_4MBIT(3, 0x01FFFE), single_color, 1);
