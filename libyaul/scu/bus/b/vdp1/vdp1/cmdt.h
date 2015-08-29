@@ -20,7 +20,7 @@ extern "C" {
         union {                                                                \
                 struct {                                                       \
                         unsigned int msb:1; /* Bit 15 */                       \
-                        unsigned int reserved:2;                               \
+                        unsigned int :2;                                       \
                         unsigned int high_speed_shrink:1;                      \
                         unsigned int pre_clipping:1;                           \
                         unsigned int user_clipping:2; /* ??? */                \
@@ -83,11 +83,11 @@ struct vdp1_cmdt_sprite {
                         unsigned int lower_right:1;
                         unsigned int lower_center:1;
                         unsigned int lower_left:1;
-                        unsigned int reserved_2:1;
+                        unsigned int :1;
                         unsigned int center_right:1;
                         unsigned int center:1;
                         unsigned int center_left:1;
-                        unsigned int reserved_1:1;
+                        unsigned int :1;
                         unsigned int upper_right:1;
                         unsigned int upper_center:1;
                         unsigned int upper_left:1;
