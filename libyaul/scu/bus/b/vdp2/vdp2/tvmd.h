@@ -73,7 +73,7 @@ static __inline uint16_t
 vdp2_tvmd_vcount_get(void)
 {
         MEMORY_WRITE(16, VDP2(EXTEN), MEMORY_READ(16, VDP2(EXTEN)) & ~0x0200);
-        for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) != 0x0200); );
+        for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) == 0x0200); );
         return MEMORY_READ(16, VDP2(VCNT)) & 0x03FF;
 }
 
