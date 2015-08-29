@@ -61,6 +61,7 @@ enum {
         DATALINK_FILE_NOT_FOUND,
         DATALINK_FILE_IO_ERROR,
         DATALINK_BAD_REQUEST,
+        DATALINK_INSUFFICIENT_MEMORY
 };
 
 static uint32_t datalink_error = DATALINK_OK;
@@ -80,7 +81,8 @@ static const char *datalink_error_strings[] = {
         "DATALINK_CORRUPTED_PACKET",
         "DATALINK_FILE_NOT_FOUND",
         "DATALINK_FILE_IO_ERROR",
-        "DATALINK_BAD_REQUEST"
+        "DATALINK_BAD_REQUEST",
+        "DATALINK_INSUFFICIENT_MEMORY"
 };
 
 static const char *ft_error_strings[] = {
@@ -117,9 +119,13 @@ static void convert_error(void);
 static uint8_t packet_checksum(const uint8_t *, uint32_t);
 
 /* Actions */
-static int action_download(const char *, uint32_t, uint32_t);
-static int action_upload(const char *, uint32_t, bool);
-static int action_execute(const char *, uint32_t);
+static int action_download_buffer(void *, uint32_t, uint32_t);
+static int action_upload_buffer(void *, uint32_t, uint32_t, bool);
+static int action_execute_buffer(void *, uint32_t, uint32_t);
+
+static int action_download_file(const char *, uint32_t, uint32_t);
+static int action_upload_file(const char *, uint32_t, bool);
+static int action_execute_file(const char *, uint32_t);
 
 /*
  *
@@ -199,6 +205,8 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
 #define MAX_TRIES (128 * 1024)
 
         DEBUG_PRINTF("Enter\n");
+
+        datalink_error = DATALINK_OK;
 
         if (len > PACKET_TOTAL_SIZE) {
                 datalink_error = DATALINK_IO_ERROR;
@@ -331,27 +339,30 @@ datalink_write(uint8_t *write_buffer, uint32_t len)
  *
  */
 static int
-action_upload(const char *input_file, uint32_t base_address, bool execute)
+action_upload_file(const char *input_file, uint32_t base_address, bool execute)
 {
         DEBUG_PRINTF("Enter\n");
 
-        FILE *iffp;
-        iffp = NULL;
+        int exit_code;
+        exit_code = 0;
+
+        datalink_error = DATALINK_OK;
 
         /* Sanity check */
         if (input_file == NULL) {
                 datalink_error = DATALINK_BAD_REQUEST;
-                goto error;
+                return -1;
         }
         if (*input_file == '\0') {
                 datalink_error = DATALINK_BAD_REQUEST;
-                goto error;
+                return -1;
         }
 
-        if (base_address == 0x00000000) {
-                datalink_error = DATALINK_BAD_REQUEST;
-                goto error;
-        }
+        FILE *iffp;
+        iffp = NULL;
+
+        uint8_t *buffer;
+        buffer = NULL;
 
         if ((iffp = fopen(input_file, "rb+")) == NULL) {
                 datalink_error = DATALINK_FILE_NOT_FOUND;
@@ -376,6 +387,153 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
                 goto error;
         }
 
+        if ((buffer = (uint8_t *)malloc(len)) == NULL) {
+                datalink_error = DATALINK_INSUFFICIENT_MEMORY;
+                goto error;
+        }
+        memset(buffer, 0x00, len);
+
+        size_t read;
+        if ((read = fread(buffer, 1, len, iffp)) != (size_t)len) {
+                datalink_error = DATALINK_FILE_IO_ERROR;
+                goto error;
+        }
+
+        int ret;
+        if ((ret = action_upload_buffer(buffer, base_address, len, execute)) < 0) {
+                goto error;
+        }
+
+        goto exit;
+
+error:
+        exit_code = -1;
+
+        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
+
+exit:
+        if (buffer != NULL) {
+                free(buffer);
+        }
+
+        if (iffp != NULL) {
+                fclose(iffp);
+        }
+
+        DEBUG_PRINTF("Exit\n");
+
+        return exit_code;
+}
+
+/*
+ *
+ */
+static int
+action_execute_file(const char *input_file, uint32_t base_address)
+{
+        DEBUG_PRINTF("Enter\n");
+
+        int ret;
+        ret = action_upload_file(input_file, base_address,
+            /* execute = */ true);
+
+        DEBUG_PRINTF("Exit\n");
+
+        return ret;
+}
+
+/*
+ *
+ */
+static int
+action_download_file(const char *output_file, uint32_t base_address,
+    uint32_t len)
+{
+        DEBUG_PRINTF("Enter\n");
+
+        int exit_code;
+        exit_code = 0;
+
+        datalink_error = DATALINK_OK;
+
+        if (output_file == NULL) {
+                datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
+        }
+        if (*output_file == '\0') {
+                datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
+        }
+
+        FILE *offp;
+        offp = NULL;
+        if ((offp = fopen(output_file, "wb+")) == NULL) {
+                return -1;
+        }
+
+        uint8_t *buffer;
+        buffer = NULL;
+        if ((buffer = (uint8_t *)malloc(len)) == NULL) {
+                datalink_error = DATALINK_INSUFFICIENT_MEMORY;
+                return -1;
+        }
+        memset(buffer, 0x00, len);
+
+        int ret;
+        if ((ret = action_download_buffer(buffer, base_address, len)) < 0) {
+                goto error;
+        }
+
+        (void)fwrite(buffer, 1, len, offp);
+
+        goto exit;
+
+error:
+        exit_code = -1;
+
+        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
+
+exit:
+        if (buffer != NULL) {
+                free(buffer);
+        }
+
+        if (offp != NULL) {
+                fclose(offp);
+        }
+
+        DEBUG_PRINTF("Exit\n");
+
+        return exit_code;
+}
+
+static int
+action_upload_buffer(void *buffer, uint32_t base_address,
+    uint32_t len, bool execute)
+{
+        DEBUG_PRINTF("Enter\n");
+
+        int exit_code;
+        exit_code = 0;
+
+        datalink_error = DATALINK_OK;
+
+        /* Sanity check */
+        if (buffer == NULL) {
+                datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
+        }
+
+        if (base_address == 0x00000000) {
+                datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
+        }
+
+        void *base_buffer;
+        base_buffer = buffer;
+        uint32_t base_len;
+        base_len = len;
+
         size_t read;
 
         uint32_t address;
@@ -393,10 +551,8 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
         execute_buffer[5] = ADDRESS_01(base_address);
         execute_buffer[6] = ADDRESS_LSB(base_address);
         execute_buffer[7] = 2;
-        if ((read = fread(&execute_buffer[8], 1, 2, iffp)) != 2) {
-                datalink_error = DATALINK_FILE_IO_ERROR;
-                goto error;
-        }
+        (void)memcpy(&execute_buffer[8], buffer, 2);
+        buffer += 2;
         execute_buffer[PACKET_HEADER_SIZE + 2 - 1] =
             packet_checksum(execute_buffer, (PACKET_HEADER_SIZE + 2) - 1);
 
@@ -404,11 +560,11 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
         address += 2;
 
         uint8_t read_buffer[PACKET_TOTAL_SIZE];
-        uint8_t buffer[PACKET_TOTAL_SIZE];
+        uint8_t tmp_buffer[PACKET_TOTAL_SIZE];
 
         do {
                 uint8_t transfer_len;
-                transfer_len = ((len - PACKET_DATA_SIZE) < 0)
+                transfer_len = (((int32_t)len - PACKET_DATA_SIZE) < 0)
                     ? len % PACKET_DATA_SIZE
                     : PACKET_DATA_SIZE;
 
@@ -421,26 +577,23 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
                         write_buffer = execute_buffer;
                         transfer_len = 2;
                 } else {
-                        write_buffer = buffer;
+                        write_buffer = tmp_buffer;
 
-                        memset(buffer, 0x00, PACKET_TOTAL_SIZE);
-                        buffer[0] = 0x5A;
-                        buffer[1] = (7 + transfer_len) > (PACKET_TOTAL_SIZE - 2)
+                        memset(write_buffer, 0x00, PACKET_TOTAL_SIZE);
+                        write_buffer[0] = 0x5A;
+                        write_buffer[1] = (7 + transfer_len) > (PACKET_TOTAL_SIZE - 2)
                             ? PACKET_TOTAL_SIZE - 2
                             : 7 + transfer_len;
-                        buffer[2] = PACKET_TYPE_SEND;
-                        buffer[3] = ADDRESS_MSB(address);
-                        buffer[4] = ADDRESS_02(address);
-                        buffer[5] = ADDRESS_01(address);
-                        buffer[6] = ADDRESS_LSB(address);
-                        buffer[7] = transfer_len;
-                        if ((read = fread(&buffer[8], 1, transfer_len, iffp)) != transfer_len) {
-                                datalink_error = DATALINK_FILE_IO_ERROR;
-                                DEBUG_PRINTF("fread() %zu, %i\n", read, transfer_len);
-                                goto error;
-                        }
-                        buffer[PACKET_HEADER_SIZE + transfer_len - 1] =
-                            packet_checksum(buffer, (PACKET_HEADER_SIZE + transfer_len) - 1);
+                        write_buffer[2] = PACKET_TYPE_SEND;
+                        write_buffer[3] = ADDRESS_MSB(address);
+                        write_buffer[4] = ADDRESS_02(address);
+                        write_buffer[5] = ADDRESS_01(address);
+                        write_buffer[6] = ADDRESS_LSB(address);
+                        write_buffer[7] = transfer_len;
+                        (void)memcpy(&write_buffer[8], buffer, transfer_len);
+                        buffer += transfer_len;
+                        write_buffer[PACKET_HEADER_SIZE + transfer_len - 1] =
+                            packet_checksum(write_buffer, (PACKET_HEADER_SIZE + transfer_len) - 1);
                 }
 
                 if ((datalink_write(write_buffer, PACKET_HEADER_SIZE + transfer_len)) < 0) {
@@ -464,45 +617,51 @@ action_upload(const char *input_file, uint32_t base_address, bool execute)
 
                 len -= transfer_len;
                 address += transfer_len;
-        } while (len >= 0);
+        } while ((int32_t)len >= 0);
+
+        if ((uintptr_t)base_buffer != (uintptr_t)(buffer - base_len)) {
+                DEBUG_PRINTF("base_buffer=%p != buffer-len=%p\n",
+                    (void *)base_buffer,
+                    (void *)(buffer - base_len));
+
+                datalink_error = DATALINK_INSUFFICIENT_READ_DATA;
+                goto error;
+        }
 
         goto exit;
 
-        int error;
-
 error:
-        error = -1;
+        exit_code = -1;
 
-        (void)printf("ERROR\n");
+        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
-        error = 0;
+        DEBUG_PRINTF("Exit\n");
 
-        if (iffp != NULL) {
-                fclose(iffp);
-        }
-
-        datalink_error = DATALINK_OK;
-
-        return error;
+        return exit_code;
 }
 
 /*
  *
  */
 static int
-action_execute(const char *input_file, uint32_t base_address)
+action_execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
-        return action_upload(input_file, base_address, /* execute = */ true);
+        int ret = action_upload_buffer(buffer, base_address, len,
+            /* execute = */ true);
+
+        DEBUG_PRINTF("Exit\n");
+
+        return ret;
 }
 
 /*
  *
  */
 static int
-action_download(const char *output_file, uint32_t base_address, uint32_t len)
+action_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
 #define STATE_RECEIVE_FIRST     0
 #define STATE_RECEIVE_MIDDLE    1
@@ -512,20 +671,25 @@ action_download(const char *output_file, uint32_t base_address, uint32_t len)
         DEBUG_PRINTF("Enter\n");
 
         /* Sanity check */
-        if (output_file == NULL) {
+        if (buffer == NULL) {
                 datalink_error = DATALINK_BAD_REQUEST;
-        }
-        if (*output_file == '\0') {
-                datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
         }
 
         if (base_address == 0x00000000) {
                 datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
         }
 
         if (len <= 1) {
                 datalink_error = DATALINK_BAD_REQUEST;
+                return -1;
         }
+
+        int exit_code;
+        exit_code = 0;
+
+        datalink_error = DATALINK_OK;
 
         uint8_t buffer_first[PACKET_HEADER_SIZE] = {
                 0x5A,
@@ -562,12 +726,6 @@ action_download(const char *output_file, uint32_t base_address, uint32_t len)
                 0, /* Length */
                 0 /* Checksum */
         };
-
-        FILE *offp;
-        offp = NULL;
-        if ((offp = fopen(output_file, "wb+")) == NULL) {
-                return -1;
-        }
 
         uint8_t *read_buffer;
         read_buffer = (uint8_t *)malloc(PACKET_TOTAL_SIZE);
@@ -677,34 +835,25 @@ action_download(const char *output_file, uint32_t base_address, uint32_t len)
 
                 address += read_buffer[7] + 1;
 
-                (void)fwrite(&read_buffer[PACKET_HEADER_SIZE - 1],
-                    1,
-                    read_buffer[7],
-                    offp);
+                (void)memcpy(buffer, &read_buffer[PACKET_HEADER_SIZE - 1],
+                    read_buffer[7]);
         }
 
         goto exit;
 
-        int error;
 error:
-        error = -1;
+        exit_code = -1;
 
-        (void)printf("ERROR\n");
+        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
-        error = 0;
-
-        if (offp != NULL) {
-                fclose(offp);
-        }
-
         if (read_buffer != NULL) {
                 free(read_buffer);
         }
 
-        datalink_error = DATALINK_OK;
+        DEBUG_PRINTF("Exit\n");
 
-        return error;
+        return exit_code;
 }
 
 /*
@@ -828,6 +977,8 @@ datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
                 0x06
         };
 
+        datalink_error = DATALINK_OK;
+
         /* Check if the response packet is an error packet */
         uint32_t buffer_idx;
         bool bad_packet;
@@ -881,7 +1032,7 @@ int
 main(int argc, char **argv)
 {
         if ((datalink_init()) < 0) {
-                return -1;
+                return 1;
         }
 
         if (argc == 1) {
@@ -889,9 +1040,10 @@ main(int argc, char **argv)
                 return 1;
         }
 
-        action_execute(argv[1], 0x26004000);
+        int ret;
+        ret = action_upload_file(argv[1], 0x26004000, /* execute = */ false);
 
         datalink_close();
 
-        return 0;
+        return (ret == 0) ? 0 : 1;
 }
