@@ -86,7 +86,7 @@ vdp2_init(void)
         /* RAM */
         /* Color RAM mode 1 */
         /* Partition both VRAM bank A and B by default */
-        MEMORY_WRITE(16, VDP2(RAMCTL), 0x0300);
+        MEMORY_WRITE(16, VDP2(RAMCTL), 0x1300);
         MEMORY_WRITE(16, VDP2(CYCA0L), 0xFFFF);
         MEMORY_WRITE(16, VDP2(CYCA0U), 0xFFFF);
         MEMORY_WRITE(16, VDP2(CYCA1L), 0xFFFF);
