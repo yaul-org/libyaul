@@ -17,7 +17,7 @@
 
 #include <ftd2xx.h>
 
-#define DEBUG
+#include "debug.h"
 
 #define RX_TIMEOUT      5000
 #define TX_TIMEOUT      1000
@@ -51,17 +51,6 @@
 #define ADDRESS_02(x)   ((uint8_t)((x) >> 16) & 0xFF)
 #define ADDRESS_01(x)   ((uint8_t)((x) >> 8) & 0xFF)
 #define ADDRESS_LSB(x)  ((uint8_t)(x) & 0xFF)
-
-#ifdef DEBUG
-#define CC_CONCAT_S(s1, s2)     s1 ## s2
-#define CC_CONCAT(s1, s2)       CC_CONCAT_S(s1, s2)
-#define DEBUG_PRINTF(fmt, ...) do {                                            \
-        (void)fprintf(stderr, "%s():L%i:" " " fmt, __FUNCTION__, __LINE__,     \
-            ##__VA_ARGS__);                                                    \
-} while(false)
-#else
-#define DEBUG_PRINTF(x...)
-#endif /* DEBUG */
 
 enum {
         DATALINK_OK,
@@ -257,6 +246,9 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
         uint32_t timeout;
         timeout = 0;
 
+        DEBUG_PRINTF("Reading %iB\n", len);
+
+        DEBUG_PRINTF("Checking Queue status\n", len);
         ft_error = FT_OK;
         while ((queued_amount < len) && (ft_error == FT_OK)) {
                 ft_error = FT_GetQueueStatus(ft_handle, &queued_amount);
@@ -270,6 +262,7 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
                         return -1;
                 }
         }
+        DEBUG_PRINTF("Queue status OK\n", len);
 
         if (ft_error != FT_OK) {
                 convert_error();
