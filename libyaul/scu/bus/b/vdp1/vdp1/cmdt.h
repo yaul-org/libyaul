@@ -16,7 +16,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(n)                                  \
+#define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n)                                  \
         union {                                                                \
                 struct {                                                       \
                         unsigned int msb:1; /* Bit 15 */                       \
@@ -29,10 +29,15 @@ extern "C" {
                         unsigned int transparent_pixel:1; /* Enable */         \
                         unsigned int color_mode:3;                             \
                         unsigned int cc_mode:3;                                \
-                } __packed __aligned(2);                                       \
+                } __aligned(2);                                                \
                                                                                \
                 uint16_t raw;                                                  \
         } CC_CONCAT(n, _mode)
+
+#define VDP1_CMDT_DUMMY_UNION_DECLARE(n)                                       \
+        union {                                                                \
+                uint16_t value;                                                \
+        } CC_CONCAT(n, _extra)
 
 struct vdp1_cmdt {
         uint16_t cmd_ctrl;
@@ -50,11 +55,12 @@ struct vdp1_cmdt {
         int16_t cmd_xd;
         int16_t cmd_yd;
         uint16_t cmd_grda;
-} __packed __aligned(32);
+        uint16_t reserved;
+} __aligned(32);
 
 struct vdp1_cmdt_gst {
         uint16_t entry[4];
-} __packed __aligned(8);
+} __aligned(8);
 
 struct vdp1_cmdt_sprite {
 #define CMDT_TYPE_NORMAL_SPRITE         0x0000
@@ -86,12 +92,12 @@ struct vdp1_cmdt_sprite {
                         unsigned int upper_center:1;
                         unsigned int upper_left:1;
                         unsigned int enable:1;
-                } __packed __aligned(2);
+                } __aligned(2);
 
                 uint16_t raw;
         } cs_zoom_point;
 
-        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cs);
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cs);
 
         union {
                 /* Mode 0, 2, 3, and 4 */
@@ -131,10 +137,12 @@ struct vdp1_cmdt_sprite {
         };
 
         uint32_t cs_grad;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(cs);
+};
 
 struct vdp1_cmdt_polygon {
-        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cp);
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cp);
 
         uint16_t cp_color;
 
@@ -146,10 +154,12 @@ struct vdp1_cmdt_polygon {
         } cp_vertex;
 
         uint32_t cp_grad;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(cp);
+};
 
 struct vdp1_cmdt_polyline {
-        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cl);
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
         uint16_t cl_color;
 
@@ -161,10 +171,12 @@ struct vdp1_cmdt_polyline {
         } cl_vertex;
 
         uint32_t cl_grad;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(cl);
+};
 
 struct vdp1_cmdt_line {
-        VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT(cl);
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
         uint16_t cl_color;
 
@@ -176,28 +188,36 @@ struct vdp1_cmdt_line {
         } cl_vertex;
 
         uint32_t cl_grad;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(cl);
+};
 
 struct vdp1_cmdt_local_coord {
         struct {
                 int16_t x;
                 int16_t y;
         } lc_coord;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(lc);
+};
 
 struct vdp1_cmdt_system_clip_coord {
         struct {
                 int16_t x;
                 int16_t y;
         } scc_coord;
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(scc);
+};
 
 struct vdp1_cmdt_user_clip_coord {
         struct {
                 int16_t x;
                 int16_t y;
         } ucc_coords[2];
-} __packed __aligned(32);
+
+        VDP1_CMDT_DUMMY_UNION_DECLARE(ucc);
+};
 
 extern void vdp1_cmdt_list_init(void);
 extern void vdp1_cmdt_list_begin(uint32_t);
@@ -216,7 +236,8 @@ extern void vdp1_cmdt_system_clip_coord_set(
 extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(void);
 
-#undef VDP1_CMDT_DRAW_MODE_DECLARE_STRUCT
+#undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
+#undef VDP1_CMDT_DUMMY_UNION_DECLARE
 
 #ifdef __cplusplus
 }
