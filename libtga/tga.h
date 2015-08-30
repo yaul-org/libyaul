@@ -26,13 +26,20 @@ typedef struct {
 #define TGA_IMAGE_TYPE_RLE_GRAYSCALE    11
         uint8_t tga_type;
 
+        uint8_t tga_bpp;
+        uint16_t tga_width;
+        uint16_t tga_height;
+
         uint8_t tga_cmap_bpp;
         uint16_t tga_cmap_len;
         uint32_t tga_cmap_bytes;
 
-        uint8_t tga_bpp;
-        uint16_t tga_width;
-        uint16_t tga_height;
+        struct {
+                /* Determine the transparent pixel color */
+                uint32_t transparent_pixel;
+                /* Enable setting MSB bit for transparent pixel color */
+                bool msb;
+        } tga_options;
 } tga_t __attribute__ ((aligned(4)));
 
 int tga_read(tga_t *, const uint8_t *);

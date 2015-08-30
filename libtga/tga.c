@@ -13,17 +13,17 @@
 
 #include "tga.h"
 
-#define BGR15_DATA_TO_RGB555         BGR16_DATA_TO_RGB555
+#define BGR15_DATA_TO_RGB555    BGR16_DATA_TO_RGB555
 #define BGR16_DATA_TO_RGB555(c)                                                \
-        (0x8000 | (((*(uint16_t *)(c)) & 0x001F) << 10) |                      \
+        ((((*(uint16_t *)(c)) & 0x001F) << 10) |                               \
         ((*(uint16_t *)(c)) & 0x03E0) |                                        \
         (((*(uint16_t *)(c)) & 0x7C00) >> 10))
 #define BGR24_DATA_TO_RGB555(c)                                                \
-        (0x8000 | (((c)[0] >> 3) << 10) | (((c)[1] >> 3) << 5) | ((c)[2] >> 3))
-#define BGRA32_DATA_TO_RGB555        BGR24_DATA_TO_RGB555
+        ((((c)[0] >> 3) << 10) | (((c)[1] >> 3) << 5) | ((c)[2] >> 3))
+#define BGRA32_DATA_TO_RGB555   BGR24_DATA_TO_RGB555
 
-#define RGB24_TO_RGB555(r, g, b) (0x8000 | (((b) >> 3) << 10) |                \
-    (((g) >> 3) << 5) | ((r) >> 3))
+#define RGB24_TO_RGB555(r, g, b) ((((b) >> 3) << 10) | (((g) >> 3) << 5) |     \
+        ((r) >> 3))
 
 #define READ_LITTLE_ENDIAN_16(a, i)                                            \
         (((uint32_t)(a)[(i)]) | ((uint32_t)(a)[(i) + 1]) << 8)
@@ -88,8 +88,6 @@ tga_read(tga_t *tga, const uint8_t *file)
         cmap_len = READ_LITTLE_ENDIAN_16(header, 5);
         cmap_bpp = header[7];
         cmap_bytes = cmap_len * (cmap_bpp >> 3);
-
-        memset(tga, 0x00, sizeof(tga_t));
 
         /* Sanity checks */
         /* The maximum size of a TGA image is 512 pixels wide by 482
@@ -228,27 +226,48 @@ tga_cmap_decode(const tga_t *tga, uint16_t *dst)
                 return 0;
         }
 
-        uint16_t cmap_idx;
+        uint16_t transparent_pixel;
+        transparent_pixel = tga->tga_options.transparent_pixel & ~0x8000;
+
+        uint32_t cmap_idx;
+
+        int32_t cmap_transparent_idx;
+        cmap_transparent_idx = -1;
 
         const uint8_t *cmap_buf;
         cmap_buf = (const uint8_t *)((uint32_t)tga->tga_file +
             _cmap_calculate_offset(tga));
 
         for (cmap_idx = 0; cmap_idx < tga->tga_cmap_len; cmap_idx++) {
+                uint16_t pixel;
+
                 switch (tga->tga_cmap_bpp >> 3) {
                 case 2:
-                        dst[cmap_idx] =
-                            BGR16_DATA_TO_RGB555(&cmap_buf[cmap_idx * 2]);
+                        pixel = BGR16_DATA_TO_RGB555(&cmap_buf[cmap_idx * 2]);
                         break;
                 case 3:
-                        dst[cmap_idx] =
-                            BGR24_DATA_TO_RGB555(&cmap_buf[cmap_idx * 3]);
+                        pixel = BGR24_DATA_TO_RGB555(&cmap_buf[cmap_idx * 3]);
                         break;
                 case 4:
-                        dst[cmap_idx] =
-                            BGRA32_DATA_TO_RGB555(&cmap_buf[cmap_idx * 4]);
+                        pixel = BGRA32_DATA_TO_RGB555(&cmap_buf[cmap_idx * 4]);
                         break;
                 }
+
+                dst[cmap_idx] = 0x8000 | pixel;
+
+                if (pixel == transparent_pixel) {
+                        cmap_transparent_idx = cmap_idx;
+                }
+        }
+
+        /* Ignore if -1 (no transparent pixel found) or 0 */
+        if (cmap_transparent_idx > 0) {
+                uint16_t pixel;
+                pixel = dst[0];
+                static char text[1024];
+                /* Swap */
+                dst[0] = dst[cmap_transparent_idx];
+                dst[cmap_transparent_idx] = pixel;
         }
 
         return cmap_idx;
@@ -330,6 +349,11 @@ true_color_image_decode(uint16_t *dst, const tga_t *tga)
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
             _image_calculate_offset(tga));
 
+        uint16_t msb;
+        msb = tga->tga_options.msb ? 0x8000 : 0x0000;
+        uint16_t transparent_pixel;
+        transparent_pixel = tga->tga_options.transparent_pixel & ~0x8000;
+
         uint16_t bytes_pp;
         bytes_pp = tga->tga_bpp >> 3;
 
@@ -353,9 +377,9 @@ true_color_image_decode(uint16_t *dst, const tga_t *tga)
                         break;
                 }
 
-                if (pixel == RGB24_TO_RGB555(255, 0, 255)) {
-                        pixel = 0x0000;
-                }
+                pixel = (pixel == transparent_pixel)
+                    ? msb
+                    : (0x8000 | pixel);
 
                 *dst++ = pixel;
         }
@@ -379,6 +403,11 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
         const uint8_t *buf;
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
             _image_calculate_offset(tga));
+
+        uint16_t msb;
+        msb = tga->tga_options.msb ? 0x8000 : 0x0000;
+        uint16_t transparent_pixel;
+        transparent_pixel = tga->tga_options.transparent_pixel & ~0x8000;
 
         uint16_t bytes_pp;
         bytes_pp = tga->tga_bpp >> 3;
@@ -416,10 +445,9 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
                                         break;
                                 }
 
-                                if (pixel == RGB24_TO_RGB555(255, 0, 255)) {
-                                        pixel &= ~0x8000;
-                                }
-
+                                pixel = (pixel == transparent_pixel)
+                                    ? msb
+                                    : (0x8000 | pixel);
                                 *dst++ = pixel;
                         }
 
@@ -440,9 +468,9 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
                                 break;
                         }
 
-                        if (pixel == RGB24_TO_RGB555(255, 0, 255)) {
-                                pixel = 0x0000;
-                        }
+                        pixel = (pixel == transparent_pixel)
+                            ? msb
+                            : (0x8000 | pixel);
 
                         amt = _true_color_image_fill(dst, pixel,
                             rcf * sizeof(uint16_t));
