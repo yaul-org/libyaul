@@ -1,6 +1,6 @@
 PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 
-TARGET:= data-link
+TARGET:= ssload
 # http://.c.gnu.org/onlinedocs/.c-4.5.2/.c/Warning-Options.html#Warning-Options
 CCFLAGS:= -O2 \
 	-s \
@@ -23,7 +23,11 @@ STORE_FILES:= .
 SED:= sed
 
 # Duplicates are taken care of when using the "$^" automatic variable
-SRCS:= $(SRC_DIR)/data-link.c
+SRCS:= \
+$(SRC_DIR)/ssload.c \
+$(SRC_DIR)/datalink.c \
+$(SRC_DIR)/drivers.c \
+$(SRC_DIR)/usb-cartridge.c
 
 OBJS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.d))
