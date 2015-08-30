@@ -6,7 +6,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #define TGA_FILE_OK                     0
 #define TGA_FILE_UNKNOWN_FORMAT         1
@@ -43,6 +43,5 @@ const char *tga_error_stringify(int);
 
 #ifdef __cplusplus
 }
-#endif
-
+#endif /* __cplusplus */
 #endif /* TGA_H_ */
