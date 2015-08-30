@@ -23,11 +23,11 @@ void
 tutorial_init(void)
 {
         static uint16_t back_screen_color[] = {
-                0x8000
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0)
         };
 
-        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            back_screen_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true,
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
 
         struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;
@@ -70,6 +70,9 @@ tutorial_init(void)
         fs_load(fh, (uint8_t *)0x00200000);
 
         tga_t tga;
+        tga.tga_options.msb = false;
+        tga.tga_options.transparent_pixel = COLOR_RGB888_TO_RGB555(0, 255, 0);
+
         int ret;
 
         uint8_t *ptr;

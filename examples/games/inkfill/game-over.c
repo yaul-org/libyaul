@@ -23,11 +23,11 @@ void
 game_over_init(void)
 {
         static uint16_t back_screen_color[] = {
-                0x8000
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0)
         };
 
-        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
-            back_screen_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true,
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
 
         struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;
@@ -70,6 +70,9 @@ game_over_init(void)
         fs_load(fh, (uint8_t *)0x00201000);
 
         tga_t tga;
+        tga.tga_options.msb = false;
+        tga.tga_options.transparent_pixel = COLOR_RGB888_TO_RGB555(0, 255, 0);
+
         int ret;
 
         uint8_t *ptr;
@@ -81,7 +84,7 @@ game_over_init(void)
         amount = tga_image_decode(&tga, (void *)VRAM_ADDR_4MBIT(0, 0x00000));
         assert(amount > 0);
 
-        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ true);
+        vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ false);
         vdp2_tvmd_display_set();
 
         changed = false;

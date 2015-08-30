@@ -17,8 +17,6 @@
 #include "globals.h"
 #include "scene.h"
 
-#define RGB888_TO_RGB555(r, g, b) ((((b) >> 3) << 10) | (((g) >> 3) << 5) | ((r) >> 3))
-
 #define TRIES_MAX 18
 
 #define GRID_CELL_COLOR_RED     0
@@ -43,7 +41,7 @@ static uint16_t *_nbg1_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x04000)
 };
 /* CRAM */
-static uint16_t *_nbg1_color_palette = (uint16_t *)CRAM_NBG1_OFFSET(1, 1, 0);
+static uint16_t *_nbg1_color_palette = (uint16_t *)CRAM_MODE_1_OFFSET(1, 1, 0);
 /* VRAM B0 */
 static uint32_t *_nbg1_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x00000);
 
@@ -58,7 +56,7 @@ static uint16_t *_nbg3_planes[4] = {
         (uint16_t *)VRAM_ADDR_4MBIT(2, 0x08000)
 };
 /* CRAM */
-static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_NBG3_OFFSET(1, 0, 0);
+static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_MODE_1_OFFSET(1, 0, 0);
 /* VRAM B0 */
 static uint32_t *_nbg3_character = (uint32_t *)VRAM_ADDR_4MBIT(2, 0x06000);
 
@@ -80,11 +78,11 @@ void
 game_init(void)
 {
         static uint16_t back_screen_color[] = {
-                RGB888_TO_RGB555(0, 127, 63)
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(84, 164, 255)
         };
 
-        vdp2_scrn_back_screen_set(/* single_color = */ false,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true,
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
 
         _grid_init();
 
@@ -143,22 +141,22 @@ _grid_init(void)
         };
 
         static uint16_t palette[] = {
-                0x0000,
-                0x8000 | RGB888_TO_RGB555(0xFF, 0x00, 0x00), /* Red */
-                0x8000 | RGB888_TO_RGB555(0xFF, 0xA5, 0x00), /* Orange */
-                0x8000 | RGB888_TO_RGB555(0x00, 0xFF, 0x00), /* Green */
-                0x8000 | RGB888_TO_RGB555(0x00, 0x00, 0xFF), /* Blue */
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF,
-                0xFFFF
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00), /* Red */
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0xFF, 0x00, 0x00), /* Red */
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0xFF, 0xA5, 0x00), /* Orange */
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0xFF, 0x00), /* Green */
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0xFF), /* Blue */
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00),
+                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0x00, 0x00, 0x00)
         };
 
         struct scrn_cell_format nbg1_format;
@@ -321,6 +319,9 @@ _grid_init(void)
         fs_load(fh, (uint8_t *)0x00201000);
 
         tga_t tga;
+        tga.tga_options.msb = false;
+        tga.tga_options.transparent_pixel = COLOR_RGB888_TO_RGB555(0, 255, 0);
+
         int ret;
 
         uint8_t *ptr;
