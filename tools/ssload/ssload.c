@@ -6,6 +6,8 @@
  */
 
 #include <ctype.h>
+#include <libgen.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,14 +19,26 @@
 
 #define PROGNAME "ssload"
 
+#define VERBOSE_PRINTF(fmt, ...) do {                                          \
+        if (options.v_set) {                                                   \
+            (void)printf(fmt, ##__VA_ARGS__);                                  \
+            (void)fflush(stdout);                                              \
+        }                                                                      \
+} while(false)
+
+void console(const struct device_driver *);
+
 static struct {
         bool h_set;
+        bool v_set;
 
         bool x_set;
         bool u_set;
         bool d_set;
+        char *filepath;
+
         bool i_set;
-        char *filename;
+        char *iso_filepath;
 
         bool a_set;
         uint32_t address;
@@ -41,12 +55,15 @@ static struct {
         uint32_t device;
 } options = {
         .h_set = false,
+        .v_set = false,
 
         .x_set = false,
         .u_set = false,
         .d_set = false,
+        .filepath = NULL,
+
         .i_set = false,
-        .filename = NULL,
+        .iso_filepath = NULL,
 
         .a_set = false,
         .address = 0x06004000,
@@ -70,6 +87,7 @@ usage(void)
             "Usage %s options\n"
             " options\n"
             "   -h\t\tProgram usage\n"
+            "   -v\t\tBe more verbose\n"
             "   -x filename\tUpload and execute file FILENAME\n"
             "   -u filename\tUpload file FILENAME\n"
             "   -d filename\tDownload data to FILENAME\n"
@@ -78,7 +96,7 @@ usage(void)
             "   -n\t\tDisable starting console\n"
             "   -i iso\tEnable ISO9660 filesystem redirection support using image ISO\n"
             "   -g port\tStart GDB proxy on TCP port PORT\n"
-            "   -p device\tChoose device DEVICE (ARP or USB-cartridge)\n",
+            "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')\n",
             PROGNAME);
         exit(2);
 }
@@ -88,6 +106,9 @@ main(int argc, char **argv)
 {
         const struct device_driver *device;
         device = NULL;
+
+        int exit_code;
+        exit_code = 0;
 
         if (argc == 1) {
                 usage();
@@ -105,25 +126,28 @@ main(int argc, char **argv)
         opterr = 0;
 
         int option;
-        while ((option = getopt(argc, argv, "hx:u:d:a:s:ni:g:p:")) > 0) {
+        while ((option = getopt(argc, argv, "hvx:u:d:a:s:ni:g:p:")) > 0) {
                 switch (option) {
                 case 'h':
                         options.h_set = true;
                         break;
+                case 'v':
+                        options.v_set = true;
+                        break;
                 case 'x':
                         options.x_set = true;
                         action_cnt++;
-                        options.filename = optarg;
+                        options.filepath = strdup(optarg);
                         break;
                 case 'u':
                         options.u_set = true;
                         action_cnt++;
-                        options.filename = optarg;
+                        options.filepath = strdup(optarg);
                         break;
                 case 'd':
                         options.d_set = true;
                         action_cnt++;
-                        options.filename = optarg;
+                        options.filepath = strdup(optarg);
                         break;
                 case 'a':
                         options.a_set = true;
@@ -148,7 +172,7 @@ main(int argc, char **argv)
                         break;
                 case 'i':
                         options.i_set = true;
-                        options.filename = optarg;
+                        options.iso_filepath = strdup(optarg);
                         break;
                 case 'g':
                         options.g_set = true;
@@ -245,49 +269,100 @@ main(int argc, char **argv)
 
         device = device_drivers[options.device];
 
+        VERBOSE_PRINTF("Detected: %s\n", device->name);
+
+        VERBOSE_PRINTF("Initializing...");
         if ((device->init()) < 0) {
+                VERBOSE_PRINTF(" FAILED\n");
                 goto error;
         }
+        VERBOSE_PRINTF(" OK\n");
 
         if (options.x_set) {
+                char *filename;
+                filename = basename(options.filepath);
+
+                VERBOSE_PRINTF("Uploading (and executing) file `%s' to 0x%08X...",
+                    filename,
+                    options.address);
+
                 int ret;
-                if ((ret = device->execute_file(options.filename,
+                if ((ret = device->execute_file(options.filepath,
                             options.address)) < 0) {
+                        VERBOSE_PRINTF(" FAILED\n");
                         goto error;
                 }
+                VERBOSE_PRINTF(" OK\n");
         }
 
         if (options.u_set) {
+                char *filename;
+                filename = basename(options.filepath);
+
+                VERBOSE_PRINTF("Uploading file `%s' to 0x%08X...", filename,
+                    options.address);
+
                 int ret;
-                if ((ret = device->upload_file(options.filename,
+                if ((ret = device->upload_file(options.filepath,
                             options.address)) < 0) {
+                        VERBOSE_PRINTF(" FAILED\n");
                         goto error;
                 }
+                VERBOSE_PRINTF(" OK\n");
         }
 
         if (options.d_set) {
+                char *filename;
+                filename = basename(options.filepath);
+
+                VERBOSE_PRINTF("Downloading from 0x%08X to file `%s'...",
+                    options.address,
+                    filename);
+
                 int ret;
-                if ((ret = device->download_file(options.filename, options.address,
+                if ((ret = device->download_file(options.filepath, options.address,
                             options.size)) < 0) {
+                        VERBOSE_PRINTF(" FAILED\n");
                         goto error;
                 }
+                VERBOSE_PRINTF(" OK\n");
         }
 
         if (options.g_set) {
+                (void)fprintf(stderr, "%s: Not yet implemented\n", PROGNAME);
+                exit(1);
         }
 
         if (options.i_set) {
+                (void)fprintf(stderr, "%s: Not yet implemented\n", PROGNAME);
+                exit(1);
         }
 
         if (!options.n_set) {
+                if (options.x_set) {
+                        VERBOSE_PRINTF("\n");
+                        console(device);
+                }
         }
 
-        return 0;
+        goto exit;
 
 error:
-        if (device != NULL) {
-                device->shutdown();
+        exit_code = 1;
+
+exit:
+        if (options.filepath != NULL) {
+                free(options.filepath);
+        }
+        if (options.iso_filepath != NULL) {
+                free(options.iso_filepath);
         }
 
-        return 1;
+        if (device != NULL) {
+                VERBOSE_PRINTF("Shutting down...");
+                device->shutdown();
+                VERBOSE_PRINTF(" OK\n");
+        }
+
+        return exit_code;
 }
