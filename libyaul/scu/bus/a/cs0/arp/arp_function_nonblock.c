@@ -67,8 +67,9 @@ arp_function_01(void)
                 }
 
                 /* Set for ARP callback */
-                if (arp_callback.ptr == NULL)
+                if (arp_callback.ptr == NULL) {
                         arp_callback.ptr = (void *)address;
+                }
                 arp_callback.function = 0x01;
                 arp_callback.exec = false;
                 arp_callback.len += len;
@@ -106,8 +107,9 @@ arp_function_09(void)
         exec = (b == 0x01);
 
         /* Set for ARP callback */
-        if (arp_callback.ptr == NULL)
+        if (arp_callback.ptr == NULL) {
                 arp_callback.ptr = (void *)(addr - len);
+        }
         arp_callback.function = 0x09;
         arp_callback.exec = exec;
         arp_callback.len += len;

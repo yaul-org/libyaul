@@ -14,6 +14,7 @@
 #include "arp-internal.h"
 
 arp_callback_t arp_callback;
+
 static void (*arp_cb)(arp_callback_t *) = NULL;
 
 static void arp_trampoline(void);
