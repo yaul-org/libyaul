@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _PERIPHERAL_H_
-#define _PERIPHERAL_H_
+#ifndef _SMPC_PERIPHERAL_H_
+#define _SMPC_PERIPHERAL_H_
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -440,4 +440,4 @@ extern void smpc_peripheral_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_PERIPHERAL_H_ */
+#endif /* !_SMPC_PERIPHERAL_H_ */

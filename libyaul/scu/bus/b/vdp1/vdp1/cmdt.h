@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CMDT_H_
-#define _CMDT_H_
+#ifndef _VDP1_CMDT_H_
+#define _VDP1_CMDT_H_
 
 #include <inttypes.h>
 
@@ -242,4 +242,4 @@ extern void vdp1_cmdt_end(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_CMDT_H_ */
+#endif /* !_VDP1_CMDT_H_ */

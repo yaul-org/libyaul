@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _UBC_H_
-#define _UBC_H_
+#ifndef _CPU_UBC_H_
+#define _CPU_UBC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,4 +15,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_UBC_H */
+#endif /* !_CPU_UBC_H */

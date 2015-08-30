@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _PRIORITY_H_
-#define _PRIORITY_H_
+#ifndef _VDP2_PRIORITY_H_
+#define _VDP2_PRIORITY_H_
 
 #include <inttypes.h>
 
@@ -19,4 +19,4 @@ extern void vdp2_priority_spn_set(uint8_t, uint8_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_PRIORITY_H_ */
+#endif /* !_VDP2_PRIORITY_H_ */

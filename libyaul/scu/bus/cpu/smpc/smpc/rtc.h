@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _RTC_H_
-#define _RTC_H_
+#ifndef _SMPC_RTC_H_
+#define _SMPC_RTC_H_
 
 #include <inttypes.h>
 
@@ -27,4 +27,4 @@ struct smpc_time {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_RTC_H_ */
+#endif /* !_SMPC_RTC_H_ */

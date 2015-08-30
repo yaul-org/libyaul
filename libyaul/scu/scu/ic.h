@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _IC_H_
-#define _IC_H_
+#ifndef _SCU_IC_H_
+#define _SCU_IC_H_
 
 #include <inttypes.h>
 
@@ -70,4 +70,4 @@ extern void scu_ic_mask_set(uint16_t, uint16_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_IC_H_ */
+#endif /* !_SCU_IC_H_ */

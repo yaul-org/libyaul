@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCRN_H_
-#define _SCRN_H_
+#ifndef _VDP2_SCRN_H_
+#define _VDP2_SCRN_H_
 
 #include <stdbool.h>
 #include <inttypes.h>
@@ -122,4 +122,4 @@ extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_SCRN_H_ */
+#endif /* !_VDP2_SCRN_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DMAC_H_
-#define _DMAC_H_
+#ifndef _CPU_DMAC_H_
+#define _CPU_DMAC_H_
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -50,4 +50,4 @@ extern void cpu_dmac_channel_stop(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_DMAC_H */
+#endif /* !_CPU_DMAC_H */

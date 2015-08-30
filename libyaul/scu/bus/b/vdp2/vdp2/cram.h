@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CRAM_H_
-#define _CRAM_H_
+#ifndef _VDP2_CRAM_H_
+#define _VDP2_CRAM_H_
 
 #include <common.h>
 
@@ -190,4 +190,4 @@ struct vdp2_cram_sprite_type_f {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_CRAM_H_ */
+#endif /* !_VDP2_CRAM_H_ */

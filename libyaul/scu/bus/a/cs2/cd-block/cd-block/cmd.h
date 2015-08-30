@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CMD_H_
-#define _CMD_H_
+#ifndef _CD_BLOCK_CMD_H_
+#define _CD_BLOCK_CMD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,4 +18,4 @@ extern void cd_block_cmd_init_cd_system(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_CMD_H_ */
+#endif /* !_CD_BLOCK_CMD_H_ */

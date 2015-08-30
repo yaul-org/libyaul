@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _PN_H_
-#define _PN_H_
+#ifndef _VDP2_PN_H_
+#define _VDP2_PN_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,4 +85,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_PN_H_ */
+#endif /* !_VDP2_PN_H_ */

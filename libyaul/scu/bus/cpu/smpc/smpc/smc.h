@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMC_H_
-#define _SMC_H_
+#ifndef _SMPC_SMC_H_
+#define _SMPC_SMC_H_
 
 #include <inttypes.h>
 
@@ -33,4 +33,4 @@ extern uint8_t smpc_smc_sysres_call(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_SMC_H_ */
+#endif /* !_SMPC_SMC_H_ */

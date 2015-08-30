@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _TVMD_H_
-#define _TVMD_H_
+#ifndef _VDP2_TVMD_H_
+#define _VDP2_TVMD_H_
 
 #include <stdbool.h>
 #include <inttypes.h>
@@ -86,4 +86,4 @@ extern void vdp2_tvmd_display_set(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_TVMD_H_ */
+#endif /* !_VDP2_TVMD_H_ */

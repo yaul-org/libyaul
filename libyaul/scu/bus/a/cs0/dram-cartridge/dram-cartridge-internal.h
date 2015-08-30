@@ -15,7 +15,7 @@
 #define UNKNOWN         0x007EFFFE
 
 /* Specific macros */
-#define DRAM(t, b, x)   (CS0((x) + ((((b) & 0x03) +                           \
+#define DRAM(t, b, x)   (CS0((x) + ((((b) & 0x03) +                            \
         (((t) & 0x01) << 2)) << 19)))
 
 extern uint8_t id;

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _INTC_H_
-#define _INTC_H_
+#ifndef _CPU_INTC_H_
+#define _CPU_INTC_H_
 
 #include <inttypes.h>
 
@@ -26,4 +26,4 @@ extern void cpu_intc_vector_base_set(void (**)(void));
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_INTC_H */
+#endif /* !_CPU_INTC_H */

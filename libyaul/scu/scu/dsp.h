@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DSP_H_
-#define _DSP_H_
+#ifndef _SCU_DSP_H_
+#define _SCU_DSP_H_
 
 #include <inttypes.h>
 
@@ -19,4 +19,4 @@ extern void scu_dsp_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* !_DSP_H_ */
+#endif /* !_SCU_DSP_H_ */

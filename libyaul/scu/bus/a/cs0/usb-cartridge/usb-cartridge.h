@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _USB_CARTRIDGE_H__
-#define _USB_CARTRIDGE_H__
+#ifndef _USB_CARTRIDGE_H_
+#define _USB_CARTRIDGE_H_
 
 #include <inttypes.h>
 #include <stdbool.h>

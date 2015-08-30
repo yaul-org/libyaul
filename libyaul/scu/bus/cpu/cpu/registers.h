@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _REGISTERS_H_
-#define _REGISTERS_H_
+#ifndef _CPU_REGISTERS_H_
+#define _CPU_REGISTERS_H_
 
 #include <inttypes.h>
 
@@ -26,4 +26,4 @@ struct cpu_registers {
         uint32_t sr;
 } __packed;
 
-#endif /* !_REGISTERS_H_ */
+#endif /* !_CPU_REGISTERS_H_ */
