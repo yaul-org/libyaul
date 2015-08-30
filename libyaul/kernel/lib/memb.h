@@ -71,8 +71,15 @@ struct memb {
         void *m_bpool;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 void memb_init(struct memb *);
 void *memb_alloc(struct memb *);
 int memb_free(struct memb *, void *);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* _MEMB_H_ */

@@ -10,9 +10,16 @@
 
 #include <cpu/registers.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include "gdb-signals.h"
 #include "sh2-704x.h"
 
 void gdb_monitor(struct cpu_registers *, int);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* !_GDB_H_ */
