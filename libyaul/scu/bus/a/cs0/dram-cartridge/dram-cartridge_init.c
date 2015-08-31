@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) 2012-2016 Israel Jacquez
  *
  * See LICENSE for details.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014
+ * Copyright (c) 2012-2016
  * See LICENSE for details.
  *
  * William A. Gatliff <bgat@billgatliff.com> 
