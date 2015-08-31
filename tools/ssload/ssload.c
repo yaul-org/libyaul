@@ -5,6 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <libgen.h>
 #include <limits.h>
@@ -13,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <sys/time.h>
 
 #include "debug.h"
 #include "drivers.h"
@@ -25,6 +28,15 @@
             (void)fflush(stdout);                                              \
         }                                                                      \
 } while(false)
+
+struct performance_stats {
+        double ps_transfer_time;
+        double ps_transfer_speed;
+
+        uint32_t _transfer_size;
+        struct timeval _time_start;
+        struct timeval _time_end;
+};
 
 void console(const struct device_driver *);
 
@@ -80,26 +92,12 @@ static struct {
         .device = DEVICE_DRIVER_DATALINK
 };
 
-static void
-usage(void)
-{
-        (void)fprintf(stderr,
-            "Usage %s options\n"
-            " options\n"
-            "   -h\t\tProgram usage\n"
-            "   -v\t\tBe more verbose\n"
-            "   -x filename\tUpload and execute file FILENAME\n"
-            "   -u filename\tUpload file FILENAME\n"
-            "   -d filename\tDownload data to FILENAME\n"
-            "   -a address\tSet address to ADDRESS (base 16, default: 0x06004000)\n"
-            "   -s size\tSet size to SIZE (base 16)\n"
-            "   -n\t\tDisable starting console\n"
-            "   -i iso\tEnable ISO9660 filesystem redirection support using image ISO\n"
-            "   -g port\tStart GDB proxy on TCP port PORT\n"
-            "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')\n",
-            PROGNAME);
-        exit(2);
-}
+static void usage(void);
+
+static int32_t calculate_file_size(const char *);
+
+static void performance_stats_begin(struct performance_stats *, uint32_t);
+static void performance_stats_end(struct performance_stats *);
 
 int
 main(int argc, char **argv)
@@ -232,13 +230,6 @@ main(int argc, char **argv)
         }
 
         /* Sanity checks */
-        if (options.u_set) {
-                if (!options.s_set) {
-                        (void)fprintf(stderr, "%s: Size option `-s' needs to be specified\n",
-                            PROGNAME);
-                        usage();
-                }
-        }
         if (options.d_set) {
                 if (!options.s_set) {
                         (void)fprintf(stderr, "%s: Size option `-s' needs to be specified\n",
@@ -278,6 +269,8 @@ main(int argc, char **argv)
         }
         VERBOSE_PRINTF(" OK\n");
 
+        struct performance_stats performance_stats;
+
         if (options.x_set) {
                 char *filename;
                 filename = basename(options.filepath);
@@ -286,12 +279,17 @@ main(int argc, char **argv)
                     filename,
                     options.address);
 
+                uint32_t size;
+                size = calculate_file_size(options.filepath);
+
                 int ret;
-                if ((ret = device->execute_file(options.filepath,
-                            options.address)) < 0) {
-                        VERBOSE_PRINTF(" FAILED\n");
-                        goto error;
-                }
+                performance_stats_begin(&performance_stats, size); {
+                        if ((ret = device->execute_file(options.filepath,
+                                    options.address)) < 0) {
+                                VERBOSE_PRINTF(" FAILED\n");
+                                goto error;
+                        }
+                } performance_stats_end(&performance_stats);
                 VERBOSE_PRINTF(" OK\n");
         }
 
@@ -302,12 +300,17 @@ main(int argc, char **argv)
                 VERBOSE_PRINTF("Uploading file `%s' to 0x%08X...", filename,
                     options.address);
 
+                uint32_t size;
+                size = calculate_file_size(options.filepath);
+
                 int ret;
-                if ((ret = device->upload_file(options.filepath,
-                            options.address)) < 0) {
-                        VERBOSE_PRINTF(" FAILED\n");
-                        goto error;
-                }
+                performance_stats_begin(&performance_stats, size); {
+                        if ((ret = device->upload_file(options.filepath,
+                                    options.address)) < 0) {
+                                VERBOSE_PRINTF(" FAILED\n");
+                                goto error;
+                        }
+                } performance_stats_end(&performance_stats);
                 VERBOSE_PRINTF(" OK\n");
         }
 
@@ -320,11 +323,13 @@ main(int argc, char **argv)
                     filename);
 
                 int ret;
-                if ((ret = device->download_file(options.filepath, options.address,
-                            options.size)) < 0) {
-                        VERBOSE_PRINTF(" FAILED\n");
-                        goto error;
-                }
+                performance_stats_begin(&performance_stats, options.size); {
+                        if ((ret = device->download_file(options.filepath,
+                                    options.address, options.size)) < 0) {
+                                VERBOSE_PRINTF(" FAILED\n");
+                                goto error;
+                        }
+                } performance_stats_end(&performance_stats);
                 VERBOSE_PRINTF(" OK\n");
         }
 
@@ -336,6 +341,13 @@ main(int argc, char **argv)
         if (options.i_set) {
                 (void)fprintf(stderr, "%s: Not yet implemented\n", PROGNAME);
                 exit(1);
+        }
+
+        if (options.x_set || options.u_set || options.d_set) {
+                VERBOSE_PRINTF("Transfer time: %.3gs\n",
+                    performance_stats.ps_transfer_time);
+                VERBOSE_PRINTF("Transfer speed: %.3g KiB/s\n",
+                    performance_stats.ps_transfer_speed);
         }
 
         if (!options.n_set) {
@@ -365,4 +377,86 @@ exit:
         }
 
         return exit_code;
+}
+
+static void
+usage(void)
+{
+        (void)fprintf(stderr,
+            "Usage %s options\n"
+            " options\n"
+            "   -h\t\tProgram usage\n"
+            "   -v\t\tBe more verbose\n"
+            "   -x filename\tUpload and execute file FILENAME\n"
+            "   -u filename\tUpload file FILENAME\n"
+            "   -d filename\tDownload data to FILENAME\n"
+            "   -a address\tSet address to ADDRESS (base 16, default: 0x06004000)\n"
+            "   -s size\tSet size to SIZE (base 16)\n"
+            "   -n\t\tDisable starting console\n"
+            "   -i iso\tEnable ISO9660 filesystem redirection support using image ISO\n"
+            "   -g port\tStart GDB proxy on TCP port PORT\n"
+            "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')\n",
+            PROGNAME);
+        exit(2);
+}
+
+static void
+performance_stats_begin(struct performance_stats *performance_stats,
+    uint32_t transfer_size)
+{
+        gettimeofday(&performance_stats->_time_start, NULL);
+        performance_stats->_transfer_size = transfer_size;
+}
+
+static void
+performance_stats_end(struct performance_stats *performance_stats)
+{
+        gettimeofday(&performance_stats->_time_end, NULL);
+
+        int64_t time_end;
+        time_end = (int64_t)(performance_stats->_time_end.tv_sec * 1000000LL) +
+            (int64_t)performance_stats->_time_end.tv_usec;
+        int64_t time_start;
+        time_start = (int64_t)(performance_stats->_time_start.tv_sec * 1000000LL) +
+            (int64_t)performance_stats->_time_start.tv_usec;
+
+        double time_delta;
+        time_delta = (double)(time_end - time_start) / 1000000.0;
+        double transfer_size;
+        transfer_size = (double)performance_stats->_transfer_size / 1024.0;
+
+        performance_stats->ps_transfer_time = time_delta;
+        performance_stats->ps_transfer_speed = transfer_size / time_delta;
+}
+
+static int32_t
+calculate_file_size(const char *input_file)
+{
+        int32_t size;
+        size = 0;
+
+        FILE *iffp;
+        iffp = NULL;
+
+        if ((iffp = fopen(input_file, "rb")) == NULL) {
+                goto error;
+        }
+        if ((fseek(iffp, 0, SEEK_END)) < 0) {
+                goto error;
+        }
+        if ((size = (int32_t)ftell(iffp)) < 0) {
+                goto error;
+        }
+
+        goto exit;
+
+error:
+        size = -1;
+
+exit:
+        if (iffp != NULL) {
+                fclose(iffp);
+        }
+
+        return size;
 }
