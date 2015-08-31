@@ -15,6 +15,7 @@ struct device_driver {
 
         int (*init)(void);
         int (*shutdown)(void);
+        const char *(*error_stringify)(void);
 
         int (*download_buffer)(void *, uint32_t, uint32_t);
         int (*download_file)(const char *, uint32_t, uint32_t);

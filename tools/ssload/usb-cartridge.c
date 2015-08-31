@@ -19,6 +19,7 @@
 
 #include "debug.h"
 #include "driver.h"
+#include "shared.h"
 
 enum {
         USB_CARTRIDGE_OK,
@@ -459,6 +460,7 @@ const struct device_driver device_usb_cartridge = {
         .name = "USB Flash Cartridge",
         .init = init,
         .shutdown = shutdown,
+        .error_stringify = NULL,
         .download_buffer = download_buffer,
         .download_file = download_file,
         .upload_buffer = upload_buffer,

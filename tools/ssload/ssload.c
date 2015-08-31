@@ -223,7 +223,7 @@ main(int argc, char **argv)
         }
 
         /* Don't allow more than one action to be set */
-        if (action_cnt > 1) {
+        if (action_cnt < 1) {
                 (void)fprintf(stderr, "%s: More than one type of action has been requested\n",
                     PROGNAME);
                 usage();
@@ -262,7 +262,7 @@ main(int argc, char **argv)
 
         VERBOSE_PRINTF("Detected: %s\n", device->name);
 
-        VERBOSE_PRINTF("Initializing...");
+        VERBOSE_PRINTF("Initializing device...");
         if ((device->init()) < 0) {
                 VERBOSE_PRINTF(" FAILED\n");
                 goto error;
@@ -362,6 +362,11 @@ main(int argc, char **argv)
 error:
         exit_code = 1;
 
+        if (device != NULL) {
+                VERBOSE_PRINTF("Error reported by device: %s\n",
+                    device->error_stringify());
+        }
+
 exit:
         if (options.filepath != NULL) {
                 free(options.filepath);
@@ -371,7 +376,7 @@ exit:
         }
 
         if (device != NULL) {
-                VERBOSE_PRINTF("Shutting down...");
+                VERBOSE_PRINTF("Shutting device down...");
                 device->shutdown();
                 VERBOSE_PRINTF(" OK\n");
         }

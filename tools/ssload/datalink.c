@@ -19,6 +19,7 @@
 
 #include "debug.h"
 #include "driver.h"
+#include "shared.h"
 
 #define RX_TIMEOUT      5000
 #define TX_TIMEOUT      1000
@@ -47,11 +48,6 @@
 
 #define PACKET_RESPONSE_TYPE_RECEIVE    0x00
 #define PACKET_RESPONSE_TYPE_SEND       0x01
-
-#define ADDRESS_MSB(x)  ((uint8_t)((x) >> 24) & 0xFF)
-#define ADDRESS_02(x)   ((uint8_t)((x) >> 16) & 0xFF)
-#define ADDRESS_01(x)   ((uint8_t)((x) >> 8) & 0xFF)
-#define ADDRESS_LSB(x)  ((uint8_t)(x) & 0xFF)
 
 enum {
         DATALINK_OK,
@@ -158,7 +154,7 @@ static uint8_t packet_checksum(const uint8_t *, uint32_t);
 static int
 init(void)
 {
-#define MAX_DEVICES 10
+#define MAX_DEVICES 16
 
         DEBUG_PRINTF("Enter\n");
 
@@ -193,14 +189,17 @@ init(void)
                 DEBUG_PRINTF("Device #%2d SN: %s\n", idx, devices_list[idx]);
         }
 
-        if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER, &ft_handle)) != FT_OK) {
+        if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
+                    &ft_handle)) != FT_OK) {
                 DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
                 goto error;
         }
-        if((ft_error = FT_SetBaudRate(ft_handle, datalink_device.baud_rate)) != FT_OK) {
+        if((ft_error = FT_SetBaudRate(ft_handle,
+                    datalink_device.baud_rate)) != FT_OK) {
                 goto error;
         }
-        if((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8, FT_STOP_BITS_2, FT_PARITY_NONE)) != FT_OK) {
+        if((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8,
+                    FT_STOP_BITS_2, FT_PARITY_NONE)) != FT_OK) {
                 goto error;
         }
         if ((ft_error = FT_SetTimeouts(ft_handle, RX_TIMEOUT, TX_TIMEOUT)) != FT_OK) {
@@ -227,6 +226,20 @@ shutdown(void)
         }
 
         return 0;
+}
+
+const char *
+error_stringify(void)
+{
+        static char buffer[1024];
+
+        memset(buffer, '\0', sizeof(buffer));
+
+        (void)sprintf(buffer, "%s (%s)",
+            datalink_error_strings[datalink_error],
+            ft_error_strings[ft_error]);
+
+        return buffer;
 }
 
 /*
@@ -307,7 +320,9 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
 
 #ifdef DEBUG
                 uint32_t buffer_idx;
-                for (buffer_idx = 0; buffer_idx < datalink_device.packet.header_size; buffer_idx++) {
+                for (buffer_idx = 0;
+                     buffer_idx < datalink_device.packet.header_size;
+                     buffer_idx++) {
                         DEBUG_PRINTF("B[%i]:0x%02X (%3u)\n",
                             buffer_idx,
                             read_buffer[buffer_idx],
@@ -337,7 +352,9 @@ datalink_write(uint8_t *write_buffer, uint32_t len)
 
 #ifdef DEBUG
         uint32_t buffer_idx;
-        for (buffer_idx = 0; buffer_idx < datalink_device.packet.header_size; buffer_idx++) {
+        for (buffer_idx = 0;
+             buffer_idx < datalink_device.packet.header_size;
+             buffer_idx++) {
                 DEBUG_PRINTF("B[%i]:0x%02X (%3u)\n",
                     buffer_idx,
                     write_buffer[buffer_idx],
@@ -436,8 +453,6 @@ download_file(const char *output_file, uint32_t base_address,
 
 error:
         exit_code = -1;
-
-        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
         if (buffer != NULL) {
@@ -543,8 +558,6 @@ upload_execute_file(const char *input_file, uint32_t base_address, bool execute)
 
 error:
         exit_code = -1;
-
-        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
         if (buffer != NULL) {
@@ -665,7 +678,8 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
         tier_1 = len <= datalink_device.packet.data_size;
 
         bool tier_2;
-        tier_2 = (len > datalink_device.packet.data_size) && (len <= (2 * datalink_device.packet.data_size));
+        tier_2 = (len > datalink_device.packet.data_size) &&
+            (len <= (2 * datalink_device.packet.data_size));
 
         bool tier_3;
         tier_3 = len > (2 * datalink_device.packet.data_size);
@@ -686,7 +700,8 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                         } else if (tier_3) {
                                 write_buffer[7] = datalink_device.packet.data_size;
                                 /* The number of middle packets to send */
-                                count = (len - datalink_device.packet.data_size - 1) / datalink_device.packet.data_size;
+                                count = (len - datalink_device.packet.data_size - 1) /
+                                    datalink_device.packet.data_size;
 
                                 state = STATE_RECEIVE_MIDDLE;
                         }
@@ -714,7 +729,8 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                         } else if (tier_2) {
                                 write_buffer[7] = len - datalink_device.packet.data_size;
                         } else if (tier_3) {
-                                write_buffer[7] = (len - datalink_device.packet.data_size) % datalink_device.packet.data_size;
+                                write_buffer[7] = (len - datalink_device.packet.data_size) %
+                                    datalink_device.packet.data_size;
                                 write_buffer[7] = (write_buffer[7] == 0)
                                     ? datalink_device.packet.data_size
                                     : write_buffer[7];
@@ -763,8 +779,6 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 
 error:
         exit_code = -1;
-
-        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
         if (read_buffer != NULL) {
@@ -918,8 +932,6 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
 
 error:
         exit_code = -1;
-
-        (void)printf("ERROR: %s\n", datalink_error_strings[datalink_error]);
 
 exit:
         DEBUG_PRINTF("Exit\n");
@@ -1103,6 +1115,7 @@ const struct device_driver device_datalink = {
         .name = "USB DataLink Red/Green LED",
         .init = init,
         .shutdown = shutdown,
+        .error_stringify = error_stringify,
         .download_buffer = download_buffer,
         .download_file = download_file,
         .upload_buffer = upload_buffer,
