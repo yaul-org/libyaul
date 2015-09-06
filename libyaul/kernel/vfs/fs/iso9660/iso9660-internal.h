@@ -2,10 +2,6 @@
  * See LICENSE for details.
  */
 
-/* Definitions describing ISO9660 file system structure, as well as the
- * functions necessary to access fields of ISO9660 file system
- * structures */
-
 #ifndef _ISO9660_INTERNAL_H_
 #define _ISO9660_INTERNAL_H_
 
@@ -23,14 +19,18 @@ struct iso_volume_descriptor {
 };
 
 /* Volume descriptor types */
-#define ISO_VD_PRIMARY          1
-#define ISO_VD_SUPPLEMENTARY    2
-#define ISO_VD_END              255
+#define ISO_VD_BOOT_RECORD      0 /* Boot record */
+#define ISO_VD_PRIMARY          1 /* Primary volume descriptor */
+#define ISO_VD_SUPPLEMENTARY    2 /* Supplementary volume descriptor */
+#define ISO_VD_VOLUME_PARTITION 3 /* Volume partition descriptor */
+#define ISO_VD_SET_TERMINATOR   255 /* Volume descriptor set terminator */
 
 #define ISO_STANDARD_ID         "CD001"
 #define ISO_ECMA_ID             "CDW01"
 
-#define ISO_MAXNAMLEN           255
+/* ISO9660 limitations */
+#define ISO_DIR_LEVEL_MAX       8
+#define ISO_FILENAME_MAX_LENGTH 11
 
 struct iso_primary_descriptor {
         char type[ISODCL(1, 1)]; /* 711 */
@@ -66,15 +66,13 @@ struct iso_primary_descriptor {
         char unused_4[ISODCL(883, 883)];
         char application_data[ISODCL(884, 1395)];
         char unused_5[ISODCL(1396, 2048)];
-};
-
-#define ISO_DEFAULT_BLOCK_SIZE  2048
+} __packed;
 
 struct iso_supplementary_descriptor {
-        char type[ISODCL(1, 1)]; /* 711 */
+        uint8_t type[ISODCL(1, 1)]; /* 711 */
         char id[ISODCL(2, 6)];
         char version[ISODCL(7, 7)]; /* 711 */
-        char flags[ISODCL(8, 8)]; /* 711? */
+        uint8_t flags[ISODCL(8, 8)];
         char system_id[ISODCL(9, 40)]; /* achars */
         char volume_id[ISODCL(41, 72)]; /* dchars */
         char unused_2[ISODCL(73, 80)];
@@ -110,22 +108,26 @@ typedef struct {
         char length[ISODCL(1, 1)]; /* 711 */
         char ext_attr_length[ISODCL(2, 2)]; /* 711 */
         uint8_t extent[ISODCL(3, 10)]; /* 733 */
-        uint8_t size[ISODCL(11, 18)]; /* 733 */
+        uint8_t data_length[ISODCL(11, 18)]; /* 733 */
         char date[ISODCL(19, 25)]; /* 7 by 711 */
-#define FLAGS_EXISTENCE         0x01
-#define FLAGS_DIRECTORY         0x02
-#define FLAGS_ASSOCIATED_FILE   0x04
-#define FLAGS_RECORD            0x08
-#define FLAGS_PROTECTION        0x10
-        char flags[ISODCL(26, 26)];
+#define DIRENT_FILE_FLAGS_FILE                  0x00
+#define DIRENT_FILE_FLAGS_HIDDEN                0x01
+#define DIRENT_FILE_FLAGS_DIRECTORY             0x02
+#define DIRENT_FILE_FLAGS_ASSOCIATED_FILE       0x04
+#define DIRENT_FILE_FLAGS_RECORD                0x08
+#define DIRENT_FILE_FLAGS_PROTECTION            0x10
+#define DIRENT_FILE_FLAGS_MULTI_EXTENT          0x80
+        char file_flags[ISODCL(26, 26)]; /* 711 */
         char file_unit_size[ISODCL(27, 27)]; /* 711 */
         char interleave[ISODCL(28, 28)]; /* 711 */
         char volume_sequence_number[ISODCL(29, 32)]; /* 723 */
-        char name_len[ISODCL(33, 33)]; /* 711 */
-        char name[1]; /* XXX */
-} iso9660_dirent_t;
+#define DIRENT_FILE_ID_FILE             0x00
+#define DIRENT_FILE_ID_DIRECTORY        0x01
+        char file_id_len[ISODCL(33, 33)]; /* 711 */
+        char name[ISODCL(34, 34)]; /* 711 */
+} __packed iso9660_dirent_t;
 
-/* Can't take size of 'iso_directory_record', because of possible
+/* Can't take size of 'iso9660_dirent_t', because of possible
  * alignment of the last entry (34 instead of 33) */
 #define ISO_DIRECTORY_RECORD_SIZE       33
 
@@ -148,9 +150,23 @@ struct iso_extended_attributes {
         uint8_t len_au[ISODCL(247, 250)]; /* 723 */
 };
 
+static __inline uint16_t
+le16dec(const void *pp) {
+        unsigned char const *p = (unsigned char const *)pp;
+
+        return ((p[1] << 8) | p[0]);
+}
+
+static __inline uint32_t
+le32dec(const void *pp) {
+        unsigned char const *p = (unsigned char const *)pp;
+
+        return ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]);
+}
+
 /* 7.1.1: uint8_t */
 static __inline int32_t
-isonum_711(const char *p)
+isonum_711(const uint8_t *p)
 {
         return (int32_t)*p;
 }
@@ -212,7 +228,5 @@ isonum_733(const uint8_t *p)
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 }
 
-/* Associated files have a leading '=' */
-#define ASSOC_CHAR      '='
-
-#endif /* _ISO9660_INTERNAL_H_ */
+#undef ISODCL
+#endif /* !_ISO9660_INTERNAL_H_ */
