@@ -47,6 +47,7 @@ static struct memb name __unused = {                                           \
         num,                                                                   \
         &CC_CONCAT(name, _memb_refcnt)[0],                                     \
         0,                                                                     \
+        0,                                                                     \
         (void *)&CC_CONCAT(name, _memb_mem)[0]                                 \
 }
 
@@ -68,6 +69,7 @@ struct memb {
         uint32_t m_bnum; /* Number of unit blocks in the block pool */
         enum memb_ref_type *m_breftype; /* Reference type array */
         uint32_t m_bidx; /* Index to next unreferenced block */
+        uint32_t m_size; /* Number of allocated unit blocks */
         void *m_bpool;
 };
 
@@ -78,6 +80,7 @@ extern "C" {
 void memb_init(struct memb *);
 void *memb_alloc(struct memb *);
 int memb_free(struct memb *, void *);
+int32_t memb_size(struct memb *);
 
 #ifdef __cplusplus
 }
