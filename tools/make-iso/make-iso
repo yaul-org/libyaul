@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2012-2016
 # See LICENSE for details.
@@ -12,40 +12,63 @@ panic() {
     exit ${2}
 }
 
-if [ ${#} != 1 ]; then
-    printf -- "Usage: ${PROGNAME} image-output-name\n" >&2
+warning() {
+    printf -- "${PROGNAME}: Warning: ${1}\n" >&2
+}
+
+if [ ${#} -lt 2 ] || [ ${#} -gt 2 ]; then
+    printf -- "Usage: ${PROGNAME} cd-directory image-output-name\n" >&2
     exit 2
 fi
 
-image="${1}"
+image="${2}"
+directory="${1}"
 
-if [ ! -d "./cd" ]; then
-    panic "Directory \`cd' does not exist in \`.'" 1
+# Check if the CD directory exists and is a directory
+if [ ! -d "${directory}" ]; then
+    panic "Directory \`${directory}' does not exist" 1
 fi
 
 # Check if all the files are present
-for file in "./cd/ABS.TXT" "./cd/BIB.TXT" "./cd/CPY.TXT" "./IP.BIN"; do
+for file in "./IP.BIN"; do
     if [ -f "${file}" ]; then
         continue
     fi
     panic "File \``basename "${file}"`' does not exist in \``dirname "${file}"`'" 1
 done
 
-genisoimage \
-    -quiet \
-    -sysid "SEGA SEGASATURN" \
-    -volid "" \
-    -volset "" \
-    -publisher "SEGA ENTERPRISES, LTD." \
-    -preparer "SEGA ENTERPRISES, LTD." \
-    -appid "SEGA ENTERPRISES, LTD." \
-    -abstract "ABS.TXT" \
-    -copyright "CPY.TXT" \
-    -biblio "BIB.TXT" \
-    -generic-boot "IP.BIN" \
-    -iso-level 1 \
-    -input-charset iso8859-1  \
-    -no-bak \
-    -m '.*' \
-    -o "${image}.iso" \
-    cd # CD directory
+# Check if genisoimage is installed
+
+options=(-quiet
+    -sysid "\"SEGA SEGASATURN\""
+    -volid ""
+    -volset ""
+    -publisher "\"SEGA ENTERPRISES, LTD.\""
+    -preparer "\"SEGA ENTERPRISES, LTD.\""
+    -appid "\"SEGA ENTERPRISES, LTD.\""
+    -iso-level 1
+    -input-charset iso8859-1
+    -no-bak
+    -m "'.*'"
+    -o "\"${image}.iso\""
+    -generic-boot "\"IP.BIN\"")
+
+if [ -e "${directory}/ABS.TXT" ]; then
+    options+=(-abstract "ABS.TXT")
+else
+    warning "Abstract file \`ABS.TXT' not found"
+fi
+
+if [ -e "${directory}/BIB.TXT" ]; then
+    options+=(-biblio "BIB.TXT")
+else
+    warning "Bibliography file \`BIB.TXT' not found"
+fi
+
+if [ -e "${directory}/CPY.TXT" ]; then
+    options+=(-copyright "CPY.TXT")
+else
+    warning "Copyright file \`CPY.TXT' not found"
+fi
+
+echo "genisoimage ${options[@]} \"${directory}\"" | sh
