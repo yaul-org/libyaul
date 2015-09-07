@@ -14,7 +14,7 @@ typedef struct {
         uint16_t logical_block;
 } iso9660_mnt_t;
 
-extern int32_t normalize_path(const char *, uint32_t x, uint32_t y,
+extern int normalize_path(const char *, uint32_t x, uint32_t y,
     char ([y])[x]);
 
 static const iso9660_dirent_t *iso9660_find(const iso9660_mnt_t *,
@@ -108,6 +108,10 @@ iso9660_find_file(const iso9660_mnt_t *mnt, const char *path)
 {
         const iso9660_dirent_t *dirent;
         dirent = iso9660_find(mnt, path);
+        if (dirent == NULL) {
+                /* XXX: errno = */
+                return NULL;
+        }
 
         uint8_t file_flags;
         file_flags = isonum_711(dirent->file_flags);
@@ -115,6 +119,7 @@ iso9660_find_file(const iso9660_mnt_t *mnt, const char *path)
         uint8_t flags;
         flags = DIRENT_FILE_FLAGS_HIDDEN | DIRENT_FILE_FLAGS_DIRECTORY;
         if ((file_flags & flags) != DIRENT_FILE_FLAGS_FILE) {
+                /* XXX: errno = */
                 return NULL;
         }
 
@@ -126,6 +131,10 @@ iso9660_find_directory(const iso9660_mnt_t *mnt, const char *path)
 {
         const iso9660_dirent_t *dirent;
         dirent = iso9660_find(mnt, path);
+        if (dirent == NULL) {
+                /* XXX: errno = */
+                return NULL;
+        }
 
         uint8_t file_flags;
         file_flags = isonum_711(dirent->file_flags);
@@ -133,6 +142,7 @@ iso9660_find_directory(const iso9660_mnt_t *mnt, const char *path)
         uint8_t flags;
         flags = DIRENT_FILE_FLAGS_HIDDEN | DIRENT_FILE_FLAGS_DIRECTORY;
         if ((file_flags & flags) != DIRENT_FILE_FLAGS_DIRECTORY) {
+                /* XXX: errno = */
                 return NULL;
         }
 
@@ -144,8 +154,11 @@ iso9660_find(const iso9660_mnt_t *mnt, const char *path)
 {
         static char path_normalized[ISO_DIR_LEVEL_MAX][ISO_FILENAME_MAX_LENGTH];
 
-        normalize_path(path, ISO_FILENAME_MAX_LENGTH, ISO_DIR_LEVEL_MAX,
-            path_normalized);
+        if ((normalize_path(path, ISO_FILENAME_MAX_LENGTH, ISO_DIR_LEVEL_MAX,
+                    path_normalized)) < 0) {
+                /* XXX: errno = */
+                return NULL;
+        }
 
         uint32_t sector;
         sector = isonum_733(mnt->dirent_root.extent);
@@ -220,7 +233,6 @@ iso9660_find(const iso9660_mnt_t *mnt, const char *path)
                                     DIRENT_FILE_FLAGS_DIRECTORY;
 
                                 if (file || directory) {
-                                        /* XXX: Just break */
                                         match = true;
                                         match_dirent = dirent;
                                         sector = isonum_733(match_dirent->extent);
