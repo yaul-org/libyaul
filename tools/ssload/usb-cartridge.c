@@ -21,6 +21,16 @@
 #include "driver.h"
 #include "shared.h"
 
+#define RX_TIMEOUT      5000
+#define TX_TIMEOUT      1000
+
+#define VID             0x0403
+#define PID             0x6001
+
+#define CMD_DOWNLOAD    1
+#define CMD_UPLOAD      2
+#define CMD_EXECUTE     3
+
 enum {
         USB_CARTRIDGE_OK,
         USB_CARTRIDGE_DEVICE_ERROR,
@@ -29,8 +39,7 @@ enum {
         USB_CARTRIDGE_IO_ERROR,
         USB_CARTRIDGE_INSUFFICIENT_READ_DATA,
         USB_CARTRIDGE_INSUFFICIENT_WRITE_DATA,
-        USB_CARTRIDGE_ERROR_PACKET,
-        USB_CARTRIDGE_CORRUPTED_PACKET,
+        USB_CARTRIDGE_CORRUPTED_DATA,
         USB_CARTRIDGE_FILE_NOT_FOUND,
         USB_CARTRIDGE_FILE_IO_ERROR,
         USB_CARTRIDGE_BAD_REQUEST,
@@ -47,8 +56,7 @@ static const char *usb_cartridge_error_strings[] = {
         "USB_CARTRIDGE_IO_ERROR",
         "USB_CARTRIDGE_INSUFFICIENT_READ_DATA",
         "USB_CARTRIDGE_INSUFFICIENT_WRITE_DATA",
-        "USB_CARTRIDGE_ERROR_PACKET",
-        "USB_CARTRIDGE_CORRUPTED_PACKET",
+        "USB_CARTRIDGE_CORRUPTED_DATA",
         "USB_CARTRIDGE_FILE_NOT_FOUND",
         "USB_CARTRIDGE_FILE_IO_ERROR",
         "USB_CARTRIDGE_BAD_REQUEST",
@@ -84,6 +92,9 @@ static const char *ft_error_strings[] = {
 static int init(void);
 static int shutdown(void);
 
+static int send_command(uint32_t, uint32_t, size_t);
+static int send_checksum(void);
+
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
 static int execute_buffer(void *, uint32_t, uint32_t);
@@ -95,8 +106,8 @@ static int execute_file(const char *, uint32_t);
 static int upload_execute_buffer(void *, uint32_t, uint32_t, bool);
 static int upload_execute_file(const char *, uint32_t, bool);
 
-static int usb_cartridge_read(uint8_t *, uint32_t);
-static int usb_cartridge_write(uint8_t *, uint32_t);
+static int device_read(uint8_t *, uint32_t);
+static int device_write(uint8_t *, uint32_t);
 static int usb_cartridge_packet_check(const uint8_t *, uint32_t);
 
 /*
@@ -108,6 +119,50 @@ init(void)
 #define MAX_DEVICES 10
 
         DEBUG_PRINTF("Enter\n");
+
+        char *devices_ptr_list[MAX_DEVICES + 1];
+        char devices_list[MAX_DEVICES][64];
+
+        int devices_cnt;
+        int idx;
+
+        for(idx = 0; idx < MAX_DEVICES; idx++) {
+                devices_ptr_list[idx] = devices_list[idx];
+        }
+        devices_ptr_list[MAX_DEVICES] = NULL;
+
+        if ((ft_error = FT_ListDevices(devices_ptr_list, &devices_cnt,
+                    FT_LIST_ALL | FT_OPEN_BY_SERIAL_NUMBER)) != FT_OK) {
+                goto error;
+        }
+
+        if (devices_cnt == 0) {
+                ft_error = FT_DEVICE_NOT_FOUND;
+                goto error;
+        }
+
+
+        for(idx = 0; ( (idx < MAX_DEVICES) && (idx < devices_cnt) ); idx++) {
+                DEBUG_PRINTF("Device #%2d SN: %s\n", idx, devices_list[idx]);
+        }
+
+        if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
+                    &ft_handle)) != FT_OK) {
+                DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
+                goto error;
+        }
+
+        if ((ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX)) != FT_OK) {
+                goto error;
+        }
+
+        if ((ft_error = FT_SetBitmode(ft_handle, 0x00, 0x00)) != FT_OK) {
+                goto error;
+        }
+
+        if ((ft_error = FT_SetTimeouts(ft_handle, RX_TIMEOUT, TX_TIMEOUT)) != FT_OK) {
+                goto error;
+        }
 
 exit:
         return 0;
@@ -135,7 +190,7 @@ shutdown(void)
  * USB Cartridge
  */
 static int
-usb_cartridge_read(uint8_t *read_buffer, uint32_t len)
+device_read(uint8_t *read_buffer, uint32_t len)
 {
         return 0;
 }
@@ -144,7 +199,7 @@ usb_cartridge_read(uint8_t *read_buffer, uint32_t len)
  * USB Cartridge
  */
 static int
-usb_cartridge_write(uint8_t *write_buffer, uint32_t len)
+device_write(uint8_t *write_buffer, uint32_t len)
 {
         return 0;
 }
@@ -410,12 +465,22 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
         /* Sanity check */
         if (buffer == NULL) {
                 usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
-                return -1;
+                goto error;
         }
 
         if (base_address == 0x00000000) {
                 usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
-                return -1;
+                goto error;
+        }
+
+        if ((send_command(CMD_UPLOAD, base_address, len)) < 0) {
+                goto error;
+        }
+
+        if (execute) {
+                if ((send_command(CMD_EXECUTE, base_address, len)) < 0) {
+                        goto error;
+                }
         }
 
         goto exit;
@@ -454,6 +519,64 @@ convert_error(void)
                 usb_cartridge_error = USB_CARTRIDGE_DEVICE_ERROR;
                 break;
         }
+}
+
+static int
+send_command(uint32_t command, uint32_t address, size_t len)
+{
+        static char *command2str[] = {
+                NULL,
+                "DOWNLOAD",
+                "UPLOAD",
+                "EXECUTE"
+        };
+
+        uint8_t buffer[9];
+
+        DEBUG_PRINTF("Command = \"%s\" (0x%02X)\n", command2str[command],
+            command);
+        DEBUG_PRINTF("Address = 0x%08X\n", address);
+        DEBUG_PRINTF("Size = 0x%08X\n", size);
+
+        buffer[0] = command;
+        buffer[1] = ADDRESS_MSB(address);
+        buffer[2] = ADDRESS_02(address);
+        buffer[3] = ADDRESS_01(address);
+        buffer[4] = ADDRESS_LSB(address);
+        buffer[5] = LEN_MSB(len);
+        buffer[6] = LEN_02(len);
+        buffer[7] = LEN_01(len);
+        buffer[8] = LEN_LSB(len);
+
+        return device_write(buffer, sizeof(buffer));
+}
+
+static int
+send_checksum(void)
+{
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        uint8_t read_buffer[1];
+        read_buffer[0] = 0x00;
+
+        uint8_t write_buffer[1];
+        write_buffer[0] = 0x00;
+
+        int ret;
+        if ((ret = device_write(write_buffer, 1)) < 0) {
+                return ret;
+        }
+
+        if ((ret = device_read(read_buffer, 1)) < 0) {
+                return ret;
+        }
+
+        if (read_buffer[0] != 0) {
+                usb_cartridge_error = USB_CARTRIDGE_CORRUPTED_DATA;
+                return -1;
+        }
+
+        return 0;
 }
 
 const struct device_driver device_usb_cartridge = {
