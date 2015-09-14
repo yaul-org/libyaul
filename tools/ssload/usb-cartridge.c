@@ -5,6 +5,33 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+/*
+ * Copyright (c) 2012, 2013, 2015, Anders Montonen
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include <assert.h>
 #include <err.h>
 #include <fcntl.h>
@@ -24,8 +51,9 @@
 #define RX_TIMEOUT      5000
 #define TX_TIMEOUT      1000
 
-#define VID             0x0403
-#define PID             0x6001
+#define I_VENDOR        0x0403
+#define I_PRODUCT       0x6001
+#define I_SERIAL        "AL00P4JX"
 
 #define CMD_DOWNLOAD    1
 #define CMD_UPLOAD      2
@@ -65,40 +93,8 @@ static const char *usb_cartridge_error_strings[] = {
         "USB_CARTRIDGE_INSUFFICIENT_MEMORY"
 };
 
-static FT_HANDLE ft_handle = NULL;
-static FT_STATUS ft_error = FT_OK;
-
-static const char *ft_error_strings[] = {
-        "FT_OK",
-        "FT_INVALID_HANDLE",
-        "FT_DEVICE_NOT_FOUND",
-        "FT_DEVICE_NOT_OPENED",
-        "FT_IO_ERROR",
-        "FT_INSUFFICIENT_RESOURCES",
-        "FT_INVALID_PARAMETER",
-        "FT_INVALID_BAUD_RATE",
-        "FT_DEVICE_NOT_OPENED_FOR_ERASE",
-        "FT_DEVICE_NOT_OPENED_FOR_WRITE",
-        "FT_FAILED_TO_WRITE_DEVICE",
-        "FT_EEPROM_READ_FAILED",
-        "FT_EEPROM_WRITE_FAILED",
-        "FT_EEPROM_ERASE_FAILED",
-        "FT_EEPROM_NOT_PRESENT",
-        "FT_EEPROM_NOT_PROGRAMMED",
-        "FT_INVALID_ARGS",
-        "FT_NOT_SUPPORTED",
-        "FT_OTHER_ERROR",
-        "FT_DEVICE_LIST_NOT_READY",
-};
-
-static crc_t crc_calculate(const uint8_t *, size_t);
-
 static int init(void);
 static int shutdown(void);
-
-static int send_command(uint32_t, uint32_t, size_t);
-static int receive_checksum(const uint8_t *, size_t);
-static int send_checksum(const uint8_t *, size_t);
 
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
@@ -113,7 +109,14 @@ static int upload_execute_file(const char *, uint32_t, bool);
 
 static int device_read(uint8_t *, uint32_t);
 static int device_write(uint8_t *, uint32_t);
-static int usb_cartridge_packet_check(const uint8_t *, uint32_t);
+
+/* Helpers */
+static void convert_error(void);
+static int send_command(uint32_t, uint32_t, size_t);
+static int receive_checksum(const uint8_t *, size_t);
+static int send_checksum(const uint8_t *, size_t);
+
+static crc_t crc_calculate(const uint8_t *, size_t);
 
 /*
  * USB Cartridge
@@ -121,37 +124,43 @@ static int usb_cartridge_packet_check(const uint8_t *, uint32_t);
 static int
 init(void)
 {
-#define MAX_DEVICES 10
-
         DEBUG_PRINTF("Enter\n");
 
-        char *devices_ptr_list[MAX_DEVICES + 1];
-        char devices_list[MAX_DEVICES][64];
+        ft_error = FT_OK;
 
-        int devices_cnt;
-        int idx;
+        char **devices_list;
+        devices_list = enumerate_devices();
 
-        for(idx = 0; idx < MAX_DEVICES; idx++) {
-                devices_ptr_list[idx] = devices_list[idx];
-        }
-        devices_ptr_list[MAX_DEVICES] = NULL;
-
-        if ((ft_error = FT_ListDevices(devices_ptr_list, &devices_cnt,
-                    FT_LIST_ALL | FT_OPEN_BY_SERIAL_NUMBER)) != FT_OK) {
+        if (devices_list == NULL) {
                 goto error;
         }
 
-        if (devices_cnt == 0) {
+        char *device_serial;
+        device_serial = NULL;
+
+        int device_idx;
+        for (device_idx = 0; device_idx < MAX_ENUMERATE_DEVICES; device_idx++) {
+                if (devices_list[device_idx] == NULL) {
+                        break;
+                }
+
+                if ((strncmp(devices_list[device_idx], I_SERIAL, sizeof(I_SERIAL))) == 0) {
+                        device_serial = devices_list[device_idx];
+                }
+
+                DEBUG_PRINTF("Device #%02X SN: %s\n", device_idx,
+                    devices_list[device_idx]);
+        }
+
+        if (device_serial == NULL) {
                 ft_error = FT_DEVICE_NOT_FOUND;
                 goto error;
         }
 
+        DEBUG_PRINTF("Opening device with serial number \"%s\"\n",
+            device_serial);
 
-        for(idx = 0; ( (idx < MAX_DEVICES) && (idx < devices_cnt) ); idx++) {
-                DEBUG_PRINTF("Device #%2d SN: %s\n", idx, devices_list[idx]);
-        }
-
-        if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
+        if ((ft_error = FT_OpenEx(device_serial, FT_OPEN_BY_SERIAL_NUMBER,
                     &ft_handle)) != FT_OK) {
                 DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
                 goto error;
@@ -161,7 +170,7 @@ init(void)
                 goto error;
         }
 
-        if ((ft_error = FT_SetBitmode(ft_handle, 0x00, 0x00)) != FT_OK) {
+        if ((ft_error = FT_SetBitMode(ft_handle, 0x00, 0x00)) != FT_OK) {
                 goto error;
         }
 
@@ -184,8 +193,24 @@ error:
 static int
 shutdown(void)
 {
-        if (ft_handle != NULL) {
-                FT_Close(ft_handle);
+        DEBUG_PRINTF("Enter\n");
+
+        if (ft_handle == NULL) {
+                return 0;
+        }
+
+        /* USB cartridge isn't happy when the buffers aren't purged */
+        DEBUG_PRINTF("Purging (RX/TX) buffers\n");
+        ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
+        if (ft_error != FT_OK) {
+                convert_error();
+                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+                return -1;
+        }
+
+        DEBUG_PRINTF("Closing\n");
+        if ((ft_error = FT_Close(ft_handle)) != FT_OK) {
+                return -1;
         }
 
         return 0;
@@ -197,6 +222,70 @@ shutdown(void)
 static int
 device_read(uint8_t *read_buffer, uint32_t len)
 {
+#define MAX_TRIES (128 * 1024)
+
+        DEBUG_PRINTF("Enter\n");
+
+        ft_error = FT_OK;
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        uint32_t read;
+        read = 0;
+
+        DEBUG_PRINTF("Request read of %iB\n", len);
+
+        do {
+                DEBUG_PRINTF("Checking Queue status\n");
+
+                DWORD queued_amount;
+                queued_amount = 0;
+
+                uint32_t timeout;
+                timeout = 0;
+
+                do {
+                        ft_error = FT_GetQueueStatus(ft_handle, &queued_amount);
+                        if (ft_error != FT_OK) {
+                                convert_error();
+                                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+                                return -1;
+                        }
+
+                        if (queued_amount == 0) {
+                                timeout++;
+                        }
+
+                        if (timeout > MAX_TRIES) {
+                                DEBUG_PRINTF("Exceeded number of tries (%i tries))\n",
+                                    MAX_TRIES);
+                                queued_amount = 1;
+                                break;
+                        }
+                } while (queued_amount == 0);
+
+                DEBUG_PRINTF("Queued amount: %iB\n", queued_amount);
+
+                DWORD size;
+                ft_error = FT_Read(ft_handle, read_buffer, queued_amount, &size);
+                if (ft_error != FT_OK) {
+                        convert_error();
+                        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+                        return -1;
+                }
+
+                read += size;
+
+                DEBUG_PRINTF("read: %i, size: %i\n", read, size);
+        } while (read < len);
+
+        if (read != len) {
+                DEBUG_PRINTF("Amount bytes read exceeded request length\n");
+                usb_cartridge_error = USB_CARTRIDGE_INSUFFICIENT_READ_DATA;
+                return -1;
+        }
+
+        DEBUG_PRINTF("%iB read\n", read);
+
         return 0;
 }
 
@@ -206,6 +295,36 @@ device_read(uint8_t *read_buffer, uint32_t len)
 static int
 device_write(uint8_t *write_buffer, uint32_t len)
 {
+        DEBUG_PRINTF("Enter\n");
+        DEBUG_PRINTF("Writing %iB\n", len);
+
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
+        if (ft_error != FT_OK) {
+                convert_error();
+                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+                return -1;
+        }
+
+        uint32_t written;
+        written = 0;
+
+        do {
+                DWORD size;
+                ft_error = FT_Write(ft_handle, write_buffer, len, &size);
+                if (ft_error != FT_OK) {
+                        convert_error();
+                        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
+
+                        return -1;
+                }
+
+                written += size;
+        } while (written < len);
+
+        DEBUG_PRINTF("%iB written\n", len);
+
         return 0;
 }
 
@@ -421,8 +540,36 @@ upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 static int
 download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
+        DEBUG_PRINTF("Enter\n");
+
         int exit_code;
         exit_code = 0;
+
+        ft_error = FT_OK;
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        /* Sanity check */
+        if (buffer == NULL) {
+                usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
+                goto error;
+        }
+
+        if (base_address == 0x00000000) {
+                usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
+                goto error;
+        }
+
+        if ((send_command(CMD_DOWNLOAD, base_address, len)) < 0) {
+                goto error;
+        }
+
+        if ((device_read(buffer, len)) < 0) {
+                goto error;
+        }
+
+        if ((receive_checksum(buffer, len)) < 0) {
+                goto error;
+        }
 
         goto exit;
 
@@ -465,6 +612,7 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
         int exit_code;
         exit_code = 0;
 
+        ft_error = FT_OK;
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         /* Sanity check */
@@ -479,6 +627,14 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
         }
 
         if ((send_command(CMD_UPLOAD, base_address, len)) < 0) {
+                goto error;
+        }
+
+        if ((device_write(buffer, len)) < 0) {
+                goto error;
+        }
+
+        if ((send_checksum(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -540,10 +696,10 @@ send_command(uint32_t command, uint32_t address, size_t len)
 
         uint8_t buffer[9];
 
-        DEBUG_PRINTF("Command = \"%s\" (0x%02X)\n", command2str[command],
+        DEBUG_PRINTF("Command: \"%s\" (0x%02X)\n", command2str[command],
             command);
-        DEBUG_PRINTF("Address = 0x%08X\n", address);
-        DEBUG_PRINTF("Size = 0x%08X\n", size);
+        DEBUG_PRINTF("Address: 0x%08X\n", address);
+        DEBUG_PRINTF("Size: %iB (0x%08X)\n", (uint32_t)len, (uint32_t)len);
 
         buffer[0] = command;
         buffer[1] = ADDRESS_MSB(address);
@@ -569,11 +725,16 @@ receive_checksum(const uint8_t *buffer, size_t buffer_len)
         uint8_t read_buffer[1];
         read_buffer[0] = 0x00;
 
+        int ret;
         if ((ret = device_read(read_buffer, sizeof(read_buffer))) < 0) {
                 return ret;
         }
 
         if ((crc_t)read_buffer[0] != checksum) {
+                DEBUG_PRINTF("Checksum received (0x%02X) does not match calculated (0x%02X)\n",
+                    (uint8_t)read_buffer[0],
+                    checksum);
+
                 usb_cartridge_error = USB_CARTRIDGE_CORRUPTED_DATA;
                 return -1;
         }
@@ -656,6 +817,8 @@ crc_calculate(const uint8_t *buffer, size_t buffer_len)
         crc_t crc_value;
         crc_value = 0x00;
 
+        DEBUG_PRINTF("Calculating checksum\n");
+
         while (buffer_len--) {
                 tbl_idx = ((crc_value >> 0) ^ *buffer) & 0xFF;
                 crc_value = (crc_table[tbl_idx] ^ (crc_value << 8)) & 0xFF;
@@ -663,7 +826,12 @@ crc_calculate(const uint8_t *buffer, size_t buffer_len)
                 buffer++;
         }
 
-        return (crc_value & 0xFF) ^ 0x00;
+        crc_t crc;
+        crc = (crc_value & 0xFF) ^ 0x00;
+
+        DEBUG_PRINTF("Calculated checksum: 0x%02X\n", (uint8_t)crc);
+
+        return crc;
 }
 
 const struct device_driver device_usb_cartridge = {

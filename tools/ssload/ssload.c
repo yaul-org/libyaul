@@ -252,7 +252,7 @@ main(int argc, char **argv)
         }
         if (options.s_set) {
                 if (!options.d_set) {
-                        (void)fprintf(stderr, "%s: One action (`-d') needs to be specified\n",
+                        (void)fprintf(stderr, "%s: Size can be set only with action `-d'\n",
                             PROGNAME);
                         usage();
                 }
@@ -260,7 +260,7 @@ main(int argc, char **argv)
 
         device = device_drivers[options.device];
 
-        VERBOSE_PRINTF("Detected: %s\n", device->name);
+        VERBOSE_PRINTF("Using: %s\n", device->name);
 
         VERBOSE_PRINTF("Initializing device...");
         if ((device->init()) < 0) {

@@ -28,6 +28,7 @@ $(SRC_DIR)/ssload.c \
 $(SRC_DIR)/console.c \
 $(SRC_DIR)/drivers.c \
 $(SRC_DIR)/datalink.c \
+$(SRC_DIR)/shared.c \
 $(SRC_DIR)/usb-cartridge.c
 
 OBJS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.o))

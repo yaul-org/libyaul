@@ -15,14 +15,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ftd2xx.h>
-
 #include "debug.h"
 #include "driver.h"
 #include "shared.h"
 
 #define RX_TIMEOUT      5000
 #define TX_TIMEOUT      1000
+
+#define I_VENDOR        0x0403
+#define I_PRODUCT       0x6001
+#define I_SERIAL        "FTS12NIT"
 
 /* Revision (green LED) */
 #define REV_GREEN_BAUD_RATE             288000
@@ -83,32 +85,6 @@ static const char *datalink_error_strings[] = {
         "DATALINK_INSUFFICIENT_MEMORY"
 };
 
-static FT_HANDLE ft_handle = NULL;
-static FT_STATUS ft_error = FT_OK;
-
-static const char *ft_error_strings[] = {
-        "FT_OK",
-        "FT_INVALID_HANDLE",
-        "FT_DEVICE_NOT_FOUND",
-        "FT_DEVICE_NOT_OPENED",
-        "FT_IO_ERROR",
-        "FT_INSUFFICIENT_RESOURCES",
-        "FT_INVALID_PARAMETER",
-        "FT_INVALID_BAUD_RATE",
-        "FT_DEVICE_NOT_OPENED_FOR_ERASE",
-        "FT_DEVICE_NOT_OPENED_FOR_WRITE",
-        "FT_FAILED_TO_WRITE_DEVICE",
-        "FT_EEPROM_READ_FAILED",
-        "FT_EEPROM_WRITE_FAILED",
-        "FT_EEPROM_ERASE_FAILED",
-        "FT_EEPROM_NOT_PRESENT",
-        "FT_EEPROM_NOT_PROGRAMMED",
-        "FT_INVALID_ARGS",
-        "FT_NOT_SUPPORTED",
-        "FT_OTHER_ERROR",
-        "FT_DEVICE_LIST_NOT_READY",
-};
-
 static struct {
         DWORD baud_rate;
 
@@ -140,9 +116,9 @@ static int execute_file(const char *, uint32_t);
 static int upload_execute_buffer(void *, uint32_t, uint32_t, bool);
 static int upload_execute_file(const char *, uint32_t, bool);
 
-static int datalink_read(uint8_t *, uint32_t);
-static int datalink_write(uint8_t *, uint32_t);
-static int datalink_packet_check(const uint8_t *, uint32_t);
+static int device_read(uint8_t *, uint32_t);
+static int device_write(uint8_t *, uint32_t);
+static int device_packet_check(const uint8_t *, uint32_t);
 
 /* Helpers */
 static void convert_error(void);
@@ -154,8 +130,6 @@ static uint8_t packet_checksum(const uint8_t *, uint32_t);
 static int
 init(void)
 {
-#define MAX_DEVICES 16
-
         DEBUG_PRINTF("Enter\n");
 
         /* XXX: To detect later */
@@ -164,41 +138,48 @@ init(void)
         datalink_device.packet.data_size = PACKET_REV_RED_DATA_SIZE;
         datalink_device.packet.total_size = PACKET_REV_RED_TOTAL_SIZE;
 
-        char *devices_ptr_list[MAX_DEVICES + 1];
-        char devices_list[MAX_DEVICES][64];
+        char **devices_list;
+        devices_list = enumerate_devices();
 
-        int devices_cnt;
-        int idx;
-
-        for(idx = 0; idx < MAX_DEVICES; idx++) {
-                devices_ptr_list[idx] = devices_list[idx];
-        }
-        devices_ptr_list[MAX_DEVICES] = NULL;
-
-        if ((ft_error = FT_ListDevices(devices_ptr_list, &devices_cnt,
-                    FT_LIST_ALL | FT_OPEN_BY_SERIAL_NUMBER)) != FT_OK) {
+        if (devices_list == NULL) {
                 goto error;
         }
 
-        if (devices_cnt == 0) {
+        char *device_serial;
+        device_serial = NULL;
+
+        int device_idx;
+        for (device_idx = 0; device_idx < MAX_ENUMERATE_DEVICES; device_idx++) {
+                if (devices_list[device_idx] == NULL) {
+                        break;
+                }
+
+                if ((strncmp(devices_list[device_idx], I_SERIAL, sizeof(I_SERIAL))) == 0) {
+                        device_serial = devices_list[device_idx];
+                }
+
+                DEBUG_PRINTF("Device #%02X SN: %s\n", device_idx,
+                    devices_list[device_idx]);
+        }
+
+        if (device_serial == NULL) {
                 ft_error = FT_DEVICE_NOT_FOUND;
                 goto error;
         }
 
-        for(idx = 0; ( (idx < MAX_DEVICES) && (idx < devices_cnt) ); idx++) {
-                DEBUG_PRINTF("Device #%2d SN: %s\n", idx, devices_list[idx]);
-        }
+        DEBUG_PRINTF("Opening device with serial number \"%s\"\n",
+            device_serial);
 
-        if((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
+        if ((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
                     &ft_handle)) != FT_OK) {
                 DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
                 goto error;
         }
-        if((ft_error = FT_SetBaudRate(ft_handle,
+        if ((ft_error = FT_SetBaudRate(ft_handle,
                     datalink_device.baud_rate)) != FT_OK) {
                 goto error;
         }
-        if((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8,
+        if ((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8,
                     FT_STOP_BITS_2, FT_PARITY_NONE)) != FT_OK) {
                 goto error;
         }
@@ -246,12 +227,13 @@ error_stringify(void)
  *
  */
 static int
-datalink_read(uint8_t *read_buffer, uint32_t len)
+device_read(uint8_t *read_buffer, uint32_t len)
 {
 #define MAX_TRIES (128 * 1024)
 
         DEBUG_PRINTF("Enter\n");
 
+        ft_error = FT_OK;
         datalink_error = DATALINK_OK;
 
         if (len > datalink_device.packet.total_size) {
@@ -268,7 +250,6 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
         DEBUG_PRINTF("Reading %iB\n", len);
 
         DEBUG_PRINTF("Checking Queue status\n");
-        ft_error = FT_OK;
         while ((queued_amount < len) && (ft_error == FT_OK)) {
                 ft_error = FT_GetQueueStatus(ft_handle, &queued_amount);
                 if ((queued_amount == 0) && (ft_error == FT_OK)) {
@@ -295,7 +276,7 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
                 return -1;
         }
 
-        if(queued_amount > 0) {
+        if (queued_amount > 0) {
                 read_buffer[0] = 0x00;
                 read_buffer[1] = 0x00;
 
@@ -340,10 +321,12 @@ datalink_read(uint8_t *read_buffer, uint32_t len)
  *
  */
 static int
-datalink_write(uint8_t *write_buffer, uint32_t len)
+device_write(uint8_t *write_buffer, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
+
+        datalink_error = DATALINK_OK;
 
         if (len > datalink_device.packet.total_size) {
                 datalink_error = DATALINK_IO_ERROR;
@@ -750,20 +733,20 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                 write_buffer[8] = packet_checksum(write_buffer,
                     datalink_device.packet.header_size - 1);
 
-                if ((datalink_write(write_buffer, datalink_device.packet.header_size)) < 0) {
+                if ((device_write(write_buffer, datalink_device.packet.header_size)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
                 memset(read_buffer, 0x00, datalink_device.packet.total_size);
-                if ((datalink_read(read_buffer, datalink_device.packet.header_size + write_buffer[7])) < 0) {
+                if ((device_read(read_buffer, datalink_device.packet.header_size + write_buffer[7])) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
-                if ((datalink_packet_check(read_buffer, PACKET_RESPONSE_TYPE_RECEIVE)) < 0) {
+                if ((device_packet_check(read_buffer, PACKET_RESPONSE_TYPE_RECEIVE)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
@@ -896,20 +879,20 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
                                 (datalink_device.packet.header_size + transfer_len) - 1);
                 }
 
-                if ((datalink_write(write_buffer, datalink_device.packet.header_size + transfer_len)) < 0) {
+                if ((device_write(write_buffer, datalink_device.packet.header_size + transfer_len)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
                 memset(read_buffer, 0x00, datalink_device.packet.total_size);
-                if ((datalink_read(read_buffer, datalink_device.packet.header_size)) < 0) {
+                if ((device_read(read_buffer, datalink_device.packet.header_size)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
                 }
 
-                if ((datalink_packet_check(read_buffer, PACKET_RESPONSE_TYPE_SEND)) < 0) {
+                if ((device_packet_check(read_buffer, PACKET_RESPONSE_TYPE_SEND)) < 0) {
                         DEBUG_PRINTF("datalink_error = %s\n",
                             datalink_error_strings[datalink_error]);
                         goto error;
@@ -1034,7 +1017,7 @@ packet_checksum(const uint8_t *buffer, uint32_t len)
  *
  */
 static int
-datalink_packet_check(const uint8_t *buffer, uint32_t response_type)
+device_packet_check(const uint8_t *buffer, uint32_t response_type)
 {
         static const uint8_t packet_response_error[] = {
                 0xA5,
