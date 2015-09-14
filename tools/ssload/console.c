@@ -18,6 +18,6 @@
 #include "drivers.h"
 
 void
-console(const struct device_driver *device)
+console(const struct device_driver *device __attribute__ ((__unused__)))
 {
 }

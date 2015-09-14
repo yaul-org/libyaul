@@ -69,5 +69,5 @@ enumerate_devices(void)
                 devices_ptr_list[device_idx] = NULL;
         }
 
-        return devices_ptr_list;
+        return (const char **)devices_ptr_list;
 }

@@ -138,14 +138,14 @@ init(void)
         datalink_device.packet.data_size = PACKET_REV_RED_DATA_SIZE;
         datalink_device.packet.total_size = PACKET_REV_RED_TOTAL_SIZE;
 
-        char **devices_list;
+        const char **devices_list;
         devices_list = enumerate_devices();
 
         if (devices_list == NULL) {
                 goto error;
         }
 
-        char *device_serial;
+        const char *device_serial;
         device_serial = NULL;
 
         int device_idx;
@@ -170,7 +170,7 @@ init(void)
         DEBUG_PRINTF("Opening device with serial number \"%s\"\n",
             device_serial);
 
-        if ((ft_error = FT_OpenEx(devices_list[0], FT_OPEN_BY_SERIAL_NUMBER,
+        if ((ft_error = FT_OpenEx((PVOID *)device_serial, FT_OPEN_BY_SERIAL_NUMBER,
                     &ft_handle)) != FT_OK) {
                 DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
                 goto error;
