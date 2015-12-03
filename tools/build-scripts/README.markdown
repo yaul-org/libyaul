@@ -3,6 +3,12 @@ Usage
 
 ### Requirements
  - POSIX Bourne shell
+ - Software dependencies:
+  - GMP
+  - MPFR
+  - MPC
+  - Texinfo
+  - ncurses
  - Time and especially patience
 
 ### Installation
@@ -13,6 +19,14 @@ Usage
 In the `config` you just copied, change the appropriate fields.
 
     emacs config
+
+If you haven't already installed the dependencies:
+
+    # Debian/Ubuntu
+    sudo apt-get install libgmp3-dev libmpfr-dev libmpc-dev libncurses5-dev texinfo
+
+    # Fedora/CentOS
+    sudo yum install gmp-devel mpfr-devel libmpc-devel ncurses-devel texi2html texinfo
 
 Before you begin building the tool-chain, be sure to double-check your changes in `config`. Otherwise,
 
