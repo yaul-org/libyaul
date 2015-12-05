@@ -18,7 +18,7 @@
 
   If under Linux, be sure to remove modules `ftdi_sio` and `usbserial`
 
-    sudo rmmod ftdio_sio
+    sudo rmmod ftdi_sio
     sudo rmmod usbserial
 
 ### Errors
