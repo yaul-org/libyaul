@@ -35,6 +35,8 @@ FETCH_FLAGS=""
 GPG="gpg"
 MAKE="make"
 MD5="md5sum"
+# Uncomment the line below if on *BSD or Mac OS X
+# MD5="md5"
 PATCH="patch"
 
 # Options
