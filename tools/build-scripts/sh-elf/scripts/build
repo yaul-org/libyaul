@@ -12,6 +12,7 @@ cd "${BUILD_SRC_DIR}/${SH_TARGET}/binutils"
 if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+        --disable-werror \
         --disable-debug \
         --disable-nls \
         --disable-shared \
