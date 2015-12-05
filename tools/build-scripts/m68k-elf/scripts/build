@@ -12,7 +12,8 @@ mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
 if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils" ]; then
     message "Configuring Binutils"
-    CFLAGS="-Wno-error=deprecated-declarations" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+    CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+        --disable-error \
         --disable-debug \
         --disable-nls \
         --disable-shared \
