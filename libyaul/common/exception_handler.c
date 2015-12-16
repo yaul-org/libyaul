@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <vdp1.h>
 #include <vdp2.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
