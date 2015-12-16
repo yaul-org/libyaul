@@ -1,5 +1,7 @@
 ROOTDIR:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
+PROJECT?=unknown
+
 CC_PREFIX?= sh-elf
 
 AS= $(CC_PREFIX)-as
@@ -9,6 +11,8 @@ CXX= $(CC_PREFIX)-g++
 NM= $(CC_PREFIX)-nm
 OB= $(CC_PREFIX)-objcopy
 OD= $(CC_PREFIX)-objdump
+
+LDSCRIPT?= $(ROOTDIR)/common/ldscripts/sh-elf.x
 
 AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
 	-I$(ROOTDIR)/common
@@ -40,7 +44,7 @@ LDFLAGS= -Wl,-Map,${PROJECT}.map \
 	-Wl,--start-group -lfixmath -ltga -lyaul -lc -lgcc \
 	-Wl,--end-group \
 	-Wl,--gc-sections \
-	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x
+	-nostartfiles -T $(LDSCRIPT)
 CXXFLAGS= $(CFLAGS) -ffreestanding -fno-exceptions -fno-rtti
 LXXFLAGS= -Wl,-Map,${PROJECT}.map \
 	-L$(ROOTDIR)/../build/libtga \
@@ -48,7 +52,7 @@ LXXFLAGS= -Wl,-Map,${PROJECT}.map \
 	-Wl,--start-group -lfixmath -ltga -lyaul -lstdc++ -lc -lgcc \
 	-Wl,--end-group \
 	-Wl,--gc-sections \
-	-nostartfiles -T $(ROOTDIR)/common/ldscripts/sh-elf.x \
+	-nostartfiles -T $(LDSCRIPT) \
 	-ffreestanding -fno-exceptions -fno-rtti
 
 # All programs must link this as the first object (crt0.o)
@@ -61,5 +65,3 @@ SUFFIXES:= .c .S .o .bin .elf .romdisk .romdisk.o
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
-
-PROJECT?=unknown

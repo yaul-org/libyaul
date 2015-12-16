@@ -1,15 +1,13 @@
 DEPENDS:= ${OBJECTS:.o=.d}
 
-all: example
-
-example: $(PROJECT).bin
+all: $(PROJECT).bin
 
 IP.BIN: ip.o
 	$(CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 		-T $(ROOTDIR)/common/ldscripts/ip.x \
 		$< -o $@
 
-image: IP.BIN example
+image: IP.BIN
 	cp $(PROJECT).bin cd/A.BIN
 	sh $(ROOTDIR)/../tools/make-iso/make-iso $(PROJECT)
 
