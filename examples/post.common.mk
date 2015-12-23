@@ -1,5 +1,7 @@
 DEPENDS:= ${OBJECTS:.o=.d}
 
+IMAGE_DIRECTORY?= cd
+
 all: $(PROJECT).bin
 
 IP.BIN: ip.o
@@ -7,9 +9,10 @@ IP.BIN: ip.o
 		-T $(ROOTDIR)/common/ldscripts/ip.x \
 		$< -o $@
 
-image: IP.BIN
+image: $(PROJECT).bin IP.BIN
+	mkdir -p $(IMAGE_DIRECTORY)
 	cp $(PROJECT).bin cd/A.BIN
-	sh $(ROOTDIR)/../tools/make-iso/make-iso $(PROJECT)
+	sh $(ROOTDIR)/../tools/make-iso/make-iso $(PWD)/$(IMAGE_DIRECTORY) $(PROJECT)
 
 $(PROJECT).bin: $(PROJECT).elf
 	$(OB) -O binary $< $@
