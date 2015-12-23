@@ -12,7 +12,8 @@
 #include "vdp2-internal.h"
 
 #define SCRN_NBGX_PAGE_SIZE(format)                                            \
-        (((64 * 64 * 2) / ((format)->scf_character_size)) *                    \
+        (((SCRN_PLANE_PAGE_WIDTH * SCRN_PLANE_PAGE_HEIGHT * 2) /               \
+            ((format)->scf_character_size)) *                                  \
             ((format)->scf_pnd_size))
 
 #define SCRN_NBGX_PLANE_SIZE(format)                                           \

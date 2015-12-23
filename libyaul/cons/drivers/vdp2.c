@@ -15,18 +15,15 @@
 
 #include "cons.h"
 
-/* The dimensions of cons is 40x28. Each cell is 32-bytes. Therefore,
- * 40*28*(32-bytes) (0x8C00 bytes) is needed for the character pattern
- * data. So, offset 0xA000 is on a 0x2000 byte boundary. */
-static uint16_t *_nbg3_planes[4] = {
+static uint16_t * const _nbg3_planes[4] = {
         /* VRAM B1 */
-        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x04000),
         /* VRAM B1 */
-        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x08000),
         /* VRAM B1 */
-        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000),
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x04000),
         /* VRAM B1 */
-        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x02000)
+        (uint16_t *)VRAM_ADDR_4MBIT(3, 0x08000)
 };
 /* CRAM */
 static uint32_t *_nbg3_color_palette = (uint32_t *)CRAM_MODE_1_OFFSET(0, 0, 0);
@@ -59,7 +56,7 @@ cons_vdp2_init(struct cons *cons)
         nbg3_format.scf_auxiliary_mode = 1;
         nbg3_format.scf_cp_table = (uint32_t)_nbg3_character_pattern;
         nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
-        nbg3_format.scf_plane_size = 1 * 1;
+        nbg3_format.scf_plane_size = 2 * 1;
         nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
         nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
         nbg3_format.scf_map.plane_c = (uint32_t)_nbg3_planes[2];
@@ -71,14 +68,14 @@ cons_vdp2_init(struct cons *cons)
         struct vram_ctl *vram_ctl;
 
         vram_ctl = vdp2_vram_control_get();
-        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CHPNDR_NBG3;
-        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_PNDR_NBG3;
+        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t4 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t3 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t2 = VRAM_CTL_CYCP_CPU_RW;
-        vram_ctl->vram_cycp.pt[3].t1 = VRAM_CTL_CYCP_CPU_RW;
-        vram_ctl->vram_cycp.pt[3].t0 = VRAM_CTL_CYCP_CPU_RW;
+        vram_ctl->vram_cycp.pt[3].t1 = VRAM_CTL_CYCP_PNDR_NBG3;
+        vram_ctl->vram_cycp.pt[3].t0 = VRAM_CTL_CYCP_CHPNDR_NBG3;
         vdp2_vram_control_set(vram_ctl);
 
         /* Clear the first unpacked cell of the font */
@@ -94,9 +91,16 @@ cons_vdp2_init(struct cons *cons)
         int32_t col;
         int32_t row;
 
+        uint16_t *nbg3_page0;
+        nbg3_page0 = _nbg3_planes[0];
+        uint16_t *nbg3_page1;
+        nbg3_page1 = &_nbg3_planes[0][SCRN_PLANE_PAGE_DIMENSION];
+
         for (row = 0; row < CONS_ROWS; row++) {
                 for (col = 0; col < CONS_COLS; col++) {
-                        _nbg3_planes[0][col + (row << 6)] =
+                        nbg3_page0[col + (row << 6)] =
+                            _nbg3_character_number | _nbg3_palette_number;
+                        nbg3_page1[col + (row << 6)] =
                             _nbg3_character_number | _nbg3_palette_number;
                 }
         }
@@ -111,17 +115,27 @@ cons_vdp2_write(struct cons *cons)
         uint32_t col;
         uint32_t row;
 
+        uint16_t *nbg3_page0;
+        nbg3_page0 = _nbg3_planes[0];
+        uint16_t *nbg3_page1;
+        nbg3_page1 = &_nbg3_planes[0][SCRN_PLANE_PAGE_DIMENSION];
+
         for (col = 0; col < CONS_COLS; col++) {
                 for (row = 0; row < CONS_ROWS; row++) {
                         struct cons_buffer *cons_buffer;
-
                         cons_buffer = &cons->buffer[col + (row * CONS_COLS)];
 
                         uint16_t character_number;
                         character_number =
                             _nbg3_character_number + cons_buffer->glyph;
-                        _nbg3_planes[0][col + (row << 6)] =
-                            character_number | _nbg3_palette_number;
+
+                        if (col < SCRN_PLANE_PAGE_WIDTH) {
+                                nbg3_page0[col + (row << 6)] =
+                                    character_number | _nbg3_palette_number;
+                        } else {
+                                nbg3_page1[(col - SCRN_PLANE_PAGE_WIDTH) + (row << 6)] =
+                                    character_number | _nbg3_palette_number;
+                        }
                 }
         }
 }
