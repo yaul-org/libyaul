@@ -41,6 +41,9 @@ struct cons {
 
 struct cons_buffer {
         uint8_t glyph;
+        uint8_t attribute;
+        uint8_t fg;
+        uint8_t bg;
 };
 
 #define CONS_DRIVER_VDP1        0

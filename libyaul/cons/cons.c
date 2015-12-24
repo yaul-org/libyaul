@@ -50,7 +50,11 @@ static inline void action_csi_dispatch_print(struct cons *, int, int *, int);
 
 static inline void buffer_clear(struct cons *, int32_t, int32_t, int32_t,
     int32_t);
-static inline void buffer_write(struct cons *, uint8_t);
+static inline void buffer_glyph_write(struct cons *, uint8_t);
+static inline uint8_t buffer_attribute_read(struct cons *);
+static inline void buffer_attribute_write(struct cons *, uint8_t);
+static inline void buffer_fg_write(struct cons *, uint8_t);
+static inline void buffer_bg_write(struct cons *, uint8_t);
 
 static bool cursor_column_exceeded(struct cons *, int32_t);
 static bool cursor_row_exceeded(struct cons *, uint32_t);
@@ -64,15 +68,11 @@ static bool cursor_cond_set(struct cons *, int32_t, int32_t);
 
 static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
-static uint8_t _fg = CONS_PALETTE_FG_WHITE;
-static uint8_t _bg = CONS_PALETTE_BG_BLACK;
-static uint8_t _attribute = CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
-
-static struct cons_buffer _cons_buffer[CONS_ROWS * CONS_COLS];
-
 void
 cons_init(struct cons *cons, uint8_t driver)
 {
+        static struct cons_buffer _cons_buffer[CONS_ROWS * CONS_COLS];
+
         assert(cons != NULL);
 
         switch (driver) {
@@ -83,12 +83,25 @@ cons_init(struct cons *cons, uint8_t driver)
                 cons_vdp2_init(cons);
                 break;
         default:
+                assert(false);
                 return;
         }
 
-        memset(_cons_buffer, 0x00,
-            CONS_ROWS * CONS_COLS * sizeof(struct cons_buffer));
         cons->buffer = &_cons_buffer[0];
+
+        uint32_t col;
+        uint32_t row;
+        for (row = 0; row < CONS_ROWS; row++) {
+                for (col = 0; col < CONS_COLS; col++) {
+                        struct cons_buffer *entry;
+                        entry = &cons->buffer[col + (row * CONS_COLS)];
+
+                        entry->attribute = CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
+                        entry->fg = CONS_PALETTE_FG_WHITE;
+                        entry->fg = CONS_PALETTE_BG_BLACK;
+                        entry->glyph = '\0';
+                }
+        }
 
         vt_parse_init(&cons->vt_parser, vt_parser_callback, cons);
 
@@ -130,10 +143,8 @@ cons_write(struct cons *cons, const char *buffer)
                 return;
         }
 
-        vdp2_tvmd_vblank_out_wait();
         vt_parse(&cons->vt_parser, buffer, len);
 
-        vdp2_tvmd_vblank_in_wait();
         cons->write(cons);
 }
 
@@ -143,12 +154,6 @@ cons_flush(struct cons *cons)
         assert(cons->initialized);
 
         cons->write(cons);
-}
-
-void
-cons_reset(struct cons *cons)
-{
-        assert(cons->initialized);
 }
 
 static void
@@ -301,20 +306,61 @@ buffer_clear(struct cons *cons, int32_t col_start, int32_t col_end,
                 for (col = col_start; col < col_end; col++) {
                         struct cons_buffer *cons_buffer;
 
-                        cons_buffer = &_cons_buffer[col + (row * CONS_COLS)];
+                        cons_buffer = &cons->buffer[col + (row * CONS_COLS)];
                         cons_buffer->glyph = '\0';
                 }
         }
 }
 
 static inline void
-buffer_write(struct cons *cons, uint8_t glyph)
+buffer_glyph_write(struct cons *cons, uint8_t glyph)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &_cons_buffer[cons->cursor.col +
+        cons_buffer = &cons->buffer[cons->cursor.col +
             (cons->cursor.row * CONS_COLS)];
         cons_buffer->glyph = glyph;
+}
+
+static inline uint8_t
+buffer_attribute_read(struct cons *cons)
+{
+        struct cons_buffer *cons_buffer;
+
+        cons_buffer = &cons->buffer[cons->cursor.col +
+            (cons->cursor.row * CONS_COLS)];
+
+        return cons_buffer->attribute;
+}
+
+static inline void
+buffer_attribute_write(struct cons *cons, uint8_t attribute)
+{
+        struct cons_buffer *cons_buffer;
+
+        cons_buffer = &cons->buffer[cons->cursor.col +
+            (cons->cursor.row * CONS_COLS)];
+        cons_buffer->attribute = attribute;
+}
+
+static inline void
+buffer_fg_write(struct cons *cons, uint8_t fg)
+{
+        struct cons_buffer *cons_buffer;
+
+        cons_buffer = &cons->buffer[cons->cursor.col +
+            (cons->cursor.row * CONS_COLS)];
+        cons_buffer->fg = fg;
+}
+
+static inline void
+buffer_bg_write(struct cons *cons, uint8_t bg)
+{
+        struct cons_buffer *cons_buffer;
+
+        cons_buffer = &cons->buffer[cons->cursor.col +
+            (cons->cursor.row * CONS_COLS)];
+        cons_buffer->bg = bg;
 }
 
 static inline void
@@ -325,7 +371,7 @@ action_character_print(struct cons *cons, int ch)
                 cursor_row_advance(cons, 1);
         }
 
-        buffer_write(cons, ch);
+        buffer_glyph_write(cons, ch);
         cursor_column_advance(cons, 1);
 }
 
@@ -539,8 +585,8 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 if (num_params == 0) {
-                        _fg = CONS_PALETTE_FG_WHITE;
-                        _bg = CONS_PALETTE_BG_BLACK;
+                        buffer_fg_write(cons, CONS_PALETTE_FG_WHITE);
+                        buffer_bg_write(cons, CONS_PALETTE_BG_BLACK);
                         break;
                 }
 
@@ -548,10 +594,10 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         /* Attribute */
                         switch (params[ofs]) {
                         case CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES:
-                                _attribute = 0;
+                                buffer_attribute_write(cons, 0);
                                 break;
                         case CONS_ATTRIBUTE_BRIGHT:
-                                _attribute = 8;
+                                buffer_attribute_write(cons, 8);
                                 break;
                         case CONS_ATTRIBUTE_DIM:
                         case CONS_ATTRIBUTE_UNDERSCORE:
@@ -559,8 +605,8 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_ATTRIBUTE_REVERSE:
                         case CONS_ATTRIBUTE_HIDDEN:
                         default:
-                                _attribute =
-                                    CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
+                                buffer_attribute_write(cons,
+                                    CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES);
                                 break;
                         }
 
@@ -574,7 +620,8 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_PALETTE_FG_MAGENTA:
                         case CONS_PALETTE_FG_CYAN:
                         case CONS_PALETTE_FG_WHITE:
-                                _fg = params[ofs + 1] + _attribute;
+                                buffer_fg_write(cons,
+                                    params[ofs + 1] + buffer_attribute_read(cons));
                                 break;
                         case CONS_PALETTE_BG_BLACK:
                         case CONS_PALETTE_BG_RED:
@@ -584,10 +631,12 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_PALETTE_BG_MAGENTA:
                         case CONS_PALETTE_BG_CYAN:
                         case CONS_PALETTE_BG_WHITE:
-                                _bg = params[ofs + 1] + _attribute;
+                                buffer_bg_write(cons,
+                                    params[ofs + 1] + buffer_attribute_read(cons));
                                 break;
                         }
                 }
+
                 break;
         }
 }

@@ -68,6 +68,8 @@ cons_vdp2_init(struct cons *cons)
         struct vram_ctl *vram_ctl;
 
         vram_ctl = vdp2_vram_control_get();
+        /* VRAM cycle pattern register becomes valid only for T0~T3, and
+         * becomes invalid for T4~T7 when changing screen resolution. */
         vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_CPU_RW;
         vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_CPU_RW;
@@ -80,7 +82,6 @@ cons_vdp2_init(struct cons *cons)
 
         /* Clear the first unpacked cell of the font */
         uint32_t i;
-
         for (i = 0; i < (8192 / sizeof(_nbg3_character_pattern)); i++) {
                 _nbg3_character_pattern[i] = font[i];
         }
@@ -128,13 +129,16 @@ cons_vdp2_write(struct cons *cons)
                         uint16_t character_number;
                         character_number =
                             _nbg3_character_number + cons_buffer->glyph;
+                        uint16_t palette_number;
+                        palette_number = _nbg3_palette_number;
+
+                        uint16_t pnd;
+                        pnd = character_number | palette_number;
 
                         if (col < SCRN_PLANE_PAGE_WIDTH) {
-                                nbg3_page0[col + (row << 6)] =
-                                    character_number | _nbg3_palette_number;
+                                nbg3_page0[col + (row << 6)] = pnd;
                         } else {
-                                nbg3_page1[(col - SCRN_PLANE_PAGE_WIDTH) + (row << 6)] =
-                                    character_number | _nbg3_palette_number;
+                                nbg3_page1[(col - SCRN_PLANE_PAGE_WIDTH) + (row << 6)] = pnd;
                         }
                 }
         }
