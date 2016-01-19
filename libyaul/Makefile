@@ -336,6 +336,8 @@ endef
 
 .PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug
 
+.SUFFIXES:= .c .S .o
+
 all: release release-internal debug
 
 release: $(BUILD_ROOT)/$(SUB_BUILD)/release $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a
