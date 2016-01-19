@@ -23,7 +23,7 @@ define macro-install
 	done
 endef
 
-.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug examples
+.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug examples list-targets
 
 all: release release-internal debug examples
 
@@ -45,3 +45,9 @@ install-debug: debug
 
 examples:
 	$(SILENT)($(MAKE) -C examples all) || exit $$?
+
+list-targets:
+	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
+	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
+	sort | \
+	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
