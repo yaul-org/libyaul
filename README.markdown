@@ -14,7 +14,6 @@ Usage
 =====
 
 ### Requirements
- - CMake ver. 2.8 or greater (a Cross-Platform Makefile Generator)
  - GCC 4.6.3 or greater SH7604 cross-compiler tool-chain (see `tools/build-scripts/`)
 
 ### Installation
@@ -22,10 +21,10 @@ Usage
 
     git submodule init
     git submodule update -f
-    mkdir -p build
-    cd build/
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../Sega-Saturn-compiler-SH7604.cmake
-    make
+    export BUILD_ROOT=`pwd`
+    export INSTALL_ROOT=/path/to/tool-chain
+    make release
+    make install-release
 
 Contributing
 ============
