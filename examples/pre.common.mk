@@ -2,15 +2,15 @@ ROOTDIR:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 PROJECT?=unknown
 
-CC_PREFIX?= sh-elf
+CC_PREFIX?= sh-elf-
 
-AS= $(CC_PREFIX)-as
-CC= $(CC_PREFIX)-gcc
-LD= $(CC_PREFIX)-gcc
-CXX= $(CC_PREFIX)-g++
-NM= $(CC_PREFIX)-nm
-OB= $(CC_PREFIX)-objcopy
-OD= $(CC_PREFIX)-objdump
+AS:= $(CC_PREFIX)as
+CC:= $(CC_PREFIX)gcc
+LD:= $(CC_PREFIX)gcc
+CXX:= $(CC_PREFIX)g++
+NM:= $(CC_PREFIX)nm
+OB:= $(CC_PREFIX)objcopy
+OD:= $(CC_PREFIX)objdump
 
 LDSCRIPT?= $(ROOTDIR)/common/ldscripts/sh-elf.x
 
