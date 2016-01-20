@@ -1,0 +1,3 @@
+%rename link old_link
+*link:
+%(old_link) -T ldscripts/ip.x%s

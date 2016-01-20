@@ -2,21 +2,41 @@ PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 
 TARGET:= yaul
 
-ifndef BUILD_ROOT
+ifeq ($(strip $(BUILD_ROOT)),)
   $(error Undefined BUILD_ROOT (build root directory))
 endif
 
-ifndef INSTALL_ROOT
+ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-ifndef BUILD
+ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
 SUB_BUILD:=$(BUILD)/lib$(TARGET)
 
-SRCS:= \
+BOOTSTRAP_FILES:= \
+	common/bootstrap/ip.S \
+	common/bootstrap/sys_aree.bin \
+	common/bootstrap/sys_arej.bin \
+	common/bootstrap/sys_aret.bin \
+	common/bootstrap/sys_areu.bin \
+	common/bootstrap/sys_init.bin \
+	common/bootstrap/sys_sec.bin
+
+LDSCRIPTS:= \
+	common/ldscripts/yaul.x \
+	common/ldscripts/ip.x
+
+SPECS:= \
+	common/specs/yaul.specs \
+	common/specs/ip.specs
+
+START_SRCS:= \
+	common/crt0.S
+
+LIB_SRCS:= \
 	common/abort.c \
 	common/assert.c \
 	common/exception.S \
@@ -272,15 +292,16 @@ INSTALL_FILES:= \
 
 SILENT?=@
 
-CC_PREFIX:= sh-elf-
-CXX:= $(CC_PREFIX)g++
-AS:= $(CC_PREFIX)as
-AO:= $(CC_PREFIX)as
-CC:= $(CC_PREFIX)gcc
-LD:= $(CC_PREFIX)gcc
-NM:= $(CC_PREFIX)nm
-OB:= $(CC_PREFIX)objcopy
-OD:= $(CC_PREFIX)objdump
+ARCH?= sh-elf
+
+CXX:= $(ARCH)-g++
+AS:= $(ARCH)-as
+AR:= $(ARCH)-ar
+CC:= $(ARCH)-gcc
+LD:= $(ARCH)-gcc
+NM:= $(ARCH)-nm
+OBJCOPY:= $(ARCH)-objcopy
+OBJDUMP:= $(ARCH)-objdump
 SED:= sed
 FIND:= find
 INSTALL:= install
@@ -304,15 +325,29 @@ CCFLAGS_release-internal:= -O2 $(CCFLAGS) \
 CCFLAGS_debug:= -O0 -g $(CCFLAGS) \
 	-DDEBUG
 
-OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(SRCS)))
-DEPS:= $(patsubst %.c,%.d,$(patsubst %.S,%.d,$(SRCS)))
+START_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(START_SRCS)))
+START_DEPS:= $(START_OBJS:.o=.d)
 
-OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(OBJS))
-OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(OBJS))
-OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(OBJS))
-DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(DEPS))
-DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(DEPS))
-DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(DEPS))
+START_OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(START_OBJS))
+START_OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(START_OBJS))
+START_OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(START_OBJS))
+START_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(START_DEPS))
+START_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(START_DEPS))
+START_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(START_DEPS))
+
+LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(LIB_SRCS)))
+LIB_DEPS:= $(LIB_OBJS:.o=.d)
+
+LIB_OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_OBJS))
+LIB_OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_OBJS))
+LIB_OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_OBJS))
+LIB_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_DEPS))
+LIB_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_DEPS))
+LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
+
+LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
+SPECS_all := $(addprefix $(BUILD_ROOT)/libyaul/,$(SPECS))
+BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(BOOTSTRAP_FILES))
 
 define macro-build-object
 	@printf -- "[1;33m$@[m\n"
@@ -328,30 +363,64 @@ define macro-build-library
 	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
 endef
 
+define macro-install-library
+	@printf -- "[1;34mInstalling $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
+	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
+endef
+
+define macro-install-start-scripts
+	$(SILENT)for object in $(START_OBJS_$1); do \
+	    printf -- "[1;34mInstalling $$object[m\n"; \
+	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/$(ARCH)/lib/; \
+	done
+endef
+
+define macro-install-files
+	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
+	    printf -- "[1;34mInstalling $$ldscript[m\n"; \
+	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
+	done
+	$(SILENT)for specs in $(SPECS_all); do \
+	    printf -- "[1;34mInstalling $$specs[m\n"; \
+	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/$(ARCH)/lib/; \
+	done
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/yaul/bootstrap
+	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
+	    printf -- "[1;34mInstalling $$bootstrap_file[m\n"; \
+	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/yaul/bootstrap; \
+	done
+endef
+
 define macro-clean
 	$(SILENT)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$1 ]; then \
 		$(FIND) $(BUILD_ROOT)/$(SUB_BUILD)/$1 -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 endef
 
-.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug
+.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug install-release install-release-internal install-debug
 
-.SUFFIXES:= .c .S .o
+.SUFFIXES:= .c .S .o .x
 
 all: release release-internal debug
 
-release: $(BUILD_ROOT)/$(SUB_BUILD)/release $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a
-release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a
-debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a
+release: $(BUILD_ROOT)/$(SUB_BUILD)/release $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a $(START_OBJS_release) $(LDSCRIPTS_all) $(SPECS_all)
+release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a $(START_OBJS_release-internal) $(LDSCRIPTS_all) $(SPECS_all)
+debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a $(START_OBJS_debug) $(LDSCRIPTS_all) $(SPECS_all)
 
 install-release: release
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-files)
+	$(call macro-install-start-scripts,release)
+	$(call macro-install-library,release)
 
 install-release-internal: release-internal
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-start-scripts,release-internal)
+	$(call macro-install-library,release-internal)
+	$(call macro-install-files)
 
 install-debug: debug
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-start-scripts,debug)
+	$(call macro-install-library,debug)
+	$(call macro-install-files)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release:
 	$(SILENT)mkdir -p $@
@@ -362,14 +431,22 @@ $(BUILD_ROOT)/$(SUB_BUILD)/release-internal:
 $(BUILD_ROOT)/$(SUB_BUILD)/debug:
 	$(SILENT)mkdir -p $@
 
-$(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a: $(OBJS_release)
+$(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a: $(LIB_OBJS_release)
 	$(call macro-build-library,release)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(OBJS_release-internal)
+$(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(LIB_OBJS_release-internal)
 	$(call macro-build-library,release-internal)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(OBJS_debug)
+$(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
+
+$(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
+	@printf -- "[1;33m$(@)[m\n"
+	$(SILENT)mkdir -p $(@D)
+	$(SILENT)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
+	    sub(/\$$INSTALL_ROOT/,"$(INSTALL_ROOT)"); \
+	} \
+	{ print }' > $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release/%.o: %.c
 	$(call macro-build-object,release)
@@ -400,6 +477,10 @@ clean-release-internal:
 clean-debug:
 	$(call macro-clean,debug)
 
--include $(DEPS_release)
--include $(DEPS_debug)
--include $(DEPS_release-internal)
+-include $(START_DEPS_release)
+-include $(START_DEPS_debug)
+-include $(START_DEPS_release-internal)
+
+-include $(LIB_DEPS_release)
+-include $(LIB_DEPS_debug)
+-include $(LIB_DEPS_release-internal)

@@ -1,63 +1,55 @@
-ROOTDIR:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+ROOT:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
 
 PROJECT?=unknown
 
-CC_PREFIX?= sh-elf-
+ARCH?= sh-elf
 
-AS:= $(CC_PREFIX)as
-CC:= $(CC_PREFIX)gcc
-LD:= $(CC_PREFIX)gcc
-CXX:= $(CC_PREFIX)g++
-NM:= $(CC_PREFIX)nm
-OB:= $(CC_PREFIX)objcopy
-OD:= $(CC_PREFIX)objdump
+CXX:= $(ARCH)-g++
+AS:= $(ARCH)-as
+AR:= $(ARCH)-ar
+CC:= $(ARCH)-gcc
+LD:= $(ARCH)-gcc
+NM:= $(ARCH)-nm
+OBJCOPY:= $(ARCH)-objcopy
+OBJDUMP:= $(ARCH)-objdump
 
-LDSCRIPT?= $(ROOTDIR)/common/ldscripts/sh-elf.x
-
-AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
-	-I$(ROOTDIR)/common
+AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
 CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main \
 	-m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
-	-I$(ROOTDIR)/../libtga \
-	-I$(ROOTDIR)/../libfixmath \
-	-I$(ROOTDIR)/../libyaul \
-	-I$(ROOTDIR)/../libyaul/common \
-	-I$(ROOTDIR)/../libyaul/common/gdb \
-	-I$(ROOTDIR)/../libyaul/cons \
-	-I$(ROOTDIR)/../libyaul/kernel \
-	-I$(ROOTDIR)/../libyaul/kernel/vfs \
-	-I$(ROOTDIR)/../libyaul/scu \
-	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/arp \
-	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/dram-cartridge \
-	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs0/usb-cartridge \
-	-I$(ROOTDIR)/../libyaul/scu/bus/a/cs2/cd-block \
-	-I$(ROOTDIR)/../libyaul/scu/bus/b/scsp \
-	-I$(ROOTDIR)/../libyaul/scu/bus/b/vdp1 \
-	-I$(ROOTDIR)/../libyaul/scu/bus/b/vdp2 \
-	-I$(ROOTDIR)/../libyaul/scu/bus/cpu \
-	-I$(ROOTDIR)/../libyaul/scu/bus/cpu/smpc
-LDFLAGS= -Wl,-Map,${PROJECT}.map \
-	-L$(ROOTDIR)/../build/libfixmath \
-	-L$(ROOTDIR)/../build/libtga \
-	-L$(ROOTDIR)/../build/libyaul \
-	-Wl,--start-group -lfixmath -ltga -lyaul -lc -lgcc \
-	-Wl,--end-group \
-	-Wl,--gc-sections \
-	-nostartfiles -T $(LDSCRIPT)
-CXXFLAGS= $(CFLAGS) -ffreestanding -fno-exceptions -fno-rtti
-LXXFLAGS= -Wl,-Map,${PROJECT}.map \
-	-L$(ROOTDIR)/../build/libtga \
-	-L$(ROOTDIR)/../build/libyaul \
-	-Wl,--start-group -lfixmath -ltga -lyaul -lstdc++ -lc -lgcc \
-	-Wl,--end-group \
-	-Wl,--gc-sections \
-	-nostartfiles -T $(LDSCRIPT) \
-	-ffreestanding -fno-exceptions -fno-rtti
+	-I$(ROOT)/../libtga \
+	-I$(ROOT)/../libfixmath \
+	-I$(ROOT)/../libyaul \
+	-I$(ROOT)/../libyaul/common \
+	-I$(ROOT)/../libyaul/common/gdb \
+	-I$(ROOT)/../libyaul/cons \
+	-I$(ROOT)/../libyaul/kernel \
+	-I$(ROOT)/../libyaul/kernel/vfs \
+	-I$(ROOT)/../libyaul/scu \
+	-I$(ROOT)/../libyaul/scu/bus/a/cs0/arp \
+	-I$(ROOT)/../libyaul/scu/bus/a/cs0/dram-cartridge \
+	-I$(ROOT)/../libyaul/scu/bus/a/cs0/usb-cartridge \
+	-I$(ROOT)/../libyaul/scu/bus/a/cs2/cd-block \
+	-I$(ROOT)/../libyaul/scu/bus/b/scsp \
+	-I$(ROOT)/../libyaul/scu/bus/b/vdp1 \
+	-I$(ROOT)/../libyaul/scu/bus/b/vdp2 \
+	-I$(ROOT)/../libyaul/scu/bus/cpu \
+	-I$(ROOT)/../libyaul/scu/bus/cpu/smpc
+LDFLAGS= -Wl,-Map,${PROJECT}.map -specs=yaul.specs
 
-# All programs must link this as the first object (crt0.o)
-OBJECTS:= $(ROOTDIR)/common/crt0.o \
-	$(ROOTDIR)/common/crt0-init.o
+CXXFLAGS= $(CFLAGS) \
+	-ffreestanding -fno-exceptions -fno-rtti
+LXXFLAGS= -Wl,-Map,${PROJECT}.map \
+	-Wl,--start-group \
+	-lstdc++ -lc -lgcc \
+	-Wl,--end-group \
+	-nostartfiles -specs=yaul.specs
+
+OBJECTS:=
 
 SUFFIXES:= .c .S .o .bin .elf .romdisk .romdisk.o
 

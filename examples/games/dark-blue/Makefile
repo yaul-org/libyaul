@@ -1,7 +1,8 @@
 include ../../pre.common.mk
 
 PROJECT:= dark-blue
-OBJECTS+= \
+LIBRARIES:= tga fixmath
+OBJECTS:= \
 	root.romdisk.o \
 	camera.o \
 	cmd_groups.o \

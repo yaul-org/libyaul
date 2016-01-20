@@ -2,15 +2,15 @@ PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 
 TARGET:= tga
 
-ifndef BUILD_ROOT
+ifeq ($(strip $(BUILD_ROOT)),)
   $(error Undefined BUILD_ROOT (build root directory))
 endif
 
-ifndef INSTALL_ROOT
+ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-ifndef BUILD
+ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
@@ -18,15 +18,16 @@ SUB_BUILD:= $(BUILD)/lib$(TARGET)
 
 SRCS:= tga.c
 
-CC_PREFIX:= sh-elf-
-CXX:= $(CC_PREFIX)g++
-AS:= $(CC_PREFIX)as
-AO:= $(CC_PREFIX)as
-CC:= $(CC_PREFIX)gcc
-LD:= $(CC_PREFIX)gcc
-NM:= $(CC_PREFIX)nm
-OB:= $(CC_PREFIX)objcopy
-OD:= $(CC_PREFIX)objdump
+ARCH?= sh-elf
+
+CXX:= $(ARCH)-g++
+AS:= $(ARCH)-as
+AR:= $(ARCH)-ar
+CC:= $(ARCH)-gcc
+LD:= $(ARCH)-gcc
+NM:= $(ARCH)-nm
+OBJCOPY:= $(ARCH)-objcopy
+OBJDUMP:= $(ARCH)-objdump
 SED:= sed
 INSTALL:= install
 
@@ -77,6 +78,11 @@ define macro-build-library
 	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
 endef
 
+define macro-install-library
+	@printf -- "[1;34mInstalling $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
+	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
+endef
+
 define macro-clean
 	$(SILENT)$(RM) $(foreach DIR,$(BUILD_ROOT)/$(SUB_BUILD)/$1,\
 		$(DIR)/*.o \
@@ -95,13 +101,13 @@ release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SU
 debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a
 
 install-release: release
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-library,release)
 
 install-release-internal: release-internal
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-library,release-internal)
 
 install-debug: debug
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a $(INSTALL_ROOT)/lib/
+	$(call macro-install-library,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release:
 	mkdir -p $@

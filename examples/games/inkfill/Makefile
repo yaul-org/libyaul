@@ -1,7 +1,9 @@
 include ../../pre.common.mk
 
 PROJECT:= inkfill
-OBJECTS+= \
+LIBRARIES:= tga
+###OBJECTS:= $(INSTALL_ROOT)/sh-elf/lib/crt0.o $(INSTALL_ROOT)/sh-elf/lib/crt0-init.o
+OBJECTS:= \
 	root.romdisk.o \
 	fs.o \
 	game-over.o \

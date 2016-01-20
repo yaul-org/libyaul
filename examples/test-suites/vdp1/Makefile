@@ -1,7 +1,8 @@
 include ../../pre.common.mk
 
 PROJECT:= vdp1
-OBJECTS+= \
+LIBRARIES:= tga fixmath
+OBJECTS:= \
 	root.romdisk.o \
 	fs.o \
 	globals.o \

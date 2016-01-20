@@ -1,0 +1,10 @@
+%rename link old_link
+*link:
+%(old_link) -T ldscripts/yaul.x%s --gc-sections
+
+%rename lib old_lib
+*lib:
+%(old_lib) --start-group -lgcc -lc -lyaul --end-group
+
+*startfile:
+crt0%O%s crt0-init%O%s

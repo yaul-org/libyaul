@@ -10,7 +10,7 @@ OUTPUT_FORMAT ("elf32-sh")
 OUTPUT_ARCH (sh)
 EXTERN (_start)
 ENTRY (_start)
-SEARCH_DIR ("/path/to/sh-elf/sh-elf/lib");
+SEARCH_DIR ("$INSTALL_ROOT/sh-elf/lib");
 
 MEMORY {
   /* 0x06004000-0x060FFFFF */
