@@ -23,9 +23,9 @@ define macro-install
 	done
 endef
 
-.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug examples list-targets
+.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug examples tools list-targets
 
-all: release release-internal debug examples
+all: release release-internal debug examples tools
 
 release release-internal debug clean clean-release clean-release-internal clean-debug:
 	$(SILENT)mkdir -p $(BUILD_ROOT)/$(BUILD)
@@ -45,6 +45,9 @@ install-debug: debug
 
 examples:
 	$(SILENT)($(MAKE) -C examples all) || exit $$?
+
+tools:
+	$(SILENT)($(MAKE) -C tools all) || exit $$?
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
