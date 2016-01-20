@@ -19,10 +19,12 @@ Usage
 ### Installation
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
 
+    cd libyaul
     git submodule init
     git submodule update -f
+    export BUILD=build
     export BUILD_ROOT=`pwd`
-    export INSTALL_ROOT=/path/to/tool-chain
+    export INSTALL_ROOT=/absolute/path/to/sh-elf-tool-chain
     make release
     make install-release
 
