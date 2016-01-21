@@ -66,7 +66,7 @@ DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/
 DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(DEPS))
 
 define macro-build-object
-	@printf -- "[1;33m$@[m\n"
+	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
 		$(foreach dir,$(INCLUDES),-I./$(dir)) \
 		-c $< -o $@
@@ -74,12 +74,12 @@ define macro-build-object
 endef
 
 define macro-build-library
-	@printf -- "[1;33m$@[m\n"
+	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
 endef
 
 define macro-install-library
-	@printf -- "[1;34mInstalling $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
+	@printf -- "[1;34m$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
 	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
 endef
 

@@ -350,7 +350,7 @@ SPECS_all := $(addprefix $(BUILD_ROOT)/libyaul/,$(SPECS))
 BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(BOOTSTRAP_FILES))
 
 define macro-build-object
-	@printf -- "[1;33m$@[m\n"
+	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
 		$(foreach dir,$(INCLUDES),-I./$(dir)) \
@@ -359,34 +359,34 @@ define macro-build-object
 endef
 
 define macro-build-library
-	@printf -- "[1;33m$@[m\n"
+	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
 endef
 
 define macro-install-library
-	@printf -- "[1;34mInstalling $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
+	@printf -- "[1;34m$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
 	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
 endef
 
 define macro-install-start-scripts
 	$(SILENT)for object in $(START_OBJS_$1); do \
-	    printf -- "[1;34mInstalling $$object[m\n"; \
+	    printf -- "[1;34m$${object#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
 endef
 
 define macro-install-files
 	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
-	    printf -- "[1;34mInstalling $$ldscript[m\n"; \
+	    printf -- "[1;34m$${ldscript#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
 	done
 	$(SILENT)for specs in $(SPECS_all); do \
-	    printf -- "[1;34mInstalling $$specs[m\n"; \
+	    printf -- "[1;34m$${specs#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/yaul/bootstrap
 	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
-	    printf -- "[1;34mInstalling $$bootstrap_file[m\n"; \
+	    printf -- "[1;34m$${bootstrap_file#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/yaul/bootstrap; \
 	done
 endef
@@ -441,7 +441,7 @@ $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "[1;33m$(@)[m\n"
+	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
 	    sub(/\$$INSTALL_ROOT/,"$(INSTALL_ROOT)"); \
