@@ -76,7 +76,7 @@ _start:
 .long __bss_end
 
 .LC3:
-.long __INIT_SECTION__
+.long _init
 
 .LC4:
 .long _main

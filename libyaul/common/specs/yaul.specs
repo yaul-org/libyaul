@@ -7,4 +7,4 @@
 %(old_lib) --start-group -lgcc -lc -lyaul --end-group
 
 *startfile:
-crt0%O%s crt0-init%O%s
+crt0%O%s
