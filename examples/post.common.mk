@@ -22,8 +22,8 @@ $(PROJECT).elf: $(OBJECTS)
 	genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
-	$(ROOT)/../tools/fsck.genromfs/fsck.genromfs ./romdisk/
-	sh $(ROOT)/../tools/bin2o/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	fsck.genromfs/fsck.genromfs ./romdisk/
+	bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
@@ -34,10 +34,12 @@ $(PROJECT).elf: $(OBJECTS)
 $(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	mkdir -p $(IMAGE_DIRECTORY)
 	cp $(PROJECT).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
-	touch $(IMAGE_DIRECTORY)/ABS.TXT
-	touch $(IMAGE_DIRECTORY)/BIB.TXT
-	touch $(IMAGE_DIRECTORY)/CPY.TXT
-	sh $(ROOT)/../tools/make-iso/make-iso $(IMAGE_DIRECTORY) $(PROJECT)
+	for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
+	    if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
+	        printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
+	    fi \
+	done
+	make-iso $(IMAGE_DIRECTORY) $(PROJECT)
 
 IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	$(eval $@_TMP_FILE:= $(shell mktemp))

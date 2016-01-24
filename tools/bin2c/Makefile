@@ -1,10 +1,16 @@
-PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
 
 TARGET:= bin2c
-# http://.c.gnu.org/onlinedocs/.c-4.5.2/.c/Warning-Options.html#Warning-Options
-CCFLAGS:= -O2 \
+
+BUILD?= build
+
+SILENT?= @
+
+CCFLAGS:= \
+	-O2 \
 	-s \
-	-pipe \
 	-Wall \
 	-Wextra \
 	-Wuninitialized \
@@ -14,41 +20,42 @@ CCFLAGS:= -O2 \
 	-Wno-unused \
 	-Wno-parentheses
 LDFLAGS:=
-INCLUDE_DIRS:=
-LIBRARY_DIRS:=
-LIBRARIES:=
-SRC_DIR:= .
-STORE_FILES:= .
 
 SED:= sed
+INSTALL:= install
+STRIP:= strip
 
-# Duplicates are taken care of when using the "$^" automatic variable
-SRCS:= $(SRC_DIR)/bin2c.c
+SRCS:= bin2c.c
 
-OBJS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.o))
-DEPS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.d))
+OBJS:= $(addprefix $(BUILD)/,$(SRCS:.c=.o))
+DEPS:= $(addprefix $(BUILD)/,$(SRCS:.c=.d))
 
-.PHONY: clean
+.PHONY: all install clean distclean
 
-all: $(TARGET)
+all: $(BUILD) $(BUILD)/$(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $^ \
-		$(foreach LIBRARY_DIR,$(LIBRARY_DIRS),-L$(LIBRARY_DIR)) \
-		$(foreach LIBRARY,$(LIBRARIES),-l$(LIBRARY)) \
-		$(LDFLAGS)
-
-$(STORE_FILES)/%.o: %.c
-	$(CC) -Wp,-MMD,$(STORE_FILES)/$*.d $(CCFLAGS) -c -o $@ $< \
-		$(foreach INCLUDE_DIR,$(INCLUDE_DIRS),-I$(INCLUDE_DIR))
-	$(SED) -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(STORE_FILES)/$*.d \
-		> $(STORE_FILES)/$*.d
-	rm $(STORE_FILES)/$*.d
+install: $(BUILD)/$(TARGET)
+	@printf -- "[1;34m$^[m\n"
+	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
 
 clean:
-	-rm -f $(foreach DIR,$(SRC_DIR),\
-		$(STORE_FILES)/$(DIR)/*.d \
-		$(STORE_FILES)/$(DIR)/*.o) \
-		$(TARGET)
+	$(RM) $(OBJS) $(DEPS) $(BUILD)/$(TARGET)
+
+distclean: clean
+	$(RM) -r $(BUILD)
+
+$(BUILD):
+	mkdir -p $@
+
+$(BUILD)/$(TARGET): $(OBJS)
+	@printf -- "[1;33m$@[m\n"
+	$(SILENT)$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	$(SILENT)$(STRIP) -s $@
+
+$(BUILD)/%.o: %.c
+	@printf -- "[1;33m$@[m\n"
+	$(SILENT)$(CC) -Wp,-MMD,$(BUILD)/$*.d $(CCFLAGS) -c -o $@ $<
+	$(SILENT)$(SED) -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD)/$*.d \
+		> $(BUILD)/$*.d
 
 -include $(DEPS)
