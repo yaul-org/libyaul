@@ -141,7 +141,7 @@ main(void)
 
         vdp2_init();
         vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), blcs_color, 0);
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), blcs_color, 1);
 
         line_scroll_screen();
 

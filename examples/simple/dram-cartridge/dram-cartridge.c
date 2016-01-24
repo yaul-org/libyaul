@@ -36,7 +36,7 @@ main(void)
 
         vdp2_init();
         vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 0);
+            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
 
         smpc_init();
 

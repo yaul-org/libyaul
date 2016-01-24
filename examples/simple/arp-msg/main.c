@@ -113,7 +113,7 @@ main(void)
         uint16_t single_color[] = { 0x9C00 };
 
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* single_color = */ true, VRAM_ADDR_4MBIT(3, 0x1FFFE), single_color, 0);
+        vdp2_scrn_back_screen_set(/* single_color = */ true, VRAM_ADDR_4MBIT(3, 0x1FFFE), single_color, 1);
 
         smpc_init();
 
