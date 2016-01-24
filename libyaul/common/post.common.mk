@@ -22,7 +22,7 @@ $(PROJECT).elf: $(OBJECTS)
 	genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
-	fsck.genromfs/fsck.genromfs ./romdisk/
+	fsck.genromfs ./romdisk/
 	bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c

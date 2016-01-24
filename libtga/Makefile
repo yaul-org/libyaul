@@ -18,6 +18,9 @@ SUB_BUILD:= $(BUILD)/lib$(TARGET)
 
 SRCS:= tga.c
 
+HEADER_FILES:= \
+	tga.h
+
 ARCH?= sh-elf
 
 CXX:= $(ARCH)-g++
@@ -65,6 +68,8 @@ DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(DEPS))
 DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(DEPS))
 DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(DEPS))
 
+HEADER_FILES_all:= $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
+
 define macro-build-object
 	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
@@ -76,6 +81,16 @@ endef
 define macro-build-library
 	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
+endef
+
+define macro-install-files
+	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
+	$(SILENT)for header_file in $(HEADER_FILES_all); do \
+	    install_header_file=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}); \
+            printf -- "[1;34m$${header_file#$(BUILD_ROOT)/}[m\n"; \
+            $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
+	done
 endef
 
 define macro-install-library
@@ -101,12 +116,15 @@ release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SU
 debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a
 
 install-release: release
+	$(call macro-install-files)
 	$(call macro-install-library,release)
 
 install-release-internal: release-internal
+	$(call macro-install-files)
 	$(call macro-install-library,release-internal)
 
 install-debug: debug
+	$(call macro-install-files)
 	$(call macro-install-library,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release:

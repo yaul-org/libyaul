@@ -216,7 +216,7 @@ LIB_SRCS:= \
 	scu/scu_timer_1_mode_set.c \
 	scu/scu_timer_1_set.c
 
-INCLUDES:= \
+INCLUDE_DIRS:= \
 	common \
 	common/gdb \
 	cons \
@@ -238,61 +238,78 @@ INCLUDES:= \
 	scu/bus/cpu \
 	scu/bus/cpu/smpc
 
-INSTALL_FILES:= \
-	common/assert.h \
-	common/common.h \
-	common/irq-mux.h \
-	common/stack.h \
+HEADER_FILES:= \
+	./yaul.h:. \
 	\
-	cons/cons/vdp1.h \
-	cons/cons/vdp2.h \
+	./common/common.h:. \
+	./common/irq-mux.h: \
+	./common/stack.h:. \
+	./common/gdb/gdb.h:. \
+	./common/gdb/gdb-signals.h:. \
+	./common/gdb/sh2-704x.h:. \
 	\
-	kernel/init.h \
+	./cons/cons.h:. \
+	./cons/drivers.h:. \
+	./cons/font.h:. \
+	./cons/vt_parse/vt_parse.h:. \
+	./cons/vt_parse/vt_parse_table.h:. \
 	\
-	kernel/lib/memb.h \
+	./kernel/lib/memb.h:../../lib \
+	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \
+	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk \
 	\
-	kernel/vfs/fs/iso9660/iso9660.h \
+	./scu/bus/a/cs0/arp/arp.h:. \
+	./scu/bus/a/cs0/arp/arp-internal.h:. \
 	\
-	kernel/vfs/fs/romdisk/romdisk.h \
+	./scu/bus/a/cs0/dram-cartridge/dram-cartridge.h:. \
+	./scu/bus/a/cs0/dram-cartridge/dram-cartridge-internal.h:. \
 	\
-	scu/bus/a/cs0/arp/arp.h \
+	./scu/bus/a/cs0/usb-cartridge/usb-cartridge.h:. \
+	./scu/bus/a/cs0/usb-cartridge/usb-cartridge-internal.h:. \
 	\
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge.h \
+	./scu/bus/a/cs2/cd-block/cd-block.h:. \
+	./scu/bus/a/cs2/cd-block/cd-block-internal.h:. \
+	./scu/bus/a/cs2/cd-block/cd-block/cmd.h:. \
 	\
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge.h \
+	./scu/bus/b/scsp/scsp.h:. \
+	./scu/bus/b/scsp/scsp.h:scsp-internal.h. \
 	\
-	scu/bus/a/cs2/cd-block/cd-block.h \
-	scu/bus/a/cs2/cd-block/cd-block/cmd.h \
+	./scu/bus/b/vdp1/vdp1.h:. \
+	./scu/bus/b/vdp1/vdp1-internal.h:. \
+	./scu/bus/b/vdp1/vdp1/cmdt.h:. \
+	./scu/bus/b/vdp1/vdp1/map.h:. \
+	./scu/bus/b/vdp1/vdp1/vram.h:. \
 	\
-	scu/bus/b/scsp/scsp.h \
+	./scu/bus/b/vdp2/vdp2.h:. \
+	./scu/bus/b/vdp2/vdp2-internal.h:. \
+	./scu/bus/b/vdp2/vdp2/cram.h:. \
+	./scu/bus/b/vdp2/vdp2/map.h:. \
+	./scu/bus/b/vdp2/vdp2/pn.h:. \
+	./scu/bus/b/vdp2/vdp2/priority.h:. \
+	./scu/bus/b/vdp2/vdp2/scrn.h:. \
+	./scu/bus/b/vdp2/vdp2/tvmd.h:. \
+	./scu/bus/b/vdp2/vdp2/vram.h:. \
 	\
-	scu/bus/b/vdp1/vdp1.h \
-	scu/bus/b/vdp1/vdp1/cmdt.h \
-	scu/bus/b/vdp1/vdp1/map.h \
+	./scu/bus/cpu/cpu.h:. \
+	./scu/bus/cpu/cpu-internal.h:. \
+	./scu/bus/cpu/cpu/dmac.h:. \
+	./scu/bus/cpu/cpu/intc.h:. \
+	./scu/bus/cpu/cpu/ubc.h:. \
+	./scu/bus/cpu/cpu/registers.h:. \
 	\
-	scu/bus/b/vdp2/vdp2.h \
-	scu/bus/b/vdp2/vdp2/cram.h \
-	scu/bus/b/vdp2/vdp2/map.h \
-	scu/bus/b/vdp2/vdp2/scrn.h \
-	scu/bus/b/vdp2/vdp2/tvmd.h \
-	scu/bus/b/vdp2/vdp2/vram.h \
+	./scu/bus/cpu/smpc/smpc.h:. \
+	./scu/bus/cpu/smpc/smpc-internal.h:. \
+	./scu/bus/cpu/smpc/smpc/peripheral.h:. \
+	./scu/bus/cpu/smpc/smpc/rtc.h:. \
+	./scu/bus/cpu/smpc/smpc/smc.h:. \
 	\
-	scu/bus/cpu/cpu.h \
-	scu/bus/cpu/cpu/dmac.h \
-	scu/bus/cpu/cpu/intc.h \
-	scu/bus/cpu/cpu/ubc.h \
-	\
-	scu/bus/cpu/smpc/smpc.h \
-	scu/bus/cpu/smpc/smpc/peripheral.h \
-	scu/bus/cpu/smpc/smpc/rtc.h \
-	scu/bus/cpu/smpc/smpc/smc.h \
-	\
-	scu/scu.h \
-	scu/scu/dma.h \
-	scu/scu/dsp.h \
-	scu/scu/ic.h \
-	scu/scu/map.h \
-	scu/scu/timer.h
+	./scu/scu.h:. \
+	./scu/scu-internal.h:. \
+	./scu/scu/dma.h:. \
+	./scu/scu/dsp.h:. \
+	./scu/scu/ic.h:. \
+	./scu/scu/map.h:. \
+	./scu/scu/timer.h:.
 
 SILENT?=@
 
@@ -349,16 +366,18 @@ LIB_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_DEPS))
 LIB_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_DEPS))
 LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 
+HEADER_FILES_all:= $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
+
 LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
-SPECS_all := $(addprefix $(BUILD_ROOT)/libyaul/,$(SPECS))
-BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(BOOTSTRAP_FILES))
-USER_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(USER_FILES))
+SPECS_all := $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(SPECS))
+BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(BOOTSTRAP_FILES))
+USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
 
 define macro-build-object
 	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
-		$(foreach dir,$(INCLUDES),-I./$(dir)) \
+		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
 	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
 endef
@@ -381,6 +400,19 @@ define macro-install-start-scripts
 endef
 
 define macro-install-files
+	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
+	$(SILENT)for pair in $(HEADER_FILES_all); do \
+	    header_file=$$(echo "$${pair}" | cut -d ':' -f 1); \
+	    rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
+            rel_header_file=$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
+	    rel_header_dir=$${rel_header_file%/*}/$${rel_dst}; \
+	    install_header_file=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}); \
+	    install_header_dir=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}); \
+	    printf -- "[1;34mlib$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/./}[m\n"; \
+	    mkdir -p $${install_header_dir}; \
+	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
+	done
 	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
 	    printf -- "[1;34m$${ldscript#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
@@ -389,15 +421,15 @@ define macro-install-files
 	    printf -- "[1;34m$${specs#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/yaul/bootstrap
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)/bootstrap
 	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
 	    printf -- "[1;34m$${bootstrap_file#$(BUILD_ROOT)/}[m\n"; \
-	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/yaul/bootstrap; \
+	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/$(TARGET)/bootstrap; \
 	done
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/yaul
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)
 	$(SILENT)for user_file in $(USER_FILES_all); do \
 	    printf -- "[1;34m$${user_file#$(BUILD_ROOT)/}[m\n"; \
-	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/yaul/; \
+	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/$(TARGET)/; \
 	done
 endef
 

@@ -1,5 +1,3 @@
-ROOT:= $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-
 ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
@@ -21,24 +19,24 @@ AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
 CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main \
 	-m2 -mb -O2 -fomit-frame-pointer \
 	-ffast-math -fstrict-aliasing \
-	-I$(ROOT)/../libtga \
-	-I$(ROOT)/../libfixmath \
-	-I$(ROOT)/../libyaul \
-	-I$(ROOT)/../libyaul/common \
-	-I$(ROOT)/../libyaul/common/gdb \
-	-I$(ROOT)/../libyaul/cons \
-	-I$(ROOT)/../libyaul/kernel \
-	-I$(ROOT)/../libyaul/kernel/vfs \
-	-I$(ROOT)/../libyaul/scu \
-	-I$(ROOT)/../libyaul/scu/bus/a/cs0/arp \
-	-I$(ROOT)/../libyaul/scu/bus/a/cs0/dram-cartridge \
-	-I$(ROOT)/../libyaul/scu/bus/a/cs0/usb-cartridge \
-	-I$(ROOT)/../libyaul/scu/bus/a/cs2/cd-block \
-	-I$(ROOT)/../libyaul/scu/bus/b/scsp \
-	-I$(ROOT)/../libyaul/scu/bus/b/vdp1 \
-	-I$(ROOT)/../libyaul/scu/bus/b/vdp2 \
-	-I$(ROOT)/../libyaul/scu/bus/cpu \
-	-I$(ROOT)/../libyaul/scu/bus/cpu/smpc
+	-I$(INSTALL_ROOT)/$(ARCH)/include/fixmath \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/tga \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/common \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/cons \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/lib \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/fs/iso9660 \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/fs/romdisk \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/a/cs0/arp \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/a/cs0/dram-cartridge \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/a/cs0/usb-cartridge \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/a/cs2/cd-block \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/scsp \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp1 \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp2 \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu/smpc
 LDFLAGS= -Wl,-Map,${PROJECT}.map -specs=yaul.specs
 
 CXXFLAGS= $(CFLAGS) \
