@@ -1,4 +1,8 @@
-include ../../pre.common.mk
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+include $(INSTALL_ROOT)/share/yaul/pre.common.mk
 
 PROJECT:= gdb
 
@@ -14,4 +18,4 @@ IP_1ST_READ_ADDR:= 0x06004000
 OBJECTS:= gdb.o \
 	test_routines.o
 
-include ../../post.common.mk
+include $(INSTALL_ROOT)/share/yaul/post.common.mk

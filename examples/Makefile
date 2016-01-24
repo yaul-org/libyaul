@@ -1,6 +1,26 @@
-ifndef INSTALL_ROOT
+EXAMPLES:= \
+	games/dark-blue \
+	games/inkfill \
+	simple/arp-comm \
+	simple/arp-msg \
+	simple/cpu-dmac \
+	simple/dram-cartridge \
+	simple/gdb \
+	simple/line-scroll-screen \
+	simple/romdisk \
+	simple/scu-dma \
+	test-suites/vdp1
+
+SILENT?= @
+
+ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-all:
-	@echo "Not yet implemented"
+.PHONY: all clean
+
+all clean:
+	$(SILENT)for example in $(EXAMPLES); do \
+		printf -- "[1;36m$@[m [1;32mexamples/$$example[m\n"; \
+		($(MAKE) -C $$example $@) || exit $$?; \
+	done

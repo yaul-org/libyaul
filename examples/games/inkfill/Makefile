@@ -1,4 +1,8 @@
-include ../../pre.common.mk
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+include $(INSTALL_ROOT)/share/yaul/pre.common.mk
 
 PROJECT:= inkfill
 
@@ -23,4 +27,4 @@ OBJECTS:= \
 	title.o \
 	tutorial.o
 
-include ../../post.common.mk
+include $(INSTALL_ROOT)/share/yaul/post.common.mk

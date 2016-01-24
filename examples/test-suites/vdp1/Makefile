@@ -1,4 +1,8 @@
-include ../../pre.common.mk
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+include $(INSTALL_ROOT)/share/yaul/pre.common.mk
 
 PROJECT:= vdp1
 
@@ -27,4 +31,4 @@ OBJECTS:= \
 
 CFLAGS+=-I.
 
-include ../../post.common.mk
+include $(INSTALL_ROOT)/share/yaul/post.common.mk

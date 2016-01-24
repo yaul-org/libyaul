@@ -25,6 +25,10 @@ BOOTSTRAP_FILES:= \
 	common/bootstrap/sys_init.bin \
 	common/bootstrap/sys_sec.bin
 
+USER_FILES:= \
+	common/pre.common.mk \
+	common/post.common.mk
+
 LDSCRIPTS:= \
 	common/ldscripts/yaul.x \
 	common/ldscripts/ip.x
@@ -348,6 +352,7 @@ LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(BUILD_ROOT)/libyaul/,$(SPECS))
 BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(BOOTSTRAP_FILES))
+USER_FILES_all = $(addprefix $(BUILD_ROOT)/libyaul/,$(USER_FILES))
 
 define macro-build-object
 	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
@@ -388,6 +393,11 @@ define macro-install-files
 	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
 	    printf -- "[1;34m$${bootstrap_file#$(BUILD_ROOT)/}[m\n"; \
 	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/yaul/bootstrap; \
+	done
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/yaul
+	$(SILENT)for user_file in $(USER_FILES_all); do \
+	    printf -- "[1;34m$${user_file#$(BUILD_ROOT)/}[m\n"; \
+	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/yaul/; \
 	done
 endef
 

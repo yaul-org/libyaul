@@ -1,4 +1,8 @@
-include ../../pre.common.mk
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+include $(INSTALL_ROOT)/share/yaul/pre.common.mk
 
 PROJECT:= dark-blue
 
@@ -38,4 +42,4 @@ ROMDISK_DEPS:= levels/test.json
 	tools/tmx2map
 	$(RM) $@
 
-include ../../post.common.mk
+include $(INSTALL_ROOT)/share/yaul/post.common.mk
