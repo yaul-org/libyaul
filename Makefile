@@ -6,11 +6,11 @@ PROJECTS:= \
 BUILD?= build
 SILENT?= @
 
-ifndef BUILD_ROOT
+ifeq ($(strip $(BUILD_ROOT)),)
   $(error Undefined BUILD_ROOT (build root directory))
 endif
 
-ifndef INSTALL_ROOT
+ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
