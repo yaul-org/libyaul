@@ -64,7 +64,8 @@ IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	$(RM) $($@_TMP_FILE)
 
 clean:
-	-rm -f $(DEPS) \
+	-rm -f $(OBJECTS) \
+		$(DEPS) \
 		$(PROJECT).asm \
 		$(PROJECT).bin \
 		$(PROJECT).elf \
