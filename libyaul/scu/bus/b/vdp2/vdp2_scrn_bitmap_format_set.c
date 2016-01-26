@@ -51,7 +51,7 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
 
         uint16_t palette_number;
 
-        palette_number = format->sbf_color_palette >> 5;
+        palette_number = (format->sbf_color_palette >> 9) & 0x07;
 
         switch (format->sbf_scroll_screen) {
         case SCRN_NBG0:
@@ -77,7 +77,7 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                 switch (format->sbf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
                 case SCRN_CCC_PALETTE_256:
-                        vdp2_regs.bmpna |= palette_number & 0x07;
+                        vdp2_regs.bmpna |= palette_number;
                         break;
                 }
 
@@ -109,7 +109,7 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                 switch (format->sbf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
                 case SCRN_CCC_PALETTE_256:
-                        vdp2_regs.bmpna |= (palette_number & 0x07) << 8;
+                        vdp2_regs.bmpna |= palette_number << 8;
                         break;
                 }
 
@@ -145,7 +145,7 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
                 switch (format->sbf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
                 case SCRN_CCC_PALETTE_256:
-                        vdp2_regs.bmpnb |= palette_number & 0x07;
+                        vdp2_regs.bmpnb |= palette_number;
                         break;
                 }
 
