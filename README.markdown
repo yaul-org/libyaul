@@ -20,11 +20,19 @@ Usage
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
 
     cd libyaul
+
+Initialize and update all submodules.
+
     git submodule init
     git submodule update -f
-    export BUILD=build
-    export BUILD_ROOT=`pwd`
-    export INSTALL_ROOT=/absolute/path/to/sh-elf-tool-chain
+
+In the `config` you just copied, change the appropriate fields.
+
+    cp -v config{.in,}
+    $EDITOR config
+
+Build and install.
+
     make release
     make install-release
 

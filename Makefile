@@ -1,17 +1,23 @@
+include config
+export
+
 PROJECTS:= \
 	libyaul \
 	libfixmath \
 	libtga
 
-BUILD?= build
 SILENT?= @
+
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
 
 ifeq ($(strip $(BUILD_ROOT)),)
   $(error Undefined BUILD_ROOT (build root directory))
 endif
 
-ifeq ($(strip $(INSTALL_ROOT)),)
-  $(error Undefined INSTALL_ROOT (install root directory))
+ifeq ($(strip $(BUILD)),)
+  $(error Undefined BUILD (build directory))
 endif
 
 define macro-install
@@ -25,7 +31,7 @@ endef
 
 .PHONY: all release release-internal debug install install-release install-release-internal install-debug clean clean-release clean-release-internal clean-debug examples tools list-targets
 
-all: release release-internal debug examples tools
+all: release release-internal debug tools
 
 install: install-release install-tools
 

@@ -1,0 +1,23 @@
+# -*- mode: config -*-
+
+# Copyright (c) 2012-2016
+# See LICENSE for details.
+#
+# Israel Jacquez <mrkotfw@gmail.com>
+
+# Only ABSOLUTE paths are to be used when applicable!
+
+# Path to tool-chain installation directory
+INSTALL_ROOT=$(HOME)/tool-chains/sh-elf
+
+# Path to where the build is to ba located
+BUILD_ROOT=$(HOME)/work/libyaul
+
+# Name of build directory
+BUILD=build
+
+# Option: Development cart used:
+#  0: None
+#  1: USB flash cartridge
+#  2: Datel Action Replay cartridge
+HAVE_DEV_CARTRIDGE=1

@@ -1,17 +1,20 @@
-PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
-
 TARGET:= yaul
-
-ifeq ($(strip $(BUILD_ROOT)),)
-  $(error Undefined BUILD_ROOT (build root directory))
-endif
 
 ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
+ifeq ($(strip $(BUILD_ROOT)),)
+  $(error Undefined BUILD_ROOT (build root directory))
+endif
+
 ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
+endif
+
+# Check options
+ifeq ($(strip $(HAVE_DEV_CARTRIDGE)),)
+  $(error Undefined HAVE_DEV_CARTRIDGE (development cartridge option))
 endif
 
 SUB_BUILD:=$(BUILD)/lib$(TARGET)
@@ -119,6 +122,7 @@ LIB_SRCS:= \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_long.c \
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_return.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_long.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_xchg_byte.c \
@@ -327,7 +331,7 @@ SED:= sed
 FIND:= find
 INSTALL:= install
 
-CCFLAGS:= -std=c99 \
+CFLAGS:= -std=c99 \
 	-s \
 	-ffast-math \
 	-fstrict-aliasing \
@@ -339,11 +343,11 @@ CCFLAGS:= -std=c99 \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses \
-	-Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-maybe-uninitialized -Wno-pointer-sign
-CCFLAGS_release:= -O2 $(CCFLAGS)
-CCFLAGS_release-internal:= -O2 $(CCFLAGS) \
+	-DHAVE_DEV_CARTRIDGE=$(HAVE_DEV_CARTRIDGE)
+CFLAGS_release:= -O2 $(CFLAGS)
+CFLAGS_release-internal:= -O2 $(CFLAGS) \
 	-DRELEASE_INTERNAL
-CCFLAGS_debug:= -O0 -g $(CCFLAGS) \
+CFLAGS_debug:= -O0 -g $(CFLAGS) \
 	-DDEBUG
 
 START_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(START_SRCS)))
@@ -376,7 +380,7 @@ USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
 define macro-build-object
 	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
 	$(SILENT)mkdir -p $(@D)
-	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
+	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
 	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d

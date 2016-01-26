@@ -8,6 +8,10 @@
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
+#ifdef DEBUG
+#include <assert.h>
+#endif /* DEBUG */
+
 #include "vdp2-internal.h"
 
 void
