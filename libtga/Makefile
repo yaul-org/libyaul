@@ -1,5 +1,3 @@
-PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
-
 TARGET:= tga
 
 ifeq ($(strip $(BUILD_ROOT)),)
