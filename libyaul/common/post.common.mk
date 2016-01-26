@@ -1,11 +1,22 @@
-ifeq ($(strip $(OBJECTS)),)
-  $(error Empty OBJECTS (object list))
+ifeq ($(strip $(PROJECT)),)
+  $(error Empty PROJECT (project name))
 endif
 
-DEPS:= ${OBJECTS:.o=.d}
+ifeq ($(strip $(OBJECTS)),)
+  # If both OBJECTS and OBJECTS_NO_LINK is empty
+  ifeq ($(strip $(OBJECTS_NO_LINK)),)
+    $(error Empty OBJECTS (object list))
+  endif
+endif
 
-IMAGE_DIRECTORY?= cd
-IMAGE_1ST_READ_BIN?= A.BIN
+ifeq ($(strip $(CUSTOM_SPECS)),)
+  LDFLAGS+= -specs=yaul.specs
+else
+  LDFLAGS+= -specs=$(CUSTOM_SPECS)
+endif
+
+DEPS:= $(OBJECTS:.o=.d)
+DEPS_NO_LINK:= $(OBJECTS_NO_LINK:.o=.d)
 
 all: $(PROJECT).iso
 
@@ -13,7 +24,7 @@ $(PROJECT).bin: $(PROJECT).elf
 	$(OBJCOPY) -O binary $< $@
 	@sh -c "du -h -s $@ | cut -d '	' -f 1"
 
-$(PROJECT).elf: $(OBJECTS)
+$(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
 	$(LD) $(OBJECTS) $(LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
 	$(NM) $(PROJECT).elf > $(PROJECT).sym
 	$(OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
@@ -65,6 +76,7 @@ IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 
 clean:
 	-rm -f $(OBJECTS) \
+		$(OBJECTS_NO_LINK) \
 		$(DEPS) \
 		$(PROJECT).asm \
 		$(PROJECT).bin \
@@ -75,3 +87,4 @@ clean:
 		$(PROJECT).sym
 
 -include $(DEPS)
+-include $(DEPS_NO_LINK)

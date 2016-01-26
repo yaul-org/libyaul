@@ -2,8 +2,13 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
+# Customizable (must be overwritten in user's Makefile)
 PROJECT?=unknown
-
+OBJECTS?=
+OBJECTS_NO_LINK?=
+CUSTOM_SPECS?=
+IMAGE_DIRECTORY?= cd
+IMAGE_1ST_READ_BIN?= A.BIN
 ARCH?= sh-elf
 
 CXX:= $(ARCH)-g++
@@ -37,17 +42,15 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp2 \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu/smpc
-LDFLAGS= -Wl,-Map,${PROJECT}.map -specs=yaul.specs
+LDFLAGS= -Wl,-Map,$(PROJECT).map
 
 CXXFLAGS= $(CFLAGS) \
 	-ffreestanding -fno-exceptions -fno-rtti
-LXXFLAGS= -Wl,-Map,${PROJECT}.map \
+LXXFLAGS= -Wl,-Map,$(PROJECT).map \
 	-Wl,--start-group \
 	-lstdc++ -lc -lgcc \
 	-Wl,--end-group \
 	-nostartfiles -specs=yaul.specs
-
-OBJECTS:=
 
 SUFFIXES:= .c .S .o .bin .elf .romdisk .romdisk.o
 
