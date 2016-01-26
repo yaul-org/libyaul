@@ -13,8 +13,8 @@ ifeq ($(strip $(BUILD)),)
 endif
 
 # Check options
-ifeq ($(strip $(HAVE_DEV_CARTRIDGE)),)
-  $(error Undefined HAVE_DEV_CARTRIDGE (development cartridge option))
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
+  $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
 endif
 
 SUB_BUILD:=$(BUILD)/lib$(TARGET)
@@ -343,7 +343,7 @@ CFLAGS:= -std=c99 \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses \
-	-DHAVE_DEV_CARTRIDGE=$(HAVE_DEV_CARTRIDGE)
+	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE)
 CFLAGS_release:= -O2 $(CFLAGS)
 CFLAGS_release-internal:= -O2 $(CFLAGS) \
 	-DRELEASE_INTERNAL

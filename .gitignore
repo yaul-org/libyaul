@@ -1,6 +1,3 @@
-/build/
-/cscope/
-/tmp/
+/environment.cfg
 .#*
 *~
-/config.h.cmake

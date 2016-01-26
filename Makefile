@@ -1,6 +1,3 @@
-include config
-export
-
 PROJECTS:= \
 	libyaul \
 	libfixmath \

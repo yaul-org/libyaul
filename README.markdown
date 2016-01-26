@@ -26,12 +26,12 @@ Initialize and update all submodules.
     git submodule init
     git submodule update -f
 
-In the `config` you just copied, change the appropriate fields.
+In the `yaul.env` you just copied, change the appropriate fields.
 
-    cp -v config{.in,}
-    $EDITOR config
+    cp -v yaul.env{.in,}
+    $EDITOR yaul.env
 
-Build and install.
+Source `yaul.env' and build and install.
 
     make release
     make install-release
