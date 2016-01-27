@@ -13,10 +13,12 @@
 
 #include <vdp2.h>
 
+#include <smpc.h>
+
 #if defined(DEBUG) || defined(RELEASE_INTERNAL)
 #include <usb-cartridge.h>
+#include <arp.h>
 #else
-#include <smpc.h>
 #endif /* defined(DEBUG) || defined(RELEASE_INTERNAL) */
 
 void __noreturn
@@ -28,7 +30,7 @@ abort(void)
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */
 #if defined(DEBUG) || defined(RELEASE_INTERNAL)
-#if HAVE_DEV_CARTRIDGE == 0
+#if HAVE_DEV_CARTRIDGE == 0 /* No dev cartridge */
         while (true) {
                 vdp2_tvmd_vblank_out_wait();
                 vdp2_tvmd_vblank_in_wait();
@@ -40,11 +42,7 @@ abort(void)
 #else
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
 #endif
-#else
-        /* We reboot for error */
+#else /* !defined(DEBUG) && !defined(RELEASE_INTERNAL) */
         smpc_smc_sysres_call();
-#endif /* defined(DEBUG) || debug(RELEASE_INTERNAL) */
-
-        while (true) {
-        }
+#endif /* defined(DEBUG) || defined(RELEASE_INTERNAL) */
 }
