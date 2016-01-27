@@ -8,10 +8,17 @@
 
 #include <usb-cartridge.h>
 
+#include <common.h>
+
+#include <stdbool.h>
+
 #include "usb-cartridge-internal.h"
 
-void
+void __noreturn
 usb_cartridge_return(void)
 {
         ((void (*)(void))0x0203F800)();
+
+        while (true) {
+        }
 }
