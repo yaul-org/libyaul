@@ -315,7 +315,16 @@ HEADER_FILES:= \
 	./scu/scu/map.h:. \
 	./scu/scu/timer.h:.
 
-SILENT?=@
+SILENT?= @
+V_BEGIN_BLACK= [1;30m
+V_BEGIN_RED= [1;31m
+V_BEGIN_GREEN= [1;32m
+V_BEGIN_YELLOW= [1;33m
+V_BEGIN_BLUE= [1;34
+V_BEGIN_MAGENTA= [1;35m
+V_BEGIN_CYAN= [1;36m
+V_BEGIN_WHITE= [1;37m
+V_END= [m
 
 ARCH?= sh-elf
 
@@ -378,7 +387,7 @@ BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(BOOTSTRAP_FILES)
 USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
 
 define macro-build-object
-	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
@@ -387,18 +396,18 @@ define macro-build-object
 endef
 
 define macro-build-library
-	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
-	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(SILENT)$(AR) rcs $@ $(LIB_OBJS_$1)
 endef
 
 define macro-install-library
-	@printf -- "[1;34m$(SUB_BUILD)/$1/lib$(TARGET).a[m\n"
+	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$1/lib$(TARGET).a$(V_END)\n"
 	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
 endef
 
 define macro-install-start-scripts
 	$(SILENT)for object in $(START_OBJS_$1); do \
-	    printf -- "[1;34m$${object#$(BUILD_ROOT)/}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${object#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
 endef
@@ -413,26 +422,26 @@ define macro-install-files
 	    rel_header_dir=$${rel_header_file%/*}/$${rel_dst}; \
 	    install_header_file=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}); \
 	    install_header_dir=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}); \
-	    printf -- "[1;34mlib$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/./}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
 	done
 	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
-	    printf -- "[1;34m$${ldscript#$(BUILD_ROOT)/}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${ldscript#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
 	done
 	$(SILENT)for specs in $(SPECS_all); do \
-	    printf -- "[1;34m$${specs#$(BUILD_ROOT)/}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${specs#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)/bootstrap
 	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
-	    printf -- "[1;34m$${bootstrap_file#$(BUILD_ROOT)/}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${bootstrap_file#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/$(TARGET)/bootstrap; \
 	done
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)
 	$(SILENT)for user_file in $(USER_FILES_all); do \
-	    printf -- "[1;34m$${user_file#$(BUILD_ROOT)/}[m\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${user_file#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/$(TARGET)/; \
 	done
 endef
@@ -487,7 +496,7 @@ $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "[1;33m$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")[m\n"
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
 	    sub(/\$$INSTALL_ROOT/,"$(INSTALL_ROOT)"); \
