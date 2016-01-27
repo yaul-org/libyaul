@@ -10,6 +10,8 @@
 
 #include <inttypes.h>
 
+#include <common.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -28,7 +30,7 @@ extern uint8_t smpc_smc_sndoff_call(void);
 extern uint8_t smpc_smc_sndon_call(void);
 extern uint8_t smpc_smc_sshoff_call(void);
 extern uint8_t smpc_smc_sshon_call(void);
-extern uint8_t smpc_smc_sysres_call(void);
+extern void smpc_smc_sysres_call(void) __noreturn;
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include <common.h>
+
 #include "smpc-internal.h"
 
 #define WAIT() do {                                                            \
