@@ -75,7 +75,7 @@ static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 void
 cons_init(uint8_t driver)
 {
-        static struct cons_buffer _cons_buffer[CONS_ROWS * CONS_COLS];
+        static struct cons_buffer _cb[CONS_ROWS * CONS_COLS];
 
         switch (driver) {
         case CONS_DRIVER_VDP1:
@@ -89,7 +89,7 @@ cons_init(uint8_t driver)
                 return;
         }
 
-        cons.buffer = &_cons_buffer[0];
+        cons.buffer = &_cb[0];
 
         uint32_t col;
         uint32_t row;
@@ -302,10 +302,10 @@ buffer_clear(int32_t col_start, int32_t col_end,
 
         for (row = row_start; row < row_end; row++) {
                 for (col = col_start; col < col_end; col++) {
-                        struct cons_buffer *cons_buffer;
+                        struct cons_buffer *cb;
 
-                        cons_buffer = &cons.buffer[col + (row * CONS_COLS)];
-                        cons_buffer->glyph = '\0';
+                        cb = &cons.buffer[col + (row * CONS_COLS)];
+                        cb->glyph = '\0';
                 }
         }
 }
@@ -313,52 +313,52 @@ buffer_clear(int32_t col_start, int32_t col_end,
 static inline void
 buffer_glyph_write(uint8_t glyph)
 {
-        struct cons_buffer *cons_buffer;
+        struct cons_buffer *cb;
 
-        cons_buffer = &cons.buffer[cons.cursor.col +
+        cb = &cons.buffer[cons.cursor.col +
             (cons.cursor.row * CONS_COLS)];
-        cons_buffer->glyph = glyph;
+        cb->glyph = glyph;
 }
 
 static inline uint8_t
 buffer_attribute_read(void)
 {
-        struct cons_buffer *cons_buffer;
+        struct cons_buffer *cb;
 
-        cons_buffer = &cons.buffer[cons.cursor.col +
+        cb = &cons.buffer[cons.cursor.col +
             (cons.cursor.row * CONS_COLS)];
 
-        return cons_buffer->attribute;
+        return cb->attribute;
 }
 
 static inline void
 buffer_attribute_write(uint8_t attribute)
 {
-        struct cons_buffer *cons_buffer;
+        struct cons_buffer *cb;
 
-        cons_buffer = &cons.buffer[cons.cursor.col +
+        cb = &cons.buffer[cons.cursor.col +
             (cons.cursor.row * CONS_COLS)];
-        cons_buffer->attribute = attribute;
+        cb->attribute = attribute;
 }
 
 static inline void
 buffer_fg_write(uint8_t fg)
 {
-        struct cons_buffer *cons_buffer;
+        struct cons_buffer *cb;
 
-        cons_buffer = &cons.buffer[cons.cursor.col +
+        cb = &cons.buffer[cons.cursor.col +
             (cons.cursor.row * CONS_COLS)];
-        cons_buffer->fg = fg;
+        cb->fg = fg;
 }
 
 static inline void
 buffer_bg_write(uint8_t bg)
 {
-        struct cons_buffer *cons_buffer;
+        struct cons_buffer *cb;
 
-        cons_buffer = &cons.buffer[cons.cursor.col +
+        cb = &cons.buffer[cons.cursor.col +
             (cons.cursor.row * CONS_COLS)];
-        cons_buffer->bg = bg;
+        cb->bg = bg;
 }
 
 static inline void

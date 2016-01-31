@@ -123,12 +123,12 @@ cons_vdp2_write(struct cons *cons)
 
         for (col = 0; col < CONS_COLS; col++) {
                 for (row = 0; row < CONS_ROWS; row++) {
-                        struct cons_buffer *cons_buffer;
-                        cons_buffer = &cons->buffer[col + (row * CONS_COLS)];
+                        struct cons_buffer *cb;
+                        cb = &cons->buffer[col + (row * CONS_COLS)];
 
                         uint16_t character_number;
                         character_number =
-                            _nbg3_character_number + cons_buffer->glyph;
+                            _nbg3_character_number + cb->glyph;
                         uint16_t palette_number;
                         palette_number = _nbg3_palette_number;
 
