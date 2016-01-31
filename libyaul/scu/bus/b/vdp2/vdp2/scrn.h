@@ -111,7 +111,8 @@ struct scrn_vcs_format {
         uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
 };
 
-extern void vdp2_scrn_back_screen_set(bool, uint32_t, uint16_t *, uint16_t );
+extern void vdp2_scrn_back_screen_addr_set(bool, uint32_t);
+extern void vdp2_scrn_back_screen_color_set(uint32_t, uint16_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(struct scrn_cell_format *);
 extern void vdp2_scrn_display_clear(void);

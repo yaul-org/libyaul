@@ -22,12 +22,8 @@ static bool changed = false;
 void
 game_over_init(void)
 {
-        static uint16_t back_screen_color[] = {
-                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0)
-        };
-
-        vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
+            COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0));
 
         struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;

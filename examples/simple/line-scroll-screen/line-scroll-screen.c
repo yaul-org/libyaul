@@ -135,13 +135,9 @@ line_scroll_screen(void)
 int
 main(void)
 {
-        uint16_t blcs_color[] = {
-                RGB888_TO_RGB555(255, 0, 0)
-        };
-
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), blcs_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
+            RGB888_TO_RGB555(255, 0, 0));
 
         line_scroll_screen();
 

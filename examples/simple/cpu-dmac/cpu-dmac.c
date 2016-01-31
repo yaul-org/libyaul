@@ -24,10 +24,6 @@ dma_complete(void)
 int
 main(void)
 {
-        uint16_t blcs_color[] = {
-                0x9C00
-        };
-
         char *text;
         uint16_t frame;
 
@@ -54,8 +50,7 @@ main(void)
         assert(text != NULL);
 
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* lcclmd = */ true, VRAM_ADDR_4MBIT(3, 0x01FFFE),
-            blcs_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x9C00);
 
         cons_init(CONS_DRIVER_VDP2);
 

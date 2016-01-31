@@ -20,10 +20,6 @@ static uint32_t *cart_area = NULL;
 int
 main(void)
 {
-        static uint16_t back_screen_color[] = {
-                0x9C00
-        };
-
         bool passed;
         char *result;
         uint32_t x;
@@ -33,8 +29,7 @@ main(void)
         uint32_t id;
 
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x9C00);
 
         smpc_init();
 

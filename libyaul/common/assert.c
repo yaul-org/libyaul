@@ -23,10 +23,6 @@ __assert_func(const char *file, int line, const char *func,
 {
         static char buf[4096];
 
-        static uint16_t single_color[] = {
-                0x80E0 /* Color green */
-        };
-
         (void)snprintf(buf, 4096,
             "[2J[HAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
             failed_expr, file, line,
@@ -38,9 +34,7 @@ __assert_func(const char *file, int line, const char *func,
 
         /* Reset the VDP1 */
         vdp1_init();
-
-        vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x01FFFE), single_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x80E0);
 
         cons_init(CONS_DRIVER_VDP2);
         cons_write(buf);

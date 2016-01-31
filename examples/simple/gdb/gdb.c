@@ -14,13 +14,8 @@ void jsr(void);
 int
 main(void)
 {
-        uint16_t blcs_color[] = {
-                0x9C00
-        };
-
         vdp2_init();
-        vdp2_scrn_back_screen_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x01FFFE),
-            blcs_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x9C00);
 
         gdb_init();
 

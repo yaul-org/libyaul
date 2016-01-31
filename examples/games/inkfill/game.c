@@ -77,12 +77,8 @@ static void _grid_flood_fill_helper(int32_t, int32_t, uint8_t, uint8_t);
 void
 game_init(void)
 {
-        static uint16_t back_screen_color[] = {
-                COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(84, 164, 255)
-        };
-
-        vdp2_scrn_back_screen_set(/* single_color = */ true,
-            VRAM_ADDR_4MBIT(3, 0x1FFFE), back_screen_color, 1);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
+            COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(84, 164, 255));
 
         _grid_init();
 
