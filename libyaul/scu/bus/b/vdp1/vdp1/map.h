@@ -8,8 +8,6 @@
 #ifndef _VDP1_MAP_H_
 #define _VDP1_MAP_H_
 
-#include <scu-internal.h>
-
 /* Macros specific for processor */
 #define VDP1(x)         (0x25D00000 + (x))
 

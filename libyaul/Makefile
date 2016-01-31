@@ -259,29 +259,25 @@ HEADER_FILES:= \
 	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk \
 	\
 	./scu/bus/a/cs0/arp/arp.h:. \
-	./scu/bus/a/cs0/arp/arp-internal.h:. \
+	./scu/bus/a/cs0/arp/arp/arp/map.h:. \
 	\
 	./scu/bus/a/cs0/dram-cartridge/dram-cartridge.h:. \
-	./scu/bus/a/cs0/dram-cartridge/dram-cartridge-internal.h:. \
+	./scu/bus/a/cs0/dram-cartridge/dram-cartridge/map.h:. \
 	\
 	./scu/bus/a/cs0/usb-cartridge/usb-cartridge.h:. \
-	./scu/bus/a/cs0/usb-cartridge/usb-cartridge-internal.h:. \
+	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/map.h:. \
 	\
 	./scu/bus/a/cs2/cd-block/cd-block.h:. \
-	./scu/bus/a/cs2/cd-block/cd-block-internal.h:. \
 	./scu/bus/a/cs2/cd-block/cd-block/cmd.h:. \
 	\
 	./scu/bus/b/scsp/scsp.h:. \
-	./scu/bus/b/scsp/scsp.h:scsp-internal.h. \
 	\
 	./scu/bus/b/vdp1/vdp1.h:. \
-	./scu/bus/b/vdp1/vdp1-internal.h:. \
 	./scu/bus/b/vdp1/vdp1/cmdt.h:. \
 	./scu/bus/b/vdp1/vdp1/map.h:. \
 	./scu/bus/b/vdp1/vdp1/vram.h:. \
 	\
 	./scu/bus/b/vdp2/vdp2.h:. \
-	./scu/bus/b/vdp2/vdp2-internal.h:. \
 	./scu/bus/b/vdp2/vdp2/cram.h:. \
 	./scu/bus/b/vdp2/vdp2/map.h:. \
 	./scu/bus/b/vdp2/vdp2/pn.h:. \
@@ -291,20 +287,19 @@ HEADER_FILES:= \
 	./scu/bus/b/vdp2/vdp2/vram.h:. \
 	\
 	./scu/bus/cpu/cpu.h:. \
-	./scu/bus/cpu/cpu-internal.h:. \
 	./scu/bus/cpu/cpu/dmac.h:. \
 	./scu/bus/cpu/cpu/intc.h:. \
-	./scu/bus/cpu/cpu/ubc.h:. \
+	./scu/bus/cpu/cpu/map.h:. \
 	./scu/bus/cpu/cpu/registers.h:. \
+	./scu/bus/cpu/cpu/ubc.h:. \
 	\
 	./scu/bus/cpu/smpc/smpc.h:. \
-	./scu/bus/cpu/smpc/smpc-internal.h:. \
 	./scu/bus/cpu/smpc/smpc/peripheral.h:. \
+	./scu/bus/cpu/smpc/smpc/map.h:. \
 	./scu/bus/cpu/smpc/smpc/rtc.h:. \
 	./scu/bus/cpu/smpc/smpc/smc.h:. \
 	\
 	./scu/scu.h:. \
-	./scu/scu-internal.h:. \
 	./scu/scu/dma.h:. \
 	./scu/scu/dsp.h:. \
 	./scu/scu/ic.h:. \

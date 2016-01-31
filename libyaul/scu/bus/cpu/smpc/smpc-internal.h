@@ -10,13 +10,10 @@
 
 #include <scu-internal.h>
 
-/* Specific macros */
-#define IREG(x)         (0x20100001 + ((x) << 1))
-#define OREG(x)         (0x20100021 + ((x) << 1))
-#define SMPC(x)         (0x20100000 + (x))
+#include <smpc/map.h>
 
-#define SMPC_IREGS      7
-#define SMPC_OREGS      32
+#define SMPC_IREGS              7
+#define SMPC_OREGS              32
 
 #define SMPC_SMC_MSHON          0x00
 #define SMPC_SMC_SSHON          0x02
@@ -39,19 +36,6 @@
 #define SMPC_CMD_ISSUE_TYPE_B   1
 #define SMPC_CMD_ISSUE_TYPE_C   2
 #define SMPC_CMD_ISSUE_TYPE_D   3
-
-/* SMPC */
-#define COMREG          0x01F
-#define SR              0x061
-#define SF              0x063
-#define PDR1            0x075
-#define PDR2            0x077
-#define DDR1            0x079
-#define DDR2            0x07B
-#define IOSEL1          0x07D
-#define IOSEL2          0x07D
-#define EXLE1           0x07F
-#define EXLE2           0x07F
 
 struct smpc_peripheral_port;
 

@@ -12,8 +12,10 @@
 #include <stddef.h>
 
 /* Write and read directly to specified address */
-#define MEMORY_WRITE(t, x, y)   (*(volatile uint ## t ## _t *)(x) = (y))
-#define MEMORY_READ(t, x)       (*(volatile uint ## t ## _t *)(x))
+#define MEMORY_READ(t, x)		(*(volatile uint ## t ## _t *)(x))
+#define MEMORY_WRITE(t, x, y)		(*(volatile uint ## t ## _t *)(x) = (y))
+#define MEMORY_WRITE_AND(t, x, y)	(*(volatile uint ## t ## _t *)(x) &= (y))
+#define MEMORY_WRITE_OR(t, x, y)	(*(volatile uint ## t ## _t *)(x) |= (y))
 
 /* Macros specific for processor */
 #define SCU(x)          (0x25FE0000 + (x))

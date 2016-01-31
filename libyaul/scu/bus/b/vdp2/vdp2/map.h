@@ -8,8 +8,6 @@
 #ifndef _VDP2_MAP_H_
 #define _VDP2_MAP_H_
 
-#include <scu-internal.h>
-
 /* Specific macros */
 #define VDP2(x)         (0x25F80000 + (x))
 
