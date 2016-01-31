@@ -13,7 +13,7 @@
 
 #include <vdp2.h>
 
-#include "cons.h"
+#include "../drivers.h"
 
 static uint16_t * const _nbg3_planes[4] = {
         /* VRAM B1 */

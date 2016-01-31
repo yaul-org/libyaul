@@ -7,7 +7,6 @@
 
 #include "globals.h"
 
-struct cons cons;
 struct smpc_peripheral_digital digital_pad;
 uint32_t tick = 0;
 char *text = NULL;

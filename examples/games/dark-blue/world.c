@@ -522,5 +522,5 @@ on_block_collision(struct object *this, struct object *other,
         }
 
         (void)sprintf(text, "block, other->id=%i\n", (int)other->id);
-        cons_buffer(&cons, text);
+        cons_buffer(text);
 }

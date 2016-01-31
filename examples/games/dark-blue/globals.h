@@ -12,7 +12,6 @@
 
 #include <inttypes.h>
 
-extern struct cons cons;
 extern struct smpc_peripheral_digital digital_pad;
 extern uint32_t tick;
 extern uint32_t start_scanline;

@@ -172,7 +172,7 @@ on_collision(struct object *this, struct object *other,
             (int)info->direction.y,
             (int)player->transform.position.x,
             (int)player->transform.position.y);
-        cons_buffer(&cons, text);
+        cons_buffer(text);
 
         _update_player(this);
 }

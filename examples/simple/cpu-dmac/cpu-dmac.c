@@ -12,13 +12,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static struct cons cons;
 static bool complete = false;
 
 static void
 dma_complete(void)
 {
-        cons_write(&cons, "[7;1HDMA transfer on channel A is complete");
+        cons_write("[7;1HDMA transfer on channel A is complete");
         complete = true;
 }
 
@@ -58,10 +57,10 @@ main(void)
         vdp2_scrn_back_screen_set(/* lcclmd = */ true, VRAM_ADDR_4MBIT(3, 0x01FFFE),
             blcs_color, 1);
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "\n[1;44m         *** CPU DMAC test ***          [m\n\n");
-        cons_write(&cons, "Transferring 1MiB in 1-byte strides\n");
+        cons_write("\n[1;44m         *** CPU DMAC test ***          [m\n\n");
+        cons_write("Transferring 1MiB in 1-byte strides\n");
 
         cfg = cfg;
         cpu_dmac_channel_stop();
@@ -72,10 +71,10 @@ main(void)
         while (true) {
                 vdp2_tvmd_vblank_out_wait();
                 (void)sprintf(text, "[6;1H%i frames have passed\n", frame);
-                cons_buffer(&cons, text);
+                cons_buffer(text);
 
                 vdp2_tvmd_vblank_in_wait();
-                cons_flush(&cons);
+                cons_flush();
 
                 frame++;
 

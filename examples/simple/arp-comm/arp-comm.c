@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static struct cons cons;
-
 static void
 local_arp_cb(arp_callback_t *arp_cb)
 {
@@ -32,7 +30,7 @@ local_arp_cb(arp_callback_t *arp_cb)
             arp_cb->function,
             (arp_cb->exec ? "yes" : "no"));
 
-        cons_write(&cons, buf);
+        cons_write(buf);
 
         free(buf);
 }
@@ -52,30 +50,30 @@ main(void)
 
         smpc_init();
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "\n[1;44m     *** ARP Communication test ***     [m\n\n");
+        cons_write("\n[1;44m     *** ARP Communication test ***     [m\n\n");
 
         if ((text = (char *)malloc(1024)) == NULL) {
                 abort();
         }
 
-        cons_write(&cons, "Initializing ARP...\n");
+        cons_write("Initializing ARP...\n");
         char *arp_ver;
         arp_ver = arp_version();
 
         if (*arp_ver == '\0') {
-                cons_write(&cons, "No ARP cartridge detected!\n");
+                cons_write("No ARP cartridge detected!\n");
                 abort();
         }
 
         (void)sprintf(text, "ARP version \"%s\" detected!\n", arp_ver);
-        cons_write(&cons, text);
+        cons_write(text);
         free(arp_ver);
 
         /* Register callback */
         arp_function_callback(&local_arp_cb);
-        cons_write(&cons, "Ready...\n\n");
+        cons_write("Ready...\n\n");
 
         while (true) {
                 vdp2_tvmd_vblank_in_wait();

@@ -15,7 +15,7 @@ static void do_action(vt_parse_t *, vt_parse_action_t, char);
 static void do_state_change(vt_parse_t *, state_change_t, char);
 
 void
-vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb, void *user_data)
+vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb)
 {
 
         parser->state = VT_PARSE_STATE_GROUND;
@@ -23,7 +23,6 @@ vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb, void *user_data)
         parser->num_params = 0;
         parser->ignore_flagged = 0;
         parser->cb = cb;
-        parser->user_data = user_data;
 }
 
 void

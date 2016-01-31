@@ -15,6 +15,7 @@
 
 #include "cons.h"
 #include "drivers.h"
+#include "vt_parse/vt_parse.h"
 
 #define CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES 0
 #define CONS_ATTRIBUTE_BRIGHT   1
@@ -44,57 +45,58 @@
 #define CONS_PALETTE_BG_WHITE   47
 #define CONS_PALETTE_BG_NORMALIZE(c) ((c) - CONS_PALETTE_BG_BLACK)
 
-static inline void action_character_print(struct cons *, int);
-static inline void action_escape_character_print(struct cons *, int);
-static inline void action_csi_dispatch_print(struct cons *, int, int *, int);
+static struct cons cons;
+static vt_parse_t vt_parser;
 
-static inline void buffer_clear(struct cons *, int32_t, int32_t, int32_t,
+static inline void action_character_print(int);
+static inline void action_escape_character_print(int);
+static inline void action_csi_dispatch_print(int, int *, int);
+
+static inline void buffer_clear(int32_t, int32_t, int32_t,
     int32_t);
-static inline void buffer_glyph_write(struct cons *, uint8_t);
-static inline uint8_t buffer_attribute_read(struct cons *);
-static inline void buffer_attribute_write(struct cons *, uint8_t);
-static inline void buffer_fg_write(struct cons *, uint8_t);
-static inline void buffer_bg_write(struct cons *, uint8_t);
+static inline void buffer_glyph_write(uint8_t);
+static inline uint8_t buffer_attribute_read(void);
+static inline void buffer_attribute_write(uint8_t);
+static inline void buffer_fg_write(uint8_t);
+static inline void buffer_bg_write(uint8_t);
 
-static bool cursor_column_exceeded(struct cons *, int32_t);
-static bool cursor_row_exceeded(struct cons *, uint32_t);
-static void cursor_column_advance(struct cons *, int32_t);
-static bool cursor_column_cond_set(struct cons *, int32_t);
-static void cursor_column_set(struct cons *, int32_t);
-static void cursor_row_advance(struct cons *, uint16_t);
-static bool cursor_row_cond_set(struct cons *, int32_t);
-static void cursor_row_set(struct cons *, int32_t);
-static bool cursor_cond_set(struct cons *, int32_t, int32_t);
+static bool cursor_column_exceeded(int32_t);
+static bool cursor_row_exceeded(uint32_t);
+static void cursor_column_advance(int32_t);
+static bool cursor_column_cond_set(int32_t);
+static void cursor_column_set(int32_t);
+static void cursor_row_advance(uint16_t);
+static bool cursor_row_cond_set(int32_t);
+static void cursor_row_set(int32_t);
+static bool cursor_cond_set(int32_t, int32_t);
 
 static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
 void
-cons_init(struct cons *cons, uint8_t driver)
+cons_init(uint8_t driver)
 {
         static struct cons_buffer _cons_buffer[CONS_ROWS * CONS_COLS];
 
-        assert(cons != NULL);
-
         switch (driver) {
         case CONS_DRIVER_VDP1:
-                cons_vdp1_init(cons);
+                cons_vdp1_init(&cons);
                 break;
         case CONS_DRIVER_VDP2:
-                cons_vdp2_init(cons);
+                cons_vdp2_init(&cons);
                 break;
         default:
                 assert(false);
                 return;
         }
 
-        cons->buffer = &_cons_buffer[0];
+        cons.buffer = &_cons_buffer[0];
 
         uint32_t col;
         uint32_t row;
         for (row = 0; row < CONS_ROWS; row++) {
                 for (col = 0; col < CONS_COLS; col++) {
                         struct cons_buffer *entry;
-                        entry = &cons->buffer[col + (row * CONS_COLS)];
+                        entry = &cons.buffer[col + (row * CONS_COLS)];
 
                         entry->attribute = CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
                         entry->fg = CONS_PALETTE_FG_WHITE;
@@ -103,18 +105,18 @@ cons_init(struct cons *cons, uint8_t driver)
                 }
         }
 
-        vt_parse_init(&cons->vt_parser, vt_parser_callback, cons);
+        vt_parse_init(&vt_parser, vt_parser_callback);
 
-        cons->cursor.col = 0;
-        cons->cursor.row = 0;
+        cons.cursor.col = 0;
+        cons.cursor.row = 0;
 
-        cons->initialized = true;
+        cons.initialized = true;
 }
 
 void
-cons_buffer(struct cons *cons, const char *buffer)
+cons_buffer(const char *buffer)
 {
-        assert(cons->initialized);
+        assert(cons.initialized);
 
         if (buffer == NULL) {
                 return;
@@ -126,13 +128,13 @@ cons_buffer(struct cons *cons, const char *buffer)
                 return;
         }
 
-        vt_parse(&cons->vt_parser, buffer, len);
+        vt_parse(&vt_parser, buffer, len);
 }
 
 void
-cons_write(struct cons *cons, const char *buffer)
+cons_write(const char *buffer)
 {
-        assert(cons->initialized);
+        assert(cons.initialized);
 
         if (buffer == NULL) {
                 return;
@@ -143,35 +145,31 @@ cons_write(struct cons *cons, const char *buffer)
                 return;
         }
 
-        vt_parse(&cons->vt_parser, buffer, len);
+        vt_parse(&vt_parser, buffer, len);
 
-        cons->write(cons);
+        cons.write(&cons);
 }
 
 void
-cons_flush(struct cons *cons)
+cons_flush(void)
 {
-        assert(cons->initialized);
+        assert(cons.initialized);
 
-        cons->write(cons);
+        cons.write(&cons);
 }
 
 static void
 vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 {
-        struct cons *cons;
-
-        cons = (struct cons *)parser->user_data;
         switch (action) {
         case VT_PARSE_ACTION_PRINT:
-                action_character_print(cons, ch);
+                action_character_print(ch);
                 break;
         case VT_PARSE_ACTION_EXECUTE:
-                action_escape_character_print(cons, ch);
+                action_escape_character_print(ch);
                 break;
         case VT_PARSE_ACTION_CSI_DISPATCH:
-                action_csi_dispatch_print(cons, ch, &parser->params[0],
-                    parser->num_params);
+                action_csi_dispatch_print(ch, &parser->params[0], parser->num_params);
                 break;
         default:
                 break;
@@ -183,11 +181,11 @@ vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
  * columns is out of bounds.
  */
 static bool __unused
-cursor_column_exceeded(struct cons *cons, int32_t x)
+cursor_column_exceeded(int32_t x)
 {
         int32_t col;
 
-        col = cons->cursor.col + x;
+        col = cons.cursor.col + x;
         return (col < 0) || (col >= CONS_COLS);
 }
 
@@ -196,11 +194,11 @@ cursor_column_exceeded(struct cons *cons, int32_t x)
  * is out of bounds.
  */
 static bool __unused
-cursor_row_exceeded(struct cons *cons, uint32_t y)
+cursor_row_exceeded(uint32_t y)
 {
         int32_t row;
 
-        row = cons->cursor.row + y;
+        row = cons.cursor.row + y;
         return (row < 0) || (row >= CONS_ROWS);
 }
 
@@ -208,20 +206,20 @@ cursor_row_exceeded(struct cons *cons, uint32_t y)
  * Advance the cursor an Y amount of rows.
  */
 static void __unused
-cursor_row_advance(struct cons *cons, uint16_t y)
+cursor_row_advance(uint16_t y)
 {
 
-        cons->cursor.row += y;
+        cons.cursor.row += y;
 }
 
 /*
  * Set the cursor an Y amount of rows.
  */
 static void __unused
-cursor_row_set(struct cons *cons, int32_t y)
+cursor_row_set(int32_t y)
 {
 
-        cons->cursor.row = y;
+        cons.cursor.row = y;
 }
 
 /*
@@ -229,11 +227,11 @@ cursor_row_set(struct cons *cons, int32_t y)
  * exceeded.
  */
 static bool __unused
-cursor_row_cond_set(struct cons *cons, int32_t row)
+cursor_row_cond_set(int32_t row)
 {
 
         if ((row >= 0) && (row <= CONS_ROWS)) {
-                cons->cursor.row = row;
+                cons.cursor.row = row;
                 return true;
         }
 
@@ -244,10 +242,10 @@ cursor_row_cond_set(struct cons *cons, int32_t row)
  * Advance the cursor an X amount of columns.
  */
 static void __unused
-cursor_column_advance(struct cons *cons, int32_t x)
+cursor_column_advance(int32_t x)
 {
 
-        cons->cursor.col += x;
+        cons.cursor.col += x;
 }
 
 /*
@@ -255,10 +253,10 @@ cursor_column_advance(struct cons *cons, int32_t x)
  * CONS_COLS.
  */
 static void __unused
-cursor_column_set(struct cons *cons, int32_t x)
+cursor_column_set(int32_t x)
 {
 
-        cons->cursor.col = x;
+        cons.cursor.col = x;
 }
 
 /*
@@ -266,11 +264,11 @@ cursor_column_set(struct cons *cons, int32_t x)
  * exceeded.
  */
 static bool __unused
-cursor_column_cond_set(struct cons *cons, int32_t col)
+cursor_column_cond_set(int32_t col)
 {
 
         if ((col >= 0) && (col <= CONS_COLS)) {
-                cons->cursor.col = col;
+                cons.cursor.col = col;
                 return true;
         }
 
@@ -282,13 +280,13 @@ cursor_column_cond_set(struct cons *cons, int32_t col)
  * and ROW both have not been exceeded.
  */
 static bool __unused
-cursor_cond_set(struct cons *cons, int32_t col, int32_t row)
+cursor_cond_set(int32_t col, int32_t row)
 {
 
         if (((col >= 0) && (col <= CONS_COLS)) &&
             ((row >= 0) && (row <= CONS_ROWS))) {
-                cons->cursor.col = col;
-                cons->cursor.row = row;
+                cons.cursor.col = col;
+                cons.cursor.row = row;
                 return true;
         }
 
@@ -296,7 +294,7 @@ cursor_cond_set(struct cons *cons, int32_t col, int32_t row)
 }
 
 static inline void
-buffer_clear(struct cons *cons, int32_t col_start, int32_t col_end,
+buffer_clear(int32_t col_start, int32_t col_end,
     int32_t row_start, int32_t row_end)
 {
         int32_t col;
@@ -306,77 +304,77 @@ buffer_clear(struct cons *cons, int32_t col_start, int32_t col_end,
                 for (col = col_start; col < col_end; col++) {
                         struct cons_buffer *cons_buffer;
 
-                        cons_buffer = &cons->buffer[col + (row * CONS_COLS)];
+                        cons_buffer = &cons.buffer[col + (row * CONS_COLS)];
                         cons_buffer->glyph = '\0';
                 }
         }
 }
 
 static inline void
-buffer_glyph_write(struct cons *cons, uint8_t glyph)
+buffer_glyph_write(uint8_t glyph)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &cons->buffer[cons->cursor.col +
-            (cons->cursor.row * CONS_COLS)];
+        cons_buffer = &cons.buffer[cons.cursor.col +
+            (cons.cursor.row * CONS_COLS)];
         cons_buffer->glyph = glyph;
 }
 
 static inline uint8_t
-buffer_attribute_read(struct cons *cons)
+buffer_attribute_read(void)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &cons->buffer[cons->cursor.col +
-            (cons->cursor.row * CONS_COLS)];
+        cons_buffer = &cons.buffer[cons.cursor.col +
+            (cons.cursor.row * CONS_COLS)];
 
         return cons_buffer->attribute;
 }
 
 static inline void
-buffer_attribute_write(struct cons *cons, uint8_t attribute)
+buffer_attribute_write(uint8_t attribute)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &cons->buffer[cons->cursor.col +
-            (cons->cursor.row * CONS_COLS)];
+        cons_buffer = &cons.buffer[cons.cursor.col +
+            (cons.cursor.row * CONS_COLS)];
         cons_buffer->attribute = attribute;
 }
 
 static inline void
-buffer_fg_write(struct cons *cons, uint8_t fg)
+buffer_fg_write(uint8_t fg)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &cons->buffer[cons->cursor.col +
-            (cons->cursor.row * CONS_COLS)];
+        cons_buffer = &cons.buffer[cons.cursor.col +
+            (cons.cursor.row * CONS_COLS)];
         cons_buffer->fg = fg;
 }
 
 static inline void
-buffer_bg_write(struct cons *cons, uint8_t bg)
+buffer_bg_write(uint8_t bg)
 {
         struct cons_buffer *cons_buffer;
 
-        cons_buffer = &cons->buffer[cons->cursor.col +
-            (cons->cursor.row * CONS_COLS)];
+        cons_buffer = &cons.buffer[cons.cursor.col +
+            (cons.cursor.row * CONS_COLS)];
         cons_buffer->bg = bg;
 }
 
 static inline void
-action_character_print(struct cons *cons, int ch)
+action_character_print(int ch)
 {
-        if (cursor_column_exceeded(cons, 0)) {
-                cursor_column_set(cons, 0);
-                cursor_row_advance(cons, 1);
+        if (cursor_column_exceeded(0)) {
+                cursor_column_set(0);
+                cursor_row_advance(1);
         }
 
-        buffer_glyph_write(cons, ch);
-        cursor_column_advance(cons, 1);
+        buffer_glyph_write(ch);
+        cursor_column_advance(1);
 }
 
 static inline void
-action_escape_character_print(struct cons *cons, int ch)
+action_escape_character_print(int ch)
 {
         int32_t tab;
 
@@ -386,36 +384,36 @@ action_escape_character_print(struct cons *cons, int ch)
         case '\f':
                 break;
         case '\b':
-                if (!cursor_column_exceeded(cons, -1)) {
-                        cursor_column_advance(cons, -1);
+                if (!cursor_column_exceeded(-1)) {
+                        cursor_column_advance(-1);
                 }
                 break;
         case '\n':
-                cursor_column_set(cons, 0);
-                cursor_row_advance(cons, 1);
+                cursor_column_set(0);
+                cursor_row_advance(1);
                 break;
         case '\r':
-                cursor_column_set(cons, 0);
+                cursor_column_set(0);
                 break;
         case '\t':
                 tab = CONS_TAB_WIDTH;
 
-                if (cursor_column_exceeded(cons, CONS_TAB_WIDTH)) {
-                        if ((tab = (CONS_COLS - cons->cursor.col - 1)) < 0) {
+                if (cursor_column_exceeded(CONS_TAB_WIDTH)) {
+                        if ((tab = (CONS_COLS - cons.cursor.col - 1)) < 0) {
                                 break;
                         }
                 }
 
-                cursor_column_advance(cons, tab);
+                cursor_column_advance(tab);
                 break;
         case '\v':
-                cursor_row_advance(cons, 1);
+                cursor_row_advance(1);
                 break;
         }
 }
 
 static inline void
-action_csi_dispatch_print(struct cons *cons, int ch, int *params,
+action_csi_dispatch_print(int ch, int *params,
     int num_params)
 {
         int32_t col;
@@ -434,11 +432,11 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 row = (params[0] == 0) ? 1 : params[0];
-                if (cursor_row_exceeded(cons, -row)) {
-                        row = cons->cursor.row;
+                if (cursor_row_exceeded(-row)) {
+                        row = cons.cursor.row;
                 }
 
-                cursor_row_advance(cons, -row);
+                cursor_row_advance(-row);
                 break;
         case 'B':
                 /* ESC [ Pn B */
@@ -450,11 +448,11 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 row = (params[0] == 0) ? 1 : params[0];
-                if (cursor_row_exceeded(cons, row)) {
-                        row = CONS_ROWS - cons->cursor.row - 1;
+                if (cursor_row_exceeded(row)) {
+                        row = CONS_ROWS - cons.cursor.row - 1;
                 }
 
-                cursor_row_advance(cons, row);
+                cursor_row_advance(row);
                 break;
         case 'C':
                 /* ESC [ Pn C */
@@ -469,11 +467,11 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 col = (params[0] == 0) ? 1 : params[0];
-                if (cursor_column_exceeded(cons, col)) {
-                        col = CONS_COLS - cons->cursor.col - 1;
+                if (cursor_column_exceeded(col)) {
+                        col = CONS_COLS - cons.cursor.col - 1;
                 }
 
-                cursor_column_advance(cons, col);
+                cursor_column_advance(col);
                 break;
         case 'D':
                 /* ESC [ Pn D */
@@ -488,11 +486,11 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 col = (params[0] == 0) ? 1 : params[0];
-                if (cursor_column_exceeded(cons, -col)) {
-                        col = cons->cursor.col;
+                if (cursor_column_exceeded(-col)) {
+                        col = cons.cursor.col;
                 }
 
-                cursor_column_advance(cons, -col);
+                cursor_column_advance(-col);
                 break;
         case 'H':
                 /* ESC [ Pn ; Pn H */
@@ -505,8 +503,8 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                  * specifying the line position and the second
                  * specifying the column position */
                 if (num_params == 0) {
-                        cursor_column_set(cons, 0);
-                        cursor_row_set(cons, 0);
+                        cursor_column_set(0);
+                        cursor_row_set(0);
                         break;
                 }
 
@@ -517,7 +515,7 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 col = ((params[1] - 1) < 0) ? 0 : params[1] - 1;
                 row = ((params[0] - 1) < 0) ? 0 : params[0] - 1;
 
-                cursor_cond_set(cons, col, row);
+                cursor_cond_set(col, row);
                 break;
         case 'J':
                 /* ESC [ Ps J */
@@ -529,20 +527,20 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 case 0:
                         /* Erase from the active position to the end of
                          * the screen, inclusive (default). */
-                        buffer_clear(cons, cons->cursor.col, CONS_COLS,
-                            cons->cursor.row, CONS_ROWS);
+                        buffer_clear(cons.cursor.col, CONS_COLS,
+                            cons.cursor.row, CONS_ROWS);
                         break;
                 case 1:
                         /* Erase from start of the screen to the active
                          * position, inclusive. */
-                        buffer_clear(cons, 0, cons->cursor.col, 0,
-                            cons->cursor.row);
+                        buffer_clear(0, cons.cursor.col, 0,
+                            cons.cursor.row);
                         break;
                 case 2:
                         /* Erase all of the display –- all lines are
                          * erased, changed to single-width, and the
                          * cursor does not move. */
-                        buffer_clear(cons, 0, CONS_COLS, 0, CONS_ROWS);
+                        buffer_clear(0, CONS_COLS, 0, CONS_ROWS);
                         break;
                 default:
                         break;
@@ -558,19 +556,19 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 case 0:
                         /* Erase from the active position to the end of
                          * the line, inclusive (default) */
-                        buffer_clear(cons, cons->cursor.col, CONS_COLS,
-                            cons->cursor.row, cons->cursor.row + 1);
+                        buffer_clear(cons.cursor.col, CONS_COLS,
+                            cons.cursor.row, cons.cursor.row + 1);
                         break;
                 case 1:
                         /* Erase from the start of the screen to the
                          * active position, inclusive */
-                        buffer_clear(cons, 0, cons->cursor.col,
-                            cons->cursor.row, cons->cursor.row + 1);
+                        buffer_clear(0, cons.cursor.col,
+                            cons.cursor.row, cons.cursor.row + 1);
                         break;
                 case 2:
                         /* Erase all of the line, inclusive */
-                        buffer_clear(cons, 0, CONS_COLS,
-                            cons->cursor.row, cons->cursor.row + 1);
+                        buffer_clear(0, CONS_COLS,
+                            cons.cursor.row, cons.cursor.row + 1);
                         break;
                 default:
                         break;
@@ -585,8 +583,8 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                 }
 
                 if (num_params == 0) {
-                        buffer_fg_write(cons, CONS_PALETTE_FG_WHITE);
-                        buffer_bg_write(cons, CONS_PALETTE_BG_BLACK);
+                        buffer_fg_write(CONS_PALETTE_FG_WHITE);
+                        buffer_bg_write(CONS_PALETTE_BG_BLACK);
                         break;
                 }
 
@@ -594,10 +592,10 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         /* Attribute */
                         switch (params[ofs]) {
                         case CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES:
-                                buffer_attribute_write(cons, 0);
+                                buffer_attribute_write(0);
                                 break;
                         case CONS_ATTRIBUTE_BRIGHT:
-                                buffer_attribute_write(cons, 8);
+                                buffer_attribute_write(8);
                                 break;
                         case CONS_ATTRIBUTE_DIM:
                         case CONS_ATTRIBUTE_UNDERSCORE:
@@ -605,8 +603,7 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_ATTRIBUTE_REVERSE:
                         case CONS_ATTRIBUTE_HIDDEN:
                         default:
-                                buffer_attribute_write(cons,
-                                    CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES);
+                                buffer_attribute_write(CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES);
                                 break;
                         }
 
@@ -620,8 +617,7 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_PALETTE_FG_MAGENTA:
                         case CONS_PALETTE_FG_CYAN:
                         case CONS_PALETTE_FG_WHITE:
-                                buffer_fg_write(cons,
-                                    params[ofs + 1] + buffer_attribute_read(cons));
+                                buffer_fg_write(params[ofs + 1] + buffer_attribute_read());
                                 break;
                         case CONS_PALETTE_BG_BLACK:
                         case CONS_PALETTE_BG_RED:
@@ -631,8 +627,7 @@ action_csi_dispatch_print(struct cons *cons, int ch, int *params,
                         case CONS_PALETTE_BG_MAGENTA:
                         case CONS_PALETTE_BG_CYAN:
                         case CONS_PALETTE_BG_WHITE:
-                                buffer_bg_write(cons,
-                                    params[ofs + 1] + buffer_attribute_read(cons));
+                                buffer_bg_write(params[ofs + 1] + buffer_attribute_read());
                                 break;
                         }
                 }

@@ -259,18 +259,18 @@ stage_simulate(void)
                     F16(-60.0f),
                     F16(120.0f));
 
-                cons_buffer(&cons, "*** acceleration=");
+                cons_buffer("*** acceleration=");
                 fix16_vector2_str(&rigid_body->acceleration, text, 2);
-                cons_buffer(&cons, text);
-                cons_buffer(&cons, "\n");
-                cons_buffer(&cons, "*** velocity=");
+                cons_buffer(text);
+                cons_buffer("\n");
+                cons_buffer("*** velocity=");
                 fix16_vector2_str(&rigid_body->velocity, text, 2);
-                cons_buffer(&cons, text);
-                cons_buffer(&cons, "\n");
-                cons_buffer(&cons, "*** displacement=");
+                cons_buffer(text);
+                cons_buffer("\n");
+                cons_buffer("*** displacement=");
                 fix16_vector2_str(&rigid_body->displacement, text, 2);
-                cons_buffer(&cons, text);
-                cons_buffer(&cons, "\n");
+                cons_buffer(text);
+                cons_buffer("\n");
 
                 int16_vector2_t displacement;
                 displacement.x = fix16_to_int(rigid_body->displacement.x);

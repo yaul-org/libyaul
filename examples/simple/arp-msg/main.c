@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <yaul.h>
 
-static struct cons cons;
-
 #define BUFFER_SIZE 128
 #define TIMEOUT 0x200
 #define BYTE_INIT 0x21
@@ -117,25 +115,25 @@ main(void)
 
         smpc_init();
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "\n[1;44m   *** ARP Communication messages ***     [m\n\n");
+        cons_write("\n[1;44m   *** ARP Communication messages ***     [m\n\n");
 
         if ((text = (char *)malloc(1024)) == NULL) {
                 abort();
         }
 
-        cons_write(&cons, "Initializing ARP...\n");
+        cons_write("Initializing ARP...\n");
         arp_ver = arp_version();
 
         if (*arp_ver == '\0') {
-                cons_write(&cons, "No ARP cartridge detected!\n");
+                cons_write("No ARP cartridge detected!\n");
                 abort();
         }
-        cons_write(&cons, arp_ver);
+        cons_write(arp_ver);
         free(arp_ver);
 
-        cons_write(&cons, "\nReady...\n\n");
+        cons_write("\nReady...\n\n");
 
         k=0;
         while (true) {
@@ -146,9 +144,9 @@ main(void)
                 if (!(k&7)) {
                         sprintf(text,"MESSAGE %i\n",k/8);
                         to_write(text,strlen(text));
-                        cons_write(&cons, "[2;9H\n");
-                        cons_write(&cons, "\n\n\n\n\n\n");
-                        cons_write(&cons, text);
+                        cons_write("[2;9H\n");
+                        cons_write("\n\n\n\n\n\n");
+                        cons_write(text);
                 }
         }
         free(text);

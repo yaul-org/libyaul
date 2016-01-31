@@ -10,7 +10,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "cons.h"
+#include "../drivers.h"
 
 static void cons_vdp1_write(struct cons *);
 

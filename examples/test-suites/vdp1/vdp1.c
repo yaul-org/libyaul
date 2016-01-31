@@ -52,7 +52,7 @@ main(void)
         hardware_init();
 
         fs_init();
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
         state_machine_init(&state_vdp1);
         state_machine_add_state(&state_vdp1, "menu",

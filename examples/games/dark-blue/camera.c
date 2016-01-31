@@ -141,8 +141,8 @@ on_update(struct object *this)
         struct bounding_box *rbb;
         rbb = &camera->private_data.m_rbb;
 
-        cons_buffer(&cons, states_str[camera->private_data.m_state]);
-        cons_buffer(&cons, "\n");
+        cons_buffer(states_str[camera->private_data.m_state]);
+        cons_buffer("\n");
 
         uint16_t old_position;
         old_position = camera->transform.position.x;

@@ -58,7 +58,7 @@ LIB_SRCS:= \
 	cons/cons.c \
 	cons/drivers/vdp1.c \
 	cons/drivers/vdp2.c \
-	cons/font.c \
+	cons/font/font.c \
 	cons/vt_parse/vt_parse.c \
 	cons/vt_parse/vt_parse_table.c \
 	\
@@ -253,10 +253,6 @@ HEADER_FILES:= \
 	./common/gdb/sh2-704x.h:. \
 	\
 	./cons/cons.h:. \
-	./cons/drivers.h:. \
-	./cons/font.h:. \
-	./cons/vt_parse/vt_parse.h:. \
-	./cons/vt_parse/vt_parse_table.h:. \
 	\
 	./kernel/lib/memb.h:../../lib \
 	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \

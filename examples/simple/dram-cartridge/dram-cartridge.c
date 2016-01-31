@@ -24,8 +24,6 @@ main(void)
                 0x9C00
         };
 
-        struct cons cons;
-
         bool passed;
         char *result;
         uint32_t x;
@@ -40,20 +38,20 @@ main(void)
 
         smpc_init();
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
+        cons_write("\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
 
-        cons_write(&cons, "Initializing DRAM cartridge... ");
+        cons_write("Initializing DRAM cartridge... ");
         dram_cartridge_init();
 
-        cons_write(&cons, "OK!\n");
+        cons_write("OK!\n");
 
         delay(2);
 
         id = dram_cartridge_id();
         if ((id != DRAM_CARTRIDGE_ID_1MIB) && (id != DRAM_CARTRIDGE_ID_4MIB)) {
-                cons_write(&cons, "[4;1H[2K[11CThe extended RAM\n"
+                cons_write("[4;1H[2K[11CThe extended RAM\n"
                     "[11Ccartridge is not\n"
                     "[11Cinsert properly.\n"
                     "\n"
@@ -73,7 +71,7 @@ main(void)
             ((id == DRAM_CARTRIDGE_ID_1MIB)
                 ? "8-Mbit"
                 : "32-Mbit"));
-        cons_write(&cons, buf);
+        cons_write(buf);
 
         for (x = 0; x < cart_len / sizeof(x); x++) {
                 vdp2_tvmd_vblank_out_wait();
@@ -82,17 +80,17 @@ main(void)
                 result = passed ? "OK!" : "FAILED!";
                 (void)sprintf(buf, "[7;1HWriting to 0x%08X (%d%%) %s\n",
                     (uintptr_t)&cart_area[x], (int)(x / cart_len), result);
-                cons_buffer(&cons, buf);
+                cons_buffer(buf);
 
                 vdp2_tvmd_vblank_in_wait();
-                cons_flush(&cons);
+                cons_flush();
 
                 if (!passed) {
                         break;
                 }
         }
 
-        cons_write(&cons, passed ? "Test is complete!" : "Test was aborted!");
+        cons_write(passed ? "Test is complete!" : "Test was aborted!");
         free(buf);
 
         abort();

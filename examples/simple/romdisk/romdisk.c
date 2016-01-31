@@ -14,6 +14,9 @@
 
 extern uint8_t root_romdisk[];
 
+#define SYS_CHGSYSCK(_CkMode_) ((**(volatile void(**)(uint32_t))0x6000320)(_CkMode_))
+#define SYS_GETSYSCK (*(volatile uint32_t*)0x6000324)
+
 static void delay(uint16_t);
 
 int
@@ -22,8 +25,6 @@ main(void)
         uint16_t blcs_color[] = {
                 0x9C00
         };
-
-        struct cons cons;
 
         void *romdisk;
 
@@ -37,11 +38,11 @@ main(void)
 
         smpc_init();
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2);
 
-        cons_write(&cons, "\n[1;44m          *** ROMDISK Test ***          [m\n\n");
+        cons_write("\n[1;44m          *** ROMDISK Test ***          [m\n\n");
 
-        cons_write(&cons, "Mounting ROMDISK... ");
+        cons_write("Mounting ROMDISK... ");
 
         romdisk_init();
 
@@ -50,20 +51,20 @@ main(void)
         delay(1);
 
         if (romdisk != NULL) {
-                cons_write(&cons, "OK!\n");
+                cons_write("OK!\n");
         }
 
         delay(1);
 
-        cons_write(&cons, "Opening \"/tmp/txt/hello.world\"... ");
+        cons_write("Opening \"/tmp/txt/hello.world\"... ");
         if ((fh = romdisk_open(romdisk, "/tmp/txt/hello.world", O_RDONLY)) == NULL) {
-                cons_write(&cons, "[1;31mFAILED[0m\n");
+                cons_write("[1;31mFAILED[0m\n");
                 abort();
         }
 
         delay(1);
 
-        cons_write(&cons, "OK!\n");
+        cons_write("OK!\n");
 
         msg_len = romdisk_total(fh);
         msg = (char *)malloc(msg_len + 1);
@@ -72,23 +73,23 @@ main(void)
 
         delay(1);
 
-        cons_write(&cons, "Reading... ");
+        cons_write("Reading... ");
         msg_len = romdisk_read(fh, msg, romdisk_total(fh));
 
         delay(1);
 
-        cons_write(&cons, "OK!\n");
+        cons_write("OK!\n");
 
         if (msg_len == 0) {
-                cons_write(&cons, "FAILED\n");
+                cons_write("FAILED\n");
                 abort();
         }
 
-        cons_write(&cons, "\n[1;32m");
-        cons_write(&cons, msg);
-        cons_write(&cons, "[m");
+        cons_write("\n[1;32m");
+        cons_write(msg);
+        cons_write("[m");
 
-        cons_write(&cons, "\nTest complete!\n");
+        cons_write("\nTest complete!\n");
 
         abort();
 }

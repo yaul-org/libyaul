@@ -22,7 +22,6 @@
 #define SCREEN_WIDTH    320
 #define SCREEN_HEIGHT   224
 
-extern struct cons cons;
 extern struct smpc_peripheral_digital digital_pad;
 extern uint32_t tick;
 

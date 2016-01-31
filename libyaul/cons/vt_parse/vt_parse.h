@@ -25,10 +25,9 @@ typedef struct vt_parse {
         char ignore_flagged;
         int params[16];
         int num_params;
-        void *user_data;
 } vt_parse_t;
 
-void vt_parse_init(vt_parse_t *, vt_parse_callback_t, void *user_data);
+void vt_parse_init(vt_parse_t *, vt_parse_callback_t);
 void vt_parse(vt_parse_t *, const char *, int);
 
 #endif /* !_VT_PARSE_H_ */

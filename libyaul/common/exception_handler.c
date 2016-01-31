@@ -62,8 +62,6 @@ format(struct cpu_registers *regs, const char *exception_name)
                 0x80E0 /* Green */
         };
 
-        struct cons cons;
-
         (void)sprintf(buf, "[1;44mException occurred:[m\n\t[1;44m%s[m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"
@@ -99,6 +97,6 @@ format(struct cpu_registers *regs, const char *exception_name)
         vdp2_scrn_back_screen_set(/* single_color = */ true,
             VRAM_ADDR_4MBIT(3, 0x01FFFE), single_color, 1);
 
-        cons_init(&cons, CONS_DRIVER_VDP2);
-        cons_write(&cons, buf);
+        cons_init(CONS_DRIVER_VDP2);
+        cons_write(buf);
 }

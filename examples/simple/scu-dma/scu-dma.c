@@ -58,8 +58,6 @@ static void scu_dma_level_0_end(void);
 static void scu_dma_level_1_end(void);
 static void scu_dma_level_2_end(void);
 
-static struct cons cons;
-
 int
 main(void)
 {
@@ -80,7 +78,7 @@ main(void)
         smpc_init();
         scu_dma_cpu_init();
 
-        cons_vdp2_init(&cons);
+        cons_init(CONS_DRIVER_VDP2);
 
         mask = IC_MSK_LEVEL_0_DMA_END | IC_MSK_LEVEL_1_DMA_END | IC_MSK_LEVEL_2_DMA_END | IC_MSK_DMA_ILLEGAL;
         /* Disable interrupts */
@@ -163,7 +161,7 @@ static void
 display_menu(void)
 {
         /* Menu */
-        cons_write(&cons, "\n[1;44m       *** SCU DMA Test Menu ***        [m\n\n"
+        cons_write("\n[1;44m       *** SCU DMA Test Menu ***        [m\n\n"
             "[1;44mSCU DMA Level 0[m\n"
             "\tA+L - Mode: Direct\n"
             "\tA+R - Mode: Indirect\n"
