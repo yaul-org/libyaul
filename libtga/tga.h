@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2013, 2014-2016
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef TGA_H_
 #define TGA_H_
 
