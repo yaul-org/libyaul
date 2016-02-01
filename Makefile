@@ -1,5 +1,6 @@
 PROJECTS:= \
 	libyaul \
+	libbcl \
 	libfixmath \
 	libtga
 
