@@ -1,7 +1,7 @@
 PROJECTS:= \
 	bin2c \
 	bin2o \
-	fsck.genromfs \
+	genromfs \
 	make-iso
 
 SILENT?= @

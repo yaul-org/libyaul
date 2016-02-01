@@ -1,4 +1,4 @@
-selftest/*.out
-selftest/*.bin
-genromfs
-genromfs.o
+/genromfs
+/genromfs.exe
+*.o
+*.d

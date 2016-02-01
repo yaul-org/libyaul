@@ -1,63 +1,50 @@
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
 
-# Makefile for the genromfs program.
+TARGET:= genromfs
 
-all: genromfs
+SILENT?= @
 
-PACKAGE = genromfs
-VERSION = 0.5.7
-CC = gcc
-CFLAGS = -O2 -Wall -DVERSION=\"$(VERSION)\"#-g#
-LDFLAGS = -s#-g
+INSTALL:= install
 
-DISTDIR = $(PACKAGE)-$(VERSION)
+CFLAGS:= -O2 \
+	-s \
+	-Wall \
+	-Wextra \
+	-Wuninitialized \
+	-Winit-self \
+	-Wuninitialized \
+	-Wshadow \
+	-Wno-unused \
+	-Wno-parentheses
 
-FILES = COPYING NEWS ChangeLog Makefile \
- genromfs.8 genromfs.c genromfs.lsm \
- readme-kernel-patch genrommkdev romfs.txt \
- checkdist \
- .gitignore selftest
+SRCS:= genromfs.c
 
-prefix = /usr
-bindir = $(prefix)/bin
-mandir = $(prefix)/man
+OBJS:= $(SRCS:.c=.o)
+DEPS:= $(SRCS:.c=.d)
 
-genromfs: genromfs.o
-	$(CC) $(LDFLAGS) genromfs.o -o genromfs
+.PHONY: all clean distclean install
 
-.c.o:
-	$(CC) $(CFLAGS) $< -c -o $@
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	@printf -- "[1;33m$@[m\n"
+	$(CC) -o $(TARGET) $^
+
+%.o: %.c
+	@printf -- "[1;33m$@[m\n"
+	$(CC) -Wp,-MMD,$*.d $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f genromfs *.o
+	$(RM) $(OBJS) $(DEPS) $(TARGET)
 
 distclean: clean
-	rm -rf $(DISTDIR) $(DISTDIR).tar.gz
 
-dist:
-	./checkdist $(VERSION)
-	rm -rf $(DISTDIR).tar.gz $(DISTDIR)
-	mkdir $(DISTDIR);
-	for i in $(FILES); do \
-		cp -r $$i $(DISTDIR)/; \
-	done; \
-	tar --owner=root --group=root -zcf $(DISTDIR).tar.gz $(DISTDIR);
-	rm -rf $(DISTDIR)
+install: $(TARGET)
+	@printf -- "[1;34m$^[m\n"
+	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
+	@printf -- "[1;34mfsck.genromfs[m\n"
+	$(SILENT)$(INSTALL) -m 755 fsck.genromfs $(INSTALL_ROOT)/bin/
 
-check:	all selftest
-	$(MAKE) -C selftest dotest
-
-install: all install-bin install-man
-
-install-bin:
-	mkdir -p $(PREFIX)$(bindir)
-	install -m 755 genromfs $(PREFIX)$(bindir)/
-
-install-man:
-	# genromfs 0.5 installed the man page in this file,
-	# remove it before someone notices :)
-	if [ -f $(PREFIX)$(bindir)/man8 ]; then \
-		rm -f $(PREFIX)$(bindir)/man8; \
-	fi
-	mkdir -p $(PREFIX)$(mandir)/man8
-	install -m 644 genromfs.8 $(PREFIX)$(mandir)/man8/
-
+-include $(DEPS)
