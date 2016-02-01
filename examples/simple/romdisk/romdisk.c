@@ -86,7 +86,10 @@ main(void)
 
         cons_write("\nTest complete!\n");
 
-        abort();
+        while (true) {
+                vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
+        }
 }
 
 static void

@@ -88,7 +88,10 @@ main(void)
         cons_write(passed ? "Test is complete!" : "Test was aborted!");
         free(buf);
 
-        abort();
+        while (true) {
+                vdp2_tvmd_vblank_out_wait();
+                vdp2_tvmd_vblank_in_wait();
+        }
 }
 
 static void
