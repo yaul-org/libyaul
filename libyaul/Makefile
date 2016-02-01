@@ -416,6 +416,7 @@ define macro-install-files
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
 	done
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts
 	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
 	    printf -- "$(V_BEGIN_BLUE)$${ldscript#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
