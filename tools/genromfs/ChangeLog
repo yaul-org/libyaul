@@ -1,0 +1,122 @@
+2009-02-15 11:43  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Many changes, the main feature is to support
+	unixy file metadata on request.  Test release 0.5.7.
+
+2007-06-26 19:04  Janos Farkas  <chexum+dev () gmail.com>
+	* NEWS, genromfs.8, genromfs.lsm: releasing 0.5.2.
+
+2002-04-30 15:09  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.c: romfs_checksum(); avoid potential side effects of an
+	ntohl() macro; processdir(): don't readdir() on NULLs.
+	Thanks to Ilguiz Latypov.
+
+2002-03-05 09:58  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.c: Cygwin needs to include sys/sysmacros.h,
+	Thanks to Arthur Shipkowski.
+
+2002-01-23 11:32  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: update version; check for correct release on dist.
+	* checkdist: new file to check for misversioned dists.
+
+2002-01-22 10:00  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* NEWS: update version, release 0.5.1.
+	* genromfs.lsm: likewise.
+
+2002-01-22 09:54  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: remove mis-installed man-page first.
+	Also fix directories to not use //.
+
+2002-01-22 08:37  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.8: document special @files, clarify wording of some
+	other options, and update version/date.
+
+2002-01-21 10:37  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: install man page in man-dir. oops.
+
+2002-01-21 09:30  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* bump version for next release.
+
+2002-01-20 12:03  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: bump version, release 0.5.
+
+2002-01-20 11:47  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: more fixes for FreeBSD build.
+
+2002-01-20 11:32  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: build fixes, add version, dist.
+
+2002-01-20 10:57  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genrommkdev: a sample script to generate special nodes from a
+	device list file.
+
+2002-01-20 10:29  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.c: use O_BINARY, and "wb" if possible to ease porting.
+
+2002-01-20 10:03  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Makefile: add prefix/bindir/mandir to ease relocated build.
+
+2002-01-20 09:36  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.c: include sys/types.h, and use int32_t, clear up
+	hopefully all ntohl/htonl confusion.
+	(thanks to Debian patches)
+
+2002-01-19 17:20  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* genromfs.c: refactor fnmatch() usage to nodematch()
+	* genromfs.c: spelling nad => and
+	* romfs.txt: thinkos
+
+2002-01-18 11:22  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* imported from http://www.uclinux.org/pub/uClinux/utilities/
+	  without the indent changes (sorry)
+
+	* Fri Aug 17 23:21:00 2001  Greg Ungerer (gerg@lineo.com)
+
+		* incorporated patches from many uClinux users
+
+		* fixed @ device link problem (profesor@sidehack.sat.gweep.net)
+		  addition of -x option to skip files
+
+		* compilation on Solaris (The LEOX team <lpm@leox.org> )
+
+		* filename device insertion (davidm@lineo.com)
+
+Tue Feb 8 09:52:51 2000 Pavel Roskin <pavel_roskin@geocities.com>
+
+	* genromfs.c (main): don't rely on char being signed when parsing
+	the arguments
+	
+Mon Sep 21 16:35:33 1998  Jakub Jelinek  <jj@ultra.linux.cz>
+
+	* genromfs.c: add support for `-a' and `-A'.
+
+	* genromfs.8: document it.
+
+Tue Aug  5 15:54:47 1997  Janos Farkas  <chexum@shadow.banki.hu>
+
+	* Version 0.2.
+
+	* genromfs.8: the manual page has been initially written by
+ 	Cristoph Lameter, now I reworked it to be less repetitive with
+ 	respect to the comments in the source :)
+
+	* genromfs.c: just helpful help, and process `-h' too.
+
+	* Makefile: add an install target.

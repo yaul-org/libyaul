@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# this is a sample device list file converter
+
+# $ cat devices.lst
+# /dev/hda1 b 3 1
+# /dev/tty1 c 4 1
+# $ genrommkdev <devices.lst
+# touch dev/@hda1,b,3,1
+# touch dev/@tty1,c,4,1
+# genrommkdev <devices.lst|sh
+
+while read a; do
+  set $a
+  node=$1
+  type=$2
+  major=$3
+  minor=$4
+  node=`echo $node|sed 'sX^/XXg'`
+  node=`echo $node|sed 'sX/\([^/]\+\)X/@\1Xg'`
+  echo touch $node,$type,$major,$minor
+done

@@ -1,6 +1,3 @@
-[submodule "tools/genromfs"]
-	path = tools/genromfs
-	url = https://github.com/chexum/genromfs.git
 [submodule "libfixmath"]
 	path = libfixmath
 	url = https://github.com/ijacquez/libfixmath.git

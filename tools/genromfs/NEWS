@@ -1,0 +1,62 @@
+Changes since 0.5.7:
+
+* Make extension options really able to copy the current data.
+* Detect unparseable numbers in the extended options.
+* Tags were stored in an incorrect order, making any value of uids, gids and
+  timestamps larger than 4095 ending up with a wrong value.
+
+Changes in the not released 0.5.7:
+
+* A test suite is now included (but may not work correctly in all
+  circumstances).
+* Implemented including files by pattern, and combining this with excludes
+* It is now possible to override alignment with a smaller value:
+  genromfs -A2048,*.boot -A1024,m68k.boot -A512,m68k.boot
+* Unix permissions, including mode bits, user and group id, and even
+  mtime may be saved for individual files.  This needs a format change,
+  which is backward compatible, but older kernels will not recognise
+  any of these features.
+
+Changes in release 0.5.2:
+
+* faked device names may contain the special characters "-" "_" and "+"
+  Thanks to Greg Ungerer
+* code changes -- avoid possible side effects of ntohl(), and report
+  nonexistant directories instead of a segfault
+  Thanks to Ilguiz Latypov
+* version numbers are checked at make distcheck time
+
+Changes in release 0.5.1:
+
+* the man page is now installed correctly
+* documented @ special files, updated man page version
+* manual wording updates
+
+Changes in release 0.5:
+
+* genromfs builds on Linux (libc5, glibc), FreeBSD, Solaris, with gcc
+* added a script to generate device special files
+* merged in the uClinux changes, thanks to:
+  Greg Ungerer (gerg -at- snapgear.com)
+  The LEOX team (lpm/bdl/bronche -at- leox.org)
+  profesor -at- sidehack.sat.gweep.net
+** allow specifying device files by names @dev,b,major,minor
+** -x option to exclude files
+** portability fixes to compile on Solaris
+* print version
+* spelling fixes
+
+Changes in release 0.3:
+
+* Support file data to be aligned on larger than 16 byte boundary
+  by Jakub Jelinek.
+
+Changes in release 0.2:
+
+* Added manual page by Christoph Lameter.
+* Added help option.
+* Added install target.
+
+Changes in release 0.1:
+
+* Initial release.

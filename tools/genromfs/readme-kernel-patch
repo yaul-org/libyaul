@@ -1,0 +1,12 @@
+
+The filesystem is part of current Linux kernels since about 2.1.25,
+but not included with the 2.0 kernels.  Patches for the 2.0 kernels
+are available from:
+
+	ftp://ftp.banki.hu:/pub/Linux/local/
+
+Sorry for the inconvenience, but I separated the user tool and the
+kernel patch to ease the updating.
+
+Janos
+

@@ -1,0 +1,245 @@
+.TH GENROMFS 8 "Feb 2009" "Version 0.5.7"
+.SH NAME
+genromfs \- create a romfs image
+.SH SYNOPSIS
+.B genromfs
+.B \-f device
+[
+.B \-d source
+]
+[
+.B \-V label
+]
+[
+.B \-a alignment
+]
+[
+.B \-A alignment,pattern
+]
+[
+.B \-x pattern
+]
+[
+.B \-v
+]
+.SH DESCRIPTION
+.B genromfs
+is used to create a romfs file system image, usually directly on
+a block device, or for test purposes, in a plain file.
+It is the
+.I mkfs
+equivalent of other filesystems.
+.PP
+.B genromfs
+will scan the current directory and its subdirectories, build a romfs
+image from the files found, and output it to the file or device you
+specified.
+.PP
+The files found during scanning will be incorporated in the filesystem image.
+To allow easier management of filesystem trees
+as a normal user,
+file names starting
+with the @ sign
+will cause a device special node to be created in the filesystem image.
+The format is the following:
+.B @name,type,major,minor.
+type can be
+.I b
+for block devices,
+.I c
+for character devices,
+and
+.I p
+for fifos.
+The first linux virtual console
+can thus be included as a
+file with the name:
+.B @tty1,c,4,1
+
+.SH OPTIONS
+.TP
+.BI -f \ output
+Specifies the file to output the image to.
+This option is required.
+This is to prevent printing binary output on standard output.
+.TP
+.BI -d \ source
+Use the specified directory as the source, not the current directory.
+.TP
+.BI -V \ label
+Build the image with the specified volume label.  Currently it is
+not used by the kernel, but it will be recorded in the image.
+.TP
+.BI -a \ alignment
+Align regular files to a larger boundary.
+.B genromfs
+will align data of each regular file in the resulting image to the specified
+alignment, while keeping the image compatible with the original romfs
+definition (by adding pad bytes between last node before the file and file's
+header).  By default,
+.B genromfs
+will guarantee only an alignment of 16 bytes.
+.TP
+.BI -A \ alignment,pattern
+Align objects matching shell wildcard pattern to alignment bytes.
+If one object matches more patterns, then the longest alignment is chosen.
+Alignment has to be a power of two.
+If a pattern doesn't contain any slashes, the pattern will match file names
+in all directories.
+Patterns starting with a slash will be expected to match absolute path names
+in the generated romfs file system.
+
+.TP
+.BI -x \ pattern
+Exclude files that match a pattern.
+It's useful to exclude CVS directories and backup files (ending in a '~').
+.TP
+.BI -i \ pattern
+Include files that match a pattern.  You can mix and match
+.B
+-i
+and
+.B
+-x
+options, they will be processed in the order specified.  You can exclude
+files matching
+.I
+*.bin
+but include
+.I
+boot*.bin
+later.
+.TP
+.BI -v
+Verbose operation,
+.B genromfs
+will print each file which is included in the image, along with
+its offset.
+
+.SH EXTENSION OPTIONS
+Except for the alignment options, these are not supported in current
+in-kernel
+.B
+romfs
+implementations as of early 2010.
+The resulting file system image
+is still readable but no extended information stored
+in the filesystem will be visible (or used).
+
+.TP
+.BI -ealign:N,PATTERN
+Same as the
+.B -AN,PATTERN
+option.
+
+.TP
+.BI -ealign:N
+Same as the
+.B -aN
+option.
+
+.TP
+.BI -eperm:N[,PATTERN]
+Will try to store the numeric (octal) permission for the files matching the pattern.  Examples are
+.B
+600
+for files accessible to their owners only, or
+.B
+4711
+for
+.I
+setuid
+files.
+Note that
+.B -eperm:[,PATTERN]
+is the same as
+.B -eperm:0[,PATTERN]
+The
+.I
+PATTERN
+is optional, if missing, it will apply to all files (which is not generally useful).
+
+.TP
+.BI -eperm[,PATTERN]
+Similar to the above option, except that the permission to store will be retrieved from the
+actual file.
+
+.TP
+.BI -euid:N[,PATTERN]
+
+.TP
+.BI -euid[,PATTERN]
+
+.TP
+.BI -egid:N[,PATTERN]
+
+.TP
+.BI -egid[,PATTERN]
+Similarly to the
+.I
+-eperm
+option, these options allow to store the file user-id and group-id information.
+
+.TP
+.BI -etime:N[,PATTERN]
+
+.TP
+.BI -etime[,PATTERN]
+Similarly, these options allow to store the file modification timestamp.  The number is the
+Unix time, the seconds since January 1, 1970, 00:00:00 UTC.
+
+.SH EXAMPLES
+
+.EX
+.B
+   genromfs -d root -f /dev/fd0 -V 'Secret labs install disk'
+.EE
+
+All files in the 
+.I root
+directory will be written to 
+.B /dev/fd0
+as a new romfs filesystem image.
+
+.EX
+.B
+   genromfs -d root -f /dev/fd0 -A 2048,/.. -A '4096,*.boot' -a 512 -V 'Bootable floppy'
+.EE
+
+Generate the image and place file data of all regular files on 512 bytes
+boundaries or on 4K boundaries, if they have the .boot extension.
+Additionally,
+align the romfs header of the '..' entry in the root directory
+on a 2K boundary.  Effectively, this makes sure that the
+romfs image uses the least
+possible space in the first 2048 bytes.
+.PP
+You can use the generated image (if you have the
+romfs module loaded, or compiled into the kernel) via:
+
+.EX
+.B
+   mount -t romfs /dev/fd0 /mnt
+.EE
+
+.SH CAVEATS
+
+.P
+Extension options might not be supported by older kernels.
+In fact, currently no kernels support showing custom permission and timestamp
+information.
+
+.P
+Please note that if you specify extension options which have no effect,
+they still cause the image format version to be marked as extended.
+One such dummy option is enabling uid storage when the the uid is zero,
+or forced to be zero.
+It should be just as compatible with older kernels.
+
+.SH AUTHOR
+This manual page was initially written by Christoph Lameter <clameter@debian.org>,
+for the Debian GNU/Linux system.
+.SH SEE ALSO
+.BR mkfs (8),
+.BR mount (8),
+.BR mkisofs (8)
