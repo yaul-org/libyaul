@@ -14,6 +14,7 @@ void jsr(void);
 int
 main(void)
 {
+        vdp1_init();
         vdp2_init();
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x9C00);
 

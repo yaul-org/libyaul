@@ -108,7 +108,7 @@ static bp_t bp_step = {
 static bp_list_t *bp_list = NULL;
 
 void
-gdb_init(void)
+gdb_sh2_704x_init(void)
 {
         void (**vbr)(void);
 

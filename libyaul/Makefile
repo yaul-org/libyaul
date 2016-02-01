@@ -250,8 +250,6 @@ HEADER_FILES:= \
 	./common/irq-mux.h: \
 	./common/stack.h:. \
 	./common/gdb/gdb.h:. \
-	./common/gdb/gdb-signals.h:. \
-	./common/gdb/sh2-704x.h:. \
 	\
 	./cons/cons.h:. \
 	\

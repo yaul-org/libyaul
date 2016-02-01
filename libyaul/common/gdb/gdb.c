@@ -44,6 +44,12 @@ static void gdb_command_read_memory(uint32_t, uint32_t);
 static void gdb_command_read_registers(struct cpu_registers *);
 static void gdb_last_signal(int);
 
+void
+gdb_init(void)
+{
+        gdb_sh2_704x_init();
+}
+
 /* At a minimum, a stub is required to support the `g',
  * `G', `m', `M', `c', and `s' commands
  *

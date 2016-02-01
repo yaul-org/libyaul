@@ -14,10 +14,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include "gdb-signals.h"
-#include "sh2-704x.h"
-
-void gdb_monitor(struct cpu_registers *, int);
+void gdb_init(void);
 
 #ifdef __cplusplus
 }
