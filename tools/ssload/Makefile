@@ -1,10 +1,35 @@
-PWD:= $(notdir $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
-
 TARGET:= ssload
-# http://.c.gnu.org/onlinedocs/.c-4.5.2/.c/Warning-Options.html#Warning-Options
-CCFLAGS:= -O2 \
+
+ifeq ($(strip $(INSTALL_ROOT)),)
+  $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+ifeq ($(strip $(BUILD_ROOT)),)
+  $(error Undefined BUILD_ROOT (build root directory))
+endif
+
+ifeq ($(strip $(BUILD)),)
+  $(error Undefined BUILD (build directory))
+endif
+
+SUB_BUILD:=$(BUILD)/tools/$(TARGET)
+
+SILENT?= @
+V_BEGIN_BLACK= [1;30m
+V_BEGIN_RED= [1;31m
+V_BEGIN_GREEN= [1;32m
+V_BEGIN_YELLOW= [1;33m
+V_BEGIN_BLUE= [1;34m
+V_BEGIN_MAGENTA= [1;35m
+V_BEGIN_CYAN= [1;36m
+V_BEGIN_WHITE= [1;37m
+V_END= [m
+
+INSTALL:= install
+SED:= sed
+
+CFLAGS:= -O2 \
 	-s \
-	-pipe \
 	-Wall \
 	-Wextra \
 	-Wuninitialized \
@@ -13,48 +38,51 @@ CCFLAGS:= -O2 \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses
-LDFLAGS:=
-INCLUDE_DIRS:= ./libftd2xx/release
-LIBRARY_DIRS:= ./libftd2xx/release/build/$(shell uname -m)
-LIBRARIES:= ftd2xx dl pthread rt
-SRC_DIR:= .
-STORE_FILES:= .
 
-SED:= sed
+SRCS:= ssload.c \
+	console.c \
+	datalink.c \
+	drivers.c \
+	shared.c \
+	usb-cartridge.c
 
-# Duplicates are taken care of when using the "$^" automatic variable
-SRCS:= \
-$(SRC_DIR)/ssload.c \
-$(SRC_DIR)/console.c \
-$(SRC_DIR)/drivers.c \
-$(SRC_DIR)/datalink.c \
-$(SRC_DIR)/shared.c \
-$(SRC_DIR)/usb-cartridge.c
+INCLUDES:= ./libftd2xx/release
 
-OBJS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.o))
-DEPS:= $(addprefix $(STORE_FILES)/,$(SRCS:.c=.d))
+LIB_DIRS:= ./libftd2xx/release/build/$(shell uname -m)
 
-.PHONY: clean
+LIBS:= ftd2xx dl pthread rt
 
-all: $(TARGET)
+OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
+DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
 
-$(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $^ \
-		$(foreach LIBRARY_DIR,$(LIBRARY_DIRS),-L$(LIBRARY_DIR)) \
-		$(foreach LIBRARY,$(LIBRARIES),-l$(LIBRARY)) \
-		$(LDFLAGS)
+.PHONY: all clean distclean install
 
-$(STORE_FILES)/%.o: %.c
-	$(CC) -Wp,-MMD,$(STORE_FILES)/$*.d $(CCFLAGS) -c -o $@ $< \
-		$(foreach INCLUDE_DIR,$(INCLUDE_DIRS),-I$(INCLUDE_DIR))
-	$(SED) -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(STORE_FILES)/$*.d \
-		> $(STORE_FILES)/$*.d
-	rm $(STORE_FILES)/$*.d
+all: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(SILENT)$(CC) -o $@ $(OBJS) \
+		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
+		$(foreach LIB,$(LIBS),-l$(LIB))
+
+$(BUILD_ROOT)/$(SUB_BUILD):
+	$(SILENT)mkdir -p $@
+
+$(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(SILENT)mkdir -p $(@D)
+	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
+		$(foreach DIR,$(INCLUDES),-I$(DIR)) \
+		-c -o $@ $<
+	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
 clean:
-	-rm -f $(foreach DIR,$(SRC_DIR),\
-		$(STORE_FILES)/$(DIR)/*.d \
-		$(STORE_FILES)/$(DIR)/*.o) \
-		$(TARGET)
+	$(SILENT)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+
+distclean: clean
+
+install: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(TARGET)$(V_END)\n"
+	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
 
 -include $(DEPS)

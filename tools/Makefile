@@ -2,7 +2,8 @@ PROJECTS:= \
 	bin2c \
 	bin2o \
 	genromfs \
-	make-iso
+	make-iso \
+	ssload
 
 SILENT?= @
 
