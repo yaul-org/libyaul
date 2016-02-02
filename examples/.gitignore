@@ -1,5 +1,6 @@
 *.asm
 *.bin
+*.BIN
 *.d
 *.elf
 *.iso
@@ -7,5 +8,3 @@
 *.o
 *.romdisk
 *.sym
-/files
-/tmp
