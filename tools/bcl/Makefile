@@ -27,6 +27,7 @@ V_END= [m
 
 INSTALL:= install
 SED:= sed
+STRIP:= strip
 
 CFLAGS:= -O2 \
 	-s \
@@ -41,8 +42,6 @@ CFLAGS:= -O2 \
 
 SRCS:= bcl.c
 
-INCLUDES:= ./libftd2xx/release
-
 OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
 
@@ -53,6 +52,7 @@ all: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(SILENT)$(CC) -o $@ $(OBJS)
+	$(SILENT)$(STRIP) -s $@
 
 $(BUILD_ROOT)/$(SUB_BUILD):
 	$(SILENT)mkdir -p $@
@@ -61,7 +61,6 @@ $(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(SILENT)mkdir -p $(@D)
 	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
-		$(foreach DIR,$(INCLUDES),-I$(DIR)) \
 		-c -o $@ $<
 	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
@@ -73,7 +72,5 @@ distclean: clean
 install: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(TARGET)$(V_END)\n"
 	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
-	@printf -- "$(V_BEGIN_BLUE)fsck.genromfs$(V_END)\n"
-	$(SILENT)$(INSTALL) -m 755 fsck.genromfs $(INSTALL_ROOT)/bin/
 
 -include $(DEPS)

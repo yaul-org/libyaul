@@ -27,6 +27,7 @@ V_END= [m
 
 INSTALL:= install
 SED:= sed
+STRIP:= strip
 
 CFLAGS:= -O2 \
 	-s \
@@ -64,6 +65,7 @@ $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	$(SILENT)$(CC) -o $@ $(OBJS) \
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
 		$(foreach LIB,$(LIBS),-l$(LIB))
+	$(SILENT)$(STRIP) -s $@
 
 $(BUILD_ROOT)/$(SUB_BUILD):
 	$(SILENT)mkdir -p $@
