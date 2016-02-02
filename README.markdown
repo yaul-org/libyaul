@@ -35,6 +35,8 @@ Source `yaul.env' and build and install.
 
     make release
     make install-release
+    make tools
+    make install-tools
 
 Contributing
 ============
