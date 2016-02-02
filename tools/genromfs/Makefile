@@ -1,12 +1,32 @@
+TARGET:= genromfs
+
 ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-TARGET:= genromfs
+ifeq ($(strip $(BUILD_ROOT)),)
+  $(error Undefined BUILD_ROOT (build root directory))
+endif
+
+ifeq ($(strip $(BUILD)),)
+  $(error Undefined BUILD (build directory))
+endif
+
+SUB_BUILD:=$(BUILD)/tools/$(TARGET)
 
 SILENT?= @
+V_BEGIN_BLACK= [1;30m
+V_BEGIN_RED= [1;31m
+V_BEGIN_GREEN= [1;32m
+V_BEGIN_YELLOW= [1;33m
+V_BEGIN_BLUE= [1;34m
+V_BEGIN_MAGENTA= [1;35m
+V_BEGIN_CYAN= [1;36m
+V_BEGIN_WHITE= [1;37m
+V_END= [m
 
 INSTALL:= install
+SED:= sed
 
 CFLAGS:= -O2 \
 	-s \
@@ -21,30 +41,39 @@ CFLAGS:= -O2 \
 
 SRCS:= genromfs.c
 
-OBJS:= $(SRCS:.c=.o)
-DEPS:= $(SRCS:.c=.d)
+INCLUDES:= ./libftd2xx/release
+
+OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
+DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
 
 .PHONY: all clean distclean install
 
-all: $(TARGET)
+all: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 
-$(TARGET): $(OBJS)
-	@printf -- "[1;33m$@[m\n"
-	$(CC) -o $(TARGET) $^
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(SILENT)$(CC) -o $@ $(OBJS)
 
-%.o: %.c
-	@printf -- "[1;33m$@[m\n"
-	$(CC) -Wp,-MMD,$*.d $(CFLAGS) -c -o $@ $<
+$(BUILD_ROOT)/$(SUB_BUILD):
+	$(SILENT)mkdir -p $@
+
+$(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(SILENT)mkdir -p $(@D)
+	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
+		$(foreach DIR,$(INCLUDES),-I$(DIR)) \
+		-c -o $@ $<
+	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
 clean:
-	$(RM) $(OBJS) $(DEPS) $(TARGET)
+	$(SILENT)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 
 distclean: clean
 
-install: $(TARGET)
-	@printf -- "[1;34m$^[m\n"
+install: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(TARGET)$(V_END)\n"
 	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
-	@printf -- "[1;34mfsck.genromfs[m\n"
+	@printf -- "$(V_BEGIN_BLUE)fsck.genromfs$(V_END)\n"
 	$(SILENT)$(INSTALL) -m 755 fsck.genromfs $(INSTALL_ROOT)/bin/
 
 -include $(DEPS)
