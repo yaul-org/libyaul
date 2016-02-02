@@ -1,4 +1,4 @@
-TARGET:= scu-assembler
+TARGET:= dspasm
 # http://gcc.gnu.org/onlinedocs/gcc-4.5.2/gcc/Warning-Options.html#Warning-Options
 CXXFLAGS:= -ggdb \
 	-Wall \
@@ -26,7 +26,7 @@ SED:= sed
 S:= $(S_DIR)/lexer.cc \
 	$(S_DIR)/parser.cc \
 	$(S_DIR)/driver.cc \
-	$(S_DIR)/scu-assembler.cc
+	$(S_DIR)/dspasm.cc
 
 O:= $(addprefix $(STORE)/,$(S:.cc=.o))
 D:= $(addprefix $(STORE)/,$(S:.cc=.dd))

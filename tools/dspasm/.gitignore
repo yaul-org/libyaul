@@ -1,5 +1,5 @@
-/scu-assembler
-/scu-assembler.exe
+/dspasm
+/dspasm.exe
 parser.ouput
 parser.cc
 parser.hh

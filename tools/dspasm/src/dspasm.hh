@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_ASSEMBLER_HH_
-#define _SCU_ASSEMBLER_HH_
+#ifndef _DSPASM_HH_
+#define _DSPASM_HH_
 
-#endif /* !_SCU_ASSEMBLER_HH_ */
+#endif /* !_DSPASM_HH_ */

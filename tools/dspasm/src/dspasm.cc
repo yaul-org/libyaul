@@ -11,7 +11,7 @@
 #include <fstream>
 #include <string>
 
-#include "scu-assembler.hh"
+#include "dspasm.hh"
 #include "driver.hh"
 
 static int usage(char *argv[])
