@@ -1,10 +1,10 @@
 PROJECTS:= \
+	bcl \
 	bin2c \
 	bin2o \
 	genromfs \
 	make-iso \
-	ssload \
-	bcl
+	ssload
 
 SILENT?= @
 
