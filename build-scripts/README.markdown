@@ -12,7 +12,7 @@ Usage
  - Time and especially patience
 
 ### Installation
-  If all requirements are met, as a _normal_ user and under the root of the `tools/build-scripts` directory, perform the following to build the cross compiler
+  If all requirements are met, as a _normal_ user and under the root of the `build-scripts/` directory, perform the following to build the cross compiler
 
     cp -v config{.in,}
 

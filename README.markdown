@@ -14,7 +14,7 @@ Usage
 =====
 
 ### Requirements
- - GCC 4.6.3 or greater SH7604 cross-compiler tool-chain (see `tools/build-scripts/`)
+ - GCC 4.6.3 or greater SH7604 cross-compiler tool-chain (see `build-scripts/`)
 
 ### Installation
   If all requirements are met, as a _normal_ user and under the root of the `libyaul` source directory, perform the following to build the library
