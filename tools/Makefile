@@ -3,7 +3,8 @@ PROJECTS:= \
 	bin2o \
 	genromfs \
 	make-iso \
-	ssload
+	ssload \
+	bcl
 
 SILENT?= @
 
