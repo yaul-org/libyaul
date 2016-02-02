@@ -29,7 +29,7 @@ endef
 
 .PHONY: all release release-internal debug install install-release install-release-internal install-debug clean clean-release clean-release-internal clean-debug examples tools list-targets
 
-all: release release-internal debug tools
+all: release release-internal debug tools examples
 
 install: install-release install-tools
 

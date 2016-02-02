@@ -8,7 +8,6 @@ EXAMPLES:= \
 	simple/gdb \
 	simple/line-scroll-screen \
 	simple/romdisk \
-	simple/scu-dma \
 	test-suites/vdp1
 
 SILENT?= @
