@@ -23,10 +23,6 @@ test_init(void)
 {
         static bool initialized = false;
 
-        static uint16_t blcs_color[] = {
-                0x9C00
-        };
-
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE), 0x9C00);
 
         if (initialized) {
