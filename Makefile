@@ -61,7 +61,7 @@ install-debug: debug
 clean: clean-release clean-tools
 
 distclean: clean-release clean-release-internal clean-debug clean-tools clean-examples
-	$(RM) -r $(BUILD_ROOT)/$(BUILD)
+	$(SILENT)$(RM) -r $(BUILD_ROOT)/$(BUILD)
 
 clean-release clean-release-internal clean-debug:
 	$(SILENT)for project in $(PROJECTS); do \
