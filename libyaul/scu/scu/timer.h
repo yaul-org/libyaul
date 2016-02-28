@@ -19,6 +19,8 @@ extern void scu_timer_0_set(uint16_t);
 extern void scu_timer_1_mode_clear(void);
 extern void scu_timer_1_mode_set(bool);
 extern void scu_timer_1_set(uint16_t);
+extern void scu_timer_all_disable(void);
+extern void scu_timer_all_enable(void);
 
 #ifdef __cplusplus
 }
