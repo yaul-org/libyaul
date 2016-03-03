@@ -221,7 +221,7 @@ struct smpc_peripheral_analog {
         uint8_t type;
         uint8_t size;
 
-#define DATA(x)                                                                \
+#define DATA(struct_name)                                                      \
         struct {                                                               \
                 /* Byte #1 */                                                  \
                 unsigned int right:1;                                          \
@@ -251,9 +251,9 @@ struct smpc_peripheral_analog {
                         /* Byte #6 */                                          \
                         uint8_t r;                                             \
                 } __packed trigger;                                            \
-        } __packed x
+        } __packed struct_name
 
-#define DATA_DIGITAL(x)                                                        \
+#define DATA_DIGITAL(struct_name)                                              \
         struct {                                                               \
                 /* Byte #1 */                                                  \
                 unsigned int right:1;                                          \
@@ -271,19 +271,19 @@ struct smpc_peripheral_analog {
                 unsigned int z:1;                                              \
                 unsigned int l:1;                                              \
                 /* 3 bits for extensions data */                               \
-        } __packed x
+        } __packed struct_name
 
-#define REPR(x, y)                                                             \
+#define REPR(struct_name, data)                                                \
         union {                                                                \
                 uint8_t raw[6];                                                \
-                DATA(y);                                                       \
-        } x
+                DATA(data);                                                    \
+        } struct_name
 
-#define REPR_DIGITAL(x, y)                                                     \
+#define REPR_DIGITAL(struct_name, data)                                        \
         union {                                                                \
                 uint16_t raw;                                                  \
-                DATA_DIGITAL(y);                                               \
-        } x
+                DATA_DIGITAL(data);                                            \
+        } struct_name
 
 #define PERIPHERAL_ANALOG_L             0x08
 #define PERIPHERAL_ANALOG_Z             0x10
@@ -354,7 +354,7 @@ struct smpc_peripheral_digital {
         uint8_t type;
         uint8_t size;
 
-#define DATA(x)                                                                \
+#define DATA(struct_name)                                                      \
         struct {                                                               \
                 unsigned int right:1;                                          \
                 unsigned int left:1;                                           \
@@ -369,13 +369,13 @@ struct smpc_peripheral_digital {
                 unsigned int y:1;                                              \
                 unsigned int z:1;                                              \
                 unsigned int l:1;                                              \
-        } __aligned(2) x
+        } __aligned(2) struct_name
 
-#define REPR(x, y)                                                             \
+#define REPR(struct_name, data)                                                \
         union {                                                                \
                 uint16_t raw;                                                  \
-                DATA(y);                                                       \
-        } x
+                DATA(data);                                                    \
+        } struct_name
 
 #define PERIPHERAL_DIGITAL_L            0x0008
 #define PERIPHERAL_DIGITAL_Z            0x0010
