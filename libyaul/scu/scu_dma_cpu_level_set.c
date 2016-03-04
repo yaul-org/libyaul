@@ -36,8 +36,9 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
          * region.
          */
 
-        if ((scu_dma_cpu_level_sanitize(cfg, mode)) < 0)
+        if ((scu_dma_cpu_level_sanitize(cfg, mode)) < 0) {
                 return;
+        }
 
         switch (mode) {
         case DMA_MODE_DIRECT:
@@ -179,13 +180,15 @@ scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
                 if (((src >= 0x00200000) && (src <= 0x002FFFFF)) || /* WORKRAM-L */
                     ((dst >= 0x00200000) && (dst <= 0x002FFFFF)) ||
                     ((src >= 0x05E00000) && (src <= 0x05FBFFFF)) || /* VDP2 area */
-                    ((dst >= 0x02000000) && (dst <= 0x058FFFFF))) /* A-Bus CS0/1/dummy/2 regions */
+                    ((dst >= 0x02000000) && (dst <= 0x058FFFFF))) { /* A-Bus CS0/1/dummy/2 regions */
                         return -1;
+                }
                 return 0;
         case DMA_MODE_INDIRECT:
                 nelems = cfg->mode.indirect.nelems;
-                if (nelems == 0)
+                if (nelems == 0) {
                         return -1;
+                }
 
                 /*
                  * Major caveat
@@ -196,8 +199,9 @@ scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
                 tbl = cfg->mode.indirect.tbl;
                 for (i = 0; tbl_nboundries[i].nelems; i++) {
                         if (nelems < tbl_nboundries[i].nelems) {
-                                if (((uint32_t)tbl & tbl_nboundries[i].boundry))
+                                if (((uint32_t)tbl & tbl_nboundries[i].boundry)) {
                                         return -1;
+                                }
 
                                 return 0;
                         }
