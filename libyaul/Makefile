@@ -108,6 +108,7 @@ LIB_SRCS:= \
 	scu/bus/a/cs0/arp/arp_function_nonblock.c \
 	scu/bus/a/cs0/arp/arp_read_byte.c \
 	scu/bus/a/cs0/arp/arp_read_long.c \
+	scu/bus/a/cs0/arp/arp_return.c \
 	scu/bus/a/cs0/arp/arp_send_long.c \
 	scu/bus/a/cs0/arp/arp_sync.c \
 	scu/bus/a/cs0/arp/arp_sync_nonblock.c \
