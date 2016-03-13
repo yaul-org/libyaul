@@ -15,7 +15,7 @@
 
     make
 
-### Usage
+### Usage (if using D2XX Direct Drivers library)
 
   If under Linux, be sure to remove modules `ftdi_sio` and `usbserial`
 
