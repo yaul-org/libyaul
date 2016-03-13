@@ -13,11 +13,30 @@
 /* Macros specific for processor. */
 #define CPU(x)          (0xFFFFF000 + (x))
 
+#define SMR             0x0E00
+#define BRR             0x0E01
+#define SCR             0x0E02
+#define TDR             0x0E03
+#define SSR             0x0E04
+#define RDR             0x0E05
+#define TIER            0x0E10
+#define FTCSR           0x0E11
+#define FRCH            0x0E12
+#define FRCL            0x0E13
+#define OCRAH           0x0E14
+#define OCRAL           0x0E15
+#define OCRBH           0x0E14
+#define OCRBL           0x0E15
+#define TCR             0x0E16
+#define TOCR            0x0E17
+#define ICRH            0x0E18
+#define ICRL            0x0E19
 #define IPRB            0x0E60
 #define VCRA            0x0E62
 #define VCRB            0x0E64
 #define VCRC            0x0E66
 #define VCRD            0x0E68
+#define ICR             0x0EE0
 #define IPRA            0x0EE2
 #define VCRWDT          0x0EE4
 #define DRCR0           0x0E71
@@ -49,5 +68,12 @@
 #define VCRDMA0         0x0FA0
 #define VCRDMA1         0x0FA8
 #define DMAOR           0x0FB0
+#define BCR1            0x0FE0
+#define BCR2            0x0FE4
+#define WCR             0x0FE8
+#define MCR             0x0FEC
+#define RTCSR           0x0FF0
+#define RTCNT           0x0FF4
+#define RTCOR           0x0FF8
 
 #endif /* !_CPU_MAP_H_ */
