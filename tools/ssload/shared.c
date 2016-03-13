@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "shared.h"
 
+#ifdef HAVE_LIBFTD2XX
 FT_HANDLE ft_handle = NULL;
 FT_STATUS ft_error = FT_OK;
 
@@ -71,3 +72,5 @@ enumerate_devices(void)
 
         return (const char **)devices_ptr_list;
 }
+#else
+#endif /* !HAVE_LIBFTD2XX */

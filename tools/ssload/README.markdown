@@ -4,7 +4,8 @@
 
 ### Requirements
 
- - D2XX Direct Drivers (`libftd2xx`)
+ - FTDI USB driver (`libftdi`) (`HAVE_LIBFTD2XX=0`)
+ - D2XX Direct Drivers (`libftd2xx`) (`HAVE_LIBFTD2XX=1`)
 
 ### Installation
 

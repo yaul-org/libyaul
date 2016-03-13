@@ -86,7 +86,7 @@ static const char *datalink_error_strings[] = {
 };
 
 static struct {
-        DWORD baud_rate;
+        uint32_t baud_rate;
 
         struct {
                 uint32_t header_size;
@@ -132,6 +132,7 @@ init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
+#ifdef HAVE_LIBFTD2XX
         /* XXX: To detect later */
         datalink_device.baud_rate = REV_RED_BAUD_RATE;
         datalink_device.packet.header_size = PACKET_REV_RED_HEADER_SIZE;
@@ -176,7 +177,7 @@ init(void)
                 goto error;
         }
         if ((ft_error = FT_SetBaudRate(ft_handle,
-                    datalink_device.baud_rate)) != FT_OK) {
+                    (DWORD)datalink_device.baud_rate)) != FT_OK) {
                 goto error;
         }
         if ((ft_error = FT_SetDataCharacteristics(ft_handle, FT_BITS_8,
@@ -194,6 +195,9 @@ error:
         DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
 
         return -1;
+#else
+        return 0;
+#endif /* !HAVE_LIBFTD2XX */
 }
 
 /*
@@ -202,9 +206,12 @@ error:
 static int
 shutdown(void)
 {
+#ifdef HAVE_LIBFTD2XX
         if (ft_handle != NULL) {
                 FT_Close(ft_handle);
         }
+#else
+#endif /* !HAVE_LIBFTD2XX */
 
         return 0;
 }
@@ -216,9 +223,12 @@ error_stringify(void)
 
         memset(buffer, '\0', sizeof(buffer));
 
+#ifdef HAVE_LIBFTD2XX
         (void)sprintf(buffer, "%s (%s)",
             datalink_error_strings[datalink_error],
             ft_error_strings[ft_error]);
+#else
+#endif /* !HAVE_LIBFTD2XX */
 
         return buffer;
 }
@@ -229,9 +239,10 @@ error_stringify(void)
 static int
 device_read(uint8_t *read_buffer, uint32_t len)
 {
-#define MAX_TRIES (128 * 1024)
-
         DEBUG_PRINTF("Enter\n");
+
+#ifdef HAVE_LIBFTD2XX
+#define MAX_TRIES (128 * 1024)
 
         ft_error = FT_OK;
         datalink_error = DATALINK_OK;
@@ -315,6 +326,9 @@ device_read(uint8_t *read_buffer, uint32_t len)
         datalink_error = DATALINK_OK;
 
         return 0;
+#else
+        return 0;
+#endif /* !HAVE_LIBFTD2XX */
 }
 
 /*
@@ -326,6 +340,7 @@ device_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
 
+#ifdef HAVE_LIBFTD2XX
         datalink_error = DATALINK_OK;
 
         if (len > datalink_device.packet.total_size) {
@@ -369,6 +384,9 @@ device_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("%iB written\n", written);
 
         return 0;
+#else
+        return 0;
+#endif /* !HAVE_LIBFTD2XX */
 }
 
 /*
@@ -928,6 +946,7 @@ exit:
 static void
 convert_error(void)
 {
+#ifdef HAVE_LIBFTD2XX
         switch (ft_error) {
         case FT_OK:
                 datalink_error = DATALINK_OK;
@@ -945,6 +964,8 @@ convert_error(void)
                 datalink_error = DATALINK_DEVICE_ERROR;
                 break;
         }
+#else
+#endif /* !HAVE_LIBFTD2XX */
 }
 
 /*

@@ -42,8 +42,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ftd2xx.h>
-
 #include "debug.h"
 #include "driver.h"
 #include "shared.h"
@@ -125,6 +123,7 @@ init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
+#ifdef HAVE_LIBFTD2XX
         ft_error = FT_OK;
 
         const char **devices_list;
@@ -184,6 +183,9 @@ error:
         DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
 
         return -1;
+#else
+        return 0;
+#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -194,6 +196,7 @@ shutdown(void)
 {
         DEBUG_PRINTF("Enter\n");
 
+#ifdef HAVE_LIBFTD2XX
         if (ft_handle == NULL) {
                 return 0;
         }
@@ -213,6 +216,9 @@ shutdown(void)
         }
 
         return 0;
+#else
+        return 0;
+#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -221,6 +227,7 @@ shutdown(void)
 static int
 device_read(uint8_t *read_buffer, uint32_t len)
 {
+#ifdef HAVE_LIBFTD2XX
 #define MAX_TRIES (128 * 1024)
 
         DEBUG_PRINTF("Enter\n");
@@ -286,6 +293,9 @@ device_read(uint8_t *read_buffer, uint32_t len)
         DEBUG_PRINTF("%iB read\n", read);
 
         return 0;
+#else
+        return 0;
+#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -297,6 +307,7 @@ device_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
 
+#ifdef HAVE_LIBFTD2XX
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
@@ -325,6 +336,9 @@ device_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("%iB written\n", len);
 
         return 0;
+#else
+        return 0;
+#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -544,7 +558,7 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
         int exit_code;
         exit_code = 0;
 
-        ft_error = FT_OK;
+        /* ft_error = FT_OK; */
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         /* Sanity check */
@@ -611,7 +625,7 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
         int exit_code;
         exit_code = 0;
 
-        ft_error = FT_OK;
+        /* ft_error = FT_OK; */
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         /* Sanity check */
@@ -662,6 +676,7 @@ exit:
 static void
 convert_error(void)
 {
+#ifdef HAVE_LIBFTD2XX
         switch (ft_error) {
         case FT_OK:
                 usb_cartridge_error = USB_CARTRIDGE_OK;
@@ -679,6 +694,8 @@ convert_error(void)
                 usb_cartridge_error = USB_CARTRIDGE_DEVICE_ERROR;
                 break;
         }
+#else
+#endif /* HAVE_LIBFTD2XX */
 }
 
 static int

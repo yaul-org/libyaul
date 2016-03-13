@@ -39,6 +39,7 @@ CFLAGS:= -O2 \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses
+LDFLAGS:=
 
 SRCS:= ssload.c \
 	console.c \
@@ -46,12 +47,19 @@ SRCS:= ssload.c \
 	drivers.c \
 	shared.c \
 	usb-cartridge.c
+INCLUDES:=
+LIB_DIRS:=
+LIBS:=
 
-INCLUDES:= ./libftd2xx/release
-
-LIB_DIRS:= ./libftd2xx/release/build/$(shell uname -m)
-
-LIBS:= ftd2xx dl pthread rt
+ifeq ($(strip $(HAVE_LIBFTD2XX)),1)
+CFLAGS+= -DHAVE_LIBFTD2XX=1
+INCLUDES+= ./libftd2xx/release
+LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
+LIBS+= ftd2xx dl pthread rt
+else
+CFLAGS+= $(shell pkg-config --cflags libftdi1)
+LDFLAGS+= $(shell pkg-config --libs libftdi1)
+endif
 
 OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
@@ -64,7 +72,8 @@ $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(SILENT)$(CC) -o $@ $(OBJS) \
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
-		$(foreach LIB,$(LIBS),-l$(LIB))
+		$(foreach LIB,$(LIBS),-l$(LIB)) \
+		$(LDFLAGS)
 	$(SILENT)$(STRIP) -s $@
 
 $(BUILD_ROOT)/$(SUB_BUILD):

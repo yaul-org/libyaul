@@ -10,7 +10,11 @@
 
 #include <inttypes.h>
 
+#ifdef HAVE_LIBFTD2XX
 #include <ftd2xx.h>
+#else
+#include <ftdi.h>
+#endif /* HAVE_LIBFTD2XX */
 
 #define ADDRESS_MSB(x)  ((uint8_t)((x) >> 24) & 0xFF)
 #define ADDRESS_02(x)   ((uint8_t)((x) >> 16) & 0xFF)
@@ -22,6 +26,7 @@
 #define LEN_01(x)       (ADDRESS_01(x))
 #define LEN_LSB(x)      (ADDRESS_LSB(x))
 
+#ifdef HAVE_LIBFTD2XX
 #define MAX_ENUMERATE_DEVICES 16
 
 extern FT_HANDLE ft_handle;
@@ -29,5 +34,6 @@ extern FT_STATUS ft_error;
 extern const char *ft_error_strings[];
 
 const char **enumerate_devices(void);
-
+#else
+#endif /* HAVE_LIBFTD2XX */
 #endif /* !SHARED_H_ */
