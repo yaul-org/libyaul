@@ -413,8 +413,8 @@ define macro-install-files
 	    rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
             rel_header_file=$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
 	    rel_header_dir=$${rel_header_file%/*}/$${rel_dst}; \
-	    install_header_file=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}); \
-	    install_header_dir=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}); \
+	    install_header_file=$$(readlink -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}); \
+	    install_header_dir=$$(readlink -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}); \
 	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
