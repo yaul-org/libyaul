@@ -261,7 +261,7 @@ HEADER_FILES:= \
 	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk \
 	\
 	./scu/bus/a/cs0/arp/arp.h:. \
-	./scu/bus/a/cs0/arp/arp/arp/map.h:. \
+	./scu/bus/a/cs0/arp/arp/map.h:. \
 	\
 	./scu/bus/a/cs0/dram-cartridge/dram-cartridge.h:. \
 	./scu/bus/a/cs0/dram-cartridge/dram-cartridge/map.h:. \
