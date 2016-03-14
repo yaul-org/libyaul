@@ -35,5 +35,7 @@ extern const char *ft_error_strings[];
 
 const char **enumerate_devices(void);
 #else
+extern struct ftdi_context ftdi_ctx;
+extern int ftdi_error;
 #endif /* HAVE_LIBFTD2XX */
 #endif /* !SHARED_H_ */

@@ -184,7 +184,39 @@ error:
 
         return -1;
 #else
+#define USB_READ_PACKET_SIZE    (64 * 1024)
+#define USB_WRITE_PACKET_SIZE   (4 * 1024)
+#define USB_PAYLOAD(x)          ((x) - (((x) / 64) * 2))
+#define READ_PAYLOAD_SIZE       (USB_PAYLOAD(USB_READ_PACKET_SIZE))
+#define WRITE_PAYLOAD_SIZE      (USB_PAYLOAD(USB_WRITE_PACKET_SIZE))
+
+        if ((ftdi_error = ftdi_init(&ftdi_ctx)) < 0) {
+                return -1;
+        }
+        if ((ftdi_error = ftdi_usb_open(&ftdi_ctx, I_VENDOR, I_PRODUCT)) < 0) {
+                return -1;
+        }
+        if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
+                goto error;
+        }
+        if ((ftdi_error = ftdi_read_data_set_chunksize(&ftdi_ctx,
+                    USB_READ_PACKET_SIZE)) < 0) {
+                goto error;
+        }
+        if ((ftdi_error = ftdi_write_data_set_chunksize(&ftdi_ctx,
+                    USB_WRITE_PACKET_SIZE)) < 0) {
+                goto error;
+        }
+        if ((ftdi_error = ftdi_set_bitmode(&ftdi_ctx, 0x0, BITMODE_RESET)) < 0) {
+                goto error;
+        }
+
+exit:
         return 0;
+
+error:
+        ftdi_usb_close(&ftdi_ctx);
+        return -1;
 #endif /* HAVE_LIBFTD2XX */
 }
 
@@ -217,6 +249,11 @@ shutdown(void)
 
         return 0;
 #else
+        if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
+                return -1;
+        }
+
+        ftdi_usb_close(&ftdi_ctx);
         return 0;
 #endif /* HAVE_LIBFTD2XX */
 }
@@ -227,18 +264,18 @@ shutdown(void)
 static int
 device_read(uint8_t *read_buffer, uint32_t len)
 {
-#ifdef HAVE_LIBFTD2XX
-#define MAX_TRIES (128 * 1024)
-
         DEBUG_PRINTF("Enter\n");
+        DEBUG_PRINTF("Request read of %iB\n", len);
 
-        ft_error = FT_OK;
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         uint32_t read;
         read = 0;
 
-        DEBUG_PRINTF("Request read of %iB\n", len);
+#ifdef HAVE_LIBFTD2XX
+#define MAX_TRIES (128 * 1024)
+
+        ft_error = FT_OK;
 
         do {
                 DEBUG_PRINTF("Checking Queue status\n");
@@ -289,13 +326,20 @@ device_read(uint8_t *read_buffer, uint32_t len)
                 usb_cartridge_error = USB_CARTRIDGE_INSUFFICIENT_READ_DATA;
                 return -1;
         }
+#else
+        while ((len - read) > 0) {
+                int amount;
+                if ((amount = ftdi_read_data(&ftdi_ctx, read_buffer, len)) < 0) {
+                        ftdi_error = amount;
+                        return -1;
+                }
+                read += amount;
+        }
+#endif /* HAVE_LIBFTD2XX */
 
         DEBUG_PRINTF("%iB read\n", read);
 
         return 0;
-#else
-        return 0;
-#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -307,18 +351,18 @@ device_write(uint8_t *write_buffer, uint32_t len)
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
 
-#ifdef HAVE_LIBFTD2XX
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
+        uint32_t written;
+        written = 0;
+
+#ifdef HAVE_LIBFTD2XX
         ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
         if (ft_error != FT_OK) {
                 convert_error();
                 DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
                 return -1;
         }
-
-        uint32_t written;
-        written = 0;
 
         do {
                 DWORD size;
@@ -332,13 +376,20 @@ device_write(uint8_t *write_buffer, uint32_t len)
 
                 written += size;
         } while (written < len);
+#else
+        while ((len - written) > 0) {
+                int amount;
+                if ((amount = ftdi_write_data(&ftdi_ctx, write_buffer, len)) < 0) {
+                        ftdi_error = amount;
+                        return -1;
+                }
+                written += amount;
+        }
+#endif /* HAVE_LIBFTD2XX */
 
         DEBUG_PRINTF("%iB written\n", len);
 
         return 0;
-#else
-        return 0;
-#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
