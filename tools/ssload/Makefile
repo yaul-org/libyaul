@@ -57,8 +57,8 @@ INCLUDES+= ./libftd2xx/release
 LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
 LIBS+= ftd2xx dl pthread rt
 else
-CFLAGS+= $(shell pkg-config --cflags libftdi1)
-LDFLAGS+= $(shell pkg-config --libs libftdi1)
+CFLAGS+= $(shell pkg-config --cflags libftdi)
+LDFLAGS+= $(shell pkg-config --libs libftdi)
 endif
 
 OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
