@@ -94,9 +94,10 @@ define macro-install-files
 	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
 	$(SILENT)for header_file in $(HEADER_FILES_all); do \
-	    install_header_file=$$(realpath -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}); \
-            printf -- "$(V_BEGIN_BLUE)$${header_file#$(BUILD_ROOT)/}$(V_END)\n"; \
-            $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
+	    path="$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}"; \
+	    install_header_file=$$(python -c "import os; print os.path.abspath(\"$${path}\")"); \
+	    printf -- "$(V_BEGIN_BLUE)$${header_file#$(BUILD_ROOT)/}$(V_END)\n"; \
+	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
 	done
 endef
 

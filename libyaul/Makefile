@@ -405,19 +405,25 @@ define macro-install-start-scripts
 	done
 endef
 
+# abs_header_file=$$(python -c "import os; print os.path.abspath(\"$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}\")");
+
 define macro-install-files
 	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
 	$(SILENT)for pair in $(HEADER_FILES_all); do \
-	    header_file=$$(echo "$${pair}" | cut -d ':' -f 1); \
-	    rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
-            rel_header_file=$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
-	    rel_header_dir=$${rel_header_file%/*}/$${rel_dst}; \
-	    install_header_file=$$(readlink -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}); \
-	    install_header_dir=$$(readlink -m $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}); \
-	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
+	    pair_header_file=$$(echo "$${pair}" | cut -d ':' -f 1); \
+	    pair_rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
+            rel_header_file=$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
+	    rel_header_dir=$${rel_header_file%/*}/$${pair_rel_dst}; \
+	    path="$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}"; \
+	    header_file=$$(basename "$${path}"); \
+	    header_dir=$$(dirname "$${path}"); \
+	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
+	    install_header_file=$${abs_header_dir}/$${header_file}; \
+	    install_header_dir=$${header_dir}; \
+	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
-	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
+	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
 	done
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts
 	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
