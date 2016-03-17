@@ -31,8 +31,9 @@ In the `yaul.env` you just copied, change the appropriate fields.
     cp -v yaul.env{.in,}
     $EDITOR yaul.env
 
-Source `yaul.env' and build and install.
+Build and install.
 
+    . yaul.env
     make release
     make install-release
     make tools
