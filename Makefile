@@ -27,6 +27,27 @@ V_BEGIN_CYAN= [1;36m
 V_BEGIN_WHITE= [1;37m
 V_END= [m
 
+define macro-generate-build-rule
+$1-$2:
+	$(SILENT)mkdir -p $(BUILD_ROOT)/$(BUILD)
+	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+endef
+
+define macro-generate-install-rule
+$1-$2:
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/lib
+	$(SILENT)mkdir -p $(INSTALL_ROOT)/include
+	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+endef
+
+define macro-generate-clean-rule
+$1-$2:
+	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+endef
+
 define macro-install
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/lib
 	$(SILENT)mkdir -p $(INSTALL_ROOT)/include
@@ -39,6 +60,10 @@ endef
 .PHONY: all release release-internal debug install install-release install-release-internal install-debug clean clean-release clean-release-internal clean-debug examples clean-examples tools install-tools clean-tools list-targets
 
 all: release release-internal debug tools
+
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release-internal)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
 release release-internal debug:
 	$(SILENT)mkdir -p $(BUILD_ROOT)/$(BUILD)
@@ -58,6 +83,10 @@ install-release-internal: release-internal
 install-debug: debug
 	$(call macro-install)
 
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-release)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-release-internal)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-debug)))
+
 clean: clean-release clean-tools
 
 distclean: clean-release clean-release-internal clean-debug clean-tools clean-examples
@@ -68,6 +97,12 @@ clean-release clean-release-internal clean-debug:
 		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
 		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
 	done
+
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean)))
+
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-release)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-release-internal)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-debug)))
 
 examples:
 	$(SILENT)($(MAKE) -C examples all) || exit $$?
