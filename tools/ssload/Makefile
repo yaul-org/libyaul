@@ -51,7 +51,7 @@ INCLUDES:=
 LIB_DIRS:=
 LIBS:=
 
-ifeq ($(strip $(HAVE_LIBFTD2XX)),1)
+ifneq ($(strip $(HAVE_LIBFTD2XX)),)
 CFLAGS+= -DHAVE_LIBFTD2XX=1
 INCLUDES+= ./libftd2xx/release
 LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
