@@ -49,12 +49,16 @@ LIB_SRCS:= \
 	common/exception.S \
 	common/exception_handler.c \
 	common/irq-mux.c \
-	common/stack.c \
-	\
+	common/stack.c
+
+ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
+LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/ihr.S \
-	common/gdb/sh2-704x.c \
-	\
+	common/gdb/sh2-704x.c
+endif
+
+LIB_SRCS+= \
 	cons/cons.c \
 	cons/drivers/vdp1.c \
 	cons/drivers/vdp2.c \
@@ -101,8 +105,10 @@ LIB_SRCS:= \
 	newlib/unlink_r.c \
 	newlib/utime_r.c \
 	newlib/wait_r.c \
-	newlib/write_r.c \
-	\
+	newlib/write_r.c
+
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
+LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp_busy_status.c \
 	scu/bus/a/cs0/arp/arp_function_callback.c \
 	scu/bus/a/cs0/arp/arp_function_nonblock.c \
@@ -113,21 +119,27 @@ LIB_SRCS:= \
 	scu/bus/a/cs0/arp/arp_sync.c \
 	scu/bus/a/cs0/arp/arp_sync_nonblock.c \
 	scu/bus/a/cs0/arp/arp_version.c \
-	scu/bus/a/cs0/arp/arp_xchg_byte.c \
-	\
+	scu/bus/a/cs0/arp/arp_xchg_byte.c
+endif
+
+LIB_SRCS+= \
 	scu/bus/a/cs0/dram-cartridge/dram-cartridge_area.c \
 	scu/bus/a/cs0/dram-cartridge/dram-cartridge_id.c \
 	scu/bus/a/cs0/dram-cartridge/dram-cartridge_init.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_size.c \
-	\
+	scu/bus/a/cs0/dram-cartridge/dram-cartridge_size.c
+
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
+LIB_SRCS+= \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_long.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_return.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_long.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_xchg_byte.c \
-	\
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_xchg_byte.c
+endif
+
+LIB_SRCS+= \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_abort_file.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_init_cd_system.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
@@ -251,24 +263,37 @@ HEADER_FILES:= \
 	\
 	./common/common.h:. \
 	./common/irq-mux.h: \
-	./common/stack.h:. \
-	./common/gdb/gdb.h:. \
-	\
+	./common/stack.h:.
+
+ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
+HEADER_FILES+= \
+	./common/gdb/gdb.h:.
+endif
+
+HEADER_FILES+= \
 	./cons/cons.h:. \
 	\
 	./kernel/lib/memb.h:../../lib \
 	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \
-	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk \
-	\
+	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk
+
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
+HEADER_FILES+= \
 	./scu/bus/a/cs0/arp/arp.h:. \
 	./scu/bus/a/cs0/arp/arp/map.h:. \
-	\
+endif
+
+HEADER_FILES+= \
 	./scu/bus/a/cs0/dram-cartridge/dram-cartridge.h:. \
-	./scu/bus/a/cs0/dram-cartridge/dram-cartridge/map.h:. \
-	\
+	./scu/bus/a/cs0/dram-cartridge/dram-cartridge/map.h:.
+
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
+HEADER_FILES+= \
 	./scu/bus/a/cs0/usb-cartridge/usb-cartridge.h:. \
 	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/map.h:. \
-	\
+endif
+
+HEADER_FILES+= \
 	./scu/bus/a/cs2/cd-block/cd-block.h:. \
 	./scu/bus/a/cs2/cd-block/cd-block/cmd.h:. \
 	\
