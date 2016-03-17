@@ -11,7 +11,13 @@
 #include <sys/queue.h>
 #include <stdlib.h>
 
+#if HAVE_DEV_CARTRIDGE == 1
 #include <usb-cartridge.h>
+#elif HAVE_DEV_CARTRIDGE == 2:
+#include <arp.h>
+#else
+#error "Invalid value for `HAVE_DEV_CARTRIDGE'"
+#endif
 
 #include <cpu/intc.h>
 #include <cpu/registers.h>
@@ -98,6 +104,10 @@ static void bp_list_breakpoint_free(bp_list_t *, bp_t *);
 static int bp_list_breakpoint_add(bp_list_t *, void *);
 static bp_t *bp_list_breakpoint_find(bp_list_t *, void *);
 
+static void device_init(void);
+static uint8_t device_read(void);
+static void device_write(uint8_t);
+
 /* Overwritten instruction meant to allow stepping through */
 static bool stepping = false;
 static bp_t bp_step = {
@@ -112,7 +122,7 @@ gdb_sh2_704x_init(void)
 {
         void (**vbr)(void);
 
-        usb_cartridge_init();
+        device_init();
 
         /* Disable interrupts */
         cpu_intc_disable();
@@ -150,20 +160,14 @@ gdb_sh2_704x_init(void)
 void
 gdb_putc(int c)
 {
-
-        /* Non-blocking */
-        usb_cartridge_send_byte(c);
+        device_write(c);
 }
 
 int
 gdb_getc(void)
 {
-        uint8_t c;
-
         /* Blocks */
-        c = usb_cartridge_read_byte();
-
-        return c;
+        return device_read();
 }
 
 void
@@ -540,4 +544,34 @@ bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
         }
 
         return NULL;
+}
+
+static void
+device_init(void)
+{
+#if HAVE_DEV_CARTRIDGE == 1
+        usb_cartridge_init();
+#elif HAVE_DEV_CARTRIDGE == 2:
+        arp_init();
+#endif
+}
+
+static uint8_t
+device_read(void)
+{
+#if HAVE_DEV_CARTRIDGE == 1
+        return usb_cartridge_read_byte();
+#elif HAVE_DEV_CARTRIDGE == 2:
+        return arp_read_byte();
+#endif
+}
+
+static void
+device_write(uint8_t value)
+{
+#if HAVE_DEV_CARTRIDGE == 1
+        usb_cartridge_send_byte(value);
+#elif HAVE_DEV_CARTRIDGE == 2:
+        arp_xchg_byte(value);
+#endif
 }
