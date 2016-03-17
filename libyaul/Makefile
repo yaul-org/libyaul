@@ -280,7 +280,7 @@ HEADER_FILES+= \
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 HEADER_FILES+= \
 	./scu/bus/a/cs0/arp/arp.h:. \
-	./scu/bus/a/cs0/arp/arp/map.h:. \
+	./scu/bus/a/cs0/arp/arp/map.h:.
 endif
 
 HEADER_FILES+= \
@@ -290,7 +290,7 @@ HEADER_FILES+= \
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 HEADER_FILES+= \
 	./scu/bus/a/cs0/usb-cartridge/usb-cartridge.h:. \
-	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/map.h:. \
+	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/map.h:.
 endif
 
 HEADER_FILES+= \
