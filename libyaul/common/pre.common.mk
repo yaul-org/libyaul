@@ -2,6 +2,11 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
+# Check options
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
+  $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
+endif
+
 # Customizable (must be overwritten in user's Makefile)
 PROJECT?=unknown
 OBJECTS?=
@@ -41,7 +46,8 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp1 \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp2 \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu \
-	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu/smpc
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu/smpc \
+	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE)
 LDFLAGS= -Wl,-Map,$(PROJECT).map
 
 CXXFLAGS= $(CFLAGS) \
