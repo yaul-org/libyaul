@@ -13,7 +13,7 @@
 
 #if HAVE_DEV_CARTRIDGE == 1
 #include <usb-cartridge.h>
-#elif HAVE_DEV_CARTRIDGE == 2:
+#elif HAVE_DEV_CARTRIDGE == 2
 #include <arp.h>
 #else
 #error "Invalid value for `HAVE_DEV_CARTRIDGE'"
@@ -551,7 +551,7 @@ device_init(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1
         usb_cartridge_init();
-#elif HAVE_DEV_CARTRIDGE == 2:
+#elif HAVE_DEV_CARTRIDGE == 2
         arp_init();
 #endif
 }
@@ -561,7 +561,7 @@ device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1
         return usb_cartridge_read_byte();
-#elif HAVE_DEV_CARTRIDGE == 2:
+#elif HAVE_DEV_CARTRIDGE == 2
         return arp_read_byte();
 #endif
 }
@@ -571,7 +571,7 @@ device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1
         usb_cartridge_send_byte(value);
-#elif HAVE_DEV_CARTRIDGE == 2:
+#elif HAVE_DEV_CARTRIDGE == 2
         arp_xchg_byte(value);
 #endif
 }
