@@ -15,6 +15,12 @@
 
     make
 
+  In order to use `ssload` as a normal user, under Linux, write your
+  own udev rule in `/etc/udev/rules.d/`
+
+    ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", \
+        NAME="bus/usb/$env{BUSNUM}/$env{DEVNUM}", GROUP="dialout", MODE="0664"
+
 ### Usage (if using D2XX Direct Drivers library)
 
   If under Linux, be sure to remove modules `ftdi_sio` and `usbserial`
