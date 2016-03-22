@@ -22,7 +22,7 @@
 #include <scu/bus/a/cs0/usb-cartridge/usb-cartridge.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <scu/bus/a/cs0/arp/arp.h>
-#else
+#elif HAVE_DEV_CARTRIDGE != 0
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
 #endif
 
@@ -44,7 +44,9 @@
 #include <common/common.h>
 #include <common/irq-mux.h>
 
+#if HAVE_DEV_CARTRIDGE != 0 /* USB flash cartridge or Datel Action Replay cartridge */
 #include <common/gdb/gdb.h>
+#endif
 
 #include <cons/cons.h>
 
