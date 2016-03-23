@@ -21,6 +21,11 @@ BUILD_SRC_DIR="/tmp"
 # number of jobs that can run simultaneously
 BUILD_MAKE_JOBS=8
 
+# Specify the path where the support libraries (i.e. GMP, MPFR, MPC, etc.) are
+# installed if not in the typical paths (/usr, /usr/local, ...). If support
+# libraries are installed in the conventional paths, leave blank
+BUILD_SUPPORT_LIBS=""
+
 # Versions
 BINUTILS_VERSION="2.24"
 GCC_VERSION="4.7.3"

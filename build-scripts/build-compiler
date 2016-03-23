@@ -131,6 +131,7 @@ for var in \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
     "BUILD_MAKE_JOBS" \
+    "BUILD_SUPPORT_LIBS" \
     "GCC_VERSION" \
     "GDB_VERSION" \
     "NEWLIB_VERSION" \
@@ -212,8 +213,10 @@ mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
     test -r "${BUILD_INSTALL_DIR}" || \
     panic "Couldn't create install directory" 1
 
-cd "${BUILD_SRC_DIR}/"
-# Ask whether to download the source packages or not
+if ! [ -d "${BUILD_SRC_DIR}" ]; then
+    panic "Path \`${BUILD_SRC_DIR}/' is non-existent" 1
+fi
+cd "${BUILD_SRC_DIR}/" 2> /dev/null
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
     printf -- "\n\t 1. ${GNU_KEYRING}"

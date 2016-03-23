@@ -47,10 +47,7 @@ cd "${OLDPWD}"
 # Build and install just the C compiler
 mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
 cd "${BUILD_SRC_DIR}/${M68K_TARGET}/gcc"
-if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
-    message "Configuring GCC"
-    CFLAGS="" LDFLAGS="" CFLAGS_FOR_TARGET="-O2 -m68000 -fomit-frame-pointer" \
-    LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
+gcc_configure_options=(
         --disable-cld \
         --disable-initfini-array \
         --disable-largefile \
@@ -76,7 +73,18 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
         --with-gnu-as \
         --with-gnu-ld \
         --without-dwarf2 \
-        --with-newlib 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
+        --with-newlib)
+if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
+    gcc_configure_options+=(
+        --with-gmp="${BUILD_SUPPORT_LIBS}" \
+        --with-mpfr="${BUILD_SUPPORT_LIBS}" \
+        --with-mpc="${BUILD_SUPPORT_LIBS}")
+fi
+if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc" ]; then
+    message "Configuring GCC"
+    CFLAGS="" LDFLAGS="" CFLAGS_FOR_TARGET="-O2 -m68000 -fomit-frame-pointer" \
+    LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
+        ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${M68K_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-gcc"
 fi
