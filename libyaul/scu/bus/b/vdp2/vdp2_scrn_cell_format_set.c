@@ -72,10 +72,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         /* The lead address must be on a boundary dependent on the size
          * of the plane. For example, if NBG0 is configured to use 2x2
          * cells, the dimensions of its page(s) will be 32x32 cells
-         * (0x800 bytes).
-         *
-         * If the dimension of the plane is 2x1, then the lead address
-         * must be on 0x1000 byte boundary. */
+         * (0x800 bytes). */
         assert((format->scf_map.plane_a & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
         assert((format->scf_map.plane_b & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
         assert((format->scf_map.plane_c & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
