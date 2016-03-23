@@ -28,13 +28,20 @@ extern "C" {
 #define SCRN_CCC_RGB_32768      3
 #define SCRN_CCC_RGB_16770000   4
 
-#define SCRN_PLANE_PAGE_WIDTH   64
-#define SCRN_PLANE_PAGE_HEIGHT  64
-#define SCRN_PLANE_PAGE_DIMENSION (SCRN_PLANE_PAGE_WIDTH * SCRN_PLANE_PAGE_HEIGHT)
+#define SCRN_CALCULATE_PAGE_WIDTH(format)                                      \
+        (((format)->scf_character_size = (1 * 1)) ? 64 : 32)
 
-#define SCRN_PLANE_PNT_WIDTH    64
-#define SCRN_PLANE_PNT_HEIGHT   64
-#define SCRN_PLANE_PNT_DIMENSION (SCRN_PLANE_PNT_WIDTH * SCRN_PLANE_PNT_HEIGHT)
+#define SCRN_CALCULATE_PAGE_HEIGHT(format)                                     \
+        (((format)->scf_character_size = (1 * 1)) ? 64 : 32)
+
+#define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
+        (((format)->scf_character_size = (1 * 1)) ? (64 * 64) : (32 * 32))
+
+#define SCRN_CALCULATE_PAGE_SIZE(format)                                       \
+        (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
+
+#define SCRN_CALCULATE_PLANE_SIZE(format)                                      \
+        (((format)->scf_plane_size) * SCRN_CALCULATE_PAGE_SIZE(format))
 
 struct scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */

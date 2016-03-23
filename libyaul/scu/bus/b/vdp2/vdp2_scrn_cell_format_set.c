@@ -12,7 +12,7 @@
 #include "vdp2-internal.h"
 
 /*
- * Possible values for SCRN_NBGX_PAGE_SIZE() (in bytes):
+ * Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +------------------+---------+
  * | 1-word, 1x1 cell | 0x2000B |
  * | 1-word, 2x2 cell | 0x0800B |
@@ -23,15 +23,6 @@
  * Page dimension is 64x64 if cell size is 1x1.
  * Page dimension is 32x32 if cell size is 2x2.
  */
-
-#define SCRN_NBGX_PAGE_DIMENSION(format)                                       \
-        (((format)->scf_character_size = (1 * 1)) ? (64 * 64) : (32 * 32))
- 
-#define SCRN_NBGX_PAGE_SIZE(format)                                            \
-        (SCRN_NBGX_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
-
-#define SCRN_NBGX_PLANE_SIZE(format)                                           \
-        (((format)->scf_plane_size) * SCRN_NBGX_PAGE_SIZE(format))
 
 void
 vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
@@ -85,10 +76,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
          *
          * If the dimension of the plane is 2x1, then the lead address
          * must be on 0x1000 byte boundary. */
-        assert((format->scf_map.plane_a & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_b & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_c & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_d & (SCRN_NBGX_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_a & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_b & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_c & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_d & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
 #endif /* DEBUG */
 
         /* Map */
@@ -111,10 +102,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_o;
         uint16_t plane_p;
 
-        plane_a = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-        plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-        plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-        plane_d = ((format->scf_map.plane_d - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
+        plane_a = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_d = ((format->scf_map.plane_d - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
         /* The map offset is effectively the bank number */
         map_offset = VRAM_BANK_4MBIT(plane_a);
@@ -313,17 +304,17 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 #endif /* DEBUG */
 
 
-                plane_e = ((format->scf_map.plane_e - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_f = ((format->scf_map.plane_f - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_g = ((format->scf_map.plane_g - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_h = ((format->scf_map.plane_h - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_i = ((format->scf_map.plane_i - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_j = ((format->scf_map.plane_j - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_k = ((format->scf_map.plane_k - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_l = ((format->scf_map.plane_l - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_m = ((format->scf_map.plane_m - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_o = ((format->scf_map.plane_o - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
-                plane_p = ((format->scf_map.plane_p - VRAM_ADDR_4MBIT(0)) / SCRN_NBGX_PAGE_SIZE(format)) & 0x003F;
+                plane_e = ((format->scf_map.plane_e - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_f = ((format->scf_map.plane_f - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_g = ((format->scf_map.plane_g - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_h = ((format->scf_map.plane_h - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_i = ((format->scf_map.plane_i - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_j = ((format->scf_map.plane_j - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_k = ((format->scf_map.plane_k - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_l = ((format->scf_map.plane_l - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_m = ((format->scf_map.plane_m - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_o = ((format->scf_map.plane_o - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_p = ((format->scf_map.plane_p - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
                 /* Character color count */
                 vdp2_regs.chctlb &= 0x8FFF;

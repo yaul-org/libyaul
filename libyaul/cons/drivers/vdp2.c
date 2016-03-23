@@ -15,6 +15,8 @@
 
 #include "../drivers.h"
 
+static struct scrn_cell_format _nbg3_format;
+
 static uint16_t * const _nbg3_planes[4] = {
         /* VRAM B1 */
         (uint16_t *)VRAM_ADDR_4MBIT(3, 0x04000),
@@ -47,22 +49,20 @@ cons_vdp2_init(struct cons *cons)
         /* We want to be in VBLANK */
         vdp2_tvmd_display_clear();
 
-        struct scrn_cell_format nbg3_format;
+        _nbg3_format.scf_scroll_screen = SCRN_NBG3;
+        _nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
+        _nbg3_format.scf_character_size = 1 * 1;
+        _nbg3_format.scf_pnd_size = 1; /* 1-word */
+        _nbg3_format.scf_auxiliary_mode = 1;
+        _nbg3_format.scf_cp_table = (uint32_t)_nbg3_character_pattern;
+        _nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
+        _nbg3_format.scf_plane_size = 2 * 1;
+        _nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
+        _nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
+        _nbg3_format.scf_map.plane_c = (uint32_t)_nbg3_planes[2];
+        _nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
 
-        nbg3_format.scf_scroll_screen = SCRN_NBG3;
-        nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
-        nbg3_format.scf_character_size = 1 * 1;
-        nbg3_format.scf_pnd_size = 1; /* 1-word */
-        nbg3_format.scf_auxiliary_mode = 1;
-        nbg3_format.scf_cp_table = (uint32_t)_nbg3_character_pattern;
-        nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
-        nbg3_format.scf_plane_size = 2 * 1;
-        nbg3_format.scf_map.plane_a = (uint32_t)_nbg3_planes[0];
-        nbg3_format.scf_map.plane_b = (uint32_t)_nbg3_planes[1];
-        nbg3_format.scf_map.plane_c = (uint32_t)_nbg3_planes[2];
-        nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
-
-        vdp2_scrn_cell_format_set(&nbg3_format);
+        vdp2_scrn_cell_format_set(&_nbg3_format);
         vdp2_priority_spn_set(SCRN_NBG3, 7);
 
         struct vram_ctl *vram_ctl;
@@ -95,7 +95,7 @@ cons_vdp2_init(struct cons *cons)
         uint16_t *nbg3_page0;
         nbg3_page0 = _nbg3_planes[0];
         uint16_t *nbg3_page1;
-        nbg3_page1 = &_nbg3_planes[0][SCRN_PLANE_PAGE_DIMENSION];
+        nbg3_page1 = &_nbg3_planes[0][SCRN_CALCULATE_PAGE_DIMENSION(&_nbg3_format)];
 
         for (row = 0; row < CONS_ROWS; row++) {
                 for (col = 0; col < CONS_COLS; col++) {
@@ -116,10 +116,13 @@ cons_vdp2_write(struct cons *cons)
         uint32_t col;
         uint32_t row;
 
+        uint32_t page_width;
+        page_width = SCRN_CALCULATE_PAGE_WIDTH(&_nbg3_format);
+
         uint16_t *nbg3_page0;
         nbg3_page0 = _nbg3_planes[0];
         uint16_t *nbg3_page1;
-        nbg3_page1 = &_nbg3_planes[0][SCRN_PLANE_PAGE_DIMENSION];
+        nbg3_page1 = &_nbg3_planes[0][SCRN_CALCULATE_PAGE_DIMENSION(&_nbg3_format)];
 
         for (col = 0; col < CONS_COLS; col++) {
                 for (row = 0; row < CONS_ROWS; row++) {
@@ -135,10 +138,10 @@ cons_vdp2_write(struct cons *cons)
                         uint16_t pnd;
                         pnd = character_number | palette_number;
 
-                        if (col < SCRN_PLANE_PAGE_WIDTH) {
+                        if (col < page_width) {
                                 nbg3_page0[col + (row << 6)] = pnd;
                         } else {
-                                nbg3_page1[(col - SCRN_PLANE_PAGE_WIDTH) + (row << 6)] = pnd;
+                                nbg3_page1[(col - page_width) + (row << 6)] = pnd;
                         }
                 }
         }
