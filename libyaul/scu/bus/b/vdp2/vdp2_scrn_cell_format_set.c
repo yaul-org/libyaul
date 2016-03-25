@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include <vdp2/scrn.h>
+#include <vdp2/vram.h>
 
 #include "vdp2-internal.h"
 
@@ -99,10 +100,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_o;
         uint16_t plane_p;
 
-        plane_a = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-        plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-        plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-        plane_d = ((format->scf_map.plane_d - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_a = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        plane_d = ((format->scf_map.plane_d - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
         /* The map offset is effectively the bank number */
         map_offset = VRAM_BANK_4MBIT(plane_a);
@@ -111,15 +112,12 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t pncnx;
         uint16_t character_number;
         uint16_t palette_number;
-        uint16_t sc_number; /* Supplementary palette number bits */
-        uint16_t sp_number; /* Supplementary character number bits */
+        uint16_t sc_number; /* Supplementary character number bits */
+        uint16_t sp_number; /* Supplementary palette number bits */
 
         switch (format->scf_pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
-
-                character_number = format->scf_cp_table >> 5;
-                palette_number = format->scf_color_palette >> 5;
 #ifdef DEBUG
                 /* Depending on the Color RAM mode, there are "invalid"
                  * CRAM banks.
@@ -129,12 +127,16 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                  * Mode 2 (1024 colors) */
 #endif /* DEBUG */
 
+                character_number = format->scf_cp_table >> 5;
+                palette_number = format->scf_color_palette >> 5;
+
                 switch (format->scf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
                         sp_number = ((palette_number & 0x70) >> 4) << 5;
                         break;
                 case SCRN_CCC_PALETTE_256:
                 case SCRN_CCC_PALETTE_2048:
+                default:
                         sp_number = 0x0000;
                         break;
                 }
@@ -148,9 +150,13 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
+                                /* Character number in pattern name table: bits 11~0
+                                 * Character number in supplemental data: 14 13 12 11 10 */
                                 sc_number = (character_number & 0x7C00) >> 10;
                                 break;
                         case (2 * 2):
+                                /* Character number in pattern name table: bits 11~0
+                                 * Character number in supplemental data: 14 13 12  1  0 */
                                 sc_number = ((character_number & 0x7000) >> 10) |
                                     (character_number & 0x03);
                                 break;
@@ -165,9 +171,13 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
+                                /* Character number in pattern name table: bits 11~0
+                                 * Character number in supplemental data: 14 13 12 __ __ */
                                 sc_number = (character_number & 0x7000) >> 10;
                                 break;
                         case (2 * 2):
+                                /* Character number in pattern name table: bits 11~0
+                                 * Character number in supplemental data: 14 __ __  1  0 */
                                 sc_number = ((character_number & 0x4000) >> 10) |
                                     (character_number & 0x03);
                                 break;
@@ -301,17 +311,18 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 #endif /* DEBUG */
 
 
-                plane_e = ((format->scf_map.plane_e - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_f = ((format->scf_map.plane_f - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_g = ((format->scf_map.plane_g - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_h = ((format->scf_map.plane_h - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_i = ((format->scf_map.plane_i - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_j = ((format->scf_map.plane_j - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_k = ((format->scf_map.plane_k - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_l = ((format->scf_map.plane_l - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_m = ((format->scf_map.plane_m - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_o = ((format->scf_map.plane_o - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-                plane_p = ((format->scf_map.plane_p - VRAM_ADDR_4MBIT(0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_e = ((format->scf_map.plane_e - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_f = ((format->scf_map.plane_f - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_g = ((format->scf_map.plane_g - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_h = ((format->scf_map.plane_h - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_i = ((format->scf_map.plane_i - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_j = ((format->scf_map.plane_j - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_k = ((format->scf_map.plane_k - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_l = ((format->scf_map.plane_l - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_m = ((format->scf_map.plane_m - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_n = ((format->scf_map.plane_n - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_o = ((format->scf_map.plane_o - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+                plane_p = ((format->scf_map.plane_p - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
                 /* Character color count */
                 vdp2_regs.chctlb &= 0x8FFF;
