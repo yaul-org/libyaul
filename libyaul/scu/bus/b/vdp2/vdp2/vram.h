@@ -23,6 +23,8 @@ extern "C" {
 #define VRAM_BANK_4MBIT(x)      (((x) >> 17) & 0x0007)
 #define VRAM_BANK_8MBIT(x)      (((x) >> 18) & 0x0007)
 
+#define VRAM_BANK_SIZE          (VRAM_ADDR_4MBIT(1, 0) - VRAM_ADDR_4MBIT(0, 0))
+
 struct vram_ctl {
 #define VRAM_CTL_SIZE_4MBIT     0x0000
 #define VRAM_CTL_SIZE_8MBIT     0x8000

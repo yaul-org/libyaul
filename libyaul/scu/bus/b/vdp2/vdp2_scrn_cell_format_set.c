@@ -69,7 +69,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 
         /* Map */
         uint16_t map_offset;
-        uint16_t map_mask;
+        uint16_t map_bits;
         uint16_t plane_a;
         uint16_t plane_b;
         uint16_t plane_c;
@@ -87,13 +87,15 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_o;
         uint16_t plane_p;
 
-        plane_a = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        map_bits = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
+        /* Take the upper 3 bits of plane A to be the map offset. */
+        plane_a = map_bits & 0x003F;
         plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
         plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
         plane_d = ((format->scf_map.plane_d - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
-        /* The map offset is effectively the bank number */
-        map_offset = VRAM_BANK_4MBIT(plane_a);
+        /* Calculate the upper 3-bits of the 9-bits "map register" */
+        map_offset = (map_bits & 0x01C0) >> 6;
 
         /* Pattern name control */
         uint16_t pncnx;

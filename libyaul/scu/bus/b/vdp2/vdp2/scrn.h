@@ -37,8 +37,7 @@ extern "C" {
 #define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
         (((format)->scf_character_size = (1 * 1)) ? (64 * 64) : (32 * 32))
 
-/*
- * Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
+/* Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
  * | PND size | Cell size | Size of plane |
  * +----------+-----------+---------------+
@@ -49,13 +48,11 @@ extern "C" {
  * +----------+-----------+---------------+
  *
  * Page dimension is 64x64 if cell size is 1x1.
- * Page dimension is 32x32 if cell size is 2x2.
- */
+ * Page dimension is 32x32 if cell size is 2x2. */
 #define SCRN_CALCULATE_PAGE_SIZE(format)                                       \
         (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
 
-/*
- * Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes):
+/* Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes):
  * +------------+----------+-----------+---------------+
  * | Plane size | PND size | Cell size | Size of plane |
  * +------------+----------+-----------+---------------+
@@ -73,10 +70,31 @@ extern "C" {
  * |            | 1-word   | 2x2       | 0x2000        |
  * |            | 2-word   | 1x1       | 0x10000       |
  * |            | 2-word   | 2x2       | 0x4000        |
- * +------------+----------+-----------+---------------+
- */
+ * +------------+----------+-----------+---------------+ */
 #define SCRN_CALCULATE_PLANE_SIZE(format)                                      \
         (((format)->scf_plane_size) * SCRN_CALCULATE_PAGE_SIZE(format))
+
+/* Possible values (plane count) for SCRN_CALCULATE_PLANES_CNT():
+ * +-------------+------------+----------+------------+------------+
+ * | Planes/bank | Char. size | PND size | Plane dim. | Plane size |
+ * +-------------+------------+----------+------------+------------+
+ * | 16          | 1x1        | 1-word   | 1x1        | 0x002000   |
+ * | 64          | 2x2        | 1-word   | 1x1        | 0x000800   |
+ * |  8          | 1x1        | 2-word   | 1x1        | 0x004000   |
+ * | 32          | 2x2        | 2-word   | 1x1        | 0x001000   |
+ * +-------------+------------+----------+------------+------------+
+ * |  8          | 1x1        | 1-word   | 2x1        | 0x004000   |
+ * | 32          | 2x2        | 1-word   | 2x1        | 0x001000   |
+ * |  4          | 1x1        | 2-word   | 2x1        | 0x008000   |
+ * | 16          | 2x2        | 2-word   | 2x1        | 0x002000   |
+ * +-------------+------------+----------+------------+------------+
+ * |  4          | 1x1        | 1-word   | 2x2        | 0x008000   |
+ * | 16          | 2x2        | 1-word   | 2x2        | 0x002000   |
+ * |  2          | 1x1        | 2-word   | 2x2        | 0x010000   |
+ * |  8          | 2x2        | 2-word   | 2x2        | 0x004000   |
+ * +-------------+------------+----------+------------+------------+ */
+#define SCRN_CALCULATE_PLANES_CNT(format)                                      \
+        (VRAM_BANK_SIZE / SCRN_CALCULATE_PLANE_SIZE((format)))
 
 struct scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */
