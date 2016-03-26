@@ -37,9 +37,44 @@ extern "C" {
 #define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
         (((format)->scf_character_size = (1 * 1)) ? (64 * 64) : (32 * 32))
 
+/*
+ * Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
+ * +----------+-----------+---------------+
+ * | PND size | Cell size | Size of plane |
+ * +----------+-----------+---------------+
+ * | 1-word   | 1x1       | 0x2000        |
+ * | 1-word   | 2x2       | 0x0800        |
+ * | 2-word   | 1x1       | 0x4000        |
+ * | 2-word   | 2x2       | 0x1000        |
+ * +----------+-----------+---------------+
+ *
+ * Page dimension is 64x64 if cell size is 1x1.
+ * Page dimension is 32x32 if cell size is 2x2.
+ */
 #define SCRN_CALCULATE_PAGE_SIZE(format)                                       \
         (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
 
+/*
+ * Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes)
+ * +------------+----------+-----------+---------------+
+ * | Plane size | PND size | Cell size | Size of plane |
+ * +------------+----------+-----------+---------------+
+ * | 1x1        | 1-word   | 1x1       | 0x2000        |
+ * |            | 1-word   | 2x2       | 0x0800        |
+ * |            | 2-word   | 1x1       | 0x4000        |
+ * |            | 2-word   | 2x2       | 0x1000        |
+ * +------------+----------+-----------+---------------+
+ * | 2x1        | 1-word   | 1x1       | 0x4000        |
+ * |            | 1-word   | 2x2       | 0x1000        |
+ * |            | 2-word   | 1x1       | 0x8000        |
+ * |            | 2-word   | 2x2       | 0x2000        |
+ * +------------+----------+-----------+---------------+
+ * | 2x2        | 1-word   | 1x1       | 0x8000        |
+ * |            | 1-word   | 2x2       | 0x2000        |
+ * |            | 2-word   | 1x1       | 0x10000       |
+ * |            | 2-word   | 2x2       | 0x4000        |
+ * +------------+----------+-----------+---------------+
+ */
 #define SCRN_CALCULATE_PLANE_SIZE(format)                                      \
         (((format)->scf_plane_size) * SCRN_CALCULATE_PAGE_SIZE(format))
 

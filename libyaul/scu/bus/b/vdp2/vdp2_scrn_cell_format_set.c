@@ -12,19 +12,6 @@
 
 #include "vdp2-internal.h"
 
-/*
- * Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
- * +------------------+---------+
- * | 1-word, 1x1 cell | 0x2000B |
- * | 1-word, 2x2 cell | 0x0800B |
- * | 2-word, 1x1 cell | 0x1000B |
- * | 2-word, 2x2 cell | 0x4000B |
- * +------------------+---------+
- *
- * Page dimension is 64x64 if cell size is 1x1.
- * Page dimension is 32x32 if cell size is 2x2.
- */
-
 void
 vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 {
