@@ -55,7 +55,7 @@ extern "C" {
         (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
 
 /*
- * Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes)
+ * Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes):
  * +------------+----------+-----------+---------------+
  * | Plane size | PND size | Cell size | Size of plane |
  * +------------+----------+-----------+---------------+
