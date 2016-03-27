@@ -1,0 +1,37 @@
+--- gcc-4.7.4/gcc/config/sh/sh.h.orig	2012-06-09 13:03:03.000000000 -0700
++++ gcc-4.7.4/gcc/config/sh/sh.h	2012-06-09 13:03:11.000000000 -0700
+@@ -103,7 +103,7 @@
+    via the stack pointer) in functions that seem suitable.  */
+ 
+ #ifndef SUBTARGET_FRAME_POINTER_REQUIRED
+-#define SUBTARGET_FRAME_POINTER_REQUIRED 0
++#define SUBTARGET_FRAME_POINTER_REQUIRED 1
+ #endif
+ 
+ 
+--- gcc-4.7.4/gcc/cp/cfns.gperf.orig	2016-03-26 21:16:03.000000000 -0700
++++ gcc-4.7.4/gcc/cp/cfns.gperf	2016-03-26 21:16:11.000000000 -0700
+@@ -22,6 +22,9 @@ __inline
+ static unsigned int hash (const char *, unsigned int);
+ #ifdef __GNUC__
+ __inline
++#ifdef __GNUC_STDC_INLINE__
++__attribute__ ((__gnu_inline__))
++#endif
+ #endif
+ const char * libc_name_p (const char *, unsigned int);
+ %}
+diff --git a/gcc/cp/cfns.h b/gcc/cp/cfns.h
+index 1c6665d..6d00c0e 100644
+--- gcc-4.4.7/gcc/cp/cfns.h.orig	2016-03-26 21:16:03.000000000 -0700
++++ gcc-4.7.4/gcc/cp/cfns.h	2016-03-26 21:16:11.000000000 -0700
+@@ -53,6 +53,9 @@ __inline
+ static unsigned int hash (const char *, unsigned int);
+ #ifdef __GNUC__
+ __inline
++#ifdef __GNUC_STDC_INLINE__
++__attribute__ ((__gnu_inline__))
++#endif
+ #endif
+ const char * libc_name_p (const char *, unsigned int);
+ /* maximum key range = 391, duplicates = 0 */

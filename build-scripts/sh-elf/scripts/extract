@@ -5,6 +5,8 @@ mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}"
 cd "${BUILD_SRC_DIR}/${SH_TARGET}"
 if [ ! -f "extracted-binutils" ]; then
     message "Extracting '${BINUTILS}'"
+    rm -r -f binutils
+    rm -r -f binutils-${BINUTILS_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
         panic "Extracting ${BINUTILS}" 1
     fi
@@ -13,6 +15,8 @@ fi
 
 if [ ! -f "extracted-gcc" ]; then
     message "Extracting '$GCC'"
+    rm -r -f gcc
+    rm -r -f gcc-${GCC_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
         panic "Extracting ${GCC}" 1
     fi
@@ -21,6 +25,8 @@ fi
 
 if [ ! -f "extracted-newlib" ]; then
     message "Extracting '${NEWLIB}'"
+    rm -r -f newlib
+    rm -r -f newlib-${NEWLIB_VERSION}
     if ! tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" > /dev/null 2>&1; then
         panic "Extracting ${NEWLIB}" 1
     fi

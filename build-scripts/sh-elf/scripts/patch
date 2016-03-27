@@ -15,6 +15,8 @@ apply_patch () {
 if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/applied-patches" ]; then
     message "Applying patches"
 
+    # GCC
+    apply_patch "gcc-${GCC_VERSION}.patch"
     # Newlib
     apply_patch "newlib-${NEWLIB_VERSION}.patch"
 fi

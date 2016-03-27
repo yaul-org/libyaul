@@ -3,4 +3,4 @@
 touch "${BUILD_SRC_DIR}/${M68K_TARGET}/build-complete"
 
 # Closing message
-message "Add '${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin' to the \$PATH environment variable"
+message "Set INSTALL_ROOT variable (in ../yaul.env) to '${BUILD_INSTALL_DIR}/${SH_TARGET}'"

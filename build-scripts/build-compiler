@@ -17,7 +17,7 @@ CONFIG_PATH="./${CONFIG_FILENAME}"
 message () {
     local _message="${1}"
 
-    printf -- "${PROGNAME}: %s\n" "${_message}"
+    printf -- "%s\n" "${_message}"
 }
 
 # Function panic:

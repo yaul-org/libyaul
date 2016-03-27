@@ -19,7 +19,7 @@ BUILD_SRC_DIR="/tmp"
 # Specifies the number of jobs (commands) to run simultaneously. If
 # BUILD_MAKE_JOBS is not set with a value, make(1) will not limit the
 # number of jobs that can run simultaneously
-BUILD_MAKE_JOBS=8
+BUILD_MAKE_JOBS=16
 
 # Specify the path where the support libraries (i.e. GMP, MPFR, MPC, etc.) are
 # installed if not in the typical paths (/usr, /usr/local, ...). If support
@@ -28,7 +28,7 @@ BUILD_SUPPORT_LIBS=""
 
 # Versions
 BINUTILS_VERSION="2.24"
-GCC_VERSION="4.7.3"
+GCC_VERSION="4.7.4"
 GDB_VERSION="7.7"
 NEWLIB_VERSION="1.20.0"
 
@@ -36,7 +36,9 @@ NEWLIB_VERSION="1.20.0"
 # The variables below might need to change depending on your OS
 AWK="awk"
 FETCH="wget"
-FETCH_FLAGS=""
+# Currently, there is a bug in wget(1), -4 is needed. Remove if
+# wget(1) is not used
+FETCH_FLAGS="-4"
 GPG="gpg"
 MAKE="make"
 MD5="md5sum"
