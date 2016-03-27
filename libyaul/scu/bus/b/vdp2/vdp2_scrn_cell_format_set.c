@@ -87,8 +87,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t plane_o;
         uint16_t plane_p;
 
-        map_bits = ((format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
-        /* Take the upper 3 bits of plane A to be the map offset. */
+        map_bits = (format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format);
         plane_a = map_bits & 0x003F;
         plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
         plane_c = ((format->scf_map.plane_c - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
@@ -104,6 +103,9 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
         uint16_t sc_number; /* Supplementary character number bits */
         uint16_t sp_number; /* Supplementary palette number bits */
 
+        character_number = format->scf_cp_table >> 5;
+        palette_number = format->scf_color_palette >> 5;
+
         switch (format->scf_pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
@@ -115,9 +117,6 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                  * Mode 1 (2048 colors, 128 banks)
                  * Mode 2 (1024 colors) */
 #endif /* DEBUG */
-
-                character_number = format->scf_cp_table >> 5;
-                palette_number = format->scf_color_palette >> 5;
 
                 switch (format->scf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
@@ -133,30 +132,25 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 /* Character number supplement mode */
                 switch (format->scf_auxiliary_mode) {
                 case 0:
-                        /* Auxiliary mode 0; flip function can be
-                         * used */
-
+                        /* Auxiliary mode 0; flip function can be used */
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
-                                /* Character number in pattern name table: bits 11~0
+                                /* Character number in pattern name table: bits 9~0
                                  * Character number in supplemental data: 14 13 12 11 10 */
                                 sc_number = (character_number & 0x7C00) >> 10;
                                 break;
                         case (2 * 2):
-                                /* Character number in pattern name table: bits 11~0
+                                /* Character number in pattern name table: bits 11~2
                                  * Character number in supplemental data: 14 13 12  1  0 */
                                 sc_number = ((character_number & 0x7000) >> 10) |
                                     (character_number & 0x03);
                                 break;
                         }
-
                         pncnx = 0x8000 | sc_number | sp_number;
                         break;
                 case 1:
-                        /* Auxiliary mode 1; flip function cannot be
-                         * used */
-
+                        /* Auxiliary mode 1; flip function cannot be used */
                         /* Supplementary character number */
                         switch (format->scf_character_size) {
                         case (1 * 1):
@@ -165,13 +159,12 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                                 sc_number = (character_number & 0x7000) >> 10;
                                 break;
                         case (2 * 2):
-                                /* Character number in pattern name table: bits 11~0
+                                /* Character number in pattern name table: bits 13~2
                                  * Character number in supplemental data: 14 __ __  1  0 */
                                 sc_number = ((character_number & 0x4000) >> 10) |
                                     (character_number & 0x03);
                                 break;
                         }
-
                         pncnx = 0xC000 | sc_number | sp_number;
                 }
                 break;
@@ -200,12 +193,11 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
                 vdp2_regs.mpofn |= map_offset;
 
                 /* Write to memory */
-                MEMORY_WRITE(16, VDP2(MPABN1), (plane_b << 8) | plane_a);
-                MEMORY_WRITE(16, VDP2(MPCDN1), (plane_d << 8) | plane_c);
+                MEMORY_WRITE(16, VDP2(MPABN0), (plane_b << 8) | plane_a);
+                MEMORY_WRITE(16, VDP2(MPCDN0), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
                 MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN0), pncnx);
-                MEMORY_WRITE(16, VDP2(PRINA), vdp2_regs.prina);
                 break;
         case SCRN_NBG1:
                 /* Character color count */
@@ -255,10 +247,10 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
-                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(MPABN2), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN2), (plane_d << 8) | plane_c);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN2), pncnx);
                 break;
         case SCRN_NBG3:
