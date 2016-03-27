@@ -16,9 +16,13 @@
 #include <smpc.h>
 
 #if defined(DEBUG) || defined(RELEASE_INTERNAL)
+#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cartridge.h>
+#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
-#else
+#elif HAVE_DEV_CARTRIDGE != 0
+#error "Invalid `HAVE_DEV_CARTRIDGE' value"
+#endif
 #endif /* defined(DEBUG) || defined(RELEASE_INTERNAL) */
 
 void __noreturn
