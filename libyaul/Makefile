@@ -346,14 +346,14 @@ V_END= [m
 
 ARCH?= sh-elf
 
-CXX:= $(ARCH)-g++
-AS:= $(ARCH)-as
-AR:= $(ARCH)-ar
-CC:= $(ARCH)-gcc
-LD:= $(ARCH)-gcc
-NM:= $(ARCH)-nm
-OBJCOPY:= $(ARCH)-objcopy
-OBJDUMP:= $(ARCH)-objdump
+AS:= $(INSTALL_ROOT)/bin/$(ARCH)-as
+AR:= $(INSTALL_ROOT)/bin/$(ARCH)-ar
+CC:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
+CXX:= $(INSTALL_ROOT)/bin/$(ARCH)-g++
+LD:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
+NM:= $(INSTALL_ROOT)/bin/$(ARCH)-nm
+OBJCOPY:= $(INSTALL_ROOT)/bin/$(ARCH)-objcopy
+OBJDUMP:= $(INSTALL_ROOT)/bin/$(ARCH)-objdump
 SED:= sed
 FIND:= find
 INSTALL:= install
@@ -429,8 +429,6 @@ define macro-install-start-scripts
 	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/$(ARCH)/lib/; \
 	done
 endef
-
-# abs_header_file=$$(python -c "import os; print os.path.abspath(\"$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}\")");
 
 define macro-install-files
 	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)

@@ -26,14 +26,14 @@ HEADER_FILES:= \
 
 ARCH?= sh-elf
 
-CXX:= $(ARCH)-g++
-AS:= $(ARCH)-as
-AR:= $(ARCH)-ar
-CC:= $(ARCH)-gcc
-LD:= $(ARCH)-gcc
-NM:= $(ARCH)-nm
-OBJCOPY:= $(ARCH)-objcopy
-OBJDUMP:= $(ARCH)-objdump
+AS:= $(INSTALL_ROOT)/bin/$(ARCH)-as
+AR:= $(INSTALL_ROOT)/bin/$(ARCH)-ar
+CC:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
+CXX:= $(INSTALL_ROOT)/bin/$(ARCH)-g++
+LD:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
+NM:= $(INSTALL_ROOT)/bin/$(ARCH)-nm
+OBJCOPY:= $(INSTALL_ROOT)/bin/$(ARCH)-objcopy
+OBJDUMP:= $(INSTALL_ROOT)/bin/$(ARCH)-objdump
 SED:= sed
 INSTALL:= install
 

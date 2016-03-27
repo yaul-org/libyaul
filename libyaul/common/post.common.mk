@@ -30,11 +30,11 @@ $(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
 	$(OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
 
 %.romdisk: $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
-	genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
+	$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
-	fsck.genromfs ./romdisk/
-	bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	$(INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
+	$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
@@ -50,7 +50,7 @@ $(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	        printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
 	    fi \
 	done
-	make-iso $(IMAGE_DIRECTORY) $(PROJECT)
+	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(PROJECT)
 
 IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	$(eval $@_TMP_FILE:= $(shell mktemp))
