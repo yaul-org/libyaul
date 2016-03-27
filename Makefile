@@ -87,7 +87,7 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(projec
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-release-internal)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-debug)))
 
-clean: clean-release clean-tools
+clean: clean-release clean-release-internal clean-debug clean-tools
 
 distclean: clean-release clean-release-internal clean-debug clean-tools clean-examples
 	$(SILENT)$(RM) -r $(BUILD_ROOT)/$(BUILD)
