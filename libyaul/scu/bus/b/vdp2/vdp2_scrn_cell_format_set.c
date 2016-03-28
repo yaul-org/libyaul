@@ -13,7 +13,7 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
+vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 {
 
 #ifdef DEBUG
@@ -120,7 +120,7 @@ vdp2_scrn_cell_format_set(struct scrn_cell_format *format)
 
                 switch (format->scf_cc_count) {
                 case SCRN_CCC_PALETTE_16:
-                        sp_number = ((palette_number & 0x70) >> 4) << 5;
+                        sp_number = ((palette_number & 0x0070) >> 4) << 5;
                         break;
                 case SCRN_CCC_PALETTE_256:
                 case SCRN_CCC_PALETTE_2048:

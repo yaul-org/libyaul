@@ -29,13 +29,13 @@ extern "C" {
 #define SCRN_CCC_RGB_16770000   4
 
 #define SCRN_CALCULATE_PAGE_WIDTH(format)                                      \
-        (((format)->scf_character_size = (1 * 1)) ? 64 : 32)
+        (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
 
 #define SCRN_CALCULATE_PAGE_HEIGHT(format)                                     \
-        (((format)->scf_character_size = (1 * 1)) ? 64 : 32)
+        (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
 
 #define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
-        (((format)->scf_character_size = (1 * 1)) ? (64 * 64) : (32 * 32))
+        (((format)->scf_character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
 
 /* Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
@@ -117,15 +117,15 @@ struct scrn_bitmap_format {
 };
 
 struct scrn_cell_format {
-        uint8_t scf_scroll_screen; /* Normal/rotational background */
+        uint32_t scf_scroll_screen; /* Normal/rotational background */
         uint32_t scf_cc_count; /* Character color count */
-        uint8_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
-        uint8_t scf_pnd_size; /* Pattern name data size: (1)-word or (2)-words */
-        uint8_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
+        uint32_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
+        uint32_t scf_pnd_size; /* Pattern name data size: (1)-word or (2)-words */
+        uint32_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
                                      * auxiliary mode #1 (no flip function) */
         uint32_t scf_cp_table; /* Character pattern table lead address*/
         uint32_t scf_color_palette; /* Color palette lead address */
-        uint8_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
+        uint32_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
 
         struct {
                 uint32_t plane_a;
@@ -146,12 +146,12 @@ struct scrn_cell_format {
                 uint32_t plane_p; /* For RBG0 and RBG1 use only */
         } scf_map; /* Map lead addresses */
 
-        uint8_t scf_rp_mode; /* RBG0 and RBG1 only
-                              * Rotation parameter mode
-                              *   Mode 0: Rotation Parameter A
-                              *   Mode 1: Rotation Parameter B
-                              *   Mode 2: Swap Coefficient Data Read
-                              *   Mode 3: Swap via Rotation Parameter Window */
+        uint32_t scf_rp_mode; /* RBG0 and RBG1 only
+                               * Rotation parameter mode
+                               *   Mode 0: Rotation Parameter A
+                               *   Mode 1: Rotation Parameter B
+                               *   Mode 2: Swap Coefficient Data Read
+                               *   Mode 3: Swap via Rotation Parameter Window */
 };
 
 struct scrn_ls_format {
@@ -174,7 +174,7 @@ struct scrn_vcs_format {
 extern void vdp2_scrn_back_screen_addr_set(bool, uint32_t);
 extern void vdp2_scrn_back_screen_color_set(uint32_t, uint16_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
-extern void vdp2_scrn_cell_format_set(struct scrn_cell_format *);
+extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
 extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
