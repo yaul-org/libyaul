@@ -87,6 +87,25 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
         uint16_t plane_o;
         uint16_t plane_p;
 
+        /* Locations where the pattern name data can be placed:
+         * +--------+--------+--------+--------+--------+--------+
+         * | VRAM A | VRAM B | A0 (3) | A1 (2) | B0 (1) | B1 (0) |
+         * +--------+--------+--------+--------+--------+--------+
+         * | 0      | 0      | YYYYYYYYYYYYYYY | NNNNNNNNNNNNNNN |
+         * |        |        | NNNNNNNNNNNNNNN | YYYYYYYYYYYYYYY |
+         * +--------+--------+--------+--------+-----------------+
+         * | 1      | 0      | NNNNNN | YYYYYY | YYYYYYYYYYYYYYY |
+         * |        |        | YYYYYY | YYYYYY | NNNNNNNNNNNNNNN |
+         * +--------+--------+--------+--------+--------+--------+
+         * | 0      | 1      | YYYYYYYYYYYYYYY | NNNNNN | YYYYYY |
+         * |        |        | NNNNNNNNNNNNNNN | YYYYYY | YYYYYY |
+         * +--------+--------+--------+--------+--------+--------+
+         * | 1      | 1      | YYYYYY | YYYYYY | NNNNNN | NNNNNN |
+         * |        |        | YYYYYY | NNNNNN | NNNNNN | YYYYYY |
+         * |        |        | NNNNNN | YYYYYY | YYYYYY | NNNNNN |
+         * |        |        | NNNNNN | NNNNNN | YYYYYY | YYYYYY |
+         * +--------+--------+--------+--------+--------+--------+ */
+
         map_bits = (format->scf_map.plane_a - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format);
         plane_a = map_bits & 0x003F;
         plane_b = ((format->scf_map.plane_b - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
