@@ -55,14 +55,7 @@ struct object_world {
                 uint32_t m_row_count;
 
                 struct scrn_cell_format m_nbg1_format;
-                uint16_t *m_nbg1_planes[4];
-                uint8_t *m_nbg1_character;
-                uint16_t *m_nbg1_color_palette;
-
                 struct scrn_cell_format m_nbg2_format;
-                uint16_t *m_nbg2_planes[4];
-                uint8_t *m_nbg2_character;
-                uint16_t *m_nbg2_color_palette;
         } private_data;
 };
 

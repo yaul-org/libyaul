@@ -109,85 +109,41 @@ on_world_init(struct object *this)
         _update_world_map(this, 0);
         _update_world_colliders(this, 0);
 
-        /* VRAM A1 */
-        world->private_data.m_nbg1_planes[0] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x01000);
-        /* VRAM A1 */
-        world->private_data.m_nbg1_planes[1] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x02000);
-        /* VRAM A1 */
-        world->private_data.m_nbg1_planes[2] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x03000);
-        /* VRAM A1 */
-        world->private_data.m_nbg1_planes[3] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x04000);
-        /* VRAM A1 */
-        world->private_data.m_nbg2_planes[0] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x05000);
-        /* VRAM A1 */
-        world->private_data.m_nbg2_planes[1] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x06000);
-        /* VRAM A1 */
-        world->private_data.m_nbg2_planes[2] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x07000);
-        /* VRAM A1 */
-        world->private_data.m_nbg2_planes[3] =
-            (uint16_t *)VRAM_ADDR_4MBIT(1, 0x08000);
-        /* VRAM A0 */
-        world->private_data.m_nbg1_character =
-            (uint8_t *)VRAM_ADDR_4MBIT(0, 0x00000);
-        /* VRAM A0 */
-        world->private_data.m_nbg2_character =
-            (uint8_t *)VRAM_ADDR_4MBIT(0, 0x01000);
-        /* CRAM */
-        world->private_data.m_nbg1_color_palette =
-            (uint16_t *)CRAM_MODE_1_OFFSET(1, 0, 0);
-        world->private_data.m_nbg2_color_palette =
-            (uint16_t *)CRAM_MODE_1_OFFSET(0, 1, 0);
+        /* Set up NBG1 */
+        struct scrn_cell_format *nbg1_format; {
+                nbg1_format = &world->private_data.m_nbg1_format;
 
-        struct scrn_cell_format *nbg1_format;
-        nbg1_format = &world->private_data.m_nbg1_format;
-        uint16_t **nbg1_planes;
-        nbg1_planes = world->private_data.m_nbg1_planes;
-        uint8_t *nbg1_character;
-        nbg1_character = world->private_data.m_nbg1_character;
-        uint16_t *nbg1_color_palette;
-        nbg1_color_palette = world->private_data.m_nbg1_color_palette;
+                nbg1_format->scf_scroll_screen = SCRN_NBG1;
+                nbg1_format->scf_cc_count = SCRN_CCC_PALETTE_256;
+                nbg1_format->scf_character_size = 2 * 2;
+                nbg1_format->scf_pnd_size = 1; /* 1-word */
+                nbg1_format->scf_auxiliary_mode = 0;
+                nbg1_format->scf_cp_table = VRAM_ADDR_4MBIT(0, 0x04000);
+                nbg1_format->scf_color_palette = CRAM_MODE_1_OFFSET(1, 0, 0);
+                nbg1_format->scf_plane_size = 1 * 1;
+                nbg1_format->scf_map.plane_a = VRAM_ADDR_4MBIT(0, 0x00000);
+                nbg1_format->scf_map.plane_b = VRAM_ADDR_4MBIT(0, 0x00800);
+                nbg1_format->scf_map.plane_c = VRAM_ADDR_4MBIT(0, 0x01000);
+                nbg1_format->scf_map.plane_d = VRAM_ADDR_4MBIT(0, 0x01800);
+        }
 
-        nbg1_format->scf_scroll_screen = SCRN_NBG1;
-        nbg1_format->scf_cc_count = SCRN_CCC_PALETTE_256;
-        nbg1_format->scf_character_size = 2 * 2;
-        nbg1_format->scf_pnd_size = 1; /* 1-word */
-        nbg1_format->scf_auxiliary_mode = 0;
-        nbg1_format->scf_cp_table = (uint32_t)nbg1_character;
-        nbg1_format->scf_color_palette = (uint32_t)nbg1_color_palette;
-        nbg1_format->scf_plane_size = 1 * 1;
-        nbg1_format->scf_map.plane_a = (uint32_t)nbg1_planes[0];
-        nbg1_format->scf_map.plane_b = (uint32_t)nbg1_planes[1];
-        nbg1_format->scf_map.plane_c = (uint32_t)nbg1_planes[2];
-        nbg1_format->scf_map.plane_d = (uint32_t)nbg1_planes[3];
+        /* Set up NBG2 */
+        struct scrn_cell_format *nbg2_format; {
+                nbg2_format = &world->private_data.m_nbg2_format;
 
-        struct scrn_cell_format *nbg2_format;
-        nbg2_format = &world->private_data.m_nbg2_format;
-        uint16_t **nbg2_planes;
-        nbg2_planes = world->private_data.m_nbg2_planes;
-        uint8_t *nbg2_character;
-        nbg2_character = world->private_data.m_nbg2_character;
-        uint16_t *nbg2_color_palette;
-        nbg2_color_palette = world->private_data.m_nbg2_color_palette;
-
-        nbg2_format->scf_scroll_screen = SCRN_NBG2;
-        nbg2_format->scf_cc_count = SCRN_CCC_PALETTE_16;
-        nbg2_format->scf_character_size = 1 * 1;
-        nbg2_format->scf_pnd_size = 1; /* 1 word */
-        nbg2_format->scf_auxiliary_mode = 1;
-        nbg2_format->scf_cp_table = (uint32_t)nbg2_character;
-        nbg2_format->scf_color_palette = (uint32_t)nbg2_color_palette;
-        nbg2_format->scf_plane_size = 1 * 1;
-        nbg2_format->scf_map.plane_a = (uint32_t)nbg2_planes[0];
-        nbg2_format->scf_map.plane_b = (uint32_t)nbg2_planes[1];
-        nbg2_format->scf_map.plane_c = (uint32_t)nbg2_planes[2];
-        nbg2_format->scf_map.plane_d = (uint32_t)nbg2_planes[3];
+                nbg2_format->scf_scroll_screen = SCRN_NBG2;
+                nbg2_format->scf_cc_count = SCRN_CCC_PALETTE_256;
+                nbg2_format->scf_character_size = 1 * 1;
+                nbg2_format->scf_pnd_size = 1; /* 1 word */
+                nbg2_format->scf_auxiliary_mode = 1;
+                nbg2_format->scf_cp_table = VRAM_ADDR_4MBIT(0, 0x08000);
+                nbg2_format->scf_color_palette = CRAM_MODE_1_OFFSET(2, 0, 0);
+                nbg2_format->scf_plane_size = 1 * 1;
+                nbg2_format->scf_map.plane_a = VRAM_ADDR_4MBIT(0, 0x02000);
+                nbg2_format->scf_map.plane_b = VRAM_ADDR_4MBIT(0, 0x02000);
+                nbg2_format->scf_map.plane_c = VRAM_ADDR_4MBIT(0, 0x02000);
+                nbg2_format->scf_map.plane_d = VRAM_ADDR_4MBIT(0, 0x02000);
+        }
 
         struct vram_ctl *vram_ctl;
         vram_ctl = vdp2_vram_control_get();
@@ -196,15 +152,15 @@ on_world_init(struct object *this)
         vram_ctl->vram_cycp.pt[0].t6 = VRAM_CTL_CYCP_CHPNDR_NBG1;
         vram_ctl->vram_cycp.pt[0].t5 = VRAM_CTL_CYCP_CHPNDR_NBG2;
         vram_ctl->vram_cycp.pt[0].t4 = VRAM_CTL_CYCP_CHPNDR_NBG2;
-        vram_ctl->vram_cycp.pt[0].t3 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[0].t2 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[0].t3 = VRAM_CTL_CYCP_PNDR_NBG1;
+        vram_ctl->vram_cycp.pt[0].t2 = VRAM_CTL_CYCP_PNDR_NBG2;
         vram_ctl->vram_cycp.pt[0].t1 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[0].t0 = VRAM_CTL_CYCP_NO_ACCESS;
 
-        vram_ctl->vram_cycp.pt[1].t7 = VRAM_CTL_CYCP_PNDR_NBG1;
-        vram_ctl->vram_cycp.pt[1].t6 = VRAM_CTL_CYCP_PNDR_NBG1;
-        vram_ctl->vram_cycp.pt[1].t5 = VRAM_CTL_CYCP_PNDR_NBG2;
-        vram_ctl->vram_cycp.pt[1].t4 = VRAM_CTL_CYCP_PNDR_NBG2;
+        vram_ctl->vram_cycp.pt[1].t7 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t6 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t5 = VRAM_CTL_CYCP_NO_ACCESS;
+        vram_ctl->vram_cycp.pt[1].t4 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[1].t3 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[1].t2 = VRAM_CTL_CYCP_NO_ACCESS;
         vram_ctl->vram_cycp.pt[1].t1 = VRAM_CTL_CYCP_NO_ACCESS;
@@ -229,9 +185,9 @@ on_world_init(struct object *this)
                 status = tga_read(&tga, ptr);
                 assert(status == TGA_FILE_OK);
                 uint32_t amount;
-                amount = tga_image_decode_tiled(&tga, (void *)nbg1_character);
+                amount = tga_image_decode_tiled(&tga, (void *)nbg1_format->scf_cp_table);
                 assert(amount > 0);
-                amount = tga_cmap_decode(&tga, nbg1_color_palette);
+                amount = tga_cmap_decode(&tga, (uint16_t *)nbg1_format->scf_color_palette);
                 assert(amount > 0);
 
                 vdp2_vram_control_set(vram_ctl);
@@ -278,37 +234,37 @@ on_world_update(struct object *this)
 static void
 on_world_draw(struct object *this)
 {
-        struct object_world *world __unused;
-        world = (struct object_world *)this;
+        struct scrn_cell_format *nbg1_format;
+        nbg1_format = &THIS(object_world, nbg1_format);
 
-        uint16_t **nbg1_planes;
-        nbg1_planes = world->private_data.m_nbg1_planes;
-        uint8_t *nbg1_character;
-        nbg1_character = world->private_data.m_nbg1_character;
+        uint32_t nbg1_page_width;
+        nbg1_page_width = SCRN_CALCULATE_PAGE_WIDTH(nbg1_format);
+        uint32_t nbg1_page_size;
+        nbg1_page_size = SCRN_CALCULATE_PAGE_SIZE(nbg1_format);
+        uint16_t *nbg1_plane_pages[4];
+        nbg1_plane_pages[0] = (uint16_t *)nbg1_format->scf_map.plane_a;
+        nbg1_plane_pages[1] = (uint16_t *)(nbg1_format->scf_map.plane_b + nbg1_page_size);
+        nbg1_plane_pages[2] = (uint16_t *)(nbg1_format->scf_map.plane_c + (2 * nbg1_page_size));
+        nbg1_plane_pages[3] = (uint16_t *)(nbg1_format->scf_map.plane_d + (3 * nbg1_page_size));
+        uint8_t *nbg1_cp_table;
+        nbg1_cp_table = (uint8_t *)THIS(object_world, nbg1_format).scf_cp_table;
         uint16_t *nbg1_color_palette;
-        nbg1_color_palette = world->private_data.m_nbg1_color_palette;
+        nbg1_color_palette = (uint16_t *)THIS(object_world, nbg1_format).scf_color_palette;
 
         vdp2_scrn_scv_x_set(SCRN_NBG1, move, 0);
 
         uint32_t column_idx;
         for (column_idx = 0; column_idx < (WORLD_COLUMNS + 1); column_idx++) {
                 struct world_column *world_column;
-                world_column = &world->private_data.m_columns[column_idx];
+                world_column = &THIS(object_world, columns)[column_idx];
                 uint32_t row_idx;
                 for (row_idx = 0; row_idx < WORLD_ROWS; row_idx++) {
-                        uint16_t character_number;
-                        character_number =
-                            (VDP2_PN_CONFIG_2_CHARACTER_NUMBER((uint32_t)nbg1_character) |
-                                VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)nbg1_color_palette)) |
+                        uint16_t pnd;
+                        pnd = (VDP2_PN_CONFIG_2_CHARACTER_NUMBER((uint32_t)nbg1_cp_table) |
+                            VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)nbg1_color_palette)) |
                             (world_column->row[row_idx].block * 2);
 
-                        uint32_t map_idx;
-                        map_idx = column_idx + (row_idx << 5);
-
-                        nbg1_planes[0][map_idx] = character_number;
-                        nbg1_planes[1][map_idx] = character_number;
-                        nbg1_planes[2][map_idx] = character_number;
-                        nbg1_planes[3][map_idx] = character_number;
+                        nbg1_plane_pages[0][column_idx + (row_idx * nbg1_page_width)] = pnd;
                 }
         }
 }

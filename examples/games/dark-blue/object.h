@@ -40,6 +40,9 @@
         }                                                                      \
 } while (false)
 
+#define THIS(type, member)                                                     \
+        (((struct type *)this)->private_data.CC_CONCAT(m_, member))
+
 struct object {
         OBJECT_DECLARATIONS
 } __may_alias;
