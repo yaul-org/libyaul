@@ -38,6 +38,10 @@ ROMDISK_DEPS:= levels/test.json
 .SUFFIXES: $(SUFFIXES) .tmx .json
 
 %.json: %.tmx
+	if ! which tiled >/dev/null 2>&1; then \
+	    printf -- "Tiled Map Editor (tiled) is required (http://www.mapeditor.org/)\n" >&2; \
+	    exit 1; \
+	fi
 	tiled --export-map "Json files (*.json)" $< $@
 	tools/tmx2map
 	$(RM) $@
