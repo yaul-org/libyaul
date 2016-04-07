@@ -30,36 +30,36 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
-                assert((vdp2_regs.scrctl & 0x0001) == 0x0000);
+                assert((vdp2_state.buffered_regs.scrctl & 0x0001) == 0x0000);
 #endif /* DEBUG */
 
-                vdp2_regs.mzctl &= 0xFFFE;
-                vdp2_regs.mzctl |= 0x0001;
+                vdp2_state.buffered_regs.mzctl &= 0xFFFE;
+                vdp2_state.buffered_regs.mzctl |= 0x0001;
                 break;
         case SCRN_NBG1:
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
-                assert((vdp2_regs.scrctl & 0x0100) == 0x0000);
+                assert((vdp2_state.buffered_regs.scrctl & 0x0100) == 0x0000);
 #endif /* DEBUG */
 
-                vdp2_regs.mzctl &= 0xFFFD;
-                vdp2_regs.mzctl |= 0x0002;
+                vdp2_state.buffered_regs.mzctl &= 0xFFFD;
+                vdp2_state.buffered_regs.mzctl |= 0x0002;
                 break;
         case SCRN_NBG2:
-                vdp2_regs.mzctl &= 0xFFFB;
-                vdp2_regs.mzctl |= 0x0004;
+                vdp2_state.buffered_regs.mzctl &= 0xFFFB;
+                vdp2_state.buffered_regs.mzctl |= 0x0004;
                 break;
         case SCRN_NBG3:
-                vdp2_regs.mzctl &= 0xFFF7;
-                vdp2_regs.mzctl |= 0x0008;
+                vdp2_state.buffered_regs.mzctl &= 0xFFF7;
+                vdp2_state.buffered_regs.mzctl |= 0x0008;
                 break;
         case SCRN_RBG0:
-                vdp2_regs.mzctl &= 0xFFEF;
-                vdp2_regs.mzctl |= 0x0010;
+                vdp2_state.buffered_regs.mzctl &= 0xFFEF;
+                vdp2_state.buffered_regs.mzctl |= 0x0010;
                 break;
         }
 
         /* Write to memory */
-        MEMORY_WRITE(16, VDP2(MZCTL), vdp2_regs.mzctl);
+        MEMORY_WRITE(16, VDP2(MZCTL), vdp2_state.buffered_regs.mzctl);
 }

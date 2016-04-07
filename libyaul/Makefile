@@ -177,6 +177,8 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_vram_control_set.c \
 	scu/bus/b/vdp2/vdp2-internal.c \
 	\
+	scu/bus/cpu/cpu_clock_freq_chg.S \
+	scu/bus/cpu/cpu_clock_freq_get.S \
 	scu/bus/cpu/cpu_dmac_channel_set.c \
 	scu/bus/cpu/cpu_dmac_channel_start.c \
 	scu/bus/cpu/cpu_dmac_channel_stop.c \

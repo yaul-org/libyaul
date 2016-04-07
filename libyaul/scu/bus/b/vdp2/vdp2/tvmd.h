@@ -15,8 +15,7 @@
 #include <scu/map.h>
 #include <vdp2/map.h>
 
-/*
- *          +-----------------+
+/*          +-----------------+
  * VBLANK=1 | Top blanking    |
  *          +-----------------+
  * VBLANK=1 | Top border      | <--- scanline #262 (top border)
@@ -28,12 +27,28 @@
  * VBLANK=1 | Bottom blanking |
  *          +-----------------+
  * VBLANK=1 | Vertical sync   |
- *          +-----------------+
- */
+ *          +-----------------+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+#define TVMD_INTERLACE_NONE     0
+#define TVMD_INTERLACE_SINGLE   1
+#define TVMD_INTERLACE_DOUBLE   2
+
+#define TVMD_VERT_224           0
+#define TVMD_VERT_240           1
+#define TVMD_VERT_256           2
+
+#define TVMD_HORZ_NORMAL_A      0
+#define TVMD_HORZ_NORMAL_B      1
+#define TVMD_HORZ_HIRESO_A      2
+#define TVMD_HORZ_HIRESO_B      3
+#define TVMD_HORZ_NORMAL_AE     4
+#define TVMD_HORZ_NORMAL_BE     5
+#define TVMD_HORZ_HIRESO_AE     6
+#define TVMD_HORZ_HIRESO_BE     7
 
 static __inline bool
 vdp2_tvmd_vblank_in(void)
@@ -82,7 +97,7 @@ extern irq_mux_t *vdp2_tvmd_hblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_out_irq_get(void);
 extern void vdp2_tvmd_display_clear(void);
-extern void vdp2_tvmd_display_set(void);
+extern void vdp2_tvmd_display_set(uint8_t, uint8_t, uint8_t);
 
 #ifdef __cplusplus
 }

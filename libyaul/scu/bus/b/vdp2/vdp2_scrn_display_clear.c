@@ -12,8 +12,8 @@
 void
 vdp2_scrn_display_clear(void)
 {
-        vdp2_regs.bgon = 0x0000;
+        vdp2_state.buffered_regs.bgon = 0x0000;
 
         /* Write to register */
-        MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
+        MEMORY_WRITE(16, VDP2(BGON), vdp2_state.buffered_regs.bgon);
 }

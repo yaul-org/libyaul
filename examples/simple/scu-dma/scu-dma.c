@@ -71,7 +71,6 @@ main(void)
         int level;
 
         vdp2_init();
-        vdp2_tvmd_display_set(); /* Turn display ON */
         vdp2_tvmd_blcs_set(/* lcclmd = */ false, VRAM_ADDR_4MBIT(3, 0x1FFFE),
             blcs_color, 0);
 
@@ -91,6 +90,9 @@ main(void)
         scu_ic_mask_chg(IC_MSK_ALL & ~mask, IC_MSK_NULL);
         /* Enable interrupts */
         cpu_intc_enable();
+
+        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+            TVMD_VERT_224);
 
         digital = smpc_peripheral_digital_port(1);
 

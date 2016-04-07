@@ -196,50 +196,50 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
         switch (format->scf_scroll_screen) {
         case SCRN_NBG0:
                 /* Character color count */
-                vdp2_regs.chctla &= 0xFF8F;
-                vdp2_regs.chctla |= format->scf_cc_count << 4;
+                vdp2_state.buffered_regs.chctla &= 0xFF8F;
+                vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 4;
 
                 /* Character size */
-                vdp2_regs.chctla &= 0xFFFE;
-                vdp2_regs.chctla |= format->scf_character_size >> 2;
+                vdp2_state.buffered_regs.chctla &= 0xFFFE;
+                vdp2_state.buffered_regs.chctla |= format->scf_character_size >> 2;
 
                 /* Plane size */
-                vdp2_regs.plsz &= 0xFFFC;
-                vdp2_regs.plsz |= format->scf_plane_size - 1;
+                vdp2_state.buffered_regs.plsz &= 0xFFFC;
+                vdp2_state.buffered_regs.plsz |= format->scf_plane_size - 1;
 
                 /* Map */
-                vdp2_regs.mpofn &= 0xFFF8;
-                vdp2_regs.mpofn |= map_offset;
+                vdp2_state.buffered_regs.mpofn &= 0xFFF8;
+                vdp2_state.buffered_regs.mpofn |= map_offset;
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(MPABN0), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN0), (plane_d << 8) | plane_c);
-                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN0), pncnx);
                 break;
         case SCRN_NBG1:
                 /* Character color count */
-                vdp2_regs.chctla &= 0xCFFF;
-                vdp2_regs.chctla |= format->scf_cc_count << 12;
+                vdp2_state.buffered_regs.chctla &= 0xCFFF;
+                vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 12;
 
                 /* Character size */
-                vdp2_regs.chctla &= 0xFEFF;
-                vdp2_regs.chctla |= (format->scf_character_size >> 2) << 8;
+                vdp2_state.buffered_regs.chctla &= 0xFEFF;
+                vdp2_state.buffered_regs.chctla |= (format->scf_character_size >> 2) << 8;
 
                 /* Plane size */
-                vdp2_regs.plsz &= 0xFFF3;
-                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 2;
+                vdp2_state.buffered_regs.plsz &= 0xFFF3;
+                vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 2;
 
                 /* Map */
-                vdp2_regs.mpofn &= 0xFF8F;
-                vdp2_regs.mpofn |= map_offset << 4;
+                vdp2_state.buffered_regs.mpofn &= 0xFF8F;
+                vdp2_state.buffered_regs.mpofn |= map_offset << 4;
 
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(MPABN1), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN1), (plane_d << 8) | plane_c);
-                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN1), pncnx);
                 break;
         case SCRN_NBG2:
@@ -249,27 +249,27 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 #endif /* DEBUG */
 
                 /* Character color count */
-                vdp2_regs.chctlb &= 0xFFFD;
-                vdp2_regs.chctlb |= format->scf_cc_count << 1;
+                vdp2_state.buffered_regs.chctlb &= 0xFFFD;
+                vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 1;
 
                 /* Character Size */
-                vdp2_regs.chctlb &= 0xFFFE;
-                vdp2_regs.chctlb |= format->scf_character_size >> 2;
+                vdp2_state.buffered_regs.chctlb &= 0xFFFE;
+                vdp2_state.buffered_regs.chctlb |= format->scf_character_size >> 2;
 
                 /* Plane Size */
-                vdp2_regs.plsz &= 0xFFCF;
-                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 4;
+                vdp2_state.buffered_regs.plsz &= 0xFFCF;
+                vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 4;
 
                 /* Map */
-                vdp2_regs.mpofn &= 0xF8FF;
-                vdp2_regs.mpofn |= map_offset << 8;
+                vdp2_state.buffered_regs.mpofn &= 0xF8FF;
+                vdp2_state.buffered_regs.mpofn |= map_offset << 8;
 
                 /* Write to memory */
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(MPABN2), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN2), (plane_d << 8) | plane_c);
-                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCN2), pncnx);
                 break;
         case SCRN_NBG3:
@@ -279,25 +279,25 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 #endif /* DEBUG */
 
                 /* Character color count */
-                vdp2_regs.chctlb &= 0xFFDF;
-                vdp2_regs.chctlb |= format->scf_cc_count << 5;
+                vdp2_state.buffered_regs.chctlb &= 0xFFDF;
+                vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 5;
 
                 /* Character size */
-                vdp2_regs.chctlb &= 0xFFEF;
-                vdp2_regs.chctlb |= format->scf_character_size << 2;
+                vdp2_state.buffered_regs.chctlb &= 0xFFEF;
+                vdp2_state.buffered_regs.chctlb |= format->scf_character_size << 2;
 
                 /* Plane size */
-                vdp2_regs.plsz &= 0xFF3F;
-                vdp2_regs.plsz |= (format->scf_plane_size - 1) << 6;
+                vdp2_state.buffered_regs.plsz &= 0xFF3F;
+                vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 6;
 
                 /* Map */
-                vdp2_regs.mpofn &= 0x8FFF;
-                vdp2_regs.mpofn |= map_offset << 12;
+                vdp2_state.buffered_regs.mpofn &= 0x8FFF;
+                vdp2_state.buffered_regs.mpofn |= map_offset << 12;
 
                 /* Write to memory */
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
-                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
                 MEMORY_WRITE(16, VDP2(MPABN3), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN3), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(PNCN3), pncnx);
@@ -325,30 +325,30 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 plane_p = ((format->scf_map.plane_p - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
 
                 /* Character color count */
-                vdp2_regs.chctlb &= 0x8FFF;
-                vdp2_regs.chctlb |= format->scf_cc_count << 12;
+                vdp2_state.buffered_regs.chctlb &= 0x8FFF;
+                vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 12;
 
                 /* Character size */
-                vdp2_regs.chctlb &= 0xFEFF;
-                vdp2_regs.chctlb |= (format->scf_character_size >> 2) << 8;
+                vdp2_state.buffered_regs.chctlb &= 0xFEFF;
+                vdp2_state.buffered_regs.chctlb |= (format->scf_character_size >> 2) << 8;
 
                 /* Rotation parameter mode */
-                vdp2_regs.rpmd &= 0xFFFE;
-                vdp2_regs.rpmd |= format->scf_rp_mode;
+                vdp2_state.buffered_regs.rpmd &= 0xFFFE;
+                vdp2_state.buffered_regs.rpmd |= format->scf_rp_mode;
 
                 switch (format->scf_rp_mode) {
                 case 0:
                         /* Mode 0: Rotation Parameter A */
 
                         /* Plane size */
-                        vdp2_regs.plsz &= 0xFCFF;
-                        vdp2_regs.plsz |= (format->scf_plane_size - 1) << 8;
+                        vdp2_state.buffered_regs.plsz &= 0xFCFF;
+                        vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 8;
 
                         /* Screen over process */
 
                         /* Map */
-                        vdp2_regs.mpofr &= 0xFFF8;
-                        vdp2_regs.mpofr |= map_offset;
+                        vdp2_state.buffered_regs.mpofr &= 0xFFF8;
+                        vdp2_state.buffered_regs.mpofr |= map_offset;
 
                         MEMORY_WRITE(16, VDP2(MPABRA), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRA), (plane_d << 8) | plane_c);
@@ -363,14 +363,14 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                         /* Mode 1: Rotation Parameter B */
 
                         /* Plane size */
-                        vdp2_regs.plsz &= 0xCFFF;
-                        vdp2_regs.plsz |= (format->scf_plane_size - 1) << 12;
+                        vdp2_state.buffered_regs.plsz &= 0xCFFF;
+                        vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 12;
 
                         /* Screen over process */
 
                         /* Map */
-                        vdp2_regs.mpofr &= 0xFF8F;
-                        vdp2_regs.mpofr |= map_offset << 4;
+                        vdp2_state.buffered_regs.mpofr &= 0xFF8F;
+                        vdp2_state.buffered_regs.mpofr |= map_offset << 4;
 
                         MEMORY_WRITE(16, VDP2(MPABRB), (plane_b << 8) | plane_a);
                         MEMORY_WRITE(16, VDP2(MPCDRB), (plane_d << 8) | plane_c);
@@ -389,11 +389,11 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 }
 
                 /* Write to memory */
-                MEMORY_WRITE(16, VDP2(MPOFR), vdp2_regs.mpofr);
-                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
-                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
+                MEMORY_WRITE(16, VDP2(MPOFR), vdp2_state.buffered_regs.mpofr);
+                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
+                MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
                 MEMORY_WRITE(16, VDP2(PNCR), pncnx);
-                MEMORY_WRITE(16, VDP2(RPMD), vdp2_regs.rpmd);
+                MEMORY_WRITE(16, VDP2(RPMD), vdp2_state.buffered_regs.rpmd);
                 break;
         }
 }

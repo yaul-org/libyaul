@@ -22,14 +22,13 @@ vdp2_scrn_back_screen_addr_set(bool single_color, uint32_t vram)
             (single_color ? 0x0000 : 0x8000) | ((vram >> 17) & 0x03));
         MEMORY_WRITE(16, VDP2(BKTAL), (vram >> 1) & 0xFFFF);
 
-        /* Force display. If BDCLMD is set and DISP has never been set,
-         * the back screen will not display properly. */
-        vdp2_tvmd_display_set();
 
         uint16_t tvmd;
         tvmd = MEMORY_READ(16, VDP2(TVMD));
         tvmd &= 0xFEFF;
-        tvmd |= 0x0100;
+        /* Force display. If BDCLMD (0x0100 is set and DISP has never
+         * been set, the back screen will not display properly. */
+        tvmd |= 0x8100;
 
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 }

@@ -20,12 +20,12 @@ vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
 
         switch (vcs->vcs_scrn) {
         case SCRN_NBG0:
-                vdp2_regs.scrctl &= 0xFFFE;
-                vdp2_regs.scrctl |= 0x0001;
+                vdp2_state.buffered_regs.scrctl &= 0xFFFE;
+                vdp2_state.buffered_regs.scrctl |= 0x0001;
                 break;
         case SCRN_NBG1:
-                vdp2_regs.scrctl &= 0xFEFF;
-                vdp2_regs.scrctl |= 0x0100;
+                vdp2_state.buffered_regs.scrctl &= 0xFEFF;
+                vdp2_state.buffered_regs.scrctl |= 0x0100;
                 break;
         default:
                 assert((vcs->vcs_scrn == SCRN_NBG0) ||
@@ -33,5 +33,5 @@ vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
         }
 
         /* Write to memory */
-        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_regs.scrctl);
+        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_state.buffered_regs.scrctl);
 }

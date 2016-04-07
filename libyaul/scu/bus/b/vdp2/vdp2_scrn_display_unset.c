@@ -22,8 +22,8 @@ vdp2_scrn_display_unset(uint8_t scrn)
                (scrn == SCRN_RBG0));
 #endif /* DEBUG */
 
-        vdp2_regs.bgon &= ~((1 << scrn) | (1 << (scrn + 8)));
+        vdp2_state.buffered_regs.bgon &= ~((1 << scrn) | (1 << (scrn + 8)));
 
         /* Write to register */
-        MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
+        MEMORY_WRITE(16, VDP2(BGON), vdp2_state.buffered_regs.bgon);
 }

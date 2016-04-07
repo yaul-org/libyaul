@@ -119,8 +119,8 @@ hardware_init(void)
 
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE), 0x9C00);
 
-        /* Turn on display */
-        vdp2_tvmd_display_set();
+        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+            TVMD_VERT_224);
 }
 
 static void

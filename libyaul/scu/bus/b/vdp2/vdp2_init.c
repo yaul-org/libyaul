@@ -13,55 +13,7 @@
 
 #include "vdp2-internal.h"
 
-struct vdp2_regs vdp2_regs;
-
-struct vram_ctl vram_ctl = {
-        .vram_size = VRAM_CTL_SIZE_4MBIT,
-        .vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B,
-        .vram_cycp.pt = {
-                {
-                        /* VRAM-A0 */
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS
-                }, {
-                        /* VRAM-A1 */
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS
-                }, {
-                        /* VRAM-B0 */
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS
-                }, {
-                        /* VRAM-B1 */
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS,
-                        VRAM_CTL_CYCP_NO_ACCESS
-                }
-        }
-};
+struct vdp2_state vdp2_state;
 
 irq_mux_t vdp2_hblank_in_irq_mux;
 irq_mux_t vdp2_vblank_in_irq_mux;
@@ -74,11 +26,26 @@ static void vdp2_vblank_out(void);
 void
 vdp2_init(void)
 {
-        /* Avoid re-initializing */
+        /* Avoid re-initializing by checking */
         static bool initialized = false;
 
-        /* Reset all buffer registers. */
-        memset(&vdp2_regs, 0x0000, sizeof(struct vdp2_regs));
+        vdp2_state.vram_ctl.vram_size = VRAM_CTL_SIZE_4MBIT;
+        vdp2_state.vram_ctl.vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B;
+        uint32_t vram_bank;
+        for (vram_bank = 0; vram_bank < 4; vram_bank++) {
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t0 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t1 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t2 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t3 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t4 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t5 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t6 = VRAM_CTL_CYCP_NO_ACCESS;
+                vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t7 = VRAM_CTL_CYCP_NO_ACCESS;
+        }
+
+        /* Reset all buffered registers. */
+        memset(&vdp2_state.buffered_regs, 0x0000,
+            sizeof(vdp2_state.buffered_regs));
 
         /* Initialize the processor to sane values */
         MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
@@ -97,25 +64,25 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(CYCB1U), 0xFFFF);
 
         /* Scroll screen */
-        vdp2_regs.bgon = 0x0000;
-        MEMORY_WRITE(16, VDP2(BGON), vdp2_regs.bgon);
-        vdp2_regs.chctla = 0x0000;
-        MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_regs.chctla);
-        MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_regs.chctlb);
+        vdp2_state.buffered_regs.bgon = 0x0000;
+        MEMORY_WRITE(16, VDP2(BGON), vdp2_state.buffered_regs.bgon);
+        vdp2_state.buffered_regs.chctla = 0x0000;
+        MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
+        MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
         MEMORY_WRITE(16, VDP2(PNCN0), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN1), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN2), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN3), 0x0000);
-        vdp2_regs.plsz = 0x0000;
-        MEMORY_WRITE(16, VDP2(PLSZ), vdp2_regs.plsz);
-        vdp2_regs.bmpna = 0x0000;
-        MEMORY_WRITE(16, VDP2(BMPNA), vdp2_regs.bmpna);
-        vdp2_regs.bmpnb = 0x0000;
-        MEMORY_WRITE(16, VDP2(BMPNB), vdp2_regs.bmpnb);
-        vdp2_regs.mpofn = 0x0000;
-        MEMORY_WRITE(16, VDP2(MPOFN), vdp2_regs.mpofn);
-        vdp2_regs.mpofr = 0x0000;
-        MEMORY_WRITE(16, VDP2(MPOFR), vdp2_regs.mpofr);
+        vdp2_state.buffered_regs.plsz = 0x0000;
+        MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
+        vdp2_state.buffered_regs.bmpna = 0x0000;
+        MEMORY_WRITE(16, VDP2(BMPNA), vdp2_state.buffered_regs.bmpna);
+        vdp2_state.buffered_regs.bmpnb = 0x0000;
+        MEMORY_WRITE(16, VDP2(BMPNB), vdp2_state.buffered_regs.bmpnb);
+        vdp2_state.buffered_regs.mpofn = 0x0000;
+        MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
+        vdp2_state.buffered_regs.mpofr = 0x0000;
+        MEMORY_WRITE(16, VDP2(MPOFR), vdp2_state.buffered_regs.mpofr);
 
         MEMORY_WRITE(16, VDP2(MPABN0), 0x0000);
         MEMORY_WRITE(16, VDP2(MPCDN0), 0x0000);
@@ -137,8 +104,8 @@ vdp2_init(void)
 
         /* Rotation scroll screen */
         MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
-        vdp2_regs.rpmd = 0x0000;
-        MEMORY_WRITE(16, VDP2(RPMD), vdp2_regs.rpmd);
+        vdp2_state.buffered_regs.rpmd = 0x0000;
+        MEMORY_WRITE(16, VDP2(RPMD), vdp2_state.buffered_regs.rpmd);
         MEMORY_WRITE(16, VDP2(OVPNRA), 0x0000);
         MEMORY_WRITE(16, VDP2(OVPNRB), 0x0000);
 
@@ -165,33 +132,33 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(BKTAU), 0x0000);
 
         /* Priority function */
-        vdp2_regs.prina = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRINA), vdp2_regs.prina);
-        vdp2_regs.prinb = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRINB), vdp2_regs.prinb);
-        vdp2_regs.prir = 0x0001;
-        MEMORY_WRITE(16, VDP2(PRIR), vdp2_regs.prir);
+        vdp2_state.buffered_regs.prina = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRINA), vdp2_state.buffered_regs.prina);
+        vdp2_state.buffered_regs.prinb = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRINB), vdp2_state.buffered_regs.prinb);
+        vdp2_state.buffered_regs.prir = 0x0001;
+        MEMORY_WRITE(16, VDP2(PRIR), vdp2_state.buffered_regs.prir);
 
         /* Color offset function */
         MEMORY_WRITE(16, VDP2(CLOFEN), 0x0000);
         MEMORY_WRITE(16, VDP2(CLOFSL), 0x0000);
 
         /* Initialize */
-        vdp2_regs.spctl = 0x0020;
-        MEMORY_WRITE(16, VDP2(SPCTL), vdp2_regs.spctl);
-        vdp2_regs.prisa = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISA), vdp2_regs.prisa);
-        vdp2_regs.prisb = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISB), vdp2_regs.prisb);
-        vdp2_regs.prisc = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISC), vdp2_regs.prisc);
-        vdp2_regs.prisd = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISD), vdp2_regs.prisd);
+        vdp2_state.buffered_regs.spctl = 0x0020;
+        MEMORY_WRITE(16, VDP2(SPCTL), vdp2_state.buffered_regs.spctl);
+        vdp2_state.buffered_regs.prisa = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRISA), vdp2_state.buffered_regs.prisa);
+        vdp2_state.buffered_regs.prisb = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRISB), vdp2_state.buffered_regs.prisb);
+        vdp2_state.buffered_regs.prisc = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRISC), vdp2_state.buffered_regs.prisc);
+        vdp2_state.buffered_regs.prisd = 0x0101;
+        MEMORY_WRITE(16, VDP2(PRISD), vdp2_state.buffered_regs.prisd);
 
-        vdp2_regs.craofa = 0x0000;
-        MEMORY_WRITE(16, VDP2(CRAOFA), vdp2_regs.craofa);
-        vdp2_regs.craofb = 0x0000;
-        MEMORY_WRITE(16, VDP2(CRAOFB), vdp2_regs.craofb);
+        vdp2_state.buffered_regs.craofa = 0x0000;
+        MEMORY_WRITE(16, VDP2(CRAOFA), vdp2_state.buffered_regs.craofa);
+        vdp2_state.buffered_regs.craofb = 0x0000;
+        MEMORY_WRITE(16, VDP2(CRAOFB), vdp2_state.buffered_regs.craofb);
 
         if (initialized) {
                 return;

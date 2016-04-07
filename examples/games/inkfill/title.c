@@ -82,7 +82,8 @@ title_init(void)
         assert(amount > 0);
 
         vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ true);
-        vdp2_tvmd_display_set();
+        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+            TVMD_VERT_224);
 
         changed = false;
 }
