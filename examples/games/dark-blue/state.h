@@ -13,8 +13,17 @@
 #define STATE_GAME_TITLE        0
 #define STATE_GAME_GAME         1
 
+/* Each state in the main state machine has a pointer to its own state
+ * data. It's up to the state to populate/use the state data. */
 struct state_data {
+        void *state_title;
+        void *state_game;
 };
+
+void state_title_init(struct state_context *);
+void state_title_update(struct state_context *);
+void state_title_draw(struct state_context *);
+void state_title_exit(struct state_context *);
 
 void state_game_init(struct state_context *);
 void state_game_update(struct state_context *);

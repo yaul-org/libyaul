@@ -34,7 +34,17 @@ main(void)
         fs_init();
         cons_init(CONS_DRIVER_VDP2);
 
+        /* Clear out all state */
+        memset(&state_data, 0x00, sizeof(state_data));
+
         state_machine_init(&state_game);
+        state_machine_add_state(&state_game, "title",
+            STATE_GAME_TITLE,
+            state_title_init,
+            state_title_update,
+            state_title_draw,
+            state_title_exit,
+            &state_data);
         state_machine_add_state(&state_game, "game",
             STATE_GAME_GAME,
             state_game_init,

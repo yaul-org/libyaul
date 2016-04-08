@@ -30,6 +30,7 @@ OBJECTS:= \
 	state.o \
 	state_game.o \
 	state_machine.o \
+	state_title.o \
 	world.o
 
 ROMDISK_DEPS:= levels/test.json
