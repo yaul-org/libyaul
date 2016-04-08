@@ -52,8 +52,7 @@ static inline void action_character_print(int);
 static inline void action_escape_character_print(int);
 static inline void action_csi_dispatch_print(int, int *, int);
 
-static inline void buffer_clear(int32_t, int32_t, int32_t,
-    int32_t);
+static inline void buffer_clear(int32_t, int32_t, int32_t, int32_t);
 static inline void buffer_glyph_write(uint8_t);
 static inline uint8_t buffer_attribute_read(void);
 static inline void buffer_attribute_write(uint8_t);
@@ -73,9 +72,9 @@ static bool cursor_cond_set(int32_t, int32_t);
 static void vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
 void
-cons_init(uint8_t driver)
+cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
 {
-        static struct cons_buffer _cb[CONS_ROWS * CONS_COLS];
+        static struct cons_buffer _cons_buffer[CONS_COLS_MAX * CONS_ROWS_MAX];
 
         switch (driver) {
         case CONS_DRIVER_VDP1:
@@ -89,14 +88,16 @@ cons_init(uint8_t driver)
                 return;
         }
 
-        cons.buffer = &_cb[0];
+        cons.buffer = &_cons_buffer[0];
+        cons.cols = cols;
+        cons.rows = rows;
 
         uint32_t col;
         uint32_t row;
-        for (row = 0; row < CONS_ROWS; row++) {
-                for (col = 0; col < CONS_COLS; col++) {
+        for (row = 0; row < cons.rows; row++) {
+                for (col = 0; col < cons.cols; col++) {
                         struct cons_buffer *entry;
-                        entry = &cons.buffer[col + (row * CONS_COLS)];
+                        entry = &cons.buffer[col + (row * cons.cols)];
 
                         entry->attribute = CONS_ATTRIBUTE_RESET_ALL_ATTRIBUTES;
                         entry->fg = CONS_PALETTE_FG_WHITE;
@@ -186,7 +187,7 @@ cursor_column_exceeded(int32_t x)
         int32_t col;
 
         col = cons.cursor.col + x;
-        return (col < 0) || (col >= CONS_COLS);
+        return (col < 0) || (col >= cons.cols);
 }
 
 /*
@@ -199,7 +200,7 @@ cursor_row_exceeded(uint32_t y)
         int32_t row;
 
         row = cons.cursor.row + y;
-        return (row < 0) || (row >= CONS_ROWS);
+        return (row < 0) || (row >= cons.rows);
 }
 
 /*
@@ -230,7 +231,7 @@ static bool __unused
 cursor_row_cond_set(int32_t row)
 {
 
-        if ((row >= 0) && (row <= CONS_ROWS)) {
+        if ((row >= 0) && (row <= cons.rows)) {
                 cons.cursor.row = row;
                 return true;
         }
@@ -250,7 +251,7 @@ cursor_column_advance(int32_t x)
 
 /*
  * Set the cursor an X amount of columns iff it does not exceed
- * CONS_COLS.
+ * cons.cols.
  */
 static void __unused
 cursor_column_set(int32_t x)
@@ -267,7 +268,7 @@ static bool __unused
 cursor_column_cond_set(int32_t col)
 {
 
-        if ((col >= 0) && (col <= CONS_COLS)) {
+        if ((col >= 0) && (col <= cons.cols)) {
                 cons.cursor.col = col;
                 return true;
         }
@@ -283,8 +284,8 @@ static bool __unused
 cursor_cond_set(int32_t col, int32_t row)
 {
 
-        if (((col >= 0) && (col <= CONS_COLS)) &&
-            ((row >= 0) && (row <= CONS_ROWS))) {
+        if (((col >= 0) && (col <= cons.cols)) &&
+            ((row >= 0) && (row <= cons.rows))) {
                 cons.cursor.col = col;
                 cons.cursor.row = row;
                 return true;
@@ -304,7 +305,7 @@ buffer_clear(int32_t col_start, int32_t col_end,
                 for (col = col_start; col < col_end; col++) {
                         struct cons_buffer *cb;
 
-                        cb = &cons.buffer[col + (row * CONS_COLS)];
+                        cb = &cons.buffer[col + (row * cons.cols)];
                         cb->glyph = '\0';
                 }
         }
@@ -316,7 +317,7 @@ buffer_glyph_write(uint8_t glyph)
         struct cons_buffer *cb;
 
         cb = &cons.buffer[cons.cursor.col +
-            (cons.cursor.row * CONS_COLS)];
+            (cons.cursor.row * cons.cols)];
         cb->glyph = glyph;
 }
 
@@ -326,7 +327,7 @@ buffer_attribute_read(void)
         struct cons_buffer *cb;
 
         cb = &cons.buffer[cons.cursor.col +
-            (cons.cursor.row * CONS_COLS)];
+            (cons.cursor.row * cons.cols)];
 
         return cb->attribute;
 }
@@ -337,7 +338,7 @@ buffer_attribute_write(uint8_t attribute)
         struct cons_buffer *cb;
 
         cb = &cons.buffer[cons.cursor.col +
-            (cons.cursor.row * CONS_COLS)];
+            (cons.cursor.row * cons.cols)];
         cb->attribute = attribute;
 }
 
@@ -347,7 +348,7 @@ buffer_fg_write(uint8_t fg)
         struct cons_buffer *cb;
 
         cb = &cons.buffer[cons.cursor.col +
-            (cons.cursor.row * CONS_COLS)];
+            (cons.cursor.row * cons.cols)];
         cb->fg = fg;
 }
 
@@ -357,7 +358,7 @@ buffer_bg_write(uint8_t bg)
         struct cons_buffer *cb;
 
         cb = &cons.buffer[cons.cursor.col +
-            (cons.cursor.row * CONS_COLS)];
+            (cons.cursor.row * cons.cols)];
         cb->bg = bg;
 }
 
@@ -399,7 +400,7 @@ action_escape_character_print(int ch)
                 tab = CONS_TAB_WIDTH;
 
                 if (cursor_column_exceeded(CONS_TAB_WIDTH)) {
-                        if ((tab = (CONS_COLS - cons.cursor.col - 1)) < 0) {
+                        if ((tab = (cons.cols - cons.cursor.col - 1)) < 0) {
                                 break;
                         }
                 }
@@ -449,7 +450,7 @@ action_csi_dispatch_print(int ch, int *params,
 
                 row = (params[0] == 0) ? 1 : params[0];
                 if (cursor_row_exceeded(row)) {
-                        row = CONS_ROWS - cons.cursor.row - 1;
+                        row = cons.rows - cons.cursor.row - 1;
                 }
 
                 cursor_row_advance(row);
@@ -468,7 +469,7 @@ action_csi_dispatch_print(int ch, int *params,
 
                 col = (params[0] == 0) ? 1 : params[0];
                 if (cursor_column_exceeded(col)) {
-                        col = CONS_COLS - cons.cursor.col - 1;
+                        col = cons.cols - cons.cursor.col - 1;
                 }
 
                 cursor_column_advance(col);
@@ -495,9 +496,9 @@ action_csi_dispatch_print(int ch, int *params,
         case 'H':
                 /* ESC [ Pn ; Pn H */
 
-                /* Both parameters are absolute: [0..CONS_COLS] and
-                 * [0..CONS_ROWS]. However, relative to the user, the values
-                 * range from (0..CONS_COLS] and (0..CONS_CONS_ROWS]. */
+                /* Both parameters are absolute: [0..cons.cols] and
+                 * [0..cons.rows]. However, relative to the user, the values
+                 * range from (0..cons.cols] and (0..cons.rows]. */
 
                 /* This sequence has two parameter values, the first
                  * specifying the line position and the second
@@ -527,8 +528,8 @@ action_csi_dispatch_print(int ch, int *params,
                 case 0:
                         /* Erase from the active position to the end of
                          * the screen, inclusive (default). */
-                        buffer_clear(cons.cursor.col, CONS_COLS,
-                            cons.cursor.row, CONS_ROWS);
+                        buffer_clear(cons.cursor.col, cons.cols,
+                            cons.cursor.row, cons.rows);
                         break;
                 case 1:
                         /* Erase from start of the screen to the active
@@ -540,7 +541,7 @@ action_csi_dispatch_print(int ch, int *params,
                         /* Erase all of the display –- all lines are
                          * erased, changed to single-width, and the
                          * cursor does not move. */
-                        buffer_clear(0, CONS_COLS, 0, CONS_ROWS);
+                        buffer_clear(0, cons.cols, 0, cons.rows);
                         break;
                 default:
                         break;
@@ -556,7 +557,7 @@ action_csi_dispatch_print(int ch, int *params,
                 case 0:
                         /* Erase from the active position to the end of
                          * the line, inclusive (default) */
-                        buffer_clear(cons.cursor.col, CONS_COLS,
+                        buffer_clear(cons.cursor.col, cons.cols,
                             cons.cursor.row, cons.cursor.row + 1);
                         break;
                 case 1:
@@ -567,7 +568,7 @@ action_csi_dispatch_print(int ch, int *params,
                         break;
                 case 2:
                         /* Erase all of the line, inclusive */
-                        buffer_clear(0, CONS_COLS,
+                        buffer_clear(0, cons.cols,
                             cons.cursor.row, cons.cursor.row + 1);
                         break;
                 default:

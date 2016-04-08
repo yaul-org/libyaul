@@ -150,6 +150,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp1/vdp1_cmdt.c \
 	scu/bus/b/vdp1/vdp1_init.c \
 	\
+	scu/bus/b/vdp2/vdp2-internal.c \
 	scu/bus/b/vdp2/vdp2_init.c \
 	scu/bus/b/vdp2/vdp2_priority_spn_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_addr_set.c \
@@ -169,13 +170,13 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_scrn_scv_y_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_vcs_set.c \
 	scu/bus/b/vdp2/vdp2_tvmd_display_clear.c \
+	scu/bus/b/vdp2/vdp2_tvmd_display_res_set.c \
 	scu/bus/b/vdp2/vdp2_tvmd_display_set.c \
 	scu/bus/b/vdp2/vdp2_tvmd_hblank_in_irq_get.c \
 	scu/bus/b/vdp2/vdp2_tvmd_vblank_in_irq_get.c \
 	scu/bus/b/vdp2/vdp2_tvmd_vblank_out_irq_get.c \
 	scu/bus/b/vdp2/vdp2_vram_control_get.c \
 	scu/bus/b/vdp2/vdp2_vram_control_set.c \
-	scu/bus/b/vdp2/vdp2-internal.c \
 	\
 	scu/bus/cpu/cpu_clock_freq_chg.S \
 	scu/bus/cpu/cpu_clock_freq_get.S \

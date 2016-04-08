@@ -97,8 +97,8 @@ cons_vdp2_init(struct cons *cons)
         uint16_t *nbg3_page1;
         nbg3_page1 = &_nbg3_planes[0][SCRN_CALCULATE_PAGE_DIMENSION(&_nbg3_format)];
 
-        for (row = 0; row < CONS_ROWS; row++) {
-                for (col = 0; col < CONS_COLS; col++) {
+        for (row = 0; row < cons->rows; row++) {
+                for (col = 0; col < cons->cols; col++) {
                         nbg3_page0[col + (row << 6)] =
                             _nbg3_character_number | _nbg3_palette_number;
                         nbg3_page1[col + (row << 6)] =
@@ -107,8 +107,7 @@ cons_vdp2_init(struct cons *cons)
         }
 
         vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
-        vdp2_tvmd_display_set(TVMD_INTERLACE_DOUBLE, TVMD_HORZ_HIRESO_A,
-            TVMD_VERT_240);
+        vdp2_tvmd_display_set();
 }
 
 static void
@@ -125,10 +124,10 @@ cons_vdp2_write(struct cons *cons)
         uint16_t *nbg3_page1;
         nbg3_page1 = &_nbg3_planes[0][SCRN_CALCULATE_PAGE_DIMENSION(&_nbg3_format)];
 
-        for (col = 0; col < CONS_COLS; col++) {
-                for (row = 0; row < CONS_ROWS; row++) {
+        for (col = 0; col < cons->cols; col++) {
+                for (row = 0; row < cons->rows; row++) {
                         struct cons_buffer *cb;
-                        cb = &cons->buffer[col + (row * CONS_COLS)];
+                        cb = &cons->buffer[col + (row * cons->cols)];
 
                         uint16_t character_number;
                         character_number =

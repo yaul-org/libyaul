@@ -106,7 +106,8 @@ extern irq_mux_t *vdp2_tvmd_hblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_in_irq_get(void);
 extern irq_mux_t *vdp2_tvmd_vblank_out_irq_get(void);
 extern void vdp2_tvmd_display_clear(void);
-extern void vdp2_tvmd_display_set(uint8_t, uint8_t, uint8_t);
+extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
+extern void vdp2_tvmd_display_set(void);
 
 #ifdef __cplusplus
 }

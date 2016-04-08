@@ -31,13 +31,15 @@ __assert_func(const char *file, int line, const char *func,
 
         /* Reset the VDP2 */
         vdp2_init();
-
-        /* Reset the VDP1 */
-        vdp1_init();
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_DOUBLE, TVMD_HORZ_HIRESO_A,
+                TVMD_VERT_240);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
                 COLOR_RGB555(0, 224, 0));
 
-        cons_init(CONS_DRIVER_VDP2);
+        /* Reset the VDP1 */
+        vdp1_init();
+
+        cons_init(CONS_DRIVER_VDP2, 80, 60);
         cons_write(buf);
 
         abort();

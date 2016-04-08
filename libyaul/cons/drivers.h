@@ -20,6 +20,9 @@
 struct cons_buffer;
 
 struct cons {
+        uint16_t cols;
+        uint16_t rows;
+
         struct {
                 int32_t col;
                 int32_t row;

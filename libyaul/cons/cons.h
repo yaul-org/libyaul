@@ -15,15 +15,15 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* Practically half the normal size of a normal console */
-#define CONS_COLS               80
-#define CONS_ROWS               60
+#define CONS_COLS_MAX           88
+#define CONS_ROWS_MAX           60
+
 #define CONS_TAB_WIDTH          2
 
 #define CONS_DRIVER_VDP1        0
 #define CONS_DRIVER_VDP2        1
 
-extern void cons_init(uint8_t);
+extern void cons_init(uint8_t, uint16_t, uint16_t);
 extern void cons_buffer(const char *);
 extern void cons_flush(void);
 extern void cons_write(const char *);
