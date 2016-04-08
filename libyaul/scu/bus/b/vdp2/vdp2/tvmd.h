@@ -33,6 +33,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define TVMD_TV_STANDARD_NTSC   0
+#define TVMD_TV_STANDARD_PAL    1
+
 #define TVMD_INTERLACE_NONE     0
 #define TVMD_INTERLACE_SINGLE   1
 #define TVMD_INTERLACE_DOUBLE   2
@@ -91,6 +94,12 @@ vdp2_tvmd_vcount_get(void)
         MEMORY_WRITE(16, VDP2(EXTEN), MEMORY_READ(16, VDP2(EXTEN)) & ~0x0200);
         for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) == 0x0200); );
         return MEMORY_READ(16, VDP2(VCNT)) & 0x03FF;
+}
+
+static __inline uint16_t
+vdp2_tvmd_tv_standard_get(void)
+{
+        return MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001;
 }
 
 extern irq_mux_t *vdp2_tvmd_hblank_in_irq_get(void);

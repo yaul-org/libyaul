@@ -13,8 +13,6 @@
 
 #include "vdp2-internal.h"
 
-struct vdp2_state vdp2_state;
-
 irq_mux_t vdp2_hblank_in_irq_mux;
 irq_mux_t vdp2_vblank_in_irq_mux;
 irq_mux_t vdp2_vblank_out_irq_mux;
@@ -28,6 +26,11 @@ vdp2_init(void)
 {
         /* Avoid re-initializing by checking */
         static bool initialized = false;
+
+        /* Reset all state */
+        vdp2_state.display_w = 320;
+        vdp2_state.display_h = 224; /* Either NTSC or PAL */
+        vdp2_state.interlaced = TVMD_INTERLACE_NONE;
 
         vdp2_state.vram_ctl.vram_size = VRAM_CTL_SIZE_4MBIT;
         vdp2_state.vram_ctl.vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B;
@@ -172,8 +175,8 @@ vdp2_init(void)
         cpu_intc_disable();
 
         uint32_t mask;
-
         mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_HBLANK_IN;
+
         scu_ic_mask_chg(IC_MASK_ALL, mask);
 
         scu_ic_interrupt_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);

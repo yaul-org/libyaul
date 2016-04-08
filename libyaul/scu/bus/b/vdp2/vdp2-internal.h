@@ -17,6 +17,8 @@ struct vdp2_state {
         uint16_t display_w;
         uint16_t display_h;
 
+        uint16_t interlaced;
+
         struct {
                 uint16_t bgon;          /* Register offset: 0x180020 */
                 uint16_t mzctl;         /* Register offset: 0x180022 */

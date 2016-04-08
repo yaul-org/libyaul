@@ -143,7 +143,8 @@ vdp2_tvmd_display_set(uint8_t interlace, uint8_t horizontal, uint8_t vertical)
         /* Update state */
         vdp2_state.display_w = display_w;
         vdp2_state.display_h = display_h;
+        vdp2_state.interlaced = interlace;
 
-        /* Write to memory */
+        /* write to memory */
         MEMORY_WRITE(16, VDP2(TVMD), tvmd);
 }
