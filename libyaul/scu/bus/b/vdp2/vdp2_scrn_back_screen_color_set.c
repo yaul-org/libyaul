@@ -7,6 +7,7 @@
 
 #include <assert.h>
 
+#include <vdp2/cram.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
@@ -17,7 +18,7 @@ vdp2_scrn_back_screen_color_set(uint32_t vram, uint16_t color)
 {
         /* Write color */
         vdp2_tvmd_vblank_in_wait();
-        *(volatile uint16_t *)vram = 0x8000 | color;
+        *(volatile uint16_t *)vram = COLOR_RGB_DATA | color;
 
         /* Set back screen address */
         vdp2_scrn_back_screen_addr_set(/* single_color = */ true, vram);

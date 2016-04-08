@@ -29,10 +29,6 @@
  * VBLANK=1 | Vertical sync   |
  *          +-----------------+ */
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #define TVMD_TV_STANDARD_NTSC   0
 #define TVMD_TV_STANDARD_PAL    1
 
@@ -44,14 +40,18 @@ extern "C" {
 #define TVMD_VERT_240           1
 #define TVMD_VERT_256           2
 
-#define TVMD_HORZ_NORMAL_A      0
-#define TVMD_HORZ_NORMAL_B      1
-#define TVMD_HORZ_HIRESO_A      2
-#define TVMD_HORZ_HIRESO_B      3
-#define TVMD_HORZ_NORMAL_AE     4
-#define TVMD_HORZ_NORMAL_BE     5
-#define TVMD_HORZ_HIRESO_AE     6
-#define TVMD_HORZ_HIRESO_BE     7
+#define TVMD_HORZ_NORMAL_A      0 /* 320x */
+#define TVMD_HORZ_NORMAL_B      1 /* 352x */
+#define TVMD_HORZ_HIRESO_A      2 /* 640x */
+#define TVMD_HORZ_HIRESO_B      3 /* 704x */
+#define TVMD_HORZ_NORMAL_AE     4 /* 320x480 */
+#define TVMD_HORZ_NORMAL_BE     5 /* 352x480 */
+#define TVMD_HORZ_HIRESO_AE     6 /* 640x480 */
+#define TVMD_HORZ_HIRESO_BE     7 /* 704x480 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 static __inline bool
 vdp2_tvmd_vblank_in(void)
