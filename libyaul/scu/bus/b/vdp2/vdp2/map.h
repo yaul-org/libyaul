@@ -73,10 +73,10 @@
 #define SCXDN0          0x0072
 #define SCYIN0          0x0074
 #define SCYDN0          0x0076
-#define ZMXN0I          0x0078
-#define ZMXN0D          0x007A
-#define ZMYN0I          0x007C
-#define ZMYN0D          0x007E
+#define ZMXIN0          0x0078
+#define ZMXDN0          0x007A
+#define ZMYIN0          0x007C
+#define ZMYDN0          0x007E
 #define SCXIN1          0x0080
 #define SCXDN1          0x0082
 #define SCYIN1          0x0084

@@ -154,6 +154,27 @@ struct scrn_cell_format {
                                *   Mode 3: Swap via Rotation Parameter Window */
 };
 
+/* Limitations for NBG0/NBG1 reduction:
+ * +--------+-----+-----------+------------+
+ * | Screen | CCC | Reduction | No display |
+ * +--------+-----+-----------+------------+
+ * | NBG0   | 16  | 1/2       | None       |
+ * |        |     +-----------+------------+
+ * |        |     | 1/4       | NBG2       |
+ * |        +-----+-----------+------------+
+ * |        | 256 | 1/2       | NBG2       |
+ * +--------+-----+-----------+------------+
+ * | NBG1   | 16  | 1/2       | None       |
+ * |        |     +-----------+------------+
+ * |        |     | 1/4       | NBG3       |
+ * |        +-----+-----------+------------+
+ * |        | 256 | 1/2       | NBG3       |
+ * +--------+-----+-----------+------------+ */
+
+#define SCRN_REDUCTION_NONE     0 /* No reduction */
+#define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */
+#define SCRN_REDUCTION_QUARTER  2 /* 1/4 reduction */
+
 struct scrn_ls_format {
         uint8_t ls_scrn;        /* Normal background */
         uint32_t ls_lsta;       /* Line scroll table (lead addr.) */
@@ -178,13 +199,15 @@ extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
 extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
+extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
 extern void vdp2_scrn_mosaic_clear(void);
 extern void vdp2_scrn_mosaic_horizontal_set(uint32_t);
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
 extern void vdp2_scrn_mosaic_vertical_set(uint32_t);
-
-extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
+extern void vdp2_scrn_reduction_set(uint8_t, uint16_t);
+extern void vdp2_scrn_reduction_x_set(uint8_t, uint16_t, uint16_t);
+extern void vdp2_scrn_reduction_y_set(uint8_t, uint16_t, uint16_t);
 extern void vdp2_scrn_scv_x_set(uint8_t, uint16_t, uint8_t);
 extern void vdp2_scrn_scv_y_set(uint8_t, uint16_t, uint8_t);
 
