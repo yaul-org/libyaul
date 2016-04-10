@@ -42,6 +42,14 @@ struct vdp2_state {
                 uint16_t prina;         /* Register offset: 0x1800F8 */
                 uint16_t prinb;         /* Register offset: 0x1800FA */
                 uint16_t prir;          /* Register offset: 0x1800FC */
+                uint16_t clofen;        /* Register offset: 0x180110 */
+                uint16_t clofsl;        /* Register offset: 0x180112 */
+                uint16_t coar;          /* Register offset: 0x180114 */
+                uint16_t coag;          /* Register offset: 0x180116 */
+                uint16_t coab;          /* Register offset: 0x180118 */
+                uint16_t cobr;          /* Register offset: 0x18011A */
+                uint16_t cobg;          /* Register offset: 0x18011C */
+                uint16_t cobb;          /* Register offset: 0x18011E */
         } buffered_regs;
 
         struct vram_ctl vram_ctl;

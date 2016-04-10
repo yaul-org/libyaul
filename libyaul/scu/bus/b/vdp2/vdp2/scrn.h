@@ -21,6 +21,8 @@ extern "C" {
 #define SCRN_NBG2               2 /* Normal background (NBG2) */
 #define SCRN_NBG3               3 /* Normal background (NBG3) */
 #define SCRN_RBG0               4 /* Rotational background (RBG0) */
+#define SCRN_BACK               5
+#define SCRN_SPRITE             6
 
 #define SCRN_CCC_PALETTE_16     0
 #define SCRN_CCC_PALETTE_256    1
@@ -192,10 +194,17 @@ struct scrn_vcs_format {
         uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
 };
 
+#define SCRN_COLOR_OFFSET_A     0
+#define SCRN_COLOR_OFFSET_B     1
+
 extern void vdp2_scrn_back_screen_addr_set(bool, uint32_t);
 extern void vdp2_scrn_back_screen_color_set(uint32_t, uint16_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
+extern void vdp2_scrn_color_offset_clear(void);
+extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t,  int16_t,  int16_t);
+extern void vdp2_scrn_color_offset_set(uint8_t, uint8_t);
+extern void vdp2_scrn_color_offset_unset(uint8_t);
 extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);

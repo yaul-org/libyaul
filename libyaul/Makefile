@@ -157,6 +157,10 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_color_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_bitmap_format_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_cell_format_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_color_offset_rgb_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_color_offset_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_color_offset_unset.c \
+	scu/bus/b/vdp2/vdp2_scrn_color_offset_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_unset.c \
