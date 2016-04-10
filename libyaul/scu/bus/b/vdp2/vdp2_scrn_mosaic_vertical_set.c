@@ -16,7 +16,7 @@ vdp2_scrn_mosaic_vertical_set(uint32_t vertical)
                 return;
         }
 
-        vdp2_state.buffered_regs.mzctl &= 0xF0FF;
+        vdp2_state.buffered_regs.mzctl &= 0x0FFF;
         vdp2_state.buffered_regs.mzctl |= (vertical - 1) << 12;
 
         /* Write to memory */
