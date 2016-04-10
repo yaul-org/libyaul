@@ -9,6 +9,7 @@
 #include <tga.h>
 
 #include "fs.h"
+#include "fs_texture.h"
 #include "objects.h"
 #include "physics.h"
 
@@ -40,13 +41,9 @@ static void on_block_draw(struct object *);
 static void on_block_collision(struct object *, struct object *,
     const struct collider_info *);
 
-static void _update_world_map(struct object *, uint32_t);
-static void _update_world_colliders(struct object *, uint32_t);
-
-static uint16_t scroll_x = 0;
-static uint16_t last_scroll_x = 0;
-static uint16_t move = 0;
-static uint16_t column = 0;
+static void m_update_map(struct object *, uint32_t);
+static void m_update_colliders(struct object *);
+static void m_start(struct object *);
 
 struct object_world object_world = {
         .active = true,
@@ -59,31 +56,42 @@ struct object_world object_world = {
         .on_draw = on_world_draw,
         .on_destroy = NULL,
         .on_collision = NULL,
-        .on_trigger = NULL
+        .on_trigger = NULL,
+        .private_functions = {
+                .m_update_map = m_update_map,
+                .m_update_colliders = m_update_colliders
+        },
+        .functions = {
+                .m_start = m_start
+        }
 };
 
-struct object_block object_block_pool[OBJECT_BLOCK_COUNT];
+static struct object_block object_block_pool[OBJECT_BLOCK_COUNT];
 
 static void
 on_world_init(struct object *this)
 {
-        struct object_world *world __unused;
-        world = (struct object_world *)this;
-
-        world->private_data.m_map_fh = fs_open("/TEST.MAP");
-        assert(world->private_data.m_map_fh != NULL);
+        THIS_PRIVATE_DATA(object_world, map_fh) = fs_open("/TEST.MAP");
+        assert(THIS_PRIVATE_DATA(object_world, map_fh) != NULL);
 
         /* World */
-        world->transform.position.x = 0;
-        world->transform.position.y = 0;
+        THIS(object_world, transform).pos_int.x = 0;
+        THIS(object_world, transform).pos_int.y = 0;
 
         /* Player */
-        object_player.transform.position.x = 5 * WORLD_BLOCK_WIDTH;
-        object_player.transform.position.y = ((WORLD_ROWS) - 11) * WORLD_BLOCK_HEIGHT;
+        OBJECT(&object_player, transform).pos_int.x = 5 * WORLD_BLOCK_WIDTH;
+        OBJECT(&object_player, transform).pos_int.y = ((WORLD_ROWS) - 11) * WORLD_BLOCK_HEIGHT;
 
-        world->private_data.m_column_count =
-            fs_size(world->private_data.m_map_fh) / WORLD_MAP_FORMAT_COLUMN_SIZE;
-        world->private_data.m_row_count = WORLD_ROWS;
+        THIS_PRIVATE_DATA(object_world, scroll_x) = 0;
+        THIS_PRIVATE_DATA(object_world, last_scroll_x) = 0;
+        THIS_PRIVATE_DATA(object_world, move) = 0;
+        THIS_PRIVATE_DATA(object_world, column) = 0;
+
+        THIS_PRIVATE_DATA(object_world, column_count) =
+            fs_size(THIS_PRIVATE_DATA(object_world, map_fh)) / WORLD_MAP_FORMAT_COLUMN_SIZE;
+        THIS_PRIVATE_DATA(object_world, row_count) = WORLD_ROWS;
+
+        fs_seek(THIS_PRIVATE_DATA(object_world, map_fh), 0, SEEK_SET);
 
         uint32_t block_idx;
         for (block_idx = 0; block_idx < OBJECT_BLOCK_COUNT; block_idx++) {
@@ -106,12 +114,12 @@ on_world_init(struct object *this)
                 physics_object_add((struct object *)block);
         }
 
-        _update_world_map(this, 0);
-        _update_world_colliders(this, 0);
+        THIS_CALL_PRIVATE_MEMBER(object_world, update_map, 0);
+        THIS_CALL_PRIVATE_MEMBER(object_world, update_colliders);
 
         /* Set up NBG1 */
         struct scrn_cell_format *nbg1_format; {
-                nbg1_format = &world->private_data.m_nbg1_format;
+                nbg1_format = &THIS_PRIVATE_DATA(object_world, nbg1_format);
 
                 nbg1_format->scf_scroll_screen = SCRN_NBG1;
                 nbg1_format->scf_cc_count = SCRN_CCC_PALETTE_256;
@@ -129,15 +137,15 @@ on_world_init(struct object *this)
 
         /* Set up NBG2 */
         struct scrn_cell_format *nbg2_format; {
-                nbg2_format = &world->private_data.m_nbg2_format;
+                nbg2_format = &THIS_PRIVATE_DATA(object_world, nbg2_format);
 
                 nbg2_format->scf_scroll_screen = SCRN_NBG2;
                 nbg2_format->scf_cc_count = SCRN_CCC_PALETTE_256;
                 nbg2_format->scf_character_size = 1 * 1;
                 nbg2_format->scf_pnd_size = 1; /* 1 word */
                 nbg2_format->scf_auxiliary_mode = 1;
-                nbg2_format->scf_cp_table = VRAM_ADDR_4MBIT(0, 0x08000);
-                nbg2_format->scf_color_palette = CRAM_MODE_1_OFFSET(2, 0, 0);
+                nbg2_format->scf_cp_table = VRAM_ADDR_4MBIT(0, 0x04000);
+                nbg2_format->scf_color_palette = CRAM_MODE_1_OFFSET(1, 0, 0);
                 nbg2_format->scf_plane_size = 1 * 1;
                 nbg2_format->scf_map.plane_a = VRAM_ADDR_4MBIT(0, 0x02000);
                 nbg2_format->scf_map.plane_b = VRAM_ADDR_4MBIT(0, 0x02000);
@@ -167,59 +175,42 @@ on_world_init(struct object *this)
         vram_ctl->vram_cycp.pt[1].t0 = VRAM_CTL_CYCP_NO_ACCESS;
 
         /* We want to be in VBLANK-IN (retrace) */
-        vdp2_tvmd_display_clear(); {
-                void *file_handle;
-                file_handle = fs_open("/WORLD.TGA");
+        fs_texture_vdp2_load("/WORLD.TGA",
+            (void *)nbg1_format->scf_cp_table,
+            (uint16_t *)nbg1_format->scf_color_palette);
 
-                size_t file_size;
-                file_size = romdisk_total(file_handle);
+        vdp2_vram_control_set(vram_ctl);
 
-                uint8_t *ptr;
-                ptr = (uint8_t *)0x00201000;
+        vdp2_scrn_cell_format_set(nbg1_format);
+        vdp2_priority_spn_set(SCRN_NBG1, 2);
+        vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
 
-                fs_read(file_handle, ptr, file_size);
-                fs_close(file_handle);
-
-                tga_t tga;
-                int status;
-                status = tga_read(&tga, ptr);
-                assert(status == TGA_FILE_OK);
-                uint32_t amount;
-                amount = tga_image_decode_tiled(&tga, (void *)nbg1_format->scf_cp_table);
-                assert(amount > 0);
-                amount = tga_cmap_decode(&tga, (uint16_t *)nbg1_format->scf_color_palette);
-                assert(amount > 0);
-
-                vdp2_vram_control_set(vram_ctl);
-
-                vdp2_scrn_cell_format_set(nbg1_format);
-                vdp2_priority_spn_set(SCRN_NBG1, 2);
-                vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
-
-                vdp2_scrn_cell_format_set(nbg2_format);
-                vdp2_priority_spn_set(SCRN_NBG2, 1);
-                vdp2_scrn_display_set(SCRN_NBG2, /* transparent = */ true);
-        } vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
-            TVMD_VERT_224);
+        vdp2_scrn_cell_format_set(nbg2_format);
+        vdp2_priority_spn_set(SCRN_NBG2, 1);
+        vdp2_scrn_display_set(SCRN_NBG2, /* transparent = */ true);
 }
 
 static void
 on_world_update(struct object *this)
 {
-        struct object_world *world __unused;
-        world = (struct object_world *)this;
+        THIS_PRIVATE_DATA(object_world, last_scroll_x) =
+            THIS_PRIVATE_DATA(object_world, scroll_x);
+        THIS_PRIVATE_DATA(object_world, scroll_x) =
+            OBJECT(&object_camera, transform).pos_int.x;
 
-        last_scroll_x = scroll_x;
-        scroll_x = object_camera.transform.position.x;
+        uint16_t delta;
+        delta = THIS_PRIVATE_DATA(object_world, scroll_x) -
+            THIS_PRIVATE_DATA(object_world, last_scroll_x);
 
-        move += scroll_x - last_scroll_x;
-        if (move >= WORLD_BLOCK_WIDTH) {
-                move = 0;
-                column++;
+        THIS_PRIVATE_DATA(object_world, move) += delta;
+        if (THIS_PRIVATE_DATA(object_world, move) >= WORLD_BLOCK_WIDTH) {
+                THIS_PRIVATE_DATA(object_world, move) = 0;
+                THIS_PRIVATE_DATA(object_world, column)++;
         }
 
-        _update_world_map(this, column);
-        _update_world_colliders(this, column);
+        THIS_CALL_PRIVATE_MEMBER(object_world, update_map,
+            THIS_PRIVATE_DATA(object_world, column));
+        THIS_CALL_PRIVATE_MEMBER(object_world, update_colliders);
 
         uint32_t block_idx;
         for (block_idx = 0; block_idx < OBJECT_BLOCK_COUNT; block_idx++) {
@@ -236,7 +227,7 @@ static void
 on_world_draw(struct object *this)
 {
         struct scrn_cell_format *nbg1_format;
-        nbg1_format = &THIS(object_world, nbg1_format);
+        nbg1_format = &THIS_PRIVATE_DATA(object_world, nbg1_format);
 
         uint32_t nbg1_page_width;
         nbg1_page_width = SCRN_CALCULATE_PAGE_WIDTH(nbg1_format);
@@ -248,16 +239,18 @@ on_world_draw(struct object *this)
         nbg1_plane_pages[2] = (uint16_t *)(nbg1_format->scf_map.plane_c + (2 * nbg1_page_size));
         nbg1_plane_pages[3] = (uint16_t *)(nbg1_format->scf_map.plane_d + (3 * nbg1_page_size));
         uint8_t *nbg1_cp_table;
-        nbg1_cp_table = (uint8_t *)THIS(object_world, nbg1_format).scf_cp_table;
+        nbg1_cp_table = (uint8_t *)THIS_PRIVATE_DATA(object_world, nbg1_format).scf_cp_table;
         uint16_t *nbg1_color_palette;
-        nbg1_color_palette = (uint16_t *)THIS(object_world, nbg1_format).scf_color_palette;
+        nbg1_color_palette = (uint16_t *)THIS_PRIVATE_DATA(object_world, nbg1_format).scf_color_palette;
 
-        vdp2_scrn_scv_x_set(SCRN_NBG1, move, 0);
+        vdp2_scrn_scv_x_set(SCRN_NBG1, THIS_PRIVATE_DATA(object_world, move),
+            0);
 
         uint32_t column_idx;
         for (column_idx = 0; column_idx < (WORLD_COLUMNS + 1); column_idx++) {
                 struct world_column *world_column;
-                world_column = &THIS(object_world, columns)[column_idx];
+                world_column = &THIS_PRIVATE_DATA(object_world, columns)[column_idx];
+
                 uint32_t row_idx;
                 for (row_idx = 0; row_idx < WORLD_ROWS; row_idx++) {
                         uint16_t pnd;
@@ -268,18 +261,39 @@ on_world_draw(struct object *this)
                         nbg1_plane_pages[0][column_idx + (row_idx * nbg1_page_width)] = pnd;
                 }
         }
+
+        struct scrn_cell_format *nbg2_format;
+        nbg2_format = &THIS_PRIVATE_DATA(object_world, nbg2_format);
+
+        uint32_t nbg2_page_width;
+        nbg2_page_width = SCRN_CALCULATE_PAGE_WIDTH(nbg2_format);
+        uint32_t nbg2_page_size;
+        nbg2_page_size = SCRN_CALCULATE_PAGE_SIZE(nbg2_format);
+        uint16_t *nbg2_plane_pages[4];
+        nbg2_plane_pages[0] = (uint16_t *)nbg2_format->scf_map.plane_a;
+        nbg2_plane_pages[1] = (uint16_t *)(nbg2_format->scf_map.plane_b + nbg2_page_size);
+        nbg2_plane_pages[2] = (uint16_t *)(nbg2_format->scf_map.plane_c + (2 * nbg2_page_size));
+        nbg2_plane_pages[3] = (uint16_t *)(nbg2_format->scf_map.plane_d + (3 * nbg2_page_size));
+        uint8_t *nbg2_cp_table;
+        nbg2_cp_table = (uint8_t *)THIS_PRIVATE_DATA(object_world, nbg2_format).scf_cp_table;
+        uint16_t *nbg2_color_palette;
+        nbg2_color_palette = (uint16_t *)THIS_PRIVATE_DATA(object_world, nbg2_format).scf_color_palette;
+
+        uint32_t x;
+        for (x = 0; x < (SCREEN_WIDTH / 8); x++) {
+                uint32_t y;
+                for (y = 0; y < (SCREEN_HEIGHT / 8); y++) {
+                        uint16_t pnd;
+                        pnd = (VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)nbg2_cp_table) |
+                            VDP2_PN_CONFIG_1_PALETTE_NUMBER((uint32_t)nbg2_color_palette));
+                        nbg2_plane_pages[0][x + (y * nbg2_page_width)] = pnd | ((3 * 4) * 2);
+                }
+        }
 }
 
 static void
-_update_world_colliders(struct object *this, uint32_t column __unused)
+m_update_colliders(struct object *this)
 {
-        struct object_world *world __unused;
-        world = (struct object_world *)this;
-
-        /* Take the position of the player */
-        struct object_player *player;
-        player = (struct object_player *)&object_player;
-
         struct bounding_box bb;
         bb.point.a.x = (-(BLOCKS / 2) * WORLD_BLOCK_WIDTH) + 1;
         bb.point.a.y = ((BLOCKS - 1) * WORLD_BLOCK_HEIGHT) - 1;
@@ -303,11 +317,11 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
                 bb_y = bb.points[point_idx].y;
 
                 int16_t column;
-                column = ((player->transform.position.x + bb_x) /
+                column = ((OBJECT(&object_player, transform).pos_int.x + bb_x) /
                     WORLD_BLOCK_WIDTH);
                 int16_t row;
                 row = (WORLD_ROWS - 1) -
-                    ((player->transform.position.y + bb_y) /
+                    ((OBJECT(&object_player, transform).pos_int.y + bb_y) /
                         WORLD_BLOCK_HEIGHT);
 
                 block_points[point_idx].x = clamp(column, 0, WORLD_COLUMNS - 1);
@@ -322,9 +336,9 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
         /* Make sure we don't cause a buffer overflow */
         assert(OBJECT_BLOCK_COUNT >= (columns * rows));
 
-        int16_t column_initial __unused;
+        int16_t column_initial;
         column_initial = block_points[3].x;
-        int16_t row_initial __unused;
+        int16_t row_initial;
         row_initial = block_points[0].y;
 
         uint32_t block_idx;
@@ -336,7 +350,7 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
                 column_offset = column_initial + column_idx;
 
                 struct world_column *world_column;
-                world_column = &world->private_data.m_columns[column_offset];
+                world_column = &THIS_PRIVATE_DATA(object_world, columns)[column_offset];
 
                 uint32_t row_idx;
                 for (row_idx = 0; row_idx < rows; row_idx++) {
@@ -372,21 +386,18 @@ _update_world_colliders(struct object *this, uint32_t column __unused)
 }
 
 static void
-_update_world_map(struct object *this, uint32_t column)
+m_update_map(struct object *this, uint32_t cur_column)
 {
-        struct object_world *world __unused;
-        world = (struct object_world *)this;
-
-        fs_seek(world->private_data.m_map_fh,
-            column * WORLD_MAP_FORMAT_COLUMN_SIZE, SEEK_SET);
+        fs_seek(THIS_PRIVATE_DATA(object_world, map_fh),
+            cur_column * WORLD_MAP_FORMAT_COLUMN_SIZE, SEEK_SET);
 
         uint32_t column_idx;
         for (column_idx = 0; column_idx < (WORLD_COLUMNS + 1); column_idx++) {
                 struct world_column *world_column;
-                world_column = &world->private_data.m_columns[column_idx];
+                world_column = &THIS_PRIVATE_DATA(object_world, columns)[column_idx];
 
                 uint8_t row[WORLD_MAP_FORMAT_COLUMN_SIZE];
-                fs_read(world->private_data.m_map_fh, &row[0],
+                fs_read(THIS_PRIVATE_DATA(object_world, map_fh), &row[0],
                     WORLD_MAP_FORMAT_COLUMN_SIZE);
 
                 uint32_t row_idx;
@@ -416,17 +427,14 @@ _update_world_map(struct object *this, uint32_t column)
 static void
 on_block_init(struct object *this)
 {
-        struct object_block *block;
-        block = (struct object_block *)this;
+        THIS_PRIVATE_DATA(object_block, block) = WORLD_COLUMN_BLOCK_NONE;
+        int16_vector2_zero(&THIS_PRIVATE_DATA(object_block, block_pos));
 
-        block->private_data.m_block = WORLD_COLUMN_BLOCK_NONE;
-        int16_vector2_zero(&block->private_data.m_block_pos);
+        THIS(object_block, transform).object = this;
+        THIS(object_block, transform).pos_int.x = 0;
+        THIS(object_block, transform).pos_int.y = 0;
 
-        block->transform.object = (struct object *)block;
-        block->transform.position.x = 0;
-        block->transform.position.y = 0;
-
-        collider_init(block->colliders[0], /* id = */ -1,
+        collider_init(THIS(object_block, colliders)[0], /* id = */ -1,
             WORLD_BLOCK_WIDTH, WORLD_BLOCK_HEIGHT,
             /* trigger = */ false, /* fixed = */ true);
 }
@@ -434,32 +442,26 @@ on_block_init(struct object *this)
 static void
 on_block_update(struct object *this)
 {
-        struct object_block *block __unused;
-        block = (struct object_block *)this;
-
-        struct object_world *world;
-        world = (struct object_world *)&object_world;
-
         uint32_t column;
-        column = block->private_data.m_block_pos.x;
+        column = THIS_PRIVATE_DATA(object_block, block_pos).x;
         uint32_t row;
-        row = block->private_data.m_block_pos.y;
+        row = THIS_PRIVATE_DATA(object_block, block_pos).y;
 
         struct world_column *world_column;
-        world_column = &world->private_data.m_columns[column];
+        world_column = &OBJECT_PRIVATE_DATA(&object_world, columns)[column];
 
-        switch (block->private_data.m_block) {
+        switch (THIS_PRIVATE_DATA(object_block, block)) {
         case WORLD_COLUMN_BLOCK_SAFE:
         case WORLD_COLUMN_BLOCK_UNSAFE:
                 world_column->row[row].block = WORLD_COLUMN_BLOCK_COLLIDER;
 
-                block->colliders[0]->id = 0;
+                THIS(object_block, colliders)[0]->id = 0;
                 break;
         }
 
         /* XXX: This is not truly in world space */
-        block->transform.position.x = column * WORLD_BLOCK_WIDTH;
-        block->transform.position.y = (WORLD_ROWS - row - 1) * WORLD_BLOCK_HEIGHT;
+        THIS(object_block, transform).pos_int.x = column * WORLD_BLOCK_WIDTH;
+        THIS(object_block, transform).pos_int.y = (WORLD_ROWS - row - 1) * WORLD_BLOCK_HEIGHT;
 }
 
 static void
@@ -468,16 +470,32 @@ on_block_draw(struct object *this __unused)
 }
 
 static void
-on_block_collision(struct object *this, struct object *other,
+on_block_collision(struct object *this __unused, struct object *other,
     const struct collider_info *info __unused)
 {
-        struct object_block *block __unused;
-        block = (struct object_block *)this;
-
         if (other->id == OBJECT_BLOCK_ID) {
                 return;
         }
 
         (void)sprintf(text, "block, other->id=%i\n", (int)other->id);
         cons_buffer(text);
+}
+
+static void
+m_start(struct object *this)
+{
+        /* World */
+        THIS(object_world, transform).pos_int.x = 0;
+        THIS(object_world, transform).pos_int.y = 0;
+
+        /* Player */
+        OBJECT(&object_player, transform).pos_int.x = 5 * WORLD_BLOCK_WIDTH;
+        OBJECT(&object_player, transform).pos_int.y = ((WORLD_ROWS) - 11) * WORLD_BLOCK_HEIGHT;
+
+        fs_seek(THIS_PRIVATE_DATA(object_world, map_fh), 0, SEEK_SET);
+
+        THIS_PRIVATE_DATA(object_world, scroll_x) = 0;
+        THIS_PRIVATE_DATA(object_world, last_scroll_x) = 0;
+        THIS_PRIVATE_DATA(object_world, move) = 0;
+        THIS_PRIVATE_DATA(object_world, column) = 0;
 }

@@ -16,8 +16,8 @@ for root, dirs, filenames in os.walk(os.path.join(os.getcwd(), "levels")):
         try:
             with open(json_filename, "r") as file_object:
                 json_data = json.load(file_object)
-                # Make sure that the height is exactly 14 tiles
-                assert(json_data['height'] == 14)
+                # Make sure that the height is exactly 15 tiles (352x240)
+                assert(json_data['height'] == 15)
                 # Make sure we have exactly three layers (Level, Collision, and Region)
                 assert(len(json_data['layers']) == 1)
                 layer_types = [str(layer['type']) for layer in json_data['layers']]

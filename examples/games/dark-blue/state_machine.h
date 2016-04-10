@@ -13,6 +13,9 @@
 
 #include <sys/queue.h>
 
+#define STATE_MACHINE_CONTEXT_DATA(state_context, state_name)                  \
+    ((struct state_data *)(state_context)->sc_data)->CC_CONCAT(state_, state_name)
+
 TAILQ_HEAD(states, state);
 
 struct state_context {

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef OBJECT_PLAYER_H
+#define OBJECT_PLAYER_H
 
 #define FIXMATH_NO_OVERFLOW 1
 #define FIXMATH_NO_ROUNDING 1
@@ -21,18 +21,24 @@
 #include "state.h"
 
 struct object_player {
-#define PLAYER_COLOR                    RGB888_TO_RGB555(255, 255, 0)
-
-#define PLAYER_STATE_IDLE               0
-#define PLAYER_STATE_RUN                1
-#define PLAYER_STATE_JUMP               2
-#define PLAYER_STATE_DEAD               3
-
         OBJECT_DECLARATIONS
 
+        /* Public data */
         struct {
-                int16_t m_direction;
+            void (*m_start)(struct object *);
+            bool (*m_dead)(struct object *);
+        } functions;
 
+        struct {
+        } data;
+
+        /* Private data */
+        struct {
+                void (*m_update_polygon)(struct object *);
+                void (*m_update_input)(struct object *);
+        } private_functions;
+
+        struct {
                 uint16_t m_width;
                 uint16_t m_height;
 
@@ -46,4 +52,4 @@ struct object_player {
 
 extern struct object_player object_player;
 
-#endif /* !PLAYER_H */
+#endif /* !OBJECT_PLAYER_H */

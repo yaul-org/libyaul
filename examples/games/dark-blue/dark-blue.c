@@ -32,12 +32,19 @@ main(void)
 {
         hardware_init();
         fs_init();
-        cons_init(CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2, 40, 80);
 
         /* Clear out all state */
         memset(&state_data, 0x00, sizeof(state_data));
 
         state_machine_init(&state_game);
+        state_machine_add_state(&state_game, "splash",
+            STATE_GAME_TITLE,
+            state_splash_init,
+            state_splash_update,
+            state_splash_draw,
+            state_splash_exit,
+            &state_data);
         state_machine_add_state(&state_game, "title",
             STATE_GAME_TITLE,
             state_title_init,
@@ -75,6 +82,8 @@ hardware_init(void)
 
         /* VDP2 */
         vdp2_init();
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+            TVMD_VERT_240);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE), 0x9C00);
 
         /* SMPC */

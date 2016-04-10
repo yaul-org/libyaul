@@ -99,13 +99,13 @@ sat_object_projection_calculate(const struct object *object,
     struct sat_projection *project)
 {
         struct aabb aabb;
-        aabb.min.x = object->transform.position.x +
+        aabb.min.x = object->transform.pos_int.x +
             object->colliders[0]->aabb.min.x - 1;
-        aabb.min.y = object->transform.position.y +
+        aabb.min.y = object->transform.pos_int.y +
             object->colliders[0]->aabb.min.y - 1;
-        aabb.max.x = object->transform.position.x +
+        aabb.max.x = object->transform.pos_int.x +
             object->colliders[0]->aabb.max.x;
-        aabb.max.y = object->transform.position.y +
+        aabb.max.y = object->transform.pos_int.y +
             object->colliders[0]->aabb.max.y;
 
         /* dot(up_vector, vertex[0]) */
@@ -172,15 +172,15 @@ sat_object_object_test(const struct object *object, const struct object *other,
 
         if (direction != NULL) {
                 int16_vector2_t object_center;
-                object_center.x = object->transform.position.x +
+                object_center.x = object->transform.pos_int.x +
                     object->colliders[0]->aabb.center.x - 1;
-                object_center.y = object->transform.position.y +
+                object_center.y = object->transform.pos_int.y +
                     object->colliders[0]->aabb.center.y - 1;
 
                 int16_vector2_t other_center;
-                other_center.x = other->transform.position.x +
+                other_center.x = other->transform.pos_int.x +
                     other->colliders[0]->aabb.center.x - 1;
-                other_center.y = other->transform.position.y +
+                other_center.y = other->transform.pos_int.y +
                     other->colliders[0]->aabb.center.y - 1;
 
                 int16_vector2_t center_diff;
@@ -223,7 +223,7 @@ stage_simulate(void)
 
                 if (!object->rigid_body->kinematic) {
                         fix16_vector2_t gravity =
-                            FIX16_VECTOR2_INITIALIZER(0.0f, -60.0f);
+                            FIX16_VECTOR2_INITIALIZER(0.0f, 0.0f);
 
                         /* Add obligatory gravitational force */
                         rigid_body_forces_add(rigid_body, &gravity);
@@ -277,11 +277,10 @@ stage_simulate(void)
                 displacement.y = fix16_to_int(rigid_body->displacement.y);
 
                 int16_vector2_t initial;
-                initial.x = transform->position.x;
+                initial.x = transform->pos_int.x;
                 initial.y = ((224 / 16) - 11) * 16;
 
-                int16_vector2_add(&initial, &displacement,
-                    &transform->position);
+                int16_vector2_add(&initial, &displacement, &transform->pos_int);
 
                 /* Clear its forces */
                 rigid_body_forces_clear(rigid_body);
@@ -445,9 +444,9 @@ stage_respond(void)
                         }
 
                         if (!object->colliders[0]->fixed) {
-                                int16_vector2_add(&object->transform.position,
+                                int16_vector2_add(&object->transform.pos_int,
                                     &position_delta,
-                                    &object->transform.position);
+                                    &object->transform.pos_int);
                         }
 
                         if (object->on_collision != NULL) {

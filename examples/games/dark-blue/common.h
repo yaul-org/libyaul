@@ -31,6 +31,6 @@
 }
 
 #define SCREEN_WIDTH    320
-#define SCREEN_HEIGHT   224
+#define SCREEN_HEIGHT   240
 
 #endif /* !COMMON_H */

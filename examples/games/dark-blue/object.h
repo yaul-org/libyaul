@@ -40,8 +40,32 @@
         }                                                                      \
 } while (false)
 
+#define OBJECT(x, member)                                                      \
+        ((x)->CC_CONCAT(,member))
+
+#define OBJECT_PUBLIC_DATA(x, member)                                          \
+        ((x)->data.CC_CONCAT(m_,member))
+
+#define OBJECT_PRIVATE_DATA(x, member)                                         \
+        ((x)->private_data.CC_CONCAT(m_,member))
+
+#define OBJECT_CALL_PUBLIC_MEMBER(x, name, args...)                            \
+        ((x))->functions.CC_CONCAT(m_, name)((struct object *)(x), ##args)
+
 #define THIS(type, member)                                                     \
+        (((struct type *)this)->CC_CONCAT(,member))
+
+#define THIS_PUBLIC_DATA(type, member)                                         \
+        (((struct type *)this)->data.CC_CONCAT(m_, member))
+
+#define THIS_PRIVATE_DATA(type, member)                                        \
         (((struct type *)this)->private_data.CC_CONCAT(m_, member))
+
+#define THIS_CALL_PUBLIC_MEMBER(type, name, args...)                           \
+        ((struct type *)this)->functions.CC_CONCAT(m_, name)(this, ##args)
+
+#define THIS_CALL_PRIVATE_MEMBER(type, name, args...)                          \
+        ((struct type *)this)->private_functions.CC_CONCAT(m_, name)(this, ##args)
 
 struct object {
         OBJECT_DECLARATIONS

@@ -18,22 +18,25 @@ IP_1ST_READ_ADDR:= 0x06004000
 LIBRARIES:= tga fixmath
 OBJECTS:= \
 	root.romdisk.o \
-	camera.o \
 	cmd_groups.o \
 	collider.o \
 	dark-blue.o \
 	fs.o \
+	fs_texture.o \
 	globals.o \
+	object_camera.o \
+	object_fade.o \
+	object_player.o \
+	object_world.o \
 	physics.o \
-	player.o \
 	rigid_body.o \
 	state.o \
 	state_game.o \
 	state_machine.o \
-	state_title.o \
-	world.o
+	state_splash.o \
+	state_title.o
 
-ROMDISK_DEPS:= levels/test.json
+ROMDISK_DEPS:= levels/test.json romdisk/*.TGA
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES) .tmx .json
@@ -43,8 +46,8 @@ ROMDISK_DEPS:= levels/test.json
 	    printf -- "Tiled Map Editor (tiled) is required (http://www.mapeditor.org/)\n" >&2; \
 	    exit 1; \
 	fi
-	tiled --export-map "Json files (*.json)" $< $@
+	echo tiled --export-map "Json files (*.json)" $< $@
 	tools/tmx2map
-	$(RM) $@
+	echo $(RM) $@
 
 include $(INSTALL_ROOT)/share/yaul/post.common.mk

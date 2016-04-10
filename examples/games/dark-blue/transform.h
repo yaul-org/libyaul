@@ -20,7 +20,8 @@ struct object;
 struct transform {
         struct object *object;
 
-        int16_vector2_t position;
+        int16_vector2_t pos_int;
+        fix16_vector2_t pos_fixed;
 } transform;
 
 #endif /* !TRANSFORM_H */

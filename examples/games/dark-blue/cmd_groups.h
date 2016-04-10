@@ -19,11 +19,12 @@ struct cmd_group {
         int32_t priority;
 
         struct cmd {
-#define CMD_GROUP_CMD_TYPE_LOCAL_COORD              1
-#define CMD_GROUP_CMD_TYPE_SYSTEM_CLIP_COORD        2
-#define CMD_GROUP_CMD_TYPE_USER_CLIP_COORD          3
-#define CMD_GROUP_CMD_TYPE_POLYGON                  4
-#define CMD_GROUP_CMD_TYPE_LINE                     5
+#define CMD_GROUP_CMD_TYPE_LOCAL_COORD          1
+#define CMD_GROUP_CMD_TYPE_SYSTEM_CLIP_COORD    2
+#define CMD_GROUP_CMD_TYPE_USER_CLIP_COORD      3
+#define CMD_GROUP_CMD_TYPE_POLYGON              4
+#define CMD_GROUP_CMD_TYPE_LINE                 5
+#define CMD_GROUP_CMD_TYPE_NORMAL_SPRITE        6
                 uint32_t type;
                 void *data;
         } cmds[CMD_GROUPS_MAX];

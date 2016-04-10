@@ -92,6 +92,9 @@ cmd_groups_update(void)
                                 case CMD_GROUP_CMD_TYPE_LINE:
                                         vdp1_cmdt_line_draw(cmd->data);
                                         break;
+                                case CMD_GROUP_CMD_TYPE_NORMAL_SPRITE:
+                                        vdp1_cmdt_sprite_draw(cmd->data);
+                                        break;
                                 default:
                                         assert(false && "Invalid command group type specified");
                                 }

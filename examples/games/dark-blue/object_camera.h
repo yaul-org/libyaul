@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef OBJECT_CAMERA_H
+#define OBJECT_CAMERA_H
 
 #define FIXMATH_NO_OVERFLOW 1
 #define FIXMATH_NO_ROUNDING 1
@@ -23,22 +23,25 @@
 struct object_camera {
         OBJECT_DECLARATIONS
 
+        /* Public data */
         struct {
-                uint16_t m_median;
-                uint16_t m_buffer;
+            void (*m_start)(struct object *, fix16_t);
+        } functions;
 
-                uint16_t m_last_state;
+        struct {
+        } data;
+
+        /* Private data */
+        struct {
                 uint16_t m_state;
-
-                struct bounding_box m_lbb;
-                struct bounding_box m_rbb;
-
+                fix16_t m_speed;
+                uint16_t m_median;
                 struct cmd_group m_cmd_group;
+                struct vdp1_cmdt_local_coord m_debug_local_coord;
                 struct vdp1_cmdt_line m_debug_line;
-                struct vdp1_cmdt_polygon m_debug_polygon[2];
         } private_data;
 };
 
 extern struct object_camera object_camera;
 
-#endif /* !CAMERA_H */
+#endif /* !OBJECT_CAMERA_H */
