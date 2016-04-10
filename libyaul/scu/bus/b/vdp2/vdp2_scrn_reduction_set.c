@@ -38,5 +38,5 @@ vdp2_scrn_reduction_set(uint8_t scrn, uint16_t horz_reduction)
         }
 
         /* Write to memory */
-        MEMORY_WRITE(16, VDP2(MZCTL), vdp2_state.buffered_regs.zmctl);
+        MEMORY_WRITE(16, VDP2(ZMCTL), vdp2_state.buffered_regs.zmctl);
 }
