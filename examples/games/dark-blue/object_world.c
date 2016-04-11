@@ -193,6 +193,16 @@ on_world_init(struct object *this)
 static void
 on_world_update(struct object *this)
 {
+        (void)sprintf(text,
+            "last_scroll_x = %i\n"
+            "scroll_x = %i\n"
+            "delta = %i\n",
+            THIS_PRIVATE_DATA(object_world, last_scroll_x),
+            THIS_PRIVATE_DATA(object_world, scroll_x),
+            (THIS_PRIVATE_DATA(object_world, last_scroll_x) -
+             THIS_PRIVATE_DATA(object_world, scroll_x)));
+        cons_buffer(text);
+
         THIS_PRIVATE_DATA(object_world, last_scroll_x) =
             THIS_PRIVATE_DATA(object_world, scroll_x);
         THIS_PRIVATE_DATA(object_world, scroll_x) =
@@ -201,6 +211,9 @@ on_world_update(struct object *this)
         uint16_t delta;
         delta = THIS_PRIVATE_DATA(object_world, scroll_x) -
             THIS_PRIVATE_DATA(object_world, last_scroll_x);
+
+        THIS(object_world, transform).pos_int.x += delta;
+        THIS(object_world, transform).pos_int.y = 0;
 
         THIS_PRIVATE_DATA(object_world, move) += delta;
         if (THIS_PRIVATE_DATA(object_world, move) >= WORLD_BLOCK_WIDTH) {
@@ -404,8 +417,11 @@ m_update_map(struct object *this, uint32_t cur_column)
                 for (row_idx = 0; row_idx < WORLD_ROWS; row_idx++) {
                         uint16_t tile_number;
 
+                        uint8_t map_entry;
+                        map_entry = row[row_idx];
+
                         uint8_t block;
-                        block = row[row_idx];
+                        block = map_entry & 0x07;
 
                         switch (block) {
                         case WORLD_COLUMN_BLOCK_NONE:
@@ -417,6 +433,15 @@ m_update_map(struct object *this, uint32_t cur_column)
                                 break;
                         default:
                                 assert(false && "Invalid block");
+                        }
+
+                        /* Item: Coin */
+                        if ((map_entry & 0x10) == 0x10) {
+                            tile_number = 2;
+                        }
+
+                        if ((map_entry & 0x08) == 0x08) {
+                            tile_number = 2;
                         }
 
                         world_column->row[row_idx].block = tile_number;

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common.h"
 #include "globals.h"
 #include "physics.h"
 
@@ -30,10 +31,10 @@ static struct object_pool {
 } object_pool;
 static uint32_t object_pool_entry_idx = 0;
 
-static void stage_simulate(void);
-static void stage_detect(void);
+static void stage_simulate(void) __unused;
+static void stage_detect(void) __unused;
 static void stage_detect_collisions_sort(struct object_pool_entry *);
-static void stage_respond(void);
+static void stage_respond(void) __unused;
 
 struct sat_projection {
         int16_t min;
@@ -62,8 +63,8 @@ void
 physics_update(void)
 {
         stage_simulate();
-        stage_detect();
-        stage_respond();
+        /* stage_detect(); */
+        /* stage_respond(); */
 }
 
 void
@@ -91,7 +92,7 @@ static inline bool
 sat_overlap_test(const struct sat_projection *a, const struct sat_projection *b)
 {
         return (((uint32_t)((a->max - b->min) > 0) |
-                (uint32_t)((a->min - b->max) > 0)) != 0);
+                 (uint32_t)((a->min - b->max) > 0)) != 0);
 }
 
 static inline void
@@ -278,7 +279,7 @@ stage_simulate(void)
 
                 int16_vector2_t initial;
                 initial.x = transform->pos_int.x;
-                initial.y = ((224 / 16) - 11) * 16;
+                initial.y = ((SCREEN_HEIGHT / 16) - 11) * 16;
 
                 int16_vector2_add(&initial, &displacement, &transform->pos_int);
 
@@ -434,10 +435,9 @@ stage_respond(void)
 
                         if (object->rigid_body != NULL) {
                                 if (collision->info.direction.x == 0) {
-                                        //object->rigid_body->displacement.y = 0;
+                                        object->rigid_body->displacement.y = 0;
                                         object->rigid_body->velocity.y = F16(0.0f);
                                 } else if (collision->info.direction.y == 0) {
-                                        //object->rigid_body->displacement.x = 0;
                                         object->rigid_body->velocity.x = F16(0.0f);
                                 }
                                 

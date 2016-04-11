@@ -128,9 +128,7 @@ state_game_init(struct state_context *state_context)
         physics_init();
         cmd_groups_init();
 
-        /* Local objects */
         OBJECT_CALL_EVENT(&object_ready, init);
-
         OBJECT_CALL_EVENT(&object_fade, init);
         OBJECT_CALL_EVENT(&object_world, init);
         OBJECT_CALL_EVENT(&object_player, init);
@@ -156,7 +154,7 @@ state_game_update(struct state_context *state_context)
                 OBJECT_CALL_PUBLIC_MEMBER(&object_fade, start,
                     /* fade_in = */ true, F16(2.0f));
                 OBJECT_CALL_PUBLIC_MEMBER(&object_world, start);
-                OBJECT_CALL_PUBLIC_MEMBER(&object_camera, start, F16(0.33f));
+                OBJECT_CALL_PUBLIC_MEMBER(&object_camera, start, F16(0.25f));
 
                 state_game->sg_state = GAME_STATE_FADE_IN;
                 break;
@@ -186,8 +184,10 @@ state_game_update(struct state_context *state_context)
         case GAME_STATE_GAME:
                 /* Check if player is dead */
                 if ((OBJECT_CALL_PUBLIC_MEMBER(&object_player, dead))) {
+                        /* Stop the camera */
+                        OBJECT_CALL_PUBLIC_MEMBER(&object_camera, stop);
                         /* If not enough lives, go to game over screen */
-                        state_game->sg_state = GAME_STATE_FADE_IN_INIT;
+                        /* state_game->sg_state = GAME_STATE_FADE_IN_INIT; */
                 }
                 break;
         case GAME_STATE_GAME_EXIT:

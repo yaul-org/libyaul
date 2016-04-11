@@ -46,6 +46,7 @@ struct object_player {
                 uint32_t m_last_state;
 
                 struct cmd_group m_cmd_group;
+                struct vdp1_cmdt_local_coord m_local_coord;
                 struct vdp1_cmdt_polygon m_polygon;
         } private_data;
 };

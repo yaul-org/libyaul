@@ -36,7 +36,7 @@ OBJECTS:= \
 	state_splash.o \
 	state_title.o
 
-ROMDISK_DEPS:= levels/test.json romdisk/*.TGA
+ROMDISK_DEPS:= levels/test.tmx levels/test.json romdisk/*.TGA
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES) .tmx .json

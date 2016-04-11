@@ -17,6 +17,13 @@
 #define PLAYER_STATE_JUMP               2
 #define PLAYER_STATE_DEAD               3
 
+static const char *player_state2str[] = {
+        "PLAYER_STATE_IDLE",
+        "PLAYER_STATE_WAITING",
+        "PLAYER_STATE_JUMP",
+        "PLAYER_STATE_DEAD"
+};
+
 static void on_init(struct object *);
 static void on_update(struct object *);
 static void on_draw(struct object *);
@@ -37,7 +44,7 @@ struct object_player object_player = {
         .id = OBJECT_PLAYER_ID,
         .rigid_body = &rigid_body,
         .colliders = {
-                NULL
+                &collider
         },
         .on_init = on_init,
         .on_update = on_update,
@@ -58,10 +65,6 @@ struct object_player object_player = {
 static void
 on_init(struct object *this)
 {
-        /* XXX: There is some serious issues with having a "large" stack
-         * frame */
-        static struct vdp1_cmdt_local_coord local;
-
         THIS_PRIVATE_DATA(object_player, state) = PLAYER_STATE_WAITING;
         THIS_PRIVATE_DATA(object_player, last_state) = THIS_PRIVATE_DATA(object_player, state);
 
@@ -72,8 +75,6 @@ on_init(struct object *this)
         width = THIS_PRIVATE_DATA(object_player, width);
         uint16_t height;
         height = THIS_PRIVATE_DATA(object_player, height);
-
-        THIS(object_player, colliders)[0] = &collider;
 
         THIS(object_player, rigid_body)->object = this;
         rigid_body_init(THIS(object_player, rigid_body), /* kinematic = */ false);
@@ -88,17 +89,18 @@ on_init(struct object *this)
 
         physics_object_add((struct object *)this);
 
+        struct vdp1_cmdt_local_coord *local_coord;
+        local_coord = &THIS_PRIVATE_DATA(object_player, local_coord);
+
+        local_coord->lc_coord.x = width / 2;
+        local_coord->lc_coord.y = SCREEN_HEIGHT - (height / 2);
+
         struct cmd_group *cmd_group;
         cmd_group = &THIS_PRIVATE_DATA(object_player, cmd_group);
-
         cmd_group_init(cmd_group);
-
         cmd_group->priority = 0;
-
-        local.lc_coord.x = width / 2;
-        local.lc_coord.y = SCREEN_HEIGHT - (height / 2);
-
-        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LOCAL_COORD, &local);
+        cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LOCAL_COORD,
+            &THIS_PRIVATE_DATA(object_player, local_coord));
         cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_POLYGON,
             &THIS_PRIVATE_DATA(object_player, polygon));
 }
@@ -106,6 +108,14 @@ on_init(struct object *this)
 static void
 on_update(struct object *this)
 {
+        (void)sprintf(text,
+            "player state=%s\n"
+            "player.x = (%i,%i)\n",
+            player_state2str[THIS_PRIVATE_DATA(object_player, state)],
+            THIS(object_player, transform).pos_int.x,
+            THIS(object_player, transform).pos_int.y);
+        cons_buffer(text);
+
         switch (THIS_PRIVATE_DATA(object_player, state)) {
         case PLAYER_STATE_IDLE:
                 THIS_PRIVATE_DATA(object_player, polygon).cp_color = PLAYER_COLOR;
@@ -115,11 +125,6 @@ on_update(struct object *this)
         case PLAYER_STATE_WAITING:
                 THIS_PRIVATE_DATA(object_player, polygon).cp_color =
                     0x8000 | RGB888_TO_RGB555(255, 0, 0);
-
-                if ((tick % 10) == 0) {
-                    /* fix16_vector2_t up = FIX16_VECTOR2_INITIALIZER(0.0f, 500.0f); */
-                    /* rigid_body_forces_add(player->rigid_body, &up); */
-                }
                 break;
         case PLAYER_STATE_JUMP:
                 THIS_PRIVATE_DATA(object_player, polygon).cp_color =
@@ -135,6 +140,10 @@ on_update(struct object *this)
         default:
                 assert(false && "Invalid state");
         }
+
+        /* XXX: Remove me */
+        THIS(object_player, transform).pos_int.x = (5 * WORLD_BLOCK_WIDTH) + OBJECT(&object_world, transform).pos_int.x;
+        THIS(object_player, transform).pos_int.y = (((WORLD_ROWS) - 11) * WORLD_BLOCK_HEIGHT) + OBJECT(&object_world, transform).pos_int.y;
 
         THIS_CALL_PRIVATE_MEMBER(object_player, update_polygon);
 
@@ -187,49 +196,40 @@ m_dead(struct object *this)
 static void
 m_update_polygon(struct object *this)
 {
-        struct vdp1_cmdt_polygon *polygon;
-        polygon = &THIS_PRIVATE_DATA(object_player, polygon);
-
         uint16_t width;
         width = THIS_PRIVATE_DATA(object_player, width);
         uint16_t height;
         height = THIS_PRIVATE_DATA(object_player, height);
 
-        int16_t x;
-        x = THIS(object_player, transform).pos_int.x;
-        int16_t y;
-        y = THIS(object_player, transform).pos_int.y;
+        /* Convert world space to local space */
+        int16_t local_x;
+        local_x = THIS(object_player, transform).pos_int.x - OBJECT(&object_world, transform).pos_int.x;
+        int16_t local_y;
+        local_y = THIS(object_player, transform).pos_int.y - OBJECT(&object_world, transform).pos_int.y;
 
-        polygon->cp_vertex.a.x = (width / 2) + x - 1;
-        polygon->cp_vertex.a.y = -(height / 2) - y;
-        polygon->cp_vertex.b.x = (width / 2) + x - 1;
-        polygon->cp_vertex.b.y = (height / 2) - y - 1;
-        polygon->cp_vertex.c.x = -(width / 2) + x;
-        polygon->cp_vertex.c.y = (height / 2) - y - 1;
-        polygon->cp_vertex.d.x = -(width / 2) + x;
-        polygon->cp_vertex.d.y = -(height / 2) - y;
+        struct vdp1_cmdt_polygon *polygon;
+        polygon = &THIS_PRIVATE_DATA(object_player, polygon);
+
+        polygon->cp_vertex.a.x = (width / 2) + local_x - 1;
+        polygon->cp_vertex.a.y = -(height / 2) - local_y;
+        polygon->cp_vertex.b.x = (width / 2) + local_x - 1;
+        polygon->cp_vertex.b.y = (height / 2) - local_y - 1;
+        polygon->cp_vertex.c.x = -(width / 2) + local_x;
+        polygon->cp_vertex.c.y = (height / 2) - local_y - 1;
+        polygon->cp_vertex.d.x = -(width / 2) + local_x;
+        polygon->cp_vertex.d.y = -(height / 2) - local_y;
 }
 
 static void
-m_update_input(struct object *this)
+m_update_input(struct object *this __unused)
 {
-        int16_vector2_t old_position;
-        old_position.x = THIS(object_player, transform).pos_int.x;
-        old_position.y = THIS(object_player, transform).pos_int.y;
-
-        int16_vector2_t new_position;
-        memcpy(&new_position, &old_position, sizeof(int16_vector2_t));
-
         if (digital_pad.connected == 1) {
                 if (digital_pad.pressed.button.a ||
                     digital_pad.pressed.button.c) {
-                        /* fix16_vector2_t up = */
-                        /*     FIX16_VECTOR2_INITIALIZER(0.0f, 2.0f * 300.0f); */
-                        /* player->private_data.m_state = PLAYER_STATE_JUMP; */
-                        /* rigid_body_forces_add(player->rigid_body, &up); */
+                        fix16_vector2_t up =
+                            FIX16_VECTOR2_INITIALIZER(0.0f, 2.0f * 300.0f);
+                        THIS_PRIVATE_DATA(object_player, state) = PLAYER_STATE_JUMP;
+                        rigid_body_forces_add(THIS(object_player, rigid_body), &up);
                 }
         }
-
-        THIS(object_player, transform).pos_int.x = new_position.x;
-        THIS(object_player, transform).pos_int.y = new_position.y;
 }

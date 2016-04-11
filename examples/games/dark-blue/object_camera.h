@@ -26,6 +26,7 @@ struct object_camera {
         /* Public data */
         struct {
             void (*m_start)(struct object *, fix16_t);
+            void (*m_stop)(struct object *);
         } functions;
 
         struct {

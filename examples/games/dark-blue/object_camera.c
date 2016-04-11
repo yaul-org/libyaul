@@ -22,6 +22,7 @@ static void on_update(struct object *);
 static void on_draw(struct object *);
 
 static void m_start(struct object *, fix16_t);
+static void m_stop(struct object *);
 
 struct object_camera object_camera = {
         .active = true,
@@ -37,7 +38,8 @@ struct object_camera object_camera = {
         .on_collision = NULL,
         .on_trigger = NULL,
         .functions = {
-                .m_start = m_start
+                .m_start = m_start,
+                .m_stop = m_stop
         }
 };
 
@@ -73,11 +75,8 @@ on_init(struct object *this)
 
         struct cmd_group *cmd_group;
         cmd_group = &THIS_PRIVATE_DATA(object_camera, cmd_group);
-
         cmd_group_init(cmd_group);
-
         cmd_group->priority = 0;
-
         cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LOCAL_COORD,
             debug_local_coord);
         cmd_group_add(cmd_group, CMD_GROUP_CMD_TYPE_LINE, debug_line);
@@ -128,4 +127,10 @@ m_start(struct object *this, fix16_t speed)
 
         THIS(object_camera, transform).pos_fixed.x = F16(0.0f);
         THIS(object_camera, transform).pos_fixed.y = F16(0.0f);
+}
+
+static void
+m_stop(struct object *this)
+{
+        THIS_PRIVATE_DATA(object_camera, state) = CAMERA_STATE_IDLE;
 }
