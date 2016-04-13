@@ -12,6 +12,15 @@
 void
 vdp2_scrn_priority_set(uint8_t scrn, uint8_t priority)
 {
+#ifdef DEBUG
+        assert((scrn == SCRN_NBG0) ||
+               (scrn == SCRN_NBG1) ||
+               (scrn == SCRN_NBG2) ||
+               (scrn == SCRN_NBG3) ||
+               (scrn == SCRN_RBG0) ||
+               (scrn == SCRN_RBG1));
+#endif /* DEBUG */
+
         /* When priority is zero, scroll screen is transparent. */
         priority &= 0x07;
 
@@ -46,7 +55,7 @@ vdp2_scrn_priority_set(uint8_t scrn, uint8_t priority)
                 MEMORY_WRITE(16, VDP2(PRINB), vdp2_state.buffered_regs.prinb);
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.prir &= 0x0F00;
+                vdp2_state.buffered_regs.prir &= 0xFFF8;
                 vdp2_state.buffered_regs.prir |= priority;
 
                 /* Write to memory */
