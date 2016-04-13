@@ -10,6 +10,7 @@
 
 #include <vdp2/cram.h>
 #include <vdp2/scrn.h>
+#include <vdp2/sprite.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
