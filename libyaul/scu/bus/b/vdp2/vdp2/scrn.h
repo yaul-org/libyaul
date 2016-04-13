@@ -282,6 +282,7 @@ extern void vdp2_scrn_mosaic_horizontal_set(uint32_t);
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
 extern void vdp2_scrn_mosaic_vertical_set(uint32_t);
+extern uint8_t vdp2_scrn_priority_get(uint8_t);
 extern void vdp2_scrn_priority_set(uint8_t, uint8_t);
 extern void vdp2_scrn_reduction_set(uint8_t, uint16_t);
 extern void vdp2_scrn_reduction_x_set(uint8_t, uint16_t, uint16_t);
