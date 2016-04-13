@@ -63,7 +63,7 @@ cons_vdp2_init(struct cons *cons)
         _nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
 
         vdp2_scrn_cell_format_set(&_nbg3_format);
-        vdp2_priority_spn_set(SCRN_NBG3, 7);
+        vdp2_scrn_priority_set(SCRN_NBG3, 7);
 
         struct vram_ctl *vram_ctl;
 

@@ -62,7 +62,7 @@ line_scroll_screen(void)
         nbg1_format.scf_map.plane_d = (uint32_t)_nbg1_planes[3];
 
         vdp2_scrn_cell_format_set(&nbg1_format);
-        vdp2_priority_spn_set(SCRN_NBG1, 7);
+        vdp2_scrn_priority_set(SCRN_NBG1, 7);
 
         vram_ctl = vdp2_vram_control_get();
         vram_ctl->vram_cycp.pt[2].t7 = VRAM_CTL_CYCP_CHPNDR_NBG1;

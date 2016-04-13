@@ -152,15 +152,14 @@ LIB_SRCS+= \
 	\
 	scu/bus/b/vdp2/vdp2-internal.c \
 	scu/bus/b/vdp2/vdp2_init.c \
-	scu/bus/b/vdp2/vdp2_priority_spn_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_addr_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_color_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_bitmap_format_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_cell_format_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_color_offset_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_color_offset_rgb_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_color_offset_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_color_offset_unset.c \
-	scu/bus/b/vdp2/vdp2_scrn_color_offset_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_unset.c \
@@ -170,6 +169,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_unset.c \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_vertical_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_priority_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_reduction_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_reduction_x_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_reduction_y_set.c \
@@ -318,7 +318,6 @@ HEADER_FILES+= \
 	./scu/bus/b/vdp2/vdp2/cram.h:. \
 	./scu/bus/b/vdp2/vdp2/map.h:. \
 	./scu/bus/b/vdp2/vdp2/pn.h:. \
-	./scu/bus/b/vdp2/vdp2/priority.h:. \
 	./scu/bus/b/vdp2/vdp2/scrn.h:. \
 	./scu/bus/b/vdp2/vdp2/tvmd.h:. \
 	./scu/bus/b/vdp2/vdp2/vram.h:. \

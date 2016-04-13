@@ -182,11 +182,11 @@ on_world_init(struct object *this)
         vdp2_vram_control_set(vram_ctl);
 
         vdp2_scrn_cell_format_set(nbg1_format);
-        vdp2_priority_spn_set(SCRN_NBG1, 2);
+        vdp2_scrn_priority_set(SCRN_NBG1, 2);
         vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
 
         vdp2_scrn_cell_format_set(nbg2_format);
-        vdp2_priority_spn_set(SCRN_NBG2, 1);
+        vdp2_scrn_priority_set(SCRN_NBG2, 1);
         vdp2_scrn_display_set(SCRN_NBG2, /* transparent = */ true);
 }
 

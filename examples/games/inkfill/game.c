@@ -175,7 +175,7 @@ _grid_init(void)
         nbg1_format.scf_map.plane_d = (uint32_t)_nbg1_planes[3];
 
         vdp2_scrn_cell_format_set(&nbg1_format);
-        vdp2_priority_spn_set(SCRN_NBG1, 6);
+        vdp2_scrn_priority_set(SCRN_NBG1, 6);
 
         vdp2_scrn_scv_x_set(SCRN_NBG1, -24, 0);
         vdp2_scrn_scv_y_set(SCRN_NBG1, -8, 0);
@@ -264,7 +264,7 @@ _grid_init(void)
         nbg3_format.scf_map.plane_d = (uint32_t)_nbg3_planes[3];
 
         vdp2_scrn_cell_format_set(&nbg3_format);
-        vdp2_priority_spn_set(SCRN_NBG3, 7);
+        vdp2_scrn_priority_set(SCRN_NBG3, 7);
 
         for (tile_idx = 0; tile_idx < 6; tile_idx++) {
                 uint32_t row;
@@ -307,7 +307,7 @@ _grid_init(void)
         nbg0_format.sbf_bitmap_pattern = VRAM_ADDR_4MBIT(0, 0x00000);
 
         vdp2_scrn_bitmap_format_set(&nbg0_format);
-        vdp2_priority_spn_set(SCRN_NBG0, 5);
+        vdp2_scrn_priority_set(SCRN_NBG0, 5);
 
         void *fh;
 

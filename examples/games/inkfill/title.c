@@ -39,7 +39,7 @@ title_init(void)
         nbg0_format.sbf_bitmap_pattern = VRAM_ADDR_4MBIT(0, 0x00000);
 
         vdp2_scrn_bitmap_format_set(&nbg0_format);
-        vdp2_priority_spn_set(SCRN_NBG0, 7);
+        vdp2_scrn_priority_set(SCRN_NBG0, 7);
 
         vram_ctl = vdp2_vram_control_get();
         vram_ctl->vram_cycp.pt[0].t7 = VRAM_CTL_CYCP_CHPNDR_NBG0;

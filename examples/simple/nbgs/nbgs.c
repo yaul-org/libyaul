@@ -246,7 +246,7 @@ config_0(void)
         vdp2_vram_control_set(vram_ctl);
 
         vdp2_scrn_cell_format_set(&format);
-        vdp2_priority_spn_set(SCRN_NBG1, 7);
+        vdp2_scrn_priority_set(SCRN_NBG1, 7);
         vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
     } vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
         TVMD_VERT_224);
