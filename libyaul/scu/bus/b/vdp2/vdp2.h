@@ -9,7 +9,6 @@
 #define _VDP2_H_
 
 #include <vdp2/cram.h>
-#include <vdp2/pn.h>
 #include <vdp2/scrn.h>
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>

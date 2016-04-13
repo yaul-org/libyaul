@@ -98,6 +98,73 @@ extern "C" {
 #define SCRN_CALCULATE_PLANES_CNT(format)                                      \
         (VRAM_BANK_SIZE / SCRN_CALCULATE_PLANE_SIZE((format)))
 
+/* Configuration table mapping. Depending on how the normal/rotational
+ * background is set up, choose a config:
+ * +--------+----------+-----------+-----------+-----------+-------------+
+ * | Config | PND size | Cell size | Aux. mode | Pal. banks| Color count |
+ * +--------+----------+-----------+-----------+-----------+-------------+
+ * | 0      | 1-word   | 1x1       | 0         | 128       | 16          |
+ * | 1      | 1-word   | 1x1       | 1         | 128       | 16          |
+ * | 2      | 1-word   | 2x2       | 0         | 128       | 16          |
+ * | 3      | 1-word   | 2x2       | 1         | 128       | 16          |
+ * | 4      | 1-word   | 1x1       | 0         | 8         | 16,256,2048 |
+ * | 5      | 1-word   | 1x1       | 1         | 8         | 16,256,2048 |
+ * | 6      | 1-word   | 2x2       | 0         | 8         | 16,256,2048 |
+ * | 7      | 1-word   | 2x2       | 1         | 8         | 16,256,2048 |
+ * | 8      | 2-word   | X         | X         | 8/128     | 16,256,2048 |
+ * +--------+----------+-----------+-----------+-----------+-------------+ */
+
+#define CHARACTER_NUMBER(x)     ((x) >> 5)
+#define PALETTE_NUMBER(x)       ((x) >> 5)
+
+#define SCRN_PND_CONFIG_0(character_addr, palette_addr, vf, hf)                \
+        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+         (((vf) & 0x01) << 11) |                                               \
+         (((hf) & 0x01) << 10) |                                               \
+         (CHARACTER_NUMBER(character_addr) & 0x0FFF))
+
+#define SCRN_PND_CONFIG_1(character_addr, palette_addr)                        \
+        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+         (CHARACTER_NUMBER(character_addr) & 0x03FF))
+
+#define SCRN_PND_CONFIG_2(character_addr, palette_addr, vf, hf)                \
+        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+         (((vf) & 0x01) << 11) |                                               \
+         (((hf) & 0x01) << 10) |                                               \
+         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+
+#define SCRN_PND_CONFIG_3(character_addr, palette_addr)                        \
+        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+
+#define SCRN_PND_CONFIG_4(character_addr, palette_addr, vf, hf)                \
+        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+         (((vf) & 0x01) << 11) |                                               \
+         (((hf) & 0x01) << 10) |                                               \
+         (CHARACTER_NUMBER(character_addr) & 0x0FFF))
+
+#define SCRN_PND_CONFIG_5(character_addr, palette_addr)                        \
+        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+         (CHARACTER_NUMBER(character_addr) & 0x03FF))
+
+#define SCRN_PND_CONFIG_6(character_addr, palette_addr, vf, hf)                \
+        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+         (((vf) & 0x01) << 11) |                                               \
+         (((hf) & 0x01) << 10) |                                               \
+         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+
+#define SCRN_PND_CONFIG_7(character_addr, palette_addr, vf, hf)                \
+        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+
+#define SCRN_PND_CONFIG_8(character_addr, palette_addr, vf, hf, pr, cc)        \
+        ((((vf) & 0x01) << 31) |                                               \
+         (((hf) & 0x01) << 30) |                                               \
+         (((pr) & 0x01) << 29) |                                               \
+         (((cc) & 0x01) << 28) |                                               \
+         ((PALETTE_NUMBER(palette_addr) & 0x007F) << 16) |                     \
+         (CHARACTER_NUMBER(character_addr) & 0x7FFF))
+
 struct scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */
         uint32_t sbf_cc_count; /* Character color count */
@@ -202,7 +269,8 @@ extern void vdp2_scrn_back_screen_color_set(uint32_t, uint16_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t,  int16_t,  int16_t);
+extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t,  int16_t,
+    int16_t);
 extern void vdp2_scrn_color_offset_set(uint8_t, uint8_t);
 extern void vdp2_scrn_color_offset_unset(uint8_t);
 extern void vdp2_scrn_display_clear(void);
