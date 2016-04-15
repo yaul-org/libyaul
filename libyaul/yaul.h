@@ -50,6 +50,8 @@
 
 #include <cons/cons.h>
 
+#include <math.h>
+
 #include <lib/memb.h>
 
 #include <fs/iso9660/iso9660.h>

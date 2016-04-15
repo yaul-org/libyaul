@@ -34,6 +34,7 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/common \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/cons \
+	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/math \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/lib \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/fs/iso9660 \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/fs/romdisk \

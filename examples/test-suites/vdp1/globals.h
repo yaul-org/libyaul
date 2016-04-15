@@ -8,11 +8,10 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <yaul.h>
-
 #define FIXMATH_NO_OVERFLOW 1
 #define FIXMATH_NO_ROUNDING 1
-#include <fixmath.h>
+
+#include <yaul.h>
 
 #include <inttypes.h>
 

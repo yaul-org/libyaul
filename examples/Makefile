@@ -1,5 +1,4 @@
 EXAMPLES:= \
-	games/dark-blue \
 	games/inkfill \
 	simple/arp-comm \
 	simple/arp-msg \

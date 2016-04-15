@@ -8,12 +8,10 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <yaul.h>
-
 #define FIXMATH_NO_OVERFLOW 1
 #define FIXMATH_NO_ROUNDING 1
 
-#include <fixmath.h>
+#include <yaul.h>
 #include <tga.h>
 
 #include "globals.h"

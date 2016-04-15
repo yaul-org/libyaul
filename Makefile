@@ -1,7 +1,6 @@
 PROJECTS:= \
 	libyaul \
 	libbcl \
-	libfixmath \
 	libtga
 
 ifeq ($(strip $(INSTALL_ROOT)),)

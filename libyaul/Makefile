@@ -140,6 +140,18 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
+	math/fix16.c \
+	math/fix16_exp.c \
+	math/fix16_matrix4.c \
+	math/fix16_sqrt.c \
+	math/fix16_str.c \
+	math/fix16_trig.c \
+	math/fix16_vector2.c \
+	math/fix16_vector3.c \
+	math/fix16_vector4.c \
+	math/fract32.c \
+	math/int16_vector2.c \
+	math/uint32.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_abort_file.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_init_cd_system.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
@@ -256,6 +268,7 @@ INCLUDE_DIRS:= \
 	kernel/vfs \
 	kernel/vfs/fs/iso9660 \
 	kernel/vfs/fs/romdisk \
+	math \
 	newlib \
 	scu \
 	scu/bus/a/cs0/arp \
@@ -270,6 +283,13 @@ INCLUDE_DIRS:= \
 
 HEADER_FILES:= \
 	./yaul.h:. \
+	\
+	./math/fix16.h:. \
+	./math/math.h:. \
+	./math/fract32.h:. \
+	./math/int16.h:. \
+	./math/int64.h:. \
+	./math/uint32.h:. \
 	\
 	./common/common.h:. \
 	./common/irq-mux.h: \
@@ -317,8 +337,8 @@ HEADER_FILES+= \
 	./scu/bus/b/vdp2/vdp2.h:. \
 	./scu/bus/b/vdp2/vdp2/cram.h:. \
 	./scu/bus/b/vdp2/vdp2/map.h:. \
-	./scu/bus/b/vdp2/vdp2/pn.h:. \
 	./scu/bus/b/vdp2/vdp2/scrn.h:. \
+	./scu/bus/b/vdp2/vdp2/sprite.h:. \
 	./scu/bus/b/vdp2/vdp2/tvmd.h:. \
 	./scu/bus/b/vdp2/vdp2/vram.h:. \
 	\
@@ -452,7 +472,7 @@ define macro-install-files
 	    header_dir=$$(dirname "$${path}"); \
 	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
 	    install_header_file=$${abs_header_dir}/$${header_file}; \
-	    install_header_dir=$${header_dir}; \
+	    install_header_dir=$${abs_header_dir}; \
 	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
