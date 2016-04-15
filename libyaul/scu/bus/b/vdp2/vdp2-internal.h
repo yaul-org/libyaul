@@ -29,6 +29,18 @@ struct vdp2_state {
                 uint16_t plsz;          /* Register offset: 0x18003A */
                 uint16_t mpofn;         /* Register offset: 0x18003C */
                 uint16_t mpofr;         /* Register offset: 0x18003E */
+                uint16_t scxin0;        /* Register offset: 0x180070 */
+                uint16_t scxdn0;        /* Register offset: 0x180072 */
+                uint16_t scyin0;        /* Register offset: 0x180074 */
+                uint16_t scydn0;        /* Register offset: 0x180076 */
+                uint16_t scxin1;        /* Register offset: 0x180080 */
+                uint16_t scxdn1;        /* Register offset: 0x180082 */
+                uint16_t scyin1;        /* Register offset: 0x180084 */
+                uint16_t scydn1;        /* Register offset: 0x180086 */
+                uint16_t scxn2;         /* Register offset: 0x180090 */
+                uint16_t scyn2;         /* Register offset: 0x180092 */
+                uint16_t scxn3;         /* Register offset: 0x180094 */
+                uint16_t scyn3;         /* Register offset: 0x180096 */
                 uint16_t zmctl;         /* Register offset: 0x180098 */
                 uint16_t scrctl;        /* Register offset: 0x18009A */
                 uint16_t rpmd;          /* Register offset: 0x1800B0 */

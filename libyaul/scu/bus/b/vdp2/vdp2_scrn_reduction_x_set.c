@@ -8,11 +8,12 @@
 #include <vdp2/scrn.h>
 
 #include <assert.h>
+#include <math.h>
 
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_reduction_x_set(uint8_t scrn, uint16_t in, uint16_t dn)
+vdp2_scrn_reduction_x_set(uint8_t scrn, fix16_t scale)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
@@ -20,11 +21,14 @@ vdp2_scrn_reduction_x_set(uint8_t scrn, uint16_t in, uint16_t dn)
                (scrn == SCRN_NBG1));
 #endif /* DEBUG */
 
-        /* Integer part rounded to 3 bits */
-        in &= 0x07;
-        /* Fractional part rounded to 8 bits, shifted left by 8 */
-        dn &= 0xFF;
-        dn <<= 8;
+        scale = fix16_clamp(scale, F16(0.0f), F16(4.0f));
+
+        uint16_t in;
+        in = fix16_to_int(scale) & 0x0007;
+
+        /* Only take into account the upper 8 bits of the fractional */
+        uint16_t dn;
+        dn = fix16_sub(scale, fix16_from_int(in)) & 0xFF00;
 
         switch (scrn) {
         case SCRN_NBG0:
