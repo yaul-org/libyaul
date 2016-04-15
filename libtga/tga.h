@@ -16,10 +16,10 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define TGA_FILE_OK                     0
-#define TGA_FILE_UNKNOWN_FORMAT         1
-#define TGA_FILE_CORRUPTED              2
-#define TGA_FILE_NOT_SUPPORTED          3
-#define TGA_MEMORY_ERROR                4
+#define TGA_FILE_UNKNOWN_FORMAT         -1
+#define TGA_FILE_CORRUPTED              -2
+#define TGA_FILE_NOT_SUPPORTED          -3
+#define TGA_MEMORY_ERROR                -4
 
 typedef struct {
         const char *tga_file;
@@ -42,7 +42,7 @@ typedef struct {
         uint32_t tga_cmap_bytes;
 
         struct {
-                /* Determine the transparent pixel color */
+                /* Determine the transparent pixel color (in RGB555) */
                 uint32_t transparent_pixel;
                 /* Enable setting MSB bit for transparent pixel color */
                 bool msb;

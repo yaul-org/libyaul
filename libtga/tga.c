@@ -32,20 +32,20 @@
 #define TGA_FOOTER_LEN  26
 
 static uint32_t cmap_image_decode_tiled(uint8_t *, const tga_t *);
+static uint32_t cmap_rle_image_decode_tiled(uint16_t *, const tga_t *);
 static uint32_t cmap_image_decode(uint8_t *, const tga_t *);
+static uint32_t cmap_rle_image_decode(uint16_t *, const tga_t *);
 
 static uint32_t true_color_image_decode(uint16_t *, const tga_t *);
 static uint32_t true_color_rle_image_decode(uint16_t *, const tga_t *);
 
+/* Inlined functions */
 static void inline _cmap_image_tile_draw(uint8_t *, uint16_t, uint16_t,
     const tga_t *);
 static int32_t _true_color_image_fill(uint16_t *, uint16_t, size_t);
 static inline uint32_t _image_calculate_offset(const tga_t *);
 static inline uint32_t _cmap_calculate_offset(const tga_t *);
 
-/*
- *
- */
 int
 tga_read(tga_t *tga, const uint8_t *file)
 {
@@ -91,7 +91,7 @@ tga_read(tga_t *tga, const uint8_t *file)
 
         /* Sanity checks */
         /* The maximum size of a TGA image is 512 pixels wide by 482
-         * pixels high. */
+         * pixels high */
         if ((width == 0) || (height == 0) || (width > 512) || (height > 482)) {
                 return TGA_FILE_CORRUPTED;
         }
@@ -187,7 +187,7 @@ tga_image_decode_tiled(const tga_t *tga, void *dst)
         case TGA_IMAGE_TYPE_RLE_TRUE_COLOR:
                 return TGA_FILE_NOT_SUPPORTED;
         case TGA_IMAGE_TYPE_RLE_CMAP:
-                return TGA_FILE_NOT_SUPPORTED;
+                return cmap_rle_image_decode_tiled(dst, tga);
         default:
                 return TGA_FILE_CORRUPTED;
         }
@@ -212,7 +212,7 @@ tga_image_decode(const tga_t *tga, void *dst)
         case TGA_IMAGE_TYPE_RLE_TRUE_COLOR:
                 return true_color_rle_image_decode(dst, tga);
         case TGA_IMAGE_TYPE_RLE_CMAP:
-                return TGA_FILE_NOT_SUPPORTED;
+                return cmap_rle_image_decode_tiled(dst, tga);
         default:
                 return TGA_FILE_CORRUPTED;
         }
@@ -264,7 +264,7 @@ tga_cmap_decode(const tga_t *tga, uint16_t *dst)
         if (cmap_transparent_idx > 0) {
                 uint16_t pixel;
                 pixel = dst[0];
-                static char text[1024];
+
                 /* Swap */
                 dst[0] = dst[cmap_transparent_idx];
                 dst[cmap_transparent_idx] = pixel;
@@ -298,17 +298,20 @@ cmap_image_decode_tiled(uint8_t *dst, const tga_t *tga)
         uint16_t tx;
         uint16_t ty;
 
-        if ((tga->tga_cmap_len - 1) <= 16) {
-                return 0;
-        } else {
-                for (tx = 0; tx < (tga->tga_width / 8); tx++) {
-                        for (ty = 0; ty < (tga->tga_height / 8); ty++) {
-                                _cmap_image_tile_draw(dst, tx, ty, tga);
-                        }
+        for (tx = 0; tx < (tga->tga_width / 8); tx++) {
+                for (ty = 0; ty < (tga->tga_height / 8); ty++) {
+                        _cmap_image_tile_draw(dst, tx, ty, tga);
                 }
         }
 
-        return 1;
+        return TGA_FILE_OK;
+}
+
+static uint32_t
+cmap_rle_image_decode_tiled(uint16_t *dst __attribute__ ((unused)),
+    const tga_t *tga __attribute__ ((unused)))
+{
+        return TGA_FILE_NOT_SUPPORTED;
 }
 
 static uint32_t
@@ -337,9 +340,13 @@ cmap_image_decode(uint8_t *dst, const tga_t *tga)
         return pixel_idx;
 }
 
-/*
- *
- */
+static uint32_t
+cmap_rle_image_decode(uint16_t *dst __attribute__ ((unused)),
+    const tga_t *tga __attribute__ ((unused)))
+{
+        return TGA_FILE_NOT_SUPPORTED;
+}
+
 static uint32_t
 true_color_image_decode(uint16_t *dst, const tga_t *tga)
 {
@@ -387,9 +394,6 @@ true_color_image_decode(uint16_t *dst, const tga_t *tga)
         return pixel_idx;
 }
 
-/*
- *
- */
 static uint32_t
 true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
 {
@@ -412,7 +416,10 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
         uint16_t bytes_pp;
         bytes_pp = tga->tga_bpp >> 3;
 
-        for (pixel_idx = 0, packet = buf; pixel_idx < (tga->tga_width * tga->tga_height); ) {
+        uint32_t pixels;
+        pixels = tga->tga_width * tga->tga_height;
+
+        for (pixel_idx = 0, packet = buf; pixel_idx < pixels; ) {
                 uint8_t packet_type;
                 uint8_t rcf;
                 uint32_t rcf_idx;
@@ -496,25 +503,39 @@ _cmap_image_tile_draw(uint8_t *dst, uint16_t tx, uint16_t ty, const tga_t *tga)
         buf = (const uint8_t *)((uint32_t)tga->tga_file +
             _image_calculate_offset(tga));
 
-        uint32_t x;
-        uint32_t y;
+        uint16_t tile_width;
+        tile_width = 0;
+        uint16_t tile_height;
+        tile_height = 0;
 
-        uint16_t tile_pixels;
-        tile_pixels = 8 * 8;
+        switch (tga->tga_bpp) {
+        case 4:
+                tile_width = 4; /* 4 bits per pixel (2 pixels per byte) */
+                tile_height = 8;
+                break;
+        case 8:
+                tile_width = 8;
+                tile_height = 8;
+                break;
+        }
 
+        uint16_t tile_bytes;
+        tile_bytes = tile_width * tile_height;
         uint16_t tile_base;
-        tile_base = tile_pixels * (tx + ((tga->tga_width / 8) * ty));
+        tile_base = tile_bytes * (tx + ((tga->tga_width / 8) * ty));
 
-        for (y = 0; y < 8; y++) {
-                for (x = 0; x < 8; x++) {
+        uint32_t y;
+        for (y = 0; y < tile_height; y++) {
+                uint32_t x;
+                for (x = 0; x < tile_width; x++) {
                         uint32_t x_offset;
-                        x_offset = (8 * tx) + x;
+                        x_offset = (tile_width * tx) + x;
                         uint32_t y_offset;
-                        y_offset = ((8 * ty) + y) * tga->tga_width;
+                        y_offset = ((tile_width * ty) + y) * tga->tga_width;
                         uint32_t offset;
                         offset = x_offset + y_offset;
 
-                        dst[tile_base + (x + (8 * y))] = buf[offset];
+                        dst[tile_base + (x + (tile_width * y))] = buf[offset];
                 }
         }
 }
