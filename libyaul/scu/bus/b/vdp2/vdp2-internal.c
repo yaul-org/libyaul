@@ -5,10 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <assert.h>
-
-#include <vdp2/scrn.h>
-
 #include "vdp2-internal.h"
 
 struct vdp2_state vdp2_state;

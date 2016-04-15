@@ -20,6 +20,7 @@ extern "C" {
 #define TGA_FILE_CORRUPTED              -2
 #define TGA_FILE_NOT_SUPPORTED          -3
 #define TGA_MEMORY_ERROR                -4
+#define TGA_MEMORY_UNALIGNMENT_ERROR    -5
 
 typedef struct {
         const char *tga_file;
@@ -41,6 +42,7 @@ typedef struct {
         uint16_t tga_cmap_len;
         uint32_t tga_cmap_bytes;
 
+        /* User modifiable */
         struct {
                 /* Determine the transparent pixel color (in RGB555) */
                 uint32_t transparent_pixel;
@@ -49,10 +51,10 @@ typedef struct {
         } tga_options;
 } tga_t __attribute__ ((aligned(4)));
 
-int tga_read(tga_t *, const uint8_t *);
-uint32_t tga_image_decode_tiled(const tga_t *, void *);
-uint32_t tga_image_decode(const tga_t *, void *);
-uint32_t tga_cmap_decode(const tga_t *, uint16_t *);
+int32_t tga_read(tga_t *, const uint8_t *);
+int32_t tga_image_decode_tiled(const tga_t *, void *);
+int32_t tga_image_decode(const tga_t *, void *);
+int32_t tga_cmap_decode(const tga_t *, uint16_t *);
 const char *tga_error_stringify(int);
 
 #ifdef __cplusplus

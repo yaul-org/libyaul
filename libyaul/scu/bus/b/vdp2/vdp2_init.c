@@ -28,8 +28,8 @@ vdp2_init(void)
         static bool initialized = false;
 
         /* Reset all state */
-        vdp2_state.display_w = 320;
-        vdp2_state.display_h = 224; /* Either NTSC or PAL */
+        vdp2_state.display_w = 0;
+        vdp2_state.display_h = 0;
         vdp2_state.interlaced = TVMD_INTERLACE_NONE;
 
         vdp2_state.vram_ctl.vram_size = VRAM_CTL_SIZE_4MBIT;
@@ -46,7 +46,7 @@ vdp2_init(void)
                 vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t7 = VRAM_CTL_CYCP_NO_ACCESS;
         }
 
-        /* Reset all buffered registers. */
+        /* Reset all buffered registers */
         memset(&vdp2_state.buffered_regs, 0x0000,
             sizeof(vdp2_state.buffered_regs));
 
@@ -67,25 +67,18 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(CYCB1U), 0xFFFF);
 
         /* Scroll screen */
-        vdp2_state.buffered_regs.bgon = 0x0000;
-        MEMORY_WRITE(16, VDP2(BGON), vdp2_state.buffered_regs.bgon);
-        vdp2_state.buffered_regs.chctla = 0x0000;
-        MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
-        MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
+        MEMORY_WRITE(16, VDP2(BGON), 0x0000);
+        MEMORY_WRITE(16, VDP2(CHCTLA), 0x0000);
+        MEMORY_WRITE(16, VDP2(CHCTLB), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN0), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN1), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN2), 0x0000);
         MEMORY_WRITE(16, VDP2(PNCN3), 0x0000);
-        vdp2_state.buffered_regs.plsz = 0x0000;
-        MEMORY_WRITE(16, VDP2(PLSZ), vdp2_state.buffered_regs.plsz);
-        vdp2_state.buffered_regs.bmpna = 0x0000;
-        MEMORY_WRITE(16, VDP2(BMPNA), vdp2_state.buffered_regs.bmpna);
-        vdp2_state.buffered_regs.bmpnb = 0x0000;
-        MEMORY_WRITE(16, VDP2(BMPNB), vdp2_state.buffered_regs.bmpnb);
-        vdp2_state.buffered_regs.mpofn = 0x0000;
-        MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
-        vdp2_state.buffered_regs.mpofr = 0x0000;
-        MEMORY_WRITE(16, VDP2(MPOFR), vdp2_state.buffered_regs.mpofr);
+        MEMORY_WRITE(16, VDP2(PLSZ), 0x0000);
+        MEMORY_WRITE(16, VDP2(BMPNA), 0x0000);
+        MEMORY_WRITE(16, VDP2(BMPNB), 0x0000);
+        MEMORY_WRITE(16, VDP2(MPOFN), 0x0000);
+        MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
 
         MEMORY_WRITE(16, VDP2(MPABN0), 0x0000);
         MEMORY_WRITE(16, VDP2(MPCDN0), 0x0000);
@@ -107,8 +100,7 @@ vdp2_init(void)
 
         /* Rotation scroll screen */
         MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
-        vdp2_state.buffered_regs.rpmd = 0x0000;
-        MEMORY_WRITE(16, VDP2(RPMD), vdp2_state.buffered_regs.rpmd);
+        MEMORY_WRITE(16, VDP2(RPMD), 0x0000);
         MEMORY_WRITE(16, VDP2(OVPNRA), 0x0000);
         MEMORY_WRITE(16, VDP2(OVPNRB), 0x0000);
 
@@ -158,10 +150,8 @@ vdp2_init(void)
         vdp2_state.buffered_regs.prisd = 0x0101;
         MEMORY_WRITE(16, VDP2(PRISD), vdp2_state.buffered_regs.prisd);
 
-        vdp2_state.buffered_regs.craofa = 0x0000;
-        MEMORY_WRITE(16, VDP2(CRAOFA), vdp2_state.buffered_regs.craofa);
-        vdp2_state.buffered_regs.craofb = 0x0000;
-        MEMORY_WRITE(16, VDP2(CRAOFB), vdp2_state.buffered_regs.craofb);
+        MEMORY_WRITE(16, VDP2(CRAOFA), 0x0000);
+        MEMORY_WRITE(16, VDP2(CRAOFB), 0x0000);
 
         if (initialized) {
                 return;

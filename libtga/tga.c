@@ -31,22 +31,22 @@
 #define TGA_HEADER_LEN  18
 #define TGA_FOOTER_LEN  26
 
-static uint32_t cmap_image_decode_tiled(uint8_t *, const tga_t *);
-static uint32_t cmap_rle_image_decode_tiled(uint16_t *, const tga_t *);
-static uint32_t cmap_image_decode(uint8_t *, const tga_t *);
-static uint32_t cmap_rle_image_decode(uint16_t *, const tga_t *);
+static int32_t cmap_image_decode_tiled(uint8_t *, const tga_t *);
+static int32_t cmap_rle_image_decode_tiled(uint16_t *, const tga_t *);
+static int32_t cmap_image_decode(uint8_t *, const tga_t *);
+static int32_t cmap_rle_image_decode(uint16_t *, const tga_t *);
 
-static uint32_t true_color_image_decode(uint16_t *, const tga_t *);
-static uint32_t true_color_rle_image_decode(uint16_t *, const tga_t *);
+static int32_t true_color_image_decode(uint16_t *, const tga_t *);
+static int32_t true_color_rle_image_decode(uint16_t *, const tga_t *);
 
 /* Inlined functions */
-static void inline _cmap_image_tile_draw(uint8_t *, uint16_t, uint16_t,
+static inline void _cmap_image_tile_draw(uint8_t *, uint16_t, uint16_t,
     const tga_t *);
-static int32_t _true_color_image_fill(uint16_t *, uint16_t, size_t);
+static inline int32_t _true_color_image_fill(uint16_t *, uint16_t, size_t);
 static inline uint32_t _image_calculate_offset(const tga_t *);
 static inline uint32_t _cmap_calculate_offset(const tga_t *);
 
-int
+int32_t
 tga_read(tga_t *tga, const uint8_t *file)
 {
 #define TGA_IMAGE_ORIGIN_BOTTOM 0x00
@@ -168,7 +168,7 @@ tga_read(tga_t *tga, const uint8_t *file)
         return TGA_FILE_OK;
 }
 
-uint32_t
+int32_t
 tga_image_decode_tiled(const tga_t *tga, void *dst)
 {
         /* XXX: Check if tga is valid */
@@ -193,7 +193,7 @@ tga_image_decode_tiled(const tga_t *tga, void *dst)
         }
 }
 
-uint32_t
+int32_t
 tga_image_decode(const tga_t *tga, void *dst)
 {
         /* XXX: Check if tga is valid */
@@ -218,12 +218,12 @@ tga_image_decode(const tga_t *tga, void *dst)
         }
 }
 
-uint32_t
+int32_t
 tga_cmap_decode(const tga_t *tga, uint16_t *dst)
 {
         if ((tga->tga_type != TGA_IMAGE_TYPE_CMAP) &&
             (tga->tga_type != TGA_IMAGE_TYPE_RLE_CMAP)) {
-                return 0;
+                return TGA_FILE_NOT_SUPPORTED;
         }
 
         uint16_t transparent_pixel;
@@ -292,7 +292,7 @@ tga_error_stringify(int error)
         }
 }
 
-static uint32_t
+static int32_t
 cmap_image_decode_tiled(uint8_t *dst, const tga_t *tga)
 {
         uint16_t tx;
@@ -307,14 +307,14 @@ cmap_image_decode_tiled(uint8_t *dst, const tga_t *tga)
         return TGA_FILE_OK;
 }
 
-static uint32_t
+static int32_t
 cmap_rle_image_decode_tiled(uint16_t *dst __attribute__ ((unused)),
     const tga_t *tga __attribute__ ((unused)))
 {
         return TGA_FILE_NOT_SUPPORTED;
 }
 
-static uint32_t
+static int32_t
 cmap_image_decode(uint8_t *dst, const tga_t *tga)
 {
         uint32_t pixel_idx;
@@ -340,14 +340,14 @@ cmap_image_decode(uint8_t *dst, const tga_t *tga)
         return pixel_idx;
 }
 
-static uint32_t
+static int32_t
 cmap_rle_image_decode(uint16_t *dst __attribute__ ((unused)),
     const tga_t *tga __attribute__ ((unused)))
 {
         return TGA_FILE_NOT_SUPPORTED;
 }
 
-static uint32_t
+static int32_t
 true_color_image_decode(uint16_t *dst, const tga_t *tga)
 {
         uint32_t pixel_idx;
@@ -394,7 +394,7 @@ true_color_image_decode(uint16_t *dst, const tga_t *tga)
         return pixel_idx;
 }
 
-static uint32_t
+static int32_t
 true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
 {
 #define TGA_PACKET_TYPE_RLE 1
@@ -483,7 +483,9 @@ true_color_rle_image_decode(uint16_t *dst, const tga_t *tga)
                             rcf * sizeof(uint16_t));
                         /* Memory address is not on a 2-byte or 4-byte
                          * boundary */
-                        assert(amt >= 0);
+                        if (amt < 0) {
+                                return TGA_MEMORY_UNALIGNMENT_ERROR;
+                        }
                         dst += rcf;
 
                         packet = (uint8_t *)(packet + bytes_pp + 1);
@@ -545,12 +547,12 @@ _true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
 {
         /* Check if address is unaligned */
         if (((uintptr_t)dst & 0x00000001) != 0) {
-                return -1;
+                return TGA_MEMORY_UNALIGNMENT_ERROR;
         }
 
         /* Check if the length is even */
         if ((length & 0x00000001) != 0) {
-                return -1;
+                return TGA_MEMORY_UNALIGNMENT_ERROR;
         }
 
         uint32_t amt;
@@ -589,7 +591,9 @@ _true_color_image_fill(uint16_t *dst, uint16_t s, size_t length)
                 amt -= sizeof(uint16_t);
         }
 
-        assert(amt == 0);
+        if (amt != 0) {
+                return TGA_MEMORY_UNALIGNMENT_ERROR;
+        }
 
         return length;
 }
