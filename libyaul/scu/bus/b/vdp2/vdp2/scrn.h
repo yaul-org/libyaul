@@ -238,7 +238,25 @@ struct scrn_cell_format {
  * |        |     | 1/4       | NBG3       |
  * |        +-----+-----------+------------+
  * |        | 256 | 1/2       | NBG3       |
- * +--------+-----+-----------+------------+ */
+ * +--------+-----+-----------+------------+
+ *
+ * The coord. increment should be a value smaller then 1 to zoom in and
+ * larger than 1 to zoom out. No zoom means equal to 1.
+ *
+ * Range limitations:
+ * +----------------+-------------------+-----+
+ * | Range (X or Y) | Reduction results | CCC |
+ * +----------------+-------------------+-----+
+ * | [0,1)          | Reduc. in         | 16  |
+ * |                |                   | 256 |
+ * +----------------+-------------------+-----+
+ * | 1              | No reduction      | 16  |
+ * +----------------+-------------------+-----+
+ * | (1,2]          | Reduc. out (1/2)  | 16  |
+ * |                |                   | 256 |
+ * +----------------+-------------------+-----+
+ * | (1,4]          | Reduc. out (1/4)  | 16  |
+ * +----------------+-------------------+-----+ */
 
 #define SCRN_REDUCTION_NONE     0 /* No reduction */
 #define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */

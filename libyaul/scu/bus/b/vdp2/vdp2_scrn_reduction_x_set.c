@@ -11,15 +11,6 @@
 
 #include "vdp2-internal.h"
 
-/* The coord increment should be a value smaller then 1 to zoom in and
- * larger than 1 to zoom out. No zoom means equal to 1.
- *
- * Notes:
- *  1. Only NBG0 and NBG1 can be zoomed.
- *  2. Reduction can be changed during horizontal retrace.
- *  3. Max reduction out is set to 1/4 means value = 4
- *  4. Max reduction out is constrainted by bitmap color depth: 1/4 in 16
- *     colors mode, 1/2 in 16/256 colors mode. */
 void
 vdp2_scrn_reduction_x_set(uint8_t scrn, uint16_t in, uint16_t dn)
 {
