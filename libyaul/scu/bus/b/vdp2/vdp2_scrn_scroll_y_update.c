@@ -10,7 +10,7 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t scroll_delta)
+vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t scroll_delta)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
