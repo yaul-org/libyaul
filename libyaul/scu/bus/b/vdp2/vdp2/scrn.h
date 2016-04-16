@@ -263,6 +263,8 @@ struct scrn_cell_format {
 #define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */
 #define SCRN_REDUCTION_QUARTER  2 /* 1/4 reduction */
 
+#define SCRN_REDUCTION_MIN      F16(0.00390625f)
+#define SCRN_REDUCTION_MAX      F16(7.0f)
 #define SCRN_REDUCTION_STEP     F16(0.00390625f)
 
 struct scrn_ls_format {
