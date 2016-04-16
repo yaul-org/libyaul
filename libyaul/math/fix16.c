@@ -2,11 +2,7 @@
 #include "int64.h"
 
 
-/* Subtraction and addition with overflow detection.
- * The versions without overflow detection are inlined in the header.
- */
-#ifndef FIXMATH_NO_OVERFLOW
-fix16_t fix16_add(fix16_t a, fix16_t b)
+fix16_t fix16_overflow_add(fix16_t a, fix16_t b)
 {
 	// Use unsigned integers because overflow with signed integers is
 	// an undefined operation (http://www.airs.com/blog/archives/120).
@@ -21,7 +17,7 @@ fix16_t fix16_add(fix16_t a, fix16_t b)
 	return sum;
 }
 
-fix16_t fix16_sub(fix16_t a, fix16_t b)
+fix16_t fix16_overflow_sub(fix16_t a, fix16_t b)
 {
 	uint32_t _a = a, _b = b;
 	uint32_t diff = _a - _b;
@@ -35,7 +31,7 @@ fix16_t fix16_sub(fix16_t a, fix16_t b)
 }
 
 /* Saturating arithmetic */
-fix16_t fix16_sadd(fix16_t a, fix16_t b)
+fix16_t fix16_overflow_sadd(fix16_t a, fix16_t b)
 {
 	fix16_t result = fix16_add(a, b);
 
@@ -45,7 +41,7 @@ fix16_t fix16_sadd(fix16_t a, fix16_t b)
 	return result;
 }	
 
-fix16_t fix16_ssub(fix16_t a, fix16_t b)
+fix16_t fix16_overflow_ssub(fix16_t a, fix16_t b)
 {
 	fix16_t result = fix16_sub(a, b);
 
@@ -54,9 +50,6 @@ fix16_t fix16_ssub(fix16_t a, fix16_t b)
 
 	return result;
 }
-#endif
-
-
 
 /* 64-bit implementation for fix16_mul. Fastest version for e.g. ARM Cortex M3.
  * Performs a 32*32 -> 64bit multiplication. The middle 32 bits are the result,

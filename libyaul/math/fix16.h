@@ -118,7 +118,6 @@ static inline fix16_t fix16_clamp(fix16_t x, fix16_t lo, fix16_t hi) {
 }
 
 /* Subtraction and addition with (optional) overflow detection. */
-#ifdef FIXMATH_NO_OVERFLOW
 static inline fix16_t fix16_add(fix16_t a0, fix16_t a1) {
         return (a0 + a1);
 }
@@ -130,15 +129,13 @@ static inline fix16_t fix16_sub(fix16_t a0, fix16_t a1) {
 static inline fix16_t fix16_mul(fix16_t a0, fix16_t a1) {
         return ((int64_t)a0 * a1) >> 16;
 }
-#else
-extern fix16_t fix16_add(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_sub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
+
+extern fix16_t fix16_overflow_add(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_sub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
 /* Saturatingrithmetic */
-extern fix16_t fix16_sadd(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_ssub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-
-#endif /* !FIXMATH_NO_OVERFLOW */
+extern fix16_t fix16_overflow_sadd(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_ssub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
 /*! Multiplies the two given fix16_t's and returns the result.
 */
