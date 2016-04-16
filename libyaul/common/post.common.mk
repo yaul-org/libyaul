@@ -30,6 +30,7 @@ $(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
 	$(OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
 
 %.romdisk: $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
+	mkdir -p ./romdisk
 	$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk

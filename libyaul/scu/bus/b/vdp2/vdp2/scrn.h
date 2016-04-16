@@ -256,12 +256,14 @@ struct scrn_cell_format {
  * | (1,2]          | Reduc. out (1/2)  | 16  |
  * |                |                   | 256 |
  * +----------------+-------------------+-----+
- * | (1,4]          | Reduc. out (1/4)  | 16  |
+ * | (1,7]          | Reduc. out (1/7)  | 16  |
  * +----------------+-------------------+-----+ */
 
 #define SCRN_REDUCTION_NONE     0 /* No reduction */
 #define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */
 #define SCRN_REDUCTION_QUARTER  2 /* 1/4 reduction */
+
+#define SCRN_REDUCTION_STEP     F16(0.00390625f)
 
 struct scrn_ls_format {
         uint8_t ls_scrn;        /* Normal background */

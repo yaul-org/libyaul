@@ -20,7 +20,7 @@ vdp2_scrn_reduction_y_set(uint8_t scrn, fix16_t scale)
                (scrn == SCRN_NBG1));
 #endif /* DEBUG */
 
-        scale = fix16_clamp(scale, F16(0.0f), F16(4.0f));
+        scale = fix16_clamp(scale, F16(0.00390625f), F16(7.0f));
 
         uint16_t in;
         in = fix16_to_int(scale) & 0x0007;

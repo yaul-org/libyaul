@@ -48,7 +48,9 @@ CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main 
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/b/vdp2 \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu \
 	-I$(INSTALL_ROOT)/$(ARCH)/include/yaul/scu/bus/cpu/smpc \
-	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE)
+	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
+	-DFIXMATH_NO_OVERFLOW=1 \
+	-DFIXMATH_NO_ROUNDING=1
 LDFLAGS= -Wl,-Map,$(PROJECT).map
 
 CXXFLAGS= $(CFLAGS) \

@@ -12,26 +12,26 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_reduction_set(uint8_t scrn, uint16_t horz_reduction)
+vdp2_scrn_reduction_set(uint8_t scrn, uint16_t reduction_amt)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scrn == SCRN_NBG0) ||
                (scrn == SCRN_NBG1));
 
-        assert((horz_reduction == SCRN_REDUCTION_NONE) ||
-               (horz_reduction == SCRN_REDUCTION_HALF) ||
-               (horz_reduction == SCRN_REDUCTION_QUARTER));
+        assert((reduction_amt == SCRN_REDUCTION_NONE) ||
+               (reduction_amt == SCRN_REDUCTION_HALF) ||
+               (reduction_amt == SCRN_REDUCTION_QUARTER));
 #endif /* DEBUG */
 
         switch (scrn) {
         case SCRN_NBG0:
                 vdp2_state.buffered_regs.zmctl &= 0xFFFC;
-                vdp2_state.buffered_regs.zmctl |= horz_reduction;
+                vdp2_state.buffered_regs.zmctl |= reduction_amt;
                 break;
         case SCRN_NBG1:
                 vdp2_state.buffered_regs.zmctl &= 0xFCFF;
-                vdp2_state.buffered_regs.zmctl |= horz_reduction << 8;
+                vdp2_state.buffered_regs.zmctl |= reduction_amt << 8;
                 break;
         default:
                 return;
