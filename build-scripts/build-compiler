@@ -237,8 +237,10 @@ else
         if [ ! -f "${BINUTILS}" ]; then
             message "Downloading \`${BINUTILS}'"
             if ! fetch "${BINUTILS_URL}" 1>> "binutils.log" 2>&1; then
-                panic "Failed to download ${BINUTILS} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+                panic "Failed to download ${BINUTILS} from ${BINUTILS_URL} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
             fi
+        fi
+        if [ ! -f "${BINUTILS_SIG}" ]; then
             if ! fetch "${BINUTILS_SIG_URL}" 1>> "binutils.log" 2>&1; then
                 panic "Failed to download ${BINUTILS_SIG} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
             fi
@@ -247,10 +249,12 @@ else
         if [ ! -f "${GCC}" ]; then
             message "Downloading \`${GCC}'"
             if ! fetch "${GCC_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GCC} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+                panic "Failed to download ${GCC} from ${GCC_URL} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
             fi
-            if ! fetch "${GCC_SIG_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GCC_SIG} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+        fi
+        if [ ! -f "${GCC_SIG}" ]; then
+            if ! fetch "${GCC_SIG_URL}" 1>> "gcc.log" 2>&1; then
+                panic "Failed to download ${GCC_SIG} from ${GCC_SIG_URL}) (see \`${BUILD_SRC_DIR}/gcc.log')" 1
             fi
         fi
 
@@ -258,10 +262,12 @@ else
             if [ ! -f "${GDB}" ]; then
                 message "Downloading \`${GDB}'"
                 if ! fetch "${GDB_URL}" 1>> "gdb.log" 2>&1; then
-                    panic "Failed to download ${GDB} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+                    panic "Failed to download ${GDB} from ${GDB_URL} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
                 fi
+            fi
+            if [ ! -f "${GDB_SIG}" ]; then
                 if ! fetch "${GDB_SIG_URL}" 1>> "gdb.log" 2>&1; then
-                    panic "Failed to download ${GDB_SIG} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+                    panic "Failed to download ${GDB_SIG} from ${GDB_SIG_URL} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
                 fi
             fi
         fi
@@ -269,24 +275,21 @@ else
         if [ ! -f "${GNU_KEYRING}" ]; then
             message "Downloading \`${GNU_KEYRING}'"
             if ! fetch "${GNU_KEYRING_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GNU_KEYRING} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
-            fi
-            if ! fetch "${GNU_KEYRING_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GNU_KEYRING} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+                panic "Failed to download ${GNU_KEYRING} from ${GNU_KEYRING_URL} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
             fi
         fi
 
         if [ ! -f "${NEWLIB}" ]; then
             message "Downloading \`${NEWLIB}'"
             if ! fetch "${NEWLIB_URL}" 1>> "newlib.log" 2>&1; then
-                panic "Failed to download ${NEWLIB} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
+                panic "Failed to download ${NEWLIB} from ${NEWLIB_URL} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
             fi
         fi
 
         if [ ! -f "${NEWLIB_MD5}" ]; then
-            message "Downloading \`${NEWLIB_MD5}'"
+            message "Downloading \`${NEWLIB_MD5}' (${NEWLIB_MD5})"
             if ! fetch "${NEWLIB_MD5_URL}" 1>> "newlib.log" 2>&1; then
-                panic "Failed to download ${NEWLIB_MD5} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
+                panic "Failed to download ${NEWLIB_MD5} from ${NEWLIB_MD5_URL} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
             fi
         fi
 
