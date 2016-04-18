@@ -1,5 +1,7 @@
-About
+Yaul  [![Build Status](https://travis-ci.org/ijacquez/libyaul.svg?branch=master)](https://travis-ci.org/ijacquez/libyaul)
 =====
+
+### About
   `libyaul` is an awesome open source SEGA Saturn software development kit that provides flexible low-level routines that are easily able to be composed to produce higher-level abstractions to further ease the burden of developing applications. For actual demonstrations running on real hardware, see my [YouTube][2] channel.
 
 ### Authors
