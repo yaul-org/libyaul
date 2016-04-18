@@ -10,4 +10,4 @@ before_install:
 - docker run shazz/libyaul-compiler:1.0 /bin/sh -c "cd /root; mkdir work; cd work; git clone https://github.com/ijacquez/libyaul.git; cd libyaul; git submodule init; git submodule update -f; cp yaul.env.in yaul.env; ln -s /opt/toolchains/ /root/tool-chains; . ./yaul.env; make release && make release-internal && make debug && make tools"
 
 script:
-- echo "Done"
+- echo "Build passed"
