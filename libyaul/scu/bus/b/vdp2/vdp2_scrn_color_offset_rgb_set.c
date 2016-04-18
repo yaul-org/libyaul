@@ -22,7 +22,7 @@ vdp2_scrn_color_offset_rgb_set(uint8_t select, int16_t r, int16_t g, int16_t b)
         /* Check range: [-256,256] */
         assert(((r >= -256) && (r <= 255)) &&
                ((g >= -256) && (g <= 255)) &&
-               ((m >= -256) && (b <= 255)));
+               ((b >= -256) && (b <= 255)));
 #endif /* DEBUG */
 
         /* Each color component in the color offset has a range [-256,255]
