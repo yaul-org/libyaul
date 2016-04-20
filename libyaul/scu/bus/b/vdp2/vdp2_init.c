@@ -32,6 +32,15 @@ vdp2_init(void)
         vdp2_state.display_h = 0;
         vdp2_state.interlaced = TVMD_INTERLACE_NONE;
 
+        vdp2_state.scroll.nbg0.x = F16(0.0f);
+        vdp2_state.scroll.nbg0.y = F16(0.0f);
+        vdp2_state.scroll.nbg1.x = F16(0.0f);
+        vdp2_state.scroll.nbg1.y = F16(0.0f);
+        vdp2_state.scroll.nbg2.x = 0;
+        vdp2_state.scroll.nbg2.y = 0;
+        vdp2_state.scroll.nbg3.x = 0;
+        vdp2_state.scroll.nbg3.x = 0;
+
         vdp2_state.vram_ctl.vram_size = VRAM_CTL_SIZE_4MBIT;
         vdp2_state.vram_ctl.vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B;
         uint32_t vram_bank;
