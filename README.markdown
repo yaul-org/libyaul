@@ -1,5 +1,11 @@
-Yaul  [![Build Status](https://travis-ci.org/ijacquez/libyaul.svg?branch=master)](https://travis-ci.org/ijacquez/libyaul)
+Yaul
 =====
+<p align="center">
+<img src="https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000" alt="license">
+  <a href="https://travis-ci.org/ijacquez/libyaul">
+    <img src="https://travis-ci.org/ijacquez/libyaul.svg?branch=master" alt="build status">
+  </a>
+</p>
 
 ### About
   `libyaul` is an awesome open source SEGA Saturn software development kit that provides flexible low-level routines that are easily able to be composed to produce higher-level abstractions to further ease the burden of developing applications. For actual demonstrations running on real hardware, see my [YouTube][2] channel.
