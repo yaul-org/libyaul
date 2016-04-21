@@ -38,6 +38,7 @@ for file in "./IP.BIN"; do
 done
 
 # Check if genisoimage is installed
+# Check if isoimage is installed
 
 options=(-quiet
     -sysid "\"SEGA SEGASATURN\""
@@ -71,4 +72,7 @@ else
     warning "Copyright file \`CPY.TXT' not found"
 fi
 
+# Generate image
 echo "genisoimage ${options[@]} \"${directory}\"" | sh
+# Output directory structure in image
+isoinfo -f -i "${image}.iso" 2>&1
