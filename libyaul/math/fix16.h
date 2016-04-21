@@ -82,6 +82,14 @@ static inline fix16_t fix16_from_double(double a) {
 	return (fix16_t)temp;
 }
 
+static inline fix16_t fix16_integral(fix16_t a) {
+        return (a & 0xFFFF0000);
+}
+
+static inline fix16_t fix16_fractional(fix16_t a) {
+        return (a & 0x0000FFFF);
+}
+
 /* Macro for defining fix16_t constant values.
    The functions above can't be used from e.g. global variable initializers,
    and their names are quite long also. This macro is useful for constants

@@ -9,7 +9,10 @@
 
 #include "vdp2-internal.h"
 
-#define BIT_WRAP(x) ((((x) & 0x07FF) + 0x07FF) & 0x07FF)
+#define WRAP_INTEGER(x)                                                        \
+    (((x) < 0)                                                                 \
+        ? ((((x) & 0x07FF) + 0x07FF) & 0x07FF)                                 \
+        : ((x) & 0x07FF))
 
 static inline void _update_fixed_point_scroll(fix16_t *, fix16_t, uint16_t *,
     uint16_t *);
@@ -137,9 +140,9 @@ _update_fixed_point_scroll(fix16_t *scroll, fix16_t delta, uint16_t *in,
         integral = fix16_to_int(scroll_of);
 
         fix16_t fractional;
-        fractional = fix16_abs(fix16_sub(scroll_of, fix16_from_int(integral)));
+        fractional = fix16_fractional(scroll_of);
 
-        *in = BIT_WRAP(integral);
+        *in = WRAP_INTEGER(integral);
         *dn = fractional & 0xFF00;
         *scroll = fix16_add(fix16_from_int(*in), fractional);
 }
@@ -147,9 +150,6 @@ _update_fixed_point_scroll(fix16_t *scroll, fix16_t delta, uint16_t *in,
 static inline void
 _update_integer_scroll(int16_t *scroll, fix16_t delta, uint16_t *in)
 {
-        int32_t scroll_of;
-        scroll_of = BIT_WRAP((*scroll + ((int16_t)fix16_to_int(delta))));
-
-        *in = (uint16_t)scroll_of;
-        *scroll = scroll_of;
+        *scroll = WRAP_INTEGER((*scroll + ((int16_t)fix16_to_int(delta))));
+        *in = *scroll;
 }
