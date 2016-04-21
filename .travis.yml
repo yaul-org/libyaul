@@ -8,8 +8,9 @@ services:
 before_install:
 - docker pull shazz/libyaul-compiler:1.0
 - docker run shazz/libyaul-compiler:1.0 /bin/sh -s << EOF
-- mkdir -p /root/work
-- cd /root/work
+- cd /root
+- mkdir work
+- cd work
 - git clone https://github.com/ijacquez/libyaul.git
 - cd libyaul
 - git submodule init
