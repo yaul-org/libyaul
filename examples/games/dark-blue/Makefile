@@ -4,19 +4,8 @@ endif
 
 include $(INSTALL_ROOT)/share/pre.common.mk
 
-PROJECT:= dark-blue
-
-IP_VERSION:= V1.000
-IP_RELEASE_DATE:= 20160101
-IP_AREAS:= JTUBKAEL
-IP_PERIPHERALS:= JAMKST
-IP_TITLE:= Dark Blue
-IP_MASTER_STACK_ADDR:= 0x06100000
-IP_SLAVE_STACK_ADDR:= 0x00000000
-IP_1ST_READ_ADDR:= 0x06004000
-
-LIBRARIES:= tga fixmath
-OBJECTS:= \
+SH_PROGRAM:= dark-blue
+SH_OBJECTS:= \
 	root.romdisk.o \
 	cmd_groups.o \
 	collider.o \
@@ -35,6 +24,16 @@ OBJECTS:= \
 	state_machine.o \
 	state_splash.o \
 	state_title.o
+SH_LIBRARIES:= tga
+
+IP_VERSION:= V1.000
+IP_RELEASE_DATE:= 20160101
+IP_AREAS:= JTUBKAEL
+IP_PERIPHERALS:= JAMKST
+IP_TITLE:= Dark Blue
+IP_MASTER_STACK_ADDR:= 0x06100000
+IP_SLAVE_STACK_ADDR:= 0x00000000
+IP_1ST_READ_ADDR:= 0x06004000
 
 ROMDISK_DEPS:= levels/test.tmx levels/test.json romdisk/*.TGA
 

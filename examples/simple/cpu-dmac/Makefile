@@ -4,7 +4,8 @@ endif
 
 include $(INSTALL_ROOT)/share/pre.common.mk
 
-PROJECT:= cpu-dmac
+SH_PROGRAM:= cpu-dmac
+SH_OBJECTS:= cpu-dmac.o
 
 IP_VERSION:= V1.000
 IP_RELEASE_DATE:= 20160101
@@ -14,7 +15,5 @@ IP_TITLE:= cpu-dmac
 IP_MASTER_STACK_ADDR:= 0x06100000
 IP_SLAVE_STACK_ADDR:= 0x00000000
 IP_1ST_READ_ADDR:= 0x06004000
-
-OBJECTS:= cpu-dmac.o
 
 include $(INSTALL_ROOT)/share/post.common.mk

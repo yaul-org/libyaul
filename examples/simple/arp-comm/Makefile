@@ -15,6 +15,6 @@ IP_MASTER_STACK_ADDR:= 0x06100000
 IP_SLAVE_STACK_ADDR:= 0x00000000
 IP_1ST_READ_ADDR:= 0x06004000
 
-OBJECTS:= arp-comm.o
+SH_OBJECTS:= arp-comm.o
 
 include $(INSTALL_ROOT)/share/post.common.mk

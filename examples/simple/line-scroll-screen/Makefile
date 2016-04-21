@@ -4,7 +4,9 @@ endif
 
 include $(INSTALL_ROOT)/share/pre.common.mk
 
-PROJECT:= line-scroll-screen
+SH_PROGRAM:= line-scroll-screen
+SH_OBJECTS:= lut.o \
+	line-scroll-screen.o
 
 IP_VERSION:= V1.000
 IP_RELEASE_DATE:= 20160101
@@ -14,8 +16,5 @@ IP_TITLE:= VDP2
 IP_MASTER_STACK_ADDR:= 0x06100000
 IP_SLAVE_STACK_ADDR:= 0x00000000
 IP_1ST_READ_ADDR:= 0x06004000
-
-OBJECTS:= lut.o \
-	line-scroll-screen.o
 
 include $(INSTALL_ROOT)/share/post.common.mk

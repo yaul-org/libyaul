@@ -1,11 +1,17 @@
-ifeq ($(strip $(PROJECT)),)
-  $(error Empty PROJECT (project name))
+ifeq ($(strip $(SH_PROGRAM)),)
+  $(error Empty SH_PROGRAM (SH program name))
 endif
 
 ifeq ($(strip $(SH_OBJECTS)),)
   # If both OBJECTS and OBJECTS_NO_LINK is empty
-  ifeq ($(strip $(OBJECTS_NO_LINK)),)
-    $(error Empty OBJECTS (object list))
+  ifeq ($(strip $(SH_OBJECTS_NO_LINK)),)
+    $(error Empty SH_OBJECTS (SH object list))
+  endif
+endif
+
+ifneq ($(strip $(M68K_PROGRAM)),)
+  ifeq ($(strip $(M68K_OBJECTS)),)
+    $(error Empty M68K_OBJECTS (M68K object list))
   endif
 endif
 
@@ -15,22 +21,38 @@ else
   SH_LDFLAGS+= -specs=$(CUSTOM_SPECS)
 endif
 
+ROMDISK_DEPS:= $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
+ifneq ($(strip $(M68K_PROGRAM)),)
+  ROMDISK_DEPS+= ./romdisk/$(M68K_PROGRAM)
+endif
+
 SH_DEPS:= $(SH_OBJECTS:.o=.d)
-DEPS_NO_LINK:= $(OBJECTS_NO_LINK:.o=.d)
+SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK:.o=.d)
 
-all: $(PROJECT).iso
+all: $(SH_PROGRAM).iso
 
-$(PROJECT).bin: $(PROJECT).elf $(M68K_PROGRAMS)
+$(SH_PROGRAM).bin: $(SH_PROGRAM).elf $(M68K_PROGRAMS)
 	$(SH_OBJCOPY) -O binary $< $@
-	@sh -c "du -h -s $@ | cut -d '	' -f 1"
+	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
-$(PROJECT).elf: $(SH_OBJECTS) $(OBJECTS_NO_LINK)
-	$(SH_LD) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
-	$(SH_NM) $(PROJECT).elf > $(PROJECT).sym
-	$(SH_OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
+$(SH_PROGRAM).elf: $(SH_OBJECTS) $(SH_OBJECTS_NO_LINK)
+	$(SH_LD) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
+	$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
-%.romdisk: $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
-	mkdir -p ./romdisk
+./romdisk/$(M68K_PROGRAM): $(M68K_PROGRAM).elf
+	$(M68K_OBJCOPY) -O binary $< $@
+	chmod -x $@
+	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
+
+$(M68K_PROGRAM).elf: $(M68K_OBJECTS)
+	$(M68K_LD) $(M68K_OBJECTS) $(M68K_LDFLAGS) -o $@
+	$(M68K_NM) $(M68K_PROGRAM).elf > $(M68K_PROGRAM).sym
+
+./romdisk:
+	mkdir -p $@
+
+%.romdisk: ./romdisk $(ROMDISK_DEPS)
 	$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
@@ -43,24 +65,18 @@ $(PROJECT).elf: $(SH_OBJECTS) $(OBJECTS_NO_LINK)
 %.o: %.S
 	$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
-%.m68k: %.m68k.S
-	$(M68K_AS) $(M68K_AFLAGS) -o $@.o $<
-	$(M68K_LD) $@.o $(M68K_LDFLAGS) -o $@.elf
-	$(M68K_OBJCOPY) -O binary $@.elf $@
-	@sh -c "du -h -s $@ | cut -d '	' -f 1"
-	chmod -x $@
-	$(RM) $@.o
-	$(RM) $@.elf
+%.m68k.o: %.m68k.S
+	$(M68K_AS) $(M68K_AFLAGS) -o $@ $<
 
-$(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
+$(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	mkdir -p $(IMAGE_DIRECTORY)
-	cp $(PROJECT).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
+	cp $(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
 	for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
 	    if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
 	        printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
 	    fi \
 	done
-	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(PROJECT)
+	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
 IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.S
 	$(eval $@_TMP_FILE:= $(shell mktemp))
@@ -78,24 +94,34 @@ IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.S
 	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
-        ' | $(SH_AS) $(SH_AFLAGS) \
+	' | $(SH_AS) $(SH_AFLAGS) \
 		-I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(RM) $($@_TMP_FILE)
 
 clean:
-	-rm -f $(SH_OBJECTS) \
-		$(M68K_PROGRAMS) \
-		$(OBJECTS_NO_LINK) \
-		$(DEPS) \
-		$(PROJECT).asm \
-		$(PROJECT).bin \
-		$(PROJECT).elf \
-		$(PROJECT).map \
+	-rm -f \
+		$(SH_PROGRAM).bin \
+		$(SH_PROGRAM).iso \
+		$(SH_OBJECTS) \
+		$(SH_DEPS) \
+		$(SH_PROGRAM).asm \
+		$(SH_PROGRAM).bin \
+		$(SH_PROGRAM).elf \
+		$(SH_PROGRAM).map \
+		$(SH_PROGRAM).sym \
+		$(SH_OBJECTS_NO_LINK) \
+		$(SH_DEPS_NO_LINK) \
 		IP.BIN \
-		IP.BIN.map \
-		$(PROJECT).sym
+		IP.BIN.map
+	if [ ! -z $(M68K_PROGRAM) ]; then \
+	    rm -f \
+	        romdisk/$(M68K_PROGRAM) \
+	        $(M68K_PROGRAM).elf \
+	        $(M68K_PROGRAM).sym \
+	        $(M68K_OBJECTS); \
+	fi
 
--include $(DEPS)
--include $(DEPS_NO_LINK)
+-include $(SH_DEPS)
+-include $(SH_DEPS_NO_LINK)

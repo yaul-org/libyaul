@@ -8,10 +8,13 @@ ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
 endif
 
 # Customizable (must be overwritten in user's Makefile)
-PROJECT?=unknown
+SH_PROGRAM?=unknown
 SH_OBJECTS?=
-OBJECTS_NO_LINK?=
-M68K_PROGRAMS?=
+SH_OBJECTS_NO_LINK?=
+SH_LIBRARIES?=
+M68K_PROGRAM?=
+M68K_OBJECTS?=
+ROMDISK_DEPS?=
 CUSTOM_SPECS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
@@ -58,11 +61,11 @@ SH_CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-ma
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
-SH_LDFLAGS= -Wl,-Map,$(PROJECT).map
+SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
 SH_CXXFLAGS= $(SH_CFLAGS) \
 	-ffreestanding -fno-exceptions -fno-rtti
-SH_LXXFLAGS= -Wl,-Map,$(PROJECT).map \
+SH_LXXFLAGS= -Wl,-Map,$(SH_PROGRAM).map \
 	-Wl,--start-group \
 	-lstdc++ -lc -lgcc \
 	-Wl,--end-group \
@@ -74,7 +77,7 @@ M68K_LDFLAGS=
 
 SUFFIXES:= .c .m68k.S .S .o .m68k .bin .elf .romdisk .romdisk.o
 
-.PHONY: clean example romdisk image
+.PHONY: clean example
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
