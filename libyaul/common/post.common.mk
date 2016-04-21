@@ -2,7 +2,7 @@ ifeq ($(strip $(PROJECT)),)
   $(error Empty PROJECT (project name))
 endif
 
-ifeq ($(strip $(OBJECTS)),)
+ifeq ($(strip $(SH_OBJECTS)),)
   # If both OBJECTS and OBJECTS_NO_LINK is empty
   ifeq ($(strip $(OBJECTS_NO_LINK)),)
     $(error Empty OBJECTS (object list))
@@ -15,17 +15,17 @@ else
   SH_LDFLAGS+= -specs=$(CUSTOM_SPECS)
 endif
 
-DEPS:= $(OBJECTS:.o=.d)
+SH_DEPS:= $(SH_OBJECTS:.o=.d)
 DEPS_NO_LINK:= $(OBJECTS_NO_LINK:.o=.d)
 
 all: $(PROJECT).iso
 
-$(PROJECT).bin: $(PROJECT).elf
+$(PROJECT).bin: $(PROJECT).elf $(M68K_PROGRAMS)
 	$(SH_OBJCOPY) -O binary $< $@
 	@sh -c "du -h -s $@ | cut -d '	' -f 1"
 
-$(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
-	$(SH_LD) $(OBJECTS) $(LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
+$(PROJECT).elf: $(SH_OBJECTS) $(OBJECTS_NO_LINK)
+	$(SH_LD) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
 	$(SH_NM) $(PROJECT).elf > $(PROJECT).sym
 	$(SH_OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
 
@@ -43,6 +43,15 @@ $(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
 %.o: %.S
 	$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
+%.m68k: %.m68k.S
+	$(M68K_AS) $(M68K_AFLAGS) -o $@.o $<
+	$(M68K_LD) $@.o $(M68K_LDFLAGS) -o $@.elf
+	$(M68K_OBJCOPY) -O binary $@.elf $@
+	@sh -c "du -h -s $@ | cut -d '	' -f 1"
+	chmod -x $@
+	$(RM) $@.o
+	$(RM) $@.elf
+
 $(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	mkdir -p $(IMAGE_DIRECTORY)
 	cp $(PROJECT).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
@@ -53,7 +62,7 @@ $(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	done
 	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(PROJECT)
 
-IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
+IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.S
 	$(eval $@_TMP_FILE:= $(shell mktemp))
 	cat $< | awk ' \
 	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
@@ -70,13 +79,14 @@ IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
         ' | $(SH_AS) $(SH_AFLAGS) \
-		-I$(INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
+		-I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(RM) $($@_TMP_FILE)
 
 clean:
-	-rm -f $(OBJECTS) \
+	-rm -f $(SH_OBJECTS) \
+		$(M68K_PROGRAMS) \
 		$(OBJECTS_NO_LINK) \
 		$(DEPS) \
 		$(PROJECT).asm \

@@ -9,8 +9,9 @@ endif
 
 # Customizable (must be overwritten in user's Makefile)
 PROJECT?=unknown
-OBJECTS?=
+SH_OBJECTS?=
 OBJECTS_NO_LINK?=
+M68K_PROGRAMS?=
 CUSTOM_SPECS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
@@ -67,11 +68,11 @@ SH_LXXFLAGS= -Wl,-Map,$(PROJECT).map \
 	-Wl,--end-group \
 	-nostartfiles -specs=yaul.specs
 
-+M68K_AFLAGS=
-+M68K_CFLAGS=
-+M68K_LDFLAGS=
+M68K_AFLAGS= --fatal-warnings
+M68K_CFLAGS=
+M68K_LDFLAGS=
 
-SUFFIXES:= .c .S .o .bin .elf .romdisk .romdisk.o
+SUFFIXES:= .c .m68k.S .S .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: clean example romdisk image
 
