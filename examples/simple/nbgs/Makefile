@@ -2,7 +2,7 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-include $(INSTALL_ROOT)/share/yaul/pre.common.mk
+include $(INSTALL_ROOT)/share/pre.common.mk
 
 PROJECT:= nbgs
 
@@ -20,4 +20,4 @@ OBJECTS:= \
 	fs.o \
 	nbgs.o
 
-include $(INSTALL_ROOT)/share/yaul/post.common.mk
+include $(INSTALL_ROOT)/share/post.common.mk

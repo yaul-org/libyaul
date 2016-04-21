@@ -58,7 +58,7 @@ fix16_t fix16_overflow_ssub(fix16_t a, fix16_t b)
  */
  
 #if !defined(FIXMATH_NO_64BIT) && !defined(FIXMATH_OPTIMIZE_8BIT) && !defined(FIXMATH_NO_OVERFLOW)
-fix16_t fix16_mul(fix16_t inArg0, fix16_t inArg1)
+fix16_t fix16_overflow_mul(fix16_t inArg0, fix16_t inArg1)
 {
 	int64_t product = (int64_t)inArg0 * inArg1;
 	

@@ -139,7 +139,7 @@ extern fix16_t fix16_overflow_ssub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
 /*! Multiplies the two given fix16_t's and returns the result.
 */
-extern fix16_t fix16_mul(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_mul(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
 /*! Divides the first given fix16_t by the second and returns the result.
 */

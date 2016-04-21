@@ -12,6 +12,13 @@ ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
+ifeq ($(strip $(SILENT)),1)
+  ECHO=@
+else
+  ECHO=
+endif
+export ECHO
+
 # Check options
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
   $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
@@ -362,7 +369,6 @@ HEADER_FILES+= \
 	./scu/scu/map.h:. \
 	./scu/scu/timer.h:.
 
-SILENT?= @
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m
 V_BEGIN_GREEN= [1;32m
@@ -373,21 +379,27 @@ V_BEGIN_CYAN= [1;36m
 V_BEGIN_WHITE= [1;37m
 V_END= [m
 
-ARCH?= sh-elf
-
-AS:= $(INSTALL_ROOT)/bin/$(ARCH)-as
-AR:= $(INSTALL_ROOT)/bin/$(ARCH)-ar
-CC:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
-CXX:= $(INSTALL_ROOT)/bin/$(ARCH)-g++
-LD:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
-NM:= $(INSTALL_ROOT)/bin/$(ARCH)-nm
-OBJCOPY:= $(INSTALL_ROOT)/bin/$(ARCH)-objcopy
-OBJDUMP:= $(INSTALL_ROOT)/bin/$(ARCH)-objdump
+SH_AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
+SH_AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
+SH_CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
+SH_LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
+SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
+SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
+M68K_AS:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as
+M68K_AR:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar
+M68K_CC:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc
+M68K_CXX:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-g++
+M68K_LD:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc
+M68K_NM:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm
+M68K_OBJCOPY:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy
+M68K_OBJDUMP:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump
 SED:= sed
 FIND:= find
 INSTALL:= install
 
-CFLAGS:= -std=c99 \
+SH_CFLAGS:= -std=c99 \
 	-s \
 	-ffast-math \
 	-fstrict-aliasing \
@@ -402,11 +414,17 @@ CFLAGS:= -std=c99 \
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
-CFLAGS_release:= -O2 $(CFLAGS)
-CFLAGS_release-internal:= -O2 $(CFLAGS) \
+SH_CFLAGS_release:= -O2 $(CFLAGS)
+SH_CFLAGS_release-internal:= -O2 $(CFLAGS) \
 	-DRELEASE_INTERNAL
-CFLAGS_debug:= -O0 -g $(CFLAGS) \
+SH_CFLAGS_debug:= -O0 -g $(CFLAGS) \
 	-DDEBUG
+
+M68K_CFLAGS:=
+
+M68K_CFLAGS_release:=
+M68K_CFLAGS_release-internal:=
+M68K_CFLAGS_debug:=
 
 START_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(START_SRCS)))
 START_DEPS:= $(START_OBJS:.o=.d)
@@ -437,39 +455,41 @@ USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
 
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)mkdir -p $(@D)
-	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CFLAGS_$1) \
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
-	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
 endef
 
 define macro-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)$(AR) rcs $@ $(LIB_OBJS_$1)
+	$(ECHO)$(SH_AR) rcs $@ $(LIB_OBJS_$1)
 endef
 
 define macro-install-library
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$1/lib$(TARGET).a$(V_END)\n"
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
+	$(ECHO)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/sh-elf/sh-elf/lib/
 endef
 
 define macro-install-start-scripts
-	$(SILENT)for object in $(START_OBJS_$1); do \
+	$(ECHO)for object in $(START_OBJS_$1); do \
 	    printf -- "$(V_BEGIN_BLUE)$${object#$(BUILD_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/$(ARCH)/lib/; \
+	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/sh-elf/sh-elf/lib/; \
 	done
 endef
 
 define macro-install-files
-	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
-	$(SILENT)for pair in $(HEADER_FILES_all); do \
+	$(ECHO)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
+	$(ECHO)$(RM) -r $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
+	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
+	    for pair in $(HEADER_FILES_all); do \
 	    pair_header_file=$$(echo "$${pair}" | cut -d ':' -f 1); \
 	    pair_rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
-            rel_header_file=$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
+	    rel_header_file=$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
 	    rel_header_dir=$${rel_header_file%/*}/$${pair_rel_dst}; \
-	    path="$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}"; \
+	    path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}"; \
 	    header_file=$$(basename "$${path}"); \
 	    header_dir=$$(dirname "$${path}"); \
 	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
@@ -479,29 +499,29 @@ define macro-install-files
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
 	done
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts
-	$(SILENT)for ldscript in $(LDSCRIPTS_all); do \
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/lib/ldscripts
+	$(ECHO)for ldscript in $(LDSCRIPTS_all); do \
 	    printf -- "$(V_BEGIN_BLUE)$${ldscript#$(BUILD_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/$(ARCH)/lib/ldscripts/; \
+	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/sh-elf/sh-elf/lib/ldscripts/; \
 	done
-	$(SILENT)for specs in $(SPECS_all); do \
+	$(ECHO)for specs in $(SPECS_all); do \
 	    printf -- "$(V_BEGIN_BLUE)$${specs#$(BUILD_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/$(ARCH)/lib/; \
+	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/sh-elf/sh-elf/lib/; \
 	done
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)/bootstrap
-	$(SILENT)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/share/$(TARGET)/bootstrap
+	$(ECHO)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
 	    printf -- "$(V_BEGIN_BLUE)$${bootstrap_file#$(BUILD_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/share/$(TARGET)/bootstrap; \
+	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/sh-elf/share/$(TARGET)/bootstrap; \
 	done
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/share/$(TARGET)
-	$(SILENT)for user_file in $(USER_FILES_all); do \
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/share
+	$(ECHO)for user_file in $(USER_FILES_all); do \
 	    printf -- "$(V_BEGIN_BLUE)$${user_file#$(BUILD_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/$(TARGET)/; \
+	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/; \
 	done
 endef
 
 define macro-clean
-	$(SILENT)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$1 ]; then \
+	$(ECHO)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$1 ]; then \
 		$(FIND) $(BUILD_ROOT)/$(SUB_BUILD)/$1 -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 endef
@@ -532,13 +552,13 @@ install-debug: debug
 	$(call macro-install-files)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release:
-	$(SILENT)mkdir -p $@
+	$(ECHO)mkdir -p $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release-internal:
-	$(SILENT)mkdir -p $@
+	$(ECHO)mkdir -p $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/debug:
-	$(SILENT)mkdir -p $@
+	$(ECHO)mkdir -p $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a: $(LIB_OBJS_release)
 	$(call macro-build-library,release)
@@ -551,9 +571,9 @@ $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)mkdir -p $(@D)
-	$(SILENT)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"$(INSTALL_ROOT)"); \
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
+	    sub(/\$$INSTALL_ROOT/,"$(INSTALL_ROOT)/sh-elf"); \
 	} \
 	{ print }' > $@
 

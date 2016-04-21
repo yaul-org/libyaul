@@ -2,7 +2,7 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-include $(INSTALL_ROOT)/share/yaul/pre.common.mk
+include $(INSTALL_ROOT)/share/pre.common.mk
 
 PROJECT:= dram-cartridge
 
@@ -17,4 +17,4 @@ IP_1ST_READ_ADDR:= 0x06004000
 
 OBJECTS:= dram-cartridge.o
 
-include $(INSTALL_ROOT)/share/yaul/post.common.mk
+include $(INSTALL_ROOT)/share/post.common.mk

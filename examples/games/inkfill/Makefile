@@ -2,7 +2,7 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-include $(INSTALL_ROOT)/share/yaul/pre.common.mk
+include $(INSTALL_ROOT)/share/pre.common.mk
 
 PROJECT:= inkfill
 
@@ -27,4 +27,4 @@ OBJECTS:= \
 	title.o \
 	tutorial.o
 
-include $(INSTALL_ROOT)/share/yaul/post.common.mk
+include $(INSTALL_ROOT)/share/post.common.mk

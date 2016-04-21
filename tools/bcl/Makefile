@@ -12,9 +12,15 @@ ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
+ifeq ($(strip $(SILENT)),1)
+  ECHO=@
+else
+  ECHO=
+endif
+export ECHO
+
 SUB_BUILD:=$(BUILD)/tools/$(TARGET)
 
-SILENT?= @
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m
 V_BEGIN_GREEN= [1;32m
@@ -51,26 +57,27 @@ all: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)$(CC) -o $@ $(OBJS)
-	$(SILENT)$(STRIP) -s $@
+	$(ECHO)$(CC) -o $@ $(OBJS)
+	$(ECHO)$(STRIP) -s $@
 
 $(BUILD_ROOT)/$(SUB_BUILD):
-	$(SILENT)mkdir -p $@
+	$(ECHO)mkdir -p $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)mkdir -p $(@D)
-	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
 		-c -o $@ $<
-	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
 clean:
-	$(SILENT)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+	$(ECHO)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 
 distclean: clean
 
 install: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(TARGET)$(V_END)\n"
-	$(SILENT)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/bin
+	$(ECHO)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
 
 -include $(DEPS)

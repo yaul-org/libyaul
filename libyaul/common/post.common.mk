@@ -10,9 +10,9 @@ ifeq ($(strip $(OBJECTS)),)
 endif
 
 ifeq ($(strip $(CUSTOM_SPECS)),)
-  LDFLAGS+= -specs=yaul.specs
+  SH_LDFLAGS+= -specs=yaul.specs
 else
-  LDFLAGS+= -specs=$(CUSTOM_SPECS)
+  SH_LDFLAGS+= -specs=$(CUSTOM_SPECS)
 endif
 
 DEPS:= $(OBJECTS:.o=.d)
@@ -21,13 +21,13 @@ DEPS_NO_LINK:= $(OBJECTS_NO_LINK:.o=.d)
 all: $(PROJECT).iso
 
 $(PROJECT).bin: $(PROJECT).elf
-	$(OBJCOPY) -O binary $< $@
+	$(SH_OBJCOPY) -O binary $< $@
 	@sh -c "du -h -s $@ | cut -d '	' -f 1"
 
 $(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
-	$(LD) $(OBJECTS) $(LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
-	$(NM) $(PROJECT).elf > $(PROJECT).sym
-	$(OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
+	$(SH_LD) $(OBJECTS) $(LDFLAGS) $(foreach lib,$(LIBRARIES),-l$(lib)) -o $@
+	$(SH_NM) $(PROJECT).elf > $(PROJECT).sym
+	$(SH_OBJDUMP) -S $(PROJECT).elf > $(PROJECT).asm
 
 %.romdisk: $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
 	mkdir -p ./romdisk
@@ -38,10 +38,10 @@ $(PROJECT).elf: $(OBJECTS) $(OBJECTS_NO_LINK)
 	$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(SH_CC) $(SH_CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.S
-	$(AS) $(AFLAGS) -o $@ $<
+	$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
 $(PROJECT).iso: $(PROJECT).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
 	mkdir -p $(IMAGE_DIRECTORY)
@@ -69,9 +69,9 @@ IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
-        ' | $(AS) $(AFLAGS) \
+        ' | $(SH_AS) $(AFLAGS) \
 		-I$(INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
-	$(CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
+	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(RM) $($@_TMP_FILE)
 

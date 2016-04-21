@@ -2,7 +2,7 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
-include $(INSTALL_ROOT)/share/yaul/pre.common.mk
+include $(INSTALL_ROOT)/share/pre.common.mk
 
 PROJECT:= line-scroll-screen
 
@@ -18,4 +18,4 @@ IP_1ST_READ_ADDR:= 0x06004000
 OBJECTS:= lut.o \
 	line-scroll-screen.o
 
-include $(INSTALL_ROOT)/share/yaul/post.common.mk
+include $(INSTALL_ROOT)/share/post.common.mk

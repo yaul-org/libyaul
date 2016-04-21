@@ -12,6 +12,13 @@ ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
+ifeq ($(strip $(SILENT)),1)
+  ECHO=@
+else
+  ECHO=
+endif
+export ECHO
+
 SUB_BUILD:= $(BUILD)/lib$(TARGET)
 
 SRCS:= tga.c
@@ -19,15 +26,14 @@ SRCS:= tga.c
 HEADER_FILES:= \
 	tga.h
 
-ARCH?= sh-elf
-AS:= $(INSTALL_ROOT)/bin/$(ARCH)-as
-AR:= $(INSTALL_ROOT)/bin/$(ARCH)-ar
-CC:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
-CXX:= $(INSTALL_ROOT)/bin/$(ARCH)-g++
-LD:= $(INSTALL_ROOT)/bin/$(ARCH)-gcc
-NM:= $(INSTALL_ROOT)/bin/$(ARCH)-nm
-OBJCOPY:= $(INSTALL_ROOT)/bin/$(ARCH)-objcopy
-OBJDUMP:= $(INSTALL_ROOT)/bin/$(ARCH)-objdump
+AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
+AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
+CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
+LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
+OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
+OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
 SED:= sed
 INSTALL:= install
 
@@ -53,7 +59,6 @@ CCFLAGS_release-internal:= -O2 $(CCFLAGS) \
 CCFLAGS_debug:= -O0 -g $(CCFLAGS) \
 	-DDEBUG
 
-SILENT?= @
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m
 V_BEGIN_GREEN= [1;32m
@@ -78,22 +83,22 @@ HEADER_FILES_all:= $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
+	$(ECHO)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
 		$(foreach dir,$(INCLUDES),-I./$(dir)) \
 		-c $< -o $@
-	$(SILENT)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
 endef
 
 define macro-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(SILENT)$(AR) rcs $@ $(OBJS_$1)
+	$(ECHO)$(AR) rcs $@ $(OBJS_$1)
 endef
 
 define macro-install-files
-	$(SILENT)$(RM) -r $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)
-	$(SILENT)for header_file in $(HEADER_FILES_all); do \
-	    path="$(INSTALL_ROOT)/$(ARCH)/include/$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}"; \
+	$(ECHO)$(RM) -r $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
+	$(ECHO)for header_file in $(HEADER_FILES_all); do \
+	    path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${header_file#$(BUILD_ROOT)/lib$(TARGET)/}"; \
 	    install_header_file=$$(python -c "import os; print os.path.abspath(\"$${path}\")"); \
 	    printf -- "$(V_BEGIN_BLUE)$${header_file#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
@@ -102,11 +107,11 @@ endef
 
 define macro-install-library
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$1/lib$(TARGET).a$(V_END)\n"
-	$(SILENT)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/$(ARCH)/lib/
+	$(ECHO)$(INSTALL) -m 644 $(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a $(INSTALL_ROOT)/sh-elf/sh-elf/lib/
 endef
 
 define macro-clean
-	$(SILENT)$(RM) $(foreach DIR,$(BUILD_ROOT)/$(SUB_BUILD)/$1,\
+	$(ECHO)$(RM) $(foreach DIR,$(BUILD_ROOT)/$(SUB_BUILD)/$1,\
 		$(DIR)/*.o \
 		$(DIR)/*.d) \
 		$(BUILD_ROOT)/$(SUB_BUILD)/$1/lib$(TARGET).a

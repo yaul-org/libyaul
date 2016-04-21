@@ -15,7 +15,13 @@ ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
-SILENT?= @
+ifeq ($(strip $(SILENT)),1)
+  ECHO=@
+else
+  ECHO=
+endif
+export ECHO
+
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m
 V_BEGIN_GREEN= [1;32m
@@ -28,29 +34,29 @@ V_END= [m
 
 define macro-generate-build-rule
 $1-$2:
-	$(SILENT)mkdir -p $(BUILD_ROOT)/$(BUILD)
-	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	$(ECHO)mkdir -p $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
 endef
 
 define macro-generate-install-rule
 $1-$2:
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/lib
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/include
-	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
 endef
 
 define macro-generate-clean-rule
 $1-$2:
-	$(SILENT)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(SILENT)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
+	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
 endef
 
 define macro-install
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/lib
-	$(SILENT)mkdir -p $(INSTALL_ROOT)/include
-	$(SILENT)for project in $(PROJECTS); do \
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
+	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
+	$(ECHO)for project in $(PROJECTS); do \
 		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
 		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
 	done
@@ -65,8 +71,8 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project)
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
 release release-internal debug:
-	$(SILENT)mkdir -p $(BUILD_ROOT)/$(BUILD)
-	$(SILENT)for project in $(PROJECTS); do \
+	$(ECHO)mkdir -p $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)for project in $(PROJECTS); do \
 		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
 		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
 	done
@@ -89,10 +95,10 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(projec
 clean: clean-release clean-release-internal clean-debug clean-tools
 
 distclean: clean-release clean-release-internal clean-debug clean-tools clean-examples
-	$(SILENT)$(RM) -r $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)$(RM) -r $(BUILD_ROOT)/$(BUILD)
 
 clean-release clean-release-internal clean-debug:
-	$(SILENT)for project in $(PROJECTS); do \
+	$(ECHO)for project in $(PROJECTS); do \
 		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
 		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
 	done
@@ -104,19 +110,19 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project)
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-debug)))
 
 examples:
-	$(SILENT)($(MAKE) -C examples all) || exit $$?
+	$(ECHO)($(MAKE) -C examples all) || exit $$?
 
 clean-examples:
-	$(SILENT)($(MAKE) -C examples clean) || exit $$?
+	$(ECHO)($(MAKE) -C examples clean) || exit $$?
 
 tools:
-	$(SILENT)($(MAKE) -C tools all) || exit $$?
+	$(ECHO)($(MAKE) -C tools all) || exit $$?
 
 install-tools: tools
-	$(SILENT)($(MAKE) -C tools install) || exit $$?
+	$(ECHO)($(MAKE) -C tools install) || exit $$?
 
 clean-tools:
-	$(SILENT)($(MAKE) -C tools clean) || exit $$?
+	$(ECHO)($(MAKE) -C tools clean) || exit $$?
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
