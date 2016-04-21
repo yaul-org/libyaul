@@ -26,18 +26,18 @@ SRCS:= tga.c
 HEADER_FILES:= \
 	tga.h
 
-AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
-AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
-CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
-LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
-OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
-OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
+SH_AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
+SH_AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
+SH_CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
+SH_LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
+SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
+SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
 SED:= sed
 INSTALL:= install
 
-CCFLAGS:= -std=c99 \
+SH_CFLAGS:= -std=c99 \
 	-s \
 	-ffast-math \
 	-fstrict-aliasing \
@@ -53,10 +53,10 @@ CCFLAGS:= -std=c99 \
 	-Wno-pointer-to-int-cast \
 	-Wno-maybe-uninitialized \
 	-Wno-pointer-sign
-CCFLAGS_release:= -O2 $(CCFLAGS)
-CCFLAGS_release-internal:= -O2 $(CCFLAGS) \
+SH_CFLAGS_release:= -O2 $(SH_CFLAGS)
+SH_CFLAGS_release-internal:= -O2 $(SH_CFLAGS) \
 	-DRELEASE_INTERNAL
-CCFLAGS_debug:= -O0 -g $(CCFLAGS) \
+SH_CFLAGS_debug:= -O0 -g $(SH_CFLAGS) \
 	-DDEBUG
 
 V_BEGIN_BLACK= [1;30m
@@ -83,7 +83,7 @@ HEADER_FILES_all:= $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CCFLAGS_$1) \
+	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDES),-I./$(dir)) \
 		-c $< -o $@
 	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
@@ -91,7 +91,7 @@ endef
 
 define macro-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)$(AR) rcs $@ $(OBJS_$1)
+	$(ECHO)$(SH_AR) rcs $@ $(OBJS_$1)
 endef
 
 define macro-install-files

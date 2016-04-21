@@ -29,6 +29,6 @@ OBJECTS:= \
 	tests/primitives/scaled_sprite/00.o \
 	tests/primitives/scaled_sprite/01.o
 
-CFLAGS+=-I.
+SH_CFLAGS+=-I.
 
 include $(INSTALL_ROOT)/share/post.common.mk

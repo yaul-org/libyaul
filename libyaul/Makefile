@@ -414,10 +414,10 @@ SH_CFLAGS:= -std=c99 \
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
-SH_CFLAGS_release:= -O2 $(CFLAGS)
-SH_CFLAGS_release-internal:= -O2 $(CFLAGS) \
+SH_CFLAGS_release:= -O2 $(SH_CFLAGS)
+SH_CFLAGS_release-internal:= -O2 $(SH_CFLAGS) \
 	-DRELEASE_INTERNAL
-SH_CFLAGS_debug:= -O0 -g $(CFLAGS) \
+SH_CFLAGS_debug:= -O0 -g $(SH_CFLAGS) \
 	-DDEBUG
 
 M68K_CFLAGS:=
@@ -456,7 +456,7 @@ USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(CFLAGS_$1) \
+	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
 	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d

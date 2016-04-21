@@ -69,7 +69,7 @@ IP.BIN: $(INSTALL_ROOT)/share/yaul/bootstrap/ip.S
 	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
-        ' | $(SH_AS) $(AFLAGS) \
+        ' | $(SH_AS) $(SH_AFLAGS) \
 		-I$(INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
