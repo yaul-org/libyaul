@@ -4,10 +4,23 @@ language: c
 
 services:
 - docker
-  
+
 before_install:
 - docker pull shazz/libyaul-compiler:1.0
-- docker run shazz/libyaul-compiler:1.0 /bin/sh -c "cd /root; mkdir work; cd work; git clone https://github.com/ijacquez/libyaul.git; cd libyaul; git submodule init; git submodule update -f; cp yaul.env.in yaul.env; ln -s /opt/toolchains/ /root/tool-chains; . ./yaul.env; make release && make release-internal && make debug && make tools"
-
-script:
-- echo "Build passed"
+- docker run shazz/libyaul-compiler:1.0 /bin/sh -s << EOF
+- mkdir -p /root/work
+- cd /root/work
+- git clone https://github.com/ijacquez/libyaul.git
+- cd libyaul
+- git submodule init
+- git submodule update -f
+- cp yaul.env.in yaul.env
+- sed -E -i 's/^export INSTALL_ROOT=.+$/\/opt/toolchains/g' yaul.env
+- cat yaul.env
+- . yaul.env
+- make release
+- make release-internal
+- make debug
+- make tools
+- # Build examples
+- EOF
