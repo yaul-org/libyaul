@@ -12,47 +12,127 @@
 void
 vdp2_scrn_scroll_x_set(uint8_t scrn, fix16_t scroll)
 {
+#ifdef DEBUG
+        /* Check if the background passed is valid */
+        assert((scrn == SCRN_NBG0) ||
+               (scrn == SCRN_RBG1) ||
+               (scrn == SCRN_NBG1) ||
+               (scrn == SCRN_NBG2) ||
+               (scrn == SCRN_NBG3) ||
+               (scrn == SCRN_RBG1));
+#endif /* DEBUG */
+
+        /* All screen scroll values must be identified as positive
+         * values */
+        uint16_t in;
+        uint16_t dn;
+
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                vdp2_state.scroll.nbg0.x = F16(0.0f);
+                _set_fixed_point_scroll(&vdp2_state.scroll.nbg0.x, scroll,
+                    &in, &dn);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXIN0), in);
+                MEMORY_WRITE(16, VDP2(SCXDN0), dn);
                 break;
         case SCRN_NBG1:
-                vdp2_state.scroll.nbg1.x = F16(0.0f);
+                _set_fixed_point_scroll(&vdp2_state.scroll.nbg1.x, scroll,
+                    &in, &dn);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXIN1), in);
+                MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
-                vdp2_state.scroll.nbg2.x = 0;
+                _set_integer_scroll(&vdp2_state.scroll.nbg3.x, scroll, &in);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXN2), in);
                 break;
         case SCRN_NBG3:
-                vdp2_state.scroll.nbg3.x = 0;
+                _set_integer_scroll(&vdp2_state.scroll.nbg3.x, scroll, &in);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXN3), in);
                 break;
         default:
                 return;
         }
-
-        vdp2_scrn_scroll_x_update(scrn, scroll);
 }
 
 void
 vdp2_scrn_scroll_y_set(uint8_t scrn, fix16_t scroll)
 {
+#ifdef DEBUG
+        /* Check if the background passed is valid */
+        assert((scrn == SCRN_NBG0) ||
+               (scrn == SCRN_RBG1) ||
+               (scrn == SCRN_NBG1) ||
+               (scrn == SCRN_NBG2) ||
+               (scrn == SCRN_NBG3) ||
+               (scrn == SCRN_RBG1));
+#endif /* DEBUG */
+
+        /* All screen scroll values must be identified as positive
+         * values */
+        uint16_t in;
+        uint16_t dn;
+
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                vdp2_state.scroll.nbg0.y = F16(0.0f);
+                _set_fixed_point_scroll(&vdp2_state.scroll.nbg0.x, scroll,
+                    &in, &dn);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXIN0), in);
+                MEMORY_WRITE(16, VDP2(SCXDN0), dn);
                 break;
         case SCRN_NBG1:
-                vdp2_state.scroll.nbg1.y = F16(0.0f);
+                _set_fixed_point_scroll(&vdp2_state.scroll.nbg1.x, scroll,
+                    &in, &dn);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXIN1), in);
+                MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
-                vdp2_state.scroll.nbg2.y = 0;
+                _set_integer_scroll(&vdp2_state.scroll.nbg3.x, scroll, &in);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXN2), in);
                 break;
         case SCRN_NBG3:
-                vdp2_state.scroll.nbg3.y = 0;
+                _set_integer_scroll(&vdp2_state.scroll.nbg3.x, scroll, &in);
+
+                /* Write to memory */
+                MEMORY_WRITE(16, VDP2(SCXN3), in);
                 break;
         default:
                 return;
         }
+}
 
-        vdp2_scrn_scroll_x_update(scrn, scroll);
+static inline void
+_update_fixed_point_scroll(fix16_t *scroll, fix16_t amount, uint16_t *in,
+    uint16_t *dn)
+{
+        int32_t integral;
+        integral = fix16_to_int(*scroll);
+
+        fix16_t fractional;
+        fractional = fix16_fractional(*scroll);
+
+        *in = WRAP_INTEGER(integral);
+        *dn = fractional & 0xFF00;
+        *scroll = fix16_add(fix16_from_int(*in), fractional);
+}
+
+static inline void
+_update_integer_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
+{
+        *scroll = WRAP_INTEGER((int16_t)fix16_to_int(amount));
+        *in = *scroll;
 }

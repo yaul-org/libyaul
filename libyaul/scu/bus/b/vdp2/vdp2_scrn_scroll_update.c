@@ -31,6 +31,9 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
                (scrn == SCRN_RBG1));
 #endif /* DEBUG */
 
+        fix16_t delta_clamped;
+        delta_clamped = fix16_clamp(delta, F16(-2047.0f), F16(2047.0f));
+
         /* All screen scroll values must be identified as positive
          * values */
         uint16_t in;
@@ -39,29 +42,31 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                _update_fixed_point_scroll(&vdp2_state.scroll.nbg0.x, delta,
-                    &in, &dn);
+                _update_fixed_point_scroll(&vdp2_state.scroll.nbg0.x,
+                    delta_clamped, &in, &dn);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXIN0), in);
                 MEMORY_WRITE(16, VDP2(SCXDN0), dn);
                 break;
         case SCRN_NBG1:
-                _update_fixed_point_scroll(&vdp2_state.scroll.nbg1.x, delta,
-                    &in, &dn);
+                _update_fixed_point_scroll(&vdp2_state.scroll.nbg1.x,
+                    delta_clamped, &in, &dn);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXIN1), in);
                 MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
-                _update_integer_scroll(&vdp2_state.scroll.nbg3.x, delta, &in);
+                _update_integer_scroll(&vdp2_state.scroll.nbg3.x, delta_clamped,
+                    &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXN2), in);
                 break;
         case SCRN_NBG3:
-                _update_integer_scroll(&vdp2_state.scroll.nbg3.x, delta, &in);
+                _update_integer_scroll(&vdp2_state.scroll.nbg3.x, delta_clamped,
+                    &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXN3), in);
