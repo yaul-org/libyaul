@@ -12,10 +12,10 @@
 
 #include "cons.h"
 
-#define FONT_H          8
-#define FONT_W          8
-
-#define FONT_NCOLORS    16
+#define FONT_CHAR_HEIGHT        (8)
+#define FONT_CHAR_WIDTH         (8)
+#define FONT_SIZE               (8192)
+#define FONT_COLOR_COUNT        (16)
 
 struct cons_buffer;
 

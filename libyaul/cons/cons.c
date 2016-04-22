@@ -76,18 +76,6 @@ cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
 {
         static struct cons_buffer _cons_buffer[CONS_COLS_MAX * CONS_ROWS_MAX];
 
-        switch (driver) {
-        case CONS_DRIVER_VDP1:
-                cons_vdp1_init(&cons);
-                break;
-        case CONS_DRIVER_VDP2:
-                cons_vdp2_init(&cons);
-                break;
-        default:
-                assert(false);
-                return;
-        }
-
         cons.buffer = &_cons_buffer[0];
         cons.cols = cols;
         cons.rows = rows;
@@ -110,6 +98,18 @@ cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
 
         cons.cursor.col = 0;
         cons.cursor.row = 0;
+
+        switch (driver) {
+        case CONS_DRIVER_VDP1:
+                cons_vdp1_init(&cons);
+                break;
+        case CONS_DRIVER_VDP2:
+                cons_vdp2_init(&cons);
+                break;
+        default:
+                assert(false);
+                return;
+        }
 
         cons.initialized = true;
 }

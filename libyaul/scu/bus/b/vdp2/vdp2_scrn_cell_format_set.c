@@ -122,8 +122,8 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
         uint16_t sc_number; /* Supplementary character number bits */
         uint16_t sp_number; /* Supplementary palette number bits */
 
-        character_number = format->scf_cp_table >> 5;
-        palette_number = format->scf_color_palette >> 5;
+        character_number = CHARACTER_NUMBER(format->scf_cp_table);
+        palette_number = PALETTE_NUMBER(format->scf_color_palette);
 
         switch (format->scf_pnd_size) {
         case 1:
