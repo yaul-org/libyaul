@@ -56,6 +56,10 @@
 
 #define __visibility(x) __attribute__ ((visibility((x))))
 
+#ifndef __notreached
+#define __notreached __builtin_unreachable
+#endif /* !__notreached */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
