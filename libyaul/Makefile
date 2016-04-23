@@ -149,6 +149,7 @@ endif
 LIB_SRCS+= \
 	math/fix16.c \
 	math/fix16_exp.c \
+	math/fix16_matrix3.c \
 	math/fix16_matrix4.c \
 	math/fix16_sqrt.c \
 	math/fix16_str.c \

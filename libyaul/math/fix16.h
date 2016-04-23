@@ -288,6 +288,19 @@ typedef union {
 /* Row-major matrix */
 typedef union {
         struct {
+                fix16_t m00, m01, m02; /* Row 0 */
+                fix16_t m10, m11, m12; /* Row 1 */
+                fix16_t m20, m21, m22; /* Row 2 */
+        } comp;
+
+        fix16_t arr[16];
+        fix16_t frow[3][3];
+        fix16_vector4_t row[3];
+} __aligned (4) fix16_matrix3_t;
+
+/* Row-major matrix */
+typedef union {
+        struct {
                 fix16_t m00, m01, m02, m03; /* Row 0 */
                 fix16_t m10, m11, m12, m13; /* Row 1 */
                 fix16_t m20, m21, m22, m23; /* Row 2 */
@@ -349,6 +362,15 @@ extern void fix16_vector3_str(const fix16_vector3_t *, char *, int);
 extern void fix16_vector3_sub(const fix16_vector3_t *, const fix16_vector3_t *,
     fix16_vector3_t *);
 extern void fix16_vector3_zero(fix16_vector3_t *);
+
+extern void fix16_matrix3_dup(const fix16_matrix3_t *, fix16_matrix3_t *);
+extern void fix16_matrix3_identity(fix16_matrix3_t *);
+extern void fix16_matrix3_inverse(const fix16_matrix3_t *, fix16_matrix3_t *);
+extern void fix16_matrix3_multiply(const fix16_matrix3_t *,
+    const fix16_matrix3_t *, fix16_matrix3_t *);
+extern void fix16_matrix3_str(const fix16_matrix3_t *, char *, int);
+extern void fix16_matrix3_transpose(const fix16_matrix3_t *, fix16_matrix3_t *);
+extern void fix16_matrix3_zero(fix16_matrix3_t *);
 
 #define FIX16_VECTOR4_INITIALIZER(x, y, z, w)                                  \
     {                                                                          \
