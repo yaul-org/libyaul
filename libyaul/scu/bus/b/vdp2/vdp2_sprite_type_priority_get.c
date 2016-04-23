@@ -24,16 +24,16 @@ vdp2_sprite_type_priority_get(uint8_t type)
         switch (type) {
         case 0:
         case 1:
-                return vdp2_state.buffered_regs.prisa & mask;
+                return vdp2_state.buffered_regs.prisa & reg_mask;
         case 2:
         case 3:
-                return vdp2_state.buffered_regs.prisb & mask;
+                return vdp2_state.buffered_regs.prisb & reg_mask;
         case 4:
         case 5:
-                return vdp2_state.buffered_regs.prisc & mask;
+                return vdp2_state.buffered_regs.prisc & reg_mask;
         case 6:
         case 7:
-                return vdp2_state.buffered_regs.prisd & mask;
+                return vdp2_state.buffered_regs.prisd & reg_mask;
         default:
                 return 0;
         }

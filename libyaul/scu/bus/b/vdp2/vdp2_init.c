@@ -157,7 +157,7 @@ vdp2_init(void)
         MEMORY_WRITE(16, VDP2(CLOFSL), 0x0000);
 
         /* Initialize */
-        vdp2_state.buffered_regs.spctl = 0x0020;
+        vdp2_state.buffered_regs.spctl = 0x0021;
         MEMORY_WRITE(16, VDP2(SPCTL), vdp2_state.buffered_regs.spctl);
         vdp2_state.buffered_regs.prisa = 0x0101;
         MEMORY_WRITE(16, VDP2(PRISA), vdp2_state.buffered_regs.prisa);
