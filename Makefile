@@ -58,7 +58,7 @@ define macro-install
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
 	$(ECHO)for project in $(PROJECTS); do \
 		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; 
+		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
 	done
 endef
 
