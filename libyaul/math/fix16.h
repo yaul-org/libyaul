@@ -53,10 +53,10 @@ static inline int fix16_to_int(fix16_t a) {
 #ifdef FIXMATH_NO_ROUNDING
         return (a >> 16);
 #else
-	if (a >= 0) {
-		return (a + (fix16_one >> 1)) / fix16_one;
+        if (a >= 0) {
+                return (a + (fix16_one >> 1)) / fix16_one;
         }
-	return (a - (fix16_one >> 1)) / fix16_one;
+        return (a - (fix16_one >> 1)) / fix16_one;
 #endif
 }
 
@@ -67,19 +67,19 @@ static inline int fix16_to_round_int(fix16_t a) {
 }
 
 static inline fix16_t fix16_from_float(float a) {
-	float temp = a * fix16_one;
+        float temp = a * fix16_one;
 #ifndef FIXMATH_NO_ROUNDING
-	temp += (temp >= 0) ? 0.5f : -0.5f;
+        temp += (temp >= 0) ? 0.5f : -0.5f;
 #endif /* !FIXMATH_NO_ROUNDING */
-	return (fix16_t)temp;
+        return (fix16_t)temp;
 }
 
 static inline fix16_t fix16_from_double(double a) {
-	double temp = a * fix16_one;
+        double temp = a * fix16_one;
 #ifndef FIXMATH_NO_ROUNDING
-	temp += (temp >= 0) ? 0.5f : -0.5f;
+        temp += (temp >= 0) ? 0.5f : -0.5f;
 #endif /* !FIXMATH_NO_ROUNDING */
-	return (fix16_t)temp;
+        return (fix16_t)temp;
 }
 
 static inline fix16_t fix16_integral(fix16_t a) {
@@ -269,10 +269,13 @@ typedef struct {
         fix16_t y;
 } __attribute__ ((packed)) fix16_vector2_t;
 
-typedef struct {
-        fix16_t x;
-        fix16_t y;
-        fix16_t z;
+typedef union {
+        struct {
+                fix16_t x;
+                fix16_t y;
+                fix16_t z;
+        };
+        fix16_t comp[3];
 } __attribute__ ((packed)) fix16_vector3_t;
 
 typedef union {
@@ -283,7 +286,7 @@ typedef union {
                 fix16_t w;
         };
         fix16_t comp[4];
-} __aligned(16) fix16_vector4_t;
+} __attribute__ ((packed)) fix16_vector4_t;
 
 /* Row-major matrix */
 typedef union {
@@ -293,10 +296,10 @@ typedef union {
                 fix16_t m20, m21, m22; /* Row 2 */
         } comp;
 
-        fix16_t arr[16];
+        fix16_t arr[9];
         fix16_t frow[3][3];
-        fix16_vector4_t row[3];
-} __aligned (4) fix16_matrix3_t;
+        fix16_vector3_t row[3];
+} __aligned(64) fix16_matrix3_t;
 
 /* Row-major matrix */
 typedef union {
@@ -305,12 +308,12 @@ typedef union {
                 fix16_t m10, m11, m12, m13; /* Row 1 */
                 fix16_t m20, m21, m22, m23; /* Row 2 */
                 fix16_t m30, m31, m32, m33; /* Row 3 */
-        } comp __aligned(32);
+        } comp;
 
-        fix16_t arr[16] __aligned (32);
-        fix16_t frow[4][4] __aligned (32);
-        fix16_vector4_t row[4] __aligned(32);
-} fix16_matrix4_t;
+        fix16_t arr[16];
+        fix16_t frow[4][4];
+        fix16_vector4_t row[4];
+} __aligned(64) fix16_matrix4_t;
 
 #define FIX16_VECTOR2_INITIALIZER(x, y)                                        \
     {                                                                          \
@@ -337,9 +340,11 @@ extern void fix16_vector2_zero(fix16_vector2_t *);
 
 #define FIX16_VECTOR3_INITIALIZER(x, y, z)                                     \
     {                                                                          \
-            F16(x),                                                            \
-            F16(y),                                                            \
-            F16(z),                                                            \
+            {                                                                  \
+                    F16(x),                                                    \
+                    F16(y),                                                    \
+                    F16(z)                                                     \
+            }                                                                  \
     }
 
 extern fix16_t fix16_vector3_angle(const fix16_vector3_t *,
@@ -352,6 +357,8 @@ extern void fix16_vector3_add(const fix16_vector3_t *, const fix16_vector3_t *,
 extern void fix16_vector3_cross(const fix16_vector3_t *,
     const fix16_vector3_t *, fix16_vector3_t *);
 extern void fix16_vector3_dup(const fix16_vector3_t *, fix16_vector3_t *);
+extern void fix16_vector3_matrix3_multiply(const fix16_matrix3_t *,
+    const fix16_vector3_t *, fix16_vector3_t *);
 extern void fix16_vector3_normalize(fix16_vector3_t *);
 extern void fix16_vector3_normalized(const fix16_vector3_t *,
     fix16_vector3_t *);

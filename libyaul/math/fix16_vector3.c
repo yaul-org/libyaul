@@ -121,6 +121,23 @@ fix16_vector3_cross(const fix16_vector3_t *u, const fix16_vector3_t *v,
 }
 
 void
+fix16_vector3_matrix3_multiply(const fix16_matrix3_t *m0,
+    const fix16_vector3_t *v0, fix16_vector3_t *result)
+{
+        result->comp[0] = fix16_add(
+                fix16_add(fix16_mul(v0->x, m0->row[0].x), fix16_mul(v0->y, m0->row[0].y)),
+                fix16_mul(v0->z, m0->row[0].z));
+
+        result->comp[1] = fix16_add(
+                fix16_add(fix16_mul(v0->x, m0->row[1].x), fix16_mul(v0->y, m0->row[1].y)),
+                fix16_mul(v0->z, m0->row[1].z));
+
+        result->comp[2] = fix16_add(
+                fix16_add(fix16_mul(v0->x, m0->row[2].x), fix16_mul(v0->y, m0->row[2].y)),
+                fix16_mul(v0->z, m0->row[2].z));
+}
+
+void
 fix16_vector3_str(const fix16_vector3_t *v0, char *buf, int decimals)
 {
         char component_buf[13] __aligned(16);

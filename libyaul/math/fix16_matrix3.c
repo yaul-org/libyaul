@@ -79,9 +79,6 @@ fix16_matrix3_inverse(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
 void
 fix16_matrix3_str(const fix16_matrix3_t *m0, char *buf, int decimals)
 {
-        /* Each row vector is 72 bytes. So,
-         * (((72 + 2 + 1) * 4) + 1) (301) bytes is required */
-
         uint32_t row_idx;
         for (row_idx = 0; row_idx < 3; row_idx++) {
                 char *buf_start;
