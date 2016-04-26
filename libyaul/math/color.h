@@ -5,12 +5,14 @@
 
 typedef union {
         struct {
-                uint8_t r;
-                uint8_t g;
-                uint8_t b;
-        };
+                unsigned int r:5;
+                unsigned int g:5;
+                unsigned int b:5;
+                unsigned int :1;
+        } __packed;
         uint8_t comp[3];
-} __attribute__ ((packed)) color_rgb_t;
+        uint16_t raw;
+}  __aligned (4) color_rgb_t;
 
 typedef union {
         struct {
@@ -19,7 +21,7 @@ typedef union {
                 fix16_t v;
         };
         fix16_t comp[3];
-} __attribute__ ((packed)) color_fix16_hsv_t;
+} __aligned (4) color_fix16_hsv_t;
 
 typedef union {
         struct {
@@ -28,7 +30,7 @@ typedef union {
                 uint8_t v;
         };
         uint8_t comp[3];
-} __attribute__ ((packed)) color_uint8_hsv_t;
+} __aligned (4) color_uint8_hsv_t;
 
 extern void color_rgb_hsv_convert(const color_rgb_t *,
     color_fix16_hsv_t *);
