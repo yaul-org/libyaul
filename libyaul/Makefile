@@ -147,6 +147,7 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
+	math/color.c \
 	math/fix16.c \
 	math/fix16_exp.c \
 	math/fix16_matrix3.c \
@@ -295,11 +296,12 @@ INCLUDE_DIRS:= \
 HEADER_FILES:= \
 	./yaul.h:. \
 	\
+	./math/color.h:. \
 	./math/fix16.h:. \
-	./math/math.h:. \
 	./math/fract32.h:. \
 	./math/int16.h:. \
 	./math/int64.h:. \
+	./math/math.h:. \
 	./math/uint32.h:. \
 	\
 	./common/common.h:. \
