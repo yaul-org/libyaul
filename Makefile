@@ -33,7 +33,7 @@ V_BEGIN_WHITE= [1;37m
 V_END= [m
 
 define macro-generate-build-rule
-$1-$2: check
+$1-$2:
 	mkdir -p $(BUILD_ROOT)/$(BUILD)
 	printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
 	($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
