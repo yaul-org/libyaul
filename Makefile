@@ -109,7 +109,7 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(projec
 
 clean: clean-release clean-release-internal clean-debug clean-tools
 
-distclean: clean-release clean-release-internal clean-debug clean-tools clean-examples
+distclean: clean-examples
 	$(ECHO)$(RM) -r $(BUILD_ROOT)/$(BUILD)
 
 clean-release clean-release-internal clean-debug:
