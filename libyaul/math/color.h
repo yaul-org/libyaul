@@ -5,10 +5,10 @@
 
 typedef union {
         struct {
-                unsigned int r:5;
-                unsigned int g:5;
-                unsigned int b:5;
                 unsigned int :1;
+                unsigned int b:5;
+                unsigned int g:5;
+                unsigned int r:5;
         } __packed;
         uint8_t comp[3];
         uint16_t raw;
@@ -16,18 +16,18 @@ typedef union {
 
 typedef union {
         struct {
-                fix16_t h;
-                fix16_t s;
                 fix16_t v;
+                fix16_t s;
+                fix16_t h;
         };
         fix16_t comp[3];
 } __aligned (4) color_fix16_hsv_t;
 
 typedef union {
         struct {
-                uint8_t h;
-                uint8_t s;
                 uint8_t v;
+                uint8_t s;
+                uint8_t h;
         };
         uint8_t comp[3];
 } __aligned (4) color_uint8_hsv_t;
