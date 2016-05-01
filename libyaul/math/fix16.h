@@ -264,13 +264,17 @@ extern fix16_t fix16_from_str(const char *);
 #define __aligned(x)    __attribute__ ((aligned(x)))
 #endif /* !__aligned */
 
+#ifndef __packed
+#define __packed        __attribute__ ((packed))
+#endif /* !__packed */
+
 typedef union {
         struct {
                 fix16_t x;
                 fix16_t y;
         };
         fix16_t comp[2];
-} __attribute__ ((packed)) fix16_vector2_t;
+} __packed fix16_vector2_t;
 
 typedef union {
         struct {
@@ -279,7 +283,7 @@ typedef union {
                 fix16_t z;
         };
         fix16_t comp[3];
-} __attribute__ ((packed)) fix16_vector3_t;
+} __packed fix16_vector3_t;
 
 typedef union {
         struct {
@@ -289,7 +293,7 @@ typedef union {
                 fix16_t w;
         };
         fix16_t comp[4];
-} __attribute__ ((packed)) fix16_vector4_t;
+} __packed fix16_vector4_t;
 
 /* Row-major matrix */
 typedef union {
