@@ -18,12 +18,104 @@ color_rgb555_rgb888_convert(const color_rgb555_t *color, color_rgb888_t *result)
 }
 
 void
+color_rgb888_rgb555_convert(const color_rgb888_t *color, color_rgb555_t *result)
+{
+        result->r = (color->r >> 3) & 0x1F;
+        result->g = (color->g >> 3) & 0x1F;
+        result->b = (color->b >> 3) & 0x1F;
+}
+
+void
 color_rgb888_fix16_rgb_convert(const color_rgb888_t *color,
     color_fix16_rgb_t *result)
 {
         result->r = fix16_div(fix16_from_int(color->r), F16(255.0f));
         result->g = fix16_div(fix16_from_int(color->g), F16(255.0f));
         result->b = fix16_div(fix16_from_int(color->b), F16(255.0f));
+}
+
+void
+color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
+    color_rgb888_t *result)
+{
+        result->r = fix16_to_int(fix16_mul(color->r, F16(255.0f))) & 0xFF;
+        result->g = fix16_to_int(fix16_mul(color->g, F16(255.0f))) & 0xFF;
+        result->b = fix16_to_int(fix16_mul(color->b, F16(255.0f))) & 0xFF;
+}
+
+void
+color_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *result)
+{
+        color_fix16_rgb_t rgb;
+        color_hsv_fix16_rgb_convert(color, &rgb);
+
+        /* Convert from [0..1] to [0..255] scale */
+        color_rgb888_t rgb888;
+        color_fix16_rgb_rgb888_convert(&rgb, &rgb888);
+
+        color_rgb888_rgb555_convert(&rgb888, result);
+}
+
+void
+color_hsv_rgb888_convert(const color_fix16_hsv_t *color, color_rgb888_t *result)
+{
+        color_fix16_rgb_t rgb;
+        color_hsv_fix16_rgb_convert(color, &rgb);
+
+        /* Convert from [0..1] to [0..255] scale */
+        color_fix16_rgb_rgb888_convert(&rgb, result);
+}
+
+void
+color_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
+    color_fix16_rgb_t *result)
+{
+        fix16_t c;
+        c = fix16_mul(color->v, color->s);
+
+        fix16_t x;
+        /* X=C*(1-|((H/60.0)%2)-1|) */
+        x = fix16_mul(c, fix16_sub(F16(1.0f), fix16_abs(fix16_sub(fix16_mod(
+                                fix16_div(color->h, F16(60.0f)),
+                                F16(2.0f)), F16(1.0f)))));
+
+        fix16_t m;
+        m = fix16_sub(color->v, c);
+
+        color_fix16_rgb_t rgb;
+        rgb.r = F16(0.0f);
+        rgb.g = F16(0.0f);
+        rgb.b = F16(0.0f);
+
+        if ((color->h >= F16(0.0f)) && (color->h < F16(60.0f))) {
+                rgb.r = c;
+                rgb.g = x;
+                rgb.b = F16(0.0f);
+        } else if ((color->h >= F16(60.0f)) && (color->h < F16(120.0f))) {
+                rgb.r = x;
+                rgb.g = c;
+                rgb.b = F16(0.0f);
+        } else if ((color->h >= F16(120.0f)) && (color->h < F16(180.0f))) {
+                rgb.r = F16(0.0f);
+                rgb.g = c;
+                rgb.b = x;
+        } else if ((color->h >= F16(180.0f)) && (color->h < F16(240.0f))) {
+                rgb.r = F16(0.0f);
+                rgb.g = x;
+                rgb.b = c;
+        } else if ((color->h >= F16(240.0f)) && (color->h < F16(300.0f))) {
+                rgb.r = x;
+                rgb.g = F16(0.0f);
+                rgb.b = c;
+        } else if ((color->h >= F16(300.0f)) && (color->h < F16(360.0f))) {
+                rgb.r = c;
+                rgb.g = F16(0.0f);
+                rgb.b = x;
+        }
+
+        result->r = fix16_add(rgb.r, m);
+        result->g = fix16_add(rgb.g, m);
+        result->b = fix16_add(rgb.b, m);
 }
 
 void

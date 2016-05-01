@@ -96,11 +96,20 @@ extern void color_rgb888_hsv_convert(const color_rgb888_t *,
     color_fix16_hsv_t *);
 extern void color_fix16_rgb_hsv_convert(const color_fix16_rgb_t *,
     color_fix16_hsv_t *);
+extern void color_hsv_rgb555_convert(const color_fix16_hsv_t *,
+    color_rgb555_t *);
+extern void color_hsv_rgb888_convert(const color_fix16_hsv_t *,
+    color_rgb888_t *);
+extern void color_hsv_fix16_rgb_convert(const color_fix16_hsv_t *,
+    color_fix16_rgb_t *);
 extern void color_rgb555_rgb888_convert(const color_rgb555_t *,
     color_rgb888_t *);
 extern void color_rgb888_fix16_rgb_convert(const color_rgb888_t *,
     color_fix16_rgb_t *);
-
+extern void color_rgb888_rgb555_convert(const color_rgb888_t *,
+    color_rgb555_t *);
+extern void color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *,
+    color_rgb888_t *);
 extern void color_hsv_lerp(const color_fix16_hsv_t *, const color_fix16_hsv_t *,
     fix16_t, color_fix16_hsv_t *);
 extern void color_hsv_str(const color_fix16_hsv_t *, char *, int32_t);
