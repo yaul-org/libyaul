@@ -198,9 +198,23 @@ fix16_color_hsv_rgb_convert(const color_rgb555_t *color,
 }
 
 void
-color_hsv_lerp(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
-    fix16_t t, color_fix16_hsv_t *result)
+color_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+    uint8_t t, color_fix16_hsv_t *result)
 {
+
+        result->h = fix16_lerp8(a->h, b->h, t);
+        result->s = fix16_lerp8(a->s, b->s, t);
+        result->v = fix16_lerp8(a->v, b->v, t);
+}
+
+void
+color_hsv_lerp16(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+    uint16_t t, color_fix16_hsv_t *result)
+{
+
+        result->h = fix16_lerp16(a->h, b->h, t);
+        result->s = fix16_lerp16(a->s, b->s, t);
+        result->v = fix16_lerp16(a->v, b->v, t);
 }
 
 void

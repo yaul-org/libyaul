@@ -110,8 +110,10 @@ extern void color_rgb888_rgb555_convert(const color_rgb888_t *,
     color_rgb555_t *);
 extern void color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *,
     color_rgb888_t *);
-extern void color_hsv_lerp(const color_fix16_hsv_t *, const color_fix16_hsv_t *,
-    fix16_t, color_fix16_hsv_t *);
+extern void color_hsv_lerp8(const color_fix16_hsv_t *,
+    const color_fix16_hsv_t *, uint8_t, color_fix16_hsv_t *);
+extern void color_hsv_lerp16(const color_fix16_hsv_t *,
+    const color_fix16_hsv_t *, uint16_t, color_fix16_hsv_t *);
 extern void color_hsv_str(const color_fix16_hsv_t *, char *, int32_t);
 
 #endif /* !__libfixmath_color_h__ */
