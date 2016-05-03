@@ -44,10 +44,10 @@ color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
 }
 
 void
-color_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *result)
+color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *result)
 {
         color_fix16_rgb_t rgb;
-        color_hsv_fix16_rgb_convert(color, &rgb);
+        color_fix16_hsv_fix16_rgb_convert(color, &rgb);
 
         /* Convert from [0..1] to [0..255] scale */
         color_rgb888_t rgb888;
@@ -57,17 +57,17 @@ color_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *result)
 }
 
 void
-color_hsv_rgb888_convert(const color_fix16_hsv_t *color, color_rgb888_t *result)
+color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *color, color_rgb888_t *result)
 {
         color_fix16_rgb_t rgb;
-        color_hsv_fix16_rgb_convert(color, &rgb);
+        color_fix16_hsv_fix16_rgb_convert(color, &rgb);
 
         /* Convert from [0..1] to [0..255] scale */
         color_fix16_rgb_rgb888_convert(&rgb, result);
 }
 
 void
-color_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
+color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
     color_fix16_rgb_t *result)
 {
         fix16_t c;
@@ -119,27 +119,27 @@ color_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
 }
 
 void
-color_rgb555_hsv_convert(const color_rgb555_t *color, color_fix16_hsv_t *result)
+color_rgb555_fix16_hsv_convert(const color_rgb555_t *color, color_fix16_hsv_t *result)
 {
         /* Convert from RGB555 to RGB888 */
         color_rgb888_t rgb888;
         color_rgb555_rgb888_convert(color, &rgb888);
 
-        color_rgb888_hsv_convert(&rgb888, result);
+        color_rgb888_fix16_hsv_convert(&rgb888, result);
 }
 
 void
-color_rgb888_hsv_convert(const color_rgb888_t *color, color_fix16_hsv_t *result)
+color_rgb888_fix16_hsv_convert(const color_rgb888_t *color, color_fix16_hsv_t *result)
 {
         /* Convert from [0..255] to [0..1] scale */
         color_fix16_rgb_t rgb;
         color_rgb888_fix16_rgb_convert(color, &rgb);
 
-        color_fix16_rgb_hsv_convert(&rgb, result);
+        color_fix16_rgb_fix16_hsv_convert(&rgb, result);
 }
 
 void
-color_fix16_rgb_hsv_convert(const color_fix16_rgb_t *color,
+color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
     color_fix16_hsv_t *result)
 {
         fix16_t min;
@@ -192,13 +192,7 @@ color_fix16_rgb_hsv_convert(const color_fix16_rgb_t *color,
 }
 
 void
-fix16_color_hsv_rgb_convert(const color_rgb555_t *color,
-    color_fix16_hsv_t *result)
-{
-}
-
-void
-color_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+color_fix16_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
     uint8_t t, color_fix16_hsv_t *result)
 {
 
@@ -208,7 +202,7 @@ color_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
 }
 
 void
-color_hsv_lerp16(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+color_fix16_hsv_lerp16(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
     uint16_t t, color_fix16_hsv_t *result)
 {
 
@@ -218,7 +212,7 @@ color_hsv_lerp16(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
 }
 
 void
-color_hsv_str(const color_fix16_hsv_t *c0, char *buf, int32_t decimals)
+color_fix16_hsv_str(const color_fix16_hsv_t *c0, char *buf, int32_t decimals)
 {
         char component_buf[13] __aligned(16);
         size_t component_buf_len;
