@@ -33,6 +33,8 @@ V_BEGIN_WHITE= [1;37m
 V_END= [m
 
 define macro-generate-build-rule
+.PHONY: $1-$2
+
 $1-$2:
 	mkdir -p $(BUILD_ROOT)/$(BUILD)
 	printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
@@ -40,6 +42,8 @@ $1-$2:
 endef
 
 define macro-generate-install-rule
+.PHONY: $1-$2
+
 $1-$2:
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
@@ -48,6 +52,8 @@ $1-$2:
 endef
 
 define macro-generate-clean-rule
+.PHONY: $1-$2
+
 $1-$2: $(BUILD_ROOT)/$(BUILD)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
 	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
@@ -62,7 +68,26 @@ define macro-install
 	done
 endef
 
-.PHONY: all release release-internal debug install install-release install-release-internal install-debug clean clean-release clean-release-internal clean-debug examples clean-examples tools install-tools clean-tools list-targets check-tool-chain
+.PHONY: all \
+	release \
+	release-internal \
+	debug \
+	install \
+	install-release \
+	install-release-internal \
+	install-debug \
+	distclean \
+	clean \
+	clean-release \
+	clean-release-internal \
+	clean-debug \
+	examples \
+	clean-examples \
+	tools \
+	install-tools \
+	clean-tools \
+	list-targets \
+	check-tool-chain
 
 all: release release-internal debug tools
 

@@ -532,7 +532,18 @@ define macro-clean
 	fi
 endef
 
-.PHONY: all release release-internal debug clean clean-release clean-release-internal clean-debug install-release install-release-internal install-debug
+.PHONY: \
+	all \
+	release \
+	release-internal \
+	debug \
+	clean \
+	clean-release \
+	clean-release-internal \
+	clean-debug \
+	install-release \
+	install-release-internal \
+	install-debug
 
 .SUFFIXES:= .c .S .o .x
 
