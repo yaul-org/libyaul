@@ -327,6 +327,14 @@ fix16_t fix16_lerp8(fix16_t inArg0, fix16_t inArg1, uint8_t inFract)
 	return (fix16_t)int64_lo(tempOut);
 }
 
+fix16_t fix16_lerp(fix16_t inArg0, fix16_t inArg1, fix16_t inFract)
+{
+        fix16_t t;
+        t = fix16_clamp(F16(0.0f), F16(1.0f), inFract);
+        return fix16_add(fix16_mul(inArg0, fix16_sub(F16(1.0f), t)),
+            fix16_mul(inArg1, t));
+}
+
 fix16_t fix16_lerp16(fix16_t inArg0, fix16_t inArg1, uint16_t inFract)
 {
 	int64_t tempOut = int64_mul_i32_i32(inArg0, (((int32_t)1 << 16) - inFract));

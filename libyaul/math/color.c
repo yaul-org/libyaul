@@ -202,13 +202,12 @@ color_fix16_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
 }
 
 void
-color_fix16_hsv_lerp16(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
-    uint16_t t, color_fix16_hsv_t *result)
+color_fix16_hsv_lerp(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+    fix16_t t, color_fix16_hsv_t *result)
 {
-
-        result->h = fix16_lerp16(a->h, b->h, t);
-        result->s = fix16_lerp16(a->s, b->s, t);
-        result->v = fix16_lerp16(a->v, b->v, t);
+        result->h = fix16_lerp(a->h, b->h, t);
+        result->s = fix16_lerp(a->s, b->s, t);
+        result->v = fix16_lerp(a->v, b->v, t);
 }
 
 void

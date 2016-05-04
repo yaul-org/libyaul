@@ -171,6 +171,9 @@ extern fix16_t fix16_mod(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
 /*! Returns the linear interpolation: (inArg0 * (1 - inFract)) + (inArg1 * inFract)
 */
+
+extern fix16_t fix16_lerp(fix16_t, fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
+
 extern fix16_t fix16_lerp8(fix16_t, fix16_t, uint8_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_lerp16(fix16_t, fix16_t, uint16_t) FIXMATH_FUNC_ATTRS;
 #ifndef FIXMATH_NO_64BIT
