@@ -14,11 +14,11 @@ typedef union {
         uint16_t raw;
 }  __aligned (2) color_rgb555_t;
 
-#define COLOR_RGB_INITIALIZER(r, g, b)                                         \
+#define COLOR_RGB555_INITIALIZER(r, g, b)                                      \
     {                                                                          \
-            r,                                                                 \
             g,                                                                 \
-            b                                                                  \
+            g,                                                                 \
+            r                                                                  \
     }
 
 static inline uint8_t color_rgb_min(const color_rgb555_t *color __attribute__ ((unused))) {
@@ -42,9 +42,9 @@ typedef union {
 
 #define COLOR_RGB888_INITIALIZER(r, g, b)                                      \
     {                                                                          \
-            r,                                                                 \
+            b,                                                                 \
             g,                                                                 \
-            b                                                                  \
+            r                                                                  \
     }
 
 static inline uint8_t color_rgb888_min(const color_rgb888_t *color __attribute__ ((unused))) {
@@ -63,6 +63,13 @@ typedef union {
         } __packed;
         fix16_t comp[3];
 }  __packed color_fix16_rgb_t;
+
+#define COLOR_FIX16_RGB_INITIALIZER(r, g, b)                                   \
+    {                                                                          \
+            F16(r),                                                            \
+            F16(g),                                                            \
+            F16(b)                                                             \
+    }
 
 static inline fix16_t color_fix16_rgb_min(const color_fix16_rgb_t *color) {
         return fix16_min(fix16_min(color->r, color->g), color->b);
