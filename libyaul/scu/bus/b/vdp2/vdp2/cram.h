@@ -42,7 +42,6 @@ extern "C" {
 #define COLOR_PALETTE_DATA      0x0000
 #define COLOR_RGB_DATA          0x8000
 
-#define COLOR_RGB555(r, g, b)   (((b) << 10) | ((g) << 5) | (r))
 #define COLOR_RGB888(r, g, b)   (((b) << 16) | ((g) << 8) | (r))
 #define COLOR_RGB888_TO_RGB555(r, g, b) ((((b) >> 3) << 10) |                  \
     (((g) >> 3) << 5) | ((r) >> 3))

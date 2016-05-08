@@ -14,6 +14,9 @@ typedef union {
         uint16_t raw;
 }  __aligned (2) color_rgb555_t;
 
+#define COLOR_RGB555(r, g, b)                                                  \
+    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(r, g, b))
+
 #define COLOR_RGB555_INITIALIZER(r, g, b)                                      \
     {                                                                          \
             {                                                                  \
