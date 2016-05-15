@@ -10,7 +10,6 @@ typedef union {
                 unsigned int g:5;
                 unsigned int r:5;
         } __packed;
-        uint8_t comp[3];
         uint16_t raw;
 }  __aligned (2) color_rgb555_t;
 

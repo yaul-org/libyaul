@@ -327,8 +327,10 @@ typedef union {
 
 #define FIX16_VECTOR2_INITIALIZER(x, y)                                        \
     {                                                                          \
-            F16(x),                                                            \
-            F16(y)                                                             \
+            {                                                                  \
+                    F16(x),                                                    \
+                    F16(y)                                                     \
+            }                                                                  \
     }
 
 extern fix16_t fix16_vector2_dot(const fix16_vector2_t *,
