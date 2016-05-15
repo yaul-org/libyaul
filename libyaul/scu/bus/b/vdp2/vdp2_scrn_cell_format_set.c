@@ -6,6 +6,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
@@ -117,12 +118,18 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         /* Pattern name control */
         uint16_t pncnx;
-        uint16_t character_number;
-        uint16_t palette_number;
-        uint16_t sc_number; /* Supplementary character number bits */
-        uint16_t sp_number; /* Supplementary palette number bits */
+        pncnx = 0x0000;
 
+        uint16_t sc_number; /* Supplementary character number bits */
+        sc_number = 0;
+
+        uint16_t sp_number; /* Supplementary palette number bits */
+        sp_number = 0;
+
+        uint16_t character_number;
         character_number = CHARACTER_NUMBER(format->scf_cp_table);
+
+        uint16_t palette_number;
         palette_number = PALETTE_NUMBER(format->scf_color_palette);
 
         switch (format->scf_pnd_size) {
@@ -195,6 +202,10 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         switch (format->scf_scroll_screen) {
         case SCRN_NBG0:
+                /* Copy */
+                (void)memcpy(&vdp2_state.nbg0.cell_format, format,
+                    sizeof(struct scrn_cell_format));
+
                 /* Character color count */
                 vdp2_state.buffered_regs.chctla &= 0xFF8F;
                 vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 4;
@@ -219,6 +230,10 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 MEMORY_WRITE(16, VDP2(PNCN0), pncnx);
                 break;
         case SCRN_NBG1:
+                /* Copy */
+                (void)memcpy(&vdp2_state.nbg1.cell_format, format,
+                    sizeof(struct scrn_cell_format));
+
                 /* Character color count */
                 vdp2_state.buffered_regs.chctla &= 0xCFFF;
                 vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 12;
@@ -247,6 +262,10 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
                        (format->scf_cc_count == SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
+
+                /* Copy */
+                (void)memcpy(&vdp2_state.nbg2.cell_format, format,
+                    sizeof(struct scrn_cell_format));
 
                 /* Character color count */
                 vdp2_state.buffered_regs.chctlb &= 0xFFFD;
@@ -277,6 +296,10 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
                        (format->scf_cc_count == SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
+
+                /* Copy */
+                (void)memcpy(&vdp2_state.nbg3.cell_format, format,
+                    sizeof(struct scrn_cell_format));
 
                 /* Character color count */
                 vdp2_state.buffered_regs.chctlb &= 0xFFDF;
@@ -309,7 +332,6 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                        (format->scf_rp_mode == 2) ||
                        (format->scf_rp_mode == 3));
 #endif /* DEBUG */
-
 
                 plane_e = ((format->scf_map.plane_e - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;
                 plane_f = ((format->scf_map.plane_f - VRAM_ADDR_4MBIT(0, 0)) / SCRN_CALCULATE_PAGE_SIZE(format)) & 0x003F;

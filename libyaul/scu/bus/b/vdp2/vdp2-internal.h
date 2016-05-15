@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include <vdp2/map.h>
+#include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
 struct vdp2_state {
@@ -22,11 +23,26 @@ struct vdp2_state {
         uint16_t interlaced;
 
         struct {
-                fix16_vector2_t nbg0;
-                fix16_vector2_t nbg1;
-                int16_vector2_t nbg2;
-                int16_vector2_t nbg3;
-        } scroll;
+                struct scrn_bitmap_format bitmap_format;
+                struct scrn_cell_format cell_format;
+                fix16_vector2_t scroll;
+        } nbg0;
+
+        struct {
+                struct scrn_bitmap_format bitmap_format;
+                struct scrn_cell_format cell_format;
+                fix16_vector2_t scroll;
+        } nbg1;
+
+        struct {
+                struct scrn_cell_format cell_format;
+                int16_vector2_t scroll;
+        } nbg2;
+
+        struct {
+                struct scrn_cell_format cell_format;
+                int16_vector2_t scroll;
+        } nbg3;
 
         struct {
                 uint16_t bgon;          /* Register offset: 0x180020 */
