@@ -29,11 +29,12 @@ main(void)
         uint32_t id;
 
         vdp2_init();
-        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE), 0x9C00);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
+            COLOR_RGB555(0, 0, 7));
 
         smpc_init();
 
-        cons_init(CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2, 40, 28);
 
         cons_write("\n[1;44m      *** DRAM Cartridge Test ***       [m\n\n");
 
