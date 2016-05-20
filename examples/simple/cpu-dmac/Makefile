@@ -2,6 +2,8 @@ ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
 endif
 
+$(error Example is broken)
+
 include $(INSTALL_ROOT)/share/pre.common.mk
 
 SH_PROGRAM:= cpu-dmac
