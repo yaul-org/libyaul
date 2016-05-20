@@ -19,17 +19,15 @@ test_init(void)
 {
         static bool initialized = false;
 
-        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE), 0x9C00);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE),
+            COLOR_RGB555(0, 0, 7));
 
         if (initialized) {
                 return;
         }
         initialized = true;
 
-        text_len = common_round_pow2(CONS_COLS * CONS_ROWS);
-        text = (char *)malloc(text_len);
-        assert(text != NULL);
-        memset(text, '\0', text_len);
+        memset(text, '\0', sizeof(text));
 }
 
 void

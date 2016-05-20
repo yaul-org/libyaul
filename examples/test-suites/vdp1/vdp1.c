@@ -52,7 +52,7 @@ main(void)
         hardware_init();
 
         fs_init();
-        cons_init(CONS_DRIVER_VDP2);
+        cons_init(CONS_DRIVER_VDP2, 40, 30);
 
         state_machine_init(&state_vdp1);
         state_machine_add_state(&state_vdp1, "menu",
@@ -117,10 +117,12 @@ hardware_init(void)
         /* Enable interrupts */
         cpu_intc_enable();
 
-        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE), 0x9C00);
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(2, 0x01FFFE),
+            COLOR_RGB555(0, 0, 7));
 
-        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
             TVMD_VERT_224);
+        vdp2_tvmd_display_set();
 }
 
 static void
