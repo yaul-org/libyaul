@@ -1,4 +1,0 @@
-Description
-===========
-
-Dark Blue
