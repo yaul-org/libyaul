@@ -1,0 +1,3 @@
+[submodule "examples"]
+	path = examples
+	url = http://github.com/ijacquez/libyaul-examples.git
