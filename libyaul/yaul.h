@@ -44,9 +44,7 @@
 #include <common/common.h>
 #include <common/irq-mux.h>
 
-#if HAVE_DEV_CARTRIDGE != 0 /* USB flash cartridge or Datel Action Replay cartridge */
 #include <common/gdb/gdb.h>
-#endif
 
 #include <cons/cons.h>
 

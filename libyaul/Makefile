@@ -63,6 +63,9 @@ LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/ihr.S \
 	common/gdb/sh2-704x.c
+else
+LIB_SRCS+= \
+	common/gdb/gdb-stub.c
 endif
 
 LIB_SRCS+= \
@@ -309,10 +312,8 @@ HEADER_FILES:= \
 	./common/irq-mux.h: \
 	./common/stack.h:.
 
-ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
 HEADER_FILES+= \
 	./common/gdb/gdb.h:.
-endif
 
 HEADER_FILES+= \
 	./cons/cons.h:. \
