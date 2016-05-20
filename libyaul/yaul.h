@@ -8,6 +8,10 @@
 #ifndef _LIBYAUL_H_
 #define _LIBYAUL_H_
 
+#if HAVE_DEV_CARTRIDGE != 0
+#error "Invalid `HAVE_DEV_CARTRIDGE' value"
+#endif
+
 /* CPU-bus CPU */
 #include <scu/bus/cpu/cpu.h>
 
@@ -18,14 +22,8 @@
 #include <scu/scu.h>
 
 /* CS0 */
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <scu/bus/a/cs0/usb-cartridge/usb-cartridge.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
+//#include <scu/bus/a/cs0/usb-cartridge/usb-cartridge.h>
 #include <scu/bus/a/cs0/arp/arp.h>
-#elif HAVE_DEV_CARTRIDGE != 0
-#error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif
-
 #include <scu/bus/a/cs0/dram-cartridge/dram-cartridge.h>
 
 /* CS2 */

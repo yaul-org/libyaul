@@ -130,6 +130,9 @@ LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp_sync_nonblock.c \
 	scu/bus/a/cs0/arp/arp_version.c \
 	scu/bus/a/cs0/arp/arp_xchg_byte.c
+else
+LIB_SRCS+= \
+	scu/bus/a/cs0/arp/arp-stub.c
 endif
 
 LIB_SRCS+= \
@@ -322,9 +325,11 @@ HEADER_FILES+= \
 	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \
 	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk
 
+HEADER_FILES+= \
+	./scu/bus/a/cs0/arp/arp.h:.
+
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 HEADER_FILES+= \
-	./scu/bus/a/cs0/arp/arp.h:. \
 	./scu/bus/a/cs0/arp/arp/map.h:.
 endif
 
