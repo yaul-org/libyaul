@@ -1,6 +1,3 @@
 #!/bin/sh
 
 touch "${BUILD_SRC_DIR}/${M68K_TARGET}/build-complete"
-
-# Closing message
-message "Set INSTALL_ROOT variable (in ../yaul.env) to '${BUILD_INSTALL_DIR}/${SH_TARGET}'"
