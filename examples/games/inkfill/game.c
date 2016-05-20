@@ -17,7 +17,7 @@
 #include "globals.h"
 #include "scene.h"
 
-#define TRIES_MAX 18
+#define TRIES_MAX 26
 
 #define GRID_CELL_COLOR_RED     0
 #define GRID_CELL_COLOR_ORANGE  1
@@ -78,7 +78,7 @@ void
 game_init(void)
 {
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
-            COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(84, 164, 255));
+            COLOR_RGB555(8, 20, 31));
 
         _grid_init();
 
@@ -100,6 +100,7 @@ game_update(void)
         }
 
         if (_grid_complete_check()) {
+                sleep(2);
                 _tries = 0;
                 _grid_randomize();
         }
@@ -165,7 +166,7 @@ _grid_init(void)
         nbg1_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg1_format.scf_character_size = 2 * 2;
         nbg1_format.scf_pnd_size = 1; /* 1 word */
-        nbg1_format.scf_auxiliary_mode = 1;
+        nbg1_format.scf_auxiliary_mode = 0;
         nbg1_format.scf_cp_table = (uint32_t)_nbg1_character;
         nbg1_format.scf_color_palette = (uint32_t)_nbg1_color_palette;
         nbg1_format.scf_plane_size = 2 * 1;
@@ -177,8 +178,8 @@ _grid_init(void)
         vdp2_scrn_cell_format_set(&nbg1_format);
         vdp2_scrn_priority_set(SCRN_NBG1, 6);
 
-        vdp2_scrn_scv_x_set(SCRN_NBG1, -24, 0);
-        vdp2_scrn_scv_y_set(SCRN_NBG1, -8, 0);
+        vdp2_scrn_scroll_x_set(SCRN_NBG1, F16(8.0f));
+        vdp2_scrn_scroll_y_set(SCRN_NBG1, F16(8.0f));
 
         /* Draw the tiles */
         uint32_t tile_idx;
@@ -231,15 +232,16 @@ _grid_init(void)
 
         for (y = 0; y < 32; y++) {
                 for (x = 0; x < 64; x++) {
-                        uint16_t character_number;
+                        uint16_t pnd;
+                        pnd = SCRN_PND_CONFIG_2((uint32_t)_nbg1_character,
+                            (uint32_t)_nbg1_color_palette,
+                            /* vf = */ 0,
+                            /* hf = */ 0);
 
-                        character_number =
-                            VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character) |
-                            VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
-                        _nbg1_planes[0][x + (y << 6)] = character_number;
-                        _nbg1_planes[1][x + (y << 6)] = character_number;
-                        _nbg1_planes[2][x + (y << 6)] = character_number;
-                        _nbg1_planes[3][x + (y << 6)] = character_number;
+                        _nbg1_planes[0][x + (y << 6)] = pnd;
+                        _nbg1_planes[1][x + (y << 6)] = pnd;
+                        _nbg1_planes[2][x + (y << 6)] = pnd;
+                        _nbg1_planes[3][x + (y << 6)] = pnd;
                 }
         }
 
@@ -254,7 +256,7 @@ _grid_init(void)
         nbg3_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         nbg3_format.scf_character_size = 1 * 1;
         nbg3_format.scf_pnd_size = 1; /* 1 word */
-        nbg3_format.scf_auxiliary_mode = 1;
+        nbg3_format.scf_auxiliary_mode = 0;
         nbg3_format.scf_cp_table = (uint32_t)_nbg3_character;
         nbg3_format.scf_color_palette = (uint32_t)_nbg3_color_palette;
         nbg3_format.scf_plane_size = 1 * 1;
@@ -284,14 +286,16 @@ _grid_init(void)
         /* Clear the entire map */
         for (y = 0; y < 64; y++) {
                 for (x = 0; x < 32; x++) {
-                        uint16_t character_number;
+                        uint16_t pnd;
+                        pnd = SCRN_PND_CONFIG_0((uint32_t)_nbg3_character,
+                            (uint32_t)_nbg3_color_palette,
+                            /* vf = */ 0,
+                            /* hf = */ 0);
 
-                        character_number =
-                            VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
-                        _nbg3_planes[0][x + (y << 5)] = character_number;
-                        _nbg3_planes[1][x + (y << 5)] = character_number;
-                        _nbg3_planes[2][x + (y << 5)] = character_number;
-                        _nbg3_planes[3][x + (y << 5)] = character_number;
+                        _nbg3_planes[0][x + (y << 5)] = pnd;
+                        _nbg3_planes[1][x + (y << 5)] = pnd;
+                        _nbg3_planes[2][x + (y << 5)] = pnd;
+                        _nbg3_planes[3][x + (y << 5)] = pnd;
                 }
         }
 
@@ -362,8 +366,9 @@ _grid_init(void)
         vdp2_scrn_display_set(SCRN_NBG1, /* transparent = */ true);
         vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
 
-        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
             TVMD_VERT_224);
+        vdp2_tvmd_display_set();
 }
 
 static void
@@ -389,35 +394,47 @@ _grid_update(void)
 static void
 _grid_draw(void)
 {
-        uint16_t character_number;
-        uint16_t palette_number;
         uint32_t x;
         uint32_t y;
 
         /* Draw actual grid */
-        character_number = VDP2_PN_CONFIG_3_CHARACTER_NUMBER((uint32_t)_nbg1_character);
-        palette_number = VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg1_color_palette);
         for (y = 0; y < GRID_HEIGHT; y++) {
                 for (x = 0; x < GRID_WIDTH; x++) {
-                        uint8_t color;
+                        uint8_t color __unused;
+                        color = _grid_color_get(x, y);
 
-                        color = _grid_color_get(x, y) + 1;
-                        _nbg1_planes[0][x + (y << 5)] =
-                            palette_number | (character_number + color);
+                        uint16_t pnd;
+                        pnd = SCRN_PND_CONFIG_2(
+                                (uint32_t)_nbg1_character,
+                                (uint32_t)_nbg1_color_palette,
+                                /* vf = */ 0,
+                                /* hf = */ 0);
+
+                        _nbg1_planes[0][2 + x + ((y + 1) << 5)] = pnd | (color + 1);
                 }
         }
 
         /* Draw number of tries */
-        character_number = VDP2_PN_CONFIG_1_CHARACTER_NUMBER((uint32_t)_nbg3_character);
-        palette_number = VDP2_PN_CONFIG_0_PALETTE_NUMBER((uint32_t)_nbg3_color_palette);
         for (y = 0; y < TRIES_MAX; y++) {
-                _nbg3_planes[0][(1) + ((y + 1) << 6)] =
-                    palette_number | (character_number + GRID_CELL_COLOR_BLUE + 1);
+                uint16_t pnd;
+                pnd = SCRN_PND_CONFIG_0(
+                        (uint32_t)_nbg3_character + ((GRID_CELL_COLOR_BLUE + 1) * 32),
+                        (uint32_t)_nbg3_color_palette,
+                        /* vf = */ 0,
+                        /* hf = */ 0);
+
+                _nbg3_planes[0][(1) + ((y + 1) << 6)] = pnd;
         }
 
         for (y = 0; y < _tries; y++) {
-                _nbg3_planes[0][(1) + ((y + 1) << 6)] =
-                    palette_number | (character_number + GRID_CELL_COLOR_RED + 1);
+                uint16_t pnd;
+                pnd = SCRN_PND_CONFIG_0(
+                        (uint32_t)_nbg3_character + ((GRID_CELL_COLOR_RED + 1) * 32),
+                        (uint32_t)_nbg3_color_palette,
+                        /* vf = */ 0,
+                        /* hf = */ 0);
+
+                _nbg3_planes[0][(1) + ((y + 1) << 6)] = pnd;
         }
 }
 

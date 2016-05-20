@@ -23,7 +23,7 @@ void
 title_init(void)
 {
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
-            COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0));
+            COLOR_RGB555(0, 0, 0));
 
         struct vram_ctl *vram_ctl;
 
@@ -82,8 +82,9 @@ title_init(void)
         assert(amount > 0);
 
         vdp2_scrn_display_set(SCRN_NBG0, /* transparent = */ true);
-        vdp2_tvmd_display_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
             TVMD_VERT_224);
+        vdp2_tvmd_display_set();
 
         changed = false;
 }

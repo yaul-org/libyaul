@@ -23,7 +23,7 @@ void
 game_over_init(void)
 {
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(3, 0x01FFFE),
-            COLOR_RGB_DATA | COLOR_RGB888_TO_RGB555(0, 0, 0));
+            COLOR_RGB555(0, 0, 0));
 
         struct scrn_bitmap_format nbg0_format;
         struct vram_ctl *vram_ctl;
