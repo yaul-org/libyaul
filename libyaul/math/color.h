@@ -5,7 +5,7 @@
 
 typedef union {
         struct {
-                unsigned int :1;
+                unsigned int msb:1;
                 unsigned int b:5;
                 unsigned int g:5;
                 unsigned int r:5;
@@ -19,6 +19,7 @@ typedef union {
 #define COLOR_RGB555_INITIALIZER(r, g, b)                                      \
     {                                                                          \
             {                                                                  \
+                    1, /* MSB */                                               \
                     b,                                                         \
                     g,                                                         \
                     r                                                          \
