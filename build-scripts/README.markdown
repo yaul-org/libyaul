@@ -3,12 +3,13 @@ Usage
 
 ### Requirements
  - POSIX Bourne shell
- - Software dependencies:
-  - GMP
-  - MPFR
-  - MPC
-  - Texinfo
-  - ncurses
+ - Wget
+ - bzip2
+ - GMP
+ - MPFR
+ - MPC
+ - Texinfo
+ - ncurses
  - Time and especially patience
 
 ### Installation
@@ -23,7 +24,14 @@ In the `config` you just copied, change the appropriate fields.
 If you haven't already installed the dependencies:
 
     # Debian/Ubuntu
-    sudo apt-get install libgmp3-dev libmpfr-dev libmpc-dev libncurses5-dev texinfo
+    sudo apt-get install wget \
+    bzip2 \
+    build-essentials \
+    libgmp3-dev \
+    libmpfr-dev \
+    libmpc-dev \
+    libncurses5-dev \
+    texinfo
 
     # Fedora/CentOS
     sudo yum install gmp-devel mpfr-devel libmpc-devel ncurses-devel texi2html texinfo

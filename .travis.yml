@@ -4,10 +4,33 @@ language: c
 
 services:
 - docker
-  
-before_install:
-- docker pull shazz/libyaul-compiler:1.0
-- docker run shazz/libyaul-compiler:1.0 /bin/sh -c "cd /root; mkdir work; cd work; git clone https://github.com/ijacquez/libyaul.git; cd libyaul; git submodule init; git submodule update -f; cp yaul.env.in yaul.env; ln -s /opt/toolchains/ /root/tool-chains; . ./yaul.env; make release && make release-internal && make debug && make tools"
+
+env:
+  global:
+    - INSTALL_ROOT=/tool-chains
+    - BUILD_ROOT=/tmp
+    - BUILD=build
+  matrix:
+    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release
+    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release-internal
+    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug
+
+    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release
+    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release-internal
+    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug
+
+    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release
+    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release-internal
+    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug
+
+    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=tools
+    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=tools
+    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
+
+before_script:
+- docker pull ijacquez/libyaul-tool-chain:1.1
 
 script:
-- echo "Build passed"
+- docker run --name "container" -e "TRAVIS_BRANCH=${TRAVIS_BRANCH}" -e "BUILD_TYPE=${BUILD_TYPE}" -e "INSTALL_ROOT=${INSTALL_ROOT}"  -e "BUILD_ROOT=${BUILD_ROOT}" -e "BUILD=${BUILD}" -e "OPTION_DEV_CARTRIDGE=${OPTION_DEV_CARTRIDGE}" -w /tmp -t -d ijacquez/libyaul-tool-chain:1.1 sh
+- docker cp .ci-build.sh container:/tmp/.ci-build.sh
+- docker exec container sh -e /tmp/.ci-build.sh

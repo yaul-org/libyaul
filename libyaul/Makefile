@@ -459,12 +459,12 @@ LIB_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_DEPS))
 LIB_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_DEPS))
 LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 
-HEADER_FILES_all:= $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
+HEADER_FILES_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
-LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
-SPECS_all := $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(SPECS))
-BOOTSTRAP_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(BOOTSTRAP_FILES))
-USER_FILES_all = $(addprefix $(BUILD_ROOT)/lib$(TARGET)/,$(USER_FILES))
+LDSCRIPTS_all:= $(LDSCRIPTS)
+SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
+BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
+USER_FILES_all = $(USER_FILES)
 
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
@@ -500,7 +500,7 @@ define macro-install-files
 	    for pair in $(HEADER_FILES_all); do \
 	    pair_header_file=$$(echo "$${pair}" | cut -d ':' -f 1); \
 	    pair_rel_dst=$$(echo "$${pair}" | cut -d ':' -f 2); \
-	    rel_header_file=$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/}; \
+	    rel_header_file=$${pair_header_file#$(THIS_ROOT)/lib$(TARGET)/}; \
 	    rel_header_dir=$${rel_header_file%/*}/$${pair_rel_dst}; \
 	    path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}"; \
 	    header_file=$$(basename "$${path}"); \
@@ -508,27 +508,27 @@ define macro-install-files
 	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
 	    install_header_file=$${abs_header_dir}/$${header_file}; \
 	    install_header_dir=$${abs_header_dir}; \
-	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${pair_header_file#$(BUILD_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${pair_header_file#$(THIS_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
 	done
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/lib/ldscripts
 	$(ECHO)for ldscript in $(LDSCRIPTS_all); do \
-	    printf -- "$(V_BEGIN_BLUE)$${ldscript#$(BUILD_ROOT)/}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${ldscript#$(THIS_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$ldscript $(INSTALL_ROOT)/sh-elf/sh-elf/lib/ldscripts/; \
 	done
 	$(ECHO)for specs in $(SPECS_all); do \
-	    printf -- "$(V_BEGIN_BLUE)$${specs#$(BUILD_ROOT)/}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${specs#$(THIS_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$specs $(INSTALL_ROOT)/sh-elf/sh-elf/lib/; \
 	done
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/share/$(TARGET)/bootstrap
 	$(ECHO)for bootstrap_file in $(BOOTSTRAP_FILES_all); do \
-	    printf -- "$(V_BEGIN_BLUE)$${bootstrap_file#$(BUILD_ROOT)/}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${bootstrap_file#$(THIS_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$bootstrap_file $(INSTALL_ROOT)/sh-elf/share/$(TARGET)/bootstrap; \
 	done
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/share
 	$(ECHO)for user_file in $(USER_FILES_all); do \
-	    printf -- "$(V_BEGIN_BLUE)$${user_file#$(BUILD_ROOT)/}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$${user_file#$(THIS_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$user_file $(INSTALL_ROOT)/share/; \
 	done
 endef

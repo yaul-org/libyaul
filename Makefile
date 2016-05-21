@@ -15,6 +15,9 @@ ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
 endif
 
+THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+export THIS_ROOT
+
 ifeq ($(strip $(SILENT)),1)
   ECHO=@
 else
@@ -38,7 +41,7 @@ define macro-generate-build-rule
 $1-$2:
 	mkdir -p $(BUILD_ROOT)/$(BUILD)
 	printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	($(MAKE) -C $1 $2) || exit $$?
 endef
 
 define macro-generate-install-rule
@@ -48,7 +51,7 @@ $1-$2:
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	$(ECHO)($(MAKE) -C $1 $2) || exit $$?
 endef
 
 define macro-generate-clean-rule
@@ -56,15 +59,15 @@ define macro-generate-clean-rule
 
 $1-$2: $(BUILD_ROOT)/$(BUILD)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(ECHO)($(MAKE) BUILD=$(BUILD) -C $1 $2) || exit $$?
+	$(ECHO)($(MAKE) -C $1 $2) || exit $$?
 endef
 
 define macro-install
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
 	$(ECHO)for project in $(PROJECTS); do \
-		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
+	    ($(MAKE) -C $$project $@) || exit $$?; \
 	done
 endef
 
@@ -109,8 +112,8 @@ check-tool-chain:
 
 release release-internal debug: $(BUILD_ROOT)/$(BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
-		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
+	    ($(MAKE) -C $$project $@) || exit $$?; \
 	done
 
 $(BUILD_ROOT)/$(BUILD):
@@ -139,8 +142,8 @@ distclean: clean-examples
 
 clean-release clean-release-internal clean-debug:
 	$(ECHO)for project in $(PROJECTS); do \
-		printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-		($(MAKE) BUILD=$(BUILD) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
+	    ($(MAKE) -C $$project $@) || exit $$?; \
 	done
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean)))
