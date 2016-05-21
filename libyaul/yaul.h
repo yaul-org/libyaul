@@ -8,7 +8,10 @@
 #ifndef _LIBYAUL_H_
 #define _LIBYAUL_H_
 
-#if HAVE_DEV_CARTRIDGE != 0
+/* Check if HAVE_DEV_CARTRIDGE has a valid value */
+/* USB flash cartridge */
+/* Datel Action Replay cartridge */
+#if (HAVE_DEV_CARTRIDGE < 0) || (HAVE_DEV_CARTRIDGE > 2)
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
 #endif
 
