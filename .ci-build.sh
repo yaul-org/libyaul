@@ -17,7 +17,7 @@ pwd
 
 set -x
 
-git clone --depth=50 --branch=test-.travis.yml https://github.com/ijacquez/libyaul.git ijacquez/libyaul
+git clone --depth=100 --branch=${TRAVIS_BRANCH} https://github.com/ijacquez/libyaul.git ijacquez/libyaul
 cd ijacquez/libyaul
 git submodule init
 git submodule update -f
