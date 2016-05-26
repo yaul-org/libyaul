@@ -8,14 +8,14 @@ ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
 endif
 
 # Customizable (must be overwritten in user's Makefile)
-SH_PROGRAM?=unknown
+SH_PROGRAM?= unknown-program
 SH_OBJECTS?=
 SH_OBJECTS_NO_LINK?=
 SH_LIBRARIES?=
-M68K_PROGRAM?=
+SH_CUSTOM_SPECS?=
+M68K_PROGRAM?= undefined-program
 M68K_OBJECTS?=
 ROMDISK_DEPS?=
-CUSTOM_SPECS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
 
@@ -77,7 +77,7 @@ M68K_LDFLAGS=
 
 SUFFIXES:= .c .m68k.S .S .o .m68k .bin .elf .romdisk .romdisk.o
 
-.PHONY: clean example
+.PHONY: all clean example list-targets
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)

@@ -63,9 +63,6 @@ LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/ihr.S \
 	common/gdb/sh2-704x.c
-else
-LIB_SRCS+= \
-	common/gdb/gdb-stub.c
 endif
 
 LIB_SRCS+= \
@@ -130,9 +127,6 @@ LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp_sync_nonblock.c \
 	scu/bus/a/cs0/arp/arp_version.c \
 	scu/bus/a/cs0/arp/arp_xchg_byte.c
-else
-LIB_SRCS+= \
-	scu/bus/a/cs0/arp/arp-stub.c
 endif
 
 LIB_SRCS+= \

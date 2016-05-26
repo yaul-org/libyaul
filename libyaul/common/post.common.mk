@@ -10,20 +10,30 @@ ifeq ($(strip $(SH_OBJECTS)),)
 endif
 
 ifneq ($(strip $(M68K_PROGRAM)),)
-  ifeq ($(strip $(M68K_OBJECTS)),)
-    $(error Empty M68K_OBJECTS (M68K object list))
+  ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
+    ifeq ($(strip $(M68K_OBJECTS)),)
+      $(error Empty M68K_OBJECTS (M68K object list))
+    endif
   endif
 endif
 
-ifeq ($(strip $(CUSTOM_SPECS)),)
+ifeq ($(strip $(SH_CUSTOM_SPECS)),)
   SH_LDFLAGS+= -specs=yaul.specs
 else
-  SH_LDFLAGS+= -specs=$(CUSTOM_SPECS)
+  SH_LDFLAGS+= -specs=$(SH_CUSTOM_SPECS)
 endif
 
 ROMDISK_DEPS:= $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
+
 ifneq ($(strip $(M68K_PROGRAM)),)
-  ROMDISK_DEPS+= ./romdisk/$(M68K_PROGRAM)
+  ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
+    # Check if there is a romdisk.o. If not, append to list of SH
+    # objects
+    ifeq ($(strip $(filter %.romdisk.o,$(SH_OBJECTS))),)
+      SH_OBJECTS+= root.romdisk.o
+    endif
+    ROMDISK_DEPS+= ./romdisk/$(M68K_PROGRAM).m68k
+  endif
 endif
 
 SH_DEPS:= $(SH_OBJECTS:.o=.d)
@@ -31,7 +41,9 @@ SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK:.o=.d)
 
 all: $(SH_PROGRAM).iso
 
-$(SH_PROGRAM).bin: $(SH_PROGRAM).elf $(M68K_PROGRAMS)
+example: all
+
+$(SH_PROGRAM).bin: $(SH_PROGRAM).elf
 	$(SH_OBJCOPY) -O binary $< $@
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
@@ -40,14 +52,14 @@ $(SH_PROGRAM).elf: $(SH_OBJECTS) $(SH_OBJECTS_NO_LINK)
 	$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
 	$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
-./romdisk/$(M68K_PROGRAM): $(M68K_PROGRAM).elf
+./romdisk/$(M68K_PROGRAM).m68k: $(M68K_PROGRAM).m68k.elf
 	$(M68K_OBJCOPY) -O binary $< $@
 	chmod -x $@
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
-$(M68K_PROGRAM).elf: $(M68K_OBJECTS)
+$(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS)
 	$(M68K_LD) $(M68K_OBJECTS) $(M68K_LDFLAGS) -o $@
-	$(M68K_NM) $(M68K_PROGRAM).elf > $(M68K_PROGRAM).sym
+	$(M68K_NM) $(M68K_PROGRAM).m68k.elf > $(M68K_PROGRAM).m68k.sym
 
 ./romdisk:
 	mkdir -p $@
@@ -117,11 +129,17 @@ clean:
 		IP.BIN.map
 	if [ ! -z $(M68K_PROGRAM) ]; then \
 	    rm -f \
-	        romdisk/$(M68K_PROGRAM) \
-	        $(M68K_PROGRAM).elf \
-	        $(M68K_PROGRAM).sym \
+	        romdisk/$(M68K_PROGRAM).m68k \
+	        $(M68K_PROGRAM).m68k.elf \
+	        $(M68K_PROGRAM).m68k.sym \
 	        $(M68K_OBJECTS); \
 	fi
+
+list-targets:
+	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
+	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
+	sort | \
+	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 -include $(SH_DEPS)
 -include $(SH_DEPS_NO_LINK)
