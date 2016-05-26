@@ -8,10 +8,7 @@
 #ifndef _VDP2_MAP_H_
 #define _VDP2_MAP_H_
 
-/* Specific macros */
-#define VDP2(x)         (0x25F80000 + (x))
-
-/* Helpers */
+/* Helpers specific to this processor */
 
 /* VDP2 */
 #define TVMD            0x0000

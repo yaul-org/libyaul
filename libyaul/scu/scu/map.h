@@ -18,10 +18,18 @@
 #define MEMORY_WRITE_OR(t, x, y)        (*(volatile uint ## t ## _t *)(x) |= (y))
 
 /* Macros specific for processor */
-#define SCU(x)          (0x25FE0000 + (x))
-#define CS0(x)          (0x22400000 + (x))
+#define CS0(x)          (0x22000000 + (x))
 #define CS1(x)          (0x24000000 + (x))
 #define DUMMY(x)        (0x25000000 + (x))
+#define CS2(x)          (0x25800000 + (x))
+#define SCSP(x)         (0x25B00000 + (x))
+#define VDP1_VRAM(x)    (0x25C00000 + (x))
+#define VDP1_FB(x)      (0x25C80000 + (x))
+#define VDP1(x)         (0x25D00000 + (x))
+#define VDP2_VRAM(x)    (0x25E00000 + (x))
+#define VDP2_CRAM(x)    (0x25F00000 + (x))
+#define VDP2(x)         (0x25F80000 + (x))
+#define SCU(x)          (0x25FE0000 + (x))
 
 /* SCU */
 #define D0R     0x0000

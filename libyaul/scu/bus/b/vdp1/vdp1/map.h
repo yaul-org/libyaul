@@ -8,11 +8,9 @@
 #ifndef _VDP1_MAP_H_
 #define _VDP1_MAP_H_
 
-/* Macros specific for processor */
-#define VDP1(x)         (0x25D00000 + (x))
-
 /* Helpers specific to this processor */
 
+/* VDP1 */
 #define TVMR            0x0000
 #define FBCR            0x0002
 #define PTMR            0x0004

@@ -11,7 +11,7 @@
 #include <scu/map.h>
 
 /* Macros specific for processor */
-#define USB_CARTRIDGE(x) (0x22000001 + ((x) << 20))
+#define USB_CARTRIDGE(x) (CS0(0x01) + ((x) << 20))
 
 #define FIFO            0x01
 #define FLAG            0x02

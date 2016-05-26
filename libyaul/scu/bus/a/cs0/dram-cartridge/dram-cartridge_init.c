@@ -77,7 +77,7 @@ detected(void)
          */
 
         /* Check the ID */
-        id = MEMORY_READ(8, CS1(ID));
+        id = MEMORY_READ(8, CS0(ID));
         id &= 0xFF;
 
         if ((id != DRAM_CARTRIDGE_ID_1MIB) &&
@@ -99,20 +99,25 @@ detected(void)
                 read = MEMORY_READ(32, DRAM(0, b, 0x00000000));
 
                 /* Is it mirrored? */
-                if (read != write)
+                if (read != write) {
                         continue;
+                }
 
                 /* Thanks to Joe Fenton or the suggestion to return the
                  * last mirrored DRAM #0 bank in order to get a
                  * contiguous address space */
-                if (id != DRAM_CARTRIDGE_ID_1MIB)
+                if (id != DRAM_CARTRIDGE_ID_1MIB) {
                         id = DRAM_CARTRIDGE_ID_1MIB;
+                }
+
                 base = (void *)DRAM(0, 3, 0x00000000);
+
                 return true;
         }
 
-        if (id != DRAM_CARTRIDGE_ID_4MIB)
+        if (id != DRAM_CARTRIDGE_ID_4MIB) {
                 id = DRAM_CARTRIDGE_ID_4MIB;
+        }
         base = (void *)DRAM(0, 0, 0x00000000);
 
         return true;
