@@ -306,8 +306,9 @@ HEADER_FILES:= \
 	./math/uint32.h:. \
 	\
 	./common/common.h:. \
-	./common/irq-mux.h: \
-	./common/stack.h:.
+	./common/irq-mux.h:. \
+	./common/stack.h:. \
+	./common/bootstrap/ip.h:../
 
 HEADER_FILES+= \
 	./common/gdb/gdb.h:.

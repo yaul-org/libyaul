@@ -10,7 +10,7 @@
 
 .ascii "SEGA SEGASATURN "       /* Hardware identifier */
 .ascii "SEGA TP KAISHA-A"       /* Manufacturer ID */
-.ascii "T-99901G  "             /* Product number */
+.ascii "T-99901G  "             /* Product ID */
 .ascii "$VERSION"               /* Version */
 .ascii "$RELEASE_DATE"          /* Release date */
 .ascii "CD-1/1  "               /* Device information */
