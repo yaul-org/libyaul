@@ -32,7 +32,7 @@ Usage
 Initialize and update all submodules.
 
     git submodule init
-    git submodule update -f
+    git submodule update -f --recursive
 
 In the `yaul.env` you just copied, change the appropriate fields.
 
