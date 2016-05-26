@@ -16,6 +16,30 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/* Hardware IDs */
+#define IP_HEADER_DATA_SIGNATURE "SEGASATURN DATA "
+#define IP_HEADER_BOOT_SIGNATURE "SEGA SEGASATURN "
+
+/* Device Info */
+#define IP_HEADER_DEVICE_INFO_ROM       "R"
+#define IP_HEADER_DEVICE_INFO_SRAM      "S"
+#define IP_HEADER_DEVICE_INFO_DRAM      "D"
+#define IP_HEADER_DEVICE_INFO_FRAM      "F"
+
+/* Area codes */
+#define IP_HEADER_AREA_CODE_JAPAN               "J"
+/* Taiwan, Philippines, Korea */
+#define IP_HEADER_AREA_CODE_ASIA_NTSC           "T"
+/* USA, Canada, Central and South American NTSC (Brasil) */
+#define IP_HEADER_AREA_CODE_AMERICA_NTSC        "U"
+/* European PAL, Southeast Asian PAL, Central and South American PAL */
+#define IP_HEADER_AREA_CODE_EUROPE_PAL          "E"
+
+/* Back-up RAM Info */
+#define IP_HEADER_BUP_INFO_BRAM_ODD_BYTES       "O"
+#define IP_HEADER_BUP_INFO_BRAM_EVEN_BYTES      "E"
+#define IP_HEADER_BUP_INFO_BRAM_WORDS           "W"
+
 struct ip_header_data {
         uint8_t hardware_id[16];
         uint8_t manufacture_id[16];
