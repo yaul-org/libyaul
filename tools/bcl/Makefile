@@ -46,7 +46,13 @@ CFLAGS:= -O2 \
 	-Wno-unused \
 	-Wno-parentheses
 
-SRCS:= bcl.c
+SRCS:= bcl.c \
+	huffman.c \
+	lz.c \
+	prs.c \
+	rice.c \
+	rle.c \
+	shannonfano.c
 
 OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
