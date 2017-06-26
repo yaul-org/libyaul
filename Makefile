@@ -3,16 +3,32 @@ PROJECTS:= \
 	libbcl \
 	libtga
 
+ifneq (1,$(words [$(shell pwd)]))
+  $(error Current directory ($(shell pwd)) contains spaces)
+endif
+
 ifeq ($(strip $(INSTALL_ROOT)),)
   $(error Undefined INSTALL_ROOT (install root directory))
+endif
+
+ifneq (1,$(words [$(strip $(INSTALL_ROOT))]))
+  $(error INSTALL_ROOT (install root directory) contains spaces)
 endif
 
 ifeq ($(strip $(BUILD_ROOT)),)
   $(error Undefined BUILD_ROOT (build root directory))
 endif
 
+ifneq (1,$(words [$(strip $(BUILD_ROOT))]))
+  $(error BUILD_ROOT (build root directory) contains spaces)
+endif
+
 ifeq ($(strip $(BUILD)),)
   $(error Undefined BUILD (build directory))
+endif
+
+ifneq (1,$(words [$(strip $(BUILD))]))
+  $(error BUILD (build directory) contains spaces)
 endif
 
 THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
