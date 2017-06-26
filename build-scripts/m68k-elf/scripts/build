@@ -73,7 +73,8 @@ gcc_configure_options=(
         --with-gnu-as \
         --with-gnu-ld \
         --without-dwarf2 \
-        --with-newlib)
+        --with-newlib \
+        MAKEINFO=missing)
 if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
     gcc_configure_options+=(
         --with-gmp="${BUILD_SUPPORT_LIBS}" \
