@@ -3,53 +3,10 @@ PROJECTS:= \
 	libbcl \
 	libtga
 
-ifneq (1,$(words [$(shell pwd)]))
-  $(error Current directory ($(shell pwd)) contains spaces)
-endif
-
-ifeq ($(strip $(INSTALL_ROOT)),)
-  $(error Undefined INSTALL_ROOT (install root directory))
-endif
-
-ifneq (1,$(words [$(strip $(INSTALL_ROOT))]))
-  $(error INSTALL_ROOT (install root directory) contains spaces)
-endif
-
-ifeq ($(strip $(BUILD_ROOT)),)
-  $(error Undefined BUILD_ROOT (build root directory))
-endif
-
-ifneq (1,$(words [$(strip $(BUILD_ROOT))]))
-  $(error BUILD_ROOT (build root directory) contains spaces)
-endif
-
-ifeq ($(strip $(BUILD)),)
-  $(error Undefined BUILD (build directory))
-endif
-
-ifneq (1,$(words [$(strip $(BUILD))]))
-  $(error BUILD (build directory) contains spaces)
-endif
+include env.mk
 
 THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export THIS_ROOT
-
-ifeq ($(strip $(SILENT)),1)
-  ECHO=@
-else
-  ECHO=
-endif
-export ECHO
-
-V_BEGIN_BLACK= [1;30m
-V_BEGIN_RED= [1;31m
-V_BEGIN_GREEN= [1;32m
-V_BEGIN_YELLOW= [1;33m
-V_BEGIN_BLUE= [1;34m
-V_BEGIN_MAGENTA= [1;35m
-V_BEGIN_CYAN= [1;36m
-V_BEGIN_WHITE= [1;37m
-V_END= [m
 
 define macro-generate-build-rule
 .PHONY: $1-$2

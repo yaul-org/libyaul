@@ -1,23 +1,6 @@
 TARGET:= tga
 
-ifeq ($(strip $(BUILD_ROOT)),)
-  $(error Undefined BUILD_ROOT (build root directory))
-endif
-
-ifeq ($(strip $(INSTALL_ROOT)),)
-  $(error Undefined INSTALL_ROOT (install root directory))
-endif
-
-ifeq ($(strip $(BUILD)),)
-  $(error Undefined BUILD (build directory))
-endif
-
-ifeq ($(strip $(SILENT)),1)
-  ECHO=@
-else
-  ECHO=
-endif
-export ECHO
+include ../env.mk
 
 SUB_BUILD:= $(BUILD)/lib$(TARGET)
 
@@ -25,17 +8,6 @@ SRCS:= tga.c
 
 HEADER_FILES:= \
 	tga.h
-
-SH_AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
-SH_AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
-SH_CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-SH_CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
-SH_LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-SH_NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
-SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
-SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
-SED:= sed
-INSTALL:= install
 
 SH_CFLAGS:= -std=c99 \
 	-s \
@@ -58,16 +30,6 @@ SH_CFLAGS_release-internal:= -O2 $(SH_CFLAGS) \
 	-DRELEASE_INTERNAL
 SH_CFLAGS_debug:= -O0 -g $(SH_CFLAGS) \
 	-DDEBUG
-
-V_BEGIN_BLACK= [1;30m
-V_BEGIN_RED= [1;31m
-V_BEGIN_GREEN= [1;32m
-V_BEGIN_YELLOW= [1;33m
-V_BEGIN_BLUE= [1;34m
-V_BEGIN_MAGENTA= [1;35m
-V_BEGIN_CYAN= [1;36m
-V_BEGIN_WHITE= [1;37m
-V_END= [m
 
 OBJS:= $(SRCS:.c=.o)
 DEPS:= $(SRCS:.c=.d)
