@@ -13,11 +13,11 @@ CONFIG_IN_FILENAME="config.in"
 CONFIG_PATH="./${CONFIG_FILENAME}"
 
 # Function message:
-#   ${1} => Message
+#   ${@} => Message
 message () {
-    local _message="${1}"
+    local _message="${@}"
 
-    printf -- "%s\n" "${_message}"
+    printf -- "${_message}\n"
 }
 
 # Function panic:
@@ -164,6 +164,7 @@ trap 'clean_up' 1 2 9 15
 
 SH_TARGET='sh-elf'
 M68K_TARGET='m68k-elf'
+TARGETS=("${SH_TARGET}" "${M68K_TARGET}")
 
 # Sane defaults for building toolchain
 export CFLAGS="-O2 -pipe"
@@ -373,7 +374,9 @@ if [ ! -f "checked-integrity" ]; then
 fi
 cd - 1> /dev/null
 
-for target in "${SH_TARGET}" "${M68K_TARGET}"; do
+message "Building targets ${TARGETS[@]}"
+
+for target in ${TARGETS[@]}; do
     if [ -f "${BUILD_SRC_DIR}/${target}/build-complete" ]; then
         continue
     fi
