@@ -1,24 +1,4 @@
 #!/bin/sh
 
-apply_patch () {
-    message "Applying patch '${1}'"
-
-    test -f "${SH_TARGET}/patches/${1}" \
-        && (patch -d "${BUILD_SRC_DIR}/${SH_TARGET}" --dry-run -p 0 < \
-        "${SH_TARGET}/patches/${1}")  1> /dev/null 2>&1 \
-        || panic "Couldn't apply patch" 1
-
-    patch -d "${BUILD_SRC_DIR}/${SH_TARGET}" -p 0 < \
-        "${SH_TARGET}/patches/${1}" 1> /dev/null 2>&1
-}
-
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/applied-patches" ]; then
-    message "Applying patches"
-
-    # GCC
-    apply_patch "gcc-${GCC_VERSION}.patch"
-    # Newlib
-    apply_patch "newlib-${NEWLIB_VERSION}.patch"
-fi
-
-touch "${BUILD_SRC_DIR}/${SH_TARGET}/applied-patches"
+apply_patch "sh-elf" "gcc" "${GCC_VERSION}.patch"
+apply_patch "sh-elf" "newlib" "${NEWLIB_VERSION}.patch"

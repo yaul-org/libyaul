@@ -160,6 +160,34 @@ clean_up () {
     exit 0
 }
 
+# Function apply_patch:
+#   ${1} => Target
+#   ${2} => Type
+#   ${3} => Patch filename
+apply_patch () {
+    local _target="${1}"
+    local _type="${2}"
+    local _patch="${3}"
+
+    local _patch_filename="${_type}-${_patch}"
+
+    if [ ! -f "${BUILD_SRC_DIR}/${_target}/${_type}--applied-patches" ]; then
+        message "Applying patch '${_patch_filename}'"
+
+        # Determine if we can patch
+        test -f "${_target}/patches/${_patch_filename}" \
+            && (patch -d "${BUILD_SRC_DIR}/${_target}" --dry-run -p 0 < \
+                      "${_target}/patches/${_patch_filename}")  1> /dev/null 2>&1 \
+            || panic "Couldn't apply patch" 1
+
+        # Patch
+        patch -d "${BUILD_SRC_DIR}/${_target}" -p 0 < \
+              "${_target}/patches/${_patch_filename}" 1> /dev/null 2>&1
+
+        touch "${BUILD_SRC_DIR}/${_target}/${_type}-applied-patches"
+    fi
+}
+
 trap 'clean_up' 1 2 9 15
 
 SH_TARGET='sh-elf'
@@ -332,46 +360,43 @@ if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
     fi
 fi
 
-if [ ! -f "checked-integrity" ]; then
-    message "Checking integrity..."
+message "Checking integrity..."
 
-    # Check integrity
-    message "Checking integrity of \`${BINUTILS}'"
-    if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
-        panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
-    fi
-
-    message "Checking integrity of \`${GCC}'"
-    if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
-        panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
-    fi
-
-    if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
-        message "Checking integrity of \`${GDB}'"
-        if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
-            panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
-        fi
-    fi
-
-    # The md5.sum is a special (annoying) case
-    message "Checking integrity of \`${NEWLIB}'"
-    md5=`cat "${NEWLIB_MD5}" 2> /dev/null | grep "${NEWLIB}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
-    case "${MD5}" in
-        "md5")
-            calculated_md5=`"${MD5}" "${NEWLIB}" | awk '{ print $1; }'`
-            ;;
-        "md5sum")
-            calculated_md5=`"${MD5}" "${NEWLIB}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
-            ;;
-    esac
-    if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
-        panic "Integrity check for ${NEWLIB} failed" 1
-    fi
-    unset "md5"
-    unset "calculated_md5"
-
-    touch "checked-integrity"
+# Check integrity
+message "Checking integrity of \`${BINUTILS}'"
+if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
+    panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
 fi
+
+message "Checking integrity of \`${GCC}'"
+if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
+    panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+fi
+
+if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+    message "Checking integrity of \`${GDB}'"
+    if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
+        panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+    fi
+fi
+
+# The md5.sum is a special (annoying) case
+message "Checking integrity of \`${NEWLIB}'"
+md5=`cat "${NEWLIB_MD5}" 2> /dev/null | grep "${NEWLIB}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
+case "${MD5}" in
+    "md5")
+        calculated_md5=`"${MD5}" "${NEWLIB}" | awk '{ print $1; }'`
+        ;;
+    "md5sum")
+        calculated_md5=`"${MD5}" "${NEWLIB}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
+        ;;
+esac
+if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
+    panic "Integrity check for ${NEWLIB} failed" 1
+fi
+unset "md5"
+unset "calculated_md5"
+
 cd - 1> /dev/null
 
 message "Building targets ${TARGETS[@]}"

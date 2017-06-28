@@ -1,22 +1,3 @@
 #!/bin/sh
 
-apply_patch () {
-    message "Applying patch '${1}'"
-
-    test -f "${M68K_TARGET}/patches/${1}" \
-        && (patch -d "${BUILD_SRC_DIR}/${M68K_TARGET}" --dry-run -p 0 < \
-        "${M68K_TARGET}/patches/${1}")  1> /dev/null 2>&1 \
-        || panic "Couldn't apply patch" 1
-
-    patch -d "${BUILD_SRC_DIR}/${M68K_TARGET}" -p 0 < \
-        "${M68K_TARGET}/patches/${1}" 1> /dev/null 2>&1
-}
-
-if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/applied-patches" ]; then
-    message "Applying patches"
-
-    # GCC
-    apply_patch "gcc-${GCC_VERSION}.patch"
-fi
-
-touch "${BUILD_SRC_DIR}/${M68K_TARGET}/applied-patches"
+apply_patch "m68k-elf" "gcc" "${GCC_VERSION}.patch"
