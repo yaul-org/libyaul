@@ -9,6 +9,10 @@
 # Build paths
 # Only ABSOLUTE paths are to be used!
 
+# Do not modify, unless you know what you're doing
+GNU_URL="ftp://ftp.gnu.org/gnu"
+NEWLIB_URL="ftp://sources.redhat.com/pub/newlib"
+
 # Path to tool-chain installation directory
 BUILD_INSTALL_DIR="${HOME}/tool-chains"
 

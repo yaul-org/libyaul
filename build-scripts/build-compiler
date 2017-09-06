@@ -127,6 +127,8 @@ for var in \
 done
 
 for var in \
+    "GNU_URL" \
+    "NEWLIB_URL" \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
@@ -154,9 +156,10 @@ clean_up () {
 
     message "Cleaning up '${BUILD_SRC_DIR}'"
 
-    rm -r -f \
-        "${BUILD_SRC_DIR}/${SH_TARGET}" \
-        "${BUILD_SRC_DIR}/${M68K_TARGET}"
+    for target in ${TARGETS[@]}; do
+        rm -r -f "${BUILD_SRC_DIR}/${target}"
+    done
+
     exit 0
 }
 
@@ -203,9 +206,6 @@ unset "LDFLAGS"
 # Add installed devkit to the path, adjusting path on minsys
 export PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
 
-GNU_URL="ftp://ftp.gnu.org/gnu"
-SOURCES_REDHAT_URL="ftp://sources.redhat.com/pub/newlib"
-
 GCC="gcc-${GCC_VERSION}.tar.bz2"
 GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
 GCC_SIG="${GCC}.sig"
@@ -228,11 +228,11 @@ GNU_KEYRING="gnu-keyring.gpg"
 GNU_KEYRING_URL="${GNU_URL}/${GNU_KEYRING}"
 
 NEWLIB="newlib-${NEWLIB_VERSION}.tar.gz"
-NEWLIB_URL="${SOURCES_REDHAT_URL}/${NEWLIB}"
+NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
 NEWLIB_SRC_DIR="newlib-${NEWLIB_VERSION}"
 
 NEWLIB_MD5="md5.sum"
-NEWLIB_MD5_URL="${SOURCES_REDHAT_URL}/${NEWLIB_MD5}"
+NEWLIB_MD5_URL="${NEWLIB_URL}/${NEWLIB_MD5}"
 
 # Get preferred installation directory and set paths to the sources
 # Make sure we have the proper permissions
