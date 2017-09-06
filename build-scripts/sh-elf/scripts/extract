@@ -14,7 +14,7 @@ if [ ! -f "extracted-binutils" ]; then
 fi
 
 if [ ! -f "extracted-gcc" ]; then
-    message "Extracting '$GCC'"
+    message "Extracting '${GCC}'"
     rm -r -f gcc
     rm -r -f gcc-${GCC_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
