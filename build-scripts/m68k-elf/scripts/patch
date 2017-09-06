@@ -1,3 +1,0 @@
-#!/bin/sh
-
-apply_patch "m68k-elf" "gcc" "${GCC_VERSION}.patch"

@@ -128,7 +128,6 @@ done
 
 for var in \
     "GNU_URL" \
-    "NEWLIB_URL" \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
@@ -136,7 +135,6 @@ for var in \
     "BUILD_SUPPORT_LIBS" \
     "GCC_VERSION" \
     "GDB_VERSION" \
-    "NEWLIB_VERSION" \
     "MAKE" \
     "AWK" \
     "GPG" \
@@ -227,13 +225,6 @@ GDB_SRC_DIR="gdb-${GDB_VERSION}"
 GNU_KEYRING="gnu-keyring.gpg"
 GNU_KEYRING_URL="${GNU_URL}/${GNU_KEYRING}"
 
-NEWLIB="newlib-${NEWLIB_VERSION}.tar.gz"
-NEWLIB_URL="${NEWLIB_URL}/${NEWLIB}"
-NEWLIB_SRC_DIR="newlib-${NEWLIB_VERSION}"
-
-NEWLIB_MD5="md5.sum"
-NEWLIB_MD5_URL="${NEWLIB_URL}/${NEWLIB_MD5}"
-
 # Get preferred installation directory and set paths to the sources
 # Make sure we have the proper permissions
 mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
@@ -253,8 +244,6 @@ if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     printf -- "\n\t 3. ${BINUTILS_SIG}"
     printf -- "\n\t 4. ${GCC}"
     printf -- "\n\t 5. ${GCC_SIG}"
-    printf -- "\n\t 6. ${NEWLIB}"
-    printf -- "\n\t 7. ${NEWLIB_MD5}"
     printf -- "\n\t 8. ${GDB}"
     printf -- "\n\t 9. ${GDB_SIG}"
     printf -- "\n"
@@ -308,20 +297,6 @@ else
             fi
         fi
 
-        if [ ! -f "${NEWLIB}" ]; then
-            message "Downloading \`${NEWLIB}'"
-            if ! fetch "${NEWLIB_URL}" 1>> "newlib.log" 2>&1; then
-                panic "Failed to download ${NEWLIB} from ${NEWLIB_URL} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
-            fi
-        fi
-
-        if [ ! -f "${NEWLIB_MD5}" ]; then
-            message "Downloading \`${NEWLIB_MD5}' (${NEWLIB_MD5})"
-            if ! fetch "${NEWLIB_MD5_URL}" 1>> "newlib.log" 2>&1; then
-                panic "Failed to download ${NEWLIB_MD5} from ${NEWLIB_MD5_URL} (see \`${BUILD_SRC_DIR}/newlib.log')" 1
-            fi
-        fi
-
         touch "downloaded-tarballs"
     fi
 fi
@@ -342,13 +317,6 @@ if [ ! -f "${GCC}" ]; then
 fi
 if [ ! -f "${GCC_SIG}" ]; then
     panic "\`${GCC_SIG}' not found" 1
-fi
-
-if [ ! -f "${NEWLIB}" ]; then
-    panic "'${NEWLIB}' not found" 1
-fi
-if [ ! -f "${NEWLIB_MD5}" ]; then
-    panic "'${NEWLIB_MD5}' not found" 1
 fi
 
 if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
@@ -379,23 +347,6 @@ if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
         panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
     fi
 fi
-
-# The md5.sum is a special (annoying) case
-message "Checking integrity of \`${NEWLIB}'"
-md5=`cat "${NEWLIB_MD5}" 2> /dev/null | grep "${NEWLIB}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
-case "${MD5}" in
-    "md5")
-        calculated_md5=`"${MD5}" "${NEWLIB}" | awk '{ print $1; }'`
-        ;;
-    "md5sum")
-        calculated_md5=`"${MD5}" "${NEWLIB}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
-        ;;
-esac
-if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
-    panic "Integrity check for ${NEWLIB} failed" 1
-fi
-unset "md5"
-unset "calculated_md5"
 
 cd - 1> /dev/null
 

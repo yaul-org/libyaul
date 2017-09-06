@@ -8,4 +8,3 @@
 > "${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log"
 > "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log"
 > "${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log"
-> "${BUILD_SRC_DIR}/newlib-${SH_TARGET}.log"

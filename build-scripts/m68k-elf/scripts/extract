@@ -12,34 +12,4 @@ if [ ! -f "extracted-binutils" ]; then
     fi
     touch "extracted-binutils"
 fi
-
-if [ ! -f "extracted-gcc" ]; then
-    message "Extracting '${GCC}'"
-    rm -r -f gcc
-    rm -r -f gcc-${GCC_VERSION}
-    if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
-        panic "Extracting ${GCC}" 1
-    fi
-    touch "extracted-gcc"
-fi
-
-if [ ! -f "extracted-newlib" ]; then
-    message "Extracting '${NEWLIB}'"
-    rm -r -f newlib
-    rm -r -f newlib-${GCC_VERSION}
-    if ! tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" > /dev/null 2>&1; then
-        panic "Extracting ${NEWLIB}" 1
-    fi
-    touch "extracted-newlib"
-fi
-
-if [ "${OPTION_ENABLE_GDB}" = "yes" ]; then
-    if [ ! -f "extracted-gdb" ]; then
-        message "Extracting '${GDB}'"
-        if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then
-            panic "Extracting ${GCC_GDB}" 1
-        fi
-        touch "extracted-gdb"
-    fi
-fi
 cd "${OLDPWD}"

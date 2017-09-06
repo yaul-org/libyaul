@@ -23,16 +23,6 @@ if [ ! -f "extracted-gcc" ]; then
     touch "extracted-gcc"
 fi
 
-if [ ! -f "extracted-newlib" ]; then
-    message "Extracting '${NEWLIB}'"
-    rm -r -f newlib
-    rm -r -f newlib-${NEWLIB_VERSION}
-    if ! tar -xzf "${BUILD_SRC_DIR}/${NEWLIB}" > /dev/null 2>&1; then
-        panic "Extracting ${NEWLIB}" 1
-    fi
-    touch "extracted-newlib"
-fi
-
 if [ "${OPTION_ENABLE_GDB}" = "yes" ]; then
     if [ ! -f "extracted-gdb" ]; then
         message "Extracting '${GDB}'"

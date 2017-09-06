@@ -1,4 +1,3 @@
 #!/bin/sh
 
 apply_patch "sh-elf" "gcc" "${GCC_VERSION}.patch"
-apply_patch "sh-elf" "newlib" "${NEWLIB_VERSION}.patch"
