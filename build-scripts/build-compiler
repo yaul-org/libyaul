@@ -14,7 +14,7 @@ CONFIG_PATH="./${CONFIG_FILENAME}"
 
 # Function message:
 #   ${@} => Message
-message () {
+function message() {
     local _message="${@}"
 
     printf -- "${_message}\n"
@@ -23,7 +23,7 @@ message () {
 # Function panic:
 #   ${1} => Message
 #   ${2} => Exit status code
-panic() {
+function panic() {
     local _message="${1}"
     local _exit_code=${2}
 
@@ -31,15 +31,16 @@ panic() {
     exit ${_exit_code}
 }
 
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "${SOURCE}" ]; do # Resolve ${SOURCE} until the file is no longer a symlink
-    ROOT="$(cd -P "$(dirname "${SOURCE}")" && pwd)"
-    SOURCE="$(readlink "${SOURCE}")"
-    # If ${SOURCE} was a relative symlink, we need to resolve it
+source="${BASH_source[0]}"
+while [ -h "${source}" ]; do # Resolve ${source} until the file is no longer a symlink
+    ROOT="$(cd -P "$(dirname "${source}")" && pwd)"
+    source="$(readlink "${source}")"
+    # If ${source} was a relative symlink, we need to resolve it
     # relative to the path where the symlink file was located
-    [[ ${SOURCE} != /* ]] && SOURCE="${ROOT}/${SOURCE}"
+    [[ ${source} != /* ]] && source="${ROOT}/${source}"
 done
-ROOT="$(cd -P "$(dirname "${SOURCE}" )" && pwd)"
+ROOT="$(cd -P "$(dirname "${source}" )" && pwd)"
+unset source
 
 if [[ "${ROOT}" != "`pwd`" ]]; then
     panic "You must be in \`${ROOT}' in order to invoke ${PROGNAME}"
@@ -65,15 +66,16 @@ EOF
     if [ ${?} -ne 0 ]; then
         panic "Syntax error in configuration file \`${CONFIG_FILENAME}' on line ${error_line}" 1
     fi
+    unset error_line
 
     source "${CONFIG_PATH}" > /dev/null 2>&1
 else
     panic "Configuration file \`${CONFIG_FILENAME}' not found; see \`${CONFIG_IN_FILENAME}'" 1
 fi
 
-# Function is_set:
+# Function is_var_set:
 #   ${1} => Variable
-is_set() {
+function is_var_set() {
     if [[ ! "${!1}" && "${!1-_}" ]]; then
         panic "Variable \"${1}\" does not exist in your config file" 1
     fi
@@ -81,15 +83,25 @@ is_set() {
 
 # Function check_boolean:
 #   ${1} => Value
-check_boolean() {
+function check_boolean() {
     if [[ "${!1}" != "no" && "${!1}" != "yes" ]]; then
         panic "Variable \"${1}\" has an invalid value in your config file" 1
     fi
 }
 
+# Function program_exists
+#   ${1} => Program name
+function program_exists() {
+    local _program_name="${1}"
+
+    if ! command -v "${_program_name}" >/dev/null 2>&1; then
+        panic "Program \"${_program_name}\" does not exist in \${PATH}" 1
+    fi
+}
+
 # Function fetch:
 #   ${1} => URL
-fetch() {
+function fetch() {
     local _url="${1}"
 
     "${FETCH}" "${FETCH_FLAGS}" "${_url}"
@@ -111,7 +123,7 @@ fetch() {
 
 # Function checksum_gpg:
 #   ${1} => File (.sig file)
-checksum_gpg() {
+function checksum_gpg() {
     local _file="${1}"
 
     "${GPG}" --verify --keyring "${BUILD_SRC_DIR}/${GNU_KEYRING}" "${_file}"
@@ -119,35 +131,9 @@ checksum_gpg() {
     return ${_exit_code}
 }
 
-for var in \
-    "OPTION_DOWNLOAD_TARBALLS" \
-    "OPTION_ENABLE_GDB"; do
-    is_set "${var}"
-    check_boolean "${var}"
-done
-
-for var in \
-    "GNU_URL" \
-    "BUILD_INSTALL_DIR" \
-    "BUILD_SRC_DIR" \
-    "BINUTILS_VERSION" \
-    "BUILD_MAKE_JOBS" \
-    "BUILD_SUPPORT_LIBS" \
-    "GCC_VERSION" \
-    "GDB_VERSION" \
-    "MAKE" \
-    "AWK" \
-    "GPG" \
-    "MD5" \
-    "PATCH" \
-    "FETCH" \
-    "FETCH_FLAGS"; do
-    is_set "${var}"
-done
-
 # Function clean_up:
 #
-clean_up () {
+function clean_up() {
     if [ -z "${BUILD_SRC_DIR}" ]; then
         exit 1
     fi
@@ -165,7 +151,7 @@ clean_up () {
 #   ${1} => Target
 #   ${2} => Type
 #   ${3} => Patch filename
-apply_patch () {
+function apply_patch() {
     local _target="${1}"
     local _type="${2}"
     local _patch="${3}"
@@ -189,20 +175,55 @@ apply_patch () {
     fi
 }
 
-trap 'clean_up' 1 2 9 15
+trap 'exit_code=${?}; clean_up; exit ${exit_code}' 0 1 2 9 15
 
-SH_TARGET='sh-elf'
-M68K_TARGET='m68k-elf'
+for var in \
+    "OPTION_DOWNLOAD_TARBALLS" \
+    "OPTION_ENABLE_GDB"; do
+    is_var_set "${var}"
+    check_boolean "${var}"
+done
+unset var
+
+for var in \
+    "GNU_URL" \
+    "BUILD_INSTALL_DIR" \
+    "BUILD_SRC_DIR" \
+    "BINUTILS_VERSION" \
+    "BUILD_MAKE_JOBS" \
+    "BUILD_SUPPORT_LIBS" \
+    "GCC_VERSION" \
+    "GDB_VERSION" \
+    "MAKE" \
+    "AWK" \
+    "GPG" \
+    "MD5" \
+    "PATCH" \
+    "FETCH" \
+    "FETCH_FLAGS"; do
+    is_var_set "${var}"
+done
+unset var
+
+for program in \
+    "MAKE" \
+    "AWK" \
+    "GPG" \
+    "MD5" \
+    "PATCH" \
+    "FETCH"; do
+    program_exists "${!program}"
+done
+unset program
+
+SH_TARGET="sh-elf"
+M68K_TARGET="m68k-elf"
 TARGETS=("${SH_TARGET}" "${M68K_TARGET}")
 
-# Sane defaults for building toolchain
-export CFLAGS="-O2 -pipe"
-export CXXFLAGS="${CFLAGS}"
-
-unset "LDFLAGS"
-
 # Add installed devkit to the path, adjusting path on minsys
-export PATH="${BUILD_INSTALL_DIR}/${SH_TARGET}/bin:${BUILD_INSTALL_DIR}/${M68K_TARGET}/bin:${PATH}"
+for target in ${TARGETS[@]}; do
+    export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
+done
 
 GCC="gcc-${GCC_VERSION}.tar.bz2"
 GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
@@ -239,13 +260,13 @@ fi
 cd "${BUILD_SRC_DIR}/" 2> /dev/null
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
-    printf -- "\n\t 1. ${GNU_KEYRING}"
-    printf -- "\n\t 2. ${BINUTILS}"
-    printf -- "\n\t 3. ${BINUTILS_SIG}"
-    printf -- "\n\t 4. ${GCC}"
-    printf -- "\n\t 5. ${GCC_SIG}"
-    printf -- "\n\t 8. ${GDB}"
-    printf -- "\n\t 9. ${GDB_SIG}"
+    printf -- "\n\t1. ${GNU_KEYRING}"
+    printf -- "\n\t2. ${BINUTILS}"
+    printf -- "\n\t3. ${BINUTILS_SIG}"
+    printf -- "\n\t4. ${GCC}"
+    printf -- "\n\t5. ${GCC_SIG}"
+    printf -- "\n\t8. ${GDB}"
+    printf -- "\n\t9. ${GDB_SIG}"
     printf -- "\n"
     printf -- "\n"
 else
@@ -379,7 +400,4 @@ for target in ${TARGETS[@]}; do
         source "${target}/scripts/finish"
     fi
 done
-
-# Clean up temporary files and source directories
-clean_up
 }
