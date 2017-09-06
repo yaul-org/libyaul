@@ -60,42 +60,11 @@ LIB_SRCS+= \
 	\
 	kernel/lib/memb.c \
 	\
-	kernel/mm/free.c \
-	kernel/mm/free_r.c \
-	kernel/mm/malloc.c \
-	kernel/mm/malloc_r.c \
-	kernel/mm/realloc.c \
-	kernel/mm/realloc_r.c \
 	kernel/mm/slob.c \
-	\
-	kernel/vfs/pathname_cache.c \
 	\
 	kernel/vfs/fs/iso9660/iso9660.c \
 	\
-	kernel/vfs/fs/romdisk/romdisk.c \
-	\
-	newlib/chmod_r.c \
-	newlib/chown_r.c \
-	newlib/close_r.c \
-	newlib/creat_r.c \
-	newlib/execve_r.c \
-	newlib/exit.c \
-	newlib/fork_r.c \
-	newlib/fstat_r.c \
-	newlib/getpid_r.c \
-	newlib/isatty_r.c \
-	newlib/kill_r.c \
-	newlib/lseek_r.c \
-	newlib/open_r.c \
-	newlib/pipe_r.c \
-	newlib/raise_r.c \
-	newlib/read_r.c \
-	newlib/sbrk_r.c \
-	newlib/stat_r.c \
-	newlib/unlink_r.c \
-	newlib/utime_r.c \
-	newlib/wait_r.c \
-	newlib/write_r.c
+	kernel/vfs/fs/romdisk/romdisk.c
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
