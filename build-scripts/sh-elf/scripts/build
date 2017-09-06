@@ -54,10 +54,15 @@ gcc_configure_options=(
         --disable-cld \
         --disable-initfini-array \
         --disable-largefile \
+        --disable-hosted-libstdcxx \
+        --disable-libstdc__-v3 \
         --disable-libstdcxx-pch \
+        --disable-libstdcxx-threads \
+        --disable-libstdcxx-time \
         --disable-multilib \
         --disable-objc-gc \
         --disable-rpath \
+        --disable-dlopen \
         --disable-shared \
         --disable-threads \
         --disable-tls \
@@ -92,7 +97,7 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
     LDFLAGS="" \
-    CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer" \
+    CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer -ffreestanding" \
     LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
         ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
@@ -100,14 +105,14 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-gcc" ]; then
-    message "Building GCC"
+    message "Building GCC (all-gcc)"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} all-gcc 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-gcc"
 fi
 
 if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gcc" ]; then
-    message "Installing GCC"
+    message "Installing GCC (install-gcc)"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} install-gcc 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
     touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gcc"
