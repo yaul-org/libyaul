@@ -158,7 +158,7 @@ function apply_patch() {
 
     local _patch_filename="${_type}-${_patch}"
 
-    if [ ! -f "${BUILD_SRC_DIR}/${_target}/${_type}--applied-patches" ]; then
+    if [ ! -f "${BUILD_SRC_DIR}/${_target}/applied-patches-${_type}" ]; then
         message "Applying patch '${_patch_filename}'"
 
         # Determine if we can patch
@@ -171,11 +171,11 @@ function apply_patch() {
         patch -d "${BUILD_SRC_DIR}/${_target}" -p 0 < \
               "${_target}/patches/${_patch_filename}" 1> /dev/null 2>&1
 
-        touch "${BUILD_SRC_DIR}/${_target}/${_type}-applied-patches"
+        touch "${BUILD_SRC_DIR}/${_target}/applied-patches-${_type}"
     fi
 }
 
-trap 'exit_code=${?}; clean_up; exit ${exit_code}' 0 1 2 9 15
+trap 'exit_code=${?}; clean_up; exit ${exit_code}' 1 9 15
 
 for var in \
     "OPTION_DOWNLOAD_TARBALLS" \
@@ -257,6 +257,7 @@ mkdir -p "${BUILD_INSTALL_DIR}" 1> /dev/null 2>&1 && \
 if ! [ -d "${BUILD_SRC_DIR}" ]; then
     panic "Path \`${BUILD_SRC_DIR}/' is non-existent" 1
 fi
+
 cd "${BUILD_SRC_DIR}/" 2> /dev/null
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
@@ -322,53 +323,56 @@ else
     fi
 fi
 
-if [ ! -f "${GNU_KEYRING}" ]; then
-    panic "\`${GNU_KEYRING}' not found"
-fi
-
-if [ ! -f "${BINUTILS}" ]; then
-    panic "\`${BINUTILS}' not found" 1
-fi
-if [ ! -f "${BINUTILS_SIG}" ]; then
-    panic "\`${BINUTILS_SIG}' not found" 1
-fi
-
-if [ ! -f "${GCC}" ]; then
-    panic "\`${GCC}' not found" 1
-fi
-if [ ! -f "${GCC_SIG}" ]; then
-    panic "\`${GCC_SIG}' not found" 1
-fi
-
-if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
-    if [ ! -f "${GDB}" ]; then
-        panic "\`${GDB}' not found" 1
+if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
+    if [ ! -f "${GNU_KEYRING}" ]; then
+        panic "\`${GNU_KEYRING}' not found"
     fi
-    if [ ! -f "${GDB_SIG}" ]; then
-        panic "\`${GDB_SIG}' not found" 1
+
+    if [ ! -f "${BINUTILS}" ]; then
+        panic "\`${BINUTILS}' not found" 1
     fi
-fi
-
-message "Checking integrity..."
-
-# Check integrity
-message "Checking integrity of \`${BINUTILS}'"
-if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
-    panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
-fi
-
-message "Checking integrity of \`${GCC}'"
-if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
-    panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
-fi
-
-if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
-    message "Checking integrity of \`${GDB}'"
-    if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
-        panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+    if [ ! -f "${BINUTILS_SIG}" ]; then
+        panic "\`${BINUTILS_SIG}' not found" 1
     fi
-fi
 
+    if [ ! -f "${GCC}" ]; then
+        panic "\`${GCC}' not found" 1
+    fi
+    if [ ! -f "${GCC_SIG}" ]; then
+        panic "\`${GCC_SIG}' not found" 1
+    fi
+
+    if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+        if [ ! -f "${GDB}" ]; then
+            panic "\`${GDB}' not found" 1
+        fi
+        if [ ! -f "${GDB_SIG}" ]; then
+            panic "\`${GDB_SIG}' not found" 1
+        fi
+    fi
+
+    message "Checking integrity..."
+
+    # Check integrity
+    message "Checking integrity of \`${BINUTILS}'"
+    if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
+        panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+    fi
+
+    message "Checking integrity of \`${GCC}'"
+    if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
+        panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+    fi
+
+    if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+        message "Checking integrity of \`${GDB}'"
+        if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
+            panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+        fi
+    fi
+
+    touch "checked-integrity"
+fi
 cd - 1> /dev/null
 
 message "Building targets ${TARGETS[@]}"
