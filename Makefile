@@ -1,7 +1,7 @@
 PROJECTS:= \
 	libyaul \
-	libbcl \
-	libtga
+	libtga \
+	libbcl
 
 include env.mk
 
@@ -44,6 +44,16 @@ define macro-install
 	done
 endef
 
+define macro-check-toolchain
+	$(ECHO)for tool in $2; do \
+	    printf -- "$(INSTALL_ROOT)/$1/bin/$1-$${tool}\n"; \
+	    if [ ! -e $(INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
+	        printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
+	        exit 1; \
+	    fi; \
+	done
+endef
+
 .PHONY: all \
 	release \
 	release-internal \
@@ -63,7 +73,7 @@ endef
 	install-tools \
 	clean-tools \
 	list-targets \
-	check-tool-chain
+	check-toolchain
 
 all: release release-internal debug tools
 
@@ -71,17 +81,10 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project)
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release-internal)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
-check-tool-chain:
-	@printf -- "$(V_BEGIN_YELLOW)tool-chain check$(V_END)\n"
-	$(ECHO)for tool_chain in "sh-elf" "m68k-elf"; do \
-	    for tool in "as" "ar" "gcc" "g++" "ld" "nm" "objcopy" "objdump"; do \
-	        printf -- "$(INSTALL_ROOT)/$${tool_chain}/bin/$${tool_chain}-$${tool}\n"; \
-	        if [ ! -e $(INSTALL_ROOT)/$${tool_chain}/bin/$${tool_chain}-$${tool} ]; then \
-	            printf -- "$${tool_chain} tool-chain has not been installed properly (see build-scripts/)\n" >&2; \
-	            exit 1; \
-	        fi; \
-	    done; \
-	done
+check-toolchain:
+	@printf -- "$(V_BEGIN_YELLOW)toolchain check$(V_END)\n"
+	$(call macro-check-toolchain,sh-elf,as ar ld nm objcopy objdump gcc g++)
+	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
 
 release release-internal debug: $(BUILD_ROOT)/$(BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
@@ -90,7 +93,7 @@ release release-internal debug: $(BUILD_ROOT)/$(BUILD)
 	done
 
 $(BUILD_ROOT)/$(BUILD):
-	@$(MAKE) -s check-tool-chain
+	@$(MAKE) -s check-toolchain
 	$(ECHO)mkdir -p $@
 
 install: install-release install-tools
