@@ -17,6 +17,7 @@ HEADER_FILES:= \
 SH_CFLAGS:= -std=c99 \
 	-s \
 	-ffast-math \
+	-ffreestanding \
 	-fstrict-aliasing \
 	-fomit-frame-pointer \
 	-Wall \

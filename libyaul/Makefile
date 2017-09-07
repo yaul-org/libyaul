@@ -339,6 +339,7 @@ HEADER_FILES+= \
 
 SH_CFLAGS:= -std=c99 \
 	-s \
+	-ffreestanding \
 	-ffast-math \
 	-fstrict-aliasing \
 	-fomit-frame-pointer \
