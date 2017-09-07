@@ -17,7 +17,7 @@ stack_backtrace(void)
         extern void *_text_start;
         extern void *_text_end;
 
-        static char buf[1024];
+        static char buf[256];
 
         uintptr_t fp;
         uintptr_t pr;
@@ -32,7 +32,7 @@ stack_backtrace(void)
         level = 0;
         *buf = '\0';
         do {
-                (void)sprintf(buf, "%s #%i 0x%08X in ??? ()\n",
+                (void)snprintf(buf, 256, "%s #%i 0x%08X in ??? ()\n",
                     buf, level, (uintptr_t)pr);
 
                 pr = STACK_FPTR_RET_ADDRESS_GET(fp);
