@@ -62,6 +62,14 @@ LIB_SRCS+= \
 	\
 	kernel/mm/slob.c \
 	\
+	lib/string/memcpy.c \
+	lib/string/memset.c \
+	lib/string/strlen.c \
+	lib/stdio/snprintf.c \
+	lib/stdlib/free.c \
+	lib/stdlib/malloc.c \
+	lib/stdlib/realloc.c
+	\
 	kernel/vfs/fs/iso9660/iso9660.c \
 	\
 	kernel/vfs/fs/romdisk/romdisk.c
