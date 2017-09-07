@@ -29,17 +29,27 @@ SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
 SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
 M68K_AS:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as
 M68K_AR:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar
-M68K_CC:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc
-M68K_CXX:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-g++
 M68K_LD:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc
 M68K_NM:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm
 M68K_OBJCOPY:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy
 M68K_OBJDUMP:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump
 
 SH_AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
-SH_CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-main \
-	-m2 -mb -O2 -fomit-frame-pointer \
-	-ffast-math -fstrict-aliasing \
+SH_CFLAGS= \
+	-W \
+	-Wall \
+	-Wextra \
+	-Werror \
+	-Wunused-parameter \
+	-Wstrict-aliasing \
+	-Wno-main \
+	-O2 \
+	-m2 \
+	-mb \
+	-ffreestanding \
+	-fomit-frame-pointer \
+	-ffast-math \
+	-fstrict-aliasing \
 	-I$(INSTALL_ROOT)/sh-elf/sh-elf/include/tga \
 	-I$(INSTALL_ROOT)/sh-elf/sh-elf/include/yaul \
 	-I$(INSTALL_ROOT)/sh-elf/sh-elf/include/yaul/common \
@@ -64,15 +74,12 @@ SH_CFLAGS= -W -Wall -Wextra -Werror -Wunused-parameter -Wstrict-aliasing -Wno-ma
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
 SH_CXXFLAGS= $(SH_CFLAGS) \
-	-ffreestanding -fno-exceptions -fno-rtti
-SH_LXXFLAGS= -Wl,-Map,$(SH_PROGRAM).map \
-	-Wl,--start-group \
-	-lstdc++ -lc -lgcc \
-	-Wl,--end-group \
-	-nostartfiles -specs=yaul.specs
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-unwind-tables
+SH_LXXFLAGS= $(SH_LDFLAGS)
 
 M68K_AFLAGS= --fatal-warnings
-M68K_CFLAGS=
 M68K_LDFLAGS=
 
 SUFFIXES:= .c .m68k.S .S .o .m68k .bin .elf .romdisk .romdisk.o

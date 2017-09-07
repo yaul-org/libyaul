@@ -18,9 +18,9 @@ ifneq ($(strip $(M68K_PROGRAM)),)
 endif
 
 ifeq ($(strip $(SH_CUSTOM_SPECS)),)
-  SH_LDFLAGS+= -specs=yaul.specs
+  SH_SPECS= yaul.specs
 else
-  SH_LDFLAGS+= -specs=$(SH_CUSTOM_SPECS)
+  SH_SPECS= $(SH_CUSTOM_SPECS)
 endif
 
 ROMDISK_DEPS:= $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
@@ -48,7 +48,7 @@ $(SH_PROGRAM).bin: $(SH_PROGRAM).elf
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
 $(SH_PROGRAM).elf: $(SH_OBJECTS) $(SH_OBJECTS_NO_LINK)
-	$(SH_LD) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
 	$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
 	$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
