@@ -7,9 +7,9 @@
 
 #include "smpc-internal.h"
 
-#include <stdbool.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdbool.h>
 
 void __noreturn
 smpc_smc_sysres_call(void)

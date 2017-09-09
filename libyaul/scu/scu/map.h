@@ -8,7 +8,7 @@
 #ifndef _SCU_MAP_H_
 #define _SCU_MAP_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
 
 /* Write and read directly to specified address */

@@ -1,6 +1,8 @@
 #ifndef __libfixmath_int64_h__
 #define __libfixmath_int64_h__
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {

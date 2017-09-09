@@ -8,9 +8,9 @@
 #ifndef _IP_H_
 #define _IP_H_
 
-#include <inttypes.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

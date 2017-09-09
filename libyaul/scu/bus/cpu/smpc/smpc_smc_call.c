@@ -5,10 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/cdefs.h>
+
 #include <assert.h>
 #include <stdbool.h>
-
-#include <common.h>
 
 #include "smpc-internal.h"
 
@@ -58,6 +58,8 @@ smpc_smc_call(uint8_t cmd, uint8_t cmd_type, uint8_t *cmd_parameters)
 
                 return 0;
         }
+
+        __unreachable();
 }
 
 #undef WAIT

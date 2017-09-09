@@ -8,7 +8,7 @@
 #ifndef _VDP2_CRAM_H_
 #define _VDP2_CRAM_H_
 
-#include <common.h>
+#include <sys/cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {

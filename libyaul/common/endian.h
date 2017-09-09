@@ -5,7 +5,7 @@
 #ifndef _ENDIAN_H_
 #define _ENDIAN_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 static inline uint16_t
 be16dec(const void *buf)

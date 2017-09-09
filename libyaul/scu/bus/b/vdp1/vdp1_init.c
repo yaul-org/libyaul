@@ -7,7 +7,7 @@
 
 #include <assert.h>
 
-#include <common.h>
+#include <sys/cdefs.h>
 
 #include <vdp1.h>
 #include <vdp2.h>
@@ -18,7 +18,7 @@ void
 vdp1_init(void)
 {
         /* Check if boundaries are correct */
-        STATIC_ASSERT((VDP1_CMDT_MEMORY_SIZE +
+        static_assert((VDP1_CMDT_MEMORY_SIZE +
                 VDP1_GST_MEMORY_SIZE +
                 VDP1_TEXURE_MEMORY_SIZE +
                 VDP1_CLUT_MEMORY_SIZE) == VDP1_VRAM_SIZE);

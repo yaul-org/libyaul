@@ -8,9 +8,9 @@
 #ifndef _USB_CARTRIDGE_H_
 #define _USB_CARTRIDGE_H_
 
-#include <common.h>
+#include <sys/cdefs.h>
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus

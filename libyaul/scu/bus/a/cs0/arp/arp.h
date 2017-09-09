@@ -8,11 +8,11 @@
 #ifndef _ARP_H_
 #define _ARP_H_
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

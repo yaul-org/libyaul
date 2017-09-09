@@ -8,9 +8,9 @@
 #ifndef _SMPC_SMC_H_
 #define _SMPC_SMC_H_
 
-#include <inttypes.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

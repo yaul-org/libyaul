@@ -10,8 +10,7 @@
 #define _ROMDISK_H_
 
 #include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +40,7 @@ struct rd_file_handle {
 
 void romdisk_init(void);
 void *romdisk_mount(const char *, const uint8_t *);
-void *romdisk_open(void *, const char *, int);
+void *romdisk_open(void *, const char *);
 void romdisk_close(void *);
 ssize_t romdisk_read(void *, void *, size_t);
 off_t romdisk_seek(void *, off_t, int);
@@ -51,4 +50,5 @@ size_t romdisk_total(void *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* _ROMDISK_H_ */

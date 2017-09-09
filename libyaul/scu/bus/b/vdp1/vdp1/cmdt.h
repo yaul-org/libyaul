@@ -8,9 +8,9 @@
 #ifndef _VDP1_CMDT_H_
 #define _VDP1_CMDT_H_
 
-#include <inttypes.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,12 +32,12 @@ extern "C" {
                 } __aligned(2);                                                \
                                                                                \
                 uint16_t raw;                                                  \
-        } CC_CONCAT(n, _mode)
+        } __CONCAT(n, _mode)
 
 #define VDP1_CMDT_DUMMY_UNION_DECLARE(n)                                       \
         union {                                                                \
                 uint16_t value;                                                \
-        } CC_CONCAT(n, _extra)
+        } __CONCAT(n, _extra)
 
 struct vdp1_cmdt {
         uint16_t cmd_ctrl;

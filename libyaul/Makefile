@@ -34,8 +34,6 @@ START_SRCS:= \
 	common/crt0.S
 
 LIB_SRCS:= \
-	common/abort.c \
-	common/assert.c \
 	common/exception.S \
 	common/exception_handler.c \
 	common/irq-mux.c \
@@ -62,13 +60,32 @@ LIB_SRCS+= \
 	\
 	kernel/mm/slob.c \
 	\
+	lib/ctype/ctype.c \
+	lib/ctype/isalpha.c \
+	lib/ctype/isascii.c \
+	lib/ctype/isblank.c \
+	lib/ctype/iscntrl.c \
+	lib/ctype/isdigit.c \
+	lib/ctype/islower.c \
+	lib/ctype/isprint.c \
+	lib/ctype/isgraph.c \
+	lib/ctype/ispunct.c \
+	lib/ctype/isspace.c \
+	lib/ctype/isupper.c \
+	lib/ctype/isxdigit.c \
 	lib/string/memcpy.c \
 	lib/string/memset.c \
+	lib/string/strchr.c \
+	lib/string/strcmp.c \
 	lib/string/strlen.c \
+	lib/string/strchr.c \
+	lib/string/strncmp.c \
 	lib/stdio/snprintf.c \
+	lib/stdlib/abort.c \
+	lib/stdlib/assert.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
-	lib/stdlib/realloc.c
+	lib/stdlib/realloc.c \
 	\
 	kernel/vfs/fs/iso9660/iso9660.c \
 	\
@@ -235,6 +252,7 @@ INCLUDE_DIRS:= \
 	common \
 	common/gdb \
 	cons \
+	lib/lib \
 	kernel \
 	kernel/lib \
 	kernel/mm \
@@ -265,7 +283,6 @@ HEADER_FILES:= \
 	./math/math.h:. \
 	./math/uint32.h:. \
 	\
-	./common/common.h:. \
 	./common/irq-mux.h:. \
 	./common/stack.h:. \
 	./common/bootstrap/ip.h:../
@@ -274,9 +291,26 @@ HEADER_FILES+= \
 	./common/gdb/gdb.h:.
 
 HEADER_FILES+= \
-	./cons/cons.h:. \
-	\
-	./kernel/lib/memb.h:../../lib \
+	./cons/cons.h:.
+
+HEADER_FILES+= \
+	./lib/lib/_ansi.h:../../.. \
+	./lib/lib/alloca.h:../../.. \
+	./lib/lib/assert.h:../../.. \
+	./lib/lib/ctype.h:../../.. \
+	./lib/lib/errno.h:../../.. \
+	./lib/lib/inttypes.h:../../.. \
+	./lib/lib/stdio.h:../../.. \
+	./lib/lib/stdlib.h:../../.. \
+	./lib/lib/string.h:../../.. \
+	./lib/lib/sys/cdefs.h:../../../../sys \
+	./lib/lib/sys/queue.h:../../../../sys \
+	./lib/lib/sys/types.h:../../../../sys
+
+HEADER_FILES+= \
+	./kernel/lib/memb.h:../../lib
+
+HEADER_FILES+= \
 	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \
 	./kernel/vfs/fs/romdisk/romdisk.h:../../../../fs/romdisk
 
@@ -434,7 +468,7 @@ define macro-install-files
 	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
 	    install_header_file=$${abs_header_dir}/$${header_file}; \
 	    install_header_dir=$${abs_header_dir}; \
-	    printf -- "$(V_BEGIN_BLUE)lib$(TARGET)/$${pair_header_file#$(THIS_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
+	    printf -- "$(V_BEGIN_BLUE)$(TARGET)/$${pair_header_file#$(THIS_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
 	    mkdir -p $${install_header_dir}; \
 	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
 	done

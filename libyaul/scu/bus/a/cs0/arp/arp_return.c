@@ -7,7 +7,7 @@
 
 #include <arp.h>
 
-#include <common.h>
+#include <sys/cdefs.h>
 
 #include "arp-internal.h"
 

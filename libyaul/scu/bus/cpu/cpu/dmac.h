@@ -8,7 +8,7 @@
 #ifndef _CPU_DMAC_H_
 #define _CPU_DMAC_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
 
 #ifdef __cplusplus

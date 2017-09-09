@@ -8,7 +8,7 @@
 #ifndef _CPU_INTC_H_
 #define _CPU_INTC_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -8,7 +8,7 @@
 #ifndef _EXCEPTION_H_
 #define _EXCEPTION_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #include <cpu/registers.h>
 

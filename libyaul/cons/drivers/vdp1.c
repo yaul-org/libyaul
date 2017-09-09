@@ -5,11 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include <string.h>
-
 #include "../drivers.h"
 
 static void cons_vdp1_write(struct cons *);

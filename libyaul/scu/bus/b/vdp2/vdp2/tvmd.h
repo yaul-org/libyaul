@@ -9,7 +9,7 @@
 #define _VDP2_TVMD_H_
 
 #include <stdbool.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #include <irq-mux.h>
 #include <scu/map.h>

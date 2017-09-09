@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 typedef struct {
         uint8_t bitpos;

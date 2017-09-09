@@ -8,7 +8,7 @@
 #ifndef _SCU_IC_H_
 #define _SCU_IC_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

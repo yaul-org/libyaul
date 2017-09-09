@@ -5,9 +5,9 @@
 #ifndef _ISO9660_INTERNAL_H_
 #define _ISO9660_INTERNAL_H_
 
-#include <inttypes.h>
+#include <sys/types.h>
 
-#include <common.h>
+#include <stdint.h>
 
 #define ISODCL(from, to)        ((to) - (from) + 1)
 

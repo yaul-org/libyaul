@@ -6,15 +6,18 @@
  * Theo Berkau <cwx@cyberwarriorx.com>
  */
 
-#include <lib/memb.h>
+#include <sys/cdefs.h>
 #include <sys/queue.h>
 
+#include <assert.h>
 #include <string.h>
-#include <inttypes.h>
+#include <stdint.h>
+
+#include <lib/memb.h>
 
 #include "slob.h"
 
-STATIC_ASSERT(SLOB_PAGE_SIZE >= SLOB_PAGE_BREAK_2ND);
+static_assert(SLOB_PAGE_SIZE >= SLOB_PAGE_BREAK_2ND);
 
 #define SLOB_BLOCK_UNIT         (sizeof(struct slob_block))
 #define SLOB_BLOCK_UNITS(s)     (((s) + SLOB_BLOCK_UNIT - 1) / SLOB_BLOCK_UNIT)

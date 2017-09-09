@@ -6,15 +6,15 @@
  * Joe Fenton <jlfenton65@gmail.com>
  */
 
-#include <stdlib.h>
-#include <inttypes.h>
-#include <stdio.h>
+#include <sys/cdefs.h>
+
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <cpu/intc.h>
 #include <sys/init.h>
-
-#include <common.h>
 
 #include "exception.h"
 

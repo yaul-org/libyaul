@@ -8,7 +8,7 @@
 #ifndef _SCU_INTERNAL_H_
 #define _SCU_INTERNAL_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
 
 #include <scu/map.h>

@@ -8,7 +8,7 @@
 #ifndef _VDP1_VRAM_H_
 #define _VDP1_VRAM_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus

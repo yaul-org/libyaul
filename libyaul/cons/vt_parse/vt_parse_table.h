@@ -5,7 +5,7 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifndef _VT_PARSE_TABLE_H_
 #define _VT_PARSE_TABLE_H_

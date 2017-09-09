@@ -8,7 +8,7 @@
 
 #include <usb-cartridge.h>
 
-#include <common.h>
+#include <sys/cdefs.h>
 
 #include <stdbool.h>
 

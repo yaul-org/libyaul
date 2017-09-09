@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 #include <vdp1/cmdt.h>
 #include <vdp1/vram.h>
@@ -171,7 +172,7 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *sprite)
                 break;
         case CMDT_TYPE_SCALED_SPRITE:
                 zp = sprite->cs_zoom_point.enable
-                    ? common_log2_down(sprite->cs_zoom_point.raw & ~0x0010)
+                    ? dlog2(sprite->cs_zoom_point.raw & ~0x0010)
                     : 0x0000;
 
                 cmdt->cmd_ctrl = (zp << 8) | 0x0001;

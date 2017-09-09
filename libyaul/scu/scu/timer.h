@@ -8,7 +8,7 @@
 #ifndef _SCU_TIMER_H_
 #define _SCU_TIMER_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus

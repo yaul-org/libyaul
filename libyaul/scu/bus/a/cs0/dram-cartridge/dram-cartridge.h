@@ -8,7 +8,7 @@
 #ifndef _DRAM_CARTRIDGE_H__
 #define _DRAM_CARTRIDGE_H__
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 

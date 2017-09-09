@@ -16,6 +16,8 @@
 #endif /* __GNUC__ */
 #endif /* !FIXMATH_FUNC_ATTRS */
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
 typedef int32_t fix16_t;
@@ -262,14 +264,6 @@ extern void fix16_to_str(fix16_t, char *, int);
  * value is too large or there were garbage characters.
  */
 extern fix16_t fix16_from_str(const char *);
-
-#ifndef __aligned
-#define __aligned(x)    __attribute__ ((aligned(x)))
-#endif /* !__aligned */
-
-#ifndef __packed
-#define __packed        __attribute__ ((packed))
-#endif /* !__packed */
 
 typedef union {
         struct {

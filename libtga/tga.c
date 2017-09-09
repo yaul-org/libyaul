@@ -9,7 +9,6 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "tga.h"
 

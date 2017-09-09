@@ -5,12 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/cdefs.h>
+
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-
-#include <common.h>
 
 #include <vdp1.h>
 #include <vdp2.h>

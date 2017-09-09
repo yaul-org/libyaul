@@ -8,9 +8,9 @@
 #ifndef _CPU_REGISTERS_H_
 #define _CPU_REGISTERS_H_
 
-#include <inttypes.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdint.h>
 
 struct cpu_registers {
         uint32_t sp;

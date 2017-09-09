@@ -31,24 +31,24 @@
 #ifndef _MEMB_H_
 #define _MEMB_H_
 
-#include <inttypes.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdint.h>
 
 /*
  * Statically declare a block pool.
  */
 #define MEMB(name, structure, num, align)                                      \
-static enum memb_ref_type CC_CONCAT(name, _memb_refcnt)[(num)] __unused;       \
+static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
 static __aligned(((align) == 0) ? 2 : (align))                                 \
-        structure CC_CONCAT(name, _memb_mem)[(num)] __unused;                  \
+        structure __CONCAT(name, _memb_mem)[(num)] __unused;                   \
 static struct memb name __unused = {                                           \
         sizeof(structure),                                                     \
         num,                                                                   \
-        &CC_CONCAT(name, _memb_refcnt)[0],                                     \
+        &__CONCAT(name, _memb_refcnt)[0],                                      \
         0,                                                                     \
         0,                                                                     \
-        (void *)&CC_CONCAT(name, _memb_mem)[0]                                 \
+        (void *)&__CONCAT(name, _memb_mem)[0]                                  \
 }
 
 /*

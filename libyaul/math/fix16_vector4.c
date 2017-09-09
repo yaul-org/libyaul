@@ -6,7 +6,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <stdio.h>
 #include <string.h>
 
 #include "fix16.h"

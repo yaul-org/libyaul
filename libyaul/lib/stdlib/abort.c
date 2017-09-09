@@ -5,9 +5,9 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <stdbool.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stdbool.h>
 
 #include <cpu/intc.h>
 

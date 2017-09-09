@@ -6,9 +6,8 @@
  */
 
 #include <assert.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <bus/cpu/cpu.h>

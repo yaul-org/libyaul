@@ -42,7 +42,6 @@
 #include <scu/bus/b/scsp/scsp.h>
 
 /* Kernel */
-#include <common/common.h>
 #include <common/irq-mux.h>
 #include <common/stack.h>
 #include <common/ip.h>

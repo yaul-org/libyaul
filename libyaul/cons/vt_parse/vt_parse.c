@@ -5,9 +5,8 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <string.h>
 
 #include "vt_parse.h"
 

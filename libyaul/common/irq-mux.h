@@ -8,7 +8,7 @@
 #ifndef _IRQ_MUX_H_
 #define _IRQ_MUX_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #include <sys/queue.h>
 

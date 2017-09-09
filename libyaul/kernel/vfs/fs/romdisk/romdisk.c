@@ -6,9 +6,10 @@
  * Lawrence Sebald
  */
 
-#include <stdlib.h>
+#include <sys/types.h>
 
-#include <common.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include "romdisk.h"
 
@@ -93,7 +94,7 @@ romdisk_mount(const char *mnt_point __unused,
 }
 
 void *
-romdisk_open(void *p, const char *fn, int mode __unused)
+romdisk_open(void *p, const char *fn)
 {
         rd_image_t *mnt;
         rd_file_handle_t *fh;
@@ -105,7 +106,7 @@ romdisk_open(void *p, const char *fn, int mode __unused)
         mnt = (rd_image_t *)p;
         directory = false;
         if ((f_idx = romdisk_find(mnt, fn, directory)) == 0) {
-                errno = ENOENT;
+                /* errno = ENOENT; */
                 return NULL;
         }
 
@@ -142,12 +143,12 @@ romdisk_read(void *p, void *buf, size_t bytes)
         if ((fh == NULL) || (fh->index == 0)) {
                 /* Not a valid file descriptor or is not open for
                  * reading */
-                errno = EBADF;
+                /* errno = EBADF; */
                 return -1;
         }
 
         if (fh->dir) {
-                errno = EISDIR;
+                /* errno = EISDIR; */
                 return -1;
         }
 
@@ -173,12 +174,12 @@ romdisk_seek(void *p, off_t offset, int whence)
         if ((fh == NULL) || (fh->index == 0)) {
                 /* Not a valid file descriptor or is not open for
                  * reading */
-                errno = EBADF;
+                /* errno = EBADF; */
                 return -1;
         }
 
         if (fh->dir) {
-                errno = EISDIR;
+                /* errno = EISDIR; */
                 return -1;
         }
 
@@ -196,7 +197,7 @@ romdisk_seek(void *p, off_t offset, int whence)
         default:
                 /* The whence argument to fseek() was not 'SEEK_SET',
                  * 'SEEK_END', or 'SEEK_CUR' */
-                errno = EINVAL;
+                /* errno = EINVAL; */
                 return -1;
         }
 
@@ -220,12 +221,12 @@ romdisk_tell(void *p)
         if ((fh == NULL) || (fh->index == 0)) {
                 /* Not a valid file descriptor or is not open for
                  * reading */
-                errno = EBADF;
+                /* errno = EBADF; */
                 return -1;
         }
 
         if (fh->dir) {
-                errno = EISDIR;
+                /* errno = EISDIR; */
                 return -1;
         }
 
@@ -243,12 +244,12 @@ romdisk_total(void *p)
         if ((fh == NULL) || (fh->index == 0)) {
                 /* Not a valid file descriptor or is not open for
                  * reading */
-                errno = EBADF;
+                /* errno = EBADF; */
                 return -1;
         }
 
         if (fh->dir) {
-                errno = EISDIR;
+                /* errno = EISDIR; */
                 return -1;
         }
 

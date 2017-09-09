@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <math.h>
+
 #include <scu/dma.h>
 
 #include <scu-internal.h>
@@ -58,7 +60,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
                 return;
         }
 
-        add = 0x00000100 | (common_log2_down(cfg->add) & 0x7);
+        add = 0x00000100 | (dlog2(cfg->add) & 0x7);
 
         switch (lvl) {
         case DMA_LEVEL_0:

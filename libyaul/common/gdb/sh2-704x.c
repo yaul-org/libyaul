@@ -6,9 +6,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/cdefs.h>
+#include <sys/queue.h>
+
 #include <assert.h>
 #include <stddef.h>
-#include <sys/queue.h>
 #include <stdlib.h>
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
@@ -23,8 +25,6 @@
 #include <cpu/registers.h>
 
 #include <smpc/smc.h>
-
-#include <common.h>
 
 #include "gdb.h"
 #include "ihr.h"

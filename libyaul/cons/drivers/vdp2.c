@@ -5,10 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <ctype.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <vdp2.h>

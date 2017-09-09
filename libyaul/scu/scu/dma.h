@@ -8,13 +8,12 @@
 #ifndef _SCU_DMA_H_
 #define _SCU_DMA_H_
 
-#include <assert.h>
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <sys/cdefs.h>
 
-#include <common.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {

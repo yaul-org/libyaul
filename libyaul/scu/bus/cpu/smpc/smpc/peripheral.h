@@ -8,13 +8,12 @@
 #ifndef _SMPC_PERIPHERAL_H_
 #define _SMPC_PERIPHERAL_H_
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stddef.h>
-
 #include <sys/queue.h>
+#include <sys/cdefs.h>
 
-#include <common.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

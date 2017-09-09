@@ -5,13 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/cdefs.h>
+
 #include <assert.h>
-#include <ctype.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-
-#include <common.h>
 
 #include "cons.h"
 #include "drivers.h"
