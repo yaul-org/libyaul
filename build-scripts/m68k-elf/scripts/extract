@@ -1,4 +1,9 @@
-#!/bin/sh
+# -*- mode: shell-script -*-
+
+# Copyright (c) 2012-2016
+# See LICENSE for details.
+#
+# Israel Jacquez <mrkotfw@gmail.com>
 
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}"

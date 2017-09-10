@@ -1,4 +1,4 @@
-#!/bin/sh
+# -*- mode: shell-script -*-
 
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}"

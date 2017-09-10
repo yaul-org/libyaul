@@ -1,4 +1,4 @@
-#!/bin/sh
+# -*- mode: shell-script -*-
 
 # Strip debug info from libraries
 find "${BUILD_INSTALL_DIR}/${SH_TARGET}/${SH_TARGET}" \
