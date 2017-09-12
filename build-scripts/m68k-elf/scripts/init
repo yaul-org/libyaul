@@ -5,4 +5,8 @@
 #
 # Israel Jacquez <mrkotfw@gmail.com>
 
-> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log"
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
+> "${BUILD_SRC_DIR}/binutils-${target}.log"

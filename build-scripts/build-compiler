@@ -186,6 +186,7 @@ done
 unset var
 
 for var in \
+    "BUILD_TARGETS" \
     "GNU_URL" \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
@@ -216,9 +217,11 @@ for program in \
 done
 unset program
 
-SH_TARGET="sh-elf"
-M68K_TARGET="m68k-elf"
-TARGETS=("${SH_TARGET}" "${M68K_TARGET}")
+TARGETS=(`printf -- "${BUILD_TARGETS}" | sed -E 's/[[:space:]]+/ /g'`)
+
+if [ ${#TARGETS[@]} -eq 0 ]; then
+    panic "Invalid build target(s)" 1
+fi
 
 # Add installed devkit to the path, adjusting path on minsys
 for target in ${TARGETS[@]}; do
@@ -375,7 +378,7 @@ if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
 fi
 cd - 1> /dev/null
 
-message "Building targets ${TARGETS[@]}"
+message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
 
 for target in ${TARGETS[@]}; do
     if [ -f "${BUILD_SRC_DIR}/${target}/build-complete" ]; then

@@ -1,3 +1,7 @@
 # -*- mode: shell-script -*-
 
-touch "${BUILD_SRC_DIR}/${SH_TARGET}/build-complete"
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
+touch "${BUILD_SRC_DIR}/${target}/build-complete"

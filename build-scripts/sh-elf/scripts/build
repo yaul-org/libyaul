@@ -6,14 +6,18 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
 # Build and install Binutils
-mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/binutils"
-cd "${BUILD_SRC_DIR}/${SH_TARGET}/binutils"
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-binutils" ]; then
+mkdir -p "${BUILD_SRC_DIR}/${target}/binutils"
+cd "${BUILD_SRC_DIR}/${target}/binutils"
+if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
-        --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
-        --target="${SH_TARGET}" \
+        --prefix="${BUILD_INSTALL_DIR}/${target}" \
+        --target="${target}" \
         --disable-werror \
         --disable-debug \
         --disable-shared \
@@ -21,34 +25,34 @@ if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-binutils" ]; then
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/configured-binutils"
+        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/configured-binutils"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-binutils" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/built-binutils" ]; then
     message "Building Binutils"
-    "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-binutils"
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/built-binutils"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-binutils" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-binutils" ]; then
     message "Installing Binutils"
-    "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-binutils"
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/installed-binutils"
 fi
 cd "${OLDPWD}"
 
 
 # Build and install just the C compiler
-mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/gcc"
-cd "${BUILD_SRC_DIR}/${SH_TARGET}/gcc"
+mkdir -p "${BUILD_SRC_DIR}/${target}/gcc"
+cd "${BUILD_SRC_DIR}/${target}/gcc"
 gcc_configure_options=(
-        --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
-        --target="${SH_TARGET}" \
-        --program-prefix="${SH_TARGET}-" \
+        --prefix="${BUILD_INSTALL_DIR}/${target}" \
+        --target="${target}" \
+        --program-prefix="${target}-" \
         --with-endian=big \
         --with-cpu=m2 \
         --disable-cld \
@@ -93,78 +97,78 @@ if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
         --with-mpfr="${BUILD_SUPPORT_LIBS}" \
         --with-mpc="${BUILD_SUPPORT_LIBS}")
 fi
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
     LDFLAGS="" \
     CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer -ffreestanding" \
     LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
-        ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gcc"
+        ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/configured-gcc"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-gcc" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/built-gcc" ]; then
     message "Building GCC (all-gcc)"
-    "${MAKE}" -j ${BUILD_MAKE_JOBS} all-gcc 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-gcc"
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} all-gcc 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/built-gcc"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gcc" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-gcc" ]; then
     message "Installing GCC (install-gcc)"
-    "${MAKE}" -j ${BUILD_MAKE_JOBS} install-gcc 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gcc"
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} install-gcc 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/installed-gcc"
 fi
 unset "CFLAGS"
 cd "${OLDPWD}"
 
 
 # Build and install the final compiler
-cd "${BUILD_SRC_DIR}/${SH_TARGET}/gcc"
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-g++" ]; then
+cd "${BUILD_SRC_DIR}/${target}/gcc"
+if [ ! -f "${BUILD_SRC_DIR}/${target}/built-g++" ]; then
     message "Building GCC"
-    "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-g++"
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/built-g++"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-g++" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-g++" ]; then
     message "Installing GCC"
-    ("${MAKE}" -j ${BUILD_MAKE_JOBS} install) 1>> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-g++"
+    ("${MAKE}" -j ${BUILD_MAKE_JOBS} install) 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/installed-g++"
 fi
 cd "${OLDPWD}"
 
 
 # Build and install GDB
 if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
-    mkdir -p "${BUILD_SRC_DIR}/${SH_TARGET}/gdb"
-    cd "${BUILD_SRC_DIR}/${SH_TARGET}/gdb"
-    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gdb" ]; then
+    mkdir -p "${BUILD_SRC_DIR}/${target}/gdb"
+    cd "${BUILD_SRC_DIR}/${target}/gdb"
+    if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-gdb" ]; then
         message "Configuring GDB"
         CFLAGS="" LDFLAGS="" ../"${GDB_SRC_DIR}"/configure \
             --disable-werror \
-            --prefix="${BUILD_INSTALL_DIR}/${SH_TARGET}" \
-            --target="${SH_TARGET}" 1>> "${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log" 2>&1 \
-            || panic "See '${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log'" 1
-        touch "${BUILD_SRC_DIR}/${SH_TARGET}/configured-gdb"
+            --prefix="${BUILD_INSTALL_DIR}/${target}" \
+            --target="${target}" 1>> "${BUILD_SRC_DIR}/gdb-${target}.log" 2>&1 \
+            || panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1
+        touch "${BUILD_SRC_DIR}/${target}/configured-gdb"
     fi
 
-    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/built-gdb" ]; then
+    if [ ! -f "${BUILD_SRC_DIR}/${target}/built-gdb" ]; then
         message "Building GDB"
-        "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log" 2>&1 || \
-            panic "See '${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log'" 1
-        touch "${BUILD_SRC_DIR}/${SH_TARGET}/built-gdb"
+        "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gdb-${target}.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1
+        touch "${BUILD_SRC_DIR}/${target}/built-gdb"
     fi
 
-    if [ ! -f "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gdb" ]; then
+    if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-gdb" ]; then
         message "Installing GDB"
-        "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log" 2>&1 || \
-            panic "See '${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log'" 1
-        touch "${BUILD_SRC_DIR}/${SH_TARGET}/installed-gdb"
+        "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/gdb-${target}.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1
+        touch "${BUILD_SRC_DIR}/${target}/installed-gdb"
     fi
     cd "${OLDPWD}"
 fi

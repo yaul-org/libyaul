@@ -7,14 +7,18 @@
 # Israel Jacquez <mrkotfw@gmail.com>
 # Joe Fenton <jlfenton65@gmail.com>
 
+[[ "${BASH_SOURCE[0]}" != "${0}" ]]  || exit 1
+
+is_var_set "target"
+
 # Build and install Binutils
-mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
-cd "${BUILD_SRC_DIR}/${M68K_TARGET}/binutils"
-if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils" ]; then
+mkdir -p "${BUILD_SRC_DIR}/${target}/binutils"
+cd "${BUILD_SRC_DIR}/${target}/binutils"
+if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="-Wno-error=unused-value -Wno-error=shift-negative-value" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
-        --prefix="${BUILD_INSTALL_DIR}/${M68K_TARGET}" \
-        --target="${M68K_TARGET}" \
+        --prefix="${BUILD_INSTALL_DIR}/${target}" \
+        --target="${target}" \
         --disable-error \
         --disable-debug \
         --disable-nls \
@@ -23,22 +27,22 @@ if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils" ]; then
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 \
-        || panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/configured-binutils"
+        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
+        || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/configured-binutils"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/built-binutils" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/built-binutils" ]; then
     message "Building Binutils"
-    "${MAKE}" 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/built-binutils"
+    "${MAKE}" 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/built-binutils"
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils" ]; then
+if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-binutils" ]; then
     message "Installing Binutils"
-    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log" 2>&1 || \
-        panic "See '${BUILD_SRC_DIR}/binutils-${M68K_TARGET}.log'" 1
-    touch "${BUILD_SRC_DIR}/${M68K_TARGET}/installed-binutils"
+    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+        panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
+    touch "${BUILD_SRC_DIR}/${target}/installed-binutils"
 fi
 cd "${OLDPWD}"

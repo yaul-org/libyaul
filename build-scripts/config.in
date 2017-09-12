@@ -9,6 +9,9 @@
 # Build paths
 # Only ABSOLUTE paths are to be used!
 
+# Build targets. Do not modify, unless you know what you're doing
+BUILD_TARGETS="sh-elf m68k-elf"
+
 # Do not modify, unless you know what you're doing
 GNU_URL="ftp://ftp.gnu.org/gnu"
 

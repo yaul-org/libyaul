@@ -5,9 +5,13 @@
 #
 # Israel Jacquez <mrkotfw@gmail.com>
 
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
 # Extract source packages
-mkdir -p "${BUILD_SRC_DIR}/${M68K_TARGET}"
-cd "${BUILD_SRC_DIR}/${M68K_TARGET}"
+mkdir -p "${BUILD_SRC_DIR}/${target}"
+cd "${BUILD_SRC_DIR}/${target}"
 if [ ! -f "extracted-binutils" ]; then
     message "Extracting '${BINUTILS}'"
     rm -r -f binutils

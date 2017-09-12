@@ -1,7 +1,10 @@
 # -*- mode: shell-script -*-
 
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
 # Strip debug info from libraries
-find "${BUILD_INSTALL_DIR}/${SH_TARGET}/${SH_TARGET}" \
-    -name "*.a" -exec "${SH_TARGET}"-strip -d {} \;
-find "${BUILD_INSTALL_DIR}/${SH_TARGET}/lib/gcc/${SH_TARGET}" \
-    -name "*.a" -exec "${SH_TARGET}"-strip -d {} \;
+find "${BUILD_INSTALL_DIR}/${target}/${target}" \
+     "${BUILD_INSTALL_DIR}/${target}/lib/gcc/${target}" \
+    -name "*.a" -exec "${target}"-strip -d {} \;

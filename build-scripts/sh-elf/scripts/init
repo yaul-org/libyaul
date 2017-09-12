@@ -5,6 +5,10 @@
 #
 # Israel Jacquez <mrkotfw@gmail.com>
 
-> "${BUILD_SRC_DIR}/binutils-${SH_TARGET}.log"
-> "${BUILD_SRC_DIR}/gcc-${SH_TARGET}.log"
-> "${BUILD_SRC_DIR}/gdb-${SH_TARGET}.log"
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+is_var_set "target"
+
+> "${BUILD_SRC_DIR}/binutils-${target}.log"
+> "${BUILD_SRC_DIR}/gcc-${target}.log"
+> "${BUILD_SRC_DIR}/gdb-${target}.log"
