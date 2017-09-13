@@ -70,4 +70,4 @@ OPTION_DOWNLOAD_TARBALLS="yes"
 # 'yes': Download and build GDB for the sh-elf target
 #        Be aware dependencies not covered
 #  'no': Do not build
-OPTION_ENABLE_GDB="yes"
+OPTION_BUILD_GDB="yes"

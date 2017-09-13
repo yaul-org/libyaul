@@ -27,7 +27,7 @@ if [ ! -f "extracted-gcc" ]; then
     touch "extracted-gcc"
 fi
 
-if [ "${OPTION_ENABLE_GDB}" = "yes" ]; then
+if [ "${OPTION_BUILD_GDB}" = "yes" ]; then
     if [ ! -f "extracted-gdb" ]; then
         message "Extracting '${GDB}'"
         if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then

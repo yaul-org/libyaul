@@ -207,7 +207,7 @@ trap 'exit_code=${?}; clean_up; exit ${exit_code}' 1 9 15
 
 for var in \
     "OPTION_DOWNLOAD_TARBALLS" \
-    "OPTION_ENABLE_GDB"; do
+    "OPTION_BUILD_GDB"; do
     is_var_set "${var}"
     check_boolean "${var}"
 done
@@ -325,7 +325,7 @@ else
             fi
         fi
 
-        if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+        if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
             if [ ! -f "${GDB}" ]; then
                 message "Downloading \`${GDB}'"
                 if ! fetch "${GDB_URL}" 1>> "gdb.log" 2>&1; then
@@ -369,7 +369,7 @@ if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
         panic "\`${GCC_SIG}' not found" 1
     fi
 
-    if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+    if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         if [ ! -f "${GDB}" ]; then
             panic "\`${GDB}' not found" 1
         fi
@@ -391,7 +391,7 @@ if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
         panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
     fi
 
-    if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+    if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         message "Checking integrity of \`${GDB}'"
         if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
             panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1

@@ -153,7 +153,7 @@ cd "${OLDPWD}"
 
 
 # Build and install GDB
-if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
+if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
     mkdir -p "${BUILD_SRC_DIR}/${target}/gdb"
     cd "${BUILD_SRC_DIR}/${target}/gdb"
     if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-gdb" ]; then
