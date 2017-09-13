@@ -9,11 +9,19 @@
 # Build paths
 # Only ABSOLUTE paths are to be used!
 
-# Build targets. Do not modify, unless you know what you're doing
-BUILD_TARGETS="sh-elf m68k-elf"
-
 # Do not modify, unless you know what you're doing
 GNU_URL="ftp://ftp.gnu.org/gnu"
+
+# Build host, where the toolchain will be executed. Leave blank if
+# unsure
+# BUILD_HOST="x86-w32-mingw32"
+# BUILD_HOST="x86_64-w64-mingw32"
+# BUILD_HOST="x86-unknown-cygwin"
+# BUILD_HOST="x86_64-unknown-cygwin"
+BUILD_HOST=""
+
+# Build targets. Do not modify, unless you know what you're doing
+BUILD_TARGETS="sh-elf m68k-elf"
 
 # Path to tool-chain installation directory
 BUILD_INSTALL_DIR="${HOME}/tool-chains"

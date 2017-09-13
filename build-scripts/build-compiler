@@ -175,6 +175,34 @@ function apply_patch() {
     fi
 }
 
+# Function build_target:
+#
+function build_target() {
+    if [ -f "${target}/scripts/init" ]; then
+        source "${target}/scripts/init"
+    fi
+
+    if [ -f "${target}/scripts/extract" ]; then
+        source "${target}/scripts/extract"
+    fi
+
+    if [ -f "${target}/scripts/patch" ]; then
+        source "${target}/scripts/patch"
+    fi
+
+    if [ -f "${target}/scripts/build" ]; then
+        source "${target}/scripts/build"
+    fi
+
+    if [ -f "${target}/scripts/strip" ]; then
+        source "${target}/scripts/strip"
+    fi
+
+    if [ -f "${target}/scripts/finish" ]; then
+        source "${target}/scripts/finish"
+    fi
+}
+
 trap 'exit_code=${?}; clean_up; exit ${exit_code}' 1 9 15
 
 for var in \
@@ -186,6 +214,7 @@ done
 unset var
 
 for var in \
+    "BUILD_HOST" \
     "BUILD_TARGETS" \
     "GNU_URL" \
     "BUILD_INSTALL_DIR" \
@@ -222,11 +251,6 @@ TARGETS=(`printf -- "${BUILD_TARGETS}" | sed -E 's/[[:space:]]+/ /g'`)
 if [ ${#TARGETS[@]} -eq 0 ]; then
     panic "Invalid build target(s)" 1
 fi
-
-# Add installed devkit to the path, adjusting path on minsys
-for target in ${TARGETS[@]}; do
-    export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
-done
 
 GCC="gcc-${GCC_VERSION}.tar.bz2"
 GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
@@ -385,26 +409,29 @@ for target in ${TARGETS[@]}; do
         continue
     fi
 
-    message "Building ${target} target..."
+    if ! [ -z "${BUILD_HOST}" ]; then
+        # In order to build a Canadian Cross build-x-host-x-target,
+        # you need to first build the build-x-host cross-compiler and
+        # the build-x-target cross-compiler.
 
-    # Begin building
-    if [ -f "${target}/scripts/init" ]; then
-        source "${target}/scripts/init"
+        export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
+
+        # We need to check if we're done building
+        if true; then
+            message "Building build-x-target (${target})"
+
+            (BUILD_HOST=""
+             BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
+
+             build_target
+             clean_up) || exit ${?}
+        fi
+    else
+        export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
     fi
-    if [ -f "${target}/scripts/extract" ]; then
-        source "${target}/scripts/extract"
-    fi
-    if [ -f "${target}/scripts/patch" ]; then
-        source "${target}/scripts/patch"
-    fi
-    if [ -f "${target}/scripts/build" ]; then
-        source "${target}/scripts/build"
-    fi
-    if [ -f "${target}/scripts/strip" ]; then
-        source "${target}/scripts/strip"
-    fi
-    if [ -f "${target}/scripts/finish" ]; then
-        source "${target}/scripts/finish"
-    fi
+
+    message "Building build-x-host-x-target (${target})"
+
+    build_target
 done
 }

@@ -13,9 +13,7 @@ is_var_set "target"
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/${target}/binutils"
 cd "${BUILD_SRC_DIR}/${target}/binutils"
-if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-binutils" ]; then
-    message "Configuring Binutils"
-    CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+binutils_configure_options=(
         --prefix="${BUILD_INSTALL_DIR}/${target}" \
         --target="${target}" \
         --disable-werror \
@@ -25,7 +23,14 @@ if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-binutils" ]; then
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
+        --with-stabs)
+if ! [ -z "${BUILD_HOST}" ]; then
+    binutils_configure_options+=(--host="${BUILD_HOST}")
+fi
+if [ ! -f "${BUILD_SRC_DIR}/${target}/configured-binutils" ]; then
+    message "Configuring Binutils"
+    CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+        ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     touch "${BUILD_SRC_DIR}/${target}/configured-binutils"
 fi
@@ -43,6 +48,7 @@ if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-binutils" ]; then
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     touch "${BUILD_SRC_DIR}/${target}/installed-binutils"
 fi
+touch "${BUILD_SRC_DIR}/${target}/completed-binutils"
 cd "${OLDPWD}"
 
 
@@ -91,6 +97,9 @@ gcc_configure_options=(
         --without-headers \
         --without-newlib
         MAKEINFO=missing)
+if ! [ -z "${BUILD_HOST}" ]; then
+    gcc_configure_options+=(--host="${BUILD_HOST}")
+fi
 if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
     gcc_configure_options+=(
         --with-gmp="${BUILD_SUPPORT_LIBS}" \
@@ -124,7 +133,6 @@ fi
 unset "CFLAGS"
 cd "${OLDPWD}"
 
-
 # Build and install the final compiler
 cd "${BUILD_SRC_DIR}/${target}/gcc"
 if [ ! -f "${BUILD_SRC_DIR}/${target}/built-g++" ]; then
@@ -140,6 +148,7 @@ if [ ! -f "${BUILD_SRC_DIR}/${target}/installed-g++" ]; then
         panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
     touch "${BUILD_SRC_DIR}/${target}/installed-g++"
 fi
+touch "${BUILD_SRC_DIR}/${target}/completed-gcc"
 cd "${OLDPWD}"
 
 
@@ -170,5 +179,6 @@ if [[ "${OPTION_ENABLE_GDB}" == "yes" ]]; then
             panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1
         touch "${BUILD_SRC_DIR}/${target}/installed-gdb"
     fi
+    touch "${BUILD_SRC_DIR}/${target}/completed-gdb"
     cd "${OLDPWD}"
 fi
