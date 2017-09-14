@@ -31,7 +31,7 @@ function panic() {
     exit ${_exit_code}
 }
 
-source="${BASH_source[0]}"
+source="${BASH_SOURCE[0]}"
 while [ -h "${source}" ]; do # Resolve ${source} until the file is no longer a symlink
     ROOT="$(cd -P "$(dirname "${source}")" && pwd)"
     source="$(readlink "${source}")"
@@ -46,32 +46,49 @@ if [[ "${ROOT}" != "`pwd`" ]]; then
     panic "You must be in \`${ROOT}' in order to invoke ${PROGNAME}"
 fi
 
+# Function is_program_exists
+#   ${1} => Program name
+function is_program_exists() {
+    local _program_name="${1}"
+
+    command -v "${_program_name}" >/dev/null 2>&1
+}
+
 # Look for automated configuration file
-if [ -f "${CONFIG_PATH}" ]; then
-    error_line=$(/usr/bin/env python << EOF
-from re import match
-
-line_no = 0
-with open("${CONFIG_PATH}", "r") as f:
-    for line in f.readlines():
-        line_no += 1
-        # Ignore comments and empty lines
-        if match(r"^\s*#.*$|^\s*$", line.strip()):
-            continue
-        if not match(r"^[A-Z_][A-Z_0-9]+=(?:\"[^\"]*\"|[0-9]+)$", line.strip()):
-            print line_no,
-            raise SystemExit
-EOF
-)
-    if [ ${?} -ne 0 ]; then
-        panic "Syntax error in configuration file \`${CONFIG_FILENAME}' on line ${error_line}" 1
-    fi
-    unset error_line
-
-    source "${CONFIG_PATH}" > /dev/null 2>&1
-else
+if ! [ -f "${CONFIG_PATH}" ]; then
     panic "Configuration file \`${CONFIG_FILENAME}' not found; see \`${CONFIG_IN_FILENAME}'" 1
 fi
+
+if ! is_program_exists "awk" && ! is_program_exists "gawk"; then
+    panic "Programs awk or gawk do not exist in \${PATH}" 1
+fi
+
+error_line=`cat "${CONFIG_PATH}" | awk '
+BEGIN {
+    line = 0;
+}
+
+{
+    line++;
+}
+
+# Ignore comments and empty lines
+/^(\s*#.*|\s*)$/ {
+    next;
+}
+
+# Match valid assignments
+! /^\s*[A-Z_][0-9A-Z_]+=(\"[^\"]*\"|[0-9]+)\s*$/ {
+    print line;
+    exit 1
+}'`
+
+if [ ${?} -ne 0 ]; then
+    panic "Syntax error in configuration file \`${CONFIG_FILENAME}' on line ${error_line}" 1
+fi
+unset error_line
+
+source "${CONFIG_PATH}" > /dev/null 2>&1
 
 # Function is_var_set:
 #   ${1} => Variable
@@ -94,7 +111,7 @@ function check_boolean() {
 function program_exists() {
     local _program_name="${1}"
 
-    if ! command -v "${_program_name}" >/dev/null 2>&1; then
+    if ! is_program_exists "${_program_name}"; then
         panic "Program \"${_program_name}\" does not exist in \${PATH}" 1
     fi
 }
