@@ -6,9 +6,6 @@
 # Dave Murphy <davem@devkitpro.org>
 # Israel Jacquez <mrkotfw@gmail.com>
 
-# Build paths
-# Only ABSOLUTE paths are to be used!
-
 # Do not modify, unless you know what you're doing
 GNU_URL="ftp://ftp.gnu.org/gnu"
 
@@ -23,11 +20,11 @@ BUILD_HOST=""
 # Build targets. Do not modify, unless you know what you're doing
 BUILD_TARGETS="sh-elf m68k-elf"
 
-# Path to tool-chain installation directory
+# Absolute path to tool-chain installation directory
 BUILD_INSTALL_DIR="${HOME}/tool-chains"
 
-# Path to previously downloaded source packages as well as the
-# location for temporary files
+# Absolute path to previously downloaded source packages as well as
+# the location for temporary files
 BUILD_SRC_DIR="/tmp"
 
 # Specifies the number of jobs (commands) to run simultaneously. If
@@ -45,8 +42,8 @@ BINUTILS_VERSION="2.24"
 GCC_VERSION="4.7.4"
 GDB_VERSION="7.7"
 
-# Tools for host
-# The variables below might need to change depending on your OS
+# Tools for host. The variables below might need to change depending
+# on your OS. Do not specify the path, just the name
 AWK="awk"
 FETCH="wget"
 # Currently, there is a bug in wget(1), -4 is needed. Remove if
