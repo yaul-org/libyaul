@@ -9,4 +9,4 @@
 
 is_var_set "target"
 
-create_stamp "${target}-build-complete"
+create_stamp "${target}-completed-build"

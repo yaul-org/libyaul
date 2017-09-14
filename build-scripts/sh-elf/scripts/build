@@ -27,7 +27,7 @@ binutils_configure_options=(
 if ! [ -z "${BUILD_HOST}" ]; then
     binutils_configure_options+=(--host="${BUILD_HOST}")
 fi
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
         ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
@@ -35,14 +35,14 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
     create_stamp "${target}-configured-binutils"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-built-binutils" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-built-binutils" ]; then
     message "Building Binutils"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-built-binutils"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-installed-binutils" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-installed-binutils" ]; then
     message "Installing Binutils"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
@@ -106,7 +106,7 @@ if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
         --with-mpfr="${BUILD_SUPPORT_LIBS}" \
         --with-mpc="${BUILD_SUPPORT_LIBS}")
 fi
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
     LDFLAGS="" \
@@ -117,14 +117,14 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     create_stamp "${target}-configured-gcc"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-built-gcc" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-built-gcc" ]; then
     message "Building GCC (all-gcc)"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} all-gcc 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
     create_stamp "${target}-built-gcc"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-installed-gcc" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-installed-gcc" ]; then
     message "Installing GCC (install-gcc)"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} install-gcc 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
@@ -135,14 +135,14 @@ cd "${OLDPWD}"
 
 # Build and install the final compiler
 cd "${BUILD_SRC_DIR}/${target}/gcc"
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-built-g++" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-built-g++" ]; then
     message "Building GCC"
     "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
     create_stamp "${target}-built-g++"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-installed-g++" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-installed-g++" ]; then
     message "Installing GCC"
     ("${MAKE}" -j ${BUILD_MAKE_JOBS} install) 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/gcc-${target}.log'" 1
@@ -156,7 +156,7 @@ cd "${OLDPWD}"
 if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
     mkdir -p "${BUILD_SRC_DIR}/${target}/gdb"
     cd "${BUILD_SRC_DIR}/${target}/gdb"
-    if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-gdb" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gdb" ]; then
         message "Configuring GDB"
         CFLAGS="" LDFLAGS="" ../"${GDB_SRC_DIR}"/configure \
             --disable-werror \
@@ -166,14 +166,14 @@ if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         create_stamp "${target}-configured-gdb"
     fi
 
-    if [ ! -f "${BUILD_STAMPS_DIR}/${target}-built-gdb" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/${target}-built-gdb" ]; then
         message "Building GDB"
         "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/gdb-${target}.log" 2>&1 || \
             panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1
         create_stamp "${target}-built-gdb"
     fi
 
-    if [ ! -f "${BUILD_STAMPS_DIR}/${target}-installed-gdb" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/${target}-installed-gdb" ]; then
         message "Installing GDB"
         "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/gdb-${target}.log" 2>&1 || \
             panic "See '${BUILD_SRC_DIR}/gdb-${target}.log'" 1

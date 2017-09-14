@@ -1,0 +1,43 @@
+# -*- mode: shell-script -*-
+
+# Copyright (c) 2012-2016
+# See LICENSE for details.
+#
+# Israel Jacquez <mrkotfw@gmail.com>
+
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
+
+# Build and install Make
+if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+    mkdir -p "${BUILD_SRC_DIR}/make/make"
+    cd "${BUILD_SRC_DIR}/make/make"
+    make_configure_options=(
+        --prefix="${BUILD_INSTALL_DIR}" \
+        --disable-werror)
+    if ! [ -z "${BUILD_HOST}" ]; then
+        make_configure_options+=(--host="${BUILD_HOST}")
+    fi
+    if ! [ -f "${BUILD_STAMPS_DIR}/configured-make" ]; then
+        message "Configuring Make"
+        CFLAGS="" LDFLAGS="" ../"${MAKE_SRC_DIR}"/configure \
+            ${make_configure_options[@]} 1>> "${BUILD_SRC_DIR}/make.log" 2>&1 \
+            || panic "See '${BUILD_SRC_DIR}/make.log'" 1
+        create_stamp "configured-make"
+    fi
+
+    if ! [ -f "${BUILD_STAMPS_DIR}/built-make" ]; then
+        message "Building Make"
+        "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/make.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/make.log'" 1
+        create_stamp "built-make"
+    fi
+
+    if ! [ -f "${BUILD_STAMPS_DIR}/installed-make" ]; then
+        message "Installing Make"
+        "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/make.log" 2>&1 || \
+            panic "See '${BUILD_SRC_DIR}/make.log'" 1
+        create_stamp "installed-make"
+    fi
+    create_stamp "completed-make"
+    cd "${OLDPWD}"
+fi

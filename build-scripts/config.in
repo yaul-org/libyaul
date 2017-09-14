@@ -41,6 +41,7 @@ BUILD_SUPPORT_LIBS=""
 BINUTILS_VERSION="2.24"
 GCC_VERSION="4.7.4"
 GDB_VERSION="7.7"
+MAKE_VERSION="4.2.1"
 
 # Tools for host. The variables below might need to change depending
 # on your OS. Do not specify the path, just the name
@@ -68,3 +69,8 @@ OPTION_DOWNLOAD_TARBALLS="yes"
 #        Be aware dependencies not covered
 #  'no': Do not build
 OPTION_BUILD_GDB="yes"
+
+# 'yes': Download and build GNU Make
+#        Be aware dependencies not covered
+#  'no': Do not build
+OPTION_BUILD_MAKE="yes"

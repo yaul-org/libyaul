@@ -174,7 +174,7 @@ function apply_patch() {
 
     local _patch_filename="${_type}-${_patch}"
 
-    if [ ! -f "${BUILD_STAMPS_DIR}/${_target}-applied-patches-${_type}" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/${_target}-applied-patches-${_type}" ]; then
         message "Applying patch '${_patch_filename}'"
 
         # Determine if we can patch
@@ -202,28 +202,30 @@ function create_stamp() {
 # Function build_target:
 #
 function build_target() {
-    if [ -f "${target}/scripts/init" ]; then
-        source "${target}/scripts/init"
+    local _path="${1}"
+
+    if [ -f "${_path}/scripts/init" ]; then
+        source "${_path}/scripts/init"
     fi
 
-    if [ -f "${target}/scripts/extract" ]; then
-        source "${target}/scripts/extract"
+    if [ -f "${_path}/scripts/extract" ]; then
+        source "${_path}/scripts/extract"
     fi
 
-    if [ -f "${target}/scripts/patch" ]; then
-        source "${target}/scripts/patch"
+    if [ -f "${_path}/scripts/patch" ]; then
+        source "${_path}/scripts/patch"
     fi
 
-    if [ -f "${target}/scripts/build" ]; then
-        source "${target}/scripts/build"
+    if [ -f "${_path}/scripts/build" ]; then
+        source "${_path}/scripts/build"
     fi
 
-    if [ -f "${target}/scripts/strip" ]; then
-        source "${target}/scripts/strip"
+    if [ -f "${_path}/scripts/strip" ]; then
+        source "${_path}/scripts/strip"
     fi
 
-    if [ -f "${target}/scripts/finish" ]; then
-        source "${target}/scripts/finish"
+    if [ -f "${_path}/scripts/finish" ]; then
+        source "${_path}/scripts/finish"
     fi
 }
 
@@ -231,7 +233,8 @@ trap 'exit_code=${?}; clean_up; exit ${exit_code}' 1 9 15
 
 for var in \
     "OPTION_DOWNLOAD_TARBALLS" \
-    "OPTION_BUILD_GDB"; do
+    "OPTION_BUILD_GDB" \
+    "OPTION_BUILD_MAKE"; do
     is_var_set "${var}"
     check_boolean "${var}"
 done
@@ -248,6 +251,7 @@ for var in \
     "BUILD_SUPPORT_LIBS" \
     "GCC_VERSION" \
     "GDB_VERSION" \
+    "MAKE_VERSION" \
     "MAKE" \
     "AWK" \
     "GPG" \
@@ -278,23 +282,29 @@ if [ ${#TARGETS[@]} -eq 0 ]; then
     panic "Invalid build target(s)" 1
 fi
 
-GCC="gcc-${GCC_VERSION}.tar.bz2"
-GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC}"
-GCC_SIG="${GCC}.sig"
+GCC_TARBALL="gcc-${GCC_VERSION}.tar.bz2"
+GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_TARBALL}"
+GCC_SIG="${GCC_TARBALL}.sig"
 GCC_SIG_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_SIG}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
-BINUTILS="binutils-${BINUTILS_VERSION}.tar.bz2"
-BINUTILS_URL="${GNU_URL}/binutils/${BINUTILS}"
-BINUTILS_SIG="${BINUTILS}.sig"
+BINUTILS_TARBALL="binutils-${BINUTILS_VERSION}.tar.bz2"
+BINUTILS_URL="${GNU_URL}/binutils/${BINUTILS_TARBALL}"
+BINUTILS_SIG="${BINUTILS_TARBALL}.sig"
 BINUTILS_SIG_URL="${GNU_URL}/binutils/${BINUTILS_SIG}"
 BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
 
-GDB="gdb-${GDB_VERSION}.tar.bz2"
-GDB_URL="${GNU_URL}/gdb/${GDB}"
-GDB_SIG="${GDB}.sig"
+GDB_TARBALL="gdb-${GDB_VERSION}.tar.bz2"
+GDB_URL="${GNU_URL}/gdb/${GDB_TARBALL}"
+GDB_SIG="${GDB_TARBALL}.sig"
 GDB_SIG_URL="${GNU_URL}/gdb/${GDB_SIG}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
+
+MAKE_TARBALL="make-${MAKE_VERSION}.tar.bz2"
+MAKE_URL="${GNU_URL}/make/${MAKE_TARBALL}"
+MAKE_SIG="${MAKE_TARBALL}.sig"
+MAKE_SIG_URL="${GNU_URL}/make/${MAKE_SIG}"
+MAKE_SRC_DIR="make-${MAKE_VERSION}"
 
 GNU_KEYRING="gnu-keyring.gpg"
 GNU_KEYRING_URL="${GNU_URL}/${GNU_KEYRING}"
@@ -318,61 +328,79 @@ mkdir -p "${BUILD_STAMPS_DIR}" 1> /dev/null 2>&1 || \
 cd "${BUILD_SRC_DIR}/" 2> /dev/null
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
-    printf -- "\n\t1. ${GNU_KEYRING}"
-    printf -- "\n\t2. ${BINUTILS}"
-    printf -- "\n\t3. ${BINUTILS_SIG}"
-    printf -- "\n\t4. ${GCC}"
-    printf -- "\n\t5. ${GCC_SIG}"
-    printf -- "\n\t8. ${GDB}"
-    printf -- "\n\t9. ${GDB_SIG}"
-    printf -- "\n"
-    printf -- "\n"
+    printf -- "  ${GNU_KEYRING}\n"
+    printf -- "  ${BINUTILS_TARBALL}\n"
+    printf -- "  ${BINUTILS_SIG}\n"
+    printf -- "  ${GCC_TARBALL}\n"
+    printf -- "  ${GCC_SIG}\n"
+    if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
+        printf -- "  ${GDB_TARBALL}\n"
+        printf -- "  ${GDB_SIG}\n"
+    fi
+    if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+        printf -- "  ${MAKE_TARBALL}\n"
+        printf -- "  ${MAKE_SIG}\n"
+    fi
 else
-    if [ ! -f "${BUILD_STAMPS_DIR}/downloaded-tarballs" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/downloaded-tarballs" ]; then
         message "Downloading files..."
 
-        if [ ! -f "${BINUTILS}" ]; then
-            message "Downloading \`${BINUTILS}'"
-            if ! fetch "${BINUTILS_URL}" 1>> "binutils.log" 2>&1; then
-                panic "Failed to download ${BINUTILS} from ${BINUTILS_URL} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+        if ! [ -f "${BINUTILS_TARBALL}" ]; then
+            message "Downloading \`${BINUTILS_TARBALL}'"
+            if ! fetch "${BINUTILS_URL}" 1>> "binutils-download.log" 2>&1; then
+                panic "Failed to download ${BINUTILS_TARBALL} from ${BINUTILS_URL} (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
             fi
         fi
-        if [ ! -f "${BINUTILS_SIG}" ]; then
-            if ! fetch "${BINUTILS_SIG_URL}" 1>> "binutils.log" 2>&1; then
-                panic "Failed to download ${BINUTILS_SIG} (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+        if ! [ -f "${BINUTILS_SIG}" ]; then
+            if ! fetch "${BINUTILS_SIG_URL}" 1>> "binutils-download.log" 2>&1; then
+                panic "Failed to download ${BINUTILS_SIG} (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
             fi
         fi
 
-        if [ ! -f "${GCC}" ]; then
-            message "Downloading \`${GCC}'"
-            if ! fetch "${GCC_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GCC} from ${GCC_URL} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+        if ! [ -f "${GCC_TARBALL}" ]; then
+            message "Downloading \`${GCC_TARBALL}'"
+            if ! fetch "${GCC_URL}"  1>> "gcc-download.log" 2>&1; then
+                panic "Failed to download ${GCC_TARBALL} from ${GCC_URL} (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
-        if [ ! -f "${GCC_SIG}" ]; then
-            if ! fetch "${GCC_SIG_URL}" 1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GCC_SIG} from ${GCC_SIG_URL}) (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+        if ! [ -f "${GCC_SIG}" ]; then
+            if ! fetch "${GCC_SIG_URL}" 1>> "gcc-download.log" 2>&1; then
+                panic "Failed to download ${GCC_SIG} from ${GCC_SIG_URL}) (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
 
         if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
-            if [ ! -f "${GDB}" ]; then
-                message "Downloading \`${GDB}'"
-                if ! fetch "${GDB_URL}" 1>> "gdb.log" 2>&1; then
-                    panic "Failed to download ${GDB} from ${GDB_URL} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+            if ! [ -f "${GDB_TARBALL}" ]; then
+                message "Downloading \`${GDB_TARBALL}'"
+                if ! fetch "${GDB_URL}" 1>> "gdb-download.log" 2>&1; then
+                    panic "Failed to download ${GDB_TARBALL} from ${GDB_URL} (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
                 fi
             fi
-            if [ ! -f "${GDB_SIG}" ]; then
-                if ! fetch "${GDB_SIG_URL}" 1>> "gdb.log" 2>&1; then
-                    panic "Failed to download ${GDB_SIG} from ${GDB_SIG_URL} (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+            if ! [ -f "${GDB_SIG}" ]; then
+                if ! fetch "${GDB_SIG_URL}" 1>> "gdb-download.log" 2>&1; then
+                    panic "Failed to download ${GDB_SIG} from ${GDB_SIG_URL} (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
                 fi
             fi
         fi
 
-        if [ ! -f "${GNU_KEYRING}" ]; then
+        if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+            if ! [ -f "${MAKE_TARBALL}" ]; then
+                message "Downloading \`${MAKE_TARBALL}'"
+                if ! fetch "${MAKE_URL}" 1>> "make.log" 2>&1; then
+                    panic "Failed to download ${MAKE_TARBALL} from ${MAKE_URL} (see \`${BUILD_SRC_DIR}/make.log')" 1
+                fi
+            fi
+            if ! [ -f "${MAKE_SIG}" ]; then
+                if ! fetch "${MAKE_SIG_URL}" 1>> "make.log" 2>&1; then
+                    panic "Failed to download ${MAKE_SIG} from ${MAKE_SIG_URL} (see \`${BUILD_SRC_DIR}/make.log')" 1
+                fi
+            fi
+        fi
+
+        if ! [ -f "${GNU_KEYRING}" ]; then
             message "Downloading \`${GNU_KEYRING}'"
-            if ! fetch "${GNU_KEYRING_URL}"  1>> "gcc.log" 2>&1; then
-                panic "Failed to download ${GNU_KEYRING} from ${GNU_KEYRING_URL} (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+            if ! fetch "${GNU_KEYRING_URL}"  1>> "gcc-download.log" 2>&1; then
+                panic "Failed to download ${GNU_KEYRING} from ${GNU_KEYRING_URL} (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
 
@@ -380,30 +408,30 @@ else
     fi
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
-    if [ ! -f "${GNU_KEYRING}" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
+    if ! [ -f "${GNU_KEYRING}" ]; then
         panic "\`${GNU_KEYRING}' not found"
     fi
 
-    if [ ! -f "${BINUTILS}" ]; then
-        panic "\`${BINUTILS}' not found" 1
+    if ! [ -f "${BINUTILS_TARBALL}" ]; then
+        panic "\`${BINUTILS_TARBALL}' not found" 1
     fi
-    if [ ! -f "${BINUTILS_SIG}" ]; then
+    if ! [ -f "${BINUTILS_SIG}" ]; then
         panic "\`${BINUTILS_SIG}' not found" 1
     fi
 
-    if [ ! -f "${GCC}" ]; then
-        panic "\`${GCC}' not found" 1
+    if ! [ -f "${GCC_TARBALL}" ]; then
+        panic "\`${GCC_TARBALL}' not found" 1
     fi
-    if [ ! -f "${GCC_SIG}" ]; then
+    if ! [ -f "${GCC_SIG}" ]; then
         panic "\`${GCC_SIG}' not found" 1
     fi
 
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
-        if [ ! -f "${GDB}" ]; then
-            panic "\`${GDB}' not found" 1
+        if ! [ -f "${GDB_TARBALL}" ]; then
+            panic "\`${GDB_TARBALL}' not found" 1
         fi
-        if [ ! -f "${GDB_SIG}" ]; then
+        if ! [ -f "${GDB_SIG}" ]; then
             panic "\`${GDB_SIG}' not found" 1
         fi
     fi
@@ -411,20 +439,27 @@ if [ ! -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
     message "Checking integrity..."
 
     # Check integrity
-    message "Checking integrity of \`${BINUTILS}'"
-    if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils.log" 2>&1; then
-        panic "Integrity check for ${BINUTILS} failed (see \`${BUILD_SRC_DIR}/binutils.log')" 1
+    message "Checking integrity of \`${BINUTILS_TARBALL}'"
+    if ! checksum_gpg "${BINUTILS_SIG}" 1>> "binutils-download.log" 2>&1; then
+        panic "Integrity check for ${BINUTILS_TARBALL} failed (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
     fi
 
-    message "Checking integrity of \`${GCC}'"
-    if ! checksum_gpg "${GCC_SIG}" 1>> "gcc.log" 2>&1; then
-        panic "Integrity check for ${GCC} failed (see \`${BUILD_SRC_DIR}/gcc.log')" 1
+    message "Checking integrity of \`${GCC_TARBALL}'"
+    if ! checksum_gpg "${GCC_SIG}" 1>> "gcc-download.log" 2>&1; then
+        panic "Integrity check for ${GCC_TARBALL} failed (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
     fi
 
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
-        message "Checking integrity of \`${GDB}'"
-        if ! checksum_gpg "${GDB_SIG}" 1>> "gdb.log" 2>&1; then
-            panic "Integrity check for ${GDB} failed (see \`${BUILD_SRC_DIR}/gdb.log')" 1
+        message "Checking integrity of \`${GDB_TARBALL}'"
+        if ! checksum_gpg "${GDB_SIG}" 1>> "gdb-download.log" 2>&1; then
+            panic "Integrity check for ${GDB_TARBALL} failed (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
+        fi
+    fi
+
+    if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+        message "Checking integrity of \`${MAKE_TARBALL}'"
+        if ! checksum_gpg "${MAKE_SIG}" 1>> "make-download.log" 2>&1; then
+            panic "Integrity check for ${MAKE_TARBALL} failed (see \`${BUILD_SRC_DIR}/make-download.log')" 1
         fi
     fi
 
@@ -435,36 +470,40 @@ cd - 1> /dev/null
 message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
 
 for target in ${TARGETS[@]}; do
-    if [ -f "${BUILD_STAMPS_DIR}/${target}-build-complete" ]; then
-        continue
-    fi
+   if [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build" ]; then
+       continue
+   fi
 
-    if ! [ -z "${BUILD_HOST}" ]; then
-        # In order to build a Canadian Cross build-x-host-x-target,
-        # you need to first build the build-x-host cross-compiler and
-        # the build-x-target cross-compiler.
+   if ! [ -z "${BUILD_HOST}" ]; then
+       # In order to build a Canadian Cross build-x-host-x-target,
+       # you need to first build the build-x-host cross-compiler and
+       # the build-x-target cross-compiler.
 
-        export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
+       # Use the path to the build-x-target build for the entire build process
+       export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
 
-        # We need to check if we're done building
-        if ! [ -f "${BUILD_STAMPS_DIR}/${target}-build-x-target-complete" ]; then
-            message "Building build-x-target (${target})"
+       if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build-x-target" ]; then
+           message "Building build-x-target (${target})"
 
-            (BUILD_HOST=""
-             BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
+           (BUILD_HOST=""
+            BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
 
-             build_target
-             clean_up
+            build_target "${target}"
+            clean_up
 
-             create_stamp "${target}-build-x-target-complete") || exit ${?}
-        fi
-    else
-        export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
-    fi
+            create_stamp "${target}-completed-build-x-target") || exit ${?}
+       fi
+   else
+       export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
+   fi
 
-    message "Building build-x-host-x-target (${target})"
+   message "Building build-x-host-x-target (${target})"
 
-    build_target
-    clean_up
+   build_target "${target}"
+   clean_up
 done
+
+if ! [ -f "${BUILD_STAMPS_DIR}/make-completed-build" ]; then
+    build_target "make"
+fi
 }

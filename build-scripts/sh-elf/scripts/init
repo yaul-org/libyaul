@@ -9,16 +9,16 @@
 
 is_var_set "target"
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-completed-binutils" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-binutils" ]; then
     > "${BUILD_SRC_DIR}/binutils-${target}.log"
 fi
 
-if [ ! -f "${BUILD_STAMPS_DIR}/${target}-completed-gcc" ]; then
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-gcc" ]; then
     > "${BUILD_SRC_DIR}/gcc-${target}.log"
 fi
 
 if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
-    if [ ! -f "${BUILD_STAMPS_DIR}/${target}-completed-gdb" ]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-gdb" ]; then
         > "${BUILD_SRC_DIR}/gdb-${target}.log"
     fi
 fi

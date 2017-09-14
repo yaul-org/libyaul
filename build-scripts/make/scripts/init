@@ -7,8 +7,8 @@
 
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
 
-is_var_set "target"
-
-if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-binutils" ]; then
-    > "${BUILD_SRC_DIR}/binutils-${target}.log"
+if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+    if ! [ -f "${BUILD_STAMPS_DIR}/completed-make" ]; then
+        > "${BUILD_SRC_DIR}/make.log"
+    fi
 fi
