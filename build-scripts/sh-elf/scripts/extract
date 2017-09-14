@@ -7,33 +7,33 @@ is_var_set "target"
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${target}"
 cd "${BUILD_SRC_DIR}/${target}"
-if [ ! -f "extracted-binutils" ]; then
+if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-binutils" ]; then
     message "Extracting '${BINUTILS}'"
     rm -r -f binutils
     rm -r -f binutils-${BINUTILS_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
         panic "Extracting ${BINUTILS}" 1
     fi
-    touch "extracted-binutils"
+    touch "${BUILD_STAMPS_DIR}/${target}-extracted-binutils"
 fi
 
-if [ ! -f "extracted-gcc" ]; then
+if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-gcc" ]; then
     message "Extracting '${GCC}'"
     rm -r -f gcc
     rm -r -f gcc-${GCC_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
         panic "Extracting ${GCC}" 1
     fi
-    touch "extracted-gcc"
+    touch "${BUILD_STAMPS_DIR}/${target}-extracted-gcc"
 fi
 
 if [ "${OPTION_BUILD_GDB}" = "yes" ]; then
-    if [ ! -f "extracted-gdb" ]; then
+    if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-gdb" ]; then
         message "Extracting '${GDB}'"
         if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then
             panic "Extracting ${GCC_GDB}" 1
         fi
-        touch "extracted-gdb"
+        touch "${BUILD_STAMPS_DIR}/${target}-extracted-gdb"
     fi
 fi
 cd "${OLDPWD}"

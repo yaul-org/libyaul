@@ -9,4 +9,6 @@
 
 is_var_set "target"
 
-> "${BUILD_SRC_DIR}/binutils-${target}.log"
+if [ ! -f "${BUILD_STAMPS_DIR}/${target}-completed-binutils" ]; then
+    > "${BUILD_SRC_DIR}/binutils-${target}.log"
+fi

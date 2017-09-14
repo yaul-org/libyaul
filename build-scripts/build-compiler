@@ -141,10 +141,9 @@ function clean_up() {
     message "Cleaning up '${BUILD_SRC_DIR}'"
 
     for target in ${TARGETS[@]}; do
+        rm -r -f "${BUILD_STAMPS_DIR}/${target}-*"
         rm -r -f "${BUILD_SRC_DIR}/${target}"
     done
-
-    exit 0
 }
 
 # Function apply_patch:
@@ -158,7 +157,7 @@ function apply_patch() {
 
     local _patch_filename="${_type}-${_patch}"
 
-    if [ ! -f "${BUILD_SRC_DIR}/${_target}/applied-patches-${_type}" ]; then
+    if [ ! -f "${BUILD_STAMPS_DIR}/${_target}-applied-patches-${_type}" ]; then
         message "Applying patch '${_patch_filename}'"
 
         # Determine if we can patch
@@ -171,7 +170,7 @@ function apply_patch() {
         patch -d "${BUILD_SRC_DIR}/${_target}" -p 0 < \
               "${_target}/patches/${_patch_filename}" 1> /dev/null 2>&1
 
-        touch "${BUILD_SRC_DIR}/${_target}/applied-patches-${_type}"
+        touch "${BUILD_STAMPS_DIR}/${_target}-applied-patches-${_type}"
     fi
 }
 
@@ -248,6 +247,8 @@ unset program
 
 TARGETS=(`printf -- "${BUILD_TARGETS}" | sed -E 's/[[:space:]]+/ /g'`)
 
+BUILD_STAMPS_DIR="${BUILD_SRC_DIR}/stamps"
+
 if [ ${#TARGETS[@]} -eq 0 ]; then
     panic "Invalid build target(s)" 1
 fi
@@ -285,6 +286,10 @@ if ! [ -d "${BUILD_SRC_DIR}" ]; then
     panic "Path \`${BUILD_SRC_DIR}/' is non-existent" 1
 fi
 
+# Create stamps directory
+mkdir -p "${BUILD_STAMPS_DIR}" 1> /dev/null 2>&1 || \
+    panic "Couldn't create ${BUILD_STAMPS_DIR}" 1
+
 cd "${BUILD_SRC_DIR}/" 2> /dev/null
 if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     message "Be sure to have the following files in ${BUILD_SRC_DIR}:"
@@ -298,7 +303,7 @@ if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     printf -- "\n"
     printf -- "\n"
 else
-    if [ ! -f "${BUILD_SRC_DIR}/downloaded-tarballs" ]; then
+    if [ ! -f "${BUILD_STAMPS_DIR}/downloaded-tarballs" ]; then
         message "Downloading files..."
 
         if [ ! -f "${BINUTILS}" ]; then
@@ -346,11 +351,11 @@ else
             fi
         fi
 
-        touch "downloaded-tarballs"
+        touch "${BUILD_STAMPS_DIR}/downloaded-tarballs"
     fi
 fi
 
-if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
+if [ ! -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
     if [ ! -f "${GNU_KEYRING}" ]; then
         panic "\`${GNU_KEYRING}' not found"
     fi
@@ -398,14 +403,14 @@ if [ ! -f "${BUILD_SRC_DIR}/checked-integrity" ]; then
         fi
     fi
 
-    touch "checked-integrity"
+    touch "${BUILD_STAMPS_DIR}/checked-integrity"
 fi
 cd - 1> /dev/null
 
 message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
 
 for target in ${TARGETS[@]}; do
-    if [ -f "${BUILD_SRC_DIR}/${target}/build-complete" ]; then
+    if [ -f "${BUILD_STAMPS_DIR}/${target}-build-complete" ]; then
         continue
     fi
 
@@ -417,14 +422,16 @@ for target in ${TARGETS[@]}; do
         export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
 
         # We need to check if we're done building
-        if true; then
+        if ! [ -f "${BUILD_STAMPS_DIR}/${target}-build-x-target-complete" ]; then
             message "Building build-x-target (${target})"
 
             (BUILD_HOST=""
              BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
 
              build_target
-             clean_up) || exit ${?}
+             clean_up
+
+             touch "${BUILD_STAMPS_DIR}/${target}-build-x-target-complete") || exit ${?}
         fi
     else
         export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
@@ -433,5 +440,6 @@ for target in ${TARGETS[@]}; do
     message "Building build-x-host-x-target (${target})"
 
     build_target
+    clean_up
 done
 }

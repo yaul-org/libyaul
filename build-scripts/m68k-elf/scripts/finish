@@ -9,4 +9,4 @@
 
 is_var_set "target"
 
-touch "${BUILD_SRC_DIR}/${target}/build-complete"
+touch "${BUILD_STAMPS_DIR}/${target}-build-complete"

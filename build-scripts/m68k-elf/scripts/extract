@@ -12,13 +12,13 @@ is_var_set "target"
 # Extract source packages
 mkdir -p "${BUILD_SRC_DIR}/${target}"
 cd "${BUILD_SRC_DIR}/${target}"
-if [ ! -f "extracted-binutils" ]; then
+if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-binutils" ]; then
     message "Extracting '${BINUTILS}'"
     rm -r -f binutils
     rm -r -f binutils-${BINUTILS_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
         panic "Extracting ${BINUTILS}" 1
     fi
-    touch "extracted-binutils"
+    touch "${BUILD_STAMPS_DIR}/${target}-extracted-binutils"
 fi
 cd "${OLDPWD}"
