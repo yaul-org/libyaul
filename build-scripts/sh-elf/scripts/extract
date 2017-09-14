@@ -14,7 +14,7 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-binutils" ]; then
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
         panic "Extracting ${BINUTILS}" 1
     fi
-    touch "${BUILD_STAMPS_DIR}/${target}-extracted-binutils"
+    create_stamp "${target}-extracted-binutils"
 fi
 
 if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-gcc" ]; then
@@ -24,7 +24,7 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-gcc" ]; then
     if ! tar -xjf "${BUILD_SRC_DIR}/${GCC}" > /dev/null 2>&1; then
         panic "Extracting ${GCC}" 1
     fi
-    touch "${BUILD_STAMPS_DIR}/${target}-extracted-gcc"
+    create_stamp "${target}-extracted-gcc"
 fi
 
 if [ "${OPTION_BUILD_GDB}" = "yes" ]; then
@@ -33,7 +33,7 @@ if [ "${OPTION_BUILD_GDB}" = "yes" ]; then
         if ! tar -xjf "${BUILD_SRC_DIR}/${GDB}" > /dev/null 2>&1; then
             panic "Extracting ${GCC_GDB}" 1
         fi
-        touch "${BUILD_STAMPS_DIR}/${target}-extracted-gdb"
+        create_stamp "${target}-extracted-gdb"
     fi
 fi
 cd "${OLDPWD}"

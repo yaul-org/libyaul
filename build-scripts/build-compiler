@@ -187,8 +187,16 @@ function apply_patch() {
         patch -d "${BUILD_SRC_DIR}/${_target}" -p 0 < \
               "${_target}/patches/${_patch_filename}" 1> /dev/null 2>&1
 
-        touch "${BUILD_STAMPS_DIR}/${_target}-applied-patches-${_type}"
+        create_stamp "${_target}-applied-patches-${_type}"
     fi
+}
+
+# Function create_stamp:
+#   ${1} => Name
+function create_stamp() {
+    local _name="${1}"
+
+    touch "${BUILD_STAMPS_DIR}/${_name}"
 }
 
 # Function build_target:
@@ -368,7 +376,7 @@ else
             fi
         fi
 
-        touch "${BUILD_STAMPS_DIR}/downloaded-tarballs"
+        create_stamp "downloaded-tarballs"
     fi
 fi
 
@@ -420,7 +428,7 @@ if [ ! -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
         fi
     fi
 
-    touch "${BUILD_STAMPS_DIR}/checked-integrity"
+    create_stamp "checked-integrity"
 fi
 cd - 1> /dev/null
 
@@ -448,7 +456,7 @@ for target in ${TARGETS[@]}; do
              build_target
              clean_up
 
-             touch "${BUILD_STAMPS_DIR}/${target}-build-x-target-complete") || exit ${?}
+             create_stamp "${target}-build-x-target-complete") || exit ${?}
         fi
     else
         export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"

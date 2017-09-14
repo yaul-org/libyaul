@@ -4,4 +4,4 @@
 
 is_var_set "target"
 
-touch "${BUILD_STAMPS_DIR}/${target}-build-complete"
+create_stamp "${target}-build-complete"

@@ -29,21 +29,21 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
         --with-gnu-ld \
         --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
-    touch "${BUILD_STAMPS_DIR}/${target}-configured-binutils"
+    create_stamp "${target}-configured-binutils"
 fi
 
 if [ ! -f "${BUILD_STAMPS_DIR}/${target}-built-binutils" ]; then
     message "Building Binutils"
     "${MAKE}" 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
-    touch "${BUILD_STAMPS_DIR}/${target}-built-binutils"
+    create_stamp "${target}-built-binutils"
 fi
 
 if [ ! -f "${BUILD_STAMPS_DIR}/${target}-installed-binutils" ]; then
     message "Installing Binutils"
     "${MAKE}" install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
-    touch "${BUILD_STAMPS_DIR}/${target}-installed-binutils"
+    create_stamp "${target}-installed-binutils"
 fi
-touch "${BUILD_STAMPS_DIR}/${target}-completed-binutils"
+create_stamp "${target}-completed-binutils"
 cd "${OLDPWD}"

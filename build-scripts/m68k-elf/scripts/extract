@@ -19,6 +19,6 @@ if [ ! -f "${BUILD_STAMPS_DIR}/${target}-extracted-binutils" ]; then
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS}" > /dev/null 2>&1; then
         panic "Extracting ${BINUTILS}" 1
     fi
-    touch "${BUILD_STAMPS_DIR}/${target}-extracted-binutils"
+    create_stamp "${target}-extracted-binutils"
 fi
 cd "${OLDPWD}"
