@@ -42,7 +42,6 @@
 #include <scu/bus/b/scsp/scsp.h>
 
 /* Kernel */
-#include <common/irq-mux.h>
 #include <common/stack.h>
 #include <common/ip.h>
 
@@ -53,6 +52,8 @@
 #include <math.h>
 
 #include <lib/memb.h>
+
+#include <sys/irq-mux.h>
 
 #include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>

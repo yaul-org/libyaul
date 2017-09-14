@@ -36,7 +36,6 @@ START_SRCS:= \
 LIB_SRCS:= \
 	common/exception.S \
 	common/exception_handler.c \
-	common/irq-mux.c \
 	common/stack.c
 
 ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
@@ -54,7 +53,8 @@ LIB_SRCS+= \
 	cons/vt_parse/vt_parse.c \
 	cons/vt_parse/vt_parse_table.c \
 	\
-	kernel/init.c \
+	kernel/sys/init.c \
+	kernel/sys/irq-mux.c \
 	\
 	kernel/lib/memb.c \
 	\
@@ -283,7 +283,6 @@ HEADER_FILES:= \
 	./math/math.h:. \
 	./math/uint32.h:. \
 	\
-	./common/irq-mux.h:. \
 	./common/stack.h:. \
 	./common/bootstrap/ip.h:../
 
@@ -309,6 +308,9 @@ HEADER_FILES+= \
 
 HEADER_FILES+= \
 	./kernel/lib/memb.h:../../lib
+
+HEADER_FILES+= \
+	./kernel/sys/irq-mux.h:../../sys
 
 HEADER_FILES+= \
 	./kernel/vfs/fs/iso9660/iso9660.h:../../../../fs/iso9660 \

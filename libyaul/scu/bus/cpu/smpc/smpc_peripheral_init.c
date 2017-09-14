@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include <cpu.h>
-#include <irq-mux.h>
+#include <sys/irq-mux.h>
 #include <scu/ic.h>
 #include <smpc/peripheral.h>
 #include <smpc/rtc.h>

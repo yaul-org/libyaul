@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <irq-mux.h>
+#include <sys/irq-mux.h>
 
 irq_mux_t *
 vdp2_tvmd_hblank_in_irq_get(void)

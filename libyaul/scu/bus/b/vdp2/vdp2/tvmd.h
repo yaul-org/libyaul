@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <irq-mux.h>
+#include <sys/irq-mux.h>
 #include <scu/map.h>
 #include <vdp2/map.h>
 

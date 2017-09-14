@@ -14,7 +14,7 @@
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
-#include <irq-mux.h>
+#include <sys/irq-mux.h>
 
 #ifdef __cplusplus
 extern "C" {
