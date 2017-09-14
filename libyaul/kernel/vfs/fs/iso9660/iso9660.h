@@ -8,11 +8,11 @@
 #ifndef _ISO9660_H_
 #define _ISO9660_H_
 
+#include <sys/types.h>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <errno.h>
 
 #ifdef __cplusplus

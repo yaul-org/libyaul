@@ -5,6 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "iso9660-internal.h"
 
 #include "iso9660.h"

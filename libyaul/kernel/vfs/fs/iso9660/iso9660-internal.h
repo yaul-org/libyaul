@@ -151,14 +151,32 @@ struct iso_extended_attributes {
 };
 
 static __inline uint16_t
-le16dec(const void *pp) {
+be16dec(const void *buf)
+{
+        const uint8_t *p = (const uint8_t *)buf;
+
+        return (uint16_t)((p[0] << 8) | p[1]);
+}
+
+static __inline uint32_t
+be32dec(const void *buf)
+{
+        const uint8_t *p = (const uint8_t *)buf;
+
+        return ((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
+}
+
+static __inline uint16_t
+le16dec(const void *pp)
+{
         unsigned char const *p = (unsigned char const *)pp;
 
         return ((p[1] << 8) | p[0]);
 }
 
 static __inline uint32_t
-le32dec(const void *pp) {
+le32dec(const void *pp)
+{
         unsigned char const *p = (unsigned char const *)pp;
 
         return ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]);
