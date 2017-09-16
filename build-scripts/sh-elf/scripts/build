@@ -100,12 +100,6 @@ gcc_configure_options=(
 if ! [ -z "${BUILD_HOST}" ]; then
     gcc_configure_options+=(--host="${BUILD_HOST}")
 fi
-if ! [ -z "${BUILD_SUPPORT_LIBS}" ]; then
-    gcc_configure_options+=(
-        --with-gmp="${BUILD_SUPPORT_LIBS}" \
-        --with-mpfr="${BUILD_SUPPORT_LIBS}" \
-        --with-mpc="${BUILD_SUPPORT_LIBS}")
-fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \

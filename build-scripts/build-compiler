@@ -244,12 +244,15 @@ for var in \
     "BUILD_HOST" \
     "BUILD_TARGETS" \
     "GNU_URL" \
+    "GCC_INFRASTRUCTURE_URL" \
     "BUILD_INSTALL_DIR" \
     "BUILD_SRC_DIR" \
     "BINUTILS_VERSION" \
     "BUILD_MAKE_JOBS" \
-    "BUILD_SUPPORT_LIBS" \
     "GCC_VERSION" \
+    "GMP_VERSION" \
+    "MPFR_VERSION" \
+    "MPC_VERSION" \
     "GDB_VERSION" \
     "MAKE_VERSION" \
     "MAKE" \
@@ -283,31 +286,49 @@ if [ ${#TARGETS[@]} -eq 0 ]; then
 fi
 
 GCC_TARBALL="gcc-${GCC_VERSION}.tar.bz2"
-GCC_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_TARBALL}"
+GCC_URL="${GNU_URL}/gnu/gcc/gcc-${GCC_VERSION}/${GCC_TARBALL}"
 GCC_SIG="${GCC_TARBALL}.sig"
-GCC_SIG_URL="${GNU_URL}/gcc/gcc-${GCC_VERSION}/${GCC_SIG}"
+GCC_SIG_URL="${GNU_URL}/gnu/gcc/gcc-${GCC_VERSION}/${GCC_SIG}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
+GMP_TARBALL="gmp-${GMP_VERSION}.tar.bz2"
+GMP_URL="${GNU_URL}/gnu/gmp/${GMP_TARBALL}"
+GMP_SIG="${GMP_TARBALL}.sig"
+GMP_SIG_URL="${GNU_URL}/gnu/gmp/${GMP_SIG}"
+GMP_SRC_DIR="${GCC_SRC_DIR}/gmp"
+
+MPFR_TARBALL="mpfr-${MPFR_VERSION}.tar.bz2"
+MPFR_URL="${GNU_URL}/gnu/mpfr/${MPFR_TARBALL}"
+MPFR_SIG="${MPFR_TARBALL}.sig"
+MPFR_SIG_URL="${GNU_URL}/gnu/mpfr/${MPFR_SIG}"
+MPFR_SRC_DIR="${GCC_SRC_DIR}/mpfr"
+
+MPC_TARBALL="mpc-${MPC_VERSION}.tar.gz"
+MPC_URL="${GCC_INFRASTRUCTURE_URL}/pub/gcc/infrastructure/${MPC_TARBALL}"
+MPC_MD5="md5.sum"
+MPC_MD5_URL="${GCC_INFRASTRUCTURE_URL}/pub/gcc/infrastructure/${MPC_MD5}"
+MPC_SRC_DIR="${GCC_SRC_DIR}/mpc"
+
 BINUTILS_TARBALL="binutils-${BINUTILS_VERSION}.tar.bz2"
-BINUTILS_URL="${GNU_URL}/binutils/${BINUTILS_TARBALL}"
+BINUTILS_URL="${GNU_URL}/gnu/binutils/${BINUTILS_TARBALL}"
 BINUTILS_SIG="${BINUTILS_TARBALL}.sig"
-BINUTILS_SIG_URL="${GNU_URL}/binutils/${BINUTILS_SIG}"
+BINUTILS_SIG_URL="${GNU_URL}/gnu/binutils/${BINUTILS_SIG}"
 BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
 
 GDB_TARBALL="gdb-${GDB_VERSION}.tar.bz2"
-GDB_URL="${GNU_URL}/gdb/${GDB_TARBALL}"
+GDB_URL="${GNU_URL}/gnu/gdb/${GDB_TARBALL}"
 GDB_SIG="${GDB_TARBALL}.sig"
-GDB_SIG_URL="${GNU_URL}/gdb/${GDB_SIG}"
+GDB_SIG_URL="${GNU_URL}/gnu/gdb/${GDB_SIG}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
 
 MAKE_TARBALL="make-${MAKE_VERSION}.tar.bz2"
-MAKE_URL="${GNU_URL}/make/${MAKE_TARBALL}"
+MAKE_URL="${GNU_URL}/gnu/make/${MAKE_TARBALL}"
 MAKE_SIG="${MAKE_TARBALL}.sig"
-MAKE_SIG_URL="${GNU_URL}/make/${MAKE_SIG}"
+MAKE_SIG_URL="${GNU_URL}/gnu/make/${MAKE_SIG}"
 MAKE_SRC_DIR="make-${MAKE_VERSION}"
 
 GNU_KEYRING="gnu-keyring.gpg"
-GNU_KEYRING_URL="${GNU_URL}/${GNU_KEYRING}"
+GNU_KEYRING_URL="${GNU_URL}/gnu/${GNU_KEYRING}"
 
 # Get preferred installation directory and set paths to the sources
 # Make sure we have the proper permissions
@@ -332,6 +353,9 @@ if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     printf -- "  ${BINUTILS_TARBALL}\n"
     printf -- "  ${BINUTILS_SIG}\n"
     printf -- "  ${GCC_TARBALL}\n"
+    printf -- "  ${GMP_TARBALL}\n"
+    printf -- "  ${MPFR_TARBALL}\n"
+    printf -- "  ${MPC_TARBALL}\n"
     printf -- "  ${GCC_SIG}\n"
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         printf -- "  ${GDB_TARBALL}\n"
@@ -366,6 +390,42 @@ else
         if ! [ -f "${GCC_SIG}" ]; then
             if ! fetch "${GCC_SIG_URL}" 1>> "gcc-download.log" 2>&1; then
                 panic "Failed to download ${GCC_SIG} from ${GCC_SIG_URL}) (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
+            fi
+        fi
+
+        if ! [ -f "${GMP_TARBALL}" ]; then
+            message "Downloading \`${GMP_TARBALL}'"
+            if ! fetch "${GMP_URL}"  1>> "gmp-download.log" 2>&1; then
+                panic "Failed to download ${GMP_TARBALL} from ${GMP_URL} (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
+            fi
+        fi
+        if ! [ -f "${GMP_SIG}" ]; then
+            if ! fetch "${GMP_SIG_URL}" 1>> "gmp-download.log" 2>&1; then
+                panic "Failed to download ${GMP_SIG} from ${GMP_SIG_URL}) (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
+            fi
+        fi
+
+        if ! [ -f "${MPFR_TARBALL}" ]; then
+            message "Downloading \`${MPFR_TARBALL}'"
+            if ! fetch "${MPFR_URL}"  1>> "mpfr-download.log" 2>&1; then
+                panic "Failed to download ${MPFR_TARBALL} from ${MPFR_URL} (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
+            fi
+        fi
+        if ! [ -f "${MPFR_SIG}" ]; then
+            if ! fetch "${MPFR_SIG_URL}" 1>> "mpfr-download.log" 2>&1; then
+                panic "Failed to download ${MPFR_SIG} from ${MPFR_SIG_URL}) (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
+            fi
+        fi
+
+        if ! [ -f "${MPC_TARBALL}" ]; then
+            message "Downloading \`${MPC_TARBALL}'"
+            if ! fetch "${MPC_URL}"  1>> "mpc-download.log" 2>&1; then
+                panic "Failed to download ${MPC_TARBALL} from ${MPC_URL} (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
+            fi
+        fi
+        if ! [ -f "${MPC_MD5}" ]; then
+            if ! fetch "${MPC_MD5_URL}" 1>> "mpc-download.log" 2>&1; then
+                panic "Failed to download ${MPC_MD5} from ${MPC_MD5_URL}) (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
             fi
         fi
 
@@ -427,6 +487,27 @@ if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
         panic "\`${GCC_SIG}' not found" 1
     fi
 
+    if ! [ -f "${GMP_TARBALL}" ]; then
+        panic "\`${GMP_TARBALL}' not found" 1
+    fi
+    if ! [ -f "${GMP_SIG}" ]; then
+        panic "\`${GMP_SIG}' not found" 1
+    fi
+
+    if ! [ -f "${MPFR_TARBALL}" ]; then
+        panic "\`${MPFR_TARBALL}' not found" 1
+    fi
+    if ! [ -f "${MPFR_SIG}" ]; then
+        panic "\`${MPFR_SIG}' not found" 1
+    fi
+
+    if ! [ -f "${MPC_TARBALL}" ]; then
+        panic "\`${MPC_TARBALL}' not found" 1
+    fi
+    if ! [ -f "${MPC_MD5}" ]; then
+        panic "\`${MPC_MD5}' not found" 1
+    fi
+
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         if ! [ -f "${GDB_TARBALL}" ]; then
             panic "\`${GDB_TARBALL}' not found" 1
@@ -448,6 +529,33 @@ if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
     if ! checksum_gpg "${GCC_SIG}" 1>> "gcc-download.log" 2>&1; then
         panic "Integrity check for ${GCC_TARBALL} failed (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
     fi
+
+    message "Checking integrity of \`${GMP_TARBALL}'"
+    if ! checksum_gpg "${GMP_SIG}" 1>> "gmp-download.log" 2>&1; then
+        panic "Integrity check for ${GMP_TARBALL} failed (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
+    fi
+
+    message "Checking integrity of \`${MPFR_TARBALL}'"
+    if ! checksum_gpg "${MPFR_SIG}" 1>> "mpfr-download.log" 2>&1; then
+        panic "Integrity check for ${MPFR_TARBALL} failed (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
+    fi
+
+    message "Checking integrity of \`${MPC_TARBALL}'"
+    # The md5.sum is a special (annoying) case
+    md5=`cat "${MPC_MD5}" 2> /dev/null | grep "${MPC_TARBALL}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
+    case "${MD5}" in
+        "md5")
+            calculated_md5=`"${MD5}" "${MPC_TARBALL}" | awk '{ print $1; }'`
+            ;;
+        "md5sum")
+            calculated_md5=`"${MD5}" "${MPC_TARBALL}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
+            ;;
+    esac
+    if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
+        panic "Integrity check for ${MPC_TARBALL} failed (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
+    fi
+    unset "md5"
+    unset "calculated_md5"
 
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         message "Checking integrity of \`${GDB_TARBALL}'"

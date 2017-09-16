@@ -5,9 +5,6 @@ Usage
  - POSIX Bourne shell
  - Wget
  - bzip2
- - GMP
- - MPFR
- - MPC
  - Texinfo
  - ncurses
  - Time and especially patience
@@ -27,9 +24,6 @@ If you haven't already installed the dependencies:
     sudo apt-get install wget \
     bzip2 \
     build-essentials \
-    libgmp3-dev \
-    libmpfr-dev \
-    libmpc-dev \
     libncurses5-dev \
     texinfo
 

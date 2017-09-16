@@ -7,7 +7,8 @@
 # Israel Jacquez <mrkotfw@gmail.com>
 
 # Do not modify, unless you know what you're doing
-GNU_URL="ftp://ftp.gnu.org/gnu"
+GNU_URL="ftp://ftp.gnu.org/"
+GCC_INFRASTRUCTURE_URL="ftp://gcc.gnu.org/"
 
 # Build host, where the toolchain will be executed. Leave blank if
 # unsure
@@ -32,14 +33,12 @@ BUILD_SRC_DIR="/tmp"
 # number of jobs that can run simultaneously
 BUILD_MAKE_JOBS=16
 
-# Specify the path where the support libraries (i.e. GMP, MPFR, MPC, etc.) are
-# installed if not in the typical paths (/usr, /usr/local, ...). If support
-# libraries are installed in the conventional paths, leave blank
-BUILD_SUPPORT_LIBS=""
-
 # Versions
 BINUTILS_VERSION="2.24"
 GCC_VERSION="4.7.4"
+GMP_VERSION="4.3.2"
+MPFR_VERSION="2.4.2"
+MPC_VERSION="0.8.1"
 GDB_VERSION="7.7"
 MAKE_VERSION="4.2.1"
 
