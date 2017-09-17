@@ -72,7 +72,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS)
 	$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
-	$(SH_CC) $(SH_CFLAGS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(SH_CC) $(SH_CFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.S
 	$(SH_AS) $(SH_AFLAGS) -o $@ $<

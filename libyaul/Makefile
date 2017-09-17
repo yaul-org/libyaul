@@ -419,7 +419,7 @@ LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 HEADER_FILES_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
 LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
-SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
+SPECS_all := $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SPECS))
 BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
 
@@ -507,7 +507,7 @@ endef
 	install-release-internal \
 	install-debug
 
-.SUFFIXES:= .c .S .o .x
+.SUFFIXES:= .c .S .o .x .specs
 
 all: release release-internal debug
 
@@ -547,6 +547,14 @@ $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(LIB_OBJS_release-i
 
 $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
+
+$(BUILD_ROOT)/$(SUB_BUILD)/%.specs: %.specs
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)cat $< | awk '{ \
+	    sub(/\$$INSTALL_ROOT/,"'$(INSTALL_ROOT)'"); \
+	} \
+	{ print }' > $@
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"

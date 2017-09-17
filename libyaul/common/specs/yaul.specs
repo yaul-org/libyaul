@@ -1,3 +1,26 @@
+%rename cpp old_cpp
+*cpp:
+%(old_cpp) \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/bcl \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/tga \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/common \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/cons \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/math \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/lib \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/fs/iso9660 \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/fs/romdisk \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/arp \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/dram-cartridge \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/usb-cartridge \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs2/cd-block \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/scsp \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/vdp1 \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/vdp2 \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/cpu \
+-I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/cpu/smpc
+
 *startfile:
 crt0%O%s
 
