@@ -74,6 +74,18 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS)
 %.o: %.c
 	$(SH_CC) $(SH_CFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
+%.o: %.cc
+	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+
+%.o: %.C
+	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+
+%.o: %.cpp
+	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+
+%.o: %.cxx
+	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+
 %.o: %.S
 	$(SH_AS) $(SH_AFLAGS) -o $@ $<
 

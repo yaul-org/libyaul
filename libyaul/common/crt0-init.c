@@ -18,17 +18,15 @@
 
 #include "exception.h"
 
-extern void (*__CTOR_LIST__[])(void);
-extern void (*__DTOR_LIST__[])(void);
-
-/* Do all constructors */
 static void __used
 call_global_ctors(void)
 {
-        /* See <http://gcc.gnu.org/onlinedocs/gccint/Initialization.html> */
+        extern void (*__CTOR_LIST__[])(void);
 
         /* Constructors are called in reverse order of the list */
-        for (uint32_t i = (uint32_t)__CTOR_LIST__[0]; i >= 1; i--) {
+        for (int32_t i = (int32_t)__CTOR_LIST__[0]; i >= 1; i--) {
+                /* Each function handles one or more destructor (within
+                 * file scope) */
                 __CTOR_LIST__[i]();
         }
 }
@@ -37,8 +35,12 @@ call_global_ctors(void)
 static void __used
 call_global_dtors(void)
 {
+        extern void (*__DTOR_LIST__[])(void);
+
         /* Destructors in forward order */
-        for (uint32_t i = 0; i < (uint32_t)__DTOR_LIST__[0]; i++) {
+        for (int32_t i = 0; i < (int32_t)__DTOR_LIST__[0]; i++) {
+                /* Each function handles one or more destructor (within
+                 * file scope) */
                 __DTOR_LIST__[i + 1]();
         }
 }
@@ -57,7 +59,6 @@ initializer(void)
         vbr[0x09] = exception_cpu_address_error;
         vbr[0x0A] = exception_dma_address_error;
 
-        /* Call constructors */
         call_global_ctors();
 
         init();
@@ -67,6 +68,5 @@ initializer(void)
 static void __used __section(".fini")
 finalizer(void)
 {
-        /* Call all destructors */
         call_global_dtors();
 }

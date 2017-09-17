@@ -34,7 +34,7 @@ M68K_NM:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm
 M68K_OBJCOPY:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy
 M68K_OBJDUMP:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump
 
-SH_AFLAGS= --fatal-warnings --isa=sh2 --big --reduce-memory-overheads
+SH_AFLAGS= --fatal-warnings
 SH_CFLAGS= \
 	-W \
 	-Wall \
@@ -43,28 +43,19 @@ SH_CFLAGS= \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
-	-O2 \
-	-m2 \
-	-mb \
-	-ffreestanding \
-	-fomit-frame-pointer \
-	-ffast-math \
-	-fstrict-aliasing \
+	-O2
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
-SH_CXXFLAGS= $(SH_CFLAGS) \
-	-fno-exceptions \
-	-fno-rtti \
-	-fno-unwind-tables
+SH_CXXFLAGS= $(SH_CFLAGS)
 SH_LXXFLAGS= $(SH_LDFLAGS)
 
 M68K_AFLAGS= --fatal-warnings
 M68K_LDFLAGS=
 
-SUFFIXES:= .c .m68k.S .S .o .m68k .bin .elf .romdisk .romdisk.o
+SUFFIXES:= .c .cc .C .cpp .cxx .m68k.s .m68k.S .s .S .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: all clean example list-targets
 

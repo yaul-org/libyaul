@@ -1,3 +1,10 @@
+%rename asm old_asm
+*asm:
+%(old_asm) \
+--isa=sh2 \
+--big \
+--reduce-memory-overheads
+
 %rename link old_link
 *link:
 %(old_link) -T ldscripts/ip.x%s

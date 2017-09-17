@@ -43,11 +43,6 @@ _start:
         jsr @r1
         nop
 
-        /* Purge and turn cache on as four-way set associative */
-        mov.l .LC6, r1
-        mov #0x11, r2
-        mov.b r2, @r1
-
         /* Enable interrupts */
         mov #0xFF, r2
         mov #0x0F, r1
@@ -57,14 +52,26 @@ _start:
         and r1, r3
         ldc r3, sr
 
+        /* Purge and turn cache on as four-way set associative */
+        mov.l .LC6, r1
+        mov #0x11, r2
+        mov.b r2, @r1
+
         /* Jump to user */
-        mov.l .LC4, r3
+        mov.l .LC5, r3
         jsr @r3
         nop
 
+        /* Disable interrupts */
+        mov #0xF0, r1
+        extu.b r1, r1
+        stc sr, r2
+        or r2, r1
+        ldc r1, sr
+
         /* Finalizer */
-        mov.l .LC5, r1
-        jmp @r1
+        mov.l .LC4, r1
+        jsr @r1
         nop
 
 .L3:
@@ -83,10 +90,10 @@ _start:
 .long __INIT_SECTION__
 
 .LC4:
-.long _main
+.long __FINI_SECTION__
 
 .LC5:
-.long __FINI_SECTION__
+.long _main
 
 .LC6:
 .long 0xFFFFFE92

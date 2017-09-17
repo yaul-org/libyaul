@@ -1,28 +1,54 @@
-%rename cpp old_cpp
-*cpp:
-%(old_cpp) \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/bcl \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/tga \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/common \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/cons \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/math \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/lib \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/fs/iso9660 \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/fs/romdisk \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/arp \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/dram-cartridge \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/usb-cartridge \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/a/cs2/cd-block \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/scsp \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/vdp1 \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/b/vdp2 \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/cpu \
--I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/cpu/smpc
+%rename asm old_asm
+*asm:
+%(old_asm) \
+--isa=sh2 \
+--big \
+--reduce-memory-overheads
+
+*includes:
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/bcl) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/tga) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/common) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/cons) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/math) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/lib) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/fs/iso9660) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/fs/romdisk) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/arp) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/dram-cartridge) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/usb-cartridge) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs2/cd-block) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/scsp) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/vdp1) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/vdp2) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/cpu) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/cpu/smpc)
+
+%rename cc1 old_c11
+*cc1:
+%(old_c11) \
+-m2 \
+-mb \
+-ffreestanding \
+-fomit-frame-pointer \
+-ffast-math \
+-fstrict-aliasing \
+%(includes)
+
+%rename cc1plus old_cc1plus
+*cc1plus:
+%(old_cc1plus) \
+-fno-exceptions \
+-fno-rtti \
+-fno-unwind-tables \
+-fno-threadsafe-statics \
+-fno-use-cxa-atexit \
+%(includes)
 
 *startfile:
-crt0%O%s crt0-init%O%s
+crt0%O%s crt0-init%O%s c++-support%O%s
 
 *endfile:
 

@@ -30,9 +30,10 @@ SPECS:= \
 	common/specs/yaul.specs \
 	common/specs/ip.specs
 
-START_SRCS:= \
+SUPPORT_SRCS:= \
 	common/crt0.S \
-	common/crt0-init.c
+	common/crt0-init.c \
+	common/c++-support.cxx
 
 LIB_SRCS:= \
 	common/exception.S \
@@ -369,7 +370,8 @@ HEADER_FILES+= \
 	./scu/scu/map.h:. \
 	./scu/scu/timer.h:.
 
-SH_CFLAGS:= -std=c99 \
+SH_CFLAGS:= \
+	-std=c99 \
 	-s \
 	-ffreestanding \
 	-ffast-math \
@@ -391,21 +393,34 @@ SH_CFLAGS_release-internal:= -O2 $(SH_CFLAGS) \
 SH_CFLAGS_debug:= -O0 -g $(SH_CFLAGS) \
 	-DDEBUG
 
+SH_CXXFLAGS:= \
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-unwind-tables \
+	-fno-threadsafe-statics \
+	-fno-use-cxa-atexit
+SH_CXXFLAGS_release:= $(SH_CFLAGS_release) \
+	$(SH_CXXFLAGS)
+SH_CXXFLAGS_release-internal:= $(SH_CFLAGS_release-internal) \
+	$(SH_CXXFLAGS)
+SH_CXXFLAGS_debug:= $(SH_CFLAGS_debug) \
+	$(SH_CXXFLAGS)
+
 M68K_CFLAGS:=
 
 M68K_CFLAGS_release:=
 M68K_CFLAGS_release-internal:=
 M68K_CFLAGS_debug:=
 
-START_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(START_SRCS)))
-START_DEPS:= $(START_OBJS:.o=.d)
+SUPPORT_OBJS:= $(patsubst %.c,%.o,$(patsubst %.cxx,%.o,$(patsubst %.S,%.o,$(SUPPORT_SRCS))))
+SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 
-START_OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(START_OBJS))
-START_OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(START_OBJS))
-START_OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(START_OBJS))
-START_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(START_DEPS))
-START_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(START_DEPS))
-START_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(START_DEPS))
+SUPPORT_OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(SUPPORT_OBJS))
+SUPPORT_OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(SUPPORT_OBJS))
+SUPPORT_OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(SUPPORT_OBJS))
+SUPPORT_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(SUPPORT_DEPS))
+SUPPORT_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(SUPPORT_DEPS))
+SUPPORT_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(SUPPORT_DEPS))
 
 LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(LIB_SRCS)))
 LIB_DEPS:= $(LIB_OBJS:.o=.d)
@@ -420,7 +435,7 @@ LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 HEADER_FILES_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
 LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
-SPECS_all := $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SPECS))
+SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
 BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
 
@@ -428,6 +443,15 @@ define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
+		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
+		-c $< -o $@
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+endef
+
+define macro-build-c++-object
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)$(SH_CXX) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
 	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
@@ -444,7 +468,7 @@ define macro-install-library
 endef
 
 define macro-install-start-scripts
-	$(ECHO)for object in $(START_OBJS_$1); do \
+	$(ECHO)for object in $(SUPPORT_OBJS_$1); do \
 	    printf -- "$(V_BEGIN_BLUE)$${object#$(BUILD_ROOT)/}$(V_END)\n"; \
 	    $(INSTALL) -m 644 $$object $(INSTALL_ROOT)/sh-elf/sh-elf/lib/; \
 	done
@@ -508,13 +532,13 @@ endef
 	install-release-internal \
 	install-debug
 
-.SUFFIXES:= .c .S .o .x .specs
+.SUFFIXES:= .c .cxx .S .o .x
 
 all: release release-internal debug
 
-release: $(BUILD_ROOT)/$(SUB_BUILD)/release $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a $(START_OBJS_release) $(LDSCRIPTS_all) $(SPECS_all)
-release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a $(START_OBJS_release-internal) $(LDSCRIPTS_all) $(SPECS_all)
-debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a $(START_OBJS_debug) $(LDSCRIPTS_all) $(SPECS_all)
+release: $(BUILD_ROOT)/$(SUB_BUILD)/release $(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a $(SUPPORT_OBJS_release) $(LDSCRIPTS_all) $(SPECS_all)
+release-internal: $(BUILD_ROOT)/$(SUB_BUILD)/release-internal $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a $(SUPPORT_OBJS_release-internal) $(LDSCRIPTS_all) $(SPECS_all)
+debug: $(BUILD_ROOT)/$(SUB_BUILD)/debug $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a $(SUPPORT_OBJS_debug) $(LDSCRIPTS_all) $(SPECS_all)
 
 install-release: release
 	$(call macro-install-files)
@@ -549,14 +573,6 @@ $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(LIB_OBJS_release-i
 $(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/%.specs: %.specs
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)mkdir -p $(@D)
-	$(ECHO)cat $< | awk '{ \
-	    sub(/\$$INSTALL_ROOT/,"'$(INSTALL_ROOT)'"); \
-	} \
-	{ print }' > $@
-
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
@@ -568,17 +584,26 @@ $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 $(BUILD_ROOT)/$(SUB_BUILD)/release/%.o: %.c
 	$(call macro-build-object,release)
 
+$(BUILD_ROOT)/$(SUB_BUILD)/release/%.o: %.cxx
+	$(call macro-build-c++-object,release)
+
 $(BUILD_ROOT)/$(SUB_BUILD)/release/%.o: %.S
 	$(call macro-build-object,release)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/%.o: %.c
 	$(call macro-build-object,release-internal)
 
+$(BUILD_ROOT)/$(SUB_BUILD)/release-internal/%.o: %.cxx
+	$(call macro-build-c++-object,release-internal)
+
 $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/%.o: %.S
 	$(call macro-build-object,release-internal)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/debug/%.o: %.c
 	$(call macro-build-object,debug)
+
+$(BUILD_ROOT)/$(SUB_BUILD)/debug/%.o: %.cxx
+	$(call macro-build-c++-object,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/debug/%.o: %.S
 	$(call macro-build-object,debug)
@@ -594,9 +619,9 @@ clean-release-internal:
 clean-debug:
 	$(call macro-clean,debug)
 
--include $(START_DEPS_release)
--include $(START_DEPS_debug)
--include $(START_DEPS_release-internal)
+-include $(SUPPORT_DEPS_release)
+-include $(SUPPORT_DEPS_debug)
+-include $(SUPPORT_DEPS_release-internal)
 
 -include $(LIB_DEPS_release)
 -include $(LIB_DEPS_debug)
