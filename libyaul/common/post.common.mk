@@ -127,13 +127,13 @@ clean:
 		$(SH_DEPS_NO_LINK) \
 		IP.BIN \
 		IP.BIN.map
-	if [ ! -z $(M68K_PROGRAM) ]; then \
-	    rm -f \
+ifneq ($(strip $(M68K_PROGRAM)),)
+	-rm -f \
 	        romdisk/$(M68K_PROGRAM).m68k \
 	        $(M68K_PROGRAM).m68k.elf \
 	        $(M68K_PROGRAM).m68k.sym \
-	        $(M68K_OBJECTS); \
-	fi
+	        $(M68K_OBJECTS)
+endif
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
