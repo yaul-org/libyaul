@@ -18,59 +18,36 @@
 
 #include "exception.h"
 
-typedef void (*fptr)(void);
+extern void (*__CTOR_LIST__[])(void);
+extern void (*__DTOR_LIST__[])(void);
 
-extern void __call_exitprocs(int, void *);
-
-extern fptr __CTOR_LIST__[];
-extern fptr __DTOR_LIST__[];
-
-/* Used by exit procs */
-void *__dso_handle = NULL;
-
-/* Do all constructors. */
+/* Do all constructors */
 static void __used
-__do_global_ctors(void)
+call_global_ctors(void)
 {
         /* See <http://gcc.gnu.org/onlinedocs/gccint/Initialization.html> */
 
-        do {
-                uint32_t i;
-                uint32_t n;
-
-                n = (uint32_t)__CTOR_LIST__[0];
-                /* Constructors are called in reverse order of the list */
-                for (i = n; i >= 1; i--)
-                        __CTOR_LIST__[i]();
-        } while (false);
+        /* Constructors are called in reverse order of the list */
+        for (uint32_t i = (uint32_t)__CTOR_LIST__[0]; i >= 1; i--) {
+                __CTOR_LIST__[i]();
+        }
 }
 
-/* Do all destructors. */
+/* Do all destructors */
 static void __used
-__do_global_dtors(void)
+call_global_dtors(void)
 {
-        uint32_t i;
-        uint32_t n;
-
-        do {
-                n = (uint32_t)__DTOR_LIST__[0];
-                /* Destructors in forward order */
-                for (i = 0; i < n; i++)
-                        __DTOR_LIST__[i + 1]();
-        } while (false);
+        /* Destructors in forward order */
+        for (uint32_t i = 0; i < (uint32_t)__DTOR_LIST__[0]; i++) {
+                __DTOR_LIST__[i + 1]();
+        }
 }
 
 /* Add function to .init section */
 static void __used __section(".init")
-__std_startup(void)
+initializer(void)
 {
         void (**vbr)(void);
-
-        /* First added, last called */
-        atexit(__do_global_dtors);
-
-        /* Do all constructors */
-        __do_global_ctors();
 
         /* Set hardware exception handling routines */
         vbr = cpu_intc_vector_base_get();
@@ -80,13 +57,16 @@ __std_startup(void)
         vbr[0x09] = exception_cpu_address_error;
         vbr[0x0A] = exception_dma_address_error;
 
+        /* Call constructors */
+        call_global_ctors();
+
         init();
 }
 
 /* Add function to .fini section */
 static void __used __section(".fini")
-__std_cleanup(void)
+finalizer(void)
 {
-
-        __call_exitprocs(0, NULL);
+        /* Call all destructors */
+        call_global_dtors();
 }

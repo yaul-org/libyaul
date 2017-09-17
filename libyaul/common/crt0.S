@@ -62,9 +62,13 @@ _start:
         jsr @r3
         nop
 
-        /* Abort */
+        /* Finalizer */
         mov.l .LC5, r1
         jmp @r1
+        nop
+
+.L3:
+        bra .L3
         nop
 
 .align 4
@@ -76,13 +80,13 @@ _start:
 .long __bss_end
 
 .LC3:
-.long _init
+.long __INIT_SECTION__
 
 .LC4:
 .long _main
 
 .LC5:
-.long _abort
+.long __FINI_SECTION__
 
 .LC6:
 .long 0xFFFFFE92

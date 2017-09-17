@@ -31,7 +31,8 @@ SPECS:= \
 	common/specs/ip.specs
 
 START_SRCS:= \
-	common/crt0.S
+	common/crt0.S \
+	common/crt0-init.c
 
 LIB_SRCS:= \
 	common/exception.S \

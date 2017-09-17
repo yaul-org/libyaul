@@ -22,7 +22,7 @@
 -I$INSTALL_ROOT/sh-elf/sh-elf/include/yaul/scu/bus/cpu/smpc
 
 *startfile:
-crt0%O%s
+crt0%O%s crt0-init%O%s
 
 *endfile:
 
