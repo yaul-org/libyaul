@@ -4,7 +4,10 @@ include ../env.mk
 
 SUB_BUILD:= $(BUILD)/lib$(TARGET)
 
-SRCS:= tga.c
+LIB_SRCS:= tga.c
+
+INCLUDE_DIRS:= \
+	../lib$(MAIN_TARGET)/lib/lib
 
 HEADER_FILES:= \
 	tga.h
@@ -32,39 +35,41 @@ SH_CFLAGS_release-internal:= -O2 $(SH_CFLAGS) \
 SH_CFLAGS_debug:= -O0 -g $(SH_CFLAGS) \
 	-DDEBUG
 
-OBJS:= $(SRCS:.c=.o)
-DEPS:= $(SRCS:.c=.d)
+LIB_OBJS:= $(LIB_SRCS:.c=.o)
+LIB_DEPS:= $(LIB_SRCS:.c=.d)
 
-OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(OBJS))
-OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(OBJS))
-OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(OBJS))
-DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(DEPS))
-DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(DEPS))
-DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(DEPS))
+LIB_OBJS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_OBJS))
+LIB_OBJS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_OBJS))
+LIB_OBJS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_OBJS))
+LIB_DEPS_release:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release/,$(LIB_DEPS))
+LIB_DEPS_release-internal:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/release-internal/,$(LIB_DEPS))
+LIB_DEPS_debug:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/debug/,$(LIB_DEPS))
 
 HEADER_FILES_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(HEADER_FILES))
 
 define macro-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
-		$(foreach dir,$(INCLUDES),-I./$(dir)) \
+		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
 		-c $< -o $@
 	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
 endef
 
 define macro-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)$(SH_AR) rcs $@ $(OBJS_$1)
+	$(ECHO)$(SH_AR) rcs $@ $(LIB_OBJS_$1)
 endef
 
 define macro-install-files
 	$(ECHO)$(RM) -r $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)
-	$(ECHO)for header_file in $(HEADER_FILES_all); do \
-	    path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${header_file#$(THIS_ROOT)/lib$(TARGET)/}"; \
-	    install_header_file=$$(python -c "import os; print os.path.abspath(\"$${path}\")"); \
+	$(ECHO)for file in $(HEADER_FILES_all); do \
+	    header_file_path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${file#$(THIS_ROOT)/lib$(TARGET)/}"; \
+	    header_file=$$(basename "$${header_file_path}"); \
+	    header_file_dirpath=$$(dirname "$${header_file_path}"); \
+	    install_header_file=$$(cd "$${header_file_dirpath}"; printf -- "$${PWD}/$${header_file}"); \
 	    printf -- "$(V_BEGIN_BLUE)$${header_file#$(THIS_ROOT)/}$(V_END)\n"; \
-	    $(INSTALL) -m 644 $${header_file} $${install_header_file}; \
+	    $(INSTALL) -m 644 "$${file}" "$${install_header_file}"; \
 	done
 endef
 
@@ -111,13 +116,13 @@ $(BUILD_ROOT)/$(SUB_BUILD)/release-internal:
 $(BUILD_ROOT)/$(SUB_BUILD)/debug:
 	mkdir -p $@
 
-$(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a: $(OBJS_release)
+$(BUILD_ROOT)/$(SUB_BUILD)/release/lib$(TARGET).a: $(LIB_OBJS_release)
 	$(call macro-build-library,release)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(OBJS_release-internal)
+$(BUILD_ROOT)/$(SUB_BUILD)/release-internal/lib$(TARGET).a: $(LIB_OBJS_release-internal)
 	$(call macro-build-library,release-internal)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(OBJS_debug)
+$(BUILD_ROOT)/$(SUB_BUILD)/debug/lib$(TARGET).a: $(LIB_OBJS_debug)
 	$(call macro-build-library,debug)
 
 $(BUILD_ROOT)/$(SUB_BUILD)/release/%.o: %.c
@@ -140,6 +145,6 @@ clean-release-internal:
 clean-debug:
 	$(call macro-clean,debug)
 
--include $(DEPS_release)
--include $(DEPS_debug)
--include $(DEPS_release-internal)
+-include $(LIB_DEPS_release)
+-include $(LIB_DEPS_debug)
+-include $(LIB_DEPS_release-internal)

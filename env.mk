@@ -65,3 +65,5 @@ else
   ECHO=
 endif
 export ECHO
+
+MAIN_TARGET= yaul

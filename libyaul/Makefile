@@ -254,13 +254,8 @@ INCLUDE_DIRS:= \
 	cons \
 	lib/lib \
 	kernel \
-	kernel/lib \
-	kernel/mm \
 	kernel/vfs \
-	kernel/vfs/fs/iso9660 \
-	kernel/vfs/fs/romdisk \
 	math \
-	newlib \
 	scu \
 	scu/bus/a/cs0/arp \
 	scu/bus/a/cs0/dram-cartridge \
@@ -467,11 +462,9 @@ define macro-install-files
 	    path="$(INSTALL_ROOT)/sh-elf/sh-elf/include/$(TARGET)/$${rel_header_dir}/$${rel_header_file##*/}"; \
 	    header_file=$$(basename "$${path}"); \
 	    header_dir=$$(dirname "$${path}"); \
-	    abs_header_dir=$$(python -c "import os; print os.path.abspath(\"$${header_dir}\")"); \
-	    install_header_file=$${abs_header_dir}/$${header_file}; \
-	    install_header_dir=$${abs_header_dir}; \
 	    printf -- "$(V_BEGIN_BLUE)$(TARGET)/$${pair_header_file#$(THIS_ROOT)/lib$(TARGET)/./}$(V_END)\n"; \
-	    mkdir -p $${install_header_dir}; \
+	    mkdir -p $${header_dir}; \
+	    install_header_file=$$(cd "$${header_dir}"; printf -- "$${PWD}/$${header_file}"); \
 	    $(INSTALL) -m 644 $${pair_header_file} $${install_header_file}; \
 	done
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/sh-elf/sh-elf/lib/ldscripts

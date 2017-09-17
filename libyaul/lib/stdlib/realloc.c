@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "slob.h"
+#include <mm/slob.h>
 
 void *
 realloc(void *old, size_t new_len)
