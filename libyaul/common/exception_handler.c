@@ -55,9 +55,11 @@ exception_ihr_dma_address_error(struct cpu_registers *regs)
 static void
 format(struct cpu_registers *regs, const char *exception_name)
 {
-        static char buf[1024];
+        static char buf[512];
 
-        (void)sprintf(buf, "[1;44mException occurred:[m\n\t[1;44m%s[m\n\n"
+        (void)snprintf(buf,
+            sizeof(buf),
+            "[1;44mException occurred:[m\n\t[1;44m%s[m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"
             "\t r2 = 0x%08X  r13 = 0x%08X\n"
@@ -89,11 +91,14 @@ format(struct cpu_registers *regs, const char *exception_name)
 
         /* Reset the VDP2 */
         vdp2_init();
-        vdp2_tvmd_display_res_set(TVMD_INTERLACE_DOUBLE, TVMD_HORZ_HIRESO_A,
-                TVMD_VERT_240);
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
+            TVMD_VERT_240);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
-                COLOR_RGB555(0, 224, 0));
+            COLOR_RGB555(0, 7, 0));
 
-        cons_init(CONS_DRIVER_VDP2, 80, 60);
-        cons_write(buf);
+        cons_init(CONS_DRIVER_VDP2, 40, 30);
+        cons_buffer(buf);
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
+        cons_flush();
 }
