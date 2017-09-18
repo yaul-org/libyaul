@@ -371,7 +371,8 @@ HEADER_FILES+= \
 	./scu/scu/timer.h:.
 
 SH_CFLAGS:= \
-	-std=c99 \
+	-std=c11 \
+	-pedantic \
 	-s \
 	-ffreestanding \
 	-ffast-math \

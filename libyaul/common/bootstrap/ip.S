@@ -17,13 +17,7 @@
 .ascii "$AREAS"                 /* Target area symbol(s) */
 .ascii "      "
 .ascii "$PERIPHERALS"           /* Compatible peripheral(s) */
-.ascii "$TITLE"                 /* Game name */
-.ascii "                "
-.ascii "                "
-.ascii "                "
-.ascii "                "
-.ascii "                "
-.ascii "                "
+.ascii "$TITLE"                 /* Game name (must be padded to 112 bytes) */
 .long 0x00000000                /* Reserved */
 .long 0x00000000                /* Reserved */
 .long 0x00000000                /* Reserved */
@@ -46,7 +40,7 @@
 .text
 .align 1
 
-        .incbin "sys_init.bin"
+.incbin "sys_init.bin"
 
         mov.l .LC1, r1
         mov.l @r1, r1
