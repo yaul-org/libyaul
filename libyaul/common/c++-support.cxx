@@ -7,17 +7,15 @@ void __cxa_pure_virtual(void) {
 }
 
 void* operator new(size_t size __unused) {
-    return (void*)1;
+    return (void*)0;
 }
 
 void* operator new[](size_t size __unused) {
-    return (void*)1;
+    return (void*)0;
 }
 
 void operator delete(void *ptr __unused) {
 }
 
 void operator delete[](void *ptr __unused) {
-
-
 }
