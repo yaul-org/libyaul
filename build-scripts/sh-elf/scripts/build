@@ -16,10 +16,12 @@ cd "${BUILD_SRC_DIR}/${target}/binutils"
 binutils_configure_options=(
         --prefix="${BUILD_INSTALL_DIR}/${target}" \
         --target="${target}" \
-        --disable-werror \
         --disable-debug \
+        --disable-multilib \
         --disable-shared \
         --disable-threads \
+        --disable-werror \
+        --enable-static \
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
@@ -29,7 +31,8 @@ if ! [ -z "${BUILD_HOST}" ]; then
 fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
     message "Configuring Binutils"
-    CFLAGS="" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+    CFLAGS="" \
+    LDFLAGS="-static -static-libgcc -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
         ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-configured-binutils"
@@ -93,6 +96,7 @@ gcc_configure_options=(
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
+        --without-ppl \
         --without-dwarf2 \
         --without-headers \
         --without-newlib
@@ -103,7 +107,7 @@ fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
-    LDFLAGS="" \
+    LDFLAGS="-static -static-libgcc -static-libstdc++" \
     CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer -ffreestanding" \
     LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
         ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \

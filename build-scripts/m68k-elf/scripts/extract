@@ -17,7 +17,7 @@ if ! [ -f "${BUILD_STAMPS_DIR}/${target}-extracted-binutils" ]; then
     rm -r -f binutils
     rm -r -f binutils-${BINUTILS_VERSION}
     if ! tar -xjf "${BUILD_SRC_DIR}/${BINUTILS_TARBALL}" > /dev/null 2>&1; then
-        panic "Extracting ${BINUTILS_TARBALL}" 1
+        panic "Failed to extract \`${BINUTILS_TARBALL}'" 1
     fi
     create_stamp "${target}-extracted-binutils"
 fi

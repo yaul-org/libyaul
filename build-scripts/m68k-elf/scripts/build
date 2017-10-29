@@ -14,34 +14,41 @@ is_var_set "target"
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/${target}/binutils"
 cd "${BUILD_SRC_DIR}/${target}/binutils"
-if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
-    message "Configuring Binutils"
-    CFLAGS="-Wno-error=unused-value -Wno-error=shift-negative-value" LDFLAGS="" ../"${BINUTILS_SRC_DIR}"/configure \
+binutils_configure_options=(
         --prefix="${BUILD_INSTALL_DIR}/${target}" \
         --target="${target}" \
-        --disable-error \
         --disable-debug \
-        --disable-nls \
+        --disable-multilib \
         --disable-shared \
         --disable-threads \
+        --disable-werror \
+        --enable-static \
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
+        --with-stabs)
+if ! [ -z "${BUILD_HOST}" ]; then
+    binutils_configure_options+=(--host="${BUILD_HOST}")
+fi
+if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
+    message "Configuring Binutils"
+    CFLAGS="" \
+    LDFLAGS="-static -static-libgcc -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
+        ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-configured-binutils"
 fi
 
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-built-binutils" ]; then
     message "Building Binutils"
-    "${MAKE}" 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-built-binutils"
 fi
 
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-installed-binutils" ]; then
     message "Installing Binutils"
-    "${MAKE}" install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
+    "${MAKE}" -j ${BUILD_MAKE_JOBS} install 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 || \
         panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-installed-binutils"
 fi

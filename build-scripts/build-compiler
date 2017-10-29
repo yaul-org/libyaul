@@ -118,22 +118,27 @@ function program_exists() {
 
 # Function fetch:
 #   ${1} => URL
+#   ${2} => File to download
 function fetch() {
     local _url="${1}"
-
-    "${FETCH}" "${FETCH_FLAGS}" "${_url}"
-    local _exit_code=${?}
+    local _file="${2}"
 
     case "${FETCH}" in
         wget)
+            "${FETCH}" "${FETCH_FLAGS}" -O "${_file}" "${_url}"
+            local _exit_code=${?}
+
             # Kludge: It looks like GNU Wget doesn't return the
             # correct exit status code.
             if [ ${_exit_code} -ge 2 ] && [ ${_exit_code} -le 8 ]; then
                 return 1
             fi
+
             return 0
             ;;
         *)
+            "${FETCH}" "${FETCH_FLAGS}" "${_url}"
+
             return ${_exit_code}
     esac
 }
@@ -148,18 +153,65 @@ function checksum_gpg() {
     return ${_exit_code}
 }
 
-# Function clean_up:
-#
-function clean_up() {
+# Function checksum_md5:
+#   ${1} => File (.md5 file)
+#   ${2} => Archive file
+function checksum_md5() {
+    local _file="${1}"
+    local _archive="${2}"
+
+    # The md5.sum is a special (annoying) case
+    local _md5=
+    local _calculated_md5=
+
+    _md5=`cat "${_file}" 2> /dev/null | grep "${_archive}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
+    case "${MD5}" in
+        "md5")
+            _calculated_md5=`"${MD5}" "${_archive}" | awk '{ print $1; }'`
+            ;;
+        "md5sum")
+            _calculated_md5=`"${MD5}" "${_archive}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
+            ;;
+    esac
+
+    if [ -z "${_md5}" ] || [[ "${_calculated_md5}" != "${_md5}" ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
+# Function clean_stamps_up:
+#   ${1} => Target
+function clean_stamps_up() {
+    local _target="${1}"
+
+    if [ -z "${BUILD_STAMPS_DIR}" ]; then
+        exit 1
+    fi
+
+    message "Cleaning up target stamps ${_target} in \`${BUILD_SRC_DIR}'"
+    # Globbing doesn't work with single or double quotes
+    rm -f "${BUILD_STAMPS_DIR}/${_target}-"*
+}
+
+# Function clean_targets_up:
+#   ${1} => Target
+function clean_targets_up() {
+    local _target="${1}"
+
     if [ -z "${BUILD_SRC_DIR}" ]; then
         exit 1
     fi
 
-    message "Cleaning up '${BUILD_SRC_DIR}'"
-
+    message "Cleaning up target ${_target} in \`${BUILD_SRC_DIR}'"
+    rm -r -f "${BUILD_SRC_DIR}/${_target}"
+}
+#
+function clean_up() {
     for target in ${TARGETS[@]}; do
-        rm -r -f "${BUILD_STAMPS_DIR}/${target}-*"
-        rm -r -f "${BUILD_SRC_DIR}/${target}"
+        clean_stamps_up "${target}"
+        clean_targets_up "${target}"
     done
 }
 
@@ -285,44 +337,45 @@ if [ ${#TARGETS[@]} -eq 0 ]; then
     panic "Invalid build target(s)" 1
 fi
 
+BINUTILS_TARBALL="binutils-${BINUTILS_VERSION}.tar.bz2"
+BINUTILS_TARBALL_URL="${GNU_URL}/gnu/binutils/${BINUTILS_TARBALL}"
+BINUTILS_SIG="${BINUTILS_TARBALL}.sig"
+BINUTILS_SIG_URL="${GNU_URL}/gnu/binutils/${BINUTILS_SIG}"
+BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
+
 GCC_TARBALL="gcc-${GCC_VERSION}.tar.bz2"
-GCC_URL="${GNU_URL}/gnu/gcc/gcc-${GCC_VERSION}/${GCC_TARBALL}"
+GCC_TARBALL_URL="${GNU_URL}/gnu/gcc/gcc-${GCC_VERSION}/${GCC_TARBALL}"
 GCC_SIG="${GCC_TARBALL}.sig"
 GCC_SIG_URL="${GNU_URL}/gnu/gcc/gcc-${GCC_VERSION}/${GCC_SIG}"
 GCC_SRC_DIR="gcc-${GCC_VERSION}"
 
 GMP_TARBALL="gmp-${GMP_VERSION}.tar.bz2"
-GMP_URL="${GNU_URL}/gnu/gmp/${GMP_TARBALL}"
+GMP_TARBALL_URL="${GNU_URL}/gnu/gmp/${GMP_TARBALL}"
 GMP_SIG="${GMP_TARBALL}.sig"
 GMP_SIG_URL="${GNU_URL}/gnu/gmp/${GMP_SIG}"
 GMP_SRC_DIR="${GCC_SRC_DIR}/gmp"
 
 MPFR_TARBALL="mpfr-${MPFR_VERSION}.tar.bz2"
-MPFR_URL="${GNU_URL}/gnu/mpfr/${MPFR_TARBALL}"
+MPFR_TARBALL_URL="${GNU_URL}/gnu/mpfr/${MPFR_TARBALL}"
 MPFR_SIG="${MPFR_TARBALL}.sig"
 MPFR_SIG_URL="${GNU_URL}/gnu/mpfr/${MPFR_SIG}"
 MPFR_SRC_DIR="${GCC_SRC_DIR}/mpfr"
 
 MPC_TARBALL="mpc-${MPC_VERSION}.tar.gz"
-MPC_URL="${GCC_INFRASTRUCTURE_URL}/pub/gcc/infrastructure/${MPC_TARBALL}"
+MPC_TARBALL_URL="${GCC_INFRASTRUCTURE_URL}/pub/gcc/infrastructure/${MPC_TARBALL}"
 MPC_MD5="md5.sum"
+MPC_RENAMED_MD5="mpc.md5.sum"
 MPC_MD5_URL="${GCC_INFRASTRUCTURE_URL}/pub/gcc/infrastructure/${MPC_MD5}"
 MPC_SRC_DIR="${GCC_SRC_DIR}/mpc"
 
-BINUTILS_TARBALL="binutils-${BINUTILS_VERSION}.tar.bz2"
-BINUTILS_URL="${GNU_URL}/gnu/binutils/${BINUTILS_TARBALL}"
-BINUTILS_SIG="${BINUTILS_TARBALL}.sig"
-BINUTILS_SIG_URL="${GNU_URL}/gnu/binutils/${BINUTILS_SIG}"
-BINUTILS_SRC_DIR="binutils-${BINUTILS_VERSION}"
-
 GDB_TARBALL="gdb-${GDB_VERSION}.tar.bz2"
-GDB_URL="${GNU_URL}/gnu/gdb/${GDB_TARBALL}"
+GDB_TARBALL_URL="${GNU_URL}/gnu/gdb/${GDB_TARBALL}"
 GDB_SIG="${GDB_TARBALL}.sig"
 GDB_SIG_URL="${GNU_URL}/gnu/gdb/${GDB_SIG}"
 GDB_SRC_DIR="gdb-${GDB_VERSION}"
 
 MAKE_TARBALL="make-${MAKE_VERSION}.tar.bz2"
-MAKE_URL="${GNU_URL}/gnu/make/${MAKE_TARBALL}"
+MAKE_TARBALL_URL="${GNU_URL}/gnu/make/${MAKE_TARBALL}"
 MAKE_SIG="${MAKE_TARBALL}.sig"
 MAKE_SIG_URL="${GNU_URL}/gnu/make/${MAKE_SIG}"
 MAKE_SRC_DIR="make-${MAKE_VERSION}"
@@ -353,10 +406,13 @@ if [[ "${OPTION_DOWNLOAD_TARBALLS}" == "no" ]]; then
     printf -- "  ${BINUTILS_TARBALL}\n"
     printf -- "  ${BINUTILS_SIG}\n"
     printf -- "  ${GCC_TARBALL}\n"
-    printf -- "  ${GMP_TARBALL}\n"
-    printf -- "  ${MPFR_TARBALL}\n"
-    printf -- "  ${MPC_TARBALL}\n"
     printf -- "  ${GCC_SIG}\n"
+    printf -- "  ${GMP_TARBALL}\n"
+    printf -- "  ${GMP_SIG}\n"
+    printf -- "  ${MPFR_TARBALL}\n"
+    printf -- "  ${MPFR_SIG}\n"
+    printf -- "  ${MPC_TARBALL}\n"
+    printf -- "  ${MPC_MD5}\n"
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         printf -- "  ${GDB_TARBALL}\n"
         printf -- "  ${GDB_SIG}\n"
@@ -371,60 +427,65 @@ else
 
         if ! [ -f "${BINUTILS_TARBALL}" ]; then
             message "Downloading \`${BINUTILS_TARBALL}'"
-            if ! fetch "${BINUTILS_URL}" 1>> "binutils-download.log" 2>&1; then
-                panic "Failed to download ${BINUTILS_TARBALL} from ${BINUTILS_URL} (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
+            if ! fetch "${BINUTILS_TARBALL_URL}" "${BINUTILS_TARBALL}" 1>> "binutils-download.log" 2>&1; then
+                panic "Failed to download ${BINUTILS_TARBALL} from ${BINUTILS_TARBALL_URL} (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
             fi
         fi
         if ! [ -f "${BINUTILS_SIG}" ]; then
-            if ! fetch "${BINUTILS_SIG_URL}" 1>> "binutils-download.log" 2>&1; then
+            message "Downloading \`${BINUTILS_SIG}'"
+            if ! fetch "${BINUTILS_SIG_URL}" "${BINUTILS_SIG}" 1>> "binutils-download.log" 2>&1; then
                 panic "Failed to download ${BINUTILS_SIG} (see \`${BUILD_SRC_DIR}/binutils-download.log')" 1
             fi
         fi
 
         if ! [ -f "${GCC_TARBALL}" ]; then
             message "Downloading \`${GCC_TARBALL}'"
-            if ! fetch "${GCC_URL}"  1>> "gcc-download.log" 2>&1; then
-                panic "Failed to download ${GCC_TARBALL} from ${GCC_URL} (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
+            if ! fetch "${GCC_TARBALL_URL}" "${GCC_TARBALL}" 1>> "gcc-download.log" 2>&1; then
+                panic "Failed to download ${GCC_TARBALL} from ${GCC_TARBALL_URL} (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
         if ! [ -f "${GCC_SIG}" ]; then
-            if ! fetch "${GCC_SIG_URL}" 1>> "gcc-download.log" 2>&1; then
+            message "Downloading \`${GCC_SIG}'"
+            if ! fetch "${GCC_SIG_URL}" "${GCC_SIG}" 1>> "gcc-download.log" 2>&1; then
                 panic "Failed to download ${GCC_SIG} from ${GCC_SIG_URL}) (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
 
         if ! [ -f "${GMP_TARBALL}" ]; then
             message "Downloading \`${GMP_TARBALL}'"
-            if ! fetch "${GMP_URL}"  1>> "gmp-download.log" 2>&1; then
-                panic "Failed to download ${GMP_TARBALL} from ${GMP_URL} (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
+            if ! fetch "${GMP_TARBALL_URL}" "${GMP_TARBALL}" 1>> "gmp-download.log" 2>&1; then
+                panic "Failed to download ${GMP_TARBALL} from ${GMP_TARBALL_URL} (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
             fi
         fi
         if ! [ -f "${GMP_SIG}" ]; then
-            if ! fetch "${GMP_SIG_URL}" 1>> "gmp-download.log" 2>&1; then
+            message "Downloading \`${GMP_SIG}'"
+            if ! fetch "${GMP_SIG_URL}" "${GMP_SIG}" 1>> "gmp-download.log" 2>&1; then
                 panic "Failed to download ${GMP_SIG} from ${GMP_SIG_URL}) (see \`${BUILD_SRC_DIR}/gmp-download.log')" 1
             fi
         fi
 
         if ! [ -f "${MPFR_TARBALL}" ]; then
             message "Downloading \`${MPFR_TARBALL}'"
-            if ! fetch "${MPFR_URL}"  1>> "mpfr-download.log" 2>&1; then
-                panic "Failed to download ${MPFR_TARBALL} from ${MPFR_URL} (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
+            if ! fetch "${MPFR_TARBALL_URL}" "${MPFR_TARBALL}" 1>> "mpfr-download.log" 2>&1; then
+                panic "Failed to download ${MPFR_TARBALL} from ${MPFR_TARBALL_URL} (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
             fi
         fi
         if ! [ -f "${MPFR_SIG}" ]; then
-            if ! fetch "${MPFR_SIG_URL}" 1>> "mpfr-download.log" 2>&1; then
+            message "Downloading \`${MPFR_SIG}'"
+            if ! fetch "${MPFR_SIG_URL}" "${MPFR_SIG}" 1>> "mpfr-download.log" 2>&1; then
                 panic "Failed to download ${MPFR_SIG} from ${MPFR_SIG_URL}) (see \`${BUILD_SRC_DIR}/mpfr-download.log')" 1
             fi
         fi
 
         if ! [ -f "${MPC_TARBALL}" ]; then
             message "Downloading \`${MPC_TARBALL}'"
-            if ! fetch "${MPC_URL}"  1>> "mpc-download.log" 2>&1; then
-                panic "Failed to download ${MPC_TARBALL} from ${MPC_URL} (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
+            if ! fetch "${MPC_TARBALL_URL}" "${MPC_TARBALL}" 1>> "mpc-download.log" 2>&1; then
+                panic "Failed to download ${MPC_TARBALL} from ${MPC_TARBALL_URL} (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
             fi
         fi
-        if ! [ -f "${MPC_MD5}" ]; then
-            if ! fetch "${MPC_MD5_URL}" 1>> "mpc-download.log" 2>&1; then
+        if ! [ -f "${MPC_RENAMED_MD5}" ]; then
+            message "Downloading \`${MPC_RENAMED_MD5}'"
+            if ! fetch "${MPC_MD5_URL}" "${MPC_RENAMED_MD5}" 1>> "mpc-download.log" 2>&1; then
                 panic "Failed to download ${MPC_MD5} from ${MPC_MD5_URL}) (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
             fi
         fi
@@ -432,12 +493,12 @@ else
         if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
             if ! [ -f "${GDB_TARBALL}" ]; then
                 message "Downloading \`${GDB_TARBALL}'"
-                if ! fetch "${GDB_URL}" 1>> "gdb-download.log" 2>&1; then
-                    panic "Failed to download ${GDB_TARBALL} from ${GDB_URL} (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
+                if ! fetch "${GDB_TARBALL_URL}" "${GDB_TARBALL}" 1>> "gdb-download.log" 2>&1; then
+                    panic "Failed to download ${GDB_TARBALL} from ${GDB_TARBALL_URL} (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
                 fi
             fi
             if ! [ -f "${GDB_SIG}" ]; then
-                if ! fetch "${GDB_SIG_URL}" 1>> "gdb-download.log" 2>&1; then
+                if ! fetch "${GDB_SIG_URL}" "${GDB_SIG}" 1>> "gdb-download.log" 2>&1; then
                     panic "Failed to download ${GDB_SIG} from ${GDB_SIG_URL} (see \`${BUILD_SRC_DIR}/gdb-download.log')" 1
                 fi
             fi
@@ -446,20 +507,20 @@ else
         if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
             if ! [ -f "${MAKE_TARBALL}" ]; then
                 message "Downloading \`${MAKE_TARBALL}'"
-                if ! fetch "${MAKE_URL}" 1>> "make.log" 2>&1; then
-                    panic "Failed to download ${MAKE_TARBALL} from ${MAKE_URL} (see \`${BUILD_SRC_DIR}/make.log')" 1
+                if ! fetch "${MAKE_TARBALL_URL}" "${MAKE_TARBALL}" 1>> "make-download.log" 2>&1; then
+                    panic "Failed to download ${MAKE_TARBALL} from ${MAKE_TARBALL_URL} (see \`${BUILD_SRC_DIR}/make-download.log')" 1
                 fi
             fi
             if ! [ -f "${MAKE_SIG}" ]; then
-                if ! fetch "${MAKE_SIG_URL}" 1>> "make.log" 2>&1; then
-                    panic "Failed to download ${MAKE_SIG} from ${MAKE_SIG_URL} (see \`${BUILD_SRC_DIR}/make.log')" 1
+                if ! fetch "${MAKE_SIG_URL}" "${MAKE_SIG}" 1>> "make-download.log" 2>&1; then
+                    panic "Failed to download ${MAKE_SIG} from ${MAKE_SIG_URL} (see \`${BUILD_SRC_DIR}/make-download.log')" 1
                 fi
             fi
         fi
 
         if ! [ -f "${GNU_KEYRING}" ]; then
             message "Downloading \`${GNU_KEYRING}'"
-            if ! fetch "${GNU_KEYRING_URL}"  1>> "gcc-download.log" 2>&1; then
+            if ! fetch "${GNU_KEYRING_URL}" "${GNU_KEYRING}" 1>> "gcc-download.log" 2>&1; then
                 panic "Failed to download ${GNU_KEYRING} from ${GNU_KEYRING_URL} (see \`${BUILD_SRC_DIR}/gcc-download.log')" 1
             fi
         fi
@@ -504,8 +565,8 @@ if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
     if ! [ -f "${MPC_TARBALL}" ]; then
         panic "\`${MPC_TARBALL}' not found" 1
     fi
-    if ! [ -f "${MPC_MD5}" ]; then
-        panic "\`${MPC_MD5}' not found" 1
+    if ! [ -f "${MPC_RENAMED_MD5}" ]; then
+        panic "\`${MPC_RENAMED_MD5}' not found" 1
     fi
 
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
@@ -514,6 +575,15 @@ if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
         fi
         if ! [ -f "${GDB_SIG}" ]; then
             panic "\`${GDB_SIG}' not found" 1
+        fi
+    fi
+
+    if [[ "${OPTION_BUILD_MAKE}" == "yes" ]]; then
+        if ! [ -f "${MAKE_TARBALL}" ]; then
+            panic "\`${MAKE_TARBALL}' not found" 1
+        fi
+        if ! [ -f "${MAKE_SIG}" ]; then
+            panic "\`${MAKE_SIG}' not found" 1
         fi
     fi
 
@@ -541,21 +611,9 @@ if ! [ -f "${BUILD_STAMPS_DIR}/checked-integrity" ]; then
     fi
 
     message "Checking integrity of \`${MPC_TARBALL}'"
-    # The md5.sum is a special (annoying) case
-    md5=`cat "${MPC_MD5}" 2> /dev/null | grep "${MPC_TARBALL}" 2> /dev/null | sed 's/[[:space:]][[:space:]]*/,/g' | cut -d ',' -f 1`
-    case "${MD5}" in
-        "md5")
-            calculated_md5=`"${MD5}" "${MPC_TARBALL}" | awk '{ print $1; }'`
-            ;;
-        "md5sum")
-            calculated_md5=`"${MD5}" "${MPC_TARBALL}" | sed -r -n 's/^([a-f0-9][a-f0-9]*)\s+.*?$/\1/pg'`
-            ;;
-    esac
-    if [ -z "${md5}" ] || [[ "${calculated_md5}" != "${md5}" ]]; then
+    if ! checksum_md5 "${MPC_RENAMED_MD5}" "${MPC_TARBALL}" 1>> "mpc-download.log" 2>&1; then
         panic "Integrity check for ${MPC_TARBALL} failed (see \`${BUILD_SRC_DIR}/mpc-download.log')" 1
     fi
-    unset "md5"
-    unset "calculated_md5"
 
     if [[ "${OPTION_BUILD_GDB}" == "yes" ]]; then
         message "Checking integrity of \`${GDB_TARBALL}'"
@@ -578,37 +636,38 @@ cd - 1> /dev/null
 message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
 
 for target in ${TARGETS[@]}; do
-   if [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build" ]; then
-       continue
-   fi
+    if [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build" ]; then
+        continue
+    fi
 
-   if ! [ -z "${BUILD_HOST}" ]; then
-       # In order to build a Canadian Cross build-x-host-x-target,
-       # you need to first build the build-x-host cross-compiler and
-       # the build-x-target cross-compiler.
+    if ! [ -z "${BUILD_HOST}" ]; then
+        # In order to build a Canadian Cross build-x-host-x-target,
+        # you need to first build the build-x-host cross-compiler and
+        # the build-x-target cross-compiler.
 
-       # Use the path to the build-x-target build for the entire build process
-       export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
+        # Use the path to the build-x-target build for the entire build process
+        export PATH="${BUILD_SRC_DIR}/build-x-target/${target}/bin:${PATH}"
 
-       if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build-x-target" ]; then
-           message "Building build-x-target (${target})"
+        if ! [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build-x-target" ]; then
+            message "Building build-x-target (${target})"
 
-           (BUILD_HOST=""
-            BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
+            (BUILD_HOST=""
+             BUILD_INSTALL_DIR="${BUILD_SRC_DIR}/build-x-target"
 
-            build_target "${target}"
-            clean_up
+             build_target "${target}"
+             clean_targets_up "${target}"
+             clean_stamps_up "${target}"
 
-            create_stamp "${target}-completed-build-x-target") || exit ${?}
-       fi
-   else
-       export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
-   fi
+             create_stamp "${target}-completed-build-x-target") || exit ${?}
+        fi
+    else
+        export PATH="${BUILD_INSTALL_DIR}/${target}/bin:${PATH}"
+    fi
 
-   message "Building build-x-host-x-target (${target})"
+    message "Building build-x-host-x-target (${target})"
 
-   build_target "${target}"
-   clean_up
+    build_target "${target}"
+    clean_targets_up "${target}"
 done
 
 if ! [ -f "${BUILD_STAMPS_DIR}/make-completed-build" ]; then
