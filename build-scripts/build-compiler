@@ -329,6 +329,9 @@ for program in \
 done
 unset program
 
+program_exists "cmp"
+program_exists "tar"
+
 TARGETS=(`printf -- "${BUILD_TARGETS}" | sed -E 's/[[:space:]]+/ /g'`)
 
 BUILD_STAMPS_DIR="${BUILD_SRC_DIR}/stamps"
