@@ -25,7 +25,8 @@ binutils_configure_options=(
         --with-gcc \
         --with-gnu-as \
         --with-gnu-ld \
-        --with-stabs)
+        --with-stabs \
+        MAKEINFO=missing)
 if ! [ -z "${BUILD_HOST}" ]; then
     binutils_configure_options+=(--host="${BUILD_HOST}")
 fi
