@@ -9,6 +9,11 @@
 PROGNAME="${0##*/}"
 TMPDIR="${TMPDIR:-/tmp}"
 
+TARGET="sh-elf"
+AFLAGS="--fatal-warnings --isa=sh2 --big --reduce-memory-overheads"
+ARCH="elf32-sh"
+DATA_SECTION="rodata"
+
 panic () {
     printf -- "${PROGNAME}: Error: ${1}" >&2
     exit ${2}
@@ -18,12 +23,12 @@ if [ -z "${INSTALL_ROOT}" ]; then
     panic "Undefined INSTALL_ROOT (install root directory)" 1
 fi
 
-temp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
-temp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
-temp3="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+tmp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+tmp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+tmp3="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
 
 clean_up () {
-    rm -f "${temp1}" "${temp2}" "${temp3}"
+    rm -f "${tmp1}" "${tmp2}" "${tmp3}"
     exit 0
 }
 
@@ -39,17 +44,17 @@ symbol="${2}"
 output="${3}"
 
 # Gotta do a different binary target here depending on the target
-(${INSTALL_ROOT}/sh-elf/bin/sh-elf-as --fatal-warnings --isa=sh2 --big --reduce-memory-overheads \
-    -o "${temp3}" || \
+(${INSTALL_ROOT}/"${TARGET}"/bin/"${TARGET}"-as ${AFLAGS} \
+    -o "${tmp3}" || \
     panic "Couldn't assemble file" 1) << EOF
-.SECTION ".rodata"
+.SECTION ".${DATA_SECTION}"
 .ALIGN 2
 EOF
 
-cat > "${temp1}" << EOF
+cat > "${tmp1}" << EOF
 SECTIONS
 {
-  .rodata :
+  .${DATA_SECTION} :
   {
      _${symbol} = .;
      *(.data);
@@ -57,9 +62,10 @@ SECTIONS
   }
 }
 EOF
-${INSTALL_ROOT}/sh-elf/bin/sh-elf-ld --no-warn-mismatch --format binary --oformat elf32-sh "${input}" \
-    --format 'elf32-sh' "${temp3}" \
-    -o "${temp2}" -r -T "${temp1}" || panic "Couldn't link file" 1
 
-${INSTALL_ROOT}/sh-elf/bin/sh-elf-objcopy --set-section-flags ".rodata=alloc,load,data,readonly" \
-    "${temp2}" "${output}" || panic "Couldn't translate object file" 1
+"${INSTALL_ROOT}/${TARGET}/bin/${TARGET}-ld" --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
+    --format "${ARCH}" "${tmp3}" \
+    -o "${tmp2}" -r -T "${tmp1}" || panic "Couldn't link file" 1
+
+"${INSTALL_ROOT}/${TARGET}/bin/${TARGET}-objcopy" --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
+    "${tmp2}" "${output}" || panic "Couldn't translate object file" 1
