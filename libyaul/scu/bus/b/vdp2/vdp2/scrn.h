@@ -31,6 +31,9 @@ extern "C" {
 #define SCRN_CCC_RGB_32768      3
 #define SCRN_CCC_RGB_16770000   4
 
+#define SCRN_CALCULATE_PAGE_COUNT(format)                                      \
+        ((format)->scf_plane_size)
+
 #define SCRN_CALCULATE_PAGE_WIDTH(format)                                      \
         (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
 

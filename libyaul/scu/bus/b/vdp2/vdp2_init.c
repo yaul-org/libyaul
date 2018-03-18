@@ -39,7 +39,7 @@ vdp2_init(void)
         vdp2_state.nbg2.scroll.x = 0;
         vdp2_state.nbg2.scroll.y = 0;
         vdp2_state.nbg3.scroll.x = 0;
-        vdp2_state.nbg3.scroll.x = 0;
+        vdp2_state.nbg3.scroll.y = 0;
 
         (void)memset(&vdp2_state.nbg0.bitmap_format, 0x00,
             sizeof(struct scrn_bitmap_format));

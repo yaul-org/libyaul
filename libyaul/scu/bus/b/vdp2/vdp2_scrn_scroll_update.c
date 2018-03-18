@@ -58,7 +58,7 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
                 MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
-                _update_integer_scroll(&vdp2_state.nbg3.scroll.x, delta_clamped,
+                _update_integer_scroll(&vdp2_state.nbg2.scroll.x, delta_clamped,
                     &in);
 
                 /* Write to memory */
@@ -116,7 +116,7 @@ vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t delta)
                 MEMORY_WRITE(16, VDP2(SCYDN1), dn);
                 break;
         case SCRN_NBG2:
-                _update_integer_scroll(&vdp2_state.nbg3.scroll.y,
+                _update_integer_scroll(&vdp2_state.nbg2.scroll.y,
                     delta_clamped, &in);
 
                 /* Write to memory */
