@@ -19,7 +19,7 @@ extern "C" {
  * R/W access from the CPU or DMA controller(s) is possible, but the
  * image may be disturbed by the access timing. Access through CPU or
  * DMA controller(s) is possible only in word units and long word
- * units. Access in bytes is now allowed. */
+ * units. Access in bytes is not allowed. */
 
 #define CRAM_MODE_0_OFFSET(x, y, z)     (0x25F00000 + ((x) << 9) +             \
     ((y) << 5) + ((z) << 1))

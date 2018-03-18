@@ -42,7 +42,7 @@ extern "C" {
 
 /* Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
- * | PND size | Cell size | Size of plane |
+ * | PND size | Cell size | Size of page  |
  * +----------+-----------+---------------+
  * | 1-word   | 1x1       | 0x2000        |
  * | 1-word   | 2x2       | 0x0800        |
@@ -192,7 +192,7 @@ struct scrn_cell_format {
         uint32_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
         uint32_t scf_pnd_size; /* Pattern name data size: (1)-word or (2)-words */
         uint32_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
-                                     * auxiliary mode #1 (no flip function) */
+                                      * auxiliary mode #1 (no flip function) */
         uint32_t scf_cp_table; /* Character pattern table lead address*/
         uint32_t scf_color_palette; /* Color palette lead address */
         uint32_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */

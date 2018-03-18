@@ -11,7 +11,7 @@ typedef union {
                 unsigned int r:5;
         } __packed;
         uint16_t raw;
-}  __aligned (2) color_rgb555_t;
+} __aligned (2) color_rgb555_t;
 
 #define COLOR_RGB555(r, g, b)                                                  \
     ((color_rgb555_t)COLOR_RGB555_INITIALIZER(r, g, b))
@@ -43,7 +43,7 @@ typedef union {
         } __packed;
         uint8_t comp[4];
         uint32_t raw;
-}  __aligned (4) color_rgb888_t;
+} __aligned (4) color_rgb888_t;
 
 #define COLOR_RGB888_INITIALIZER(r, g, b)                                      \
     {                                                                          \
@@ -67,7 +67,7 @@ typedef union {
                 fix16_t r;
         } __packed;
         fix16_t comp[3];
-}  __packed color_fix16_rgb_t;
+} __packed color_fix16_rgb_t;
 
 #define COLOR_FIX16_RGB_INITIALIZER(r, g, b)                                   \
     {                                                                          \
