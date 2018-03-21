@@ -135,9 +135,6 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 cpu_clock_freq_chg(clock_freq);
         }
 
-        /* Enable display */
-        tvmd |= 0x8000;
-
         /* Write to TVMD bit during VBLANK-IN */
         vdp2_tvmd_vblank_in_wait();
 
