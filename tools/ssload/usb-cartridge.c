@@ -33,7 +33,6 @@
  */
 
 #include <assert.h>
-#include <err.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <math.h>
@@ -91,8 +90,8 @@ static const char *usb_cartridge_error_strings[] = {
         "USB_CARTRIDGE_INSUFFICIENT_MEMORY"
 };
 
-static int init(void);
-static int shutdown(void);
+static int dev_init(void);
+static int dev_shutdown(void);
 
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
@@ -119,7 +118,7 @@ static crc_t crc_calculate(const uint8_t *, size_t);
  * USB Cartridge
  */
 static int
-init(void)
+dev_init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -216,6 +215,7 @@ exit:
 
 error:
         ftdi_usb_close(&ftdi_ctx);
+
         return -1;
 #endif /* HAVE_LIBFTD2XX */
 }
@@ -224,7 +224,7 @@ error:
  * USB Cartridge
  */
 static int
-shutdown(void)
+dev_shutdown(void)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -601,6 +601,19 @@ upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 /*
  * USB Cartridge
  */
+static char *
+error_stringify(void)
+{
+#ifdef HAVE_LIBFTD2XX
+        return "<error>";
+#else
+        return ftdi_get_error_string(&ftdi_ctx);
+#endif /* HAVE_LIBFTD2XX */
+}
+
+/*
+ * USB Cartridge
+ */
 static int
 download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
@@ -902,9 +915,9 @@ crc_calculate(const uint8_t *buffer, size_t buffer_len)
 
 const struct device_driver device_usb_cartridge = {
         .name = "USB Flash Cartridge",
-        .init = init,
-        .shutdown = shutdown,
-        .error_stringify = NULL,
+        .init = dev_init,
+        .shutdown = dev_shutdown,
+        .error_stringify = error_stringify,
         .download_buffer = download_buffer,
         .download_file = download_file,
         .upload_buffer = upload_buffer,

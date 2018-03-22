@@ -6,7 +6,6 @@
  */
 
 #include <assert.h>
-#include <err.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <math.h>
@@ -102,8 +101,8 @@ static struct {
         }
 };
 
-static int init(void);
-static int shutdown(void);
+static int dev_init(void);
+static int dev_shutdown(void);
 
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
@@ -128,7 +127,7 @@ static uint8_t packet_checksum(const uint8_t *, uint32_t);
  *
  */
 static int
-init(void)
+dev_init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -204,7 +203,7 @@ error:
  *
  */
 static int
-shutdown(void)
+dev_shutdown(void)
 {
 #ifdef HAVE_LIBFTD2XX
         if (ft_handle != NULL) {
@@ -1117,8 +1116,8 @@ device_packet_check(const uint8_t *buffer, uint32_t response_type)
 
 const struct device_driver device_datalink = {
         .name = "USB DataLink Red/Green LED",
-        .init = init,
-        .shutdown = shutdown,
+        .init = dev_init,
+        .shutdown = dev_shutdown,
         .error_stringify = error_stringify,
         .download_buffer = download_buffer,
         .download_file = download_file,
