@@ -23,23 +23,29 @@ __assert_func(const char *file, int line, const char *func,
         static char buf[4096];
 
         (void)snprintf(buf, 4096,
-            "[2J[HAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
+            "[H[2JAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
             failed_expr, file, line,
             (func ? ", function: " : ""),
             (func ? func : ""));
 
+        cpu_intc_disable();
+
         /* Reset the VDP2 */
         vdp2_init();
-        vdp2_tvmd_display_res_set(TVMD_INTERLACE_DOUBLE, TVMD_HORZ_HIRESO_A,
-                TVMD_VERT_240);
+        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A, TVMD_VERT_240);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
-                COLOR_RGB555(0, 28, 0));
+                COLOR_RGB555(0, 7, 0));
+        vdp2_tvmd_display_set();
 
         /* Reset the VDP1 */
         vdp1_init();
 
-        cons_init(CONS_DRIVER_VDP2, 80, 60);
-        cons_write(buf);
+        cons_init(CONS_DRIVER_VDP2, 40, 30);
+        cons_buffer(buf);
+
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
+        cons_flush();
 
         abort();
 }

@@ -42,7 +42,9 @@ abort(void)
 #elif HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cartridge_return();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-        arp_return();
+        while (true) {
+                arp_function_nonblock();
+        }
 #else
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
 #endif
