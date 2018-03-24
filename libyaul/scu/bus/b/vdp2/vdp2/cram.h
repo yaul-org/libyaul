@@ -21,6 +21,8 @@ extern "C" {
  * DMA controller(s) is possible only in word units and long word
  * units. Access in bytes is not allowed. */
 
+#define CRAM_ADDR(x)                    (0x25F00000 + ((x) << 1))
+
 #define CRAM_MODE_0_OFFSET(x, y, z)     (0x25F00000 + ((x) << 9) +             \
     ((y) << 5) + ((z) << 1))
 #define CRAM_MODE_1_OFFSET(x, y, z)     CRAM_MODE_0_OFFSET(x, y, z)
@@ -38,6 +40,8 @@ extern "C" {
 #define CRAM_MODE_0_SIZE        0x0800
 #define CRAM_MODE_1_SIZE        0x1000
 #define CRAM_MODE_2_SIZE        0x1000
+
+#define CRAM_SIZE               0x1000
 
 #define COLOR_PALETTE_DATA      0x0000
 #define COLOR_RGB_DATA          0x8000
