@@ -76,11 +76,14 @@ extern "C" {
  * |            | 1-word   | 2x2       | 0x2000        |
  * |            | 2-word   | 1x1       | 0x10000       |
  * |            | 2-word   | 2x2       | 0x4000        |
- * +------------+----------+-----------+---------------+ */
+ * +------------+----------+-----------+---------------+
+ */
 #define SCRN_CALCULATE_PLANE_SIZE(format)                                      \
         (((format)->scf_plane_size) * SCRN_CALCULATE_PAGE_SIZE(format))
 
-/* Possible values (plane count) for SCRN_CALCULATE_PLANES_CNT():
+/*-
+ * Possible values (plane count) that can fit within a 4Mbit VRAM bank:
+ *
  * +-------------+------------+----------+------------+------------+
  * | Planes/bank | Char. size | PND size | Plane dim. | Plane size |
  * +-------------+------------+----------+------------+------------+
@@ -98,25 +101,36 @@ extern "C" {
  * | 16          | 2x2        | 1-word   | 2x2        | 0x002000   |
  * |  2          | 1x1        | 2-word   | 2x2        | 0x010000   |
  * |  8          | 2x2        | 2-word   | 2x2        | 0x004000   |
- * +-------------+------------+----------+------------+------------+ */
-#define SCRN_CALCULATE_PLANES_CNT(format)                                      \
-        (VRAM_BANK_SIZE / SCRN_CALCULATE_PLANE_SIZE((format)))
+ * +-------------+------------+----------+------------+------------+
+ */
+#define SCRN_CALCULATE_PLANES_2SPLIT_4MBIT_CNT(format)                         \
+        (VRAM_2SPLIT_BANK_SIZE_4MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+
+#define SCRN_CALCULATE_PLANES_4SPLIT_4MBIT_CNT(format)                         \
+        (VRAM_4SPLIT_BANK_SIZE_4MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+
+#define SCRN_CALCULATE_PLANES_2SPLIT_8MBIT_CNT(format)                         \
+        (VRAM_2SPLIT_BANK_SIZE_8MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+
+#define SCRN_CALCULATE_PLANES_4SPLIT_8MBIT_CNT(format)                         \
+        (VRAM_4SPLIT_BANK_SIZE_8MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
 
 /* Configuration table mapping. Depending on how the normal/rotational
  * background is set up, choose a config:
- * +--------+----------+-----------+-----------+-----------+-------------+
- * | Config | PND size | Cell size | Aux. mode | Pal. banks| Color count |
- * +--------+----------+-----------+-----------+-----------+-------------+
- * | 0      | 1-word   | 1x1       | 0         | 128       | 16          |
- * | 1      | 1-word   | 1x1       | 1         | 128       | 16          |
- * | 2      | 1-word   | 2x2       | 0         | 128       | 16          |
- * | 3      | 1-word   | 2x2       | 1         | 128       | 16          |
- * | 4      | 1-word   | 1x1       | 0         | 8         | 16,256,2048 |
- * | 5      | 1-word   | 1x1       | 1         | 8         | 16,256,2048 |
- * | 6      | 1-word   | 2x2       | 0         | 8         | 16,256,2048 |
- * | 7      | 1-word   | 2x2       | 1         | 8         | 16,256,2048 |
- * | 8      | 2-word   | X         | X         | 8/128     | 16,256,2048 |
- * +--------+----------+-----------+-----------+-----------+-------------+ */
+ * +-----+--------+------+-----------+------------+------------+-------------+
+ * | CFG | PND    | Cell | Aux. mode | Chr. count | Pal. banks | Color count |
+ * +-----+--------+------+-----------+------------+------------+-------------+
+ * | 0   | 1-word | 1x1  | 0         | 0x0400     | 128        | 16          |
+ * | 1   | 1-word | 1x1  | 1         | 0x1000     | 128        | 16          |
+ * | 2   | 1-word | 2x2  | 0         | 0x0400     | 128        | 16          |
+ * | 3   | 1-word | 2x2  | 1         | 0x1000     | 128        | 16          |
+ * | 4   | 1-word | 1x1  | 0         | 0x0200     | 8          | 16,256,2048 |
+ * | 5   | 1-word | 1x1  | 1         | 0x0800     | 8          | 16,256,2048 |
+ * | 6   | 1-word | 2x2  | 0         | 0x0200     | 8          | 16,256,2048 |
+ * | 7   | 1-word | 2x2  | 1         | 0x0800     | 8          | 16,256,2048 |
+ * | 8   | 2-word | X    | X         | 0x8000     | 8/128      | 16,256,2048 |
+ * +-----+--------+------+-----------+------------+------------+-------------+
+ */
 
 #define CHARACTER_NUMBER(x)     ((x) >> 5)
 #define PALETTE_NUMBER(x)       ((x) >> 5)
