@@ -12,33 +12,52 @@
 
 #include "arp-internal.h"
 
-static void arp_function_01(void);
-static void arp_function_09(void);
+static void _arp_function_nop(void);
+static void _arp_function_01(void);
+static void _arp_function_09(void);
+
+static void (*_arp_function_table[])(void) = {
+        _arp_function_nop,
+        _arp_function_01,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_09,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop,
+        _arp_function_nop
+};
 
 void
 arp_function_nonblock(void)
 {
-        uint32_t b;
 
-        if (!(arp_sync_nonblock()))
-                return;
-
-        b = arp_xchg_byte(0x00);
-        switch (b) {
-        case 0x01:
-                arp_function_01();
-                return;
-        case 0x09:
-                arp_function_09();
-        default:
+        if (!(arp_sync_nonblock())) {
                 return;
         }
+
+        uint32_t command;
+        command = arp_xchg_byte(0x00) & 0x0F;
+
+        _arp_function_table[command]();
+}
+
+static void
+_arp_function_nop(void)
+{
 }
 
 /* Read byte from memory and send to client (download
  * from client's perspective) */
 static void
-arp_function_01(void)
+_arp_function_01(void)
 {
         uint32_t b;
         uint32_t address;
@@ -48,7 +67,6 @@ arp_function_01(void)
         /* Send some bogus value? */
         arp_send_long(0x00000000);
 
-        /* XXX Still blocking */
         len = 0;
         while (true) {
                 /* Read address */
@@ -89,7 +107,7 @@ arp_function_01(void)
 
 /* Upload memory and jump (if requested) */
 static void
-arp_function_09(void)
+_arp_function_09(void)
 {
         uint32_t b;
         uint32_t addr;

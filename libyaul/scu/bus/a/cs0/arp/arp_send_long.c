@@ -13,8 +13,6 @@ void
 arp_send_long(uint32_t w)
 {
 
-        while ((arp_busy_status()));
-
         arp_xchg_byte((w >> 24));
         arp_xchg_byte((w >> 16));
         arp_xchg_byte((w >> 8));

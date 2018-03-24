@@ -17,7 +17,7 @@ arp_read_byte(void)
         while ((arp_busy_status()));
 
         b = MEMORY_READ(8, ARP(INPUT));
-        /* Write back? */
+        /* Write back */
         MEMORY_WRITE(8, ARP(OUTPUT), b);
 
         return b;

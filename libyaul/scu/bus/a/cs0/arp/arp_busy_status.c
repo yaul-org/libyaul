@@ -17,8 +17,11 @@ arp_busy_status(void)
 
         status = MEMORY_READ(8, ARP(STATUS));
         status &= 0x01;
-        /* Busy? */
         busy = (status == 0x00);
+
+        if (!busy) {
+                MEMORY_WRITE(8, ARP(status), 0x0);
+        }
 
         return busy;
 }
