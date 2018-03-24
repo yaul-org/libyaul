@@ -29,15 +29,15 @@ vdp2_vram_control_set(struct vram_ctl *ctl)
         /* Cycle patterns */
         /* The VDP2 is not smart enough to direct all of this VRAM
          * traffic automatically; you must do it yourself */
-        MEMORY_WRITE(16, VDP2(CYCA0L), ctl->vram_cycp.pv[0] & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA0U), (ctl->vram_cycp.pv[0] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCA0L), (ctl->vram_cycp.pv[0] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCA0U), ctl->vram_cycp.pv[0] & 0xFFFF);
 
-        MEMORY_WRITE(16, VDP2(CYCA1L), ctl->vram_cycp.pv[1] & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA1U), (ctl->vram_cycp.pv[1] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCA1L), (ctl->vram_cycp.pv[1] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCA1U), ctl->vram_cycp.pv[1] & 0xFFFF);
 
-        MEMORY_WRITE(16, VDP2(CYCB0L), ctl->vram_cycp.pv[2] & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB0U), (ctl->vram_cycp.pv[2] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCB0L), (ctl->vram_cycp.pv[2] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCB0U), ctl->vram_cycp.pv[2] & 0xFFFF);
 
-        MEMORY_WRITE(16, VDP2(CYCB1L), ctl->vram_cycp.pv[3] & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB1U), (ctl->vram_cycp.pv[3] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCB1L), (ctl->vram_cycp.pv[3] >> 16) & 0xFFFF);
+        MEMORY_WRITE(16, VDP2(CYCB1U), ctl->vram_cycp.pv[3] & 0xFFFF);
 }
