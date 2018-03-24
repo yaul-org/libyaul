@@ -8,6 +8,8 @@
 #include <cpu.h>
 #include <vdp2/tvmd.h>
 
+#include <assert.h>
+
 #include "vdp2-internal.h"
 
 void
