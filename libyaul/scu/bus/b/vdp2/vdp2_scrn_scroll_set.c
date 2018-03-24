@@ -9,14 +9,39 @@
 
 #include "vdp2-internal.h"
 
-#define WRAP_INTEGER(x)                                                        \
+/*-
+ * Integer scrolling for NGB2 and NBG3
+ * +------------------+-------+ +------------------+-------+
+ * | X integer scroll | Value | | Y integer scroll | Value |
+ * +------------------+-------+ +------------------+-------+
+ * | -2048            |  0    | | -2048            |       |
+ * | -2047            |  2047 | | -2047            |       |
+ * |  ...             |  ...  | |  ...             |       |
+ * | -2               |  1    | | -2               |       |
+ * | -1               |  0    | | -1               |       |
+ * |                  |       | |                  |       |
+ * |  0               |  0    | |  0               |       |
+ * |                  |       | |                  |       |
+ * |  1               |  2047 | |  1               |       |
+ * |  2               |  2046 | |  2               |       |
+ * |  ...             |  ...  | |  ...             |       |
+ * |  2047            |  1    | |  2047            |       |
+ * |  2048            |  0    | |  2048            |       |
+ * +------------------+-------+ +------------------+-------+
+ */
+
+#define WRAP_Y_INTEGER(x)                                                      \
     (((x) < 0)                                                                 \
         ? ((((x) & 0x07FF) + 0x07FF) & 0x07FF)                                 \
         : ((x) & 0x07FF))
 
+#define WRAP_X_INTEGER(x)                                                      \
+    ((0x07FF - (x) + 1) & 0x07FF)
+
 static inline void _set_fixed_point_scroll(fix16_t *, fix16_t, uint16_t *,
     uint16_t *);
-static inline void _set_integer_scroll(int16_t *, fix16_t, uint16_t *);
+static inline void _set_integer_x_scroll(int16_t *, fix16_t, uint16_t *);
+static inline void _set_integer_y_scroll(int16_t *, fix16_t, uint16_t *);
 
 void
 vdp2_scrn_scroll_x_set(uint8_t scrn, fix16_t scroll)
@@ -55,13 +80,13 @@ vdp2_scrn_scroll_x_set(uint8_t scrn, fix16_t scroll)
                 MEMORY_WRITE(16, VDP2(SCXDN1), dn);
                 break;
         case SCRN_NBG2:
-                _set_integer_scroll(&vdp2_state.nbg2.scroll.x, scroll, &in);
+                _set_integer_x_scroll(&vdp2_state.nbg2.scroll.x, scroll, &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXN2), in);
                 break;
         case SCRN_NBG3:
-                _set_integer_scroll(&vdp2_state.nbg3.scroll.x, scroll, &in);
+                _set_integer_x_scroll(&vdp2_state.nbg3.scroll.x, scroll, &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCXN3), in);
@@ -108,13 +133,13 @@ vdp2_scrn_scroll_y_set(uint8_t scrn, fix16_t scroll)
                 MEMORY_WRITE(16, VDP2(SCYDN1), dn);
                 break;
         case SCRN_NBG2:
-                _set_integer_scroll(&vdp2_state.nbg2.scroll.y, scroll, &in);
+                _set_integer_y_scroll(&vdp2_state.nbg2.scroll.y, scroll, &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCYN2), in);
                 break;
         case SCRN_NBG3:
-                _set_integer_scroll(&vdp2_state.nbg3.scroll.y, scroll, &in);
+                _set_integer_y_scroll(&vdp2_state.nbg3.scroll.y, scroll, &in);
 
                 /* Write to memory */
                 MEMORY_WRITE(16, VDP2(SCYN3), in);
@@ -140,8 +165,15 @@ _set_fixed_point_scroll(fix16_t *scroll, fix16_t amount, uint16_t *in,
 }
 
 static inline void
-_set_integer_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
+_set_integer_x_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
 {
-        *scroll = WRAP_INTEGER((int16_t)fix16_to_int(amount));
+        *scroll = WRAP_X_INTEGER((int16_t)fix16_to_int(amount));
+        *in = *scroll;
+}
+
+static inline void
+_set_integer_y_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
+{
+        *scroll = WRAP_Y_INTEGER((int16_t)fix16_to_int(amount));
         *in = *scroll;
 }
