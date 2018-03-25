@@ -1,6 +1,7 @@
-TARGET:= ssload
-
 include ../../env.mk
+
+TARGET:= ssload
+PROGRAM:= $(TARGET)$(EXE_EXT)
 
 SUB_BUILD:=$(BUILD)/tools/$(TARGET)
 
@@ -23,7 +24,7 @@ SRCS:= ssload.c \
 	shared.c \
 	usb-cartridge.c
 INCLUDES:=
-LIB_DIRS:=
+LIB_DIRS:= /usr/lib
 LIBS:=
 
 ifneq ($(strip $(HAVE_LIBFTD2XX)),)
@@ -36,14 +37,18 @@ CFLAGS+= $(shell pkg-config --cflags libftdi)
 LDFLAGS+= $(shell pkg-config --libs libftdi)
 endif
 
+ifneq ($(strip $(DEBUG)),)
+CFLAGS+= -DDEBUG
+endif
+
 OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
 
 .PHONY: all clean distclean install
 
-all: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+all: $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
+$(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(CC) -o $@ $(OBJS) \
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
@@ -63,12 +68,12 @@ $(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
 	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
 clean:
-	$(ECHO)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
+	$(ECHO)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 
 distclean: clean
 
-install: $(BUILD_ROOT)/$(SUB_BUILD)/$(TARGET)
-	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(TARGET)$(V_END)\n"
+install: $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
+	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(PROGRAM)$(V_END)\n"
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/bin
 	$(ECHO)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
 
