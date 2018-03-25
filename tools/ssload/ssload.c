@@ -400,7 +400,13 @@ usage(void)
             "   -n\t\tDisable starting console\n"
             "   -i iso\tEnable ISO9660 filesystem redirection support using image ISO\n"
             "   -g port\tStart GDB proxy on TCP port PORT\n"
-            "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')\n",
+            "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')"
+#ifdef DEBUG
+            "\n"
+            "\n"
+            "Debug enabled"
+#endif /* DEBUG */
+            "\n",
             PROGNAME);
         exit(2);
 }
