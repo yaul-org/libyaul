@@ -19,16 +19,16 @@ extern "C" {
 #define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n)                                  \
         union {                                                                \
                 struct {                                                       \
-                        unsigned int msb:1; /* Bit 15 */                       \
+                        unsigned int msb:1;                       /* Bit 15 */ \
                         unsigned int :2;                                       \
-                        unsigned int high_speed_shrink:1;                      \
-                        unsigned int pre_clipping:1;                           \
-                        unsigned int user_clipping:2; /* ??? */                \
-                        unsigned int mesh:1;                                   \
-                        unsigned int end_code:1; /* Enable */                  \
-                        unsigned int transparent_pixel:1; /* Enable */         \
-                        unsigned int color_mode:3;                             \
-                        unsigned int cc_mode:3;                                \
+                        unsigned int high_speed_shrink:1;         /* Bit 12 */ \
+                        unsigned int pre_clipping:1;              /* Bit 11 */ \
+                        unsigned int user_clipping:2;          /* Bits 10-9 */ \
+                        unsigned int mesh:1;                       /* Bit 8 */ \
+                        unsigned int end_code:1;                   /* Bit 7 */ \
+                        unsigned int transparent_pixel:1;          /* Bit 6 */ \
+                        unsigned int color_mode:3;              /* Bits 5-3 */ \
+                        unsigned int cc_mode:3;                 /* Bits 2-0 */ \
                 } __aligned(2);                                                \
                                                                                \
                 uint16_t raw;                                                  \

@@ -249,18 +249,30 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_polygon *polygon)
         cmdt = fetch();
 
         cmdt->cmd_ctrl = 0x0004;
-        cmdt->cmd_pmod = polygon->cp_mode.raw;
+        /* Force bit 6 and 7 to be set */
+        cmdt->cmd_pmod = polygon->cp_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_colr = polygon->cp_color;
-        /* CCW starting from vertex D */
-        cmdt->cmd_xd = polygon->cp_vertex.d.x;
-        cmdt->cmd_yd = polygon->cp_vertex.d.y;
+
+        /*-
+         * CCW starting from vertex D
+         * D------------C
+         * |            |
+         * |            |
+         * |            |
+         * |            |
+         * A------------B
+         */
+
         cmdt->cmd_xa = polygon->cp_vertex.a.x;
         cmdt->cmd_ya = polygon->cp_vertex.a.y;
         cmdt->cmd_xb = polygon->cp_vertex.b.x;
         cmdt->cmd_yb = polygon->cp_vertex.b.y;
         cmdt->cmd_xc = polygon->cp_vertex.c.x;
         cmdt->cmd_yc = polygon->cp_vertex.c.y;
+        cmdt->cmd_xd = polygon->cp_vertex.d.x;
+        cmdt->cmd_yd = polygon->cp_vertex.d.y;
+
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (polygon->cp_grad >> 3) & 0xFFFF;
