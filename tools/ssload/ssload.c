@@ -202,10 +202,12 @@ main(int argc, char **argv)
                                 (void)fprintf(stderr, "%s: Missing argument for option `-%c'\n",
                                     PROGNAME, optopt);
                                 usage();
+                                break;
                         default:
                                 (void)fprintf(stderr, "%s: Unknown option `-%c'\n",
                                     PROGNAME, optopt);
                                 usage();
+                                break;
                         }
                         break;
                 default:

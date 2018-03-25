@@ -38,4 +38,9 @@ const char **enumerate_devices(void);
 extern struct ftdi_context ftdi_ctx;
 extern int ftdi_error;
 #endif /* HAVE_LIBFTD2XX */
+
+#ifdef DEBUG
+void debug_hexdump(const uint8_t *, uint32_t);
+#endif /* DEBUG */
+
 #endif /* !SHARED_H_ */

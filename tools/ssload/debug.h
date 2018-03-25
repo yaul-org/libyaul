@@ -21,6 +21,8 @@
 #endif /* DEBUG */
 
 #ifdef DEBUG
+#include "shared.h"
+
 #define DEBUG_HEXDUMP(buffer, len) do {                                        \
         debug_hexdump(buffer, len);                                            \
 } while (false)

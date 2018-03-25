@@ -306,7 +306,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
                         }
                 } while (queued_amount == 0);
 
-                DEBUG_PRINTF("Queued amount: %iB\n", queued_amount);
+                DEBUG_PRINTF("Queued amount: %luiB\n", queued_amount);
 
                 DWORD size;
                 ft_error = FT_Read(ft_handle, read_buffer, queued_amount, &size);
@@ -318,7 +318,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
 
                 read += size;
 
-                DEBUG_PRINTF("read: %i, size: %i\n", read, size);
+                DEBUG_PRINTF("read: %u, size: %lui\n", read, size);
         } while (read < len);
 
         if (read != len) {
@@ -601,7 +601,7 @@ upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 /*
  * USB Cartridge
  */
-static char *
+static const char *
 error_stringify(void)
 {
 #ifdef HAVE_LIBFTD2XX

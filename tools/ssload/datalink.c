@@ -123,9 +123,6 @@ static int device_packet_check(const uint8_t *, uint32_t);
 static void convert_error(void);
 static uint8_t packet_checksum(const uint8_t *, uint32_t);
 
-/* Debug helpers */
-static void debug_hexdump(const uint8_t *, uint32_t);
-
 /*
  *
  */
@@ -284,7 +281,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
 
         if (queued_amount != len) {
                 datalink_error = DATALINK_INSUFFICIENT_READ_DATA;
-                DEBUG_PRINTF("Queued RX amount (%iB) doesn't match length request (%iB)\n",
+                DEBUG_PRINTF("Queued RX amount (%luiB) doesn't match length request (%uB)\n",
                     queued_amount, len);
                 return -1;
         }
@@ -302,7 +299,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
                         return -1;
                 } else if (read != len) {
                         datalink_error = DATALINK_INSUFFICIENT_READ_DATA;
-                        DEBUG_PRINTF("Read (%iB) amount doesn't match length request (%iB)\n",
+                        DEBUG_PRINTF("Read (%luiB) amount doesn't match length request (%uB)\n",
                             read, len);
                         return -1;
                 }
@@ -383,7 +380,7 @@ device_write(uint8_t *write_buffer, uint32_t len)
                 return -1;
         }
 
-        DEBUG_PRINTF("%iB written\n", written);
+        DEBUG_PRINTF("%luiB written\n", written);
 
         return 0;
 #else
