@@ -123,6 +123,9 @@ static int device_packet_check(const uint8_t *, uint32_t);
 static void convert_error(void);
 static uint8_t packet_checksum(const uint8_t *, uint32_t);
 
+/* Debug helpers */
+static void debug_hexdump(const uint8_t *, uint32_t);
+
 /*
  *
  */
@@ -976,46 +979,12 @@ packet_checksum(const uint8_t *buffer, uint32_t len)
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Reading %iB from buffer\n", len);
 
+        DEBUG_HEXDUMP(buffer, len);
+
         uint32_t checksum;
         checksum = 0;
 
         uint32_t buffer_idx;
-
-#ifdef DEBUG
-        static char output_buffer[2048];
-
-        uint32_t output_idx;
-        output_idx = 0;
-        uint32_t fold_x;
-        fold_x = 0;
-
-        /* Skip 1st line */
-        (void)sprintf(output_buffer, "\nHH HH HH HH HH HH HH HH\n");
-        output_idx += strlen(output_buffer);
-
-        for (buffer_idx = 0; buffer_idx < len; buffer_idx++) {
-                (void)sprintf(&output_buffer[output_idx],
-                    "%02X", buffer[buffer_idx]);
-                output_idx += 2;
-                if (((fold_x + 1) % 20) == 0) {
-                        output_buffer[output_idx] = '\n';
-                        output_idx++;
-                } else if ((buffer_idx + 1) != len) {
-                        output_buffer[output_idx] = ' ';
-                        output_idx++;
-                }
-
-                fold_x++;
-        }
-        if (output_buffer[output_idx] != '\n') {
-                output_buffer[output_idx] = '\n';
-                output_idx++;
-        }
-        output_buffer[output_idx] = '\0';
-
-        DEBUG_PRINTF("%s", output_buffer);
-#endif /* DEBUG */
-
         for (buffer_idx = 1; buffer_idx < len; buffer_idx++) {
 #ifdef DEBUG
                 if (buffer_idx < datalink_device.packet.header_size) {
@@ -1063,12 +1032,15 @@ device_packet_check(const uint8_t *buffer, uint32_t response_type)
                 0x06
         };
 
+        DEBUG_PRINTF("Enter\n");
+
         datalink_error = DATALINK_OK;
 
         /* Check if the response packet is an error packet */
         uint32_t buffer_idx;
         bool bad_packet;
 
+        /* XXX: Refactor to memcmp() */
         for (buffer_idx = 0;
              ((buffer_idx < datalink_device.packet.header_size) &&
                  (buffer[buffer_idx] == packet_response_error[buffer_idx]));
@@ -1076,6 +1048,8 @@ device_packet_check(const uint8_t *buffer, uint32_t response_type)
 
         bad_packet = buffer_idx == datalink_device.packet.header_size;
         if (bad_packet) {
+                DEBUG_HEXDUMP(buffer, datalink_device.packet.header_size);
+
                 datalink_error = DATALINK_ERROR_PACKET;
                 return -1;
         }
@@ -1098,12 +1072,15 @@ device_packet_check(const uint8_t *buffer, uint32_t response_type)
                 }
                 break;
         case PACKET_RESPONSE_TYPE_SEND:
+                /* XXX: Refactor to memcmp() */
                 for (buffer_idx = 0;
                      ((buffer_idx < datalink_device.packet.header_size) &&
                          (buffer[buffer_idx] == packet_response_send[buffer_idx]));
                      buffer_idx++);
                 bad_packet = buffer_idx != datalink_device.packet.header_size;
                 if (bad_packet) {
+                        DEBUG_HEXDUMP(buffer, datalink_device.packet.header_size);
+
                         datalink_error = DATALINK_ERROR_PACKET;
                         return -1;
                 }

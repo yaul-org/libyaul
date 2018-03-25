@@ -20,4 +20,12 @@
 #define DEBUG_PRINTF(x...)
 #endif /* DEBUG */
 
+#ifdef DEBUG
+#define DEBUG_HEXDUMP(buffer, len) do {                                        \
+        debug_hexdump(buffer, len);                                            \
+} while (false)
+#else
+#define DEBUG_HEXDUMP(...)
+#endif /* DEBUG */
+
 #endif /* !DEBUG_H_ */
