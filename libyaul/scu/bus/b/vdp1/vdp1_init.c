@@ -137,6 +137,7 @@ vdp1_init(void)
                 MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
                 /* FCM = FCT = 1 */
                 MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+                vdp2_tvmd_vblank_out_wait();
                 /* Wait for change of FB (CEF = 1) */
                 while ((MEMORY_READ(16, VDP1(EDSR)) & 0x0002) == 0x0002) {
                 }
@@ -156,5 +157,5 @@ vdp1_init(void)
         /* Switch to 1-cycle mode */
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
 }
