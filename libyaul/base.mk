@@ -35,6 +35,29 @@ all: $(TYPE)
 
 $(TYPE): $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(LDSCRIPTS_all) $(SPECS_all)
 
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
+	$(ECHO)mkdir -p $@
+
+$(LIB_FILE_base): $(LIB_OBJS_base)
+	$(call macro-sh-build-library)
+
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
+	$(call macro-sh-build-object,$(TYPE))
+
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
+	$(call macro-sh-build-c++-object,$(TYPE))
+
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.S
+	$(call macro-sh-build-object,$(TYPE))
+
+$(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
+	    sub(/\$$INSTALL_ROOT/,"'$(INSTALL_ROOT)'/'$(SH_ARCH)'"); \
+	} \
+	{ print }' > $@
+
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -61,29 +84,6 @@ $(foreach USER_FILE,$(USER_FILES_all), \
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
-	$(ECHO)mkdir -p $@
-
-$(LIB_FILE_base): $(LIB_OBJS_base)
-	$(call macro-sh-build-library)
-
-$(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)mkdir -p $(@D)
-	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(INSTALL_ROOT)'/'$(SH_ARCH)'"); \
-	} \
-	{ print }' > $@
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
-	$(call macro-sh-build-object,$(TYPE))
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
-	$(call macro-sh-build-c++-object,$(TYPE))
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.S
-	$(call macro-sh-build-object,$(TYPE))
 
 clean:
 	$(ECHO)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \

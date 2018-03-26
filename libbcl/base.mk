@@ -16,6 +16,15 @@ all: $(TYPE)
 
 $(TYPE): $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base)
 
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
+	mkdir -p $@
+
+$(LIB_FILE_base): $(LIB_OBJS_base)
+	$(call macro-sh-build-library,$(TYPE))
+
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
+	$(call macro-sh-build-object,$(TYPE))
+
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -25,15 +34,6 @@ $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
-	mkdir -p $@
-
-$(LIB_FILE_base): $(LIB_OBJS_base)
-	$(call macro-sh-build-library,$(TYPE))
-
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
-	$(call macro-sh-build-object,$(TYPE))
 
 clean:
 	$(ECHO)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
