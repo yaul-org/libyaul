@@ -22,6 +22,7 @@ USER_FILES_all = $(USER_FILES)
 define macro-generate-install-file-rule
 $(INSTALL_ROOT)/$3/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
+	@mkdir -p $$(@D)
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
 install-$4: $4 $(INSTALL_ROOT)/$3/$2
