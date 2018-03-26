@@ -30,23 +30,110 @@ ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
 endif
 
-SH_AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as$(EXE_EXT)
-SH_AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar$(EXE_EXT)
-SH_CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc$(EXE_EXT)
-SH_CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++$(EXE_EXT)
-SH_LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc$(EXE_EXT)
-SH_NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm$(EXE_EXT)
-SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump$(EXE_EXT)
+SH_ARCH:= sh-elf
 
-M68K_AS:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as$(EXE_EXT)
-M68K_AR:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar$(EXE_EXT)
-M68K_CC:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc$(EXE_EXT)
-M68K_CXX:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-g++$(EXE_EXT)
-M68K_LD:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-gcc$(EXE_EXT)
-M68K_NM:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm$(EXE_EXT)
-M68K_OBJCOPY:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy$(EXE_EXT)
-M68K_OBJDUMP:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump$(EXE_EXT)
+SH_AS:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
+SH_AR:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
+SH_CC:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_CXX:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
+SH_LD:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_NM:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
+
+SH_CFLAGS_shared:= \
+	-pedantic \
+	-s \
+	-ffreestanding \
+	-ffast-math \
+	-fstrict-aliasing \
+	-fomit-frame-pointer \
+	-Wall \
+	-Wuninitialized \
+	-Winit-self \
+	-Wuninitialized \
+	-Wshadow \
+	-Wno-unused \
+	-Wno-parentheses \
+	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
+	-DFIXMATH_NO_OVERFLOW=1 \
+	-DFIXMATH_NO_ROUNDING=1
+
+SH_CFLAGS:= \
+	-std=c11 \
+	$(SH_CFLAGS_shared)
+
+SH_CXXFLAGS_shared:=
+
+SH_CXXFLAGS:= \
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-unwind-tables \
+	-fno-threadsafe-statics \
+	-fno-use-cxa-atexit \
+	$(SH_CXXFLAGS_shared)
+
+SH_CFLAGS_shared_release:= -O2
+SH_CFLAGS_shared_debug:= -O0 -g -DDEBUG
+
+SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
+SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
+
+SH_CXXFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CXXFLAGS)
+SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
+
+define macro-sh-build-object
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)$(SH_CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
+		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
+		-c $< -o $@
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+endef
+
+define macro-sh-build-c++-object
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)mkdir -p $(@D)
+	$(ECHO)$(SH_CXX) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CXXFLAGS_$1) \
+		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
+		-c $< -o $@
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+endef
+
+define macro-sh-build-library
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+	$(ECHO)$(SH_AR) rcs $@ $^
+endef
+
+define macro-sh-generate-install-header-rule
+$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2: $1/$2
+	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
+	mkdir -p "$$(@D)"; \
+	path=$$$$(cd "$$(@D)"; pwd); \
+	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/}/$$(@F)$(V_END)\n";
+	$(ECHO)$(INSTALL) -m 644 $$< $$@
+
+install-$4: $4 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2
+endef
+
+define macro-sh-generate-install-lib-rule
+$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2: $1
+	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
+	$(ECHO)$(INSTALL) -m 644 $$< $$@
+
+install-$3: $3 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2
+endef
+
+M68K_ARCH:= m68k-elf
+
+M68K_AS:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-as$(EXE_EXT)
+M68K_AR:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-ar$(EXE_EXT)
+M68K_CC:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-gcc$(EXE_EXT)
+M68K_CXX:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-g++$(EXE_EXT)
+M68K_LD:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-gcc$(EXE_EXT)
+M68K_NM:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-nm$(EXE_EXT)
+M68K_OBJCOPY:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objcopy$(EXE_EXT)
+M68K_OBJDUMP:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objdump$(EXE_EXT)
 
 FIND:= find
 INSTALL:= install

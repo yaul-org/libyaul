@@ -12,60 +12,57 @@ define macro-generate-build-rule
 .PHONY: $1-$2
 
 $1-$2:
-	mkdir -p $(BUILD_ROOT)/$(BUILD)
-	printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	($(MAKE) -C $1 $2) || exit $$?
+	$(ECHO)mkdir -p $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$2$(V_END)\n"
+	$(ECHO)($(MAKE) -C $1 -f $2.mk $2) || exit $${?}
 endef
 
 define macro-generate-install-rule
-.PHONY: $1-$2
+.PHONY: $1-install-$2
 
-$1-$2:
+$1-install-$2:
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
-	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(ECHO)($(MAKE) -C $1 $2) || exit $$?
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)install-$2$(V_END)\n"
+	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
 
 define macro-generate-clean-rule
-.PHONY: $1-$2
+.PHONY: $1-clean-$2
 
-$1-$2: $(BUILD_ROOT)/$(BUILD)
-	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$1$(V_END)\n"
-	$(ECHO)($(MAKE) -C $1 $2) || exit $$?
+$1-clean-$2: $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)clean-$2$(V_END)\n"
+	$(ECHO)($(MAKE) -C $1 -f $2.mk clean) || exit $${?}
 endef
 
 define macro-install
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
 	$(ECHO)for project in $(PROJECTS); do \
-	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-	    ($(MAKE) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
+	    ($(MAKE) -C $${project} -f $<.mk $@) || exit $${?}; \
 	done
 endef
 
 define macro-check-toolchain
 	$(ECHO)for tool in $2; do \
-	    printf -- "$(INSTALL_ROOT)/$1/bin/$1-$${tool}\n"; \
+	    printf -- "$(INSTALL_ROOT)/$1/bin/$1-$${tool}$(EXE_EXT)\n"; \
 	    if [ ! -e $(INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
-	        printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
-	        exit 1; \
+		printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
+		exit 1; \
 	    fi; \
 	done
 endef
 
 .PHONY: all \
 	release \
-	release-internal \
 	debug \
 	install \
 	install-release \
-	install-release-internal \
 	install-debug \
 	distclean \
 	clean \
 	clean-release \
-	clean-release-internal \
 	clean-debug \
 	examples \
 	clean-examples \
@@ -75,10 +72,9 @@ endef
 	list-targets \
 	check-toolchain
 
-all: release release-internal debug tools
+all: release debug tools
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release-internal)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
 check-toolchain:
@@ -86,10 +82,10 @@ check-toolchain:
 	$(call macro-check-toolchain,sh-elf,as ar ld nm objcopy objdump gcc g++)
 	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
 
-release release-internal debug: $(BUILD_ROOT)/$(BUILD)
+release debug: $(BUILD_ROOT)/$(BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
-	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-	    ($(MAKE) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
+	    ($(MAKE) -C $${project} -f $@.mk $@) || exit $${?}; \
 	done
 
 $(BUILD_ROOT)/$(BUILD):
@@ -101,47 +97,46 @@ install: install-release install-tools
 install-release: release
 	$(call macro-install)
 
-install-release-internal: release-internal
-	$(call macro-install)
-
 install-debug: debug
 	$(call macro-install)
 
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-release)))
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-release-internal)))
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),install-debug)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
-clean: clean-release clean-release-internal clean-debug clean-tools
+clean: clean-release clean-debug clean-tools
 
 distclean: clean-examples
 	$(ECHO)$(RM) -r $(BUILD_ROOT)/$(BUILD)
 
-clean-release clean-release-internal clean-debug:
+clean-release:
 	$(ECHO)for project in $(PROJECTS); do \
-	    printf -- "$(V_BEGIN_CYAN)$@$(V_END) $(V_BEGIN_GREEN)$$project$(V_END)\n"; \
-	    ($(MAKE) -C $$project $@) || exit $$?; \
+	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
+	    ($(MAKE) -C $${project} -f release.mk clean) || exit $${?}; \
 	done
 
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean)))
+clean-debug:
+	$(ECHO)for project in $(PROJECTS); do \
+	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
+	    ($(MAKE) -C $${project} -f debug.mk clean) || exit $${?}; \
+	done
 
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-release)))
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-release-internal)))
-$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),clean-debug)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),release)))
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),debug)))
 
 examples:
-	$(ECHO)($(MAKE) -C examples all) || exit $$?
+	$(ECHO)($(MAKE) -C examples all) || exit $${?}
 
 clean-examples:
-	$(ECHO)($(MAKE) -C examples clean) || exit $$?
+	$(ECHO)($(MAKE) -C examples clean) || exit $${?}
 
 tools:
-	$(ECHO)($(MAKE) -C tools all) || exit $$?
+	$(ECHO)($(MAKE) -C tools all) || exit $${?}
 
 install-tools: tools
-	$(ECHO)($(MAKE) -C tools install) || exit $$?
+	$(ECHO)($(MAKE) -C tools install) || exit $${?}
 
 clean-tools:
-	$(ECHO)($(MAKE) -C tools clean) || exit $$?
+	$(ECHO)($(MAKE) -C tools clean) || exit $${?}
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
