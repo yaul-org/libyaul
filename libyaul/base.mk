@@ -1,5 +1,7 @@
 # -*- mode: makefile -*-
 
+SUB_BUILD:=$(BUILD)/lib$(TARGET)
+
 LIB_FILE_base:= $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
 
 LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(LIB_SRCS)))

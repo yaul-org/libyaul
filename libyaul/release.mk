@@ -9,7 +9,6 @@ endif
 
 TARGET:= yaul
 TYPE:= release
-SUB_BUILD:=$(BUILD)/lib$(TARGET)
 
 include build-files.mk
 include base.mk
