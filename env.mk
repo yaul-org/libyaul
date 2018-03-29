@@ -26,6 +26,11 @@ ifneq (1,$(words [$(strip $(BUILD))]))
   $(error BUILD (build directory) contains spaces)
 endif
 
+# Check options
+ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
+  $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
+endif
+
 ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
 endif
@@ -135,10 +140,10 @@ M68K_NM:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-nm$(EXE_EXT)
 M68K_OBJCOPY:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objcopy$(EXE_EXT)
 M68K_OBJDUMP:= $(INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objdump$(EXE_EXT)
 
-FIND:= find
-INSTALL:= install
-SED:= sed
-STRIP:= strip
+FIND:= find$(EXE_EXT)
+INSTALL:= install$(EXE_EXT)
+SED:= sed$(EXE_EXT)
+STRIP:= strip$(EXE_EXT)
 
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m

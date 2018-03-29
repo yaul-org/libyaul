@@ -1,10 +1,5 @@
 # -*- mode: makefile -*-
 
-# Check options
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
-endif
-
 BOOTSTRAP_FILES:= \
 	common/bootstrap/ip.S \
 	common/bootstrap/sys_aree.bin \
