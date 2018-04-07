@@ -23,7 +23,11 @@
 
 #define SLOB_PAGE(sb)           ((struct slob_page *)((uintptr_t)(sb) & SLOB_PAGE_MASK))
 
-#define SLOB_PAGE_ACTUAL_SIZE   (SLOB_PAGE_SIZE - sizeof(struct slob_block) - sizeof(struct slob_block) - sizeof(struct slob_page_meta) - sizeof(SLIST_ENTRY(slob_page)))
+#define SLOB_PAGE_ACTUAL_SIZE   (SLOB_PAGE_SIZE -                              \
+    sizeof(struct slob_block) -                                                \
+    sizeof(struct slob_block) -                                                \
+    sizeof(struct slob_page_meta) -                                            \
+    sizeof(SLIST_ENTRY(slob_page)))
 
 #define SLOB_PAGE_LIST_END      (0xFFFFFFFF)
 
@@ -70,11 +74,11 @@ static uint32_t slob_page_list_block_units(struct slob_page_list *);
 static uint32_t slob_page_list_count(struct slob_page_list *);
 
 static struct slob_page_list
-slob_small_page = SLIST_HEAD_INITIALIZER(slob_small_page);
+slob_small_page_list = SLIST_HEAD_INITIALIZER(slob_small_page_list);
 static struct slob_page_list
-slob_medium_page = SLIST_HEAD_INITIALIZER(slob_medium_page);
+slob_medium_page_list = SLIST_HEAD_INITIALIZER(slob_medium_page_list);
 static struct slob_page_list
-slob_large_page = SLIST_HEAD_INITIALIZER(slob_large_page);
+slob_large_page_list = SLIST_HEAD_INITIALIZER(slob_large_page_list);
 
 MEMB(slob_pages, struct slob_page, SLOB_PAGE_COUNT, 0);
 
@@ -298,9 +302,9 @@ slob_stats(struct slob_stats *stats)
         uint32_t usedpcnt;
         usedpcnt = 0;
 
-        usedpcnt += slob_page_list_count(&slob_small_page);
-        usedpcnt += slob_page_list_count(&slob_medium_page);
-        usedpcnt += slob_page_list_count(&slob_large_page);
+        usedpcnt += slob_page_list_count(&slob_small_page_list);
+        usedpcnt += slob_page_list_count(&slob_medium_page_list);
+        usedpcnt += slob_page_list_count(&slob_large_page_list);
 
         uint32_t freepcnt;
         freepcnt = SLOB_PAGE_COUNT - usedpcnt;
@@ -308,9 +312,9 @@ slob_stats(struct slob_stats *stats)
         uint32_t bavail;
         bavail = freepcnt * SLOB_BLOCK_UNITS(SLOB_PAGE_ACTUAL_SIZE);
 
-        bavail += slob_page_list_block_units(&slob_small_page);
-        bavail += slob_page_list_block_units(&slob_medium_page);
-        bavail += slob_page_list_block_units(&slob_large_page);
+        bavail += slob_page_list_block_units(&slob_small_page_list);
+        bavail += slob_page_list_block_units(&slob_medium_page_list);
+        bavail += slob_page_list_block_units(&slob_large_page_list);
 
         stats->ss_usedpcnt = usedpcnt;
         stats->ss_pages = SLOB_PAGE_COUNT;
@@ -328,7 +332,7 @@ slob_stats(struct slob_stats *stats)
  */
 static void
 slob_block_list_set(struct slob_block *sb, struct slob_block *sb_next,
-                    uint32_t bunits)
+    uint32_t bunits)
 {
         struct slob_page *sp;
         uint32_t bofs;
@@ -481,11 +485,11 @@ slob_page_list_select(uint32_t bunits)
         struct slob_page_list *spl;
 
         if (bunits <= SLOB_BLOCK_UNITS(SLOB_PAGE_BREAK_1ST)) {
-                spl = &slob_small_page;
+                spl = &slob_small_page_list;
         } else if (bunits <= SLOB_BLOCK_UNITS(SLOB_PAGE_BREAK_2ND)) {
-                spl = &slob_medium_page;
+                spl = &slob_medium_page_list;
         } else {
-                spl = &slob_large_page;
+                spl = &slob_large_page_list;
         }
 
         return spl;
