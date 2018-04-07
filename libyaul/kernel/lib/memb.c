@@ -33,6 +33,14 @@
 
 #include "memb.h"
 
+/*
+ * Returns 1 if PTR is within bounds of the block pool NAME.
+ */
+#define MEMB_PTR_BOUND(name, ptr)                                              \
+        (((int8_t *)(ptr) >= (int8_t *)(name)->m_bpool) &&                     \
+                ((int8_t *)(ptr) < ((int8_t *)(name)->m_bpool +                \
+                        ((name)->m_bnum * (name)->m_bsize))))
+
 static void memb_block_next(struct memb *);
 
 /*

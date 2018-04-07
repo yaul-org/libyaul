@@ -40,8 +40,10 @@
  */
 #define MEMB(name, structure, num, align)                                      \
 static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
+                                                                               \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
         structure __CONCAT1(name, _memb_mem)[(num)] __unused;                  \
+                                                                               \
 static struct memb name __unused = {                                           \
         sizeof(structure),                                                     \
         num,                                                                   \
@@ -50,14 +52,6 @@ static struct memb name __unused = {                                           \
         0,                                                                     \
         (void *)&__CONCAT(name, _memb_mem)[0]                                  \
 }
-
-/*
- * Returns 1 if PTR is within bounds of the block pool NAME.
- */
-#define MEMB_PTR_BOUND(name, ptr)                                              \
-        (((int8_t *)(ptr) >= (int8_t *)(name)->m_bpool) &&                     \
-                ((int8_t *)(ptr) < ((int8_t *)(name)->m_bpool +                \
-                        ((name)->m_bnum * (name)->m_bsize))))
 
 enum memb_ref_type {
         MEMB_REF_AVAILABLE,
