@@ -42,13 +42,14 @@ void
 memb_init(struct memb *mb)
 {
         uint32_t bidx;
+
         for (bidx = 0; bidx < mb->m_bnum; bidx++) {
                 mb->m_breftype[bidx] = MEMB_REF_AVAILABLE;
         }
 
         mb->m_size = 0;
 
-        memset(mb->m_bpool, 0, mb->m_bsize * mb->m_bnum);
+        memset(mb->m_bpool, 0x00, mb->m_bsize * mb->m_bnum);
 }
 
 /*-
@@ -71,17 +72,25 @@ memb_alloc(struct memb *mb)
                 return NULL;
         }
 
+        /* Are we full? */
+        if (mb->m_bidx >= mb->m_bnum) {
+                return NULL;
+        }
+
         /* Try next-fit method */
         bidx = mb->m_bidx;
+
         if (mb->m_breftype[bidx] == MEMB_REF_AVAILABLE) {
                 goto allocate;
         }
 
         /* Try first-fit method */
         cur_bidx = mb->m_bidx;
+
         do {
                 memb_block_next(mb);
                 bidx = mb->m_bidx;
+
                 if (mb->m_breftype[bidx] == MEMB_REF_AVAILABLE) {
                         goto allocate;
                 }
@@ -126,18 +135,23 @@ memb_free(struct memb *mb, void *addr)
         /* Walk through the list of blocks and try to find the block to
          * which the pointer address points to. */
         uint32_t bidx;
+
         for (bidx = 0; bidx < mb->m_bnum; bidx++) {
                 if (block == (int8_t *)addr) {
                         if (mb->m_breftype[bidx] == MEMB_REF_AVAILABLE) {
                                 break;
                         }
+
                         mb->m_breftype[bidx] = MEMB_REF_AVAILABLE;
+                        mb->m_size--;
+
                         /* Set recently freed block to next block
                          * index */
-                        mb->m_bidx = bidx;
-                        mb->m_size--;
+                        mb->m_bidx = (mb->m_size == 0) ? 0 : bidx;
+
                         return 0;
                 }
+
                 block += mb->m_bsize;
         }
 
@@ -166,5 +180,6 @@ memb_block_next(struct memb *mb)
         if (mb->m_bidx >= (mb->m_bnum - 1)) {
                 mb->m_bidx = 0;
         }
+
         mb->m_bidx++;
 }

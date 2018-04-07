@@ -40,8 +40,8 @@
  */
 #define MEMB(name, structure, num, align)                                      \
 static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
-static __aligned(((align) == 0) ? 2 : (align))                                 \
-        structure __CONCAT(name, _memb_mem)[(num)] __unused;                   \
+static __aligned(((align) <= 0) ? 4 : (align))                                 \
+        structure __CONCAT1(name, _memb_mem)[(num)] __unused;                  \
 static struct memb name __unused = {                                           \
         sizeof(structure),                                                     \
         num,                                                                   \
