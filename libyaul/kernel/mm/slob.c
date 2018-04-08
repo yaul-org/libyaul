@@ -23,6 +23,8 @@
 
 #define SLOB_PAGE(sb)           ((struct slob_page *)((uintptr_t)(sb) & SLOB_PAGE_MASK))
 
+#define ROUND(x)                ((((x) & 1) == 0) ? x : ((x) + 2 - ((x) & 1)))
+
 #define SLOB_PAGE_ACTUAL_SIZE   (SLOB_PAGE_SIZE -                              \
     sizeof(struct slob_block) -                                                \
     sizeof(struct slob_block) -                                                \
@@ -109,9 +111,11 @@ slob_alloc(size_t size)
                 return NULL;
         }
 
-        /* 1+ unit for the prepended SLOB header */
-        bunits = SLOB_BLOCK_UNITS(size) + 1;
+        /* 1+ unit for the prepended SLOB header and rounded to the
+         * nearest multiple of 2 */
+        bunits = ROUND(SLOB_BLOCK_UNITS(size) + 1);
         btotal = SLOB_BLOCK_UNITS(SLOB_PAGE_ACTUAL_SIZE);
+
         /* See restrictions */
         if (bunits > btotal) {
                 return NULL;
@@ -153,32 +157,9 @@ slob_alloc(size_t size)
  * Change the size of the pre-allocated memory.
  */
 void *
-slob_realloc(void *old __unused, size_t new_len __unused)
+slob_realloc(void *old __unused, size_t nsize __unused)
 {
-        void *result;
-        size_t real_len;
-        size_t new_real_len;
-
-        if (old == NULL) {
-                return slob_alloc(new_len);
-        }
-
-        real_len = slob_block_units_ptr(old);
-        new_real_len = SLOB_BLOCK_UNITS(new_len) + 1;
-
-        if (new_real_len <= real_len) {
-                return old;
-        }
-
-        result = slob_alloc(new_len);
-        if (result == NULL) {
-                return NULL;
-        }
-
-        memcpy(result, old, (real_len - 1) * SLOB_BLOCK_UNIT);
-        slob_free(old);
-
-        return result;
+        return NULL;
 }
 
 /*
@@ -272,7 +253,7 @@ slob_free(void *addr)
                 slob_block_list_set(sb, bnext, bunits);
         }
 
-        if ((sb + bunits) == bnext) {
+        if (((sb + bunits) == bnext) && !(slob_block_list_last(bnext))) {
                 /* Coalesce adjacent block from the right */
                 slob_block_list_set(block,
                     slob_block_list_next(bnext),
@@ -311,17 +292,15 @@ slob_stats(struct slob_stats *stats)
 
         uint32_t bavail;
         bavail = freepcnt * SLOB_BLOCK_UNITS(SLOB_PAGE_ACTUAL_SIZE);
-
         bavail += slob_page_list_block_units(&slob_small_page_list);
         bavail += slob_page_list_block_units(&slob_medium_page_list);
         bavail += slob_page_list_block_units(&slob_large_page_list);
 
         stats->ss_usedpcnt = usedpcnt;
         stats->ss_pages = SLOB_PAGE_COUNT;
-        stats->ss_avail = (bavail / 2) * SLOB_BLOCK_UNIT;
 
-        /* For every allocation request, one block unit is required for
-         * bookkeeping */
+        stats->ss_avail = (bavail / 2) * SLOB_BLOCK_UNIT;
+        /* For every allocation request, one block unit is required for bookkeeping*/
         stats->ss_size = (SLOB_PAGE_ACTUAL_SIZE / 2) * SLOB_PAGE_COUNT;
 
         return 0;
@@ -376,7 +355,11 @@ slob_block_list_next(struct slob_block *sb)
 static bool
 slob_block_list_last(struct slob_block *sb)
 {
-        return (sb == NULL);
+        if (sb == NULL) {
+                return true;
+        }
+
+        return ((sb->sb_bunits == 0) && ((slob_block_list_next(sb)) == NULL));
 }
 
 /*
@@ -421,24 +404,21 @@ slob_block_alloc(struct slob_page *sp, uint32_t bunits)
 
         if (bunits == bavail) {
                 /* No fragmentation (exact fit) */
-                if (bprev != NULL) {
-                        slob_block_list_set(bprev, bnext, bunits);
-                }
 
-                sp->sp_meta.spm_bfree = slob_block_list_next(block);
+                if (bprev != NULL) {
+                        slob_block_list_set(bprev, bnext, slob_block_units(bprev));
+                } else {
+                        sp->sp_meta.spm_bfree = slob_block_list_next(block);
+                }
         } else if (bunits < bavail) {
                 /* Fragmentation */
 
                 /* Make a new free block */
-                if (slob_block_list_last(bnext)) {
-                        slob_block_list_term(block + bunits, bavail - bunits);
-                } else {
-                        slob_block_list_set(block + bunits, bnext, bavail - bunits);
-                }
+                slob_block_list_set(block + bunits, bnext, bavail - bunits);
 
                 if (bprev != NULL) {
-                        /* Have the previous block point to the
-                         * newly created block */
+                        /* Have the previous block point to the newly
+                         * created block */
                         slob_block_list_set(bprev, block + bunits,
                             slob_block_units(bprev));
                 } else {
