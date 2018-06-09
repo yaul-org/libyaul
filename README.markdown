@@ -1,5 +1,3 @@
-Yaul
-====
 <p align="center">
 <img src="https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000" alt="license">
   <a href="https://travis-ci.org/ijacquez/libyaul">
@@ -7,7 +5,8 @@ Yaul
   </a>
 </p>
 
-### About
+Yaul
+====
   Yaul is an open source SEGA Saturn development kit.
 
 Installation
