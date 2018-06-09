@@ -13,31 +13,31 @@ Installation
 ============
   1. Build the tool-chain (see `build-scripts/`) first. Take note where the tool-chain is installed. Once installed, under the root of the `libyaul` source tree, build and install the library.
 
-    cd libyaul
+    $ cd libyaul
 
   2. Initialize and update all submodules.
 
-    git submodule init
-    git submodule update -f --recursive
+    $ git submodule init
+    $ git submodule update -f --recursive
 
   3. Copy the template `yaul.env.in` and rename it to `yaul.env`.
 
-  4. Change the necessary parameters.
+  4. Change the necessary parameters in `yaul.env`
      1. Set the absolute path to the tool-chain in `INSTALL_ROOT`.
      2. Set the absolute path to where the `libyaul` source tree is located in `BUILD_ROOT`.
      3. Set the type of development cart you own in `OPTION_DEV_CARTRIDGE`. If none, set to 0.
 
   5. Read the file `yaul.env` into your current shell. Note, this needs to be done every time a new shell is opened.
 
-    . yaul.env
+    $ source yaul.env
 
   6. Build and install the supported libraries.
 
-    make install-release
+    $ make install-release
 
   7. Build and install the tools.
 
-    make install-tools
+    $ make install-tools
 
   8. Once the library and tools has been installed, you can now build any of the given examples in the `libyaul-examples` submodule.
 
