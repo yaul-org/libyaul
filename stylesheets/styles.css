@@ -11,7 +11,8 @@ body {
 }
 
 .wrapper {
-  padding: 0px 300px 0px;
+  width: 840px;
+  padding: 0px 0px 0px;
   margin: 0 auto;
 }
 
@@ -266,7 +267,8 @@ hr {
 
 footer {
   margin: 0 auto;
-  padding: 5px 300px 0px;
+  width: 840px;
+  padding: 5px 0px 0px;
   color: #ccc;
   overflow: hidden;
 }
