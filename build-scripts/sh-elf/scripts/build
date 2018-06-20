@@ -10,6 +10,19 @@
 
 is_var_set "target"
 
+extra_ldflags=""
+# Darwin does not support the -static flag, because its libc
+# is not shipped as a static library.
+if [ "${HOST_OS}" != "Darwin" ]; then
+    extra_ldflags="-static"
+fi
+
+# -static-libgcc is only relevant for GCC
+compiler_version="$(${CC-gcc} --version 2>&1)"
+if ! echo "${compiler_version}" | grep -E -q "(clang|Apple LLVM) version"; then
+    extra_ldflags="${extra_ldflags} -static-libgcc"
+fi
+
 # Build and install Binutils
 mkdir -p "${BUILD_SRC_DIR}/${target}/binutils"
 cd "${BUILD_SRC_DIR}/${target}/binutils"
@@ -33,7 +46,7 @@ fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="" \
-    LDFLAGS="-static -static-libgcc -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
+    LDFLAGS="$extra_ldflags -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
         ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-configured-binutils"
@@ -108,7 +121,7 @@ fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
-    LDFLAGS="-static -static-libgcc -static-libstdc++" \
+    LDFLAGS="$extra_ldflags -static-libstdc++" \
     CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer -ffreestanding" \
     LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
         ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
