@@ -638,6 +638,8 @@ cd - 1> /dev/null
 
 message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
 
+export HOST_OS="$(uname -s)"
+
 for target in ${TARGETS[@]}; do
     if [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build" ]; then
         continue
