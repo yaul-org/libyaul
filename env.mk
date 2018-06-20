@@ -124,6 +124,7 @@ endef
 define macro-sh-generate-install-lib-rule
 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
+	mkdir -p "$$(@D)"
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
 install-$3: $3 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2
