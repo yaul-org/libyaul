@@ -35,6 +35,10 @@ ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
 endif
 
+# Installation location; by default, this is the same path that
+# contains the toolchain, but it can be set to another path instead.
+PREFIX ?= $(INSTALL_ROOT)
+
 SH_ARCH:= sh-elf
 
 SH_AS:= $(INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
@@ -111,23 +115,23 @@ define macro-sh-build-library
 endef
 
 define macro-sh-generate-install-header-rule
-$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2: $1/$2
+$(PREFIX)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2: $1/$2
 	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
-	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/}/$$(@F)$(V_END)\n";
+	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(PREFIX)/$(SH_ARCH)/$(SH_ARCH)/}/$$(@F)$(V_END)\n";
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
-install-$4: $4 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2
+install-$4: $4 $(PREFIX)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2
 endef
 
 define macro-sh-generate-install-lib-rule
-$(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2: $1
+$(PREFIX)/$(SH_ARCH)/$(SH_ARCH)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
 	mkdir -p "$$(@D)"
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
-install-$3: $3 $(INSTALL_ROOT)/$(SH_ARCH)/$(SH_ARCH)/lib/$2
+install-$3: $3 $(PREFIX)/$(SH_ARCH)/$(SH_ARCH)/lib/$2
 endef
 
 M68K_ARCH:= m68k-elf
