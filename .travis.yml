@@ -29,5 +29,5 @@ before_script:
 
 script:
   - docker run --name "container" -e "TRAVIS_BRANCH=${TRAVIS_BRANCH}" -e "BUILD_TYPE=${BUILD_TYPE}" -e "INSTALL_ROOT=${INSTALL_ROOT}" -e "BUILD_ROOT=${BUILD_ROOT}" -e "BUILD=${BUILD}" -e "OPTION_DEV_CARTRIDGE=${OPTION_DEV_CARTRIDGE}" -t -d ijacquez/libyaul-tool-chain:1.3 sh
-  - docker cp .ci-build.sh container:/root/.ci-build.sh
-  - docker exec container sh -e /root/.ci-build.sh
+  - docker cp .travis/test.sh container:/root/test.sh
+  - docker exec container sh -e /root/test.sh
