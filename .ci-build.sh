@@ -19,7 +19,6 @@ pwd
 
 set -x
 
-pwd
 tar mxvfz /root/tool-chains.tar.gz -C /
 git clone --depth=100 --branch=${TRAVIS_BRANCH} https://github.com/ijacquez/libyaul.git libyaul
 cd libyaul
