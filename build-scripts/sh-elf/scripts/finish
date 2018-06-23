@@ -1,7 +1,0 @@
-# -*- mode: shell-script -*-
-
-[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
-
-is_var_set "target"
-
-create_stamp "${target}-completed-build"

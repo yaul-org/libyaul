@@ -4,3 +4,6 @@
 [submodule "docs"]
 	path = docs
 	url = http://github.com/ijacquez/libyaul-docs.git
+[submodule "build-scripts"]
+	path = build-scripts
+	url = https://github.com/ijacquez/libyaul-build-scripts.git

@@ -1,5 +1,0 @@
-# -*- mode: shell-script -*-
-
-[[ "${BASH_SOURCE[0]}" != "${0}" ]] || exit 1
-
-create_stamp "make-completed-build"
