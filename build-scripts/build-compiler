@@ -331,6 +331,10 @@ unset program
 
 program_exists "cmp"
 program_exists "tar"
+program_exists "grep"
+
+HOST_OS="`uname -s`"
+HOST_COMPILER_VERSION="`${CC-gcc} --version 2>&1`"
 
 TARGETS=(`printf -- "${BUILD_TARGETS}" | sed -E 's/[[:space:]]+/ /g'`)
 
@@ -637,8 +641,6 @@ fi
 cd - 1> /dev/null
 
 message "Building targets: `echo ${TARGETS[@]} | sed -E 's/ /, /g'`"
-
-export HOST_OS="$(uname -s)"
 
 for target in ${TARGETS[@]}; do
     if [ -f "${BUILD_STAMPS_DIR}/${target}-completed-build" ]; then

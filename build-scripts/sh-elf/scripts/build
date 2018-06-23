@@ -18,8 +18,7 @@ if [ "${HOST_OS}" != "Darwin" ]; then
 fi
 
 # -static-libgcc is only relevant for GCC
-compiler_version="$(${CC-gcc} --version 2>&1)"
-if ! echo "${compiler_version}" | grep -E -q "(clang|Apple LLVM) version"; then
+if ! echo "${HOST_COMPILER_VERSION}" | grep -E -q "(clang|Apple LLVM) version"; then
     extra_ldflags="${extra_ldflags} -static-libgcc"
 fi
 
@@ -46,7 +45,7 @@ fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-binutils" ]; then
     message "Configuring Binutils"
     CFLAGS="" \
-    LDFLAGS="$extra_ldflags -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
+    LDFLAGS="${extra_ldflags} -static-libstdc++" ../"${BINUTILS_SRC_DIR}"/configure \
         ${binutils_configure_options[@]} 1>> "${BUILD_SRC_DIR}/binutils-${target}.log" 2>&1 \
         || panic "See '${BUILD_SRC_DIR}/binutils-${target}.log'" 1
     create_stamp "${target}-configured-binutils"
@@ -121,7 +120,7 @@ fi
 if ! [ -f "${BUILD_STAMPS_DIR}/${target}-configured-gcc" ]; then
     message "Configuring GCC"
     CFLAGS="" \
-    LDFLAGS="$extra_ldflags -static-libstdc++" \
+    LDFLAGS="${extra_ldflags} -static-libstdc++" \
     CFLAGS_FOR_TARGET="-O2 -m2 -mb -fomit-frame-pointer -ffreestanding" \
     LDFLAGS_FOR_TARGET="" ../"${GCC_SRC_DIR}"/configure \
         ${gcc_configure_options[@]} 1>> "${BUILD_SRC_DIR}/gcc-${target}.log" 2>&1 \
