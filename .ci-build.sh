@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 change_env_value() {
     local _variable="${1}"
     local _value="${2}"
@@ -17,8 +19,10 @@ pwd
 
 set -x
 
-git clone --depth=100 --branch=${TRAVIS_BRANCH} https://github.com/ijacquez/libyaul.git ijacquez/libyaul
-cd ijacquez/libyaul
+pwd
+tar mxvfz /root/tool-chains.tar.gz -C /
+git clone --depth=100 --branch=${TRAVIS_BRANCH} https://github.com/ijacquez/libyaul.git libyaul
+cd libyaul
 git submodule init
 git submodule update -f
 cp yaul.env.in yaul.env
