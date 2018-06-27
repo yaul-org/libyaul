@@ -160,11 +160,23 @@ V_BEGIN_CYAN= [1;36m
 V_BEGIN_WHITE= [1;37m
 V_END= [m
 
-ifeq ($(strip $(SILENT)),1)
-  ECHO=@
-else
+ifeq ($(strip $(SILENT)),)
   ECHO=
+else
+  ECHO=@
 endif
 export ECHO
+
+ifneq ($(strip $(NOCOLOR)),)
+  V_BEGIN_BLACK=
+  V_BEGIN_RED=
+  V_BEGIN_GREEN=
+  V_BEGIN_YELLOW=
+  V_BEGIN_BLUE=
+  V_BEGIN_MAGENTA=
+  V_BEGIN_CYAN=
+  V_BEGIN_WHITE=
+  V_END=
+endif
 
 MAIN_TARGET= yaul
