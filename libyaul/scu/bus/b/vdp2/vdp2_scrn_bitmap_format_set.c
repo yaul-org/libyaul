@@ -14,10 +14,38 @@
 
 #include "vdp2-internal.h"
 
+#ifdef DEBUG
+static void _debug_check(const struct scrn_bitmap_format *);
+#endif /* DEBUG */
+
+static void _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
+static void _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
+static void _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
+
 void
 vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
 {
 #ifdef DEBUG
+        _debug_check(format);
+#endif /* DEBUG */
+
+        switch (format->sbf_scroll_screen) {
+        case SCRN_NBG0:
+                _nbg0_scrn_bitmap_format_set(format);
+                break;
+        case SCRN_NBG1:
+                _nbg1_scrn_bitmap_format_set(format);
+                break;
+        case SCRN_RBG0:
+                _rbg0_scrn_bitmap_format_set(format);
+               break;
+        }
+}
+
+#ifdef DEBUG
+static void
+_debug_check(const struct scrn_bitmap_format *format)
+{
         assert(format != NULL);
 
         /* Check if the background passed is valid */
@@ -40,144 +68,165 @@ vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
 
         assert((format->sbf_bitmap_size.height == 256) ||
                (format->sbf_bitmap_size.height == 512));
+}
 #endif /* DEBUG */
 
-        uint32_t bank;
+static void
+_nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+{
+        vdp2_state.buffered_regs.chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
+        vdp2_state.buffered_regs.mpofn &= 0xFFF8;       /* Bits 0,1,2 */
+        vdp2_state.buffered_regs.bmpna &= 0xFFC8;       /* Bits 0,1,2,4,5 */
 
-        switch (vdp2_state.vram_ctl.vram_size) {
-        case VRAM_CTL_SIZE_4MBIT:
-                bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+        uint16_t cc_count;
+        cc_count = (format->sbf_cc_count & 0x07) << 4;
+
+        uint16_t bank;
+        bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+
+        uint16_t palette_number;
+        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+
+        uint16_t width;
+        width = format->sbf_bitmap_size.width >> 10;
+
+        uint16_t height;
+        height = format->sbf_bitmap_size.height >> 9;
+
+        /* Screen display format */
+        /* Character color count */
+        /* Bitmap size */
+        vdp2_state.buffered_regs.chctla |= 0x0002;
+        vdp2_state.buffered_regs.chctla |= cc_count;
+        vdp2_state.buffered_regs.chctla |= width << 3;
+        vdp2_state.buffered_regs.chctla |= height << 2;
+
+        /* Pattern boundry lead address */
+        vdp2_state.buffered_regs.mpofn |= bank;
+
+        /* Supplementary palette number */
+
+        /* Specifying a palette number for 2,048-colors is invalid as it
+         * uses up nearly all of CRAM (4 KiB).
+         *
+         * 256-color needs 3 bits as there are 8 possible color banks.
+         *
+         * For 16-colors, there are 128 possible banks, but only 8 are
+         * available (the lower 4- bits of the palette number is 0). */
+        switch (format->sbf_cc_count) {
+        case SCRN_CCC_PALETTE_16:
+        case SCRN_CCC_PALETTE_256:
+                vdp2_state.buffered_regs.bmpna |= palette_number;
                 break;
-        case VRAM_CTL_SIZE_8MBIT:
-                bank = VRAM_BANK_8MBIT(format->sbf_bitmap_pattern);
+        }
+}
+
+static void
+_nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+{
+        vdp2_state.buffered_regs.chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
+        vdp2_state.buffered_regs.mpofn &= 0xFF8F;       /* Bits 4,5,6 */
+        vdp2_state.buffered_regs.bmpna &= 0xC8FF;       /* Bits 8,9,10,12,13 */
+
+        uint16_t cc_count;
+        cc_count = (format->sbf_cc_count & 0x03) << 12;
+
+        uint16_t bank;
+        bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+
+        uint16_t palette_number;
+        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+
+        uint16_t width;
+        width = format->sbf_bitmap_size.width >> 10;
+
+        uint16_t height;
+        height = format->sbf_bitmap_size.height >> 9;
+
+        /* Screen display format */
+        /* Character color count */
+        /* Bitmap size */
+        vdp2_state.buffered_regs.chctla |= 0x0200;
+        vdp2_state.buffered_regs.chctla |= cc_count;
+        vdp2_state.buffered_regs.chctla |= width << 10;
+        vdp2_state.buffered_regs.chctla |= height << 10;
+
+        /* Pattern boundry lead address */
+        vdp2_state.buffered_regs.mpofn |= bank << 4;
+
+        /* Supplementary palette number */
+        switch (format->sbf_cc_count) {
+        case SCRN_CCC_PALETTE_16:
+        case SCRN_CCC_PALETTE_256:
+                vdp2_state.buffered_regs.bmpna |= palette_number << 8;
+                break;
+        }
+}
+
+static void
+_rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+{
+#ifdef DEBUG
+        assert((format->sbf_bitmap_size.width == 512));
+
+        assert((format->sbf_rp_mode == 0) ||
+               (format->sbf_rp_mode == 1) ||
+               (format->sbf_rp_mode == 2) ||
+               (format->sbf_rp_mode == 3));
+#endif /* DEBUG */
+
+        vdp2_state.buffered_regs.chctlb &= 0xC0FF;      /* Bits 8,9,10,12,13,14*/
+        vdp2_state.buffered_regs.bmpnb &= 0xFFC8;       /* Bits 0,1,2,4,5*/
+        vdp2_state.buffered_regs.rpmd &= 0xFFFC;        /* Bits 0,1 */
+
+        uint16_t cc_count;
+        cc_count = (format->sbf_cc_count & 0x03) << 12;
+
+        uint16_t bank;
+        bank = VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+
+        uint16_t palette_number;
+        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+
+        uint16_t width;
+        width = format->sbf_bitmap_size.width >> 10;
+
+        uint16_t height;
+        height = format->sbf_bitmap_size.height >> 9;
+
+        /* Screen display format */
+        /* Character color count */
+        /* Bitmap size */
+        vdp2_state.buffered_regs.chctlb |= 0x0200;
+        vdp2_state.buffered_regs.chctlb |= cc_count;
+        vdp2_state.buffered_regs.chctlb |= width << 10;
+        vdp2_state.buffered_regs.chctlb |= height << 10;
+
+        /* Supplementary palette number */
+        switch (format->sbf_cc_count) {
+        case SCRN_CCC_PALETTE_16:
+        case SCRN_CCC_PALETTE_256:
+                vdp2_state.buffered_regs.bmpnb |= palette_number;
                 break;
         }
 
-        uint16_t palette_number;
+        /* Rotation parameter mode */
+        vdp2_state.buffered_regs.rpmd |= format->sbf_rp_mode;
 
-        palette_number = (format->sbf_color_palette >> 9) & 0x07;
-
-        switch (format->sbf_scroll_screen) {
-        case SCRN_NBG0:
-                /* Screen display format */
-                vdp2_state.buffered_regs.chctla &= 0xFFFD;
-                vdp2_state.buffered_regs.chctla |= 0x0002;
-
-                /* Character color count */
-                vdp2_state.buffered_regs.chctla &= 0xFF8F;
-                vdp2_state.buffered_regs.chctla |= format->sbf_cc_count << 4;
+        switch (format->sbf_rp_mode) {
+        case 0:
+                /* Mode 0: Rotation Parameter A */
 
                 /* Pattern boundry lead address */
-                vdp2_state.buffered_regs.mpofn &= 0xFFF8;
-                vdp2_state.buffered_regs.mpofn |= bank;
-
-                /* Bitmap size */
-                vdp2_state.buffered_regs.chctla &= 0xFFF3;
-                vdp2_state.buffered_regs.chctla |= ((format->sbf_bitmap_size.width >> 10) << 3) |
-                    ((format->sbf_bitmap_size.height >> 9) << 2);
-
-                /* Supplementary palette number */
-                vdp2_state.buffered_regs.bmpna &= 0xFFF8;
-                switch (format->sbf_cc_count) {
-                case SCRN_CCC_PALETTE_16:
-                case SCRN_CCC_PALETTE_256:
-                        vdp2_state.buffered_regs.bmpna |= palette_number;
-                        break;
-                }
-
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
-                MEMORY_WRITE(16, VDP2(BMPNA), vdp2_state.buffered_regs.bmpna);
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
+                vdp2_state.buffered_regs.mpofr &= 0xFFF8;
+                vdp2_state.buffered_regs.mpofr |= bank;
                 break;
-        case SCRN_NBG1:
-                /* Screen display format */
-                vdp2_state.buffered_regs.chctla &= 0xFDFF;
-                vdp2_state.buffered_regs.chctla |= 0x0200;
-
-                /* Character color count */
-                vdp2_state.buffered_regs.chctla &= 0xCFFF;
-                vdp2_state.buffered_regs.chctla |= format->sbf_cc_count << 12;
+        case 1:
+                /* Mode 1: Rotation Parameter B */
 
                 /* Pattern boundry lead address */
-                vdp2_state.buffered_regs.mpofn &= 0xFF8F;
-                vdp2_state.buffered_regs.mpofn |= bank << 4;
-
-                /* Bitmap size */
-                vdp2_state.buffered_regs.chctla &= 0xF3FF;
-                vdp2_state.buffered_regs.chctla |= ((format->sbf_bitmap_size.width >> 10) << 11) |
-                    ((format->sbf_bitmap_size.height >> 9) << 10);
-
-                /* Supplementary palette number */
-                vdp2_state.buffered_regs.bmpna &= 0xF8FF;
-                switch (format->sbf_cc_count) {
-                case SCRN_CCC_PALETTE_16:
-                case SCRN_CCC_PALETTE_256:
-                        vdp2_state.buffered_regs.bmpna |= palette_number << 8;
-                        break;
-                }
-
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
-                MEMORY_WRITE(16, VDP2(BMPNA), vdp2_state.buffered_regs.bmpna);
-                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
-                break;
-        case SCRN_RBG0:
-#ifdef DEBUG
-                assert((format->sbf_bitmap_size.width == 512));
-
-                assert((format->sbf_rp_mode == 0) ||
-                       (format->sbf_rp_mode == 1) ||
-                       (format->sbf_rp_mode == 2) ||
-                       (format->sbf_rp_mode == 3));
-#endif /* DEBUG */
-
-                /* Screen display format */
-                vdp2_state.buffered_regs.chctlb &= 0xFDFF;
-                vdp2_state.buffered_regs.chctlb |= 0x0200;
-
-                /* Character color count */
-                vdp2_state.buffered_regs.chctlb &= 0x8FFF;
-                vdp2_state.buffered_regs.chctlb |= format->sbf_cc_count << 12;
-
-                /* Bitmap size */
-                vdp2_state.buffered_regs.chctlb &= 0xFBFF;
-                vdp2_state.buffered_regs.chctlb |= (format->sbf_bitmap_size.height >> 9) << 10;
-
-                /* Supplementary palette number */
-                vdp2_state.buffered_regs.bmpnb &= 0xFFF8;
-                switch (format->sbf_cc_count) {
-                case SCRN_CCC_PALETTE_16:
-                case SCRN_CCC_PALETTE_256:
-                        vdp2_state.buffered_regs.bmpnb |= palette_number;
-                        break;
-                }
-
-                /* Rotation parameter mode */
-                vdp2_state.buffered_regs.rpmd &= 0xFFFE;
-                vdp2_state.buffered_regs.rpmd |= format->sbf_rp_mode;
-
-                switch (format->sbf_rp_mode) {
-                case 0:
-                        /* Mode 0: Rotation Parameter A */
-
-                        /* Map */
-                        vdp2_state.buffered_regs.mpofr &= 0xFF8F;
-                        vdp2_state.buffered_regs.mpofr |= bank << 4;
-                        break;
-                case 1:
-                        /* Mode 1: Rotation Parameter B */
-
-                        /* Map */
-                        vdp2_state.buffered_regs.mpofr &= 0xFF8F;
-                        vdp2_state.buffered_regs.mpofr |= bank << 4;
-                        break;
-                }
-
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(CHCTLB), vdp2_state.buffered_regs.chctlb);
-                MEMORY_WRITE(16, VDP2(BMPNB), vdp2_state.buffered_regs.bmpnb);
-                MEMORY_WRITE(16, VDP2(MPOFR), vdp2_state.buffered_regs.mpofr);
+                vdp2_state.buffered_regs.mpofr &= 0xFF8F;
+                vdp2_state.buffered_regs.mpofr |= bank << 4;
                 break;
         }
 }
