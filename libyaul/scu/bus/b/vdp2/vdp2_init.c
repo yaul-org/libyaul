@@ -110,6 +110,8 @@ vdp2_init(void)
         vdp2_state.buffered_regs.prisc = 0x0101;
         vdp2_state.buffered_regs.prisd = 0x0101;
 
+        vdp2_tvmd_display_clear();
+
         if (initialized) {
                 return;
         }
