@@ -223,6 +223,7 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
                 vdp2_state.buffered_regs.mpofn |= map_offset;
 
                 /* Write to memory */
+                MEMORY_WRITE(16, VDP2(MPOFN), vdp2_state.buffered_regs.mpofn);
                 MEMORY_WRITE(16, VDP2(MPABN0), (plane_b << 8) | plane_a);
                 MEMORY_WRITE(16, VDP2(MPCDN0), (plane_d << 8) | plane_c);
                 MEMORY_WRITE(16, VDP2(CHCTLA), vdp2_state.buffered_regs.chctla);
