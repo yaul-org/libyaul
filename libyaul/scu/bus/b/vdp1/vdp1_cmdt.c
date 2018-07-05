@@ -212,20 +212,19 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_sprite *sprite)
 
         switch (sprite->cs_mode.color_mode) {
         case 0:
-                cmdt->cmd_colr = sprite->cs_color_bank << 4;
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFF0;
                 break;
         case 1:
-                cmdt->cmd_colr =
-                    (uint16_t)((sprite->cs_clut >> 3) & 0xFFFF);
+                cmdt->cmd_colr = (uint16_t)((sprite->cs_clut >> 3) & 0xFFFF);
                 break;
         case 2:
-                cmdt->cmd_colr = sprite->cs_color_bank << 6;
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFC0;
                 break;
         case 3:
-                cmdt->cmd_colr = sprite->cs_color_bank << 7;
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF80;
                 break;
         case 4:
-                cmdt->cmd_colr = sprite->cs_color_bank << 8;
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF00;
                 break;
         case 5:
                 break;

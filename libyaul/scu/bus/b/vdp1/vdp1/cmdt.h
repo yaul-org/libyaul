@@ -10,6 +10,8 @@
 
 #include <sys/cdefs.h>
 
+#include <vdp2/sprite.h>
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -101,7 +103,27 @@ struct vdp1_cmdt_sprite {
 
         union {
                 /* Mode 0, 2, 3, and 4 */
-                uint32_t cs_color_bank;
+                union {
+                        struct vdp2_sprite_type_0 type_0;
+                        struct vdp2_sprite_type_1 type_1;
+                        struct vdp2_sprite_type_2 type_2;
+                        struct vdp2_sprite_type_3 type_3;
+                        struct vdp2_sprite_type_4 type_4;
+                        struct vdp2_sprite_type_5 type_5;
+                        struct vdp2_sprite_type_6 type_6;
+                        struct vdp2_sprite_type_7 type_7;
+                        struct vdp2_sprite_type_8 type_8;
+                        struct vdp2_sprite_type_9 type_9;
+                        struct vdp2_sprite_type_a type_a;
+                        struct vdp2_sprite_type_b type_b;
+                        struct vdp2_sprite_type_c type_c;
+                        struct vdp2_sprite_type_d type_d;
+                        struct vdp2_sprite_type_e type_e;
+                        struct vdp2_sprite_type_f type_f;
+
+                        uint16_t raw;
+                } cs_color_bank;
+
                 /* Mode 1 */
                 uint32_t cs_clut;
         };
