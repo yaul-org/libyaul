@@ -14,6 +14,7 @@
 _scu_ic_interrupt_get:
         mov.l .LC1, r1
         sts.l pr, @-r15
+        mov.l @r1, r1
         jsr @r1
         nop
         lds.l @r15+, pr
@@ -23,4 +24,4 @@ _scu_ic_interrupt_get:
 .align 2
 
 .LC1:
-.long 0x0600077C
+.long 0x06000304
