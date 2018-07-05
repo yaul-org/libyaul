@@ -23,7 +23,7 @@ extern void internal_exception_dma_address_error(void);
 
 static void _format_exception_message(struct cpu_registers *, char *, const char *);
 
-static char _buffer[512];
+static char _buffer[1024];
 
 void
 cpu_init(void)
@@ -100,7 +100,11 @@ _format_exception_message(struct cpu_registers *regs,
             "\t r8 = 0x%08X mach = 0x%08X\n"
             "\t r9 = 0x%08X macl = 0x%08X\n"
             "\tr10 = 0x%08X   pr = 0x%08X\n"
-            "                     pc = 0x%08X\n",
+            "                     pc = 0x%08X\n"
+            "----------------------------------------\n"
+            "SR bits\n\n"
+            "\tM Q I3 I2 I1 I0 - - S T\n"
+            "\t%lu %lu  %lu  %lu  %lu  %lu     %lu %lu\n",
             exception_name,
             (uintptr_t)regs->r[0], (uintptr_t)regs->r[11],
             (uintptr_t)regs->r[1], (uintptr_t)regs->r[12],
@@ -113,5 +117,13 @@ _format_exception_message(struct cpu_registers *regs,
             (uintptr_t)regs->r[8], (uintptr_t)regs->mach,
             (uintptr_t)regs->r[9], (uintptr_t)regs->macl,
             (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
-            (uintptr_t)regs->pc);
+            (uintptr_t)regs->pc,
+            (uint32_t)((regs->sr >> 9) & 0x01),
+            (uint32_t)((regs->sr >> 8) & 0x01),
+            (uint32_t)((regs->sr >> 7) & 0x01),
+            (uint32_t)((regs->sr >> 6) & 0x01),
+            (uint32_t)((regs->sr >> 5) & 0x01),
+            (uint32_t)((regs->sr >> 4) & 0x01),
+            (uint32_t)((regs->sr >> 1) & 0x01),
+            (uint32_t)((regs->sr >> 0) & 0x01));
 }
