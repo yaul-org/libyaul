@@ -22,7 +22,7 @@ __assert_func(const char *file, int line, const char *func,
 {
         static char buf[4096];
 
-        (void)snprintf(buf, 4096,
+        (void)sprintf(buf,
             "[H[2JAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
             failed_expr, file, line,
             (func ? ", function: " : ""),

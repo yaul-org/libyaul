@@ -20,6 +20,7 @@ int strcmp(const char *, const char *);
 char *strcpy(char * __restrict, const char * __restrict);
 size_t strcspn(const char *, const char *);
 size_t strlen(const char *);
+size_t strnlen(const char *, size_t);
 char *strncat(char * __restrict, const char * __restrict, size_t);
 int strncmp(const char *, const char *, size_t);
 char *strncpy(char * __restrict, const char * __restrict, size_t);
