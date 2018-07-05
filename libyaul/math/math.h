@@ -11,6 +11,7 @@ extern "C" {
 #include "fix16.h"
 #include "int16.h"
 #include "color.h"
+#include "fix.h"
 
 #ifndef min
 #define min(a, b)                                                              \

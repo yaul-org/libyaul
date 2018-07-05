@@ -285,6 +285,7 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
+	./math/:fix.h:yaul/math/ \
 	./math/:fix16.h:yaul/math/ \
 	./math/:fract32.h:yaul/math/ \
 	./math/:int16.h:yaul/math/ \
