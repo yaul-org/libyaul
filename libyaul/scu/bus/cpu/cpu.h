@@ -10,6 +10,7 @@
 
 #include <cpu/intc.h>
 #include <cpu/dmac.h>
+#include <cpu/frt.h>
 #include <cpu/registers.h>
 
 #ifdef __cplusplus
@@ -33,4 +34,5 @@ extern void cpu_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CPU_H_ */
