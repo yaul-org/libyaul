@@ -142,9 +142,14 @@ _cell_plane_calc(
 static uint16_t
 _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
 {
-        /* Pattern name control */
         uint16_t pncnx;
         pncnx = 0x0000;
+
+        uint16_t aux;
+        aux = 0x0000;
+
+        uint16_t sf_type;
+        sf_type = 0x0000;
 
         uint16_t sc_number; /* Supplementary character number bits */
         sc_number = 0;
@@ -199,8 +204,6 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
                                              (character_number & 0x03);
                                 break;
                         }
-
-                        pncnx = 0x8000 | sc_number | sp_number;
                         break;
                 case 1:
                         /* Auxiliary mode 1; flip function cannot be used */
@@ -219,8 +222,23 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
                                 break;
                         }
 
-                        pncnx = 0xC000 | sc_number | sp_number;
+                        aux = 0x4000;
                 }
+
+                /* Special function type */
+                switch (format->scf_sf_type) {
+                case SCRN_SF_TYPE_PRIORITY:
+                        sf_type = 0x0200;
+                        break;
+                case SCRN_SF_TYPE_COLOR_CALCULATION:
+                        sf_type = 0x0100;
+                        break;
+                default:
+                        sf_type = 0x0000;
+                        break;
+                }
+
+                pncnx = 0x8000 | aux | sf_type | sc_number | sp_number;
                 break;
         case 2:
                 /* Pattern name data size: 2-words */
@@ -241,6 +259,8 @@ _nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
         vdp2_state.buffered_regs.mpabn0 = 0x0000;
         vdp2_state.buffered_regs.mpcdn0 = 0x0000;
         vdp2_state.buffered_regs.pncn0 = 0x0000;
+        vdp2_state.buffered_regs.sfsel &= 0xFFFE;
+        vdp2_state.buffered_regs.sfprmd &= 0xFFFC;
 
         /* Copy */
         (void)memcpy(&vdp2_state.nbg0.cell_format, format, sizeof(*format));
@@ -264,11 +284,13 @@ _nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         /* Map */
         vdp2_state.buffered_regs.mpofn |= map_offset;
-
         vdp2_state.buffered_regs.mpabn0 = (planes[1] << 8) | planes[0];
         vdp2_state.buffered_regs.mpcdn0 = (planes[3] << 8) | planes[2];
-
         vdp2_state.buffered_regs.pncn0 = pncn0;
+
+        /* Special function */
+        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 0;
+        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 0;
 }
 
 static void
@@ -281,6 +303,8 @@ _nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
         vdp2_state.buffered_regs.mpabn1 = 0x0000;
         vdp2_state.buffered_regs.mpcdn1 = 0x0000;
         vdp2_state.buffered_regs.pncn1 = 0x0000;
+        vdp2_state.buffered_regs.sfsel &= 0xFFFD;
+        vdp2_state.buffered_regs.sfprmd &= 0xFFF3;
 
         /* Copy */
         (void)memcpy(&vdp2_state.nbg1.cell_format, format, sizeof(*format));
@@ -304,11 +328,13 @@ _nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         /* Map */
         vdp2_state.buffered_regs.mpofn |= map_offset << 4;
-
         vdp2_state.buffered_regs.mpabn1 = (planes[1] << 8) | planes[0];
         vdp2_state.buffered_regs.mpcdn1 = (planes[3] << 8) | planes[2];
-
         vdp2_state.buffered_regs.pncn1 = pncn1;
+
+        /* Special function */
+        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 1;
+        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 2;
 }
 
 static void
@@ -326,6 +352,8 @@ _nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
         vdp2_state.buffered_regs.mpabn2 = 0x0000;
         vdp2_state.buffered_regs.mpcdn2 = 0x0000;
         vdp2_state.buffered_regs.pncn2 = 0x0000;
+        vdp2_state.buffered_regs.sfsel &= 0xFFFB;
+        vdp2_state.buffered_regs.sfprmd &= 0xFFCF;
 
         /* Copy */
         (void)memcpy(&vdp2_state.nbg2.cell_format, format, sizeof(*format));
@@ -349,11 +377,13 @@ _nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         /* Map */
         vdp2_state.buffered_regs.mpofn |= map_offset << 8;
-
         vdp2_state.buffered_regs.mpabn2 = (planes[1] << 8) | planes[0];
         vdp2_state.buffered_regs.mpcdn2 = (planes[3] << 8) | planes[2];
-
         vdp2_state.buffered_regs.pncn2 = pncn2;
+
+        /* Special function */
+        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 2;
+        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 4;
 }
 
 static void
@@ -371,6 +401,8 @@ _nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
         vdp2_state.buffered_regs.mpabn3 = 0x0000;
         vdp2_state.buffered_regs.mpcdn3 = 0x0000;
         vdp2_state.buffered_regs.pncn3 = 0x0000;
+        vdp2_state.buffered_regs.sfsel &= 0xFFF7;
+        vdp2_state.buffered_regs.sfprmd &= 0xFF3F;
 
         /* Copy */
         (void)memcpy(&vdp2_state.nbg3.cell_format, format,
@@ -395,11 +427,13 @@ _nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
 
         /* Map */
         vdp2_state.buffered_regs.mpofn |= map_offset << 12;
-
         vdp2_state.buffered_regs.mpabn3 = (planes[1] << 8) | planes[0];
         vdp2_state.buffered_regs.mpcdn3 = (planes[3] << 8) | planes[2];
-
         vdp2_state.buffered_regs.pncn3 = pncn3;
+
+        /* Special function */
+        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 3;
+        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 6;
 }
 
 static void
@@ -436,6 +470,8 @@ _rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
         vdp2_state.buffered_regs.mpmnrb = 0x0000;
         vdp2_state.buffered_regs.mpoprb = 0x0000;
         vdp2_state.buffered_regs.pncr = 0x0000;
+        vdp2_state.buffered_regs.sfsel &= 0xFFEF;
+        vdp2_state.buffered_regs.sfprmd &= 0xFCFF;
 
         uint16_t pncr;
         pncr = _cell_pattern_name_control_calc(format);
@@ -503,4 +539,8 @@ _rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
         }
 
         vdp2_state.buffered_regs.pncr = pncr;
+
+        /* Special function */
+        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 4;
+        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 8;
 }
