@@ -14,7 +14,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void gdb_init(void);
+extern void gdb_init(void);
 
 #ifdef __cplusplus
 }

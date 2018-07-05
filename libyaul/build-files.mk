@@ -27,15 +27,13 @@ SUPPORT_SRCS:= \
 	common/c++-support.cxx
 
 LIB_SRCS:= \
-	common/exception.S \
-	common/exception_handler.c \
 	common/internal_exception_show.c \
 	common/stack.c
 
 ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
-	common/gdb/ihr.S \
+	common/gdb/gdb-ihr.S \
 	common/gdb/sh2-704x.c
 endif
 
@@ -183,20 +181,11 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_vram_control_get.c \
 	scu/bus/b/vdp2/vdp2_vram_control_set.c \
 	\
-	scu/bus/cpu/cpu_clock_freq_chg.S \
-	scu/bus/cpu/cpu_clock_freq_get.S \
 	scu/bus/cpu/cpu_dmac_channel_set.c \
 	scu/bus/cpu/cpu_dmac_channel_start.c \
 	scu/bus/cpu/cpu_dmac_channel_stop.c \
-	scu/bus/cpu/cpu_intc_disable.S \
-	scu/bus/cpu/cpu_intc_enable.S \
-	scu/bus/cpu/cpu_intc_interrupt_get.S \
-	scu/bus/cpu/cpu_intc_interrupt_set.S \
-	scu/bus/cpu/cpu_intc_mask_get.S \
-	scu/bus/cpu/cpu_intc_mask_set.S \
-	scu/bus/cpu/cpu_intc_vector_base_get.S \
-	scu/bus/cpu/cpu_intc_vector_base_set.S \
-	scu/bus/cpu/cpu_intc_vector_table.S \
+	scu/bus/cpu/cpu_init.c \
+	scu/bus/cpu/cpu_exception_trampoline.S \
 	scu/bus/cpu/cpu_ubc_init.c \
 	\
 	scu/bus/cpu/smpc/smpc_init.c \
@@ -231,12 +220,6 @@ LIB_SRCS+= \
 	scu/scu_dma_cpu_level_start.c \
 	scu/scu_dma_cpu_level_stop.c \
 	scu/scu_dsp_init.c \
-	scu/scu_ic_interrupt_get.S \
-	scu/scu_ic_interrupt_set.S \
-	scu/scu_ic_mask_chg.S \
-	scu/scu_ic_mask_get.S \
-	scu/scu_ic_mask_set.S \
-	scu/scu_ic_status_get.c \
 	scu/scu_timer_0_set.c \
 	scu/scu_timer_1_mode_clear.c \
 	scu/scu_timer_1_mode_set.c \
@@ -245,6 +228,7 @@ LIB_SRCS+= \
 	scu/scu_timer_all_enable.c
 
 INCLUDE_DIRS:= \
+	. \
 	common \
 	common/gdb \
 	cons \
@@ -269,6 +253,9 @@ HEADER_FILES:= \
 
 INSTALL_HEADER_FILES:= \
 	./:yaul.h:./yaul/
+
+INSTALL_HEADER_FILES+= \
+	./:bios.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/:_ansi.h:./ \

@@ -66,17 +66,17 @@
 .text
 .align 1
 
-.global _ihr_ubc
-.type _ihr_ubc, @function
+.global _internal_gdb_ihr_ubc
+.type _internal_gdb_ihr_ubc, @function
 
-_ihr_ubc:
+_internal_gdb_ihr_ubc:
         rte
         nop
 
-.global _ihr_break
-.type _ihr_break, @function
+.global _internal_gdb_ihr_break
+.type _internal_gdb_ihr_break, @function
 
-_ihr_break:
+_internal_gdb_ihr_break:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -90,10 +90,10 @@ _ihr_break:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _ihr_illegal_instruction
-.type _ihr_illegal_instruction, @function
+.global _internal_gdb_exception_illegal_instruction
+.type _internal_gdb_exception_illegal_instruction, @function
 
-_ihr_illegal_instruction:
+_internal_gdb_exception_illegal_instruction:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -107,17 +107,17 @@ _ihr_illegal_instruction:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _ihr_illegal_slot
-.type _ihr_illegal_slot, @function
+.global _internal_gdb_exception_illegal_slot
+.type _internal_gdb_exception_illegal_slot, @function
 
-_ihr_illegal_slot:
-        bra _ihr_illegal_instruction
+_internal_gdb_exception_illegal_slot:
+        bra _internal_gdb_exception_illegal_instruction
         nop
 
-.global _ihr_cpu_address_error
-.type _ihr_cpu_address_error, @function
+.global _internal_gdb_exception_cpu_address_error
+.type _internal_gdb_exception_cpu_address_error, @function
 
-_ihr_cpu_address_error:
+_internal_gdb_exception_cpu_address_error:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -131,11 +131,11 @@ _ihr_cpu_address_error:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _ihr_dma_address_error
-.type _ihr_dma_address_error, @function
+.global _internal_gdb_exception_dma_address_error
+.type _internal_gdb_exception_dma_address_error, @function
 
-_ihr_dma_address_error:
-        bra _ihr_cpu_address_error
+_internal_gdb_exception_dma_address_error:
+        bra _internal_gdb_exception_cpu_address_error
         nop
 
 .align 2

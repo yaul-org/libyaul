@@ -17,8 +17,8 @@
 #include "gdb.h"
 #include "sh2-704x.h"
 
-#define IS_ALIGNED(t, addr,len)                                               \
-        (((len) >= sizeof(uint ## t ## _t)) &&                                \
+#define IS_ALIGNED(t, addr,len)                                                \
+        (((len) >= sizeof(uint ## t ## _t)) &&                                 \
         (((uint32_t)(addr) % sizeof(uint ## t ## _t)) == 0))
 
 #define GDB_RX_BUF_LEN  512
@@ -30,19 +30,19 @@ typedef union {
 } lc_t;
 
 /* Helpers */
-static char *hex_buffer_to_mem(const char *, void *, size_t);
-static char *parse_unsigned_long(char *, uint32_t *, int);
-static char low_nibble_to_hex(char);
-static int hex_digit_to_integer(char);
-static int mem_to_hex_buffer(const void *, char *, size_t);
-static uint8_t put_buf(const char *, int);
-static void get_packet(char *);
-static void put_packet(char, const char *, size_t);
+static char *_hex_buffer_to_mem(const char *, void *, size_t);
+static char *_parse_unsigned_long(char *, uint32_t *, int);
+static char _low_nibble_to_hex(char);
+static int _hex_digit_to_integer(char);
+static int _mem_to_hex_buffer(const void *, char *, size_t);
+static uint8_t _put_buf(const char *, int);
+static void _get_packet(char *);
+static void _put_packet(char, const char *, size_t);
 
 /* GDB commands */
-static void gdb_command_read_memory(uint32_t, uint32_t);
-static void gdb_command_read_registers(struct cpu_registers *);
-static void gdb_last_signal(int);
+static void _gdb_command_read_memory(uint32_t, uint32_t);
+static void _gdb_command_read_registers(struct cpu_registers *);
+static void _gdb_last_signal(int);
 
 void
 gdb_init(void)
@@ -71,18 +71,18 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 
         int err;
 
-        gdb_last_signal(sigval);
+        _gdb_last_signal(sigval);
         gdb_monitor_entry(reg_file);
 
         while (true) {
                 hargs = &*buf;
-                get_packet(hargs);
+                _get_packet(hargs);
 
                 switch (*hargs++) {
                 case '?':
                         /* '?'
                          * Indicate the reason the target halted */
-                        gdb_last_signal(sigval);
+                        _gdb_last_signal(sigval);
                         break;
                 case 'A':
                         /* 'A arg-len,arg-num,arg,...' *
@@ -100,12 +100,12 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                         /* 'D'
                          * Detach gdb from the remote system */
 
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
                         return;
                 case 'g':
                         /* 'g'
                          * Read general registers */
-                        gdb_command_read_registers(reg_file);
+                        _gdb_command_read_registers(reg_file);
                         break;
                 case 'G':
                         /* 'G XX...'
@@ -125,41 +125,41 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                          */
 
                         /* Send OK back to GDB */
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
 
                         gdb_kill();
                         return;
                 case 'm':
                         /* 'm addr,length'
                          * Read LENGTH bytes memory from specified ADDRess */
-                        hargs = parse_unsigned_long(hargs, &addr, ',');
-                        parse_unsigned_long(hargs, &length, '\0');
+                        hargs = _parse_unsigned_long(hargs, &addr, ',');
+                        _parse_unsigned_long(hargs, &length, '\0');
 
-                        gdb_command_read_memory(addr, length);
+                        _gdb_command_read_memory(addr, length);
                         break;
                 case 'M':
                         /* 'M addr,length:XX...'
                          * Write LENGTH bytes memory from ADDRess */
 
-                        hargs = parse_unsigned_long(hargs, &addr, ',');
-                        data = parse_unsigned_long(hargs, &length, ':');
+                        hargs = _parse_unsigned_long(hargs, &addr, ',');
+                        data = _parse_unsigned_long(hargs, &length, ':');
 
-                        hex_buffer_to_mem(data, (void *)addr, length);
+                        _hex_buffer_to_mem(data, (void *)addr, length);
 
                         /* Send OK back to GDB */
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
                         break;
                 case 'P':
                         /* 'P n...=r...'
                          * Write to a specific register with a value */
 
-                        hargs = parse_unsigned_long(hargs, &n, '=');
+                        hargs = _parse_unsigned_long(hargs, &n, '=');
 
-                        hex_buffer_to_mem(hargs, &r, sizeof(uint32_t));
+                        _hex_buffer_to_mem(hargs, &r, sizeof(uint32_t));
                         gdb_register_file_write(reg_file, n, r);
 
                         /* Send OK back to GDB */
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
                         break;
                 case 'R':
                         /* 'R XX'
@@ -169,7 +169,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                         /* 's [addr]'
                          * Single step */
                         addr = 0x00000000;
-                        parse_unsigned_long(hargs, &addr, '\0');
+                        _parse_unsigned_long(hargs, &addr, '\0');
                         gdb_step(reg_file, addr);
                         return;
                 case 'S':
@@ -186,16 +186,16 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 
                         type = 0x00000000;
                         addr = 0x00000000;
-                        hargs = parse_unsigned_long(hargs, &type, ',');
-                        hargs = parse_unsigned_long(hargs, &addr, ',');
-                        parse_unsigned_long(hargs, &kind, '\0');
+                        hargs = _parse_unsigned_long(hargs, &type, ',');
+                        hargs = _parse_unsigned_long(hargs, &addr, ',');
+                        _parse_unsigned_long(hargs, &kind, '\0');
 
                         if ((err = gdb_remove_break(type, addr, kind)) < 0) {
-                                put_packet('E', "01", 2);
+                                _put_packet('E', "01", 2);
                                 break;
                         }
 
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
                         break;
                 case 'Z':
                         /* 'Z type,addr,kind'
@@ -203,28 +203,28 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 
                         type = 0x00000000;
                         addr = 0x00000000;
-                        hargs = parse_unsigned_long(hargs, &type, ',');
-                        hargs = parse_unsigned_long(hargs, &addr, ',');
-                        parse_unsigned_long(hargs, &kind, '\0');
+                        hargs = _parse_unsigned_long(hargs, &type, ',');
+                        hargs = _parse_unsigned_long(hargs, &addr, ',');
+                        _parse_unsigned_long(hargs, &kind, '\0');
 
                         if ((err = gdb_break(type, addr, kind)) < 0) {
-                                put_packet('E', "01", 2);
+                                _put_packet('E', "01", 2);
                                 break;
                         }
 
                         /* Send OK back to GDB */
-                        put_packet('\0', "OK", 2);
+                        _put_packet('\0', "OK", 2);
                         break;
                 default:
                         /* Invalid */
-                        put_packet('\0', NULL, 0);
+                        _put_packet('\0', NULL, 0);
                         break;
                 }
         }
 }
 
 static void
-gdb_command_read_registers(struct cpu_registers *reg_file)
+_gdb_command_read_registers(struct cpu_registers *reg_file)
 {
         char tx_buf[8];
         size_t tx_len;
@@ -240,20 +240,20 @@ gdb_command_read_registers(struct cpu_registers *reg_file)
                 csum = 0;
                 /* Loop through all registers */
                 for (n = 0; gdb_register_file_read(reg_file, n, &r); n++) {
-                        tx_len = mem_to_hex_buffer(&r, tx_buf, sizeof(r));
+                        tx_len = _mem_to_hex_buffer(&r, tx_buf, sizeof(r));
                         /* Send to GDB and calculate checksum */
-                        csum += put_buf(tx_buf, tx_len);
+                        csum += _put_buf(tx_buf, tx_len);
                 }
 
                 /* Send message footer */
                 gdb_putc('#');
-                gdb_putc(low_nibble_to_hex(csum >> 4));
-                gdb_putc(low_nibble_to_hex(csum));
+                gdb_putc(_low_nibble_to_hex(csum >> 4));
+                gdb_putc(_low_nibble_to_hex(csum));
         } while ((gdb_getc() & 0x7F) != '+');
 }
 
 static void
-gdb_command_read_memory(uint32_t address, uint32_t length)
+_gdb_command_read_memory(uint32_t address, uint32_t length)
 {
         char tx_buf[8];
         size_t tx_len;
@@ -272,35 +272,35 @@ gdb_command_read_memory(uint32_t address, uint32_t length)
                         /* Read from memory */
                         p = (uint8_t *)(address + i);
                         r = *p;
-                        tx_len = mem_to_hex_buffer(&r, tx_buf, 1);
+                        tx_len = _mem_to_hex_buffer(&r, tx_buf, 1);
 
                         /* Send to GDB and calculate checksum */
-                        csum += put_buf(tx_buf, tx_len);
+                        csum += _put_buf(tx_buf, tx_len);
                 }
 
                 /* Send message footer */
                 gdb_putc('#');
-                gdb_putc(low_nibble_to_hex(csum >> 4));
-                gdb_putc(low_nibble_to_hex(csum));
+                gdb_putc(_low_nibble_to_hex(csum >> 4));
+                gdb_putc(_low_nibble_to_hex(csum));
         } while ((gdb_getc() & 0x7F) != '+');
 }
 
 static void
-gdb_last_signal(int sigval)
+_gdb_last_signal(int sigval)
 {
         char tx_buf[2];
 
-        tx_buf[0] = low_nibble_to_hex(sigval >> 4);
-        tx_buf[1] = low_nibble_to_hex(sigval);
+        tx_buf[0] = _low_nibble_to_hex(sigval >> 4);
+        tx_buf[1] = _low_nibble_to_hex(sigval);
 
         /* Send packet */
-        put_packet('S', tx_buf, sizeof(tx_buf));
+        _put_packet('S', tx_buf, sizeof(tx_buf));
 }
 
 /* Packet format
  * $packet-data#checksum */
 static void
-put_packet(char c, const char *buf, size_t len)
+_put_packet(char c, const char *buf, size_t len)
 {
         uint8_t csum;
 
@@ -309,24 +309,25 @@ put_packet(char c, const char *buf, size_t len)
                 gdb_putc('$');
 
                 /* Send the message type, if specified */
-                if (c != '\0')
+                if (c != '\0') {
                         gdb_putc(c);
+                }
                 /* Send the data */
-                csum = c + put_buf(buf, len);
+                csum = c + _put_buf(buf, len);
 
                 /* Send the footer */
                 gdb_putc('#');
 
                 /* Checksum */
-                gdb_putc(low_nibble_to_hex(csum >> 4));
-                gdb_putc(low_nibble_to_hex(csum));
+                gdb_putc(_low_nibble_to_hex(csum >> 4));
+                gdb_putc(_low_nibble_to_hex(csum));
         } while ((gdb_getc() & 0x7F) != '+');
 }
 
 /* Packet format
  * $<data>#<checksum> */
 static void
-get_packet(char *rx_buf)
+_get_packet(char *rx_buf)
 {
         uint8_t ch;
         uint8_t csum;
@@ -350,8 +351,9 @@ get_packet(char *rx_buf)
                 /* now, read until a # or end of buffer is found */
                 for (len = 0; ; len++) {
                         ch = gdb_getc() & 0x7F;
-                        if (ch == '#')
+                        if (ch == '#') {
                                 break;
+                        }
 
                         csum += ch;
                         rx_buf[len] = ch;
@@ -360,8 +362,8 @@ get_packet(char *rx_buf)
                 rx_buf[len] = '\0';
 
                 /* Check if packet has a correct checksum */
-                xmit_csum = hex_digit_to_integer(gdb_getc() & 0x7F);
-                xmit_csum = hex_digit_to_integer(gdb_getc() & 0x7F) + (xmit_csum << 4);
+                xmit_csum = _hex_digit_to_integer(gdb_getc() & 0x7F);
+                xmit_csum = _hex_digit_to_integer(gdb_getc() & 0x7F) + (xmit_csum << 4);
 
                 if (csum != xmit_csum) {
                         /* Bad checksum */
@@ -390,17 +392,20 @@ get_packet(char *rx_buf)
 
 /* Convert '[0-9a-fA-F]' to its integer equivalent */
 static int
-hex_digit_to_integer(char h)
+_hex_digit_to_integer(char h)
 {
 
-        if ((h >= 'a') && (h <= 'f'))
+        if ((h >= 'a') && (h <= 'f')) {
                 return h - 'a' + 10;
+        }
 
-        if ((h >= '0') && (h <= '9'))
+        if ((h >= '0') && (h <= '9')) {
                 return h - '0';
+        }
 
-        if ((h >= 'A') && (h <= 'F'))
+        if ((h >= 'A') && (h <= 'F')) {
                 return h - 'A' + 10;
+        }
 
         return 0;
 }
@@ -408,7 +413,7 @@ hex_digit_to_integer(char h)
 /* Convert the low nibble of C to its hexadecimal character
  * equivalent */
 static char
-low_nibble_to_hex(char c)
+_low_nibble_to_hex(char c)
 {
         static const char lut[] = {
                 "0123456789ABCDEF"
@@ -418,12 +423,13 @@ low_nibble_to_hex(char c)
 }
 
 /* Translates a delimited hexadecimal string to an unsigned long (32-bit) */
-static char *parse_unsigned_long(char *hargs, uint32_t *l, int delim)
+static char *_parse_unsigned_long(char *hargs, uint32_t *l, int delim)
 {
 
         *l = 0x00000000;
-        while (*hargs != delim)
-                *l = (*l << 4) + hex_digit_to_integer(*hargs++);
+        while (*hargs != delim) {
+                *l = (*l << 4) + _hex_digit_to_integer(*hargs++);
+        }
 
         return hargs + 1;
 }
@@ -436,7 +442,7 @@ static char *parse_unsigned_long(char *hargs, uint32_t *l, int delim)
  * This function carefully preserves the endianness of the data, because
  * that's what GDB expects */
 static int
-mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
+_mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
 {
         lc_t lc_buf;
 
@@ -461,8 +467,8 @@ mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
                 len -= cbuf_len;
 
                 for (i = 0; i < cbuf_len; i++) {
-                        *h_buf++ = low_nibble_to_hex(lc_buf.cbuf[i] >> 4);
-                        *h_buf++ = low_nibble_to_hex(lc_buf.cbuf[i]);
+                        *h_buf++ = _low_nibble_to_hex(lc_buf.cbuf[i] >> 4);
+                        *h_buf++ = _low_nibble_to_hex(lc_buf.cbuf[i]);
                         ret_val += 2;
                 }
         }
@@ -475,7 +481,7 @@ mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
  *
  * Points to the first empty byte after the region written */
 static char *
-hex_buffer_to_mem(const char *buf, void *mem, size_t len)
+_hex_buffer_to_mem(const char *buf, void *mem, size_t len)
 {
         lc_t lc_buf;
 
@@ -486,20 +492,20 @@ hex_buffer_to_mem(const char *buf, void *mem, size_t len)
                 if (IS_ALIGNED(32, mem, len)) {
                         cbuf_len = sizeof(uint32_t);
                         for (i = 0; i < cbuf_len; i++) {
-                                lc_buf.cbuf[i] = (hex_digit_to_integer(*buf++) << 4);
-                                lc_buf.cbuf[i] += hex_digit_to_integer(*buf++);
+                                lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);
+                                lc_buf.cbuf[i] += _hex_digit_to_integer(*buf++);
                         }
                         *(uint32_t *)mem = lc_buf.lbuf;
                 } else if (IS_ALIGNED(16, mem, len)) {
                         cbuf_len = sizeof(uint16_t);
                         for (i = 0; i < cbuf_len; i++ ) {
-                                lc_buf.cbuf[i] = (hex_digit_to_integer(*buf++) << 4);
-                                lc_buf.cbuf[i] += hex_digit_to_integer(*buf++);
+                                lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);
+                                lc_buf.cbuf[i] += _hex_digit_to_integer(*buf++);
                         }
                         *(uint16_t *)mem = lc_buf.sbuf;
                 } else {
-                        lc_buf.cbuf[0] = (hex_digit_to_integer(*buf++) << 4);
-                        lc_buf.cbuf[0] += hex_digit_to_integer(*buf++);
+                        lc_buf.cbuf[0] = (_hex_digit_to_integer(*buf++) << 4);
+                        lc_buf.cbuf[0] += _hex_digit_to_integer(*buf++);
 
                         cbuf_len = sizeof(char);
                         *(char *)mem = lc_buf.cbuf[0];
@@ -512,7 +518,7 @@ hex_buffer_to_mem(const char *buf, void *mem, size_t len)
 }
 
 static uint8_t
-put_buf(const char *buf, int len)
+_put_buf(const char *buf, int len)
 {
         uint8_t sum;
         char c;

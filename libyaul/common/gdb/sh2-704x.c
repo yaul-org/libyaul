@@ -2,7 +2,7 @@
  * Copyright (c) 2012-2016
  * See LICENSE for details.
  *
- * William A. Gatliff <bgat@billgatliff.com> 
+ * William A. Gatliff <bgat@billgatliff.com>
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
@@ -19,16 +19,23 @@
 #include <arp.h>
 #else
 #error "Invalid value for `HAVE_DEV_CARTRIDGE'"
-#endif
+#endif /* HAVE_DEV_CARTRIDGE */
 
+#include <bios.h>
 #include <cpu/intc.h>
 #include <cpu/registers.h>
 
 #include <smpc/smc.h>
 
 #include "gdb.h"
-#include "ihr.h"
 #include "sh2-704x.h"
+
+extern void internal_gdb_ihr_break(void);
+extern void internal_gdb_exception_cpu_address_error(void);
+extern void internal_gdb_exception_dma_address_error(void);
+extern void internal_gdb_exception_illegal_instruction(void);
+extern void internal_gdb_exception_illegal_slot(void);
+extern void internal_gdb_ihr_ubc(void);
 
 #define R0      0
 #define R1      1
@@ -60,15 +67,15 @@
 #define OPCODE_BTS(op)          (((op) & 0xFF00) == 0x8D00)
 #define OPCODE_BF(op)           (((op) & 0xFF00) == 0x8B00)
 #define OPCODE_BFS(op)          (((op) & 0xFF00) == 0x8F00)
-#define OPCODE_8_DISP(op) ((((op) & 0x0080) == 0x0000)                        \
-                ? ((op) & 0x00FF)                                             \
-                /* Sign-extend */                                             \
+#define OPCODE_8_DISP(op)       ((((op) & 0x0080) == 0x0000)                   \
+                ? ((op) & 0x00FF)                                              \
+                /* Sign-extend */                                              \
                 : ((op) & 0x00FF) | 0xFFFFFF00)
 #define OPCODE_BRA(op)          (((op) & 0xF000) == 0xA000)
 #define OPCODE_BSR(op)          (((op) & 0xF000) == 0xB000)
-#define OPCODE_12_DISP(op) ((((op) & 0x0800) == 0x0000)                       \
-                ? ((op) & 0x0FFF)                                             \
-                /* Sign-extend */                                             \
+#define OPCODE_12_DISP(op)      ((((op) & 0x0800) == 0x0000)                   \
+                ? ((op) & 0x0FFF)                                              \
+                /* Sign-extend */                                              \
                 : ((op) & 0x0FFF) | 0xFFFFF000)
 #define OPCODE_BRAF(op)         (((op) & 0xF0FF) == 0x0023)
 #define OPCODE_BRAF_M(op)       (((op) & 0x0F00) >> 8)
@@ -83,7 +90,7 @@
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t calculate_pc(struct cpu_registers *);
+static uint32_t _calculate_pc(struct cpu_registers *);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -96,53 +103,56 @@ struct bp {
         TAILQ_ENTRY(bp) entries;
 };
 
-static bp_list_t *bp_list_alloc(void);
-static bool bp_list_empty(bp_list_t *);
-static void bp_list_free(bp_list_t **) __unused;
-static bp_t *bp_list_breakpoint_alloc(void);
-static void bp_list_breakpoint_free(bp_list_t *, bp_t *);
-static int bp_list_breakpoint_add(bp_list_t *, void *);
-static bp_t *bp_list_breakpoint_find(bp_list_t *, void *);
+static bp_list_t *_bp_list_alloc(void);
+static bool _bp_list_empty(bp_list_t *);
+static void _bp_list_free(bp_list_t **) __unused;
+static bp_t *_bp_list_breakpoint_alloc(void);
+static void _bp_list_breakpoint_free(bp_list_t *, bp_t *);
+static int _bp_list_breakpoint_add(bp_list_t *, void *);
+static bp_t *_bp_list_breakpoint_find(bp_list_t *, void *);
 
-static void device_init(void);
-static uint8_t device_read(void);
-static void device_write(uint8_t);
+static void _device_init(void);
+static uint8_t _device_read(void);
+static void _device_write(uint8_t);
 
 /* Overwritten instruction meant to allow stepping through */
-static bool stepping = false;
-static bp_t bp_step = {
+static bool _stepping = false;
+static bp_t _bp_step = {
         .addr = NULL,
         .instruction = 0x0000
 };
 
-static bp_list_t *bp_list = NULL;
+static bp_list_t *_bp_list = NULL;
 
 void
 gdb_sh2_704x_init(void)
 {
-        void (**vbr)(void);
-
-        device_init();
+        _device_init();
 
         /* Disable interrupts */
-        cpu_intc_disable();
+        uint32_t mask;
+        mask = cpu_intc_mask_get();
 
-        bp_list = bp_list_alloc();
+        cpu_intc_mask_set(0x0F);
+
+        _bp_list = _bp_list_alloc();
 
         /* Clear */
-        bp_step.addr = 0x00000000;
-        bp_step.instruction = 0x0000;
-        stepping = false;
+        _bp_step.addr = 0x00000000;
+        _bp_step.instruction = 0x0000;
+        _stepping = false;
 
-        vbr = cpu_intc_vector_base_get();
-        vbr[0x04] = ihr_illegal_instruction;
-        vbr[0x06] = ihr_illegal_slot;
-        vbr[0x09] = ihr_cpu_address_error;
-        vbr[0x0A] = ihr_dma_address_error;
-        /* Register UBC IHR */
-        vbr[0x0C] = ihr_ubc;
-        /* Register break IHR */
-        vbr[0x20] = ihr_break;
+        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
+            internal_gdb_exception_illegal_instruction);
+        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_SLOT,
+            internal_gdb_exception_illegal_slot);
+        cpu_intc_ihr_set(INTC_INTERRUPT_CPU_ADDRESS_ERROR,
+            internal_gdb_exception_cpu_address_error);
+        cpu_intc_ihr_set(INTC_INTERRUPT_DMA_ADDRESS_ERROR,
+            internal_gdb_exception_dma_address_error);
+
+        cpu_intc_ihr_set(INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
+        cpu_intc_ihr_set(INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
 
         /* Initialize UBC */
         /*
@@ -151,7 +161,7 @@ gdb_sh2_704x_init(void)
          */
 
         /* Enable interrupts */
-        cpu_intc_enable();
+        cpu_intc_mask_set(mask);
 
         /* Cause a breakpoint to sync with GDB */
         gdb_sync();
@@ -160,14 +170,14 @@ gdb_sh2_704x_init(void)
 void
 gdb_putc(int c)
 {
-        device_write(c);
+        _device_write(c);
 }
 
 int
 gdb_getc(void)
 {
         /* Blocks */
-        return device_read();
+        return _device_read();
 }
 
 void
@@ -175,18 +185,19 @@ gdb_step(struct cpu_registers *reg_file, uint32_t addr)
 {
         uint16_t *p;
 
-        if (addr != 0x00000000)
+        if (addr != 0x00000000) {
                 p = (uint16_t *)addr;
-        else
+        } else {
                 /* Determine where we'll be going */
-                p = (uint16_t *)calculate_pc(reg_file);
+                p = (uint16_t *)_calculate_pc(reg_file);
+        }
 
-        bp_step.addr = (void *)p;
-        bp_step.instruction = *p;
+        _bp_step.addr = (void *)p;
+        _bp_step.instruction = *p;
         *p = INSTRN_TRAPA(0x20);
 
         /* We're stepping, be aware of breakpoints and watchpoints */
-        stepping = true;
+        _stepping = true;
 }
 
 int
@@ -196,14 +207,16 @@ gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind)
 
         kind = kind;
 
-        if (addr == 0x00000000)
+        if (addr == 0x00000000) {
                 return -1;
+        }
 
         switch (type) {
         case 0x00:
-                if ((bp = bp_list_breakpoint_find(bp_list, (void *)addr)) == NULL)
+                if ((bp = _bp_list_breakpoint_find(_bp_list, (void *)addr)) == NULL) {
                         return -1;
-                bp_list_breakpoint_free(bp_list, bp);
+                }
+                _bp_list_breakpoint_free(_bp_list, bp);
                 return 0;
         default:
                 return -1;
@@ -216,13 +229,15 @@ gdb_break(uint32_t type, uint32_t addr, uint32_t kind)
 
         kind = kind;
 
-        if (addr == 0x00000000)
+        if (addr == 0x00000000) {
                 return -1;
+        }
 
         switch (type) {
         case 0x00:
-                if ((bp_list_breakpoint_add(bp_list, (void *)addr)) < 0)
+                if ((_bp_list_breakpoint_add(_bp_list, (void *)addr)) < 0) {
                         return -1;
+                }
 
                 return 0;
         default:
@@ -235,7 +250,7 @@ gdb_kill(void)
 {
 
         smpc_smc_resenab_call();
-        cpu_intc_enable();
+        cpu_intc_mask_set(0xF);
         smpc_smc_sysres_call();
 }
 
@@ -247,8 +262,9 @@ gdb_monitor_entry(struct cpu_registers *reg_file)
 
         bp_t *bp;
 
-        if (!stepping && bp_list_empty(bp_list))
+        if (!_stepping && _bp_list_empty(_bp_list)) {
                 return;
+        }
 
         /* Clobber what TRAPA stored on the stack and jump back by one
          * instruction because of the TRAPA instruction */
@@ -257,22 +273,22 @@ gdb_monitor_entry(struct cpu_registers *reg_file)
 
         /* Determine if we're stepping into/over a breakpoint */
         p = (uint16_t *)reg_file->pc;
-        if ((bp = bp_list_breakpoint_find(bp_list, (void *)p)) != NULL) {
+        if ((bp = _bp_list_breakpoint_find(_bp_list, (void *)p)) != NULL) {
                 p = (uint16_t *)bp->addr;
                 *p = bp->instruction;
         }
 
         /* Upon GDB monitor entry */
-        if (stepping) {
+        if (_stepping) {
                 /* Overwrite TRAPA instruction */
-                p = (uint16_t *)bp_step.addr;
-                *p = bp_step.instruction;
+                p = (uint16_t *)_bp_step.addr;
+                *p = _bp_step.instruction;
 
                 /* Clear */
-                bp_step.addr = 0x00000000;
-                bp_step.instruction = 0x0000;
+                _bp_step.addr = 0x00000000;
+                _bp_step.instruction = 0x0000;
 
-                stepping = false;
+                _stepping = false;
         }
 }
 
@@ -388,7 +404,7 @@ gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
  *
  * Returns the destination address */
 static uint32_t
-calculate_pc(struct cpu_registers *reg_file)
+_calculate_pc(struct cpu_registers *reg_file)
 {
         uint16_t opcode;
         uint32_t pc;
@@ -427,11 +443,11 @@ calculate_pc(struct cpu_registers *reg_file)
         } else if (OPCODE_JSR(opcode)) {
                 m = OPCODE_JSR_M(opcode);
                 pc = reg_file->r[m];
-        } else if (OPCODE_RTS(opcode))
+        } else if (OPCODE_RTS(opcode)) {
                 pc = reg_file->pr;
-        else if (OPCODE_RTE(opcode))
+        } else if (OPCODE_RTE(opcode)) {
                 pc = *(uint32_t *)reg_file->sp;
-        else if (OPCODE_TRAPA(opcode)) {
+        } else if (OPCODE_TRAPA(opcode)) {
                 pc = *(uint32_t *)(reg_file->vbr +
                     (OPCODE_TRAPA_IMM(opcode) << 1));
         }
@@ -440,12 +456,13 @@ calculate_pc(struct cpu_registers *reg_file)
 }
 
 static bp_list_t *
-bp_list_alloc(void)
+_bp_list_alloc(void)
 {
         bp_list_t *bpl;
 
-        if ((bpl = (bp_list_t *)malloc(sizeof(bp_list_t))) == NULL)
+        if ((bpl = (bp_list_t *)malloc(sizeof(bp_list_t))) == NULL) {
                 return NULL;
+        }
 
         /* Initialize queue */
         TAILQ_INIT(bpl);
@@ -454,17 +471,18 @@ bp_list_alloc(void)
 }
 
 static bool
-bp_list_empty(bp_list_t *bpl)
+_bp_list_empty(bp_list_t *bpl)
 {
 
-        if (TAILQ_EMPTY(bpl))
+        if (TAILQ_EMPTY(bpl)) {
                 return true;
+        }
 
         return false;
 }
 
 static void
-bp_list_free(bp_list_t **bplp)
+_bp_list_free(bp_list_t **bplp)
 {
 
         assert(*bplp != NULL);
@@ -474,12 +492,13 @@ bp_list_free(bp_list_t **bplp)
 }
 
 static bp_t *
-bp_list_breakpoint_alloc(void)
+_bp_list_breakpoint_alloc(void)
 {
         bp_t *bp;
 
-        if ((bp = (bp_t *)malloc(sizeof(bp_t))) == NULL)
+        if ((bp = (bp_t *)malloc(sizeof(bp_t))) == NULL) {
                 return NULL;
+        }
 
         bp->addr = NULL;
         bp->instruction = 0x0000;
@@ -488,14 +507,15 @@ bp_list_breakpoint_alloc(void)
 }
 
 static void
-bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
+_bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
 {
         uint16_t *p;
 
         assert(bp != NULL);
 
-        if (TAILQ_EMPTY(bpl))
+        if (TAILQ_EMPTY(bpl)) {
                 return;
+        }
 
         p = (uint16_t *)bp->addr;
         *p = bp->instruction;
@@ -505,18 +525,20 @@ bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
 }
 
 static int
-bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
+_bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
 {
         bp_t *bp;
 
         assert(bpl != NULL);
 
         /* Check if we have a breakpoint of the same address already present */
-        if ((bp_list_breakpoint_find(bp_list, (void *)addr)) != NULL)
+        if ((_bp_list_breakpoint_find(_bp_list, (void *)addr)) != NULL) {
                 return 0;
+        }
 
-        if ((bp = bp_list_breakpoint_alloc()) == NULL)
+        if ((bp = _bp_list_breakpoint_alloc()) == NULL) {
                 return -1;
+        }
 
         bp->addr = addr;
         bp->instruction = *(uint16_t *)addr;
@@ -529,49 +551,51 @@ bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
 }
 
 static bp_t *
-bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
+_bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
 {
         bp_t *bp_np;
 
         assert(bpl != NULL);
 
-        if (TAILQ_EMPTY(bpl))
+        if (TAILQ_EMPTY(bpl)) {
                 return NULL;
+        }
 
         TAILQ_FOREACH (bp_np, bpl, entries) {
-                if (bp_np->addr == addr)
+                if (bp_np->addr == addr) {
                         return bp_np;
+                }
         }
 
         return NULL;
 }
 
 static void
-device_init(void)
+_device_init(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cartridge_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_init();
-#endif
+#endif /* HAVE_DEV_CARTRIDGE */
 }
 
 static uint8_t
-device_read(void)
+_device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         return usb_cartridge_read_byte();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_read_byte();
-#endif
+#endif /* HAVE_DEV_CARTRIDGE */
 }
 
 static void
-device_write(uint8_t value)
+_device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cartridge_send_byte(value);
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_xchg_byte(value);
-#endif
+#endif /* HAVE_DEV_CARTRIDGE */
 }

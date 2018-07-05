@@ -5,7 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <cpu.h>
+#include <bios.h>
+#include <cpu/intc.h>
 #include <scu/ic.h>
 #include <vdp2.h>
 
@@ -124,20 +125,23 @@ vdp2_init(void)
         irq_mux_init(&vdp2_vblank_out_irq_mux);
 
         /* Disable interrupts */
-        cpu_intc_disable();
+        uint32_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0x0F);
 
         uint32_t mask;
         mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_HBLANK_IN;
 
         scu_ic_mask_chg(IC_MASK_ALL, mask);
 
-        scu_ic_interrupt_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);
-        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_IN, &vdp2_vblank_in);
-        scu_ic_interrupt_set(IC_INTERRUPT_VBLANK_OUT, &vdp2_vblank_out);
+        scu_ic_ihr_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);
+        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, &vdp2_vblank_in);
+        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, &vdp2_vblank_out);
         scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
-        cpu_intc_enable();
+        cpu_intc_mask_set(sr_mask);
 }
 
 static void

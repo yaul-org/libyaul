@@ -10,18 +10,75 @@
 
 #include <stdint.h>
 
+#include <cpu/registers.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-extern void (*cpu_intc_interrupt_get(uint8_t))(void);
-extern void (**cpu_intc_vector_base_get(void))(void);
-extern uint8_t cpu_intc_mask_get(void);
-extern void cpu_intc_disable(void);
-extern void cpu_intc_enable(void);
-extern void cpu_intc_interrupt_set(uint8_t, void (*)(void));
-extern void cpu_intc_mask_set(uint8_t);
-extern void cpu_intc_vector_base_set(void (**)(void));
+#define INTC_INTERRUPT_ILLEGAL_INSTRUCTION      0x04
+#define INTC_INTERRUPT_ILLEGAL_SLOT             0x06
+#define INTC_INTERRUPT_CPU_ADDRESS_ERROR        0x09
+#define INTC_INTERRUPT_DMA_ADDRESS_ERROR        0x0A
+#define INTC_INTERRUPT_UBC                      0x0C
+#define INTC_INTERRUPT_BREAK                    0x20
+#define INTC_INTERRUPT_DIVU_OVFI                0x50
+#define INTC_INTERRUPT_DMAC0                    0x51
+#define INTC_INTERRUPT_DMAC1                    0x52
+#define INTC_INTERRUPT_WDT_ITI                  0x53
+#define INTC_INTERRUPT_BSC                      0x54
+#define INTC_INTERRUPT_SCI_ERI                  0x55
+#define INTC_INTERRUPT_SCI_RXI                  0x56
+#define INTC_INTERRUPT_SCI_TXI                  0x57
+#define INTC_INTERRUPT_SCI_TEI                  0x58
+#define INTC_INTERRUPT_FRT_ICI                  0x59
+#define INTC_INTERRUPT_FRT_OCI                  0x5A
+#define INTC_INTERRUPT_FRT_OVI                  0x5B
+#define INTC_INTERRUPT_UNKNOWN_A                0x5C
+#define INTC_INTERRUPT_UNKNOWN_B                0x5D
+#define INTC_INTERRUPT_UNKNOWN_C                0x5E
+#define INTC_INTERRUPT_UNKNOWN_D                0x5F
+
+static inline void __attribute__ ((always_inline))
+cpu_intc_ihr_set(uint8_t vector, void (*ihr)(void))
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000310;
+
+        ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
+}
+
+static inline void __attribute__ ((always_inline)) (*cpu_intc_ihr_get(uint8_t vector))(void)
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000314;
+
+        return ((void (*(*)(uint8_t))(void))*bios_address)(vector);
+}
+
+static inline uint32_t __attribute__ ((always_inline))
+cpu_intc_mask_get(void)
+{
+        register uint32_t reg_sr;
+        reg_sr = cpu_reg_sr_get();
+
+        register uint32_t mask;
+        mask = (reg_sr >> 4) & 0x0F;
+
+        return mask;
+}
+
+static inline void __attribute__ ((always_inline))
+cpu_intc_mask_set(uint8_t mask)
+{
+        register uint32_t reg_sr;
+        reg_sr = cpu_reg_sr_get();
+
+        reg_sr &= 0xFFFFFF0F;
+        reg_sr |= (mask & 0x0F) << 4;
+
+        cpu_reg_sr_set(reg_sr);
+}
 
 #ifdef __cplusplus
 }

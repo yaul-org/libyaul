@@ -5,6 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <bios.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
 #include <scu/ic.h>
@@ -27,7 +28,7 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
         uint32_t ipra;
 
         assert((cfg->ch == CPU_DMAC_CHANNEL(0)) ||
-            (cfg->ch == CPU_DMAC_CHANNEL(1)));
+               (cfg->ch == CPU_DMAC_CHANNEL(1)));
 
         /* Source and destination address modes */
         chcr = cfg->src.mode | cfg->dst.mode;
@@ -75,7 +76,7 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
                 chcr |= 0x00000004;
                 /* Set interrupt handling routine */
                 ihr = cfg->ihr;
-                cpu_intc_interrupt_set(cfg->vector, trampoline);
+                cpu_intc_ihr_set(cfg->vector, trampoline);
 
                 /* Set priority */
                 assert(cfg->priority <= 15);
@@ -108,7 +109,7 @@ cpu_dmac_channel_set(struct cpu_channel_cfg *cfg)
         }
 }
 
-static void
+static void __attribute__ ((interrupt_handler))
 trampoline(void)
 {
         uint16_t ipra;
