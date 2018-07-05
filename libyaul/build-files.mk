@@ -158,6 +158,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_scrn_display_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_display_unset.c \
 	scu/bus/b/vdp2/vdp2_scrn_ls_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_sf_codes_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_clear.c \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_horizontal_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_mosaic_set.c \

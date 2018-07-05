@@ -213,6 +213,13 @@ struct scrn_cell_format {
         uint32_t scf_cp_table; /* Character pattern table lead address*/
         uint32_t scf_color_palette; /* Color palette lead address */
         uint32_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
+        uint32_t scf_sf_type; /* Special function type priority
+                               * Special function type color calculation */
+        uint32_t scf_sf_code; /* Special function code A
+                               * Special function code B */
+        uint32_t scf_sf_mode; /* Mode 0 (per screen)
+                               * Mode 1 (per cell)
+                               * Mode 2 (per pixel) */
 
         union {
                 uint32_t planes[16];
@@ -244,6 +251,22 @@ struct scrn_cell_format {
                                *   Mode 2: Swap Coefficient Data Read
                                *   Mode 3: Swap via Rotation Parameter Window */
 };
+
+#define SCRN_SF_TYPE_NONE               0
+#define SCRN_SF_TYPE_PRIORITY           1
+#define SCRN_SF_TYPE_COLOR_CALCULATION  2
+
+#define SCRN_SF_CODE_A          0
+#define SCRN_SF_CODE_B          1
+
+#define SCRN_SF_CODE_0x00_0x01  (1 << 0)
+#define SCRN_SF_CODE_0x02_0x03  (1 << 1)
+#define SCRN_SF_CODE_0x04_0x05  (1 << 2)
+#define SCRN_SF_CODE_0x06_0x07  (1 << 3)
+#define SCRN_SF_CODE_0x08_0x09  (1 << 4)
+#define SCRN_SF_CODE_0x0A_0x0B  (1 << 5)
+#define SCRN_SF_CODE_0x0C_0x0D  (1 << 6)
+#define SCRN_SF_CODE_0x0E_0x0F  (1 << 7)
 
 /* Limitations for NBG0/NBG1 reduction:
  * +--------+-----+-----------+------------+
@@ -335,6 +358,7 @@ extern void vdp2_scrn_scroll_x_set(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_x_update(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_y_set(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_y_update(uint8_t, fix16_t);
+extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
 
 #ifdef __cplusplus
 }
