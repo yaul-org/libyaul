@@ -226,17 +226,7 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
                 }
 
                 /* Special function type */
-                switch (format->scf_sf_type) {
-                case SCRN_SF_TYPE_PRIORITY:
-                        sf_type = 0x0200;
-                        break;
-                case SCRN_SF_TYPE_COLOR_CALCULATION:
-                        sf_type = 0x0100;
-                        break;
-                default:
-                        sf_type = 0x0000;
-                        break;
-                }
+                sf_type = (format->scf_sf_type & 0x03) << 8;
 
                 pncnx = 0x8000 | aux | sf_type | sc_number | sp_number;
                 break;

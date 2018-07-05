@@ -195,6 +195,13 @@ struct scrn_bitmap_format {
         uint32_t sbf_color_palette; /* Color palette lead address (if
                                      * applicable) */
         uint32_t sbf_bitmap_pattern; /* Bitmap pattern lead address */
+        uint32_t sbf_sf_type; /* Special function type priority
+                               * Special function type color calculation */
+        uint32_t sbf_sf_code; /* Special function code A
+                               * Special function code B */
+        uint32_t sbf_sf_mode; /* Mode 0 (per screen)
+                               * Mode 1 (per cell)
+                               * Mode 2 (per pixel) */
         uint8_t sbf_rp_mode; /* RBG0 and RBG1 only
                               * Rotation parameter mode
                               *   Mode 0: Rotation Parameter A
@@ -253,8 +260,8 @@ struct scrn_cell_format {
 };
 
 #define SCRN_SF_TYPE_NONE               0
-#define SCRN_SF_TYPE_PRIORITY           1
-#define SCRN_SF_TYPE_COLOR_CALCULATION  2
+#define SCRN_SF_TYPE_COLOR_CALCULATION  1
+#define SCRN_SF_TYPE_PRIORITY           2
 
 #define SCRN_SF_CODE_A          0
 #define SCRN_SF_CODE_B          1
