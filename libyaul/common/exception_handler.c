@@ -57,8 +57,7 @@ format(struct cpu_registers *regs, const char *exception_name)
 {
         static char buf[512];
 
-        (void)snprintf(buf,
-            sizeof(buf),
+        (void)sprintf(buf,
             "[1;44mException occurred:[m\n\t[1;44m%s[m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"

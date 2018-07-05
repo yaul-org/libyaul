@@ -71,6 +71,7 @@ LIB_SRCS+= \
 	lib/string/strchr.c \
 	lib/string/strcmp.c \
 	lib/string/strlen.c \
+	lib/string/strnlen.c \
 	lib/string/strchr.c \
 	lib/string/strncmp.c \
 	lib/stdio/snprintf.c \
