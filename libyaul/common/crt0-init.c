@@ -54,6 +54,8 @@ initializer(void)
         /* Set hardware exception handling routines */
         vbr = cpu_intc_vector_base_get();
 
+        /* Bypass our trampoline IHR as these IHR have to push all of
+         * the CPU registers onto the stack */
         vbr[0x04] = exception_illegal_instruction;
         vbr[0x06] = exception_illegal_slot;
         vbr[0x09] = exception_cpu_address_error;

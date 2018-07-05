@@ -18,8 +18,8 @@ _cpu_intc_interrupt_set:
         mov.l .LC1, r0
         mov.l @(r0, r4), r5
 .L2:
-        mov.l .LC2, r3
         mov.l .LC3, r1
+        mov.l .LC2, r3
         add r4, r1
         add r4, r3
         mov.l @r1, r2
@@ -29,6 +29,8 @@ _cpu_intc_interrupt_set:
         mov.l @r3, r2
         mov.l r2, @r1
         stc vbr, r0
+        /* Set trampoline IHR to the vector table before custom IHR
+         * clobbers the default IHR in our vector table */
         mov.l r2, @(r0, r4)
 .L3:
         /* Update IHR */
@@ -38,7 +40,7 @@ _cpu_intc_interrupt_set:
 
 .align 2
 
-.LC1:
+.LC1: /* Default handlers in BIOS ROM */
 .long 0x20000600
 .LC2:
 .long _cpu_intc_vector_table
@@ -48,6 +50,7 @@ _cpu_intc_interrupt_set:
 .data
 .align 2
 
+/* Table to keep track if an IHR at a vector has been initialized */
 .type .LC4, @object
 .size .LC4, 1024
 
