@@ -26,6 +26,11 @@ internal_exception_show(const char *buffer)
             TVMD_VERT_224);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
             COLOR_RGB555(0, 7, 0));
+
+        /* Set sprite to type 0 and set its priority to 0 (invisible) */
+        vdp2_sprite_type_set(0);
+        vdp2_sprite_priority_set(0, 0);
+
         vdp2_tvmd_display_set();
 
         cons_init(CONS_DRIVER_VDP2, 40, 28);
