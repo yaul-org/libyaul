@@ -36,11 +36,11 @@ abort(void)
 #if defined(DEBUG)
 #if HAVE_DEV_CARTRIDGE == 0 /* No dev cartridge */
         while (true) {
-                vdp2_tvmd_vblank_out_wait();
-                vdp2_tvmd_vblank_in_wait();
         }
 #elif HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cartridge_return();
+        while (true) {
+                /* XXX: Call for waiting for data instead of returning */
+        }
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         while (true) {
                 arp_function_nonblock();
