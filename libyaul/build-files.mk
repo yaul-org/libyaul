@@ -171,8 +171,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_scrn_scroll_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_scroll_update.c \
 	scu/bus/b/vdp2/vdp2_scrn_vcs_set.c \
-	scu/bus/b/vdp2/vdp2_sprite_type_priority_get.c \
-	scu/bus/b/vdp2/vdp2_sprite_type_priority_set.c \
+	scu/bus/b/vdp2/vdp2_sprite_priority_set.c \
 	scu/bus/b/vdp2/vdp2_sprite_type_set.c \
 	scu/bus/b/vdp2/vdp2_tvmd_display_clear.c \
 	scu/bus/b/vdp2/vdp2_tvmd_display_res_set.c \

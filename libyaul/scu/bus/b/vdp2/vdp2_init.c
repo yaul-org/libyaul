@@ -104,7 +104,7 @@ vdp2_init(void)
         vdp2_state.buffered_regs.prir = 0x0001;
 
         /* Initialize */
-        vdp2_state.buffered_regs.spctl = 0x0021;
+        vdp2_state.buffered_regs.spctl = 0x0020;
         vdp2_state.buffered_regs.prisa = 0x0101;
         vdp2_state.buffered_regs.prisb = 0x0101;
         vdp2_state.buffered_regs.prisc = 0x0101;

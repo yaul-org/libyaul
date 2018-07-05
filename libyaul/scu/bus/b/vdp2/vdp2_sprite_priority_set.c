@@ -10,21 +10,22 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_sprite_type_priority_set(uint8_t type, uint8_t priority)
+vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
 {
 #ifdef DEBUG
-        assert((type >= 0) && (type <= 7));
+        assert((sprite_register >= 0) && (sprite_register <= 7));
 #endif /* DEBUG */
 
         /* When priority is zero, scroll screen is transparent. */
         priority &= 0x07;
 
         uint16_t shift;
-        shift = (type & 0x01) << 3;
-        uint16_t reg_mask;
-        reg_mask = ~(0x07 << shift);
+        shift = (sprite_register & 0x01) << 3;
 
-        switch (type) {
+        uint16_t reg_mask;
+        reg_mask = 0xFFFF & ~(0x07 << shift);
+
+        switch (sprite_register) {
         case 0:
         case 1:
                 vdp2_state.buffered_regs.prisa &= reg_mask;
