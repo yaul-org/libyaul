@@ -15,8 +15,8 @@ void
 vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
 {
 
-        MEMORY_WRITE(16, VDP2(VCSTAU), (vcs->vcs_vcsta >> 17) & 0x0007);
-        MEMORY_WRITE(16, VDP2(VCSTAL), (vcs->vcs_vcsta >> 1) & 0xFFFF);
+        vdp2_state.buffered_regs.vcstau = (vcs->vcs_vcsta >> 17) & 0x0007;
+        vdp2_state.buffered_regs.vcstal = (vcs->vcs_vcsta >> 1) & 0xFFFF;
 
         switch (vcs->vcs_scrn) {
         case SCRN_NBG0:
@@ -29,9 +29,6 @@ vdp2_scrn_vcs_set(struct scrn_vcs_format *vcs)
                 break;
         default:
                 assert((vcs->vcs_scrn == SCRN_NBG0) ||
-                    (vcs->vcs_scrn == SCRN_NBG1));
+                       (vcs->vcs_scrn == SCRN_NBG1));
         }
-
-        /* Write to memory */
-        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_state.buffered_regs.scrctl);
 }

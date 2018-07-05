@@ -65,7 +65,4 @@ vdp2_scrn_display_set(uint8_t scrn, bool transparent)
                        (cc_count != SCRN_CCC_RGB_32768));
         }
 #endif /* DEBUG */
-
-        /* Write to register */
-        MEMORY_WRITE(16, VDP2(BGON), vdp2_state.buffered_regs.bgon);
 }

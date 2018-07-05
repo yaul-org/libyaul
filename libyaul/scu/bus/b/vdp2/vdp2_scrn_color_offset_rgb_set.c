@@ -32,21 +32,11 @@ vdp2_scrn_color_offset_rgb_set(uint8_t select, int16_t r, int16_t g, int16_t b)
                 vdp2_state.buffered_regs.coar = r & 0x01FF;
                 vdp2_state.buffered_regs.coag = g & 0x01FF;
                 vdp2_state.buffered_regs.coab = b & 0x01FF;
-
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(COAR), vdp2_state.buffered_regs.coar);
-                MEMORY_WRITE(16, VDP2(COAG), vdp2_state.buffered_regs.coag);
-                MEMORY_WRITE(16, VDP2(COAB), vdp2_state.buffered_regs.coab);
                 break;
         case SCRN_COLOR_OFFSET_B:
                 vdp2_state.buffered_regs.cobr = r & 0x01FF;
                 vdp2_state.buffered_regs.cobg = g & 0x01FF;
                 vdp2_state.buffered_regs.cobb = b & 0x01FF;
-
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(COBR), vdp2_state.buffered_regs.cobr);
-                MEMORY_WRITE(16, VDP2(COBG), vdp2_state.buffered_regs.cobg);
-                MEMORY_WRITE(16, VDP2(COBB), vdp2_state.buffered_regs.cobb);
                 break;
         default:
                 return;

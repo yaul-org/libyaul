@@ -152,7 +152,7 @@ struct vdp2_sprite_type_f {
 } __packed;
 
 extern void vdp2_sprite_type_set(uint8_t);
-extern uint8_t vdp2_sprite_type_priority_get(uint8_t);
+extern int8_t vdp2_sprite_type_priority_get(uint8_t);
 extern void vdp2_sprite_type_priority_set(uint8_t, uint8_t);
 
 #ifdef __cplusplus

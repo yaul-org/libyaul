@@ -46,30 +46,26 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
                     delta_clamped, &in, &dn);
 
                 /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCXIN0), in);
-                MEMORY_WRITE(16, VDP2(SCXDN0), dn);
+                vdp2_state.buffered_regs.scxin0 = in;
+                vdp2_state.buffered_regs.scxdn0 = dn;
                 break;
         case SCRN_NBG1:
                 _update_fixed_point_scroll(&vdp2_state.nbg1.scroll.x,
                     delta_clamped, &in, &dn);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCXIN1), in);
-                MEMORY_WRITE(16, VDP2(SCXDN1), dn);
+                vdp2_state.buffered_regs.scxin1 = in;
+                vdp2_state.buffered_regs.scxdn1 = dn;
                 break;
         case SCRN_NBG2:
-                _update_integer_scroll(&vdp2_state.nbg2.scroll.x, delta_clamped,
-                    &in);
+                _update_integer_scroll(&vdp2_state.nbg2.scroll.x, delta_clamped, &in);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCXN2), in);
+                vdp2_state.buffered_regs.scxn2 = in;
                 break;
         case SCRN_NBG3:
                 _update_integer_scroll(&vdp2_state.nbg3.scroll.x, delta_clamped,
                     &in);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCXN3), in);
+                vdp2_state.buffered_regs.scxn3 = in;
                 break;
         default:
                 return;
@@ -103,31 +99,27 @@ vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t delta)
                 _update_fixed_point_scroll(&vdp2_state.nbg0.scroll.y,
                     delta_clamped, &in, &dn);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCYIN0), in);
-                MEMORY_WRITE(16, VDP2(SCYDN0), dn);
+                vdp2_state.buffered_regs.scyin0 = in;
+                vdp2_state.buffered_regs.scydn0 = dn;
                 break;
         case SCRN_NBG1:
                 _update_fixed_point_scroll(&vdp2_state.nbg1.scroll.y,
                     delta_clamped, &in, &dn);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCYIN1), in);
-                MEMORY_WRITE(16, VDP2(SCYDN1), dn);
+                vdp2_state.buffered_regs.scyin1 = in;
+                vdp2_state.buffered_regs.scydn1 = dn;
                 break;
         case SCRN_NBG2:
                 _update_integer_scroll(&vdp2_state.nbg2.scroll.y,
                     delta_clamped, &in);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCYN2), in);
+                vdp2_state.buffered_regs.scyn2 = in;
                 break;
         case SCRN_NBG3:
                 _update_integer_scroll(&vdp2_state.nbg3.scroll.y,
                     delta_clamped, &in);
 
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(SCYN3), in);
+                vdp2_state.buffered_regs.scyn3 = in;
                 break;
         default:
                 return;

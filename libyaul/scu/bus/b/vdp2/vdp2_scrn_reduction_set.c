@@ -36,7 +36,4 @@ vdp2_scrn_reduction_set(uint8_t scrn, uint16_t reduction_amt)
         default:
                 return;
         }
-
-        /* Write to memory */
-        MEMORY_WRITE(16, VDP2(ZMCTL), vdp2_state.buffered_regs.zmctl);
 }

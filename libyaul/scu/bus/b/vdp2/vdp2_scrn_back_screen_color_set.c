@@ -17,9 +17,7 @@
 void
 vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
 {
-        /* Write color */
-        vdp2_tvmd_vblank_in_wait();
-        *(volatile uint16_t *)vram = COLOR_RGB_DATA | color.raw;
+        vdp2_state.back.color = COLOR_RGB_DATA | color.raw;
 
         /* Set back screen address */
         vdp2_scrn_back_screen_addr_set(/* single_color = */ true, vram);

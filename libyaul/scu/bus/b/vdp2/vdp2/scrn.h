@@ -214,24 +214,28 @@ struct scrn_cell_format {
         uint32_t scf_color_palette; /* Color palette lead address */
         uint32_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
 
-        struct {
-                uint32_t plane_a;
-                uint32_t plane_b;
-                uint32_t plane_c;
-                uint32_t plane_d;
-                uint32_t plane_e; /* For RBG0 and RBG1 use only */
-                uint32_t plane_f; /* For RBG0 and RBG1 use only */
-                uint32_t plane_g; /* For RBG0 and RBG1 use only */
-                uint32_t plane_h; /* For RBG0 and RBG1 use only */
-                uint32_t plane_i; /* For RBG0 and RBG1 use only */
-                uint32_t plane_j; /* For RBG0 and RBG1 use only */
-                uint32_t plane_k; /* For RBG0 and RBG1 use only */
-                uint32_t plane_l; /* For RBG0 and RBG1 use only */
-                uint32_t plane_m; /* For RBG0 and RBG1 use only */
-                uint32_t plane_n; /* For RBG0 and RBG1 use only */
-                uint32_t plane_o; /* For RBG0 and RBG1 use only */
-                uint32_t plane_p; /* For RBG0 and RBG1 use only */
-        } scf_map; /* Map lead addresses */
+        union {
+                uint32_t planes[16];
+
+                struct {
+                        uint32_t plane_a;
+                        uint32_t plane_b;
+                        uint32_t plane_c;
+                        uint32_t plane_d;
+                        uint32_t plane_e; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_f; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_g; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_h; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_i; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_j; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_k; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_l; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_m; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_n; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_o; /* For RBG0 and RBG1 use only */
+                        uint32_t plane_p; /* For RBG0 and RBG1 use only */
+                } __packed;
+        } scf_map;                      /* Map lead addresses */
 
         uint32_t scf_rp_mode; /* RBG0 and RBG1 only
                                * Rotation parameter mode
