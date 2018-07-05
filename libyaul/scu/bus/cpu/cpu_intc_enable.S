@@ -12,6 +12,7 @@
 .type _cpu_intc_enable, @function
 
 _cpu_intc_enable:
+        /* Force set the interrupt mask bits to 0 (bits 4-7) in SR */
         mov #0xFF, r2
         mov #0x0F, r1
         shll8 r2
