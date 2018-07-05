@@ -29,6 +29,7 @@ SUPPORT_SRCS:= \
 LIB_SRCS:= \
 	common/exception.S \
 	common/exception_handler.c \
+	common/internal_exception_show.c \
 	common/stack.c
 
 ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)

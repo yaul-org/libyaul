@@ -9,56 +9,52 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <vdp1.h>
-#include <vdp2.h>
-#include <vdp2/tvmd.h>
-#include <vdp2/vram.h>
-
-#include <cons.h>
+#include <internal.h>
 
 #include "exception.h"
 
-static void format(struct cpu_registers *, const char *);
+static void format_exception_message(struct cpu_registers *, char *, const char *);
+
+static char _buffer[512];
 
 void __noreturn __hidden
 exception_ihr_illegal_instruction(struct cpu_registers *regs)
 {
-
-        format(regs, "Illegal instruction");
-        abort();
+        format_exception_message(regs, _buffer, "Illegal instruction");
+        internal_exception_show(_buffer);
 }
 
 void __noreturn __hidden
 exception_ihr_illegal_slot(struct cpu_registers *regs)
 {
 
-        format(regs, "Illegal slot");
-        abort();
+        format_exception_message(regs, _buffer, "Illegal slot");
+        internal_exception_show(_buffer);
 }
 
 void __noreturn __hidden
 exception_ihr_cpu_address_error(struct cpu_registers *regs)
 {
 
-        format(regs, "CPU address error");
-        abort();
+        format_exception_message(regs, _buffer, "CPU address error");
+        internal_exception_show(_buffer);
 }
 
 void __noreturn __hidden
 exception_ihr_dma_address_error(struct cpu_registers *regs)
 {
 
-        format(regs, "DMA address error");
-        abort();
+        format_exception_message(regs, _buffer, "DMA address error");
+        internal_exception_show(_buffer);
 }
 
 static void
-format(struct cpu_registers *regs, const char *exception_name)
+format_exception_message(struct cpu_registers *regs,
+    char *buffer,
+    const char *exception_name)
 {
-        static char buf[512];
-
-        (void)sprintf(buf,
-            "[1;44mException occurred:[m\n\t[1;44m%s[m\n\n"
+        (void)sprintf(buffer,
+            "[1;44mException occurred: %s[m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"
             "\t r2 = 0x%08X  r13 = 0x%08X\n"
@@ -84,20 +80,4 @@ format(struct cpu_registers *regs, const char *exception_name)
             (uintptr_t)regs->r[9], (uintptr_t)regs->macl,
             (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
             (uintptr_t)regs->pc);
-
-        /* Reset the VDP1 */
-        vdp1_init();
-
-        /* Reset the VDP2 */
-        vdp2_init();
-        vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
-            TVMD_VERT_240);
-        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
-            COLOR_RGB555(0, 7, 0));
-
-        cons_init(CONS_DRIVER_VDP2, 40, 30);
-        cons_buffer(buf);
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
-        cons_flush();
 }
