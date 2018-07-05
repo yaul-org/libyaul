@@ -62,6 +62,22 @@ extern "C" {
 #define IC_IST_LEVEL_0_DMA_END  0x00000800
 #define IC_IST_DMA_ILLEGAL      0x00001000
 #define IC_IST_SPRITE_END       0x00002000
+#define IC_IST_EXTERNAL_16      0x00010000
+#define IC_IST_EXTERNAL_15      0x00020000
+#define IC_IST_EXTERNAL_14      0x00040000
+#define IC_IST_EXTERNAL_13      0x00080000
+#define IC_IST_EXTERNAL_12      0x00100000
+#define IC_IST_EXTERNAL_11      0x00200000
+#define IC_IST_EXTERNAL_10      0x00400000
+#define IC_IST_EXTERNAL_09      0x00800000
+#define IC_IST_EXTERNAL_08      0x01000000
+#define IC_IST_EXTERNAL_07      0x02000000
+#define IC_IST_EXTERNAL_06      0x04000000
+#define IC_IST_EXTERNAL_05      0x08000000
+#define IC_IST_EXTERNAL_04      0x10000000
+#define IC_IST_EXTERNAL_03      0x20000000
+#define IC_IST_EXTERNAL_02      0x40000000
+#define IC_IST_EXTERNAL_01      0x80000000
 
 static inline void __attribute__ ((always_inline))
 scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
