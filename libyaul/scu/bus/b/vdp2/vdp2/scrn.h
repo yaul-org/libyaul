@@ -314,9 +314,9 @@ struct scrn_cell_format {
 #define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */
 #define SCRN_REDUCTION_QUARTER  2 /* 1/4 reduction */
 
-#define SCRN_REDUCTION_MIN      F16(0.00390625f)
-#define SCRN_REDUCTION_MAX      F16(7.0f)
-#define SCRN_REDUCTION_STEP     F16(0.00390625f)
+#define SCRN_REDUCTION_STEP     Q0_3_8(1.0f / 256.0f)
+#define SCRN_REDUCTION_MIN      SCRN_REDUCTION_STEP
+#define SCRN_REDUCTION_MAX      Q0_3_8(7.0f)
 
 struct scrn_ls_format {
         uint8_t ls_scrn;        /* Normal background */
@@ -359,8 +359,8 @@ extern void vdp2_scrn_mosaic_vertical_set(uint32_t);
 extern uint8_t vdp2_scrn_priority_get(uint8_t);
 extern void vdp2_scrn_priority_set(uint8_t, uint8_t);
 extern void vdp2_scrn_reduction_set(uint8_t, uint16_t);
-extern void vdp2_scrn_reduction_x_set(uint8_t, fix16_t);
-extern void vdp2_scrn_reduction_y_set(uint8_t, fix16_t);
+extern void vdp2_scrn_reduction_x_set(uint8_t scrn, q0_3_8_t);
+extern void vdp2_scrn_reduction_y_set(uint8_t scrn, q0_3_8_t);
 extern void vdp2_scrn_scroll_x_set(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_x_update(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_y_set(uint8_t, fix16_t);
