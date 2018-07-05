@@ -13,10 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <cpu/intc.h>
+#include <cpu.h>
 #include <sys/init.h>
-
-#include "exception.h"
 
 static void __used
 call_global_ctors(void)
@@ -49,17 +47,7 @@ call_global_dtors(void)
 static void __used __section(".init")
 initializer(void)
 {
-        void (**vbr)(void);
-
-        /* Set hardware exception handling routines */
-        vbr = cpu_intc_vector_base_get();
-
-        /* Bypass our trampoline IHR as these IHR have to push all of
-         * the CPU registers onto the stack */
-        vbr[0x04] = exception_illegal_instruction;
-        vbr[0x06] = exception_illegal_slot;
-        vbr[0x09] = exception_cpu_address_error;
-        vbr[0x0A] = exception_dma_address_error;
+        cpu_init();
 
         call_global_ctors();
 

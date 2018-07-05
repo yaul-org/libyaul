@@ -23,12 +23,17 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
 
         uint32_t w;
 
-        cpu_intc_disable();
+        /* Disable interrupts */
+        uint32_t mask;
+        mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0x0F);
 
         error = -1;
         /* Check if we can continue */
-        if (busy())
+        if (busy()) {
                 goto busy;
+        }
 
         hirq = MEMORY_READ(16, CD_BLOCK(HIRQ));
         hirq &= 0xFFFE;
@@ -44,14 +49,16 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         /* Wait */
         for (w = 0; w < 0x00240000; w++) {
                 /* Check if we can continue */
-                if (busy())
+                if (busy()) {
                         /* CD-block is busy */
                         continue;
+                }
         }
 
         /* Check if we can continue */
-        if (busy())
+        if (busy()) {
                 goto busy;
+        }
 
         /* Read status */
         status->cr1 = MEMORY_READ(16, CD_BLOCK(CR1));
@@ -63,12 +70,13 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         cd_status = status->cr1;
         cd_status >>= 8;
         /* Checking if waiting or if command was rejected */
-        if ((cd_status & 0x80) == 0x80)
+        if ((cd_status & 0x80) == 0x80) {
                 goto busy;
+        }
 
         error = 0;
 busy:
-        cpu_intc_enable();
+        cpu_intc_mask_set(mask);
 
         /* Command executed was successful */
         return error;

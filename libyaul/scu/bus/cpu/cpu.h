@@ -16,11 +16,19 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define CPU_CLOCK_FREQ_26MHZ    0
-#define CPU_CLOCK_FREQ_28MHZ    1
+#define CPU_CLOCK_SPEED_26MHZ   0
+#define CPU_CLOCK_SPEED_28MHZ   1
 
-uint32_t cpu_clock_freq_get(void);
-void cpu_clock_freq_chg(uint32_t);
+static inline void __attribute__ ((always_inline))
+cpu_nop(void)
+{
+        __asm__ volatile ("nop"
+            : /* No outputs */
+            : /* No inputs */
+        );
+}
+
+extern void cpu_init(void);
 
 #ifdef __cplusplus
 }

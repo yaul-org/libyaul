@@ -45,7 +45,10 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         irq_mux_handle_t *n_hdl;
 
         /* Disable interrupts */
-        cpu_intc_disable();
+        uint32_t mask;
+        mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0x0F);
 
         n_hdl = irq_mux_handle_alloc();
         assert(n_hdl != NULL);
@@ -57,7 +60,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         TAILQ_INSERT_TAIL(&irq_mux->im_tq, n_hdl, handles);
 
         /* Enable interrupts */
-        cpu_intc_enable();
+        cpu_intc_mask_set(mask);
 }
 
 void

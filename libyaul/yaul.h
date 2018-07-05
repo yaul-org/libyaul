@@ -13,7 +13,9 @@
 /* Datel Action Replay cartridge */
 #if (HAVE_DEV_CARTRIDGE < 0) || (HAVE_DEV_CARTRIDGE > 2)
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif
+#endif /* HAVE_DEV_CARTRIDGE */
+
+#include <bios.h>
 
 /* CPU-bus CPU */
 #include <scu/bus/cpu/cpu.h>

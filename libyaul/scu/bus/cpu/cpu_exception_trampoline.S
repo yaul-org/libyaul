@@ -45,43 +45,43 @@
 .text
 
 .align 4
-.global _exception_illegal_instruction
-.type _exception_illegal_instruction, @function
+.global _internal_exception_illegal_instruction
+.type _internal_exception_illegal_instruction, @function
 
-_exception_illegal_instruction:
+_internal_exception_illegal_instruction:
         MACRO_EXCEPTION_TRAMPOLINE .LC1
 
 .align 4
-.global _exception_illegal_slot
-.type _exception_illegal_slot, @function
+.global _internal_exception_illegal_slot
+.type _internal_exception_illegal_slot, @function
 
-_exception_illegal_slot:
+_internal_exception_illegal_slot:
         MACRO_EXCEPTION_TRAMPOLINE .LC2
 
 .align 4
-.global _exception_cpu_address_error
-.type _exception_cpu_address_error, @function
+.global _internal_exception_cpu_address_error
+.type _internal_exception_cpu_address_error, @function
 
-_exception_cpu_address_error:
+_internal_exception_cpu_address_error:
         MACRO_EXCEPTION_TRAMPOLINE .LC3
 
 .align 4
-.global _exception_dma_address_error
-.type _exception_dma_address_error, @function
+.global _internal_exception_dma_address_error
+.type _internal_exception_dma_address_error, @function
 
-_exception_dma_address_error:
+_internal_exception_dma_address_error:
         MACRO_EXCEPTION_TRAMPOLINE .LC4
 
 .align 2
 
 .LC1:
-.long _exception_ihr_illegal_instruction
+.long _internal_ihr_exception_illegal_instruction
 
 .LC2:
-.long _exception_ihr_illegal_slot
+.long _internal_ihr_exception_illegal_slot
 
 .LC3:
-.long _exception_ihr_cpu_address_error
+.long _internal_ihr_exception_cpu_address_error
 
 .LC4:
-.long _exception_ihr_dma_address_error
+.long _internal_ihr_exception_dma_address_error

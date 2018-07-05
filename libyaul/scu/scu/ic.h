@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <scu/map.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -61,11 +63,58 @@ extern "C" {
 #define IC_IST_DMA_ILLEGAL      0x00001000
 #define IC_IST_SPRITE_END       0x00002000
 
-extern uint32_t scu_ic_interrupt_get(void);
-extern uint32_t scu_ic_status_get(void);
-extern void scu_ic_interrupt_set(uint8_t, void (*)(void));
-extern void scu_ic_mask_chg(uint16_t, uint16_t);
-extern void scu_ic_mask_set(uint16_t, uint16_t);
+static inline void __attribute__ ((always_inline))
+scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000300;
+
+        ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
+}
+
+static inline void __attribute__ ((always_inline)) (*scu_ic_ihr_get(uint8_t vector))(void)
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000304;
+
+        return ((void (*(*)(uint8_t))(void))*bios_address)(vector);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_ic_mask_set(uint32_t mask)
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000340;
+
+        ((void (*)(uint32_t))*bios_address)(mask);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000340;
+
+        ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
+}
+
+static inline uint32_t __attribute__ ((always_inline))
+scu_ic_mask_get(void)
+{
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000348;
+
+        return *bios_address;
+}
+
+static inline uint32_t __attribute__ ((always_inline))
+scu_ic_status_get(void)
+{
+        uint32_t ist;
+        ist = MEMORY_READ(32, SCU(IST));
+
+        return ist;
+}
 
 #ifdef __cplusplus
 }
