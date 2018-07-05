@@ -184,8 +184,9 @@ LIB_SRCS+= \
 	scu/bus/cpu/cpu_dmac_channel_set.c \
 	scu/bus/cpu/cpu_dmac_channel_start.c \
 	scu/bus/cpu/cpu_dmac_channel_stop.c \
-	scu/bus/cpu/cpu_init.c \
 	scu/bus/cpu/cpu_exception_trampoline.S \
+	scu/bus/cpu/cpu_frt_init.c \
+	scu/bus/cpu/cpu_init.c \
 	scu/bus/cpu/cpu_ubc_init.c \
 	\
 	scu/bus/cpu/smpc/smpc_init.c \

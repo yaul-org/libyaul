@@ -14,6 +14,15 @@ extern "C" {
 
 #include <cpu/map.h>
 
+#define FRT_CLOCK_DIV_8                 0x00
+#define FRT_CLOCK_DIV_32                0x01
+#define FRT_CLOCK_DIV_128               0x02
+#define FRT_CLOCK_DIV_RISING_EDGE       0x03
+
+#define FRT_CLOCK_DIV_8_COUNT_1MS       0x0D1F
+#define FRT_CLOCK_DIV_32_COUNT_1MS      0x0348
+#define FRT_CLOCK_DIV_128_COUNT_1MS     0x00D2
+
 static inline void __attribute__ ((always_inline))
 cpu_frt_count_set(uint16_t count)
 {
@@ -67,5 +76,7 @@ cpu_frt_ocrb_set(uint16_t count)
         MEMORY_WRITE(8, CPU(OCRBH), (uint8_t)(count >> 8));
         MEMORY_WRITE(8, CPU(OCRBL), (uint8_t)(count & 0xFF));
 }
+
+extern void cpu_frt_init(uint8_t);
 
 #endif /* !_CPU_FRT_H_ */
