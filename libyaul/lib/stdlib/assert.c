@@ -33,8 +33,7 @@ __assert_func(const char *file, int line, const char *func,
         /* Reset the VDP2 */
         vdp2_init();
         vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A, TVMD_VERT_240);
-        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
-                COLOR_RGB555(0, 7, 0));
+        vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE), COLOR_RGB555(0, 7, 0));
         vdp2_tvmd_display_set();
 
         /* Reset the VDP1 */
@@ -45,6 +44,7 @@ __assert_func(const char *file, int line, const char *func,
 
         vdp2_tvmd_vblank_out_wait();
         vdp2_tvmd_vblank_in_wait();
+        vdp2_commit();
         cons_flush();
 
         abort();
