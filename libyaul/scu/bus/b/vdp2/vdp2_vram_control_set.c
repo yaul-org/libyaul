@@ -12,32 +12,38 @@
 void
 vdp2_vram_control_set(struct vram_ctl *ctl)
 {
-        uint16_t vrsize;
-        uint16_t ramctl;
-
         /* VRAM size */
-        vrsize = ctl->vram_size;
-        MEMORY_WRITE(16, VDP2(VRSIZE), vrsize);
+        vdp2_state.buffered_regs.vrsize = ctl->vram_size;
 
         /* VRAM mode */
-        ramctl = MEMORY_READ(16, VDP2(RAMCTL));
-        ramctl &= 0xFCFF;
-        ramctl |= ctl->vram_mode;
+        vdp2_state.buffered_regs.ramctl &= 0xFCFF;
+        vdp2_state.buffered_regs.ramctl |= ctl->vram_mode;
 
-        MEMORY_WRITE(16, VDP2(RAMCTL), ramctl);
+        vdp2_state.buffered_regs.ramctl = 0x1300;
 
         /* Cycle patterns */
         /* The VDP2 is not smart enough to direct all of this VRAM
          * traffic automatically; you must do it yourself */
-        MEMORY_WRITE(16, VDP2(CYCA0L), (ctl->vram_cycp.pv[0] >> 16) & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA0U), ctl->vram_cycp.pv[0] & 0xFFFF);
+        vdp2_state.buffered_regs.cyca0l = (ctl->vram_cycp.pv[0] >> 16) & 0xFFFF;
+        vdp2_state.buffered_regs.cyca0u = ctl->vram_cycp.pv[0] & 0xFFFF;
 
-        MEMORY_WRITE(16, VDP2(CYCA1L), (ctl->vram_cycp.pv[1] >> 16) & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA1U), ctl->vram_cycp.pv[1] & 0xFFFF);
+        vdp2_state.buffered_regs.cyca1l = (ctl->vram_cycp.pv[1] >> 16) & 0xFFFF;
+        vdp2_state.buffered_regs.cyca1u = ctl->vram_cycp.pv[1] & 0xFFFF;
 
-        MEMORY_WRITE(16, VDP2(CYCB0L), (ctl->vram_cycp.pv[2] >> 16) & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB0U), ctl->vram_cycp.pv[2] & 0xFFFF);
+        vdp2_state.buffered_regs.cycb0l = (ctl->vram_cycp.pv[2] >> 16) & 0xFFFF;
+        vdp2_state.buffered_regs.cycb0u = ctl->vram_cycp.pv[2] & 0xFFFF;
 
-        MEMORY_WRITE(16, VDP2(CYCB1L), (ctl->vram_cycp.pv[3] >> 16) & 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB1U), ctl->vram_cycp.pv[3] & 0xFFFF);
+        vdp2_state.buffered_regs.cycb1l = (ctl->vram_cycp.pv[3] >> 16) & 0xFFFF;
+        vdp2_state.buffered_regs.cycb1u = ctl->vram_cycp.pv[3] & 0xFFFF;
+
+        MEMORY_WRITE(16, VDP2(VRSIZE), vdp2_state.buffered_regs.vrsize);
+        MEMORY_WRITE(16, VDP2(RAMCTL), vdp2_state.buffered_regs.ramctl);
+        MEMORY_WRITE(16, VDP2(CYCA0L), vdp2_state.buffered_regs.cyca0l);
+        MEMORY_WRITE(16, VDP2(CYCA0U), vdp2_state.buffered_regs.cyca0u);
+        MEMORY_WRITE(16, VDP2(CYCA1L), vdp2_state.buffered_regs.cyca1l);
+        MEMORY_WRITE(16, VDP2(CYCA1U), vdp2_state.buffered_regs.cyca1u);
+        MEMORY_WRITE(16, VDP2(CYCB0L), vdp2_state.buffered_regs.cycb0l);
+        MEMORY_WRITE(16, VDP2(CYCB0U), vdp2_state.buffered_regs.cycb0u);
+        MEMORY_WRITE(16, VDP2(CYCB1L), vdp2_state.buffered_regs.cycb1l);
+        MEMORY_WRITE(16, VDP2(CYCB1U), vdp2_state.buffered_regs.cycb1u);
 }

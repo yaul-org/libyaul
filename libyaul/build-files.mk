@@ -143,6 +143,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp1/vdp1_init.c \
 	\
 	scu/bus/b/vdp2/vdp2-internal.c \
+	scu/bus/b/vdp2/vdp2_commit.c \
 	scu/bus/b/vdp2/vdp2_init.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_addr_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_color_set.c \

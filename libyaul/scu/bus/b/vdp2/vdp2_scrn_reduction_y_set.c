@@ -20,25 +20,24 @@ vdp2_scrn_reduction_y_set(uint8_t scrn, fix16_t scale)
                (scrn == SCRN_NBG1));
 #endif /* DEBUG */
 
-        scale = fix16_clamp(scale, SCRN_REDUCTION_MIN, SCRN_REDUCTION_MAX);
+        uint16_t clamped_scale;
+        clamped_scale = fix16_clamp(scale, SCRN_REDUCTION_MIN, SCRN_REDUCTION_MAX);
 
         uint16_t in;
-        in = fix16_to_int(scale) & 0x0007;
+        in = fix16_to_int(clamped_scale) & 0x0007;
 
         /* Only take into account the upper 8 bits of the fractional */
         uint16_t dn;
-        dn = fix16_sub(scale, fix16_from_int(in)) & 0xFF00;
+        dn = fix16_sub(clamped_scale, fix16_from_int(in)) & 0xFF00;
 
         switch (scrn) {
         case SCRN_NBG0:
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(ZMYIN0), in);
-                MEMORY_WRITE(16, VDP2(ZMYDN0), dn);
+                vdp2_state.buffered_regs.zmyin0 = in;
+                vdp2_state.buffered_regs.zmydn0 = dn;
                 break;
         case SCRN_NBG1:
-                /* Write to memory */
-                MEMORY_WRITE(16, VDP2(ZMYIN1), in);
-                MEMORY_WRITE(16, VDP2(ZMYDN1), dn);
+                vdp2_state.buffered_regs.zmyin1 = in;
+                vdp2_state.buffered_regs.zmydn1 = dn;
                 break;
         default:
                 return;

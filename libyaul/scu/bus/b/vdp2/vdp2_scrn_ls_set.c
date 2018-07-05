@@ -30,20 +30,17 @@ vdp2_scrn_ls_set(struct scrn_ls_format *ls)
                 vdp2_state.buffered_regs.scrctl &= 0x3F01;
                 vdp2_state.buffered_regs.scrctl |= ls->ls_fun;
 
-                MEMORY_WRITE(16, VDP2(LSTA0U), lstau);
-                MEMORY_WRITE(16, VDP2(LSTA0L), lstal);
+                vdp2_state.buffered_regs.lsta0u = lstau;
+                vdp2_state.buffered_regs.lsta0l = lstal;
                 break;
         case SCRN_NBG1:
                 vdp2_state.buffered_regs.scrctl &= 0x3F01;
                 vdp2_state.buffered_regs.scrctl |= ls->ls_fun;
 
-                MEMORY_WRITE(16, VDP2(LSTA1U), lstau);
-                MEMORY_WRITE(16, VDP2(LSTA1L), lstal);
+                vdp2_state.buffered_regs.lsta1u = lstau;
+                vdp2_state.buffered_regs.lsta1l = lstal;
                 break;
         default:
                 return;
         }
-
-        /* Write to memory */
-        MEMORY_WRITE(16, VDP2(SCRCTL), vdp2_state.buffered_regs.scrctl);
 }

@@ -21,6 +21,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern void vdp2_init(void);
+extern void vdp2_commit(void);
 
 #ifdef __cplusplus
 }

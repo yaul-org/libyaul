@@ -54,8 +54,12 @@ vdp2_init(void)
         (void)memset(&vdp2_state.nbg3.cell_format, 0x00,
             sizeof(struct scrn_cell_format));
 
+        /* Reset all buffered registers */
+        memset(&vdp2_state.buffered_regs, 0x0000, sizeof(vdp2_state.buffered_regs));
+
         vdp2_state.vram_ctl.vram_size = VRAM_CTL_SIZE_4MBIT;
         vdp2_state.vram_ctl.vram_mode = VRAM_CTL_MODE_PART_BANK_A | VRAM_CTL_MODE_PART_BANK_B;
+
         uint32_t vram_bank;
         for (vram_bank = 0; vram_bank < 4; vram_bank++) {
                 vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t0 = VRAM_CTL_CYCP_NO_ACCESS;
@@ -68,125 +72,50 @@ vdp2_init(void)
                 vdp2_state.vram_ctl.vram_cycp.pt[vram_bank].t7 = VRAM_CTL_CYCP_NO_ACCESS;
         }
 
-        /* Reset all buffered registers */
-        memset(&vdp2_state.buffered_regs, 0x0000,
-            sizeof(vdp2_state.buffered_regs));
-
-        /* Initialize the processor to sane values */
-        MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
+        /* Initialize the buffered registers to sane values */
 
         /* RAM */
         /* Color RAM mode 1 */
         /* Partition both VRAM bank A and B by default */
-        MEMORY_WRITE(16, VDP2(RAMCTL), 0x1300);
-        MEMORY_WRITE(16, VDP2(CYCA0L), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA0U), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA1L), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCA1U), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB0L), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB0U), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB1L), 0xFFFF);
-        MEMORY_WRITE(16, VDP2(CYCB1U), 0xFFFF);
+        vdp2_state.buffered_regs.ramctl = 0x1300;
 
-        /* Scroll screen */
-        MEMORY_WRITE(16, VDP2(BGON), 0x0000);
-        MEMORY_WRITE(16, VDP2(CHCTLA), 0x0000);
-        MEMORY_WRITE(16, VDP2(CHCTLB), 0x0000);
-        MEMORY_WRITE(16, VDP2(PNCN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(PNCN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(PNCN2), 0x0000);
-        MEMORY_WRITE(16, VDP2(PNCN3), 0x0000);
-        MEMORY_WRITE(16, VDP2(PLSZ), 0x0000);
-        MEMORY_WRITE(16, VDP2(BMPNA), 0x0000);
-        MEMORY_WRITE(16, VDP2(BMPNB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPOFN), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
+        vdp2_state.buffered_regs.cyca0l = 0xFFFF;
+        vdp2_state.buffered_regs.cyca0u = 0xFFFF;
+        vdp2_state.buffered_regs.cyca1l = 0xFFFF;
+        vdp2_state.buffered_regs.cyca1u = 0xFFFF;
+        vdp2_state.buffered_regs.cycb0l = 0xFFFF;
+        vdp2_state.buffered_regs.cycb0u = 0xFFFF;
+        vdp2_state.buffered_regs.cycb1l = 0xFFFF;
+        vdp2_state.buffered_regs.cycb1u = 0xFFFF;
 
-        MEMORY_WRITE(16, VDP2(MPABN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPABN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPABN2), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDN2), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPABN3), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDN3), 0x0000);
-
-        MEMORY_WRITE(16, VDP2(SCXIN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCYIN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCXIN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCYIN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCXN2), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCYN2), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCXN3), 0x0000);
-        MEMORY_WRITE(16, VDP2(SCYN3), 0x0000);
-
-        MEMORY_WRITE(16, VDP2(ZMXIN0), 0x0001);
-        MEMORY_WRITE(16, VDP2(ZMXDN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(ZMYIN0), 0x0001);
-        MEMORY_WRITE(16, VDP2(ZMYDN0), 0x0000);
-        MEMORY_WRITE(16, VDP2(ZMXIN1), 0x0001);
-        MEMORY_WRITE(16, VDP2(ZMXDN1), 0x0000);
-        MEMORY_WRITE(16, VDP2(ZMYIN1), 0x0001);
-        MEMORY_WRITE(16, VDP2(ZMYDN1), 0x0000);
-
-        /* Rotation scroll screen */
-        MEMORY_WRITE(16, VDP2(MPOFR), 0x0000);
-        MEMORY_WRITE(16, VDP2(RPMD), 0x0000);
-        MEMORY_WRITE(16, VDP2(OVPNRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(OVPNRB), 0x0000);
-
-        MEMORY_WRITE(16, VDP2(MPABRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPEFRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPGHRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPIJRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPKLRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPMNRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPOPRA), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPABRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPCDRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPEFRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPGHRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPIJRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPKLRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPMNRB), 0x0000);
-        MEMORY_WRITE(16, VDP2(MPOPRB), 0x0000);
-
-        /* Line screen */
-        /* Back screen */
-        MEMORY_WRITE(16, VDP2(BKTAL), 0x0000);
-        MEMORY_WRITE(16, VDP2(BKTAU), 0x0000);
+        /* Zoom */
+        vdp2_state.buffered_regs.zmxin0 = 0x0001;
+        vdp2_state.buffered_regs.zmxdn0 = 0x0000;
+        vdp2_state.buffered_regs.zmyin0 = 0x0001;
+        vdp2_state.buffered_regs.zmydn0 = 0x0000;
+        vdp2_state.buffered_regs.zmxin1 = 0x0001;
+        vdp2_state.buffered_regs.zmxdn1 = 0x0000;
+        vdp2_state.buffered_regs.zmyin1 = 0x0001;
+        vdp2_state.buffered_regs.zmydn1 = 0x0000;
 
         /* Priority function */
         vdp2_state.buffered_regs.prina = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRINA), vdp2_state.buffered_regs.prina);
         vdp2_state.buffered_regs.prinb = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRINB), vdp2_state.buffered_regs.prinb);
         vdp2_state.buffered_regs.prir = 0x0001;
-        MEMORY_WRITE(16, VDP2(PRIR), vdp2_state.buffered_regs.prir);
-
-        /* Color offset function */
-        MEMORY_WRITE(16, VDP2(CLOFEN), 0x0000);
-        MEMORY_WRITE(16, VDP2(CLOFSL), 0x0000);
 
         /* Initialize */
         vdp2_state.buffered_regs.spctl = 0x0021;
-        MEMORY_WRITE(16, VDP2(SPCTL), vdp2_state.buffered_regs.spctl);
         vdp2_state.buffered_regs.prisa = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISA), vdp2_state.buffered_regs.prisa);
         vdp2_state.buffered_regs.prisb = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISB), vdp2_state.buffered_regs.prisb);
         vdp2_state.buffered_regs.prisc = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISC), vdp2_state.buffered_regs.prisc);
         vdp2_state.buffered_regs.prisd = 0x0101;
-        MEMORY_WRITE(16, VDP2(PRISD), vdp2_state.buffered_regs.prisd);
-
-        MEMORY_WRITE(16, VDP2(CRAOFA), 0x0000);
-        MEMORY_WRITE(16, VDP2(CRAOFB), 0x0000);
 
         if (initialized) {
                 return;
         }
+
+        /* Initialized */
+        initialized = true;
 
         irq_mux_init(&vdp2_hblank_in_irq_mux);
         irq_mux_init(&vdp2_vblank_in_irq_mux);
@@ -207,9 +136,6 @@ vdp2_init(void)
 
         /* Enable interrupts */
         cpu_intc_enable();
-
-        /* Initialized */
-        initialized = true;
 }
 
 static void

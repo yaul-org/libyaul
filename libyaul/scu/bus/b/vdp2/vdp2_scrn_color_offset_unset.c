@@ -51,7 +51,4 @@ vdp2_scrn_color_offset_unset(uint8_t scrn)
         default:
                 return;
         }
-
-        /* Write to memory */
-        MEMORY_WRITE(16, VDP2(CLOFEN), vdp2_state.buffered_regs.clofen);
 }

@@ -38,7 +38,4 @@ vdp2_scrn_mosaic_unset(uint8_t scrn)
                 vdp2_state.buffered_regs.mzctl &= 0xFFEF;
                 break;
         }
-
-        /* Write to memory */
-        MEMORY_WRITE(16, VDP2(MZCTL), vdp2_state.buffered_regs.mzctl);
 }

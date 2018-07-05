@@ -9,7 +9,7 @@
 
 #include "vdp2-internal.h"
 
-uint8_t
+int8_t
 vdp2_sprite_type_priority_get(uint8_t type)
 {
 #ifdef DEBUG
@@ -18,6 +18,7 @@ vdp2_sprite_type_priority_get(uint8_t type)
 
         uint16_t shift;
         shift = (type & 0x01) << 3;
+
         uint16_t reg_mask;
         reg_mask = 0x07 << shift;
 
@@ -34,7 +35,7 @@ vdp2_sprite_type_priority_get(uint8_t type)
         case 6:
         case 7:
                 return vdp2_state.buffered_regs.prisd & reg_mask;
-        default:
-                return 0;
         }
+
+        return -1;
 }

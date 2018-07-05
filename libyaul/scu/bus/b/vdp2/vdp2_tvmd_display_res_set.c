@@ -44,36 +44,33 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         uint16_t display_w;
         uint16_t display_h;
 
-        uint16_t tvmd;
-        tvmd = MEMORY_READ(16, VDP2(TVMD));
-
-        tvmd &= 0xFFCF;
+        vdp2_state.buffered_regs.tvmd &= 0xFFCF;
         switch (vertical)  {
         case TVMD_VERT_224:
                 display_h = 224;
                 break;
         case TVMD_VERT_240:
                 display_h = 240;
-                tvmd |= 0x0010;
+                vdp2_state.buffered_regs.tvmd |= 0x0010;
                 break;
         case TVMD_VERT_256:
                 display_h = 256;
-                tvmd |= 0x0020;
+                vdp2_state.buffered_regs.tvmd |= 0x0020;
                 break;
         default:
                 return;
         }
 
-        tvmd &= 0xFF3F;
+        vdp2_state.buffered_regs.tvmd &= 0xFF3F;
         switch (interlace)  {
         case TVMD_INTERLACE_NONE:
                 break;
         case TVMD_INTERLACE_SINGLE:
-                tvmd |= 0x0080;
+                vdp2_state.buffered_regs.tvmd |= 0x0080;
                 break;
         case TVMD_INTERLACE_DOUBLE:
                 display_h = 2 * vertical;
-                tvmd |= 0x00C0;
+                vdp2_state.buffered_regs.tvmd |= 0x00C0;
                 break;
         default:
                 return;
@@ -82,7 +79,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         uint16_t clock_freq;
         clock_freq = CPU_CLOCK_FREQ_26MHZ;
 
-        tvmd &= 0xFFF0;
+        vdp2_state.buffered_regs.tvmd &= 0xFFF0;
         switch (horizontal) {
         case TVMD_HORZ_NORMAL_A:
                 display_w = 320;
@@ -91,41 +88,41 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         case TVMD_HORZ_NORMAL_B:
                 display_w = 352;
                 clock_freq = CPU_CLOCK_FREQ_28MHZ;
-                tvmd |= 0x0001;
+                vdp2_state.buffered_regs.tvmd |= 0x0001;
                 break;
         case TVMD_HORZ_HIRESO_A:
                 display_w = 640;
                 clock_freq = CPU_CLOCK_FREQ_26MHZ;
-                tvmd |= 0x0002;
+                vdp2_state.buffered_regs.tvmd |= 0x0002;
                 break;
         case TVMD_HORZ_HIRESO_B:
                 display_w = 704;
                 clock_freq = CPU_CLOCK_FREQ_28MHZ;
-                tvmd |= 0x0003;
+                vdp2_state.buffered_regs.tvmd |= 0x0003;
                 break;
         case TVMD_HORZ_NORMAL_AE:
                 display_w = 320;
                 display_h = 480;
                 clock_freq = CPU_CLOCK_FREQ_26MHZ;
-                tvmd |= 0x0004;
+                vdp2_state.buffered_regs.tvmd |= 0x0004;
                 break;
         case TVMD_HORZ_NORMAL_BE:
                 display_w = 352;
                 display_h = 480;
                 clock_freq = CPU_CLOCK_FREQ_28MHZ;
-                tvmd |= 0x0005;
+                vdp2_state.buffered_regs.tvmd |= 0x0005;
                 break;
         case TVMD_HORZ_HIRESO_AE:
                 display_w = 640;
                 display_h = 480;
                 clock_freq = CPU_CLOCK_FREQ_26MHZ;
-                tvmd |= 0x0006;
+                vdp2_state.buffered_regs.tvmd |= 0x0006;
                 break;
         case TVMD_HORZ_HIRESO_BE:
                 display_w = 704;
                 display_h = 480;
                 clock_freq = CPU_CLOCK_FREQ_28MHZ;
-                tvmd |= 0x0007;
+                vdp2_state.buffered_regs.tvmd |= 0x0007;
                 break;
         default:
                 return;
@@ -137,14 +134,14 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 cpu_clock_freq_chg(clock_freq);
         }
 
-        /* Write to TVMD bit during VBLANK-IN */
-        vdp2_tvmd_vblank_in_wait();
-
         /* Update state */
         vdp2_state.display_w = display_w;
         vdp2_state.display_h = display_h;
         vdp2_state.interlaced = interlace;
 
+        /* Write to TVMD bit during VBLANK-IN */
+        vdp2_tvmd_vblank_in_wait();
+
         /* write to memory */
-        MEMORY_WRITE(16, VDP2(TVMD), tvmd);
+        MEMORY_WRITE(16, VDP2(TVMD), vdp2_state.buffered_regs.tvmd);
 }
