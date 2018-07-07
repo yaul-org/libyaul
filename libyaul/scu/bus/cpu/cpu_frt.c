@@ -23,6 +23,8 @@ static void _default_ihr(void);
 #define FRT_IHR_INDEX_OCBI      1
 #define FRT_IHR_INDEX_OCAI      2
 
+static void (*_frt_ovi_ihr)(void) = _default_ihr;
+
 static void (*_frt_oc_ihr_table[])(void) = {
         _default_ihr,
         _default_ihr,
@@ -32,17 +34,18 @@ static void (*_frt_oc_ihr_table[])(void) = {
 void
 cpu_frt_init(uint8_t clock_div)
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x8C);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8C);
+        MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
 
         cpu_frt_priority_set(15);
 
-        /* Set time control register */
+        /* Set internal clock (divisor) */
         MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
         cpu_frt_oca_clear();
         cpu_frt_ocb_clear();
+        cpu_frt_ovi_clear();
 
         cpu_intc_ihr_set(INTC_INTERRUPT_FRT_ICI, _frt_ici_handler);
         cpu_intc_ihr_set(INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
@@ -106,6 +109,17 @@ cpu_frt_ocb_set(uint16_t count, void (*ihr)(void))
         }
 }
 
+void
+cpu_frt_ovi_set(void (*ihr)(void))
+{
+        MEMORY_WRITE_AND(8, CPU(TIER), ~0x02);
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
+
+        _frt_ovi_ihr = (ihr != NULL) ? ihr : _default_ihr;
+
+        MEMORY_WRITE_OR(8, CPU(TIER), 0x02);
+}
+
 static void __attribute__ ((interrupt_handler))
 _frt_ici_handler(void)
 {
@@ -135,6 +149,12 @@ _frt_oci_handler(void)
 static void __attribute__ ((interrupt_handler))
 _frt_ovi_handler(void)
 {
+        MEMORY_WRITE_AND(8, CPU(TIER), ~0x02);
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
+
+        _frt_ovi_ihr();
+
+        MEMORY_WRITE_OR(8, CPU(TIER), 0x02);
 }
 
 static void
