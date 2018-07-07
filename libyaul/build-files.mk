@@ -344,6 +344,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/b/vdp2/vdp2/:vram.h:yaul/scu/bus/b/vdp2/vdp2/ \
 	\
 	./scu/bus/cpu/:cpu.h:yaul/scu/bus/cpu/ \
+	./scu/bus/cpu/cpu/:cache.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:dmac.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:frt.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
