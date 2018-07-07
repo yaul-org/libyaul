@@ -349,6 +349,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:map.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:registers.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
 	\
 	./scu/bus/cpu/smpc/:smpc.h:yaul/scu/bus/cpu/smpc/ \
