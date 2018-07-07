@@ -8,6 +8,7 @@
 #ifndef _CPU_H_
 #define _CPU_H_
 
+#include <cpu/cache.h>
 #include <cpu/dmac.h>
 #include <cpu/frt.h>
 #include <cpu/intc.h>
