@@ -14,12 +14,9 @@
         sts.l mach, @-r15
         sts.l macl, @-r15
         mov.l r14, @-r15
-        /* Begin to disable interrupts */
         mov #0xF0, r14
         mov.l r13, @-r15
-        extu.b r14, r14
-        stc sr, r13
-        or r13, r14
+        /* Disable interrupts */
         ldc r14, sr
         mov.l \handler, r14
         mov.l r12, @-r15
