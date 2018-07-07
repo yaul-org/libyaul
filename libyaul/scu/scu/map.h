@@ -8,14 +8,24 @@
 #ifndef _SCU_MAP_H_
 #define _SCU_MAP_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 
 /* Write and read directly to specified address */
 #define MEMORY_READ(t, x)               (*(volatile uint ## t ## _t *)(x))
-#define MEMORY_WRITE(t, x, y)           (*(volatile uint ## t ## _t *)(x) = (y))
-#define MEMORY_WRITE_AND(t, x, y)       (*(volatile uint ## t ## _t *)(x) &= (y))
-#define MEMORY_WRITE_OR(t, x, y)        (*(volatile uint ## t ## _t *)(x) |= (y))
+
+#define MEMORY_WRITE(t, x, y) do {                                             \
+        (*(volatile uint ## t ## _t *)(x) = (y));                              \
+} while (false)
+
+#define MEMORY_WRITE_AND(t, x, y) do {                                         \
+        (*(volatile uint ## t ## _t *)(x) &= (y));                             \
+} while (false)
+
+#define MEMORY_WRITE_OR(t, x, y) do {                                          \
+        (*(volatile uint ## t ## _t *)(x) |= (y));                             \
+} while (false)
 
 /* Macros specific for processor */
 #define CS0(x)          (0x22000000 + (x))
