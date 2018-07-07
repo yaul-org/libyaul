@@ -12,6 +12,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include <stdbool.h>
+
 #include <cpu/map.h>
 
 #define FRT_CLOCK_DIV_8                 0x00
@@ -19,9 +21,21 @@ extern "C" {
 #define FRT_CLOCK_DIV_128               0x02
 #define FRT_CLOCK_DIV_RISING_EDGE       0x03
 
-#define FRT_CLOCK_DIV_8_COUNT_1MS       0x0D1F
-#define FRT_CLOCK_DIV_32_COUNT_1MS      0x0348
-#define FRT_CLOCK_DIV_128_COUNT_1MS     0x00D2
+#define FRT_NTSC_320_8_COUNT_1MS        0x0D1F
+#define FRT_NTSC_320_32_COUNT_1MS       0x0348
+#define FRT_NTSC_320_128_COUNT_1MS      0x00D2
+
+#define FRT_NTSC_352_8_COUNT_1MS        0x0DFC
+#define FRT_NTSC_352_32_COUNT_1MS       0x037F
+#define FRT_NTSC_352_128_COUNT_1MS      0x00E0
+
+#define FRT_PAL_320_8_COUNT_1MS         0x0D08
+#define FRT_PAL_320_32_COUNT_1MS        0x0342
+#define FRT_PAL_320_128_COUNT_1MS       0x00D0
+
+#define FRT_PAL_352_8_COUNT_1MS         0x0DFC
+#define FRT_PAL_352_32_COUNT_1MS        0x037F
+#define FRT_PAL_352_128_COUNT_1MS       0x00E0
 
 static inline void __attribute__ ((always_inline))
 cpu_frt_count_set(uint16_t count)
@@ -42,6 +56,31 @@ cpu_frt_count_get(void)
         return (reg_frth << 8) | reg_frtl;
 }
 
+static inline uint16_t __attribute__ ((always_inline))
+cpu_frt_input_capture_get(void)
+{
+        register uint16_t reg_icrh;
+        reg_icrh = MEMORY_READ(8, CPU(FRCH));
+
+        register uint16_t reg_icrl;
+        reg_icrl = MEMORY_READ(8, CPU(FRCL));
+
+        return (reg_icrh << 8) | reg_icrl;
+}
+
+static inline void __attribute__ ((always_inline))
+cpu_frt_priority_set(uint8_t priority)
+{
+        /* Set the interrupt priority level for FRT (shared amongst all
+         * FRT related interrupts */
+        register uint16_t iprb;
+        iprb = MEMORY_READ(16, CPU(IPRB));
+
+        iprb = (iprb & 0x00FF) | ((priority & 0x0F) << 8);
+
+        MEMORY_WRITE(16, CPU(IPRB), iprb);
+}
+
 static inline uint8_t __attribute__ ((always_inline))
 cpu_frt_status_get(void)
 {
@@ -51,32 +90,16 @@ cpu_frt_status_get(void)
         return reg_ftcsr;
 }
 
-static inline void
-cpu_frt_ocra_set(uint16_t count)
-{
-        uint16_t reg_tocr;
-        reg_tocr = MEMORY_READ(8, CPU(TOCR));
-        /* Select OCRA register and select output compare A match */
-        reg_tocr = (reg_tocr & ~0x04) | 0x2;
+#define cpu_frt_oca_clear() do {                                               \
+        cpu_frt_oca_set(0, NULL);                                              \
+} while (false)
 
-        MEMORY_WRITE(8, CPU(TOCR), reg_tocr);
-        MEMORY_WRITE(8, CPU(OCRAH), (uint8_t)(count >> 8));
-        MEMORY_WRITE(8, CPU(OCRAL), (uint8_t)(count & 0xFF));
-}
-
-static inline void
-cpu_frt_ocrb_set(uint16_t count)
-{
-        uint16_t reg_tocr;
-        reg_tocr = MEMORY_READ(8, CPU(TOCR));
-        /* Select OCRB register and select output compare B match */
-        reg_tocr = reg_tocr | 0x04 | 0x01;
-
-        MEMORY_WRITE(8, CPU(TOCR), reg_tocr);
-        MEMORY_WRITE(8, CPU(OCRBH), (uint8_t)(count >> 8));
-        MEMORY_WRITE(8, CPU(OCRBL), (uint8_t)(count & 0xFF));
-}
+#define cpu_frt_ocb_clear() do {                                               \
+        cpu_frt_ocb_set(0, NULL);                                              \
+} while (false)
 
 extern void cpu_frt_init(uint8_t);
+extern void cpu_frt_oca_set(uint16_t, void (*)(void));
+extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
 
 #endif /* !_CPU_FRT_H_ */
