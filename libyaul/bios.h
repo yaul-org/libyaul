@@ -10,6 +10,9 @@
 
 #include <stdint.h>
 
+#define CPU_CLOCK_SPEED_26MHZ   0
+#define CPU_CLOCK_SPEED_28MHZ   1
+
 static inline const uint32_t * __attribute__ ((always_inline))
 bios_int_priority_table_get(void)
 {
