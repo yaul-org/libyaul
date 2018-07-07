@@ -98,8 +98,13 @@ cpu_frt_status_get(void)
         cpu_frt_ocb_set(0, NULL);                                              \
 } while (false)
 
+#define cpu_frt_ovi_clear() do {                                               \
+        cpu_frt_ovi_set(NULL);                                                 \
+} while (false)
+
 extern void cpu_frt_init(uint8_t);
 extern void cpu_frt_oca_set(uint16_t, void (*)(void));
 extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
+extern void cpu_frt_ovi_set(void (*)(void));
 
 #endif /* !_CPU_FRT_H_ */
