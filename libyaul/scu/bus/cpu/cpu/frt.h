@@ -59,13 +59,13 @@ cpu_frt_count_get(void)
 static inline uint16_t __attribute__ ((always_inline))
 cpu_frt_input_capture_get(void)
 {
-        register uint16_t reg_icrh;
-        reg_icrh = MEMORY_READ(8, CPU(FRCH));
+        register uint16_t reg_ficrh;
+        reg_ficrh = MEMORY_READ(8, CPU(FICRH));
 
-        register uint16_t reg_icrl;
-        reg_icrl = MEMORY_READ(8, CPU(FRCL));
+        register uint16_t reg_ficrl;
+        reg_ficrl = MEMORY_READ(8, CPU(FICRL));
 
-        return (reg_icrh << 8) | reg_icrl;
+        return (reg_ficrh << 8) | reg_ficrl;
 }
 
 static inline void __attribute__ ((always_inline))
