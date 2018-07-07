@@ -19,9 +19,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define CPU_CLOCK_SPEED_26MHZ   0
-#define CPU_CLOCK_SPEED_28MHZ   1
-
 static inline void __attribute__ ((always_inline))
 cpu_nop(void)
 {
