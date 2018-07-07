@@ -32,13 +32,13 @@ static void (*_frt_oc_ihr_table[])(void) = {
 void
 cpu_frt_init(uint8_t clock_div)
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x0C);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x0C);
+        MEMORY_WRITE_AND(8, CPU(TIER), ~0x8C);
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8C);
 
         cpu_frt_priority_set(15);
 
         /* Set time control register */
-        MEMORY_WRITE_AND(8, CPU(TCR), ~0x03);
+        MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
         cpu_frt_oca_clear();
