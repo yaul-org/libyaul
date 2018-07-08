@@ -107,4 +107,8 @@ extern void cpu_frt_oca_set(uint16_t, void (*)(void));
 extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
 extern void cpu_frt_ovi_set(void (*)(void));
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* !_CPU_FRT_H_ */
