@@ -15,6 +15,7 @@
 #include <cpu/intc.h>
 #include <cpu/registers.h>
 #include <cpu/sync.h>
+#include <cpu/wdt.h>
 
 #ifdef __cplusplus
 extern "C" {
