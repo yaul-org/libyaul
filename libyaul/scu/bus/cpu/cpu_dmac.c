@@ -72,10 +72,27 @@ cpu_dmac_status_get(struct dmac_ch_status *status)
 
         status->dcs_ch_enabled = (ch1_enabled << 1) | ch0_enabled;
 
+        /*-
+         * Truth table to determine if a specific channel is enabled or not
+         *
+         * TE DE Busy
+         *  0  0 0
+         *  0  1 1    Could be a false positive
+         *  1  0 0
+         *  1  1 0
+         */
+        uint8_t de;
+        uint8_t te;
+
         uint8_t ch0_busy;
-        ch0_busy = (reg_chcr0 & 0x00000001) ^ ((reg_chcr0 >> 1) & 0x00000001);
+        de = reg_chcr0 & 0x00000001;
+        te = (reg_chcr0 >> 1) & 0x00000001;
+        ch0_busy = (((de | te) ^ 1) | de) ^ 1;
+
         uint8_t ch1_busy;
-        ch1_busy = (reg_chcr1 & 0x00000001) ^ ((reg_chcr1 >> 1) & 0x00000001);
+        de = reg_chcr1 & 0x00000001;
+        te = (reg_chcr1 >> 1) & 0x00000001;
+        ch1_busy = (((de | te) ^ 1) | de) ^ 1;
 
         status->dcs_ch_busy = (ch1_busy << 1) | ch0_busy;
 }
