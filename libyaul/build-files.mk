@@ -181,9 +181,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_vram_control_get.c \
 	scu/bus/b/vdp2/vdp2_vram_control_set.c \
 	\
-	scu/bus/cpu/cpu_dmac_channel_set.c \
-	scu/bus/cpu/cpu_dmac_channel_start.c \
-	scu/bus/cpu/cpu_dmac_channel_stop.c \
+	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_exception_trampoline.S \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
