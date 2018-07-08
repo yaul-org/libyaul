@@ -10,9 +10,11 @@
 #include <stdio.h>
 
 #include <bios.h>
+#include <cpu/dmac.h>
+#include <cpu/frt.h>
 #include <cpu/intc.h>
-#include <cpu/registers.h>
 #include <cpu/map.h>
+#include <cpu/registers.h>
 
 #include <internal.h>
 
@@ -48,6 +50,9 @@ cpu_init(void)
         MEMORY_WRITE(32, CPU(VCRDMA1), INTC_INTERRUPT_DMAC1);
         MEMORY_WRITE(16, CPU(VCRWDT), (INTC_INTERRUPT_WDT_ITI << 8) | INTC_INTERRUPT_BSC);
         MEMORY_WRITE(32, CPU(VCRDIV), INTC_INTERRUPT_DIVU_OVFI);
+
+        cpu_frt_init(FRT_CLOCK_DIV_8);
+        cpu_dmac_init();
 }
 
 void __noreturn
