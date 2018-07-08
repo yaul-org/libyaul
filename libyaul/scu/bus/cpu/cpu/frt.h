@@ -69,7 +69,7 @@ cpu_frt_input_capture_get(void)
 }
 
 static inline void __attribute__ ((always_inline))
-cpu_frt_priority_set(uint8_t priority)
+cpu_frt_interrupt_priority_set(uint8_t priority)
 {
         /* Set the interrupt priority level for FRT (shared amongst all
          * FRT related interrupts */
