@@ -9,6 +9,7 @@
 #define _CPU_H_
 
 #include <cpu/cache.h>
+#include <cpu/divu.h>
 #include <cpu/dmac.h>
 #include <cpu/endian.h>
 #include <cpu/frt.h>

@@ -343,6 +343,7 @@ INSTALL_HEADER_FILES+= \
 	\
 	./scu/bus/cpu/:cpu.h:yaul/scu/bus/cpu/ \
 	./scu/bus/cpu/cpu/:cache.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:divu.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:dmac.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:endian.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:frt.h:yaul/scu/bus/cpu/cpu/ \
