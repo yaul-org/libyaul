@@ -10,6 +10,7 @@
 
 #include <cpu/cache.h>
 #include <cpu/dmac.h>
+#include <cpu/endian.h>
 #include <cpu/frt.h>
 #include <cpu/intc.h>
 #include <cpu/registers.h>
