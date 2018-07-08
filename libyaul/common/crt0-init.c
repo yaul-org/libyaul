@@ -55,8 +55,10 @@ initializer(void)
 }
 
 /* Add function to .fini section */
-static void __used __section(".fini")
+static void __used __section(".fini") __noreturn
 finalizer(void)
 {
         call_global_dtors();
+
+        __builtin_unreachable();
 }
