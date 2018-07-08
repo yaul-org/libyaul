@@ -17,7 +17,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-extern void usb_cartridge_return(void) __noreturn;
 extern uint32_t usb_cartridge_read_long(void);
 extern uint8_t usb_cartridge_read_byte(void);
 extern uint8_t usb_cartridge_xchg_byte(uint8_t);

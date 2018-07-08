@@ -110,7 +110,6 @@ LIB_SRCS+= \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_long.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_return.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_byte.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_long.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_xchg_byte.c
