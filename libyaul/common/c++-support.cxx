@@ -1,21 +1,24 @@
+#include <assert.h>
 #include <stdlib.h>
 
 extern "C"
 void __cxa_pure_virtual(void) {
         /* Pure C++ virtual call; abort! */
-        abort();
+    assert("Pure C++ virtual call");
 }
 
-void* operator new(size_t size __unused) {
-    return (void*)0;
+void* __attribute__ ((weak)) operator new(size_t size) {
+    return malloc(size);
 }
 
-void* operator new[](size_t size __unused) {
-    return (void*)0;
+void* __attribute__ ((weak)) operator new[](size_t size) {
+    return malloc(size);
 }
 
-void operator delete(void *ptr __unused) {
+void __attribute__ ((weak)) operator delete(void *ptr) {
+    free(ptr);
 }
 
-void operator delete[](void *ptr __unused) {
+void __attribute__ ((weak)) operator delete[](void *ptr) {
+    free(ptr);
 }
