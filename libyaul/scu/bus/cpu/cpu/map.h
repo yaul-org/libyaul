@@ -31,7 +31,6 @@
 #define TOCR            0x0E17
 #define FICRH           0x0E18
 #define FICRL           0x0E19
-#define CCR             0x0E29
 #define IPRB            0x0E60
 #define VCRA            0x0E62
 #define VCRB            0x0E64
@@ -46,6 +45,7 @@
 #define RSTCSRR         0x0E83
 #define FMR             0x0E90
 #define SBYCR           0x0E91
+#define CCR             0x0E92
 #define ICR             0x0EE0
 #define IPRA            0x0EE2
 #define VCRWDT          0x0EE4

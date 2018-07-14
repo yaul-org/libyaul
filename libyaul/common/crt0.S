@@ -41,20 +41,25 @@ _start:
         nop
 
         /* Enable interrupts */
-        mov #0xF0, r2
+        mov #0x00, r2
         mov.l .LC6, r1
-        mov #0x11, r3
         ldc r2, sr
-        mov.l .LC5, r0
-
-        /* Purge and turn cache on as four-way set associative */
-        mov.b r3, @r1
-
-        /* Jump to user */
+        mov.l .LC5, r3
         mov #0x00, r4
         mov #0x00, r5
         mov #0x00, r6
-        jsr @r0
+
+        /* Disable cache, purge, and enable cache */
+        mov.b @r1, r0
+        and #0xFE, r0
+        mov.b r0, @r1
+        or #0x10, r0
+        mov.b r0, @r1
+        or #0x01, r0
+        mov.b r0, @r1
+
+        /* Jump to user */
+        jsr @r3
         mov #0x00, r7
 
         /* Disable interrupts */
