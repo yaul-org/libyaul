@@ -33,9 +33,9 @@ extern uint8_t arp_read_byte(void);
 extern uint8_t arp_xchg_byte(uint8_t);
 extern void arp_function_callback(void (*)(arp_callback_t *));
 extern void arp_function_nonblock(void);
+extern void arp_return(void) __noreturn;
 extern void arp_send_long(uint32_t);
 extern void arp_sync(void);
-extern void arp_return(void) __noreturn;
 
 #ifdef __cplusplus
 }
