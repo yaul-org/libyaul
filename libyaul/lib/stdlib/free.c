@@ -1,13 +1,7 @@
 #include <mm/slob.h>
 
-void __attribute__ ((weak, alias("free")))
-override_free(void *addr)
-{
-        slob_free(addr);
-}
-
-void
+void __attribute__ ((weak))
 free(void *addr)
 {
-        override_free(addr);
+        slob_free(addr);
 }

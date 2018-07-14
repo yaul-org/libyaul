@@ -263,7 +263,8 @@ INSTALL_HEADER_FILES+= \
 	./lib/lib/:string.h:./ \
 	./lib/lib/sys/:cdefs.h:./sys/ \
 	./lib/lib/sys/:queue.h:./sys/ \
-	./lib/lib/sys/:types.h:./sys/
+	./lib/lib/sys/:types.h:./sys/ \
+	./kernel/sys/:init.h:./sys/
 
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
