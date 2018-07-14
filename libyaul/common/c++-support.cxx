@@ -3,8 +3,8 @@
 
 extern "C"
 void __cxa_pure_virtual(void) {
-        /* Pure C++ virtual call; abort! */
-    assert("Pure C++ virtual call");
+    /* Pure C++ virtual call; abort! */
+    assert(false);
 }
 
 void* __attribute__ ((weak)) operator new(size_t size) {
