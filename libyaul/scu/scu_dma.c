@@ -94,10 +94,12 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
          * of the A bus, everything else should set it */
 
         uint32_t add;
-        add = 0x00000100 | (cfg->dlc_stride & 0x7);
+        add = 0x00000100 | (cfg->dlc_stride & 0x07);
 
         uint32_t mode;
-        mode = ((cfg->dlc_mode & 0x01) << 24) | (cfg->dlc_update << 8) | cfg->dlc_starting_factor;
+        mode = ((cfg->dlc_mode & 0x01) << 24) |
+               ((cfg->dlc_update & 0x0101) << 8) |
+                (cfg->dlc_starting_factor & 0x07);
 
         switch (cfg->dlc_level & 0x03) {
         case 0:
