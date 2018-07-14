@@ -50,23 +50,23 @@ extern "C" {
 #define DMA_MODE_DIRECT         0x00
 #define DMA_MODE_INDIRECT       0x01
 
-#define DMA_MODE_START_FACTOR_VBLANK_IN         0x00
-#define DMA_MODE_START_FACTOR_VBLANK_OUT        0x01
-#define DMA_MODE_START_FACTOR_HBLANK_IN         0x02
-#define DMA_MODE_START_FACTOR_TIMER_0           0x03
-#define DMA_MODE_START_FACTOR_TIMER_1           0x04
-#define DMA_MODE_START_FACTOR_SOUND_REQ         0x05
-#define DMA_MODE_START_FACTOR_SPRITE_DRAW_END   0x06
-#define DMA_MODE_START_FACTOR_ENABLE            0x07
+#define DMA_START_FACTOR_VBLANK_IN              0x00
+#define DMA_START_FACTOR_VBLANK_OUT             0x01
+#define DMA_START_FACTOR_HBLANK_IN              0x02
+#define DMA_START_FACTOR_TIMER_0                0x03
+#define DMA_START_FACTOR_TIMER_1                0x04
+#define DMA_START_FACTOR_SOUND_REQ              0x05
+#define DMA_START_FACTOR_SPRITE_DRAW_END        0x06
+#define DMA_START_FACTOR_ENABLE                 0x07
 
-#define DMA_DST_STRIDE_0_BYTES     0x00
-#define DMA_DST_STRIDE_2_BYTES     0x01
-#define DMA_DST_STRIDE_4_BYTES     0x02
-#define DMA_DST_STRIDE_8_BYTES     0x03
-#define DMA_DST_STRIDE_16_BYTES    0x04
-#define DMA_DST_STRIDE_32_BYTES    0x05
-#define DMA_DST_STRIDE_64_BYTES    0x06
-#define DMA_DST_STRIDE_128_BYTES   0x07
+#define DMA_STRIDE_0_BYTES      0x00
+#define DMA_STRIDE_2_BYTES      0x01
+#define DMA_STRIDE_4_BYTES      0x02
+#define DMA_STRIDE_8_BYTES      0x03
+#define DMA_STRIDE_16_BYTES     0x04
+#define DMA_STRIDE_32_BYTES     0x05
+#define DMA_STRIDE_64_BYTES     0x06
+#define DMA_STRIDE_128_BYTES    0x07
 
 #define DMA_UPDATE_NONE 0x000
 #define DMA_UPDATE_RUP  0x100
@@ -98,20 +98,60 @@ struct dma_level_cfg {
         void (*dlc_ihr)(void);
 };
 
+static inline uint8_t __attribute__ ((always_inline))
+scu_dma_level0_busy(void)
+{
+        /* In operation or on standby */
+        return (MEMORY_READ(32, SCU(DSTA)) >> 4) & 0x03;
+}
+
+static inline uint32_t __attribute__ ((always_inline))
+scu_dma_level1_busy(void)
+{
+        /* In operation or on standby */
+        register uint32_t reg_dsta;
+        reg_dsta = MEMORY_READ(32, SCU(DSTA));
+
+        reg_dsta >>= 8;
+
+        return ((reg_dsta >> 10) & 0x02) | (reg_dsta & 0x01);
+}
+
+static inline uint8_t __attribute__ ((always_inline))
+scu_dma_level2_busy(void)
+{
+        /* In operation or on standby */
+        return (MEMORY_READ(32, SCU(DSTA)) >> 16) & 0x03;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_level_busy(uint8_t level)
+{
+        switch (level) {
+        case 0:
+                scu_dma_level0_busy();
+                break;
+        case 1:
+                scu_dma_level1_busy();
+                break;
+        case 2:
+                scu_dma_level2_busy();
+                break;
+        }
+}
+
 static inline void __attribute__ ((always_inline))
 scu_dma_level0_wait(void)
 {
         /* Cannot modify registers while in operation */
-        while (((MEMORY_READ(32, SCU(DSTA)) & 0x00000010) != 0x00000000) ||
-               ((MEMORY_READ(32, SCU(DSTA)) & 0x00000020) != 0x00000000));
+        while ((scu_dma_level0_busy()) != 0x00);
 }
 
 static inline void __attribute__ ((always_inline))
 scu_dma_level1_wait(void)
 {
         /* Cannot modify registers while in operation */
-        while (((MEMORY_READ(32, SCU(DSTA)) & 0x00000100) != 0x00000000) ||
-               ((MEMORY_READ(32, SCU(DSTA)) & 0x00080000) != 0x00000000));
+        while ((scu_dma_level1_busy()) != 0x00);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -121,8 +161,7 @@ scu_dma_level2_wait(void)
          * level 2 during DMA level 1 operation. */
 
         /* Cannot modify registers while in operation */
-        while (((MEMORY_READ(32, SCU(DSTA)) & 0x00001000) != 0x00000000) ||
-               ((MEMORY_READ(32, SCU(DSTA)) & 0x00002000) != 0x00000000));
+        while ((scu_dma_level2_busy()) != 0x00);
 }
 
 static inline void __attribute__ ((always_inline))
