@@ -71,11 +71,10 @@ struct dma_level_cfg {
         enum dma_mode_update_type update;
 };
 
-extern void scu_dma_cpu_init(void);
-extern void scu_dma_cpu_level_set(enum dma_level, enum dma_mode,
-    struct dma_level_cfg *);
-extern void scu_dma_cpu_level_start(enum dma_level);
-extern void scu_dma_cpu_level_stop(enum dma_level);
+extern void scu_dma_init(void);
+extern void scu_dma_level_set(enum dma_level, enum dma_mode, struct dma_level_cfg *);
+extern void scu_dma_level_start(enum dma_level);
+extern void scu_dma_level_stop(enum dma_level);
 
 #ifdef __cplusplus
 }

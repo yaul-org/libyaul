@@ -11,7 +11,7 @@
 
 #include <scu-internal.h>
 
-static int scu_dma_cpu_level_sanitize(struct dma_level_cfg *, enum dma_mode);
+static int scu_dma_level_sanitize(struct dma_level_cfg *, enum dma_mode);
 
 /*
  * Activate DMA from the Master CPU
@@ -26,7 +26,7 @@ static int scu_dma_cpu_level_sanitize(struct dma_level_cfg *, enum dma_mode);
  * A-bus <-> B-bus
  */
 void
-scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_cfg *cfg)
+scu_dma_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_cfg *cfg)
 {
         uint32_t dst;
         uint32_t src;
@@ -38,7 +38,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
          * region.
          */
 
-        if ((scu_dma_cpu_level_sanitize(cfg, mode)) < 0) {
+        if ((scu_dma_level_sanitize(cfg, mode)) < 0) {
                 return;
         }
 
@@ -126,7 +126,7 @@ scu_dma_cpu_level_set(enum dma_level lvl, enum dma_mode mode, struct dma_level_c
 }
 
 static int
-scu_dma_cpu_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
+scu_dma_level_sanitize(struct dma_level_cfg *cfg, enum dma_mode mode)
 {
         /*
          * Items related to the entire SCU DMA
