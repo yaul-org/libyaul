@@ -576,7 +576,6 @@ _device_init(void)
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cartridge_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-        arp_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 }
 

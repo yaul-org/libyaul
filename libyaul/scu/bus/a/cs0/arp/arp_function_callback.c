@@ -23,20 +23,20 @@ void
 arp_function_callback(void (*cb)(arp_callback_t *))
 {
         /* Disable interrupts */
-        uint32_t mask;
-        mask = cpu_intc_mask_get();
+        uint32_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         /* Clear ARP callback */
         memset(&arp_callback.ptr, 0x00, sizeof(arp_callback));
 
         assert(cb != NULL);
         arp_cb = cb;
-        cpu_intc_interrupt_set(USER_VECTOR(32), arp_trampoline);
+        cpu_intc_ihr_set(USER_VECTOR(32), arp_trampoline);
 
         /* Enable interrupts */
-        cpu_intc_mask_set(mask);
+        cpu_intc_mask_set(sr_mask);
 }
 
 static void
