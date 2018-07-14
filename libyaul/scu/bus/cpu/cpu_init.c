@@ -18,10 +18,55 @@
 
 #include <internal.h>
 
-extern void internal_exception_illegal_instruction(void);
-extern void internal_exception_illegal_slot(void);
-extern void internal_exception_cpu_address_error(void);
-extern void internal_exception_dma_address_error(void);
+#define EXCEPTION_TRAMPOLINE_EMIT(name)                                        \
+__asm__ (".align 4\n"                                                          \
+         "\n"                                                                  \
+         ".local __exception_" __STRING(name) "\n"                             \
+         ".type __exception_" __STRING(name) ", @function\n"                   \
+         "\n"                                                                  \
+         "__exception_" __STRING(name) ":\n"                                   \
+         "\tsts.l pr, @-r15\n"                                                 \
+         "\tstc.l gbr, @-r15\n"                                                \
+         "\tstc.l vbr, @-r15\n"                                                \
+         "\tsts.l mach, @-r15\n"                                               \
+         "\tsts.l macl, @-r15\n"                                               \
+         "\tmov.l r14, @-r15\n"                                                \
+         "\tmov #0xF0, r14\n"                                                  \
+         "\tmov.l r13, @-r15\n"                                                \
+         "\tldc r14, sr\n"                                                     \
+         "\tmov.l 1f, r14\n"                                                   \
+         "\tmov.l r12, @-r15\n"                                                \
+         "\tmov r15, r13\n"                                                    \
+         "\tmov.l r11, @-r15\n"                                                \
+         "\tadd #0x28, r13\n"                                                  \
+         "\tmov.l r10, @-r15\n"                                                \
+         "\tmov.l r9, @-r15\n"                                                 \
+         "\tmov.l r8, @-r15\n"                                                 \
+         "\tmov.l r7, @-r15\n"                                                 \
+         "\tmov.l r6, @-r15\n"                                                 \
+         "\tmov.l r5, @-r15\n"                                                 \
+         "\tmov.l r4, @-r15\n"                                                 \
+         "\tmov.l r3, @-r15\n"                                                 \
+         "\tmov.l r2, @-r15\n"                                                 \
+         "\tmov.l r1, @-r15\n"                                                 \
+         "\tmov.l r0, @-r15\n"                                                 \
+         "\tmov.l r13, @-r15\n"                                                \
+         "\tjmp @r14\n"                                                        \
+         "\tmov r15, r4\n"                                                     \
+         "\t.align 2\n"                                                        \
+         "\n"                                                                  \
+         "\t1:\n"                                                              \
+         "\t.long __ihr_exception_" __STRING(name) "\n")
+
+void _exception_illegal_instruction(void);
+void _exception_illegal_slot(void);
+void _exception_cpu_address_error(void);
+void _exception_dma_address_error(void);
+
+EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
+EXCEPTION_TRAMPOLINE_EMIT(illegal_slot);
+EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
+EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
 
 static void _format_exception_message(struct cpu_registers *, char *, const char *);
 
@@ -32,13 +77,13 @@ cpu_init(void)
 {
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
-            internal_exception_illegal_instruction);
+            _exception_illegal_instruction);
         cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_SLOT,
-            internal_exception_illegal_slot);
+            _exception_illegal_slot);
         cpu_intc_ihr_set(INTC_INTERRUPT_CPU_ADDRESS_ERROR,
-            internal_exception_cpu_address_error);
+            _exception_cpu_address_error);
         cpu_intc_ihr_set(INTC_INTERRUPT_DMA_ADDRESS_ERROR,
-            internal_exception_dma_address_error);
+            _exception_dma_address_error);
 
         /* Set the appropriate vector numbers for the on-chip peripheral
          * modules */
@@ -55,32 +100,32 @@ cpu_init(void)
         cpu_dmac_init();
 }
 
-void __noreturn
-internal_ihr_exception_illegal_instruction(struct cpu_registers *regs)
+static void __noreturn
+_ihr_exception_illegal_instruction(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal instruction");
 
         internal_exception_show(_buffer);
 }
 
-void __noreturn
-internal_ihr_exception_illegal_slot(struct cpu_registers *regs)
+static void __noreturn
+_ihr_exception_illegal_slot(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal slot");
 
         internal_exception_show(_buffer);
 }
 
-void __noreturn
-internal_ihr_exception_cpu_address_error(struct cpu_registers *regs)
+static void __noreturn
+_ihr_exception_cpu_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "CPU address error");
 
         internal_exception_show(_buffer);
 }
 
-void __noreturn
-internal_ihr_exception_dma_address_error(struct cpu_registers *regs)
+static void __noreturn
+_ihr_exception_dma_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "DMA address error");
 
