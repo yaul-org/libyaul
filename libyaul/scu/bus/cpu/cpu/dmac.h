@@ -103,9 +103,9 @@ cpu_dmac_channel_stop(uint8_t ch)
 }
 
 extern void cpu_dmac_init(void);
+extern void cpu_dmac_status_get(struct dmac_ch_status *);
 extern void cpu_dmac_channel_config_set(const struct dmac_ch_cfg *);
 extern void cpu_dmac_channel_wait(uint8_t);
-extern void cpu_dmac_channel_get(struct dmac_ch_status *);
 
 #ifdef __cplusplus
 }
