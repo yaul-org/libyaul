@@ -1,9 +1,6 @@
-#include <stdint.h>
-#include <stddef.h>
-
 #include <mm/slob.h>
 
-void *
+void * __attribute__ ((weak))
 realloc(void *old, size_t new_len)
 {
         void *ret;

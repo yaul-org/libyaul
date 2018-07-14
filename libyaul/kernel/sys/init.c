@@ -17,10 +17,8 @@
 
 #include <cpu.h>
 
-static void _mm_init(void);
-
-void __attribute__ ((weak, alias("mm_init")))
-override_malloc_initializer(void)
+void __attribute__ ((weak))
+user_init(void)
 {
         slob_init();
 }
@@ -61,7 +59,7 @@ _init(void)
 
         cpu_init();
 
-        _mm_init();
+        user_init();
 }
 
 static void __section(".fini") __used __noreturn
@@ -70,10 +68,4 @@ _fini(void)
         _call_global_dtors();
 
         __builtin_unreachable();
-}
-
-static void
-_mm_init(void)
-{
-        override_malloc_initializer();
 }
