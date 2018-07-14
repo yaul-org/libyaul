@@ -300,7 +300,6 @@ scu_dma_level_stop(uint8_t level)
 
 extern void scu_dma_init(void);
 extern void scu_dma_level_config_set(const struct dma_level_cfg *);
-extern int32_t scu_dma_level_config_validate(const struct dma_level_cfg *);
 extern void cpu_dma_illegal_set(void (*)(void));
 
 #ifdef __cplusplus
