@@ -30,4 +30,5 @@ size_t iso9660_total(void *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* _ISO9660_H_ */

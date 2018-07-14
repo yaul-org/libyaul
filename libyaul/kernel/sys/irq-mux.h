@@ -43,4 +43,5 @@ extern void irq_mux_init(irq_mux_t *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_IRQ_MUX_H_ */

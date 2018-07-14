@@ -26,4 +26,5 @@ extern void vdp2_commit(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP2_H_ */

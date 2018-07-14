@@ -120,4 +120,5 @@ extern void vdp2_sprite_priority_set(uint8_t, uint8_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP2_SPRITE_H_ */

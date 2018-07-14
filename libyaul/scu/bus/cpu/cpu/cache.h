@@ -15,4 +15,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CPU_CACHE_H */

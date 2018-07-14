@@ -10,10 +10,6 @@
 
 #include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 /* Color RAM (CRAM) stores color data of sprites and scroll screens.
  *
  * R/W access from the CPU or DMA controller(s) is possible, but the
@@ -50,7 +46,4 @@ extern "C" {
 #define COLOR_RGB888_TO_RGB555(r, g, b) ((((b) >> 3) << 10) |                  \
     (((g) >> 3) << 5) | ((r) >> 3))
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 #endif /* !_VDP2_CRAM_H_ */

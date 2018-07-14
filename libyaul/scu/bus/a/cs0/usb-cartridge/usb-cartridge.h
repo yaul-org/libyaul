@@ -27,4 +27,5 @@ extern void usb_cartridge_send_long(uint32_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_USB_CARTRIDGE_H_ */

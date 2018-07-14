@@ -110,4 +110,5 @@ extern void cpu_dmac_channel_get(struct dmac_ch_status *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CPU_DMAC_H */

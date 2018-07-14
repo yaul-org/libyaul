@@ -12,6 +12,10 @@
 
 #include "cons.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define FONT_CHAR_HEIGHT        (8)
 #define FONT_CHAR_WIDTH         (8)
 #define FONT_SIZE               (8192)
@@ -47,5 +51,9 @@ void cons_vdp2_init(struct cons *);
 
 extern const uint32_t font[];
 extern const uint16_t palette[];
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !_DRIVERS_H_ */

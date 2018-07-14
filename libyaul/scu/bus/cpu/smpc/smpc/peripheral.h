@@ -439,4 +439,5 @@ extern void smpc_peripheral_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SMPC_PERIPHERAL_H_ */

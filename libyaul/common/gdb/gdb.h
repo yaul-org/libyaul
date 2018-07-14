@@ -19,4 +19,5 @@ extern void gdb_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_GDB_H_ */

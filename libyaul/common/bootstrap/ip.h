@@ -12,10 +12,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 /* Hardware IDs */
 #define IP_HEADER_DATA_SIGNATURE "SEGASATURN DATA "
 #define IP_HEADER_BOOT_SIGNATURE "SEGA SEGASATURN "
@@ -113,7 +109,4 @@ struct ip_header_boot {
         unsigned int :32;
 } __packed;
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 #endif /* !_IP_H_ */

@@ -25,4 +25,5 @@ extern void scu_timer_all_enable(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SCU_TIMER_H_ */

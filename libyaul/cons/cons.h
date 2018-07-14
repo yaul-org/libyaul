@@ -31,4 +31,5 @@ extern void cons_write(const char *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CONS_H_ */

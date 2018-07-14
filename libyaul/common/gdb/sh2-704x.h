@@ -12,6 +12,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define gdb_sync() do {                                                        \
         __asm__ __volatile__ ("trapa #0x20");                                  \
 } while (false)
@@ -26,5 +30,9 @@ void gdb_monitor_entry(struct cpu_registers *);
 void gdb_putc(int);
 void gdb_sh2_704x_init(void);
 void gdb_step(struct cpu_registers *, uint32_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !_SH2_704X_H_ */

@@ -18,4 +18,5 @@ extern void cd_block_cmd_init_cd_system(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CD_BLOCK_CMD_H_ */

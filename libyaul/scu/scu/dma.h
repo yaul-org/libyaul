@@ -80,4 +80,5 @@ extern void scu_dma_cpu_level_stop(enum dma_level);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SCU_DMA_H_ */

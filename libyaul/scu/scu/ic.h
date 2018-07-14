@@ -135,4 +135,5 @@ scu_ic_status_get(void)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SCU_IC_H_ */

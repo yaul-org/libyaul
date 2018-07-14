@@ -19,4 +19,5 @@ extern char *stack_backtrace(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_STACK_H_ */
