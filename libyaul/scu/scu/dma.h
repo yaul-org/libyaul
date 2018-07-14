@@ -92,7 +92,7 @@ struct dma_level_cfg {
         uint16_t dlc_xfer_count;
 
         uint8_t dlc_stride;
-        uint8_t dlc_update;
+        uint16_t dlc_update;
         uint8_t dlc_starting_factor;
 
         void (*dlc_ihr)(void);
