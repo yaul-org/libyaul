@@ -23,6 +23,15 @@ extern "C" {
 #endif /* __cplusplus */
 
 static inline void __attribute__ ((always_inline))
+cpu_clrmac(void)
+{
+        __asm__ volatile ("clrmac"
+            : /* No outputs */
+            : /* No inputs */
+            : "mach", "macl");
+}
+
+static inline void __attribute__ ((always_inline))
 cpu_nop(void)
 {
         __asm__ volatile ("nop"
