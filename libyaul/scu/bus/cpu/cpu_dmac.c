@@ -22,7 +22,7 @@ static void _default_ihr(void);
 #define DMAC_IHR_INDEX_CH0      0
 #define DMAC_IHR_INDEX_CH1      1
 
-static void (*_frt_dmac_ihr_table[])(void) = {
+static void (*_dmac_ihr_table[])(void) = {
         _default_ihr,
         _default_ihr
 };
@@ -131,14 +131,14 @@ cpu_dmac_channel_config_set(const struct dmac_ch_cfg *cfg)
         /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
         reg_tcr = (reg_tcr > 0x00FFFFFF) ? 0x00000000 : reg_tcr;
 
-        _frt_dmac_ihr_table[cfg->dcc_ch] = _default_ihr;
+        _dmac_ihr_table[cfg->dcc_ch] = _default_ihr;
 
         if (cfg->dcc_ihr != NULL) {
                 /* Enable interrupt */
                 reg_chcr |= 0x00000004;
 
                 /* Set interrupt handling routine */
-                _frt_dmac_ihr_table[cfg->dcc_ch] = cfg->dcc_ihr;
+                _dmac_ihr_table[cfg->dcc_ch] = cfg->dcc_ihr;
         }
 
         MEMORY_WRITE(32, CPU(DAR0 | n), (uint32_t)cfg->dcc_dst);
@@ -170,7 +170,7 @@ cpu_dmac_channel_wait(uint8_t ch)
 static void __attribute__ ((interrupt_handler))
 _dmac_ch0_ihr_handler(void)
 {
-        _frt_dmac_ihr_table[DMAC_IHR_INDEX_CH0]();
+        _dmac_ihr_table[DMAC_IHR_INDEX_CH0]();
 
         MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
 }
@@ -178,7 +178,7 @@ _dmac_ch0_ihr_handler(void)
 static void __attribute__ ((interrupt_handler))
 _dmac_ch1_ihr_handler(void)
 {
-        _frt_dmac_ihr_table[DMAC_IHR_INDEX_CH1]();
+        _dmac_ihr_table[DMAC_IHR_INDEX_CH1]();
 
         MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
 }
