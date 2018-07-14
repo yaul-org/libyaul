@@ -39,6 +39,21 @@ extern "C" {
 #define INTC_INTERRUPT_UNKNOWN_C                0x5E
 #define INTC_INTERRUPT_UNKNOWN_D                0x5F
 
+#define INTC_PRIORITY_VBLANK_IN         15
+#define INTC_PRIORITY_VBLANK_OUT        14
+#define INTC_PRIORITY_HBLANK_IN         13
+#define INTC_PRIORITY_TIMER_0           12
+#define INTC_PRIORITY_TIMER_1           11
+#define INTC_PRIORITY_DSP_END           10
+#define INTC_PRIORITY_SOUND_REQUEST     9
+#define INTC_PRIORITY_SYSTEM_MANAGER    8
+#define INTC_PRIORITY_PAD_INTERRUPT     8
+#define INTC_PRIORITY_LEVEL_2_DMA_END   6
+#define INTC_PRIORITY_LEVEL_1_DMA_END   6
+#define INTC_PRIORITY_LEVEL_0_DMA_END   5
+#define INTC_PRIORITY_DMA_ILLEGAL       3
+#define INTC_PRIORITY_SPRITE_END        2
+
 static inline void __attribute__ ((always_inline))
 cpu_intc_ihr_set(uint8_t vector, void (*ihr)(void))
 {
