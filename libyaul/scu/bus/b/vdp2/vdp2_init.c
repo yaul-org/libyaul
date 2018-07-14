@@ -128,17 +128,21 @@ vdp2_init(void)
         uint32_t sr_mask;
         sr_mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         uint32_t mask;
         mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_HBLANK_IN;
+
+        uint32_t scu_mask;
+        scu_mask = scu_ic_mask_get();
 
         scu_ic_mask_chg(IC_MASK_ALL, mask);
 
         scu_ic_ihr_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, &vdp2_vblank_in);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, &vdp2_vblank_out);
-        scu_ic_mask_chg(IC_MASK_ALL & ~mask, IC_MASK_NONE);
+
+        scu_ic_mask_chg(scu_mask & ~mask, IC_MASK_NONE);
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);

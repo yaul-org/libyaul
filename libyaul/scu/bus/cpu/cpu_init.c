@@ -10,10 +10,10 @@
 #include <stdio.h>
 
 #include <bios.h>
-#include <cpu/dmac.h>
 #include <cpu/frt.h>
 #include <cpu/intc.h>
 #include <cpu/map.h>
+#include <cpu/dmac.h>
 #include <cpu/registers.h>
 
 #include <internal.h>
