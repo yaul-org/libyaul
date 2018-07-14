@@ -10,11 +10,11 @@
 #include <scu-internal.h>
 
 void
-scu_dma_cpu_init(void)
+scu_dma_init(void)
 {
 
         /* Stop and disable all DMA levels */
-        scu_dma_cpu_level_stop(DMA_LEVEL_0);
-        scu_dma_cpu_level_stop(DMA_LEVEL_1);
-        scu_dma_cpu_level_stop(DMA_LEVEL_2);
+        scu_dma_level_stop(DMA_LEVEL_0);
+        scu_dma_level_stop(DMA_LEVEL_1);
+        scu_dma_level_stop(DMA_LEVEL_2);
 }

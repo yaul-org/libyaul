@@ -213,10 +213,10 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_smc_sshon_call.c \
 	scu/bus/cpu/smpc/smpc_smc_sysres_call.c \
 	\
-	scu/scu_dma_cpu_init.c \
-	scu/scu_dma_cpu_level_set.c \
-	scu/scu_dma_cpu_level_start.c \
-	scu/scu_dma_cpu_level_stop.c \
+	scu/scu_dma_init.c \
+	scu/scu_dma_level_set.c \
+	scu/scu_dma_level_start.c \
+	scu/scu_dma_level_stop.c \
 	scu/scu_dsp_init.c \
 	scu/scu_timer_0_set.c \
 	scu/scu_timer_1_mode_clear.c \
