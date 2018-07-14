@@ -23,8 +23,8 @@ SPECS:= \
 
 SUPPORT_SRCS:= \
 	common/crt0.S \
-	common/crt0-init.c \
-	common/c++-support.cxx
+	common/c++-support.cxx \
+	kernel/sys/init.c
 
 LIB_SRCS:= \
 	common/internal_exception_show.c \
@@ -45,7 +45,6 @@ LIB_SRCS+= \
 	cons/vt_parse/vt_parse.c \
 	cons/vt_parse/vt_parse_table.c \
 	\
-	kernel/sys/init.c \
 	kernel/sys/irq-mux.c \
 	\
 	kernel/lib/memb.c \

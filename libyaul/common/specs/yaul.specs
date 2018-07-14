@@ -48,7 +48,7 @@
 %(includes)
 
 *startfile:
-crt0%O%s crt0-init%O%s c++-support%O%s
+crt0%O%s init%O%s c++-support%O%s
 
 *endfile:
 
