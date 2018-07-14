@@ -149,6 +149,50 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
         }
 }
 
+int32_t
+scu_dma_level_config_validate(const struct dma_level_cfg *cfg __unused)
+{
+#ifdef DEBUG
+        if (cfg == NULL) {
+                return -1;
+        }
+
+        if (cfg->dlc_xfer == NULL) {
+                return -1;
+        }
+
+        switch (cfg->dlc_mode & 0x01) {
+        case DMA_MODE_DIRECT:
+                /* Verify transfer table entry */
+                break;
+        case DMA_MODE_INDIRECT:
+                if (cfg->dlc_xfer_count == 0) {
+                        return -1;
+                }
+
+                /* The transfer table start address must be on a power
+                 * of 2 boundary */
+                uint32_t boundary;
+                boundary = pow2(cfg->dlc_xfer_count * sizeof(struct dma_xfer)) - 1;
+
+                if (((uint32_t)cfg->dlc_xfer & boundary) != 0x00000000) {
+                        return -1;
+                }
+
+                /* Verify that the end bit is set in the last entry */
+                uint32_t last_src;
+                last_src = cfg->dlc_xfer[cfg->dlc_xfer_count - 1].src;
+                if ((last_src & 0x80000000) == 0x00000000) {
+                        return -1;
+                }
+
+                break;
+        }
+#endif /* DEBUG */
+
+        return 0;
+}
+
 void
 cpu_dma_illegal_set(void (*ihr)(void))
 {
