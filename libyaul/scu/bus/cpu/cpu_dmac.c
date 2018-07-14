@@ -110,6 +110,7 @@ cpu_dmac_channel_config_set(const struct dmac_ch_cfg *cfg)
         reg_chcr = ((cfg->dcc_src_mode & 0x03) << 12) |
                    ((cfg->dcc_dst_mode & 0x03) << 14) |
                    ((cfg->dcc_stride & 0x03) << 10) |
+                   ((cfg->dcc_bus_mode & 0x01) << 4) |
                    /* Always enable AR (auto-request mode) */
                    0x00000200;
 

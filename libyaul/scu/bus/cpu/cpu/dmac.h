@@ -39,6 +39,10 @@ struct dmac_ch_cfg {
 #define DMAC_STRIDE_16_BYTES    0x03
         uint8_t dcc_stride;
 
+#define DMAC_BUS_MODE_CYCLE_STEAL       0x00
+#define DMAC_BUS_MODE_BURST             0x01
+        uint8_t dcc_bus_mode;
+
         uint32_t dcc_src;
         uint32_t dcc_dst;
         uint32_t dcc_len;
