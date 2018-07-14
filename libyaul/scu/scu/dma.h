@@ -68,11 +68,15 @@ extern "C" {
 #define DMA_DST_STRIDE_64_BYTES    0x06
 #define DMA_DST_STRIDE_128_BYTES   0x07
 
-#define DMA_UPDATE_NONE 0x00000000
-#define DMA_UPDATE_RUP  0x00010000
-#define DMA_UPDATE_WUP  0x00000100
+#define DMA_UPDATE_NONE 0x000
+#define DMA_UPDATE_RUP  0x100
+#define DMA_UPDATE_WUP  0x001
 
-#define DMA_MODE_INDIRECT_END 0x8000000
+#define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
+        .len = (_len),                                                         \
+        .dst = (uint32_t)(_dst),                                               \
+        .src = (uint32_t)(_src)                                                \
+}
 
 struct dma_xfer {
         uint32_t len;
@@ -81,23 +85,17 @@ struct dma_xfer {
 } __packed;
 
 struct dma_level_cfg {
-        uint8_t level;
-        uint8_t mode;
+        uint8_t dlc_level;
+        uint8_t dlc_mode;
 
-        union {
-                struct dma_xfer direct;
+        struct dma_xfer *dlc_xfer;
+        uint16_t dlc_xfer_count;
 
-                struct {
-                        struct dma_indirect_entry *tbl;
-                        uint16_t nelems;
-                } indirect;
-        };
+        uint8_t dlc_stride;
+        uint8_t dlc_update;
+        uint8_t dlc_starting_factor;
 
-        uint8_t stride;
-        uint32_t update;
-        uint8_t starting_factor;
-
-        void (*ihr)(void);
+        void (*dlc_ihr)(void);
 };
 
 static inline void __attribute__ ((always_inline))
@@ -147,8 +145,8 @@ static inline void __attribute__ ((always_inline))
 scu_dma_level0_enable(void)
 {
         scu_dma_level0_wait();
-        MEMORY_WRITE_AND(32, SCU(D0EN), ~0x00000101);
-        MEMORY_WRITE_OR(32, SCU(D0EN), 0x00000100);
+
+        MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -156,8 +154,7 @@ scu_dma_level1_enable(void)
 {
         scu_dma_level1_wait();
 
-        MEMORY_WRITE_AND(32, SCU(D1EN), ~0x00000101);
-        MEMORY_WRITE_OR(32, SCU(D1EN), 0x00000100);
+        MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -165,8 +162,7 @@ scu_dma_level2_enable(void)
 {
         scu_dma_level2_wait();
 
-        MEMORY_WRITE_AND(32, SCU(D2EN), ~0x00000101);
-        MEMORY_WRITE_OR(32, SCU(D2EN), 0x00000100);
+        MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -194,7 +190,6 @@ scu_dma_level0_start(void)
 {
         scu_dma_level0_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D0MD), 0x00000007);
         MEMORY_WRITE_OR(32, SCU(D0EN), 0x00000101);
 }
 
@@ -203,7 +198,6 @@ scu_dma_level1_start(void)
 {
         scu_dma_level1_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D1MD), 0x00000007);
         MEMORY_WRITE_OR(32, SCU(D1EN), 0x00000101);
 }
 
@@ -212,7 +206,6 @@ scu_dma_level2_start(void)
 {
         scu_dma_level2_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D2MD), 0x00000007);
         MEMORY_WRITE_OR(32, SCU(D2EN), 0x00000101);
 }
 

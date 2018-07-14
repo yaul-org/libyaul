@@ -65,33 +65,41 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
         uint32_t src;
         uint32_t count;
 
-        switch (cfg->mode & 0x01) {
+        switch (cfg->dlc_mode & 0x01) {
         case DMA_MODE_DIRECT:
-                /* The absolute address must not be cached. */
-                dst = 0x20000000 | cfg->direct.dst;
-                /* The absolute address must not be cached. */
-                src = 0x20000000 | cfg->direct.src;
-                count = cfg->direct.len;
+                /* The absolute address must not be cached */
+                dst = 0x20000000 | cfg->dlc_xfer->dst;
+                /* The absolute address must not be cached */
+                src = 0x20000000 | cfg->dlc_xfer->src;
+                count = cfg->dlc_xfer->len;
                 break;
         case DMA_MODE_INDIRECT:
+                /* Transfer count cannot be ignored like in direct
+                 * mode */
+                if (cfg->dlc_xfer_count == 0) {
+                        return;
+                }
+
+                /* The absolute address must not be cached */
+                dst = 0x20000000 | (uint32_t)cfg->dlc_xfer;
                 src = 0x00000000;
-                /* The absolute address must not be cached. */
-                dst = 0x20000000 | (uint32_t)cfg->indirect.tbl;
                 count = 0x00000000;
+
+                /* Force set the transfer end bit */
+                cfg->dlc_xfer[cfg->dlc_xfer_count - 1].src |= 0x80000000;
                 break;
         }
 
+        /* Since bit 8 being unset is effective only for the CS2 space
+         * of the A bus, everything else should set it */
+
         uint32_t add;
-
-        /* Since this is effective only for the CS2 space of the A bus,
-         * everything else should set bit 8 */
-
-        add = 0x00000100 | (cfg->stride & 0x7);
+        add = 0x00000100 | (cfg->dlc_stride & 0x7);
 
         uint32_t mode;
-        mode = ((cfg->mode & 0x01) << 24) | cfg->update | cfg->starting_factor;
+        mode = ((cfg->dlc_mode & 0x01) << 24) | (cfg->dlc_update << 8) | cfg->dlc_starting_factor;
 
-        switch (cfg->level & 0x03) {
+        switch (cfg->dlc_level & 0x03) {
         case 0:
                 /* Level 0 is able to transfer 1MiB */
                 count &= 0x00100000 - 1;
@@ -133,11 +141,11 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
                 break;
         }
 
-        _dma_ihr_table[cfg->level & 0x03] = _default_ihr;
+        _dma_ihr_table[cfg->dlc_level & 0x03] = _default_ihr;
 
-        if (cfg->ihr != NULL) {
+        if (cfg->dlc_ihr != NULL) {
                 /* Set interrupt handling routine */
-                _dma_ihr_table[cfg->level & 0x03] = cfg->ihr;
+                _dma_ihr_table[cfg->dlc_level & 0x03] = cfg->dlc_ihr;
         }
 }
 
