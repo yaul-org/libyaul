@@ -132,6 +132,26 @@ scu_ic_status_get(void)
         return ist;
 }
 
+static inline const uint32_t * __attribute__ ((always_inline))
+scu_ic_priority_table_get(void)
+{
+        /* Priority table is 0x80 bytes */
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000A80;
+
+        return bios_address;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_ic_priority_table_set(uint32_t *table)
+{
+        /* Priority table is 0x80 bytes */
+        register uint32_t *bios_address;
+        bios_address = (uint32_t *)0x06000280;
+
+        ((void (*)(uint32_t *))*bios_address)(table);
+}
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
