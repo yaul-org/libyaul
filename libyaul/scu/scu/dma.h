@@ -229,7 +229,7 @@ scu_dma_level0_start(void)
 {
         scu_dma_level0_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D0EN), 0x00000101);
+        MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -237,7 +237,7 @@ scu_dma_level1_start(void)
 {
         scu_dma_level1_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D1EN), 0x00000101);
+        MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -245,7 +245,7 @@ scu_dma_level2_start(void)
 {
         scu_dma_level2_wait();
 
-        MEMORY_WRITE_OR(32, SCU(D2EN), 0x00000101);
+        MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
 }
 
 static inline void __attribute__ ((always_inline))
