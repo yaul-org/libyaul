@@ -60,6 +60,7 @@
 #define D2AD    0x004C
 #define D2EN    0x0050
 #define D2MD    0x0054
+#define DSTP    0x0060
 #define DSTA    0x007C
 #define PPAF    0x0080
 #define PPD     0x0084
