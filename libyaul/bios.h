@@ -17,16 +17,6 @@ extern "C" {
 #define CPU_CLOCK_SPEED_26MHZ   0
 #define CPU_CLOCK_SPEED_28MHZ   1
 
-static inline const uint32_t * __attribute__ ((always_inline))
-bios_int_priority_table_get(void)
-{
-        /* Priority table is 0x80 bytes */
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000A80;
-
-        return bios_address;
-}
-
 static inline void __attribute__ ((always_inline))
 bios_clock_speed_change(uint8_t mode)
 {
