@@ -17,4 +17,5 @@ extern void scsp_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SCSP_H_ */

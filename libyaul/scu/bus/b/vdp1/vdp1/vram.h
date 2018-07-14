@@ -11,10 +11,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #define VDP1_CMDT_COUNT_MAX     2048
 #define VDP1_CMDT_MEMORY_SIZE   (VDP1_CMDT_COUNT_MAX *                         \
             sizeof(struct vdp1_cmdt)) /* In bytes */
@@ -40,7 +36,4 @@ extern "C" {
 
 #define VDP1_VRAM_SIZE          0x80000 /* In bytes */
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 #endif /* !_VDP1_VRAM_H_ */

@@ -35,4 +35,5 @@ extern void smpc_smc_sysres_call(void) __noreturn;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SMPC_SMC_H_ */

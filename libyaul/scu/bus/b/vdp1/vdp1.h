@@ -21,4 +21,5 @@ extern void vdp1_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif
+
+#endif /* !_VDP1_H_ */

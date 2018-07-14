@@ -264,4 +264,5 @@ extern void vdp1_cmdt_end(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP1_CMDT_H_ */

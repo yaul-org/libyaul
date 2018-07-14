@@ -19,4 +19,5 @@ extern void cd_block_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CD_BLOCK_H_ */

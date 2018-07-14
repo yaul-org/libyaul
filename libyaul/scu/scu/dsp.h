@@ -19,4 +19,5 @@ extern void scu_dsp_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SCU_DSP_H_ */

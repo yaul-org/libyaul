@@ -125,4 +125,5 @@ extern void vdp2_vram_control_set(struct vram_ctl *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP2_VRAM_H_ */

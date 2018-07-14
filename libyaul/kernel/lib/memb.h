@@ -35,6 +35,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*
  * Statically declare a block pool.
  */
@@ -67,10 +71,6 @@ struct memb {
         void *m_bpool;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 void memb_init(struct memb *);
 void *memb_alloc(struct memb *);
 int memb_free(struct memb *, void *);
@@ -79,4 +79,5 @@ int32_t memb_size(struct memb *);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* _MEMB_H_ */

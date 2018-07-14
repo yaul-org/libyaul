@@ -370,4 +370,5 @@ extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP2_SCRN_H_ */

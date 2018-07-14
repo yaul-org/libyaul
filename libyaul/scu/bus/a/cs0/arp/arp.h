@@ -40,4 +40,5 @@ extern void arp_return(void) __noreturn;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_ARP_H_ */

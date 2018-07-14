@@ -29,4 +29,5 @@ extern void dram_cartridge_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_DRAM_CARTRIDGE_H_ */

@@ -83,4 +83,5 @@ cpu_intc_mask_set(uint8_t mask)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_CPU_INTC_H */

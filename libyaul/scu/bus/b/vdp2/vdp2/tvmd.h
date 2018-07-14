@@ -15,6 +15,10 @@
 #include <scu/map.h>
 #include <vdp2/map.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*          +-----------------+
  * VBLANK=1 | Top blanking    |
  *          +-----------------+
@@ -48,10 +52,6 @@
 #define TVMD_HORZ_NORMAL_BE     5 /* 352x480 */
 #define TVMD_HORZ_HIRESO_AE     6 /* 640x480 */
 #define TVMD_HORZ_HIRESO_BE     7 /* 704x480 */
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 static __inline bool
 vdp2_tvmd_vblank_in(void)
@@ -112,4 +112,5 @@ extern void vdp2_tvmd_display_set(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_VDP2_TVMD_H_ */

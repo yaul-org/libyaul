@@ -21,4 +21,5 @@ extern void smpc_init(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* !_SMPC_H_ */
