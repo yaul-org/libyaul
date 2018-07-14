@@ -64,6 +64,7 @@ SH_CFLAGS_shared:= \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses \
+	-save-temps=obj \
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
