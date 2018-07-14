@@ -102,7 +102,7 @@ smpc_peripheral_init(void)
         uint32_t sr_mask;
         sr_mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         /* Set both ports to "SMPC" control mode */
         MEMORY_WRITE(8, SMPC(EXLE1), 0x00);
@@ -120,14 +120,12 @@ smpc_peripheral_init(void)
         vblank_out = vdp2_tvmd_vblank_out_irq_get();
         irq_mux_handle_add(vblank_out, irq_mux_vblank_out, NULL);
 
-        uint32_t mask;
+        uint32_t scu_mask;
+        scu_mask = scu_ic_mask_get();
 
-        mask = IC_MASK_SYSTEM_MANAGER;
-        scu_ic_mask_chg(IC_MASK_ALL, mask);
-
-        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER,
-            &handler_system_manager);
-        scu_ic_ihr_set(IC_MASK_ALL & ~mask, IC_MASK_NONE);
+        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_SYSTEM_MANAGER);
+        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER, &handler_system_manager);
+        scu_ic_mask_chg(scu_mask & ~IC_MASK_SYSTEM_MANAGER, IC_MASK_NONE);
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);

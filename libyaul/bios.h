@@ -40,7 +40,7 @@ static inline uint32_t __attribute__ ((always_inline))
 bios_clock_speed_get(void)
 {
         register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000320;
+        bios_address = (uint32_t *)0x06000324;
 
         return *bios_address;
 }
