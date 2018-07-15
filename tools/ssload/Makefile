@@ -33,8 +33,14 @@ INCLUDES+= ./libftd2xx/release
 LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
 LIBS+= ftd2xx dl pthread rt
 else
-CFLAGS+= $(shell pkg-config --cflags libftdi)
-LDFLAGS+= $(shell pkg-config --libs libftdi)
+ifneq ($(strip $(HAVE_LIBFTDI1_32BIT)),)
+INCLUDES+= libftdi1-1.4/include/libftdi1 libusb-1.0/include/libusb-1.0
+LIB_DIRS+= libftdi1-1.4/lib libusb-1.0/lib
+LIBS+= ftdi1 usb-1.0
+else
+CFLAGS+= $(shell pkg-config --cflags libftdi1)
+LDFLAGS+= $(shell pkg-config --libs libftdi1)
+endif
 endif
 
 ifneq ($(strip $(DEBUG)),)
