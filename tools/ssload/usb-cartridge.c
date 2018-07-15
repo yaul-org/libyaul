@@ -190,23 +190,30 @@ error:
 #define WRITE_PAYLOAD_SIZE      (USB_PAYLOAD(USB_WRITE_PACKET_SIZE))
 
         if ((ftdi_error = ftdi_init(&ftdi_ctx)) < 0) {
-                return -1;
+                DEBUG_PRINTF("ftdi_init()\n");
+                goto error;
         }
-        if ((ftdi_error = ftdi_usb_open(&ftdi_ctx, I_VENDOR, I_PRODUCT)) < 0) {
-                return -1;
+        ftdi_error = ftdi_usb_open(&ftdi_ctx, I_VENDOR, I_PRODUCT);
+        if ((ftdi_error < 0) && (ftdi_error != -5)) {
+                DEBUG_PRINTF("ftdi_usb_open()\n");
+                goto error;
         }
         if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
+                DEBUG_PRINTF("ftdi_usb_purge_buffers()\n");
                 goto error;
         }
         if ((ftdi_error = ftdi_read_data_set_chunksize(&ftdi_ctx,
                     USB_READ_PACKET_SIZE)) < 0) {
+                DEBUG_PRINTF("ftdi_read_data_set_chunksize()\n");
                 goto error;
         }
         if ((ftdi_error = ftdi_write_data_set_chunksize(&ftdi_ctx,
                     USB_WRITE_PACKET_SIZE)) < 0) {
+                DEBUG_PRINTF("ftdi_write_data_set_chunksize()\n");
                 goto error;
         }
-        if ((ftdi_error = ftdi_set_bitmode(&ftdi_ctx, 0x0, BITMODE_RESET)) < 0) {
+        if ((ftdi_error = ftdi_set_bitmode(&ftdi_ctx, 0x00, BITMODE_RESET)) < 0) {
+                DEBUG_PRINTF("ftdi_set_bitmode()\n");
                 goto error;
         }
 
@@ -214,6 +221,8 @@ exit:
         return 0;
 
 error:
+        DEBUG_PRINTF("ftdi_error: %i\n", ftdi_error);
+
         ftdi_usb_close(&ftdi_ctx);
 
         return -1;
