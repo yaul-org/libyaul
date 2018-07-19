@@ -37,29 +37,29 @@ extern void internal_gdb_exception_illegal_instruction(void);
 extern void internal_gdb_exception_illegal_slot(void);
 extern void internal_gdb_ihr_ubc(void);
 
-#define R0      0
-#define R1      1
-#define R2      2
-#define R3      3
-#define R4      4
-#define R5      5
-#define R6      6
-#define R7      7
-#define R8      8
-#define R9      9
-#define R10     10
-#define R11     11
-#define R12     12
-#define R13     13
-#define R14     14
-#define SP      15
-#define PC      16
-#define PR      17
-#define GBR     18
-#define VBR     19
-#define MACH    20
-#define MACL    21
-#define SR      22
+#define REG_R0          0
+#define REG_R1          1
+#define REG_R2          2
+#define REG_R3          3
+#define REG_R4          4
+#define REG_R5          5
+#define REG_R6          6
+#define REG_R7          7
+#define REG_R8          8
+#define REG_R9          9
+#define REG_R10         10
+#define REG_R11         11
+#define REG_R12         12
+#define REG_R13         13
+#define REG_R14         14
+#define REG_SP          15
+#define REG_PC          16
+#define REG_PR          17
+#define REG_GBR         18
+#define REG_VBR         19
+#define REG_MACH        20
+#define REG_MACL        21
+#define REG_SR          22
 
 #define INSTRN_TRAPA(i)         (0xC300 | ((i) & 0xFF))
 
@@ -297,45 +297,45 @@ gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
 {
 
         switch (n) {
-        case R0:
-        case R1:
-        case R2:
-        case R3:
-        case R4:
-        case R5:
-        case R6:
-        case R7:
-        case R8:
-        case R9:
-        case R10:
-        case R11:
-        case R12:
-        case R13:
-        case R14:
+        case REG_R0:
+        case REG_R1:
+        case REG_R2:
+        case REG_R3:
+        case REG_R4:
+        case REG_R5:
+        case REG_R6:
+        case REG_R7:
+        case REG_R8:
+        case REG_R9:
+        case REG_R10:
+        case REG_R11:
+        case REG_R12:
+        case REG_R13:
+        case REG_R14:
                 *r = reg_file->r[n];
                 return true;
-        case SP:
+        case REG_SP:
                 *r = reg_file->sp;
                 return true;
-        case MACL:
+        case REG_MACL:
                 *r = reg_file->macl;
                 return true;
-        case MACH:
+        case REG_MACH:
                 *r = reg_file->mach;
                 return true;
-        case VBR:
+        case REG_VBR:
                 *r = reg_file->vbr;
                 return true;
-        case GBR:
+        case REG_GBR:
                 *r = reg_file->gbr;
                 return true;
-        case PR:
+        case REG_PR:
                 *r = reg_file->pr;
                 return true;
-        case PC:
+        case REG_PC:
                 *r = reg_file->pc;
                 return true;
-        case SR:
+        case REG_SR:
                 *r = reg_file->sr;
                 return true;
         default:
@@ -350,45 +350,45 @@ gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
         uint32_t *p;
 
         switch (n) {
-        case R0:
-        case R1:
-        case R2:
-        case R3:
-        case R4:
-        case R5:
-        case R6:
-        case R7:
-        case R8:
-        case R9:
-        case R10:
-        case R11:
-        case R12:
-        case R13:
-        case R14:
+        case REG_R0:
+        case REG_R1:
+        case REG_R2:
+        case REG_R3:
+        case REG_R4:
+        case REG_R5:
+        case REG_R6:
+        case REG_R7:
+        case REG_R8:
+        case REG_R9:
+        case REG_R10:
+        case REG_R11:
+        case REG_R12:
+        case REG_R13:
+        case REG_R14:
                 p = &reg_file->r[n];
                 break;
-        case SP:
+        case REG_SP:
                 p = &reg_file->sp;
                 break;
-        case MACL:
+        case REG_MACL:
                 p = &reg_file->macl;
                 break;
-        case MACH:
+        case REG_MACH:
                 p = &reg_file->mach;
                 break;
-        case VBR:
+        case REG_VBR:
                 p = &reg_file->vbr;
                 break;
-        case GBR:
+        case REG_GBR:
                 p = &reg_file->gbr;
                 break;
-        case PR:
+        case REG_PR:
                 p = &reg_file->pr;
                 break;
-        case PC:
+        case REG_PC:
                 p = &reg_file->pc;
                 break;
-        case SR:
+        case REG_SR:
                 p = &reg_file->sr;
                 break;
         default:
