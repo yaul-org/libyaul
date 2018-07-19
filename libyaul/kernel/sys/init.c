@@ -44,7 +44,7 @@ _call_global_dtors(void)
         extern void (*__DTOR_LIST__[])(void);
 
         /* Destructors in forward order */
-        uint32_t i;
+        int32_t i;
         for (i = 0; i < (int32_t)__DTOR_LIST__[0]; i++) {
                 /* Each function handles one or more destructor (within
                  * file scope) */
