@@ -44,6 +44,58 @@ cpu_cache_disable(void)
 }
 
 static inline void __attribute__ ((always_inline))
+cpu_cache_data_repl_disable(void)
+{
+        volatile uint8_t *reg_ccr;
+        reg_ccr = (uint8_t *)CPU(CCR);
+
+        uint8_t t0;
+        t0 = *reg_ccr & ~0x01;
+
+        *reg_ccr = t0 | 0x04;
+        *reg_ccr = t0 | 0x05;
+}
+
+static inline void __attribute__ ((always_inline))
+cpu_cache_data_repl_enable(void)
+{
+        volatile uint8_t *reg_ccr;
+        reg_ccr = (uint8_t *)CPU(CCR);
+
+        uint8_t t0;
+        t0 = *reg_ccr & ~0x05;
+
+        *reg_ccr = t0;
+        *reg_ccr = t0 | 0x01;
+}
+
+static inline void __attribute__ ((always_inline))
+cpu_cache_instr_repl_disable(void)
+{
+        volatile uint8_t *reg_ccr;
+        reg_ccr = (uint8_t *)CPU(CCR);
+
+        uint8_t t0;
+        t0 = *reg_ccr & ~0x01;
+
+        *reg_ccr = t0 | 0x02;
+        *reg_ccr = t0 | 0x03;
+}
+
+static inline void __attribute__ ((always_inline))
+cpu_cache_instr_repl_enable(void)
+{
+        volatile uint8_t *reg_ccr;
+        reg_ccr = (uint8_t *)CPU(CCR);
+
+        uint8_t t0;
+        t0 = *reg_ccr & ~0x03;
+
+        *reg_ccr = t0;
+        *reg_ccr = t0 | 0x01;
+}
+
+static inline void __attribute__ ((always_inline))
 cpu_cache_way_mode_set(uint8_t mode)
 {
         volatile uint8_t *reg_ccr;
