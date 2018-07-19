@@ -16,6 +16,7 @@
 #include <cpu/frt.h>
 #include <cpu/intc.h>
 #include <cpu/registers.h>
+#include <cpu/slave.h>
 #include <cpu/sync.h>
 #include <cpu/wdt.h>
 
