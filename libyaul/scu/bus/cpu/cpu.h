@@ -8,6 +8,7 @@
 #ifndef _CPU_H_
 #define _CPU_H_
 
+#include <cpu/instructions.h>
 #include <cpu/cache.h>
 #include <cpu/divu.h>
 #include <cpu/dmac.h>
@@ -21,24 +22,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-static inline void __attribute__ ((always_inline))
-cpu_clrmac(void)
-{
-        __asm__ volatile ("clrmac"
-            : /* No outputs */
-            : /* No inputs */
-            : "mach", "macl");
-}
-
-static inline void __attribute__ ((always_inline))
-cpu_nop(void)
-{
-        __asm__ volatile ("nop"
-            : /* No outputs */
-            : /* No inputs */
-        );
-}
 
 extern void cpu_init(void);
 

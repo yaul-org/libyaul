@@ -179,6 +179,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_vram_control_get.c \
 	scu/bus/b/vdp2/vdp2_vram_control_set.c \
 	\
+	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
@@ -342,6 +343,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:dmac.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:endian.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:frt.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:instructions.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:map.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:registers.h:yaul/scu/bus/cpu/cpu/ \
