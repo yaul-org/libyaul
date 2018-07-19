@@ -195,22 +195,6 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_peripheral_racing_port.c \
 	scu/bus/cpu/smpc/smpc_peripheral_raw_port.c \
 	scu/bus/cpu/smpc/smpc_rtc_settime_call.c \
-	scu/bus/cpu/smpc/smpc_smc_call.c \
-	scu/bus/cpu/smpc/smpc_smc_cdoff_call.c \
-	scu/bus/cpu/smpc/smpc_smc_cdon_call.c \
-	scu/bus/cpu/smpc/smpc_smc_ckchg320_call.c \
-	scu/bus/cpu/smpc/smpc_smc_ckchg352_call.c \
-	scu/bus/cpu/smpc/smpc_smc_intback_call.c \
-	scu/bus/cpu/smpc/smpc_smc_mshon_call.c \
-	scu/bus/cpu/smpc/smpc_smc_nmireq_call.c \
-	scu/bus/cpu/smpc/smpc_smc_resdisa_call.c \
-	scu/bus/cpu/smpc/smpc_smc_resenab_call.c \
-	scu/bus/cpu/smpc/smpc_smc_setsmem_call.c \
-	scu/bus/cpu/smpc/smpc_smc_sndoff_call.c \
-	scu/bus/cpu/smpc/smpc_smc_sndon_call.c \
-	scu/bus/cpu/smpc/smpc_smc_sshoff_call.c \
-	scu/bus/cpu/smpc/smpc_smc_sshon_call.c \
-	scu/bus/cpu/smpc/smpc_smc_sysres_call.c \
 	\
 	scu/scu_dma.c \
 	scu/scu_dsp_init.c \
