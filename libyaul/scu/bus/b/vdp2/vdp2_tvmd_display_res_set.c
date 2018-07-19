@@ -132,7 +132,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         /* If clock frequency is not set, change to the correct
          * frequency */
         if (sys_clock != clock_freq) {
-                bios_clock_speed_change(clock_freq);
+                bios_clock_speed_chg(clock_freq);
         }
 
         /* Update state */
