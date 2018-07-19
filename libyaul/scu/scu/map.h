@@ -40,6 +40,8 @@
 #define VDP2_CRAM(x)    (0x25F00000 + (x))
 #define VDP2(x)         (0x25F80000 + (x))
 #define SCU(x)          (0x25FE0000 + (x))
+#define MINIT           (0x21000000)
+#define SINIT           (0x21800000)
 
 /* SCU */
 #define D0R     0x0000
