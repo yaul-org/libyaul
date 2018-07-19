@@ -37,6 +37,12 @@ extern "C" {
 #define FRT_PAL_352_32_COUNT_1MS        0x037F
 #define FRT_PAL_352_128_COUNT_1MS       0x00E0
 
+#define FRTCS_CCLRA     0x01
+#define FRTCS_OVF       0x02
+#define FRTCS_OCFB      0x04
+#define FRTCS_OCFA      0x08
+#define FRTCS_ICF       0x80
+
 static inline void __attribute__ ((always_inline))
 cpu_frt_count_set(uint16_t count)
 {
@@ -84,11 +90,18 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 static inline uint8_t __attribute__ ((always_inline))
 cpu_frt_status_get(void)
 {
-        register uint8_t reg_ftcsr;
-        reg_ftcsr = MEMORY_READ(8, CPU(FTCSR));
-
-        return reg_ftcsr;
+        return MEMORY_READ(8, CPU(FTCSR));
 }
+
+static inline void __attribute__ ((always_inline))
+cpu_frt_control_chg(uint8_t mask)
+{
+        MEMORY_WRITE_AND(8, CPU(FTCSR), mask);
+}
+
+#define cpu_frt_ici_clear() do {                                               \
+        cpu_frt_ici_set(NULL);                                                 \
+} while (false)
 
 #define cpu_frt_oca_clear() do {                                               \
         cpu_frt_oca_set(0, NULL);                                              \
@@ -105,6 +118,7 @@ cpu_frt_status_get(void)
 extern void cpu_frt_init(uint8_t);
 extern void cpu_frt_oca_set(uint16_t, void (*)(void));
 extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
+extern void cpu_frt_ici_set(void (*)(void));
 extern void cpu_frt_ovi_set(void (*)(void));
 
 #ifdef __cplusplus

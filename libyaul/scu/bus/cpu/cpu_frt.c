@@ -43,6 +43,7 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
+        cpu_frt_ici_clear();
         cpu_frt_oca_clear();
         cpu_frt_ocb_clear();
         cpu_frt_ovi_clear();
@@ -110,51 +111,98 @@ cpu_frt_ocb_set(uint16_t count, void (*ihr)(void))
 }
 
 void
+cpu_frt_ici_set(void (*ihr)(void))
+{
+        volatile uint8_t *reg_tier;
+        reg_tier = (volatile uint8_t *)CPU(TIER);
+
+        *reg_tier &= ~0x80;
+
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
+
+        _frt_ovi_ihr = _default_ihr;
+
+        if (ihr != NULL) {
+                _frt_ovi_ihr = ihr;
+
+                *reg_tier |= 0x80;
+        }
+}
+
+void
 cpu_frt_ovi_set(void (*ihr)(void))
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x02);
+        volatile uint8_t *reg_tier;
+        reg_tier = (volatile uint8_t *)CPU(TIER);
+
+        *reg_tier &= ~0x02;
+
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        _frt_ovi_ihr = (ihr != NULL) ? ihr : _default_ihr;
+        _frt_ovi_ihr = _default_ihr;
 
-        MEMORY_WRITE_OR(8, CPU(TIER), 0x02);
+        if (ihr != NULL) {
+                _frt_ovi_ihr = ihr;
+
+                *reg_tier |= 0x02;
+        }
 }
 
 static void __attribute__ ((interrupt_handler))
 _frt_ici_handler(void)
 {
+        volatile uint8_t *reg_tier;
+        reg_tier = (volatile uint8_t *)CPU(TIER);
+
+        *reg_tier &= ~0x80;
+
+        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
+
+        _frt_ovi_ihr();
+
+        *reg_tier |= 0x80;
 }
 
 static void __attribute__ ((interrupt_handler))
 _frt_oci_handler(void)
 {
-        register uint8_t reg_ftcsr;
-        reg_ftcsr = cpu_frt_status_get();
+        volatile uint8_t *reg_tier;
+        reg_tier = (volatile uint8_t *)CPU(TIER);
+
+        volatile uint8_t *reg_ftcsr;
+        reg_ftcsr = (volatile uint8_t *)CPU(FTCSR);
+
+        uint8_t ftcsr_bits;
+        ftcsr_bits = *reg_ftcsr;
 
         /* Disable OCA or OCB interrupt (or neither), invoke the
          * callback and enable interrupt again */
 
         uint32_t ocf_bits;
-        ocf_bits = reg_ftcsr & 0x0C;
+        ocf_bits = ftcsr_bits & 0x0C;
 
-        MEMORY_WRITE_AND(8, CPU(TIER), ~ocf_bits);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~ocf_bits);
+        *reg_tier &= ~ocf_bits;
+        *reg_ftcsr = ftcsr_bits & ~0x0C;
 
         _frt_oc_ihr_table[(ocf_bits & 0x08) >> 2]();
         _frt_oc_ihr_table[(ocf_bits & 0x04) >> 2]();
 
-        MEMORY_WRITE_OR(8, CPU(TIER), ocf_bits);
+        *reg_tier |= ocf_bits;
 }
 
 static void __attribute__ ((interrupt_handler))
 _frt_ovi_handler(void)
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x02);
+        volatile uint8_t *reg_tier;
+        reg_tier = (volatile uint8_t *)CPU(TIER);
+
+        *reg_tier &= ~0x02;
+
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
         _frt_ovi_ihr();
 
-        MEMORY_WRITE_OR(8, CPU(TIER), 0x02);
+        *reg_tier |= 0x02;
 }
 
 static void
