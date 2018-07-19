@@ -17,6 +17,15 @@ extern "C" {
 #define CPU_CLOCK_SPEED_26MHZ   0
 #define CPU_CLOCK_SPEED_28MHZ   1
 
+static inline uint8_t * __attribute__ ((always_inline))
+bios_power_persistent_memory_get(void)
+{
+        uint8_t *bios_address;
+        bios_address = (uint8_t *)0x06000210;
+
+        return bios_address;
+}
+
 static inline void __attribute__ ((always_inline))
 bios_clock_speed_change(uint8_t mode)
 {
