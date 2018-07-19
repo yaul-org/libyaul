@@ -27,7 +27,7 @@ bios_power_persistent_memory_get(void)
 }
 
 static inline void __attribute__ ((always_inline))
-bios_clock_speed_change(uint8_t mode)
+bios_clock_speed_chg(uint8_t mode)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000320;
