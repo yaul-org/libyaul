@@ -16,6 +16,7 @@
 #include <cpu/slave.h>
 
 static void _slave_entry(void);
+
 static void _default_entry(void);
 
 static void (*_entry)(void) = _default_entry;
@@ -38,7 +39,7 @@ cpu_slave_entry_set(void (*entry)(void))
         _entry = (entry != NULL) ? entry : _default_entry;
 }
 
-static void
+static void __noreturn
 _slave_entry(void)
 {
         while (true) {
