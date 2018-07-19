@@ -23,15 +23,10 @@ cpu_sync_spinlock(uint8_t b)
         bios_address = (uint8_t *)0x26000B00;
 
         __asm__ volatile ("add %[b], %[bios_address]\n"
-                          ".LC%=:\n"
+                          "1:\n"
                           "\ttas.b @%[out]\n"
-                          "\tbf .LC%="
+                          "\tbf 1b"
             : [out] "=r" (bios_address)
-            /* For the operand %[bios_address] input, occupy the same
-             * location as operand %[out].
-             *
-             * A number in constraint is allowed only in an input
-             * operand and it must refer to an output operand. */
             : [bios_address] "0" (bios_address), [b] "r" (b));
 }
 
