@@ -53,10 +53,10 @@ cpu_frt_count_set(uint16_t count)
 static inline uint16_t __attribute__ ((always_inline))
 cpu_frt_count_get(void)
 {
-        register uint16_t reg_frth;
+        uint16_t reg_frth;
         reg_frth = MEMORY_READ(8, CPU(FRCH));
 
-        register uint16_t reg_frtl;
+        uint16_t reg_frtl;
         reg_frtl = MEMORY_READ(8, CPU(FRCL));
 
         return (reg_frth << 8) | reg_frtl;
@@ -65,10 +65,10 @@ cpu_frt_count_get(void)
 static inline uint16_t __attribute__ ((always_inline))
 cpu_frt_input_capture_get(void)
 {
-        register uint16_t reg_ficrh;
+        uint8_t reg_ficrh;
         reg_ficrh = MEMORY_READ(8, CPU(FICRH));
 
-        register uint16_t reg_ficrl;
+        uint8_t reg_ficrl;
         reg_ficrl = MEMORY_READ(8, CPU(FICRL));
 
         return (reg_ficrh << 8) | reg_ficrl;
@@ -79,7 +79,7 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 {
         /* Set the interrupt priority level for FRT (shared amongst all
          * FRT related interrupts */
-        register uint16_t iprb;
+        uint16_t iprb;
         iprb = MEMORY_READ(16, CPU(IPRB));
 
         iprb = (iprb & 0x00FF) | ((priority & 0x0F) << 8);
