@@ -8,10 +8,15 @@
 #ifndef _SMPC_MAP_H_
 #define _SMPC_MAP_H_
 
+#include <scu/map.h>
+
 /* Specific macros */
 #define IREG(x)         (0x20100001 + ((x) << 1))
 #define OREG(x)         (0x20100021 + ((x) << 1))
 #define SMPC(x)         (0x20100000 + (x))
+
+#define SMPC_IREGS      7
+#define SMPC_OREGS      32
 
 /* SMPC */
 #define COMREG          0x01F

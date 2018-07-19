@@ -6,6 +6,7 @@
  */
 
 #include <smpc/rtc.h>
+#include <smpc/smc.h>
 
 #include "smpc-internal.h"
 
@@ -25,7 +26,5 @@ smpc_rtc_settime_call(struct smpc_time *time)
         MEMORY_WRITE(8, IREG(5), time->minutes);
         MEMORY_WRITE(8, IREG(6), time->seconds);
 
-        smpc_smc_call(SMPC_RTC_SETTIME, SMPC_CMD_ISSUE_TYPE_C, NULL);
-
-        return MEMORY_READ(8, OREG(31));
+        return smpc_smc_call(SMPC_RTC_SETTIME);
 }
