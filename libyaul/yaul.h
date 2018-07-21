@@ -48,7 +48,6 @@
 #include <scu/bus/b/scsp/scsp.h>
 
 /* Kernel */
-#include <common/stack.h>
 #include <common/ip.h>
 
 #include <common/gdb/gdb.h>

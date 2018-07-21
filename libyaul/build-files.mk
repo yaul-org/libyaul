@@ -27,8 +27,7 @@ SUPPORT_SRCS:= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
-	common/internal_exception_show.c \
-	common/stack.c
+	common/internal_exception_show.c
 
 ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
@@ -262,7 +261,6 @@ INSTALL_HEADER_FILES+= \
 	./math/:uint32.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
-	./common/:stack.h:yaul/common/ \
 	./common/bootstrap/:ip.h:yaul/common/ \
 	./common/gdb/:gdb.h:yaul/common/gdb/
 
