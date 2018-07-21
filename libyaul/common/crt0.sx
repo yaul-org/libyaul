@@ -17,6 +17,7 @@ _start:
         mov.l .LC7, r15
         mov #0xF0, r1
         mov.l .LC0, r2
+        mov r15, r14
 
         /* Disable interrupts */
         mov.l .LC1, r3

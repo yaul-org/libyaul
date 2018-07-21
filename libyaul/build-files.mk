@@ -1,7 +1,7 @@
 # -*- mode: makefile -*-
 
 BOOTSTRAP_FILES:= \
-	common/bootstrap/ip.S \
+	common/bootstrap/ip.sx \
 	common/bootstrap/sys_aree.bin \
 	common/bootstrap/sys_arej.bin \
 	common/bootstrap/sys_aret.bin \
@@ -22,7 +22,7 @@ SPECS:= \
 	common/specs/ip.specs
 
 SUPPORT_SRCS:= \
-	common/crt0.S \
+	common/crt0.sx \
 	common/c++-support.cxx \
 	kernel/sys/init.c
 
@@ -32,7 +32,7 @@ LIB_SRCS:= \
 ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
-	common/gdb/gdb-ihr.S \
+	common/gdb/gdb-ihr.sx \
 	common/gdb/sh2-704x.c
 endif
 

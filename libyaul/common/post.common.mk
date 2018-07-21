@@ -2,16 +2,24 @@ ifeq ($(strip $(SH_PROGRAM)),)
   $(error Empty SH_PROGRAM (SH program name))
 endif
 
-ifeq ($(strip $(SH_OBJECTS)),)
-  # If both OBJECTS and OBJECTS_NO_LINK is empty
-  ifeq ($(strip $(SH_OBJECTS_NO_LINK)),)
+# Check that SH_OBJECTS doesn't include duplicates
+# Be mindful that sort remove duplicates
+SH_OBJECTS_UNIQ= $(sort $(SH_OBJECTS))
+SH_OBJECTS_NO_LINK_UNIQ= $(sort $(SH_OBJECTS))
+
+ifeq ($(strip $(SH_OBJECTS_UNIQ)),)
+  # If both SH_OBJECTS_UNIQ and SH_OBJECTS_NO_LINK_UNIQ is empty
+  ifeq ($(strip $(SH_OBJECTS_NO_LINK_UNIQ)),)
     $(error Empty SH_OBJECTS (SH object list))
   endif
 endif
 
+# Check that M68K_OBJECTS doesn't include duplicates
+M68K_OBJECTS_UNIQ= $(sort $(M68K_OBJECTS))
+
 ifneq ($(strip $(M68K_PROGRAM)),)
   ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
-    ifeq ($(strip $(M68K_OBJECTS)),)
+    ifeq ($(strip $(M68K_OBJECTS_UNIQ)),)
       $(error Empty M68K_OBJECTS (M68K object list))
     endif
   endif
@@ -29,15 +37,16 @@ ifneq ($(strip $(M68K_PROGRAM)),)
   ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
     # Check if there is a romdisk.o. If not, append to list of SH
     # objects
-    ifeq ($(strip $(filter %.romdisk.o,$(SH_OBJECTS))),)
-      SH_OBJECTS+= root.romdisk.o
+    ifeq ($(strip $(filter %.romdisk.o,$(SH_OBJECTS_UNIQ))),)
+      SH_OBJECTS_UNIQ+= root.romdisk.o
     endif
     ROMDISK_DEPS+= ./romdisk/$(M68K_PROGRAM).m68k
   endif
 endif
 
-SH_DEPS:= $(SH_OBJECTS:.o=.d)
-SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK:.o=.d)
+SH_DEPS:= $(SH_OBJECTS_UNIQ:.o=.d)
+SH_TEMPS:= $(SH_OBJECTS_UNIQ:.o=.i) $(SH_OBJECTS_UNIQ:.o=.s)
+SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
 
 all: $(SH_PROGRAM).iso
 
@@ -47,8 +56,8 @@ $(SH_PROGRAM).bin: $(SH_PROGRAM).elf
 	$(SH_OBJCOPY) -O binary $< $@
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
-$(SH_PROGRAM).elf: $(SH_OBJECTS) $(SH_OBJECTS_NO_LINK)
-	$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+$(SH_PROGRAM).elf: $(SH_OBJECTS_UNIQ) $(SH_OBJECTS_NO_LINK_UNIQ)
+	$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
 	$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
 	$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
@@ -57,8 +66,8 @@ $(SH_PROGRAM).elf: $(SH_OBJECTS) $(SH_OBJECTS_NO_LINK)
 	chmod -x $@
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
-$(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS)
-	$(M68K_LD) $(M68K_OBJECTS) $(M68K_LDFLAGS) -o $@
+$(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
+	$(M68K_LD) $(M68K_OBJECTS_UNIQ) $(M68K_LDFLAGS) -o $@
 	$(M68K_NM) $(M68K_PROGRAM).m68k.elf > $(M68K_PROGRAM).m68k.sym
 
 ./romdisk:
@@ -86,10 +95,10 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS)
 %.o: %.cxx
 	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
-%.o: %.S
+%.o: %.sx
 	$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
-%.m68k.o: %.m68k.S
+%.m68k.o: %.m68k.sx
 	$(M68K_AS) $(M68K_AFLAGS) -o $@ $<
 
 $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
@@ -102,7 +111,7 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
-IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.S
+IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	$(eval $@_TMP_FILE:= $(shell mktemp))
 	cat $< | awk ' \
 	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
@@ -146,14 +155,14 @@ clean:
 	-rm -f \
 		$(SH_PROGRAM).bin \
 		$(SH_PROGRAM).iso \
-		$(SH_OBJECTS) \
-		$(SH_DEPS) \
+		$(SH_OBJECTS_UNIQ) \
+		$(SH_TEMPS) \
 		$(SH_PROGRAM).asm \
 		$(SH_PROGRAM).bin \
 		$(SH_PROGRAM).elf \
 		$(SH_PROGRAM).map \
 		$(SH_PROGRAM).sym \
-		$(SH_OBJECTS_NO_LINK) \
+		$(SH_OBJECTS_NO_LINK_UNIQ) \
 		$(SH_DEPS_NO_LINK) \
 		IP.BIN \
 		IP.BIN.map

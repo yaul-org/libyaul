@@ -4,13 +4,13 @@ SUB_BUILD:=$(BUILD)/lib$(TARGET)
 
 LIB_FILE_base:= $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
 
-LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(LIB_SRCS)))
+LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.sx,%.o,$(LIB_SRCS)))
 LIB_DEPS:= $(LIB_OBJS:.o=.d)
 
 LIB_OBJS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
 LIB_DEPS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
 
-SUPPORT_OBJS:= $(patsubst %.c,%.o,$(patsubst %.cxx,%.o,$(patsubst %.S,%.o,$(SUPPORT_SRCS))))
+SUPPORT_OBJS:= $(patsubst %.c,%.o,$(patsubst %.cxx,%.o,$(patsubst %.sx,%.o,$(SUPPORT_SRCS))))
 SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 
 SUPPORT_OBJS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS))
@@ -32,7 +32,7 @@ endef
 
 .PHONY: all $(TYPE) install-$(TYPE)
 
-.SUFFIXES:= .c .cxx .S .o .x
+.SUFFIXES:= .c .cxx .sx .o .x
 
 all: $(TYPE)
 
@@ -50,7 +50,7 @@ $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
 $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 	$(call macro-sh-build-c++-object,$(TYPE))
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.S
+$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
 
 $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
