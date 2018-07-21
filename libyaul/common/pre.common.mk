@@ -55,7 +55,7 @@ SH_LXXFLAGS= $(SH_LDFLAGS)
 M68K_AFLAGS= --fatal-warnings
 M68K_LDFLAGS=
 
-SUFFIXES:= .c .cc .C .cpp .cxx .m68k.s .m68k.S .s .S .o .m68k .bin .elf .romdisk .romdisk.o
+SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: all clean example list-targets
 
