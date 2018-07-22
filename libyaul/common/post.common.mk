@@ -1,3 +1,5 @@
+.PHONY: $(SH_PROGRAM)
+
 ifeq ($(strip $(SH_PROGRAM)),)
   $(error Empty SH_PROGRAM (SH program name))
 endif
@@ -47,6 +49,8 @@ endif
 SH_DEPS:= $(SH_OBJECTS_UNIQ:.o=.d)
 SH_TEMPS:= $(SH_OBJECTS_UNIQ:.o=.i) $(SH_OBJECTS_UNIQ:.o=.s)
 SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
+
+$(SH_PROGRAM): $(SH_PROGRAM).iso
 
 all: $(SH_PROGRAM).iso
 
