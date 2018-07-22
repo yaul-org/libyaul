@@ -11,16 +11,16 @@
 #include "usb-cartridge-internal.h"
 
 uint32_t
-usb_cartridge_read_long(void)
+usb_cartridge_long_read(void)
 {
         uint32_t b;
 
         b = 0;
 
-        b |= (usb_cartridge_read_byte()) << 24;
-        b |= (usb_cartridge_read_byte()) << 16;
-        b |= (usb_cartridge_read_byte()) << 8;
-        b |= (usb_cartridge_read_byte());
+        b |= (usb_cartridge_byte_read()) << 24;
+        b |= (usb_cartridge_byte_read()) << 16;
+        b |= (usb_cartridge_byte_read()) << 8;
+        b |= (usb_cartridge_byte_read());
 
         return b;
 }

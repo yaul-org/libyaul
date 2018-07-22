@@ -17,12 +17,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-extern uint32_t usb_cartridge_read_long(void);
-extern uint8_t usb_cartridge_read_byte(void);
-extern uint8_t usb_cartridge_xchg_byte(uint8_t);
+extern uint32_t usb_cartridge_long_read(void);
+extern uint8_t usb_cartridge_byte_read(void);
+extern uint8_t usb_cartridge_byte_xchg(uint8_t);
+extern void usb_cartridge_byte_send(uint8_t);
 extern void usb_cartridge_init(void);
-extern void usb_cartridge_send_byte(uint8_t);
-extern void usb_cartridge_send_long(uint32_t);
+extern void usb_cartridge_long_send(uint32_t);
 
 #ifdef __cplusplus
 }

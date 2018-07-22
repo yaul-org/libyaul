@@ -104,12 +104,12 @@ LIB_SRCS+= \
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_read.c \
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_send.c \
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_xchg.c \
 	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_byte.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_read_long.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_byte.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_send_long.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_xchg_byte.c
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_read.c \
+	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_send.c
 endif
 
 LIB_SRCS+= \

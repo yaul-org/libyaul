@@ -13,7 +13,7 @@
 #define USB_RXF         0x01
 
 uint8_t
-usb_cartridge_read_byte(void)
+usb_cartridge_byte_read(void)
 {
         uint8_t b;
 
