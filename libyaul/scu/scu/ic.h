@@ -109,7 +109,7 @@ static inline void __attribute__ ((always_inline))
 scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
 {
         register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000340;
+        bios_address = (uint32_t *)0x06000344;
 
         ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
