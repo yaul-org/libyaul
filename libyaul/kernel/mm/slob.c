@@ -9,7 +9,7 @@
 #include <sys/cdefs.h>
 #include <sys/queue.h>
 
-#include <lib/memb.h>
+#include <mm/memb.h>
 
 #include <assert.h>
 #include <string.h>

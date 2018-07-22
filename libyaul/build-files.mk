@@ -46,8 +46,7 @@ LIB_SRCS+= \
 	\
 	kernel/sys/irq-mux.c \
 	\
-	kernel/lib/memb.c \
-	\
+	kernel/mm/memb.c \
 	kernel/mm/slob.c \
 	\
 	lib/ctype/ctype.c \
@@ -268,7 +267,7 @@ INSTALL_HEADER_FILES+= \
 	./kernel/cons/:cons.h:yaul/cons/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/lib/:memb.h:yaul/lib/
+	./kernel/mm/:memb.h:yaul/mm/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:irq-mux.h:yaul/sys/
