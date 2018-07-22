@@ -10,11 +10,81 @@
 
 #include <stdint.h>
 
+#include <scu/map.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
+#define DSP_RAM_PAGE_0  0x00
+#define DSP_RAM_PAGE_1  0x01
+#define DSP_RAM_PAGE_2  0x02
+#define DSP_RAM_PAGE_3  0x03
+
+#define DSP_PROGRAM_SIZE        0x1000
+#define DSP_PROGRAM_WORD_COUNT  (DSP_PROGRAM_SIZE / 4)
+
+#define DSP_RAM_PAGE_SIZE       0x0100
+#define DSP_RAM_PAGE_WORD_COUNT (DSP_RAM_PAGE_SIZE / 4)
+
+static inline void __attribute__ ((always_inline))
+scu_dsp_program_start(void)
+{
+        volatile uint32_t *reg_ppaf;
+        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
+
+        *reg_ppaf &= ~0x00020000;
+        *reg_ppaf |= 0x04010000;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dsp_program_stop(void)
+{
+        volatile uint32_t *reg_ppaf;
+        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
+
+        *reg_ppaf &= ~0x00030000;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dsp_program_step(void)
+{
+        volatile uint32_t *reg_ppaf;
+        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
+
+        *reg_ppaf &= ~0x00010000;
+        *reg_ppaf |= 0x00020000;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dsp_program_pause(bool pause)
+{
+        volatile uint32_t *reg_ppaf;
+        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
+
+        if (pause) {
+                *reg_ppaf |= 0x02000000;
+        } else {
+                *reg_ppaf |= 0x04000000;
+        }
+}
+
+static inline uint8_t __attribute__ ((always_inline))
+scu_dsp_program_counter_get(void)
+{
+        return MEMORY_READ(32, SCU(PPAF)) & 0x0000007F;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dsp_program_end_wait(void)
+{
+        while ((MEMORY_READ(32, SCU(PPAF)) & 0x00040000) == 0x00000000);
+}
+
 extern void scu_dsp_init(void);
+extern void scu_dsp_program_load(uint8_t, const void *, uint32_t);
+extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
+extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
 
 #ifdef __cplusplus
 }
