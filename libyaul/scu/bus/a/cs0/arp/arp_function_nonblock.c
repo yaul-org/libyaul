@@ -44,7 +44,7 @@ arp_function_nonblock(void)
         }
 
         uint32_t command;
-        command = arp_xchg_byte(0x00) & 0x0F;
+        command = arp_byte_xchg(0x00) & 0x0F;
 
         _arp_function_table[command]();
 }
@@ -65,19 +65,19 @@ _arp_function_01(void)
         uint8_t checksum;
 
         /* Send some bogus value? */
-        arp_send_long(0x00000000);
+        arp_long_send(0x00000000);
 
         len = 0;
         while (true) {
                 /* Read address */
-                address = arp_read_long();
+                address = arp_long_read();
                 /* Read length */
-                len = arp_read_long();
+                len = arp_long_read();
                 /* Check if we're done with transfer */
                 if (len == 0) {
                         /* ACK */
-                        arp_xchg_byte('O');
-                        arp_xchg_byte('K');
+                        arp_byte_xchg('O');
+                        arp_byte_xchg('K');
 
                         /* Call ARP user callback */
                         USER_VECTOR_CALL(32);
@@ -95,13 +95,13 @@ _arp_function_01(void)
                 checksum = 0;
                 for (; len > 0; len--, address++) {
                         b = MEMORY_READ(8, address);
-                        arp_xchg_byte(b);
+                        arp_byte_xchg(b);
 
                         /* Checksum allow overflow */
                         checksum += b;
                 }
 
-                arp_xchg_byte(checksum);
+                arp_byte_xchg(checksum);
         }
 }
 
@@ -116,12 +116,12 @@ _arp_function_09(void)
         bool exec;
 
         /* Read addr */
-        addr = arp_read_long();
+        addr = arp_long_read();
         this_addr = addr;
         /* Read length */
-        len = arp_read_long();
+        len = arp_long_read();
         /* Execute? */
-        b = arp_xchg_byte(0x00);
+        b = arp_byte_xchg(0x00);
         exec = (b == 0x01);
 
         /* Set for ARP callback */
@@ -135,7 +135,7 @@ _arp_function_09(void)
         /* XXX
          * Blocking */
         for (; len > 0; len--, addr++) {
-                b = arp_xchg_byte(b);
+                b = arp_byte_xchg(b);
                 /* Write to memory */
                 MEMORY_WRITE(8, addr, b);
         }

@@ -10,7 +10,7 @@
 #include "arp-internal.h"
 
 uint8_t
-arp_xchg_byte(uint8_t c)
+arp_byte_xchg(uint8_t c)
 {
         uint8_t b;
 

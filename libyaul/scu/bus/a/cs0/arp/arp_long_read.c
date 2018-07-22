@@ -10,15 +10,15 @@
 #include "arp-internal.h"
 
 uint32_t
-arp_read_long(void)
+arp_long_read(void)
 {
         uint32_t b;
 
         b = 0;
-        b |= (arp_xchg_byte(0x00)) << 24;
-        b |= (arp_xchg_byte(0x00)) << 16;
-        b |= (arp_xchg_byte(0x00)) << 8;
-        b |= (arp_xchg_byte(0x00));
+        b |= (arp_byte_xchg(0x00)) << 24;
+        b |= (arp_byte_xchg(0x00)) << 16;
+        b |= (arp_byte_xchg(0x00)) << 8;
+        b |= (arp_byte_xchg(0x00));
 
         return b;
 }

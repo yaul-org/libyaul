@@ -21,12 +21,12 @@ arp_sync_nonblock(void)
         }
 
         /* Send 'D' back iff we receive an 'I' */
-        if ((b = arp_xchg_byte('D')) != 'I') {
+        if ((b = arp_byte_xchg('D')) != 'I') {
                 return false;
         }
 
         /* Send 'O' back iff we receive an 'N' */
-        if ((b = arp_xchg_byte('O')) != 'N') {
+        if ((b = arp_byte_xchg('O')) != 'N') {
                 return false;
         }
 

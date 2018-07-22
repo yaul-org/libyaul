@@ -20,7 +20,7 @@ static void (*arp_cb)(arp_callback_t *) = NULL;
 static void arp_trampoline(void);
 
 void
-arp_function_callback(void (*cb)(arp_callback_t *))
+arp_function_callback_set(void (*cb)(arp_callback_t *))
 {
         /* Disable interrupts */
         uint32_t sr_mask;
