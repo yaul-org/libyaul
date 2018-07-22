@@ -17,6 +17,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 static inline void __attribute__ ((always_inline))
+cpu_instr_trapa(const uint8_t vector)
+{
+        __asm__ volatile ("trapa %[n]"
+            : /* No outputs */
+            : [n] "n" (vector));
+}
+
+static inline void __attribute__ ((always_inline))
 cpu_instr_clrmac(void)
 {
         __asm__ volatile ("clrmac"

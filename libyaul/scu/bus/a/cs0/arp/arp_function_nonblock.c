@@ -5,10 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <arp.h>
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <arp.h>
+
+#include <cpu/instructions.h>
 
 #include "arp-internal.h"
 
@@ -80,7 +82,7 @@ _arp_function_01(void)
                         arp_byte_xchg('K');
 
                         /* Call ARP user callback */
-                        USER_VECTOR_CALL(32);
+                        cpu_instr_trapa(32);
                         return;
                 }
 
@@ -144,6 +146,6 @@ _arp_function_09(void)
          * chunk of data which just happens to be the start address */
         if ((uint32_t)arp_callback.ptr == this_addr) {
                 /* Call ARP user callback */
-                USER_VECTOR_CALL(32);
+                cpu_instr_trapa(32);
         }
 }
