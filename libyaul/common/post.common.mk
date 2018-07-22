@@ -105,20 +105,20 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	mkdir -p $(IMAGE_DIRECTORY)
 	cp $(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
 	for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
-	    if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
-	        printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
-	    fi \
-	done
+            if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
+                printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
+            fi \
+        done
 	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
 IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	$(eval $@_TMP_FILE:= $(shell mktemp))
 	cat $< | awk ' \
-	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
-	/\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
-	/\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
-	/\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
-	/\.ascii \"\$$TITLE\"/ { \
+        /\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
+        /\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
+        /\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
+        /\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
+        /\.ascii \"\$$TITLE\"/ { \
             L = 7; \
             # Truncate to 112 characters \
             s = "$(IP_TITLE)"; \
@@ -141,44 +141,44 @@ IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
             } \
             next; \
         } \
-	/\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
-	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
-	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
-	{ print; } \
-	' | $(SH_AS) $(SH_AFLAGS) \
-		-I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
+        /\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
+        /\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
+        /\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
+        { print; } \
+        ' | $(SH_AS) $(SH_AFLAGS) \
+        -I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
-	-specs=ip.specs $($@_TMP_FILE) -o $@
+        -specs=ip.specs $($@_TMP_FILE) -o $@
 	$(RM) $($@_TMP_FILE)
 
 clean:
 	-rm -f \
-		$(SH_PROGRAM).bin \
-		$(SH_PROGRAM).iso \
-		$(SH_OBJECTS_UNIQ) \
-		$(SH_TEMPS) \
-		$(SH_PROGRAM).asm \
-		$(SH_PROGRAM).bin \
-		$(SH_PROGRAM).elf \
-		$(SH_PROGRAM).map \
-		$(SH_PROGRAM).sym \
-		$(SH_OBJECTS_NO_LINK_UNIQ) \
-		$(SH_DEPS_NO_LINK) \
-		IP.BIN \
-		IP.BIN.map
+            $(SH_PROGRAM).bin \
+            $(SH_PROGRAM).iso \
+            $(SH_OBJECTS_UNIQ) \
+            $(SH_TEMPS) \
+            $(SH_PROGRAM).asm \
+            $(SH_PROGRAM).bin \
+            $(SH_PROGRAM).elf \
+            $(SH_PROGRAM).map \
+            $(SH_PROGRAM).sym \
+            $(SH_OBJECTS_NO_LINK_UNIQ) \
+            $(SH_DEPS_NO_LINK) \
+            IP.BIN \
+            IP.BIN.map
 ifneq ($(strip $(M68K_PROGRAM)),)
 	-rm -f \
-	        romdisk/$(M68K_PROGRAM).m68k \
-	        $(M68K_PROGRAM).m68k.elf \
-	        $(M68K_PROGRAM).m68k.sym \
-	        $(M68K_OBJECTS)
+            romdisk/$(M68K_PROGRAM).m68k \
+            $(M68K_PROGRAM).m68k.elf \
+            $(M68K_PROGRAM).m68k.sym \
+            $(M68K_OBJECTS)
 endif
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
-	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
-	sort | \
-	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
+        awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
+        sort | \
+        grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 -include $(SH_DEPS)
 -include $(SH_DEPS_NO_LINK)
