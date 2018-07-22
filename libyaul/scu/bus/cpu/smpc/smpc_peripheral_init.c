@@ -16,10 +16,9 @@
 #include <smpc/smc.h>
 #include <vdp2.h>
 
+#include <mm/memb.h>
+
 #include <sys/irq-mux.h>
-
-#include <lib/memb.h>
-
 #include <sys/queue.h>
 
 #include "smpc-internal.h"

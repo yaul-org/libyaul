@@ -56,7 +56,7 @@
 
 #include <math.h>
 
-#include <lib/memb.h>
+#include <mm/memb.h>
 
 #include <sys/init.h>
 #include <sys/irq-mux.h>
