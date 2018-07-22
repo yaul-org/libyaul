@@ -53,67 +53,81 @@ all: $(SH_PROGRAM).iso
 example: all
 
 $(SH_PROGRAM).bin: $(SH_PROGRAM).elf
-	$(SH_OBJCOPY) -O binary $< $@
-	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_OBJCOPY) -O binary $< $@
+	@du -hs $@ | awk '{ print $$1 }'
 
 $(SH_PROGRAM).elf: $(SH_OBJECTS_UNIQ) $(SH_OBJECTS_NO_LINK_UNIQ)
-	$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
-	$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
-	$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(ECHO)$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
+	$(ECHO)$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
 ./romdisk/$(M68K_PROGRAM).m68k: $(M68K_PROGRAM).m68k.elf
-	$(M68K_OBJCOPY) -O binary $< $@
-	chmod -x $@
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(M68K_OBJCOPY) -O binary $< $@
+	$(ECHO)chmod -x $@
 	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
 
 $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
-	$(M68K_LD) $(M68K_OBJECTS_UNIQ) $(M68K_LDFLAGS) -o $@
-	$(M68K_NM) $(M68K_PROGRAM).m68k.elf > $(M68K_PROGRAM).m68k.sym
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(M68K_LD) $(M68K_OBJECTS_UNIQ) $(M68K_LDFLAGS) -o $@
+	$(ECHO)$(M68K_NM) $(M68K_PROGRAM).m68k.elf > $(M68K_PROGRAM).m68k.sym
 
 ./romdisk:
-	mkdir -p $@
+	$(ECHO)mkdir -p $@
 
 %.romdisk: ./romdisk $(ROMDISK_DEPS)
-	$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
-	$(INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
-	$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
+	$(ECHO)$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
-	$(SH_CC) $(SH_CFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_CC) $(SH_CFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cc
-	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.C
-	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cpp
-	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cxx
-	$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.sx
-	$(SH_AS) $(SH_AFLAGS) -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
 %.m68k.o: %.m68k.sx
-	$(M68K_AS) $(M68K_AFLAGS) -o $@ $<
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(M68K_AS) $(M68K_AFLAGS) -o $@ $<
 
 $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -type f)
-	mkdir -p $(IMAGE_DIRECTORY)
-	cp $(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
-	for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)mkdir -p $(IMAGE_DIRECTORY)
+	$(ECHO)cp $(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
+	$(ECHO)for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
             if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
                 printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
             fi \
         done
-	$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
+	$(ECHO)$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
 IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
-	$(eval $@_TMP_FILE:= $(shell mktemp))
-	cat $< | awk ' \
+	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
+	$(ECHO)cat $< | awk ' \
         /\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
         /\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
         /\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
@@ -147,12 +161,13 @@ IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
         { print; } \
         ' | $(SH_AS) $(SH_AFLAGS) \
         -I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
-	$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
+	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
         -specs=ip.specs $($@_TMP_FILE) -o $@
-	$(RM) $($@_TMP_FILE)
+	$(ECHO)$(RM) $($@_TMP_FILE)
 
 clean:
-	-rm -f \
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
+	$(ECHO)-rm -f \
             $(SH_PROGRAM).bin \
             $(SH_PROGRAM).iso \
             $(SH_OBJECTS_UNIQ) \
@@ -167,7 +182,8 @@ clean:
             IP.BIN \
             IP.BIN.map
 ifneq ($(strip $(M68K_PROGRAM)),)
-	-rm -f \
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
+	$(ECHO)-rm -f \
             romdisk/$(M68K_PROGRAM).m68k \
             $(M68K_PROGRAM).m68k.elf \
             $(M68K_PROGRAM).m68k.sym \

@@ -7,6 +7,36 @@ ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
   $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
 endif
 
+ifeq ($(strip $(SILENT)),)
+  ECHO=
+else
+  ECHO=@
+endif
+export ECHO
+
+ifeq ($(strip $(NOCOLOR)),)
+  V_BEGIN_BLACK= [1;30m
+  V_BEGIN_RED= [1;31m
+  V_BEGIN_GREEN= [1;32m
+  V_BEGIN_YELLOW= [1;33m
+  V_BEGIN_BLUE= [1;34m
+  V_BEGIN_MAGENTA= [1;35m
+  V_BEGIN_CYAN= [1;36m
+  V_BEGIN_WHITE= [1;37m
+  V_END= [m
+else
+  V_BEGIN_BLACK=
+  V_BEGIN_RED=
+  V_BEGIN_GREEN=
+  V_BEGIN_YELLOW=
+  V_BEGIN_BLUE=
+  V_BEGIN_MAGENTA=
+  V_BEGIN_CYAN=
+  V_BEGIN_WHITE=
+  V_END=
+endif
+export V_BEGIN_YELLOW
+
 # Customizable (must be overwritten in user's Makefile)
 SH_PROGRAM?= unknown-program
 SH_OBJECTS?=
