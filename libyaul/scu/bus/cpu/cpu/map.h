@@ -40,6 +40,7 @@
 #define DRCR1           0x0E72
 #define WTCSRW          0x0E80
 #define WTCSRR          0x0E80
+#define WTCNTW          0x0E80
 #define WTCNTR          0x0E81
 #define RSTCSRW         0x0E82
 #define RSTCSRR         0x0E83

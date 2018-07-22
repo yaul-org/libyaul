@@ -183,6 +183,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/cpu_init.c \
 	scu/bus/cpu/cpu_slave.c \
 	scu/bus/cpu/cpu_ubc_init.c \
+	scu/bus/cpu/cpu_wdt.c \
 	\
 	scu/bus/cpu/smpc/smpc_init.c \
 	scu/bus/cpu/smpc/smpc_peripheral_analog_port.c \
