@@ -33,7 +33,7 @@ arp_function_callback_set(void (*cb)(arp_callback_t *))
 
         assert(cb != NULL);
         arp_cb = cb;
-        cpu_intc_ihr_set(USER_VECTOR(32), arp_trampoline);
+        cpu_intc_ihr_set(32, arp_trampoline);
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);
