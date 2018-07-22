@@ -10,12 +10,12 @@
 #include "usb-cartridge-internal.h"
 
 uint8_t
-usb_cartridge_xchg_byte(uint8_t c)
+usb_cartridge_byte_xchg(uint8_t c)
 {
         uint8_t b;
 
-        b = usb_cartridge_read_byte();
-        usb_cartridge_send_byte(c);
+        b = usb_cartridge_byte_read();
+        usb_cartridge_byte_send(c);
 
         return b;
 }

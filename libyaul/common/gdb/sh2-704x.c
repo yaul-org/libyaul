@@ -583,7 +583,7 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        return usb_cartridge_read_byte();
+        return usb_cartridge_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_read_byte();
 #endif /* HAVE_DEV_CARTRIDGE */
@@ -593,7 +593,7 @@ static void
 _device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cartridge_send_byte(value);
+        usb_cartridge_byte_send(value);
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_xchg_byte(value);
 #endif /* HAVE_DEV_CARTRIDGE */
