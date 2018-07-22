@@ -24,6 +24,30 @@ cpu_instr_trapa(const uint8_t vector)
             : [n] "n" (vector));
 }
 
+static inline uint32_t __attribute__ ((always_inline))
+cpu_instr_swapb(uint32_t x)
+{
+        register uint32_t out;
+
+        __asm__ volatile ("swap.b %[in], %[out]\n"
+                : [out] "=&r" (out)
+                : [in] "r" (x));
+
+        return out;
+}
+
+static inline uint32_t __attribute__ ((always_inline))
+cpu_instr_swapw(uint32_t x)
+{
+        register uint32_t out;
+
+        __asm__ volatile ("swap.w %[in], %[out]\n"
+                : [out] "=&r" (out)
+                : [in] "r" (x));
+
+        return out;
+}
+
 static inline void __attribute__ ((always_inline))
 cpu_instr_clrmac(void)
 {
