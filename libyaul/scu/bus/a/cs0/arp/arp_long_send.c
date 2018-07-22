@@ -10,11 +10,11 @@
 #include "arp-internal.h"
 
 void
-arp_send_long(uint32_t w)
+arp_long_send(uint32_t w)
 {
 
-        arp_xchg_byte((w >> 24));
-        arp_xchg_byte((w >> 16));
-        arp_xchg_byte((w >> 8));
-        arp_xchg_byte((w & 0xFF));
+        arp_byte_xchg(w >> 24);
+        arp_byte_xchg(w >> 16);
+        arp_byte_xchg(w >> 8);
+        arp_byte_xchg(w & 0xFF);
 }

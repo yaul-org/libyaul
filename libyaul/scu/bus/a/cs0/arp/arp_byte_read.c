@@ -10,7 +10,7 @@
 #include "arp-internal.h"
 
 uint8_t
-arp_read_byte(void)
+arp_byte_read(void)
 {
         uint8_t b;
 

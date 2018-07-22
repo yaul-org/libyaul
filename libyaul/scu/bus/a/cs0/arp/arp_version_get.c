@@ -15,7 +15,7 @@
 #include "arp-internal.h"
 
 char *
-arp_version(void)
+arp_version_get(void)
 {
         const char *arp_ver;
         char *buf;

@@ -27,14 +27,14 @@ typedef struct {
 
 extern bool arp_busy_status(void);
 extern bool arp_sync_nonblock(void);
-extern char *arp_version(void);
-extern uint32_t arp_read_long(void);
-extern uint8_t arp_read_byte(void);
-extern uint8_t arp_xchg_byte(uint8_t);
-extern void arp_function_callback(void (*)(arp_callback_t *));
+extern char *arp_version_get(void);
+extern uint32_t arp_long_read(void);
+extern uint8_t arp_byte_read(void);
+extern uint8_t arp_byte_xchg(uint8_t);
+extern void arp_function_callback_set(void (*)(arp_callback_t *));
 extern void arp_function_nonblock(void);
 extern void arp_return(void) __noreturn;
-extern void arp_send_long(uint32_t);
+extern void arp_long_send(uint32_t);
 extern void arp_sync(void);
 
 #ifdef __cplusplus

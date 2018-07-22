@@ -84,16 +84,16 @@ LIB_SRCS+= \
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp_busy_status.c \
-	scu/bus/a/cs0/arp/arp_function_callback.c \
+	scu/bus/a/cs0/arp/arp_byte_read.c \
+	scu/bus/a/cs0/arp/arp_byte_xchg.c \
+	scu/bus/a/cs0/arp/arp_function_callback_set.c \
 	scu/bus/a/cs0/arp/arp_function_nonblock.c \
-	scu/bus/a/cs0/arp/arp_read_byte.c \
-	scu/bus/a/cs0/arp/arp_read_long.c \
+	scu/bus/a/cs0/arp/arp_long_read.c \
+	scu/bus/a/cs0/arp/arp_long_send.c \
 	scu/bus/a/cs0/arp/arp_return.c \
-	scu/bus/a/cs0/arp/arp_send_long.c \
 	scu/bus/a/cs0/arp/arp_sync.c \
 	scu/bus/a/cs0/arp/arp_sync_nonblock.c \
-	scu/bus/a/cs0/arp/arp_version.c \
-	scu/bus/a/cs0/arp/arp_xchg_byte.c
+	scu/bus/a/cs0/arp/arp_version_get.c
 endif
 
 LIB_SRCS+= \
