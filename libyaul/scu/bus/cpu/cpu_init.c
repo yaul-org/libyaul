@@ -18,6 +18,7 @@
 #include <cpu/map.h>
 #include <cpu/registers.h>
 #include <cpu/slave.h>
+#include <cpu/wdt.h>
 
 #include <internal.h>
 
