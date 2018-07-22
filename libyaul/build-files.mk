@@ -37,12 +37,12 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
-	cons/cons.c \
-	cons/drivers/vdp1.c \
-	cons/drivers/vdp2.c \
-	cons/font/font.c \
-	cons/vt_parse/vt_parse.c \
-	cons/vt_parse/vt_parse_table.c \
+	kernel/cons/cons.c \
+	kernel/cons/drivers/vdp1.c \
+	kernel/cons/drivers/vdp2.c \
+	kernel/cons/font/font.c \
+	kernel/cons/vt_parse/vt_parse.c \
+	kernel/cons/vt_parse/vt_parse_table.c \
 	\
 	kernel/sys/irq-mux.c \
 	\
@@ -209,9 +209,9 @@ INCLUDE_DIRS:= \
 	. \
 	common \
 	common/gdb \
-	cons \
 	lib/lib \
 	kernel \
+	kernel/cons \
 	kernel/vfs \
 	math \
 	scu \
@@ -265,7 +265,7 @@ INSTALL_HEADER_FILES+= \
 	./common/gdb/:gdb.h:yaul/common/gdb/
 
 INSTALL_HEADER_FILES+= \
-	./cons/:cons.h:yaul/cons/
+	./kernel/cons/:cons.h:yaul/cons/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/lib/:memb.h:yaul/lib/
