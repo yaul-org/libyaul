@@ -16,23 +16,36 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define CPU_MASTER      0
+#define CPU_SLAVE       1
+
 static inline void __attribute__ ((always_inline))
-cpu_slave_notify(void)
+cpu_slave_notify(uint8_t cpu)
 {
-        MEMORY_WRITE(16, MINIT, 0xFFFF);
+        volatile uint16_t *reg_init;
+        reg_init = (volatile uint16_t *)(((cpu & 0x01) == CPU_MASTER)
+            ? SINIT
+            : MINIT);
+
+        *reg_init = 0xFFFF;
 }
 
 static inline void __attribute__ ((always_inline))
-cpu_slave_master_notify(void)
+cpu_slave_notification_wait(void)
 {
-        MEMORY_WRITE(16, SINIT, 0xFFFF);
+        volatile uint8_t *reg_ftcsr;
+        reg_ftcsr = (volatile uint8_t *)CPU(FTCSR);
+
+        while ((*reg_ftcsr & 0x80) == 0x00);
+
+        *reg_ftcsr &= ~0x80;
 }
 
 extern void cpu_slave_init(void);
-extern void cpu_slave_entry_set(void (*entry)(void));
+extern void cpu_slave_entry_set(uint8_t, void (*)(void));
 
-#define cpu_slave_entry_clear() do {                                           \
-        cpu_slave_entry_set(NULL);                                             \
+#define cpu_slave_entry_clear(cpu) do {                                        \
+        cpu_slave_entry_set(cpu, NULL);                                        \
 } while (false)
 
 #ifdef __cplusplus

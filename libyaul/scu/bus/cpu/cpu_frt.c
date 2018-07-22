@@ -13,7 +13,6 @@
 #include <cpu/map.h>
 #include <cpu/frt.h>
 
-static void _frt_ici_handler(void);
 static void _frt_oci_handler(void);
 static void _frt_ovi_handler(void);
 
@@ -43,12 +42,10 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
-        cpu_frt_ici_clear();
         cpu_frt_oca_clear();
         cpu_frt_ocb_clear();
         cpu_frt_ovi_clear();
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_FRT_ICI, _frt_ici_handler);
         cpu_intc_ihr_set(INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
         cpu_intc_ihr_set(INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
 
@@ -111,25 +108,6 @@ cpu_frt_ocb_set(uint16_t count, void (*ihr)(void))
 }
 
 void
-cpu_frt_ici_set(void (*ihr)(void))
-{
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
-
-        *reg_tier &= ~0x80;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
-
-        _frt_ovi_ihr = _default_ihr;
-
-        if (ihr != NULL) {
-                _frt_ovi_ihr = ihr;
-
-                *reg_tier |= 0x80;
-        }
-}
-
-void
 cpu_frt_ovi_set(void (*ihr)(void))
 {
         volatile uint8_t *reg_tier;
@@ -146,21 +124,6 @@ cpu_frt_ovi_set(void (*ihr)(void))
 
                 *reg_tier |= 0x02;
         }
-}
-
-static void __attribute__ ((interrupt_handler))
-_frt_ici_handler(void)
-{
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
-
-        *reg_tier &= ~0x80;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
-
-        _frt_ovi_ihr();
-
-        *reg_tier |= 0x80;
 }
 
 static void __attribute__ ((interrupt_handler))

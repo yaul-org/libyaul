@@ -57,23 +57,23 @@ extern "C" {
 #define INTC_PRIORITY_SPRITE_END        2
 
 static inline void __attribute__ ((always_inline))
-cpu_intc_ihr_set(uint8_t vector, void (*ihr)(void))
+cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000310;
 
-        ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
+        ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
-static inline void __attribute__ ((always_inline)) (*cpu_intc_ihr_get(uint8_t vector))(void)
+static inline void __attribute__ ((always_inline)) (*cpu_intc_ihr_get(uint32_t vector))(void)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000314;
 
-        return ((void (*(*)(uint8_t))(void))*bios_address)(vector);
+        return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint8_t __attribute__ ((always_inline))
 cpu_intc_mask_get(void)
 {
         register uint32_t reg_sr;
