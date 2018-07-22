@@ -197,7 +197,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_rtc_settime_call.c \
 	\
 	scu/scu_dma.c \
-	scu/scu_dsp_init.c \
+	scu/scu_dsp.c \
 	scu/scu_timer_0_set.c \
 	scu/scu_timer_1_mode_clear.c \
 	scu/scu_timer_1_mode_set.c \
