@@ -22,7 +22,7 @@ scu_dsp_init(void)
 }
 
 void
-scu_dsp_program_load(uint8_t pc, const void *program, uint32_t count)
+scu_dsp_program_load(const void *program, uint32_t count)
 {
         if (count == 0) {
                 return;
@@ -37,9 +37,6 @@ scu_dsp_program_load(uint8_t pc, const void *program, uint32_t count)
         for (i = 0; i < count; i++) {
                 MEMORY_WRITE(32, SCU(PPD), program_p[i]);
         }
-
-        /* Load the program counter */
-        MEMORY_WRITE(32, SCU(PPAF), 0x00008000 | (pc & 0x7F));
 }
 
 void
