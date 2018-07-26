@@ -28,33 +28,6 @@ extern "C" {
 #define DSP_RAM_PAGE_WORD_COUNT (DSP_RAM_PAGE_SIZE / 4)
 
 static inline void __attribute__ ((always_inline))
-scu_dsp_program_start(uint8_t pc)
-{
-        MEMORY_WRITE(32, SCU(PPAF), 0x00018000 | pc);
-}
-
-static inline void __attribute__ ((always_inline))
-scu_dsp_program_stop(void)
-{
-        MEMORY_WRITE(32, SCU(PPAF), 0x00000000);
-}
-
-static inline uint8_t __attribute__ ((always_inline))
-scu_dsp_program_step(void)
-{
-        volatile uint32_t *reg_ppaf;
-        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
-
-        uint8_t pc;
-        pc = *reg_ppaf & 0xFF;
-
-        *reg_ppaf = 0x00008000 | pc;
-        *reg_ppaf = 0x00020000 | pc;
-
-        return pc;
-}
-
-static inline void __attribute__ ((always_inline))
 scu_dsp_program_pause(bool pause)
 {
         if (pause) {
@@ -64,12 +37,6 @@ scu_dsp_program_pause(bool pause)
         }
 }
 
-static inline void __attribute__ ((always_inline))
-scu_dsp_program_end_wait(void)
-{
-        while ((MEMORY_READ(32, SCU(PPAF)) & 0x00040000) == 0x00000000);
-}
-////////////////////////////////////////////////////////////////////////////////
 #define scu_dsp_end_clear() do {                                               \
         scu_dsp_end_set(NULL);                                                 \
 } while (false)
@@ -77,6 +44,12 @@ scu_dsp_program_end_wait(void)
 extern void scu_dsp_init(void);
 extern void scu_dsp_end_set(void (*)(void));
 extern void scu_dsp_program_load(const void *, uint32_t);
+extern void scu_dsp_program_pc_set(uint8_t);
+extern void scu_dsp_program_start(void);
+extern void scu_dsp_program_stop(void);
+extern uint8_t scu_dsp_program_step(void);
+extern bool scu_dsp_program_end(void);
+extern void scu_dsp_program_end_wait(void);
 extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
 extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
 
