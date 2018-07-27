@@ -46,7 +46,7 @@ cpu_dmac_init(void)
 }
 
 void
-cpu_dmac_status_get(struct dmac_ch_status *status)
+cpu_dmac_status_get(struct dmac_status *status)
 {
         if (status == NULL) {
                 return;

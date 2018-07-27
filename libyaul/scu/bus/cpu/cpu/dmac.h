@@ -50,13 +50,13 @@ struct dmac_ch_cfg {
         void (*dcc_ihr)(void);
 };
 
-struct dmac_ch_status {
-        unsigned dcs_enabled : 1;
-        unsigned dcs_priority_mode : 1;
-        unsigned dcs_ch_enabled : 2;
-        unsigned dcs_ch_busy : 2;
-        unsigned dcs_address_error : 1;
-        unsigned dcs_nmi_interrupt : 1;
+struct dmac_status {
+        unsigned dcs_enabled: 1;
+        unsigned dcs_priority_mode: 1;
+        unsigned dcs_ch_enabled: 2;
+        unsigned dcs_ch_busy: 2;
+        unsigned dcs_address_error: 1;
+        unsigned dcs_nmi_interrupt: 1;
 } __packed;
 
 static inline void __attribute__ ((always_inline))
@@ -107,7 +107,7 @@ cpu_dmac_channel_stop(uint8_t ch)
 }
 
 extern void cpu_dmac_init(void);
-extern void cpu_dmac_status_get(struct dmac_ch_status *);
+extern void cpu_dmac_status_get(struct dmac_status *);
 extern void cpu_dmac_channel_config_set(const struct dmac_ch_cfg *);
 extern void cpu_dmac_channel_wait(uint8_t);
 
