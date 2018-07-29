@@ -21,7 +21,7 @@ extern "C" {
 #define DSP_RAM_PAGE_2  0x02
 #define DSP_RAM_PAGE_3  0x03
 
-#define DSP_PROGRAM_SIZE        0x1000
+#define DSP_PROGRAM_SIZE        0x0400
 #define DSP_PROGRAM_WORD_COUNT  (DSP_PROGRAM_SIZE / 4)
 
 #define DSP_RAM_PAGE_SIZE       0x0100
