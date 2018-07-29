@@ -34,22 +34,20 @@ static void (*_dma_illegal_ihr)(void) = _default_ihr;
 void
 scu_dma_init(void)
 {
-        uint32_t mask;
-        mask = IC_MASK_LEVEL_0_DMA_END |
-               IC_MASK_LEVEL_1_DMA_END |
-               IC_MASK_LEVEL_2_DMA_END |
-               IC_MASK_DMA_ILLEGAL;
-
         uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
+        scu_mask = IC_MASK_LEVEL_0_DMA_END |
+                   IC_MASK_LEVEL_1_DMA_END |
+                   IC_MASK_LEVEL_2_DMA_END |
+                   IC_MASK_DMA_ILLEGAL;
 
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_NONE);
+        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, &_dma_level0_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, &_dma_level1_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, &_dma_level2_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, _dma_level0_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, _dma_level1_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, _dma_level2_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, _dma_illegal_handler);
 
-        scu_ic_mask_chg(scu_mask & ~mask, IC_MASK_NONE);
+        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 
         /* Writing to DSTP causes a hang */
 
@@ -68,7 +66,7 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
         if (cfg == NULL) {
                 return;
         }
-        
+
         if (cfg->dlc_xfer == NULL) {
                 return;
         }
