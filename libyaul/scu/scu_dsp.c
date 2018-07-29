@@ -64,6 +64,7 @@ scu_dsp_program_load(const void *program, uint32_t count)
         }
 
         scu_dsp_program_stop();
+        scu_dsp_program_pc_set(0);
 
         uint32_t *program_p;
         program_p = (uint32_t *)program;
@@ -72,23 +73,18 @@ scu_dsp_program_load(const void *program, uint32_t count)
         for (i = 0; i < count; i++) {
                 MEMORY_WRITE(32, SCU(PPD), program_p[i]);
         }
-
-        /* Set DSP's program counter to 0 */
-        MEMORY_WRITE(32, SCU(PPAF), 0x00008000);
 }
 
 void
 scu_dsp_program_clear(void)
 {
         scu_dsp_program_stop();
+        scu_dsp_program_pc_set(0);
 
         uint32_t i;
         for (i = 0; i < DSP_PROGRAM_WORD_COUNT; i++) {
                 MEMORY_WRITE(32, SCU(PPD), 0xF8000000);
         }
-
-        /* Set DSP's program counter to 0 */
-        MEMORY_WRITE(32, SCU(PPAF), 0x00008000);
 }
 
 void
@@ -153,21 +149,14 @@ scu_dsp_program_step(void)
 bool
 scu_dsp_program_end(void)
 {
-        if (_end) {
-                return true;
-        }
-
         volatile uint32_t *reg_ppaf;
         reg_ppaf = (volatile uint32_t *)SCU(PPAF);
 
         uint32_t ppaf_bits;
         ppaf_bits = *reg_ppaf;
 
-        if (!_overflow) {
-                _overflow = (ppaf_bits & 0x00080000) != 0x00000000;
-        }
-
-        _end = (ppaf_bits & 0x00040000) != 0x00000000;
+        _overflow = _overflow || ((ppaf_bits & 0x00080000) != 0x00000000);
+        _end = _end || ((ppaf_bits & 0x00040000) != 0x00000000);
 
         return _end;
 }
