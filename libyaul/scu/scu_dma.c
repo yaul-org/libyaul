@@ -169,7 +169,7 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
 }
 
 void
-cpu_dma_illegal_set(void (*ihr)(void))
+scu_dma_illegal_set(void (*ihr)(void))
 {
         _dma_illegal_ihr = (ihr != NULL) ? ihr : _default_ihr;
 }
