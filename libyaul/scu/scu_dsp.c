@@ -20,13 +20,13 @@ static bool _end = true;
 
 static void (*_dsp_end_ihr)(void) = _default_ihr;
 
+static inline void _update_flags(void);
+
 void
 scu_dsp_init(void)
 {
         /* Disable DSP END interrupt */
         scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_DSP_END);
-
-        scu_dsp_program_stop();
 
         scu_dsp_program_clear();
 
@@ -73,18 +73,34 @@ scu_dsp_program_load(const void *program, uint32_t count)
         for (i = 0; i < count; i++) {
                 MEMORY_WRITE(32, SCU(PPD), program_p[i]);
         }
+
+        scu_dsp_program_pc_set(0);
 }
 
 void
 scu_dsp_program_clear(void)
 {
-        scu_dsp_program_stop();
+        /* Load and start program that clears Z, S, and C flags */
+        static const uint32_t program[] = {
+                0x00020000, /* CLR A */
+                0x00001501, /* MOV #$01, PL */
+                0x10000000, /* ADD */
+                0xF8000000  /* ENDI */
+        };
+
+        scu_dsp_program_load(&program[0], sizeof(program) / sizeof(*program));
+        scu_dsp_program_start();
+        scu_dsp_program_end_wait();
+
         scu_dsp_program_pc_set(0);
 
+        /* Clear program RAM */
         uint32_t i;
         for (i = 0; i < DSP_PROGRAM_WORD_COUNT; i++) {
                 MEMORY_WRITE(32, SCU(PPD), 0xF8000000);
         }
+
+        scu_dsp_program_pc_set(0);
 }
 
 void
@@ -149,14 +165,7 @@ scu_dsp_program_step(void)
 bool
 scu_dsp_program_end(void)
 {
-        volatile uint32_t *reg_ppaf;
-        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
-
-        uint32_t ppaf_bits;
-        ppaf_bits = *reg_ppaf;
-
-        _overflow = _overflow || ((ppaf_bits & 0x00080000) != 0x00000000);
-        _end = _end || ((ppaf_bits & 0x00040000) != 0x00000000);
+        _update_flags();
 
         return _end;
 }
@@ -256,11 +265,7 @@ scu_dsp_status_get(struct dsp_status *status)
 static void
 _dsp_end_handler(void)
 {
-        /* Read SCU(PPAF) as the program end interrupt flag is reset
-         * when read */
-        MEMORY_WRITE_AND(32, SCU(PPAF), ~0x00040000);
-
-        _end = true;
+        _update_flags();
 
         _dsp_end_ihr();
 }
@@ -268,4 +273,20 @@ _dsp_end_handler(void)
 static void
 _default_ihr(void)
 {
+}
+
+static inline void
+_update_flags(void)
+{
+        volatile uint32_t *reg_ppaf;
+        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
+
+        /* Read SCU(PPAF) as the program end interrupt flag is reset
+         * when read */
+
+        uint32_t ppaf_bits;
+        ppaf_bits = *reg_ppaf;
+
+        _overflow = _overflow || ((ppaf_bits & 0x00080000) != 0x00000000);
+        _end = _end || ((ppaf_bits & 0x00040000) != 0x00000000);
 }
