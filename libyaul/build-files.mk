@@ -179,9 +179,9 @@ LIB_SRCS+= \
 	\
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
+	scu/bus/cpu/cpu_dual.c \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
-	scu/bus/cpu/cpu_slave.c \
 	scu/bus/cpu/cpu_ubc_init.c \
 	scu/bus/cpu/cpu_wdt.c \
 	\
@@ -330,7 +330,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:map.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:registers.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:slave.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:dual.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:wdt.h:yaul/scu/bus/cpu/cpu/ \

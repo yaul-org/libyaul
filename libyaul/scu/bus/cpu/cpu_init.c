@@ -13,11 +13,11 @@
 
 #include <cpu/divu.h>
 #include <cpu/dmac.h>
+#include <cpu/dual.h>
 #include <cpu/frt.h>
 #include <cpu/intc.h>
 #include <cpu/map.h>
 #include <cpu/registers.h>
-#include <cpu/slave.h>
 #include <cpu/wdt.h>
 
 #include <internal.h>
@@ -104,7 +104,7 @@ cpu_init(void)
         cpu_frt_init(FRT_CLOCK_DIV_8);
         cpu_wdt_init(WDT_CLOCK_DIV_2);
         cpu_dmac_init();
-        cpu_slave_init();
+        cpu_dual_init();
 }
 
 static void __noreturn

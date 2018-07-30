@@ -41,6 +41,9 @@ extern "C" {
 #define INTC_INTERRUPT_FREE_6F                  0x6F
 #define INTC_INTERRUPT_SLAVE_ENTRY              0x94
 
+#define INTC_INTERRUPT_MASTER_BASE      0x000
+#define INTC_INTERRUPT_SLAVE_BASE       0x100
+
 #define INTC_PRIORITY_VBLANK_IN         15
 #define INTC_PRIORITY_VBLANK_OUT        14
 #define INTC_PRIORITY_HBLANK_IN         13
