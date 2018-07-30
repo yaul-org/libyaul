@@ -194,16 +194,13 @@ scu_dsp_data_read(uint8_t ram_page, uint8_t offset, void *data, uint32_t count)
         uint32_t *data_p;
         data_p = (uint32_t *)data;
 
-        uint8_t addr;
-        addr = (ram_page & 0x03) << 6;
+        uint8_t address;
+        address = (ram_page & 0x03) << 6;
+
+        MEMORY_WRITE(32, SCU(PDA), address | offset);
 
         uint32_t i;
         for (i = 0; i < count; i++) {
-                uint32_t addr_offset;
-                addr_offset = i + offset;
-
-                MEMORY_WRITE(32, SCU(PDA), addr | addr_offset);
-
                 data_p[i] = MEMORY_READ(32, SCU(PDD));
         }
 }
@@ -226,16 +223,13 @@ scu_dsp_data_write(uint8_t ram_page, uint8_t offset, void *data, uint32_t count)
         uint32_t *data_p;
         data_p = (uint32_t *)data;
 
-        uint8_t addr;
-        addr = (ram_page & 0x03) << 6;
+        uint8_t address;
+        address = (ram_page & 0x03) << 6;
+
+        MEMORY_WRITE(32, SCU(PDA), address | offset);
 
         uint32_t i;
         for (i = 0; i < count; i++) {
-                uint32_t addr_offset;
-                addr_offset = i + offset;
-
-                MEMORY_WRITE(32, SCU(PDA), addr | addr_offset);
-
                 MEMORY_WRITE(32, SCU(PDD), data_p[i]);
         }
 }
