@@ -73,6 +73,8 @@ _slave_entry(void)
 {
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x80);
 
+        cpu_cache_purge();
+
         while (true) {
                 cpu_slave_notification_wait();
 
