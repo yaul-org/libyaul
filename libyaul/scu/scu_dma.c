@@ -49,7 +49,7 @@ scu_dma_init(void)
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 
-        /* Writing to DSTP causes a hang */
+        /* Writing to SCU(DSTP) causes a hang */
 
         scu_dma_level0_stop();
         scu_dma_level1_stop();

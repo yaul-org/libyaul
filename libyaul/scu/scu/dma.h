@@ -153,19 +153,16 @@ scu_dma_level2_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) >> 16) & 0x03;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline uint8_t __attribute__ ((always_inline))
 scu_dma_level_busy(uint8_t level)
 {
         switch (level) {
         case 0:
-                scu_dma_level0_busy();
-                break;
+                return scu_dma_level0_busy();
         case 1:
-                scu_dma_level1_busy();
-                break;
+                return scu_dma_level1_busy();
         case 2:
-                scu_dma_level2_busy();
-                break;
+                return scu_dma_level2_busy();
         }
 }
 
