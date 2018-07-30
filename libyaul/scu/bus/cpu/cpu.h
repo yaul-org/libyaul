@@ -8,15 +8,15 @@
 #ifndef _CPU_H_
 #define _CPU_H_
 
-#include <cpu/instructions.h>
 #include <cpu/cache.h>
 #include <cpu/divu.h>
 #include <cpu/dmac.h>
+#include <cpu/dual.h>
 #include <cpu/endian.h>
 #include <cpu/frt.h>
+#include <cpu/instructions.h>
 #include <cpu/intc.h>
 #include <cpu/registers.h>
-#include <cpu/slave.h>
 #include <cpu/sync.h>
 #include <cpu/wdt.h>
 
