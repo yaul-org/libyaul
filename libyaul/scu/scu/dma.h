@@ -72,6 +72,10 @@ extern "C" {
 #define DMA_UPDATE_RUP  0x100
 #define DMA_UPDATE_WUP  0x001
 
+#define DMA_BUS_A       0x00
+#define DMA_BUS_B       0x01
+#define DMA_BUS_DSP     0x02
+
 #define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
         .len = (_len),                                                         \
         .dst = (uint32_t)(_dst),                                               \
@@ -97,6 +101,31 @@ struct dma_level_cfg {
 
         void (*dlc_ihr)(void);
 };
+
+static inline uint32_t __attribute__ ((always_inline))
+scu_dma_dsp_busy(void)
+{
+        /* In operation, on standby, or interrupted to background */
+        return MEMORY_READ(32, SCU(DSTA)) & 0x00010003;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_dsp_wait(void)
+{
+        while ((scu_dma_dsp_busy()));
+}
+
+static inline uint8_t __attribute__ ((always_inline))
+scu_dma_bus_access_busy(void)
+{
+        return (MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_bus_access_wait(uint8_t bus_mask)
+{
+        while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
+}
 
 static inline uint8_t __attribute__ ((always_inline))
 scu_dma_level0_busy(void)
