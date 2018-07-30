@@ -9,8 +9,9 @@
 
 #include <smpc/smc.h>
 
-#include <cpu/instructions.h>
+#include <cpu/cache.h>
 #include <cpu/frt.h>
+#include <cpu/instructions.h>
 #include <cpu/intc.h>
 #include <cpu/map.h>
 #include <cpu/slave.h>
@@ -67,7 +68,7 @@ cpu_slave_entry_set(uint8_t cpu, void (*entry)(void))
         }
 }
 
-static void __noreturn
+static void __noreturn __aligned(16)
 _slave_entry(void)
 {
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x80);
