@@ -24,7 +24,7 @@ static void _slave_ici_handler(void);
 static void _default_entry(void);
 
 static void (*_master_entry)(void) = _default_entry;
-static void (*_slave_entry)(void) = _default_entry;
+static void (*_slave_entry)(void) __section(".uncached") = _default_entry;
 
 static int8_t _slave_entry_type = -1;
 
