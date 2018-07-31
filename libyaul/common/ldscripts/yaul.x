@@ -103,12 +103,21 @@ SECTIONS
      __bss_end__ = .;
   }
 
-  __end = .;
-  PROVIDE (_end = .);
+  .uncached (0x20000000 | __bss_end) : AT(__bss_end)
+  {
+     PROVIDE_HIDDEN (__uncached_start = .);
+     *(.uncached)
+     . = ALIGN (0x10);
+     PROVIDE_HIDDEN (__uncached_end = .);
+  }
 
- /DISCARD/ :
- {
-    *(.rela.*)
-    *(.comment)
- }
+  /* Back to cached addresses */
+  __end = __bss_end + SIZEOF(.uncached);
+  PROVIDE (_end = __bss_end + SIZEOF(.uncached));
+
+  /DISCARD/ :
+  {
+     *(.rela.*)
+     *(.comment)
+  }
 }
