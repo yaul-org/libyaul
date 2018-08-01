@@ -20,7 +20,8 @@ static bool _end = true;
 
 static void (*_dsp_end_ihr)(void) = _default_ihr;
 
-static inline void _update_flags(void);
+static inline uint32_t _read_ppaf(void);
+static inline void _update_flags(uint32_t);
 
 void
 scu_dsp_init(void)
@@ -143,12 +144,11 @@ scu_dsp_program_step(void)
 
         *reg_ppaf = 0x00020000;
 
-        while (true) {
-                _overflow = (ppaf_bits & 0x00080000) != 0x00000000;
+        _overflow = false;
+        _end = false;
 
-                /* Read SCU(PPAF) as the program end interrupt flag is
-                 * reset when read */
-                _end = (ppaf_bits & 0x00040000) != 0x00000000;
+        while (true) {
+                _update_flags (ppaf_bits);
 
                 /* Wait until DSP is done executing one instruction */
                 if (_end || ((ppaf_bits & 0x00030000) == 0x00000000)) {
@@ -164,7 +164,7 @@ scu_dsp_program_step(void)
 bool
 scu_dsp_program_end(void)
 {
-        _update_flags();
+        _read_ppaf();
 
         return _end;
 }
@@ -173,6 +173,21 @@ void
 scu_dsp_program_end_wait(void)
 {
         while (!(scu_dsp_program_end()));
+}
+
+bool
+scu_dsp_dma_busy(void)
+{
+        uint32_t ppaf_bits;
+        ppaf_bits = _read_ppaf();
+
+        return ((ppaf_bits & 0x00800000) != 0x00000000);
+}
+
+void
+scu_dsp_dma_wait(void)
+{
+        while ((scu_dsp_dma_busy()));
 }
 
 void
@@ -258,7 +273,7 @@ scu_dsp_status_get(struct dsp_status *status)
 static void
 _dsp_end_handler(void)
 {
-        _update_flags();
+        _read_ppaf();
 
         _dsp_end_ihr();
 }
@@ -268,8 +283,8 @@ _default_ihr(void)
 {
 }
 
-static inline void
-_update_flags(void)
+static inline uint32_t
+_read_ppaf(void)
 {
         volatile uint32_t *reg_ppaf;
         reg_ppaf = (volatile uint32_t *)SCU(PPAF);
@@ -280,6 +295,14 @@ _update_flags(void)
         uint32_t ppaf_bits;
         ppaf_bits = *reg_ppaf;
 
+        _update_flags(ppaf_bits);
+
+        return ppaf_bits;
+}
+
+static inline void __attribute__ ((always_inline))
+_update_flags(uint32_t ppaf_bits)
+{
         _overflow = _overflow || ((ppaf_bits & 0x00080000) != 0x00000000);
         _end = _end || ((ppaf_bits & 0x00040000) != 0x00000000);
 }

@@ -67,6 +67,8 @@ extern void scu_dsp_program_pc_set(uint8_t);
 extern void scu_dsp_program_start(void);
 extern void scu_dsp_program_stop(void);
 extern uint8_t scu_dsp_program_step(void);
+extern bool scu_dsp_dma_busy(void);
+extern void scu_dsp_dma_wait(void);
 extern bool scu_dsp_program_end(void);
 extern void scu_dsp_program_end_wait(void);
 extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
