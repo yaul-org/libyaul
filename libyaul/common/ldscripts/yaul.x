@@ -59,7 +59,8 @@ SECTIONS
      KEEP (*(.dtors))
      LONG (0x00000000)
      __DTOR_END__ = .;
-     . = ALIGN (0x04);
+
+     . = ALIGN (0x10);
 
      *(.rdata)
      *(.rodata)
@@ -76,8 +77,6 @@ SECTIONS
      *(.data)
      *(.data.*)
      *(.gnu.linkonce.d.*)
-     SORT (CONSTRUCTORS)
-
      *(.sdata)
      *(.sdata.*)
      *(.gnu.linkonce.s.*)
@@ -103,17 +102,18 @@ SECTIONS
      __bss_end__ = .;
   }
 
-  .uncached (0x20000000 | __bss_end) : AT(__bss_end)
+  .uncached (0x20000000 | __bss_end) : AT (__bss_end)
   {
      PROVIDE_HIDDEN (__uncached_start = .);
      *(.uncached)
      . = ALIGN (0x10);
+
      PROVIDE_HIDDEN (__uncached_end = .);
   }
 
   /* Back to cached addresses */
-  __end = __bss_end + SIZEOF(.uncached);
-  PROVIDE (_end = __bss_end + SIZEOF(.uncached));
+  __end = __bss_end + SIZEOF (.uncached);
+  PROVIDE (_end = __bss_end + SIZEOF (.uncached));
 
   /DISCARD/ :
   {
