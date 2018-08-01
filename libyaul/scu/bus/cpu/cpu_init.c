@@ -104,7 +104,7 @@ cpu_init(void)
         cpu_frt_init(FRT_CLOCK_DIV_8);
         cpu_wdt_init(WDT_CLOCK_DIV_2);
         cpu_dmac_init();
-        cpu_dual_init();
+        cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
 }
 
 static void __noreturn
