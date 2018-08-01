@@ -63,7 +63,6 @@ scu_dsp_program_load(const void *program, uint32_t count)
                 return;
         }
 
-        scu_dsp_program_stop();
         scu_dsp_program_pc_set(0);
 
         uint32_t *program_p;
