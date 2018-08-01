@@ -45,16 +45,16 @@ cpu_dual_notification_wait(void)
         *reg_ftcsr &= ~0x80;
 }
 
-extern void cpu_dual_init(void);
+extern void cpu_dual_init(uint8_t);
 extern void cpu_dual_master_set(void (*)(void));
-extern void cpu_dual_slave_set(uint8_t, void (*)(void));
+extern void cpu_dual_slave_set(void (*)(void));
 
 #define cpu_dual_master_clear() do {                                           \
         cpu_dual_master_set(NULL);                                             \
 } while (false)
 
-#define cpu_dual_slave_clear(cpu) do {                                         \
-        cpu_dual_slave_set(CPU_DUAL_ENTRY_POLLING, NULL);                      \
+#define cpu_dual_slave_clear() do {                                            \
+        cpu_dual_slave_set(NULL);                                              \
 } while (false)
 
 #ifdef __cplusplus
