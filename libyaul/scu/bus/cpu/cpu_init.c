@@ -67,11 +67,6 @@ void _exception_illegal_slot(void);
 void _exception_cpu_address_error(void);
 void _exception_dma_address_error(void);
 
-EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
-EXCEPTION_TRAMPOLINE_EMIT(illegal_slot);
-EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
-EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
-
 static void _format_exception_message(struct cpu_registers *, char *, const char *);
 
 static char _buffer[1024];
@@ -138,6 +133,11 @@ _ihr_exception_dma_address_error(struct cpu_registers *regs)
 
         internal_exception_show(_buffer);
 }
+
+EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
+EXCEPTION_TRAMPOLINE_EMIT(illegal_slot);
+EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
+EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
 
 static void
 _format_exception_message(struct cpu_registers *regs,
