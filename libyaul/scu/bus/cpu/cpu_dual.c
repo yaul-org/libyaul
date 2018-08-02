@@ -6,14 +6,21 @@
  */
 
 #include <sys/cdefs.h>
-#include <smpc/smc.h>
 
 #include <cpu/cache.h>
+#include <cpu/divu.h>
+#include <cpu/dmac.h>
 #include <cpu/dual.h>
 #include <cpu/frt.h>
 #include <cpu/instructions.h>
 #include <cpu/intc.h>
 #include <cpu/map.h>
+#include <cpu/registers.h>
+#include <cpu/wdt.h>
+
+#include <smpc/smc.h>
+
+#include <cpu-internal.h>
 
 static void _slave_init(void);
 
@@ -91,8 +98,10 @@ cpu_dual_slave_set(void (*entry)(void))
 static void
 _slave_init(void)
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
+        cpu_divu_init();
+        cpu_frt_init(FRT_CLOCK_DIV_8);
+        cpu_wdt_init(WDT_CLOCK_DIV_2);
+        cpu_dmac_init();
 
         cpu_intc_mask_set(0);
 
