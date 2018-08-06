@@ -198,12 +198,7 @@ LIB_SRCS+= \
 	\
 	scu/scu_dma.c \
 	scu/scu_dsp.c \
-	scu/scu_timer_0_set.c \
-	scu/scu_timer_1_mode_clear.c \
-	scu/scu_timer_1_mode_set.c \
-	scu/scu_timer_1_set.c \
-	scu/scu_timer_all_disable.c \
-	scu/scu_timer_all_enable.c
+	scu/scu_timer.c
 
 INCLUDE_DIRS:= \
 	. \

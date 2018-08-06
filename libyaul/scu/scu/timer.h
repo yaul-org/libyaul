@@ -11,16 +11,54 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <scu/map.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-extern void scu_timer_0_set(uint16_t);
-extern void scu_timer_1_mode_clear(void);
-extern void scu_timer_1_mode_set(bool);
-extern void scu_timer_1_set(uint16_t);
-extern void scu_timer_all_disable(void);
-extern void scu_timer_all_enable(void);
+static inline void __attribute__ ((always_inline))
+scu_timer_t0_value_set(uint16_t line)
+{
+        MEMORY_WRITE(32, SCU(T0C), line & 0x03FF);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_timer_t1_value_set(uint16_t value)
+{
+        MEMORY_WRITE(32, SCU(T1S), value & 0x01FF);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_timer_disable(void)
+{
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_timer_enable(void)
+{
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_timer_line_enable(void)
+{
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000101);
+}
+
+#define scu_timer_t0_clear() do {                                              \
+        scu_timer_t0_set(NULL);                                                \
+} while (false)
+
+#define scu_timer_t1_clear() do {                                              \
+        scu_timer_t1_set(NULL);                                                \
+} while (false)
+
+extern void scu_timer_init(void);
+extern void scu_timer_t0_set(void (*)(void));
+extern void scu_timer_t1_set(void (*)(void));
+extern void scu_timer_t1_line_set(int16_t);
 
 #ifdef __cplusplus
 }
