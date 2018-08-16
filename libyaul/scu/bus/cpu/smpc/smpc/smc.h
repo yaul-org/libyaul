@@ -90,16 +90,11 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
         /* Fetch peripheral data "SMPC" status */
         smpc_smc_wait(true);
 
-        volatile uint8_t *reg_ireg;
-        reg_ireg = (volatile uint8_t *)SMPC(SF);
-
-        reg_ireg[0] = ireg0 & 0x01;
-        reg_ireg[1] = ireg1 & 0x7F;
-        reg_ireg[2] = 0xF0;
+        MEMORY_WRITE(8, IREG(0), ireg0 & 0x01);
+        MEMORY_WRITE(8, IREG(1), ireg1 & 0x7F);
+        MEMORY_WRITE(8, IREG(2), 0xF0);
 
         MEMORY_WRITE(8, SMPC(COMREG), SMPC_SMC_INTBACK);
-
-        smpc_smc_wait(false);
 
         return 0;
 }
