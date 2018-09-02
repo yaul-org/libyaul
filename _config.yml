@@ -1,3 +1,5 @@
+# bundle exec jekyll serve -H 0.0.0.0 -P 80
+
 theme: minima
 title: Yaul
 description: An open source SEGA Saturn development kit
