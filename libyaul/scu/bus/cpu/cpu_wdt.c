@@ -36,6 +36,9 @@ cpu_wdt_init(uint8_t clock_div)
          * For reading, use 8-bit reads on *R registers only.
          */
 
+        MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x7F00);
+        MEMORY_WRITE_OR(16, CPU(VCRWDT), INTC_INTERRUPT_WDT_ITI << 8);
+
         MEMORY_WRITE(16, CPU(WTCSRW), 0xA518 | (clock_div & 0x07));
 
         MEMORY_WRITE(16, CPU(RSTCSRW), 0xA500);

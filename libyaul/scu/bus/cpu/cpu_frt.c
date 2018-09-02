@@ -36,6 +36,9 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
 
+        MEMORY_WRITE(16, CPU(VCRC), (INTC_INTERRUPT_FRT_ICI << 8) | INTC_INTERRUPT_FRT_OCI);
+        MEMORY_WRITE(16, CPU(VCRD), INTC_INTERRUPT_FRT_OVI << 8);
+
         cpu_frt_interrupt_priority_set(15);
 
         /* Set internal clock (divisor) */

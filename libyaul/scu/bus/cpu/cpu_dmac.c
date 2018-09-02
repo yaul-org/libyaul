@@ -34,6 +34,9 @@ cpu_dmac_init(void)
         cpu_dmac_channel_stop(0);
         cpu_dmac_channel_stop(1);
 
+        MEMORY_WRITE(32, CPU(VCRDMA0), INTC_INTERRUPT_DMAC0);
+        MEMORY_WRITE(32, CPU(VCRDMA1), INTC_INTERRUPT_DMAC1);
+
         cpu_dmac_interrupt_priority_set(15);
 
         MEMORY_WRITE(8, CPU(DRCR0), 0x00);
