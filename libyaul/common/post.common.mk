@@ -7,7 +7,7 @@ endif
 # Check that SH_OBJECTS doesn't include duplicates
 # Be mindful that sort remove duplicates
 SH_OBJECTS_UNIQ= $(sort $(SH_OBJECTS))
-SH_OBJECTS_NO_LINK_UNIQ= $(sort $(SH_OBJECTS))
+SH_OBJECTS_NO_LINK_UNIQ= $(sort $(SH_OBJECTS_NO_LINK))
 
 ifeq ($(strip $(SH_OBJECTS_UNIQ)),)
   # If both SH_OBJECTS_UNIQ and SH_OBJECTS_NO_LINK_UNIQ is empty
@@ -27,10 +27,12 @@ ifneq ($(strip $(M68K_PROGRAM)),)
   endif
 endif
 
+SH_SPECS= yaul.specs
+
 ifeq ($(strip $(SH_CUSTOM_SPECS)),)
-  SH_SPECS= yaul.specs
+  SH_SPECS+= yaul-main.specs
 else
-  SH_SPECS= $(SH_CUSTOM_SPECS)
+  SH_SPECS+= $(SH_CUSTOM_SPECS)
 endif
 
 ROMDISK_DEPS:= $(shell find ./romdisk -type f 2> /dev/null) $(ROMDISK_DEPS)
@@ -63,7 +65,7 @@ $(SH_PROGRAM).bin: $(SH_PROGRAM).elf
 
 $(SH_PROGRAM).elf: $(SH_OBJECTS_UNIQ) $(SH_OBJECTS_NO_LINK_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_LD) -specs=$(SH_SPECS) $(SH_OBJECTS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(SH_OBJECTS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
 	$(ECHO)$(SH_NM) $(SH_PROGRAM).elf > $(SH_PROGRAM).sym
 	$(ECHO)$(SH_OBJDUMP) -S $(SH_PROGRAM).elf > $(SH_PROGRAM).asm
 
@@ -92,23 +94,23 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CC) $(SH_CFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(SH_CC) $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cc
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.C
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cpp
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.cxx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) -specs=$(SH_SPECS) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
 
 %.o: %.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"

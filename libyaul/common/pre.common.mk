@@ -76,7 +76,8 @@ SH_CFLAGS= \
 	-O2
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
-	-DFIXMATH_NO_ROUNDING=1
+	-DFIXMATH_NO_ROUNDING=1 \
+	-save-temps
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
 SH_CXXFLAGS= $(SH_CFLAGS)
@@ -91,3 +92,5 @@ SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
+
+.PRECIOUS: %.elf %.c %.o

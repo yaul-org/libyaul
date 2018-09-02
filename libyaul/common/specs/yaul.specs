@@ -6,6 +6,7 @@
 --reduce-memory-overheads
 
 *includes:
+-I . \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/bcl) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/tga) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul) \
@@ -48,13 +49,13 @@
 %(includes)
 
 *startfile:
-crt0%O%s init%O%s c++-support%O%s
+
 
 *endfile:
 
 
 *lib:
--lyaul -lgcc
+
 
 %rename link old_link
 *link:
