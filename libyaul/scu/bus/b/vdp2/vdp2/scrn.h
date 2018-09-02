@@ -338,7 +338,7 @@ struct scrn_vcs_format {
 #define SCRN_COLOR_OFFSET_A     0
 #define SCRN_COLOR_OFFSET_B     1
 
-extern void vdp2_scrn_back_screen_addr_set(bool, uint32_t);
+extern void vdp2_scrn_back_screen_addr_set(uint32_t, bool);
 extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
