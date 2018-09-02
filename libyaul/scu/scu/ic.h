@@ -88,6 +88,12 @@ scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
         ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
+static inline void __attribute__ ((always_inline))
+scu_ic_ihr_clear(uint8_t vector)
+{
+        scu_ic_ihr_set(vector, NULL);
+}
+
 static inline void __attribute__ ((always_inline)) (*scu_ic_ihr_get(uint8_t vector))(void)
 {
         register uint32_t *bios_address;

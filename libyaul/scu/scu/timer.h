@@ -18,9 +18,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 static inline void __attribute__ ((always_inline))
-scu_timer_t0_value_set(uint16_t line)
+scu_timer_t0_value_set(uint16_t value)
 {
-        MEMORY_WRITE(32, SCU(T0C), line & 0x03FF);
+        MEMORY_WRITE(32, SCU(T0C), value & 0x03FF);
 }
 
 static inline void __attribute__ ((always_inline))
