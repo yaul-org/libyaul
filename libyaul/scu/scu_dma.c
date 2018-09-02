@@ -113,7 +113,7 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
 
         uint32_t mode;
         mode = ((cfg->dlc_mode & 0x01) << 24) |
-               ((cfg->dlc_update & 0x0101) << 8) |
+                (cfg->dlc_update & 0x00010100) |
                 (cfg->dlc_starting_factor & 0x07);
 
         switch (cfg->dlc_level & 0x03) {

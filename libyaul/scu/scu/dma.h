@@ -25,26 +25,26 @@ extern "C" {
 /*-
  * SCU DMA should be activated by the Master CPU
  *
- * Keep in mind that:
- *   1. DMA transfers does not begin until it is explictily started
- *   2. DMA transfer level 2 will block the CPU during operation of level 1
+ * - Keep in mind that:
+ *     1. DMA transfers does not begin until it is explictily started
+ *     2. DMA transfer level 2 will block the CPU during operation of level 1
  *
- * SCU DMA is for transfers between different buses:
- * Work RAM-H <-> A-bus
- * Work RAM-H <-> B-bus
- * A-bus <-> B-bus
+ * - SCU DMA is for transfers between different buses:
+ *     1. Work RAM-H <-> A-bus
+ *     2. Work RAM-H <-> B-bus
+ *     3. A-bus <-> B-bus
  *
- * 1. A-bus write prohibited
- * 2. VDP2 area read prohibited
- * 4. WORKRAM-L usage from SCU disabled
+ * - A-bus write prohibited
+ * - VDP2 area read prohibited
+ * - WORKRAM-L usage from SCU disabled
  *
- * 2. Restriction on write address addition value in DMA based on access
- *    address
+ * - Restriction on write address addition value in DMA based on access
+ *   address
  *
- *    WORKRAM-H                        -> 0x02 can be set
- *    External areas 1 to 3            -> 0x02 can be set
- *    External area 4 (A-bus I/O area) -> 0x00 and 0x02 can be set
- *    VDP1, VDP2, SCSP                 -> all values can be set
+ *   1. WORKRAM-H                        -> 0x02 can be set
+ *   2. External areas 1 to 3            -> 0x02 can be set
+ *   3. External area 4 (A-bus I/O area) -> 0x00 and 0x02 can be set
+ *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
 #define DMA_MODE_DIRECT         0x00
@@ -68,9 +68,9 @@ extern "C" {
 #define DMA_STRIDE_64_BYTES     0x06
 #define DMA_STRIDE_128_BYTES    0x07
 
-#define DMA_UPDATE_NONE 0x000
-#define DMA_UPDATE_RUP  0x100
-#define DMA_UPDATE_WUP  0x001
+#define DMA_UPDATE_NONE 0x00000000
+#define DMA_UPDATE_RUP  0x00010000
+#define DMA_UPDATE_WUP  0x00000100
 
 #define DMA_BUS_A       0x00
 #define DMA_BUS_B       0x01
@@ -96,7 +96,7 @@ struct dma_level_cfg {
         uint16_t dlc_xfer_count;
 
         uint8_t dlc_stride;
-        uint16_t dlc_update;
+        uint32_t dlc_update;
         uint8_t dlc_starting_factor;
 
         void (*dlc_ihr)(void);
