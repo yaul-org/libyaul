@@ -13,7 +13,7 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_back_screen_addr_set(bool single_color, uint32_t vram)
+vdp2_scrn_back_screen_addr_set(uint32_t vram, bool single_color)
 {
         uint16_t bkclmd;
         bkclmd = (single_color) ? 0x0000 : 0x8000;
