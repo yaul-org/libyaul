@@ -4,7 +4,6 @@ theme: minima
 title: Yaul
 description: An open source SEGA Saturn development kit
 author: Israel Jacquez
-email: mrkotfw@gmail.com
 show_downloads: false
 
 show_excerpts: false
