@@ -86,6 +86,15 @@ SH_LXXFLAGS= $(SH_LDFLAGS)
 M68K_AFLAGS= --fatal-warnings
 M68K_LDFLAGS=
 
+IP_VERSION?= V1.000
+IP_RELEASE_DATE?= YYYYMMDD
+IP_AREAS?= JTUBKAEL
+IP_PERIPHERALS?= JAMKST
+IP_TITLE?= Title
+IP_MASTER_STACK_ADDR?= 0x06004000
+IP_SLAVE_STACK_ADDR?= 0x06002000
+IP_1ST_READ_ADDR?= 0x06004000
+
 SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: all clean example list-targets
