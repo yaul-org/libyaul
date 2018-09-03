@@ -190,6 +190,8 @@ clean:
 	    $(SH_PROGRAM).bin \
 	    $(SH_PROGRAM).iso \
 	    $(SH_OBJECTS_UNIQ) \
+	    $(SH_DEPS) \
+	    $(SH_DEPS_NO_LINK) \
 	    $(SH_TEMPS) \
 	    $(SH_PROGRAM).asm \
 	    $(SH_PROGRAM).bin \
