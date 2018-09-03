@@ -384,8 +384,9 @@ _get_packet(char *rx_buf)
 
                         /* Skip the first 3 characters by removing the
                          * sequence characters */
-                        for (i = 3; i < len; i++)
+                        for (i = 3; i < len; i++) {
                                 rx_buf[i - 3] = rx_buf[i];
+                        }
                 }
         } while (false);
 }
@@ -459,7 +460,7 @@ _mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
                         lc_buf.sbuf = *(uint16_t *)mem;
                         cbuf_len = sizeof(uint16_t);
                 } else {
-                        lc_buf.cbuf[0] = *(char*)mem;
+                        lc_buf.cbuf[0] = *(char *)mem;
                         cbuf_len = sizeof(char);
                 }
 
