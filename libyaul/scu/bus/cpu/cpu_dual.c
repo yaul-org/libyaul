@@ -22,7 +22,27 @@
 
 #include <cpu-internal.h>
 
+#define SLAVE_ENTRY_TRAMPOLINE_EMIT(type)                                      \
+__asm__ (".align 1\n"                                                          \
+         "\n"                                                                  \
+         ".local __slave_" __STRING(type) "_entry_trampoline\n"                \
+         ".type __slave_" __STRING(type) "_entry_trampoline, @function\n"      \
+         "\n"                                                                  \
+         "__slave_" __STRING(type) "_entry_trampoline:\n"                      \
+         "\tmov.l 1f, r15\n"                                                   \
+         "\tmov.l 2f, r1\n"                                                    \
+         "\tjmp @r1\n"                                                         \
+         "\tnop\n"                                                             \
+         ".align 4\n"                                                          \
+         "1:\n"                                                                \
+         ".long __slave_stack\n"                                               \
+         "2:\n"                                                                \
+         ".long __slave_" __STRING(type) "_entry\n")
+
 static void _slave_init(void);
+
+void _slave_polling_entry_trampoline(void);
+void _slave_ici_entry_trampoline(void);
 
 static void _slave_polling_entry(void);
 static void _slave_ici_entry(void);
@@ -36,8 +56,8 @@ static void (*_master_entry)(void) = _default_entry;
 static void (*_slave_entry)(void) __section(".uncached") = _default_entry;
 
 static void (*_slave_entry_table[])(void) = {
-        &_slave_polling_entry,
-        &_slave_ici_entry
+        &_slave_polling_entry_trampoline,
+        &_slave_ici_entry_trampoline
 };
 
 void
@@ -108,6 +128,8 @@ _slave_init(void)
         cpu_cache_purge();
 }
 
+SLAVE_ENTRY_TRAMPOLINE_EMIT(polling);
+
 static void __noreturn __aligned(16)
 _slave_polling_entry(void)
 {
@@ -119,6 +141,8 @@ _slave_polling_entry(void)
                 _slave_entry();
         }
 }
+
+SLAVE_ENTRY_TRAMPOLINE_EMIT(ici);
 
 static void __noreturn
 _slave_ici_entry(void)

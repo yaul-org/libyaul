@@ -173,15 +173,6 @@ cpu_reg_fp_get(void)
         return reg_r14;
 }
 
-static inline void __attribute__ ((always_inline))
-cpu_reg_sp_set(uint32_t reg_sp)
-{
-        __asm__ volatile ("mov %0, r15"
-            : /* No outputs */
-            : "r" (reg_sp)
-            : "memory", "r14"); /* Don't clobber fp register */
-}
-
 static inline uint32_t __attribute__ ((always_inline))
 cpu_reg_sp_get(void)
 {

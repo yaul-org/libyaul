@@ -27,6 +27,19 @@ ifneq ($(strip $(M68K_PROGRAM)),)
   endif
 endif
 
+SH_DEFSYMS=
+
+ifneq ($(strip $(IP_MASTER_STACK_ADDR)),)
+  SH_DEFSYMS+= -Wl,--defsym=__master_stack=$(IP_MASTER_STACK_ADDR)
+endif
+
+ifneq ($(strip $(IP_SLAVE_STACK_ADDR)),)
+  SH_DEFSYMS+= -Wl,--defsym=__slave_stack=$(IP_SLAVE_STACK_ADDR)
+endif
+
+SH_LDFLAGS+= $(SH_DEFSYMS)
+SH_LXXFLAGS+= $(SH_DEFSYMS)
+
 SH_SPECS= yaul.specs
 
 ifeq ($(strip $(SH_CUSTOM_SPECS)),)
@@ -125,82 +138,82 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	$(ECHO)mkdir -p $(IMAGE_DIRECTORY)
 	$(ECHO)cp $(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
 	$(ECHO)for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
-            if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
-                printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
-            fi \
-        done
+	    if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
+		printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
+	    fi \
+	done
 	$(ECHO)$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
 IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
 	$(ECHO)cat $< | awk ' \
-        /\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
-        /\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
-        /\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
-        /\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
-        /\.ascii \"\$$TITLE\"/ { \
-            L = 7; \
-            # Truncate to 112 characters \
-            s = "$(IP_TITLE)"; \
-            # Strip out control characters \
-            gsub(/[\t\r\v\n\f]/, "", s); \
-            s = substr(s, 0, 112); \
-            t = s; \
-            q = length(s); \
-            l = q; \
-            while (l > 0) { \
-                printf ".ascii \"%-16.16s\"\n", t; \
-                a = ((l - 16) >= 0) ? 16 : l; \
-                l -= a; \
-                t = substr(t, a + 1, q - a); \
-                L--; \
-            } \
-            while (L > 0) { \
-                printf ".ascii \"                \"\n"; \
-                L--; \
-            } \
-            next; \
-        } \
-        /\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
-        /\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
-        /\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
-        { print; } \
-        ' | $(SH_AS) $(SH_AFLAGS) \
-        -I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
+	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
+	/\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
+	/\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
+	/\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
+	/\.ascii \"\$$TITLE\"/ { \
+	    L = 7; \
+	    # Truncate to 112 characters \
+	    s = "$(IP_TITLE)"; \
+	    # Strip out control characters \
+	    gsub(/[\t\r\v\n\f]/, "", s); \
+	    s = substr(s, 0, 112); \
+	    t = s; \
+	    q = length(s); \
+	    l = q; \
+	    while (l > 0) { \
+		printf ".ascii \"%-16.16s\"\n", t; \
+		a = ((l - 16) >= 0) ? 16 : l; \
+		l -= a; \
+		t = substr(t, a + 1, q - a); \
+		L--; \
+	    } \
+	    while (L > 0) { \
+		printf ".ascii \"                \"\n"; \
+		L--; \
+	    } \
+	    next; \
+	} \
+	/\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
+	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
+	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
+	{ print; } \
+	' | $(SH_AS) $(SH_AFLAGS) \
+	-I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
-        -specs=ip.specs $($@_TMP_FILE) -o $@
+	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(ECHO)$(RM) $($@_TMP_FILE)
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
-            $(SH_PROGRAM).bin \
-            $(SH_PROGRAM).iso \
-            $(SH_OBJECTS_UNIQ) \
-            $(SH_TEMPS) \
-            $(SH_PROGRAM).asm \
-            $(SH_PROGRAM).bin \
-            $(SH_PROGRAM).elf \
-            $(SH_PROGRAM).map \
-            $(SH_PROGRAM).sym \
-            $(SH_OBJECTS_NO_LINK_UNIQ) \
-            $(SH_DEPS_NO_LINK) \
-            IP.BIN \
-            IP.BIN.map
+	    $(SH_PROGRAM).bin \
+	    $(SH_PROGRAM).iso \
+	    $(SH_OBJECTS_UNIQ) \
+	    $(SH_TEMPS) \
+	    $(SH_PROGRAM).asm \
+	    $(SH_PROGRAM).bin \
+	    $(SH_PROGRAM).elf \
+	    $(SH_PROGRAM).map \
+	    $(SH_PROGRAM).sym \
+	    $(SH_OBJECTS_NO_LINK_UNIQ) \
+	    $(SH_DEPS_NO_LINK) \
+	    IP.BIN \
+	    IP.BIN.map
 ifneq ($(strip $(M68K_PROGRAM)),)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
-            romdisk/$(M68K_PROGRAM).m68k \
-            $(M68K_PROGRAM).m68k.elf \
-            $(M68K_PROGRAM).m68k.sym \
-            $(M68K_OBJECTS)
+	    romdisk/$(M68K_PROGRAM).m68k \
+	    $(M68K_PROGRAM).m68k.elf \
+	    $(M68K_PROGRAM).m68k.sym \
+	    $(M68K_OBJECTS)
 endif
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
-        awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
-        sort | \
-        grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
+	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
+	sort | \
+	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 -include $(SH_DEPS)
 -include $(SH_DEPS_NO_LINK)
