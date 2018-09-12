@@ -153,14 +153,40 @@ romdisk_read(void *p, void *buf, size_t bytes)
         }
 
         /* Is there enough left? */
-        if ((fh->ptr + bytes) > fh->len)
+        if ((fh->ptr + bytes) > fh->len) {
                 bytes = fh->len - fh->ptr;
+        }
 
         ofs = (uint8_t *)(mnt->image + fh->index + fh->ptr);
         memcpy(buf, ofs, bytes);
         fh->ptr += bytes;
 
         return bytes;
+}
+
+void *
+romdisk_direct(void *p)
+{
+        rd_file_handle_t *fh;
+        rd_image_t *mnt;
+
+        fh = (rd_file_handle_t *)p;
+        mnt = (rd_image_t *)fh->mnt;
+
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                /* errno = EBADF; */
+                return NULL;
+        }
+
+        if (fh->dir) {
+                /* errno = EISDIR; */
+                return NULL;
+        }
+
+        return (void *)(mnt->image + fh->index);
 }
 
 off_t
