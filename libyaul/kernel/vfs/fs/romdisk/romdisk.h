@@ -43,6 +43,7 @@ void *romdisk_mount(const char *, const uint8_t *);
 void *romdisk_open(void *, const char *);
 void romdisk_close(void *);
 ssize_t romdisk_read(void *, void *, size_t);
+void *romdisk_direct(void *);
 off_t romdisk_seek(void *, off_t, int);
 off_t romdisk_tell(void *);
 size_t romdisk_total(void *);
