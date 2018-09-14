@@ -99,9 +99,6 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
                 dst = 0x20000000 | (uint32_t)cfg->dlc_xfer;
                 src = 0x00000000;
                 count = 0x00000000;
-
-                /* Force set the transfer end bit */
-                cfg->dlc_xfer[cfg->dlc_xfer_count - 1].src |= 0x80000000;
                 break;
         }
 
