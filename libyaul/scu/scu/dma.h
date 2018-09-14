@@ -76,8 +76,16 @@ extern "C" {
 #define DMA_BUS_B       0x01
 #define DMA_BUS_DSP     0x02
 
+#define DMA_INDIRECT_TBL_END    0x80000000
+
 #define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
         .len = (_len),                                                         \
+        .dst = (uint32_t)(_dst),                                               \
+        .src = (uint32_t)(_src)                                                \
+}
+
+#define DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                      \
+        .len = DMA_INDIRECT_TBL_END | (_len),                                  \
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
