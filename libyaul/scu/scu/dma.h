@@ -120,7 +120,7 @@ scu_dma_dsp_busy(void)
 static inline void __attribute__ ((always_inline))
 scu_dma_dsp_wait(void)
 {
-        while ((scu_dma_dsp_busy()));
+        while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
 static inline uint8_t __attribute__ ((always_inline))
@@ -164,13 +164,14 @@ scu_dma_level2_busy(void)
 static inline uint8_t __attribute__ ((always_inline))
 scu_dma_level_busy(uint8_t level)
 {
-        switch (level) {
-        case 0:
-                return scu_dma_level0_busy();
-        case 1:
-                return scu_dma_level1_busy();
+        switch (level & 0x03) {
         case 2:
                 return scu_dma_level2_busy();
+        case 1:
+                return scu_dma_level1_busy();
+        case 0:
+        default:
+                return scu_dma_level0_busy();
         }
 }
 
