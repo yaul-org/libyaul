@@ -93,6 +93,9 @@ static const char *usb_cartridge_error_strings[] = {
 static int dev_init(void);
 static int dev_shutdown(void);
 
+static int read_byte(void *);
+static int send_byte(void *);
+
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
 static int execute_buffer(void *, uint32_t, uint32_t);
@@ -624,6 +627,80 @@ error_stringify(void)
  * USB Cartridge
  */
 static int
+read_byte(void *buffer)
+{
+        DEBUG_PRINTF("Enter\n");
+
+        int exit_code;
+        exit_code = 0;
+
+        /* ft_error = FT_OK; */
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        /* Sanity check */
+        if (buffer == NULL) {
+                usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
+                goto error;
+        }
+
+        if ((device_read(buffer, 1)) < 0) {
+                goto error;
+        }
+
+        goto exit;
+
+error:
+        exit_code = -1;
+
+        (void)printf("ERROR: %s\n", usb_cartridge_error_strings[usb_cartridge_error]);
+
+exit:
+        DEBUG_PRINTF("Exit\n");
+
+        return exit_code;
+}
+
+/*
+ * USB Cartridge
+ */
+static int
+send_byte(void *buffer)
+{
+        DEBUG_PRINTF("Enter\n");
+
+        int exit_code;
+        exit_code = 0;
+
+        /* ft_error = FT_OK; */
+        usb_cartridge_error = USB_CARTRIDGE_OK;
+
+        /* Sanity check */
+        if (buffer == NULL) {
+                usb_cartridge_error = USB_CARTRIDGE_BAD_REQUEST;
+                goto error;
+        }
+
+        if ((device_write(buffer, 1)) < 0) {
+                goto error;
+        }
+
+        goto exit;
+
+error:
+        exit_code = -1;
+
+        (void)printf("ERROR: %s\n", usb_cartridge_error_strings[usb_cartridge_error]);
+
+exit:
+        DEBUG_PRINTF("Exit\n");
+
+        return exit_code;
+}
+
+/*
+ * USB Cartridge
+ */
+static int
 download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
@@ -927,6 +1004,8 @@ const struct device_driver device_usb_cartridge = {
         .init = dev_init,
         .shutdown = dev_shutdown,
         .error_stringify = error_stringify,
+        .read_byte = read_byte,
+        .send_byte = send_byte,
         .download_buffer = download_buffer,
         .download_file = download_file,
         .upload_buffer = upload_buffer,
