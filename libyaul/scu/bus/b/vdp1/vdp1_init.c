@@ -112,18 +112,16 @@ vdp1_init(void)
         MEMORY_WRITE(16, VDP1(EWRR), (uint16_t)(((512 / 8) << 9) | (255)));
 
         /* Need to write half words */
-        memcpy((void *)CMD_TABLE(0, 0), _clear_cmd_list, sizeof(_clear_cmd_list));
+        // memcpy((void *)CMD_TABLE(0, 0), _clear_cmd_list, sizeof(_clear_cmd_list));
 
-        /* Start drawing immediately */
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0001);
-        /* Wait until VDP1 finishes drawing (CEF = BEF = 1) */
-        while ((MEMORY_READ(16, VDP1(EDSR)) & 0x0003) == 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-
-        vdp1_cmdt_list_init();
+        /* /\* Start drawing immediately *\/ */
+        /* MEMORY_WRITE(16, VDP1(PTMR), 0x0001); */
+        /* /\* Wait until VDP1 finishes drawing (CEF = BEF = 1) *\/ */
+        /* while ((MEMORY_READ(16, VDP1(EDSR)) & 0x0003) == 0x0000); */
+        /* MEMORY_WRITE(16, VDP1(PTMR), 0x0000); */
 
         /* Switch to 1-cycle mode */
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
 }
