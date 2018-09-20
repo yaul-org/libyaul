@@ -18,6 +18,33 @@
 #include "drivers.h"
 
 void
-console(const struct device_driver *device __attribute__ ((__unused__)))
+console(const struct device_driver *device)
 {
+        uint8_t term_byte;
+        term_byte = 0xFF;
+
+        while (true) {
+                char byte;
+                byte = '\0';
+
+                int ret;
+
+                if ((ret = device->read_byte(&byte)) != 0) {
+                        break;
+                }
+
+                switch (byte) {
+                case '\0':
+                        /* Send termination byte */
+                        device->send_byte(&term_byte);
+                        break;
+                default:
+                        (void)putchar(byte);
+                        break;
+                }
+
+                fflush(stdout);
+        }
+
+        (void)putchar('\n');
 }
