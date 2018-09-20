@@ -14,11 +14,9 @@
 
 #include "vdp2-internal.h"
 
-irq_mux_t vdp2_hblank_in_irq_mux;
 irq_mux_t vdp2_vblank_in_irq_mux;
 irq_mux_t vdp2_vblank_out_irq_mux;
 
-static void vdp2_hblank_in(void);
 static void vdp2_vblank_in(void);
 static void vdp2_vblank_out(void);
 
@@ -120,7 +118,6 @@ vdp2_init(void)
         /* Initialized */
         initialized = true;
 
-        irq_mux_init(&vdp2_hblank_in_irq_mux);
         irq_mux_init(&vdp2_vblank_in_irq_mux);
         irq_mux_init(&vdp2_vblank_out_irq_mux);
 
@@ -132,12 +129,10 @@ vdp2_init(void)
 
         uint32_t scu_mask;
         scu_mask = IC_MASK_VBLANK_IN |
-                   IC_MASK_VBLANK_OUT |
-                   IC_MASK_HBLANK_IN;
+                   IC_MASK_VBLANK_OUT;
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_HBLANK_IN, &vdp2_hblank_in);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, &vdp2_vblank_in);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, &vdp2_vblank_out);
 
@@ -145,12 +140,6 @@ vdp2_init(void)
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);
-}
-
-static void
-vdp2_hblank_in(void)
-{
-        irq_mux_handle(&vdp2_hblank_in_irq_mux);
 }
 
 static void
