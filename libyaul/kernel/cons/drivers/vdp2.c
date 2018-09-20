@@ -13,7 +13,6 @@
 
 #include "../drivers.h"
 
-static void cons_vdp2_reset(struct cons *);
 static void cons_vdp2_write(struct cons *);
 
 static struct scrn_cell_format _nbg3_format;

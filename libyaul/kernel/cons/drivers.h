@@ -48,6 +48,7 @@ struct cons_buffer {
 
 void cons_vdp1_init(struct cons *);
 void cons_vdp2_init(struct cons *);
+void cons_usb_cartridge_init(struct cons *);
 
 extern const uint32_t font[];
 extern const uint16_t palette[];

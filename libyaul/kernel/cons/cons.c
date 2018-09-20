@@ -105,6 +105,9 @@ cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
         case CONS_DRIVER_VDP2:
                 cons_vdp2_init(&cons);
                 break;
+        case CONS_DRIVER_USB_CARTRIDGE:
+                cons_usb_cartridge_init(&cons);
+                break;
         default:
                 assert(false);
                 return;
