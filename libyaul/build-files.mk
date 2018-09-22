@@ -197,6 +197,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_peripheral_raw_port.c \
 	scu/bus/cpu/smpc/smpc_rtc_settime_call.c \
 	\
+	scu/scu-internal.c \
 	scu/scu_dma.c \
 	scu/scu_dsp.c \
 	scu/scu_timer.c
