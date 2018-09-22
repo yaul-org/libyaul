@@ -169,6 +169,24 @@ scu_dma_illegal_set(void (*ihr)(void))
         _dma_illegal_ihr = (ihr != NULL) ? ihr : _default_ihr;
 }
 
+int8_t
+scu_dma_level_unused_get(void)
+{
+        if (!scu_dma_level_busy(0)) {
+                return 0;
+        }
+
+        if (!scu_dma_level_busy(1)) {
+                return 1;
+        }
+
+        if (!scu_dma_level_busy(2)) {
+                return 2;
+        }
+
+        return -1;
+}
+
 static void
 _default_ihr(void)
 {
