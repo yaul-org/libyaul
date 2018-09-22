@@ -333,6 +333,14 @@ scu_dma_level_stop(uint8_t level)
         }
 }
 
+static inline void __attribute__ ((always_inline))
+scu_dma_stop(void)
+{
+        scu_dma_level0_stop();
+        scu_dma_level1_stop();
+        scu_dma_level2_stop();
+}
+
 extern void scu_dma_init(void);
 extern void scu_dma_level_config_set(const struct dma_level_cfg *);
 extern void scu_dma_illegal_set(void (*)(void));
