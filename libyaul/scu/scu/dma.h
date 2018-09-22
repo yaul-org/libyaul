@@ -101,7 +101,6 @@ struct dma_level_cfg {
         uint8_t dlc_mode;
 
         struct dma_xfer *dlc_xfer;
-        uint16_t dlc_xfer_count;
 
         uint8_t dlc_stride;
         uint32_t dlc_update;
@@ -341,9 +340,14 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
+static inline void __attribute__ ((always_inline))
+scu_dma_illegal_set(void (*ihr)(void))
+{
+        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, ihr);
+}
+
 extern void scu_dma_init(void);
 extern void scu_dma_level_config_set(const struct dma_level_cfg *);
-extern void scu_dma_illegal_set(void (*)(void));
 extern int8_t scu_dma_level_unused_get(void);
 
 #ifdef __cplusplus
