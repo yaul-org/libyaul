@@ -24,5 +24,5 @@ vdp2_scrn_display_unset(uint8_t scrn)
                (scrn == SCRN_RBG0));
 #endif /* DEBUG */
 
-        vdp2_state.buffered_regs.bgon &= ~((1 << scrn) | (1 << (scrn + 8)));
+        _internal_state_vdp2.buffered_regs.bgon &= ~((1 << scrn) | (1 << (scrn + 8)));
 }

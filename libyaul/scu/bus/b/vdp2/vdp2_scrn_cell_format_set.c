@@ -242,18 +242,18 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
 static void
 _nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
 {
-        vdp2_state.buffered_regs.chctla &= 0xFF8F;
-        vdp2_state.buffered_regs.chctla &= 0xFFFE;
-        vdp2_state.buffered_regs.plsz &= 0xFFFC;
-        vdp2_state.buffered_regs.mpofn &= 0xFFF8;
-        vdp2_state.buffered_regs.mpabn0 = 0x0000;
-        vdp2_state.buffered_regs.mpcdn0 = 0x0000;
-        vdp2_state.buffered_regs.pncn0 = 0x0000;
-        vdp2_state.buffered_regs.sfsel &= 0xFFFE;
-        vdp2_state.buffered_regs.sfprmd &= 0xFFFC;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xFF8F;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xFFFE;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xFFFC;
+        _internal_state_vdp2.buffered_regs.mpofn &= 0xFFF8;
+        _internal_state_vdp2.buffered_regs.mpabn0 = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdn0 = 0x0000;
+        _internal_state_vdp2.buffered_regs.pncn0 = 0x0000;
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFFE;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFFFC;
 
         /* Copy */
-        (void)memcpy(&vdp2_state.nbg0.cell_format, format, sizeof(*format));
+        (void)memcpy(&_internal_state_vdp2.nbg0.cell_format, format, sizeof(*format));
 
         uint16_t pncn0;
         pncn0 = _cell_pattern_name_control_calc(format);
@@ -264,40 +264,40 @@ _nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 4;
+        _internal_state_vdp2.buffered_regs.chctla |= format->scf_cc_count << 4;
 
         /* Character size */
-        vdp2_state.buffered_regs.chctla |= format->scf_character_size >> 2;
+        _internal_state_vdp2.buffered_regs.chctla |= format->scf_character_size >> 2;
 
         /* Plane size */
-        vdp2_state.buffered_regs.plsz |= format->scf_plane_size - 1;
+        _internal_state_vdp2.buffered_regs.plsz |= format->scf_plane_size - 1;
 
         /* Map */
-        vdp2_state.buffered_regs.mpofn |= map_offset;
-        vdp2_state.buffered_regs.mpabn0 = (planes[1] << 8) | planes[0];
-        vdp2_state.buffered_regs.mpcdn0 = (planes[3] << 8) | planes[2];
-        vdp2_state.buffered_regs.pncn0 = pncn0;
+        _internal_state_vdp2.buffered_regs.mpofn |= map_offset;
+        _internal_state_vdp2.buffered_regs.mpabn0 = (planes[1] << 8) | planes[0];
+        _internal_state_vdp2.buffered_regs.mpcdn0 = (planes[3] << 8) | planes[2];
+        _internal_state_vdp2.buffered_regs.pncn0 = pncn0;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 0;
-        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 0;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 0;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 0;
 }
 
 static void
 _nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
 {
-        vdp2_state.buffered_regs.chctla &= 0xCFFF;
-        vdp2_state.buffered_regs.chctla &= 0xFEFF;
-        vdp2_state.buffered_regs.plsz &= 0xFFF3;
-        vdp2_state.buffered_regs.mpofn &= 0xFF8F;
-        vdp2_state.buffered_regs.mpabn1 = 0x0000;
-        vdp2_state.buffered_regs.mpcdn1 = 0x0000;
-        vdp2_state.buffered_regs.pncn1 = 0x0000;
-        vdp2_state.buffered_regs.sfsel &= 0xFFFD;
-        vdp2_state.buffered_regs.sfprmd &= 0xFFF3;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xCFFF;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xFEFF;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xFFF3;
+        _internal_state_vdp2.buffered_regs.mpofn &= 0xFF8F;
+        _internal_state_vdp2.buffered_regs.mpabn1 = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdn1 = 0x0000;
+        _internal_state_vdp2.buffered_regs.pncn1 = 0x0000;
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFFD;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFFF3;
 
         /* Copy */
-        (void)memcpy(&vdp2_state.nbg1.cell_format, format, sizeof(*format));
+        (void)memcpy(&_internal_state_vdp2.nbg1.cell_format, format, sizeof(*format));
 
         uint16_t pncn1;
         pncn1 = _cell_pattern_name_control_calc(format);
@@ -308,23 +308,23 @@ _nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        vdp2_state.buffered_regs.chctla |= format->scf_cc_count << 12;
+        _internal_state_vdp2.buffered_regs.chctla |= format->scf_cc_count << 12;
 
         /* Character size */
-        vdp2_state.buffered_regs.chctla |= (format->scf_character_size >> 2) << 8;
+        _internal_state_vdp2.buffered_regs.chctla |= (format->scf_character_size >> 2) << 8;
 
         /* Plane size */
-        vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 2;
+        _internal_state_vdp2.buffered_regs.plsz |= (format->scf_plane_size - 1) << 2;
 
         /* Map */
-        vdp2_state.buffered_regs.mpofn |= map_offset << 4;
-        vdp2_state.buffered_regs.mpabn1 = (planes[1] << 8) | planes[0];
-        vdp2_state.buffered_regs.mpcdn1 = (planes[3] << 8) | planes[2];
-        vdp2_state.buffered_regs.pncn1 = pncn1;
+        _internal_state_vdp2.buffered_regs.mpofn |= map_offset << 4;
+        _internal_state_vdp2.buffered_regs.mpabn1 = (planes[1] << 8) | planes[0];
+        _internal_state_vdp2.buffered_regs.mpcdn1 = (planes[3] << 8) | planes[2];
+        _internal_state_vdp2.buffered_regs.pncn1 = pncn1;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 1;
-        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 2;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 1;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 2;
 }
 
 static void
@@ -335,18 +335,18 @@ _nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
                (format->scf_cc_count == SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
-        vdp2_state.buffered_regs.chctlb &= 0xFFFD;
-        vdp2_state.buffered_regs.chctlb &= 0xFFFE;
-        vdp2_state.buffered_regs.plsz &= 0xFFCF;
-        vdp2_state.buffered_regs.mpofn &= 0xF8FF;
-        vdp2_state.buffered_regs.mpabn2 = 0x0000;
-        vdp2_state.buffered_regs.mpcdn2 = 0x0000;
-        vdp2_state.buffered_regs.pncn2 = 0x0000;
-        vdp2_state.buffered_regs.sfsel &= 0xFFFB;
-        vdp2_state.buffered_regs.sfprmd &= 0xFFCF;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xFFFD;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xFFFE;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xFFCF;
+        _internal_state_vdp2.buffered_regs.mpofn &= 0xF8FF;
+        _internal_state_vdp2.buffered_regs.mpabn2 = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdn2 = 0x0000;
+        _internal_state_vdp2.buffered_regs.pncn2 = 0x0000;
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFFB;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFFCF;
 
         /* Copy */
-        (void)memcpy(&vdp2_state.nbg2.cell_format, format, sizeof(*format));
+        (void)memcpy(&_internal_state_vdp2.nbg2.cell_format, format, sizeof(*format));
 
         uint16_t pncn2;
         pncn2 = _cell_pattern_name_control_calc(format);
@@ -357,23 +357,23 @@ _nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 1;
+        _internal_state_vdp2.buffered_regs.chctlb |= format->scf_cc_count << 1;
 
         /* Character Size */
-        vdp2_state.buffered_regs.chctlb |= format->scf_character_size >> 2;
+        _internal_state_vdp2.buffered_regs.chctlb |= format->scf_character_size >> 2;
 
         /* Plane Size */
-        vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 4;
+        _internal_state_vdp2.buffered_regs.plsz |= (format->scf_plane_size - 1) << 4;
 
         /* Map */
-        vdp2_state.buffered_regs.mpofn |= map_offset << 8;
-        vdp2_state.buffered_regs.mpabn2 = (planes[1] << 8) | planes[0];
-        vdp2_state.buffered_regs.mpcdn2 = (planes[3] << 8) | planes[2];
-        vdp2_state.buffered_regs.pncn2 = pncn2;
+        _internal_state_vdp2.buffered_regs.mpofn |= map_offset << 8;
+        _internal_state_vdp2.buffered_regs.mpabn2 = (planes[1] << 8) | planes[0];
+        _internal_state_vdp2.buffered_regs.mpcdn2 = (planes[3] << 8) | planes[2];
+        _internal_state_vdp2.buffered_regs.pncn2 = pncn2;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 2;
-        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 4;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 2;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 4;
 }
 
 static void
@@ -384,18 +384,18 @@ _nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
                (format->scf_cc_count == SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
-        vdp2_state.buffered_regs.chctlb &= 0xFFDF;
-        vdp2_state.buffered_regs.chctlb &= 0xFFEF;
-        vdp2_state.buffered_regs.plsz &= 0xFF3F;
-        vdp2_state.buffered_regs.mpofn &= 0x8FFF;
-        vdp2_state.buffered_regs.mpabn3 = 0x0000;
-        vdp2_state.buffered_regs.mpcdn3 = 0x0000;
-        vdp2_state.buffered_regs.pncn3 = 0x0000;
-        vdp2_state.buffered_regs.sfsel &= 0xFFF7;
-        vdp2_state.buffered_regs.sfprmd &= 0xFF3F;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xFFDF;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xFFEF;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xFF3F;
+        _internal_state_vdp2.buffered_regs.mpofn &= 0x8FFF;
+        _internal_state_vdp2.buffered_regs.mpabn3 = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdn3 = 0x0000;
+        _internal_state_vdp2.buffered_regs.pncn3 = 0x0000;
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFF7;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFF3F;
 
         /* Copy */
-        (void)memcpy(&vdp2_state.nbg3.cell_format, format,
+        (void)memcpy(&_internal_state_vdp2.nbg3.cell_format, format,
             sizeof(struct scrn_cell_format));
 
         uint16_t pncn3;
@@ -407,23 +407,23 @@ _nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 5;
+        _internal_state_vdp2.buffered_regs.chctlb |= format->scf_cc_count << 5;
 
         /* Character size */
-        vdp2_state.buffered_regs.chctlb |= format->scf_character_size << 2;
+        _internal_state_vdp2.buffered_regs.chctlb |= format->scf_character_size << 2;
 
         /* Plane size */
-        vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 6;
+        _internal_state_vdp2.buffered_regs.plsz |= (format->scf_plane_size - 1) << 6;
 
         /* Map */
-        vdp2_state.buffered_regs.mpofn |= map_offset << 12;
-        vdp2_state.buffered_regs.mpabn3 = (planes[1] << 8) | planes[0];
-        vdp2_state.buffered_regs.mpcdn3 = (planes[3] << 8) | planes[2];
-        vdp2_state.buffered_regs.pncn3 = pncn3;
+        _internal_state_vdp2.buffered_regs.mpofn |= map_offset << 12;
+        _internal_state_vdp2.buffered_regs.mpabn3 = (planes[1] << 8) | planes[0];
+        _internal_state_vdp2.buffered_regs.mpcdn3 = (planes[3] << 8) | planes[2];
+        _internal_state_vdp2.buffered_regs.pncn3 = pncn3;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 3;
-        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 6;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 3;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 6;
 }
 
 static void
@@ -436,32 +436,32 @@ _rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
                (format->scf_rp_mode == 3));
 #endif /* DEBUG */
 
-        vdp2_state.buffered_regs.chctlb &= 0x8FFF;
-        vdp2_state.buffered_regs.chctlb &= 0xFEFF;
-        vdp2_state.buffered_regs.rpmd &= 0xFFFE;
-        vdp2_state.buffered_regs.plsz &= 0xFCFF;
-        vdp2_state.buffered_regs.plsz &= 0xCFFF;
-        vdp2_state.buffered_regs.mpofr &= 0xFFF8;
-        vdp2_state.buffered_regs.mpofr &= 0xFF8F;
-        vdp2_state.buffered_regs.mpabra = 0x0000;
-        vdp2_state.buffered_regs.mpcdra = 0x0000;
-        vdp2_state.buffered_regs.mpefra = 0x0000;
-        vdp2_state.buffered_regs.mpghra = 0x0000;
-        vdp2_state.buffered_regs.mpijra = 0x0000;
-        vdp2_state.buffered_regs.mpklra = 0x0000;
-        vdp2_state.buffered_regs.mpmnra = 0x0000;
-        vdp2_state.buffered_regs.mpopra = 0x0000;
-        vdp2_state.buffered_regs.mpabrb = 0x0000;
-        vdp2_state.buffered_regs.mpcdrb = 0x0000;
-        vdp2_state.buffered_regs.mpefrb = 0x0000;
-        vdp2_state.buffered_regs.mpghrb = 0x0000;
-        vdp2_state.buffered_regs.mpijrb = 0x0000;
-        vdp2_state.buffered_regs.mpklrb = 0x0000;
-        vdp2_state.buffered_regs.mpmnrb = 0x0000;
-        vdp2_state.buffered_regs.mpoprb = 0x0000;
-        vdp2_state.buffered_regs.pncr = 0x0000;
-        vdp2_state.buffered_regs.sfsel &= 0xFFEF;
-        vdp2_state.buffered_regs.sfprmd &= 0xFCFF;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0x8FFF;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xFEFF;
+        _internal_state_vdp2.buffered_regs.rpmd &= 0xFFFE;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xFCFF;
+        _internal_state_vdp2.buffered_regs.plsz &= 0xCFFF;
+        _internal_state_vdp2.buffered_regs.mpofr &= 0xFFF8;
+        _internal_state_vdp2.buffered_regs.mpofr &= 0xFF8F;
+        _internal_state_vdp2.buffered_regs.mpabra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpefra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpghra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpijra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpklra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpmnra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpopra = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpabrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpcdrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpefrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpghrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpijrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpklrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpmnrb = 0x0000;
+        _internal_state_vdp2.buffered_regs.mpoprb = 0x0000;
+        _internal_state_vdp2.buffered_regs.pncr = 0x0000;
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFEF;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFCFF;
 
         uint16_t pncr;
         pncr = _cell_pattern_name_control_calc(format);
@@ -472,54 +472,54 @@ _rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        vdp2_state.buffered_regs.chctlb |= format->scf_cc_count << 12;
+        _internal_state_vdp2.buffered_regs.chctlb |= format->scf_cc_count << 12;
 
         /* Character size */
-        vdp2_state.buffered_regs.chctlb |= (format->scf_character_size >> 2) << 8;
+        _internal_state_vdp2.buffered_regs.chctlb |= (format->scf_character_size >> 2) << 8;
 
         /* Rotation parameter mode */
-        vdp2_state.buffered_regs.rpmd |= format->scf_rp_mode;
+        _internal_state_vdp2.buffered_regs.rpmd |= format->scf_rp_mode;
 
         switch (format->scf_rp_mode) {
         case 0:
                 /* Mode 0: Rotation Parameter A */
 
                 /* Plane size */
-                vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 8;
+                _internal_state_vdp2.buffered_regs.plsz |= (format->scf_plane_size - 1) << 8;
 
                 /* Screen over process */
 
                 /* Map */
-                vdp2_state.buffered_regs.mpofr |= map_offset;
+                _internal_state_vdp2.buffered_regs.mpofr |= map_offset;
 
-                vdp2_state.buffered_regs.mpabra = (planes[1] << 8) | planes[0];
-                vdp2_state.buffered_regs.mpcdra = (planes[3] << 8) | planes[2];
-                vdp2_state.buffered_regs.mpefra = (planes[5] << 8) | planes[4];
-                vdp2_state.buffered_regs.mpghra = (planes[7] << 8) | planes[6];
-                vdp2_state.buffered_regs.mpijra = (planes[9] << 8) | planes[8];
-                vdp2_state.buffered_regs.mpklra = (planes[11] << 8) | planes[10];
-                vdp2_state.buffered_regs.mpmnra = (planes[13] << 8) | planes[12];
-                vdp2_state.buffered_regs.mpopra = (planes[15] << 8) | planes[14];
+                _internal_state_vdp2.buffered_regs.mpabra = (planes[1] << 8) | planes[0];
+                _internal_state_vdp2.buffered_regs.mpcdra = (planes[3] << 8) | planes[2];
+                _internal_state_vdp2.buffered_regs.mpefra = (planes[5] << 8) | planes[4];
+                _internal_state_vdp2.buffered_regs.mpghra = (planes[7] << 8) | planes[6];
+                _internal_state_vdp2.buffered_regs.mpijra = (planes[9] << 8) | planes[8];
+                _internal_state_vdp2.buffered_regs.mpklra = (planes[11] << 8) | planes[10];
+                _internal_state_vdp2.buffered_regs.mpmnra = (planes[13] << 8) | planes[12];
+                _internal_state_vdp2.buffered_regs.mpopra = (planes[15] << 8) | planes[14];
                 break;
         case 1:
                 /* Mode 1: Rotation Parameter B */
 
                 /* Plane size */
-                vdp2_state.buffered_regs.plsz |= (format->scf_plane_size - 1) << 12;
+                _internal_state_vdp2.buffered_regs.plsz |= (format->scf_plane_size - 1) << 12;
 
                 /* Screen over process */
 
                 /* Map */
-                vdp2_state.buffered_regs.mpofr |= map_offset << 4;
+                _internal_state_vdp2.buffered_regs.mpofr |= map_offset << 4;
 
-                vdp2_state.buffered_regs.mpabrb = (planes[1] << 8) | planes[0];
-                vdp2_state.buffered_regs.mpcdrb = (planes[3] << 8) | planes[2];
-                vdp2_state.buffered_regs.mpefrb = (planes[5] << 8) | planes[4];
-                vdp2_state.buffered_regs.mpghrb = (planes[7] << 8) | planes[6];
-                vdp2_state.buffered_regs.mpijrb = (planes[9] << 8) | planes[8];
-                vdp2_state.buffered_regs.mpklrb = (planes[11] << 8) | planes[10];
-                vdp2_state.buffered_regs.mpmnrb = (planes[13] << 8) | planes[12];
-                vdp2_state.buffered_regs.mpoprb = (planes[15] << 8) | planes[14];
+                _internal_state_vdp2.buffered_regs.mpabrb = (planes[1] << 8) | planes[0];
+                _internal_state_vdp2.buffered_regs.mpcdrb = (planes[3] << 8) | planes[2];
+                _internal_state_vdp2.buffered_regs.mpefrb = (planes[5] << 8) | planes[4];
+                _internal_state_vdp2.buffered_regs.mpghrb = (planes[7] << 8) | planes[6];
+                _internal_state_vdp2.buffered_regs.mpijrb = (planes[9] << 8) | planes[8];
+                _internal_state_vdp2.buffered_regs.mpklrb = (planes[11] << 8) | planes[10];
+                _internal_state_vdp2.buffered_regs.mpmnrb = (planes[13] << 8) | planes[12];
+                _internal_state_vdp2.buffered_regs.mpoprb = (planes[15] << 8) | planes[14];
                 break;
         case 2:
                 break;
@@ -528,9 +528,9 @@ _rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
                 break;
         }
 
-        vdp2_state.buffered_regs.pncr = pncr;
+        _internal_state_vdp2.buffered_regs.pncr = pncr;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 4;
-        vdp2_state.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 8;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->scf_sf_code & 0x01) << 4;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->scf_sf_mode & 0x03) << 8;
 }

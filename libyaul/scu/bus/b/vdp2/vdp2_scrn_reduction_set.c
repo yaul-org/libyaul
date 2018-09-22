@@ -26,12 +26,12 @@ vdp2_scrn_reduction_set(uint8_t scrn, uint16_t reduction_amt)
 
         switch (scrn) {
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.zmctl &= 0xFFFC;
-                vdp2_state.buffered_regs.zmctl |= reduction_amt;
+                _internal_state_vdp2.buffered_regs.zmctl &= 0xFFFC;
+                _internal_state_vdp2.buffered_regs.zmctl |= reduction_amt;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.zmctl &= 0xFCFF;
-                vdp2_state.buffered_regs.zmctl |= reduction_amt << 8;
+                _internal_state_vdp2.buffered_regs.zmctl &= 0xFCFF;
+                _internal_state_vdp2.buffered_regs.zmctl |= reduction_amt << 8;
                 break;
         default:
                 return;

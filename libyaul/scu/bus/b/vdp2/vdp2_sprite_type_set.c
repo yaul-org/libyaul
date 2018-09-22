@@ -22,8 +22,9 @@ vdp2_sprite_type_set(uint8_t type)
 #endif /* DEBUG */
 
         /* Types 0 to 7 are for low resolution (320 or 352), and types 8
-         * to 15 are for high resolution (640 or 704). The data widths
-         * are 16-bits and 8-bits, respectively. */
-        vdp2_state.buffered_regs.spctl &= 0xFFF0;
-        vdp2_state.buffered_regs.spctl |= type & 0x000F;
+         * to 15 are for high resolution (640 or 704).
+         *
+         * The data widths are 16-bits and 8-bits, respectively. */
+        _internal_state_vdp2.buffered_regs.spctl &= 0xFFF0;
+        _internal_state_vdp2.buffered_regs.spctl |= type & 0x000F;
 }

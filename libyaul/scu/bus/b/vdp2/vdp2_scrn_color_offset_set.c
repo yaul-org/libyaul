@@ -32,53 +32,53 @@ vdp2_scrn_color_offset_set(uint8_t scrn, uint8_t select)
 
         switch (scrn) {
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.clofen &= 0xFFFE;
-                vdp2_state.buffered_regs.clofen |= 0x0001;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFE;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0001;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFFE;
-                vdp2_state.buffered_regs.clofsl |= select << 0;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFFE;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 0;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.clofen &= 0xFFFD;
-                vdp2_state.buffered_regs.clofen |= 0x0002;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFD;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0002;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFFD;
-                vdp2_state.buffered_regs.clofsl |= select << 1;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFFD;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 1;
                 break;
         case SCRN_NBG2:
-                vdp2_state.buffered_regs.clofen &= 0xFFFB;
-                vdp2_state.buffered_regs.clofen |= 0x0004;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFB;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0004;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFFB;
-                vdp2_state.buffered_regs.clofsl |= select << 2;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFFB;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 2;
                 break;
         case SCRN_NBG3:
-                vdp2_state.buffered_regs.clofen &= 0xFFF7;
-                vdp2_state.buffered_regs.clofen |= 0x0008;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFF7;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0008;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFF7;
-                vdp2_state.buffered_regs.clofsl |= select << 3;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFF7;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 3;
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.clofen &= 0xFFEF;
-                vdp2_state.buffered_regs.clofen |= 0x0010;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFEF;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0010;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFEF;
-                vdp2_state.buffered_regs.clofsl |= select << 4;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFEF;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 4;
                 break;
         case SCRN_BACK:
-                vdp2_state.buffered_regs.clofen &= 0xFFDF;
-                vdp2_state.buffered_regs.clofen |= 0x0020;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFDF;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0020;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFDF;
-                vdp2_state.buffered_regs.clofsl |= select << 5;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFDF;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 5;
                 break;
         case SCRN_SPRITE:
-                vdp2_state.buffered_regs.clofen &= 0xFFBF;
-                vdp2_state.buffered_regs.clofen |= 0x0040;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFBF;
+                _internal_state_vdp2.buffered_regs.clofen |= 0x0040;
 
-                vdp2_state.buffered_regs.clofsl &= 0xFFBF;
-                vdp2_state.buffered_regs.clofsl |= select << 6;
+                _internal_state_vdp2.buffered_regs.clofsl &= 0xFFBF;
+                _internal_state_vdp2.buffered_regs.clofsl |= select << 6;
                 break;
         default:
                 return;

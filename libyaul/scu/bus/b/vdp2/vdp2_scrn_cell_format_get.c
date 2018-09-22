@@ -27,13 +27,13 @@ vdp2_scrn_cell_format_get(uint8_t scrn)
 
         switch (scrn) {
         case SCRN_NBG0:
-                return &vdp2_state.nbg0.cell_format;
+                return &_internal_state_vdp2.nbg0.cell_format;
         case SCRN_NBG1:
-                return &vdp2_state.nbg1.cell_format;
+                return &_internal_state_vdp2.nbg1.cell_format;
         case SCRN_NBG2:
-                return &vdp2_state.nbg2.cell_format;
+                return &_internal_state_vdp2.nbg2.cell_format;
         case SCRN_NBG3:
-                return &vdp2_state.nbg3.cell_format;
+                return &_internal_state_vdp2.nbg3.cell_format;
         default:
                 return NULL;
         }

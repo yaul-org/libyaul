@@ -74,11 +74,11 @@ _debug_check(const struct scrn_bitmap_format *format)
 static void
 _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 {
-        vdp2_state.buffered_regs.chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
-        vdp2_state.buffered_regs.mpofn &= 0xFFF8;       /* Bits 0,1,2 */
-        vdp2_state.buffered_regs.bmpna &= 0xFFC8;       /* Bits 0,1,2,4,5 */
-        vdp2_state.buffered_regs.sfsel &= 0xFFFE;
-        vdp2_state.buffered_regs.sfprmd &= 0xFFFC;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
+        _internal_state_vdp2.buffered_regs.mpofn &= 0xFFF8;       /* Bits 0,1,2 */
+        _internal_state_vdp2.buffered_regs.bmpna &= 0xFFC8;       /* Bits 0,1,2,4,5 */
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFFE;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFFFC;
 
         uint16_t cc_count;
         cc_count = (format->sbf_cc_count & 0x07) << 4;
@@ -98,13 +98,13 @@ _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         /* Screen display format */
         /* Character color count */
         /* Bitmap size */
-        vdp2_state.buffered_regs.chctla |= 0x0002;
-        vdp2_state.buffered_regs.chctla |= cc_count;
-        vdp2_state.buffered_regs.chctla |= width << 3;
-        vdp2_state.buffered_regs.chctla |= height << 2;
+        _internal_state_vdp2.buffered_regs.chctla |= 0x0002;
+        _internal_state_vdp2.buffered_regs.chctla |= cc_count;
+        _internal_state_vdp2.buffered_regs.chctla |= width << 3;
+        _internal_state_vdp2.buffered_regs.chctla |= height << 2;
 
         /* Pattern boundry lead address */
-        vdp2_state.buffered_regs.mpofn |= bank;
+        _internal_state_vdp2.buffered_regs.mpofn |= bank;
 
         /* Supplementary palette number */
 
@@ -118,26 +118,26 @@ _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         switch (format->sbf_cc_count) {
         case SCRN_CCC_PALETTE_16:
         case SCRN_CCC_PALETTE_256:
-                vdp2_state.buffered_regs.bmpna |= palette_number;
+                _internal_state_vdp2.buffered_regs.bmpna |= palette_number;
                 break;
         }
 
         /* Special function type */
-        vdp2_state.buffered_regs.bmpna |= (format->sbf_sf_type & 0x03) << 4;
+        _internal_state_vdp2.buffered_regs.bmpna |= (format->sbf_sf_type & 0x03) << 4;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 0;
-        vdp2_state.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 0;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 0;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 0;
 }
 
 static void
 _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 {
-        vdp2_state.buffered_regs.chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
-        vdp2_state.buffered_regs.mpofn &= 0xFF8F;       /* Bits 4,5,6 */
-        vdp2_state.buffered_regs.bmpna &= 0xC8FF;       /* Bits 8,9,10,12,13 */
-        vdp2_state.buffered_regs.sfsel &= 0xFFFD;
-        vdp2_state.buffered_regs.sfprmd &= 0xFFF3;
+        _internal_state_vdp2.buffered_regs.chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
+        _internal_state_vdp2.buffered_regs.mpofn &= 0xFF8F;       /* Bits 4,5,6 */
+        _internal_state_vdp2.buffered_regs.bmpna &= 0xC8FF;       /* Bits 8,9,10,12,13 */
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFFD;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFFF3;
 
         uint16_t cc_count;
         cc_count = (format->sbf_cc_count & 0x03) << 12;
@@ -157,28 +157,28 @@ _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         /* Screen display format */
         /* Character color count */
         /* Bitmap size */
-        vdp2_state.buffered_regs.chctla |= 0x0200;
-        vdp2_state.buffered_regs.chctla |= cc_count;
-        vdp2_state.buffered_regs.chctla |= width << 10;
-        vdp2_state.buffered_regs.chctla |= height << 10;
+        _internal_state_vdp2.buffered_regs.chctla |= 0x0200;
+        _internal_state_vdp2.buffered_regs.chctla |= cc_count;
+        _internal_state_vdp2.buffered_regs.chctla |= width << 10;
+        _internal_state_vdp2.buffered_regs.chctla |= height << 10;
 
         /* Pattern boundry lead address */
-        vdp2_state.buffered_regs.mpofn |= bank << 4;
+        _internal_state_vdp2.buffered_regs.mpofn |= bank << 4;
 
         /* Supplementary palette number */
         switch (format->sbf_cc_count) {
         case SCRN_CCC_PALETTE_16:
         case SCRN_CCC_PALETTE_256:
-                vdp2_state.buffered_regs.bmpna |= palette_number << 8;
+                _internal_state_vdp2.buffered_regs.bmpna |= palette_number << 8;
                 break;
         }
 
         /* Special function type */
-        vdp2_state.buffered_regs.bmpna |= (format->sbf_sf_type & 0x03) << 12;
+        _internal_state_vdp2.buffered_regs.bmpna |= (format->sbf_sf_type & 0x03) << 12;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 1;
-        vdp2_state.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 2;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 1;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 2;
 }
 
 static void
@@ -193,11 +193,11 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
                (format->sbf_rp_mode == 3));
 #endif /* DEBUG */
 
-        vdp2_state.buffered_regs.chctlb &= 0xC0FF;      /* Bits 8,9,10,12,13,14*/
-        vdp2_state.buffered_regs.bmpnb &= 0xFFC8;       /* Bits 0,1,2,4,5*/
-        vdp2_state.buffered_regs.rpmd &= 0xFFFC;        /* Bits 0,1 */
-        vdp2_state.buffered_regs.sfsel &= 0xFFEF;
-        vdp2_state.buffered_regs.sfprmd &= 0xFCFF;
+        _internal_state_vdp2.buffered_regs.chctlb &= 0xC0FF;      /* Bits 8,9,10,12,13,14*/
+        _internal_state_vdp2.buffered_regs.bmpnb &= 0xFFC8;       /* Bits 0,1,2,4,5*/
+        _internal_state_vdp2.buffered_regs.rpmd &= 0xFFFC;        /* Bits 0,1 */
+        _internal_state_vdp2.buffered_regs.sfsel &= 0xFFEF;
+        _internal_state_vdp2.buffered_regs.sfprmd &= 0xFCFF;
 
         uint16_t cc_count;
         cc_count = (format->sbf_cc_count & 0x03) << 12;
@@ -217,43 +217,43 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         /* Screen display format */
         /* Character color count */
         /* Bitmap size */
-        vdp2_state.buffered_regs.chctlb |= 0x0200;
-        vdp2_state.buffered_regs.chctlb |= cc_count;
-        vdp2_state.buffered_regs.chctlb |= width << 10;
-        vdp2_state.buffered_regs.chctlb |= height << 10;
+        _internal_state_vdp2.buffered_regs.chctlb |= 0x0200;
+        _internal_state_vdp2.buffered_regs.chctlb |= cc_count;
+        _internal_state_vdp2.buffered_regs.chctlb |= width << 10;
+        _internal_state_vdp2.buffered_regs.chctlb |= height << 10;
 
         /* Supplementary palette number */
         switch (format->sbf_cc_count) {
         case SCRN_CCC_PALETTE_16:
         case SCRN_CCC_PALETTE_256:
-                vdp2_state.buffered_regs.bmpnb |= palette_number;
+                _internal_state_vdp2.buffered_regs.bmpnb |= palette_number;
                 break;
         }
 
         /* Rotation parameter mode */
-        vdp2_state.buffered_regs.rpmd |= format->sbf_rp_mode;
+        _internal_state_vdp2.buffered_regs.rpmd |= format->sbf_rp_mode;
 
         switch (format->sbf_rp_mode) {
         case 0:
                 /* Mode 0: Rotation Parameter A */
 
                 /* Pattern boundry lead address */
-                vdp2_state.buffered_regs.mpofr &= 0xFFF8;
-                vdp2_state.buffered_regs.mpofr |= bank;
+                _internal_state_vdp2.buffered_regs.mpofr &= 0xFFF8;
+                _internal_state_vdp2.buffered_regs.mpofr |= bank;
                 break;
         case 1:
                 /* Mode 1: Rotation Parameter B */
 
                 /* Pattern boundry lead address */
-                vdp2_state.buffered_regs.mpofr &= 0xFF8F;
-                vdp2_state.buffered_regs.mpofr |= bank << 4;
+                _internal_state_vdp2.buffered_regs.mpofr &= 0xFF8F;
+                _internal_state_vdp2.buffered_regs.mpofr |= bank << 4;
                 break;
         }
 
         /* Special function type */
-        vdp2_state.buffered_regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;
+        _internal_state_vdp2.buffered_regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;
 
         /* Special function */
-        vdp2_state.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 4;
-        vdp2_state.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 8;
+        _internal_state_vdp2.buffered_regs.sfsel |= (format->sbf_sf_code & 0x01) << 4;
+        _internal_state_vdp2.buffered_regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 8;
 }

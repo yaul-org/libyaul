@@ -28,25 +28,25 @@ vdp2_scrn_color_offset_unset(uint8_t scrn)
 
         switch (scrn) {
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.clofen &= 0xFFFE;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFE;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.clofen &= 0xFFFD;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFD;
                 break;
         case SCRN_NBG2:
-                vdp2_state.buffered_regs.clofen &= 0xFFFB;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFFB;
                 break;
         case SCRN_NBG3:
-                vdp2_state.buffered_regs.clofen &= 0xFFF7;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFF7;
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.clofen &= 0xFFEF;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFEF;
                 break;
         case SCRN_BACK:
-                vdp2_state.buffered_regs.clofen &= 0xFFDF;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFDF;
                 break;
         case SCRN_SPRITE:
-                vdp2_state.buffered_regs.clofen &= 0xFFBF;
+                _internal_state_vdp2.buffered_regs.clofen &= 0xFFBF;
                 break;
         default:
                 return;

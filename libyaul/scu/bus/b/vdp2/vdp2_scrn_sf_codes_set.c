@@ -22,12 +22,12 @@ vdp2_scrn_sf_codes_set(uint8_t code, uint8_t codes)
 
         switch (code) {
         case SCRN_SF_CODE_A:
-                vdp2_state.buffered_regs.sfcode &= 0xFF00;
-                vdp2_state.buffered_regs.sfcode |= (uint16_t)codes;
+                _internal_state_vdp2.buffered_regs.sfcode &= 0xFF00;
+                _internal_state_vdp2.buffered_regs.sfcode |= (uint16_t)codes;
                 break;
         case SCRN_SF_CODE_B:
-                vdp2_state.buffered_regs.sfcode &= 0x00FF;
-                vdp2_state.buffered_regs.sfcode |= (uint16_t)codes << 8;
+                _internal_state_vdp2.buffered_regs.sfcode &= 0x00FF;
+                _internal_state_vdp2.buffered_regs.sfcode |= (uint16_t)codes << 8;
                 break;
         }
 }

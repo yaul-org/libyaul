@@ -12,10 +12,10 @@
 void
 vdp2_tvmd_display_clear(void)
 {
-        vdp2_state.buffered_regs.tvmd &= 0x7FFF;
+        _internal_state_vdp2.buffered_regs.tvmd &= 0x7FFF;
 
         /* Change the DISP bit during VBLANK */
         vdp2_tvmd_vblank_in_wait();
 
-        MEMORY_WRITE(16, VDP2(TVMD), vdp2_state.buffered_regs.tvmd);
+        MEMORY_WRITE(16, VDP2(TVMD), _internal_state_vdp2.buffered_regs.tvmd);
 }

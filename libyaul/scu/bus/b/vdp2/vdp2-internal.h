@@ -8,15 +8,15 @@
 #ifndef _VDP2_INTERNAL_H_
 #define _VDP2_INTERNAL_H_
 
-#include <scu-internal.h>
-
 #include <math.h>
+
+#include <scu-internal.h>
 
 #include <vdp2/map.h>
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
-struct vdp2_state {
+struct state_vdp2 {
         uint16_t display_w;
         uint16_t display_h;
 
@@ -203,6 +203,6 @@ struct vdp2_state {
         struct vram_ctl vram_ctl;
 };
 
-extern struct vdp2_state vdp2_state;
+extern struct state_vdp2 _internal_state_vdp2;
 
 #endif /* !_VDP2_INTERNAL_H_ */

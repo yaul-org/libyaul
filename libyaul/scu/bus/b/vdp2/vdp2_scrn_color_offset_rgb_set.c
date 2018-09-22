@@ -29,14 +29,14 @@ vdp2_scrn_color_offset_rgb_set(uint8_t select, int16_t r, int16_t g, int16_t b)
          * Lower bound: -(2**(9-1)) & upper bound: (2**9)-1 */
         switch (select) {
         case SCRN_COLOR_OFFSET_A:
-                vdp2_state.buffered_regs.coar = r & 0x01FF;
-                vdp2_state.buffered_regs.coag = g & 0x01FF;
-                vdp2_state.buffered_regs.coab = b & 0x01FF;
+                _internal_state_vdp2.buffered_regs.coar = r & 0x01FF;
+                _internal_state_vdp2.buffered_regs.coag = g & 0x01FF;
+                _internal_state_vdp2.buffered_regs.coab = b & 0x01FF;
                 break;
         case SCRN_COLOR_OFFSET_B:
-                vdp2_state.buffered_regs.cobr = r & 0x01FF;
-                vdp2_state.buffered_regs.cobg = g & 0x01FF;
-                vdp2_state.buffered_regs.cobb = b & 0x01FF;
+                _internal_state_vdp2.buffered_regs.cobr = r & 0x01FF;
+                _internal_state_vdp2.buffered_regs.cobg = g & 0x01FF;
+                _internal_state_vdp2.buffered_regs.cobb = b & 0x01FF;
                 break;
         default:
                 return;
