@@ -134,11 +134,10 @@ _arp_function_09(void)
         arp_callback.exec = exec;
         arp_callback.len += len;
 
-        /* XXX
-         * Blocking */
+        /* XXX: Blocking */
         for (; len > 0; len--, addr++) {
                 b = arp_byte_xchg(b);
-                /* Write to memory */
+
                 MEMORY_WRITE(8, addr, b);
         }
 
