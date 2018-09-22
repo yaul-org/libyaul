@@ -7,29 +7,12 @@
 
 #include <math.h>
 
+#include <cpu/cache.h>
 #include <cpu/intc.h>
+
 #include <scu/dma.h>
 
 #include <scu-internal.h>
-
-static void _dma_level0_ihr_handler(void);
-static void _dma_level1_ihr_handler(void);
-static void _dma_level2_ihr_handler(void);
-static void _dma_illegal_handler(void);
-
-static void _default_ihr(void);
-
-#define DMA_IHR_INDEX_LEVEL0      0
-#define DMA_IHR_INDEX_LEVEL1      1
-#define DMA_IHR_INDEX_LEVEL2      2
-
-static void (*_dma_ihr_table[])(void) = {
-        _default_ihr,
-        _default_ihr,
-        _default_ihr
-};
-
-static void (*_dma_illegal_ihr)(void) = _default_ihr;
 
 void
 scu_dma_init(void)
@@ -42,10 +25,10 @@ scu_dma_init(void)
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, _dma_level0_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, _dma_level1_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, _dma_level2_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, _dma_illegal_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, NULL);
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 
@@ -57,10 +40,6 @@ scu_dma_init(void)
 void
 scu_dma_level_config_set(const struct dma_level_cfg *cfg)
 {
-        uint32_t dst;
-        uint32_t src;
-        uint32_t count;
-
         if (cfg == NULL) {
                 return;
         }
@@ -69,32 +48,28 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
                 return;
         }
 
+        uint8_t level;
+        level = cfg->dlc_level & 0x03;
+
+        if (level > 2) {
+                return;
+        }
+
+        uint32_t dst;
+        uint32_t src;
+        uint32_t count;
+
         switch (cfg->dlc_mode & 0x01) {
         case DMA_MODE_DIRECT:
                 /* The absolute address must not be cached */
-                dst = 0x20000000 | cfg->dlc_xfer->dst;
+                dst = CPU_CACHE_THROUGH | cfg->dlc_xfer->dst;
                 /* The absolute address must not be cached */
-                src = 0x20000000 | cfg->dlc_xfer->src;
+                src = CPU_CACHE_THROUGH | cfg->dlc_xfer->src;
                 count = cfg->dlc_xfer->len;
                 break;
         case DMA_MODE_INDIRECT:
-                /* Transfer count cannot be ignored like in direct
-                 * mode */
-                if (cfg->dlc_xfer_count == 0) {
-                        return;
-                }
-
-                /* The transfer table start address must be on a power
-                 * of 2 boundary */
-                uint32_t boundary;
-                boundary = pow2(cfg->dlc_xfer_count * sizeof(struct dma_xfer)) - 1;
-
-                if (((uint32_t)cfg->dlc_xfer & boundary) != 0x00000000) {
-                        return;
-                }
-
                 /* The absolute address must not be cached */
-                dst = 0x20000000 | (uint32_t)cfg->dlc_xfer;
+                dst = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer;
                 src = 0x00000000;
                 count = 0x00000000;
                 break;
@@ -111,7 +86,7 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
                 (cfg->dlc_update & 0x00010100) |
                 (cfg->dlc_starting_factor & 0x07);
 
-        switch (cfg->dlc_level & 0x03) {
+        switch (level) {
         case 0:
                 /* Level 0 is able to transfer 1MiB */
                 count &= 0x00100000 - 1;
@@ -153,18 +128,10 @@ scu_dma_level_config_set(const struct dma_level_cfg *cfg)
                 break;
         }
 
-        _dma_ihr_table[cfg->dlc_level & 0x03] = _default_ihr;
+        uint8_t vector;
+        vector = IC_INTERRUPT_LEVEL_2_DMA_END + (2 - level);
 
-        if (cfg->dlc_ihr != NULL) {
-                /* Set interrupt handling routine */
-                _dma_ihr_table[cfg->dlc_level & 0x03] = cfg->dlc_ihr;
-        }
-}
-
-void
-scu_dma_illegal_set(void (*ihr)(void))
-{
-        _dma_illegal_ihr = (ihr != NULL) ? ihr : _default_ihr;
+        scu_ic_ihr_set(vector, cfg->dlc_ihr);
 }
 
 int8_t
@@ -183,33 +150,4 @@ scu_dma_level_unused_get(void)
         }
 
         return -1;
-}
-
-static void
-_default_ihr(void)
-{
-}
-
-static void
-_dma_level0_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL0]();
-}
-
-static void
-_dma_level1_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL1]();
-}
-
-static void
-_dma_level2_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL2]();
-}
-
-static void
-_dma_illegal_handler(void)
-{
-        _dma_illegal_ihr();
 }
