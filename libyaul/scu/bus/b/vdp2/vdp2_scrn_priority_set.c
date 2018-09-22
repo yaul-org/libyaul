@@ -29,24 +29,24 @@ vdp2_scrn_priority_set(uint8_t scrn, uint8_t priority)
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.prina &= 0xFFF8;
-                vdp2_state.buffered_regs.prina |= priority;
+                _internal_state_vdp2.buffered_regs.prina &= 0xFFF8;
+                _internal_state_vdp2.buffered_regs.prina |= priority;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.prina &= 0xF8FF;
-                vdp2_state.buffered_regs.prina |= priority << 8;
+                _internal_state_vdp2.buffered_regs.prina &= 0xF8FF;
+                _internal_state_vdp2.buffered_regs.prina |= priority << 8;
                 break;
         case SCRN_NBG2:
-                vdp2_state.buffered_regs.prinb &= 0xFFF8;
-                vdp2_state.buffered_regs.prinb |= priority;
+                _internal_state_vdp2.buffered_regs.prinb &= 0xFFF8;
+                _internal_state_vdp2.buffered_regs.prinb |= priority;
                 break;
         case SCRN_NBG3:
-                vdp2_state.buffered_regs.prinb &= 0xF8FF;
-                vdp2_state.buffered_regs.prinb |= priority << 8;
+                _internal_state_vdp2.buffered_regs.prinb &= 0xF8FF;
+                _internal_state_vdp2.buffered_regs.prinb |= priority << 8;
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.prir &= 0xFFF8;
-                vdp2_state.buffered_regs.prir |= priority;
+                _internal_state_vdp2.buffered_regs.prir &= 0xFFF8;
+                _internal_state_vdp2.buffered_regs.prir |= priority;
                 break;
         default:
                 return;

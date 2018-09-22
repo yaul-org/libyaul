@@ -12,5 +12,5 @@
 void
 vdp2_scrn_display_clear(void)
 {
-        vdp2_state.buffered_regs.bgon = 0x0000;
+        _internal_state_vdp2.buffered_regs.bgon = 0x0000;
 }

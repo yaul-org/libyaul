@@ -12,6 +12,5 @@
 void
 vdp2_scrn_mosaic_clear(void)
 {
-
-        vdp2_state.buffered_regs.mzctl &= 0xFFE0;
+        _internal_state_vdp2.buffered_regs.mzctl &= 0xFFE0;
 }

@@ -22,12 +22,12 @@ vdp2_scrn_reduction_y_set(uint8_t scrn, q0_3_8_t scale)
 
         switch (scrn) {
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.zmyin0 = Q0_3_8_INT(scale);
-                vdp2_state.buffered_regs.zmydn0 = Q0_3_8_FRAC(scale) << 8;
+                _internal_state_vdp2.buffered_regs.zmyin0 = Q0_3_8_INT(scale);
+                _internal_state_vdp2.buffered_regs.zmydn0 = Q0_3_8_FRAC(scale) << 8;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.zmyin1 = Q0_3_8_INT(scale);
-                vdp2_state.buffered_regs.zmydn1 = Q0_3_8_FRAC(scale) << 8;
+                _internal_state_vdp2.buffered_regs.zmyin1 = Q0_3_8_INT(scale);
+                _internal_state_vdp2.buffered_regs.zmydn1 = Q0_3_8_FRAC(scale) << 8;
                 break;
         default:
                 return;

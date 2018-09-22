@@ -24,15 +24,15 @@ vdp2_scrn_priority_get(uint8_t scrn)
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                return vdp2_state.buffered_regs.prina & 0x0007;
+                return _internal_state_vdp2.buffered_regs.prina & 0x0007;
         case SCRN_NBG1:
-                return (vdp2_state.buffered_regs.prina & 0x0700) >> 8;
+                return (_internal_state_vdp2.buffered_regs.prina & 0x0700) >> 8;
         case SCRN_NBG2:
-                return vdp2_state.buffered_regs.prinb & 0x0007;
+                return _internal_state_vdp2.buffered_regs.prinb & 0x0007;
         case SCRN_NBG3:
-                return (vdp2_state.buffered_regs.prinb & 0x0700) >> 8;
+                return (_internal_state_vdp2.buffered_regs.prinb & 0x0700) >> 8;
         case SCRN_RBG0:
-                return vdp2_state.buffered_regs.prir & 0x0007;
+                return _internal_state_vdp2.buffered_regs.prir & 0x0007;
         default:
                 return 0;
         }

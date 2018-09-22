@@ -10,8 +10,7 @@
 irq_mux_t *
 vdp2_tvmd_vblank_in_irq_get(void)
 {
-        extern irq_mux_t vdp2_vblank_in_irq_mux;
+        extern irq_mux_t _internal_vdp2_vblank_in_irq_mux;
 
-        /* Getter */
-        return &vdp2_vblank_in_irq_mux;
+        return &_internal_vdp2_vblank_in_irq_mux;
 }

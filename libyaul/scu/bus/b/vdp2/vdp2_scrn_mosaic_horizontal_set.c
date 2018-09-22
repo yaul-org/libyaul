@@ -12,11 +12,10 @@
 void
 vdp2_scrn_mosaic_horizontal_set(uint32_t horizontal)
 {
-
         if ((horizontal < 1) || (horizontal > 16)) {
                 return;
         }
 
-        vdp2_state.buffered_regs.mzctl &= 0xF0FF;
-        vdp2_state.buffered_regs.mzctl |= (horizontal - 1) << 8;
+        _internal_state_vdp2.buffered_regs.mzctl &= 0xF0FF;
+        _internal_state_vdp2.buffered_regs.mzctl |= (horizontal - 1) << 8;
 }

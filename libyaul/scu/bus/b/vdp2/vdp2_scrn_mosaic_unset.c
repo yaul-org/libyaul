@@ -25,19 +25,19 @@ vdp2_scrn_mosaic_unset(uint8_t scrn)
         switch (scrn) {
         case SCRN_RBG1:
         case SCRN_NBG0:
-                vdp2_state.buffered_regs.mzctl &= 0xFFFE;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFE;
                 break;
         case SCRN_NBG1:
-                vdp2_state.buffered_regs.mzctl &= 0xFFFD;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFD;
                 break;
         case SCRN_NBG2:
-                vdp2_state.buffered_regs.mzctl &= 0xFFFB;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFB;
                 break;
         case SCRN_NBG3:
-                vdp2_state.buffered_regs.mzctl &= 0xFFF7;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFF7;
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.mzctl &= 0xFFEF;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFEF;
                 break;
         }
 }

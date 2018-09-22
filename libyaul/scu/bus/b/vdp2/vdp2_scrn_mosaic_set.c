@@ -33,33 +33,33 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
-                assert((vdp2_state.buffered_regs.scrctl & 0x0001) == 0x0000);
+                assert((_internal_state_vdp2.buffered_regs.scrctl & 0x0001) == 0x0000);
 #endif /* DEBUG */
 
-                vdp2_state.buffered_regs.mzctl &= 0xFFFE;
-                vdp2_state.buffered_regs.mzctl |= 0x0001;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFE;
+                _internal_state_vdp2.buffered_regs.mzctl |= 0x0001;
                 break;
         case SCRN_NBG1:
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
-                assert((vdp2_state.buffered_regs.scrctl & 0x0100) == 0x0000);
+                assert((_internal_state_vdp2.buffered_regs.scrctl & 0x0100) == 0x0000);
 #endif /* DEBUG */
 
-                vdp2_state.buffered_regs.mzctl &= 0xFFFD;
-                vdp2_state.buffered_regs.mzctl |= 0x0002;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFD;
+                _internal_state_vdp2.buffered_regs.mzctl |= 0x0002;
                 break;
         case SCRN_NBG2:
-                vdp2_state.buffered_regs.mzctl &= 0xFFFB;
-                vdp2_state.buffered_regs.mzctl |= 0x0004;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFFB;
+                _internal_state_vdp2.buffered_regs.mzctl |= 0x0004;
                 break;
         case SCRN_NBG3:
-                vdp2_state.buffered_regs.mzctl &= 0xFFF7;
-                vdp2_state.buffered_regs.mzctl |= 0x0008;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFF7;
+                _internal_state_vdp2.buffered_regs.mzctl |= 0x0008;
                 break;
         case SCRN_RBG0:
-                vdp2_state.buffered_regs.mzctl &= 0xFFEF;
-                vdp2_state.buffered_regs.mzctl |= 0x0010;
+                _internal_state_vdp2.buffered_regs.mzctl &= 0xFFEF;
+                _internal_state_vdp2.buffered_regs.mzctl |= 0x0010;
                 break;
         }
 }

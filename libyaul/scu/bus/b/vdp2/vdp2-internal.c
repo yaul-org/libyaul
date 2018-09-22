@@ -7,4 +7,4 @@
 
 #include "vdp2-internal.h"
 
-struct vdp2_state vdp2_state;
+struct state_vdp2 _internal_state_vdp2 __aligned(16);

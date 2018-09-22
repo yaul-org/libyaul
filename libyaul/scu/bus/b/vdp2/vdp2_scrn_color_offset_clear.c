@@ -14,6 +14,6 @@
 void
 vdp2_scrn_color_offset_clear(void)
 {
-        vdp2_state.buffered_regs.clofen = 0x0000;
-        vdp2_state.buffered_regs.clofsl = 0x0000;
+        _internal_state_vdp2.buffered_regs.clofen = 0x0000;
+        _internal_state_vdp2.buffered_regs.clofsl = 0x0000;
 }
