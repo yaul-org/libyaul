@@ -21,7 +21,7 @@ static void _default_ihr(void);
 
 #define DMA_IHR_INDEX_LEVEL0      0
 #define DMA_IHR_INDEX_LEVEL1      1
-#define DMA_IHR_INDEX_LEVEL2      1
+#define DMA_IHR_INDEX_LEVEL2      2
 
 static void (*_dma_ihr_table[])(void) = {
         _default_ihr,
@@ -51,9 +51,7 @@ scu_dma_init(void)
 
         /* Writing to SCU(DSTP) causes a hang */
 
-        scu_dma_level0_stop();
-        scu_dma_level1_stop();
-        scu_dma_level2_stop();
+        scu_dma_stop();
 }
 
 void
