@@ -38,100 +38,136 @@ scu_dma_init(void)
 }
 
 void
-scu_dma_level_config_set(const struct dma_level_cfg *cfg)
+scu_dma_level_config_buffer(uint8_t level, const struct dma_level_cfg *cfg, void *buffer)
 {
-        if (cfg == NULL) {
-                return;
-        }
+        assert(cfg != NULL);
 
-        if (cfg->dlc_xfer == NULL) {
-                return;
-        }
+        assert(buffer != NULL);
 
-        uint8_t level;
-        level = cfg->dlc_level & 0x03;
+        assert(cfg->dlc_xfer != NULL);
 
-        if (level > 2) {
-                return;
-        }
+        assert(level <= 2);
 
-        uint32_t dst;
-        uint32_t src;
-        uint32_t count;
+        scu_dma_level_xfer_update(cfg, buffer);
+
+        struct state_scu_dma_level *state;
+        state = buffer;
+
+        /* Since bit 8 being unset is effective only for the CS2 space
+         * of the A bus, everything else should set it */
+        state->buffered_regs.dnad = 0x00000100 | (cfg->dlc_stride & 0x07);
+
+        state->buffered_regs.dnmd = ((cfg->dlc_mode & 0x01) << 24) |
+                                     (cfg->dlc_update & 0x00010100) |
+                                     (cfg->dlc_starting_factor & 0x07);
+
+        scu_dma_level_ihr_update(cfg, buffer);
+}
+
+void
+scu_dma_level_config_set(uint8_t level, const struct dma_level_cfg *cfg)
+{
+        static struct state_scu_dma_level state;
+
+        scu_dma_level_config_buffer(level, cfg, &state);
+        scu_dma_level_buffer_set(&state);
+}
+
+void
+scu_dma_level_xfer_update(const struct dma_level_cfg *cfg, void *buffer)
+{
+        assert(cfg != NULL);
+
+        assert(buffer != NULL);
+
+        assert(cfg->dlc_xfer != NULL);
+
+        const uint32_t count_mask[] = {
+                /* Level 0 is able to transfer 1MiB */
+                0x00100000 - 1,
+                /* Level 1 is able transfer 4KiB */
+                0x00001000 - 1,
+                /* Level 2 is able transfer 4KiB */
+                0x00001000 - 1
+        };
+
+        struct state_scu_dma_level *state;
+        state = buffer;
 
         switch (cfg->dlc_mode & 0x01) {
         case DMA_MODE_DIRECT:
                 /* The absolute address must not be cached */
-                dst = CPU_CACHE_THROUGH | cfg->dlc_xfer->dst;
+                state->buffered_regs.dnw = CPU_CACHE_THROUGH | cfg->dlc_xfer->dst;
                 /* The absolute address must not be cached */
-                src = CPU_CACHE_THROUGH | cfg->dlc_xfer->src;
-                count = cfg->dlc_xfer->len;
+                state->buffered_regs.dnr = CPU_CACHE_THROUGH | cfg->dlc_xfer->src;
+                state->buffered_regs.dnc = cfg->dlc_xfer->len & count_mask[state->level];
                 break;
         case DMA_MODE_INDIRECT:
                 /* The absolute address must not be cached */
-                dst = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer;
-                src = 0x00000000;
-                count = 0x00000000;
+                state->buffered_regs.dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer;
+                state->buffered_regs.dnr = 0x00000000;
+                state->buffered_regs.dnc = 0x00000000;
                 break;
         }
+}
 
-        /* Since bit 8 being unset is effective only for the CS2 space
-         * of the A bus, everything else should set it */
+void
+scu_dma_level_ihr_update(const struct dma_level_cfg *cfg, void *buffer)
+{
+        assert(cfg != NULL);
 
-        uint32_t add;
-        add = 0x00000100 | (cfg->dlc_stride & 0x07);
+        assert(buffer != NULL);
 
-        uint32_t mode;
-        mode = ((cfg->dlc_mode & 0x01) << 24) |
-                (cfg->dlc_update & 0x00010100) |
-                (cfg->dlc_starting_factor & 0x07);
+        struct state_scu_dma_level *state;
+        state = buffer;
 
-        switch (level) {
+        state->ihr = cfg->dlc_ihr;
+}
+
+void
+scu_dma_level_buffer_set(const void *buffer)
+{
+        assert(buffer != NULL);
+
+        const struct state_scu_dma_level *state;
+        state = buffer;
+
+        /* Wait until the SCU DMA level is idle as the registers might
+         * be modified by SCU DMA (think the update bits) */
+
+        switch (state->level) {
         case 0:
-                /* Level 0 is able to transfer 1MiB */
-                count &= 0x00100000 - 1;
-
-                scu_dma_level0_wait();
-                scu_dma_level0_stop();
-
-                MEMORY_WRITE(32, SCU(D0R), src);
-                MEMORY_WRITE(32, SCU(D0W), dst);
-                MEMORY_WRITE(32, SCU(D0C), count);
-                MEMORY_WRITE(32, SCU(D0AD), add);
-                MEMORY_WRITE(32, SCU(D0MD), mode);
-                break;
-        case 1:
-                /* Level 1 is able transfer 4KiB */
-                count &= 0x00001000 - 1;
-
                 scu_dma_level0_wait();
                 scu_dma_level1_stop();
 
-                MEMORY_WRITE(32, SCU(D1R), src);
-                MEMORY_WRITE(32, SCU(D1W), dst);
-                MEMORY_WRITE(32, SCU(D1C), count);
-                MEMORY_WRITE(32, SCU(D1AD), add);
-                MEMORY_WRITE(32, SCU(D1MD), mode);
+                MEMORY_WRITE(32, SCU(D0R), state->buffered_regs.dnr);
+                MEMORY_WRITE(32, SCU(D0W), state->buffered_regs.dnw);
+                MEMORY_WRITE(32, SCU(D0C), state->buffered_regs.dnc);
+                MEMORY_WRITE(32, SCU(D0AD), state->buffered_regs.dnad);
+                MEMORY_WRITE(32, SCU(D0MD), state->buffered_regs.dnmd);
                 break;
-        case 2:
-                /* Level 2 is able transfer 4KiB */
-                count &= 0x00001000 - 1;
+        case 1:
+                scu_dma_level1_wait();
+                scu_dma_level1_stop();
 
+                MEMORY_WRITE(32, SCU(D1R), state->buffered_regs.dnr);
+                MEMORY_WRITE(32, SCU(D1W), state->buffered_regs.dnw);
+                MEMORY_WRITE(32, SCU(D1C), state->buffered_regs.dnc);
+                MEMORY_WRITE(32, SCU(D1AD), state->buffered_regs.dnad);
+                MEMORY_WRITE(32, SCU(D1MD), state->buffered_regs.dnmd);
+        case 2:
                 scu_dma_level2_wait();
                 scu_dma_level2_stop();
 
-                MEMORY_WRITE(32, SCU(D2R), src);
-                MEMORY_WRITE(32, SCU(D2W), dst);
-                MEMORY_WRITE(32, SCU(D2C), count);
-                MEMORY_WRITE(32, SCU(D2AD), add);
-                MEMORY_WRITE(32, SCU(D2MD), mode);
+                MEMORY_WRITE(32, SCU(D2R), state->buffered_regs.dnr);
+                MEMORY_WRITE(32, SCU(D2W), state->buffered_regs.dnw);
+                MEMORY_WRITE(32, SCU(D2C), state->buffered_regs.dnc);
+                MEMORY_WRITE(32, SCU(D2AD), state->buffered_regs.dnad);
+                MEMORY_WRITE(32, SCU(D2MD), state->buffered_regs.dnmd);
                 break;
         }
 
-        uint8_t vector;
-        vector = IC_INTERRUPT_LEVEL_2_DMA_END + (2 - level);
-
-        scu_ic_ihr_set(vector, cfg->dlc_ihr);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_DMA_END(state->level), state->ihr);
 }
 
 int8_t
