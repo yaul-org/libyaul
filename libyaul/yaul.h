@@ -59,6 +59,7 @@
 #include <mm/memb.h>
 
 #include <sys/init.h>
+#include <sys/dma-queue.h>
 #include <sys/irq-mux.h>
 
 #include <fs/iso9660/iso9660.h>

@@ -5,14 +5,30 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
-
 #include <cpu/cache.h>
 #include <cpu/intc.h>
 
 #include <scu/dma.h>
 
 #include <scu-internal.h>
+
+static void _dma_level0_ihr_handler(void);
+static void _dma_level1_ihr_handler(void);
+static void _dma_level2_ihr_handler(void);
+
+static void _default_ihr(void *);
+
+static void (*_dma_level_ihr_table[])(void *) = {
+        _default_ihr,
+        _default_ihr,
+        _default_ihr
+};
+
+static void *_dma_level_work_table[] = {
+        NULL,
+        NULL,
+        NULL
+};
 
 void
 scu_dma_init(void)
@@ -25,9 +41,9 @@ scu_dma_init(void)
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, NULL);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, NULL);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, _dma_level0_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, _dma_level1_ihr_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, _dma_level2_ihr_handler);
         scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, NULL);
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
@@ -43,8 +59,6 @@ scu_dma_level_config_buffer(uint8_t level, const struct dma_level_cfg *cfg, void
         assert(cfg != NULL);
 
         assert(buffer != NULL);
-
-        assert(cfg->dlc_xfer != NULL);
 
         assert(level <= 2);
 
@@ -80,8 +94,6 @@ scu_dma_level_xfer_update(const struct dma_level_cfg *cfg, void *buffer)
 
         assert(buffer != NULL);
 
-        assert(cfg->dlc_xfer != NULL);
-
         const uint32_t count_mask[] = {
                 /* Level 0 is able to transfer 1MiB */
                 0x00100000 - 1,
@@ -96,15 +108,21 @@ scu_dma_level_xfer_update(const struct dma_level_cfg *cfg, void *buffer)
 
         switch (cfg->dlc_mode & 0x01) {
         case DMA_MODE_DIRECT:
+                assert(cfg->dlc_xfer.direct.len != 0x00000000);
+                assert(cfg->dlc_xfer.direct.dst != 0x00000000);
+                assert(cfg->dlc_xfer.direct.src != 0x00000000);
+
                 /* The absolute address must not be cached */
-                state->buffered_regs.dnw = CPU_CACHE_THROUGH | cfg->dlc_xfer->dst;
+                state->buffered_regs.dnw = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.dst;
                 /* The absolute address must not be cached */
-                state->buffered_regs.dnr = CPU_CACHE_THROUGH | cfg->dlc_xfer->src;
-                state->buffered_regs.dnc = cfg->dlc_xfer->len & count_mask[state->level];
+                state->buffered_regs.dnr = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.src;
+                state->buffered_regs.dnc = cfg->dlc_xfer.direct.len & count_mask[state->level];
                 break;
         case DMA_MODE_INDIRECT:
+                assert(cfg->dlc_xfer.indirect != NULL);
+
                 /* The absolute address must not be cached */
-                state->buffered_regs.dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer;
+                state->buffered_regs.dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer.indirect;
                 state->buffered_regs.dnr = 0x00000000;
                 state->buffered_regs.dnc = 0x00000000;
                 break;
@@ -122,6 +140,7 @@ scu_dma_level_ihr_update(const struct dma_level_cfg *cfg, void *buffer)
         state = buffer;
 
         state->ihr = cfg->dlc_ihr;
+        state->work = cfg->dlc_work;
 }
 
 void
@@ -132,13 +151,15 @@ scu_dma_level_buffer_set(const void *buffer)
         const struct state_scu_dma_level *state;
         state = buffer;
 
+        assert(state->level <= 2);
+
         /* Wait until the SCU DMA level is idle as the registers might
          * be modified by SCU DMA (think the update bits) */
 
         switch (state->level) {
         case 0:
                 scu_dma_level0_wait();
-                scu_dma_level1_stop();
+                scu_dma_level0_stop();
 
                 MEMORY_WRITE(32, SCU(D0R), state->buffered_regs.dnr);
                 MEMORY_WRITE(32, SCU(D0W), state->buffered_regs.dnw);
@@ -167,7 +188,8 @@ scu_dma_level_buffer_set(const void *buffer)
                 break;
         }
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_DMA_END(state->level), state->ihr);
+        _dma_level_ihr_table[state->level] = (state->ihr != NULL) ? state->ihr : _default_ihr;
+        _dma_level_work_table[state->level] = state->work;
 }
 
 int8_t
@@ -186,4 +208,36 @@ scu_dma_level_unused_get(void)
         }
 
         return -1;
+}
+
+static void
+_dma_level0_ihr_handler(void)
+{
+        void *work;
+        work = _dma_level_work_table[0];
+
+        _dma_level_ihr_table[0](work);
+}
+
+static void
+_dma_level1_ihr_handler(void)
+{
+        void *work;
+        work = _dma_level_work_table[1];
+
+        _dma_level_ihr_table[1](work);
+}
+
+static void
+_dma_level2_ihr_handler(void)
+{
+        void *work;
+        work = _dma_level_work_table[2];
+
+        _dma_level_ihr_table[2](work);
+}
+
+static void
+_default_ihr(void *work __unused)
+{
 }

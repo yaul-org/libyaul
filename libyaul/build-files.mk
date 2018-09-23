@@ -46,6 +46,7 @@ LIB_SRCS+= \
 	kernel/cons/vt_parse/vt_parse.c \
 	kernel/cons/vt_parse/vt_parse_table.c \
 	\
+	kernel/sys/dma-queue.c \
 	kernel/sys/irq-mux.c \
 	\
 	kernel/mm/memb.c \
@@ -268,6 +269,7 @@ INSTALL_HEADER_FILES+= \
 	./kernel/mm/:memb.h:yaul/mm/
 
 INSTALL_HEADER_FILES+= \
+	./kernel/sys/:dma-queue.h:yaul/sys/ \
 	./kernel/sys/:irq-mux.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \

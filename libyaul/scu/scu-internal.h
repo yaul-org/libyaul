@@ -18,7 +18,7 @@ struct state_scu_dma_level {
         uint8_t level;
 
         union {
-                uint32_t buffer[DMA_REG_BUFFER_WORD_COUNT];
+                uint32_t buffer[5];
 
                 struct {
                         uint32_t dnr;
@@ -29,7 +29,8 @@ struct state_scu_dma_level {
                 };
         } buffered_regs;
 
-        void (*ihr)(void);
+        void (*ihr)(void *);
+        void *work;
 } __aligned(32);
 
 #endif /* !_SCU_INTERNAL_H_ */
