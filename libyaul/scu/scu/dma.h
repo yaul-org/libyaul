@@ -102,13 +102,20 @@ struct dma_xfer {
 struct dma_level_cfg {
         uint8_t dlc_mode;
 
-        struct dma_xfer *dlc_xfer;
+        union {
+                /* Indirect mode */
+                void *indirect;
+
+                /* Direct mode */
+                struct dma_xfer direct;
+        } dlc_xfer;
 
         uint8_t dlc_stride;
         uint32_t dlc_update;
         uint8_t dlc_starting_factor;
 
-        void (*dlc_ihr)(void);
+        void (*dlc_ihr)(void *);
+        void *dlc_work;
 };
 
 static inline uint32_t __attribute__ ((always_inline))

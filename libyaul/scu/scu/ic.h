@@ -31,12 +31,6 @@ extern "C" {
 #define IC_INTERRUPT_DMA_ILLEGAL        0x4C
 #define IC_INTERRUPT_SPRITE_END         0x4D
 
-#define IC_INTERRUPT_TIMER(n)                                                  \
-        (IC_INTERRUPT_TIMER_0 + ((n) & 0x01))
-
-#define IC_INTERRUPT_LEVEL_DMA_END(n)                                          \
-        (IC_INTERRUPT_LEVEL_2_DMA_END + (2 - ((n) & 0x03)))
-
 #define IC_MASK_NONE            0x00000000
 #define IC_MASK_VBLANK_IN       0x00000001
 #define IC_MASK_VBLANK_OUT      0x00000002
@@ -53,12 +47,6 @@ extern "C" {
 #define IC_MASK_DMA_ILLEGAL     0x00001000
 #define IC_MASK_SPRITE_END      0x00002000
 #define IC_MASK_ALL             0x0000BFFF
-
-#define IC_MASK_TIMER(n)                                                       \
-        (IC_MASK_TIMER_0 + ((n) & 0x01))
-
-#define IC_MASK_LEVEL_DMA_END(n)                                               \
-        (IC_MASK_LEVEL_2_DMA_END + (2 - ((n) & 0x03)))
 
 #define IC_IST_NONE             0x00000000
 #define IC_IST_VBLANK_IN        0x00000001
@@ -91,12 +79,6 @@ extern "C" {
 #define IC_IST_EXTERNAL_03      0x20000000
 #define IC_IST_EXTERNAL_02      0x40000000
 #define IC_IST_EXTERNAL_01      0x80000000
-
-#define IC_IST_TIMER(n)                                                        \
-        (IC_IST_TIMER_0 + ((n) & 0x01))
-
-#define IC_IST_LEVEL_DMA_END(n)                                                \
-        (IC_IST_LEVEL_2_DMA_END + (2 - ((n) & 0x03)))
 
 static inline void __attribute__ ((always_inline))
 scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
