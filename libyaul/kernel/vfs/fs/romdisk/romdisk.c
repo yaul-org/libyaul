@@ -65,7 +65,6 @@ static rd_file_t fhs;
 void
 romdisk_init(void)
 {
-
         TAILQ_INIT(&fhs);
 }
 
@@ -369,6 +368,7 @@ romdisk_fd_alloc(void)
 {
         rd_file_handle_t *fh;
         fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t));
+
         if (fh == NULL) {
                 return NULL;
         }
@@ -381,11 +381,11 @@ romdisk_fd_alloc(void)
 static void
 romdisk_fd_free(rd_file_handle_t *fd)
 {
-        rd_file_handle_t *fh;
-
-        if (fd != NULL) {
+        if (fd == NULL) {
                 return;
         }
+
+        rd_file_handle_t *fh;
 
         TAILQ_FOREACH(fh, &fhs, handles) {
                 if (fh == fd) {
