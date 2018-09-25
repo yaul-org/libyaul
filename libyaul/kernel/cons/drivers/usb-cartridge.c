@@ -80,9 +80,6 @@ _write(struct cons *cons)
          * response */
         if (char_count > 0) {
                 usb_cartridge_byte_send('\0');
-
-                /* Wait until we get a response */
-                while ((usb_cartridge_byte_read()) != 0xFF);
         }
 }
 #endif /* HAVE_DEV_CARTRIDGE */
