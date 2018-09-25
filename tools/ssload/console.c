@@ -33,15 +33,7 @@ console(const struct device_driver *device)
                         break;
                 }
 
-                switch (byte) {
-                case '\0':
-                        /* Send termination byte */
-                        device->send_byte(&term_byte);
-                        break;
-                default:
-                        (void)putchar(byte);
-                        break;
-                }
+                (void)putchar(byte);
 
                 fflush(stdout);
         }
