@@ -387,11 +387,20 @@ romdisk_fd_free(rd_file_handle_t *fd)
 
         rd_file_handle_t *fh;
 
-        TAILQ_FOREACH(fh, &fhs, handles) {
+        bool fd_match;
+        fd_match = false;
+
+        TAILQ_FOREACH (fh, &fhs, handles) {
                 if (fh == fd) {
-                        TAILQ_REMOVE(&fhs, fh, handles);
-                        free(fh);
-                        return;
+                        fd_match = true;
+                        break;
                 }
         }
+
+        if (!fd_match) {
+                return;
+        }
+
+        TAILQ_REMOVE(&fhs, fh, handles);
+        free(fh);
 }
