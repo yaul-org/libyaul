@@ -25,19 +25,10 @@
 /* Maximum count of requests in ring buffer to take in */
 #define DMA_QUEUE_REQUESTS_MAX_COUNT    32
 
-#define DMA_QUEUE_REQUEST_TYPE_COPY     0
-#define DMA_QUEUE_REQUEST_TYPE_POINTER  1
-
 struct dma_queue {
         struct dma_queue_request {
                 uint8_t tag;
-
-                uint8_t type;
-
-                union {
-                        struct state_scu_dma_level *state_ptr;
-                        struct state_scu_dma_level state;
-                };
+                struct state_scu_dma_level state;
 
                 void (*handler)(void *);
                 void *work;
@@ -109,28 +100,18 @@ dma_queue_enqueue(const void *buffer, uint8_t tag)
                 goto exit;
         }
 
-        bool dma_busy;
-        dma_busy = ((scu_dma_level_busy(DMA_QUEUE_SCU_DMA_LEVEL)) != 0x00);
-
-        bool tagged_immediate;
-        tagged_immediate = (tag == DMA_QUEUE_TAG_IMMEDIATE);
-
         /* No processing of the ring buffer has occured (head pointer is
          * at the beginning of the ring buffer) */
         struct dma_queue_request *request;
         request = &dma_queue->requests[dma_queue->tail];
 
         request->tag = tag;
-        request->type = DMA_QUEUE_REQUEST_TYPE_POINTER;
-
-        const struct state_scu_dma_level *which_state;
-        which_state = buffer;
 
         _copy_dma_request_state(&request->state, buffer);
 
         request->tag = tag;
-        request->handler = (which_state->ihr != NULL)
-            ? which_state->ihr
+        request->handler = (request->state.ihr != NULL)
+            ? request->state.ihr
             : _default_handler;
 
         dma_queue->tail++;
@@ -140,10 +121,6 @@ exit:
         dma_queue->tail &= DMA_QUEUE_REQUESTS_MAX_COUNT - 1;
 
         scu_ic_mask_chg(DMA_QUEUE_SCU_DMA_MASK_ENABLE, IC_MASK_NONE);
-
-        if (tagged_immediate && !dma_busy && (error >= 0)) {
-                _start_dma_request(request);
-        }
 
         return error;
 }
@@ -218,9 +195,7 @@ _start_dma_request(const struct dma_queue_request *request)
         assert(request != NULL);
 
         const struct state_scu_dma_level *state;
-        state = (request->type == DMA_QUEUE_REQUEST_TYPE_COPY)
-            ? &request->state
-            : request->state_ptr;
+        state = &request->state;
 
         scu_dma_level_buffer_set(state);
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
