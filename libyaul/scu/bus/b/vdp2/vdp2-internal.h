@@ -45,8 +45,13 @@ struct state_vdp2 {
         } nbg3;
 
         struct {
-                uint16_t color;
+                union {
+                        uint16_t color;
+                        uint16_t *buffer;
+                };
+
                 uint32_t vram;
+                uint16_t count;
         } back;
 
         union {
@@ -200,8 +205,8 @@ struct state_vdp2 {
                 };
         } buffered_regs;
 
-        struct dma_level_cfg commit_dma_level_cfg;
-        uint8_t commit_dma_buffer[DMA_REG_BUFFER_BYTE_SIZE];
+        struct dma_xfer commit_dma_xfer_tbl[3] __aligned(4 * 16);
+        uint32_t commit_dma_buffer[DMA_REG_BUFFER_WORD_COUNT];
         void (*commit_dma_handler)(void *);
         void *commit_dma_work;
 

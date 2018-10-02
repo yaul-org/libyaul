@@ -15,12 +15,17 @@
 #include "vdp2-internal.h"
 
 void
-vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
+vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb555_t *buffer, uint16_t count)
 {
         assert(vram != 0x00000000);
 
-        _internal_state_vdp2.back.color = COLOR_RGB_DATA | color.raw;
+        assert(buffer != NULL);
+
+        assert(count > 0);
+
+        _internal_state_vdp2.back.buffer = (uint16_t *)buffer;
+        _internal_state_vdp2.back.count = count;
 
         /* Set back screen address */
-        vdp2_scrn_back_screen_addr_set(vram, /* single_color = */ true);
+        vdp2_scrn_back_screen_addr_set(vram, /* single_color = */ false);
 }

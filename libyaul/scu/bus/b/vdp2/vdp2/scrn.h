@@ -340,6 +340,7 @@ struct scrn_vcs_format {
 
 extern void vdp2_scrn_back_screen_addr_set(uint32_t, bool);
 extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
+extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
 extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
 extern const struct scrn_cell_format *vdp2_scrn_cell_format_get(uint8_t);
