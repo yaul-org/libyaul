@@ -8,6 +8,6 @@
 #ifndef _INTERNAL_H_
 #define _INTERNAL_H_
 
-void __noreturn internal_exception_show(const char *);
+void __noreturn _internal_exception_show(const char *);
 
 #endif /* !_INTERNAL_H_ */

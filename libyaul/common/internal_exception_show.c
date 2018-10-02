@@ -15,11 +15,8 @@
 #include <cons.h>
 
 void __noreturn
-internal_exception_show(const char *buffer)
+_internal_exception_show(const char *buffer)
 {
-        /* Reset the VDP1 */
-        vdp1_init();
-
         /* Reset the VDP2 */
         vdp2_init();
         vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,

@@ -104,7 +104,7 @@ _ihr_exception_illegal_instruction(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal instruction");
 
-        internal_exception_show(_buffer);
+        _internal_exception_show(_buffer);
 }
 
 static void __noreturn
@@ -112,7 +112,7 @@ _ihr_exception_illegal_slot(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal slot");
 
-        internal_exception_show(_buffer);
+        _internal_exception_show(_buffer);
 }
 
 static void __noreturn
@@ -120,7 +120,7 @@ _ihr_exception_cpu_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "CPU address error");
 
-        internal_exception_show(_buffer);
+        _internal_exception_show(_buffer);
 }
 
 static void __noreturn
@@ -128,7 +128,7 @@ _ihr_exception_dma_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "DMA address error");
 
-        internal_exception_show(_buffer);
+        _internal_exception_show(_buffer);
 }
 
 EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
