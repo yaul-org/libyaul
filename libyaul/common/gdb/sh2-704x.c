@@ -133,7 +133,7 @@ gdb_sh2_704x_init(void)
         uint32_t mask;
         mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         _bp_list = _bp_list_alloc();
 
@@ -250,7 +250,7 @@ gdb_kill(void)
 {
 
         smpc_smc_resenab_call();
-        cpu_intc_mask_set(0xF);
+        cpu_intc_mask_set(15);
         smpc_smc_sysres_call();
 }
 
