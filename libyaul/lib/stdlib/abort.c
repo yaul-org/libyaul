@@ -29,7 +29,7 @@ void __noreturn
 abort(void)
 {
         /* Disable interrupts */
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */

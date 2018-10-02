@@ -153,7 +153,7 @@ smpc_smc_sshon_call(void)
         return smpc_smc_call(SMPC_SMC_SSHON);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __attribute__ ((always_inline)) __noreturn
 smpc_smc_sysres_call(void)
 {
         smpc_smc_wait(true);
