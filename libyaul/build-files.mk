@@ -145,6 +145,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp2/vdp2_init.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_addr_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_back_screen_color_set.c \
+	scu/bus/b/vdp2/vdp2_scrn_back_screen_buffer_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_bitmap_format_set.c \
 	scu/bus/b/vdp2/vdp2_scrn_cell_format_get.c \
 	scu/bus/b/vdp2/vdp2_scrn_cell_format_set.c \

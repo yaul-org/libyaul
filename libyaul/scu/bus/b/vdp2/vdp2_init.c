@@ -59,6 +59,10 @@ vdp2_init(void)
         (void)memset(&_internal_state_vdp2.nbg3.cell_format, 0x00,
             sizeof(struct scrn_cell_format));
 
+        _internal_state_vdp2.back.color = COLOR_RGB_DATA;
+        _internal_state_vdp2.back.vram = VRAM_ADDR_4MBIT(0, 0x00000);
+        _internal_state_vdp2.back.count = 1;
+
         /* Reset all buffered registers */
         memset(&_internal_state_vdp2.buffered_regs, 0x00,
             sizeof(_internal_state_vdp2.buffered_regs));
@@ -125,23 +129,39 @@ vdp2_init(void)
         /* Initialized */
         _initialized = true;
 
-        struct dma_level_cfg *dma_level_cfg;
-        dma_level_cfg = &_internal_state_vdp2.commit_dma_level_cfg;
+        struct dma_xfer *dma_xfer_tbl;
+        dma_xfer_tbl = &_internal_state_vdp2.commit_dma_xfer_tbl[0];
 
-        dma_level_cfg->dlc_mode = DMA_MODE_DIRECT;
-        dma_level_cfg->dlc_xfer.direct.len = sizeof(_internal_state_vdp2.buffered_regs) - 16;
-        dma_level_cfg->dlc_xfer.direct.dst = VDP2(16);
-        dma_level_cfg->dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&_internal_state_vdp2.buffered_regs.buffer[8];
-        dma_level_cfg->dlc_stride = DMA_STRIDE_2_BYTES;
-        dma_level_cfg->dlc_update = DMA_UPDATE_NONE;
-        dma_level_cfg->dlc_starting_factor = DMA_START_FACTOR_ENABLE;
-        dma_level_cfg->dlc_ihr = _internal_vdp2_commit_handler;
-        dma_level_cfg->dlc_work = NULL;
+        /* Skip the first 8 VDP2 registers */
+        dma_xfer_tbl[0].len = 2;
+        dma_xfer_tbl[0].dst = VDP2(0);
+        dma_xfer_tbl[0].src = CPU_CACHE_THROUGH |
+            (uint32_t)&_internal_state_vdp2.buffered_regs.buffer[0];
+
+        dma_xfer_tbl[1].len = sizeof(_internal_state_vdp2.buffered_regs) - 16;
+        dma_xfer_tbl[1].dst = VDP2(16);
+        dma_xfer_tbl[1].src = CPU_CACHE_THROUGH |
+            (uint32_t)&_internal_state_vdp2.buffered_regs.buffer[8];
+
+        dma_xfer_tbl[2].len = 1 * sizeof(color_rgb555_t);
+        dma_xfer_tbl[2].dst = _internal_state_vdp2.back.vram;
+        dma_xfer_tbl[2].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH |
+            (uint32_t)&_internal_state_vdp2.back.color;
+
+        struct dma_level_cfg dma_level_cfg = {
+                .dlc_mode = DMA_MODE_INDIRECT,
+                .dlc_xfer.indirect = &_internal_state_vdp2.commit_dma_xfer_tbl[0],
+                .dlc_stride = DMA_STRIDE_2_BYTES,
+                .dlc_update = DMA_UPDATE_NONE,
+                .dlc_starting_factor = DMA_START_FACTOR_ENABLE,
+                .dlc_ihr = _internal_vdp2_commit_handler,
+                .dlc_work = NULL
+        };
 
         void *commit_dma_buffer;
         commit_dma_buffer = &_internal_state_vdp2.commit_dma_buffer[0];
 
-        scu_dma_level_config_buffer(0, dma_level_cfg, commit_dma_buffer);
+        scu_dma_level_config_buffer(0, &dma_level_cfg, commit_dma_buffer);
 
         vdp2_commit_handler_set(NULL, NULL);
 
