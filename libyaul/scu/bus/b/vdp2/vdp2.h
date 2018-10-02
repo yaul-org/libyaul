@@ -21,7 +21,10 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern void vdp2_init(void);
+
 extern void vdp2_commit(void);
+extern void vdp2_commit_block(void);
+extern void vdp2_commit_handler_set(void (*)(void *), void *);
 
 #ifdef __cplusplus
 }
