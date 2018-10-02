@@ -37,10 +37,12 @@ struct dma_queue {
         uint16_t head;
         uint16_t tail;
         uint16_t count;
+
+        bool busy;
 };
 
 static void _update_dma_request_pointers(const struct dma_queue_request *);
-static void _start_dma_request(const struct dma_queue_request *);
+static void _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *);
 static void _copy_dma_request_state(struct state_scu_dma_level *, const void *);
 
 static void _default_handler(void *);
@@ -158,9 +160,21 @@ dma_queue_flush(uint8_t tag)
                 return 0;
         }
 
-        _start_dma_request(request);
+        _start_dma_request(dma_queue, request);
 
         return 0;
+}
+
+void
+dma_queue_flush_wait(uint8_t tag)
+{
+        assert(tag < DMA_QUEUE_TAG_COUNT);
+
+        struct dma_queue *dma_queue;
+        dma_queue = &_dma_queues[tag];
+
+        while (dma_queue->busy) {
+        }
 }
 
 uint32_t
@@ -190,9 +204,12 @@ _update_dma_request_pointers(const struct dma_queue_request *request)
 }
 
 static void __attribute__ ((always_inline)) inline
-_start_dma_request(const struct dma_queue_request *request)
+_start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *request)
 {
+        assert(dma_queue != NULL);
         assert(request != NULL);
+
+        dma_queue->busy = true;
 
         const struct state_scu_dma_level *state;
         state = &request->state;
@@ -244,12 +261,14 @@ _dma_handler(void)
         /* Finished with the current request */
         _current_request = NULL;
 
-        if (dma_queue->count > 0) {
+        if (dma_queue->count == 0) {
+                dma_queue->busy = false;
+        } else {
                 struct dma_queue_request *next_request;
                 next_request = &dma_queue->requests[dma_queue->head];
 
                 _update_dma_request_pointers(next_request);
-                _start_dma_request(next_request);
+                _start_dma_request(dma_queue, next_request);
         }
 
         handler(work);
