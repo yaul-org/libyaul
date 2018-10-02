@@ -25,5 +25,5 @@ __assert_func(const char *file, int line, const char *func,
             (func ? ", function: " : ""),
             (func ? func : ""));
 
-        internal_exception_show(buffer);
+        _internal_exception_show(buffer);
 }
