@@ -200,6 +200,11 @@ struct state_vdp2 {
                 };
         } buffered_regs;
 
+        struct dma_level_cfg commit_dma_level_cfg;
+        uint8_t commit_dma_buffer[DMA_REG_BUFFER_BYTE_SIZE];
+        void (*commit_dma_handler)(void *);
+        void *commit_dma_work;
+
         struct vram_ctl vram_ctl;
 };
 

@@ -6,8 +6,12 @@
  */
 
 #include <bios.h>
+
+#include <cpu/cache.h>
 #include <cpu/intc.h>
+
 #include <scu/ic.h>
+
 #include <vdp2.h>
 
 #include <string.h>
@@ -23,6 +27,8 @@ static void _vdp2_vblank_out(void);
 void
 vdp2_init(void)
 {
+        extern void _internal_vdp2_commit_handler(void *);
+
         /* Avoid re-initializing by checking */
         static bool _initialized = false;
 
@@ -118,6 +124,26 @@ vdp2_init(void)
 
         /* Initialized */
         _initialized = true;
+
+        struct dma_level_cfg *dma_level_cfg;
+        dma_level_cfg = &_internal_state_vdp2.commit_dma_level_cfg;
+
+        dma_level_cfg->dlc_mode = DMA_MODE_DIRECT;
+        dma_level_cfg->dlc_xfer.direct.len = sizeof(_internal_state_vdp2.buffered_regs) - 16;
+        dma_level_cfg->dlc_xfer.direct.dst = VDP2(16);
+        dma_level_cfg->dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&_internal_state_vdp2.buffered_regs.buffer[8];
+        dma_level_cfg->dlc_stride = DMA_STRIDE_2_BYTES;
+        dma_level_cfg->dlc_update = DMA_UPDATE_NONE;
+        dma_level_cfg->dlc_starting_factor = DMA_START_FACTOR_ENABLE;
+        dma_level_cfg->dlc_ihr = _internal_vdp2_commit_handler;
+        dma_level_cfg->dlc_work = NULL;
+
+        void *commit_dma_buffer;
+        commit_dma_buffer = &_internal_state_vdp2.commit_dma_buffer[0];
+
+        scu_dma_level_config_buffer(0, dma_level_cfg, commit_dma_buffer);
+
+        vdp2_commit_handler_set(NULL, NULL);
 
         irq_mux_init(&_internal_vdp2_vblank_in_irq_mux);
         irq_mux_init(&_internal_vdp2_vblank_out_irq_mux);
