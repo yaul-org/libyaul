@@ -38,10 +38,10 @@
  */
 #define MEMB_PTR_BOUND(name, ptr)                                              \
         (((int8_t *)(ptr) >= (int8_t *)(name)->m_bpool) &&                     \
-                ((int8_t *)(ptr) < ((int8_t *)(name)->m_bpool +                \
-                        ((name)->m_bnum * (name)->m_bsize))))
+         ((int8_t *)(ptr) < ((int8_t *)(name)->m_bpool +                       \
+             ((name)->m_bnum * (name)->m_bsize))))
 
-static void memb_block_next(struct memb *);
+static void _incr_block_index(struct memb *);
 
 /*
  * Initialize a block pool MB.
@@ -96,7 +96,7 @@ memb_alloc(struct memb *mb)
         cur_bidx = mb->m_bidx;
 
         do {
-                memb_block_next(mb);
+                _incr_block_index(mb);
                 bidx = mb->m_bidx;
 
                 if (mb->m_breftype[bidx] == MEMB_REF_AVAILABLE) {
@@ -112,7 +112,7 @@ allocate:
         block = (int8_t *)mb->m_bpool + (bidx * mb->m_bsize);
         mb->m_breftype[bidx] = MEMB_REF_RESERVED;
         /* Increase to next block index */
-        memb_block_next(mb);
+        _incr_block_index(mb);
 
         mb->m_size++;
 
@@ -122,7 +122,7 @@ allocate:
 /*
  * Free the unit block as dirty.
  *
- * If successful, 0 is returned. Otherwise a -1 is returned if the
+ * If successful, 0 is returned. Otherwise -1 is returned if the
  * address is not within the bounds of the block pool MB.
  */
 int
@@ -170,7 +170,7 @@ memb_free(struct memb *mb, void *addr)
  * Return the number of blocks allocated.
  *
  * If successful, the number of blocks allocated is returned. Otherwise
- * a -1 is returned.
+ * -1 is returned.
  */
 int32_t
 memb_size(struct memb *mb)
@@ -182,8 +182,19 @@ memb_size(struct memb *mb)
         return mb->m_size;
 }
 
-static void
-memb_block_next(struct memb *mb)
+/*
+ * Determine if ADDR is within bounds of the block pool MB. Otherwise 0
+ * is returned.
+ *
+ */
+bool
+memb_bounds(struct memb *mb, void *addr)
+{
+        return MEMB_PTR_BOUND(mb, addr);
+}
+
+static void __attribute__ ((always_inline)) inline
+_incr_block_index(struct memb *mb)
 {
         if (mb->m_bidx >= (mb->m_bnum - 1)) {
                 mb->m_bidx = 0;

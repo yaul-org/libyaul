@@ -183,14 +183,13 @@ slob_free(void *addr)
 
         uint32_t bunits;
 
-        if (addr == NULL) {
-                return;
-        }
+        assert(addr != NULL);
+
+        /* Check if ADDR is within bounds of a SLOB managed memory */
+        assert((memb_bounds(&slob_pages, addr)));
 
         sb = (struct slob_block *)addr - 1;
         sp = SLOB_PAGE(sb);
-
-        /* XXX: Check if addr is within bounds of a SLOB page */
 
         bunits = slob_block_units(sb);
 

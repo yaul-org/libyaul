@@ -34,6 +34,7 @@
 #include <sys/cdefs.h>
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,6 +76,7 @@ void memb_init(struct memb *);
 void *memb_alloc(struct memb *);
 int memb_free(struct memb *, void *);
 int32_t memb_size(struct memb *);
+bool memb_bounds(struct memb *, void *);
 
 #ifdef __cplusplus
 }
