@@ -62,10 +62,10 @@ __asm__ (".align 4\n"                                                          \
          "\t1:\n"                                                              \
          "\t.long __ihr_exception_" __STRING(name) "\n")
 
-void _exception_illegal_instruction(void);
-void _exception_illegal_slot(void);
-void _exception_cpu_address_error(void);
-void _exception_dma_address_error(void);
+void _exception_illegal_instruction(void) __used;
+void _exception_illegal_slot(void) __used;
+void _exception_cpu_address_error(void) __used;
+void _exception_dma_address_error(void) __used;
 
 static void _format_exception_message(struct cpu_registers *, char *, const char *);
 
