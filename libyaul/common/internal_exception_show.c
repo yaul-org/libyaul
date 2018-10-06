@@ -35,7 +35,7 @@ _internal_exception_show(const char *buffer)
 
         vdp2_tvmd_vblank_out_wait();
         vdp2_tvmd_vblank_in_wait();
-        vdp2_commit_block();
+        vdp2_commit_wait();
         cons_flush();
 
         abort();

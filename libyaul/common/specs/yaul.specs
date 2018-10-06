@@ -22,8 +22,7 @@
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs0/usb-cartridge) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/a/cs2/cd-block) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/scsp) \
--I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/vdp1) \
--I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/vdp2) \
+-I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/b/vdp) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/cpu) \
 -I %:getenv(INSTALL_ROOT /sh-elf/sh-elf/include/yaul/scu/bus/cpu/smpc)
 
