@@ -38,11 +38,8 @@
 /* CS2 */
 #include <scu/bus/a/cs2/cd-block/cd-block.h>
 
-/* B-bus VDP1 */
-#include <scu/bus/b/vdp1/vdp1.h>
-
-/* B-bus VDP2 */
-#include <scu/bus/b/vdp2/vdp2.h>
+/* B-bus VDP1 and VDP2 */
+#include <scu/bus/b/vdp/vdp.h>
 
 /* B-bus SCSP */
 #include <scu/bus/b/scsp/scsp.h>

@@ -17,6 +17,8 @@
 
 #include <cpu.h>
 
+#include <vdp.h>
+
 void __attribute__ ((weak))
 user_init(void)
 {
@@ -58,6 +60,8 @@ _init(void)
         _call_global_ctors();
 
         cpu_init();
+
+        vdp_init();
 
         user_init();
 }
