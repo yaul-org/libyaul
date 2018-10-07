@@ -14,9 +14,10 @@
 #include <sys/cdefs.h>
 
 #include <mm/slob.h>
+#include <sys/dma-queue.h>
 
 #include <cpu.h>
-
+#include <scu.h>
 #include <vdp.h>
 
 void __attribute__ ((weak))
@@ -60,6 +61,7 @@ _init(void)
         _call_global_ctors();
 
         cpu_init();
+        scu_init();
 
         vdp_init();
 
