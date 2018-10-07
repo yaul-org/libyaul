@@ -28,7 +28,7 @@
 struct dma_queue {
         struct dma_queue_request {
                 uint8_t tag;
-                struct state_scu_dma_level state;
+                uint32_t reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
 
                 void (*handler)(void *);
                 void *work;
@@ -43,7 +43,7 @@ struct dma_queue {
 
 static void _update_dma_request_pointers(const struct dma_queue_request *);
 static void _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *);
-static void _copy_dma_request_state(struct state_scu_dma_level *, const void *);
+static void _copy_dma_reg_buffer(void *, const void *);
 
 static void _default_handler(void *);
 
@@ -56,24 +56,11 @@ static const struct dma_queue_request *_last_request;
 void
 dma_queue_init(void)
 {
-        uint32_t tag;
-        for (tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
-                _dma_queues[tag].head = 0;
-                _dma_queues[tag].tail = 0;
-                _dma_queues[tag].count = 0;
-        }
-
-        _current_request = NULL;
-        _last_request = NULL;
-
-        scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL);
-        scu_dma_level_stop(DMA_QUEUE_SCU_DMA_LEVEL);
-
-        scu_ic_ihr_set(DMA_QUEUE_SCU_DMA_INTERRUPT, _dma_handler);
+        dma_queue_clear();
 }
 
 int8_t
-dma_queue_enqueue(const void *buffer, uint8_t tag)
+dma_queue_enqueue(const void *buffer, uint8_t tag, void (*handler)(void *), void *work)
 {
         assert(buffer != NULL);
 
@@ -109,12 +96,11 @@ dma_queue_enqueue(const void *buffer, uint8_t tag)
 
         request->tag = tag;
 
-        _copy_dma_request_state(&request->state, buffer);
+        _copy_dma_reg_buffer(&request->reg_buffer[0], buffer);
 
         request->tag = tag;
-        request->handler = (request->state.ihr != NULL)
-            ? request->state.ihr
-            : _default_handler;
+        request->handler = (handler != NULL) ? handler : _default_handler;
+        request->work = work;
 
         dma_queue->tail++;
         dma_queue->count++;
@@ -125,6 +111,23 @@ exit:
         scu_ic_mask_chg(DMA_QUEUE_SCU_DMA_MASK_ENABLE, IC_MASK_NONE);
 
         return error;
+}
+
+void
+dma_queue_clear(void)
+{
+        uint32_t tag;
+        for (tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
+                _dma_queues[tag].head = 0;
+                _dma_queues[tag].tail = 0;
+                _dma_queues[tag].count = 0;
+        }
+
+        _current_request = NULL;
+        _last_request = NULL;
+
+        scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL);
+        scu_dma_level_stop(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
 int8_t
@@ -211,34 +214,24 @@ _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *
 
         dma_queue->busy = true;
 
-        const struct state_scu_dma_level *state;
-        state = &request->state;
-
-        scu_dma_level_buffer_set(state);
+        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, DMA_START_FACTOR_ENABLE, &request->reg_buffer[0], _dma_handler);
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
-static void __attribute__ ((always_inline)) inline
-_copy_dma_request_state(struct state_scu_dma_level *dst_state, const void *buffer)
+static inline void __attribute__ ((always_inline))
+_copy_dma_reg_buffer(void *dst_buffer, const void *src_buffer)
 {
-        const struct state_scu_dma_level *src_state;
-        src_state = buffer;
-
         uint32_t *dst;
-        dst = &dst_state->buffered_regs.buffer[0];
+        dst = dst_buffer;
 
         const uint32_t *src;
-        src = &src_state->buffered_regs.buffer[0];
+        src = src_buffer;
 
         *(dst++) = *(src++);
         *(dst++) = *(src++);
         *(dst++) = *(src++);
         *(dst++) = *(src++);
         *(dst++) = *(src++);
-
-        dst_state->level = src_state->level;
-        dst_state->ihr = src_state->ihr;
-        dst_state->work = src_state->work;
 }
 
 static void

@@ -78,8 +78,8 @@ extern "C" {
 
 #define DMA_INDIRECT_TBL_END 0x80000000
 
-#define DMA_REG_BUFFER_BYTE_SIZE        32
-#define DMA_REG_BUFFER_WORD_COUNT       8
+#define DMA_REG_BUFFER_BYTE_SIZE        20
+#define DMA_REG_BUFFER_WORD_COUNT       (DMA_REG_BUFFER_BYTE_SIZE / 4)
 
 #define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
         .len = (_len),                                                         \
@@ -112,10 +112,6 @@ struct dma_level_cfg {
 
         uint8_t dlc_stride;
         uint32_t dlc_update;
-        uint8_t dlc_starting_factor;
-
-        void (*dlc_ihr)(void *);
-        void *dlc_work;
 };
 
 static inline uint32_t __attribute__ ((always_inline))
@@ -219,50 +215,6 @@ scu_dma_level_wait(uint8_t level)
                 break;
         case 2:
                 scu_dma_level2_wait();
-                break;
-        }
-}
-
-static inline void __attribute__ ((always_inline))
-scu_dma_level0_enable(void)
-{
-        scu_dma_level0_wait();
-
-        MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
-}
-
-static inline void __attribute__ ((always_inline))
-scu_dma_level1_enable(void)
-{
-        scu_dma_level1_wait();
-
-        MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
-}
-
-static inline void __attribute__ ((always_inline))
-scu_dma_level2_enable(void)
-{
-        scu_dma_level2_wait();
-
-        MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
-}
-
-static inline void __attribute__ ((always_inline))
-scu_dma_level_enable(uint8_t level)
-{
-        /* Clear starting bit, but enable the DMA level. Other required
-         * data must be set in advance since DMA begins (depending on
-         * the starting factor) after this bit is set. */
-
-        switch (level) {
-        case 0:
-                scu_dma_level0_enable();
-                break;
-        case 1:
-                scu_dma_level1_enable();
-                break;
-        case 2:
-                scu_dma_level2_enable();
                 break;
         }
 }
@@ -387,11 +339,8 @@ scu_dma_illegal_set(void (*ihr)(void))
 }
 
 extern void scu_dma_init(void);
-extern void scu_dma_level_config_buffer(uint8_t, const struct dma_level_cfg *, void *);
-extern void scu_dma_level_config_set(uint8_t, const struct dma_level_cfg *);
-extern void scu_dma_level_xfer_update(const struct dma_level_cfg *, void *);
-extern void scu_dma_level_ihr_update(const struct dma_level_cfg *, void *);
-extern void scu_dma_level_buffer_set(const void *);
+extern void scu_dma_config_buffer(void *, const struct dma_level_cfg *);
+extern void scu_dma_config_set(uint8_t, uint8_t, const void *, void (*)(void));
 extern int8_t scu_dma_level_unused_get(void);
 
 #ifdef __cplusplus
