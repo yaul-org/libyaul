@@ -41,7 +41,7 @@ LIB_SRCS+= \
 	kernel/cons/cons.c \
 	kernel/cons/drivers/vdp1.c \
 	kernel/cons/drivers/vdp2.c \
-	kernel/cons/drivers/usb-cartridge.c \
+	kernel/cons/drivers/usb-cart.c \
 	kernel/cons/font/font.c \
 	kernel/cons/vt_parse/vt_parse.c \
 	kernel/cons/vt_parse/vt_parse_table.c \
@@ -107,12 +107,7 @@ LIB_SRCS+= \
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_read.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_send.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_xchg.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_read.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_send.c
+	scu/bus/a/cs0/usb-cart/usb-cart.c
 endif
 
 LIB_SRCS+= \
@@ -204,7 +199,7 @@ INCLUDE_DIRS:= \
 	scu \
 	scu/bus/a/cs0/arp \
 	scu/bus/a/cs0/dram-cartridge \
-	scu/bus/a/cs0/usb-cartridge \
+	scu/bus/a/cs0/usb-cart \
 	scu/bus/a/cs2/cd-block \
 	scu/bus/b/scsp \
 	scu/bus/b/vdp \
@@ -287,8 +282,8 @@ endif
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs0/usb-cartridge/:usb-cartridge.h:yaul/scu/bus/a/cs0/usb-cartridge/ \
-	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/:map.h:yaul/scu/bus/a/cs0/usb-cartridge/usb-cartridge/
+	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/scu/bus/a/cs0/usb-cart/ \
+	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/scu/bus/a/cs0/usb-cart/usb-cart/
 endif
 
 INSTALL_HEADER_FILES+= \
