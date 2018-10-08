@@ -63,6 +63,8 @@ _init(void)
         cpu_init();
         scu_init();
 
+        dma_queue_init();
+
         vdp_init();
 
         user_init();
