@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <bus/a/cs0/usb-cartridge/usb-cartridge.h>
+#include <usb-cart.h>
 
 #include "../drivers.h"
 
@@ -18,12 +18,12 @@ static void _write(struct cons *);
 #endif /* HAVE_DEV_CARTRIDGE */
 
 void
-cons_usb_cartridge_init(struct cons *cons)
+cons_usb_cart_init(struct cons *cons)
 {
         cons->write = _write;
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cartridge_init();
+        usb_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 }
 
@@ -51,7 +51,7 @@ _write(struct cons *cons)
                                 break;
                         }
 
-                        usb_cartridge_byte_send(cb->glyph);
+                        usb_cart_byte_send(cb->glyph);
 
                         char_count++;
                         send_newline = false;
@@ -67,7 +67,7 @@ _write(struct cons *cons)
                 sent_chars = (char_count - prev_char_count) > 0;
 
                 if (send_newline || (sent_chars && (col < cons->cols))) {
-                        usb_cartridge_byte_send('\n');
+                        usb_cart_byte_send('\n');
                 }
 
                 /* If we've reached the end of the row and sent characters,
@@ -79,7 +79,7 @@ _write(struct cons *cons)
         /* If we've sent at least one character, wait for the
          * response */
         if (char_count > 0) {
-                usb_cartridge_byte_send('\0');
+                usb_cart_byte_send('\0');
         }
 }
 #endif /* HAVE_DEV_CARTRIDGE */

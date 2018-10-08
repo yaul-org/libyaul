@@ -28,9 +28,9 @@
 
 /* CS0 */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <scu/bus/a/cs0/usb-cartridge/usb-cartridge.h>
+#include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <scu/bus/a/cs0/arp/arp.h>
+#include <arp.h>
 #endif /* HAVE_DEV_CARTRIDGE */
 
 #include <scu/bus/a/cs0/dram-cartridge/dram-cartridge.h>
