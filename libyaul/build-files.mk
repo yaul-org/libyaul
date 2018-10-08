@@ -156,9 +156,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_scrn_sf_codes_set.c \
 	scu/bus/b/vdp/vdp2_scrn_mosaic.c \
 	scu/bus/b/vdp/vdp2_scrn_priority_set.c \
-	scu/bus/b/vdp/vdp2_scrn_reduction_set.c \
-	scu/bus/b/vdp/vdp2_scrn_reduction_x_set.c \
-	scu/bus/b/vdp/vdp2_scrn_reduction_y_set.c \
+	scu/bus/b/vdp/vdp2_scrn_reduction.c \
 	scu/bus/b/vdp/vdp2_scrn_scroll_set.c \
 	scu/bus/b/vdp/vdp2_scrn_scroll_update.c \
 	scu/bus/b/vdp/vdp2_scrn_vcs_set.c \
