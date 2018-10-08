@@ -72,11 +72,11 @@ extern "C" {
 #define DMA_UPDATE_RUP  0x00010000
 #define DMA_UPDATE_WUP  0x00000100
 
+#define DMA_INDIRECT_TBL_END 0x80000000
+
 #define DMA_BUS_A       0x00
 #define DMA_BUS_B       0x01
 #define DMA_BUS_DSP     0x02
-
-#define DMA_INDIRECT_TBL_END 0x80000000
 
 #define DMA_REG_BUFFER_BYTE_SIZE        20
 #define DMA_REG_BUFFER_WORD_COUNT       (DMA_REG_BUFFER_BYTE_SIZE / 4)
@@ -336,6 +336,41 @@ static inline void __attribute__ ((always_inline))
 scu_dma_illegal_set(void (*ihr)(void))
 {
         scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, ihr);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_level0_end_set(void (*ihr)(void))
+{
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_level1_end_set(void (*ihr)(void))
+{
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_level2_end_set(void (*ihr)(void))
+{
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
+}
+
+static inline void __attribute__ ((always_inline))
+scu_dma_level_end_set(uint8_t level, void (*ihr)(void))
+{
+        switch (level & 0x03) {
+        case 2:
+                scu_dma_level2_end_set(ihr);
+                break;
+        case 1:
+                scu_dma_level1_end_set(ihr);
+                break;
+        case 0:
+        default:
+                scu_dma_level0_end_set(ihr);
+                break;
+        }
 }
 
 extern void scu_dma_init(void);
