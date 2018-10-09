@@ -1,62 +1,75 @@
 /*
  * Copyright (c) 2012-2016 Israel Jacquez
- *
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <dram-cartridge.h>
+#include <dram-cart.h>
 
-#include "dram-cartridge-internal.h"
+#include "dram-cart-internal.h"
 
-uint8_t id = 0x00;
-void *base = NULL;
+static uint8_t _id = 0x00;
+static void *_base = NULL;
 
-static bool detected(void);
+static bool _detect_dram_cart(void);
 
 void
-dram_cartridge_init(void)
+dram_cart_init(void)
 {
-        static bool initialized = false;
-
-        uint32_t asr0;
-        uint32_t aref;
-
-        if (initialized)
-                return;
-
         /* Write to A-Bus "dummy" area */
         MEMORY_WRITE(16, DUMMY(UNKNOWN), 0x0001);
 
         /* Set the SCU wait */
         /* Don't ask about this magic constant */
-        asr0 = MEMORY_READ(32, SCU(ASR0));
+        uint32_t asr0_bits;
+        asr0_bits = MEMORY_READ(32, SCU(ASR0));
         MEMORY_WRITE(32, SCU(ASR0), 0x23301FF0);
+
         /* Write to A-Bus refresh */
-        aref = MEMORY_READ(32, SCU(AREF));
+        uint32_t aref_bits;
+        aref_bits = MEMORY_READ(32, SCU(AREF));
         MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
         /* Determine ID and base address */
-        if (!(detected())) {
+        if (!(_detect_dram_cart())) {
                 /* Restore values in case we can't detect DRAM
                  * cartridge */
-                MEMORY_WRITE(32, SCU(ASR0), asr0);
-                MEMORY_WRITE(32, SCU(AREF), aref);
-                return;
+                MEMORY_WRITE(32, SCU(ASR0), asr0_bits);
+                MEMORY_WRITE(32, SCU(AREF), aref_bits);
         }
+}
 
-        initialized = true;
+void *
+dram_cart_area_get(void)
+{
+        return _base;
+}
+
+uint8_t
+dram_cart_id_get(void)
+{
+        return _id;
+}
+
+size_t
+dram_cart_size(void)
+{
+        switch (_id) {
+        case DRAM_CART_ID_1MIB:
+                return 0x00100000;
+        case DRAM_CART_ID_4MIB:
+                return 0x00400000;
+        default:
+                return 0;
+        }
 }
 
 static bool
-detected(void)
+_detect_dram_cart(void)
 {
-        uint32_t read;
-        uint32_t write;
-        uint32_t b;
-
-        /*               8-Mbit DRAM            32-Mbit DRAM
+        /*
+         *             8-Mbit DRAM            32-Mbit DRAM
          *             +--------------------+ +--------------------+
          * 0x224000000 | DRAM #0            | | DRAM #0            |
          *             +--------------------+ |                    |
@@ -77,25 +90,29 @@ detected(void)
          */
 
         /* Check the ID */
-        id = MEMORY_READ(8, CS0(ID));
-        id &= 0xFF;
+        _id = MEMORY_READ(8, CS0(ID));
+        _id &= 0xFF;
 
-        if ((id != DRAM_CARTRIDGE_ID_1MIB) &&
-            (id != DRAM_CARTRIDGE_ID_4MIB)) {
-                id = 0x00;
-                base = NULL;
+        if ((_id != DRAM_CART_ID_1MIB) && (_id != DRAM_CART_ID_4MIB)) {
+                _id = 0x00;
+                _base = NULL;
+
                 return false;
         }
 
-        for (b = 0; b < DRAM_CARTRIDGE_BANKS; b++) {
+        uint32_t b;
+        for (b = 0; b < DRAM_CART_BANKS; b++) {
                 MEMORY_WRITE(32, DRAM(0, b, 0x00000000), 0x00000000);
                 MEMORY_WRITE(32, DRAM(1, b, 0x00000000), 0x00000000);
         }
 
         /* Check DRAM #0 for mirrored banks */
+        uint32_t write;
         write = 0x5A5A5A5A;
         MEMORY_WRITE(32, DRAM(0, 0, 0x00000000), write);
-        for (b = 1; b < DRAM_CARTRIDGE_BANKS; b++) {
+
+        for (b = 1; b < DRAM_CART_BANKS; b++) {
+                uint32_t read;
                 read = MEMORY_READ(32, DRAM(0, b, 0x00000000));
 
                 /* Is it mirrored? */
@@ -106,19 +123,20 @@ detected(void)
                 /* Thanks to Joe Fenton or the suggestion to return the
                  * last mirrored DRAM #0 bank in order to get a
                  * contiguous address space */
-                if (id != DRAM_CARTRIDGE_ID_1MIB) {
-                        id = DRAM_CARTRIDGE_ID_1MIB;
+                if (_id != DRAM_CART_ID_1MIB) {
+                        _id = DRAM_CART_ID_1MIB;
                 }
 
-                base = (void *)DRAM(0, 3, 0x00000000);
+                _base = (void *)DRAM(0, 3, 0x00000000);
 
                 return true;
         }
 
-        if (id != DRAM_CARTRIDGE_ID_4MIB) {
-                id = DRAM_CARTRIDGE_ID_4MIB;
+        if (_id != DRAM_CART_ID_4MIB) {
+                _id = DRAM_CART_ID_4MIB;
         }
-        base = (void *)DRAM(0, 0, 0x00000000);
+
+        _base = (void *)DRAM(0, 0, 0x00000000);
 
         return true;
 }

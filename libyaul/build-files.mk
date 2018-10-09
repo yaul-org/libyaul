@@ -100,10 +100,7 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_area.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_id.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_init.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_size.c
+	scu/bus/a/cs0/dram-cart/dram-cart.c
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
@@ -203,7 +200,7 @@ INCLUDE_DIRS:= \
 	math \
 	scu \
 	scu/bus/a/cs0/arp \
-	scu/bus/a/cs0/dram-cartridge \
+	scu/bus/a/cs0/dram-cart \
 	scu/bus/a/cs0/usb-cartridge \
 	scu/bus/a/cs2/cd-block \
 	scu/bus/b/scsp \
@@ -276,8 +273,8 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs2/cd-block/:cd-block.h:yaul/scu/bus/a/cs2/cd-block/ \
 	./scu/bus/a/cs2/cd-block/cd-block/:cmd.h:yaul/scu/bus/a/cs2/cd-block/cd-block/ \
 	\
-	./scu/bus/a/cs0/dram-cartridge/:dram-cartridge.h:yaul/scu/bus/a/cs0/dram-cartridge/ \
-	./scu/bus/a/cs0/dram-cartridge/:dram-cartridge/map.h:yaul/scu/bus/a/cs0/dram-cartridge/
+	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/scu/bus/a/cs0/dram-cart/ \
+	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 INSTALL_HEADER_FILES+= \
