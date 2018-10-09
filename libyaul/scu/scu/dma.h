@@ -146,7 +146,7 @@ scu_dma_level0_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) >> 4) & 0x03;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint8_t __attribute__ ((always_inline))
 scu_dma_level1_busy(void)
 {
         /* In operation or on standby */
