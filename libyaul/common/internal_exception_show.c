@@ -9,6 +9,8 @@
 
 #include <cpu/intc.h>
 
+#include <scu/ic.h>
+
 #include <vdp1.h>
 #include <vdp2.h>
 #include <vdp2/tvmd.h>
@@ -23,7 +25,8 @@ _internal_exception_show(const char *buffer)
 {
         cpu_intc_mask_set(15);
 
-        /* Reset the VDP2 */
+        scu_ic_chg_mask(IC_MASK_ALL, IC_MASK_ALL);
+
         vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
             TVMD_VERT_224);
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x01FFFE),
