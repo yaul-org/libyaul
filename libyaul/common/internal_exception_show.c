@@ -25,7 +25,7 @@ _internal_exception_show(const char *buffer)
 {
         cpu_intc_mask_set(15);
 
-        scu_ic_chg_mask(IC_MASK_ALL, IC_MASK_ALL);
+        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_ALL);
 
         vdp2_tvmd_display_res_set(TVMD_INTERLACE_NONE, TVMD_HORZ_NORMAL_A,
             TVMD_VERT_224);
