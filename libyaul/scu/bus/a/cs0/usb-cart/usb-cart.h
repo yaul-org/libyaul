@@ -63,6 +63,7 @@ extern uint32_t usb_cart_long_read(void);
 extern void usb_cart_long_send(uint32_t);
 
 extern void usb_cart_dma_read(void *, uint32_t);
+extern void usb_cart_dma_send(const void *, uint32_t);
 
 #ifdef __cplusplus
 }
