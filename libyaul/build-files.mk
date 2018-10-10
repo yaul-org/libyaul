@@ -254,7 +254,8 @@ INSTALL_HEADER_FILES+= \
 	./kernel/cons/:cons.h:yaul/cons/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/
+	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:slob.h:yaul/mm/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/ \
