@@ -54,6 +54,7 @@
 #include <math.h>
 
 #include <mm/memb.h>
+#include <mm/slob.h>
 
 #include <sys/init.h>
 #include <sys/dma-queue.h>
