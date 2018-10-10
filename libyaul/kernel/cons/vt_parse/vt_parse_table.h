@@ -47,8 +47,8 @@ typedef enum {
 
 typedef uint8_t state_change_t;
 
-extern state_change_t vt_parse_state_table[15][256];
-extern vt_parse_action_t vt_parse_entry_actions[15];
-extern vt_parse_action_t vt_parse_exit_actions[15];
+extern state_change_t _internal_vt_parse_state_table[15][256];
+extern vt_parse_action_t _internal_vt_parse_entry_actions[15];
+extern vt_parse_action_t _internal_vt_parse_exit_actions[15];
 
 #endif /* _VT_PARSE_TABLE_H_ */

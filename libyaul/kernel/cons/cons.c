@@ -8,8 +8,9 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cons.h"
@@ -19,7 +20,7 @@
 
 static inline __attribute__ ((always_inline)) void _action_character_print(int);
 static inline __attribute__ ((always_inline)) void _action_escape_character_print(int);
-static inline __attribute__ ((always_inline)) void _action_csi_dispatch_print(int, int *, int);
+static inline __attribute__ ((always_inline)) void _action_csi_dispatch_print(int32_t, int32_t *, int32_t);
 
 static void _buffer_clear(int32_t, int32_t, int32_t, int32_t);
 static void _buffer_line_clear(int32_t, int32_t, int32_t);
@@ -43,21 +44,26 @@ static vt_parse_t _vt_parser;
 void
 cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
 {
-        static struct cons_buffer _cons_buffer[CONS_COLS_MAX * CONS_ROWS_MAX];
-
         assert(cols > 0);
         assert(rows > 0);
 
-        _cons.buffer = &_cons_buffer[0];
+        if (_cons.buffer != NULL) {
+                free(_cons.buffer);
+        }
+
+        _cons.buffer = malloc(cols * rows);
+
+        assert(_cons.buffer != NULL);
+
         _cons.cols = cols;
         _cons.rows = rows;
 
-        _buffer_clear(0, _cons.cols, 0, _cons.rows);
-
-        vt_parse_init(&_vt_parser, _vt_parser_callback);
-
         _cons.cursor.col = 0;
         _cons.cursor.row = 0;
+
+        _buffer_clear(0, _cons.cols, 0, _cons.rows);
+
+        _internal_vt_parse_init(&_vt_parser, _vt_parser_callback);
 
         switch (driver) {
         case CONS_DRIVER_VDP1:
@@ -86,7 +92,7 @@ cons_buffer(const char *buffer)
                 return;
         }
 
-        vt_parse(&_vt_parser, buffer, len);
+        _internal_vt_parse(&_vt_parser, buffer, len);
 }
 
 void
@@ -99,7 +105,7 @@ cons_write(const char *buffer)
                 return;
         }
 
-        vt_parse(&_vt_parser, buffer, len);
+        _internal_vt_parse(&_vt_parser, buffer, len);
 
         _cons.write(&_cons);
 }
@@ -233,6 +239,7 @@ _cursor_cond_set(int32_t col, int32_t row)
             ((row >= 0) && (row <= _cons.rows))) {
                 _cons.cursor.col = col;
                 _cons.cursor.row = row;
+
                 return true;
         }
 
@@ -330,7 +337,7 @@ _action_escape_character_print(int ch)
 }
 
 static inline void __attribute__ ((always_inline))
-_action_csi_dispatch_print(int ch, int *params, int num_params)
+_action_csi_dispatch_print(int32_t ch, int32_t *params, int32_t num_params)
 {
         int32_t col;
         int32_t row;
