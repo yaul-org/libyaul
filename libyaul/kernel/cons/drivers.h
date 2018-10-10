@@ -32,8 +32,6 @@ struct cons {
                 int32_t row;
         } cursor;
 
-        bool initialized;
-
         void (*write)(struct cons *);
 
         struct cons_buffer *buffer;
@@ -41,10 +39,7 @@ struct cons {
 
 struct cons_buffer {
         uint8_t glyph;
-        uint8_t attribute;
-        uint8_t fg;
-        uint8_t bg;
-};
+} __packed;
 
 void cons_vdp1_init(struct cons *);
 void cons_vdp2_init(struct cons *);
