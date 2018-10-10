@@ -15,6 +15,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define CONS_COLS_MIN           40
+#define CONS_ROWS_MIN           28
+
 #define CONS_COLS_MAX           88
 #define CONS_ROWS_MAX           60
 
