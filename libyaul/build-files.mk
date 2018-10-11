@@ -43,8 +43,6 @@ LIB_SRCS+= \
 	kernel/cons/drivers/vdp2.c \
 	kernel/cons/drivers/usb-cartridge.c \
 	kernel/cons/font/font.c \
-	kernel/cons/vt_parse/vt_parse.c \
-	kernel/cons/vt_parse/vt_parse_table.c \
 	\
 	kernel/sys/dma-queue.c \
 	kernel/sys/irq-mux.c \

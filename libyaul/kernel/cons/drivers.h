@@ -26,6 +26,7 @@ struct cons_buffer;
 struct cons {
         uint16_t cols;
         uint16_t rows;
+        uint16_t cell_count;
 
         struct {
                 int32_t col;

@@ -41,20 +41,17 @@ cons_vdp2_init(struct cons *cons)
         vdp2_scrn_cell_format_set(&_nbg3_format);
         vdp2_scrn_priority_set(SCRN_NBG3, 7);
 
-        struct vram_ctl *vram_ctl;
+        struct vram_cycp vram_cycp;
 
-        vram_ctl = vdp2_vram_control_get();
-        /* VRAM cycle pattern register becomes valid only for T0~T3, and
-         * becomes invalid for T4~T7 when changing screen resolution. */
-        vram_ctl->vram_cycp.pt[3].t0 = VRAM_CTL_CYCP_PNDR_NBG3;
-        vram_ctl->vram_cycp.pt[3].t1 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[3].t2 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[3].t3 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[3].t4 = VRAM_CTL_CYCP_CHPNDR_NBG3;
-        vram_ctl->vram_cycp.pt[3].t5 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[3].t6 = VRAM_CTL_CYCP_NO_ACCESS;
-        vram_ctl->vram_cycp.pt[3].t7 = VRAM_CTL_CYCP_NO_ACCESS;
-        vdp2_vram_control_set(vram_ctl);
+        vram_cycp.pt[3].t0 = VRAM_CYCP_PNDR_NBG3;
+        vram_cycp.pt[3].t1 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp.pt[3].t2 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp.pt[3].t3 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp.pt[3].t4 = VRAM_CYCP_CHPNDR_NBG3;
+        vram_cycp.pt[3].t5 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp.pt[3].t6 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp.pt[3].t7 = VRAM_CYCP_NO_ACCESS;
+        vdp2_vram_cycp_set(&vram_cycp);
 
         /* Clear the first unpacked cell of the font */
         volatile uint16_t *cp;

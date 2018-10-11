@@ -1,3 +1,5 @@
+/* -*- mode: c -*- */
+
 /*
  * Copyright (c) 2012 Joshua Haberman
  * See LICENSE for details.
@@ -5,9 +7,7 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
-#include "vt_parse_table.h"
-
-state_change_t _internal_vt_parse_state_table[15][256] = {
+static state_change_t _vt_parse_state_table[15][256] = {
         {
                 0,
                 0,
@@ -2137,7 +2137,7 @@ state_change_t _internal_vt_parse_state_table[15][256] = {
         }
 };
 
-vt_parse_action_t _internal_vt_parse_entry_actions[] = {
+static vt_parse_action_t _vt_parse_entry_actions[] = {
         0, /* None for ANYWHERE */
         VT_PARSE_ACTION_CLEAR, /* CSI_ENTRY */
         0, /* None for CSI_IGNORE */
@@ -2155,7 +2155,7 @@ vt_parse_action_t _internal_vt_parse_entry_actions[] = {
         0 /* None for SOS_PM_APC_STRING */
 };
 
-vt_parse_action_t _internal_vt_parse_exit_actions[] = {
+static vt_parse_action_t _vt_parse_exit_actions[] = {
         0, /* None for ANYWHERE */
         0, /* None for CSI_ENTRY */
         0, /* None for CSI_IGNORE */
