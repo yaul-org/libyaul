@@ -16,7 +16,7 @@
 #include "cons.h"
 #include "drivers.h"
 
-#include "vt_parse/vt_parse.h"
+#include "vt_parse.inc"
 
 static inline __attribute__ ((always_inline)) void _action_character_print(int);
 static inline __attribute__ ((always_inline)) void _action_escape_character_print(int);
@@ -61,13 +61,14 @@ cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
 
         _cons.cols = cols;
         _cons.rows = rows;
+        _cons.cell_count = cols * rows;
 
         _cons.cursor.col = 0;
         _cons.cursor.row = 0;
 
         _buffer_clear();
 
-        _internal_vt_parse_init(&_vt_parser, _vt_parser_callback);
+        _vt_parse_init(&_vt_parser, _vt_parser_callback);
 
         switch (driver) {
         case CONS_DRIVER_VDP1:
@@ -96,7 +97,7 @@ cons_buffer(const char *buffer)
                 return;
         }
 
-        _internal_vt_parse(&_vt_parser, buffer, len);
+        _vt_parse(&_vt_parser, buffer, len);
 }
 
 void
@@ -109,7 +110,7 @@ cons_write(const char *buffer)
                 return;
         }
 
-        _internal_vt_parse(&_vt_parser, buffer, len);
+        _vt_parse(&_vt_parser, buffer, len);
 
         _cons.write(&_cons);
 }
@@ -253,17 +254,7 @@ _cursor_cond_set(int32_t col, int32_t row)
 static void
 _buffer_clear(void)
 {
-        int32_t col;
-        int32_t row;
-
-        for (row = 0; row < _cons.rows; row++) {
-                for (col = 0; col < _cons.cols; col++) {
-                        struct cons_buffer *cb;
-                        cb = &_cons.buffer[col + (row * _cons.cols)];
-
-                        cb->glyph = '\0';
-                }
-        }
+        (void)memset(_cons.buffer, '\0', _cons.cell_count);
 }
 
 static void
