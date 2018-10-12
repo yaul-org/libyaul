@@ -1,3 +1,5 @@
+/* -*- mode: c -*- */
+
 /*
  * Copyright (c) 2012-2016 Israel Jacquez
  * See LICENSE for details.
@@ -7,7 +9,12 @@
 
 #include <stdint.h>
 
-const uint32_t font[] = {
+#define FONT_CHAR_HEIGHT        (8)
+#define FONT_CHAR_WIDTH         (8)
+#define FONT_SIZE               (8192)
+#define FONT_COLOR_COUNT        (16)
+
+static const uint32_t _font_cpd[] = {
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
         0x07777770, 0x70000007, 0x70700707, 0x70000007, 0x70777707, 0x70077007, 0x70000007, 0x07777770,
         0x07777770, 0x77777777, 0x77077077, 0x77777777, 0x77000077, 0x77700777, 0x77777777, 0x07777770,
@@ -266,7 +273,7 @@ const uint32_t font[] = {
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
 };
 
-const uint16_t palette[] = {
+static const uint16_t _font_pal[] = {
         0x0000, 0x800F, 0x81E0, 0x81EF, 0xBC00, 0xBC0F, 0xBDE0, 0xBDEF,
         0x0000, 0x801F, 0x83E0, 0x83FF, 0xFC00, 0xFC1F, 0xFFE0, 0xFFFF
 };

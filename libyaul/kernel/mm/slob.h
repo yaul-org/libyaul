@@ -32,7 +32,7 @@ extern "C" {
 #define SLOB_PAGE_COUNT 16
 #endif /* !SLOB_PAGE_COUNT */
 
-#define SLOB_PAGE_SIZE  0x1000
+#define SLOB_PAGE_SIZE  0x2000
 #define SLOB_PAGE_MASK  (~(SLOB_PAGE_SIZE - 1))
 
 #define SLOB_PAGE_BREAK_1ST 0x0100

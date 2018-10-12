@@ -14,18 +14,12 @@
 #include <string.h>
 
 #include "cons.h"
-#include "drivers.h"
 
 #include "vt_parse.inc"
 
 static inline __attribute__ ((always_inline)) void _action_character_print(int);
 static inline __attribute__ ((always_inline)) void _action_escape_character_print(int);
 static inline __attribute__ ((always_inline)) void _action_csi_dispatch_print(int32_t, int32_t *, int32_t);
-
-static void _buffer_clear(void);
-static void _buffer_area_clear(int32_t, int32_t, int32_t, int32_t);
-static void _buffer_line_clear(int32_t, int32_t, int32_t);
-static inline void __attribute__ ((always_inline)) _buffer_glyph_write(uint8_t);
 
 static inline __attribute__ ((always_inline)) bool _cursor_column_exceeded(int32_t);
 static inline __attribute__ ((always_inline)) bool _cursor_row_exceeded(uint32_t);
@@ -39,25 +33,40 @@ static inline __attribute__ ((always_inline)) bool _cursor_cond_set(int32_t, int
 
 static void _vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
-static struct cons _cons;
-static vt_parse_t _vt_parser;
+typedef struct {
+        uint16_t cols;
+        uint16_t rows;
+        uint16_t cell_count;
+
+        struct {
+                int32_t col;
+                int32_t row;
+        } cursor;
+
+        cons_ops_t ops;
+
+        vt_parse_t vt_parser;
+} cons_t;
+
+static cons_t _cons;
 
 void
-cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
+cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
 {
+        assert(ops != NULL);
+
         assert((cols >= CONS_COLS_MIN) && (cols <= CONS_COLS_MAX));
         assert((rows >= CONS_ROWS_MIN) && (rows <= CONS_ROWS_MAX));
 
-        if ((_cons.cols != cols) || (_cons.rows != rows)) {
-                /* In case cons is initialized more than once */
-                if (_cons.buffer != NULL) {
-                        free(_cons.buffer);
-                }
+        _cons.ops.clear = ops->clear;
+        _cons.ops.area_clear = ops->area_clear;
+        _cons.ops.line_clear = ops->line_clear;
+        _cons.ops.write = ops->write;
 
-                _cons.buffer = malloc(cols * rows);
-        }
-
-        assert(_cons.buffer != NULL);
+        assert(_cons.ops.clear != NULL);
+        assert(_cons.ops.area_clear != NULL);
+        assert(_cons.ops.line_clear != NULL);
+        assert(_cons.ops.write != NULL);
 
         _cons.cols = cols;
         _cons.rows = rows;
@@ -66,24 +75,9 @@ cons_init(uint8_t driver, uint16_t cols, uint16_t rows)
         _cons.cursor.col = 0;
         _cons.cursor.row = 0;
 
-        _buffer_clear();
+        ops->clear();
 
-        _vt_parse_init(&_vt_parser, _vt_parser_callback);
-
-        switch (driver) {
-        case CONS_DRIVER_VDP1:
-                cons_vdp1_init(&_cons);
-                break;
-        case CONS_DRIVER_VDP2:
-                cons_vdp2_init(&_cons);
-                break;
-        case CONS_DRIVER_USB_CARTRIDGE:
-                cons_usb_cartridge_init(&_cons);
-                break;
-        default:
-                assert(false);
-                return;
-        }
+        _vt_parse_init(&_cons.vt_parser, _vt_parser_callback);
 }
 
 void
@@ -97,28 +91,7 @@ cons_buffer(const char *buffer)
                 return;
         }
 
-        _vt_parse(&_vt_parser, buffer, len);
-}
-
-void
-cons_write(const char *buffer)
-{
-        assert(buffer != NULL);
-
-        size_t len;
-        if ((len = strlen(buffer)) == 0) {
-                return;
-        }
-
-        _vt_parse(&_vt_parser, buffer, len);
-
-        _cons.write(&_cons);
-}
-
-void
-cons_flush(void)
-{
-        _cons.write(&_cons);
+        _vt_parse(&_cons.vt_parser, buffer, len);
 }
 
 static void
@@ -251,51 +224,6 @@ _cursor_cond_set(int32_t col, int32_t row)
         return false;
 }
 
-static void
-_buffer_clear(void)
-{
-        (void)memset(_cons.buffer, '\0', _cons.cell_count);
-}
-
-static void
-_buffer_area_clear(int32_t col_start, int32_t col_end, int32_t row_start,
-    int32_t row_end)
-{
-        int32_t col;
-        int32_t row;
-
-        for (row = row_start; row < row_end; row++) {
-                for (col = col_start; col < col_end; col++) {
-                        struct cons_buffer *cb;
-                        cb = &_cons.buffer[col + (row * _cons.cols)];
-
-                        cb->glyph = '\0';
-                }
-        }
-}
-
-static void
-_buffer_line_clear(int32_t col_start, int32_t col_end, int32_t row)
-{
-        int32_t col;
-
-        for (col = col_start; col < col_end; col++) {
-                struct cons_buffer *cb;
-                cb = &_cons.buffer[col + (row * _cons.cols)];
-
-                cb->glyph = '\0';
-        }
-}
-
-static inline void __attribute__ ((always_inline))
-_buffer_glyph_write(uint8_t glyph)
-{
-        struct cons_buffer *cb;
-        cb = &_cons.buffer[_cons.cursor.col + (_cons.cursor.row * _cons.cols)];
-
-        cb->glyph = glyph;
-}
-
 static inline void __attribute__ ((always_inline))
 _action_character_print(int ch)
 {
@@ -304,7 +232,7 @@ _action_character_print(int ch)
                 _cursor_row_advance(1);
         }
 
-        _buffer_glyph_write(ch);
+        _cons.ops.write(_cons.cursor.col, _cons.cursor.row, ch);
         _cursor_column_advance(1);
 }
 
@@ -459,20 +387,20 @@ _action_csi_dispatch_print(int32_t ch, int32_t *params, int32_t num_params)
                 case 0:
                         /* Erase from the active position to the end of
                          * the screen, inclusive (default). */
-                        _buffer_area_clear(_cons.cursor.col, _cons.cols,
+                        _cons.ops.area_clear(_cons.cursor.col, _cons.cols,
                             _cons.cursor.row, _cons.rows);
                         break;
                 case 1:
                         /* Erase from start of the screen to the active
                          * position, inclusive. */
-                        _buffer_area_clear(0, _cons.cursor.col, 0,
+                        _cons.ops.area_clear(0, _cons.cursor.col, 0,
                             _cons.cursor.row);
                         break;
                 case 2:
                         /* Erase all of the display –- all lines are
                          * erased, changed to single-width, and the
                          * cursor does not move. */
-                        _buffer_clear();
+                        _cons.ops.clear();
                         break;
                 default:
                         break;
@@ -488,18 +416,18 @@ _action_csi_dispatch_print(int32_t ch, int32_t *params, int32_t num_params)
                 case 0:
                         /* Erase from the active position to the end of
                          * the line, inclusive (default) */
-                        _buffer_line_clear(_cons.cursor.col, _cons.cols,
+                        _cons.ops.line_clear(_cons.cursor.col, _cons.cols,
                             _cons.cursor.row);
                         break;
                 case 1:
                         /* Erase from the start of the screen to the
                          * active position, inclusive */
-                        _buffer_line_clear(0, _cons.cursor.col,
+                        _cons.ops.line_clear(0, _cons.cursor.col,
                             _cons.cursor.row);
                         break;
                 case 2:
                         /* Erase all of the line, inclusive */
-                        _buffer_line_clear(0, _cons.cols, _cons.cursor.row);
+                        _cons.ops.line_clear(0, _cons.cols, _cons.cursor.row);
                         break;
                 default:
                         break;
