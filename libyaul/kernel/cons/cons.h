@@ -18,19 +18,20 @@ extern "C" {
 #define CONS_COLS_MIN           40
 #define CONS_ROWS_MIN           28
 
-#define CONS_COLS_MAX           88
-#define CONS_ROWS_MAX           60
+#define CONS_COLS_MAX           128
+#define CONS_ROWS_MAX           128
 
 #define CONS_TAB_WIDTH          2
 
-#define CONS_DRIVER_VDP1                0
-#define CONS_DRIVER_VDP2                1
-#define CONS_DRIVER_USB_CARTRIDGE       2
+typedef struct {
+        void (*clear)(void);
+        void (*area_clear)(int32_t, int32_t, int32_t, int32_t);
+        void (*line_clear)(int32_t, int32_t, int32_t);
+        void (*write)(int32_t, int32_t, uint8_t);
+} cons_ops_t;
 
-extern void cons_init(uint8_t, uint16_t, uint16_t);
+extern void cons_init(const cons_ops_t *, uint16_t, uint16_t);
 extern void cons_buffer(const char *);
-extern void cons_flush(void);
-extern void cons_write(const char *);
 
 #ifdef __cplusplus
 }
