@@ -12,17 +12,31 @@
 
 #include "../dbgio-internal.h"
 
-static void _nop(void);
+static void _init(const void *);
+static void _buffer(const char *);
+static void _flush(void);
+
+const uint32_t _default_params;
 
 const dbgio_dev_ops_t _internal_dev_ops_null = {
         .dev = DBGIO_DEV_NULL,
-        .default_params = NULL,
-        .init = (void (*)(const void *))_nop,
-        .buffer = (void (*)(const char *))_nop,
-        .flush = _nop
+        .default_params = &_default_params,
+        .init = _init,
+        .buffer = _buffer,
+        .flush = _flush
 };
 
 static void
-_nop(void)
+_init(const void *params __unused)
+{
+}
+
+static void
+_buffer(const char *buffer __unused)
+{
+}
+
+static void
+_flush(void)
 {
 }
