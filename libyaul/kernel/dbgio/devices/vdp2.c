@@ -110,14 +110,16 @@ _init(const dbgio_vdp2_t *params)
                 uint32_t reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
         } *dma_font;
 
-        static const cons_ops_t cons_op = {
+        static const cons_ops_t cons_ops = {
                 .clear = _buffer_clear,
                 .area_clear = _buffer_area_clear,
                 .line_clear = _buffer_line_clear,
                 .write = _buffer_write
         };
 
-        _dev_state = malloc(sizeof(dev_state_t));
+        if (_dev_state == NULL) {
+                _dev_state = malloc(sizeof(dev_state_t));
+        }
         assert(_dev_state != NULL);
 
         _dev_state->cell_format.scf_scroll_screen = SCRN_NBG3;
@@ -191,7 +193,9 @@ _init(const dbgio_vdp2_t *params)
                 /* vf = */ 0,
                 /* hf = */ 0);
 
-        _dev_state->page_pnd = malloc(_dev_state->page_size);
+        if (_dev_state->page_pnd == NULL) {
+                _dev_state->page_pnd = malloc(_dev_state->page_size);
+        }
         assert(_dev_state->page_pnd != NULL);
 
         struct dma_level_cfg dma_level_cfg;
@@ -231,9 +235,11 @@ _init(const dbgio_vdp2_t *params)
 
         _dev_state->state = STATE_BUFFER_DIRTY;
         _dev_state->cols = 40;
-        _dev_state->rows = 28;
+        _dev_state->rows = 32;
 
-        cons_init(&cons_op, _dev_state->cols, _dev_state->rows);
+        cons_init(&cons_ops, _dev_state->cols, _dev_state->rows);
+
+        _flush();
 }
 
 static void
