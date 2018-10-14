@@ -15,9 +15,10 @@
 static const dbgio_dev_ops_t *_dev_ops;
 
 static const dbgio_dev_ops_t *_dev_ops_table[] = {
+        &_internal_dev_ops_null,
         NULL,
-        NULL,
-        &_internal_dev_ops_vdp2
+        &_internal_dev_ops_vdp2,
+        &_internal_dev_ops_usb_cart,
 };
 
 void

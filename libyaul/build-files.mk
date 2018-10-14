@@ -39,7 +39,10 @@ endif
 
 LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
+	kernel/dbgio/devices/null.c \
+	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
+	kernel/dbgio/devices/usb-cart.c \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \

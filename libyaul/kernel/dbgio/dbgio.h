@@ -15,9 +15,10 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define DBGIO_DEV_NULL  0
-#define DBGIO_DEV_VDP1  1
-#define DBGIO_DEV_VDP2  2
+#define DBGIO_DEV_NULL          0
+#define DBGIO_DEV_VDP1          1
+#define DBGIO_DEV_VDP2          2
+#define DBGIO_DEV_USB_CART      3
 
 typedef struct {
         const uint32_t *font_cpd;

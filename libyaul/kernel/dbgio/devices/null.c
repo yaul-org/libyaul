@@ -14,8 +14,8 @@
 
 static void _nop(void);
 
-const dbgio_dev_ops_t _internal_dev_ops_usb_cart = {
-        .dev = DBGIO_DEV_USB_CART,
+const dbgio_dev_ops_t _internal_dev_ops_null = {
+        .dev = DBGIO_DEV_NULL,
         .default_params = NULL,
         .init = (void (*)(const void *))_nop,
         .buffer = (void (*)(const char *))_nop,
