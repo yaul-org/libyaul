@@ -37,12 +37,13 @@ _internal_exception_show(const char *buffer)
         vdp2_sprite_type_set(0);
         vdp2_sprite_priority_set(0, 0);
 
+        dbgio_dev_default_init(DBGIO_DEV_VDP2);
+        dbgio_dev_set(DBGIO_DEV_VDP2);
         dbgio_buffer(buffer);
+        dbgio_flush();
 
         vdp2_commit_handler_set(NULL, NULL);
         vdp2_commit();
-
-        dbgio_flush();
 
         vdp2_tvmd_vblank_out_wait();
         vdp2_tvmd_vblank_in_wait();
