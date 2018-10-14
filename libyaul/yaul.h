@@ -49,7 +49,7 @@
 
 #include <common/gdb/gdb.h>
 
-#include <cons/cons.h>
+#include <dbgio/dbgio.h>
 
 #include <math.h>
 

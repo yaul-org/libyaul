@@ -38,6 +38,7 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
+	kernel/dbgio/dbgio.c \
 	kernel/dbgio/devices/vdp2.c \
 	kernel/dbgio/devices/cons/cons.c \
 	\
@@ -193,7 +194,7 @@ INCLUDE_DIRS:= \
 	common/gdb \
 	lib/lib \
 	kernel \
-	kernel/cons \
+	kernel/dbgio \
 	kernel/vfs \
 	math \
 	scu \
