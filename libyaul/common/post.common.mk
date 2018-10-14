@@ -183,6 +183,7 @@ clean:
             $(SH_PROGRAM).sym \
             $(SH_OBJECTS_NO_LINK_UNIQ) \
             $(SH_DEPS_NO_LINK) \
+            root.romdisk \
             IP.BIN \
             IP.BIN.map
 ifneq ($(strip $(M68K_PROGRAM)),)
