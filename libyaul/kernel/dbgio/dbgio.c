@@ -31,7 +31,9 @@ void
 dbgio_dev_init(uint8_t dev, const void *params)
 {
         assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP2));
+               (dev == DBGIO_DEV_VDP1) ||
+               (dev == DBGIO_DEV_VDP2) ||
+               (dev == DBGIO_DEV_USB_CART));
 
         assert(params != NULL);
 
@@ -41,17 +43,16 @@ dbgio_dev_init(uint8_t dev, const void *params)
 void
 dbgio_dev_default_init(uint8_t dev)
 {
-        assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP2));
-
-        _dev_ops_table[dev]->init(_dev_ops_table[dev]->default_params);
+        dbgio_dev_init(dev, _dev_ops_table[dev]->default_params);
 }
 
 void
 dbgio_dev_set(uint8_t dev)
 {
         assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP2));
+               (dev == DBGIO_DEV_VDP1) ||
+               (dev == DBGIO_DEV_VDP2) ||
+               (dev == DBGIO_DEV_USB_CART));
 
         _dev_ops = _dev_ops_table[dev];
 }
@@ -62,6 +63,10 @@ dbgio_buffer(const char *buffer)
         assert(_dev_ops != NULL);
 
         assert(buffer != NULL);
+
+        if (*buffer == '\0') {
+                return;
+        }
 
         _dev_ops->buffer(buffer);
 }
