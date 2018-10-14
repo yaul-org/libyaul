@@ -17,6 +17,10 @@
 
 #include <sys/dma-queue.h>
 
+#include <dbgio.h>
+
+#include "../dbgio-internal.h"
+
 #include "cons/cons.h"
 
 #include "vdp2_font.inc"
@@ -24,6 +28,10 @@
 #define STATE_IDLE              0x00
 #define STATE_BUFFER_DIRTY      0x01
 #define STATE_BUFFER_FLUSHING   0x02
+
+static void _init(const dbgio_vdp2_t *);
+static void _buffer(const char *);
+static void _flush(void);
 
 static inline void __attribute__ ((always_inline)) _pnd_clear(uint32_t, uint32_t);
 static inline void __attribute__ ((always_inline)) _pnd_write(uint32_t, uint32_t, uint16_t);
@@ -53,16 +61,38 @@ typedef struct {
         uint8_t rows;
 } dev_state_t;
 
+static const dbgio_vdp2_t _default_params = {
+        .font_cpd = &_font_cpd[0],
+        .font_pal = &_font_pal[0],
+        .font_fg = 1,
+        .font_bg = 0,
+
+        .scrn = SCRN_NBG3,
+
+        .cpd_bank = 3,
+        .cpd_offset = 0x00000,
+
+        .pnd_bank = 3,
+        .pnd_offset = 2,
+
+        .cpd_cycp_mask = 0x0FFFFFFF,
+        .pnd_cycp_mask = 0xFFF0FFFF,
+
+        .cram_index = 0
+};
+
+const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
+        .dev = DBGIO_DEV_VDP2,
+        .default_params = &_default_params,
+        .init = (void (*)(const void *))_init,
+        .buffer = _buffer,
+        .flush = _flush
+};
+
 static dev_state_t *_dev_state;
 
-/* Remove { */
-void cons_vdp2_init(void);
-void cons_vdp2_buffer(const char *);
-void cons_vdp2_flush(void);
-/* } */
-
-void
-cons_vdp2_init(void)
+static void
+_init(const dbgio_vdp2_t *params)
 {
         struct {
                 /* A bit of a hack in order to align the indirect
@@ -207,8 +237,8 @@ cons_vdp2_init(void)
         cons_init(&cons_op, _dev_state->cols, _dev_state->rows);
 }
 
-void
-cons_vdp2_buffer(const char *buffer)
+static void
+_buffer(const char *buffer)
 {
         /* If we're flushing, we have to block */
         while ((_dev_state->state & STATE_BUFFER_FLUSHING) == STATE_BUFFER_FLUSHING) {
@@ -217,8 +247,8 @@ cons_vdp2_buffer(const char *buffer)
         cons_buffer(buffer);
 }
 
-void
-cons_vdp2_flush(void)
+static void
+_flush(void)
 {
         if (_dev_state->state != STATE_BUFFER_DIRTY) {
                 return;
