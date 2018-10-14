@@ -42,6 +42,10 @@ typedef struct {
         uint8_t cram_index;
 } dbgio_vdp2_t;
 
+typedef struct {
+        uint16_t buffer_size;
+} dbgio_usb_cart_t;
+
 extern void dbgio_init(void);
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
