@@ -43,6 +43,18 @@ extern "C" {
 #define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
         (((format)->scf_character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
 
+#define SCRN_CALCULATE_PAGE_COUNT_M(plsz)                                      \
+        (plsz)
+
+#define SCRN_CALCULATE_PAGE_WIDTH_M(chsz)                                      \
+        (((chsz) == (1 * 1)) ? 64 : 32)
+
+#define SCRN_CALCULATE_PAGE_HEIGHT_M(chsz)                                     \
+        (((chsz) == (1 * 1)) ? 64 : 32)
+
+#define SCRN_CALCULATE_PAGE_DIMENSION_M(chsz)                                  \
+        (((chsz) == (1 * 1)) ? (64 * 64) : (32 * 32))
+
 /* Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
  * | PND size | Cell size | Size of page  |
@@ -57,6 +69,9 @@ extern "C" {
  * Page dimension is 32x32 if cell size is 2x2. */
 #define SCRN_CALCULATE_PAGE_SIZE(format)                                       \
         (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
+
+#define SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                                \
+        (SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
 
 /* Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes):
  * +------------+----------+-----------+---------------+

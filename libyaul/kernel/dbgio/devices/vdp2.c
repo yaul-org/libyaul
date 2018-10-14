@@ -71,8 +71,26 @@ static const dbgio_vdp2_t _default_params = {
         .pnd_bank = 3,
         .pnd_offset = 2,
 
-        .cpd_cycp_mask = 0x0FFFFFFF,
-        .pnd_cycp_mask = 0xFFF0FFFF,
+        .cpd_cycp = {
+                .t0 = VRAM_CYCP_PNDR_NBG3,
+                .t1 = VRAM_CYCP_NO_ACCESS,
+                .t2 = VRAM_CYCP_NO_ACCESS,
+                .t3 = VRAM_CYCP_NO_ACCESS,
+                .t4 = VRAM_CYCP_CHPNDR_NBG3,
+                .t5 = VRAM_CYCP_NO_ACCESS,
+                .t6 = VRAM_CYCP_NO_ACCESS,
+                .t7 = VRAM_CYCP_NO_ACCESS
+        },
+        .pnd_cycp = {
+                .t0 = VRAM_CYCP_PNDR_NBG3,
+                .t1 = VRAM_CYCP_NO_ACCESS,
+                .t2 = VRAM_CYCP_NO_ACCESS,
+                .t3 = VRAM_CYCP_NO_ACCESS,
+                .t4 = VRAM_CYCP_CHPNDR_NBG3,
+                .t5 = VRAM_CYCP_NO_ACCESS,
+                .t6 = VRAM_CYCP_NO_ACCESS,
+                .t7 = VRAM_CYCP_NO_ACCESS
+        },
 
         .cram_index = 0
 };
@@ -106,44 +124,70 @@ _init(const dbgio_vdp2_t *params)
 
         assert(params != NULL);
 
+        assert(params->font_cpd != NULL);
+        assert(params->font_pal != NULL);
+
+        assert((params->font_fg >= 0) && (params->font_bg <= 15));
+        assert((params->font_bg >= 0) && (params->font_bg <= 15));
+
+        assert((params->scrn == SCRN_NBG0) ||
+               (params->scrn == SCRN_NBG1) ||
+               (params->scrn == SCRN_NBG2) ||
+               (params->scrn == SCRN_NBG3));
+
+        assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
+        /* XXX: Fetch the VRAM bank split configuration and determine
+         * the VRAM bank size */
+        assert(params->cpd_offset < VRAM_4SPLIT_BANK_SIZE_4MBIT);
+
+        assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
+        /* XXX: Determine the page size and check against the number of
+         * available offsets */
+
+        /* There are 128 16-color banks, depending on CRAM mode */
+        /* XXX: Fetch CRAM mode and check number of available 16-color
+         * banks */
+        assert((params->cram_index >= 0) && (params->cram_index < 128));
+
         if (_dev_state == NULL) {
                 _dev_state = malloc(sizeof(dev_state_t));
         }
         assert(_dev_state != NULL);
 
-        _dev_state->cell_format.scf_scroll_screen = SCRN_NBG3;
+        _dev_state->page_size = SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
+        _dev_state->page_width = SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
+        _dev_state->page_height = SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
+
+        uint32_t cpd;
+        cpd = VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
+
+        /* One page per plane */
+        uint32_t page;
+        page = VRAM_ADDR_4MBIT(params->pnd_bank,
+            params->pnd_offset * _dev_state->page_size);
+
+        uint32_t color_palette;
+        color_palette = CRAM_ADDR(params->cram_index << 3);
+
+        _dev_state->cell_format.scf_scroll_screen = params->scrn;
         _dev_state->cell_format.scf_cc_count = SCRN_CCC_PALETTE_16;
         _dev_state->cell_format.scf_character_size = 1 * 1;
         _dev_state->cell_format.scf_pnd_size = 1; /* 1-word */
         _dev_state->cell_format.scf_auxiliary_mode = 0;
-        _dev_state->cell_format.scf_cp_table = VRAM_ADDR_4MBIT(3, 0x00000);
-        _dev_state->cell_format.scf_color_palette = CRAM_MODE_1_OFFSET(0, 0, 0);
+        _dev_state->cell_format.scf_cp_table = cpd;
+        _dev_state->cell_format.scf_color_palette = color_palette;
         _dev_state->cell_format.scf_plane_size = 1 * 1;
-        _dev_state->cell_format.scf_map.plane_a = VRAM_ADDR_4MBIT(3, 0x04000);
-        _dev_state->cell_format.scf_map.plane_b = VRAM_ADDR_4MBIT(3, 0x08000);
-        _dev_state->cell_format.scf_map.plane_c = VRAM_ADDR_4MBIT(3, 0x04000);
-        _dev_state->cell_format.scf_map.plane_d = VRAM_ADDR_4MBIT(3, 0x08000);
+        _dev_state->cell_format.scf_map.plane_a = page;
+        _dev_state->cell_format.scf_map.plane_b = page;
+        _dev_state->cell_format.scf_map.plane_c = page;
+        _dev_state->cell_format.scf_map.plane_d = page;
 
         vdp2_scrn_cell_format_set(&_dev_state->cell_format);
-        vdp2_scrn_priority_set(SCRN_NBG3, 7);
-        vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
+        vdp2_scrn_priority_set(params->scrn, 7);
+        vdp2_scrn_display_set(params->scrn, /* transparent = */ true);
 
-        struct vram_cycp_bank vram_cycp_bank;
-
-        vram_cycp_bank.t0 = VRAM_CYCP_PNDR_NBG3;
-        vram_cycp_bank.t1 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp_bank.t2 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp_bank.t3 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp_bank.t4 = VRAM_CYCP_CHPNDR_NBG3;
-        vram_cycp_bank.t5 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp_bank.t6 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp_bank.t7 = VRAM_CYCP_NO_ACCESS;
-
-        vdp2_vram_cycp_bank_set(3, &vram_cycp_bank);
-
-        _dev_state->page_size = SCRN_CALCULATE_PAGE_SIZE(&_dev_state->cell_format);
-        _dev_state->page_width = SCRN_CALCULATE_PAGE_WIDTH(&_dev_state->cell_format);
-        _dev_state->page_height = SCRN_CALCULATE_PAGE_HEIGHT(&_dev_state->cell_format);
+        vdp2_vram_cycp_bank_set(params->cpd_bank, &params->cpd_cycp);
+        vdp2_vram_cycp_bank_set(params->pnd_bank, &params->pnd_cycp);
 
         /* Restricting the page to 64x32 avoids wasting space */
         _dev_state->page_size /= 2;
@@ -170,7 +214,7 @@ _init(const dbgio_vdp2_t *params)
         /* XXX: Refactor { */
         uint32_t aligned_offset;
         aligned_offset = (((uint32_t)aligned + 0x0000001F) & ~0x0000001F) - (uint32_t)aligned;
-        dma_font = (uint32_t)aligned + aligned_offset;
+        dma_font = (void *)((uint32_t)aligned + aligned_offset);
         /* } */
 
         dma_level_cfg.dlc_mode = DMA_MODE_INDIRECT;
@@ -181,12 +225,12 @@ _init(const dbgio_vdp2_t *params)
         /* Font CPD */
         dma_font->xfer_tbl[0].len = FONT_SIZE;
         dma_font->xfer_tbl[0].dst = (uint32_t)_dev_state->cell_format.scf_cp_table;
-        dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)&_font_cpd[0];
+        dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)params->font_cpd;
 
         /* Font PAL */
         dma_font->xfer_tbl[1].len = FONT_COLOR_COUNT * sizeof(color_rgb888_t);
         dma_font->xfer_tbl[1].dst = _dev_state->cell_format.scf_color_palette;
-        dma_font->xfer_tbl[1].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)&_font_pal[0];
+        dma_font->xfer_tbl[1].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
         scu_dma_config_buffer(dma_font->reg_buffer, &dma_level_cfg);
 
