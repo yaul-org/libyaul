@@ -38,7 +38,7 @@ typedef struct {
         uint16_t page_width;
         uint16_t page_height;
         uint16_t *page_pnd;
-        uint16_t page_clear_pnd;
+        uint16_t pnd_clear;
 
         uint8_t state;
 } dev_state_t;
@@ -56,6 +56,15 @@ static void _buffer_write(int32_t, int32_t, uint8_t);
 
 static void _dma_font_handler(void *);
 static void _dma_handler(void *);
+
+/* Restrictions:
+ * 1. Screen will always be displayed
+ * 2. Rotational backgrounds are not supported
+ * 3. Screen priority is always 7
+ * 4. 1x1 plane size is enforced
+ * 5. Page 0 of plane A will always be used
+ * 6. Resets scroll position to (0, 0)
+ */
 
 static const dbgio_vdp2_t _default_params = {
         .font_cpd = &_font_cpd[0],
@@ -135,6 +144,9 @@ _init(const dbgio_vdp2_t *params)
                (params->scrn == SCRN_NBG2) ||
                (params->scrn == SCRN_NBG3));
 
+        assert((params->scrn != SCRN_RBG0) &&
+               (params->scrn != SCRN_RBG1));
+
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
         /* XXX: Fetch the VRAM bank split configuration and determine
          * the VRAM bank size */
@@ -186,6 +198,8 @@ _init(const dbgio_vdp2_t *params)
 
         vdp2_scrn_cell_format_set(&_dev_state->cell_format);
         vdp2_scrn_priority_set(params->scrn, 7);
+        vdp2_scrn_scroll_x_set(params->scrn, F16(0.0f));
+        vdp2_scrn_scroll_y_set(params->scrn, F16(0.0f));
         vdp2_scrn_display_set(params->scrn, /* transparent = */ true);
 
         vdp2_vram_cycp_bank_set(params->cpd_bank, &params->cpd_cycp);
@@ -195,7 +209,7 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->page_size /= 2;
 
         /* PND value used to clear pages */
-        _dev_state->page_clear_pnd = SCRN_PND_CONFIG_0(
+        _dev_state->pnd_clear = SCRN_PND_CONFIG_0(
                 _dev_state->cell_format.scf_cp_table,
                 _dev_state->cell_format.scf_color_palette,
                 /* vf = */ 0,
@@ -272,7 +286,7 @@ _flush(void)
 static inline void __attribute__ ((always_inline))
 _pnd_clear(uint32_t col, uint32_t row)
 {
-        _pnd_write(col, row, _dev_state->page_clear_pnd);
+        _pnd_write(col, row, _dev_state->pnd_clear);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -287,9 +301,7 @@ _pnd_write(uint32_t col, uint32_t row, uint16_t value)
 static void
 _buffer_clear(void)
 {
-        _dev_state->state |= STATE_BUFFER_DIRTY;
-
-        (void)memset(_dev_state->page_pnd, 0x00, _dev_state->page_size);
+        _buffer_area_clear(0, CONS_COLS_MIN, 0, CONS_ROWS_MIN);
 }
 
 static void
