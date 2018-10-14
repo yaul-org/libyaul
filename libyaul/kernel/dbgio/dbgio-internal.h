@@ -23,7 +23,10 @@ typedef struct {
         void (*flush)(void);
 } dbgio_dev_ops_t;
 
+extern const dbgio_dev_ops_t _internal_dev_ops_null;
+extern const dbgio_dev_ops_t _internal_dev_ops_vdp1;
 extern const dbgio_dev_ops_t _internal_dev_ops_vdp2;
+extern const dbgio_dev_ops_t _internal_dev_ops_usb_cart;
 
 #ifdef __cplusplus
 }
