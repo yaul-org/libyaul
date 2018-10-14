@@ -17,7 +17,7 @@
 
 #include <sys/dma-queue.h>
 
-#include "cons.h"
+#include "cons/cons.h"
 
 #include "vdp2_font.inc"
 
