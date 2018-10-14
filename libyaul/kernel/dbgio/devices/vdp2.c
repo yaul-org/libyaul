@@ -91,16 +91,6 @@ static void
 _init(const dbgio_vdp2_t *params)
 {
         struct {
-                /* A bit of a hack in order to align the indirect
-                 * transfer table to a 32-byte boundary */
-                unsigned int : 32;
-                unsigned int : 32;
-                unsigned int : 32;
-                unsigned int : 32;
-                unsigned int : 32;
-                unsigned int : 32;
-                unsigned int : 32;
-
                 /* Holds transfers for font CPD and PAL */
                 struct dma_xfer xfer_tbl[2];
 
@@ -197,8 +187,16 @@ _init(const dbgio_vdp2_t *params)
 
         struct dma_level_cfg dma_level_cfg;
 
-        dma_font = malloc(sizeof(*dma_font));
-        assert(dma_font != NULL);
+        void *aligned;
+        aligned = malloc(sizeof(*dma_font) + 32);
+        assert(aligned != NULL);
+
+        /* Align to a 32-byte boundary */
+        /* XXX: Refactor { */
+        uint32_t aligned_offset;
+        aligned_offset = (((uint32_t)aligned + 0x0000001F) & ~0x0000001F) - (uint32_t)aligned;
+        dma_font = (uint32_t)aligned + aligned_offset;
+        /* } */
 
         dma_level_cfg.dlc_mode = DMA_MODE_INDIRECT;
         dma_level_cfg.dlc_xfer.indirect = &dma_font->xfer_tbl[0];
@@ -218,7 +216,7 @@ _init(const dbgio_vdp2_t *params)
         scu_dma_config_buffer(dma_font->reg_buffer, &dma_level_cfg);
 
         dma_queue_enqueue(dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
-            _dma_font_handler, dma_font);
+            _dma_font_handler, aligned);
 
         /* 64x32 page PND */
         dma_level_cfg.dlc_mode = DMA_MODE_DIRECT;
