@@ -25,6 +25,9 @@
 #define STATE_BUFFER_DIRTY      0x01
 #define STATE_BUFFER_FLUSHING   0x02
 
+static inline void __attribute__ ((always_inline)) _pnd_clear(uint32_t, uint32_t);
+static inline void __attribute__ ((always_inline)) _pnd_write(uint32_t, uint32_t, uint16_t);
+
 static void _buffer_clear(void);
 static void _buffer_area_clear(int32_t, int32_t, int32_t, int32_t);
 static void _buffer_line_clear(int32_t, int32_t, int32_t);
@@ -227,6 +230,21 @@ cons_vdp2_flush(void)
             _dma_handler, NULL);
 }
 
+static inline void __attribute__ ((always_inline))
+_pnd_clear(uint32_t col, uint32_t row)
+{
+        _pnd_write(col, row, _dev_state->page_clear_pnd);
+}
+
+static inline void __attribute__ ((always_inline))
+_pnd_write(uint32_t col, uint32_t row, uint16_t value)
+{
+        uint32_t offset;
+        offset = col + (row * _dev_state->page_width);
+
+        _dev_state->page_pnd[offset] = value;
+}
+
 static void
 _buffer_clear(void)
 {
@@ -245,7 +263,7 @@ _buffer_area_clear(int32_t col_start, int32_t col_end, int32_t row_start,
         for (row = row_start; row < row_end; row++) {
                 int32_t col;
                 for (col = col_start; col < col_end; col++) {
-                        _dev_state->page_pnd[col + (row * _dev_state->page_width)] = _dev_state->page_clear_pnd;
+                        _pnd_clear(col, row);
                 }
         }
 }
@@ -257,7 +275,7 @@ _buffer_line_clear(int32_t col_start, int32_t col_end, int32_t row)
 
         int32_t col;
         for (col = col_start; col < col_end; col++) {
-                _dev_state->page_pnd[col + (row * _dev_state->page_width)] = _dev_state->page_clear_pnd;
+                _pnd_clear(col, row);
         }
 }
 
@@ -273,7 +291,7 @@ _buffer_write(int32_t col, int32_t row, uint8_t ch)
                 /* vf = */ 0,
                 /* hf = */ 0);
 
-        _dev_state->page_pnd[col + (row * _dev_state->page_width)] = pnd;
+        _pnd_write(col, row, pnd);
 }
 
 static void
