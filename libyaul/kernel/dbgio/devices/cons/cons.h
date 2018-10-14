@@ -15,13 +15,13 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define CONS_COLS_MIN           40
-#define CONS_ROWS_MIN           28
+#define CONS_COLS_MIN   40
+#define CONS_ROWS_MIN   32
 
-#define CONS_COLS_MAX           128
-#define CONS_ROWS_MAX           128
+#define CONS_COLS_MAX   64
+#define CONS_ROWS_MAX   64
 
-#define CONS_TAB_WIDTH          2
+#define CONS_TAB_WIDTH  2
 
 typedef struct {
         void (*clear)(void);
