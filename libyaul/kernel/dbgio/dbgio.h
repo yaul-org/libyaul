@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <vdp2/vram.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -34,8 +36,8 @@ typedef struct {
         uint8_t pnd_bank;
         uint8_t pnd_offset;
 
-        uint32_t cpd_cycp_mask;
-        uint32_t pnd_cycp_mask;
+        struct vram_cycp_bank cpd_cycp;
+        struct vram_cycp_bank pnd_cycp;
 
         uint8_t cram_index;
 } dbgio_vdp2_t;
