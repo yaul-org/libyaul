@@ -29,20 +29,6 @@
 #define STATE_BUFFER_DIRTY      0x01
 #define STATE_BUFFER_FLUSHING   0x02
 
-static void _init(const dbgio_vdp2_t *);
-static void _flush(void);
-
-static inline void __attribute__ ((always_inline)) _pnd_clear(uint32_t, uint32_t);
-static inline void __attribute__ ((always_inline)) _pnd_write(uint32_t, uint32_t, uint16_t);
-
-static void _buffer_clear(void);
-static void _buffer_area_clear(int32_t, int32_t, int32_t, int32_t);
-static void _buffer_line_clear(int32_t, int32_t, int32_t);
-static void _buffer_write(int32_t, int32_t, uint8_t);
-
-static void _dma_font_handler(void *);
-static void _dma_handler(void *);
-
 typedef struct {
         uint32_t dma_reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
 
@@ -56,6 +42,20 @@ typedef struct {
 
         uint8_t state;
 } dev_state_t;
+
+static void _init(const dbgio_vdp2_t *);
+static void _flush(void);
+
+static inline void __attribute__ ((always_inline)) _pnd_clear(uint32_t, uint32_t);
+static inline void __attribute__ ((always_inline)) _pnd_write(uint32_t, uint32_t, uint16_t);
+
+static void _buffer_clear(void);
+static void _buffer_area_clear(int32_t, int32_t, int32_t, int32_t);
+static void _buffer_line_clear(int32_t, int32_t, int32_t);
+static void _buffer_write(int32_t, int32_t, uint8_t);
+
+static void _dma_font_handler(void *);
+static void _dma_handler(void *);
 
 static const dbgio_vdp2_t _default_params = {
         .font_cpd = &_font_cpd[0],
@@ -95,6 +95,8 @@ static const dbgio_vdp2_t _default_params = {
         .cram_index = 0
 };
 
+static dev_state_t *_dev_state;
+
 const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
         .dev = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
@@ -102,8 +104,6 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
         .buffer = cons_buffer,
         .flush = _flush
 };
-
-static dev_state_t *_dev_state;
 
 static void
 _init(const dbgio_vdp2_t *params)
@@ -151,6 +151,8 @@ _init(const dbgio_vdp2_t *params)
 
         if (_dev_state == NULL) {
                 _dev_state = malloc(sizeof(dev_state_t));
+
+                memset(_dev_state, 0x00, sizeof(dev_state_t));
         }
         assert(_dev_state != NULL);
 
@@ -247,9 +249,9 @@ _init(const dbgio_vdp2_t *params)
 
         scu_dma_config_buffer(_dev_state->dma_reg_buffer, &dma_level_cfg);
 
-        _dev_state->state = STATE_BUFFER_DIRTY;
-
         cons_init(&cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
+
+        _dev_state->state = STATE_BUFFER_DIRTY;
 
         _flush();
 }
