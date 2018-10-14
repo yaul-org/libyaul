@@ -30,7 +30,6 @@
 #define STATE_BUFFER_FLUSHING   0x02
 
 static void _init(const dbgio_vdp2_t *);
-static void _buffer(const char *);
 static void _flush(void);
 
 static inline void __attribute__ ((always_inline)) _pnd_clear(uint32_t, uint32_t);
@@ -85,7 +84,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
         .dev = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
-        .buffer = _buffer,
+        .buffer = cons_buffer,
         .flush = _flush
 };
 
@@ -235,16 +234,6 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->rows = 28;
 
         cons_init(&cons_op, _dev_state->cols, _dev_state->rows);
-}
-
-static void
-_buffer(const char *buffer)
-{
-        /* If we're flushing, we have to block */
-        while ((_dev_state->state & STATE_BUFFER_FLUSHING) == STATE_BUFFER_FLUSHING) {
-        }
-
-        cons_buffer(buffer);
 }
 
 static void
