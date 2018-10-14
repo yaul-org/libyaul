@@ -89,7 +89,7 @@ struct vram_ctl {
         uint8_t vram_mode; /* VRAM mode bank partitions */
 };
 
-struct vram_cycp {
+struct vram_cycp_bank {
         /*
          * General guideline for number of accesses required
          *
@@ -116,7 +116,7 @@ struct vram_cycp {
 #define VRAM_CYCP_NO_ACCESS     0xF /* No access */
 
         union {
-                uint32_t pv[4]; /* VRAM cycle pattern value */
+                uint32_t raw;
 
                 struct {
                         unsigned int t0:4; /* Timing T0 */
@@ -127,13 +127,21 @@ struct vram_cycp {
                         unsigned int t5:4; /* Timing T5 */
                         unsigned int t6:4; /* Timing T6 */
                         unsigned int t7:4; /* Timing T7 */
-                } __packed pt[4];
+                } __packed;
         };
-};
+} __packed;
+
+struct vram_cycp {
+        struct vram_cycp_bank pt[4];
+} __packed;
 
 extern void vdp2_vram_control_set(const struct vram_ctl *);
+
 extern void vdp2_vram_cycp_set(const struct vram_cycp *);
 extern void vdp2_vram_cycp_clear(void);
+
+extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vram_cycp_bank *);
+extern void vdp2_vram_cycp_bank_clear(uint8_t);
 
 #ifdef __cplusplus
 }
