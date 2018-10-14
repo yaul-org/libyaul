@@ -13,7 +13,10 @@
 
 #include <sys/cdefs.h>
 
+#include <dbgio/dbgio.h>
+
 #include <mm/slob.h>
+
 #include <sys/dma-queue.h>
 
 #include <cpu.h>
@@ -64,6 +67,8 @@ _init(void)
         scu_init();
 
         dma_queue_init();
+
+        dbgio_init();
 
         vdp_init();
 
