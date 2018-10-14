@@ -55,9 +55,6 @@ typedef struct {
         uint16_t page_clear_pnd;
 
         uint8_t state;
-
-        uint8_t cols;
-        uint8_t rows;
 } dev_state_t;
 
 static const dbgio_vdp2_t _default_params = {
@@ -234,10 +231,8 @@ _init(const dbgio_vdp2_t *params)
         scu_dma_config_buffer(_dev_state->dma_reg_buffer, &dma_level_cfg);
 
         _dev_state->state = STATE_BUFFER_DIRTY;
-        _dev_state->cols = 40;
-        _dev_state->rows = 32;
 
-        cons_init(&cons_ops, _dev_state->cols, _dev_state->rows);
+        cons_init(&cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
 
         _flush();
 }
