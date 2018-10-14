@@ -89,19 +89,6 @@ struct vram_ctl {
         uint8_t vram_mode; /* VRAM mode bank partitions */
 };
 
-struct vram_cycp_bank {
-        /*
-         * General guideline for number of accesses required
-         *
-         *   1 - Pattern name data (1-word or 2-words)
-         *   1 - 16-color character pattern or bitmapped data
-         *   2 - 256-color character pattern or bitmapped data
-         *   4 - 2048-color character pattern or bitmapped data
-         *   4 - 32K-color character pattern or bitmapped data
-         *   8 - 16M-color character pattern or bitmapped data
-         *   1 - Vertical cell scroll table data
-         */
-
 #define VRAM_CYCP_PNDR_NBG0     0x0 /* NBG0 pattern name data read */
 #define VRAM_CYCP_PNDR_NBG1     0x1 /* NBG1 pattern name data read */
 #define VRAM_CYCP_PNDR_NBG2     0x2 /* NBG2 pattern name data read */
@@ -114,6 +101,28 @@ struct vram_cycp_bank {
 #define VRAM_CYCP_VCSTDR_NBG1   0xD /* NBG0 vertical cell scroll table data read */
 #define VRAM_CYCP_CPU_RW        0xE /* CPU read/write */
 #define VRAM_CYCP_NO_ACCESS     0xF /* No access */
+
+/* Pattern name data read */
+#define VRAM_CYCP_PNDR(n)       ((n) & 0x03)
+
+/* Character pattern name data read */
+#define VRAM_CYCP_CHPNDR(n)     (((n) & 0x03) + 0x04)
+
+/* Vertical cell scroll table data read */
+#define VRAM_CYCP_VCSTDR(n)     (((n) & 0x01) + 0x0C)
+
+struct vram_cycp_bank {
+        /*
+         * General guideline for number of accesses required
+         *
+         *   1 - Pattern name data (1-word or 2-words)
+         *   1 - 16-color character pattern or bitmapped data
+         *   2 - 256-color character pattern or bitmapped data
+         *   4 - 2048-color character pattern or bitmapped data
+         *   4 - 32K-color character pattern or bitmapped data
+         *   8 - 16M-color character pattern or bitmapped data
+         *   1 - Vertical cell scroll table data
+         */
 
         union {
                 uint32_t raw;
@@ -140,6 +149,7 @@ extern void vdp2_vram_control_set(const struct vram_ctl *);
 extern void vdp2_vram_cycp_set(const struct vram_cycp *);
 extern void vdp2_vram_cycp_clear(void);
 
+extern struct vram_cycp_bank vdp2_vram_cycp_bank_get(uint8_t);
 extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vram_cycp_bank *);
 extern void vdp2_vram_cycp_bank_clear(uint8_t);
 
