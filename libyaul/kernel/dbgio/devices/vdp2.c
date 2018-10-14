@@ -104,6 +104,8 @@ _init(const dbgio_vdp2_t *params)
                 .write = _buffer_write
         };
 
+        assert(params != NULL);
+
         if (_dev_state == NULL) {
                 _dev_state = malloc(sizeof(dev_state_t));
         }
@@ -126,45 +128,18 @@ _init(const dbgio_vdp2_t *params)
         vdp2_scrn_priority_set(SCRN_NBG3, 7);
         vdp2_scrn_display_set(SCRN_NBG3, /* transparent = */ true);
 
-        struct vram_cycp vram_cycp;
+        struct vram_cycp_bank vram_cycp_bank;
 
-        vram_cycp.pt[0].t0 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t1 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t2 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t3 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t4 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t5 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t6 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[0].t7 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t0 = VRAM_CYCP_PNDR_NBG3;
+        vram_cycp_bank.t1 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t2 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t3 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t4 = VRAM_CYCP_CHPNDR_NBG3;
+        vram_cycp_bank.t5 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t6 = VRAM_CYCP_NO_ACCESS;
+        vram_cycp_bank.t7 = VRAM_CYCP_NO_ACCESS;
 
-        vram_cycp.pt[1].t0 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t1 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t2 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t3 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t4 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t5 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t6 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[1].t7 = VRAM_CYCP_NO_ACCESS;
-
-        vram_cycp.pt[2].t0 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t1 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t2 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t3 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t4 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t5 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t6 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[2].t7 = VRAM_CYCP_NO_ACCESS;
-
-        vram_cycp.pt[3].t0 = VRAM_CYCP_PNDR_NBG3;
-        vram_cycp.pt[3].t1 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[3].t2 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[3].t3 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[3].t4 = VRAM_CYCP_CHPNDR_NBG3;
-        vram_cycp.pt[3].t5 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[3].t6 = VRAM_CYCP_NO_ACCESS;
-        vram_cycp.pt[3].t7 = VRAM_CYCP_NO_ACCESS;
-
-        vdp2_vram_cycp_set(&vram_cycp);
+        vdp2_vram_cycp_bank_set(3, &vram_cycp_bank);
 
         _dev_state->page_size = SCRN_CALCULATE_PAGE_SIZE(&_dev_state->cell_format);
         _dev_state->page_width = SCRN_CALCULATE_PAGE_WIDTH(&_dev_state->cell_format);
