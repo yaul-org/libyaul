@@ -60,6 +60,15 @@ struct dmac_status {
 } __packed;
 
 static inline void __attribute__ ((always_inline))
+cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
+{
+        uint32_t n;
+        n = (ch & 0x01) << 4;
+
+        MEMORY_WRITE(32, CPU(TCR0 | n), tcr_bits);
+}
+
+static inline void __attribute__ ((always_inline))
 cpu_dmac_enable(void)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x0000000F);

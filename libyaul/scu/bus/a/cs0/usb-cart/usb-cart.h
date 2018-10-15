@@ -19,7 +19,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define USB_CART_OUT_EP_SIZE 64
+/* 64-byte packet contains a 2-byte payload */
+#define USB_CART_OUT_EP_SIZE 62
 
 static inline void __attribute__ ((always_inline))
 usb_cart_rxf_wait(void)
