@@ -73,7 +73,7 @@ SH_CFLAGS= \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
-	-O2
+	-O2 \
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1 \
