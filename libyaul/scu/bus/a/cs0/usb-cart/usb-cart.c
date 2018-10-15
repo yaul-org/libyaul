@@ -164,6 +164,8 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
                 len_left -= USB_CART_OUT_EP_SIZE;
         }
 
+        MEMORY_WRITE(32, SCU(ASR0), 0x00000000);
+
         if (len_left < 0) {
                 uint32_t count;
                 count = (len_left + USB_CART_OUT_EP_SIZE);
@@ -173,7 +175,6 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
                         uint8_t *p;
                         p = (uint8_t *)((uint32_t)buffer + len - count + i);
 
-                        usb_cart_txe_wait();
                         usb_cart_byte_send(*p);
                 }
         }
