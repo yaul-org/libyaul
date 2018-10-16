@@ -32,9 +32,13 @@ usb_cart_init(void)
 void
 usb_cart_long_send(uint32_t w)
 {
+        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 24);
+        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 16);
+        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 8);
+        usb_cart_txe_wait();
         usb_cart_byte_send(w & 0xFF);
 }
 
@@ -44,9 +48,13 @@ usb_cart_long_read(void)
         uint32_t b;
         b = 0;
 
+        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 24;
+        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 16;
+        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 8;
+        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read());
 
         return b;
@@ -56,8 +64,10 @@ uint8_t
 usb_cart_byte_xchg(uint8_t c)
 {
         uint8_t b;
+        usb_cart_rxf_wait();
         b = usb_cart_byte_read();
 
+        usb_cart_txe_wait();
         usb_cart_byte_send(c);
 
         return b;
@@ -69,6 +79,10 @@ usb_cart_dma_read(void *buffer, uint32_t len)
         assert(buffer != NULL);
 
         assert(len > 0);
+
+        if (len == 0) {
+                return;
+        }
 
         const struct dmac_ch_cfg dmac_cfg = {
                 .dcc_ch = 0,
@@ -93,22 +107,46 @@ usb_cart_dma_read(void *buffer, uint32_t len)
 
         /* Disabling A-bus refresh adds ~20 KiB/s */
         MEMORY_WRITE(32, SCU(AREF), 0x00000000);
-        MEMORY_WRITE(32, SCU(ASR0), 0x00000000);
+        /* Set 9-cycle wait was tested manually, and found to be the
+         * bare minimum */
+        MEMORY_WRITE(32, SCU(ASR0), 0x20F00000);
 
-        while (len > 0) {
-                uint32_t len_mod;
-                len_mod = len & (USB_CART_OUT_EP_SIZE - 1);
+        int32_t len_left;
+        len_left = len;
 
-                uint32_t offset;
-                offset = (len_mod == 0) ? USB_CART_OUT_EP_SIZE : len_mod;
+        do {
+                len_left -= USB_CART_OUT_EP_SIZE;
+
+                if (len_left < 0) {
+                        break;
+                }
 
                 usb_cart_rxf_wait();
-                cpu_dmac_channel_transfer_set(0, offset);
+
                 cpu_dmac_channel_start(0);
-
-                len -= offset;
-
                 cpu_dmac_channel_wait(0);
+
+                /* Reset CPU-DMAC transfer */
+                cpu_dmac_channel_transfer_set(0, USB_CART_OUT_EP_SIZE);
+        } while (len_left > 0);
+
+        MEMORY_WRITE(32, SCU(ASR0), 0x00000000);
+
+        if (len_left < 0) {
+                uint32_t count;
+                count = (len_left + USB_CART_OUT_EP_SIZE);
+
+                uint32_t i;
+                for (i = 0; i < count; i++) {
+                        uint32_t offset;
+                        offset = (uint32_t)buffer + len - count + i;
+
+                        uint8_t *p;
+                        p = (uint8_t *)offset;
+
+                        usb_cart_rxf_wait();
+                        *p = usb_cart_byte_read();
+                }
         }
 
         MEMORY_WRITE(32, SCU(AREF), aref_bits);
@@ -121,6 +159,10 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
         assert(buffer != NULL);
 
         assert(len > 0);
+
+        if (len == 0) {
+                return;
+        }
 
         const struct dmac_ch_cfg dmac_cfg = {
                 .dcc_ch = 0,
@@ -152,7 +194,13 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
         int32_t len_left;
         len_left = len;
 
-        while (len_left > 0) {
+        do {
+                len_left -= USB_CART_OUT_EP_SIZE;
+
+                if (len_left < 0) {
+                        break;
+                }
+
                 usb_cart_txe_wait();
 
                 cpu_dmac_channel_start(0);
@@ -160,9 +208,7 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
 
                 /* Reset CPU-DMAC transfer */
                 cpu_dmac_channel_transfer_set(0, USB_CART_OUT_EP_SIZE);
-
-                len_left -= USB_CART_OUT_EP_SIZE;
-        }
+        } while (len_left > 0);
 
         MEMORY_WRITE(32, SCU(ASR0), 0x00000000);
 
@@ -172,9 +218,13 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
 
                 uint32_t i;
                 for (i = 0; i < count; i++) {
-                        uint8_t *p;
-                        p = (uint8_t *)((uint32_t)buffer + len - count + i);
+                        uint32_t offset;
+                        offset = (uint32_t)buffer + len - count + i;
 
+                        const uint8_t *p;
+                        p = (const uint8_t *)offset;
+
+                        usb_cart_txe_wait();
                         usb_cart_byte_send(*p);
                 }
         }

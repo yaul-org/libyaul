@@ -22,13 +22,31 @@ extern "C" {
 /* 64-byte packet contains a 2-byte payload */
 #define USB_CART_OUT_EP_SIZE 62
 
+static inline bool __attribute__ ((always_inline))
+usb_cart_rxf_full(void)
+{
+        /* When the RXF# flag is low, this indicates there is still
+         * unread data in the internal receive buffer remaining to be
+         * read by the downstream FPGA or micro */
+        return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x01) == 0x01);
+}
+
+static inline bool __attribute__ ((always_inline))
+usb_cart_txe_full(void)
+{
+        /* When the TXE# flag is low, this indicates there is enough
+         * internal transmit buffer space available for writing data
+         * back to the host */
+        return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x02) == 0x02);
+}
+
 static inline void __attribute__ ((always_inline))
 usb_cart_rxf_wait(void)
 {
         /* When the RXF# flag is low, this indicates there is still
          * unread data in the internal receive buffer remaining to be
          * read by the downstream FPGA or micro */
-        while ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x01) == 0x01);
+        while ((usb_cart_rxf_full()));
 }
 
 static inline void __attribute__ ((always_inline))
@@ -37,22 +55,18 @@ usb_cart_txe_wait(void)
         /* When the TXE# flag is low, this indicates there is enough
          * internal transmit buffer space available for writing data
          * back to the host */
-        while ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x02) == 0x02);
+        while ((usb_cart_txe_full()));
 }
 
 static inline uint8_t __attribute__ ((always_inline))
 usb_cart_byte_read(void)
 {
-        usb_cart_rxf_wait();
-
         return MEMORY_READ(8, USB_CART(FIFO));
 }
 
 static inline void __attribute__ ((always_inline))
 usb_cart_byte_send(uint8_t c)
 {
-        usb_cart_txe_wait();
-
         MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
 
