@@ -39,6 +39,8 @@ extern struct ftdi_context ftdi_ctx;
 extern int ftdi_error;
 #endif /* HAVE_LIBFTD2XX */
 
+int verbose_printf(const char *, ...);
+
 #ifdef DEBUG
 void debug_hexdump(const uint8_t *, uint32_t);
 #endif /* DEBUG */

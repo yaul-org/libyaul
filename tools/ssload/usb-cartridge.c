@@ -93,8 +93,8 @@ static const char *usb_cartridge_error_strings[] = {
 static int dev_init(void);
 static int dev_shutdown(void);
 
-static int read_byte(void *);
-static int send_byte(void *);
+static int _usb_cart_read(void *, uint32_t);
+static int _usb_cart_send(void *, uint32_t);
 
 static int download_buffer(void *, uint32_t, uint32_t);
 static int upload_buffer(void *, uint32_t, uint32_t);
@@ -340,6 +340,11 @@ device_read(uint8_t *read_buffer, uint32_t len)
         }
 #else
         while ((len - read) > 0) {
+                DEBUG_PRINTF("Call to ftdi_read_data(%i)\n", len);
+                DEBUG_PRINTF("Read %iB\n", read);
+
+                DEBUG_HEXDUMP(read_buffer, read);
+
                 int amount;
                 if ((amount = ftdi_read_data(&ftdi_ctx, read_buffer, len)) < 0) {
                         ftdi_error = amount;
@@ -623,11 +628,8 @@ error_stringify(void)
 #endif /* HAVE_LIBFTD2XX */
 }
 
-/*
- * USB Cartridge
- */
 static int
-read_byte(void *buffer)
+_usb_cart_read(void *buffer, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -643,7 +645,7 @@ read_byte(void *buffer)
                 goto error;
         }
 
-        if ((device_read(buffer, 1)) < 0) {
+        if ((device_read(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -660,11 +662,8 @@ exit:
         return exit_code;
 }
 
-/*
- * USB Cartridge
- */
 static int
-send_byte(void *buffer)
+_usb_cart_send(void *buffer, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -680,7 +679,7 @@ send_byte(void *buffer)
                 goto error;
         }
 
-        if ((device_write(buffer, 1)) < 0) {
+        if ((device_write(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -1004,8 +1003,8 @@ const struct device_driver device_usb_cartridge = {
         .init = dev_init,
         .shutdown = dev_shutdown,
         .error_stringify = error_stringify,
-        .read_byte = read_byte,
-        .send_byte = send_byte,
+        .read = _usb_cart_read,
+        .send = _usb_cart_send,
         .download_buffer = download_buffer,
         .download_file = download_file,
         .upload_buffer = upload_buffer,
