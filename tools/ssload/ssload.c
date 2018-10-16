@@ -14,20 +14,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include <sys/time.h>
 
 #include "debug.h"
+#include "shared.h"
 #include "drivers.h"
 
 #define PROGNAME "ssload"
-
-#define VERBOSE_PRINTF(fmt, ...) do {                                          \
-        if (options.v_set) {                                                   \
-            (void)printf(fmt, ##__VA_ARGS__);                                  \
-            (void)fflush(stdout);                                              \
-        }                                                                      \
-} while(false)
 
 struct performance_stats {
         double ps_transfer_time;
@@ -262,14 +257,14 @@ main(int argc, char **argv)
 
         device = device_drivers[options.device];
 
-        VERBOSE_PRINTF("Using: %s\n", device->name);
+        verbose_printf("Using: %s\n", device->name);
 
-        VERBOSE_PRINTF("Initializing device...");
+        verbose_printf("Initializing device...");
         if ((device->init()) < 0) {
-                VERBOSE_PRINTF(" FAILED\n");
+                verbose_printf(" FAILED\n");
                 goto error;
         }
-        VERBOSE_PRINTF(" OK\n");
+        verbose_printf(" OK\n");
 
         struct performance_stats performance_stats;
 
@@ -277,7 +272,7 @@ main(int argc, char **argv)
                 char *filename;
                 filename = basename(options.filepath);
 
-                VERBOSE_PRINTF("Uploading (and executing) file `%s' to 0x%08X...",
+                verbose_printf("Uploading (and executing) file `%s' to 0x%08X...",
                     filename,
                     options.address);
 
@@ -288,18 +283,18 @@ main(int argc, char **argv)
                 performance_stats_begin(&performance_stats, size); {
                         if ((ret = device->execute_file(options.filepath,
                                     options.address)) < 0) {
-                                VERBOSE_PRINTF(" FAILED\n");
+                                verbose_printf(" FAILED\n");
                                 goto error;
                         }
                 } performance_stats_end(&performance_stats);
-                VERBOSE_PRINTF(" OK\n");
+                verbose_printf(" OK\n");
         }
 
         if (options.u_set) {
                 char *filename;
                 filename = basename(options.filepath);
 
-                VERBOSE_PRINTF("Uploading file `%s' to 0x%08X...", filename,
+                verbose_printf("Uploading file `%s' to 0x%08X...", filename,
                     options.address);
 
                 uint32_t size;
@@ -309,18 +304,18 @@ main(int argc, char **argv)
                 performance_stats_begin(&performance_stats, size); {
                         if ((ret = device->upload_file(options.filepath,
                                     options.address)) < 0) {
-                                VERBOSE_PRINTF(" FAILED\n");
+                                verbose_printf(" FAILED\n");
                                 goto error;
                         }
                 } performance_stats_end(&performance_stats);
-                VERBOSE_PRINTF(" OK\n");
+                verbose_printf(" OK\n");
         }
 
         if (options.d_set) {
                 char *filename;
                 filename = basename(options.filepath);
 
-                VERBOSE_PRINTF("Downloading from 0x%08X to file `%s'...",
+                verbose_printf("Downloading from 0x%08X to file `%s'...",
                     options.address,
                     filename);
 
@@ -328,11 +323,11 @@ main(int argc, char **argv)
                 performance_stats_begin(&performance_stats, options.size); {
                         if ((ret = device->download_file(options.filepath,
                                     options.address, options.size)) < 0) {
-                                VERBOSE_PRINTF(" FAILED\n");
+                                verbose_printf(" FAILED\n");
                                 goto error;
                         }
                 } performance_stats_end(&performance_stats);
-                VERBOSE_PRINTF(" OK\n");
+                verbose_printf(" OK\n");
         }
 
         if (options.g_set) {
@@ -346,15 +341,15 @@ main(int argc, char **argv)
         }
 
         if (options.x_set || options.u_set || options.d_set) {
-                VERBOSE_PRINTF("Transfer time: %.3gs\n",
+                verbose_printf("Transfer time: %.3gs\n",
                     performance_stats.ps_transfer_time);
-                VERBOSE_PRINTF("Transfer speed: %.3g KiB/s\n",
+                verbose_printf("Transfer speed: %.3g KiB/s\n",
                     performance_stats.ps_transfer_speed);
         }
 
         if (!options.n_set) {
                 if (options.x_set) {
-                        VERBOSE_PRINTF("\n");
+                        verbose_printf("\n");
                         console(device);
                 }
         }
@@ -365,7 +360,7 @@ error:
         exit_code = 1;
 
         if (device != NULL) {
-                VERBOSE_PRINTF("Error reported by device: %s\n",
+                verbose_printf("Error reported by device: %s\n",
                     device->error_stringify());
         }
 
@@ -378,12 +373,32 @@ exit:
         }
 
         if (device != NULL) {
-                VERBOSE_PRINTF("Shutting device down...");
+                verbose_printf("Shutting device down...");
                 device->shutdown();
-                VERBOSE_PRINTF(" OK\n");
+                verbose_printf(" OK\n");
         }
 
         return exit_code;
+}
+
+int
+verbose_printf(const char *format, ...)
+{
+        if (!options.v_set) {
+                return 0;
+        }
+
+        va_list args;
+
+        va_start(args, format);
+
+        int ret;
+        ret = vprintf(format, args);
+        (void)fflush(stdout);
+
+        va_end(args);
+
+        return ret;
 }
 
 static void

@@ -5,6 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
 #include <ctype.h>
 #include <libgen.h>
 #include <limits.h>
@@ -15,28 +16,37 @@
 #include <unistd.h>
 
 #include "debug.h"
+#include "shared.h"
 #include "drivers.h"
 
 void
 console(const struct device_driver *device)
 {
-        uint8_t term_byte;
-        term_byte = 0xFF;
+        int ret;
+
+        uint32_t size;
+        size = 0;
 
         while (true) {
-                char byte;
-                byte = '\0';
+                uint8_t buffer[62];
 
-                int ret;
+                memset(buffer, '\0', sizeof(buffer));
 
-                if ((ret = device->read_byte(&byte)) != 0) {
-                        break;
+                if ((ret = device->read(buffer, sizeof(buffer))) < 0) {
+                        goto error;
                 }
 
-                (void)putchar(byte);
+                size += strlen((const char *)buffer);
 
-                fflush(stdout);
+                DEBUG_PRINTF("\"%.*s\" (size: %u bytes)\n", size, buffer, size);
+
+                (void)printf("%.*s", size, buffer);
+                (void)fflush(stdout);
         }
 
-        (void)putchar('\n');
+error:
+        verbose_printf("Error reported by device: %s\n",
+            device->error_stringify());
+
+        return;
 }
