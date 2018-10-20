@@ -23,6 +23,12 @@
 #include <scu.h>
 #include <vdp.h>
 
+#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
+#include <usb-cart.h>
+#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
+#include <arp.h>
+#endif /* HAVE_DEV_CARTRIDGE */
+
 void __attribute__ ((weak))
 user_init(void)
 {
@@ -65,6 +71,10 @@ _init(void)
 
         cpu_init();
         scu_init();
+
+#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
+        usb_cart_init();
+#endif /* HAVE_DEV_CARTRIDGE */
 
         dma_queue_init();
 

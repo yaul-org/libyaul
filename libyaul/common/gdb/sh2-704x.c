@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cartridge.h>
+#include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
 #else
@@ -574,7 +574,7 @@ static void
 _device_init(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cartridge_init();
+        usb_cart_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #endif /* HAVE_DEV_CARTRIDGE */
 }
@@ -583,7 +583,7 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        return usb_cartridge_byte_read();
+        return usb_cart_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_byte_read();
 #endif /* HAVE_DEV_CARTRIDGE */
@@ -593,7 +593,7 @@ static void
 _device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cartridge_byte_send(value);
+        usb_cart_byte_send(value);
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_byte_xchg(value);
 #endif /* HAVE_DEV_CARTRIDGE */

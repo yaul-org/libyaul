@@ -17,7 +17,7 @@
 
 #if defined(DEBUG)
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cartridge.h>
+#include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
 #elif HAVE_DEV_CARTRIDGE != 0
