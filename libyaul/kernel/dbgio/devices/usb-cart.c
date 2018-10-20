@@ -12,7 +12,7 @@
 
 #include <dbgio.h>
 
-#include <usb-cartridge.h>
+#include <usb-cart.h>
 
 #include "../dbgio-internal.h"
 
@@ -114,7 +114,7 @@ _flush(void)
 
         uint32_t i;
         for (i = 0; i < len; i++) {
-                usb_cartridge_byte_send(_dev_state->buffer[i]);
+                usb_cart_byte_send(_dev_state->buffer[i]);
         }
 
         _dev_state->buffer_p = _dev_state->buffer;
