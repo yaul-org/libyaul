@@ -109,7 +109,7 @@ usb_cart_dma_read(void *buffer, uint32_t len)
         MEMORY_WRITE(32, SCU(AREF), 0x00000000);
         /* Set 9-cycle wait was tested manually, and found to be the
          * bare minimum */
-        MEMORY_WRITE(32, SCU(ASR0), 0x20F00000);
+        MEMORY_WRITE(32, SCU(ASR0), 0x00900000);
 
         int32_t len_left;
         len_left = len;
