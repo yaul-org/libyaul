@@ -59,14 +59,22 @@ struct state_vdp2 {
                         uint16_t vcnt;          /* Register offset: 0x18000A */
                         unsigned : 16;          /* Register offset: 0x18000C */
                         uint16_t ramctl;        /* Register offset: 0x18000E */
-                        uint16_t cyca0l;        /* Register offset: 0x180010 */
-                        uint16_t cyca0u;        /* Register offset: 0x180012 */
-                        uint16_t cyca1l;        /* Register offset: 0x180014 */
-                        uint16_t cyca1u;        /* Register offset: 0x180016 */
-                        uint16_t cycb0l;        /* Register offset: 0x180018 */
-                        uint16_t cycb0u;        /* Register offset: 0x18001A */
-                        uint16_t cycb1l;        /* Register offset: 0x18001C */
-                        uint16_t cycb1u;        /* Register offset: 0x18001E */
+
+                        union {
+                                struct {
+                                        uint16_t cyca0l;        /* Register offset: 0x180010 */
+                                        uint16_t cyca0u;        /* Register offset: 0x180012 */
+                                        uint16_t cyca1l;        /* Register offset: 0x180014 */
+                                        uint16_t cyca1u;        /* Register offset: 0x180016 */
+                                        uint16_t cycb0l;        /* Register offset: 0x180018 */
+                                        uint16_t cycb0u;        /* Register offset: 0x18001A */
+                                        uint16_t cycb1l;        /* Register offset: 0x18001C */
+                                        uint16_t cycb1u;        /* Register offset: 0x18001E */
+                                } __packed;
+
+                                uint32_t cyc[4];
+                        };
+
                         uint16_t bgon;          /* Register offset: 0x180020 */
                         uint16_t mzctl;         /* Register offset: 0x180022 */
                         uint16_t sfsel;         /* Register offset: 0x180024 */

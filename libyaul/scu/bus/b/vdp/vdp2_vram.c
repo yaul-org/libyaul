@@ -55,31 +55,43 @@ vdp2_vram_cycp_set(const struct vram_cycp *vram_cycp)
 {
         assert(vram_cycp != NULL);
 
-        _state_vdp2()->regs.cyca0l = (vram_cycp->pv[0] >> 16) & 0xFFFF;
-        _state_vdp2()->regs.cyca0u = vram_cycp->pv[0] & 0xFFFF;
-
-        _state_vdp2()->regs.cyca1l = (vram_cycp->pv[1] >> 16) & 0xFFFF;
-        _state_vdp2()->regs.cyca1u = vram_cycp->pv[1] & 0xFFFF;
-
-        _state_vdp2()->regs.cycb0l = (vram_cycp->pv[2] >> 16) & 0xFFFF;
-        _state_vdp2()->regs.cycb0u = vram_cycp->pv[2] & 0xFFFF;
-
-        _state_vdp2()->regs.cycb1l = (vram_cycp->pv[3] >> 16) & 0xFFFF;
-        _state_vdp2()->regs.cycb1u = vram_cycp->pv[3] & 0xFFFF;
+        vdp2_vram_cycp_bank_set(0, &vram_cycp->pt[0]);
+        vdp2_vram_cycp_bank_set(1, &vram_cycp->pt[1]);
+        vdp2_vram_cycp_bank_set(2, &vram_cycp->pt[2]);
+        vdp2_vram_cycp_bank_set(3, &vram_cycp->pt[3]);
 }
 
 void
 vdp2_vram_cycp_clear(void)
 {
-        _state_vdp2()->regs.cyca0l = 0xFFFF;
-        _state_vdp2()->regs.cyca0u = 0xFFFF;
+        vdp2_vram_cycp_bank_clear(0);
+        vdp2_vram_cycp_bank_clear(1);
+        vdp2_vram_cycp_bank_clear(2);
+        vdp2_vram_cycp_bank_clear(3);
+}
 
-        _state_vdp2()->regs.cyca1l = 0xFFFF;
-        _state_vdp2()->regs.cyca1u = 0xFFFF;
+struct vram_cycp_bank
+vdp2_vram_cycp_bank_get(uint8_t bank)
+{
+        assert((bank >= 0) && (bank <= 3));
 
-        _state_vdp2()->regs.cycb0l = 0xFFFF;
-        _state_vdp2()->regs.cycb0u = 0xFFFF;
+        return *(struct vram_cycp_bank *)&_state_vdp2()->regs.cyc[bank];
+}
 
-        _state_vdp2()->regs.cycb1l = 0xFFFF;
-        _state_vdp2()->regs.cycb1u = 0xFFFF;
+void
+vdp2_vram_cycp_bank_set(uint8_t bank, const struct vram_cycp_bank *cycp_bank)
+{
+        assert((bank >= 0) && (bank <= 3));
+
+        assert(cycp_bank != NULL);
+
+        _state_vdp2()->regs.cyc[bank] = cycp_bank->raw;
+}
+
+void
+vdp2_vram_cycp_bank_clear(uint8_t bank)
+{
+        assert((bank >= 0) && (bank <= 3));
+
+        _state_vdp2()->regs.cyc[bank] = 0xFFFFFFFF;
 }
