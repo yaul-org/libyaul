@@ -38,13 +38,12 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
-	kernel/cons/cons.c \
-	kernel/cons/drivers/vdp1.c \
-	kernel/cons/drivers/vdp2.c \
-	kernel/cons/drivers/usb-cartridge.c \
-	kernel/cons/font/font.c \
-	kernel/cons/vt_parse/vt_parse.c \
-	kernel/cons/vt_parse/vt_parse_table.c \
+	kernel/dbgio/dbgio.c \
+	kernel/dbgio/devices/null.c \
+	kernel/dbgio/devices/vdp1.c \
+	kernel/dbgio/devices/vdp2.c \
+	kernel/dbgio/devices/usb-cart.c \
+	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
 	kernel/sys/irq-mux.c \
@@ -198,7 +197,7 @@ INCLUDE_DIRS:= \
 	common/gdb \
 	lib/lib \
 	kernel \
-	kernel/cons \
+	kernel/dbgio \
 	kernel/vfs \
 	math \
 	scu \
@@ -251,7 +250,7 @@ INSTALL_HEADER_FILES+= \
 	./common/gdb/:gdb.h:yaul/common/gdb/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/cons/:cons.h:yaul/cons/
+	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:memb.h:yaul/mm/ \

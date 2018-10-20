@@ -1,3 +1,5 @@
+/* -*- mode: c -*- */
+
 /*
  * Copyright (c) 2012 Joshua Haberman
  * See LICENSE for details.
@@ -5,29 +7,85 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-#include "vt_parse.h"
+#define MAX_INTERMEDIATE_CHARS  2
 
-static void do_action(vt_parse_t *, vt_parse_action_t, char);
-static void do_state_change(vt_parse_t *, state_change_t, char);
+#define ACTION(sc)              ((sc) & 0x0F)
+#define STATE(sc)               ((sc) >> 4)
 
-void
-vt_parse_init(vt_parse_t *parser, vt_parse_callback_t cb)
+typedef enum {
+        VT_PARSE_STATE_ANYWHERE = 0,
+        VT_PARSE_STATE_CSI_ENTRY = 1,
+        VT_PARSE_STATE_CSI_IGNORE = 2,
+        VT_PARSE_STATE_CSI_INTERMEDIATE = 3,
+        VT_PARSE_STATE_CSI_PARAM = 4,
+        VT_PARSE_STATE_DCS_ENTRY = 5,
+        VT_PARSE_STATE_DCS_IGNORE = 6,
+        VT_PARSE_STATE_DCS_INTERMEDIATE = 7,
+        VT_PARSE_STATE_DCS_PARAM = 8,
+        VT_PARSE_STATE_DCS_PASSTHROUGH = 9,
+        VT_PARSE_STATE_ESCAPE = 10,
+        VT_PARSE_STATE_ESCAPE_INTERMEDIATE = 11,
+        VT_PARSE_STATE_GROUND = 12,
+        VT_PARSE_STATE_OSC_STRING = 13,
+        VT_PARSE_STATE_SOS_PM_APC_STRING = 14
+} vt_parse_state_t;
+
+typedef enum {
+        VT_PARSE_ACTION_CLEAR = 1,
+        VT_PARSE_ACTION_COLLECT = 2,
+        VT_PARSE_ACTION_CSI_DISPATCH = 3,
+        VT_PARSE_ACTION_ESC_DISPATCH = 4,
+        VT_PARSE_ACTION_EXECUTE = 5,
+        VT_PARSE_ACTION_HOOK = 6,
+        VT_PARSE_ACTION_IGNORE = 7,
+        VT_PARSE_ACTION_OSC_END = 8,
+        VT_PARSE_ACTION_OSC_PUT = 9,
+        VT_PARSE_ACTION_OSC_START = 10,
+        VT_PARSE_ACTION_PARAM = 11,
+        VT_PARSE_ACTION_PRINT = 12,
+        VT_PARSE_ACTION_PUT = 13,
+        VT_PARSE_ACTION_UNHOOK = 14
+} vt_parse_action_t;
+
+typedef uint8_t state_change_t;
+
+struct vt_parse;
+
+typedef void (*vt_parse_callback_t)(struct vt_parse *, vt_parse_action_t, int);
+
+typedef struct vt_parse {
+        vt_parse_state_t state;
+        vt_parse_callback_t callback;
+        uint8_t intermediate_chars[MAX_INTERMEDIATE_CHARS + 1];
+        uint8_t ignore_flagged;
+        int32_t params[16];
+        int32_t num_params;
+} vt_parse_t;
+
+static void _do_action(vt_parse_t *, vt_parse_action_t, char);
+static void _do_state_change(vt_parse_t *, state_change_t, char);
+
+#include "vt_parse_table.inc"
+
+static void
+_vt_parse_init(vt_parse_t *parser, vt_parse_callback_t callback)
 {
-
         parser->state = VT_PARSE_STATE_GROUND;
         parser->intermediate_chars[0] = '\0';
         parser->num_params = 0;
         parser->ignore_flagged = 0;
-        parser->cb = cb;
+        parser->callback = callback;
 }
 
-void
-vt_parse(vt_parse_t *parser, const char *data, int len)
+static void
+_vt_parse(vt_parse_t *parser, const char *data, int32_t len)
 {
-        int i;
+        int32_t i;
         uint8_t ch;
         state_change_t change;
 
@@ -38,18 +96,18 @@ vt_parse(vt_parse_t *parser, const char *data, int len)
                  * always use that.  Otherwise use the transition from
                  * the current state */
 
-                change = vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][ch];
+                change = _vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][ch];
                 if (!change) {
-                        change = vt_parse_state_table[parser->state][ch];
+                        change = _vt_parse_state_table[parser->state][ch];
                 }
-                do_state_change(parser, change, data[i]);
+                _do_state_change(parser, change, data[i]);
         }
 }
 
 static
-void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
+void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
 {
-        int num_intermediate_chars;
+        int32_t num_intermediate_chars;
 
         /* Some actions we handle internally (like parsing parameters), others
          * we hand to our client for processing */
@@ -65,7 +123,7 @@ void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
         case VT_PARSE_ACTION_UNHOOK:
         case VT_PARSE_ACTION_CSI_DISPATCH:
         case VT_PARSE_ACTION_ESC_DISPATCH:
-                parser->cb(parser, action, ch);
+                parser->callback(parser, action, ch);
                 break;
         case VT_PARSE_ACTION_IGNORE:
                 /* Do nothing */
@@ -87,7 +145,7 @@ void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                         parser->params[parser->num_params - 1] = 0;
                 } else {
                         /* The character is a digit */
-                        int current_param;
+                        int32_t current_param;
 
                         if (parser->num_params == 0) {
                                 parser->num_params = 1;
@@ -105,12 +163,13 @@ void do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                 parser->ignore_flagged = 0;
                 break;
         default:
-                abort();
+                assert(false);
+                return;
         }
 }
 
 static void
-do_state_change(vt_parse_t *parser, state_change_t change, char ch)
+_do_state_change(vt_parse_t *parser, state_change_t change, char ch)
 {
         /* A state change is an action and/or a new state to transition
          * to */
@@ -131,23 +190,23 @@ do_state_change(vt_parse_t *parser, state_change_t change, char ch)
                 vt_parse_action_t exit_action;
                 vt_parse_action_t entry_action;
 
-                exit_action = vt_parse_exit_actions[parser->state];
-                entry_action = vt_parse_entry_actions[new_state];
+                exit_action = _vt_parse_exit_actions[parser->state];
+                entry_action = _vt_parse_entry_actions[new_state];
 
                 if (exit_action) {
-                        do_action(parser, exit_action, 0);
+                        _do_action(parser, exit_action, 0);
                 }
 
                 if (action) {
-                        do_action(parser, action, ch);
+                        _do_action(parser, action, ch);
                 }
 
                 if (entry_action) {
-                        do_action(parser, entry_action, 0);
+                        _do_action(parser, entry_action, 0);
                 }
 
                 parser->state = new_state;
         } else {
-                do_action(parser, action, ch);
+                _do_action(parser, action, ch);
         }
 }
