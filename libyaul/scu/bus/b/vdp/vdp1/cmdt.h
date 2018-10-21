@@ -156,6 +156,8 @@ struct vdp1_cmdt_sprite {
                                 int16_t y;
                         } a, b, c, d;
                 } cs_vertex;
+
+                int16_t cs_vertices[8];
         };
 
         uint32_t cs_grad;
@@ -168,12 +170,16 @@ struct vdp1_cmdt_polygon {
 
         uint16_t cp_color;
 
-        struct {
+        union {
                 struct {
-                        int16_t x;
-                        int16_t y;
-                } a, b, c, d;
-        } cp_vertex;
+                        struct {
+                                int16_t x;
+                                int16_t y;
+                        } a, b, c, d;
+                } cp_vertex;
+
+                int16_t cp_vertices[8];
+        };
 
         uint32_t cp_grad;
 
@@ -185,12 +191,16 @@ struct vdp1_cmdt_polyline {
 
         uint16_t cl_color;
 
-        struct {
+        union {
                 struct {
-                        int16_t x;
-                        int16_t y;
-                } a, b, c, d;
-        } cl_vertex;
+                        struct {
+                                int16_t x;
+                                int16_t y;
+                        } a, b, c, d;
+                } cl_vertex;
+
+                int16_t cl_vertices[8];
+        };
 
         uint32_t cl_grad;
 
@@ -202,12 +212,16 @@ struct vdp1_cmdt_line {
 
         uint16_t cl_color;
 
-        struct {
+        union {
                 struct {
-                        int16_t x;
-                        int16_t y;
-                } a, b;
-        } cl_vertex;
+                        struct {
+                                int16_t x;
+                                int16_t y;
+                        } a, b;
+                } cl_vertex;
+
+                int16_t cl_vertices[4];
+        };
 
         uint32_t cl_grad;
 
