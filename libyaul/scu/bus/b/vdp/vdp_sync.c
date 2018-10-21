@@ -20,6 +20,8 @@ static void _vdp1_dma_handler(void *);
 
 static void _vdp2_commit_handler(void *);
 
+static void _default_handler(void);
+
 static struct dma_level_cfg _vdp1_dma_cfg;
 static uint8_t _vdp1_dma_reg_buffer[DMA_REG_BUFFER_BYTE_SIZE];
 
@@ -44,6 +46,9 @@ static volatile int16_t _interval = 0;
 
 static volatile bool _vblank_in = false;
 static volatile bool _vblank_out = false;
+
+static void (*_user_vblank_in_handler)(void);
+static void (*_user_vblank_out_handler)(void);
 
 void
 vdp_sync_init(void)
@@ -72,6 +77,10 @@ vdp_sync_init(void)
         scu_dma_config_buffer(&_vdp1_dma_reg_buffer[0], &_vdp1_dma_cfg);
 
         scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT);
+
+        vdp_sync_vblank_in_clear();
+        vdp_sync_vblank_out_clear();
+
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
         scu_ic_mask_chg(~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT), IC_MASK_NONE);
@@ -178,6 +187,18 @@ vdp2_sync_commit_wait(void)
         }
 }
 
+void
+vdp_sync_vblank_in_set(void (*ihr)(void))
+{
+        _user_vblank_in_handler = (ihr != NULL) ? ihr : _default_handler;
+}
+
+void
+vdp_sync_vblank_out_set(void (*ihr)(void))
+{
+        _user_vblank_out_handler = (ihr != NULL) ? ihr : _default_handler;
+}
+
 static void
 _vblank_in_handler(void)
 {
@@ -193,6 +214,8 @@ _vblank_in_handler(void)
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
                 assert(ret == 0);
         }
+
+        _user_vblank_in_handler();
 }
 
 static void
@@ -216,6 +239,8 @@ _vblank_out_handler(void)
                         _interval--;
                 }
         }
+
+        _user_vblank_out_handler();
 }
 
 static void
@@ -242,4 +267,9 @@ _vdp2_commit_handler(void *work __unused)
         _state_vdp2_commit = false;
         _state_vdp2_committed = true;
         _state_vdp2_pending = false;
+}
+
+static void
+_default_handler(void)
+{
 }
