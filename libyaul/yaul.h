@@ -33,7 +33,7 @@
 #include <arp.h>
 #endif /* HAVE_DEV_CARTRIDGE */
 
-#include <scu/bus/a/cs0/dram-cartridge/dram-cartridge.h>
+#include <scu/bus/a/cs0/dram-cart/dram-cart.h>
 
 /* CS2 */
 #include <scu/bus/a/cs2/cd-block/cd-block.h>
