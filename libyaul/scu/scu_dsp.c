@@ -255,11 +255,8 @@ scu_dsp_status_get(struct dsp_status *status)
                 return;
         }
 
-        volatile uint32_t *reg_ppaf;
-        reg_ppaf = (volatile uint32_t *)SCU(PPAF);
-
         uint32_t ppaf_bits;
-        ppaf_bits = *reg_ppaf;
+        ppaf_bits = _read_ppaf();
 
         uint32_t *status_p;
         status_p = (uint32_t *)status;

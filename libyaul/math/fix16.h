@@ -270,8 +270,9 @@ typedef union {
                 fix16_t x;
                 fix16_t y;
         };
+
         fix16_t comp[2];
-} __packed fix16_vector2_t;
+} __packed __aligned(4) fix16_vector2_t;
 
 typedef union {
         struct {
@@ -279,8 +280,9 @@ typedef union {
                 fix16_t y;
                 fix16_t z;
         };
+
         fix16_t comp[3];
-} __packed fix16_vector3_t;
+} __packed __aligned(16) fix16_vector3_t;
 
 typedef union {
         struct {
@@ -289,8 +291,9 @@ typedef union {
                 fix16_t z;
                 fix16_t w;
         };
+
         fix16_t comp[4];
-} __packed fix16_vector4_t;
+} __packed __aligned(16) fix16_vector4_t;
 
 /* Row-major matrix */
 typedef union {

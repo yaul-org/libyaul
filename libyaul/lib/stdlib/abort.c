@@ -17,7 +17,7 @@
 
 #if defined(DEBUG)
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cartridge.h>
+#include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
 #elif HAVE_DEV_CARTRIDGE != 0
@@ -29,7 +29,7 @@ void __noreturn
 abort(void)
 {
         /* Disable interrupts */
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */

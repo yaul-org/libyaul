@@ -73,10 +73,11 @@ SH_CFLAGS= \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
-	-O2
+	-O2 \
 	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
-	-DFIXMATH_NO_ROUNDING=1
+	-DFIXMATH_NO_ROUNDING=1 \
+	-save-temps
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
 SH_CXXFLAGS= $(SH_CFLAGS)
@@ -85,9 +86,20 @@ SH_LXXFLAGS= $(SH_LDFLAGS)
 M68K_AFLAGS= --fatal-warnings
 M68K_LDFLAGS=
 
+IP_VERSION?= V1.000
+IP_RELEASE_DATE?= YYYYMMDD
+IP_AREAS?= JTUBKAEL
+IP_PERIPHERALS?= JAMKST
+IP_TITLE?= Title
+IP_MASTER_STACK_ADDR?= 0x06004000
+IP_SLAVE_STACK_ADDR?= 0x06002000
+IP_1ST_READ_ADDR?= 0x06004000
+
 SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: all clean example list-targets
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
+
+.PRECIOUS: %.elf %.c %.o

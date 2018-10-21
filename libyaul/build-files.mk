@@ -19,6 +19,7 @@ LDSCRIPTS:= \
 
 SPECS:= \
 	common/specs/yaul.specs \
+	common/specs/yaul-main.specs \
 	common/specs/ip.specs
 
 SUPPORT_SRCS:= \
@@ -37,13 +38,14 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
-	kernel/cons/cons.c \
-	kernel/cons/drivers/vdp1.c \
-	kernel/cons/drivers/vdp2.c \
-	kernel/cons/font/font.c \
-	kernel/cons/vt_parse/vt_parse.c \
-	kernel/cons/vt_parse/vt_parse_table.c \
+	kernel/dbgio/dbgio.c \
+	kernel/dbgio/devices/null.c \
+	kernel/dbgio/devices/vdp1.c \
+	kernel/dbgio/devices/vdp2.c \
+	kernel/dbgio/devices/usb-cart.c \
+	kernel/dbgio/devices/cons/cons.c \
 	\
+	kernel/sys/dma-queue.c \
 	kernel/sys/irq-mux.c \
 	\
 	kernel/mm/memb.c \
@@ -97,19 +99,11 @@ LIB_SRCS+= \
 endif
 
 LIB_SRCS+= \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_area.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_id.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_init.c \
-	scu/bus/a/cs0/dram-cartridge/dram-cartridge_size.c
+	scu/bus/a/cs0/dram-cart/dram-cart.c
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_read.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_send.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_byte_xchg.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_init.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_read.c \
-	scu/bus/a/cs0/usb-cartridge/usb-cartridge_long_send.c
+	scu/bus/a/cs0/usb-cart/usb-cart.c
 endif
 
 LIB_SRCS+= \
@@ -134,48 +128,35 @@ LIB_SRCS+= \
 	\
 	scu/bus/b/scsp/scsp_init.c \
 	\
-	scu/bus/b/vdp1/vdp1_cmdt.c \
-	scu/bus/b/vdp1/vdp1_init.c \
-	\
-	scu/bus/b/vdp2/vdp2-internal.c \
-	scu/bus/b/vdp2/vdp2_commit.c \
-	scu/bus/b/vdp2/vdp2_init.c \
-	scu/bus/b/vdp2/vdp2_scrn_back_screen_addr_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_back_screen_color_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_bitmap_format_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_cell_format_get.c \
-	scu/bus/b/vdp2/vdp2_scrn_cell_format_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_color_offset_clear.c \
-	scu/bus/b/vdp2/vdp2_scrn_color_offset_rgb_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_color_offset_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_color_offset_unset.c \
-	scu/bus/b/vdp2/vdp2_scrn_display_clear.c \
-	scu/bus/b/vdp2/vdp2_scrn_display_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_display_unset.c \
-	scu/bus/b/vdp2/vdp2_scrn_ls_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_sf_codes_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_mosaic_clear.c \
-	scu/bus/b/vdp2/vdp2_scrn_mosaic_horizontal_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_mosaic_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_mosaic_unset.c \
-	scu/bus/b/vdp2/vdp2_scrn_mosaic_vertical_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_priority_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_reduction_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_reduction_x_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_reduction_y_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_scroll_set.c \
-	scu/bus/b/vdp2/vdp2_scrn_scroll_update.c \
-	scu/bus/b/vdp2/vdp2_scrn_vcs_set.c \
-	scu/bus/b/vdp2/vdp2_sprite_priority_set.c \
-	scu/bus/b/vdp2/vdp2_sprite_type_set.c \
-	scu/bus/b/vdp2/vdp2_tvmd_display_clear.c \
-	scu/bus/b/vdp2/vdp2_tvmd_display_res_set.c \
-	scu/bus/b/vdp2/vdp2_tvmd_display_set.c \
-	scu/bus/b/vdp2/vdp2_tvmd_hblank_in_irq_get.c \
-	scu/bus/b/vdp2/vdp2_tvmd_vblank_in_irq_get.c \
-	scu/bus/b/vdp2/vdp2_tvmd_vblank_out_irq_get.c \
-	scu/bus/b/vdp2/vdp2_vram_control_get.c \
-	scu/bus/b/vdp2/vdp2_vram_control_set.c \
+	scu/bus/b/vdp/vdp_init.c \
+	scu/bus/b/vdp/vdp_sync.c \
+	scu/bus/b/vdp/vdp-internal.c \
+	scu/bus/b/vdp/vdp1_cmdt.c \
+	scu/bus/b/vdp/vdp2_commit.c \
+	scu/bus/b/vdp/vdp2_scrn_back_screen.c \
+	scu/bus/b/vdp/vdp2_scrn_bitmap_format_set.c \
+	scu/bus/b/vdp/vdp2_scrn_cell_format_set.c \
+	scu/bus/b/vdp/vdp2_scrn_color_offset_clear.c \
+	scu/bus/b/vdp/vdp2_scrn_color_offset_rgb_set.c \
+	scu/bus/b/vdp/vdp2_scrn_color_offset_set.c \
+	scu/bus/b/vdp/vdp2_scrn_color_offset_unset.c \
+	scu/bus/b/vdp/vdp2_scrn_display_clear.c \
+	scu/bus/b/vdp/vdp2_scrn_display_set.c \
+	scu/bus/b/vdp/vdp2_scrn_display_unset.c \
+	scu/bus/b/vdp/vdp2_scrn_ls_set.c \
+	scu/bus/b/vdp/vdp2_scrn_sf_codes_set.c \
+	scu/bus/b/vdp/vdp2_scrn_mosaic.c \
+	scu/bus/b/vdp/vdp2_scrn_priority_set.c \
+	scu/bus/b/vdp/vdp2_scrn_reduction.c \
+	scu/bus/b/vdp/vdp2_scrn_scroll_set.c \
+	scu/bus/b/vdp/vdp2_scrn_scroll_update.c \
+	scu/bus/b/vdp/vdp2_scrn_vcs_set.c \
+	scu/bus/b/vdp/vdp2_sprite_priority_set.c \
+	scu/bus/b/vdp/vdp2_sprite_type_set.c \
+	scu/bus/b/vdp/vdp2_tvmd_display_clear.c \
+	scu/bus/b/vdp/vdp2_tvmd_display_res_set.c \
+	scu/bus/b/vdp/vdp2_tvmd_display_set.c \
+	scu/bus/b/vdp/vdp2_vram.c \
 	\
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
@@ -196,6 +177,8 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_peripheral_raw_port.c \
 	scu/bus/cpu/smpc/smpc_rtc_settime_call.c \
 	\
+	scu/scu-internal.c \
+	scu/scu_init.c \
 	scu/scu_dma.c \
 	scu/scu_dsp.c \
 	scu/scu_timer.c
@@ -206,17 +189,16 @@ INCLUDE_DIRS:= \
 	common/gdb \
 	lib/lib \
 	kernel \
-	kernel/cons \
+	kernel/dbgio \
 	kernel/vfs \
 	math \
 	scu \
 	scu/bus/a/cs0/arp \
-	scu/bus/a/cs0/dram-cartridge \
-	scu/bus/a/cs0/usb-cartridge \
+	scu/bus/a/cs0/dram-cart \
+	scu/bus/a/cs0/usb-cart \
 	scu/bus/a/cs2/cd-block \
 	scu/bus/b/scsp \
-	scu/bus/b/vdp1 \
-	scu/bus/b/vdp2 \
+	scu/bus/b/vdp \
 	scu/bus/cpu \
 	scu/bus/cpu/smpc
 
@@ -260,12 +242,14 @@ INSTALL_HEADER_FILES+= \
 	./common/gdb/:gdb.h:yaul/common/gdb/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/cons/:cons.h:yaul/cons/
+	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/
+	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:slob.h:yaul/mm/
 
 INSTALL_HEADER_FILES+= \
+	./kernel/sys/:dma-queue.h:yaul/sys/ \
 	./kernel/sys/:irq-mux.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
@@ -284,8 +268,8 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs2/cd-block/:cd-block.h:yaul/scu/bus/a/cs2/cd-block/ \
 	./scu/bus/a/cs2/cd-block/cd-block/:cmd.h:yaul/scu/bus/a/cs2/cd-block/cd-block/ \
 	\
-	./scu/bus/a/cs0/dram-cartridge/:dram-cartridge.h:yaul/scu/bus/a/cs0/dram-cartridge/ \
-	./scu/bus/a/cs0/dram-cartridge/:dram-cartridge/map.h:yaul/scu/bus/a/cs0/dram-cartridge/
+	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/scu/bus/a/cs0/dram-cart/ \
+	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
 INSTALL_HEADER_FILES+= \
@@ -295,25 +279,25 @@ endif
 
 ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs0/usb-cartridge/:usb-cartridge.h:yaul/scu/bus/a/cs0/usb-cartridge/ \
-	./scu/bus/a/cs0/usb-cartridge/usb-cartridge/:map.h:yaul/scu/bus/a/cs0/usb-cartridge/usb-cartridge/
+	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/scu/bus/a/cs0/usb-cart/ \
+	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/scu/bus/a/cs0/usb-cart/usb-cart/
 endif
 
 INSTALL_HEADER_FILES+= \
 	./scu/bus/b/scsp/:scsp.h:yaul/scu/bus/b/scsp/ \
 	\
-	./scu/bus/b/vdp1/:vdp1.h:yaul/scu/bus/b/vdp1/ \
-	./scu/bus/b/vdp1/vdp1/:cmdt.h:yaul/scu/bus/b/vdp1/vdp1/ \
-	./scu/bus/b/vdp1/vdp1/:map.h:yaul/scu/bus/b/vdp1/vdp1/ \
-	./scu/bus/b/vdp1/vdp1/:vram.h:yaul/scu/bus/b/vdp1/vdp1/ \
-	\
-	./scu/bus/b/vdp2/:vdp2.h:yaul/scu/bus/b/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:cram.h:yaul/scu/bus/b/vdp2/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:map.h:yaul/scu/bus/b/vdp2/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:scrn.h:yaul/scu/bus/b/vdp2/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:sprite.h:yaul/scu/bus/b/vdp2/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:tvmd.h:yaul/scu/bus/b/vdp2/vdp2/ \
-	./scu/bus/b/vdp2/vdp2/:vram.h:yaul/scu/bus/b/vdp2/vdp2/ \
+	./scu/bus/b/vdp/:vdp.h:yaul/scu/bus/b/vdp/ \
+	./scu/bus/b/vdp/:vdp1.h:yaul/scu/bus/b/vdp/ \
+	./scu/bus/b/vdp/vdp1/:cmdt.h:yaul/scu/bus/b/vdp/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:map.h:yaul/scu/bus/b/vdp/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:vram.h:yaul/scu/bus/b/vdp/vdp1/ \
+	./scu/bus/b/vdp/:vdp2.h:yaul/scu/bus/b/vdp/ \
+	./scu/bus/b/vdp/vdp2/:cram.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:map.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:sprite.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:tvmd.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:vram.h:yaul/scu/bus/b/vdp/vdp2/ \
 	\
 	./scu/bus/cpu/:cpu.h:yaul/scu/bus/cpu/ \
 	./scu/bus/cpu/cpu/:cache.h:yaul/scu/bus/cpu/cpu/ \

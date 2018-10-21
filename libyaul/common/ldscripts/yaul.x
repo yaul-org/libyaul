@@ -13,13 +13,17 @@ ENTRY (_start)
 SEARCH_DIR ("$INSTALL_ROOT/sh-elf/lib");
 
 MEMORY {
-  /* 0x06004000-0x060FFFFF */
-  ram (Wx) : ORIGIN = 0x06004000, LENGTH = 0x000F4000
+  boot (Wx)        : ORIGIN = 0x06000000, LENGTH = 0x00000C00
+  master_stack (W) : ORIGIN = 0x06004000, LENGTH = 0x00002000
+  slave_stack (W)  : ORIGIN = 0x06002000, LENGTH = 0x00001400
+  ram (Wx)         : ORIGIN = 0x06004000, LENGTH = 0x000FC000
 }
 
-/* 0x060F4000-0x06100000 */
-PROVIDE (__stack = ORIGIN (ram) + LENGTH (ram) + 0x00008000);
-PROVIDE (__stack_end = ORIGIN (ram) + LENGTH (ram));
+PROVIDE (__master_stack = ORIGIN (master_stack));
+PROVIDE (__master_stack_end = ORIGIN (master_stack) - LENGTH (master_stack));
+
+PROVIDE_HIDDEN (__slave_stack = ORIGIN (slave_stack));
+PROVIDE_HIDDEN (__slave_stack_end = ORIGIN (slave_stack) - LENGTH (slave_stack));
 
 SECTIONS
 {
@@ -50,7 +54,7 @@ SECTIONS
      KEEP (*(.ctors))
      LONG (0x00000000)
      __CTOR_END__ = .;
-     . = ALIGN (0x04);
+     . = ALIGN (0x10);
 
      __DTOR_LIST__ = .;
      ___DTOR_LIST__ = .;
@@ -59,7 +63,6 @@ SECTIONS
      KEEP (*(.dtors))
      LONG (0x00000000)
      __DTOR_END__ = .;
-
      . = ALIGN (0x10);
 
      *(.rdata)
@@ -77,6 +80,8 @@ SECTIONS
      *(.data)
      *(.data.*)
      *(.gnu.linkonce.d.*)
+     SORT (CONSTRUCTORS)
+
      *(.sdata)
      *(.sdata.*)
      *(.gnu.linkonce.s.*)
@@ -114,10 +119,4 @@ SECTIONS
   /* Back to cached addresses */
   __end = __bss_end + SIZEOF (.uncached);
   PROVIDE (_end = __bss_end + SIZEOF (.uncached));
-
-  /DISCARD/ :
-  {
-     *(.rela.*)
-     *(.comment)
-  }
 }

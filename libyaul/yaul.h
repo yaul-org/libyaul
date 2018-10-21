@@ -28,9 +28,9 @@
 
 /* CS0 */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <scu/bus/a/cs0/usb-cartridge/usb-cartridge.h>
+#include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <scu/bus/a/cs0/arp/arp.h>
+#include <arp.h>
 #endif /* HAVE_DEV_CARTRIDGE */
 
 #include <scu/bus/a/cs0/dram-cartridge/dram-cartridge.h>
@@ -38,11 +38,8 @@
 /* CS2 */
 #include <scu/bus/a/cs2/cd-block/cd-block.h>
 
-/* B-bus VDP1 */
-#include <scu/bus/b/vdp1/vdp1.h>
-
-/* B-bus VDP2 */
-#include <scu/bus/b/vdp2/vdp2.h>
+/* B-bus VDP1 and VDP2 */
+#include <scu/bus/b/vdp/vdp.h>
 
 /* B-bus SCSP */
 #include <scu/bus/b/scsp/scsp.h>
@@ -52,13 +49,15 @@
 
 #include <common/gdb/gdb.h>
 
-#include <cons/cons.h>
+#include <dbgio/dbgio.h>
 
 #include <math.h>
 
 #include <mm/memb.h>
+#include <mm/slob.h>
 
 #include <sys/init.h>
+#include <sys/dma-queue.h>
 #include <sys/irq-mux.h>
 
 #include <fs/iso9660/iso9660.h>

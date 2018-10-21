@@ -65,7 +65,6 @@ static rd_file_t fhs;
 void
 romdisk_init(void)
 {
-
         TAILQ_INIT(&fhs);
 }
 
@@ -153,14 +152,40 @@ romdisk_read(void *p, void *buf, size_t bytes)
         }
 
         /* Is there enough left? */
-        if ((fh->ptr + bytes) > fh->len)
+        if ((fh->ptr + bytes) > fh->len) {
                 bytes = fh->len - fh->ptr;
+        }
 
         ofs = (uint8_t *)(mnt->image + fh->index + fh->ptr);
         memcpy(buf, ofs, bytes);
         fh->ptr += bytes;
 
         return bytes;
+}
+
+void *
+romdisk_direct(void *p)
+{
+        rd_file_handle_t *fh;
+        rd_image_t *mnt;
+
+        fh = (rd_file_handle_t *)p;
+        mnt = (rd_image_t *)fh->mnt;
+
+        /* Sanity checks */
+        if ((fh == NULL) || (fh->index == 0)) {
+                /* Not a valid file descriptor or is not open for
+                 * reading */
+                /* errno = EBADF; */
+                return NULL;
+        }
+
+        if (fh->dir) {
+                /* errno = EISDIR; */
+                return NULL;
+        }
+
+        return (void *)(mnt->image + fh->index);
 }
 
 off_t
@@ -343,6 +368,7 @@ romdisk_fd_alloc(void)
 {
         rd_file_handle_t *fh;
         fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t));
+
         if (fh == NULL) {
                 return NULL;
         }
@@ -355,17 +381,26 @@ romdisk_fd_alloc(void)
 static void
 romdisk_fd_free(rd_file_handle_t *fd)
 {
-        rd_file_handle_t *fh;
-
-        if (fd != NULL) {
+        if (fd == NULL) {
                 return;
         }
 
-        TAILQ_FOREACH(fh, &fhs, handles) {
+        rd_file_handle_t *fh;
+
+        bool fd_match;
+        fd_match = false;
+
+        TAILQ_FOREACH (fh, &fhs, handles) {
                 if (fh == fd) {
-                        TAILQ_REMOVE(&fhs, fh, handles);
-                        free(fh);
-                        return;
+                        fd_match = true;
+                        break;
                 }
         }
+
+        if (!fd_match) {
+                return;
+        }
+
+        TAILQ_REMOVE(&fhs, fh, handles);
+        free(fh);
 }

@@ -15,6 +15,7 @@
 #define DEBUG_PRINTF(fmt, ...) do {                                            \
         (void)fprintf(stderr, "%s():L%i:" " " fmt, __FUNCTION__, __LINE__,     \
             ##__VA_ARGS__);                                                    \
+        (void)fflush(stderr);                                                  \
 } while(false)
 #else
 #define DEBUG_PRINTF(x...)

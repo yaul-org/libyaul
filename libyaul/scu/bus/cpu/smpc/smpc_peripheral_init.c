@@ -59,6 +59,8 @@
 #define PC_GET_DATA(x)          (OREG_OFFSET((x)))
 #define PC_GET_DATA_BYTE(x, y)  (((uint8_t *)OREG_OFFSET((x)))[(y)])
 
+struct smpc_time time;
+
 struct smpc_peripheral_port smpc_peripheral_port_1;
 struct smpc_peripheral_port smpc_peripheral_port_2;
 
@@ -76,10 +78,7 @@ static void peripheral_free(struct smpc_peripheral *);
 static int32_t peripheral_update(struct smpc_peripheral_port *,
     struct smpc_peripheral *, uint8_t);
 
-static void handler_system_manager(void);
-
-static void irq_mux_vblank_in(irq_mux_handle_t * __unused);
-static void irq_mux_vblank_out(irq_mux_handle_t * __unused);
+static void _system_manager_handler(void);
 
 /* A memory pool that holds two peripherals directly connected to each
  * port that also hold MAX_PERIPHERALS (6) each making a total of 14
@@ -97,42 +96,126 @@ smpc_peripheral_init(void)
         smpc_peripheral_port_2.peripheral = peripheral_alloc();
         TAILQ_INIT(&smpc_peripheral_port_2.peripherals);
 
-        /* Disable interrupts */
-        uint32_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(15);
-
         /* Set both ports to "SMPC" control mode */
         MEMORY_WRITE(8, SMPC(EXLE1), 0x00);
         MEMORY_WRITE(8, SMPC(IOSEL1), 0x00);
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
-        /* Send INTBACK at start of VBLANK-IN */
-        irq_mux_t *vblank_in;
-        vblank_in = vdp2_tvmd_vblank_in_irq_get();
-        irq_mux_handle_add(vblank_in, irq_mux_vblank_in, NULL);
-
-        /* Parse at start of VBLANK-OUT */
-        irq_mux_t *vblank_out;
-        vblank_out = vdp2_tvmd_vblank_out_irq_get();
-        irq_mux_handle_add(vblank_out, irq_mux_vblank_out, NULL);
-
         scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_SYSTEM_MANAGER);
-
-        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER, &handler_system_manager);
-
+        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER, &_system_manager_handler);
         scu_ic_mask_chg(~IC_MASK_SYSTEM_MANAGER, IC_MASK_NONE);
+}
 
-        /* Enable interrupts */
-        cpu_intc_mask_set(sr_mask);
+void
+smpc_peripheral_intback_issue(void)
+{
+        /* Send "INTBACK" "SMPC" command */
+        /* Set to 255-byte mode for both ports; time optimized
+         *
+         * Return peripheral data and time, cartridge code, area
+         * code, etc.*/
+        smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN | OPE);
+}
+
+void
+smpc_peripheral_process(void)
+{
+        static struct smpc_peripheral_port *ports[] = {
+                &smpc_peripheral_port_1,
+                &smpc_peripheral_port_2,
+                NULL
+        };
+
+        if (!_collection_complete) {
+                return;
+        }
+
+        _collection_complete = false;
+
+        _oreg_offset = 0;
+
+        /* Ignore OREG0 */
+        _oreg_offset++;
+
+        time.year = (OREG_GET(_oreg_offset) << 8) | OREG_GET(_oreg_offset + 1);
+        _oreg_offset++;
+        _oreg_offset++;
+
+        time.day = OREG_GET(_oreg_offset) & 0xF0;
+        time.month = OREG_GET(_oreg_offset) & 0x0F;
+        _oreg_offset++;
+
+        time.days = OREG_GET(_oreg_offset);
+        _oreg_offset++;
+
+        time.hours = OREG_GET(_oreg_offset);
+        _oreg_offset++;
+
+        time.minutes = OREG_GET(_oreg_offset);
+        _oreg_offset++;
+
+        time.seconds = OREG_GET(_oreg_offset);
+        _oreg_offset++;
+
+        /* Ignore OREG8
+         * Ignore OREG9
+         * Ignore OREG10
+         * Ignore OREG11
+         * ... */
+
+        int32_t port_idx;
+
+        /* Peripheral data starts at offset 32 (OREG0) in the OREG buffer */
+        _oreg_offset = SMPC_OREGS;
+
+        for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
+                struct smpc_peripheral_port *port;
+
+                port = ports[port_idx];
+
+                int32_t previous_connected; /* Previous connected peripherals */
+                int32_t connected;
+
+                /* Update peripheral connected directly to the port */
+                previous_connected = port->peripheral->connected;
+                if ((connected = peripheral_update(/* parent = */ NULL,
+                            port->peripheral, port_idx + 1)) < 0) {
+                        /* Couldn't parse data; invalid peripheral */
+                        port->peripheral->connected = 0;
+                        port_peripherals_free(port);
+                        continue;
+                }
+
+                port_peripherals_free(port);
+
+                if (connected > 1) {
+                        int32_t sub_port;
+
+                        port->peripheral->connected = 0;
+                        for (sub_port = 1; connected > 0; connected--, sub_port++) {
+                                struct smpc_peripheral *peripheral;
+
+                                peripheral = peripheral_alloc();
+                                assert(peripheral != NULL);
+
+                                if ((peripheral_update(/* parent = */ port, peripheral, sub_port)) < 0) {
+                                        peripheral_free(peripheral);
+                                        continue;
+                                }
+
+                                /* Add peripheral */
+                                TAILQ_INSERT_TAIL(&port->peripherals, peripheral, peripherals);
+
+                                port->peripheral->connected++;
+                        }
+                }
+        }
 }
 
 static void
 port_peripherals_free(struct smpc_peripheral_port *port)
 {
-
         assert(port != NULL);
 
         struct smpc_peripheral *peripheral;
@@ -310,7 +393,7 @@ peripheral_update(struct smpc_peripheral_port *parent,
 }
 
 static void
-handler_system_manager(void)
+_system_manager_handler(void)
 {
         static uint32_t offset = 0;
 
@@ -323,8 +406,8 @@ handler_system_manager(void)
         }
 
         uint8_t sr;
-
         sr = MEMORY_READ(8, SMPC(SR));
+
         if ((sr & 0x80) == 0x80) {
                 if ((sr & NPE) == 0x00) {
                         /* Mark that SMPC status and peripheral data
@@ -341,111 +424,4 @@ handler_system_manager(void)
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
         MEMORY_WRITE(8, IREG(0), CONT);
-}
-
-static void
-irq_mux_vblank_in(irq_mux_handle_t *irq_mux __unused)
-{
-
-        /* Send "INTBACK" "SMPC" command */
-        /* Set to 255-byte mode for both ports; time optimized
-         *
-         * Return peripheral data and time, cartridge code, area
-         * code, etc.*/
-        smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN | OPE);
-}
-struct smpc_time time;
-static void
-irq_mux_vblank_out(irq_mux_handle_t *irq_mux __unused)
-{
-        static struct smpc_peripheral_port *ports[] = {
-                &smpc_peripheral_port_1,
-                &smpc_peripheral_port_2,
-                NULL
-        };
-
-        if (!_collection_complete) {
-                return;
-        }
-
-        _collection_complete = false;
-
-        _oreg_offset = 0;
-
-        /* Ignore OREG0 */
-        _oreg_offset++;
-
-        time.year = (OREG_GET(_oreg_offset) << 8) | OREG_GET(_oreg_offset + 1);
-        _oreg_offset++;
-        _oreg_offset++;
-
-        time.day = OREG_GET(_oreg_offset) & 0xF0;
-        time.month = OREG_GET(_oreg_offset) & 0x0F;
-        _oreg_offset++;
-
-        time.days = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        time.hours = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        time.minutes = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        time.seconds = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        /* Ignore OREG8
-         * Ignore OREG9
-         * Ignore OREG10
-         * Ignore OREG11
-         * ... */
-
-        int32_t port_idx;
-
-        /* Peripheral data starts at offset 32 (OREG0) in the OREG buffer */
-        _oreg_offset = SMPC_OREGS;
-
-        for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
-                struct smpc_peripheral_port *port;
-
-                port = ports[port_idx];
-
-                int32_t previous_connected; /* Previous connected peripherals */
-                int32_t connected;
-
-                /* Update peripheral connected directly to the port */
-                previous_connected = port->peripheral->connected;
-                if ((connected = peripheral_update(/* parent = */ NULL,
-                            port->peripheral, port_idx + 1)) < 0) {
-                        /* Couldn't parse data; invalid peripheral */
-                        port->peripheral->connected = 0;
-                        port_peripherals_free(port);
-                        continue;
-                }
-
-                port_peripherals_free(port);
-
-                if (connected > 1) {
-                        int32_t sub_port;
-
-                        port->peripheral->connected = 0;
-                        for (sub_port = 1; connected > 0; connected--, sub_port++) {
-                                struct smpc_peripheral *peripheral;
-
-                                peripheral = peripheral_alloc();
-                                assert(peripheral != NULL);
-
-                                if ((peripheral_update(/* parent = */ port, peripheral, sub_port)) < 0) {
-                                        peripheral_free(peripheral);
-                                        continue;
-                                }
-
-                                /* Add peripheral */
-                                TAILQ_INSERT_TAIL(&port->peripherals, peripheral, peripherals);
-
-                                port->peripheral->connected++;
-                        }
-                }
-        }
 }

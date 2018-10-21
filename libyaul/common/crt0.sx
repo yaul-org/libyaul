@@ -93,4 +93,4 @@ _start:
 .long 0xFFFFFE92
 
 .LC7:
-.long __stack
+.long __master_stack

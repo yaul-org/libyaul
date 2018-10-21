@@ -48,7 +48,7 @@ irq_mux_handle_add(irq_mux_t *irq_mux, void (*hdl)(irq_mux_handle_t *), void *us
         uint32_t mask;
         mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         n_hdl = irq_mux_handle_alloc();
         assert(n_hdl != NULL);

@@ -5,35 +5,28 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
-
+#include <cpu/cache.h>
 #include <cpu/intc.h>
+
 #include <scu/dma.h>
 
 #include <scu-internal.h>
 
-static void _dma_level0_ihr_handler(void);
-static void _dma_level1_ihr_handler(void);
-static void _dma_level2_ihr_handler(void);
-static void _dma_illegal_handler(void);
-
-static void _default_ihr(void);
-
-#define DMA_IHR_INDEX_LEVEL0      0
-#define DMA_IHR_INDEX_LEVEL1      1
-#define DMA_IHR_INDEX_LEVEL2      1
-
-static void (*_dma_ihr_table[])(void) = {
-        _default_ihr,
-        _default_ihr,
-        _default_ihr
-};
-
-static void (*_dma_illegal_ihr)(void) = _default_ihr;
+struct dma_regs {
+        uint32_t dnr;
+        uint32_t dnw;
+        uint32_t dnc;
+        uint32_t dnad;
+        uint32_t dnmd;
+} __packed;
 
 void
 scu_dma_init(void)
 {
+        static_assert(sizeof(struct dma_regs) == DMA_REG_BUFFER_BYTE_SIZE);
+
+        scu_dma_stop();
+
         uint32_t scu_mask;
         scu_mask = IC_MASK_LEVEL_0_DMA_END |
                    IC_MASK_LEVEL_1_DMA_END |
@@ -42,161 +35,133 @@ scu_dma_init(void)
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, _dma_level0_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, _dma_level1_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, _dma_level2_ihr_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, _dma_illegal_handler);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, NULL);
+        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, NULL);
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
-
-        /* Writing to SCU(DSTP) causes a hang */
-
-        scu_dma_level0_stop();
-        scu_dma_level1_stop();
-        scu_dma_level2_stop();
 }
 
 void
-scu_dma_level_config_set(const struct dma_level_cfg *cfg)
+scu_dma_config_buffer(void *buffer, const struct dma_level_cfg *cfg)
 {
-        uint32_t dst;
-        uint32_t src;
-        uint32_t count;
+        assert(cfg != NULL);
 
-        if (cfg == NULL) {
-                return;
-        }
+        assert(buffer != NULL);
 
-        if (cfg->dlc_xfer == NULL) {
-                return;
-        }
+        struct dma_regs *regs;
+        regs = buffer;
+
+        /* Clear mode, starting factor and update bits */
+        regs->dnmd &= ~0x01010107;
 
         switch (cfg->dlc_mode & 0x01) {
         case DMA_MODE_DIRECT:
+                assert(cfg->dlc_xfer.direct.len != 0x00000000);
+                assert(cfg->dlc_xfer.direct.dst != 0x00000000);
+                assert(cfg->dlc_xfer.direct.src != 0x00000000);
+
                 /* The absolute address must not be cached */
-                dst = 0x20000000 | cfg->dlc_xfer->dst;
+                regs->dnw = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.dst;
                 /* The absolute address must not be cached */
-                src = 0x20000000 | cfg->dlc_xfer->src;
-                count = cfg->dlc_xfer->len;
+                regs->dnr = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.src;
+
+                /* Level 0 is able to transfer 1MiB
+                 * Level 1 is able to transfer 4KiB
+                 * Level 2 is able to transfer 4KiB */
+                regs->dnc = cfg->dlc_xfer.direct.len;
                 break;
         case DMA_MODE_INDIRECT:
-                /* Transfer count cannot be ignored like in direct
-                 * mode */
-                if (cfg->dlc_xfer_count == 0) {
-                        return;
-                }
-
-                /* The transfer table start address must be on a power
-                 * of 2 boundary */
-                uint32_t boundary;
-                boundary = pow2(cfg->dlc_xfer_count * sizeof(struct dma_xfer)) - 1;
-
-                if (((uint32_t)cfg->dlc_xfer & boundary) != 0x00000000) {
-                        return;
-                }
+                assert(cfg->dlc_xfer.indirect != NULL);
 
                 /* The absolute address must not be cached */
-                dst = 0x20000000 | (uint32_t)cfg->dlc_xfer;
-                src = 0x00000000;
-                count = 0x00000000;
-
-                /* Force set the transfer end bit */
-                cfg->dlc_xfer[cfg->dlc_xfer_count - 1].src |= 0x80000000;
+                regs->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer.indirect;
+                regs->dnr = 0x00000000;
+                regs->dnc = 0x00000000;
+                regs->dnmd |= 0x01000000;
                 break;
         }
 
         /* Since bit 8 being unset is effective only for the CS2 space
          * of the A bus, everything else should set it */
+        regs->dnad = 0x00000100 | (cfg->dlc_stride & 0x07);
 
-        uint32_t add;
-        add = 0x00000100 | (cfg->dlc_stride & 0x07);
-
-        uint32_t mode;
-        mode = ((cfg->dlc_mode & 0x01) << 24) |
-                (cfg->dlc_update & 0x00010100) |
-                (cfg->dlc_starting_factor & 0x07);
-
-        switch (cfg->dlc_level & 0x03) {
-        case 0:
-                /* Level 0 is able to transfer 1MiB */
-                count &= 0x00100000 - 1;
-
-                scu_dma_level0_wait();
-                scu_dma_level0_stop();
-
-                MEMORY_WRITE(32, SCU(D0R), src);
-                MEMORY_WRITE(32, SCU(D0W), dst);
-                MEMORY_WRITE(32, SCU(D0C), count);
-                MEMORY_WRITE(32, SCU(D0AD), add);
-                MEMORY_WRITE(32, SCU(D0MD), mode);
-                break;
-        case 1:
-                /* Level 1 is able transfer 4KiB */
-                count &= 0x00001000 - 1;
-
-                scu_dma_level0_wait();
-                scu_dma_level1_stop();
-
-                MEMORY_WRITE(32, SCU(D1R), src);
-                MEMORY_WRITE(32, SCU(D1W), dst);
-                MEMORY_WRITE(32, SCU(D1C), count);
-                MEMORY_WRITE(32, SCU(D1AD), add);
-                MEMORY_WRITE(32, SCU(D1MD), mode);
-                break;
-        case 2:
-                /* Level 2 is able transfer 4KiB */
-                count &= 0x00001000 - 1;
-
-                scu_dma_level2_wait();
-                scu_dma_level2_stop();
-
-                MEMORY_WRITE(32, SCU(D2R), src);
-                MEMORY_WRITE(32, SCU(D2W), dst);
-                MEMORY_WRITE(32, SCU(D2C), count);
-                MEMORY_WRITE(32, SCU(D2AD), add);
-                MEMORY_WRITE(32, SCU(D2MD), mode);
-                break;
-        }
-
-        _dma_ihr_table[cfg->dlc_level & 0x03] = _default_ihr;
-
-        if (cfg->dlc_ihr != NULL) {
-                /* Set interrupt handling routine */
-                _dma_ihr_table[cfg->dlc_level & 0x03] = cfg->dlc_ihr;
-        }
+        regs->dnmd |= cfg->dlc_update & 0x00010100;
 }
 
 void
-scu_dma_illegal_set(void (*ihr)(void))
+scu_dma_config_set(uint8_t level, uint8_t start_factor, const void *buffer, void (*ihr)(void))
 {
-        _dma_illegal_ihr = (ihr != NULL) ? ihr : _default_ihr;
+        assert(buffer != NULL);
+
+        assert(level <= 2);
+
+        assert(start_factor <= 7);
+
+        const struct dma_regs *regs;
+        regs = buffer;
+
+        switch (level) {
+        case 0:
+                scu_dma_level0_wait();
+                scu_dma_level0_stop();
+
+                MEMORY_WRITE(32, SCU(D0R), regs->dnr);
+                MEMORY_WRITE(32, SCU(D0W), regs->dnw);
+                MEMORY_WRITE(32, SCU(D0C), regs->dnc);
+                MEMORY_WRITE(32, SCU(D0AD), regs->dnad);
+                MEMORY_WRITE(32, SCU(D0MD), regs->dnmd | start_factor);
+
+                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
+
+                MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
+                break;
+        case 1:
+                scu_dma_level1_wait();
+                scu_dma_level1_stop();
+
+                MEMORY_WRITE(32, SCU(D1R), regs->dnr);
+                MEMORY_WRITE(32, SCU(D1W), regs->dnw);
+                MEMORY_WRITE(32, SCU(D1C), regs->dnc);
+                MEMORY_WRITE(32, SCU(D1AD), regs->dnad);
+                MEMORY_WRITE(32, SCU(D1MD), regs->dnmd | start_factor);
+
+                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
+
+                MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
+                break;
+        case 2:
+                scu_dma_level2_wait();
+                scu_dma_level2_stop();
+
+                MEMORY_WRITE(32, SCU(D2R), regs->dnr);
+                MEMORY_WRITE(32, SCU(D2W), regs->dnw);
+                MEMORY_WRITE(32, SCU(D2C), regs->dnc);
+                MEMORY_WRITE(32, SCU(D2AD), regs->dnad);
+                MEMORY_WRITE(32, SCU(D2MD), regs->dnmd | start_factor);
+
+                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
+
+                MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
+                break;
+        }
 }
 
-static void
-_default_ihr(void)
+int8_t
+scu_dma_level_unused_get(void)
 {
-}
+        if ((scu_dma_level_busy(0)) != 0x00) {
+                return 0;
+        }
 
-static void
-_dma_level0_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL0]();
-}
+        if ((scu_dma_level_busy(1)) != 0x00) {
+                return 1;
+        }
 
-static void
-_dma_level1_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL1]();
-}
+        if ((scu_dma_level_busy(2)) != 0x00) {
+                return 2;
+        }
 
-static void
-_dma_level2_ihr_handler(void)
-{
-        _dma_ihr_table[DMA_IHR_INDEX_LEVEL2]();
-}
-
-static void
-_dma_illegal_handler(void)
-{
-        _dma_illegal_ihr();
+        return -1;
 }

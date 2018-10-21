@@ -435,6 +435,8 @@ extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
 extern void smpc_peripheral_digital_port(uint8_t,
     struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_init(void);
+extern void smpc_peripheral_intback_issue(void);
+extern void smpc_peripheral_process(void);
 
 #ifdef __cplusplus
 }

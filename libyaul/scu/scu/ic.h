@@ -48,6 +48,7 @@ extern "C" {
 #define IC_MASK_SPRITE_END      0x00002000
 #define IC_MASK_ALL             0x0000BFFF
 
+#define IC_IST_NONE             0x00000000
 #define IC_IST_VBLANK_IN        0x00000001
 #define IC_IST_VBLANK_OUT       0x00000002
 #define IC_IST_HBLANK_IN        0x00000004
@@ -136,6 +137,15 @@ scu_ic_status_get(void)
         ist = MEMORY_READ(32, SCU(IST));
 
         return ist;
+}
+
+static inline void __attribute__ ((always_inline))
+scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
+{
+        volatile uint32_t *reg_ist;
+        reg_ist = (volatile uint32_t *)SCU(IST);
+
+        *reg_ist = (*reg_ist & and_mask) | or_mask;
 }
 
 static inline const uint32_t * __attribute__ ((always_inline))

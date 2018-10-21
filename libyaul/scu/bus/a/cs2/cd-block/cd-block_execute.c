@@ -27,7 +27,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         uint32_t mask;
         mask = cpu_intc_mask_get();
 
-        cpu_intc_mask_set(0x0F);
+        cpu_intc_mask_set(15);
 
         error = -1;
         /* Check if we can continue */
@@ -40,7 +40,6 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         hirq &= ~regs->hirq_mask;
         MEMORY_WRITE(16, CD_BLOCK(HIRQ), hirq);
 
-        /* Write to memory */
         MEMORY_WRITE(16, CD_BLOCK(CR1), regs->cr1);
         MEMORY_WRITE(16, CD_BLOCK(CR2), regs->cr2);
         MEMORY_WRITE(16, CD_BLOCK(CR3), regs->cr3);
@@ -75,6 +74,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         }
 
         error = 0;
+
 busy:
         cpu_intc_mask_set(mask);
 

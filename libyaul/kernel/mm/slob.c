@@ -38,7 +38,11 @@ struct slob_page;
 struct slob_page_meta {
         uint32_t spm_bunits; /* Free number of block units */
         struct slob_block *spm_bfree; /* Pointer to first free block */
-} __aligned (sizeof(uintptr_t));
+
+        unsigned int : 32;
+        unsigned int : 32;
+        unsigned int : 32;
+} __packed;
 
 struct slob_block {
         /* The start of the address of the request returned to the
@@ -82,7 +86,7 @@ slob_medium_page_list = SLIST_HEAD_INITIALIZER(slob_medium_page_list);
 static struct slob_page_list
 slob_large_page_list = SLIST_HEAD_INITIALIZER(slob_large_page_list);
 
-MEMB(slob_pages, struct slob_page, SLOB_PAGE_COUNT, 0);
+MEMB(slob_pages, struct slob_page, SLOB_PAGE_COUNT, SLOB_PAGE_SIZE);
 
 /*
  * Initialize the SLOB allocator.
@@ -179,14 +183,13 @@ slob_free(void *addr)
 
         uint32_t bunits;
 
-        if (addr == NULL) {
-                return;
-        }
+        assert(addr != NULL);
+
+        /* Check if ADDR is within bounds of a SLOB managed memory */
+        assert((memb_bounds(&slob_pages, addr)));
 
         sb = (struct slob_block *)addr - 1;
         sp = SLOB_PAGE(sb);
-
-        /* XXX: Check if addr is within bounds of a SLOB page */
 
         bunits = slob_block_units(sb);
 
@@ -533,7 +536,7 @@ slob_page_list_block_units(struct slob_page_list *spl)
 
                 /* Walk the free block list starting at the first free
                  * block */
-                for (;;) {
+                while (true) {
                         if (slob_block_list_last(block)) {
                                 return bavail;
                         }

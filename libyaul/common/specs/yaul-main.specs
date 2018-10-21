@@ -1,0 +1,8 @@
+*startfile:
+crt0%O%s init%O%s c++-support%O%s
+
+*endfile:
+
+
+*lib:
+-lyaul -lgcc
