@@ -25,9 +25,9 @@ extern "C" {
 
 typedef struct {
         void (*clear)(void);
-        void (*area_clear)(int32_t, int32_t, int32_t, int32_t);
-        void (*line_clear)(int32_t, int32_t, int32_t);
-        void (*write)(int32_t, int32_t, uint8_t);
+        void (*area_clear)(int16_t, int16_t, int16_t, int16_t);
+        void (*line_clear)(int16_t, int16_t, int16_t);
+        void (*write)(int16_t, int16_t, uint8_t);
 } cons_ops_t;
 
 extern void cons_init(const cons_ops_t *, uint16_t, uint16_t);
