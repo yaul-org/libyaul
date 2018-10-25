@@ -255,14 +255,14 @@ struct vdp1_cmdt_user_clip_coord {
         VDP1_CMDT_DUMMY_UNION_DECLARE(ucc);
 };
 
-extern void vdp1_cmdt_sprite_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_polygon *);
-extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_polyline *);
-extern void vdp1_cmdt_line_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *, const struct vdp1_cmdt_user_clip_coord *);
-extern void vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *, const struct vdp1_cmdt_system_clip_coord *);
-extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt *, struct vdp1_cmdt_local_coord *);
-extern void vdp1_cmdt_end(struct vdp1_cmdt *);
+extern struct vdp1_cmdt *vdp1_cmdt_sprite_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+extern struct vdp1_cmdt *vdp1_cmdt_polygon_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_polygon *);
+extern struct vdp1_cmdt *vdp1_cmdt_polyline_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_polyline *);
+extern struct vdp1_cmdt *vdp1_cmdt_line_draw(struct vdp1_cmdt *, const struct vdp1_cmdt_line *);
+extern struct vdp1_cmdt *vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *, const struct vdp1_cmdt_user_clip_coord *);
+extern struct vdp1_cmdt *vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *, const struct vdp1_cmdt_system_clip_coord *);
+extern struct vdp1_cmdt *vdp1_cmdt_local_coord_set(struct vdp1_cmdt *, struct vdp1_cmdt_local_coord *);
+extern struct vdp1_cmdt *vdp1_cmdt_end(struct vdp1_cmdt *);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
 #undef VDP1_CMDT_DUMMY_UNION_DECLARE
