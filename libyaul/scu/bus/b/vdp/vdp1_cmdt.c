@@ -15,7 +15,7 @@
 
 #include "vdp-internal.h"
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_sprite_draw(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_sprite *sprite)
 {
@@ -98,9 +98,11 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt *cmdt,
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (sprite->cs_grad >> 3) & 0xFFFF;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_polygon_draw(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_polygon *polygon)
 {
@@ -132,9 +134,11 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt *cmdt,
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (polygon->cp_grad >> 3) & 0xFFFF;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_polyline_draw(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_polyline *polyline)
 {
@@ -154,9 +158,11 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt *cmdt,
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (polyline->cl_grad >> 3) & 0xFFFF;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_line_draw(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_line *line)
 {
@@ -172,9 +178,11 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt *cmdt,
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (line->cl_grad >> 3) & 0xFFFF;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_user_clip_coord *user_clip)
 {
@@ -199,9 +207,11 @@ vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *cmdt,
         /* Lower-right (x2, y2) */
         cmdt->cmd_xc = x1 & 0x01FF;
         cmdt->cmd_yc = y1 & 0x00FF;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_system_clip_coord *system_clip)
 {
@@ -209,9 +219,11 @@ vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *cmdt,
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xc = system_clip->scc_coord.x;
         cmdt->cmd_yc = system_clip->scc_coord.y;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_local_coord_set(struct vdp1_cmdt *cmdt,
     struct vdp1_cmdt_local_coord *local)
 {
@@ -219,10 +231,14 @@ vdp1_cmdt_local_coord_set(struct vdp1_cmdt *cmdt,
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xa = local->lc_coord.x;
         cmdt->cmd_ya = local->lc_coord.y;
+
+        return cmdt + 1;
 }
 
-void
+struct vdp1_cmdt *
 vdp1_cmdt_end(struct vdp1_cmdt *cmdt)
 {
         cmdt->cmd_ctrl |= 0x8000;
+
+        return cmdt + 1;
 }
