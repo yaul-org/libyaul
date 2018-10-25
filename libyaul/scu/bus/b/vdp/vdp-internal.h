@@ -20,6 +20,26 @@
 #define COMMIT_XFER_VDP2_REGS           1
 #define COMMIT_XFER_BACK_SCREEN_BUFFER  2
 
+struct state_vdp1 {
+        union {
+                uint16_t buffer[11];
+
+                struct {
+                        uint16_t tvmr;          /* Register offset: 0x100000 */
+                        uint16_t fbcr;          /* Register offset: 0x100002 */
+                        uint16_t ptmr;          /* Register offset: 0x100004 */
+                        uint16_t ewdr;          /* Register offset: 0x100006 */
+                        uint16_t ewlr;          /* Register offset: 0x100008 */
+                        uint16_t ewrr;          /* Register offset: 0x10000A */
+                        uint16_t endr;          /* Register offset: 0x10000C */
+                        unsigned : 16;          /* Register offset: 0x100010 */
+                        unsigned : 16;          /* Register offset: 0x100012 */
+                        unsigned : 16;          /* Register offset: 0x100014 */
+                        unsigned : 16;          /* Register offset: 0x100016 */
+                };
+        } regs;
+};
+
 struct state_vdp2 {
         uint16_t display_w;
         uint16_t display_h;
@@ -206,6 +226,14 @@ struct state_vdp2 {
                 };
         } regs;
 };
+
+static inline struct state_vdp1 * __attribute__ ((always_inline))
+_state_vdp1(void)
+{
+        extern struct state_vdp1 _internal_state_vdp1;
+
+        return &_internal_state_vdp1;
+}
 
 static inline struct state_vdp2 * __attribute__ ((always_inline))
 _state_vdp2(void)

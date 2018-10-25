@@ -16,6 +16,12 @@
 
 #include "vdp-internal.h"
 
+/* Check if boundaries are correct */
+static_assert((VDP1_CMDT_MEMORY_SIZE +
+               VDP1_GST_MEMORY_SIZE +
+               VDP1_TEXURE_MEMORY_SIZE +
+               VDP1_CLUT_MEMORY_SIZE) == VDP1_VRAM_SIZE);
+
 static void _init_vdp1(void);
 
 static void _init_vdp2(void);
@@ -23,6 +29,10 @@ static void _init_vdp2(void);
 void
 vdp_init(void)
 {
+        /* Reset all buffered registers and initialize to sane values */
+        (void)memset(&_state_vdp1()->regs, 0x00, sizeof(_state_vdp1()->regs));
+        (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
+
         _init_vdp1();
 
         _init_vdp2();
@@ -33,25 +43,23 @@ vdp_init(void)
 static void
 _init_vdp1(void)
 {
-        /* Check if boundaries are correct */
-        static_assert((VDP1_CMDT_MEMORY_SIZE +
-                       VDP1_GST_MEMORY_SIZE +
-                       VDP1_TEXURE_MEMORY_SIZE +
-                       VDP1_CLUT_MEMORY_SIZE) == VDP1_VRAM_SIZE);
+        const struct vdp1_env env = {
+                .env_color = COLOR_RGB555(0, 0, 0),
+                .env_erase_points = {
+                        INT16_VECTOR2_INITIALIZER(0, 0),
+                        INT16_VECTOR2_INITIALIZER(320, 224)
+                },
+                .env_bpp = ENV_BPP_16,
+                .env_rotation = ENV_ROTATION_0,
+                .env_color_mode = ENV_COLOR_MODE_RGB_PALETTE
+        };
 
-        /* Initialize the processor to sane values */
-        MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
+        vdp1_env_set(&env);
 }
 
 static void
 _init_vdp2(void)
 {
-        /* Reset all buffered registers and initialize to sane values */
-        (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
-
         vdp2_tvmd_display_clear();
 
         vdp2_scrn_scroll_x_set(SCRN_NBG0, F16(0.0f));
