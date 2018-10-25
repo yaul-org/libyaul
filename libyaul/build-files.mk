@@ -132,6 +132,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp_sync.c \
 	scu/bus/b/vdp/vdp-internal.c \
 	scu/bus/b/vdp/vdp1_cmdt.c \
+	scu/bus/b/vdp/vdp1_env.c \
 	scu/bus/b/vdp/vdp2_commit.c \
 	scu/bus/b/vdp/vdp2_scrn_back_screen.c \
 	scu/bus/b/vdp/vdp2_scrn_bitmap_format_set.c \
@@ -289,6 +290,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/b/vdp/:vdp.h:yaul/scu/bus/b/vdp/ \
 	./scu/bus/b/vdp/:vdp1.h:yaul/scu/bus/b/vdp/ \
 	./scu/bus/b/vdp/vdp1/:cmdt.h:yaul/scu/bus/b/vdp/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:env.h:yaul/scu/bus/b/vdp/vdp1/ \
 	./scu/bus/b/vdp/vdp1/:map.h:yaul/scu/bus/b/vdp/vdp1/ \
 	./scu/bus/b/vdp/vdp1/:vram.h:yaul/scu/bus/b/vdp/vdp1/ \
 	./scu/bus/b/vdp/:vdp2.h:yaul/scu/bus/b/vdp/ \
