@@ -22,9 +22,6 @@ static void _vdp2_commit_handler(void *);
 
 static void _default_handler(void);
 
-static struct dma_level_cfg _vdp1_dma_cfg;
-static uint8_t _vdp1_dma_reg_buffer[DMA_REG_BUFFER_BYTE_SIZE];
-
 /* VDP1 related state */
 /* Request for VDP1 to draw */
 static volatile bool _state_vdp1_commit = false;
@@ -32,6 +29,10 @@ static volatile bool _state_vdp1_commit = false;
 static volatile bool _state_vdp1_committed = false;
 /* Request to change frame buffer */
 static volatile bool _state_vdp1_change = false;
+/* Keep track of the current command table operation */
+static volatile uint16_t _vdp1_last_command = 0x0000;
+static struct dma_level_cfg _vdp1_dma_cfg;
+static uint8_t _vdp1_dma_reg_buffer[DMA_REG_BUFFER_BYTE_SIZE];
 
 /* VDP2 relate state */
 /* Request for VDP2 to update state */
@@ -53,6 +54,8 @@ static void (*_user_vblank_out_handler)(void);
 void
 vdp_sync_init(void)
 {
+        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END);
+
         _state_vdp1_commit = false;
         _state_vdp1_committed = false;
         _state_vdp1_change = false;
@@ -64,67 +67,50 @@ vdp_sync_init(void)
         _sync = false;
         _interval = 0;
 
+        _vdp1_last_command = 0x0000;
+
         _vblank_in = false;
         _vblank_out = false;
-
-        _vdp1_dma_cfg.dlc_mode = DMA_MODE_DIRECT;
-        _vdp1_dma_cfg.dlc_xfer.direct.len = 0xFFFFFFFF;
-        _vdp1_dma_cfg.dlc_xfer.direct.dst = 0xFFFFFFFF;
-        _vdp1_dma_cfg.dlc_xfer.direct.src = 0xFFFFFFFF;
-        _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
-        _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
-
-        scu_dma_config_buffer(&_vdp1_dma_reg_buffer[0], &_vdp1_dma_cfg);
-
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT);
 
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
 
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
-        scu_ic_mask_chg(~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT), IC_MASK_NONE);
 
         vdp2_commit_handler_set(_vdp2_commit_handler, NULL);
 
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_SPRITE_END);
         scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
-        scu_ic_mask_chg(~IC_MASK_SPRITE_END, IC_MASK_NONE);
+
+        scu_ic_mask_chg(~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END), IC_MASK_NONE);
 }
 
 void
 vdp_sync(int16_t interval)
 {
-        /* If a request for VDP1 to draw has been made, wait until VDP1
-         * has finished drawing */
-        if (_state_vdp1_commit) {
-                while (!_state_vdp1_committed) {
-                }
-
-                _state_vdp1_commit = false;
-                _state_vdp1_committed = false;
-
-                /* Request to change frame buffers */
-                _state_vdp1_change = true;
-        }
+        uint32_t scu_mask;
+        scu_mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT;
 
         /* Enter critical section */
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT);
+        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
+
         assert(!_sync);
         assert(interval >= 0);
 
+        vdp1_sync_draw_wait();
+
         _interval = interval;
         _sync = true;
-        scu_ic_mask_chg(~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT), IC_MASK_NONE);
+        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 
         /* Wait until VDP1 changed frame buffers and wait until VDP2
          * state has been committed. */
         while (_state_vdp1_change || (_state_vdp2_commit && !_state_vdp2_committed)) {
         }
 
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT);
+        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
         _sync = false;
-        scu_ic_mask_chg(~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT), IC_MASK_NONE);
+        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 }
 
 void
@@ -145,9 +131,12 @@ vdp1_sync_draw(const struct vdp1_cmdt *cmdts, uint16_t cmdt_count)
 
         assert(cmdt_count > 0);
 
+        _vdp1_dma_cfg.dlc_mode = DMA_MODE_DIRECT;
         _vdp1_dma_cfg.dlc_xfer.direct.len = cmdt_count * sizeof(struct vdp1_cmdt);
-        _vdp1_dma_cfg.dlc_xfer.direct.dst = CMD_TABLE(0, 0);
+        _vdp1_dma_cfg.dlc_xfer.direct.dst = CMD_TABLE(_vdp1_last_command, 0);
         _vdp1_dma_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&cmdts[0];
+        _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
+        _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
 
         scu_dma_config_buffer(&_vdp1_dma_reg_buffer[0], &_vdp1_dma_cfg);
 
@@ -168,6 +157,10 @@ vdp1_sync_draw_wait(void)
 
         while (!_state_vdp1_committed) {
         }
+
+        _state_vdp1_committed = false;
+        _state_vdp1_commit = false;
+        _state_vdp1_change = true;
 }
 
 void
@@ -185,6 +178,12 @@ vdp2_sync_commit_wait(void)
 {
         while (_state_vdp2_commit && !_state_vdp2_committed) {
         }
+}
+
+uint16_t
+vdp1_sync_last_command_get(void)
+{
+        return _vdp1_last_command;
 }
 
 void
@@ -228,11 +227,16 @@ _vblank_out_handler(void)
 
         if (_sync) {
                 if ((_interval == 0) && _state_vdp1_change) {
-                        /* Manual mode (change) */
+                        /* Force stop drawing */
+                        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
                         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
+                        /* Manual mode (change) */
                         MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
 
                         _state_vdp1_change = false;
+
+                        /* Reset command address to the top */
+                        _vdp1_last_command = 0x0000;
                 }
 
                 if (_interval > 0) {
@@ -246,7 +250,11 @@ _vblank_out_handler(void)
 static void
 _sprite_end_handler(void)
 {
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+        /* Set and get the last operation command address */
+        uint16_t copr_bits;
+        copr_bits = MEMORY_READ(16, VDP1(COPR));
+
+        _vdp1_last_command = copr_bits >> 2;
 
         /* VDP1 request to commit is finished */
         _state_vdp1_committed = true;
