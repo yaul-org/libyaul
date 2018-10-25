@@ -38,6 +38,21 @@ vdp_init(void)
         _init_vdp2();
 
         vdp_sync_init();
+
+        uint8_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
+        struct vdp1_cmdt cmdt_end;
+
+        vdp1_cmdt_end(&cmdt_end);
+
+        vdp1_sync_draw(&cmdt_end, 1);
+        vdp2_sync_commit();
+        vdp_sync(0);
+
+        cpu_intc_mask_set(sr_mask);
 }
 
 static void
