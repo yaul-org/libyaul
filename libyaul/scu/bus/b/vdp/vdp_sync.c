@@ -133,7 +133,7 @@ vdp1_sync_draw(const struct vdp1_cmdt *cmdts, uint16_t cmdt_count)
 
         _vdp1_dma_cfg.dlc_mode = DMA_MODE_DIRECT;
         _vdp1_dma_cfg.dlc_xfer.direct.len = cmdt_count * sizeof(struct vdp1_cmdt);
-        _vdp1_dma_cfg.dlc_xfer.direct.dst = CMD_TABLE(_vdp1_last_command, 0);
+        _vdp1_dma_cfg.dlc_xfer.direct.dst = VDP1_CMD_TABLE(_vdp1_last_command, 0);
         _vdp1_dma_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&cmdts[0];
         _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
         _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
