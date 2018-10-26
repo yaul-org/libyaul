@@ -73,11 +73,6 @@ struct vdp1_cmdt_gst {
 } __aligned(8);
 
 struct vdp1_cmdt_sprite {
-#define CMDT_TYPE_NORMAL_SPRITE         0x0000
-#define CMDT_TYPE_SCALED_SPRITE         0x0001
-#define CMDT_TYPE_DISTORTED_SPRITE      0x0002
-        uint16_t cs_type;
-
         union {
 #define CMDT_ZOOM_POINT_UPPER_LEFT      0x0030
 #define CMDT_ZOOM_POINT_UPPER_CENTER    0x0050
@@ -268,7 +263,9 @@ extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
 extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *, uint16_t);
 extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
 
-extern void vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern void vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern void vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern void vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
 extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
 extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
 extern void vdp1_cmdt_line_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
