@@ -175,13 +175,6 @@ vdp2_sync_commit(void)
         vdp2_commit();
 }
 
-void
-vdp2_sync_commit_wait(void)
-{
-        while (_state_vdp2_commit && !_state_vdp2_committed) {
-        }
-}
-
 uint16_t
 vdp1_sync_last_command_get(void)
 {
