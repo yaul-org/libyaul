@@ -44,11 +44,14 @@ vdp_init(void)
 
         cpu_intc_mask_set(0);
 
-        struct vdp1_cmdt cmdt_end;
+        struct vdp1_cmdt_list cmdt_list;
+        struct vdp1_cmdt cmdt;
 
-        vdp1_cmdt_end(&cmdt_end);
+        vdp1_cmdt_list_init(&cmdt_list, &cmdt, 1);
 
-        vdp1_sync_draw(&cmdt_end, 1);
+        vdp1_cmdt_end(&cmdt_list);
+
+        vdp1_sync_draw(&cmdt_list);
         vdp2_sync_commit();
         vdp_sync(0);
 

@@ -114,13 +114,12 @@ vdp_sync(int16_t interval)
 }
 
 void
-vdp1_sync_draw(const struct vdp1_cmdt *cmdts, uint16_t cmdt_count)
+vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 {
-        if (cmdt_count == 0) {
-                return;
-        }
-
-        assert(cmdts != NULL);
+        assert(cmdt_list != NULL);
+        assert(cmdt_list->cmdts != NULL);
+        assert(cmdt_list->cmdt != NULL);
+        assert(cmdt_list->count > 0);
 
         /* If we're trying to issue multiple draw calls while the
          * previous draw call hasn't yet been committed, wait */
@@ -129,12 +128,15 @@ vdp1_sync_draw(const struct vdp1_cmdt *cmdts, uint16_t cmdt_count)
         _state_vdp1_commit = true;
         _state_vdp1_committed = false;
 
-        assert(cmdt_count > 0);
+        uint16_t count;
+        count = cmdt_list->cmdt - cmdt_list->cmdts;
+
+        assert(count <= cmdt_list->count);
 
         _vdp1_dma_cfg.dlc_mode = DMA_MODE_DIRECT;
-        _vdp1_dma_cfg.dlc_xfer.direct.len = cmdt_count * sizeof(struct vdp1_cmdt);
+        _vdp1_dma_cfg.dlc_xfer.direct.len = count * sizeof(struct vdp1_cmdt);
         _vdp1_dma_cfg.dlc_xfer.direct.dst = VDP1_CMD_TABLE(_vdp1_last_command, 0);
-        _vdp1_dma_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&cmdts[0];
+        _vdp1_dma_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts;
         _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
         _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
 

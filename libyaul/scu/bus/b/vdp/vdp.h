@@ -27,7 +27,7 @@ extern void vdp_init(void);
 
 extern void vdp_sync_init(void);
 extern void vdp_sync(int16_t);
-extern void vdp1_sync_draw(const struct vdp1_cmdt *, uint16_t);
+extern void vdp1_sync_draw(const struct vdp1_cmdt_list *);
 extern void vdp1_sync_draw_wait(void);
 extern void vdp2_sync_commit(void);
 extern void vdp2_sync_commit_wait(void);
