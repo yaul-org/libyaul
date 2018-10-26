@@ -58,6 +58,16 @@ vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts, u
 }
 
 void
+vdp1_cmdt_list_reset(struct vdp1_cmdt_list *cmdt_list)
+{
+        assert(cmdt_list != NULL);
+        assert(cmdts != NULL);
+        assert(count > 0);
+
+        cmdt_list->cmdt = cmdt_list->cmdts;
+}
+
+void
 vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
