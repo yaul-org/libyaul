@@ -6,19 +6,66 @@
  */
 
 #include <assert.h>
-#include <stdbool.h>
-#include <string.h>
 #include <math.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <vdp1/cmdt.h>
 #include <vdp1/vram.h>
 
 #include "vdp-internal.h"
 
-struct vdp1_cmdt *
-vdp1_cmdt_sprite_draw(struct vdp1_cmdt *cmdt,
+static inline void __attribute__ ((always_inline)) _cmdt_list_assert(const struct vdp1_cmdt_list *);
+
+struct vdp1_cmdt_list *
+vdp1_cmdt_list_alloc(uint16_t count)
+{
+        assert(count > 0);
+
+        struct vdp1_cmdt_list *cmdt_list;
+        cmdt_list = malloc(sizeof(struct vdp1_cmdt_list));
+        assert(cmdt_list != NULL);
+
+        struct vdp1_cmdt *cmdts;
+        cmdts = malloc(count * sizeof(struct vdp1_cmdt));
+        assert(cmdts != NULL);
+
+        vdp1_cmdt_list_init(cmdt_list, cmdts, count);
+
+        return cmdt_list;
+}
+
+void
+vdp1_cmdt_list_free(struct vdp1_cmdt_list *cmdt_list)
+{
+        assert(cmdt_list != NULL);
+
+        free(cmdt_list->cmdts);
+        free(cmdt_list);
+}
+
+void
+vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts, uint16_t count)
+{
+        assert(cmdt_list != NULL);
+        assert(cmdts != NULL);
+        assert(count > 0);
+
+        cmdt_list->cmdts = cmdts;
+        cmdt_list->cmdt = cmdt_list->cmdts;
+        cmdt_list->count = count;
+}
+
+void
+vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         bool scale;
         uint16_t zp;
 
@@ -99,13 +146,18 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt *cmdt,
          * mode is specified */
         cmdt->cmd_grda = (sprite->cs_grad >> 3) & 0xFFFF;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_polygon_draw(struct vdp1_cmdt *cmdt,
+void
+vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polygon *polygon)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl = 0x0004;
         /* Force bit 6 and 7 to be set */
         cmdt->cmd_pmod = polygon->cp_mode.raw | 0x00C0;
@@ -135,13 +187,18 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt *cmdt,
          * mode is specified */
         cmdt->cmd_grda = (polygon->cp_grad >> 3) & 0xFFFF;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_polyline_draw(struct vdp1_cmdt *cmdt,
+void
+vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polyline *polyline)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
@@ -159,13 +216,18 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt *cmdt,
          * mode is specified */
         cmdt->cmd_grda = (polyline->cl_grad >> 3) & 0xFFFF;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_line_draw(struct vdp1_cmdt *cmdt,
+void
+vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_line *line)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
@@ -179,13 +241,18 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt *cmdt,
          * mode is specified */
         cmdt->cmd_grda = (line->cl_grad >> 3) & 0xFFFF;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *cmdt,
+void
+vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_user_clip_coord *user_clip)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         int16_t x0;
         x0 = user_clip->ucc_coords[0].x;
 
@@ -208,37 +275,63 @@ vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *cmdt,
         cmdt->cmd_xc = x1 & 0x01FF;
         cmdt->cmd_yc = y1 & 0x00FF;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *cmdt,
+void
+vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_system_clip_coord *system_clip)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xc = system_clip->scc_coord.x;
         cmdt->cmd_yc = system_clip->scc_coord.y;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_local_coord_set(struct vdp1_cmdt *cmdt,
-    struct vdp1_cmdt_local_coord *local)
+void
+vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *cmdt_list,
+    const struct vdp1_cmdt_local_coord *local)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xa = local->lc_coord.x;
         cmdt->cmd_ya = local->lc_coord.y;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_end(struct vdp1_cmdt *cmdt)
+void
+vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
 {
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
         cmdt->cmd_ctrl |= 0x8000;
 
-        return cmdt + 1;
+        cmdt_list->cmdt++;
+}
+
+static inline void __attribute__ ((always_inline))
+_cmdt_list_assert(const struct vdp1_cmdt_list *cmdt_list)
+{
+        assert(cmdt_list != NULL);
+        assert(cmdt_list->cmdts != NULL);
+        assert(cmdt_list->cmdt != NULL);
+        assert(cmdt_list->cmdt >= cmdt_list->cmdts);
+        assert(cmdt_list->count > 0);
+        assert((uint16_t)((cmdt_list->cmdt + 1) - cmdt_list->cmdts) <= cmdt_list->count);
 }
