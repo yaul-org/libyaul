@@ -16,6 +16,8 @@
 
 #include "vdp-internal.h"
 
+static inline void __attribute__ ((always_inline)) _cmdt_cmd_grda_set(struct vdp1_cmdt *, uint32_t);
+
 static inline void __attribute__ ((always_inline)) _cmdt_list_assert(const struct vdp1_cmdt_list *);
 
 struct vdp1_cmdt_list *
@@ -152,9 +154,7 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_size = (((sprite->cs_width >> 3) << 8) |
             sprite->cs_height) & 0x3FFF;
 
-        /* Gouraud shading processing is valid when a color calculation
-         * mode is specified */
-        cmdt->cmd_grda = (sprite->cs_grad >> 3) & 0xFFFF;
+        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
         cmdt_list->cmdt++;
 }
@@ -169,9 +169,9 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt->cmd_ctrl = 0x0004;
+        cmdt->cmd_link = 0x0000;
         /* Force bit 6 and 7 to be set */
         cmdt->cmd_pmod = polygon->cp_mode.raw | 0x00C0;
-        cmdt->cmd_link = 0x0000;
         cmdt->cmd_colr = polygon->cp_color;
 
         /*-
@@ -193,9 +193,7 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xd = polygon->cp_vertex.d.x;
         cmdt->cmd_yd = polygon->cp_vertex.d.y;
 
-        /* Gouraud shading processing is valid when a color calculation
-         * mode is specified */
-        cmdt->cmd_grda = (polygon->cp_grad >> 3) & 0xFFFF;
+        _cmdt_cmd_grda_set(cmdt, sprite->cp_grad);
 
         cmdt_list->cmdt++;
 }
@@ -210,8 +208,8 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt->cmd_ctrl = 0x0005;
-        cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
+        cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
         cmdt->cmd_colr = polyline->cl_color;
         /* CCW starting from vertex D */
         cmdt->cmd_xd = polyline->cl_vertex.d.x;
@@ -222,9 +220,8 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_yb = polyline->cl_vertex.b.y;
         cmdt->cmd_xc = polyline->cl_vertex.c.x;
         cmdt->cmd_yc = polyline->cl_vertex.c.y;
-        /* Gouraud shading processing is valid when a color calculation
-         * mode is specified */
-        cmdt->cmd_grda = (polyline->cl_grad >> 3) & 0xFFFF;
+
+        _cmdt_cmd_grda_set(cmdt, sprite->cl_grad);
 
         cmdt_list->cmdt++;
 }
@@ -239,17 +236,16 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt->cmd_ctrl = 0x0006;
-        cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
         cmdt->cmd_link = 0x0000;
+        cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
         cmdt->cmd_colr = line->cl_color;
         /* CCW starting from vertex D */
         cmdt->cmd_xa = line->cl_vertex.a.x;
         cmdt->cmd_ya = line->cl_vertex.a.y;
         cmdt->cmd_xb = line->cl_vertex.b.x;
         cmdt->cmd_yb = line->cl_vertex.b.y;
-        /* Gouraud shading processing is valid when a color calculation
-         * mode is specified */
-        cmdt->cmd_grda = (line->cl_grad >> 3) & 0xFFFF;
+
+        _cmdt_cmd_grda_set(cmdt, sprite->cl_grad);
 
         cmdt_list->cmdt++;
 }
@@ -278,6 +274,7 @@ vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
         assert(((x0 <= x1) && (y0 <= y1)));
 
         cmdt->cmd_ctrl = 0x0008;
+        cmdt->cmd_link = 0x0000;
         /* Upper-left (x1, y1) */
         cmdt->cmd_xa = x0 & 0x01FF;
         cmdt->cmd_ya = y0 & 0x00FF;
@@ -331,8 +328,17 @@ vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
         cmdt = cmdt_list->cmdt;
 
         cmdt->cmd_ctrl |= 0x8000;
+        cmdt->cmd_link = 0x0000;
 
         cmdt_list->cmdt++;
+}
+
+static inline void __attribute__ ((always_inline))
+_cmdt_cmd_grda_set(struct vdp1_cmdt *cmdt, uint32_t grad)
+{
+        /* Gouraud shading processing is valid when a color calculation
+         * mode is specified */
+        cmdt->cmd_grda = (grad >> 3) & 0xFFFF;
 }
 
 static inline void __attribute__ ((always_inline))
