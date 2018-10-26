@@ -17,6 +17,9 @@
 #include "vdp-internal.h"
 
 static inline void __attribute__ ((always_inline)) _cmdt_cmd_grda_set(struct vdp1_cmdt *, uint32_t);
+static inline void __attribute__ ((always_inline)) _cmdt_cmd_colr_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+static inline void __attribute__ ((always_inline)) _cmdt_cmd_srca_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+static inline void __attribute__ ((always_inline)) _cmdt_cmd_size_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
 
 static inline void __attribute__ ((always_inline)) _cmdt_list_assert(const struct vdp1_cmdt_list *);
 
@@ -63,14 +66,14 @@ void
 vdp1_cmdt_list_reset(struct vdp1_cmdt_list *cmdt_list)
 {
         assert(cmdt_list != NULL);
-        assert(cmdts != NULL);
-        assert(count > 0);
+        assert(cmdt_list->cmdts != NULL);
+        assert(cmdt_list->count > 0);
 
         cmdt_list->cmdt = cmdt_list->cmdts;
 }
 
 void
-vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
+vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
         _cmdt_list_assert(cmdt_list);
@@ -78,82 +81,86 @@ vdp1_cmdt_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
 
-        bool scale;
-        uint16_t zp;
-
-        switch (sprite->cs_type) {
-        case CMDT_TYPE_NORMAL_SPRITE:
-                cmdt->cmd_ctrl = 0x0000;
-
-                cmdt->cmd_pmod = (sprite->cs_mode.raw & 0x9FFF) ^ 0x00C0;
-
-                cmdt->cmd_xa = sprite->cs_position.x;
-                cmdt->cmd_ya = sprite->cs_position.y;
-                break;
-        case CMDT_TYPE_SCALED_SPRITE:
-                zp = sprite->cs_zoom_point.enable
-                    ? dlog2(sprite->cs_zoom_point.raw & ~0x0010)
-                    : 0x0000;
-
-                cmdt->cmd_ctrl = (zp << 8) | 0x0001;
-                cmdt->cmd_pmod = sprite->cs_mode.raw;
-
-                scale = zp == 0x0000;
-                if (scale) {
-                        /* Scale with two vertices, A and C. No zoom point */
-                        cmdt->cmd_xa = sprite->cs_vertex.a.x;
-                        cmdt->cmd_ya = sprite->cs_vertex.a.y;
-                        cmdt->cmd_xc = sprite->cs_vertex.c.x;
-                        cmdt->cmd_yc = sprite->cs_vertex.c.y;
-                } else {
-                        cmdt->cmd_xa = sprite->cs_zoom.point.x;
-                        cmdt->cmd_ya = sprite->cs_zoom.point.y;
-                        cmdt->cmd_xb = sprite->cs_zoom.display.x;
-                        cmdt->cmd_yb = sprite->cs_zoom.display.y;
-                }
-                break;
-        case CMDT_TYPE_DISTORTED_SPRITE:
-                cmdt->cmd_ctrl = 0x0002;
-                cmdt->cmd_pmod = sprite->cs_mode.raw;
-
-                /* CCW starting from vertex D */
-                cmdt->cmd_xd = sprite->cs_vertex.d.x;
-                cmdt->cmd_yd = sprite->cs_vertex.d.y;
-                cmdt->cmd_xa = sprite->cs_vertex.a.x;
-                cmdt->cmd_ya = sprite->cs_vertex.a.y;
-                cmdt->cmd_xb = sprite->cs_vertex.b.x;
-                cmdt->cmd_yb = sprite->cs_vertex.b.y;
-                cmdt->cmd_xc = sprite->cs_vertex.c.x;
-                cmdt->cmd_yc = sprite->cs_vertex.c.y;
-                break;
-        }
-
+        cmdt->cmd_ctrl = 0x0000;
         cmdt->cmd_link = 0x0000;
 
-        switch (sprite->cs_mode.color_mode) {
-        case 0:
-                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFF0;
-                break;
-        case 1:
-                cmdt->cmd_colr = (uint16_t)((sprite->cs_clut >> 3) & 0xFFFF);
-                break;
-        case 2:
-                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFC0;
-                break;
-        case 3:
-                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF80;
-                break;
-        case 4:
-                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF00;
-                break;
-        case 5:
-                break;
+        cmdt->cmd_pmod = (sprite->cs_mode.raw & 0x9FFF) ^ 0x00C0;
+
+        cmdt->cmd_xa = sprite->cs_position.x;
+        cmdt->cmd_ya = sprite->cs_position.y;
+
+        _cmdt_cmd_colr_set(cmdt, sprite);
+        _cmdt_cmd_srca_set(cmdt, sprite);
+        _cmdt_cmd_size_set(cmdt, sprite);
+        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
+
+        cmdt_list->cmdt++;
+}
+
+void
+vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
+    const struct vdp1_cmdt_sprite *sprite)
+{
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
+        uint16_t zp;
+        zp = (sprite->cs_zoom_point.enable)
+            ? dlog2(sprite->cs_zoom_point.raw & ~0x0010)
+            : 0x0000;
+
+        cmdt->cmd_ctrl = (zp << 8) | 0x0001;
+        cmdt->cmd_link = 0x0000;
+        cmdt->cmd_pmod = sprite->cs_mode.raw;
+
+        if (sprite->cs_zoom_point.enable) {
+                /* Scale with two vertices, A and C. No zoom point */
+                cmdt->cmd_xa = sprite->cs_vertex.a.x;
+                cmdt->cmd_ya = sprite->cs_vertex.a.y;
+                cmdt->cmd_xc = sprite->cs_vertex.c.x;
+                cmdt->cmd_yc = sprite->cs_vertex.c.y;
+        } else {
+                cmdt->cmd_xa = sprite->cs_zoom.point.x;
+                cmdt->cmd_ya = sprite->cs_zoom.point.y;
+                cmdt->cmd_xb = sprite->cs_zoom.display.x;
+                cmdt->cmd_yb = sprite->cs_zoom.display.y;
         }
 
-        cmdt->cmd_srca = (sprite->cs_char >> 3) & 0xFFFF;
-        cmdt->cmd_size = (((sprite->cs_width >> 3) << 8) |
-            sprite->cs_height) & 0x3FFF;
+        _cmdt_cmd_colr_set(cmdt, sprite);
+        _cmdt_cmd_srca_set(cmdt, sprite);
+        _cmdt_cmd_size_set(cmdt, sprite);
+        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
+        cmdt_list->cmdt++;
+}
+
+void
+vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
+    const struct vdp1_cmdt_sprite *sprite)
+{
+        _cmdt_list_assert(cmdt_list);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = cmdt_list->cmdt;
+
+        cmdt->cmd_ctrl = 0x0002;
+        cmdt->cmd_pmod = sprite->cs_mode.raw;
+
+        /* CCW starting from vertex D */
+        cmdt->cmd_xd = sprite->cs_vertex.d.x;
+        cmdt->cmd_yd = sprite->cs_vertex.d.y;
+        cmdt->cmd_xa = sprite->cs_vertex.a.x;
+        cmdt->cmd_ya = sprite->cs_vertex.a.y;
+        cmdt->cmd_xb = sprite->cs_vertex.b.x;
+        cmdt->cmd_yb = sprite->cs_vertex.b.y;
+        cmdt->cmd_xc = sprite->cs_vertex.c.x;
+        cmdt->cmd_yc = sprite->cs_vertex.c.y;
+
+        _cmdt_cmd_colr_set(cmdt, sprite);
+        _cmdt_cmd_srca_set(cmdt, sprite);
+        _cmdt_cmd_size_set(cmdt, sprite);
         _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
         cmdt_list->cmdt++;
@@ -193,7 +200,7 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xd = polygon->cp_vertex.d.x;
         cmdt->cmd_yd = polygon->cp_vertex.d.y;
 
-        _cmdt_cmd_grda_set(cmdt, sprite->cp_grad);
+        _cmdt_cmd_grda_set(cmdt, polygon->cp_grad);
 
         cmdt_list->cmdt++;
 }
@@ -221,7 +228,7 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xc = polyline->cl_vertex.c.x;
         cmdt->cmd_yc = polyline->cl_vertex.c.y;
 
-        _cmdt_cmd_grda_set(cmdt, sprite->cl_grad);
+        _cmdt_cmd_grda_set(cmdt, polyline->cl_grad);
 
         cmdt_list->cmdt++;
 }
@@ -245,7 +252,7 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xb = line->cl_vertex.b.x;
         cmdt->cmd_yb = line->cl_vertex.b.y;
 
-        _cmdt_cmd_grda_set(cmdt, sprite->cl_grad);
+        _cmdt_cmd_grda_set(cmdt, line->cl_grad);
 
         cmdt_list->cmdt++;
 }
@@ -339,6 +346,51 @@ _cmdt_cmd_grda_set(struct vdp1_cmdt *cmdt, uint32_t grad)
         /* Gouraud shading processing is valid when a color calculation
          * mode is specified */
         cmdt->cmd_grda = (grad >> 3) & 0xFFFF;
+}
+
+static inline void __attribute__ ((always_inline))
+_cmdt_cmd_colr_set(struct vdp1_cmdt *cmdt,
+    const struct vdp1_cmdt_sprite *sprite)
+{
+        switch (sprite->cs_mode.color_mode) {
+        case 0:
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFF0;
+                break;
+        case 1:
+                cmdt->cmd_colr = (uint16_t)((sprite->cs_clut >> 3) & 0xFFFF);
+                break;
+        case 2:
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFFC0;
+                break;
+        case 3:
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF80;
+                break;
+        case 4:
+                cmdt->cmd_colr = sprite->cs_color_bank.raw & 0xFF00;
+                break;
+        case 5:
+                break;
+        }
+}
+
+static inline void __attribute__ ((always_inline))
+_cmdt_cmd_srca_set(struct vdp1_cmdt *cmdt,
+    const struct vdp1_cmdt_sprite *sprite)
+{
+        cmdt->cmd_srca = (sprite->cs_char >> 3) & 0xFFFF;
+}
+
+static inline void __attribute__ ((always_inline))
+_cmdt_cmd_size_set(struct vdp1_cmdt *cmdt,
+    const struct vdp1_cmdt_sprite *sprite)
+{
+        uint16_t width;
+        width = sprite->cs_width;
+
+        uint16_t height;
+        height = sprite->cs_height;
+
+        cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
 }
 
 static inline void __attribute__ ((always_inline))
