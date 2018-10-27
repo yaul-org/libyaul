@@ -12,7 +12,7 @@
 void
 vdp2_tvmd_display_clear(void)
 {
-        _state_vdp2()->regs.tvmd &= 0x7FFF;
+        _state_vdp2()->regs.tvmd &= 0x7EFF;
 
         /* Change the DISP bit during VBLANK */
         vdp2_tvmd_vblank_in_wait();
