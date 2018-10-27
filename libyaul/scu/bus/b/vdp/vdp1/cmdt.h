@@ -10,9 +10,11 @@
 
 #include <sys/cdefs.h>
 
+#include <stdint.h>
+
 #include <vdp2/sprite.h>
 
-#include <stdint.h>
+#include <color.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,7 +173,7 @@ struct vdp1_cmdt_sprite {
 struct vdp1_cmdt_polygon {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cp);
 
-        uint16_t cp_color;
+        color_rgb555_t cp_color;
 
         union {
                 struct {
@@ -192,7 +194,7 @@ struct vdp1_cmdt_polygon {
 struct vdp1_cmdt_polyline {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
-        uint16_t cl_color;
+        color_rgb555_t cl_color;
 
         union {
                 struct {
@@ -213,7 +215,7 @@ struct vdp1_cmdt_polyline {
 struct vdp1_cmdt_line {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
-        uint16_t cl_color;
+        color_rgb555_t cl_color;
 
         union {
                 struct {

@@ -45,6 +45,7 @@ void
 vdp1_cmdt_list_free(struct vdp1_cmdt_list *cmdt_list)
 {
         assert(cmdt_list != NULL);
+        assert(cmdt_list->cmdts != NULL);
 
         free(cmdt_list->cmdts);
         free(cmdt_list);
@@ -179,7 +180,7 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_link = 0x0000;
         /* Force bit 6 and 7 to be set */
         cmdt->cmd_pmod = polygon->cp_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polygon->cp_color;
+        cmdt->cmd_colr = polygon->cp_color.raw;
 
         /*-
          * CCW starting from vertex D
@@ -217,7 +218,7 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polyline->cl_color;
+        cmdt->cmd_colr = polyline->cl_color.raw;
         /* CCW starting from vertex D */
         cmdt->cmd_xd = polyline->cl_vertex.d.x;
         cmdt->cmd_yd = polyline->cl_vertex.d.y;
@@ -245,7 +246,7 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
-        cmdt->cmd_colr = line->cl_color;
+        cmdt->cmd_colr = line->cl_color.raw;
         /* CCW starting from vertex D */
         cmdt->cmd_xa = line->cl_vertex.a.x;
         cmdt->cmd_ya = line->cl_vertex.a.y;
