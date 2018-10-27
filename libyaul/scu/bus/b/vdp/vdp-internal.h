@@ -41,10 +41,10 @@ struct state_vdp1 {
 };
 
 struct state_vdp2 {
-        uint16_t display_w;
-        uint16_t display_h;
-
-        uint16_t interlaced;
+        struct {
+                int16_vector2_t resolution;
+                uint8_t interlace;
+        } tv;
 
         struct {
                 fix16_vector2_t scroll;

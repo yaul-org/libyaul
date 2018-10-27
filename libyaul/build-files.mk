@@ -154,9 +154,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_scrn_vcs_set.c \
 	scu/bus/b/vdp/vdp2_sprite_priority_set.c \
 	scu/bus/b/vdp/vdp2_sprite_type_set.c \
-	scu/bus/b/vdp/vdp2_tvmd_display_clear.c \
-	scu/bus/b/vdp/vdp2_tvmd_display_res_set.c \
-	scu/bus/b/vdp/vdp2_tvmd_display_set.c \
+	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
 	\
 	scu/bus/cpu/cpu_divu.c \

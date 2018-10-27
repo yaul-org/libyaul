@@ -114,6 +114,7 @@ vdp2_tvmd_tv_standard_get(void)
 }
 
 extern void vdp2_tvmd_display_clear(void);
+extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
 extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
 extern void vdp2_tvmd_display_set(void);
 
