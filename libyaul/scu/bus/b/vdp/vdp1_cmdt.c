@@ -284,11 +284,11 @@ vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0008;
         cmdt->cmd_link = 0x0000;
         /* Upper-left (x1, y1) */
-        cmdt->cmd_xa = x0 & 0x01FF;
-        cmdt->cmd_ya = y0 & 0x00FF;
+        cmdt->cmd_xa = x0 & 0x03FF;
+        cmdt->cmd_ya = y0 & 0x01FF;
         /* Lower-right (x2, y2) */
-        cmdt->cmd_xc = x1 & 0x01FF;
-        cmdt->cmd_yc = y1 & 0x00FF;
+        cmdt->cmd_xc = x1 & 0x03FF;
+        cmdt->cmd_yc = y1 & 0x01FF;
 
         cmdt_list->cmdt++;
 }
