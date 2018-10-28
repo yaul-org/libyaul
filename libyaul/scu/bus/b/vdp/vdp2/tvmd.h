@@ -36,6 +36,9 @@ extern "C" {
 #define TVMD_TV_STANDARD_NTSC   0
 #define TVMD_TV_STANDARD_PAL    1
 
+#define TVMD_TV_FIELD_SCAN_EVEN 0
+#define TVMD_TV_FIELD_SCAN_ODD  1
+
 #define TVMD_INTERLACE_NONE     0
 #define TVMD_INTERLACE_SINGLE   1
 #define TVMD_INTERLACE_DOUBLE   2
@@ -111,6 +114,12 @@ static inline uint16_t __attribute__ ((always_inline))
 vdp2_tvmd_tv_standard_get(void)
 {
         return MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001;
+}
+
+static inline uint8_t __attribute__ ((always_inline))
+vdp2_tvmd_field_scan_get(void)
+{
+        return (MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001;
 }
 
 extern void vdp2_tvmd_display_clear(void);
