@@ -10,6 +10,8 @@
 #include <vdp1/env.h>
 #include <vdp1/map.h>
 
+#include <vdp2/tvmd.h>
+
 #include "vdp-internal.h"
 
 void
@@ -48,7 +50,7 @@ vdp1_env_set(const struct vdp1_env *env)
         uint16_t x1;
         x1 = env->env_erase_points[0].x >> 3;
         uint16_t x3;
-        x3 = env->env_erase_points[1].x >> 3;
+        x3 = (env->env_erase_points[1].x + 1) >> 3;
 
         uint16_t y1;
         y1 = env->env_erase_points[0].y;
@@ -58,6 +60,10 @@ vdp1_env_set(const struct vdp1_env *env)
         if (env->env_bpp == ENV_BPP_8) {
                 x1 >>= 1;
                 x3 >>= 1;
+        }
+
+        if (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE) {
+                y3 >>= 1;
         }
 
         _state_vdp1()->regs.ewlr = (x1 << 9) | y1;

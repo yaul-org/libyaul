@@ -21,6 +21,10 @@
 #define COMMIT_XFER_BACK_SCREEN_BUFFER  2
 
 struct state_vdp1 {
+        struct {
+                int16_t interlace_pass;
+        } tv;
+
         union {
                 uint16_t buffer[11];
 

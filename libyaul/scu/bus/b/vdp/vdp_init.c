@@ -72,12 +72,18 @@ _init_vdp1(void)
                 .env_color_mode = ENV_COLOR_MODE_RGB_PALETTE
         };
 
+        _state_vdp1()->tv.interlace_pass = 0;
+
         vdp1_env_set(&env);
 }
 
 static void
 _init_vdp2(void)
 {
+        _state_vdp2()->tv.resolution.x = 0;
+        _state_vdp2()->tv.resolution.y = 0;
+        _state_vdp2()->tv.interlace = TVMD_INTERLACE_NONE;
+
         vdp2_tvmd_display_clear();
 
         vdp2_scrn_scroll_x_set(SCRN_NBG0, F16(0.0f));
@@ -95,7 +101,7 @@ _init_vdp2(void)
         vdp2_scrn_priority_set(SCRN_NBG3, 1);
         vdp2_scrn_priority_set(SCRN_RBG0, 1);
 
-        vdp2_sprite_type_set(0);
+        vdp2_sprite_type_set(0x0);
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
         vdp2_sprite_priority_set(2, 0);

@@ -158,6 +158,13 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         /* Update state */
         _state_vdp2()->tv.resolution.x = width;
         _state_vdp2()->tv.resolution.y = height;
+
+        /* Reset the VDP1 interlace pass if the interlace mode has
+         * changed from none to double, or double to none/single */
+        if (_state_vdp2()->tv.interlace != interlace) {
+                _state_vdp1()->tv.interlace_pass = 0;
+        }
+
         _state_vdp2()->tv.interlace = interlace;
 
         /* If clock frequency is not set, change to the correct
