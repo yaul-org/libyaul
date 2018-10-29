@@ -49,6 +49,8 @@ vdp1_env_set(const struct vdp1_env *env)
 
         uint16_t x1;
         x1 = env->env_erase_points[0].x >> 3;
+        /* Add 1 to compensate for the hardware substracting one after
+         * shifting to the left by 3 */
         uint16_t x3;
         x3 = (env->env_erase_points[1].x + 1) >> 3;
 
@@ -63,6 +65,7 @@ vdp1_env_set(const struct vdp1_env *env)
         }
 
         if (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE) {
+                y1 >>= 1;
                 y3 >>= 1;
         }
 
