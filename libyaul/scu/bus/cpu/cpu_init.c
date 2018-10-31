@@ -99,7 +99,7 @@ cpu_init(void)
         cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
 }
 
-static void __noreturn
+static void __noreturn __used 
 _ihr_exception_illegal_instruction(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal instruction");
@@ -107,7 +107,7 @@ _ihr_exception_illegal_instruction(struct cpu_registers *regs)
         _internal_exception_show(_buffer);
 }
 
-static void __noreturn
+static void __noreturn __used 
 _ihr_exception_illegal_slot(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "Illegal slot");
@@ -115,7 +115,7 @@ _ihr_exception_illegal_slot(struct cpu_registers *regs)
         _internal_exception_show(_buffer);
 }
 
-static void __noreturn
+static void __noreturn __used 
 _ihr_exception_cpu_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "CPU address error");
@@ -123,7 +123,7 @@ _ihr_exception_cpu_address_error(struct cpu_registers *regs)
         _internal_exception_show(_buffer);
 }
 
-static void __noreturn
+static void __noreturn __used 
 _ihr_exception_dma_address_error(struct cpu_registers *regs)
 {
         _format_exception_message(regs, _buffer, "DMA address error");
