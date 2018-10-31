@@ -78,6 +78,7 @@ LIB_SRCS+= \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
 	lib/stdlib/realloc.c \
+	lib/stdlib/abs.c \
 	\
 	kernel/vfs/fs/iso9660/iso9660.c \
 	\
