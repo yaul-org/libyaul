@@ -52,7 +52,7 @@ vdp1_mode_status_get(struct vdp1_mode_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        *status = *(volatile struct vdp1_mode_status *)VDP1(MODR);
+        *status = *(struct vdp1_mode_status *)VDP1(MODR);
 }
 
 static inline void __attribute__ ((always_inline))
@@ -60,7 +60,7 @@ vdp1_transfer_status_get(struct vdp1_transfer_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        *status = *(volatile struct vdp1_transfer_status *)VDP1(EDSR);
+        *status = *(struct vdp1_transfer_status *)VDP1(EDSR);
 }
 
 #ifdef __cplusplus

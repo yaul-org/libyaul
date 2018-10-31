@@ -130,7 +130,7 @@ _slave_init(void)
 
 SLAVE_ENTRY_TRAMPOLINE_EMIT(polling);
 
-static void __noreturn __aligned(16)
+static void __noreturn __aligned(16) __used 
 _slave_polling_entry(void)
 {
         _slave_init();
@@ -144,7 +144,7 @@ _slave_polling_entry(void)
 
 SLAVE_ENTRY_TRAMPOLINE_EMIT(ici);
 
-static void __noreturn
+static void __noreturn __used 
 _slave_ici_entry(void)
 {
         _slave_init();

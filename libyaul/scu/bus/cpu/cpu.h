@@ -25,6 +25,12 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern void cpu_init(void);
+extern void _slave_polling_entry(void);
+extern void _slave_ici_entry(void);
+extern void _exception_illegal_instruction(void);
+extern void _exception_illegal_slot(void);
+extern void _exception_cpu_address_error(void);
+extern void _exception_dma_address_error(void);
 
 #ifdef __cplusplus
 }
