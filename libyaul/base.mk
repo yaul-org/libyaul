@@ -1,33 +1,33 @@
 # -*- mode: makefile -*-
 
-SUB_BUILD:=$(BUILD)/lib$(TARGET)
+SUB_BUILD:=$(YAUL_BUILD)/lib$(TARGET)
 
-LIB_FILE_base:= $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
+LIB_FILE_base:= $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
 
 LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.sx,%.o,$(LIB_SRCS)))
 LIB_DEPS:= $(LIB_OBJS:.o=.d)
 
-LIB_OBJS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
-LIB_DEPS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
+LIB_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
+LIB_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
 
 SUPPORT_OBJS:= $(patsubst %.c,%.o,$(patsubst %.cxx,%.o,$(patsubst %.sx,%.o,$(SUPPORT_SRCS))))
 SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 
-SUPPORT_OBJS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS))
-SUPPORT_DEPS_base:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_DEPS))
+SUPPORT_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS))
+SUPPORT_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_DEPS))
 
-LDSCRIPTS_all:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
+LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
 BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
 
 define macro-generate-install-file-rule
-$(INSTALL_ROOT)/$3/$2: $1
+$(YAUL_INSTALL_ROOT)/$3/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
 	@mkdir -p $$(@D)
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
-install-$4: $4 $(INSTALL_ROOT)/$3/$2
+install-$4: $4 $(YAUL_INSTALL_ROOT)/$3/$2
 endef
 
 .PHONY: all $(TYPE) install-$(TYPE)
@@ -36,28 +36,28 @@ endef
 
 all: $(TYPE)
 
-$(TYPE): $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(LDSCRIPTS_all) $(SPECS_all)
+$(TYPE): $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(LDSCRIPTS_all) $(SPECS_all)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
 	$(ECHO)mkdir -p $@
 
 $(LIB_FILE_base): $(LIB_OBJS_base)
 	$(call macro-sh-build-library)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
 	$(call macro-sh-build-object,$(TYPE))
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 	$(call macro-sh-build-c++-object,$(TYPE))
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
 
-$(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(PREFIX)'/'$(SH_ARCH)'"); \
+	    sub(/\$$INSTALL_ROOT/,"'$(YAUL_PREFIX)'/'$(SH_ARCH)'"); \
 	} \
 	{ print }' > $@
 
@@ -89,8 +89,8 @@ $(foreach USER_FILE,$(USER_FILES_all), \
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
 clean:
-	$(ECHO)if [ -d $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
-		$(FIND) $(BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
+	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
+		$(FIND) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 	$(ECHO)$(RM) $(LIB_FILE_base)
 

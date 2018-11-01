@@ -3,7 +3,7 @@ include ../../env.mk
 TARGET:= ssload
 PROGRAM:= $(TARGET)$(EXE_EXT)
 
-SUB_BUILD:=$(BUILD)/tools/$(TARGET)
+SUB_BUILD:=$(YAUL_BUILD)/tools/$(TARGET)
 
 CFLAGS:= -O2 \
 	-s \
@@ -47,40 +47,40 @@ ifneq ($(strip $(DEBUG)),)
 CFLAGS+= -DDEBUG
 endif
 
-OBJS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
-DEPS:= $(addprefix $(BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
+OBJS:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
+DEPS:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
 
 .PHONY: all clean distclean install
 
-all: $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
+all: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 
-$(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(CC) -o $@ $(OBJS) \
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
 		$(foreach LIB,$(LIBS),-l$(LIB)) \
 		$(LDFLAGS)
 	$(ECHO)$(STRIP) -s $@
 
-$(BUILD_ROOT)/$(SUB_BUILD):
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD):
 	$(ECHO)mkdir -p $@
 
-$(BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/%.o: %.c
+	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(CC) -Wp,-MMD,$(BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
+	$(ECHO)$(CC) -Wp,-MMD,$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$*.d $(CFLAGS) \
 		$(foreach DIR,$(INCLUDES),-I$(DIR)) \
 		-c -o $@ $<
-	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(BUILD_ROOT)/$(SUB_BUILD)/$*.d
+	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$*.d
 
 clean:
-	$(ECHO)$(RM) $(OBJS) $(DEPS) $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
+	$(ECHO)$(RM) $(OBJS) $(DEPS) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 
 distclean: clean
 
-install: $(BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
+install: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(PROGRAM)$(V_END)\n"
-	$(ECHO)mkdir -p $(INSTALL_ROOT)/bin
-	$(ECHO)$(INSTALL) -m 755 $< $(INSTALL_ROOT)/bin/
+	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/bin
+	$(ECHO)$(INSTALL) -m 755 $< $(YAUL_INSTALL_ROOT)/bin/
 
 -include $(DEPS)

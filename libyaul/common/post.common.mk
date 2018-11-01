@@ -98,12 +98,12 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.romdisk: ./romdisk $(ROMDISK_DEPS)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
-	$(ECHO)$(INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
 
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -142,9 +142,9 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 		printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
 	    fi \
 	done
-	$(ECHO)$(INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
-IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
+IP.BIN: $(YAUL_INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
 	$(ECHO)cat $< | awk ' \
 	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
@@ -179,7 +179,7 @@ IP.BIN: $(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
 	' | $(SH_AS) $(SH_AFLAGS) \
-	-I$(INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
+	-I$(YAUL_INSTALL_ROOT)/sh-elf/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(ECHO)$(RM) $($@_TMP_FILE)

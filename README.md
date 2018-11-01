@@ -81,11 +81,11 @@ tool-chain.
 1. Open `.yaul.env` in a text editor and change the following to
    define your environment:
 
-   1. Set the absolute path to the tool-chain in `INSTALL_ROOT`.
+   1. Set the absolute path to the tool-chain in `YAUL_INSTALL_ROOT`.
    2. Set the absolute path to where the `libyaul` source tree is
-      located in `BUILD_ROOT`.
+      located in `YAUL_BUILD_ROOT`.
    3. Set the type of development cart you own in
-      `OPTION_DEV_CARTRIDGE`. If none, set to 0 (zero).
+      `YAUL_OPTION_DEV_CARTRIDGE`. If none, set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.
 

@@ -11,23 +11,23 @@ env:
     - BUILD_ROOT=/tmp
     - BUILD=build
   matrix:
-    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release
-    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug
 
-    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release
-    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug
 
-    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release
-    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug
 
-    - OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=tools
-    - OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=tools
-    - OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=tools
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=tools
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
 
 before_script:
   - docker pull ijacquez/libyaul-tool-chain:1.3
 
 script:
-  - docker run --name "container" -e "TRAVIS_BRANCH=${TRAVIS_BRANCH}" -e "BUILD_TYPE=${BUILD_TYPE}" -e "INSTALL_ROOT=${INSTALL_ROOT}" -e "BUILD_ROOT=${BUILD_ROOT}" -e "BUILD=${BUILD}" -e "OPTION_DEV_CARTRIDGE=${OPTION_DEV_CARTRIDGE}" -t -d ijacquez/libyaul-tool-chain:1.3 sh
+  - docker run --name "container" -e "TRAVIS_BRANCH=${TRAVIS_BRANCH}" -e "BUILD_TYPE=${BUILD_TYPE}" -e "YAUL_INSTALL_ROOT=${YAUL_INSTALL_ROOT}" -e "YAUL_BUILD_ROOT=${YAUL_BUILD_ROOT}" -e "YAUL_BUILD=${YAUL_BUILD}" -e "YAUL_OPTION_DEV_CARTRIDGE=${YAUL_OPTION_DEV_CARTRIDGE}" -t -d ijacquez/libyaul-tool-chain:1.3 sh
   - docker cp .travis/test.sh container:/root/test.sh
   - docker exec container sh -e /root/test.sh
