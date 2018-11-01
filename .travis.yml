@@ -7,9 +7,9 @@ services:
 
 env:
   global:
-    - INSTALL_ROOT=/tool-chains
-    - BUILD_ROOT=/tmp
-    - BUILD=build
+    - YAUL_INSTALL_ROOT=/tool-chains
+    - YAUL_BUILD_ROOT=/tmp
+    - YAUL_BUILD=build
   matrix:
     - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release
     - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug
