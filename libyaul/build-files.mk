@@ -30,7 +30,7 @@ SUPPORT_SRCS:= \
 LIB_SRCS:= \
 	common/internal_exception_show.c
 
-ifneq ($(strip $(OPTION_DEV_CARTRIDGE)),0)
+ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/gdb-ihr.sx \
@@ -83,7 +83,7 @@ LIB_SRCS+= \
 	\
 	kernel/vfs/fs/romdisk/romdisk.c
 
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp_busy_status.c \
 	scu/bus/a/cs0/arp/arp_byte_read.c \
@@ -101,7 +101,7 @@ endif
 LIB_SRCS+= \
 	scu/bus/a/cs0/dram-cart/dram-cart.c
 
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
 	scu/bus/a/cs0/usb-cart/usb-cart.c
 endif
@@ -270,13 +270,13 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/scu/bus/a/cs0/dram-cart/ \
 	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
 
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),2)
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
 INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/arp/:arp.h:yaul/scu/bus/a/cs0/arp/ \
 	./scu/bus/a/cs0/arp/arp/:map.h:yaul/scu/bus/a/cs0/arp/arp/
 endif
 
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),1)
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
 INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/scu/bus/a/cs0/usb-cart/ \
 	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/scu/bus/a/cs0/usb-cart/usb-cart/

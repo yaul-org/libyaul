@@ -12,7 +12,7 @@ define macro-generate-build-rule
 .PHONY: $1-$2
 
 $1-$2:
-	$(ECHO)mkdir -p $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)mkdir -p $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)$2$(V_END)\n"
 	$(ECHO)($(MAKE) -C $1 -f $2.mk $2) || exit $${?}
 endef
@@ -21,8 +21,8 @@ define macro-generate-install-rule
 .PHONY: $1-install-$2
 
 $1-install-$2:
-	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
-	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
+	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
+	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)install-$2$(V_END)\n"
 	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
@@ -30,14 +30,14 @@ endef
 define macro-generate-clean-rule
 .PHONY: $1-clean-$2
 
-$1-clean-$2: $(BUILD_ROOT)/$(BUILD)
+$1-clean-$2: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)clean-$2$(V_END)\n"
 	$(ECHO)($(MAKE) -C $1 -f $2.mk clean) || exit $${?}
 endef
 
 define macro-install
-	$(ECHO)mkdir -p $(INSTALL_ROOT)/lib
-	$(ECHO)mkdir -p $(INSTALL_ROOT)/include
+	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
+	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
 	$(ECHO)for project in $(PROJECTS); do \
 	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
 	    ($(MAKE) -C $${project} -f $<.mk $@) || exit $${?}; \
@@ -46,8 +46,8 @@ endef
 
 define macro-check-toolchain
 	$(ECHO)for tool in $2; do \
-	    printf -- "$(INSTALL_ROOT)/$1/bin/$1-$${tool}$(EXE_EXT)\n"; \
-	    if [ ! -e $(INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
+	    printf -- "$(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool}$(EXE_EXT)\n"; \
+	    if [ ! -e $(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
 		printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
 		exit 1; \
 	    fi; \
@@ -61,6 +61,7 @@ endef
 	install-release \
 	install-debug \
 	distclean \
+	create-pacman-package \
 	clean \
 	clean-release \
 	clean-debug \
@@ -82,13 +83,13 @@ check-toolchain:
 	$(call macro-check-toolchain,sh-elf,as ar ld nm objcopy objdump gcc g++)
 	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
 
-release debug: $(BUILD_ROOT)/$(BUILD)
+release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
 	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
 	    ($(MAKE) -C $${project} -f $@.mk $@) || exit $${?}; \
 	done
 
-$(BUILD_ROOT)/$(BUILD):
+$(YAUL_BUILD_ROOT)/$(YAUL_BUILD):
 	@$(MAKE) -s check-toolchain
 	$(ECHO)mkdir -p $@
 
@@ -103,10 +104,13 @@ install-debug: debug
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
+create-pacman-package:
+	@echo "X"
+
 clean: clean-release clean-debug clean-tools
 
 distclean: clean-examples
-	$(ECHO)$(RM) -r $(BUILD_ROOT)/$(BUILD)
+	$(ECHO)$(RM) -r $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 
 clean-release:
 	$(ECHO)for project in $(PROJECTS); do \

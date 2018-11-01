@@ -19,8 +19,8 @@ panic () {
     exit ${2}
 }
 
-if [ -z "${INSTALL_ROOT}" ]; then
-    panic "Undefined INSTALL_ROOT (install root directory)" 1
+if [ -z "${YAUL_INSTALL_ROOT}" ]; then
+    panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
 fi
 
 tmp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
@@ -44,7 +44,7 @@ symbol="${2}"
 output="${3}"
 
 # Gotta do a different binary target here depending on the target
-(${INSTALL_ROOT}/"${TARGET}"/bin/"${TARGET}"-as ${AFLAGS} \
+(${YAUL_INSTALL_ROOT}/"${TARGET}"/bin/"${TARGET}"-as ${AFLAGS} \
     -o "${tmp3}" || \
     panic "Couldn't assemble file" 1) << EOF
 .SECTION ".${DATA_SECTION}"
@@ -63,9 +63,9 @@ SECTIONS
 }
 EOF
 
-"${INSTALL_ROOT}/${TARGET}/bin/${TARGET}-ld" --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
+"${YAUL_INSTALL_ROOT}/${TARGET}/bin/${TARGET}-ld" --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
     --format "${ARCH}" "${tmp3}" \
     -o "${tmp2}" -r -T "${tmp1}" || panic "Couldn't link file" 1
 
-"${INSTALL_ROOT}/${TARGET}/bin/${TARGET}-objcopy" --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
+"${YAUL_INSTALL_ROOT}/${TARGET}/bin/${TARGET}-objcopy" --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
     "${tmp2}" "${output}" || panic "Couldn't translate object file" 1

@@ -1,10 +1,10 @@
-ifeq ($(strip $(INSTALL_ROOT)),)
-  $(error Undefined INSTALL_ROOT (install root directory))
+ifeq ($(strip $(YAUL_INSTALL_ROOT)),)
+  $(error Undefined YAUL_INSTALL_ROOT (install root directory))
 endif
 
 # Check options
-ifeq ($(strip $(OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined OPTION_DEV_CARTRIDGE (development cartridge option))
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
+  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
 endif
 
 ifeq ($(strip $(SILENT)),)
@@ -49,20 +49,20 @@ ROMDISK_DEPS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
 
-SH_AS:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-as
-SH_AR:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
-SH_CC:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-SH_CXX:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
-SH_LD:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
-SH_NM:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
-SH_OBJCOPY:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
-SH_OBJDUMP:= $(INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
-M68K_AS:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as
-M68K_AR:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar
-M68K_LD:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ld
-M68K_NM:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm
-M68K_OBJCOPY:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy
-M68K_OBJDUMP:= $(INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump
+SH_AS:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-as
+SH_AR:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
+SH_CC:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_CXX:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-g++
+SH_LD:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
+SH_NM:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
+SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
+SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
+M68K_AS:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as
+M68K_AR:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar
+M68K_LD:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ld
+M68K_NM:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm
+M68K_OBJCOPY:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy
+M68K_OBJDUMP:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump
 
 SH_AFLAGS= --fatal-warnings
 SH_CFLAGS= \
@@ -74,7 +74,7 @@ SH_CFLAGS= \
 	-Wstrict-aliasing \
 	-Wno-main \
 	-O2 \
-	-DHAVE_DEV_CARTRIDGE=$(OPTION_DEV_CARTRIDGE) \
+	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1 \
 	-save-temps
