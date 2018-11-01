@@ -57,7 +57,7 @@ $(BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(INSTALL_ROOT)'/'$(SH_ARCH)'"); \
+	    sub(/\$$INSTALL_ROOT/,"'$(PREFIX)'/'$(SH_ARCH)'"); \
 	} \
 	{ print }' > $@
 
