@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include <vdp1/map.h>
+
 #include <vdp2/sprite.h>
 
 #include <color.h>
@@ -259,6 +261,18 @@ struct vdp1_cmdt_user_clip_coord {
 
         VDP1_CMDT_DUMMY_UNION_DECLARE(ucc);
 };
+
+static inline uint16_t __attribute__ ((always_inline))
+vdp1_cmdt_current_get(void)
+{
+        return MEMORY_READ(16, VDP1(COPR)) >> 2;
+}
+
+static inline uint16_t __attribute__ ((always_inline))
+vdp1_cmdt_last_get(void)
+{
+        return MEMORY_READ(16, VDP1(LOPR)) >> 2;
+}
 
 extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
 extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
