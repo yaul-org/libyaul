@@ -332,11 +332,7 @@ no_sync:
 static void
 _sprite_end_handler(void)
 {
-        /* Set and get the last operation command address */
-        uint16_t copr_bits;
-        copr_bits = MEMORY_READ(16, VDP1(COPR));
-
-        _vdp1_last_command = copr_bits >> 2;
+        _vdp1_last_command = vdp1_cmdt_current_get();
 
         /* VDP1 request to commit is finished */
         _state_vdp1_committed = true;
