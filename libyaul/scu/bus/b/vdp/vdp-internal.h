@@ -25,6 +25,14 @@ struct state_vdp1 {
                 int16_t interlace_pass;
         } tv;
 
+        struct {
+                uint32_t cmdt_base;
+                uint32_t texture_base;
+                uint32_t gouraud_base;
+                uint32_t clut_base;
+                uint32_t remaining_base;
+        } vram;
+
         union {
                 uint16_t buffer[11];
 

@@ -72,10 +72,6 @@ struct vdp1_cmdt {
         uint16_t reserved;
 } __aligned(32);
 
-struct vdp1_cmdt_gst {
-        uint16_t entry[4];
-} __aligned(8);
-
 struct vdp1_cmdt_sprite {
         union {
 #define CMDT_ZOOM_POINT_UPPER_LEFT      0x0030
@@ -278,6 +274,8 @@ extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
 extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
 extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *, uint16_t);
 extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
+
+extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
 
 extern void vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
 extern void vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
