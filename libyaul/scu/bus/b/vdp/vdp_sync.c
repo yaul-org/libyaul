@@ -150,7 +150,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         uint32_t xfer_len;
         xfer_len = count * sizeof(struct vdp1_cmdt);
         uint32_t xfer_dst;
-        xfer_dst = VDP1_CMD_TABLE(_vdp1_last_command, 0);
+        xfer_dst = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
         uint32_t xfer_src;
         xfer_src = CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts;
 

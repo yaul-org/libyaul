@@ -73,6 +73,12 @@ vdp1_cmdt_list_reset(struct vdp1_cmdt_list *cmdt_list)
         cmdt_list->cmdt = cmdt_list->cmdts;
 }
 
+struct vdp1_cmdt *
+vdp1_cmdt_base_get(void)
+{
+        return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
+}
+
 void
 vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
