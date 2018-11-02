@@ -62,7 +62,7 @@ static void
 _init_vdp1(void)
 {
         const struct vdp1_env env = {
-                .env_color = COLOR_RGB555(0, 0, 0),
+                .env_erase_color = COLOR_RGB555(0, 0, 0),
                 .env_erase_points = {
                         INT16_VECTOR2_INITIALIZER(0, 0),
                         INT16_VECTOR2_INITIALIZER(320, 224)

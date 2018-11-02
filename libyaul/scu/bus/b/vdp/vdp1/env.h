@@ -24,7 +24,7 @@
 #define ENV_COLOR_MODE_RGB_PALETTE      1
 
 struct vdp1_env {
-        color_rgb555_t env_color;
+        color_rgb555_t env_erase_color;
         int16_vector2_t env_erase_points[2];
         uint8_t env_bpp;
         uint8_t env_rotation;
