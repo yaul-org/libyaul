@@ -29,22 +29,22 @@ struct vdp1_transfer_status {
         };
 } __packed __aligned(2);
 
-        struct vdp1_mode_status {
-                union {
-                        struct {
-                                unsigned vms_version:4;
-                                unsigned :3;
-                                unsigned vms_ptm1:1;
-                                unsigned vms_eos:1;
-                                unsigned vms_die:1;
-                                unsigned vms_dil:1;
-                                unsigned vms_fcm:1;
-                                unsigned vms_vbe:1;
-                                unsigned vms_tvm:3;
-                        } __packed;
+struct vdp1_mode_status {
+        union {
+                struct {
+                        unsigned vms_version:4;
+                        unsigned :3;
+                        unsigned vms_ptm1:1;
+                        unsigned vms_eos:1;
+                        unsigned vms_die:1;
+                        unsigned vms_dil:1;
+                        unsigned vms_fcm:1;
+                        unsigned vms_vbe:1;
+                        unsigned vms_tvm:3;
+                } __packed;
 
-                        uint16_t raw;
-                };
+                uint16_t raw;
+        };
 } __packed __aligned(2);
 
 static inline void __attribute__ ((always_inline))
@@ -52,7 +52,7 @@ vdp1_mode_status_get(struct vdp1_mode_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        *status = *(struct vdp1_mode_status *)VDP1(MODR);
+        status->raw = MEMORY_READ(16, VDP1(MODR));
 }
 
 static inline void __attribute__ ((always_inline))
@@ -60,7 +60,7 @@ vdp1_transfer_status_get(struct vdp1_transfer_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        *status = *(struct vdp1_transfer_status *)VDP1(EDSR);
+        status->raw = MEMORY_READ(16, VDP1(EDSR));
 }
 
 #ifdef __cplusplus
