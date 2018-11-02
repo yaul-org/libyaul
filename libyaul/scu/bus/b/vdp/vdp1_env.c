@@ -45,7 +45,7 @@ vdp1_env_set(const struct vdp1_env *env)
         /* Always clear TVM and VBE bits */
         _state_vdp1()->regs.tvmr = (env->env_rotation << 1) | env->env_bpp;
 
-        _state_vdp1()->regs.ewdr = env->env_color.raw;
+        _state_vdp1()->regs.ewdr = env->env_erase_color.raw;
 
         uint16_t x1;
         x1 = env->env_erase_points[0].x >> 3;
