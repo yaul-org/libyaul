@@ -53,7 +53,7 @@ dram_cart_id_get(void)
 }
 
 size_t
-dram_cart_size(void)
+dram_cart_size_get(void)
 {
         switch (_id) {
         case DRAM_CART_ID_1MIB:
