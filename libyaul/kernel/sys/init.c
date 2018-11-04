@@ -29,6 +29,8 @@
 #include <arp.h>
 #endif /* HAVE_DEV_CARTRIDGE */
 
+#include <dram-cart.h>
+
 void __attribute__ ((weak))
 user_init(void)
 {
@@ -74,6 +76,8 @@ _init(void)
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cart_init();
+#else
+        dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
         dma_queue_init();
