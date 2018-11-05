@@ -26,6 +26,9 @@ typedef union {
             }                                                                  \
     }
 
+#define COLOR_RGB888_RGB555(r, g, b)                                           \
+    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(r >> 3, g >> 3, b >> 3))
+
 static inline uint8_t color_rgb_min(const color_rgb555_t *color __attribute__ ((unused))) {
         return 0;
 }
