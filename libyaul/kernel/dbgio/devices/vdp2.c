@@ -30,7 +30,7 @@
 #define STATE_BUFFER_FLUSHING   0x02
 
 typedef struct {
-        uint32_t dma_reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
+        struct dma_reg_buffer dma_reg_buffer;
 
         struct scrn_cell_format cell_format;
 
@@ -121,7 +121,7 @@ _init(const dbgio_vdp2_t *params)
                 /* Holds transfers for font CPD and PAL */
                 struct dma_xfer xfer_tbl[2];
 
-                uint32_t reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
+                struct dma_reg_buffer reg_buffer;
         } *dma_font;
 
         static const cons_ops_t cons_ops = {
@@ -248,9 +248,9 @@ _init(const dbgio_vdp2_t *params)
         dma_font->xfer_tbl[1].dst = _dev_state->cell_format.scf_color_palette;
         dma_font->xfer_tbl[1].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
-        scu_dma_config_buffer(dma_font->reg_buffer, &dma_level_cfg);
+        scu_dma_config_buffer(&dma_font->reg_buffer, &dma_level_cfg);
 
-        dma_queue_enqueue(dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+        dma_queue_enqueue(&dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
             _dma_font_handler, aligned);
 
         /* 64x32 page PND */
@@ -261,7 +261,7 @@ _init(const dbgio_vdp2_t *params)
         dma_level_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
         dma_level_cfg.dlc_update = DMA_UPDATE_NONE;
 
-        scu_dma_config_buffer(_dev_state->dma_reg_buffer, &dma_level_cfg);
+        scu_dma_config_buffer(&_dev_state->dma_reg_buffer, &dma_level_cfg);
 
         cons_init(&cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
 
@@ -279,7 +279,7 @@ _flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        dma_queue_enqueue(_dev_state->dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+        dma_queue_enqueue(&_dev_state->dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
             _dma_handler, NULL);
 }
 

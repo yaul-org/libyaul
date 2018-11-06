@@ -28,7 +28,7 @@
 struct dma_queue {
         struct dma_queue_request {
                 uint8_t tag;
-                uint32_t reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
+                struct dma_reg_buffer reg_buffer;
 
                 void (*handler)(void *);
                 void *work;
@@ -43,7 +43,7 @@ struct dma_queue {
 
 static void _update_dma_request_pointers(const struct dma_queue_request *);
 static void _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *);
-static void _copy_dma_reg_buffer(void *, const void *);
+static void _copy_dma_reg_buffer(struct dma_reg_buffer *, const struct dma_reg_buffer *);
 
 static void _default_handler(void *);
 
@@ -60,9 +60,9 @@ dma_queue_init(void)
 }
 
 int8_t
-dma_queue_enqueue(const void *buffer, uint8_t tag, void (*handler)(void *), void *work)
+dma_queue_enqueue(const struct dma_reg_buffer *reg_buffer, uint8_t tag, void (*handler)(void *), void *work)
 {
-        assert(buffer != NULL);
+        assert(reg_buffer != NULL);
 
         assert(tag < DMA_QUEUE_TAG_COUNT);
 
@@ -96,7 +96,7 @@ dma_queue_enqueue(const void *buffer, uint8_t tag, void (*handler)(void *), void
 
         request->tag = tag;
 
-        _copy_dma_reg_buffer(&request->reg_buffer[0], buffer);
+        _copy_dma_reg_buffer(&request->reg_buffer, reg_buffer);
 
         request->tag = tag;
         request->handler = (handler != NULL) ? handler : _default_handler;
@@ -214,18 +214,18 @@ _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *
 
         dma_queue->busy = true;
 
-        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, DMA_START_FACTOR_ENABLE, &request->reg_buffer[0], _dma_handler);
+        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, DMA_START_FACTOR_ENABLE, &request->reg_buffer, _dma_handler);
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
 static inline void __attribute__ ((always_inline))
-_copy_dma_reg_buffer(void *dst_buffer, const void *src_buffer)
+_copy_dma_reg_buffer(struct dma_reg_buffer *dst_buffer, const struct dma_reg_buffer *src_buffer)
 {
         uint32_t *dst;
-        dst = dst_buffer;
+        dst = &dst_buffer->buffer[0];
 
         const uint32_t *src;
-        src = src_buffer;
+        src = &src_buffer->buffer[0];
 
         *(dst++) = *(src++);
         *(dst++) = *(src++);

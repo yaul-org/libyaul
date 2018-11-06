@@ -18,13 +18,13 @@ struct dma_regs {
         uint32_t dnc;
         uint32_t dnad;
         uint32_t dnmd;
-} __packed;
+} __packed __aligned(4);
+
+static_assert(sizeof(struct dma_regs) == sizeof(struct dma_reg_buffer));
 
 void
 scu_dma_init(void)
 {
-        static_assert(sizeof(struct dma_regs) == DMA_REG_BUFFER_BYTE_SIZE);
-
         scu_dma_stop();
 
         uint32_t scu_mask;
@@ -44,14 +44,15 @@ scu_dma_init(void)
 }
 
 void
-scu_dma_config_buffer(void *buffer, const struct dma_level_cfg *cfg)
+scu_dma_config_buffer(struct dma_reg_buffer *reg_buffer,
+    const struct dma_level_cfg *cfg)
 {
         assert(cfg != NULL);
 
-        assert(buffer != NULL);
+        assert(reg_buffer != NULL);
 
         struct dma_regs *regs;
-        regs = buffer;
+        regs = (struct dma_regs *)&reg_buffer->buffer[0];
 
         /* Clear mode, starting factor and update bits */
         regs->dnmd &= ~0x01010107;
@@ -91,16 +92,17 @@ scu_dma_config_buffer(void *buffer, const struct dma_level_cfg *cfg)
 }
 
 void
-scu_dma_config_set(uint8_t level, uint8_t start_factor, const void *buffer, void (*ihr)(void))
+scu_dma_config_set(uint8_t level, uint8_t start_factor,
+    const struct dma_reg_buffer *reg_buffer, void (*ihr)(void))
 {
-        assert(buffer != NULL);
+        assert(reg_buffer != NULL);
 
         assert(level <= 2);
 
         assert(start_factor <= 7);
 
         const struct dma_regs *regs;
-        regs = buffer;
+        regs = (struct dma_regs *)&reg_buffer->buffer[0];
 
         switch (level) {
         case 0:

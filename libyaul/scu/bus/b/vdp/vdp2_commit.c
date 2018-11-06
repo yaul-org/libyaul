@@ -21,8 +21,8 @@ static void *_work;
 void
 vdp2_commit(void)
 {
-        void *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer[0];
+        struct dma_reg_buffer *reg_buffer;
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         int8_t ret;
         ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN, _commit_handler, _work);

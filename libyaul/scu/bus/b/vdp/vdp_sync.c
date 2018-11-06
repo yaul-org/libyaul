@@ -40,7 +40,7 @@ static volatile bool _state_vdp1_change = false;
 static volatile uint16_t _vdp1_last_command = 0x0000;
 /* SCU-DMA state */
 static struct dma_level_cfg _vdp1_dma_cfg;
-static uint8_t _vdp1_dma_reg_buffer[DMA_REG_BUFFER_BYTE_SIZE];
+static struct dma_reg_buffer _vdp1_dma_reg_buffer;
 
 /* VDP2 relate state */
 /* Request for VDP2 to update state */
@@ -161,10 +161,10 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
         _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
 
-        scu_dma_config_buffer(&_vdp1_dma_reg_buffer[0], &_vdp1_dma_cfg);
+        scu_dma_config_buffer(&_vdp1_dma_reg_buffer, &_vdp1_dma_cfg);
 
         int8_t ret;
-        ret = dma_queue_enqueue(&_vdp1_dma_reg_buffer[0], DMA_QUEUE_TAG_IMMEDIATE, _vdp1_dma_handler, NULL);
+        ret = dma_queue_enqueue(&_vdp1_dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE, _vdp1_dma_handler, NULL);
         assert(ret == 0);
 
         ret = dma_queue_flush(DMA_QUEUE_TAG_IMMEDIATE);

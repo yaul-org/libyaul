@@ -78,9 +78,6 @@ extern "C" {
 #define DMA_BUS_B       0x01
 #define DMA_BUS_DSP     0x02
 
-#define DMA_REG_BUFFER_BYTE_SIZE        20
-#define DMA_REG_BUFFER_WORD_COUNT       (DMA_REG_BUFFER_BYTE_SIZE / 4)
-
 #define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
         .len = (_len),                                                         \
         .dst = (uint32_t)(_dst),                                               \
@@ -92,6 +89,10 @@ extern "C" {
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
+
+struct dma_reg_buffer {
+        uint32_t buffer[5];
+} __packed __aligned(4);
 
 struct dma_xfer {
         uint32_t len;
@@ -374,8 +375,8 @@ scu_dma_level_end_set(uint8_t level, void (*ihr)(void))
 }
 
 extern void scu_dma_init(void);
-extern void scu_dma_config_buffer(void *, const struct dma_level_cfg *);
-extern void scu_dma_config_set(uint8_t, uint8_t, const void *, void (*)(void));
+extern void scu_dma_config_buffer(struct dma_reg_buffer *, const struct dma_level_cfg *);
+extern void scu_dma_config_set(uint8_t, uint8_t, const struct dma_reg_buffer *, void (*)(void));
 extern int8_t scu_dma_level_unused_get(void);
 
 #ifdef __cplusplus
