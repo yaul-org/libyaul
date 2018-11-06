@@ -22,7 +22,7 @@ extern "C" {
 #define DMA_QUEUE_TAG_COUNT             3
 
 extern void dma_queue_init(void);
-extern int8_t dma_queue_enqueue(const void *, uint8_t, void (*)(void *), void *);
+extern int8_t dma_queue_enqueue(const struct dma_reg_buffer *, uint8_t, void (*)(void *), void *);
 extern void dma_queue_clear(void);
 extern int8_t dma_queue_flush(uint8_t);
 extern void dma_queue_flush_wait(uint8_t);

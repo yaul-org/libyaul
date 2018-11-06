@@ -68,7 +68,7 @@ struct state_vdp2 {
 
         struct {
                 struct dma_xfer xfer_table[3] __aligned(4 * 16);
-                uint32_t reg_buffer[DMA_REG_BUFFER_WORD_COUNT];
+                struct dma_reg_buffer reg_buffer;
         } commit;
 
         union {

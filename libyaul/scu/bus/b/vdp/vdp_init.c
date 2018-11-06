@@ -152,7 +152,7 @@ _init_vdp2(void)
         };
 
         void *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer[0];
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 
