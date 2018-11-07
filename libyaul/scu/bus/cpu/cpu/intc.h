@@ -16,10 +16,19 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define INTC_INTERRUPT_POWER_ON_RESET_PC        0x00
+#define INTC_INTERRUPT_POWER_ON_RESET_SP        0x01
+
+#define INTC_INTERRUPT_MANUAL_RESET_PC          0x02
+#define INTC_INTERRUPT_MANUAL_RESET_SP          0x03
+
 #define INTC_INTERRUPT_ILLEGAL_INSTRUCTION      0x04
 #define INTC_INTERRUPT_ILLEGAL_SLOT             0x06
 #define INTC_INTERRUPT_CPU_ADDRESS_ERROR        0x09
 #define INTC_INTERRUPT_DMA_ADDRESS_ERROR        0x0A
+
+#define INTC_INTERRUPT_NMI                      0x0B
+
 #define INTC_INTERRUPT_UBC                      0x0C
 #define INTC_INTERRUPT_BREAK                    0x20
 
