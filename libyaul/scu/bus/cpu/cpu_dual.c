@@ -31,6 +31,7 @@ __asm__ (".align 1\n"                                                          \
          "__slave_" __STRING(type) "_entry_trampoline:\n"                      \
          "\tmov.l 1f, r15\n"                                                   \
          "\tmov.l 2f, r1\n"                                                    \
+         "\tmov r15, r14\n"                                                    \
          "\tjmp @r1\n"                                                         \
          "\tnop\n"                                                             \
          ".align 4\n"                                                          \
@@ -130,7 +131,7 @@ _slave_init(void)
 
 SLAVE_ENTRY_TRAMPOLINE_EMIT(polling);
 
-static void __noreturn __aligned(16) __used 
+static void __noreturn __aligned(16) __used
 _slave_polling_entry(void)
 {
         _slave_init();
@@ -144,7 +145,7 @@ _slave_polling_entry(void)
 
 SLAVE_ENTRY_TRAMPOLINE_EMIT(ici);
 
-static void __noreturn __used 
+static void __noreturn __used
 _slave_ici_entry(void)
 {
         _slave_init();
