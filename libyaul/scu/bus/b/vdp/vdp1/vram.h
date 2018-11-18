@@ -11,30 +11,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define VDP1_CMDT_COUNT_MAX     2048
-#define VDP1_CMDT_MEMORY_SIZE   (VDP1_CMDT_COUNT_MAX *                         \
-            sizeof(struct vdp1_cmdt)) /* In bytes */
+#include <vdp1/cmdt.h>
 
-#define VDP1_TEXURE_MEMORY_SIZE ((432) * (1 << 10)) /* In bytes */
+#define VDP1_VRAM_SIZE 0x00080000 /* In bytes */
 
-#define VDP1_GST_COUNT_MAX      1024
-#define VDP1_GST_MEMORY_SIZE    (VDP1_GST_COUNT_MAX *                          \
-            sizeof(struct vdp1_cmdt_gst)) /* In bytes */
+struct vdp1_gouraud_table {
+        color_rgb555_t vgt_color[4];
+} __aligned(8);
 
-#define VDP1_CLUT_COUNT_MAX     256
-#define VDP1_CLUT_MEMORY_SIZE   (VDP1_CLUT_COUNT_MAX *                         \
-            (16 * sizeof(uint16_t))) /* In bytes */
+struct vdp1_clut {
+        color_rgb555_t vcl_color[16];
+} __aligned(32);
 
-#define VDP1_VRAM_SIZE          0x00080000 /* In bytes */
-
-#define VDP1_CMD_TABLE(x, y)    (0x25C00000 + ((x) << 5) + (((y) << 1) & 0x1F))
-#define VDP1_CLUT(x, y)         (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
-            ((x) << 5) + ((y) << 1))
-#define VDP1_GOURAUD(x, y)      (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
-            VDP1_CLUT_MEMORY_SIZE + ((x) << 3) + ((y) << 1))
-#define VDP1_TEXTURE(x)         (0x25C00000 + VDP1_CMDT_MEMORY_SIZE +          \
-            VDP1_CLUT_MEMORY_SIZE + VDP1_GST_MEMORY_SIZE + ((x)))
-
-#define VDP1_FRAME_BUFFER(x, y) (0x25C80000 + (((x) & 0x1) << 18) + (y))
+extern void *vdp1_vram_texture_base_get(void);
+extern struct vdp1_gouraud_table *vdp1_vram_gouraud_base_get(void);
+extern struct vdp1_clut *vdp1_vram_clut_base_get(void);
+extern void *vdp1_vram_remaining_get(void);
 
 #endif /* !_VDP1_VRAM_H_ */
