@@ -16,12 +16,6 @@
 
 #include "vdp-internal.h"
 
-/* Check if boundaries are correct */
-static_assert((VDP1_CMDT_MEMORY_SIZE +
-               VDP1_GST_MEMORY_SIZE +
-               VDP1_TEXURE_MEMORY_SIZE +
-               VDP1_CLUT_MEMORY_SIZE) == VDP1_VRAM_SIZE);
-
 static void _init_vdp1(void);
 
 static void _init_vdp2(void);
@@ -69,7 +63,13 @@ _init_vdp1(void)
                 },
                 .env_bpp = ENV_BPP_16,
                 .env_rotation = ENV_ROTATION_0,
-                .env_color_mode = ENV_COLOR_MODE_RGB_PALETTE
+                .env_color_mode = ENV_COLOR_MODE_RGB_PALETTE,
+                .env_limits = {
+                        .cmdt_count = 2048,
+                        .texture_size = 0x0006BFE0,
+                        .gouraud_count = 1024,
+                        .clut_count = 256
+                }
         };
 
         _state_vdp1()->tv.interlace_pass = 0;

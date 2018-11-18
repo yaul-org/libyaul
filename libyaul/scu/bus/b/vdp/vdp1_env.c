@@ -9,38 +9,66 @@
 
 #include <vdp1/env.h>
 #include <vdp1/map.h>
+#include <vdp1/cmdt.h>
+#include <vdp1/vram.h>
 
 #include <vdp2/tvmd.h>
 
 #include "vdp-internal.h"
 
+static inline void __attribute__ ((always_inline)) _env_assert(const struct vdp1_env *);
+static inline void __attribute__ ((always_inline)) _env_limits_assert(const struct vdp1_env *);
+static inline void __attribute__ ((always_inline)) _env_erase_assert(const struct vdp1_env *);
+
 void
 vdp1_env_set(const struct vdp1_env *env)
 {
-        assert(env != NULL);
+        _env_assert(env);
 
-        assert((env->env_bpp == ENV_BPP_8) || (env->env_bpp == ENV_BPP_16));
+        /* We have to have at least one command */
+        assert(env->env_limits.cmdt_count > 0);
 
-        assert((env->env_rotation == ENV_ROTATION_0) ||
-               (env->env_rotation == ENV_ROTATION_90));
+        /* One command table is allocated to us */
+        uint32_t vram_size;
+        vram_size = VDP1_VRAM_SIZE - sizeof(struct vdp1_cmdt);
 
-        assert((env->env_erase_points[0].x >= 0) &&
-               (env->env_erase_points[0].y >= 0));
+        uint32_t cmdt_size;
+        cmdt_size = env->env_limits.cmdt_count * sizeof(struct vdp1_cmdt);
 
-        assert((env->env_erase_points[1].x > 0) &&
-               (env->env_erase_points[1].y >= 0));
+        uint32_t texture_size;
+        texture_size = env->env_limits.texture_size;
 
-        assert((env->env_erase_points[0].x <= 1008) &&
-               (env->env_erase_points[0].y < 512));
+        uint32_t gouraud_size;
+        gouraud_size = env->env_limits.gouraud_count * sizeof(struct vdp1_gouraud_table);
 
-        assert((env->env_erase_points[1].x <= 1024) &&
-               (env->env_erase_points[1].y < 512));
+        uint32_t clut_size;
+        clut_size = env->env_limits.clut_count * sizeof(struct vdp1_clut);
 
-        assert((env->env_erase_points[0].x < env->env_erase_points[1].x) &&
-               (env->env_erase_points[0].y <= env->env_erase_points[1].y));
+        uint32_t total_size;
+        total_size = cmdt_size + texture_size + gouraud_size + clut_size;
 
-        assert((env->env_color_mode == ENV_COLOR_MODE_PALETTE) ||
-               (env->env_color_mode == ENV_COLOR_MODE_RGB_PALETTE));
+        assert(total_size <= vram_size);
+
+        uint32_t vram_base;
+        vram_base = VDP1_VRAM(sizeof(struct vdp1_cmdt));
+
+        _state_vdp1()->vram.cmdt_base = vram_base;
+        vram_base += cmdt_size;
+
+        _state_vdp1()->vram.texture_base = vram_base;
+        vram_base += texture_size;
+
+        _state_vdp1()->vram.gouraud_base = vram_base;
+        vram_base += gouraud_size;
+
+        _state_vdp1()->vram.clut_base = vram_base;
+        vram_base += clut_size;
+
+        /* Get the remaining amount left over */
+        _state_vdp1()->vram.remaining_base =
+            (((VDP1_VRAM(VDP1_VRAM_SIZE) - vram_base) == 0)
+                ? 0x00000000
+                : vram_base);
 
         /* Always clear TVM and VBE bits */
         _state_vdp1()->regs.tvmr = (env->env_rotation << 1) | env->env_bpp;
@@ -83,4 +111,46 @@ vdp1_env_set(const struct vdp1_env *env)
         MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs.ewdr);
         MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs.ewlr);
         MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
+}
+
+static inline void __attribute__ ((always_inline))
+_env_assert(const struct vdp1_env *env)
+{
+        assert(env != NULL);
+
+        assert((env->env_bpp == ENV_BPP_8) || (env->env_bpp == ENV_BPP_16));
+
+        assert((env->env_rotation == ENV_ROTATION_0) ||
+               (env->env_rotation == ENV_ROTATION_90));
+
+        assert((env->env_color_mode == ENV_COLOR_MODE_PALETTE) ||
+               (env->env_color_mode == ENV_COLOR_MODE_RGB_PALETTE));
+
+        // _env_limits_assert(env);
+
+        _env_erase_assert(env);
+}
+
+static inline void __attribute__ ((always_inline))
+_env_limits_assert(const struct vdp1_env *env)
+{
+}
+
+static inline void __attribute__ ((always_inline))
+_env_erase_assert(const struct vdp1_env *env)
+{
+        assert((env->env_erase_points[0].x >= 0) &&
+               (env->env_erase_points[0].y >= 0));
+
+        assert((env->env_erase_points[1].x > 0) &&
+               (env->env_erase_points[1].y >= 0));
+
+        assert((env->env_erase_points[0].x <= 1008) &&
+               (env->env_erase_points[0].y < 512));
+
+        assert((env->env_erase_points[1].x <= 1024) &&
+               (env->env_erase_points[1].y < 512));
+
+        assert((env->env_erase_points[0].x < env->env_erase_points[1].x) &&
+               (env->env_erase_points[0].y <= env->env_erase_points[1].y));
 }
