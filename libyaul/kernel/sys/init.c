@@ -94,5 +94,8 @@ _fini(void)
 {
         _call_global_dtors();
 
+        while (true) {
+        }
+
         __builtin_unreachable();
 }
