@@ -25,7 +25,7 @@ extern "C" {
 #define DBGIO_DEV_COUNT         4
 
 typedef struct {
-        const uint32_t *font_cpd;
+        const uint8_t *font_cpd;
         const uint16_t *font_pal;
         uint8_t font_fg;
         uint8_t font_bg;

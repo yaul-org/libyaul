@@ -54,6 +54,8 @@ static void _buffer_area_clear(int16_t, int16_t, int16_t, int16_t);
 static void _buffer_line_clear(int16_t, int16_t, int16_t);
 static void _buffer_write(int16_t, int16_t, uint8_t);
 
+static const uint8_t *_font_1bpp_4bpp_decompress(const uint8_t *, uint8_t, uint8_t);
+
 static void _dma_font_handler(void *);
 static void _dma_handler(void *);
 
@@ -69,7 +71,7 @@ static void _dma_handler(void *);
 static const dbgio_vdp2_t _default_params = {
         .font_cpd = &_font_cpd[0],
         .font_pal = &_font_pal[0],
-        .font_fg = 1,
+        .font_fg = 7,
         .font_bg = 0,
 
         .scrn = SCRN_NBG3,
@@ -220,6 +222,9 @@ _init(const dbgio_vdp2_t *params)
         }
         assert(_dev_state->page_pnd != NULL);
 
+        const uint8_t *font_cpd;
+        font_cpd = _font_1bpp_4bpp_decompress(params->font_cpd, params->font_fg, params->font_bg);
+
         struct dma_level_cfg dma_level_cfg;
 
         void *aligned;
@@ -239,9 +244,9 @@ _init(const dbgio_vdp2_t *params)
         dma_level_cfg.dlc_update = DMA_UPDATE_NONE;
 
         /* Font CPD */
-        dma_font->xfer_tbl[0].len = FONT_SIZE;
+        dma_font->xfer_tbl[0].len = FONT_4BPP_SIZE;
         dma_font->xfer_tbl[0].dst = (uint32_t)_dev_state->cell_format.scf_cp_table;
-        dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)params->font_cpd;
+        dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)font_cpd;
 
         /* Font PAL */
         dma_font->xfer_tbl[1].len = FONT_COLOR_COUNT * sizeof(color_rgb888_t);
@@ -343,6 +348,52 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
                 /* hf = */ 0);
 
         _pnd_write(col, row, pnd);
+}
+
+static inline uint8_t __attribute__ ((always_inline))
+_1bpp_4bpp_convert(uint8_t *row_1bpp, const uint8_t *fgbg)
+{
+        uint8_t out_4bpp;
+        out_4bpp = 0x00;
+
+        out_4bpp |= (fgbg[*row_1bpp & 0x01] & 0x0F) << 4;
+        *row_1bpp >>= 1;
+        out_4bpp |= fgbg[*row_1bpp & 0x01] & 0x0F;
+        *row_1bpp >>= 1;
+
+        return out_4bpp;
+}
+
+static const uint8_t *
+_font_1bpp_4bpp_decompress(const uint8_t *font_cpd, uint8_t fg, uint8_t bg)
+{
+        assert(font_cpd != NULL);
+        assert(((uintptr_t)font_cpd & 0x00000003) == 0x00000000);
+
+        uint8_t *dec_cpd;
+        dec_cpd = (uint8_t *)malloc(FONT_4BPP_SIZE);
+        assert(dec_cpd != NULL);
+
+        const uint8_t fgbg[] = {
+                bg,
+                fg
+        };
+
+        uint32_t i;
+        for (i = 0; i < FONT_1BPP_SIZE; i++) {
+                uint32_t j;
+                j = i << 2;
+
+                uint8_t cpd;
+                cpd = font_cpd[i];
+
+                dec_cpd[j + 0] = _1bpp_4bpp_convert(&cpd, fgbg);
+                dec_cpd[j + 1] = _1bpp_4bpp_convert(&cpd, fgbg);
+                dec_cpd[j + 2] = _1bpp_4bpp_convert(&cpd, fgbg);
+                dec_cpd[j + 3] = _1bpp_4bpp_convert(&cpd, fgbg);
+        }
+
+        return dec_cpd;
 }
 
 static void
