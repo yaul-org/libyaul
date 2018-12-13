@@ -155,16 +155,16 @@ _init(const dbgio_vdp2_t *params)
 
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
         /* XXX: Fetch the VRAM bank split configuration and determine
-         * the VRAM bank size */
+         *      the VRAM bank size */
         assert(params->cpd_offset < VRAM_4SPLIT_BANK_SIZE_4MBIT);
 
         assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
         /* XXX: Determine the page size and check against the number of
-         * available offsets */
+         *      available offsets */
 
         /* There are 128 16-color banks, depending on CRAM mode */
         /* XXX: Fetch CRAM mode and check number of available 16-color
-         * banks */
+         *      banks */
         assert((params->cram_index >= 0) && (params->cram_index < 128));
 
         if (_dev_state == NULL) {
@@ -283,6 +283,13 @@ _init(const dbgio_vdp2_t *params)
          * call to vdp_sync() */
         vdp_sync_user_callback_add(free, aligned);
         vdp_sync_user_callback_add(free, dec_cpd);
+
+        /* Due to the 1BPP font being decompressed in cached H-WRAM, we
+         * need to flush the cache as the DMA transfer accesses the
+         * uncached mirror address to the decompressed 4BPP font, which
+         * could result in fetching stale values not yet written back to
+         * H-WRAM */
+        cpu_cache_purge();
 }
 
 static void
