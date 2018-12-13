@@ -44,6 +44,7 @@ typedef struct {
 } dev_state_t;
 
 static void _init(const dbgio_vdp2_t *);
+static void _deinit(void);
 static void _flush(void);
 
 static inline void __attribute__ ((always_inline)) _pnd_clear(int16_t, int16_t);
@@ -110,6 +111,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
         .dev = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
+        .deinit = _deinit,
         .buffer = cons_buffer,
         .flush = _flush
 };
@@ -268,6 +270,23 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->state = STATE_BUFFER_DIRTY;
 
         _flush();
+}
+
+static void
+_deinit(void)
+{
+#ifdef CHECK
+        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+                return;
+        }
+
+        free(_dev_state->page_pnd);
+        free(_dev_state);
+
+        _dev_state = NULL;
+#endif /* CHECK */
+
+        _dev_state->state = STATE_IDLE;
 }
 
 static void

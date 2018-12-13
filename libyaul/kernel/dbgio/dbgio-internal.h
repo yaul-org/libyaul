@@ -19,6 +19,7 @@ typedef struct {
         uint8_t dev;
         const void *default_params;
         void (*init)(const void *);
+        void (*deinit)(void);
         void (*buffer)(const char *);
         void (*flush)(void);
 } dbgio_dev_ops_t;
