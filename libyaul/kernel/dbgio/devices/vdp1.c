@@ -18,6 +18,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp1 = {
         .dev = DBGIO_DEV_VDP1,
         .default_params = NULL,
         .init = (void (*)(const void *))_nop,
+        .deinit = _nop,
         .buffer = (void (*)(const char *))_nop,
         .flush = _nop
 };

@@ -21,6 +21,7 @@
 #define STATE_BUFFER_FLUSHING   0x02
 
 static void _init(const dbgio_usb_cart_t *);
+static void _deinit(void);
 static void _buffer(const char *);
 static void _flush(void);
 
@@ -42,6 +43,7 @@ const dbgio_dev_ops_t _internal_dev_ops_usb_cart = {
         .dev = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
+        .deinit = _deinit,
         .buffer = _buffer,
         .flush = _flush
 };
@@ -77,6 +79,11 @@ _init(const dbgio_usb_cart_t *params)
         _dev_state->buffer_size = params->buffer_size;
 
         _dev_state->state = STATE_IDLE;
+}
+
+static void
+_deinit(void)
+{
 }
 
 static void

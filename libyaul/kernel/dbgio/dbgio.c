@@ -50,6 +50,8 @@ dbgio_dev_init(uint8_t dev, const void *params)
                (dev == DBGIO_DEV_VDP2) ||
                (dev == DBGIO_DEV_USB_CART));
 
+        assert(_dev_ops_table[dev]->init != NULL);
+
         assert(params != NULL);
 
         if (_dev_init_table[dev]) {
@@ -66,6 +68,26 @@ void
 dbgio_dev_default_init(uint8_t dev)
 {
         dbgio_dev_init(dev, _dev_ops_table[dev]->default_params);
+}
+
+void
+dbgio_dev_deinit(uint8_t dev)
+{
+        assert((dev == DBGIO_DEV_NULL) ||
+               (dev == DBGIO_DEV_VDP1) ||
+               (dev == DBGIO_DEV_VDP2) ||
+               (dev == DBGIO_DEV_USB_CART));
+
+        assert(_dev_ops_table[dev]->deinit != NULL);
+
+        if (!_dev_init_table[dev]) {
+                return;
+        }
+
+        _dev_ops_table[dev]->deinit();
+
+        /* Mark that we've initialized this device already */
+        _dev_init_table[dev] = false;
 }
 
 void
