@@ -13,7 +13,7 @@
 
 #include <cpu/cache.h>
 
-#include <vdp2.h>
+#include <vdp.h>
 
 #include <sys/dma-queue.h>
 
@@ -278,6 +278,11 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->state = STATE_BUFFER_DIRTY;
 
         _flush();
+
+        /* We're truly initialized once the user has made at least one
+         * call to vdp_sync() */
+        vdp_sync_user_callback_add(free, aligned);
+        vdp_sync_user_callback_add(free, dec_cpd);
 }
 
 static void
