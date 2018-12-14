@@ -123,16 +123,16 @@ vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_pmod = sprite->cs_mode.raw;
 
         if (sprite->cs_zoom_point.enable) {
+                cmdt->cmd_xa = sprite->cs_zoom.point.x;
+                cmdt->cmd_ya = sprite->cs_zoom.point.y;
+                cmdt->cmd_xb = sprite->cs_zoom.display.x;
+                cmdt->cmd_yb = sprite->cs_zoom.display.y;
+        } else {
                 /* Scale with two vertices, A and C. No zoom point */
                 cmdt->cmd_xa = sprite->cs_vertex.a.x;
                 cmdt->cmd_ya = sprite->cs_vertex.a.y;
                 cmdt->cmd_xc = sprite->cs_vertex.c.x;
                 cmdt->cmd_yc = sprite->cs_vertex.c.y;
-        } else {
-                cmdt->cmd_xa = sprite->cs_zoom.point.x;
-                cmdt->cmd_ya = sprite->cs_zoom.point.y;
-                cmdt->cmd_xb = sprite->cs_zoom.display.x;
-                cmdt->cmd_yb = sprite->cs_zoom.display.y;
         }
 
         _cmdt_cmd_colr_set(cmdt, sprite);
