@@ -308,7 +308,7 @@ _deinit(void)
 static void
 _flush(void)
 {
-        if (_dev_state->state != STATE_BUFFER_DIRTY) {
+        if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
                 return;
         }
 
