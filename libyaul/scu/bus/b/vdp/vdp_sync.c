@@ -14,6 +14,8 @@
 
 #include "vdp-internal.h"
 
+#define USER_CALLBACK_COUNT 16
+
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
@@ -56,8 +58,13 @@ static volatile int16_t _field_count = 0;
 static volatile bool _vblank_in = false;
 static volatile bool _vblank_out = false;
 
+static void (*_user_callbacks[USER_CALLBACK_COUNT])(void *);
+static void *_user_works[USER_CALLBACK_COUNT];
+
 static void (*_user_vblank_in_handler)(void);
 static void (*_user_vblank_out_handler)(void);
+
+static void _default_user_callback(void *);
 
 void
 vdp_sync_init(void)
@@ -95,6 +102,12 @@ vdp_sync_init(void)
         scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+
+        uint32_t i;
+        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
+                _user_callbacks[i] = _default_user_callback;
+                _user_works[i] = NULL;
+        }
 }
 
 void
@@ -125,6 +138,14 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
         _sync = false;
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+
+        uint32_t i;
+        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
+                _user_callbacks[i](_user_works[i]);
+
+                _user_callbacks[i] = _default_user_callback;
+                _user_works[i] = NULL;
+        }
 }
 
 void
@@ -221,6 +242,25 @@ void
 vdp_sync_vblank_out_set(void (*ihr)(void))
 {
         _user_vblank_out_handler = (ihr != NULL) ? ihr : _default_handler;
+}
+
+void
+vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
+{
+        assert(user_callback != NULL);
+
+        uint32_t i;
+        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
+                if (_user_callbacks[i] != _default_user_callback) {
+                        continue;
+                }
+
+                _user_callbacks[i] = user_callback;
+                _user_works[i] = work;
+                return;
+        }
+
+        assert(i != USER_CALLBACK_COUNT);
 }
 
 static void
@@ -387,4 +427,9 @@ _vdp1_transfer_over(void)
                         (transfer_status.vte_cef == 0x00);
 
         return ((mode_status.vms_ptm1 != 0x00) && transfer_over);
+}
+
+static void
+_default_user_callback(void *work __unused)
+{
 }

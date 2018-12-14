@@ -37,6 +37,8 @@ extern void vdp2_sync_commit(void);
 extern void vdp_sync_vblank_in_set(void (*)(void));
 extern void vdp_sync_vblank_out_set(void (*)(void));
 
+extern void vdp_sync_user_callback_add(void (*)(void *), void *);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
