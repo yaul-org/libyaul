@@ -169,12 +169,10 @@ _init(const dbgio_vdp2_t *params)
          *      banks */
         assert((params->cram_index >= 0) && (params->cram_index < 128));
 
-        if (_dev_state == NULL) {
-                _dev_state = malloc(sizeof(dev_state_t));
-
-                memset(_dev_state, 0x00, sizeof(dev_state_t));
-        }
+        _dev_state = malloc(sizeof(dev_state_t));
         assert(_dev_state != NULL);
+
+        (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
 
         _dev_state->page_size = SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
         _dev_state->page_width = SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
@@ -221,9 +219,7 @@ _init(const dbgio_vdp2_t *params)
                 /* vf = */ 0,
                 /* hf = */ 0);
 
-        if (_dev_state->page_pnd == NULL) {
-                _dev_state->page_pnd = malloc(_dev_state->page_size);
-        }
+        _dev_state->page_pnd = malloc(_dev_state->page_size);
         assert(_dev_state->page_pnd != NULL);
 
         uint8_t *dec_cpd;
@@ -235,12 +231,12 @@ _init(const dbgio_vdp2_t *params)
 
         struct dma_level_cfg dma_level_cfg;
 
+        /* Align to a 32-byte boundary */
+        /* XXX: Refactor { */
         void *aligned;
         aligned = malloc(sizeof(*dma_font) + 32);
         assert(aligned != NULL);
 
-        /* Align to a 32-byte boundary */
-        /* XXX: Refactor { */
         uint32_t aligned_offset;
         aligned_offset = (((uint32_t)aligned + 0x0000001F) & ~0x0000001F) - (uint32_t)aligned;
         dma_font = (void *)((uint32_t)aligned + aligned_offset);
@@ -257,7 +253,7 @@ _init(const dbgio_vdp2_t *params)
         dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)dec_cpd;
 
         /* Font PAL */
-        dma_font->xfer_tbl[1].len = FONT_COLOR_COUNT * sizeof(color_rgb888_t);
+        dma_font->xfer_tbl[1].len = FONT_COLOR_COUNT * sizeof(color_rgb555_t);
         dma_font->xfer_tbl[1].dst = _dev_state->color_palette;
         dma_font->xfer_tbl[1].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
@@ -297,7 +293,6 @@ _init(const dbgio_vdp2_t *params)
 static void
 _deinit(void)
 {
-#ifdef CHECK
         if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
                 return;
         }
@@ -306,7 +301,6 @@ _deinit(void)
         free(_dev_state);
 
         _dev_state = NULL;
-#endif /* CHECK */
 
         _dev_state->state = STATE_IDLE;
 }
