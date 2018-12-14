@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include <scu.h>
+
 #include <vdp1/map.h>
 
 #include <vdp2/sprite.h>
