@@ -17,8 +17,9 @@
 #include "../dbgio-internal.h"
 
 #define STATE_IDLE              0x00
-#define STATE_BUFFER_DIRTY      0x01
-#define STATE_BUFFER_FLUSHING   0x02
+#define STATE_INITIALIZED       0x01
+#define STATE_BUFFER_DIRTY      0x02
+#define STATE_BUFFER_FLUSHING   0x04
 
 static void _init(const dbgio_usb_cart_t *);
 static void _deinit(void);
@@ -60,7 +61,6 @@ _init(const dbgio_usb_cart_t *params)
         }
         assert(_dev_state != NULL);
 
-
         if ((_dev_state->buffer != NULL) &&
             (_dev_state->buffer_size != params->buffer_size)) {
                 free(_dev_state->buffer);
@@ -78,12 +78,22 @@ _init(const dbgio_usb_cart_t *params)
         _dev_state->buffer_p = _dev_state->buffer;
         _dev_state->buffer_size = params->buffer_size;
 
-        _dev_state->state = STATE_IDLE;
+        _dev_state->state = STATE_INITIALIZED;
 }
 
 static void
 _deinit(void)
 {
+        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+                return;
+        }
+
+        free(_dev_state->buffer);
+        free(_dev_state);
+
+        _dev_state = NULL;
+
+        _dev_state->state = STATE_IDLE;
 }
 
 static void
@@ -109,8 +119,7 @@ _buffer(const char *buffer)
 static void
 _flush(void)
 {
-        if (_dev_state->state != STATE_BUFFER_DIRTY)
-        {
+        if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
                 return;
         }
 
