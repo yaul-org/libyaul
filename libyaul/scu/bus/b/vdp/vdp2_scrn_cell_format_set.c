@@ -194,12 +194,12 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
                         switch (format->scf_character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 9~0
-                                 * Character number in supplemental data: 14 13 12 11 10 */
+                                 * Character number in supplemental data: bits 14 13 12 11 10 */
                                 sc_number = (character_number & 0x7C00) >> 10;
                                 break;
                         case (2 * 2):
                                 /* Character number in pattern name table: bits 11~2
-                                 * Character number in supplemental data: 14 13 12  1  0 */
+                                 * Character number in supplemental data: bits 14 13 12  1  0 */
                                 sc_number = ((character_number & 0x7000) >> 10) |
                                              (character_number & 0x03);
                                 break;
@@ -211,12 +211,12 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
                         switch (format->scf_character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 11~0
-                                 * Character number in supplemental data: 14 13 12 __ __ */
+                                 * Character number in supplemental data: bits 14 13 12 __ __ */
                                 sc_number = (character_number & 0x7000) >> 10;
                                 break;
                         case (2 * 2):
                                 /* Character number in pattern name table: bits 13~2
-                                 * Character number in supplemental data: 14 __ __  1  0 */
+                                 * Character number in supplemental data: bits 14 __ __  1  0 */
                                 sc_number = ((character_number & 0x4000) >> 10) |
                                              (character_number & 0x03);
                                 break;
