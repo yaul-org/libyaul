@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <cpu/cache.h>
+#include <cpu/dmac.h>
 
 #include <vdp.h>
 
@@ -28,19 +29,25 @@
 #define STATE_IDLE              0x00
 #define STATE_INITIALIZED       0x01
 #define STATE_BUFFER_DIRTY      0x02
-#define STATE_BUFFER_FLUSHING   0x04
+#define STATE_BUFFER_CLEARED    0x04
+#define STATE_BUFFER_FLUSHING   0x08
 
 typedef struct {
         struct dma_reg_buffer dma_reg_buffer;
 
+        /* Base CPD VRAM address */
         uint32_t cp_table;
+        /* Base palette CRAM address */
         uint32_t color_palette;
 
+        /* Base page VRAM address */
         uint32_t page_base;
         uint16_t *page_pnd;
+        /* Size of splt page */
         uint16_t page_size;
         uint16_t page_width;
         uint16_t page_height;
+        /* PND value for clearing a page */
         uint16_t pnd_clear;
 
         uint8_t state;
@@ -48,6 +55,7 @@ typedef struct {
 
 static void _init(const dbgio_vdp2_t *);
 static void _deinit(void);
+static void _buffer(const char *);
 static void _flush(void);
 
 static inline void __attribute__ ((always_inline)) _pnd_clear(int16_t, int16_t);
@@ -118,7 +126,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
         .deinit = _deinit,
-        .buffer = cons_buffer,
+        .buffer = _buffer,
         .flush = _flush
 };
 
@@ -156,8 +164,8 @@ _init(const dbgio_vdp2_t *params)
                (params->scrn != SCRN_RBG1));
 
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
-        /* XXX: Fetch the VRAM bank split configuration and determine
-         *      the VRAM bank size */
+        /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
+         *      bank size */
         assert(params->cpd_offset < VRAM_4SPLIT_BANK_SIZE_4MBIT);
 
         assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
@@ -165,8 +173,7 @@ _init(const dbgio_vdp2_t *params)
          *      available offsets */
 
         /* There are 128 16-color banks, depending on CRAM mode */
-        /* XXX: Fetch CRAM mode and check number of available 16-color
-         *      banks */
+        /* XXX: Fetch CRAM mode and check number of available 16-color banks */
         assert((params->cram_index >= 0) && (params->cram_index < 128));
 
         _dev_state = malloc(sizeof(dev_state_t));
@@ -273,21 +280,18 @@ _init(const dbgio_vdp2_t *params)
 
         cons_init(&cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
 
-        _dev_state->state = STATE_BUFFER_DIRTY;
-
-        _flush();
-
-        /* We're truly initialized once the user has made at least one
-         * call to vdp_sync() */
+        /* We're truly initialized once the user has made at least one call to
+         * vdp_sync() */
         vdp_sync_user_callback_add(free, aligned);
         vdp_sync_user_callback_add(free, dec_cpd);
 
-        /* Due to the 1BPP font being decompressed in cached H-WRAM, we
-         * need to flush the cache as the DMA transfer accesses the
-         * uncached mirror address to the decompressed 4BPP font, which
-         * could result in fetching stale values not yet written back to
-         * H-WRAM */
+        /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
+         * flush the cache as the DMA transfer accesses the uncached mirror
+         * address to the decompressed 4BPP font, which could result in fetching
+         * stale values not yet written back to H-WRAM */
         cpu_cache_purge();
+
+        _dev_state->state = STATE_INITIALIZED;
 }
 
 static void
@@ -306,9 +310,26 @@ _deinit(void)
 }
 
 static void
+_buffer(const char *buffer)
+{
+        /* It's the best we can do for now. If the current buffer is marked for
+         * flushing, we have to silently drop any calls to write to the
+         * buffer */
+        if ((_dev_state->state & STATE_BUFFER_FLUSHING) == STATE_BUFFER_FLUSHING) {
+                return;
+        }
+
+        cons_buffer(buffer);
+}
+
+static void
 _flush(void)
 {
         if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
+                return;
+        }
+
+        if ((_dev_state->state & STATE_BUFFER_FLUSHING) == STATE_BUFFER_FLUSHING) {
                 return;
         }
 
@@ -336,7 +357,33 @@ _pnd_write(int16_t col, int16_t row, uint16_t value)
 static void
 _buffer_clear(void)
 {
-        _buffer_area_clear(0, CONS_COLS_MIN, 0, CONS_ROWS_MIN);
+        /* Don't try to clear the buffer again if it's already been cleared */
+        if ((_dev_state->state & STATE_BUFFER_CLEARED) == STATE_BUFFER_CLEARED) {
+                return;
+        }
+
+        _dev_state->state |= STATE_BUFFER_DIRTY;
+
+        uint8_t ch;
+        ch = 2;
+
+        struct dmac_ch_cfg dmac_cfg  = {
+                .dcc_ch = ch,
+                .dcc_dst = (uint32_t)&_dev_state->page_pnd[0],
+                .dcc_dst_mode = DMAC_DESTINATION_INCREMENT,
+                .dcc_src_mode = DMAC_SOURCE_FIXED,
+                .dcc_src = _dev_state->pnd_clear,
+                .dcc_len = _dev_state->page_size,
+                .dcc_stride = DMAC_STRIDE_2_BYTES,
+                .dcc_bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .dcc_ihr = NULL
+        };
+
+        cpu_dmac_channel_config_set(&dmac_cfg);
+        cpu_dmac_channel_start(ch);
+        cpu_dmac_channel_wait(ch);
+
+        _dev_state->state |= STATE_BUFFER_CLEARED;
 }
 
 static void
@@ -344,6 +391,8 @@ _buffer_area_clear(int16_t col_start, int16_t col_end, int16_t row_start,
     int16_t row_end)
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
+
+        /* XXX: Should we check if attempting to clear the entire buffer? */
 
         int16_t row;
         for (row = row_start; row < row_end; row++) {
@@ -369,6 +418,7 @@ static void
 _buffer_write(int16_t col, int16_t row, uint8_t ch)
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
+        _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
         uint16_t pnd;
         pnd = SCRN_PND_CONFIG_0(
@@ -426,6 +476,4 @@ static void
 _dma_handler(void *work __unused)
 {
         _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
-
-        _dev_state->state |= STATE_INITIALIZED;
 }
