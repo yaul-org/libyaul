@@ -13,6 +13,10 @@
 
 #include <vdp1/cmdt.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define VDP1_VRAM_SIZE 0x00080000 /* In bytes */
 
 struct vdp1_gouraud_table {
@@ -27,5 +31,9 @@ extern void *vdp1_vram_texture_base_get(void);
 extern struct vdp1_gouraud_table *vdp1_vram_gouraud_base_get(void);
 extern struct vdp1_clut *vdp1_vram_clut_base_get(void);
 extern void *vdp1_vram_remaining_get(void);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !_VDP1_VRAM_H_ */
