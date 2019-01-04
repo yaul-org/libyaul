@@ -1,8 +1,8 @@
 ### About
 
-`ssload` is (hopefully) a be-all tool to communicate with your Sega Saturn
+`ssload` is (hopefully) a be-all tool to communicate with your Sega Saturn.
 
-### Requirements
+### Dependencies
 
  - FTDI USB driver (`libftdi`) (`HAVE_LIBFTD2XX=0`)
  - D2XX Direct Drivers (`libftd2xx`) (`HAVE_LIBFTD2XX=1`)
@@ -21,7 +21,7 @@
     ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", \
         NAME="bus/usb/$env{BUSNUM}/$env{DEVNUM}", GROUP="dialout", MODE="0664"
 
-### Notes about MinGW
+#### Notes about MinGW
 
   It doesn't work unless libftdi-0.20 is used. Building all versions of libftdi1 yield issues.
   
@@ -30,15 +30,15 @@
 
     cmake \
         -DCMAKE_SYSTEM_NAME=Windows \
-        -DCMAKE_FIND_ROOT_PATH=c:/msys64/mingw32 \
-        -DLIBUSB_LIBRARIES=c:/msys64/mingw32/lib/libusb-1.0.dll.a \
-        -DLIBUSB_INCLUDE_DIR=c:/msys64/mingw32/include/libusb-1.0 \
+        -DCMAKE_FIND_ROOT_PATH=c:/path/to/msys64/mingw32 \
+        -DLIBUSB_LIBRARIES=c:/path/to/msys64/mingw32/lib/libusb-1.0.dll.a \
+        -DLIBUSB_INCLUDE_DIR=c:/path/to/msys64/mingw32/include/libusb-1.0 \
         -DCMAKE_C_COMPILER=/mingw32/bin/gcc.exe \
         -DCMAKE_CXX_COMPILER=/mingw32/bin/g++.exe -G "Unix Makefiles" ..
 
-### Usage (if using D2XX Direct Drivers library)
+#### Notes about Linux
 
-  If under Linux, be sure to remove modules `ftdi_sio` and `usbserial`
+  If under Linux and D2XX Direct Drivers library is used, be sure to remove modules `ftdi_sio` and `usbserial`.
 
     sudo rmmod ftdi_sio
     sudo rmmod usbserial
@@ -48,4 +48,4 @@
   Found a bug or do you have a suggestion to make `ssload` even
   better than it already is? Create an issue [here][1].
 
-[1]: https://github.com/mrkotfw/libyaul/issues
+[1]: https://github.com/ijacquez/libyaul/issues
