@@ -113,6 +113,8 @@ vdp_sync_init(void)
 void
 vdp_sync(int16_t interval __unused)
 {
+        vdp1_sync_draw_wait();
+
         uint32_t scu_mask;
         scu_mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT;
 
@@ -120,8 +122,6 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
         assert(!_sync);
-
-        vdp1_sync_draw_wait();
 
         _sync = true;
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
