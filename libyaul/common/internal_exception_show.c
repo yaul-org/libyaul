@@ -16,6 +16,8 @@
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
+#include <vdp.h>
+
 #include <sys/dma-queue.h>
 
 #include <dbgio.h>
@@ -37,21 +39,17 @@ _internal_exception_show(const char *buffer)
         vdp2_sprite_type_set(0);
         vdp2_sprite_priority_set(0, 0);
 
+        dma_queue_clear();
+
         dbgio_dev_default_init(DBGIO_DEV_VDP2);
         dbgio_dev_set(DBGIO_DEV_VDP2);
         dbgio_buffer(buffer);
         dbgio_flush();
 
-        vdp2_commit_handler_set(NULL, NULL);
-        vdp2_commit();
-
-        vdp2_tvmd_vblank_out_wait();
-        vdp2_tvmd_vblank_in_wait();
-        dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
-
         cpu_intc_mask_set(0);
 
-        dma_queue_flush_wait(DMA_QUEUE_TAG_VBLANK_IN);
+        vdp2_sync_commit();
+        vdp_sync(0);
 
         cpu_intc_mask_set(15);
 

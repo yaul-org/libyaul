@@ -66,6 +66,9 @@ static void (*_user_vblank_out_handler)(void);
 
 static void _default_user_callback(void *);
 
+static void _init_vdp1(void);
+static void _init_vdp2(void);
+
 void
 vdp_sync_init(void)
 {
@@ -74,19 +77,11 @@ vdp_sync_init(void)
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        _state_vdp1_commit = false;
-        _state_vdp1_committed = false;
-        _state_vdp1_change = false;
-        _state_vdp1_transferred = false;
-
-        _state_vdp2_commit = false;
-        _state_vdp2_committed = false;
-        _state_vdp2_pending = false;
+        _init_vdp1();
+        _init_vdp2();
 
         _sync = false;
         _field_count = 0;
-
-        _vdp1_last_command = 0x0000;
 
         _vblank_in = false;
         _vblank_out = false;
@@ -97,17 +92,13 @@ vdp_sync_init(void)
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
-        vdp2_commit_handler_set(_vdp2_commit_handler, NULL);
-
-        scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
-
-        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
-
         uint32_t i;
         for (i = 0; i < USER_CALLBACK_COUNT; i++) {
                 _user_callbacks[i] = _default_user_callback;
                 _user_works[i] = NULL;
         }
+
+        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 }
 
 void
@@ -223,7 +214,12 @@ vdp2_sync_commit(void)
         _state_vdp2_committed = false;
         _state_vdp2_pending = false;
 
-        vdp2_commit();
+        struct dma_reg_buffer *reg_buffer;
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+
+        int8_t ret;
+        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN, _vdp2_commit_handler, NULL);
+        assert(ret == 0);
 }
 
 uint16_t
@@ -261,6 +257,58 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
         }
 
         assert(i != USER_CALLBACK_COUNT);
+}
+
+static void
+_init_vdp1(void)
+{
+        _state_vdp1_commit = false;
+        _state_vdp1_committed = false;
+        _state_vdp1_change = false;
+        _state_vdp1_transferred = false;
+
+        _vdp1_last_command = 0x0000;
+
+        scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
+}
+
+static void
+_init_vdp2(void)
+{
+        _state_vdp2_commit = false;
+        _state_vdp2_committed = false;
+        _state_vdp2_pending = false;
+
+        struct dma_xfer *xfer;
+
+        /* Write VDP2(TVMD) first */
+        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
+        xfer->len = 2;
+        xfer->dst = VDP2(0);
+        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.tvmd;
+
+        /* Skip the first 8 VDP2 registers */
+        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REGS];
+        xfer->len = sizeof(_state_vdp2()->regs) - 16;
+        xfer->dst = VDP2(16);
+        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.buffer[8];
+
+        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
+        xfer->len = 0;
+        xfer->dst = 0x00000000;
+        xfer->src = 0x00000000;
+
+        struct dma_level_cfg dma_level_cfg = {
+                .dlc_mode = DMA_MODE_INDIRECT,
+                .dlc_xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
+                .dlc_stride = DMA_STRIDE_2_BYTES,
+                .dlc_update = DMA_UPDATE_NONE
+        };
+
+        void *reg_buffer;
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+
+        scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 }
 
 static void
