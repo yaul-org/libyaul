@@ -156,8 +156,6 @@ _init_vdp2(void)
 
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 
-        vdp2_commit_handler_set(NULL, NULL);
-
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x000000),
             COLOR_RGB555(0, 0, 0));
 
