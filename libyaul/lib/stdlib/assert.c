@@ -19,11 +19,16 @@ __assert_func(const char *file, int line, const char *func,
 {
         static char buffer[4096];
 
+        bool has_func_str;
+        has_func_str = (func != NULL) || (*func != '\0');
+
         (void)sprintf(buffer,
             "[H[2JAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
-            failed_expr, file, line,
-            (func ? ", function: " : ""),
-            (func ? func : ""));
+            failed_expr,
+            file,
+            line,
+            ((has_func_str) ? ", function: " : ""),
+            ((has_func_str) ? func : ""));
 
         _internal_exception_show(buffer);
 }
