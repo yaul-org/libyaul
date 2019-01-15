@@ -15,7 +15,7 @@ _BEGIN_STD_C
 #define RAND_MAX __RAND_MAX
 
 void abort(void) __attribute__ ((__noreturn__));
-int abs(int);
+int32_t abs(int32_t);
 int atexit(void (*__func)(void));
 int atoi(const char *nptr);
 void exit(int status) __attribute__ ((__noreturn__));

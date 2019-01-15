@@ -11,9 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <internal.h>
-
-int abs(int32_t number)
+int32_t
+abs(int32_t number)
 {
         return (number < 0) ? -number : number;
 }
