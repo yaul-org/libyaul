@@ -13,8 +13,7 @@
 
 #include <internal.h>
 
-int abs(int number)
+int abs(int32_t number)
 {
-  return number < 0 ? -number : number;
+        return (number < 0) ? -number : number;
 }
-
