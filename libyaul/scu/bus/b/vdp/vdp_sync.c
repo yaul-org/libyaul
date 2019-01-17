@@ -6,6 +6,8 @@
  */
 
 #include <cpu/cache.h>
+#include <cpu/intc.h>
+
 #include <scu/ic.h>
 
 #include <vdp.h>
@@ -20,9 +22,9 @@ static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
 
-static void _vdp1_dma_handler(void *);
+static void _vdp1_dma_handler(const struct dma_queue_transfer *);
 
-static void _vdp2_commit_handler(void *);
+static void _vdp2_commit_handler(const struct dma_queue_transfer *);
 
 static void _default_handler(void);
 
@@ -52,6 +54,9 @@ static volatile bool _state_vdp2_committed = false;
 /* Request is pending */
 static volatile bool _state_vdp2_pending = false;
 
+static const uint32_t _scu_mask_set = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END;
+static const uint32_t _scu_mask_unset = ~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END);
+
 static volatile bool _sync = false;
 static volatile int16_t _field_count = 0;
 
@@ -72,10 +77,7 @@ static void _init_vdp2(void);
 void
 vdp_sync_init(void)
 {
-        uint16_t scu_mask;
-        scu_mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END;
-
-        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
+        scu_ic_mask_chg(IC_MASK_ALL, _scu_mask_set);
 
         _init_vdp1();
         _init_vdp2();
@@ -92,13 +94,9 @@ vdp_sync_init(void)
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
-        uint32_t i;
-        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
-                _user_callbacks[i] = _default_user_callback;
-                _user_works[i] = NULL;
-        }
+        scu_ic_mask_chg(_scu_mask_unset, IC_MASK_NONE);
 
-        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+        vdp_sync_user_callback_clear();
 }
 
 void
@@ -106,19 +104,24 @@ vdp_sync(int16_t interval __unused)
 {
         vdp1_sync_draw_wait();
 
+        uint8_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
+
         uint32_t scu_mask;
-        scu_mask = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT;
+        scu_mask = scu_ic_mask_get();
 
         /* Enter critical section */
-        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
+        cpu_intc_mask_set(15);
+        scu_ic_mask_chg(IC_MASK_ALL, _scu_mask_set);
 
         assert(!_sync);
 
         _sync = true;
-        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+        scu_ic_mask_chg(_scu_mask_unset, IC_MASK_NONE);
+        cpu_intc_mask_set(0);
 
-        /* Wait until VDP1 changed frame buffers and wait until VDP2
-         * state has been committed. */
+        /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
+         * been committed. */
         bool vdp1_working;
         bool vdp2_working;
         do {
@@ -126,17 +129,23 @@ vdp_sync(int16_t interval __unused)
                 vdp2_working = _state_vdp2_commit && !_state_vdp2_committed;
         } while (vdp1_working || vdp2_working);
 
-        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
+        cpu_intc_mask_set(15);
+        scu_ic_mask_chg(IC_MASK_ALL, _scu_mask_set);
         _sync = false;
-        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+        scu_ic_mask_chg(_scu_mask_unset, IC_MASK_NONE);
+        cpu_intc_mask_set(0);
 
         uint32_t i;
         for (i = 0; i < USER_CALLBACK_COUNT; i++) {
                 _user_callbacks[i](_user_works[i]);
 
+                /* Remove callback as soon as it's done */
                 _user_callbacks[i] = _default_user_callback;
                 _user_works[i] = NULL;
         }
+
+        scu_ic_mask_set(scu_mask);
+        cpu_intc_mask_set(sr_mask);
 }
 
 void
@@ -190,6 +199,16 @@ vdp1_sync_draw_wait(void)
                 return;
         }
 
+        uint8_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
+        uint32_t scu_mask;
+        scu_mask = scu_ic_mask_get();
+
+        scu_ic_mask_chg(_scu_mask_unset, IC_MASK_NONE);
+
         if (_interlace_mode_double()) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
                  * the command list */
@@ -205,6 +224,9 @@ vdp1_sync_draw_wait(void)
         }
 
         _state_vdp1_change = true;
+
+        scu_ic_mask_set(scu_mask);
+        cpu_intc_mask_set(sr_mask);
 }
 
 void
@@ -240,7 +262,7 @@ vdp_sync_vblank_out_set(void (*ihr)(void))
         _user_vblank_out_handler = (ihr != NULL) ? ihr : _default_handler;
 }
 
-void
+int8_t
 vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 {
         assert(user_callback != NULL);
@@ -253,10 +275,34 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 
                 _user_callbacks[i] = user_callback;
                 _user_works[i] = work;
-                return;
+
+                return i;
         }
 
         assert(i != USER_CALLBACK_COUNT);
+
+        return -1;
+}
+
+void
+vdp_sync_user_callback_remove(int8_t id)
+{
+        assert(id >= 0);
+        assert(id < USER_CALLBACK_COUNT);
+
+        _user_callbacks[id] = _default_user_callback;
+        _user_works[id] = NULL;
+
+}
+
+void
+vdp_sync_user_callback_clear(void)
+{
+        uint32_t i;
+        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
+                _user_callbacks[i] = _default_user_callback;
+                _user_works[i] = NULL;
+        }
 }
 
 static void
@@ -427,7 +473,7 @@ _sprite_end_handler(void)
 }
 
 static void
-_vdp1_dma_handler(void *work __unused)
+_vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 {
         _state_vdp1_transferred = true;
 
@@ -441,7 +487,7 @@ _vdp1_dma_handler(void *work __unused)
 }
 
 static void
-_vdp2_commit_handler(void *work __unused)
+_vdp2_commit_handler(const struct dma_queue_transfer *transfer __unused)
 {
         /* VDP2 request to commit is finished */
         _state_vdp2_commit = false;
