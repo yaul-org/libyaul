@@ -26,11 +26,13 @@
 
 #include "vdp2_font.inc"
 
-#define STATE_IDLE              0x00
-#define STATE_INITIALIZED       0x01
-#define STATE_BUFFER_DIRTY      0x02
-#define STATE_BUFFER_CLEARED    0x04
-#define STATE_BUFFER_FLUSHING   0x08
+#define STATE_IDLE                      0x00
+#define STATE_INITIALIZED               0x01
+#define STATE_PARTIALLY_INITIALIZED     0x02
+#define STATE_BUFFER_DIRTY              0x04
+#define STATE_BUFFER_CLEARED            0x08
+#define STATE_BUFFER_FLUSHING           0x10
+#define STATE_BUFFER_FORCE_FLUSHING     0x20
 
 typedef struct {
         struct dma_reg_buffer dma_reg_buffer;
@@ -53,6 +55,13 @@ typedef struct {
         uint8_t state;
 } dev_state_t;
 
+static struct {
+        /* List of pointers to free */
+        void *free_ptrs[2];
+        /* VDP sync callback ID to remove */
+        int8_t sync_cid;
+} _init_work;
+
 static void _init(const dbgio_vdp2_t *);
 static void _deinit(void);
 static void _buffer(const char *);
@@ -70,7 +79,10 @@ static void _buffer_write(int16_t, int16_t, uint8_t);
 static void _font_1bpp_4bpp_decompress(uint8_t *, const uint8_t *, uint8_t,
     uint8_t);
 
-static void _dma_handler(void *);
+static void _init_dma_handler(const struct dma_queue_transfer *);
+static void _flush_dma_handler(const struct dma_queue_transfer *);
+
+static void _cleanup_initialization(void);
 
 /* Restrictions:
  * 1. Screen will always be displayed
@@ -176,7 +188,13 @@ _init(const dbgio_vdp2_t *params)
         /* XXX: Fetch CRAM mode and check number of available 16-color banks */
         assert((params->cram_index >= 0) && (params->cram_index < 128));
 
-        _dev_state = malloc(sizeof(dev_state_t));
+        if ((_dev_state->state & (STATE_INITIALIZED | STATE_PARTIALLY_INITIALIZED)) != 0x00) {
+                return;
+        }
+
+        if (_dev_state == NULL) {
+                _dev_state = malloc(sizeof(dev_state_t));
+        }
         assert(_dev_state != NULL);
 
         (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
@@ -226,12 +244,15 @@ _init(const dbgio_vdp2_t *params)
                 /* vf = */ 0,
                 /* hf = */ 0);
 
-        _dev_state->page_pnd = malloc(_dev_state->page_size);
+        if (_dev_state->page_pnd == NULL) {
+                _dev_state->page_pnd = malloc(_dev_state->page_size);
+        }
         assert(_dev_state->page_pnd != NULL);
 
         uint8_t *dec_cpd;
         dec_cpd = (uint8_t *)malloc(FONT_4BPP_SIZE);
         assert(dec_cpd != NULL);
+        _init_work.free_ptrs[0] = dec_cpd;
 
         _font_1bpp_4bpp_decompress(dec_cpd, params->font_cpd, params->font_fg,
             params->font_bg);
@@ -243,6 +264,7 @@ _init(const dbgio_vdp2_t *params)
         void *aligned;
         aligned = malloc(sizeof(*dma_font) + 32);
         assert(aligned != NULL);
+        _init_work.free_ptrs[1] = aligned;
 
         uint32_t aligned_offset;
         aligned_offset = (((uint32_t)aligned + 0x0000001F) & ~0x0000001F) - (uint32_t)aligned;
@@ -266,7 +288,10 @@ _init(const dbgio_vdp2_t *params)
 
         scu_dma_config_buffer(&dma_font->reg_buffer, &dma_level_cfg);
 
-        dma_queue_enqueue(&dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN, NULL, NULL);
+        int8_t ret;
+        ret = dma_queue_enqueue(&dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+            _init_dma_handler, NULL);
+        assert(ret == 0);
 
         /* 64x32 page PND */
         dma_level_cfg.dlc_mode = DMA_MODE_DIRECT;
@@ -282,8 +307,8 @@ _init(const dbgio_vdp2_t *params)
 
         /* We're truly initialized once the user has made at least one call to
          * vdp_sync() */
-        vdp_sync_user_callback_add(free, aligned);
-        vdp_sync_user_callback_add(free, dec_cpd);
+        _init_work.sync_cid = vdp_sync_user_callback_add(
+                (void (*)(void *))_cleanup_initialization, NULL);
 
         /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
          * flush the cache as the DMA transfer accesses the uncached mirror
@@ -291,13 +316,17 @@ _init(const dbgio_vdp2_t *params)
          * stale values not yet written back to H-WRAM */
         cpu_cache_purge();
 
-        _dev_state->state = STATE_INITIALIZED;
+        _dev_state->state = STATE_PARTIALLY_INITIALIZED;
 }
 
 static void
 _deinit(void)
 {
-        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & (STATE_PARTIALLY_INITIALIZED | STATE_INITIALIZED)) == 0x00) {
                 return;
         }
 
@@ -312,10 +341,21 @@ _deinit(void)
 static void
 _buffer(const char *buffer)
 {
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & (STATE_PARTIALLY_INITIALIZED | STATE_INITIALIZED)) == 0x00) {
+                return;
+        }
+
         /* It's the best we can do for now. If the current buffer is marked for
          * flushing, we have to silently drop any calls to write to the
          * buffer */
-        if ((_dev_state->state & STATE_BUFFER_FLUSHING) == STATE_BUFFER_FLUSHING) {
+        uint8_t state_mask;
+        state_mask = STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
+
+        if ((_dev_state->state & state_mask) == STATE_BUFFER_FLUSHING) {
                 return;
         }
 
@@ -325,6 +365,14 @@ _buffer(const char *buffer)
 static void
 _flush(void)
 {
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & (STATE_PARTIALLY_INITIALIZED | STATE_INITIALIZED)) == 0x00) {
+                return;
+        }
+
         if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
                 return;
         }
@@ -335,8 +383,12 @@ _flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        dma_queue_enqueue(&_dev_state->dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
-            _dma_handler, NULL);
+        int8_t ret;
+        ret = dma_queue_enqueue(&_dev_state->dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+            _flush_dma_handler, NULL);
+        assert(ret == 0);
+
+        _cleanup_initialization();
 }
 
 static inline void __attribute__ ((always_inline))
@@ -473,7 +525,52 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd, uint8_t fg,
 }
 
 static void
-_dma_handler(void *work __unused)
+_init_dma_handler(const struct dma_queue_transfer *transfer)
 {
-        _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
+        if (transfer->dqt_status == DMA_QUEUE_STATUS_COMPLETE) {
+                return;
+        }
+
+        _dev_state->state = STATE_IDLE;
+
+        /* When a DMA request is canceled, it's called outside of any
+         * internal interrupt handlers, so we're able to call free() */
+        free(_init_work.free_ptrs[0]);
+        free(_init_work.free_ptrs[1]);
+
+        vdp_sync_user_callback_remove(_init_work.sync_cid);
+}
+
+static void
+_flush_dma_handler(const struct dma_queue_transfer *transfer)
+{
+        if (transfer->dqt_status == DMA_QUEUE_STATUS_COMPLETE) {
+                uint8_t state_mask;
+                state_mask = STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
+
+                _dev_state->state &= ~state_mask;
+
+                return;
+        }
+
+        /* If the DMA request was canceled, then we should allow force
+         * flush while blocking any more writes to the buffer */
+        _dev_state->state |= STATE_BUFFER_FORCE_FLUSHING;
+}
+
+static void
+_cleanup_initialization(void)
+{
+        if ((_dev_state->state & STATE_PARTIALLY_INITIALIZED) != STATE_PARTIALLY_INITIALIZED) {
+                return;
+        }
+
+        _dev_state->state &= ~STATE_PARTIALLY_INITIALIZED;
+        _dev_state->state |= STATE_INITIALIZED;
+
+        free(_init_work.free_ptrs[0]);
+        free(_init_work.free_ptrs[1]);
+
+        _init_work.free_ptrs[0] = NULL;
+        _init_work.free_ptrs[1] = NULL;
 }
