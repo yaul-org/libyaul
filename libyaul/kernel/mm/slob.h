@@ -35,8 +35,8 @@ extern "C" {
 #define SLOB_PAGE_SIZE  0x4000
 #define SLOB_PAGE_MASK  (~(SLOB_PAGE_SIZE - 1))
 
-#define SLOB_PAGE_BREAK_1ST 0x0100
-#define SLOB_PAGE_BREAK_2ND 0x0400
+#define SLOB_PAGE_BREAK_1ST 0x1000
+#define SLOB_PAGE_BREAK_2ND 0x2000
 
 struct slob_stats {
         /* Number of free bytes (across all SLOB pages) */
