@@ -21,19 +21,19 @@ extern "C" {
 #define WDT_CLOCK_DIV_4096      6
 #define WDT_CLOCK_DIV_8192      7
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_wdt_count_set(uint8_t count)
 {
         MEMORY_WRITE(16, CPU(WTCNTW), 0x5A00 | count);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 cpu_wdt_count_get(void)
 {
         return MEMORY_READ(8, CPU(WTCNTR));
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_wdt_enable(void)
 {
         uint8_t wtcr_bits;
@@ -45,7 +45,7 @@ cpu_wdt_enable(void)
         MEMORY_WRITE(16, CPU(WTCSRW), 0x5A18 | wtcr_bits);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_wdt_disable(void)
 {
         uint8_t wtcr_bits;
@@ -56,7 +56,7 @@ cpu_wdt_disable(void)
         MEMORY_WRITE(16, CPU(WTCSRW), 0x5A18 | wtcr_bits);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
         uint16_t ipra;

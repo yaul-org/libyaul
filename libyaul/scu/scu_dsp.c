@@ -297,7 +297,7 @@ _read_ppaf(void)
         return ppaf_bits;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _update_flags(uint32_t ppaf_bits)
 {
         _overflow = _overflow || ((ppaf_bits & 0x00080000) != 0x00000000);

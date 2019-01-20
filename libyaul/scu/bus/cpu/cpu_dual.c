@@ -156,7 +156,7 @@ _slave_ici_entry(void)
         }
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _master_ici_handler(void)
 {
         volatile uint8_t *reg_tier;
@@ -171,7 +171,7 @@ _master_ici_handler(void)
         *reg_tier |= 0x80;
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _slave_ici_handler(void)
 {
         volatile uint8_t *reg_tier;

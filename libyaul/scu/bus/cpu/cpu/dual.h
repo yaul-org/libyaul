@@ -22,19 +22,19 @@ extern "C" {
 #define CPU_DUAL_ENTRY_POLLING 0
 #define CPU_DUAL_ENTRY_ICI     1
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dual_master_notify(void)
 {
         MEMORY_WRITE(16, SINIT, 0xFFFF);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dual_slave_notify(void)
 {
         MEMORY_WRITE(16, MINIT, 0xFFFF);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dual_notification_wait(void)
 {
         volatile uint8_t *reg_ftcsr;

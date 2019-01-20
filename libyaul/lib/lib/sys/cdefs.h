@@ -113,6 +113,8 @@
                 __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
 #endif /* !static_assert */
 
+#define __interrupt_handler	__attribute__ ((interrupt_handler))
+
 /*
  * Compiler-dependent macros to help declare dead (non-returning) and
  * pure (no side effects) functions, and unused variables.  They are
@@ -129,9 +131,9 @@
 #define __unused                __attribute__ ((__unused__))
 #define __used                  __attribute__ ((__used__))
 #define __packed                __attribute__ ((__packed__))
+#define __weak                  __attribute__ ((__weak__))
 #define __aligned(x)            __attribute__ ((__aligned__(x)))
 #define __section(x)            __attribute__ ((__section__(x)))
-
 #define __alloc_size(x)         __attribute__ ((__alloc_size__(x)))
 
 #if __has_attribute(__alloc_align__)

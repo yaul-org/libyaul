@@ -260,13 +260,13 @@ struct vdp1_cmdt_user_clip_coord {
         VDP1_CMDT_DUMMY_UNION_DECLARE(ucc);
 };
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
 {
         return MEMORY_READ(16, VDP1(COPR)) >> 2;
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 vdp1_cmdt_last_get(void)
 {
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;

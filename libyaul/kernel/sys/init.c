@@ -31,7 +31,7 @@
 
 #include <dram-cart.h>
 
-void __attribute__ ((weak))
+void __weak
 user_init(void)
 {
         slob_init();

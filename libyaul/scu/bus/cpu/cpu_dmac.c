@@ -171,7 +171,7 @@ cpu_dmac_channel_wait(uint8_t ch)
         while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000);
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _dmac_ch0_ihr_handler(void)
 {
         _dmac_ihr_table[DMAC_IHR_INDEX_CH0]();
@@ -179,7 +179,7 @@ _dmac_ch0_ihr_handler(void)
         MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _dmac_ch1_ihr_handler(void)
 {
         _dmac_ihr_table[DMAC_IHR_INDEX_CH1]();

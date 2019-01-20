@@ -17,19 +17,19 @@
 
 #include "vt_parse.inc"
 
-static inline __attribute__ ((always_inline)) void _action_character_print(int);
-static inline __attribute__ ((always_inline)) void _action_escape_character_print(int);
-static inline __attribute__ ((always_inline)) void _action_csi_dispatch_print(int16_t, int16_t *, int16_t);
+static inline __always_inline void _action_character_print(int);
+static inline __always_inline void _action_escape_character_print(int);
+static inline __always_inline void _action_csi_dispatch_print(int16_t, int16_t *, int16_t);
 
-static inline __attribute__ ((always_inline)) bool _cursor_column_exceeded(int16_t);
-static inline __attribute__ ((always_inline)) bool _cursor_row_exceeded(uint16_t);
-static inline __attribute__ ((always_inline)) void _cursor_column_advance(int16_t);
-static inline __attribute__ ((always_inline)) bool _cursor_column_cond_set(int16_t);
-static inline __attribute__ ((always_inline)) void _cursor_column_set(int16_t);
-static inline __attribute__ ((always_inline)) void _cursor_row_advance(uint16_t);
-static inline __attribute__ ((always_inline)) bool _cursor_row_cond_set(int16_t);
-static inline __attribute__ ((always_inline)) void _cursor_row_set(int16_t);
-static inline __attribute__ ((always_inline)) bool _cursor_cond_set(int16_t, int16_t);
+static inline __always_inline bool _cursor_column_exceeded(int16_t);
+static inline __always_inline bool _cursor_row_exceeded(uint16_t);
+static inline __always_inline void _cursor_column_advance(int16_t);
+static inline __always_inline bool _cursor_column_cond_set(int16_t);
+static inline __always_inline void _cursor_column_set(int16_t);
+static inline __always_inline void _cursor_row_advance(uint16_t);
+static inline __always_inline bool _cursor_row_cond_set(int16_t);
+static inline __always_inline void _cursor_row_set(int16_t);
+static inline __always_inline bool _cursor_cond_set(int16_t, int16_t);
 
 static void _vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
@@ -117,7 +117,7 @@ _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
  * Return true if the current cursor position plus an X amount of
  * columns is out of bounds.
  */
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _cursor_column_exceeded(int16_t x)
 {
         int16_t col;
@@ -130,7 +130,7 @@ _cursor_column_exceeded(int16_t x)
  * Return true if the current cursor position plus an Y amount of rows
  * is out of bounds.
  */
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _cursor_row_exceeded(uint16_t y)
 {
         int16_t row;
@@ -142,7 +142,7 @@ _cursor_row_exceeded(uint16_t y)
 /*
  * Advance the cursor an Y amount of rows.
  */
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cursor_row_advance(uint16_t y)
 {
         _cons.cursor.row += y;
@@ -151,7 +151,7 @@ _cursor_row_advance(uint16_t y)
 /*
  * Set the cursor an Y amount of rows.
  */
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cursor_row_set(int16_t y)
 {
         _cons.cursor.row = y;
@@ -161,7 +161,7 @@ _cursor_row_set(int16_t y)
  * Set the cursor to ROW and return TRUE iff the ROW has not been
  * exceeded.
  */
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _cursor_row_cond_set(int16_t row)
 {
         if ((row >= 0) && (row <= _cons.rows)) {
@@ -175,7 +175,7 @@ _cursor_row_cond_set(int16_t row)
 /*
  * Advance the cursor an X amount of columns.
  */
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cursor_column_advance(int16_t x)
 {
         _cons.cursor.col += x;
@@ -185,7 +185,7 @@ _cursor_column_advance(int16_t x)
  * Set the cursor an X amount of columns iff it does not exceed
  * _cons.cols.
  */
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cursor_column_set(int16_t x)
 {
         _cons.cursor.col = x;
@@ -195,7 +195,7 @@ _cursor_column_set(int16_t x)
  * Set the cursor to COL and return TRUE iff the COL has not been
  * exceeded.
  */
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _cursor_column_cond_set(int16_t col)
 {
         if ((col >= 0) && (col <= _cons.cols)) {
@@ -210,7 +210,7 @@ _cursor_column_cond_set(int16_t col)
  * Set both the COL and ROW of the cursor and return TRUE iff the COL
  * and ROW both have not been exceeded.
  */
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _cursor_cond_set(int16_t col, int16_t row)
 {
         if (((col >= 0) && (col <= _cons.cols)) &&
@@ -224,7 +224,7 @@ _cursor_cond_set(int16_t col, int16_t row)
         return false;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _action_character_print(int ch)
 {
         if (_cursor_column_exceeded(0)) {
@@ -236,7 +236,7 @@ _action_character_print(int ch)
         _cursor_column_advance(1);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _action_escape_character_print(int ch)
 {
         int16_t tab;
@@ -275,7 +275,7 @@ _action_escape_character_print(int ch)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _action_csi_dispatch_print(int16_t ch, int16_t *params, int16_t num_params)
 {
         int16_t col;

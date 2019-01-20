@@ -239,7 +239,7 @@ struct state_vdp2 {
         } regs;
 };
 
-static inline struct state_vdp1 * __attribute__ ((always_inline))
+static inline struct state_vdp1 * __always_inline
 _state_vdp1(void)
 {
         extern struct state_vdp1 _internal_state_vdp1;
@@ -247,7 +247,7 @@ _state_vdp1(void)
         return &_internal_state_vdp1;
 }
 
-static inline struct state_vdp2 * __attribute__ ((always_inline))
+static inline struct state_vdp2 * __always_inline
 _state_vdp2(void)
 {
         extern struct state_vdp2 _internal_state_vdp2;

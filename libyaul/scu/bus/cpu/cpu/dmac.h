@@ -8,6 +8,8 @@
 #ifndef _CPU_DMAC_H_
 #define _CPU_DMAC_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -59,7 +61,7 @@ struct dmac_status {
         unsigned dcs_nmi_interrupt: 1;
 } __packed;
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
 {
         uint32_t n;
@@ -68,34 +70,34 @@ cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
         MEMORY_WRITE(32, CPU(TCR0 | n), tcr_bits);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_enable(void)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x0000000F);
         MEMORY_WRITE_OR(32, CPU(DMAOR), 0x00000001);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_disable(void)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
         MEMORY_WRITE_AND(16, CPU(IPRA), ~0x1F00);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_priority_mode_set(uint8_t mode)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
         MEMORY_WRITE_OR(32, CPU(DMAOR), (mode & 0x01) << 3);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_channel_start(uint8_t ch)
 {
         uint32_t n;
@@ -105,7 +107,7 @@ cpu_dmac_channel_start(uint8_t ch)
         MEMORY_WRITE_OR(32, CPU(CHCR0 | n), 0x00000001);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_dmac_channel_stop(uint8_t ch)
 {
         uint32_t n;

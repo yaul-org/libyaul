@@ -15,25 +15,25 @@
 extern "C" {
 #endif /* __cplusplus */
 
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 cpu_divu_status_get(void)
 {
         return MEMORY_READ(32, CPU(DVCR)) & 0x00000001;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_divu_quotient_get(void)
 {
         return MEMORY_READ(32, CPU(DVDNTL));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_divu_remainder_get(void)
 {
         return MEMORY_READ(32, CPU(DVDNTH));
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_divu_64_32_set(uint32_t dividendh, uint32_t dividendl, uint32_t divisor)
 {
         MEMORY_WRITE(32, CPU(DVSR), divisor);
@@ -42,7 +42,7 @@ cpu_divu_64_32_set(uint32_t dividendh, uint32_t dividendl, uint32_t divisor)
         MEMORY_WRITE(32, CPU(DVDNTL), dividendl);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
 {
         MEMORY_WRITE(32, CPU(DVSR), divisor);
@@ -50,7 +50,7 @@ cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
         MEMORY_WRITE(32, CPU(DVDNT), dividend);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
         register uint16_t ipra;

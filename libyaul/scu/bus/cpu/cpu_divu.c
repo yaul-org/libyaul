@@ -47,7 +47,7 @@ cpu_divu_ovfi_set(void (*ihr)(void))
         }
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _divu_ovfi_handler(void)
 {
         MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);

@@ -68,7 +68,7 @@ extern "C" {
 #define INTC_PRIORITY_DMA_ILLEGAL       3
 #define INTC_PRIORITY_SPRITE_END        2
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
 {
         register uint32_t *bios_address;
@@ -77,7 +77,7 @@ cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
-static inline void __attribute__ ((always_inline)) (*cpu_intc_ihr_get(uint32_t vector))(void)
+static inline void __always_inline (*cpu_intc_ihr_get(uint32_t vector))(void)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000314;
@@ -85,7 +85,7 @@ static inline void __attribute__ ((always_inline)) (*cpu_intc_ihr_get(uint32_t v
         return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 cpu_intc_mask_get(void)
 {
         register uint32_t reg_sr;
@@ -97,7 +97,7 @@ cpu_intc_mask_get(void)
         return mask;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_intc_mask_set(uint8_t mask)
 {
         register uint32_t reg_sr;

@@ -37,14 +37,14 @@ extern "C" {
 #define FRT_PAL_352_32_COUNT_1MS        0x037F
 #define FRT_PAL_352_128_COUNT_1MS       0x00E0
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
 {
         MEMORY_WRITE(8, CPU(FRCH), (uint8_t)(count >> 8));
         MEMORY_WRITE(8, CPU(FRCL), (uint8_t)(count & 0xFF));
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 cpu_frt_count_get(void)
 {
         uint16_t reg_frth;
@@ -56,7 +56,7 @@ cpu_frt_count_get(void)
         return (reg_frth << 8) | reg_frtl;
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 cpu_frt_input_capture_get(void)
 {
         uint8_t reg_ficrh;
@@ -68,7 +68,7 @@ cpu_frt_input_capture_get(void)
         return (reg_ficrh << 8) | reg_ficrl;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_frt_interrupt_priority_set(uint8_t priority)
 {
         /* Set the interrupt priority level for FRT (shared amongst all

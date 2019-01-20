@@ -8,6 +8,8 @@
 #ifndef _SCU_IC_H_
 #define _SCU_IC_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
 #include <scu/map.h>
@@ -80,7 +82,7 @@ extern "C" {
 #define IC_IST_EXTERNAL_02      0x40000000
 #define IC_IST_EXTERNAL_01      0x80000000
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
 {
         register uint32_t *bios_address;
@@ -89,13 +91,13 @@ scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
         ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_ihr_clear(uint8_t vector)
 {
         scu_ic_ihr_set(vector, NULL);
 }
 
-static inline void __attribute__ ((always_inline)) (*scu_ic_ihr_get(uint8_t vector))(void)
+static inline void __always_inline (*scu_ic_ihr_get(uint8_t vector))(void)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000304;
@@ -103,7 +105,7 @@ static inline void __attribute__ ((always_inline)) (*scu_ic_ihr_get(uint8_t vect
         return ((void (*(*)(uint8_t))(void))*bios_address)(vector);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_mask_set(uint32_t mask)
 {
         register uint32_t *bios_address;
@@ -112,7 +114,7 @@ scu_ic_mask_set(uint32_t mask)
         ((void (*)(uint32_t))*bios_address)(mask);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
 {
         register uint32_t *bios_address;
@@ -121,7 +123,7 @@ scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
         ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 scu_ic_mask_get(void)
 {
         register uint32_t *bios_address;
@@ -130,7 +132,7 @@ scu_ic_mask_get(void)
         return *bios_address;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 scu_ic_status_get(void)
 {
         uint32_t ist;
@@ -139,7 +141,7 @@ scu_ic_status_get(void)
         return ist;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
 {
         volatile uint32_t *reg_ist;
@@ -148,7 +150,7 @@ scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
         *reg_ist = (*reg_ist & and_mask) | or_mask;
 }
 
-static inline const uint32_t * __attribute__ ((always_inline))
+static inline const uint32_t * __always_inline
 scu_ic_priority_table_get(void)
 {
         /* Priority table is 0x80 bytes */
@@ -158,7 +160,7 @@ scu_ic_priority_table_get(void)
         return bios_address;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_ic_priority_table_set(uint32_t *table)
 {
         /* Priority table is 0x80 bytes */

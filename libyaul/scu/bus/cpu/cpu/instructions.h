@@ -16,7 +16,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_instr_trapa(const uint8_t vector)
 {
         __asm__ volatile ("trapa %[n]"
@@ -24,7 +24,7 @@ cpu_instr_trapa(const uint8_t vector)
             : [n] "n" (vector));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_instr_swapb(uint32_t x)
 {
         register uint32_t out;
@@ -36,7 +36,7 @@ cpu_instr_swapb(uint32_t x)
         return out;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_instr_swapw(uint32_t x)
 {
         register uint32_t out;
@@ -48,7 +48,7 @@ cpu_instr_swapw(uint32_t x)
         return out;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_instr_clrmac(void)
 {
         __asm__ volatile ("clrmac"
@@ -57,7 +57,7 @@ cpu_instr_clrmac(void)
             : "mach", "macl");
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 {
         __asm__ volatile ("xtrct %[rm], %[rn]"
@@ -67,7 +67,7 @@ cpu_instr_xtrct(uint32_t rm, uint32_t rn)
         return rn;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_instr_nop(void)
 {
         __asm__ volatile ("nop"

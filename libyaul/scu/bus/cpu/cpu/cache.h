@@ -8,11 +8,13 @@
 #ifndef _CPU_CACHE_H_
 #define _CPU_CACHE_H_
 
+#include <sys/cdefs.h>
+
+#include <cpu/map.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-#include <cpu/map.h>
 
 #define CPU_CACHE               0x00000000
 #define CPU_CACHE_THROUGH       0x20000000
@@ -31,19 +33,19 @@ extern "C" {
 #define CPU_CACHE_MODE_4_WAY    0x00
 #define CPU_CACHE_MODE_2_WAY    0x08
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_enable(void)
 {
         MEMORY_WRITE_OR(8, CPU(CCR), 0x01);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_disable(void)
 {
         MEMORY_WRITE_AND(8, CPU(CCR), ~0x01);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_data_repl_disable(void)
 {
         volatile uint8_t *reg_ccr;
@@ -56,7 +58,7 @@ cpu_cache_data_repl_disable(void)
         *reg_ccr = t0 | 0x05;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_data_repl_enable(void)
 {
         volatile uint8_t *reg_ccr;
@@ -69,7 +71,7 @@ cpu_cache_data_repl_enable(void)
         *reg_ccr = t0 | 0x01;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_instr_repl_disable(void)
 {
         volatile uint8_t *reg_ccr;
@@ -82,7 +84,7 @@ cpu_cache_instr_repl_disable(void)
         *reg_ccr = t0 | 0x03;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_instr_repl_enable(void)
 {
         volatile uint8_t *reg_ccr;
@@ -95,7 +97,7 @@ cpu_cache_instr_repl_enable(void)
         *reg_ccr = t0 | 0x01;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_way_mode_set(uint8_t mode)
 {
         volatile uint8_t *reg_ccr;
@@ -109,7 +111,7 @@ cpu_cache_way_mode_set(uint8_t mode)
         *reg_ccr = t0 | mode | 0x01;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_purge_line(void *addr)
 {
         uint32_t *purge_addr;
@@ -118,7 +120,7 @@ cpu_cache_purge_line(void *addr)
         *purge_addr = 0x00000000;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_cache_purge(void)
 {
         volatile uint8_t *reg_ccr;
