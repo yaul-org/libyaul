@@ -15,7 +15,7 @@
 
 #include <smpc.h>
 
-#if defined(DEBUG)
+#ifdef DEBUG
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart.h>
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
@@ -33,7 +33,7 @@ abort(void)
 
         /* This does not execute cleanup functions registered with
          * 'atexit' or 'on_exit' */
-#if defined(DEBUG)
+#ifdef DEBUG
 #if HAVE_DEV_CARTRIDGE == 0 /* No dev cartridge */
         while (true) {
         }

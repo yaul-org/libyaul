@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+
+#include <cpu/intc.h>
 
 #include <internal.h>
 
@@ -18,6 +22,7 @@ __assert_func(const char *file, int line, const char *func,
     const char *failed_expr)
 {
         static char buffer[4096];
+        static bool asserted = false;
 
         bool has_func_str;
         has_func_str = (func != NULL) || (*func != '\0');
@@ -29,6 +34,18 @@ __assert_func(const char *file, int line, const char *func,
             line,
             ((has_func_str) ? ", function: " : ""),
             ((has_func_str) ? func : ""));
+
+        /* If we crash within an assert, then let's fallback to simply copying
+         * the assert buffer to L-WRAM */
+        if (asserted) {
+                cpu_intc_mask_set(15);
+
+                (void)memcpy((void *)0x20200000, buffer, sizeof(buffer));
+
+                abort();
+        }
+
+        asserted = true;
 
         _internal_exception_show(buffer);
 }
