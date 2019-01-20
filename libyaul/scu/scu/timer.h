@@ -17,31 +17,31 @@
 extern "C" {
 #endif /* __cplusplus */
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
 {
         MEMORY_WRITE(32, SCU(T0C), value & 0x03FF);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_timer_t1_value_set(uint16_t value)
 {
         MEMORY_WRITE(32, SCU(T1S), value & 0x01FF);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_timer_disable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_timer_enable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_timer_line_enable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000101);

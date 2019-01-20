@@ -129,7 +129,7 @@ cpu_frt_ovi_set(void (*ihr)(void))
         }
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _frt_oci_handler(void)
 {
         volatile uint8_t *reg_tier;
@@ -156,7 +156,7 @@ _frt_oci_handler(void)
         *reg_tier |= ocf_bits;
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _frt_ovi_handler(void)
 {
         volatile uint8_t *reg_tier;

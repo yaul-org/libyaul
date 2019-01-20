@@ -35,7 +35,7 @@ extern "C" {
 #define SMPC_SMC_SETSMEM        0x17
 #define SMPC_RTC_SETTIME        0x16
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 smpc_smc_wait(bool enter)
 {
         volatile uint8_t *reg_sf;
@@ -48,7 +48,7 @@ smpc_smc_wait(bool enter)
         }
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_call(uint8_t cmd)
 {
         smpc_smc_wait(true);
@@ -60,31 +60,31 @@ smpc_smc_call(uint8_t cmd)
         return MEMORY_READ(8, OREG(31));
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_cdoff_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CDOFF);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_cdon_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CDON);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_ckchg320_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CKCHG320);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_ckchg352_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CKCHG352);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
 {
         /* Fetch peripheral data "SMPC" status */
@@ -99,61 +99,61 @@ smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
         return 0;
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_mshon_call(void)
 {
         return smpc_smc_call(SMPC_SMC_MSHON);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_nmireq_call(void)
 {
         return smpc_smc_call(SMPC_SMC_NMIREQ);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_resdisa_call(void)
 {
         return smpc_smc_call(SMPC_SMC_RESDISA);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_resenab_call(void)
 {
         return smpc_smc_call(SMPC_SMC_RESENAB);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_setsmem_call(void)
 {
         return smpc_smc_call(SMPC_SMC_SETSMEM);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_sndoff_call(void)
 {
         return smpc_smc_call(SMPC_SMC_SNDOFF);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_sndon_call(void)
 {
         return smpc_smc_call(SMPC_SMC_SNDON);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_sshoff_call(void)
 {
         return smpc_smc_call(SMPC_SMC_SSHOFF);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 smpc_smc_sshon_call(void)
 {
         return smpc_smc_call(SMPC_SMC_SSHON);
 }
 
-static inline void __attribute__ ((always_inline)) __noreturn
+static inline void __always_inline __noreturn
 smpc_smc_sysres_call(void)
 {
         smpc_smc_wait(true);

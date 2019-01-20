@@ -28,8 +28,8 @@ static void _vdp2_commit_handler(const struct dma_queue_transfer *);
 
 static void _default_handler(void);
 
-static inline bool __attribute__ ((always_inline)) _interlace_mode_double(void);
-static inline bool __attribute__ ((always_inline)) _vdp1_transfer_over(void);
+static inline bool __always_inline _interlace_mode_double(void);
+static inline bool __always_inline _vdp1_transfer_over(void);
 
 /* VDP1 related state */
 /* VDP1 Request for VDP1 to draw */
@@ -500,13 +500,13 @@ _default_handler(void)
 {
 }
 
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _interlace_mode_double(void)
 {
         return (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE);
 }
 
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 _vdp1_transfer_over(void)
 {
         struct vdp1_transfer_status transfer_status;

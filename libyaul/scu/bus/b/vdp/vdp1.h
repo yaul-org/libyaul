@@ -47,7 +47,7 @@ struct vdp1_mode_status {
         };
 } __packed __aligned(2);
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp1_mode_status_get(struct vdp1_mode_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
@@ -55,7 +55,7 @@ vdp1_mode_status_get(struct vdp1_mode_status *status)
         status->raw = MEMORY_READ(16, VDP1(MODR));
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp1_transfer_status_get(struct vdp1_transfer_status *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will

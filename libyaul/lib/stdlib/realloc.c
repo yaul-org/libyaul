@@ -1,6 +1,8 @@
+#include <sys/cdefs.h>
+
 #include <mm/slob.h>
 
-void * __attribute__ ((weak))
+void * __weak
 realloc(void *old, size_t new_len)
 {
         void *ret;

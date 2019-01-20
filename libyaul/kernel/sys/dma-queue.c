@@ -293,7 +293,7 @@ dma_queue_capacity_get(void)
         return DMA_QUEUE_REQUESTS_MAX_COUNT;
 }
 
-static void __attribute__ ((always_inline)) inline
+static void __always_inline inline
 _update_dma_request_pointers(const struct dma_queue_request *request)
 {
         assert(request != NULL);
@@ -302,7 +302,7 @@ _update_dma_request_pointers(const struct dma_queue_request *request)
         _current_request = request;
 }
 
-static void __attribute__ ((always_inline)) inline
+static void __always_inline inline
 _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *request)
 {
         assert(dma_queue != NULL);
@@ -314,7 +314,7 @@ _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _copy_dma_reg_buffer(struct dma_reg_buffer *dst_buffer, const struct dma_reg_buffer *src_buffer)
 {
         uint32_t *dst;

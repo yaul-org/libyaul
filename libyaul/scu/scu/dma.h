@@ -115,39 +115,39 @@ struct dma_level_cfg {
         uint32_t dlc_update;
 };
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
         /* In operation, on standby, or interrupted to background */
         return MEMORY_READ(32, SCU(DSTA)) & 0x00010003;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_dsp_wait(void)
 {
         while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 scu_dma_bus_access_busy(void)
 {
         return (MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_bus_access_wait(uint8_t bus_mask)
 {
         while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 scu_dma_level0_busy(void)
 {
         /* In operation or on standby */
         return (MEMORY_READ(32, SCU(DSTA)) >> 4) & 0x03;
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 scu_dma_level1_busy(void)
 {
         /* In operation or on standby */
@@ -159,14 +159,14 @@ scu_dma_level1_busy(void)
         return ((reg_dsta >> 10) & 0x02) | (reg_dsta & 0x01);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 scu_dma_level2_busy(void)
 {
         /* In operation or on standby */
         return (MEMORY_READ(32, SCU(DSTA)) >> 16) & 0x03;
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 scu_dma_level_busy(uint8_t level)
 {
         switch (level & 0x03) {
@@ -180,21 +180,21 @@ scu_dma_level_busy(uint8_t level)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level0_wait(void)
 {
         /* Cannot modify registers while in operation */
         while ((scu_dma_level0_busy()) != 0x00);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level1_wait(void)
 {
         /* Cannot modify registers while in operation */
         while ((scu_dma_level1_busy()) != 0x00);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level2_wait(void)
 {
         /* To prevent operation errors, do not activate DMA
@@ -204,7 +204,7 @@ scu_dma_level2_wait(void)
         while ((scu_dma_level2_busy()) != 0x00);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level_wait(uint8_t level)
 {
         switch (level) {
@@ -220,46 +220,46 @@ scu_dma_level_wait(uint8_t level)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level0_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level1_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level2_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level0_start(void)
 {
         scu_dma_level0_wait();
         scu_dma_level0_fast_start();
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level1_start(void)
 {
         scu_dma_level1_wait();
         scu_dma_level1_fast_start();
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level2_start(void)
 {
         scu_dma_level2_wait();
         scu_dma_level2_fast_start();
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level_fast_start(uint8_t level)
 {
         switch (level) {
@@ -275,7 +275,7 @@ scu_dma_level_fast_start(uint8_t level)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level_start(uint8_t level)
 {
         switch (level) {
@@ -291,25 +291,25 @@ scu_dma_level_start(uint8_t level)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level0_stop(void)
 {
         MEMORY_WRITE(32, SCU(D0EN), 0x00000000);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level1_stop(void)
 {
         MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level2_stop(void)
 {
         MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level_stop(uint8_t level)
 {
         switch (level) {
@@ -325,7 +325,7 @@ scu_dma_level_stop(uint8_t level)
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_stop(void)
 {
         scu_dma_level0_stop();
@@ -333,31 +333,31 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_illegal_set(void (*ihr)(void))
 {
         scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level0_end_set(void (*ihr)(void))
 {
         scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level1_end_set(void (*ihr)(void))
 {
         scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level2_end_set(void (*ihr)(void))
 {
         scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dma_level_end_set(uint8_t level, void (*ihr)(void))
 {
         switch (level & 0x03) {

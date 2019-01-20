@@ -72,7 +72,7 @@ cpu_wdt_interval_mode_set(void (*ihr)(void))
         cpu_wdt_count_set(0);
 }
 
-static void __attribute__ ((interrupt_handler))
+static void __interrupt_handler
 _wdt_iti_handler(void)
 {
         uint8_t wtcr_bits;

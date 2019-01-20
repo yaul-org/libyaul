@@ -16,7 +16,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_sync_spinlock(uint8_t b)
 {
         register uint8_t *bios_address;
@@ -30,7 +30,7 @@ cpu_sync_spinlock(uint8_t b)
             : [bios_address] "0" (bios_address), [b] "r" (b));
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_sync_spinlock_clear(uint8_t b)
 {
         register uint8_t *bios_address;

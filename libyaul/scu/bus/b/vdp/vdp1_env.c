@@ -16,9 +16,9 @@
 
 #include "vdp-internal.h"
 
-static inline void __attribute__ ((always_inline)) _env_assert(const struct vdp1_env *);
-static inline void __attribute__ ((always_inline)) _env_limits_assert(const struct vdp1_env *);
-static inline void __attribute__ ((always_inline)) _env_erase_assert(const struct vdp1_env *);
+static inline void __always_inline _env_assert(const struct vdp1_env *);
+static inline void __always_inline _env_limits_assert(const struct vdp1_env *);
+static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
 
 void
 vdp1_env_set(const struct vdp1_env *env)
@@ -113,7 +113,7 @@ vdp1_env_set(const struct vdp1_env *env)
         MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _env_assert(const struct vdp1_env *env)
 {
         assert(env != NULL);
@@ -131,12 +131,12 @@ _env_assert(const struct vdp1_env *env)
         _env_erase_assert(env);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _env_limits_assert(const struct vdp1_env *env)
 {
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _env_erase_assert(const struct vdp1_env *env)
 {
         assert((env->env_erase_points[0].x >= 0) &&

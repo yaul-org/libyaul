@@ -67,8 +67,8 @@ static void _deinit(void);
 static void _buffer(const char *);
 static void _flush(void);
 
-static inline void __attribute__ ((always_inline)) _pnd_clear(int16_t, int16_t);
-static inline void __attribute__ ((always_inline)) _pnd_write(int16_t, int16_t,
+static inline void __always_inline _pnd_clear(int16_t, int16_t);
+static inline void __always_inline _pnd_write(int16_t, int16_t,
     uint16_t);
 
 static void _buffer_clear(void);
@@ -391,13 +391,13 @@ _flush(void)
         _cleanup_initialization();
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _pnd_clear(int16_t col, int16_t row)
 {
         _pnd_write(col, row, _dev_state->pnd_clear);
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _pnd_write(int16_t col, int16_t row, uint16_t value)
 {
         int16_t offset;
@@ -483,7 +483,7 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
         _pnd_write(col, row, pnd);
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 _1bpp_4bpp_convert(uint8_t *row_1bpp, const uint8_t *fgbg)
 {
         uint8_t out_4bpp;

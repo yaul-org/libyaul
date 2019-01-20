@@ -16,12 +16,12 @@
 
 #include "vdp-internal.h"
 
-static inline void __attribute__ ((always_inline)) _cmdt_cmd_grda_set(struct vdp1_cmdt *, uint32_t);
-static inline void __attribute__ ((always_inline)) _cmdt_cmd_colr_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
-static inline void __attribute__ ((always_inline)) _cmdt_cmd_srca_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
-static inline void __attribute__ ((always_inline)) _cmdt_cmd_size_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+static inline void __always_inline _cmdt_cmd_grda_set(struct vdp1_cmdt *, uint32_t);
+static inline void __always_inline _cmdt_cmd_colr_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+static inline void __always_inline _cmdt_cmd_srca_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
+static inline void __always_inline _cmdt_cmd_size_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
 
-static inline void __attribute__ ((always_inline)) _cmdt_list_assert(const struct vdp1_cmdt_list *);
+static inline void __always_inline _cmdt_list_assert(const struct vdp1_cmdt_list *);
 
 struct vdp1_cmdt_list *
 vdp1_cmdt_list_alloc(uint16_t count)
@@ -347,7 +347,7 @@ vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
         cmdt_list->cmdt++;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cmdt_cmd_grda_set(struct vdp1_cmdt *cmdt, uint32_t grad)
 {
         /* Gouraud shading processing is valid when a color calculation
@@ -355,7 +355,7 @@ _cmdt_cmd_grda_set(struct vdp1_cmdt *cmdt, uint32_t grad)
         cmdt->cmd_grda = (grad >> 3) & 0xFFFF;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cmdt_cmd_colr_set(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_sprite *sprite)
 {
@@ -380,14 +380,14 @@ _cmdt_cmd_colr_set(struct vdp1_cmdt *cmdt,
         }
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cmdt_cmd_srca_set(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_sprite *sprite)
 {
         cmdt->cmd_srca = (sprite->cs_char >> 3) & 0xFFFF;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cmdt_cmd_size_set(struct vdp1_cmdt *cmdt,
     const struct vdp1_cmdt_sprite *sprite)
 {
@@ -400,7 +400,7 @@ _cmdt_cmd_size_set(struct vdp1_cmdt *cmdt,
         cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 _cmdt_list_assert(const struct vdp1_cmdt_list *cmdt_list)
 {
         assert(cmdt_list != NULL);

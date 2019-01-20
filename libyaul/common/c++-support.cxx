@@ -7,18 +7,18 @@ void __cxa_pure_virtual(void) {
     assert(false);
 }
 
-void* __attribute__ ((weak)) operator new(size_t size) {
+void* __weak operator new(size_t size) {
     return malloc(size);
 }
 
-void* __attribute__ ((weak)) operator new[](size_t size) {
+void* __weak operator new[](size_t size) {
     return malloc(size);
 }
 
-void __attribute__ ((weak)) operator delete(void *ptr) {
+void __weak operator delete(void *ptr) {
     free(ptr);
 }
 
-void __attribute__ ((weak)) operator delete[](void *ptr) {
+void __weak operator delete[](void *ptr) {
     free(ptr);
 }

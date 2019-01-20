@@ -25,7 +25,7 @@ extern "C" {
 /* Via __builtin_bswap32() and __builtin_bswap16(), GCC emits a function
  * with no use of the swap instructions */
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 bswap16(uint32_t x)
 {
         register uint32_t out;
@@ -37,7 +37,7 @@ bswap16(uint32_t x)
         return out;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 bswap32(uint32_t x)
 {
         register uint32_t out;

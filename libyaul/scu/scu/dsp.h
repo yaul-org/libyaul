@@ -8,6 +8,8 @@
 #ifndef _SCU_DSP_H_
 #define _SCU_DSP_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
 #include <scu/map.h>
@@ -45,7 +47,7 @@ struct dsp_status {
         unsigned int pc:8;
 } __packed;
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 scu_dsp_program_pause(bool pause)
 {
         if (pause) {

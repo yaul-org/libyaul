@@ -59,7 +59,7 @@ dlog2(uint32_t value)
         return l;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 pow2(uint32_t value)
 {
         value--;

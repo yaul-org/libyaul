@@ -34,7 +34,7 @@ struct cpu_registers {
         uint32_t sr;
 } __packed;
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_gbr_set(uint32_t reg_gbr)
 {
         __asm__ volatile ("ldc %0, gbr"
@@ -42,7 +42,7 @@ cpu_reg_gbr_set(uint32_t reg_gbr)
             : "r" (reg_gbr));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_gbr_get(void)
 {
         register uint32_t reg_gbr;
@@ -55,7 +55,7 @@ cpu_reg_gbr_get(void)
         return reg_gbr;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_vbr_set(uint32_t reg_vbr)
 {
         __asm__ volatile ("ldc %0, vbr"
@@ -63,7 +63,7 @@ cpu_reg_vbr_set(uint32_t reg_vbr)
             : "r" (reg_vbr));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_vbr_get(void)
 {
         register uint32_t reg_vbr;
@@ -76,7 +76,7 @@ cpu_reg_vbr_get(void)
         return reg_vbr;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_mach_set(uint32_t reg_mach)
 {
         __asm__ volatile ("lds %0, mach"
@@ -84,7 +84,7 @@ cpu_reg_mach_set(uint32_t reg_mach)
             : "r" (reg_mach));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_mach_get(void)
 {
         register uint32_t reg_mach;
@@ -97,7 +97,7 @@ cpu_reg_mach_get(void)
         return reg_mach;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_macl_set(uint32_t reg_macl)
 {
         __asm__ volatile ("lds %0, macl"
@@ -105,7 +105,7 @@ cpu_reg_macl_set(uint32_t reg_macl)
             : "r" (reg_macl));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_macl_get(void)
 {
         register uint32_t reg_macl;
@@ -118,7 +118,7 @@ cpu_reg_macl_get(void)
         return reg_macl;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_pr_set(uint32_t reg_pr)
 {
         __asm__ volatile ("lds %0, pr"
@@ -126,7 +126,7 @@ cpu_reg_pr_set(uint32_t reg_pr)
             : "r" (reg_pr));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_pr_get(void)
 {
         register uint32_t reg_pr;
@@ -139,7 +139,7 @@ cpu_reg_pr_get(void)
         return reg_pr;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 cpu_reg_sr_set(uint32_t reg_sr)
 {
         __asm__ volatile ("ldc %0, sr"
@@ -147,7 +147,7 @@ cpu_reg_sr_set(uint32_t reg_sr)
             : "r" (reg_sr));
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_sr_get(void)
 {
         register uint32_t reg_sr;
@@ -160,7 +160,7 @@ cpu_reg_sr_get(void)
         return reg_sr;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_fp_get(void)
 {
         register uint32_t reg_r14;
@@ -173,7 +173,7 @@ cpu_reg_fp_get(void)
         return reg_r14;
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 cpu_reg_sp_get(void)
 {
         register uint32_t reg_r15;

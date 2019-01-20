@@ -14,10 +14,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include <sys/cdefs.h>
+
 #define CPU_CLOCK_SPEED_26MHZ   0
 #define CPU_CLOCK_SPEED_28MHZ   1
 
-static inline uint8_t * __attribute__ ((always_inline))
+static inline uint8_t * __always_inline
 bios_power_persistent_memory_get(void)
 {
         uint8_t *bios_address;
@@ -26,7 +28,7 @@ bios_power_persistent_memory_get(void)
         return bios_address;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 bios_clock_speed_chg(uint8_t mode)
 {
         register uint32_t *bios_address;
@@ -35,7 +37,7 @@ bios_clock_speed_chg(uint8_t mode)
         ((void (*)(uint8_t))*bios_address)(mode);
 }
 
-static inline uint32_t __attribute__ ((always_inline))
+static inline uint32_t __always_inline
 bios_clock_speed_get(void)
 {
         register uint32_t *bios_address;
@@ -44,7 +46,7 @@ bios_clock_speed_get(void)
         return *bios_address;
 }
 
-static inline void __attribute__ ((noreturn, always_inline))
+static inline void __noreturn __always_inline
 bios_cd_player_execute(void)
 {
         register uint32_t *bios_address;

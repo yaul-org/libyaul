@@ -56,19 +56,19 @@ extern "C" {
 #define TVMD_HORZ_HIRESO_AE     6 /* 640x480 */
 #define TVMD_HORZ_HIRESO_BE     7 /* 704x480 */
 
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 vdp2_tvmd_vblank_in(void)
 {
         return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008;
 }
 
-static inline bool __attribute__ ((always_inline))
+static inline bool __always_inline
 vdp2_tvmd_vblank_out(void)
 {
         return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000;
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp2_tvmd_vblank_in_wait(void)
 {
         /* Wait until we're in V-BLANK-IN */
@@ -76,7 +76,7 @@ vdp2_tvmd_vblank_in_wait(void)
         /* Start of V-BLANK-IN */
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp2_tvmd_vblank_out_wait(void)
 {
         /* Wait until we're in V-BLANK-OUT */
@@ -84,13 +84,13 @@ vdp2_tvmd_vblank_out_wait(void)
         /* Start of V-BLANK-OUT */
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp2_tvmd_extern_wait(void)
 {
         for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
 }
 
-static inline void __attribute__ ((always_inline))
+static inline void __always_inline
 vdp2_tvmd_extern_latch(void)
 {
         MEMORY_WRITE_AND(16, VDP2(EXTEN), ~0x0200);
@@ -98,25 +98,25 @@ vdp2_tvmd_extern_latch(void)
         for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) == 0x0200); );
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 vdp2_tvmd_hcount_get(void)
 {
         return MEMORY_READ(16, VDP2(HCNT)) & 0x03FF;
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 vdp2_tvmd_vcount_get(void)
 {
         return MEMORY_READ(16, VDP2(VCNT)) & 0x03FF;
 }
 
-static inline uint16_t __attribute__ ((always_inline))
+static inline uint16_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
         return MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001;
 }
 
-static inline uint8_t __attribute__ ((always_inline))
+static inline uint8_t __always_inline
 vdp2_tvmd_field_scan_get(void)
 {
         return (MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001;
