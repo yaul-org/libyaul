@@ -55,7 +55,7 @@ static volatile bool _state_vdp2_committed = false;
 static volatile bool _state_vdp2_pending = false;
 
 static const uint32_t _scu_mask_set = IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END;
-static const uint32_t _scu_mask_unset = ~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END);
+static const uint32_t _scu_mask_unset = ~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END) & IC_MASK_ALL;
 
 static volatile bool _sync = false;
 static volatile int16_t _field_count = 0;
@@ -189,7 +189,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         assert(ret == 0);
 
         ret = dma_queue_flush(DMA_QUEUE_TAG_IMMEDIATE);
-        assert(ret == 0);
+        assert(ret >= 0);
 }
 
 void
@@ -412,7 +412,7 @@ _vblank_in_handler(void)
 
                 int8_t ret;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
-                assert(ret == 0);
+                assert(ret >= 0);
         }
 
 no_sync:

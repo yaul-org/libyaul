@@ -45,7 +45,6 @@ extern "C" {
         })
 #endif /* !clamp */
 
-
 static __inline uint32_t
 dlog2(uint32_t value)
 {
