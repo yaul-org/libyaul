@@ -183,6 +183,10 @@ slob_free(void *addr)
 
         uint32_t bunits;
 
+        if (addr == NULL) {
+                return;
+        }
+
         assert(addr != NULL);
 
         /* Check if ADDR is within bounds of a SLOB managed memory */

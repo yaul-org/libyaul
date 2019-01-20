@@ -36,8 +36,8 @@ extern void dma_queue_init(void);
 extern int8_t dma_queue_enqueue(const struct dma_reg_buffer *, uint8_t, void (*)(const struct dma_queue_transfer *), void *);
 extern void dma_queue_tag_clear(uint8_t);
 extern void dma_queue_clear(void);
-extern int8_t dma_queue_flush(uint8_t);
-extern void dma_queue_flush_wait(uint8_t);
+extern uint32_t dma_queue_flush(uint8_t);
+extern void dma_queue_flush_wait(void);
 extern uint32_t dma_queue_count_get(uint8_t);
 extern uint32_t dma_queue_capacity_get(void);
 
