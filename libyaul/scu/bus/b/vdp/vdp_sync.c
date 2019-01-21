@@ -21,8 +21,6 @@
 #define SCU_MASK_ENABLE         (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
 #define SCU_MASK_DISABLE        (~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END) & IC_MASK_ALL)
 
-#define STATE_NONE                      0x00
-
 #define STATE_SYNC                      0x01
 #define STATE_SYNC_VBLANK_IN            0x02
 #define STATE_SYNC_VBLANK_OUT           0x04
@@ -49,11 +47,15 @@ static void _default_handler(void);
 static inline bool __always_inline _interlace_mode_double(void);
 static inline bool __always_inline _vdp1_transfer_over(void);
 
-static volatile struct {
-        uint8_t sync;
-        uint8_t vdp1;
-        uint8_t vdp2;
-        uint8_t field_count;
+static volatile union {
+        struct {
+                uint8_t sync;
+                uint8_t vdp1;
+                uint8_t vdp2;
+                uint8_t field_count;
+        } __packed;
+
+        uint32_t raw;
 } _state __aligned(4);
 
 /* Keep track of the current command table operation */
@@ -77,6 +79,8 @@ void
 vdp_sync_init(void)
 {
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
+
+        _state.raw = 0x00000000;
 
         _init_vdp1();
         _init_vdp2();
