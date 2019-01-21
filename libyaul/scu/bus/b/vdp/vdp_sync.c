@@ -18,6 +18,12 @@
 
 #define USER_CALLBACK_COUNT 16
 
+#define STATE_VDP1_IDLE                 0x00
+#define STATE_VDP1_REQUEST_COMMIT_LIST  0x01 /* VDP1 Request for VDP1 to draw */
+#define STATE_VDP1_LIST_TRANSFERRED     0x02 /* VDP1 finished transferring via DMA */
+#define STATE_VDP1_LIST_COMMITTED       0x04 /* VDP1 finished drawing */
+#define STATE_VDP1_REQUEST_CHANGE       0x08 /* Request to change frame buffer */
+
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
@@ -32,14 +38,8 @@ static inline bool __always_inline _interlace_mode_double(void);
 static inline bool __always_inline _vdp1_transfer_over(void);
 
 /* VDP1 related state */
-/* VDP1 Request for VDP1 to draw */
-static volatile bool _state_vdp1_commit = false;
-/* VDP1 finished transferring via DMA */
-static volatile bool _state_vdp1_transferred = false;
-/* VDP1 finished drawing */
-static volatile bool _state_vdp1_committed = false;
-/* Request to change frame buffer */
-static volatile bool _state_vdp1_change = false;
+static volatile uint32_t _state_vdp1_sync = STATE_VDP1_IDLE;
+
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
 /* SCU-DMA state */
@@ -125,7 +125,7 @@ vdp_sync(int16_t interval __unused)
         bool vdp1_working;
         bool vdp2_working;
         do {
-                vdp1_working = _state_vdp1_change;
+                vdp1_working = (_state_vdp1_sync & STATE_VDP1_REQUEST_CHANGE) != 0x00;
                 vdp2_working = _state_vdp2_commit && !_state_vdp2_committed;
         } while (vdp1_working || vdp2_working);
 
@@ -165,8 +165,10 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
 
-        _state_vdp1_commit = true;
-        _state_vdp1_committed = false;
+        /* _state_vdp1_request_commit = true; */
+        _state_vdp1_sync |= STATE_VDP1_REQUEST_COMMIT_LIST;
+        /* _state_vdp1_committed = false; */
+        _state_vdp1_sync &= ~STATE_VDP1_LIST_COMMITTED;
 
         uint32_t xfer_len;
         xfer_len = count * sizeof(struct vdp1_cmdt);
@@ -195,7 +197,8 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 void
 vdp1_sync_draw_wait(void)
 {
-        if (!_state_vdp1_commit) {
+        if ((_state_vdp1_sync & STATE_VDP1_REQUEST_COMMIT_LIST) == 0x00) {
+        /* if (!_state_vdp1_request_commit) { */
                 return;
         }
 
@@ -212,18 +215,23 @@ vdp1_sync_draw_wait(void)
         if (_interlace_mode_double()) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
                  * the command list */
-                while (!_state_vdp1_transferred) {
+                while ((_state_vdp1_sync & STATE_VDP1_LIST_TRANSFERRED) == 0x00) {
+                /* while (!_state_vdp1_transferred) { */
                 }
         } else {
                 /* Wait until VDP1 has processed the command list */
-                while (!_state_vdp1_committed) {
+                while ((_state_vdp1_sync & STATE_VDP1_LIST_COMMITTED) == 0x00) {
+                /* while (!_state_vdp1_committed) { */
                 }
 
-                _state_vdp1_commit = false;
-                _state_vdp1_committed = false;
+                /* _state_vdp1_request_commit = false; */
+                _state_vdp1_sync &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
+                /* _state_vdp1_committed = false; */
+                _state_vdp1_sync &= ~STATE_VDP1_LIST_COMMITTED;
         }
 
-        _state_vdp1_change = true;
+        /* _state_vdp1_change = true; */
+        _state_vdp1_sync |= STATE_VDP1_REQUEST_CHANGE;
 
         scu_ic_mask_set(scu_mask);
         cpu_intc_mask_set(sr_mask);
@@ -308,10 +316,14 @@ vdp_sync_user_callback_clear(void)
 static void
 _init_vdp1(void)
 {
-        _state_vdp1_commit = false;
-        _state_vdp1_committed = false;
-        _state_vdp1_change = false;
-        _state_vdp1_transferred = false;
+        _state_vdp1_sync &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
+        /* _state_vdp1_request_commit = false; */
+        _state_vdp1_sync &= ~STATE_VDP1_LIST_COMMITTED;
+        /* _state_vdp1_committed = false; */
+        _state_vdp1_sync &= ~STATE_VDP1_REQUEST_CHANGE;
+        /* _state_vdp1_change = false; */
+        _state_vdp1_sync &= ~STATE_VDP1_LIST_TRANSFERRED;
+        /* _state_vdp1_transferred = false; */
 
         _vdp1_last_command = 0x0000;
 
@@ -381,7 +393,8 @@ _vblank_in_handler(void)
         bool commit_vdp2;
         commit_vdp2 = true;
 
-        if ((_interlace_mode_double()) && _state_vdp1_transferred) {
+        /* if ((_interlace_mode_double()) && _state_vdp1_transferred) { */
+        if ((_interlace_mode_double()) && ((_state_vdp1_sync & STATE_VDP1_LIST_TRANSFERRED) != 0x00)) {
                 /* Assert for now, until we can perform a pseudo draw
                  * continuation */
                 if ((_vdp1_transfer_over())) {
@@ -431,7 +444,8 @@ _vblank_out_handler(void)
                 goto no_sync;
         }
 
-        if (!_state_vdp1_change) {
+        /* if (!_state_vdp1_change) { */
+        if ((_state_vdp1_sync & STATE_VDP1_REQUEST_CHANGE) == 0x00) {
                 goto no_sync;
         }
 
@@ -440,10 +454,14 @@ _vblank_out_handler(void)
                 if (_field_count == 2) {
                         _field_count = 0;
 
-                        _state_vdp1_commit = false;
-                        _state_vdp1_committed = false;
-                        _state_vdp1_change = false;
-                        _state_vdp1_transferred = false;
+                        _state_vdp1_sync &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
+                        /* _state_vdp1_request_commit = false; */
+                        _state_vdp1_sync &= ~STATE_VDP1_LIST_COMMITTED;
+                        /* _state_vdp1_committed = false; */
+                        _state_vdp1_sync &= ~STATE_VDP1_REQUEST_CHANGE;
+                        /* _state_vdp1_change = false; */
+                        _state_vdp1_sync &= ~STATE_VDP1_LIST_TRANSFERRED;
+                        /* _state_vdp1_transferred = false; */
 
                         /* Reset command address to the top */
                         _vdp1_last_command = 0x0000;
@@ -452,8 +470,10 @@ _vblank_out_handler(void)
                 /* Manual mode (change) */
                 MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
 
-                _state_vdp1_change = false;
-                _state_vdp1_transferred = false;
+                _state_vdp1_sync &= ~STATE_VDP1_REQUEST_CHANGE;
+                /* _state_vdp1_change = false; */
+                _state_vdp1_sync &= ~STATE_VDP1_LIST_TRANSFERRED;
+                /* _state_vdp1_transferred = false; */
 
                 /* Reset command address to the top */
                 _vdp1_last_command = 0x0000;
@@ -469,13 +489,15 @@ _sprite_end_handler(void)
         _vdp1_last_command = vdp1_cmdt_current_get();
 
         /* VDP1 request to commit is finished */
-        _state_vdp1_committed = true;
+        /* _state_vdp1_committed = true; */
+        _state_vdp1_sync |= STATE_VDP1_LIST_COMMITTED;
 }
 
 static void
 _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 {
-        _state_vdp1_transferred = true;
+        /* _state_vdp1_transferred = true; */
+        _state_vdp1_sync |= STATE_VDP1_LIST_TRANSFERRED;
 
         if ((_interlace_mode_double())) {
                 return;
