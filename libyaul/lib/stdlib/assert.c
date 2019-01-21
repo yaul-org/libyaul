@@ -14,6 +14,9 @@
 #include <string.h>
 
 #include <cpu/intc.h>
+#include <cpu/dmac.h>
+
+#include <scu/dma.h>
 
 #include <internal.h>
 
@@ -27,8 +30,15 @@ __assert_func(const char *file, int line, const char *func,
         bool has_func_str;
         has_func_str = (func != NULL) || (*func != '\0');
 
+        /* Avoid adding code to clear the screen if we've asserted more than
+         * once */
+        const char *clear_screen;
+        clear_screen = (!asserted) ? "" : "[H[2J";
+
         (void)sprintf(buffer,
-            "[H[2JAssertion \"%s\" failed: file \"%s\", line %d%s%s\n",
+            "%s"
+            "Assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
+            clear_screen,
             failed_expr,
             file,
             line,
@@ -39,6 +49,9 @@ __assert_func(const char *file, int line, const char *func,
          * the assert buffer to L-WRAM */
         if (asserted) {
                 cpu_intc_mask_set(15);
+
+                cpu_dmac_stop();
+                scu_dma_stop();
 
                 (void)memcpy((void *)0x20200000, buffer, sizeof(buffer));
 
