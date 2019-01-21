@@ -117,6 +117,13 @@ cpu_dmac_channel_stop(uint8_t ch)
         MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000001);
 }
 
+static inline void __always_inline
+cpu_dmac_stop(void)
+{
+        cpu_dmac_channel_stop(0);
+        cpu_dmac_channel_stop(1);
+}
+
 extern void cpu_dmac_init(void);
 extern void cpu_dmac_status_get(struct dmac_status *);
 extern void cpu_dmac_channel_config_set(const struct dmac_ch_cfg *);
