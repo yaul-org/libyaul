@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _LIBYAUL_H_
-#define _LIBYAUL_H_
+#ifndef _YAUL_H_
+#define _YAUL_H_
 
 /* Check if HAVE_DEV_CARTRIDGE has a valid value */
 /* USB flash cartridge */
@@ -63,4 +63,4 @@
 #include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
 
-#endif /* !_LIBYAUL_H_ */
+#endif /* !_YAUL_H_ */
