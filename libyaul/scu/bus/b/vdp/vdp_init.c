@@ -27,11 +27,11 @@ vdp_init(void)
         (void)memset(&_state_vdp1()->regs, 0x00, sizeof(_state_vdp1()->regs));
         (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
 
+        vdp_sync_init();
+
         _init_vdp1();
 
         _init_vdp2();
-
-        vdp_sync_init();
 
         uint8_t sr_mask;
         sr_mask = cpu_intc_mask_get();
@@ -124,37 +124,6 @@ _init_vdp2(void)
         };
 
         vdp2_vram_control_set(&vram_ctl);
-
-        struct dma_xfer *xfer;
-
-        /* Write VDP2(TVMD) first */
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
-        xfer->len = 2;
-        xfer->dst = VDP2(0);
-        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.tvmd;
-
-        /* Skip the first 8 VDP2 registers */
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REGS];
-        xfer->len = sizeof(_state_vdp2()->regs) - 16;
-        xfer->dst = VDP2(16);
-        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.buffer[8];
-
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
-        xfer->len = 0;
-        xfer->dst = 0x00000000;
-        xfer->src = 0x00000000;
-
-        struct dma_level_cfg dma_level_cfg = {
-                .dlc_mode = DMA_MODE_INDIRECT,
-                .dlc_xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
-                .dlc_stride = DMA_STRIDE_2_BYTES,
-                .dlc_update = DMA_UPDATE_NONE
-        };
-
-        void *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer;
-
-        scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x000000),
             COLOR_RGB555(0, 0, 0));
