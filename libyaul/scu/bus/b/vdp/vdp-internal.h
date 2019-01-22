@@ -12,6 +12,8 @@
 
 #include <scu-internal.h>
 
+#include <vdp1/env.h>
+
 #include <vdp2/map.h>
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
@@ -32,6 +34,8 @@ struct state_vdp1 {
                 uint32_t clut_base;
                 uint32_t remaining_base;
         } vram;
+
+        struct vdp1_env env;
 
         union {
                 uint16_t buffer[11];
