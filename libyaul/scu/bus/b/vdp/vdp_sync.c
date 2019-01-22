@@ -80,10 +80,10 @@ vdp_sync_init(void)
 {
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
 
-        _state.raw = 0x00000000;
-
         _init_vdp1();
         _init_vdp2();
+
+        _state.raw = 0x00000000;
 
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
@@ -107,7 +107,6 @@ vdp_sync(int16_t interval __unused)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        /* Enter critical section */
         cpu_intc_mask_set(15);
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
 
@@ -119,7 +118,7 @@ vdp_sync(int16_t interval __unused)
         cpu_intc_mask_set(0);
 
         /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
-         * been committed. */
+         * been committed */
         bool vdp1_working;
         bool vdp2_working;
         do {
@@ -136,7 +135,9 @@ vdp_sync(int16_t interval __unused)
 
         cpu_intc_mask_set(15);
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
+
         _state.sync &= ~STATE_SYNC;
+
         scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
@@ -313,11 +314,6 @@ vdp_sync_user_callback_clear(void)
 static void
 _init_vdp1(void)
 {
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
-        _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
-        _state.vdp1 &= ~STATE_VDP1_LIST_TRANSFERRED;
-
         _vdp1_last_command = 0x0000;
 
         scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
@@ -326,10 +322,6 @@ _init_vdp1(void)
 static void
 _init_vdp2(void)
 {
-        _state.vdp2 &= ~STATE_VDP2_REQUEST_COMMIT;
-        _state.vdp2 &= ~STATE_VDP2_COMMITTED;
-        _state.vdp2 &= ~STATE_VDP2_REQUEST_PENDING;
-
         struct dma_xfer *xfer;
 
         /* Write VDP2(TVMD) first */
@@ -356,7 +348,7 @@ _init_vdp2(void)
                 .dlc_update = DMA_UPDATE_NONE
         };
 
-        void *reg_buffer;
+        struct dma_reg_buffer *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
