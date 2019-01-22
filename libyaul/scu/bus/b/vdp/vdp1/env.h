@@ -42,6 +42,7 @@ struct vdp1_env {
         } env_limits;
 };
 
+extern void vdp1_env_default_set(void);
 extern void vdp1_env_set(const struct vdp1_env *);
 
 #ifdef __cplusplus

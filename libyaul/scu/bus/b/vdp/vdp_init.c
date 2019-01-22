@@ -55,26 +55,25 @@ vdp_init(void)
 static void
 _init_vdp1(void)
 {
-        const struct vdp1_env env = {
-                .env_erase_color = COLOR_RGB555(0, 0, 0),
-                .env_erase_points = {
-                        INT16_VECTOR2_INITIALIZER(0, 0),
-                        INT16_VECTOR2_INITIALIZER(320, 224)
-                },
-                .env_bpp = ENV_BPP_16,
-                .env_rotation = ENV_ROTATION_0,
-                .env_color_mode = ENV_COLOR_MODE_RGB_PALETTE,
-                .env_limits = {
-                        .cmdt_count = 2048,
-                        .texture_size = 0x0006BFE0,
-                        .gouraud_count = 1024,
-                        .clut_count = 256
-                }
-        };
-
         _state_vdp1()->tv.interlace_pass = 0;
 
-        vdp1_env_set(&env);
+        struct vdp1_env *default_env;
+        default_env = &_state_vdp1()->env;
+
+        default_env->env_erase_color = COLOR_RGB555(0, 0, 0);
+        default_env->env_erase_points[0].x = 0;
+        default_env->env_erase_points[0].y = 0;
+        default_env->env_erase_points[1].x = 320;
+        default_env->env_erase_points[1].y = 224;
+        default_env->env_bpp = ENV_BPP_16;
+        default_env->env_rotation = ENV_ROTATION_0;
+        default_env->env_color_mode = ENV_COLOR_MODE_RGB_PALETTE;
+        default_env->env_limits.cmdt_count = 2048;
+        default_env->env_limits.texture_size = 0x0006BFE0;
+        default_env->env_limits.gouraud_count = 1024;
+        default_env->env_limits.clut_count = 256;
+
+        vdp1_env_default_set();
 }
 
 static void
