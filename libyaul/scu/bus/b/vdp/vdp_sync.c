@@ -21,18 +21,18 @@
 #define SCU_MASK_ENABLE         (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
 #define SCU_MASK_DISABLE        (~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END) & IC_MASK_ALL)
 
-#define STATE_SYNC                      0x01
-#define STATE_SYNC_VBLANK_IN            0x02
-#define STATE_SYNC_VBLANK_OUT           0x04
+#define STATE_SYNC                      0x01 /* Request to synchronize */
+#define STATE_VBLANK_IN                 0x02 /* VBLANK-IN has occurred */
+#define STATE_VBLANK_OUT                0x04 /* VBLANK-OUT has occurred */
 
-#define STATE_VDP1_REQUEST_COMMIT_LIST  0x01 /* VDP1 Request for VDP1 to draw */
-#define STATE_VDP1_LIST_TRANSFERRED     0x02 /* VDP1 finished transferring via DMA */
-#define STATE_VDP1_LIST_COMMITTED       0x04 /* VDP1 finished drawing */
-#define STATE_VDP1_REQUEST_CHANGE       0x08 /* VDP1 request to change frame buffer */
+#define STATE_VDP1_REQUEST_COMMIT_LIST  0x01 /* VDP1 request to draw list */
+#define STATE_VDP1_LIST_TRANSFERRED     0x02 /* VDP1 finished transferring list via SCU-DMA */
+#define STATE_VDP1_LIST_COMMITTED       0x04 /* VDP1 finished drawing list */
+#define STATE_VDP1_REQUEST_CHANGE       0x08 /* VDP1 request to change frame buffers */
 
 #define STATE_VDP2_REQUEST_COMMIT       0x01 /* VDP2 request to commit state */
-#define STATE_VDP2_REQUEST_PENDING      0x02 /* VDP2 request commit is pending */
-#define STATE_VDP2_COMMITTED            0x04 /* VDP2 finished updating state */
+#define STATE_VDP2_REQUEST_PENDING      0x02 /* VDP2 request to commit state is pending */
+#define STATE_VDP2_COMMITTED            0x04 /* VDP2 finished committing state */
 
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
@@ -60,12 +60,14 @@ static volatile union {
 
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
-/* SCU-DMA state */
+/* VDP1 SCU-DMA state */
 static struct dma_level_cfg _vdp1_dma_cfg;
 static struct dma_reg_buffer _vdp1_dma_reg_buffer;
 
-static void (*_user_callbacks[USER_CALLBACK_COUNT])(void *);
-static void *_user_works[USER_CALLBACK_COUNT];
+static struct {
+        void (*callback)(void *);
+        void *work;
+} _user_callbacks[USER_CALLBACK_COUNT] __aligned(16);
 
 static void (*_user_vblank_in_handler)(void);
 static void (*_user_vblank_out_handler)(void);
@@ -141,13 +143,18 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
-        uint32_t i;
-        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
-                _user_callbacks[i](_user_works[i]);
+        uint32_t id;
+        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
+                void (*callback)(void *);
+                callback = _user_callbacks[id].callback;
 
-                /* Remove callback as soon as it's done */
-                _user_callbacks[i] = _default_user_callback;
-                _user_works[i] = NULL;
+                void *work;
+                work = _user_callbacks[id].work;
+
+                _user_callbacks[id].callback = _default_user_callback;
+                _user_callbacks[id].work = NULL;
+
+                callback(work);
         }
 
         scu_ic_mask_set(scu_mask);
@@ -273,19 +280,19 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 {
         assert(user_callback != NULL);
 
-        uint32_t i;
-        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
-                if (_user_callbacks[i] != _default_user_callback) {
+        uint32_t id;
+        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
+                if (_user_callbacks[id].callback != _default_user_callback) {
                         continue;
                 }
 
-                _user_callbacks[i] = user_callback;
-                _user_works[i] = work;
+                _user_callbacks[id].callback = user_callback;
+                _user_callbacks[id].work = work;
 
-                return i;
+                return id;
         }
 
-        assert(i != USER_CALLBACK_COUNT);
+        assert(id != USER_CALLBACK_COUNT);
 
         return -1;
 }
@@ -296,18 +303,17 @@ vdp_sync_user_callback_remove(int8_t id)
         assert(id >= 0);
         assert(id < USER_CALLBACK_COUNT);
 
-        _user_callbacks[id] = _default_user_callback;
-        _user_works[id] = NULL;
-
+        _user_callbacks[id].callback = _default_user_callback;
+        _user_callbacks[id].work = NULL;
 }
 
 void
 vdp_sync_user_callback_clear(void)
 {
-        uint32_t i;
-        for (i = 0; i < USER_CALLBACK_COUNT; i++) {
-                _user_callbacks[i] = _default_user_callback;
-                _user_works[i] = NULL;
+        uint32_t id;
+        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
+                _user_callbacks[id].callback = _default_user_callback;
+                _user_callbacks[id].work = NULL;
         }
 }
 
@@ -366,8 +372,8 @@ _vblank_in_handler(void)
 
         /* VBLANK-IN interrupt runs at scanline #224 */
 
-        _state.sync |= STATE_SYNC_VBLANK_IN;
-        _state.sync &= ~STATE_SYNC_VBLANK_OUT;
+        _state.sync |= STATE_VBLANK_IN;
+        _state.sync &= ~STATE_VBLANK_OUT;
 
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
@@ -427,8 +433,8 @@ _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
-        _state.sync |= STATE_SYNC_VBLANK_OUT;
-        _state.sync &= ~STATE_SYNC_VBLANK_IN;
+        _state.sync |= STATE_VBLANK_OUT;
+        _state.sync &= ~STATE_VBLANK_IN;
 
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
