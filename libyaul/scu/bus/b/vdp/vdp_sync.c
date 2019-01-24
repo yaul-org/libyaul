@@ -25,8 +25,8 @@
 #define STATE_VBLANK_IN                 0x02 /* VBLANK-IN has occurred */
 #define STATE_VBLANK_OUT                0x04 /* VBLANK-OUT has occurred */
 
-#define STATE_VDP1_REQUEST_COMMIT_LIST  0x01 /* VDP1 request to draw list */
-#define STATE_VDP1_LIST_TRANSFERRED     0x02 /* VDP1 finished transferring list via SCU-DMA */
+#define STATE_VDP1_REQUEST_XFER_LIST    0x01 /* VDP1 request to transfer list */
+#define STATE_VDP1_LIST_XFERRED         0x02 /* VDP1 finished transferring list via SCU-DMA */
 #define STATE_VDP1_LIST_COMMITTED       0x04 /* VDP1 finished drawing list */
 #define STATE_VDP1_REQUEST_CHANGE       0x08 /* VDP1 request to change frame buffers */
 
@@ -119,6 +119,10 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
+        if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) != 0x00) {
+                _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
+        }
+
         /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
          * been committed */
         bool vdp1_working;
@@ -178,7 +182,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
 
-        _state.vdp1 |= STATE_VDP1_REQUEST_COMMIT_LIST;
+        _state.vdp1 |= STATE_VDP1_REQUEST_XFER_LIST;
         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
 
         uint32_t xfer_len;
@@ -208,7 +212,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 void
 vdp1_sync_draw_wait(void)
 {
-        if ((_state.vdp1 & STATE_VDP1_REQUEST_COMMIT_LIST) == 0x00) {
+        if ((_state.vdp1 & STATE_VDP1_REQUEST_XFER_LIST) == 0x00) {
                 return;
         }
 
@@ -225,18 +229,15 @@ vdp1_sync_draw_wait(void)
         if (_interlace_mode_double()) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
                  * the command list */
-                while ((_state.vdp1 & STATE_VDP1_LIST_TRANSFERRED) == 0x00) {
+                while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
                 }
         } else {
                 /* Wait until VDP1 has processed the command list */
                 while ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                 }
 
-                _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
-                _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
+                _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
         }
-
-        _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
 
         scu_ic_mask_set(scu_mask);
         cpu_intc_mask_set(sr_mask);
@@ -384,7 +385,7 @@ _vblank_in_handler(void)
         bool commit_vdp2;
         commit_vdp2 = true;
 
-        if ((_interlace_mode_double()) && ((_state.vdp1 & STATE_VDP1_LIST_TRANSFERRED) != 0x00)) {
+        if ((_interlace_mode_double()) && ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00)) {
                 /* Assert for now, until we can perform a pseudo draw
                  * continuation */
                 if ((_vdp1_transfer_over())) {
@@ -449,10 +450,10 @@ _vblank_out_handler(void)
                 if (_state.field_count == 2) {
                         _state.field_count = 0;
 
-                        _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
+                        _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
                         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
                         _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
-                        _state.vdp1 &= ~STATE_VDP1_LIST_TRANSFERRED;
+                        _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
 
                         /* Reset command address to the top */
                         _vdp1_last_command = 0x0000;
@@ -462,7 +463,7 @@ _vblank_out_handler(void)
                 MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
 
                 _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
-                _state.vdp1 &= ~STATE_VDP1_LIST_TRANSFERRED;
+                _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
 
                 /* Reset command address to the top */
                 _vdp1_last_command = 0x0000;
@@ -484,7 +485,7 @@ _sprite_end_handler(void)
 static void
 _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 {
-        _state.vdp1 |= STATE_VDP1_LIST_TRANSFERRED;
+        _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
 
         if ((_interlace_mode_double())) {
                 return;
