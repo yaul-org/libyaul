@@ -31,6 +31,7 @@
 #define STATE_VDP1_LIST_COMMITTED       0x08 /* VDP1 finished committing list */
 #define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
 #define STATE_VDP1_CHANGED              0x20 /* VDP1 changing frame buffers */
+#define STATE_VDP1_XFER_QUEUE_FULL      0x40
 
 #define STATE_VDP2_REQUEST_COMMIT       0x01 /* VDP2 request to commit state */
 #define STATE_VDP2_REQUEST_PENDING      0x02 /* VDP2 request to commit state is pending */
@@ -192,6 +193,13 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
 
+        /* Ensure that we don't exceed the amount of VRAM dedicated to command
+         * lists */
+        uint32_t vdp1_vram;
+        vdp1_vram = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
+
+        assert (vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
+
         _state.vdp1 |= STATE_VDP1_REQUEST_XFER_LIST;
         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
         _state.vdp1 &= ~STATE_VDP1_CHANGED;
@@ -199,7 +207,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         uint32_t xfer_len;
         xfer_len = count * sizeof(struct vdp1_cmdt);
         uint32_t xfer_dst;
-        xfer_dst = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
+        xfer_dst = vdp1_vram;
         uint32_t xfer_src;
         xfer_src = CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts;
 
