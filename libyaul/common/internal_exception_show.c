@@ -50,7 +50,6 @@ _internal_exception_show(const char *buffer)
         dbgio_dev_set(DBGIO_DEV_VDP2);
         dbgio_buffer(buffer);
 
-        vdp2_sync_commit();
         dbgio_flush();
         vdp_sync(0);
 
