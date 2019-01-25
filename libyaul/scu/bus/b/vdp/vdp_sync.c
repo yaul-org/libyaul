@@ -31,10 +31,9 @@
 #define STATE_VDP1_LIST_COMMITTED       0x08 /* VDP1 finished committing list */
 #define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
 #define STATE_VDP1_CHANGED              0x20 /* VDP1 changing frame buffers */
-#define STATE_VDP1_XFER_QUEUE_FULL      0x40
 
 #define STATE_VDP2_REQUEST_COMMIT       0x01 /* VDP2 request to commit state */
-#define STATE_VDP2_REQUEST_PENDING      0x02 /* VDP2 request to commit state is pending */
+#define STATE_VDP2_COMITTING            0x02 /* VDP2 is committing state */
 #define STATE_VDP2_COMMITTED            0x04 /* VDP2 finished committing state */
 
 static void _vblank_in_handler(void);
@@ -106,6 +105,18 @@ vdp_sync(int16_t interval __unused)
 {
         vdp1_sync_draw_wait();
 
+        _state.vdp2 |= STATE_VDP2_REQUEST_COMMIT;
+        _state.vdp2 &= ~STATE_VDP2_COMMITTED;
+        _state.vdp2 &= ~STATE_VDP2_COMITTING;
+
+        struct dma_reg_buffer *reg_buffer;
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+
+        int8_t ret;
+        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+            _vdp2_commit_handler, NULL);
+        assert(ret == 0);
+
         uint8_t sr_mask;
         sr_mask = cpu_intc_mask_get();
 
@@ -133,6 +144,7 @@ vdp_sync(int16_t interval __unused)
          * been committed */
         bool vdp1_working;
         bool vdp2_working;
+
         do {
                 bool vdp1_request_change;
                 vdp1_request_change = (_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) != 0x00;
@@ -264,22 +276,6 @@ vdp1_sync_draw_wait(void)
         cpu_intc_mask_set(sr_mask);
 }
 
-void
-vdp2_sync_commit(void)
-{
-        _state.vdp2 |= STATE_VDP2_REQUEST_COMMIT;
-        _state.vdp2 &= ~STATE_VDP2_COMMITTED;
-        _state.vdp2 &= ~STATE_VDP2_REQUEST_PENDING;
-
-        struct dma_reg_buffer *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer;
-
-        int8_t ret;
-        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
-            _vdp2_commit_handler, NULL);
-        assert(ret == 0);
-}
-
 uint16_t
 vdp1_sync_last_command_get(void)
 {
@@ -383,6 +379,29 @@ _init_vdp2(void)
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 }
 
+static inline bool __always_inline
+_interlace_mode_double(void)
+{
+        return (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE);
+}
+
+static inline bool __always_inline
+_vdp1_transfer_over(void)
+{
+        struct vdp1_transfer_status transfer_status;
+        vdp1_transfer_status_get(&transfer_status);
+
+        struct vdp1_mode_status mode_status;
+        vdp1_mode_status_get(&mode_status);
+
+        /* Detect if VDP1 is still drawing (transfer over status) */
+        bool transfer_over;
+        transfer_over = (transfer_status.vte_bef == 0x00) &&
+                        (transfer_status.vte_cef == 0x00);
+
+        return ((mode_status.vms_ptm1 != 0x00) && transfer_over);
+}
+
 static void
 _vblank_in_handler(void)
 {
@@ -439,11 +458,11 @@ _vblank_in_handler(void)
         bool vdp2_request_commit;
         vdp2_request_commit = (_state.vdp2 & STATE_VDP2_REQUEST_COMMIT) != 0x00;
 
-        bool vdp2_request_pending;
-        vdp2_request_pending = (_state.vdp2 & STATE_VDP2_REQUEST_PENDING) != 0x00;
+        bool vdp2_comitting;
+        vdp2_comitting = (_state.vdp2 & STATE_VDP2_COMITTING) != 0x00;
 
-        if (commit_vdp2 && vdp2_request_commit && !vdp2_request_pending) {
-                _state.vdp2 |= STATE_VDP2_REQUEST_PENDING;
+        if (commit_vdp2 && vdp2_request_commit && !vdp2_comitting) {
+                _state.vdp2 |= STATE_VDP2_COMITTING;
 
                 int8_t ret;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
@@ -531,38 +550,14 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 static void
 _vdp2_commit_handler(const struct dma_queue_transfer *transfer __unused)
 {
-        /* VDP2 request to commit is finished */
         _state.vdp2 &= ~STATE_VDP2_REQUEST_COMMIT;
         _state.vdp2 |= STATE_VDP2_COMMITTED;
-        _state.vdp2 &= ~STATE_VDP2_REQUEST_PENDING;
+        _state.vdp2 &= ~STATE_VDP2_COMITTING;
 }
 
 static void
 _default_handler(void)
 {
-}
-
-static inline bool __always_inline
-_interlace_mode_double(void)
-{
-        return (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE);
-}
-
-static inline bool __always_inline
-_vdp1_transfer_over(void)
-{
-        struct vdp1_transfer_status transfer_status;
-        vdp1_transfer_status_get(&transfer_status);
-
-        struct vdp1_mode_status mode_status;
-        vdp1_mode_status_get(&mode_status);
-
-        /* Detect if VDP1 is still drawing (transfer over status) */
-        bool transfer_over;
-        transfer_over = (transfer_status.vte_bef == 0x00) &&
-                        (transfer_status.vte_cef == 0x00);
-
-        return ((mode_status.vms_ptm1 != 0x00) && transfer_over);
 }
 
 static void
