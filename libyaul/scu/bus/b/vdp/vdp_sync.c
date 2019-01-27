@@ -212,6 +212,13 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 
         assert (vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
 
+        assert((cmdt_list->cmdts[count - 1].cmd_ctrl & 0x8000) == 0x8000);
+
+        /* Keep track of how many commands are being sent. Remove the "draw end"
+         * command from the count as it needs to be overwritten on next request
+         * to sync VDP1 */
+        _vdp1_last_command += count - 1;
+
         _state.vdp1 |= STATE_VDP1_REQUEST_XFER_LIST;
         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
         _state.vdp1 &= ~STATE_VDP1_CHANGED;
@@ -421,11 +428,6 @@ _vblank_in_handler(void)
                 goto no_sync;
         }
 
-        /* Commit VDP2 by default, unless double-density interlace mode is set
-         * as we need to wait two field scans */
-        bool commit_vdp2;
-        commit_vdp2 = true;
-
         bool vdp1_list_xferred;
         vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
 
@@ -451,8 +453,15 @@ _vblank_in_handler(void)
                         _state.field_count++;
                 }
 
-                /* Don't commit VDP2 until we've completed two field scans */
-                commit_vdp2 = (_state.field_count < 2);
+                /* If double-density interlace mode is set as we need to wait
+                 * two field scans, so avoid committing VDP2 state */
+                if (_state.field_count != 2) {
+                        goto no_sync;
+                }
+
+                /* MEMORY_WRITE(16, VDP1(PTMR), 0x0000); */
+
+                _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
         }
 
         bool vdp2_request_commit;
@@ -461,7 +470,7 @@ _vblank_in_handler(void)
         bool vdp2_comitting;
         vdp2_comitting = (_state.vdp2 & STATE_VDP2_COMITTING) != 0x00;
 
-        if (commit_vdp2 && vdp2_request_commit && !vdp2_comitting) {
+        if (vdp2_request_commit && !vdp2_comitting) {
                 _state.vdp2 |= STATE_VDP2_COMITTING;
 
                 int8_t ret;
@@ -491,31 +500,30 @@ _vblank_out_handler(void)
         }
 
         if ((_interlace_mode_double())) {
-                /* If we've completed two field scans */
-                if (_state.field_count == 2) {
-                        _state.field_count = 0;
-
-                        _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
-                        _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
-                        _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
-                        _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
-
-                        /* Reset command address to the top */
-                        _vdp1_last_command = 0x0000;
+                if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
+                        goto no_change;
                 }
+
+                /* If we've completed two field scans */
+                if (_state.field_count != 2) {
+                        goto no_change;
+                }
+
+                _state.field_count = 0;
         } else {
                 /* Manual mode (change) */
                 MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
-
-                _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
-                _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
-
-                _state.vdp1 |= STATE_VDP1_CHANGED;
-
-                /* Reset command address to the top */
-                _vdp1_last_command = 0x0000;
         }
 
+        _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
+        _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
+
+        _state.vdp1 |= STATE_VDP1_CHANGED;
+
+        /* Reset command address to the top */
+        _vdp1_last_command = 0x0000;
+
+no_change:
 no_sync:
         _user_vblank_out_handler();
 }
@@ -523,8 +531,6 @@ no_sync:
 static void
 _sprite_end_handler(void)
 {
-        _vdp1_last_command = vdp1_cmdt_current_get();
-
         /* VDP1 request to commit is finished */
         _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
