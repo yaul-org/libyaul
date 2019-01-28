@@ -12,6 +12,8 @@
 
 #include <scu-internal.h>
 
+#include <vdp1/env.h>
+
 #include <vdp2/map.h>
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
@@ -22,16 +24,14 @@
 
 struct state_vdp1 {
         struct {
-                int16_t interlace_pass;
-        } tv;
-
-        struct {
                 uint32_t cmdt_base;
                 uint32_t texture_base;
                 uint32_t gouraud_base;
                 uint32_t clut_base;
                 uint32_t remaining_base;
         } vram;
+
+        struct vdp1_env env;
 
         union {
                 uint16_t buffer[11];
@@ -55,7 +55,6 @@ struct state_vdp1 {
 struct state_vdp2 {
         struct {
                 int16_vector2_t resolution;
-                uint8_t interlace;
         } tv;
 
         struct {

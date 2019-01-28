@@ -6,6 +6,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include <vdp1/env.h>
 #include <vdp1/map.h>
@@ -19,6 +20,15 @@
 static inline void __always_inline _env_assert(const struct vdp1_env *);
 static inline void __always_inline _env_limits_assert(const struct vdp1_env *);
 static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
+
+void
+vdp1_env_default_set(void)
+{
+        const struct vdp1_env *default_env;
+        default_env = &_state_vdp1()->env;
+
+        vdp1_env_set(default_env);
+}
 
 void
 vdp1_env_set(const struct vdp1_env *env)
@@ -92,7 +102,7 @@ vdp1_env_set(const struct vdp1_env *env)
                 x3 >>= 1;
         }
 
-        if (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE) {
+        if (((_state_vdp2()->regs.tvmd >> 7) & 0x01) != 0x00) {
                 y1 >>= 1;
                 y3 >>= 1;
         }
@@ -102,6 +112,11 @@ vdp1_env_set(const struct vdp1_env *env)
 
         _state_vdp2()->regs.spctl &= 0x371F;
         _state_vdp2()->regs.spctl |= env->env_color_mode << 5;
+
+        struct vdp1_env *default_env;
+        default_env = &_state_vdp1()->env;
+
+        (void)memcpy(default_env, env, sizeof(struct vdp1_env));
 
         /* Force stop drawing */
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
