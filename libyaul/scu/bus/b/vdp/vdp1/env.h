@@ -39,7 +39,7 @@ struct vdp1_env {
                 uint32_t texture_size;
                 uint32_t gouraud_count;
                 uint32_t clut_count;
-        } env_limits;
+        } env_limits __aligned(4);
 };
 
 extern void vdp1_env_default_set(void);

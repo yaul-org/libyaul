@@ -54,8 +54,6 @@ vdp_init(void)
 static void
 _init_vdp1(void)
 {
-        _state_vdp1()->tv.interlace_pass = 0;
-
         struct vdp1_env *default_env;
         default_env = &_state_vdp1()->env;
 
@@ -80,7 +78,6 @@ _init_vdp2(void)
 {
         _state_vdp2()->tv.resolution.x = 0;
         _state_vdp2()->tv.resolution.y = 0;
-        _state_vdp2()->tv.interlace = TVMD_INTERLACE_NONE;
 
         vdp2_tvmd_display_clear();
 
