@@ -32,9 +32,8 @@
 #define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
 #define STATE_VDP1_CHANGED              0x20 /* VDP1 changing frame buffers */
 
-#define STATE_VDP2_REQUEST_COMMIT       0x01 /* VDP2 request to commit state */
-#define STATE_VDP2_COMITTING            0x02 /* VDP2 is committing state */
-#define STATE_VDP2_COMMITTED            0x04 /* VDP2 finished committing state */
+#define STATE_VDP2_COMITTING            0x01 /* VDP2 is committing state */
+#define STATE_VDP2_COMMITTED            0x02 /* VDP2 finished committing state */
 
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
@@ -105,10 +104,6 @@ vdp_sync(int16_t interval __unused)
 {
         vdp1_sync_draw_wait();
 
-        _state.vdp2 |= STATE_VDP2_REQUEST_COMMIT;
-        _state.vdp2 &= ~STATE_VDP2_COMMITTED;
-        _state.vdp2 &= ~STATE_VDP2_COMITTING;
-
         struct dma_reg_buffer *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
@@ -133,6 +128,7 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
+        /* There are times when the list transfer is completed before syncing */
         if ((_state.vdp1 & (STATE_VDP1_REQUEST_XFER_LIST | STATE_VDP1_LIST_XFERRED)) != 0x00) {
                 _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
         }
@@ -151,13 +147,10 @@ vdp_sync(int16_t interval __unused)
 
                 vdp1_working = vdp1_request_change && !vdp1_changed;
 
-                bool vdp2_request_commit;
-                vdp2_request_commit = (_state.vdp2 & STATE_VDP2_REQUEST_COMMIT) != 0x00;
-
                 bool vdp2_committed;
                 vdp2_committed = (_state.vdp2 & STATE_VDP2_COMMITTED) != 0x00;
 
-                vdp2_working = vdp2_request_commit && !vdp2_committed;
+                vdp2_working = !vdp2_committed;
         } while (vdp1_working || vdp2_working);
 
         cpu_intc_mask_set(15);
@@ -453,13 +446,7 @@ _vblank_in_handler(void)
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
         }
 
-        bool vdp2_request_commit;
-        vdp2_request_commit = (_state.vdp2 & STATE_VDP2_REQUEST_COMMIT) != 0x00;
-
-        bool vdp2_comitting;
-        vdp2_comitting = (_state.vdp2 & STATE_VDP2_COMITTING) != 0x00;
-
-        if (vdp2_request_commit && !vdp2_comitting) {
+        if ((_state.vdp2 & STATE_VDP2_COMITTING) == 0x00) {
                 _state.vdp2 |= STATE_VDP2_COMITTING;
 
                 int8_t ret;
@@ -546,7 +533,8 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
         _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
         _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
 
-        /* We can only draw during VBLANK-IN in double-density interlace mode */
+        /* We can only draw during VBLANK-IN and in 1-cycle mode when in
+         * double-density interlace mode */
         if ((_interlace_mode_double())) {
                 return;
         }
@@ -561,7 +549,6 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 static void
 _vdp2_commit_handler(const struct dma_queue_transfer *transfer __unused)
 {
-        _state.vdp2 &= ~STATE_VDP2_REQUEST_COMMIT;
         _state.vdp2 |= STATE_VDP2_COMMITTED;
         _state.vdp2 &= ~STATE_VDP2_COMITTING;
 }
