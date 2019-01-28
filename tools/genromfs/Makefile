@@ -52,6 +52,6 @@ install: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/bin
 	$(ECHO)$(INSTALL) -m 755 $< $(YAUL_INSTALL_ROOT)/bin/
 	@printf -- "$(V_BEGIN_BLUE)fsck.genromfs$(V_END)\n"
-	$(ECHO)$(INSTALL) -m 755 fsck.genromfs $(YAUL_INSTALL_ROOTx)/bin/
+	$(ECHO)$(INSTALL) -m 755 fsck.genromfs $(YAUL_INSTALL_ROOT)/bin/
 
 -include $(DEPS)
