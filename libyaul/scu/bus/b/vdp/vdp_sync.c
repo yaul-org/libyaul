@@ -119,8 +119,6 @@ vdp_sync(int16_t interval __unused)
         cpu_intc_mask_set(15);
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
-        assert((_state.sync & STATE_SYNC) == 0x00);
-
         _state.sync |= STATE_SYNC;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
@@ -441,7 +439,7 @@ _vblank_in_handler(void)
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
         }
 
-        if ((_state.vdp2 & STATE_VDP2_COMITTING) == 0x00) {
+        if ((_state.vdp2 & (STATE_VDP2_COMITTING | STATE_VDP2_COMMITTED)) == 0x00) {
                 _state.vdp2 |= STATE_VDP2_COMITTING;
 
                 int8_t ret;
