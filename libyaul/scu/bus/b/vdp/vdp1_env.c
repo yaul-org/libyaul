@@ -102,7 +102,7 @@ vdp1_env_set(const struct vdp1_env *env)
                 x3 >>= 1;
         }
 
-        if (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE) {
+        if (((_state_vdp2()->regs.tvmd >> 7) & 0x01) != 0x00) {
                 y1 >>= 1;
                 y3 >>= 1;
         }

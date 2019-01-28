@@ -24,10 +24,6 @@
 
 struct state_vdp1 {
         struct {
-                int16_t interlace_pass;
-        } tv;
-
-        struct {
                 uint32_t cmdt_base;
                 uint32_t texture_base;
                 uint32_t gouraud_base;
@@ -59,7 +55,6 @@ struct state_vdp1 {
 struct state_vdp2 {
         struct {
                 int16_vector2_t resolution;
-                uint8_t interlace;
         } tv;
 
         struct {

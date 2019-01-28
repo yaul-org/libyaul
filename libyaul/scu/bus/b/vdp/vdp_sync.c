@@ -133,10 +133,7 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
-        bool vdp1_list_committed;
-        vdp1_list_committed = (_state.vdp1 & STATE_VDP1_LIST_COMMITTED) != 0x00;
-
-        if (!(_interlace_mode_double()) && vdp1_list_committed) {
+        if ((_state.vdp1 & (STATE_VDP1_REQUEST_XFER_LIST | STATE_VDP1_LIST_XFERRED)) != 0x00) {
                 _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
         }
 
@@ -148,6 +145,7 @@ vdp_sync(int16_t interval __unused)
         do {
                 bool vdp1_request_change;
                 vdp1_request_change = (_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) != 0x00;
+
                 bool vdp1_changed;
                 vdp1_changed = (_state.vdp1 & STATE_VDP1_CHANGED) != 0x00;
 
@@ -167,6 +165,10 @@ vdp_sync(int16_t interval __unused)
 
         _state.sync &= ~STATE_SYNC;
 
+        _state.vdp1 = 0x00;
+        _state.vdp2 = 0x00;
+        _state.field_count = 0;
+
         scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
@@ -183,6 +185,9 @@ vdp_sync(int16_t interval __unused)
 
                 callback(work);
         }
+
+        /* Reset command address to the top */
+        _vdp1_last_command = 0x0000;
 
         scu_ic_mask_set(scu_mask);
         cpu_intc_mask_set(sr_mask);
@@ -389,7 +394,14 @@ _init_vdp2(void)
 static inline bool __always_inline
 _interlace_mode_double(void)
 {
-        return (_state_vdp2()->tv.interlace == TVMD_INTERLACE_DOUBLE);
+        /* Considering that this is read within interrupt handlers */
+        volatile uint16_t *tvmd;
+        tvmd = (volatile uint16_t *)&_state_vdp2()->regs.tvmd;
+
+        bool mode;
+        mode = ((*tvmd >> 7) & 0x01) != 0x00;
+
+        return mode;
 }
 
 static inline bool __always_inline
@@ -412,13 +424,6 @@ _vdp1_transfer_over(void)
 static void
 _vblank_in_handler(void)
 {
-        const uint16_t fbcr_bits[] = {
-                /* Render even-numbered lines */
-                0x0008,
-                /* Render odd-numbered lines */
-                0x000C
-        };
-
         /* VBLANK-IN interrupt runs at scanline #224 */
 
         _state.sync |= STATE_VBLANK_IN;
@@ -432,36 +437,20 @@ _vblank_in_handler(void)
         vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
 
         if ((_interlace_mode_double()) && vdp1_list_xferred) {
-                /* Assert for now, until we can perform a pseudo draw
-                 * continuation */
-                if ((_vdp1_transfer_over())) {
-                        assert(false);
-
-                        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-
-                        goto transfer_over;
-                }
-
-                /* Get even/odd field scan */
-                uint8_t field_scan;
-                field_scan = vdp2_tvmd_field_scan_get();
-
-                if (field_scan == _state.field_count) {
-                        MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
-                        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
-
-                        _state.field_count++;
-                }
-
-                /* If double-density interlace mode is set as we need to wait
-                 * two field scans, so avoid committing VDP2 state */
-                if (_state.field_count != 2) {
+                /* When in double-density interlace mode and field count is
+                 * zero, commit VDP2 state only once */
+                if (_state.field_count == 2) {
                         goto no_sync;
                 }
 
-                /* MEMORY_WRITE(16, VDP1(PTMR), 0x0000); */
+                _state.vdp1 |= STATE_VDP1_REQUEST_COMMIT_LIST;
 
-                _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
+                /* Going from manual to 1-cycle mode requires the FCM atd FCT
+                 * bits to be cleared. Otherwise, we get weird behavior from the
+                 * VDP1 */
+                MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+                MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+                MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
         }
 
         bool vdp2_request_commit;
@@ -478,7 +467,6 @@ _vblank_in_handler(void)
                 assert(ret >= 0);
         }
 
-transfer_over:
 no_sync:
         _user_vblank_in_handler();
 }
@@ -487,6 +475,17 @@ static void
 _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
+
+        const uint16_t fbcr_bits[] = {
+                /* Render even-numbered lines (includes change) */
+                0x0008,
+                /* Render odd-numbered lines (includes change) */
+                0x000C
+        };
+
+        /* Get even/odd field scan */
+        uint8_t field_scan;
+        field_scan = vdp2_tvmd_field_scan_get();
 
         _state.sync |= STATE_VBLANK_OUT;
         _state.sync &= ~STATE_VBLANK_IN;
@@ -500,16 +499,24 @@ _vblank_out_handler(void)
         }
 
         if ((_interlace_mode_double())) {
+                /* Assert for now, until we can perform a pseudo draw
+                 * continuation */
+                assert(!(_vdp1_transfer_over()));
+
+                /* Check for transfer over here */
                 if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                         goto no_change;
                 }
 
-                /* If we've completed two field scans */
+                if (field_scan == _state.field_count) {
+                        MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
+
+                        _state.field_count++;
+                }
+
                 if (_state.field_count != 2) {
                         goto no_change;
                 }
-
-                _state.field_count = 0;
         } else {
                 /* Manual mode (change) */
                 MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
@@ -519,9 +526,6 @@ _vblank_out_handler(void)
         _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
 
         _state.vdp1 |= STATE_VDP1_CHANGED;
-
-        /* Reset command address to the top */
-        _vdp1_last_command = 0x0000;
 
 no_change:
 no_sync:
@@ -542,6 +546,7 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
         _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
         _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
 
+        /* We can only draw during VBLANK-IN in double-density interlace mode */
         if ((_interlace_mode_double())) {
                 return;
         }
