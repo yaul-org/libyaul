@@ -18,8 +18,8 @@
 
 #define USER_CALLBACK_COUNT 16
 
-#define SCU_MASK_ENABLE         (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
-#define SCU_MASK_DISABLE        (~(IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END) & IC_MASK_ALL)
+#define SCU_MASK_OR     (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
+#define SCU_MASK_AND    ((~(SCU_MASK_OR)) & IC_MASK_ALL)
 
 #define STATE_SYNC                      0x01 /* Request to synchronize */
 #define STATE_VBLANK_IN                 0x02 /* VBLANK-IN has occurred */
@@ -82,7 +82,7 @@ static void _init_vdp2(void);
 void
 vdp_sync_init(void)
 {
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
+        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
         _init_vdp1();
         _init_vdp2();
@@ -95,7 +95,7 @@ vdp_sync_init(void)
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
-        scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
         vdp_sync_user_callback_clear();
 }
@@ -124,13 +124,13 @@ vdp_sync(int16_t interval __unused)
         scu_mask = scu_ic_mask_get();
 
         cpu_intc_mask_set(15);
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
+        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
         assert((_state.sync & STATE_SYNC) == 0x00);
 
         _state.sync |= STATE_SYNC;
 
-        scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
         if ((_state.vdp1 & (STATE_VDP1_REQUEST_XFER_LIST | STATE_VDP1_LIST_XFERRED)) != 0x00) {
@@ -161,7 +161,7 @@ vdp_sync(int16_t interval __unused)
         } while (vdp1_working || vdp2_working);
 
         cpu_intc_mask_set(15);
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_ENABLE);
+        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
         _state.sync &= ~STATE_SYNC;
 
@@ -169,7 +169,7 @@ vdp_sync(int16_t interval __unused)
         _state.vdp2 = 0x00;
         _state.field_count = 0;
 
-        scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
         cpu_intc_mask_set(0);
 
         uint32_t id;
@@ -271,7 +271,7 @@ vdp1_sync_draw_wait(void)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(SCU_MASK_DISABLE, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
         if (_interlace_mode_double()) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
