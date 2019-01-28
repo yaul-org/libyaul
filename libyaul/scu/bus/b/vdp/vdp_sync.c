@@ -28,9 +28,9 @@
 #define STATE_VDP1_REQUEST_COMMIT_LIST	0x04 /* VDP1 request to commit list */
 #define STATE_VDP1_LIST_COMMITTED       0x08 /* VDP1 finished committing list */
 #define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
-#define STATE_VDP1_CHANGED              0x20 /* VDP1 changing frame buffers */
+#define STATE_VDP1_CHANGED              0x20 /* VDP1 changed frame buffers */
 
-#define STATE_VDP2_COMITTING            0x01 /* VDP2 is committing state */
+#define STATE_VDP2_COMITTING            0x01 /* VDP2 is committing state via SCU-DMA */
 #define STATE_VDP2_COMMITTED            0x02 /* VDP2 finished committing state */
 
 static void _vblank_in_handler(void);
@@ -264,7 +264,7 @@ vdp1_sync_draw_wait(void)
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
-        if (_interlace_mode_double()) {
+        if ((_interlace_mode_double())) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
                  * the command list */
                 while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
@@ -478,7 +478,6 @@ _vblank_out_handler(void)
                  * continuation */
                 assert(!(_vdp1_transfer_over()));
 
-                /* Check for transfer over here */
                 if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                         goto no_change;
                 }
