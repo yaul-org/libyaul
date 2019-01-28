@@ -22,8 +22,6 @@
 #define SCU_MASK_AND    ((~(SCU_MASK_OR)) & IC_MASK_ALL)
 
 #define STATE_SYNC                      0x01 /* Request to synchronize */
-#define STATE_VBLANK_IN                 0x02 /* VBLANK-IN has occurred */
-#define STATE_VBLANK_OUT                0x04 /* VBLANK-OUT has occurred */
 
 #define STATE_VDP1_REQUEST_XFER_LIST    0x01 /* VDP1 request to transfer list */
 #define STATE_VDP1_LIST_XFERRED         0x02 /* VDP1 finished transferring list via SCU-DMA */
@@ -419,9 +417,6 @@ _vblank_in_handler(void)
 {
         /* VBLANK-IN interrupt runs at scanline #224 */
 
-        _state.sync |= STATE_VBLANK_IN;
-        _state.sync &= ~STATE_VBLANK_OUT;
-
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
         }
@@ -470,13 +465,6 @@ _vblank_out_handler(void)
                 0x000C
         };
 
-        /* Get even/odd field scan */
-        uint8_t field_scan;
-        field_scan = vdp2_tvmd_field_scan_get();
-
-        _state.sync |= STATE_VBLANK_OUT;
-        _state.sync &= ~STATE_VBLANK_IN;
-
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
         }
@@ -494,6 +482,10 @@ _vblank_out_handler(void)
                 if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                         goto no_change;
                 }
+
+                /* Get even/odd field scan */
+                uint8_t field_scan;
+                field_scan = vdp2_tvmd_field_scan_get();
 
                 if (field_scan == _state.field_count) {
                         MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
