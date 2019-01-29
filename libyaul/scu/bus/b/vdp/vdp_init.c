@@ -113,12 +113,13 @@ _init_vdp2(void)
         vdp2_scrn_reduction_y_set(SCRN_NBG1, Q0_3_8(1.0f));
 
         const struct vram_ctl vram_ctl = {
-                .cram_mode = VRAM_CTL_CRAM_MODE_1,
                 .vram_size = VRAM_CTL_SIZE_4MBIT,
                 .vram_mode = VRAM_CTL_MODE_PART_BANK_BOTH
         };
 
         vdp2_vram_control_set(&vram_ctl);
+
+        vdp2_cram_mode_set(0);
 
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x000000),
             COLOR_RGB555(0, 0, 0));

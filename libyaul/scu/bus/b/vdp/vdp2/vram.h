@@ -68,11 +68,6 @@ extern "C" {
 #define VRAM_4SPLIT_BANK_SIZE_8MBIT     (VRAM_SIZE_8MBIT / 4)
 
 struct vram_ctl {
-#define VRAM_CTL_CRAM_MODE_0            0x0000 /* RGB555, 1,204 colors */
-#define VRAM_CTL_CRAM_MODE_1            0x0001 /* RGB555, 2,048 colors */
-#define VRAM_CTL_CRAM_MODE_2            0x0002 /* RGB888, 1,204 colors */
-        uint8_t cram_mode; /* CRAM mode */
-
 #define VRAM_CTL_COEFFICIENT_TABLE_VRAM 0x0000 /* Store coefficient table in VRAM */
 #define VRAM_CTL_COEFFICIENT_TABLE_CRAM 0x0001 /* Store coefficient table in CRAM */
         uint8_t coefficient_table;
@@ -87,7 +82,7 @@ struct vram_ctl {
 #define VRAM_CTL_MODE_PART_BANK_B       0x0002 /* Partition VRAM-B into two banks */
 #define VRAM_CTL_MODE_PART_BANK_BOTH    0x0003
         uint8_t vram_mode; /* VRAM mode bank partitions */
-};
+} __aligned(4);
 
 #define VRAM_CYCP_PNDR_NBG0     0x0 /* NBG0 pattern name data read */
 #define VRAM_CYCP_PNDR_NBG1     0x1 /* NBG1 pattern name data read */
