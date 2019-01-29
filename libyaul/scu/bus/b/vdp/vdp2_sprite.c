@@ -52,3 +52,21 @@ vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
                 return;
         }
 }
+
+void
+vdp2_sprite_type_set(uint8_t type)
+{
+#ifdef DEBUG
+        assert((type >= 0x00) && (type <= 0x0F));
+
+        /* XXX: Check if the sprite color format is valid with the
+         * sprite type specified. */
+#endif /* DEBUG */
+
+        /* Types 0 to 7 are for low resolution (320 or 352), and types 8
+         * to 15 are for high resolution (640 or 704).
+         *
+         * The data widths are 16-bits and 8-bits, respectively. */
+        _state_vdp2()->regs.spctl &= 0xFFF0;
+        _state_vdp2()->regs.spctl |= type & 0x000F;
+}
