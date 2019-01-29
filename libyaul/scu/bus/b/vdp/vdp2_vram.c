@@ -5,31 +5,31 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <vdp2/cram.h>
 #include <vdp2/vram.h>
-
-#include <sys/dma-queue.h>
 
 #include "vdp-internal.h"
 
 void
 vdp2_vram_control_set(const struct vram_ctl *vram_ctl)
 {
+#ifdef DEBUG
         assert(vram_ctl != NULL);
-
-        assert((vram_ctl->cram_mode == VRAM_CTL_CRAM_MODE_0) ||
-               (vram_ctl->cram_mode == VRAM_CTL_CRAM_MODE_1) ||
-               (vram_ctl->cram_mode == VRAM_CTL_CRAM_MODE_2));
 
         assert((vram_ctl->vram_size == VRAM_CTL_SIZE_4MBIT) ||
                (vram_ctl->vram_size == VRAM_CTL_SIZE_8MBIT));
 
         assert((vram_ctl->vram_mode & 0xFC) == 0x00);
 
+        assert((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
+              ((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_CRAM)));
+#endif /* DEBUG */
+
         /* If the coefficient table is set to be stored in CRAM, the
          * color mode must be 1 */
-        assert((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
-              ((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_CRAM) &&
-                vram_ctl->cram_mode == VRAM_CTL_CRAM_MODE_1));
+        if (vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_CRAM) {
+                _state_vdp2()->regs.ramctl |= 0x1000;
+        }
 
         /* VRAM size */
         _state_vdp2()->regs.vrsize = vram_ctl->vram_size;
@@ -37,10 +37,6 @@ vdp2_vram_control_set(const struct vram_ctl *vram_ctl)
         /* Coefficient table storage */
         _state_vdp2()->regs.ramctl &= 0x7FFF;
         _state_vdp2()->regs.ramctl |= vram_ctl->coefficient_table << 15;
-
-        /* CRAM mode */
-        _state_vdp2()->regs.ramctl &= 0xCFFF;
-        _state_vdp2()->regs.ramctl |= vram_ctl->cram_mode << 12;
 
         /* VRAM mode */
         _state_vdp2()->regs.ramctl &= 0xFCFF;

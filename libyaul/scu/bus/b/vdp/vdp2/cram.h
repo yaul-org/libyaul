@@ -8,7 +8,13 @@
 #ifndef _VDP2_CRAM_H_
 #define _VDP2_CRAM_H_
 
+#include <stdint.h>
+
 #include <sys/cdefs.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /* Color RAM (CRAM) stores color data of sprites and scroll screens.
  *
@@ -45,5 +51,12 @@
 #define COLOR_RGB888(r, g, b)   (((b) << 16) | ((g) << 8) | (r))
 #define COLOR_RGB888_TO_RGB555(r, g, b) ((((b) >> 3) << 10) |                  \
     (((g) >> 3) << 5) | ((r) >> 3))
+
+extern void vdp2_cram_mode_set(uint8_t);
+extern void vdp2_cram_offset_set(uint8_t, uint32_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !_VDP2_CRAM_H_ */
