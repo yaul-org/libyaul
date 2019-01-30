@@ -22,6 +22,8 @@
 #define SCU_MASK_AND    ((~(SCU_MASK_OR)) & IC_MASK_ALL)
 
 #define STATE_SYNC                      0x01 /* Request to synchronize */
+#define STATE_INTERLACE_SINGLE		0x02
+#define STATE_INTERLACE_DOUBLE		0x04
 
 #define STATE_VDP1_REQUEST_XFER_LIST    0x01 /* VDP1 request to transfer list */
 #define STATE_VDP1_LIST_XFERRED         0x02 /* VDP1 finished transferring list via SCU-DMA */
@@ -43,7 +45,6 @@ static void _vdp2_commit_handler(const struct dma_queue_transfer *);
 
 static void _default_handler(void);
 
-static inline bool __always_inline _interlace_mode_double(void);
 static inline bool __always_inline _vdp1_transfer_over(void);
 
 static volatile union {
@@ -100,6 +101,18 @@ vdp_sync_init(void)
 void
 vdp_sync(int16_t interval __unused)
 {
+        _state.sync &= ~STATE_INTERLACE_SINGLE;
+        _state.sync &= ~STATE_INTERLACE_DOUBLE;
+
+        switch ((_state_vdp2()->regs.tvmd >> 6) & 0x3) {
+        case 0x2:
+                _state.sync |= STATE_INTERLACE_SINGLE;
+                break;
+        case 0x3:
+                _state.sync |= STATE_INTERLACE_DOUBLE;
+                break;
+        }
+
         vdp1_sync_draw_wait();
 
         struct dma_reg_buffer *reg_buffer;
@@ -262,7 +275,10 @@ vdp1_sync_draw_wait(void)
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
-        if ((_interlace_mode_double())) {
+        bool interlace_mode_double;
+        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+
+        if (interlace_mode_double) {
                 /* Wait for transfer only as we can't wait until VDP1 processes
                  * the command list */
                 while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
@@ -381,19 +397,6 @@ _init_vdp2(void)
 }
 
 static inline bool __always_inline
-_interlace_mode_double(void)
-{
-        /* Considering that this is read within interrupt handlers */
-        volatile uint16_t *tvmd;
-        tvmd = (volatile uint16_t *)&_state_vdp2()->regs.tvmd;
-
-        bool mode;
-        mode = ((*tvmd >> 7) & 0x01) != 0x00;
-
-        return mode;
-}
-
-static inline bool __always_inline
 _vdp1_transfer_over(void)
 {
         struct vdp1_transfer_status transfer_status;
@@ -419,10 +422,13 @@ _vblank_in_handler(void)
                 goto no_sync;
         }
 
+        bool interlace_mode_double;
+        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+
         bool vdp1_list_xferred;
         vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
 
-        if ((_interlace_mode_double()) && vdp1_list_xferred) {
+        if (interlace_mode_double && vdp1_list_xferred) {
                 /* When in double-density interlace mode and field count is
                  * zero, commit VDP2 state only once */
                 if (_state.field_count == 2) {
@@ -471,7 +477,10 @@ _vblank_out_handler(void)
                 goto no_sync;
         }
 
-        if ((_interlace_mode_double())) {
+        bool interlace_mode_double;
+        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+
+        if (interlace_mode_double) {
                 /* Assert for now, until we can perform a pseudo draw
                  * continuation */
                 assert(!(_vdp1_transfer_over()));
@@ -524,7 +533,10 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 
         /* We can only draw during VBLANK-IN and in 1-cycle mode when in
          * double-density interlace mode */
-        if ((_interlace_mode_double())) {
+        bool interlace_mode_double;
+        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+
+        if (interlace_mode_double) {
                 return;
         }
 
