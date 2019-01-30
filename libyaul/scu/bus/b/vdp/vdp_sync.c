@@ -462,7 +462,7 @@ _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
-        const uint16_t fbcr_bits[] = {
+        static const uint16_t fbcr_bits[] = {
                 /* Render even-numbered lines (includes change) */
                 0x0008,
                 /* Render odd-numbered lines (includes change) */
