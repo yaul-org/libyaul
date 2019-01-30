@@ -422,16 +422,25 @@ _vblank_in_handler(void)
                 goto no_sync;
         }
 
-        bool interlace_mode_double;
-        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+        bool interlace_mode;
+        interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
         bool vdp1_list_xferred;
         vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
 
-        if (interlace_mode_double && vdp1_list_xferred) {
-                /* When in double-density interlace mode and field count is
-                 * zero, commit VDP2 state only once */
+        if (interlace_mode && vdp1_list_xferred) {
+                /* When in single/double-density interlace mode and field count
+                 * is zero, commit VDP2 state only once */
                 if (_state.field_count == 2) {
+                        goto no_sync;
+                }
+
+                bool interlace_mode_single;
+                interlace_mode_single = (_state.sync & STATE_INTERLACE_SINGLE) != 0x00;
+
+                /* When in single-density interlace mode, call to plot only
+                 * once */
+                if (interlace_mode_single && (_state.field_count > 0)) {
                         goto no_sync;
                 }
 
@@ -477,29 +486,29 @@ _vblank_out_handler(void)
                 goto no_sync;
         }
 
-        bool interlace_mode_double;
-        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+        bool interlace_mode;
+        interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
-        if (interlace_mode_double) {
-                /* Assert for now, until we can perform a pseudo draw
-                 * continuation */
-                assert(!(_vdp1_transfer_over()));
-
+        if (interlace_mode) {
                 if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                         goto no_change;
                 }
 
-                /* Get even/odd field scan */
-                uint8_t field_scan;
-                field_scan = vdp2_tvmd_field_scan_get();
+                bool interlace_mode_double;
+                interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
 
-                if (field_scan == _state.field_count) {
+                if (interlace_mode_double) {
+                        /* Get even/odd field scan */
+                        uint8_t field_scan;
+                        field_scan = vdp2_tvmd_field_scan_get();
+
                         MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
-
-                        _state.field_count++;
                 }
 
-                if (_state.field_count != 2) {
+                _state.field_count++;
+
+                /* When in single-density interlace mode, wait two fields */
+                if (_state.field_count < 2) {
                         goto no_change;
                 }
         } else {
