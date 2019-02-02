@@ -53,7 +53,7 @@ __assert_func(const char *file, int line, const char *func,
                 cpu_dmac_stop();
                 scu_dma_stop();
 
-                (void)memcpy((void *)0x20200000, buffer, sizeof(buffer));
+                (void)memcpy((void *)LWRAM_UNCACHED(0), buffer, sizeof(buffer));
 
                 abort();
         }
