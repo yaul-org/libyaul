@@ -42,6 +42,28 @@ extern "C" {
                 uint16_t raw;                                                  \
         } __CONCAT(n, _mode)
 
+#define VDP1_CMDT_SPRITE_TYPE_DECLARE(n)                                       \
+        union {                                                                \
+                struct vdp2_sprite_type_0 type_0;                              \
+                struct vdp2_sprite_type_1 type_1;                              \
+                struct vdp2_sprite_type_2 type_2;                              \
+                struct vdp2_sprite_type_3 type_3;                              \
+                struct vdp2_sprite_type_4 type_4;                              \
+                struct vdp2_sprite_type_5 type_5;                              \
+                struct vdp2_sprite_type_6 type_6;                              \
+                struct vdp2_sprite_type_7 type_7;                              \
+                struct vdp2_sprite_type_8 type_8;                              \
+                struct vdp2_sprite_type_9 type_9;                              \
+                struct vdp2_sprite_type_a type_a;                              \
+                struct vdp2_sprite_type_b type_b;                              \
+                struct vdp2_sprite_type_c type_c;                              \
+                struct vdp2_sprite_type_d type_d;                              \
+                struct vdp2_sprite_type_e type_e;                              \
+                struct vdp2_sprite_type_f type_f;                              \
+                                                                               \
+                uint16_t raw;                                                  \
+        } __CONCAT(n, _sprite_type)
+
 #define VDP1_CMDT_DUMMY_UNION_DECLARE(n)                                       \
         union {                                                                \
                 uint16_t value;                                                \
@@ -108,26 +130,7 @@ struct vdp1_cmdt_sprite {
 
         union {
                 /* Mode 0, 2, 3, and 4 */
-                union {
-                        struct vdp2_sprite_type_0 type_0;
-                        struct vdp2_sprite_type_1 type_1;
-                        struct vdp2_sprite_type_2 type_2;
-                        struct vdp2_sprite_type_3 type_3;
-                        struct vdp2_sprite_type_4 type_4;
-                        struct vdp2_sprite_type_5 type_5;
-                        struct vdp2_sprite_type_6 type_6;
-                        struct vdp2_sprite_type_7 type_7;
-                        struct vdp2_sprite_type_8 type_8;
-                        struct vdp2_sprite_type_9 type_9;
-                        struct vdp2_sprite_type_a type_a;
-                        struct vdp2_sprite_type_b type_b;
-                        struct vdp2_sprite_type_c type_c;
-                        struct vdp2_sprite_type_d type_d;
-                        struct vdp2_sprite_type_e type_e;
-                        struct vdp2_sprite_type_f type_f;
-
-                        uint16_t raw;
-                } cs_color_bank;
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(cs);
 
                 /* Mode 1 */
                 uint32_t cs_clut;
@@ -173,7 +176,11 @@ struct vdp1_cmdt_sprite {
 struct vdp1_cmdt_polygon {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cp);
 
-        color_rgb555_t cp_color;
+        union {
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(cp);
+
+                color_rgb555_t cp_color;
+        };
 
         union {
                 struct {
@@ -194,7 +201,11 @@ struct vdp1_cmdt_polygon {
 struct vdp1_cmdt_polyline {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
-        color_rgb555_t cl_color;
+        union {
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(cl);
+
+                color_rgb555_t cl_color;
+        };
 
         union {
                 struct {
@@ -215,7 +226,11 @@ struct vdp1_cmdt_polyline {
 struct vdp1_cmdt_line {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
 
-        color_rgb555_t cl_color;
+        union {
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(cl);
+
+                color_rgb555_t cl_color;
+        };
 
         union {
                 struct {
@@ -291,6 +306,7 @@ extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *, const struct vdp1
 extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
+#undef VDP1_CMDT_SPRITE_TYPE_DECLARE
 #undef VDP1_CMDT_DUMMY_UNION_DECLARE
 
 #ifdef __cplusplus
