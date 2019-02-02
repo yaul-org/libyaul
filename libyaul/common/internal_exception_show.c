@@ -35,8 +35,16 @@ _internal_exception_show(const char *buffer)
 
         vdp2_tvmd_display_set();
 
-        vdp2_sprite_type_set(0);
+        vdp1_env_default_set();
+
         vdp2_sprite_priority_set(0, 0);
+        vdp2_sprite_priority_set(1, 0);
+        vdp2_sprite_priority_set(2, 0);
+        vdp2_sprite_priority_set(3, 0);
+        vdp2_sprite_priority_set(4, 0);
+        vdp2_sprite_priority_set(5, 0);
+        vdp2_sprite_priority_set(6, 0);
+        vdp2_sprite_priority_set(7, 0);
 
         /* Clear any pending VDP sync user callbacks */
         vdp_sync_user_callback_clear();
