@@ -33,6 +33,7 @@ struct vdp1_env {
         uint8_t env_bpp;
         uint8_t env_rotation;
         uint8_t env_color_mode;
+        uint8_t env_sprite_type;
 };
 
 extern void vdp1_env_default_set(void);

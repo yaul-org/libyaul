@@ -65,6 +65,7 @@ _init_vdp1(void)
         default_env->env_bpp = ENV_BPP_16;
         default_env->env_rotation = ENV_ROTATION_0;
         default_env->env_color_mode = ENV_COLOR_MODE_RGB_PALETTE;
+        default_env->env_sprite_type = 0x0;
 
         vdp1_env_default_set();
 
@@ -94,7 +95,6 @@ _init_vdp2(void)
         vdp2_scrn_priority_set(SCRN_NBG3, 1);
         vdp2_scrn_priority_set(SCRN_RBG0, 1);
 
-        vdp2_sprite_type_set(0x0);
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
         vdp2_sprite_priority_set(2, 0);

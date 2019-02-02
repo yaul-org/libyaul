@@ -63,13 +63,14 @@ vdp1_env_set(const struct vdp1_env *env)
         _state_vdp1()->regs.ewlr = (x1 << 9) | y1;
         _state_vdp1()->regs.ewrr = (x3 << 9) | y3;
 
-        _state_vdp2()->regs.spctl &= 0x371F;
+        _state_vdp2()->regs.spctl &= 0x3710;
         _state_vdp2()->regs.spctl |= env->env_color_mode << 5;
 
-        struct vdp1_env *default_env;
-        default_env = &_state_vdp1()->env;
-
-        (void)memcpy(default_env, env, sizeof(struct vdp1_env));
+        /* Types 0x0 to 0x7 are for low resolution (320 or 352), and types 0x8
+         * to 0xF are for high resolution (640 or 704).
+         *
+         * The frame buffer bit-depth are 16-bits and 8-bits, respectively */
+        _state_vdp2()->regs.spctl |= env->env_sprite_type & 0x000F;
 
         /* Force stop drawing */
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
@@ -95,6 +96,14 @@ _env_assert(const struct vdp1_env *env)
                (env->env_color_mode == ENV_COLOR_MODE_RGB_PALETTE));
 
         _env_erase_assert(env);
+
+        assert((env->env_sprite_type >= 0x0) && (env->env_sprite_type <= 0xF));
+
+        /* If frame buffer bit-depth is 8, only sprite types 0x8 to 0xF are
+         * valid. If frame buffer bit-depth is 16, only sprite types 0x0 to 0x7
+         * are valid */
+        assert(((env->env_bpp == ENV_BPP_8) && (env->env_sprite_type >= 0x8)) ||
+               ((env->env_bpp == ENV_BPP_16) && (env->env_sprite_type <= 0x7)));
 }
 
 static inline void __always_inline

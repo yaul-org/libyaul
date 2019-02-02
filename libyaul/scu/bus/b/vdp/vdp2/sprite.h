@@ -63,7 +63,7 @@ struct vdp2_sprite_type_6 {
         unsigned int dc:10; /* Dot color data bits */
 } __packed;
 
-struct vdp2_sprite_type_7 {        
+struct vdp2_sprite_type_7 {
         unsigned int sdw:1; /* Shadow (or sprite window) bit */
         unsigned int pr:3; /* Priority bit(s) */
         unsigned int cc:3; /* Color calculation ratio bit(s) */
@@ -114,7 +114,6 @@ struct vdp2_sprite_type_f {
         unsigned int dc:6; /* Dot color data bits */
 } __packed;
 
-extern void vdp2_sprite_type_set(uint8_t);
 extern void vdp2_sprite_priority_set(uint8_t, uint8_t);
 
 #ifdef __cplusplus
