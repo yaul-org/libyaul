@@ -223,6 +223,7 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_link = 0x0000;
+        /* Force bit 6 and 7 to be set */
         cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
         cmdt->cmd_colr = polyline->cl_color.raw;
         /* CCW starting from vertex D */
