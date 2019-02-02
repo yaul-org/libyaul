@@ -64,11 +64,6 @@ extern "C" {
                 uint16_t raw;                                                  \
         } __CONCAT(n, _sprite_type)
 
-#define VDP1_CMDT_DUMMY_UNION_DECLARE(n)                                       \
-        union {                                                                \
-                uint16_t value;                                                \
-        } __CONCAT(n, _extra)
-
 struct vdp1_cmdt;
 
 struct vdp1_cmdt_list {
@@ -169,8 +164,6 @@ struct vdp1_cmdt_sprite {
         };
 
         uint32_t cs_grad;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(cs);
 };
 
 struct vdp1_cmdt_polygon {
@@ -194,8 +187,6 @@ struct vdp1_cmdt_polygon {
         };
 
         uint32_t cp_grad;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(cp);
 };
 
 struct vdp1_cmdt_polyline {
@@ -219,8 +210,6 @@ struct vdp1_cmdt_polyline {
         };
 
         uint32_t cl_grad;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(cl);
 };
 
 struct vdp1_cmdt_line {
@@ -244,8 +233,6 @@ struct vdp1_cmdt_line {
         };
 
         uint32_t cl_grad;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(cl);
 };
 
 struct vdp1_cmdt_local_coord {
@@ -253,8 +240,6 @@ struct vdp1_cmdt_local_coord {
                 int16_t x;
                 int16_t y;
         } lc_coord;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(lc);
 };
 
 struct vdp1_cmdt_system_clip_coord {
@@ -262,8 +247,6 @@ struct vdp1_cmdt_system_clip_coord {
                 int16_t x;
                 int16_t y;
         } scc_coord;
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(scc);
 };
 
 struct vdp1_cmdt_user_clip_coord {
@@ -271,8 +254,6 @@ struct vdp1_cmdt_user_clip_coord {
                 int16_t x;
                 int16_t y;
         } ucc_coords[2];
-
-        VDP1_CMDT_DUMMY_UNION_DECLARE(ucc);
 };
 
 static inline uint16_t __always_inline
@@ -307,7 +288,6 @@ extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
 #undef VDP1_CMDT_SPRITE_TYPE_DECLARE
-#undef VDP1_CMDT_DUMMY_UNION_DECLARE
 
 #ifdef __cplusplus
 }
