@@ -27,6 +27,7 @@ struct vdp1_clut {
         color_rgb555_t vcl_color[16];
 } __aligned(32);
 
+extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
 extern void *vdp1_vram_texture_base_get(void);
 extern struct vdp1_gouraud_table *vdp1_vram_gouraud_base_get(void);
 extern struct vdp1_clut *vdp1_vram_clut_base_get(void);

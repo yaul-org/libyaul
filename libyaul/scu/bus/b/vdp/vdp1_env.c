@@ -11,14 +11,12 @@
 #include <vdp1/env.h>
 #include <vdp1/map.h>
 #include <vdp1/cmdt.h>
-#include <vdp1/vram.h>
 
 #include <vdp2/tvmd.h>
 
 #include "vdp-internal.h"
 
 static inline void __always_inline _env_assert(const struct vdp1_env *);
-static inline void __always_inline _env_limits_assert(const struct vdp1_env *);
 static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
 
 void
@@ -34,51 +32,6 @@ void
 vdp1_env_set(const struct vdp1_env *env)
 {
         _env_assert(env);
-
-        /* We have to have at least one command */
-        assert(env->env_limits.cmdt_count > 0);
-
-        /* One command table is allocated to us */
-        uint32_t vram_size;
-        vram_size = VDP1_VRAM_SIZE - sizeof(struct vdp1_cmdt);
-
-        uint32_t cmdt_size;
-        cmdt_size = env->env_limits.cmdt_count * sizeof(struct vdp1_cmdt);
-
-        uint32_t texture_size;
-        texture_size = env->env_limits.texture_size;
-
-        uint32_t gouraud_size;
-        gouraud_size = env->env_limits.gouraud_count * sizeof(struct vdp1_gouraud_table);
-
-        uint32_t clut_size;
-        clut_size = env->env_limits.clut_count * sizeof(struct vdp1_clut);
-
-        uint32_t total_size;
-        total_size = cmdt_size + texture_size + gouraud_size + clut_size;
-
-        assert(total_size <= vram_size);
-
-        uint32_t vram_base;
-        vram_base = VDP1_VRAM(sizeof(struct vdp1_cmdt));
-
-        _state_vdp1()->vram.cmdt_base = vram_base;
-        vram_base += cmdt_size;
-
-        _state_vdp1()->vram.texture_base = vram_base;
-        vram_base += texture_size;
-
-        _state_vdp1()->vram.gouraud_base = vram_base;
-        vram_base += gouraud_size;
-
-        _state_vdp1()->vram.clut_base = vram_base;
-        vram_base += clut_size;
-
-        /* Get the remaining amount left over */
-        _state_vdp1()->vram.remaining_base =
-            (((VDP1_VRAM(VDP1_VRAM_SIZE) - vram_base) == 0)
-                ? 0x00000000
-                : vram_base);
 
         /* Always clear TVM and VBE bits */
         _state_vdp1()->regs.tvmr = (env->env_rotation << 1) | env->env_bpp;
@@ -141,14 +94,7 @@ _env_assert(const struct vdp1_env *env)
         assert((env->env_color_mode == ENV_COLOR_MODE_PALETTE) ||
                (env->env_color_mode == ENV_COLOR_MODE_RGB_PALETTE));
 
-        // _env_limits_assert(env);
-
         _env_erase_assert(env);
-}
-
-static inline void __always_inline
-_env_limits_assert(const struct vdp1_env *env)
-{
 }
 
 static inline void __always_inline

@@ -65,12 +65,10 @@ _init_vdp1(void)
         default_env->env_bpp = ENV_BPP_16;
         default_env->env_rotation = ENV_ROTATION_0;
         default_env->env_color_mode = ENV_COLOR_MODE_RGB_PALETTE;
-        default_env->env_limits.cmdt_count = 2048;
-        default_env->env_limits.texture_size = 0x0006BFE0;
-        default_env->env_limits.gouraud_count = 1024;
-        default_env->env_limits.clut_count = 256;
 
         vdp1_env_default_set();
+
+        vdp1_vram_partitions_set(2048, 0x0006BFE0, 1024, 256);
 }
 
 static void
