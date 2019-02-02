@@ -69,6 +69,13 @@ static struct {
         void *work;
 } _user_callbacks[USER_CALLBACK_COUNT] __aligned(16);
 
+static const uint16_t _fbcr_bits[] = {
+        /* Render even-numbered lines */
+        0x0008,
+        /* Render odd-numbered lines */
+        0x000C
+};
+
 static void (*_user_vblank_in_handler)(void);
 static void (*_user_vblank_out_handler)(void);
 
@@ -446,10 +453,17 @@ _vblank_in_handler(void)
 
                 _state.vdp1 |= STATE_VDP1_REQUEST_COMMIT_LIST;
 
-                /* Going from manual to 1-cycle mode requires the FCM atd FCT
+                /* Get even/odd field scan */
+                uint8_t field_scan;
+                field_scan = vdp2_tvmd_field_scan_get();
+
+                /* Going from manual to 1-cycle mode requires the FCM and FCT
                  * bits to be cleared. Otherwise, we get weird behavior from the
-                 * VDP1 */
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+                 * VDP1.
+                 *
+                 * However, VDP1(FBCR) must not be entirely cleared. This caused
+                 * a lot of glitching when in double-density interlace mode */
+                MEMORY_WRITE(16, VDP1(FBCR), _fbcr_bits[field_scan]);
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
         }
@@ -470,13 +484,6 @@ static void
 _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
-
-        static const uint16_t fbcr_bits[] = {
-                /* Render even-numbered lines (includes change) */
-                0x0008,
-                /* Render odd-numbered lines (includes change) */
-                0x000C
-        };
 
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
@@ -502,7 +509,7 @@ _vblank_out_handler(void)
                         uint8_t field_scan;
                         field_scan = vdp2_tvmd_field_scan_get();
 
-                        MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
+                        MEMORY_WRITE(16, VDP1(FBCR), _fbcr_bits[field_scan]);
                 }
 
                 _state.field_count++;
