@@ -28,20 +28,29 @@
 } while (false)
 
 /* Macros specific for processor */
-#define CS0(x)          (0x22000000 + (x))
-#define CS1(x)          (0x24000000 + (x))
-#define DUMMY(x)        (0x25000000 + (x))
-#define CS2(x)          (0x25800000 + (x))
-#define SCSP(x)         (0x25B00000 + (x))
-#define VDP1_VRAM(x)    (0x25C00000 + (x))
-#define VDP1_FB(x)      (0x25C80000 + (x))
-#define VDP1(x)         (0x25D00000 + (x))
-#define VDP2_VRAM(x)    (0x25E00000 + (x))
-#define VDP2_CRAM(x)    (0x25F00000 + (x))
-#define VDP2(x)         (0x25F80000 + (x))
-#define SCU(x)          (0x25FE0000 + (x))
-#define MINIT           (0x21000000)
-#define SINIT           (0x21800000)
+#define CS0(x)                  (0x22000000 + (x))
+#define CS1(x)                  (0x24000000 + (x))
+#define DUMMY(x)                (0x25000000 + (x))
+#define CS2(x)                  (0x25800000 + (x))
+#define SCSP(x)                 (0x25B00000 + (x))
+#define VDP1_VRAM(x)            (0x25C00000 + (x))
+#define VDP1_FB(x)              (0x25C80000 + (x))
+#define VDP1(x)                 (0x25D00000 + (x))
+#define VDP2_VRAM(x)            (0x25E00000 + (x))
+#define VDP2_CRAM(x)            (0x25F00000 + (x))
+#define VDP2(x)                 (0x25F80000 + (x))
+#define SCU(x)                  (0x25FE0000 + (x))
+
+#define HWRAM(x)                (0x06000000 + (x))
+#define HWRAM_UNCACHED(x)       (0x26000000 + (x))
+#define HWRAM_PURGE_CACHE(x)    (0x46000000 + (x))
+
+#define LWRAM(x)                (0x00200000 + (x))
+#define LWRAM_UNCACHED(x)       (0x20200000 + (x))
+#define LWRAM_PURGE_CACHE(x)    (0x40200000 + (x))
+
+#define MINIT                   (0x21000000)
+#define SINIT                   (0x21800000)
 
 /* SCU */
 #define D0R     0x0000
