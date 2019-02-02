@@ -69,6 +69,13 @@ static struct {
         void *work;
 } _user_callbacks[USER_CALLBACK_COUNT] __aligned(16);
 
+static const uint16_t _fbcr_bits[] = {
+        /* Render even-numbered lines */
+        0x0008,
+        /* Render odd-numbered lines */
+        0x000C
+};
+
 static void (*_user_vblank_in_handler)(void);
 static void (*_user_vblank_out_handler)(void);
 
@@ -422,25 +429,41 @@ _vblank_in_handler(void)
                 goto no_sync;
         }
 
-        bool interlace_mode_double;
-        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+        bool interlace_mode;
+        interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
         bool vdp1_list_xferred;
         vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
 
-        if (interlace_mode_double && vdp1_list_xferred) {
-                /* When in double-density interlace mode and field count is
-                 * zero, commit VDP2 state only once */
+        if (interlace_mode && vdp1_list_xferred) {
+                /* When in single/double-density interlace mode and field count
+                 * is zero, commit VDP2 state only once */
                 if (_state.field_count == 2) {
+                        goto no_sync;
+                }
+
+                bool interlace_mode_single;
+                interlace_mode_single = (_state.sync & STATE_INTERLACE_SINGLE) != 0x00;
+
+                /* When in single-density interlace mode, call to plot only
+                 * once */
+                if (interlace_mode_single && (_state.field_count > 0)) {
                         goto no_sync;
                 }
 
                 _state.vdp1 |= STATE_VDP1_REQUEST_COMMIT_LIST;
 
-                /* Going from manual to 1-cycle mode requires the FCM atd FCT
+                /* Get even/odd field scan */
+                uint8_t field_scan;
+                field_scan = vdp2_tvmd_field_scan_get();
+
+                /* Going from manual to 1-cycle mode requires the FCM and FCT
                  * bits to be cleared. Otherwise, we get weird behavior from the
-                 * VDP1 */
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+                 * VDP1.
+                 *
+                 * However, VDP1(FBCR) must not be entirely cleared. This caused
+                 * a lot of glitching when in double-density interlace mode */
+                MEMORY_WRITE(16, VDP1(FBCR), _fbcr_bits[field_scan]);
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
                 MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
         }
@@ -462,13 +485,6 @@ _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
-        static const uint16_t fbcr_bits[] = {
-                /* Render even-numbered lines (includes change) */
-                0x0008,
-                /* Render odd-numbered lines (includes change) */
-                0x000C
-        };
-
         if ((_state.sync & STATE_SYNC) == 0x00) {
                 goto no_sync;
         }
@@ -477,29 +493,29 @@ _vblank_out_handler(void)
                 goto no_sync;
         }
 
-        bool interlace_mode_double;
-        interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
+        bool interlace_mode;
+        interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
-        if (interlace_mode_double) {
-                /* Assert for now, until we can perform a pseudo draw
-                 * continuation */
-                assert(!(_vdp1_transfer_over()));
-
+        if (interlace_mode) {
                 if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                         goto no_change;
                 }
 
-                /* Get even/odd field scan */
-                uint8_t field_scan;
-                field_scan = vdp2_tvmd_field_scan_get();
+                bool interlace_mode_double;
+                interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
 
-                if (field_scan == _state.field_count) {
-                        MEMORY_WRITE(16, VDP1(FBCR), fbcr_bits[field_scan]);
+                if (interlace_mode_double) {
+                        /* Get even/odd field scan */
+                        uint8_t field_scan;
+                        field_scan = vdp2_tvmd_field_scan_get();
 
-                        _state.field_count++;
+                        MEMORY_WRITE(16, VDP1(FBCR), _fbcr_bits[field_scan]);
                 }
 
-                if (_state.field_count != 2) {
+                _state.field_count++;
+
+                /* When in single-density interlace mode, wait two fields */
+                if (_state.field_count < 2) {
                         goto no_change;
                 }
         } else {
