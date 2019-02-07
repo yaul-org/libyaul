@@ -129,3 +129,4 @@ You can find me (*@mrkotfw*) on [Discord][4].
 [1]: http://yaul.org/downloads
 [2]: https://www.msys2.org/
 [3]: https://github.com/msys2/msys2/wiki/MSYS2-installation
+[4]: https://discord.gg/S434dWA
