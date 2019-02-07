@@ -122,6 +122,10 @@ tool-chain.
 You can now build any of the given examples in the `libyaul-examples`
 submodule.
 
+## Contact
+
+You can find me (*@mrkotfw*) on [Discord][4].
+
 [1]: http://yaul.org/downloads
 [2]: https://www.msys2.org/
 [3]: https://github.com/msys2/msys2/wiki/MSYS2-installation
