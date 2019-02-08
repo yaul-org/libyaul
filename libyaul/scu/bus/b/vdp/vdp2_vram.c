@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <string.h>
+
 #include <vdp2/cram.h>
 #include <vdp2/vram.h>
 
