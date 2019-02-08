@@ -275,6 +275,70 @@ struct scrn_cell_format {
                                *   Mode 3: Swap via Rotation Parameter Window */
 };
 
+/* Hardware defined */
+struct scrn_rotation_table {
+        /* Screen start coordinates */
+        uint32_t xst;
+        uint32_t yst;
+        uint32_t zst;
+
+        /* Screen vertical coordinate increments (per each line) */
+        uint32_t delta_xst;
+        uint32_t delta_yst;
+
+        /* Screen horizontal coordinate increments (per each dot) */
+        uint32_t delta_x;
+        uint32_t delta_y;
+
+        /* Rotation matrix
+         *
+         * A B C
+         * D E F
+         * G H I
+         */
+        union {
+                uint32_t raw[2][3]; /* XXX: Needs to be tested */
+
+                struct {
+                        uint32_t a;
+                        uint32_t b;
+                        uint32_t c;
+                        uint32_t d;
+                        uint32_t e;
+                        uint32_t f;
+                } param __packed;
+
+                uint32_t params[6]; /* Parameters A, B, C, D, E, F */
+        } matrix;
+
+        /* View point coordinates */
+        uint16_t px;
+        uint16_t py;
+        uint16_t pz;
+
+        unsigned int :16;
+
+        /* Center coordinates */
+        uint16_t cx;
+        uint16_t cy;
+        uint16_t cz;
+
+        unsigned int :16;
+
+        /* Amount of horizontal shifting */
+        uint32_t mx;
+        uint32_t my;
+
+        /* Scaling coefficients */
+        uint32_t kx; /* Expansion/reduction coefficient X */
+        uint32_t ky; /* Expansion/reduction coefficient Y */
+
+        /* Coefficient table address */
+        uint32_t kast;       /* Coefficient table start address */
+        uint32_t delta_kast; /* Addr. increment coeff. table (per line) */
+        uint32_t delta_kax;  /* Addr. increment coeff. table (per dot) */
+} __packed;
+
 #define SCRN_SF_TYPE_NONE               0
 #define SCRN_SF_TYPE_COLOR_CALCULATION  1
 #define SCRN_SF_TYPE_PRIORITY           2
