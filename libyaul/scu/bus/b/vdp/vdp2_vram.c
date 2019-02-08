@@ -44,6 +44,8 @@ vdp2_vram_control_set(const struct vram_ctl *vram_ctl)
 
         MEMORY_WRITE(16, VDP2(VRSIZE), _state_vdp2()->regs.vrsize);
         MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs.ramctl);
+
+        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl, sizeof(struct vram_ctl));
 }
 
 void
