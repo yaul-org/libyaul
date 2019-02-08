@@ -119,7 +119,7 @@ tool-chain.
 
 ## Building and running an example
 
-You can now build any of the given examples in the `libyaul-examples`
+You can now build any of the given examples in the [`libyaul-examples`][5]
 submodule.
 
 ## Contact
@@ -130,3 +130,4 @@ You can find me (*@mrkotfw*) on [Discord][4].
 [2]: https://www.msys2.org/
 [3]: https://github.com/msys2/msys2/wiki/MSYS2-installation
 [4]: https://discord.gg/S434dWA
+[5]: https://github.com/ijacquez/libyaul-examples
