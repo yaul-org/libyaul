@@ -223,6 +223,7 @@ struct scrn_bitmap_format {
                               *   Mode 1: Rotation Parameter B
                               *   Mode 2: Swap Coefficient Data Read
                               *   Mode 3: Swap via Rotation Parameter Window */
+        uint32_t sbf_rotation_table;
 };
 
 struct scrn_cell_format {

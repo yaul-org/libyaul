@@ -233,11 +233,12 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
                (format->sbf_rp_mode == 3));
 #endif /* DEBUG */
 
-        _state_vdp2()->regs.chctlb &= 0xC0FF;      /* Bits 8,9,10,12,13,14*/
-        _state_vdp2()->regs.bmpnb &= 0xFFC8;       /* Bits 0,1,2,4,5*/
-        _state_vdp2()->regs.rpmd &= 0xFFFC;        /* Bits 0,1 */
+        _state_vdp2()->regs.chctlb &= 0xC0FF; /* Bits 8, 9, 10, 12, 13, 14 */
+        _state_vdp2()->regs.bmpnb &= 0xFFC8;  /* Bits 0, 1, 2, 4, 5 */
+        _state_vdp2()->regs.rpmd &= 0xFFFC;   /* Bits 0, 1 */
         _state_vdp2()->regs.sfsel &= 0xFFEF;
         _state_vdp2()->regs.sfprmd &= 0xFCFF;
+        _state_vdp2()->regs.ramctl &= 0xB300;
 
         uint16_t cc_count;
         cc_count = (format->sbf_cc_count & 0x03) << 12;
@@ -289,6 +290,8 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
                 _state_vdp2()->regs.mpofr |= bank << 4;
                 break;
         }
+
+        /* Rotation data bank selection */
 
         /* Special function type */
         _state_vdp2()->regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;
