@@ -131,6 +131,9 @@ static const dbgio_vdp2_t _default_params = {
         .cram_index = 0
 };
 
+/* Parameters set by the user */
+static dbgio_vdp2_t _params;
+
 static dev_state_t *_dev_state;
 
 const dbgio_dev_ops_t _internal_dev_ops_vdp2 = {
@@ -226,13 +229,6 @@ _init(const dbgio_vdp2_t *params)
         };
 
         vdp2_scrn_cell_format_set(&cell_format);
-        vdp2_scrn_priority_set(params->scrn, 7);
-        vdp2_scrn_scroll_x_set(params->scrn, F16(0.0f));
-        vdp2_scrn_scroll_y_set(params->scrn, F16(0.0f));
-        vdp2_scrn_display_set(params->scrn, /* transparent = */ true);
-
-        vdp2_vram_cycp_bank_set(params->cpd_bank, &params->cpd_cycp);
-        vdp2_vram_cycp_bank_set(params->pnd_bank, &params->pnd_cycp);
 
         /* Restricting the page to 64x32 avoids wasting space */
         _dev_state->page_size /= 2;
@@ -316,6 +312,9 @@ _init(const dbgio_vdp2_t *params)
          * stale values not yet written back to H-WRAM */
         cpu_cache_purge();
 
+        /* Copy user's set device parameters */
+        (void)memcpy(&_params, params, sizeof(dbgio_vdp2_t));
+
         _dev_state->state = STATE_PARTIALLY_INITIALIZED;
 }
 
@@ -382,6 +381,15 @@ _flush(void)
         }
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
+
+        /* Force reset */
+        vdp2_scrn_priority_set(_params.scrn, 7);
+        vdp2_scrn_scroll_x_set(_params.scrn, F16(0.0f));
+        vdp2_scrn_scroll_y_set(_params.scrn, F16(0.0f));
+        vdp2_scrn_display_set(_params.scrn, /* transparent = */ true);
+
+        vdp2_vram_cycp_bank_set(_params.cpd_bank, &_params.cpd_cycp);
+        vdp2_vram_cycp_bank_set(_params.pnd_bank, &_params.pnd_cycp);
 
         int8_t ret;
         ret = dma_queue_enqueue(&_dev_state->dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
