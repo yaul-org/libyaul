@@ -286,7 +286,7 @@ typedef union {
         };
 
         fix16_t comp[3];
-} __packed __aligned(16) fix16_vector3_t;
+} __packed __aligned(4) fix16_vector3_t;
 
 typedef union {
         struct {
