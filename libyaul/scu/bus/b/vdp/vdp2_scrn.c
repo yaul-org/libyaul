@@ -224,8 +224,24 @@ _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 static void
 _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 {
+        const uint8_t rot_bank_select[2][2] = {
+                {
+                        /* VRAM bank is not partitioned */
+                        0x03,
+                        0x03,
+                }, {
+                        /* VRAM bank is partitioned */
+                        0x03,
+                        0x0C
+                }
+        };
+
 #ifdef DEBUG
-        assert((format->sbf_bitmap_size.width == 512));
+        assert((format->sbf_bitmap_size.width > 0) &&
+               ((format->sbf_bitmap_size.width & 0x1FF) == 0x0000));
+
+        assert((format->sbf_bitmap_size.height > 0) &&
+               ((format->sbf_bitmap_size.height & 0x00FF) == 0x0000));
 
         assert((format->sbf_rp_mode == 0) ||
                (format->sbf_rp_mode == 1) ||
@@ -292,6 +308,63 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         }
 
         /* Rotation data bank selection */
+        /* Calculate the number of banks used */
+        uint32_t pixel_count;
+        pixel_count = format->sbf_bitmap_size.width * format->sbf_bitmap_size.height;
+        uint32_t bitmap_size;
+        bitmap_size = pixel_count;
+
+        switch (format->sbf_cc_count) {
+        case SCRN_CCC_PALETTE_16:
+                bitmap_size >>= 1;
+                break;
+        case SCRN_CCC_PALETTE_256:
+                break;
+        case SCRN_CCC_PALETTE_2048:
+        case SCRN_CCC_RGB_32768:
+                bitmap_size <<= 1;
+                break;
+        case SCRN_CCC_RGB_16770000:
+                bitmap_size <<= 2;
+                break;
+        }
+
+        uint16_t ramctl_bits;
+        ramctl_bits = _state_vdp2()->regs.ramctl;
+
+        uint16_t bank_count;
+        bank_count = (bitmap_size >> 18) + 1;
+
+        uint8_t parted_bank_a;
+        parted_bank_a = (ramctl_bits >> 8) & 0x01;
+
+        uint8_t parted_bank_b;
+        parted_bank_b = (ramctl_bits >> 9) & 0x01;
+
+        for (uint16_t bank_offset = 0; bank_offset < bank_count; bank_offset++) {
+                uint8_t which_bank;
+                which_bank = bank + bank_offset;
+
+                uint8_t which_subbank;
+                which_subbank = which_bank & 0x01;
+
+                switch (which_bank) {
+                case 0:
+                case 1:
+                        ramctl_bits |= (uint16_t)rot_bank_select[parted_bank_a][which_subbank];
+                        break;
+                case 2:
+                case 3:
+                        ramctl_bits |= (uint16_t)rot_bank_select[parted_bank_b][which_subbank] << 4;
+                        break;
+                }
+        }
+
+        _state_vdp2()->regs.ramctl = ramctl_bits;
+
+        /* Rotation parameter table */
+        _state_vdp2()->regs.rptau = VRAM_BANK_4MBIT(format->sbf_rotation_table);
+        _state_vdp2()->regs.rptal = format->sbf_rotation_table & 0xFFFE;
 
         /* Special function type */
         _state_vdp2()->regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;
