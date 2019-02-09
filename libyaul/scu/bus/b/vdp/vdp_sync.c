@@ -379,11 +379,17 @@ _init_vdp2(void)
         xfer->dst = VDP2(0);
         xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.tvmd;
 
-        /* Skip the first 8 VDP2 registers */
+        /* Skip committing the first 7 VDP2 registers:
+         * TVMD
+         * EXTEN
+         * TVSTAT R/O
+         * VRSIZE R/W
+         * HCNT   R/O
+         * VCNT   R/O */
         xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REGS];
-        xfer->len = sizeof(_state_vdp2()->regs) - 16;
-        xfer->dst = VDP2(16);
-        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.buffer[8];
+        xfer->len = sizeof(_state_vdp2()->regs) - 14;
+        xfer->dst = VDP2(14);
+        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.buffer[7];
 
         xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
         xfer->len = 0;
