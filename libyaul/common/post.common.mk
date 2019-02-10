@@ -74,7 +74,7 @@ example: all
 $(SH_PROGRAM).bin: $(SH_PROGRAM).elf
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_OBJCOPY) -O binary $< $@
-	@du -hs $@ | awk '{ print $$1 }'
+	@[ -z "${SILENT}" ] && du -hs $@ | awk '{ print $$1 }' || true
 
 $(SH_PROGRAM).elf: $(SH_OBJECTS_UNIQ) $(SH_OBJECTS_NO_LINK_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -98,12 +98,13 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.romdisk: ./romdisk $(ROMDISK_DEPS)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs -a 16 -v -V "ROOT" -d ./romdisk/ -f $@
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS)	-d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/fsck.genromfs ./romdisk/
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/bin2o $< `echo "$<" | sed -E 's/[\. ]/_/g'` $@
+	$(ECHO)$(RM) $<
 
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -142,7 +143,7 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 		printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
 	    fi \
 	done
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
 IP.BIN: $(YAUL_INSTALL_ROOT)/sh-elf/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
