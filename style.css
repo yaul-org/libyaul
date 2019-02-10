@@ -67,6 +67,7 @@ span.todo {
 }
 
 span.done {
+    font-size: 65%;
     background: #00dd00;
 }
 
