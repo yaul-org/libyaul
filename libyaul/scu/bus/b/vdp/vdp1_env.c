@@ -63,8 +63,13 @@ vdp1_env_set(const struct vdp1_env *env)
         _state_vdp1()->regs.ewlr = (x1 << 9) | y1;
         _state_vdp1()->regs.ewrr = (x3 << 9) | y3;
 
+        uint16_t spclmd;
+        spclmd = env->env_color_mode << 5;
+
         _state_vdp2()->regs.spctl &= 0x3710;
-        _state_vdp2()->regs.spctl |= env->env_color_mode << 5;
+        /* Disable sprite window (SPWINEN) when SPCLMD bit is set */
+        _state_vdp2()->regs.spctl ^= (spclmd >> 1);
+        _state_vdp2()->regs.spctl |= spclmd;
 
         /* Types 0x0 to 0x7 are for low resolution (320 or 352), and types 0x8
          * to 0xF are for high resolution (640 or 704).
