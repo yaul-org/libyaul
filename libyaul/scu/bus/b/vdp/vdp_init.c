@@ -117,7 +117,7 @@ _init_vdp2(void)
 
         vdp2_vram_control_set(&vram_ctl);
 
-        vdp2_cram_mode_set(0);
+        vdp2_cram_mode_set(1);
 
         vdp2_scrn_back_screen_color_set(VRAM_ADDR_4MBIT(0, 0x000000),
             COLOR_RGB555(0, 0, 0));
