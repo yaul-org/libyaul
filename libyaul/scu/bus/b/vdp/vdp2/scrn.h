@@ -198,6 +198,13 @@ extern "C" {
          ((PALETTE_NUMBER(palette_addr) & 0x007F) << 16) |                     \
          (CHARACTER_NUMBER(character_addr) & 0x7FFF))
 
+
+#define VRAM_USAGE_TYPE_NONE            0x00
+#define VRAM_USAGE_TYPE_COEFF_TBL       0x01
+#define VRAM_USAGE_TYPE_PND             0x02
+#define VRAM_USAGE_TYPE_CPD             0x03
+#define VRAM_USAGE_TYPE_BPD             0x03
+
 struct scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */
         uint32_t sbf_cc_count; /* Character color count */
@@ -223,7 +230,23 @@ struct scrn_bitmap_format {
                               *   Mode 1: Rotation Parameter B
                               *   Mode 2: Swap Coefficient Data Read
                               *   Mode 3: Swap via Rotation Parameter Window */
-        uint32_t sbf_rotation_table;
+        uint32_t sbf_rotation_tbl; /* RBG0 and RBG1 only */
+
+        struct {
+                union {
+                        uint8_t a;
+                        uint8_t a0;
+                };
+
+                uint8_t a1;
+
+                union {
+                        uint8_t b;
+                        uint8_t b0;
+                };
+
+                uint8_t b1;
+        } sbf_usage_banks; /* RBG0 and RBG1 only */
 };
 
 struct scrn_cell_format {
@@ -265,7 +288,7 @@ struct scrn_cell_format {
                         uint32_t plane_o; /* For RBG0 and RBG1 use only */
                         uint32_t plane_p; /* For RBG0 and RBG1 use only */
                 } __packed;
-        } scf_map;                      /* Map lead addresses */
+        } scf_map; /* Map lead addresses */
 
         uint32_t scf_rp_mode; /* RBG0 and RBG1 only
                                * Rotation parameter mode
@@ -273,6 +296,23 @@ struct scrn_cell_format {
                                *   Mode 1: Rotation Parameter B
                                *   Mode 2: Swap Coefficient Data Read
                                *   Mode 3: Swap via Rotation Parameter Window */
+        uint32_t scf_rotation_tbl; /* RBG0 and RBG1 only */
+
+        struct {
+                union {
+                        uint8_t a;
+                        uint8_t a0;
+                };
+
+                uint8_t a1;
+
+                union {
+                        uint8_t b;
+                        uint8_t b0;
+                };
+
+                uint8_t b1;
+        } scf_usage_banks; /* RBG0 and RBG1 only */
 };
 
 /* Hardware defined */
