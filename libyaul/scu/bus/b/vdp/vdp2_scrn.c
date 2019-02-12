@@ -63,7 +63,7 @@ vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
 }
 
 void
-vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *format)
+vdp2_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 {
 #ifdef DEBUG
         _debug_check_bitmap(format);
@@ -323,8 +323,8 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         _state_vdp2()->regs.ramctl |= format->sbf_usage_banks.b1 << 6;
 
         /* Rotation parameter table */
-        _state_vdp2()->regs.rptau = VRAM_BANK_4MBIT(format->sbf_rotation_tbl);
-        _state_vdp2()->regs.rptal = format->sbf_rotation_tbl & 0xFFFE;
+        _state_vdp2()->regs.rptau = VRAM_BANK_4MBIT(format->sbf_rotation_table);
+        _state_vdp2()->regs.rptal = format->sbf_rotation_table & 0xFFFE;
 
         /* Special function type */
         _state_vdp2()->regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;

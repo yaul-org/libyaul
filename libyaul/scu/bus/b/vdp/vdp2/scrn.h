@@ -230,7 +230,7 @@ struct scrn_bitmap_format {
                               *   Mode 1: Rotation Parameter B
                               *   Mode 2: Swap Coefficient Data Read
                               *   Mode 3: Swap via Rotation Parameter Window */
-        uint32_t sbf_rotation_tbl; /* RBG0 and RBG1 only */
+        uint32_t sbf_rotation_table; /* RBG0 and RBG1 only */
 
         struct {
                 union {
@@ -461,7 +461,7 @@ struct scrn_vcs_format {
 extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
 extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
 
-extern void vdp2_scrn_bitmap_format_set(struct scrn_bitmap_format *);
+extern void vdp2_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
 extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
 extern void vdp2_scrn_color_offset_clear(void);
 extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t,  int16_t, int16_t);
