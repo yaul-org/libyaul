@@ -275,16 +275,26 @@ extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
 
 extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
 
-extern void vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
-extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
-extern void vdp1_cmdt_line_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
-extern void vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
-extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
+extern uint16_t vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern uint16_t vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern uint16_t vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
+extern uint16_t vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
+extern uint16_t vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
+extern uint16_t vdp1_cmdt_line_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
+extern uint16_t vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
+extern uint16_t vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
+extern uint16_t vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
+
+extern void vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);
+extern void vdp1_cmdt_jump_call(struct vdp1_cmdt_list *, uint8_t, uint8_t);
+extern void vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);
+extern void vdp1_cmdt_jump_skip_call(struct vdp1_cmdt_list *, uint8_t, uint8_t);
+
+extern void vdp1_cmdt_jump_next(struct vdp1_cmdt_list *, uint8_t);
+extern void vdp1_cmdt_jump_return(struct vdp1_cmdt_list *, uint8_t);
+extern void vdp1_cmdt_jump_skip_next(struct vdp1_cmdt_list *, uint8_t);
+extern void vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *, uint8_t);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
 #undef VDP1_CMDT_SPRITE_TYPE_DECLARE

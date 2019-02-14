@@ -22,6 +22,8 @@ static inline void __always_inline _cmdt_cmd_srca_set(struct vdp1_cmdt *, const 
 static inline void __always_inline _cmdt_cmd_size_set(struct vdp1_cmdt *, const struct vdp1_cmdt_sprite *);
 
 static inline void __always_inline _cmdt_list_assert(const struct vdp1_cmdt_list *);
+static inline void __always_inline _cmdt_list_next_assert(const struct vdp1_cmdt_list *);
+static inline void __always_inline _cmdt_jump_assert(const struct vdp1_cmdt_list *, uint8_t);
 
 struct vdp1_cmdt_list *
 vdp1_cmdt_list_alloc(uint16_t count)
@@ -79,14 +81,17 @@ vdp1_cmdt_base_get(void)
         return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
 }
 
-void
+uint16_t
 vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x0000;
         cmdt->cmd_link = 0x0000;
@@ -101,17 +106,20 @@ vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         _cmdt_cmd_size_set(cmdt, sprite);
         _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         uint16_t zp;
         zp = (sprite->cs_zoom_point.enable)
@@ -140,19 +148,23 @@ vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         _cmdt_cmd_size_set(cmdt, sprite);
         _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_sprite *sprite)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
 
+        cmdt_list->cmdt++;
+
         cmdt->cmd_ctrl = 0x0002;
+        cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = sprite->cs_mode.raw;
 
         /* CCW starting from vertex D */
@@ -170,17 +182,20 @@ vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *cmdt_list,
         _cmdt_cmd_size_set(cmdt, sprite);
         _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polygon *polygon)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x0004;
         cmdt->cmd_link = 0x0000;
@@ -209,17 +224,20 @@ vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *cmdt_list,
 
         _cmdt_cmd_grda_set(cmdt, polygon->cp_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polyline *polyline)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_link = 0x0000;
@@ -238,17 +256,20 @@ vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *cmdt_list,
 
         _cmdt_cmd_grda_set(cmdt, polyline->cl_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_line *line)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_link = 0x0000;
@@ -262,17 +283,20 @@ vdp1_cmdt_line_draw(struct vdp1_cmdt_list *cmdt_list,
 
         _cmdt_cmd_grda_set(cmdt, line->cl_grad);
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_user_clip_coord *user_clip)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         int16_t x0;
         x0 = user_clip->ucc_coords[0].x;
@@ -297,55 +321,165 @@ vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xc = x1 & 0x03FF;
         cmdt->cmd_yc = y1 & 0x01FF;
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_system_clip_coord *system_clip)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xc = system_clip->scc_coord.x;
         cmdt->cmd_yc = system_clip->scc_coord.y;
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
-void
+uint16_t
 vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_local_coord *local)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
 
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xa = local->lc_coord.x;
         cmdt->cmd_ya = local->lc_coord.y;
 
-        cmdt_list->cmdt++;
+        return (cmdt - &cmdt_list->cmdts[0]);
 }
 
 void
 vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
 {
         _cmdt_list_assert(cmdt_list);
+        _cmdt_list_next_assert(cmdt_list);
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
 
+        cmdt_list->cmdt++;
+
         cmdt->cmd_ctrl |= 0x8000;
         cmdt->cmd_link = 0x0000;
+}
 
-        cmdt_list->cmdt++;
+void
+vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
+    uint8_t link_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x1000;
+        cmdt->cmd_link = link_index & 0xFFFC;
+}
+
+void
+vdp1_cmdt_jump_call(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
+    uint8_t link_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x2000;
+        cmdt->cmd_link = link_index & 0xFFFC;
+}
+
+void
+vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
+    uint8_t link_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x5000;
+        cmdt->cmd_link = link_index & 0xFFFC;
+}
+
+void
+vdp1_cmdt_jump_skip_call(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
+    uint8_t link_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x6000;
+        cmdt->cmd_link = link_index & 0xFFFC;
+}
+
+void
+vdp1_cmdt_jump_next(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+}
+
+void
+vdp1_cmdt_jump_return(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x3000;
+}
+
+void
+vdp1_cmdt_jump_skip_next(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x4000;
+}
+
+void
+vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x7000;
 }
 
 static inline void __always_inline
@@ -409,5 +543,18 @@ _cmdt_list_assert(const struct vdp1_cmdt_list *cmdt_list)
         assert(cmdt_list->cmdt != NULL);
         assert(cmdt_list->cmdt >= cmdt_list->cmdts);
         assert(cmdt_list->count > 0);
+}
+
+static inline void __always_inline
+_cmdt_list_next_assert(const struct vdp1_cmdt_list *cmdt_list)
+{
         assert((uint16_t)((cmdt_list->cmdt + 1) - cmdt_list->cmdts) <= cmdt_list->count);
+}
+
+static inline void __always_inline
+_cmdt_jump_assert(const struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_list_assert(cmdt_list);
+
+        assert((cmdt_index >= 0) && (cmdt_index < cmdt_list->count));
 }
