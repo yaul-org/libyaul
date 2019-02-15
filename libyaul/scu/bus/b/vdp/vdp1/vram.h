@@ -28,7 +28,28 @@ struct vdp1_gouraud_table {
 } __aligned(8);
 
 struct vdp1_clut {
-        color_rgb555_t vcl_color[16];
+        struct {
+                union {
+                        struct vdp2_sprite_type_0 type_0;
+                        struct vdp2_sprite_type_1 type_1;
+                        struct vdp2_sprite_type_2 type_2;
+                        struct vdp2_sprite_type_3 type_3;
+                        struct vdp2_sprite_type_4 type_4;
+                        struct vdp2_sprite_type_5 type_5;
+                        struct vdp2_sprite_type_6 type_6;
+                        struct vdp2_sprite_type_7 type_7;
+                        struct vdp2_sprite_type_8 type_8;
+                        struct vdp2_sprite_type_9 type_9;
+                        struct vdp2_sprite_type_a type_a;
+                        struct vdp2_sprite_type_b type_b;
+                        struct vdp2_sprite_type_c type_c;
+                        struct vdp2_sprite_type_d type_d;
+                        struct vdp2_sprite_type_e type_e;
+                        struct vdp2_sprite_type_f type_f;
+
+                        color_rgb555_t color;
+                };
+        } vcl_entries[16];
 } __aligned(32);
 
 extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
