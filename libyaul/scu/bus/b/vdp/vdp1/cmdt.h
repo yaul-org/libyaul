@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include <int16.h>
+
 #include <scu.h>
 
 #include <vdp1/map.h>
@@ -136,28 +138,18 @@ struct vdp1_cmdt_sprite {
         uint16_t cs_height;
 
         union {
-                struct {
-                        int16_t x;
-                        int16_t y;
-                } cs_position;
+                int16_vector2_t cs_position;
 
                 struct {
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } point;
-
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } display;
+                        int16_vector2_t point;
+                        int16_vector2_t display;
                 } cs_zoom;
 
                 struct {
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } a, b, c, d;
+                        int16_vector2_t a;
+                        int16_vector2_t b;
+                        int16_vector2_t c;
+                        int16_vector2_t d;
                 } cs_vertex;
 
                 int16_t cs_vertices[8];
@@ -177,10 +169,10 @@ struct vdp1_cmdt_polygon {
 
         union {
                 struct {
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } a, b, c, d;
+                        int16_vector2_t a;
+                        int16_vector2_t b;
+                        int16_vector2_t c;
+                        int16_vector2_t d;
                 } cp_vertex;
 
                 int16_t cp_vertices[8];
@@ -200,10 +192,10 @@ struct vdp1_cmdt_polyline {
 
         union {
                 struct {
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } a, b, c, d;
+                        int16_vector2_t a;
+                        int16_vector2_t b;
+                        int16_vector2_t c;
+                        int16_vector2_t d;
                 } cl_vertex;
 
                 int16_t cl_vertices[8];
@@ -223,10 +215,8 @@ struct vdp1_cmdt_line {
 
         union {
                 struct {
-                        struct {
-                                int16_t x;
-                                int16_t y;
-                        } a, b;
+                        int16_vector2_t a;
+                        int16_vector2_t b;
                 } cl_vertex;
 
                 int16_t cl_vertices[4];
@@ -236,24 +226,15 @@ struct vdp1_cmdt_line {
 };
 
 struct vdp1_cmdt_local_coord {
-        struct {
-                int16_t x;
-                int16_t y;
-        } lc_coord;
+        int16_vector2_t lc_coord;
 };
 
 struct vdp1_cmdt_system_clip_coord {
-        struct {
-                int16_t x;
-                int16_t y;
-        } scc_coord;
+        int16_vector2_t scc_coord;
 };
 
 struct vdp1_cmdt_user_clip_coord {
-        struct {
-                int16_t x;
-                int16_t y;
-        } ucc_coords[2];
+        int16_vector2_t ucc_coords[2];
 };
 
 static inline uint16_t __always_inline
