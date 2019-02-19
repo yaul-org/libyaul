@@ -66,6 +66,34 @@ extern "C" {
                 uint16_t raw;                                                  \
         } __CONCAT(n, _sprite_type)
 
+#define VDP1_CMDT_SPRITE_DECLARE(n)                                            \
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n);                                 \
+                                                                               \
+        union {                                                                \
+                /* Mode 0, 2, 3, and 4 */                                      \
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(n);                              \
+                                                                               \
+                /* Mode 1 */                                                   \
+                uint32_t __CONCAT(n, _clut);                                   \
+        };                                                                     \
+                                                                               \
+        uint32_t __CONCAT(n, _char);                                           \
+        uint16_t __CONCAT(n, _width);                                          \
+        uint16_t __CONCAT(n, _height);                                         \
+                                                                               \
+        uint32_t __CONCAT(n, _grad)
+
+#define VDP1_CMDT_NON_TEXTURED_DECLARE(n)                                      \
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n);                                 \
+                                                                               \
+        union {                                                                \
+                VDP1_CMDT_SPRITE_TYPE_DECLARE(n);                              \
+                                                                               \
+                color_rgb555_t __CONCAT(n, _color);                            \
+        };                                                                     \
+                                                                               \
+        uint32_t __CONCAT(n, _grad)
+
 struct vdp1_cmdt;
 
 struct vdp1_cmdt_list {
@@ -93,7 +121,24 @@ struct vdp1_cmdt {
         uint16_t reserved;
 } __aligned(32);
 
-struct vdp1_cmdt_sprite {
+struct vdp1_cmdt_normal_sprite {
+        VDP1_CMDT_SPRITE_DECLARE(cs);
+
+        union {
+                int16_vector2_t cs_position;
+
+                struct {
+                        int16_vector2_t a;
+                } cs_vertex;
+
+                int16_t cs_components[2];
+                int16_vector2_t cs_vertices[1];
+        };
+};
+
+struct vdp1_cmdt_scaled_sprite {
+        VDP1_CMDT_SPRITE_DECLARE(cs);
+
         union {
 #define CMDT_ZOOM_POINT_UPPER_LEFT      0x0030
 #define CMDT_ZOOM_POINT_UPPER_CENTER    0x0050
@@ -123,28 +168,45 @@ struct vdp1_cmdt_sprite {
                 uint16_t raw;
         } cs_zoom_point;
 
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cs);
-
         union {
-                /* Mode 0, 2, 3, and 4 */
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(cs);
+                struct {
+                        /* Vertex A */
+                        int16_vector2_t cs_ul;
 
-                /* Mode 1 */
-                uint32_t cs_clut;
-        };
+                        /* Vertex B */
+                        unsigned int : 16;
+                        unsigned int : 16;
 
-        uint32_t cs_char;
-        uint16_t cs_width;
-        uint16_t cs_height;
-
-        union {
-                int16_vector2_t cs_position;
+                        /* Vertex C */
+                        int16_vector2_t cs_lr;
+                } cs_scale;
 
                 struct {
+                        /* Vertex A */
                         int16_vector2_t point;
+                        /* Vertex B */
                         int16_vector2_t display;
+
+                        /* Vertex C */
+                        unsigned int : 16;
+                        unsigned int : 16;
                 } cs_zoom;
 
+                struct {
+                        int16_vector2_t a;
+                        int16_vector2_t b;
+                        int16_vector2_t c;
+                } cs_vertex;
+
+                int16_t cs_components[6];
+                int16_vector2_t cs_vertices[3];
+        };
+};
+
+struct vdp1_cmdt_distorted_sprite {
+        VDP1_CMDT_SPRITE_DECLARE(cs);
+
+        union {
                 struct {
                         int16_vector2_t a;
                         int16_vector2_t b;
@@ -152,20 +214,13 @@ struct vdp1_cmdt_sprite {
                         int16_vector2_t d;
                 } cs_vertex;
 
-                int16_t cs_vertices[8];
+                int16_t cs_components[8];
+                int16_vector2_t cs_vertices[4];
         };
-
-        uint32_t cs_grad;
 };
 
 struct vdp1_cmdt_polygon {
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cp);
-
-        union {
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(cp);
-
-                color_rgb555_t cp_color;
-        };
+        VDP1_CMDT_NON_TEXTURED_DECLARE(cp);
 
         union {
                 struct {
@@ -175,20 +230,13 @@ struct vdp1_cmdt_polygon {
                         int16_vector2_t d;
                 } cp_vertex;
 
-                int16_t cp_vertices[8];
+                int16_t cp_components[8];
+                int16_vector2_t cp_vertices[4];
         };
-
-        uint32_t cp_grad;
 };
 
 struct vdp1_cmdt_polyline {
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
-
-        union {
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(cl);
-
-                color_rgb555_t cl_color;
-        };
+        VDP1_CMDT_NON_TEXTURED_DECLARE(cl);
 
         union {
                 struct {
@@ -198,20 +246,13 @@ struct vdp1_cmdt_polyline {
                         int16_vector2_t d;
                 } cl_vertex;
 
-                int16_t cl_vertices[8];
+                int16_t cl_components[4];
+                int16_vector2_t cl_vertices[4];
         };
-
-        uint32_t cl_grad;
 };
 
 struct vdp1_cmdt_line {
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(cl);
-
-        union {
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(cl);
-
-                color_rgb555_t cl_color;
-        };
+        VDP1_CMDT_NON_TEXTURED_DECLARE(cl);
 
         union {
                 struct {
@@ -219,10 +260,9 @@ struct vdp1_cmdt_line {
                         int16_vector2_t b;
                 } cl_vertex;
 
-                int16_t cl_vertices[4];
+                int16_t cl_components[4];
+                int16_vector2_t cl_vertices[8];
         };
-
-        uint32_t cl_grad;
 };
 
 struct vdp1_cmdt_local_coord {
@@ -256,19 +296,21 @@ extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
 
 extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
 
-extern void vdp1_cmdt_normal_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_scaled_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_distorted_sprite_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_sprite *);
-extern void vdp1_cmdt_polygon_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
-extern void vdp1_cmdt_polyline_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
-extern void vdp1_cmdt_line_draw(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
-extern void vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
-extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
+extern void vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_normal_sprite *);
+extern void vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_scaled_sprite *);
+extern void vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_distorted_sprite *);
+extern void vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
+extern void vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
+extern void vdp1_cmdt_line_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
+extern void vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
+extern void vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
+extern void vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
 #undef VDP1_CMDT_SPRITE_TYPE_DECLARE
+#undef VDP1_CMDT_SPRITE_DECLARE
+#undef VDP1_CMDT_NON_TEXTURED_DECLARE
 
 #ifdef __cplusplus
 }
