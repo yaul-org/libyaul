@@ -79,7 +79,7 @@ vdp1_cmdt_base_get(void)
         return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
 }
 
-void
+uint16_t
 vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_normal_sprite *sprite)
 {
@@ -89,6 +89,9 @@ vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0000;
         cmdt->cmd_link = 0x0000;
@@ -101,9 +104,11 @@ vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_xa = sprite->cs_position.x;
         cmdt->cmd_ya = sprite->cs_position.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_scaled_sprite *sprite)
 {
@@ -113,6 +118,9 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0001;
         cmdt->cmd_link = 0x0000;
@@ -130,7 +138,7 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
                 cmdt->cmd_xc = sprite->cs_vertex.c.x;
                 cmdt->cmd_yc = sprite->cs_vertex.c.y;
 
-                return;
+                return index;
         }
 
         uint16_t zp;
@@ -144,9 +152,11 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ya = sprite->cs_zoom.point.y;
         cmdt->cmd_xb = sprite->cs_zoom.display.x;
         cmdt->cmd_yb = sprite->cs_zoom.display.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_distorted_sprite *sprite)
 {
@@ -156,6 +166,9 @@ vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0002;
         cmdt->cmd_link = 0x0000;
@@ -184,9 +197,11 @@ vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_yc = sprite->cs_vertex.c.y;
         cmdt->cmd_xd = sprite->cs_vertex.d.x;
         cmdt->cmd_yd = sprite->cs_vertex.d.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polygon *polygon)
 {
@@ -196,6 +211,9 @@ vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0004;
         cmdt->cmd_link = 0x0000;
@@ -223,9 +241,11 @@ vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_yc = polygon->cp_vertex.c.y;
         cmdt->cmd_xd = polygon->cp_vertex.d.x;
         cmdt->cmd_yd = polygon->cp_vertex.d.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_polyline *polyline)
 {
@@ -235,6 +255,9 @@ vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_link = 0x0000;
@@ -253,9 +276,11 @@ vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_yb = polyline->cl_vertex.b.y;
         cmdt->cmd_xc = polyline->cl_vertex.c.x;
         cmdt->cmd_yc = polyline->cl_vertex.c.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_line_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_line *line)
 {
@@ -265,6 +290,9 @@ vdp1_cmdt_line_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt = cmdt_list->cmdt;
 
         cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_link = 0x0000;
@@ -278,9 +306,11 @@ vdp1_cmdt_line_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ya = line->cl_vertex.a.y;
         cmdt->cmd_xb = line->cl_vertex.b.x;
         cmdt->cmd_yb = line->cl_vertex.b.y;
+
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_user_clip_coord *user_clip)
 {
@@ -288,6 +318,11 @@ vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
 
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
+
+        cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
 
         int16_t x0;
         x0 = user_clip->ucc_coords[0].x;
@@ -312,10 +347,10 @@ vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_xc = x1 & 0x03FF;
         cmdt->cmd_yc = y1 & 0x01FF;
 
-        cmdt_list->cmdt++;
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_system_clip_coord *system_clip)
 {
@@ -324,15 +359,20 @@ vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
 
+        cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
+
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xc = system_clip->scc_coord.x;
         cmdt->cmd_yc = system_clip->scc_coord.y;
 
-        cmdt_list->cmdt++;
+        return index;
 }
 
-void
+uint16_t
 vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *cmdt_list,
     const struct vdp1_cmdt_local_coord *local)
 {
@@ -341,12 +381,17 @@ vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *cmdt_list,
         struct vdp1_cmdt *cmdt;
         cmdt = cmdt_list->cmdt;
 
+        cmdt_list->cmdt++;
+
+        uint16_t index;
+        index = cmdt - &cmdt_list->cmdts[0];
+
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_xa = local->lc_coord.x;
         cmdt->cmd_ya = local->lc_coord.y;
 
-        cmdt_list->cmdt++;
+        return index;
 }
 
 void
