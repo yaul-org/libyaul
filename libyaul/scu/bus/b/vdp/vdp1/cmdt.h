@@ -296,15 +296,15 @@ extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
 
 extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
 
-extern void vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_normal_sprite *);
-extern void vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_scaled_sprite *);
-extern void vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_distorted_sprite *);
-extern void vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
-extern void vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
-extern void vdp1_cmdt_line_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
-extern void vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
-extern void vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
-extern void vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
+extern uint16_t vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_normal_sprite *);
+extern uint16_t vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_scaled_sprite *);
+extern uint16_t vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_distorted_sprite *);
+extern uint16_t vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
+extern uint16_t vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
+extern uint16_t vdp1_cmdt_line_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
+extern uint16_t vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
+extern uint16_t vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
+extern uint16_t vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
