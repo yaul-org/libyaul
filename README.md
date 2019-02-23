@@ -120,15 +120,15 @@ submodule.
 
 1. Start the RTags daemon (`rdm`)
 
-    rdm &
+       $ rdm &
 
 1. Generate `compile_commands.json` via [`compiledb`][6]
 
-    make -B -n -w -k | compiledb
+       $ make -B -n -w -k | compiledb
 
 1. Index the RTags project, and wait until `rdm` is silent.
 
-    rc -J .
+       $ rc -J .
 
 ## Contact
 
