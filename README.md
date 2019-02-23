@@ -1,16 +1,10 @@
-<p align="center">
-<img src="https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000" alt="license">
-  <a href="https://travis-ci.org/ijacquez/libyaul">
-    <img src="https://travis-ci.org/ijacquez/libyaul.svg?branch=master" alt="build status">
-  </a>
-</p>
-
 Yet Another Useless [Saturn] Library
 ===
-
 <p align="center">
   <img width="460" height="300" src=".images/logo.png">
 </p>
+
+[![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)][4]
 
 Yaul is an open source development kit for the SEGA Saturn. The SDK as
 a whole aims to minimize the _painful_ experience that is developing
