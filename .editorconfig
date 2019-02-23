@@ -17,6 +17,9 @@ trim_trailing_whitespace = true
 [*.sx]
 trim_trailing_whitespace = true
 
+[*.{env,env.in}]
+trim_trailing_whitespace = true
+
 [.travis.yml]
 indent_style = space
 indent_size = 2
