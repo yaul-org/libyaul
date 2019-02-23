@@ -116,6 +116,20 @@ tool-chain.
 You can now build any of the given examples in the [`libyaul-examples`][5]
 submodule.
 
+## Enabling RTags
+
+1. Start the RTags daemon (`rdm`)
+
+    rdm &
+
+1. Generate `compile_commands.json` via [`compiledb`][6]
+
+    make -B -n -w -k | compiledb
+
+1. Index the RTags project, and wait until `rdm` is silent.
+
+    rc -J .
+
 ## Contact
 
 You can find me (*@mrkotfw*) on [Discord][4].
@@ -125,3 +139,4 @@ You can find me (*@mrkotfw*) on [Discord][4].
 [3]: https://github.com/msys2/msys2/wiki/MSYS2-installation
 [4]: https://discord.gg/S434dWA
 [5]: https://github.com/ijacquez/libyaul-examples
+[6]: https://github.com/nickdiego/compiledb
