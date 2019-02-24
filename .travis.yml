@@ -22,7 +22,7 @@ env:
     - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
 
 before_script:
-  - wget -O tool-chain.tar.bz2 https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB
+  - wget -O tool-chain.tar.bz2 "https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB"
   - sudo mkdir /tool-chains
   - sudo tar mxvfjp tool-chain.tar.bz2 -C /tool-chains/
   - git submodule init
