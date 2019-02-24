@@ -23,8 +23,8 @@ env:
 
 before_script:
   - wget -O tool-chain.tar.bz2 https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB
-  - mkdir /tool-chains
-  - tar mxvfjp tool-chain.tar.bz2 -C /tool-chains/
+  - sudo mkdir /tool-chains
+  - sudo tar mxvfjp tool-chain.tar.bz2 -C /tool-chains/
   - git submodule init
   - git submodule update -f
 
