@@ -8,7 +8,7 @@ change_env_value() {
     mv yaul.env.tmp yaul.env
 }
 
-for var in "TRAVIS_BRANCH" "BUILD_TYPE" "YAUL_INSTALL_ROOT" "YAUL_BUILD_ROOT" "YAUL_BUILD" "YAUL_OPTION_DEV_CARTRIDGE"; do
+for var in "BUILD_TYPE" "YAUL_INSTALL_ROOT" "YAUL_BUILD_ROOT" "YAUL_BUILD" "YAUL_OPTION_DEV_CARTRIDGE"; do
     if ! set 2>&1 | grep -q -E "^${var}=.+$"; then
         printf -- "Environment variable \`${var}' was not set\n"
         exit 1
@@ -19,11 +19,6 @@ pwd
 
 set -x
 
-tar mxvfz /root/tool-chains.tar.gz -C /
-git clone --depth=100 --branch=${TRAVIS_BRANCH} https://github.com/ijacquez/libyaul.git libyaul
-cd libyaul
-git submodule init
-git submodule update -f
 cp yaul.env.in yaul.env
 change_env_value "YAUL_INSTALL_ROOT" "${YAUL_INSTALL_ROOT}"
 change_env_value "YAUL_BUILD_ROOT" "${YAUL_BUILD_ROOT}"
