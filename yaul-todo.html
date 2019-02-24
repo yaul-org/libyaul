@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2019-02-10 Sun 16:30 -->
+<!-- 2019-02-24 Sun 00:54 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Yaul tasks</title>
@@ -233,57 +233,176 @@ for the JavaScript code in this tag.
 <div id="content">
 <h1 class="title">Yaul tasks</h1>
 
-<div id="outline-container-orgade6cd5" class="outline-2">
-<h2 id="orgade6cd5">libyaul</h2>
-<div class="outline-text-2" id="text-orgade6cd5">
+<div id="outline-container-org8656b00" class="outline-2">
+<h2 id="org8656b00">libyaul</h2>
+<div class="outline-text-2" id="text-org8656b00">
 </div>
-<div id="outline-container-org6ada826" class="outline-3">
-<h3 id="org6ada826">General</h3>
-<div class="outline-text-3" id="text-org6ada826">
+<div id="outline-container-org5bbf336" class="outline-3">
+<h3 id="org5bbf336">General</h3>
+<div class="outline-text-3" id="text-org5bbf336">
 </div>
-<div id="outline-container-org9d5fb8c" class="outline-4">
-<h4 id="org9d5fb8c">Tasks</h4>
-<div class="outline-text-4" id="text-org9d5fb8c">
+<div id="outline-container-org1fde480" class="outline-4">
+<h4 id="org1fde480">Tasks</h4>
+<div class="outline-text-4" id="text-org1fde480">
 </div>
 <ul class="org-ul">
-<li><a id="org1dc7d16"></a><span class="todo TODO">TODO</span> Specify the SCU addresses for SCU-DMA purposes<br /></li>
-<li><a id="org3485ec6"></a><span class="todo TODO">TODO</span> Clean up yaul namespace (e.g. hide <code>vt_*</code> namespace)<br /></li>
-<li><a id="org3175f3f"></a><span class="todo TODO">TODO</span> Clean up coding style in <code>libyaul/</code><br /></li>
-<li><a id="orgbd604eb"></a><span class="todo TODO">TODO</span> Set address defaults via libyaul <code>Makefile</code><br /></li>
-<li><a id="org5b6121b"></a><span class="todo TODO">TODO</span> Use <code>I(n)</code> macro to access <code>(&amp;(__CONCAT(_internal_,n)))</code><br /></li>
-<li><a id="org1d1b379"></a><span class="todo TODO">TODO</span> Eliminate the use of a trap interrupt for ARP<br /></li>
-<li><a id="org0d3c294"></a><span class="todo TODO">TODO</span> Implement <code>usb_cartridge_function_nonblock()</code><br /></li>
-<li><a id="org16012ed"></a><span class="todo TODO">TODO</span> Fix support for SMPC RTC<br /></li>
-<li><a id="org847e5ad"></a><span class="todo TODO">TODO</span> Issue SMPC INTBACK command 300μs after VBLANK-IN<br /></li>
-<li><a id="orgc82efe0"></a><span class="todo TODO">TODO</span> Remove slow VDP2 configuration validation<br /></li>
-<li><a id="org6c12e3b"></a><span class="todo TODO">TODO</span> Clean up <code>math/</code> to include only basic 16.16 support<br /></li>
-<li><a id="org0d98d07"></a><span class="todo TODO">TODO</span> Clean up <code>math/</code> to include inlined 2-,3-vector ops<br /></li>
-<li><a id="org44f1b05"></a><span class="todo TODO">TODO</span> Profile SGDK impl. of <code>*printf()</code> v. <i>mpaland/printf</i> v. <i>tinyprintf</i><br /></li>
-<li><a id="org5e36372"></a><span class="todo TODO">TODO</span> Implement overlay support<br /></li>
-<li><a id="org611533b"></a><span class="todo TODO">TODO</span> Complete implementation of ISO9660<br /></li>
-<li><a id="orgb6333f8"></a><span class="todo TODO">TODO</span> Add <code>irq_mux</code> handlers for CPU and SCU interrupts<br /></li>
+<li><a id="orge2ef806"></a><span class="todo TODO">TODO</span> Implement overlay support<br /></li>
+<li><a id="orge3d2cc0"></a><span class="todo TODO">TODO</span> Clean up coding style in <code>libyaul/</code><br /></li>
+<li><a id="orga80469d"></a><span class="todo TODO">TODO</span> Set address defaults via libyaul <code>Makefile</code><br /></li>
+<li><a id="orgf09da28"></a><span class="todo TODO">TODO</span> Complete implementation of ISO9660<br /></li>
+<li><a id="orgc8aeb77"></a><span class="todo TODO">TODO</span> Use <code>I(n)</code> macro to access <code>(&amp;(__CONCAT(_internal_,n)))</code><br /></li>
+<li><a id="orga3390e2"></a><span class="done REMOVE">REMOVE</span> <del>Add <code>irq_mux</code> handlers for CPU and SCU interrupts</del><br />
+<div class="outline-text-5" id="text-orga3390e2">
+<ul class="org-ul">
+<li>There is no need for this.</li>
+</ul>
+</div>
+</li>
+<li><a id="org6cb84a5"></a><span class="todo DONE">DONE</span> <del>Specify the SCU addresses for SCU-DMA purposes</del><br />
+<div class="outline-text-5" id="text-org6cb84a5">
+<ul class="org-ul">
+<li>Specifying the alternative SCU address resulted in the Saturn
+locking up.</li>
+</ul>
+</div>
+</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org5af60cf" class="outline-3">
-<h3 id="org5af60cf">Paths</h3>
-<div class="outline-text-3" id="text-org5af60cf">
+<div id="outline-container-org56eec35" class="outline-3">
+<h3 id="org56eec35">Paths</h3>
+<div class="outline-text-3" id="text-org56eec35">
 </div>
-<div id="outline-container-org6ffa8f5" class="outline-4">
-<h4 id="org6ffa8f5"><code>scu/bus/cpu/cpu_divu.c</code></h4>
-<div class="outline-text-4" id="text-org6ffa8f5">
+<div id="outline-container-org69d65ed" class="outline-4">
+<h4 id="org69d65ed"><code>kernel/dbgio</code></h4>
+<div class="outline-text-4" id="text-org69d65ed">
 </div>
 <ul class="org-ul">
-<li><a id="org6af01cc"></a><span class="todo TODO">TODO</span> Fix bug with fetching quotient after computation<br /></li>
+<li><a id="org2abd946"></a>Tasks<br />
+<ul class="org-ul">
+<li><a id="orga16cecc"></a><span class="todo TODO">TODO</span> Hide <code>vt_*</code> namespace<br /></li>
+</ul>
+</li>
+<li><a id="org3d2d116"></a><code>devices/vdp1</code><br />
+<ul class="org-ul">
+<li><a id="orgc9ce242"></a><span class="todo TODO">TODO</span> Implement basic device<br /></li>
+</ul>
+</li>
+<li><a id="org0497cd3"></a><code>devices/vdp2</code><br />
+<ul class="org-ul">
+<li><a id="org0bc63eb"></a><span class="todo TODO">TODO</span> Run through performance tests via FRT counter<br /></li>
+<li><a id="org36d0050"></a><span class="todo TODO">TODO</span> Optimize hot spots if needed<br /></li>
+</ul>
+</li>
+<li><a id="orgabd500c"></a><code>devices/usb-cart</code><br />
+<ul class="org-ul">
+<li><a id="org0d5e30c"></a><span class="todo TODO">TODO</span> Implement de-init function<br /></li>
+</ul>
+</li>
+<li><a id="org5e05f85"></a><code>devices/debug-cart</code><br />
+<ul class="org-ul">
+<li><a id="org40aed81"></a><span class="todo TODO">TODO</span> Add Mednafen specific "debug" cart<br /></li>
+</ul>
+</li>
 </ul>
 </div>
-<div id="outline-container-org4c47e6c" class="outline-4">
-<h4 id="org4c47e6c"><code>scu/bus/b/vdp/vdp2_vram.c</code></h4>
-<div class="outline-text-4" id="text-org4c47e6c">
+<div id="outline-container-orgbbff5da" class="outline-4">
+<h4 id="orgbbff5da"><code>kernel/mm/memb.c</code></h4>
+<div class="outline-text-4" id="text-orgbbff5da">
 </div>
 <ul class="org-ul">
-<li><a id="orge252c18"></a><span class="done DONE">DONE</span> <del>Fix basic VDP2 RAM control support (for RBGx support); fixes <code>vdp2-bitmap</code></del><br />
-<div class="outline-text-5" id="text-orge252c18">
+<li><a id="orgc57656e"></a><span class="todo TODO">TODO</span> Allow for MEMB to use pools of allocated memory<br /></li>
+<li><a id="org1085f01"></a><span class="todo TODO">TODO</span> Use bit maps to manage MEMB allocation states<br /></li>
+</ul>
+</div>
+<div id="outline-container-orgd759187" class="outline-4">
+<h4 id="orgd759187"><code>kernel/mm/slob.c</code></h4>
+<div class="outline-text-4" id="text-orgd759187">
+</div>
+<ul class="org-ul">
+<li><a id="org229c882"></a><span class="todo TODO">TODO</span> Implement <code>slob_memalign()</code><br /></li>
+<li><a id="org22467b3"></a><span class="todo TODO">TODO</span> Move <code>SLOB_PAGE_MASK</code> into <code>slob.c</code><br /></li>
+<li><a id="orgc44f809"></a><span class="todo TODO">TODO</span> Force allocations to go through <code>slob_memalign()</code> for 4-byte aligned allocations<br /></li>
+<li><a id="orga426043"></a><span class="todo TODO">TODO</span> Decrease memory footprint from 4-byte to 2-byte<br /></li>
+<li><a id="org1ffa959"></a><span class="todo TODO">TODO</span> Reduce size of <code>struct slob_stats</code> (use <code>uint16_t</code>)<br /></li>
+<li><a id="org9558032"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_SIZE</code> is non-zero<br /></li>
+<li><a id="orgdaa457e"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_SIZE</code> is power of 2<br /></li>
+<li><a id="org70b519b"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST</code> and <code>SLOB_PAGE_BREAK_2ND</code> are non-zero<br /></li>
+<li><a id="orgd80fdb3"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST</code> and <code>SLOB_PAGE_BREAK_2ND</code> are POW of 2<br /></li>
+<li><a id="org081c747"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST &lt; SLOB_PAGE_BREAK_2ND &lt; SLOB_PAGE_SIZE</code><br /></li>
+<li><a id="orgd77ea88"></a><span class="todo TODO">TODO</span> Allow for SLOB to use designated areas of memory during run-time<br /></li>
+<li><a id="org975ca41"></a><span class="todo TODO">TODO</span> Optimize size of SLOB page meta structure (<code>struct slob_page_meta</code>)<br /></li>
+<li><a id="org11248a0"></a><span class="todo TODO">TODO</span> Implement <code>slob_realloc()</code><br /></li>
+</ul>
+</div>
+<div id="outline-container-org1ac90b0" class="outline-4">
+<h4 id="org1ac90b0"><code>kernel/sys/dma-queue.c</code></h4>
+<div class="outline-text-4" id="text-org1ac90b0">
+</div>
+<ul class="org-ul">
+<li><a id="org11ae734"></a><span class="todo TODO">TODO</span> Add ability to flush and block: <code>dma_queue_flush()</code><br /></li>
+<li><a id="org0f8bdf9"></a><span class="todo TODO">TODO</span> DMA register buffers<br /></li>
+<li><a id="org01d071e"></a><span class="todo TODO">TODO</span> Dynamically allocate SCU-DMA level when flushing DMA queue<br /></li>
+<li><a id="org56035e4"></a><span class="todo TODO">TODO</span> Simplify DMA queue requests to take partial SCU-DMA configs<br /></li>
+</ul>
+</div>
+<div id="outline-container-org01894f9" class="outline-4">
+<h4 id="org01894f9"><code>lib/stdio/snprintf.c</code></h4>
+<div class="outline-text-4" id="text-org01894f9">
+</div>
+<ul class="org-ul">
+<li><a id="org8548e19"></a><span class="todo TODO">TODO</span> Profile SGDK impl. of <code>*printf()</code> v. <i>mpaland/printf</i> v. <i>tinyprintf</i><br /></li>
+</ul>
+</div>
+<div id="outline-container-orga025896" class="outline-4">
+<h4 id="orga025896"><code>math</code></h4>
+<div class="outline-text-4" id="text-orga025896">
+</div>
+<ul class="org-ul">
+<li><a id="org0e2c253"></a><span class="todo TODO">TODO</span> Clean up to include only basic 16.16 support<br /></li>
+<li><a id="orga75e686"></a><span class="todo TODO">TODO</span> Clean up to include inlined 2-,3-vector function ops<br /></li>
+</ul>
+</div>
+<div id="outline-container-org32aeb2b" class="outline-4">
+<h4 id="org32aeb2b"><code>scu/bus/a/cs0/arp</code></h4>
+<div class="outline-text-4" id="text-org32aeb2b">
+</div>
+<ul class="org-ul">
+<li><a id="org78915b0"></a><span class="todo TODO">TODO</span> Eliminate the use of a trap interrupt for ARP<br /></li>
+</ul>
+</div>
+<div id="outline-container-org97c268c" class="outline-4">
+<h4 id="org97c268c"><code>scu/bus/a/cs0/usb-cart</code></h4>
+<div class="outline-text-4" id="text-org97c268c">
+</div>
+<ul class="org-ul">
+<li><a id="orgc6f758c"></a><span class="todo TODO">TODO</span> Implement <code>usb_cartridge_function_nonblock()</code><br /></li>
+</ul>
+</div>
+<div id="outline-container-orgd26f05f" class="outline-4">
+<h4 id="orgd26f05f"><code>scu/bus/b/vdp/vdp1_cmdt.c</code></h4>
+<div class="outline-text-4" id="text-orgd26f05f">
+</div>
+<ul class="org-ul">
+<li><a id="org91010c7"></a><span class="todo TODO">TODO</span> Rename <code>cmdt</code> and <code>cmdts</code> members in <code>struct vdp1_cmdt_list</code><br /></li>
+<li><a id="org938d746"></a><span class="todo DONE">DONE</span> Add jumping modes<br /></li>
+</ul>
+</div>
+<div id="outline-container-org9ede0b9" class="outline-4">
+<h4 id="org9ede0b9"><code>scu/bus/b/vdp/vdp2_scrn.c</code></h4>
+<div class="outline-text-4" id="text-org9ede0b9">
+</div>
+<ul class="org-ul">
+<li><a id="org574162f"></a><span class="todo TODO">TODO</span> Remove slow VDP2 configuration validation<br /></li>
+</ul>
+</div>
+<div id="outline-container-org9f6f422" class="outline-4">
+<h4 id="org9f6f422"><code>scu/bus/b/vdp/vdp2_vram.c</code></h4>
+<div class="outline-text-4" id="text-org9f6f422">
+</div>
+<ul class="org-ul">
+<li><a id="org1341eaa"></a><span class="todo DONE">DONE</span> <del>Fix basic VDP2 RAM control support (for RBGx support); fixes <code>vdp2-bitmap</code></del><br />
+<div class="outline-text-5" id="text-org1341eaa">
 <ul class="org-ul">
 <li>The functionality was added to <code>scu/bus/b/vdp/vdp2_scrn.c</code> instead.</li>
 </ul>
@@ -291,394 +410,426 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </div>
-<div id="outline-container-orgd1de1bf" class="outline-4">
-<h4 id="orgd1de1bf"><code>scu/bus/b/vdp/vdp_sync.c</code></h4>
-<div class="outline-text-4" id="text-orgd1de1bf">
+<div id="outline-container-orgd3a10d3" class="outline-4">
+<h4 id="orgd3a10d3"><code>scu/bus/b/vdp/vdp_sync.c</code></h4>
+<div class="outline-text-4" id="text-orgd3a10d3">
 </div>
 <ul class="org-ul">
-<li><a id="org867d4d3"></a><span class="todo TODO">TODO</span> Fix switching from manual to 1-cycle mode<br /></li>
-<li><a id="orgdfc6882"></a><span class="todo TODO">TODO</span> Fix switching from 1-cycle to manual mode<br /></li>
-<li><a id="orgc225161"></a><span class="todo TODO">TODO</span> Support manual mode and double-interlace mode<br /></li>
-<li><a id="org1a6e377"></a><span class="todo TODO">TODO</span> Add support for VDP1 transfer-over (pseudo-draw continuation)<br /></li>
-<li><a id="orgd21a16c"></a><span class="todo TODO">TODO</span> Optimize by moving all state to using one variable<br /></li>
-<li><a id="orgf72441a"></a><span class="todo TODO">TODO</span> Add support for VDP1 transfer-over<br /></li>
+<li><a id="orge70eaf0"></a><span class="todo TODO">TODO</span> Test switching from double to none-interlaced via <code>vdp_sync()</code><br /></li>
+<li><a id="orge088765"></a><span class="todo TODO">TODO</span> Fix switching from manual to 1-cycle mode<br /></li>
+<li><a id="org21a8398"></a><span class="todo TODO">TODO</span> Fix switching from 1-cycle to manual mode<br /></li>
+<li><a id="orgf341261"></a><span class="todo TODO">TODO</span> Support manual mode and double-interlace mode<br /></li>
+<li><a id="orga778b20"></a><span class="todo TODO">TODO</span> Add support for VDP1 transfer-over (pseudo-draw continuation)<br /></li>
+<li><a id="org7b21928"></a><span class="todo TODO">TODO</span> Optimize by moving all state to using one variable<br /></li>
+<li><a id="orgbef2ad8"></a><span class="todo TODO">TODO</span> Add support for VDP1 transfer-over<br /></li>
 </ul>
 </div>
-<div id="outline-container-orge06ea23" class="outline-4">
-<h4 id="orge06ea23"><code>scu/bus/b/vdp/vdp1_cmdt.c</code></h4>
-<div class="outline-text-4" id="text-orge06ea23">
+<div id="outline-container-orgea1f321" class="outline-4">
+<h4 id="orgea1f321"><code>scu/bus/b/vdp/vdp2/vram.h</code></h4>
+<div class="outline-text-4" id="text-orgea1f321">
 </div>
 <ul class="org-ul">
-<li><a id="orgc3d6415"></a><span class="todo TODO">TODO</span> Rename <code>cmdt</code> and <code>cmdts</code> members in <code>struct vdp1_cmdt_list</code><br /></li>
+<li><a id="org8424990"></a><span class="todo TODO">TODO</span> Add <code>VDP2_</code> prefix to VDP2 VRAM macros<br /></li>
 </ul>
 </div>
-<div id="outline-container-org2a66115" class="outline-4">
-<h4 id="org2a66115"><code>kernel/dbgio</code></h4>
-<div class="outline-text-4" id="text-org2a66115">
+<div id="outline-container-orgd2b50e3" class="outline-4">
+<h4 id="orgd2b50e3"><code>scu/bus/cpu/cpu_divu.c</code></h4>
+<div class="outline-text-4" id="text-orgd2b50e3">
 </div>
 <ul class="org-ul">
-<li><a id="orgda6bc85"></a><code>devices/vdp1</code><br />
-<ul class="org-ul">
-<li><a id="org8a8568d"></a><span class="todo TODO">TODO</span> Implement basic device<br /></li>
-</ul>
-</li>
-<li><a id="org99e9b13"></a><code>devices/vdp2</code><br />
-<ul class="org-ul">
-<li><a id="org5f56873"></a><span class="todo TODO">TODO</span> Run through performance tests via FRT counter<br /></li>
-<li><a id="orgd9d035a"></a><span class="todo TODO">TODO</span> Optimize hot spots if needed<br /></li>
-</ul>
-</li>
-<li><a id="org0852698"></a><code>devices/usb-cart</code><br />
-<ul class="org-ul">
-<li><a id="org92ea8df"></a><span class="todo TODO">TODO</span> Implement deinit function<br /></li>
-</ul>
-</li>
+<li><a id="org8343b2a"></a><span class="todo TODO">TODO</span> Fix bug with fetching quotient after computation<br /></li>
 </ul>
 </div>
-<div id="outline-container-orgb99a67d" class="outline-4">
-<h4 id="orgb99a67d"><code>scu/scu_dma.c</code></h4>
-<div class="outline-text-4" id="text-orgb99a67d">
+<div id="outline-container-orgf07e36c" class="outline-4">
+<h4 id="orgf07e36c"><code>scu/bus/cpu/smpc/smpc_peripheral*.c</code></h4>
+<div class="outline-text-4" id="text-orgf07e36c">
 </div>
 <ul class="org-ul">
-<li><a id="org0e46e25"></a><span class="todo TODO">TODO</span> Bitwise OR both SCU-DMA level 1 and 2 for busy<br /></li>
+<li><a id="org4f1b3ff"></a><span class="todo TODO">TODO</span> Coalesce all peripheral files together into <code>smpc_peripheral.c</code><br /></li>
+<li><a id="org4d44ab4"></a><span class="todo TODO">TODO</span> Issue SMPC INTBACK command 300μs after VBLANK-IN<br /></li>
 </ul>
 </div>
-<div id="outline-container-org113e258" class="outline-4">
-<h4 id="org113e258"><code>kernel/sys/dma-queue.c</code></h4>
-<div class="outline-text-4" id="text-org113e258">
+<div id="outline-container-orgac0db93" class="outline-4">
+<h4 id="orgac0db93"><code>scu/bus/cpu/smpc/smpc_rtc.c</code></h4>
+<div class="outline-text-4" id="text-orgac0db93">
 </div>
 <ul class="org-ul">
-<li><a id="orgde96dee"></a><span class="todo TODO">TODO</span> Add ability to flush and block: <code>dma_queue_flush()</code><br /></li>
-<li><a id="org569759c"></a><span class="todo TODO">TODO</span> DMA register buffers<br /></li>
-<li><a id="org10df25e"></a><span class="todo TODO">TODO</span> Dynamically allocate SCU-DMA level when flushing DMA queue<br /></li>
-<li><a id="org6ee87a7"></a><span class="todo TODO">TODO</span> Simplify DMA queue requests to take partial SCU-DMA configs<br /></li>
+<li><a id="orgff55ace"></a><span class="todo TODO">TODO</span> Fix support for SMPC RTC<br /></li>
 </ul>
 </div>
-<div id="outline-container-orgc698cc8" class="outline-4">
-<h4 id="orgc698cc8"><code>kernel/mm/memb.c</code></h4>
-<div class="outline-text-4" id="text-orgc698cc8">
+<div id="outline-container-orgc90fc19" class="outline-4">
+<h4 id="orgc90fc19"><code>scu/scu_dma.c</code></h4>
+<div class="outline-text-4" id="text-orgc90fc19">
 </div>
 <ul class="org-ul">
-<li><a id="org4225473"></a><span class="todo TODO">TODO</span> Allow for MEMB to use pools of allocated memory<br /></li>
-<li><a id="orgd356113"></a><span class="todo TODO">TODO</span> Use bit maps to manage MEMB allocation states<br /></li>
-</ul>
-</div>
-<div id="outline-container-orgf34cba7" class="outline-4">
-<h4 id="orgf34cba7"><code>scu/bus/cpu/smpc/smpc_peripheral*.c</code></h4>
-<div class="outline-text-4" id="text-orgf34cba7">
-</div>
-<ul class="org-ul">
-<li><a id="org74e8230"></a><span class="todo TODO">TODO</span> Coalesce all peripheral files together into <code>smpc_peripheral.c</code><br /></li>
-</ul>
-</div>
-<div id="outline-container-org86084b3" class="outline-4">
-<h4 id="org86084b3"><code>kernel/mm/slob.c</code></h4>
-<div class="outline-text-4" id="text-org86084b3">
-</div>
-<ul class="org-ul">
-<li><a id="org71fe53b"></a><span class="todo TODO">TODO</span> Implement <code>slob_memalign()</code><br /></li>
-<li><a id="org40e1602"></a><span class="todo TODO">TODO</span> Move <code>SLOB_PAGE_MASK</code> into <code>slob.c</code><br /></li>
-<li><a id="orgac5a2da"></a><span class="todo TODO">TODO</span> Force allocations to go through <code>slob_memalign()</code> for 4-byte aligned allocations<br /></li>
-<li><a id="org755909c"></a><span class="todo TODO">TODO</span> Decrease memory footprint from 4-byte to 2-byte<br /></li>
-<li><a id="orgd7c05b8"></a><span class="todo TODO">TODO</span> Reduce size of <code>struct slob_stats</code> (use <code>uint16_t</code>)<br /></li>
-<li><a id="org8ae5bb7"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_SIZE</code> is non-zero<br /></li>
-<li><a id="orgd28b70d"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_SIZE</code> is power of 2<br /></li>
-<li><a id="org084877f"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST</code> and <code>SLOB_PAGE_BREAK_2ND</code> are non-zero<br /></li>
-<li><a id="org5dd450b"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST</code> and <code>SLOB_PAGE_BREAK_2ND</code> are POW of 2<br /></li>
-<li><a id="org3393e86"></a><span class="todo TODO">TODO</span> Static assert that <code>SLOB_PAGE_BREAK_1ST &lt; SLOB_PAGE_BREAK_2ND &lt; SLOB_PAGE_SIZE</code><br /></li>
-<li><a id="org2fc22ea"></a><span class="todo TODO">TODO</span> Allow for SLOB to use designated areas of memory during run-time<br /></li>
-<li><a id="orgf61da2d"></a><span class="todo TODO">TODO</span> Optimize size of SLOB page meta structure (<code>struct slob_page_meta</code>)<br /></li>
-<li><a id="org5652ae4"></a><span class="todo TODO">TODO</span> Implement <code>slob_realloc()</code><br /></li>
+<li><a id="org3062fb0"></a><span class="todo TODO">TODO</span> Bitwise OR both SCU-DMA level 1 and 2 for busy<br /></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-org73086a2" class="outline-2">
-<h2 id="org73086a2">libtga</h2>
-<div class="outline-text-2" id="text-org73086a2">
+<div id="outline-container-orgb0a4942" class="outline-2">
+<h2 id="orgb0a4942">libtga</h2>
+<div class="outline-text-2" id="text-orgb0a4942">
 <p>
 None for now.
 </p>
 </div>
 </div>
-<div id="outline-container-orga21835b" class="outline-2">
-<h2 id="orga21835b">libbcl</h2>
-<div class="outline-text-2" id="text-orga21835b">
+<div id="outline-container-org79d1281" class="outline-2">
+<h2 id="org79d1281">libbcl</h2>
+<div class="outline-text-2" id="text-org79d1281">
 <p>
 None for now.
 </p>
 </div>
 </div>
-<div id="outline-container-org26f04d3" class="outline-2">
-<h2 id="org26f04d3">Tools</h2>
-<div class="outline-text-2" id="text-org26f04d3">
+<div id="outline-container-org946b6a2" class="outline-2">
+<h2 id="org946b6a2">Tools</h2>
+<div class="outline-text-2" id="text-org946b6a2">
 </div>
-<div id="outline-container-org3044237" class="outline-3">
-<h3 id="org3044237"><code>satgrit</code></h3>
-<div class="outline-text-3" id="text-org3044237">
+<div id="outline-container-org42876a3" class="outline-3">
+<h3 id="org42876a3"><code>satgrit</code></h3>
+<div class="outline-text-3" id="text-org42876a3">
 </div>
-<div id="outline-container-org62f7d3e" class="outline-4">
-<h4 id="org62f7d3e">Tasks</h4>
-<div class="outline-text-4" id="text-org62f7d3e">
+<div id="outline-container-org7de2fce" class="outline-4">
+<h4 id="org7de2fce">Tasks</h4>
+<div class="outline-text-4" id="text-org7de2fce">
 </div>
 <ul class="org-ul">
-<li><a id="orgf61cfd9"></a><span class="todo TODO">TODO</span> Rename <code>grit</code> to <code>satgrit</code><br /></li>
-<li><a id="org8dfa012"></a><span class="todo TODO">TODO</span> Clean up source code (run <code>astyle</code>)<br /></li>
-<li><a id="orgcb0042a"></a><span class="todo TODO">TODO</span> Remove any GBA/DS specific support<br /></li>
-<li><a id="orgd43a97a"></a><span class="todo TODO">TODO</span> Support 4-BPP<br /></li>
-<li><a id="org5a8e243"></a><span class="todo TODO">TODO</span> Support 16-BPP (2048 colors)<br /></li>
-<li><a id="orgb9785cc"></a><span class="todo TODO">TODO</span> Support exporting to TMX<br /></li>
+<li><a id="org32a9d27"></a><span class="todo TODO">TODO</span> Rename <code>grit</code> to <code>satgrit</code><br /></li>
+<li><a id="orge0279ec"></a><span class="todo TODO">TODO</span> Clean up source code (run <code>astyle</code>)<br /></li>
+<li><a id="orgd70dcae"></a><span class="todo TODO">TODO</span> Remove any GBA/DS specific support<br /></li>
+<li><a id="org745b97b"></a><span class="todo TODO">TODO</span> Support 4-BPP<br /></li>
+<li><a id="orgbde0ce8"></a><span class="todo TODO">TODO</span> Support 16-BPP (2048 colors)<br /></li>
+<li><a id="orgf2b9c46"></a><span class="todo TODO">TODO</span> Support exporting to TMX<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgb34fac3" class="outline-3">
-<h3 id="orgb34fac3"><code>tmx2sat</code></h3>
-<div class="outline-text-3" id="text-orgb34fac3">
+<div id="outline-container-orgf9b1405" class="outline-3">
+<h3 id="orgf9b1405"><code>tmx2sat</code></h3>
+<div class="outline-text-3" id="text-orgf9b1405">
 </div>
-<div id="outline-container-orgc4b3f2b" class="outline-4">
-<h4 id="orgc4b3f2b">Tasks</h4>
-<div class="outline-text-4" id="text-orgc4b3f2b">
+<div id="outline-container-org9edf339" class="outline-4">
+<h4 id="org9edf339">Tasks</h4>
+<div class="outline-text-4" id="text-org9edf339">
 </div>
 <ul class="org-ul">
-<li><a id="org04c4d4d"></a><span class="todo TODO">TODO</span> Support <code>.scr</code> file format from <i>SEGA</i><br /></li>
-<li><a id="org27281f9"></a><span class="todo TODO">TODO</span> Validate custom properties<br /></li>
-<li><a id="org29f2107"></a><span class="todo TODO">TODO</span> Support special function<br /></li>
-<li><a id="orgbc4832e"></a><span class="todo TODO">TODO</span> Use object layer to denote which tiles to mark<br /></li>
-<li><a id="org72130ad"></a><span class="todo TODO">TODO</span> Support special custom properties<br /></li>
-<li><a id="org05f44fd"></a><span class="todo TODO">TODO</span> Support exporting raw pattern name data (entire map)<br /></li>
-<li><a id="org5dafadb"></a><span class="todo TODO">TODO</span> Support exporting VDP2 register map<br /></li>
+<li><a id="org90d51d3"></a><span class="todo TODO">TODO</span> Support <code>.scr</code> file format from <i>SEGA</i><br /></li>
+<li><a id="org4ad3986"></a><span class="todo TODO">TODO</span> Validate custom properties<br /></li>
+<li><a id="org8be857c"></a><span class="todo TODO">TODO</span> Support special function<br /></li>
+<li><a id="org6cdacd3"></a><span class="todo TODO">TODO</span> Support special custom properties<br /></li>
+<li><a id="org7f88d50"></a><span class="todo TODO">TODO</span> Support exporting raw pattern name data (entire map)<br /></li>
+<li><a id="org3dcc6a5"></a><span class="todo TODO">TODO</span> Support exporting VDP2 register map<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org5c0026e" class="outline-3">
-<h3 id="org5c0026e"><code>ssload</code></h3>
-<div class="outline-text-3" id="text-org5c0026e">
+<div id="outline-container-orgf601a1e" class="outline-3">
+<h3 id="orgf601a1e"><code>ssload</code></h3>
+<div class="outline-text-3" id="text-orgf601a1e">
 </div>
-<div id="outline-container-org374ff84" class="outline-4">
-<h4 id="org374ff84">Tasks</h4>
-<div class="outline-text-4" id="text-org374ff84">
+<div id="outline-container-org9b74f94" class="outline-4">
+<h4 id="org9b74f94">Tasks</h4>
+<div class="outline-text-4" id="text-org9b74f94">
 </div>
 <ul class="org-ul">
-<li><a id="org3535e6e"></a><span class="todo TODO">TODO</span> Add device operation to fp<br /></li>
-<li><a id="org69a71bf"></a><span class="todo TODO">TODO</span> Add debug target<br /></li>
-<li><a id="org895b4f2"></a><span class="todo TODO">TODO</span> Add support for Pseudo Saturn Kai Lite protocol<br /></li>
-<li><a id="orge521bfc"></a><span class="todo TODO">TODO</span> Rewrite datalink to not use official FTDI library<br /></li>
-<li><a id="org3d23212"></a><span class="todo TODO">TODO</span> Add system calls (idea of <code>dc-tool/load</code>)<br /></li>
+<li><a id="org1a86f13"></a><span class="todo TODO">TODO</span> Add device operation to fp<br /></li>
+<li><a id="orgd05b417"></a><span class="todo TODO">TODO</span> Add debug target<br /></li>
+<li><a id="org0ad2af0"></a><span class="todo TODO">TODO</span> Add support for Pseudo Saturn Kai Lite protocol<br /></li>
+<li><a id="orge5f609e"></a><span class="todo TODO">TODO</span> Rewrite datalink to not use official FTDI library<br /></li>
+<li><a id="orgf7c74ec"></a><span class="todo TODO">TODO</span> Add system calls (idea of <code>dc-tool/load</code>)<br /></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org999e75b" class="outline-3">
+<h3 id="org999e75b"><code>make-cue</code></h3>
+<div class="outline-text-3" id="text-org999e75b">
+</div>
+<div id="outline-container-org9c75145" class="outline-4">
+<h4 id="org9c75145">Tasks</h4>
+<div class="outline-text-4" id="text-org9c75145">
+</div>
+<ul class="org-ul">
+<li><a id="orgf0fa583"></a><span class="todo TODO">TODO</span> Add tool<br /></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-org3e14cab" class="outline-2">
-<h2 id="org3e14cab">Examples</h2>
-<div class="outline-text-2" id="text-org3e14cab">
+<div id="outline-container-org4252fe3" class="outline-2">
+<h2 id="org4252fe3">Performance tests</h2>
+<div class="outline-text-2" id="text-org4252fe3">
 </div>
-<div id="outline-container-org2fe2508" class="outline-3">
-<h3 id="org2fe2508"><code>cpu-wdt</code></h3>
-<div class="outline-text-3" id="text-org2fe2508">
+<div id="outline-container-orgdaa8a8f" class="outline-3">
+<h3 id="orgdaa8a8f">VDP1</h3>
+<div class="outline-text-3" id="text-orgdaa8a8f">
 </div>
-<div id="outline-container-org8458f07" class="outline-4">
-<h4 id="org8458f07">Tasks</h4>
-<div class="outline-text-4" id="text-org8458f07">
+<div id="outline-container-orgd33efeb" class="outline-4">
+<h4 id="orgd33efeb">Tasks</h4>
+<div class="outline-text-4" id="text-orgd33efeb">
 </div>
 <ul class="org-ul">
-<li><a id="org1c8ce4d"></a><span class="todo TODO">TODO</span> Add example<br /></li>
+<li><a id="org43bdaa7"></a><span class="todo TODO">TODO</span> Time how long to fill/clear 320x224 <code>[0/4]</code><br />
+<div class="outline-text-5" id="text-org43bdaa7">
+<ul class="org-ul">
+<li class="off"><code>[&#xa0;]</code> Normal Sprite</li>
+<li class="off"><code>[&#xa0;]</code> Scaled sprite</li>
+<li class="off"><code>[&#xa0;]</code> Distorted sprite</li>
+<li class="off"><code>[&#xa0;]</code> Polygons</li>
+</ul>
+</div>
+</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org9747706" class="outline-3">
-<h3 id="org9747706"><code>gdb</code></h3>
-<div class="outline-text-3" id="text-org9747706">
 </div>
-<div id="outline-container-org392e64f" class="outline-4">
-<h4 id="org392e64f">Tasks</h4>
-<div class="outline-text-4" id="text-org392e64f">
+<div id="outline-container-orge0283a4" class="outline-2">
+<h2 id="orge0283a4">Examples</h2>
+<div class="outline-text-2" id="text-orge0283a4">
+</div>
+<div id="outline-container-org4e48922" class="outline-3">
+<h3 id="org4e48922">General</h3>
+<div class="outline-text-3" id="text-org4e48922">
+</div>
+<div id="outline-container-orgf979f33" class="outline-4">
+<h4 id="orgf979f33">Tasks</h4>
+<div class="outline-text-4" id="text-orgf979f33">
 </div>
 <ul class="org-ul">
-<li><a id="orge06316c"></a><span class="todo TODO">TODO</span> Test and fix any issues with <code>gdb-ftdi-proxy</code><br /></li>
+<li><a id="orga429650"></a><span class="todo TODO">TODO</span> Add preview GIFs to the remaining examples<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8599baa" class="outline-3">
-<h3 id="org8599baa"><code>dram-cart</code></h3>
-<div class="outline-text-3" id="text-org8599baa">
+<div id="outline-container-org7d2a639" class="outline-3">
+<h3 id="org7d2a639"><code>cpu-wdt</code></h3>
+<div class="outline-text-3" id="text-org7d2a639">
 </div>
-<div id="outline-container-org3d5c643" class="outline-4">
-<h4 id="org3d5c643">Tasks</h4>
-<div class="outline-text-4" id="text-org3d5c643">
+<div id="outline-container-org9dbd326" class="outline-4">
+<h4 id="org9dbd326">Tasks</h4>
+<div class="outline-text-4" id="text-org9dbd326">
 </div>
 <ul class="org-ul">
-<li><a id="org2975f2a"></a><span class="todo TODO">TODO</span> Use to uncompress an image into DRAM<br /></li>
-<li><a id="org3d5cc16"></a><span class="todo TODO">TODO</span> Test example on real hardware<br /></li>
-<li><a id="orgf14649a"></a><span class="todo TODO">TODO</span> Fix example if broken on real hardware<br /></li>
+<li><a id="org69beafe"></a><span class="todo TODO">TODO</span> Add example<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org0e8bff7" class="outline-3">
-<h3 id="org0e8bff7"><code>scu-dsp-matrix</code></h3>
-<div class="outline-text-3" id="text-org0e8bff7">
+<div id="outline-container-org77fa3dc" class="outline-3">
+<h3 id="org77fa3dc"><code>gdb</code></h3>
+<div class="outline-text-3" id="text-org77fa3dc">
 </div>
-<div id="outline-container-org315fb8a" class="outline-4">
-<h4 id="org315fb8a">Tasks</h4>
-<div class="outline-text-4" id="text-org315fb8a">
+<div id="outline-container-orgab53052" class="outline-4">
+<h4 id="orgab53052">Tasks</h4>
+<div class="outline-text-4" id="text-orgab53052">
 </div>
 <ul class="org-ul">
-<li><a id="org0d10743"></a><span class="todo TODO">TODO</span> DMA to copy matrix + vector data, then signal via interrupt for master to fill with new data<br /></li>
+<li><a id="orgf8bc908"></a><span class="todo TODO">TODO</span> Test and fix any issues with <code>gdb-ftdi-proxy</code><br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd4e8356" class="outline-3">
-<h3 id="orgd4e8356"><code>smpc-rtc</code></h3>
-<div class="outline-text-3" id="text-orgd4e8356">
+<div id="outline-container-org91ee91b" class="outline-3">
+<h3 id="org91ee91b"><code>dram-cart</code></h3>
+<div class="outline-text-3" id="text-org91ee91b">
 </div>
-<div id="outline-container-orgbc2cae8" class="outline-4">
-<h4 id="orgbc2cae8">Tasks</h4>
-<div class="outline-text-4" id="text-orgbc2cae8">
+<div id="outline-container-org10c5b95" class="outline-4">
+<h4 id="org10c5b95">Tasks</h4>
+<div class="outline-text-4" id="text-org10c5b95">
 </div>
 <ul class="org-ul">
-<li><a id="orgd460505"></a><span class="todo TODO">TODO</span> Add example<br /></li>
+<li><a id="org1177b80"></a><span class="todo TODO">TODO</span> Use to uncompress an image into DRAM<br /></li>
+<li><a id="org18737a8"></a><span class="todo TODO">TODO</span> Test example on real hardware<br /></li>
+<li><a id="org9c6b073"></a><span class="todo TODO">TODO</span> Fix example if broken on real hardware<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgbb00db8" class="outline-3">
-<h3 id="orgbb00db8"><code>vdp2-rbg0</code></h3>
-<div class="outline-text-3" id="text-orgbb00db8">
+<div id="outline-container-orge91f87c" class="outline-3">
+<h3 id="orge91f87c"><code>scu-dsp-matrix</code></h3>
+<div class="outline-text-3" id="text-orge91f87c">
 </div>
-<div id="outline-container-org6672310" class="outline-4">
-<h4 id="org6672310">Tasks</h4>
-<div class="outline-text-4" id="text-org6672310">
+<div id="outline-container-org9fe5983" class="outline-4">
+<h4 id="org9fe5983">Tasks</h4>
+<div class="outline-text-4" id="text-org9fe5983">
 </div>
 <ul class="org-ul">
-<li><a id="org4ff16d1"></a><span class="todo TODO">TODO</span> Fix example<br /></li>
+<li><a id="orgd1b2954"></a><span class="todo TODO">TODO</span> DMA to copy matrix + vector data, then signal via interrupt for master to fill with new data<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org412a26c" class="outline-3">
-<h3 id="org412a26c"><code>vdp2-bitmap</code></h3>
-<div class="outline-text-3" id="text-org412a26c">
+<div id="outline-container-org0bf1e85" class="outline-3">
+<h3 id="org0bf1e85"><code>smpc-rtc</code></h3>
+<div class="outline-text-3" id="text-org0bf1e85">
 </div>
-<div id="outline-container-org1d41925" class="outline-4">
-<h4 id="org1d41925">Tasks</h4>
-<div class="outline-text-4" id="text-org1d41925">
+<div id="outline-container-org6780e08" class="outline-4">
+<h4 id="org6780e08">Tasks</h4>
+<div class="outline-text-4" id="text-org6780e08">
 </div>
 <ul class="org-ul">
-<li><a id="orgc477a37"></a><span class="done DONE">DONE</span> <del>Port changes to <code>libyaul/</code></del><br /></li>
-<li><a id="org38e80a2"></a><span class="done DONE">DONE</span> <del>Fix example</del><br /></li>
+<li><a id="org4f7a864"></a><span class="todo TODO">TODO</span> Add example<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org46be80a" class="outline-3">
-<h3 id="org46be80a"><code>vdp2-2x2-plane</code></h3>
-<div class="outline-text-3" id="text-org46be80a">
+<div id="outline-container-org0b1e090" class="outline-3">
+<h3 id="org0b1e090"><code>vdp2-rbg0</code></h3>
+<div class="outline-text-3" id="text-org0b1e090">
 </div>
-<div id="outline-container-orgb17a181" class="outline-4">
-<h4 id="orgb17a181">Tasks</h4>
-<div class="outline-text-4" id="text-orgb17a181">
+<div id="outline-container-org6f2e649" class="outline-4">
+<h4 id="org6f2e649">Tasks</h4>
+<div class="outline-text-4" id="text-org6f2e649">
 </div>
 <ul class="org-ul">
-<li><a id="orgae048d8"></a><span class="todo TODO">TODO</span> Mark each page to have a letter<br /></li>
+<li><a id="org6abc975"></a><span class="todo TODO">TODO</span> Fix example<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orge84d1a4" class="outline-3">
-<h3 id="orge84d1a4"><code>vdp1-textured-cube</code> (<code>vdp1-cube</code>)</h3>
-<div class="outline-text-3" id="text-orge84d1a4">
+<div id="outline-container-org5fa4ce6" class="outline-3">
+<h3 id="org5fa4ce6"><code>vdp2-bitmap</code></h3>
+<div class="outline-text-3" id="text-org5fa4ce6">
 </div>
-<div id="outline-container-org37fdd23" class="outline-4">
-<h4 id="org37fdd23">Tasks</h4>
-<div class="outline-text-4" id="text-org37fdd23">
+<div id="outline-container-orgf274a72" class="outline-4">
+<h4 id="orgf274a72">Tasks</h4>
+<div class="outline-text-4" id="text-orgf274a72">
 </div>
 <ul class="org-ul">
-<li><a id="org46f1f24"></a><span class="todo TODO">TODO</span> Rename <code>vdp1-cube</code> to <code>vdp1-textured-cube</code><br /></li>
-<li><a id="org5000b81"></a><span class="todo TODO">TODO</span> Simplify to only include what is needed for a textured cube<br /></li>
+<li><a id="org6ba0d9f"></a><span class="todo DONE">DONE</span> <del>Port changes to <code>libyaul/</code></del><br /></li>
+<li><a id="org1d737aa"></a><span class="todo DONE">DONE</span> <del>Fix example</del><br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgb7545c6" class="outline-3">
-<h3 id="orgb7545c6"><code>vdp1-double-interlace</code></h3>
-<div class="outline-text-3" id="text-orgb7545c6">
+<div id="outline-container-org70b1e4d" class="outline-3">
+<h3 id="org70b1e4d"><code>vdp2-2x2-plane</code></h3>
+<div class="outline-text-3" id="text-org70b1e4d">
+</div>
+<div id="outline-container-org999c57d" class="outline-4">
+<h4 id="org999c57d">Tasks</h4>
+<div class="outline-text-4" id="text-org999c57d">
+</div>
+<ul class="org-ul">
+<li><a id="org3cb613c"></a><span class="todo TODO">TODO</span> Mark each page to have a letter<br /></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org87a3e85" class="outline-3">
+<h3 id="org87a3e85"><code>vdp1-textured-cube</code> (<code>vdp1-cube</code>)</h3>
+<div class="outline-text-3" id="text-org87a3e85">
+</div>
+<div id="outline-container-org8a062ac" class="outline-4">
+<h4 id="org8a062ac">Tasks</h4>
+<div class="outline-text-4" id="text-org8a062ac">
+</div>
+<ul class="org-ul">
+<li><a id="orgf4f3c04"></a><span class="todo TODO">TODO</span> Rename <code>vdp1-cube</code> to <code>vdp1-textured-cube</code><br /></li>
+<li><a id="orgd2c2dd5"></a><span class="todo TODO">TODO</span> Simplify to only include what is needed for a textured cube<br /></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org59c4e07" class="outline-3">
+<h3 id="org59c4e07"><code>vdp1-double-interlace</code></h3>
+<div class="outline-text-3" id="text-org59c4e07">
 <p>
 Show a large 320x448 sprite.
 </p>
 </div>
-<div id="outline-container-org8a69a39" class="outline-4">
-<h4 id="org8a69a39">Tasks</h4>
-<div class="outline-text-4" id="text-org8a69a39">
+<div id="outline-container-orgc2ea09c" class="outline-4">
+<h4 id="orgc2ea09c">Tasks</h4>
+<div class="outline-text-4" id="text-orgc2ea09c">
 </div>
 <ul class="org-ul">
-<li><a id="org90c57f0"></a><span class="todo TODO">TODO</span> Rewrite example<br /></li>
+<li><a id="org46a54e7"></a><span class="todo TODO">TODO</span> Rewrite example<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org3967446" class="outline-3">
-<h3 id="org3967446"><code>vdp1-mic3d</code></h3>
-<div class="outline-text-3" id="text-org3967446">
+<div id="outline-container-org368ad26" class="outline-3">
+<h3 id="org368ad26"><code>vdp1-user-clipping</code></h3>
+<div class="outline-text-3" id="text-org368ad26">
+<p>
+Show an example where the user clip region can be manipulated.
+</p>
 </div>
-<div id="outline-container-org212afe8" class="outline-4">
-<h4 id="org212afe8">Tasks</h4>
-<div class="outline-text-4" id="text-org212afe8">
+<div id="outline-container-org0f71865" class="outline-4">
+<h4 id="org0f71865"><span class="todo TODO">TODO</span> Add example</h4>
+</div>
+</div>
+<div id="outline-container-org862e07e" class="outline-3">
+<h3 id="org862e07e"><code>vdp1-mic3d</code></h3>
+<div class="outline-text-3" id="text-org862e07e">
+</div>
+<div id="outline-container-orgede4680" class="outline-4">
+<h4 id="orgede4680">Tasks</h4>
+<div class="outline-text-4" id="text-orgede4680">
 </div>
 <ul class="org-ul">
-<li><a id="org98fdf05"></a><span class="todo TODO">TODO</span> Switch over to <code>fix16_t</code> (Use Q16.16 format)<br /></li>
-<li><a id="orgd51659e"></a><span class="todo TODO">TODO</span> Get rid of magic numbers<br /></li>
+<li><a id="orga2505e1"></a><span class="todo TODO">TODO</span> Switch over to <code>fix16_t</code> (Use Q16.16 format)<br /></li>
+<li><a id="org7d64269"></a><span class="todo TODO">TODO</span> Get rid of magic numbers<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd88105e" class="outline-3">
-<h3 id="orgd88105e"><code>vdp1-lines</code></h3>
-<div class="outline-text-3" id="text-orgd88105e">
+<div id="outline-container-org57f9083" class="outline-3">
+<h3 id="org57f9083"><code>vdp1-lines</code></h3>
+<div class="outline-text-3" id="text-org57f9083">
 <p>
 Draw random lines on screen indefinitely. This is a stress test.
 </p>
 </div>
-<div id="outline-container-orgfa71a42" class="outline-4">
-<h4 id="orgfa71a42">Tasks</h4>
-<div class="outline-text-4" id="text-orgfa71a42">
+<div id="outline-container-orgde440d0" class="outline-4">
+<h4 id="orgde440d0">Tasks</h4>
+<div class="outline-text-4" id="text-orgde440d0">
 </div>
 <ul class="org-ul">
-<li><a id="org8da20da"></a><span class="todo TODO">TODO</span> Add example<br /></li>
+<li><a id="org8566c62"></a><span class="todo TODO">TODO</span> Add example<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgb8109c3" class="outline-3">
-<h3 id="orgb8109c3"><code>vdp1-render-texture</code></h3>
-<div class="outline-text-3" id="text-orgb8109c3">
+<div id="outline-container-orgcd9c78d" class="outline-3">
+<h3 id="orgcd9c78d"><code>vdp1-render-texture</code></h3>
+<div class="outline-text-3" id="text-orgcd9c78d">
 <p>
 Render and copy the VDP1 frame buffer to NBG0/1 or RBG0 bitmap.
 </p>
 </div>
-<div id="outline-container-org46a3c5b" class="outline-4">
-<h4 id="org46a3c5b">Tasks</h4>
-<div class="outline-text-4" id="text-org46a3c5b">
+<div id="outline-container-orgb405e92" class="outline-4">
+<h4 id="orgb405e92">Tasks</h4>
+<div class="outline-text-4" id="text-orgb405e92">
 </div>
 <ul class="org-ul">
-<li><a id="org37a2194"></a><span class="todo TODO">TODO</span> Add example<br /></li>
+<li><a id="org83507d0"></a><span class="todo TODO">TODO</span> Add example<br /></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-orgd733928" class="outline-2">
-<h2 id="orgd733928">Hardware testing</h2>
-<div class="outline-text-2" id="text-orgd733928">
+<div id="outline-container-org01efba7" class="outline-2">
+<h2 id="org01efba7">Hardware testing</h2>
+<div class="outline-text-2" id="text-org01efba7">
 </div>
-<div id="outline-container-org095f434" class="outline-3">
-<h3 id="org095f434">SCU-DMA</h3>
-<div class="outline-text-3" id="text-org095f434">
+<div id="outline-container-org01a8db7" class="outline-3">
+<h3 id="org01a8db7">VDP1</h3>
+<div class="outline-text-3" id="text-org01a8db7">
 </div>
-<div id="outline-container-org4d16ed0" class="outline-4">
-<h4 id="org4d16ed0">Tasks</h4>
-<div class="outline-text-4" id="text-org4d16ed0">
+<div id="outline-container-org1c7c7f5" class="outline-4">
+<h4 id="org1c7c7f5">Tasks</h4>
+<div class="outline-text-4" id="text-org1c7c7f5">
 </div>
 <ul class="org-ul">
-<li><a id="orgc30f394"></a><span class="todo TODO">TODO</span> Test SCU-DMA update bits <code>[0/2]</code><br />
-<div class="outline-text-5" id="text-orgc30f394">
+<li><a id="org87e2a6a"></a><span class="todo TODO">TODO</span> Test single-interlace<br /></li>
+<li><a id="orgcf076a8"></a><span class="todo TODO">TODO</span> Test VDP1 CLUT (mode 0) referencing color bank codes with gouroud shading<br /></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga4ed401" class="outline-3">
+<h3 id="orga4ed401">SCU-DMA</h3>
+<div class="outline-text-3" id="text-orga4ed401">
+</div>
+<div id="outline-container-org1b98b54" class="outline-4">
+<h4 id="org1b98b54">Tasks</h4>
+<div class="outline-text-4" id="text-org1b98b54">
+</div>
+<ul class="org-ul">
+<li><a id="orgc6f5cdd"></a><span class="todo TODO">TODO</span> Test SCU-DMA update bits <code>[0/2]</code><br />
+<div class="outline-text-5" id="text-orgc6f5cdd">
 <ul class="org-ul">
 <li class="off"><code>[&#xa0;]</code> RUP</li>
 <li class="off"><code>[&#xa0;]</code> WUP</li>
 </ul>
 </div>
 </li>
-<li><a id="org90123a4"></a><span class="todo TODO">TODO</span> Test SCU-DMA starting factor bits <code>[0/4]</code><br />
-<div class="outline-text-5" id="text-org90123a4">
+<li><a id="org1fc6a14"></a><span class="todo TODO">TODO</span> Test SCU-DMA starting factor bits <code>[0/5]</code><br />
+<div class="outline-text-5" id="text-org1fc6a14">
 <ul class="org-ul">
 <li class="off"><code>[&#xa0;]</code> Timer 0</li>
 <li class="off"><code>[&#xa0;]</code> Timer 1</li>
@@ -688,76 +839,90 @@ Render and copy the VDP1 frame buffer to NBG0/1 or RBG0 bitmap.
 </ul>
 </div>
 </li>
-<li><a id="orgedaea06"></a><span class="todo TODO">TODO</span> Test SCU-DMA illegal interrupt<br /></li>
+<li><a id="orgf3bdb0d"></a><span class="todo TODO">TODO</span> Test SCU-DMA illegal interrupt<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org6c5273e" class="outline-3">
-<h3 id="org6c5273e">SCU-DSP</h3>
-<div class="outline-text-3" id="text-org6c5273e">
+<div id="outline-container-orgd56046c" class="outline-3">
+<h3 id="orgd56046c">SCU-DSP</h3>
+<div class="outline-text-3" id="text-orgd56046c">
 </div>
-<div id="outline-container-orgd16abe0" class="outline-4">
-<h4 id="orgd16abe0">Tasks</h4>
-<div class="outline-text-4" id="text-orgd16abe0">
+<div id="outline-container-org7110634" class="outline-4">
+<h4 id="org7110634">Tasks</h4>
+<div class="outline-text-4" id="text-org7110634">
 </div>
 <ul class="org-ul">
-<li><a id="orgba1a541"></a><span class="todo TODO">TODO</span> Finish SCU-DSP instruction test<br /></li>
-<li><a id="orgb9daa4c"></a><span class="todo TODO">TODO</span> Test DMA to master communication (sending data back and forth)<br /></li>
-<li><a id="orgfb3ed81"></a><span class="todo TODO">TODO</span> Test pause/unpause<br /></li>
-<li><a id="org230e0b6"></a><span class="todo TODO">TODO</span> Test jump instructions and why PC is set to whack values<br /></li>
-<li><a id="org7a9ec6e"></a><span class="todo TODO">TODO</span> Test overflow bit status<br /></li>
-<li><a id="org7220474"></a><span class="todo TODO">TODO</span> Test SCU-DSP DMA and SCU-DMA operating at the same time<br /></li>
-<li><a id="org432c742"></a><span class="todo TODO">TODO</span> Compile an empty program and see what is being exported<br /></li>
+<li><a id="org00c5522"></a><span class="todo TODO">TODO</span> Finish SCU-DSP instruction test<br /></li>
+<li><a id="orgaee888f"></a><span class="todo TODO">TODO</span> Test DMA to master communication (sending data back and forth)<br /></li>
+<li><a id="org38bb0c2"></a><span class="todo TODO">TODO</span> Test pause/unpause<br /></li>
+<li><a id="org6dbf93d"></a><span class="todo TODO">TODO</span> Test jump instructions and why PC is set to whack values<br /></li>
+<li><a id="orgdf83477"></a><span class="todo TODO">TODO</span> Test overflow bit status<br /></li>
+<li><a id="org864f9fc"></a><span class="todo TODO">TODO</span> Test SCU-DSP DMA and SCU-DMA operating at the same time<br /></li>
+<li><a id="org9dc346f"></a><span class="todo TODO">TODO</span> Compile an empty program and see what is being exported<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org757e868" class="outline-3">
-<h3 id="org757e868">CPU</h3>
-<div class="outline-text-3" id="text-org757e868">
+<div id="outline-container-org7bbbd40" class="outline-3">
+<h3 id="org7bbbd40">CPU</h3>
+<div class="outline-text-3" id="text-org7bbbd40">
 </div>
-<div id="outline-container-orgd022fcc" class="outline-4">
-<h4 id="orgd022fcc">Tasks</h4>
-<div class="outline-text-4" id="text-orgd022fcc">
+<div id="outline-container-orgb0239f0" class="outline-4">
+<h4 id="orgb0239f0">Tasks</h4>
+<div class="outline-text-4" id="text-orgb0239f0">
 </div>
 <ul class="org-ul">
-<li><a id="org4420fb7"></a><span class="todo TODO">TODO</span> Test CPU-WDT<br /></li>
-<li><a id="org0a4f6b3"></a><span class="todo TODO">TODO</span> Test CPU-DIVU overflow interrupt<br /></li>
+<li><a id="org63c75f2"></a><span class="todo TODO">TODO</span> Test CPU-WDT<br /></li>
+<li><a id="orgb05b91a"></a><span class="todo TODO">TODO</span> Test CPU-DIVU overflow interrupt<br /></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-org7a09aa0" class="outline-2">
-<h2 id="org7a09aa0">Yabause</h2>
-<div class="outline-text-2" id="text-org7a09aa0">
+<div id="outline-container-orgcd5614b" class="outline-2">
+<h2 id="orgcd5614b">Yabause</h2>
+<div class="outline-text-2" id="text-orgcd5614b">
 </div>
-<div id="outline-container-org6fcb177" class="outline-3">
-<h3 id="org6fcb177">VDP1</h3>
-<div class="outline-text-3" id="text-org6fcb177">
+<div id="outline-container-org0ba058a" class="outline-3">
+<h3 id="org0ba058a">CPU</h3>
+<div class="outline-text-3" id="text-org0ba058a">
 </div>
-<div id="outline-container-orgd26fa51" class="outline-4">
-<h4 id="orgd26fa51">Tasks</h4>
-<div class="outline-text-4" id="text-orgd26fa51">
+<div id="outline-container-orgce53d06" class="outline-4">
+<h4 id="orgce53d06">Tasks</h4>
+<div class="outline-text-4" id="text-orgce53d06">
 </div>
 <ul class="org-ul">
-<li><a id="org6180739"></a><span class="todo TODO">TODO</span> Toggle user clip debug draw<br /></li>
-<li><a id="org0bb4ef9"></a><span class="todo TODO">TODO</span> Toggle user clip commands on/off<br /></li>
-<li><a id="org349459c"></a><span class="todo TODO">TODO</span> Add better support for drawing user clip commands<br /></li>
-<li><a id="orgf2472d4"></a><span class="todo TODO">TODO</span> Add disabling of user clip commands<br /></li>
-<li><a id="org1167a1b"></a><span class="done DONE">DONE</span> <del>Add wireframe toggle option</del><br /></li>
+<li><a id="orgd176f1c"></a><span class="todo TODO">TODO</span> Add command-line option for adding SSH2 breakpoints<br /></li>
+<li><a id="orgd373a3f"></a><span class="todo TODO">TODO</span> Add memory related breakpoint command-line options<br /></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8e61f3c" class="outline-3">
-<h3 id="org8e61f3c">VDP2</h3>
-<div class="outline-text-3" id="text-org8e61f3c">
+<div id="outline-container-orgbacf3a6" class="outline-3">
+<h3 id="orgbacf3a6">VDP1</h3>
+<div class="outline-text-3" id="text-orgbacf3a6">
 </div>
-<div id="outline-container-org7ebb958" class="outline-4">
-<h4 id="org7ebb958">Tasks</h4>
+<div id="outline-container-org3a0f00e" class="outline-4">
+<h4 id="org3a0f00e">Tasks</h4>
+<div class="outline-text-4" id="text-org3a0f00e">
 </div>
-<div id="outline-container-org1588999" class="outline-4">
-<h4 id="org1588999"><span class="todo TODO">TODO</span> Add cycle pattern register view</h4>
-<div class="outline-text-4" id="text-org1588999">
+<ul class="org-ul">
+<li><a id="orgefd86a9"></a><span class="todo TODO">TODO</span> Toggle user clip debug draw<br /></li>
+<li><a id="orgd0d57ed"></a><span class="todo TODO">TODO</span> Toggle user clip commands on/off<br /></li>
+<li><a id="org648e620"></a><span class="todo TODO">TODO</span> Add better support for drawing user clip commands<br /></li>
+<li><a id="orgd096df7"></a><span class="todo TODO">TODO</span> Add disabling of user clip commands<br /></li>
+<li><a id="org586d788"></a><span class="todo DONE">DONE</span> <del>Add wireframe toggle option</del><br /></li>
+</ul>
 </div>
+</div>
+<div id="outline-container-org642fb9c" class="outline-3">
+<h3 id="org642fb9c">VDP2</h3>
+<div class="outline-text-3" id="text-org642fb9c">
+</div>
+<div id="outline-container-org0a17c31" class="outline-4">
+<h4 id="org0a17c31">Tasks</h4>
+<div class="outline-text-4" id="text-org0a17c31">
+</div>
+<ul class="org-ul">
+<li><a id="org5e8e9a2"></a><span class="todo TODO">TODO</span> Add cycle pattern register view<br /></li>
+</ul>
 </div>
 </div>
 </div>
