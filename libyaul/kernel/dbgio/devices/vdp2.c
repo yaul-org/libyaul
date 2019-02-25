@@ -99,7 +99,7 @@ static const dbgio_vdp2_t _default_params = {
         .font_fg = 7,
         .font_bg = 0,
 
-        .scrn = SCRN_NBG3,
+        .scrn = VDP2_SCRN_NBG3,
 
         .cpd_bank = 3,
         .cpd_offset = 0x00000,
@@ -170,13 +170,13 @@ _init(const dbgio_vdp2_t *params)
         assert((params->font_fg >= 0) && (params->font_bg <= 15));
         assert((params->font_bg >= 0) && (params->font_bg <= 15));
 
-        assert((params->scrn == SCRN_NBG0) ||
-               (params->scrn == SCRN_NBG1) ||
-               (params->scrn == SCRN_NBG2) ||
-               (params->scrn == SCRN_NBG3));
+        assert((params->scrn == VDP2_SCRN_NBG0) ||
+               (params->scrn == VDP2_SCRN_NBG1) ||
+               (params->scrn == VDP2_SCRN_NBG2) ||
+               (params->scrn == VDP2_SCRN_NBG3));
 
-        assert((params->scrn != SCRN_RBG0) &&
-               (params->scrn != SCRN_RBG1));
+        assert((params->scrn != VDP2_SCRN_RBG0) &&
+               (params->scrn != VDP2_SCRN_RBG1));
 
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
         /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
@@ -202,9 +202,9 @@ _init(const dbgio_vdp2_t *params)
 
         (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
 
-        _dev_state->page_size = SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
-        _dev_state->page_width = SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
-        _dev_state->page_height = SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
+        _dev_state->page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
+        _dev_state->page_width = VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
+        _dev_state->page_height = VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
 
         /* One page per plane */
         _dev_state->page_base = VDP2_VRAM_ADDR_4MBIT(params->pnd_bank,
@@ -213,9 +213,9 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->cp_table = VDP2_VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
         _dev_state->color_palette = CRAM_ADDR(params->cram_index << 3);
 
-        struct scrn_cell_format cell_format = {
+        struct vdp2_scrn_cell_format cell_format = {
                 .scf_scroll_screen = params->scrn,
-                .scf_cc_count = SCRN_CCC_PALETTE_16,
+                .scf_cc_count = VDP2_SCRN_CCC_PALETTE_16,
                 .scf_character_size = 1 * 1,
                 .scf_pnd_size = 1, /* 1-word */
                 .scf_auxiliary_mode = 0,
@@ -234,7 +234,7 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->page_size /= 2;
 
         /* PND value used to clear pages */
-        _dev_state->pnd_clear = SCRN_PND_CONFIG_0(
+        _dev_state->pnd_clear = VDP2_SCRN_PND_CONFIG_0(
                 cell_format.scf_cp_table,
                 cell_format.scf_color_palette,
                 /* vf = */ 0,
@@ -481,7 +481,7 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
         _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
         uint16_t pnd;
-        pnd = SCRN_PND_CONFIG_0(
+        pnd = VDP2_SCRN_PND_CONFIG_0(
                 /* Each cell is 32 bytes */
                 _dev_state->cp_table | (ch << 5),
                 _dev_state->color_palette,

@@ -13,11 +13,11 @@ void
 vdp2_scrn_mosaic_set(uint8_t scrn)
 {
 #ifdef DEBUG
-        assert((scrn == SCRN_NBG0) ||
-               (scrn == SCRN_NBG1) ||
-               (scrn == SCRN_NBG2) ||
-               (scrn == SCRN_NBG3) ||
-               (scrn == SCRN_RBG0));
+        assert((scrn == VDP2_SCRN_NBG0) ||
+               (scrn == VDP2_SCRN_NBG1) ||
+               (scrn == VDP2_SCRN_NBG2) ||
+               (scrn == VDP2_SCRN_NBG3) ||
+               (scrn == VDP2_SCRN_RBG0));
 #endif /* DEBUG */
 
         /* If performing mosaic processing in NBG0 or NBG1, the vertical
@@ -26,8 +26,8 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
          * Mosaic processing is then ignored for NBG0 or NBG1. */
 
         switch (scrn) {
-        case SCRN_RBG1:
-        case SCRN_NBG0:
+        case VDP2_SCRN_RBG1:
+        case VDP2_SCRN_NBG0:
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
@@ -37,7 +37,7 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
                 _state_vdp2()->regs.mzctl &= 0xFFFE;
                 _state_vdp2()->regs.mzctl |= 0x0001;
                 break;
-        case SCRN_NBG1:
+        case VDP2_SCRN_NBG1:
 #ifdef DEBUG
                 /* Make sure that the vertical cell scroll function is
                  * not being used */
@@ -47,15 +47,15 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
                 _state_vdp2()->regs.mzctl &= 0xFFFD;
                 _state_vdp2()->regs.mzctl |= 0x0002;
                 break;
-        case SCRN_NBG2:
+        case VDP2_SCRN_NBG2:
                 _state_vdp2()->regs.mzctl &= 0xFFFB;
                 _state_vdp2()->regs.mzctl |= 0x0004;
                 break;
-        case SCRN_NBG3:
+        case VDP2_SCRN_NBG3:
                 _state_vdp2()->regs.mzctl &= 0xFFF7;
                 _state_vdp2()->regs.mzctl |= 0x0008;
                 break;
-        case SCRN_RBG0:
+        case VDP2_SCRN_RBG0:
                 _state_vdp2()->regs.mzctl &= 0xFFEF;
                 _state_vdp2()->regs.mzctl |= 0x0010;
                 break;
@@ -66,28 +66,28 @@ void
 vdp2_scrn_mosaic_unset(uint8_t scrn)
 {
 #ifdef DEBUG
-        assert((scrn == SCRN_NBG0) ||
-               (scrn == SCRN_NBG1) ||
-               (scrn == SCRN_NBG2) ||
-               (scrn == SCRN_NBG3) ||
-               (scrn == SCRN_RBG0));
+        assert((scrn == VDP2_SCRN_NBG0) ||
+               (scrn == VDP2_SCRN_NBG1) ||
+               (scrn == VDP2_SCRN_NBG2) ||
+               (scrn == VDP2_SCRN_NBG3) ||
+               (scrn == VDP2_SCRN_RBG0));
 #endif /* DEBUG */
 
         switch (scrn) {
-        case SCRN_RBG1:
-        case SCRN_NBG0:
+        case VDP2_SCRN_RBG1:
+        case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs.mzctl &= 0xFFFE;
                 break;
-        case SCRN_NBG1:
+        case VDP2_SCRN_NBG1:
                 _state_vdp2()->regs.mzctl &= 0xFFFD;
                 break;
-        case SCRN_NBG2:
+        case VDP2_SCRN_NBG2:
                 _state_vdp2()->regs.mzctl &= 0xFFFB;
                 break;
-        case SCRN_NBG3:
+        case VDP2_SCRN_NBG3:
                 _state_vdp2()->regs.mzctl &= 0xFFF7;
                 break;
-        case SCRN_RBG0:
+        case VDP2_SCRN_RBG0:
                 _state_vdp2()->regs.mzctl &= 0xFFEF;
                 break;
         }

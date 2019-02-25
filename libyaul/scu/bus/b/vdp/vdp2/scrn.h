@@ -16,46 +16,46 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define SCRN_NBG0               0 /* Normal background (NBG0) */
-#define SCRN_RBG1               5 /* Rotational background (RBG1) */
-#define SCRN_NBG1               1 /* Normal background (NBG1) */
-#define SCRN_NBG2               2 /* Normal background (NBG2) */
-#define SCRN_NBG3               3 /* Normal background (NBG3) */
-#define SCRN_RBG0               4 /* Rotational background (RBG0) */
-#define SCRN_BACK               5
-#define SCRN_SPRITE             6
+#define VDP2_SCRN_NBG0          0 /* Normal background (NBG0) */
+#define VDP2_SCRN_RBG1          5 /* Rotational background (RBG1) */
+#define VDP2_SCRN_NBG1          1 /* Normal background (NBG1) */
+#define VDP2_SCRN_NBG2          2 /* Normal background (NBG2) */
+#define VDP2_SCRN_NBG3          3 /* Normal background (NBG3) */
+#define VDP2_SCRN_RBG0          4 /* Rotational background (RBG0) */
+#define VDP2_SCRN_BACK          5
+#define VDP2_SCRN_SPRITE        6
 
-#define SCRN_CCC_PALETTE_16     0
-#define SCRN_CCC_PALETTE_256    1
-#define SCRN_CCC_PALETTE_2048   2
-#define SCRN_CCC_RGB_32768      3
-#define SCRN_CCC_RGB_16770000   4
+#define VDP2_SCRN_CCC_PALETTE_16        0
+#define VDP2_SCRN_CCC_PALETTE_256       1
+#define VDP2_SCRN_CCC_PALETTE_2048      2
+#define VDP2_SCRN_CCC_RGB_32768         3
+#define VDP2_SCRN_CCC_RGB_16770000      4
 
-#define SCRN_CALCULATE_PAGE_COUNT(format)                                      \
+#define VDP2_SCRN_CALCULATE_PAGE_COUNT(format)                                 \
         ((format)->scf_plane_size)
 
-#define SCRN_CALCULATE_PAGE_WIDTH(format)                                      \
+#define VDP2_SCRN_CALCULATE_PAGE_WIDTH(format)                                 \
         (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
 
-#define SCRN_CALCULATE_PAGE_HEIGHT(format)                                     \
+#define VDP2_SCRN_CALCULATE_PAGE_HEIGHT(format)                                \
         (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
 
-#define SCRN_CALCULATE_PAGE_DIMENSION(format)                                  \
+#define VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format)                             \
         (((format)->scf_character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
 
-#define SCRN_CALCULATE_PAGE_COUNT_M(plsz)                                      \
+#define VDP2_SCRN_CALCULATE_PAGE_COUNT_M(plsz)                                 \
         (plsz)
 
-#define SCRN_CALCULATE_PAGE_WIDTH_M(chsz)                                      \
+#define VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(chsz)                                 \
         (((chsz) == (1 * 1)) ? 64 : 32)
 
-#define SCRN_CALCULATE_PAGE_HEIGHT_M(chsz)                                     \
+#define VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(chsz)                                \
         (((chsz) == (1 * 1)) ? 64 : 32)
 
-#define SCRN_CALCULATE_PAGE_DIMENSION_M(chsz)                                  \
+#define VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz)                             \
         (((chsz) == (1 * 1)) ? (64 * 64) : (32 * 32))
 
-/* Possible values for SCRN_CALCULATE_PAGE_SIZE() (in bytes):
+/* Possible values for VDP2_SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
  * | PND size | Cell size | Size of page  |
  * +----------+-----------+---------------+
@@ -67,13 +67,13 @@ extern "C" {
  *
  * Page dimension is 64x64 if cell size is 1x1.
  * Page dimension is 32x32 if cell size is 2x2. */
-#define SCRN_CALCULATE_PAGE_SIZE(format)                                       \
-        (SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
+#define VDP2_SCRN_CALCULATE_PAGE_SIZE(format)                                  \
+        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
 
-#define SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                                \
-        (SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
+#define VDP2_SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                           \
+        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
 
-/* Possible vales for SCRN_CALCULATE_PLANE_SIZE() (in bytes):
+/* Possible vales for VDP2_SCRN_CALCULATE_PLANE_SIZE() (in bytes):
  * +------------+----------+-----------+---------------+
  * | Plane size | PND size | Cell size | Size of plane |
  * +------------+----------+-----------+---------------+
@@ -93,8 +93,9 @@ extern "C" {
  * |            | 2-word   | 2x2       | 0x4000        |
  * +------------+----------+-----------+---------------+
  */
-#define SCRN_CALCULATE_PLANE_SIZE(format)                                      \
-        (((format)->scf_plane_size) * SCRN_CALCULATE_PAGE_SIZE(format))
+
+#define VDP2_SCRN_CALCULATE_PLANE_SIZE(format)                                 \
+        (((format)->scf_plane_size) * VDP2_SCRN_CALCULATE_PAGE_SIZE(format))
 
 /*-
  * Possible values (plane count) that can fit within a 4Mbit VRAM bank:
@@ -118,19 +119,20 @@ extern "C" {
  * |  8          | 2x2        | 2-word   | 2x2        | 0x004000   |
  * +-------------+------------+----------+------------+------------+
  */
-#define SCRN_CALCULATE_PLANES_2SPLIT_4MBIT_CNT(format)                         \
-        (VRAM_2SPLIT_BANK_SIZE_4MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_CALCULATE_PLANES_2_4MBIT_CNT(format)                         \
+        (VDP2_VRAM_BSIZE_2_4MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
-#define SCRN_CALCULATE_PLANES_4SPLIT_4MBIT_CNT(format)                         \
-        (VRAM_4SPLIT_BANK_SIZE_4MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_CALCULATE_PLANES_4_4MBIT_CNT(format)                         \
+        (VDP2_VRAM_BSIZE_4_4MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
-#define SCRN_CALCULATE_PLANES_2SPLIT_8MBIT_CNT(format)                         \
-        (VRAM_2SPLIT_BANK_SIZE_8MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_CALCULATE_PLANES_2_8MBIT_CNT(format)                         \
+        (VDP2_VRAM_BSIZE_2_8MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
-#define SCRN_CALCULATE_PLANES_4SPLIT_8MBIT_CNT(format)                         \
-        (VRAM_4SPLIT_BANK_SIZE_8MBIT / SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_CALCULATE_PLANES_4_8MBIT_CNT(format)                         \
+        (VDP2_VRAM_BSIZE_4_8MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
-/* Configuration table mapping. Depending on how the normal/rotational
+/*-
+ * Configuration table mapping. Depending on how the normal/rotational
  * background is set up, choose a config:
  * +-----+--------+------+-----------+------------+------------+-------------+
  * | CFG | PND    | Cell | Aux. mode | Chr. count | Pal. banks | Color count |
@@ -147,65 +149,64 @@ extern "C" {
  * +-----+--------+------+-----------+------------+------------+-------------+
  */
 
-#define CHARACTER_NUMBER(x)     ((x) >> 5)
-#define PALETTE_NUMBER(x)       ((x) >> 5)
+#define VDP2_SCRN_PND_CHARACTER_NUM(x)   ((x) >> 5)
+#define VDP2_SCRN_PND_PALETTE_NUM(x)     ((x) >> 5)
 
-#define SCRN_PND_CONFIG_0(character_addr, palette_addr, vf, hf)                \
-        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+#define VDP2_SCRN_PND_CONFIG_0(character_addr, palette_addr, vf, hf)           \
+        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         (CHARACTER_NUMBER(character_addr) & 0x0FFF))
+         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFF))
 
-#define SCRN_PND_CONFIG_1(character_addr, palette_addr)                        \
-        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
-         (CHARACTER_NUMBER(character_addr) & 0x03FF))
+#define VDP2_SCRN_PND_CONFIG_1(character_addr, palette_addr)                   \
+        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
+         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x03FF))
 
-#define SCRN_PND_CONFIG_2(character_addr, palette_addr, vf, hf)                \
-        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
+#define VDP2_SCRN_PND_CONFIG_2(character_addr, palette_addr, vf, hf)           \
+        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
 
-#define SCRN_PND_CONFIG_3(character_addr, palette_addr)                        \
-        (((PALETTE_NUMBER(palette_addr) & 0x000F) << 12) |                     \
-         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+#define VDP2_SCRN_PND_CONFIG_3(character_addr, palette_addr)                   \
+        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
+         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
 
-#define SCRN_PND_CONFIG_4(character_addr, palette_addr, vf, hf)                \
-        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+#define VDP2_SCRN_PND_CONFIG_4(character_addr, palette_addr, vf, hf)           \
+        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         (CHARACTER_NUMBER(character_addr) & 0x0FFF))
+         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFF))
 
-#define SCRN_PND_CONFIG_5(character_addr, palette_addr)                        \
-        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
-         (CHARACTER_NUMBER(character_addr) & 0x03FF))
+#define VDP2_SCRN_PND_CONFIG_5(character_addr, palette_addr)                   \
+        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
+         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x03FF))
 
-#define SCRN_PND_CONFIG_6(character_addr, palette_addr, vf, hf)                \
-        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
+#define VDP2_SCRN_PND_CONFIG_6(character_addr, palette_addr, vf, hf)           \
+        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
 
-#define SCRN_PND_CONFIG_7(character_addr, palette_addr, vf, hf)                \
-        ((((PALETTE_NUMBER(palette_addr) >> 4) & 0x0007) << 12) |              \
-         ((CHARACTER_NUMBER(character_addr) & 0x0FFC) >> 2))
+#define VDP2_SCRN_PND_CONFIG_7(character_addr, palette_addr, vf, hf)           \
+        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
+         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
 
-#define SCRN_PND_CONFIG_8(character_addr, palette_addr, vf, hf, pr, cc)        \
+#define VDP2_SCRN_PND_CONFIG_8(character_addr, palette_addr, vf, hf, pr, cc)   \
         ((((vf) & 0x01) << 31) |                                               \
          (((hf) & 0x01) << 30) |                                               \
          (((pr) & 0x01) << 29) |                                               \
          (((cc) & 0x01) << 28) |                                               \
-         ((PALETTE_NUMBER(palette_addr) & 0x007F) << 16) |                     \
-         (CHARACTER_NUMBER(character_addr) & 0x7FFF))
+         ((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x007F) << 16) |          \
+         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x7FFF))
 
+#define VDP2_VRAM_USAGE_TYPE_NONE       0x00
+#define VDP2_VRAM_USAGE_TYPE_COEFF_TBL  0x01
+#define VDP2_VRAM_USAGE_TYPE_PND        0x02
+#define VDP2_VRAM_USAGE_TYPE_CPD        0x03
+#define VDP2_VRAM_USAGE_TYPE_BPD        0x03
 
-#define VRAM_USAGE_TYPE_NONE            0x00
-#define VRAM_USAGE_TYPE_COEFF_TBL       0x01
-#define VRAM_USAGE_TYPE_PND             0x02
-#define VRAM_USAGE_TYPE_CPD             0x03
-#define VRAM_USAGE_TYPE_BPD             0x03
-
-struct scrn_bitmap_format {
+struct vdp2_scrn_bitmap_format {
         uint8_t sbf_scroll_screen; /* Normal/rotational background */
         uint32_t sbf_cc_count; /* Character color count */
 
@@ -249,7 +250,7 @@ struct scrn_bitmap_format {
         } sbf_usage_banks; /* RBG0 and RBG1 only */
 };
 
-struct scrn_cell_format {
+struct vdp2_scrn_cell_format {
         uint32_t scf_scroll_screen; /* Normal/rotational background */
         uint32_t scf_cc_count; /* Character color count */
         uint32_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
@@ -316,7 +317,7 @@ struct scrn_cell_format {
 };
 
 /* Hardware defined */
-struct scrn_rotation_table {
+struct vdp2_scrn_rotation_table {
         /* Screen start coordinates */
         uint32_t xst;
         uint32_t yst;
@@ -379,23 +380,24 @@ struct scrn_rotation_table {
         uint32_t delta_kax;  /* Addr. increment coeff. table (per dot) */
 } __packed;
 
-#define SCRN_SF_TYPE_NONE               0
-#define SCRN_SF_TYPE_COLOR_CALCULATION  1
-#define SCRN_SF_TYPE_PRIORITY           2
+#define VDP2_SCRN_SF_TYPE_NONE                  0
+#define VDP2_SCRN_SF_TYPE_COLOR_CALCULATION     1
+#define VDP2_SCRN_SF_TYPE_PRIORITY              2
 
-#define SCRN_SF_CODE_A          0
-#define SCRN_SF_CODE_B          1
+#define VDP2_SCRN_SF_CODE_A     0
+#define VDP2_SCRN_SF_CODE_B     1
 
-#define SCRN_SF_CODE_0x00_0x01  (1 << 0)
-#define SCRN_SF_CODE_0x02_0x03  (1 << 1)
-#define SCRN_SF_CODE_0x04_0x05  (1 << 2)
-#define SCRN_SF_CODE_0x06_0x07  (1 << 3)
-#define SCRN_SF_CODE_0x08_0x09  (1 << 4)
-#define SCRN_SF_CODE_0x0A_0x0B  (1 << 5)
-#define SCRN_SF_CODE_0x0C_0x0D  (1 << 6)
-#define SCRN_SF_CODE_0x0E_0x0F  (1 << 7)
+#define VDP2_SCRN_SF_CODE_0x00_0x01     (1 << 0)
+#define VDP2_SCRN_SF_CODE_0x02_0x03     (1 << 1)
+#define VDP2_SCRN_SF_CODE_0x04_0x05     (1 << 2)
+#define VDP2_SCRN_SF_CODE_0x06_0x07     (1 << 3)
+#define VDP2_SCRN_SF_CODE_0x08_0x09     (1 << 4)
+#define VDP2_SCRN_SF_CODE_0x0A_0x0B     (1 << 5)
+#define VDP2_SCRN_SF_CODE_0x0C_0x0D     (1 << 6)
+#define VDP2_SCRN_SF_CODE_0x0E_0x0F     (1 << 7)
 
-/* Limitations for NBG0/NBG1 reduction:
+/*-
+ * Limitations for NBG0/NBG1 reduction:
  * +--------+-----+-----------+------------+
  * | Screen | CCC | Reduction | No display |
  * +--------+-----+-----------+------------+
@@ -412,8 +414,8 @@ struct scrn_rotation_table {
  * |        | 256 | 1/2       | NBG3       |
  * +--------+-----+-----------+------------+
  *
- * The coord. increment should be a value smaller then 1 to zoom in and
- * larger than 1 to zoom out. No zoom means equal to 1.
+ * The coord. increment should be a value smaller then 1 to zoom in and larger
+ * than 1 to zoom out. No zoom means equal to 1.
  *
  * Range limitations:
  * +----------------+-------------------+-----+
@@ -430,47 +432,47 @@ struct scrn_rotation_table {
  * | (1,7]          | Reduc. out (1/7)  | 16  |
  * +----------------+-------------------+-----+ */
 
-#define SCRN_REDUCTION_NONE     0 /* No reduction */
-#define SCRN_REDUCTION_HALF     1 /* 1/2 reduction */
-#define SCRN_REDUCTION_QUARTER  2 /* 1/4 reduction */
+#define VDP2_SCRN_REDUCTION_NONE        0 /* No reduction */
+#define VDP2_SCRN_REDUCTION_HALF        1 /* 1/2 reduction */
+#define VDP2_SCRN_REDUCTION_QUARTER     2 /* 1/4 reduction */
 
-#define SCRN_REDUCTION_STEP     Q0_3_8(1.0f / 256.0f)
-#define SCRN_REDUCTION_MIN      SCRN_REDUCTION_STEP
-#define SCRN_REDUCTION_MAX      Q0_3_8(7.0f)
+#define VDP2_SCRN_REDUCTION_STEP        Q0_3_8(1.0f / 256.0f)
+#define VDP2_SCRN_REDUCTION_MIN         VDP2_SCRN_REDUCTION_STEP
+#define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
-struct scrn_ls_format {
+struct vdp2_scrn_ls_format {
         uint8_t ls_scrn;        /* Normal background */
         uint32_t ls_lsta;       /* Line scroll table (lead addr.) */
         uint8_t ls_int;         /* Dependent on the interlace setting */
 
-#define SCRN_LS_N0SCX   0x0002
-#define SCRN_LS_N1SCX   0x0200
-#define SCRN_LS_N0SCY   0x0004
-#define SCRN_LS_N1SCY   0x0400
+#define VDP2_SCRN_LS_N0SCX      0x0002
+#define VDP2_SCRN_LS_N1SCX      0x0200
+#define VDP2_SCRN_LS_N0SCY      0x0004
+#define VDP2_SCRN_LS_N1SCY      0x0400
         uint16_t ls_fun;        /* Enable line scroll */
 };
 
-struct scrn_vcs_format {
+struct vdp2_scrn_vcs_format {
         uint8_t vcs_scrn;       /* Normal background */
         uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
 };
 
-#define SCRN_COLOR_OFFSET_A     0
-#define SCRN_COLOR_OFFSET_B     1
+#define VDP2_SCRN_COLOR_OFFSET_A        0
+#define VDP2_SCRN_COLOR_OFFSET_B        1
 
 extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
 extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
 
-extern void vdp2_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
-extern void vdp2_scrn_cell_format_set(const struct scrn_cell_format *);
+extern void vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+extern void vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t,  int16_t, int16_t);
+extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t, int16_t, int16_t);
 extern void vdp2_scrn_color_offset_set(uint8_t, uint8_t);
 extern void vdp2_scrn_color_offset_unset(uint8_t);
 extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
-extern void vdp2_scrn_ls_set(struct scrn_ls_format *);
+extern void vdp2_scrn_ls_set(struct vdp2_scrn_ls_format *);
 
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
