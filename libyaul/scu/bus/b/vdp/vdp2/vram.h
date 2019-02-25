@@ -30,17 +30,17 @@ extern "C" {
  * 0x080000 +----------+
  */
 
-#define VRAM_ADDR_4MBIT(x, y)           (0x25E00000 + ((x) << 17) + (y))
+#define VDP2_VRAM_ADDR_4MBIT(x, y)      (0x25E00000 + ((x) << 17) + (y))
 
-#define VRAM_BANK_4MBIT(x)              (((x) >> 17) & 0x0007)
+#define VDP2_VRAM_BANK_4MBIT(x)         (((x) >> 17) & 0x0007)
 
-#define VRAM_SIZE_4MBIT                 (0x00080000)
+#define VDP2_VRAM_SIZE_4MBIT            (0x00080000)
 
 /* 4 Mbit 2-split VRAM bank size */
-#define VRAM_2SPLIT_BANK_SIZE_4MBIT     (VRAM_SIZE_4MBIT / 2)
+#define VDP2_VRAM_BSIZE_2_4MBIT         (VDP2_VRAM_SIZE_4MBIT / 2)
 
 /* 4 Mbit 4-split VRAM bank size */
-#define VRAM_4SPLIT_BANK_SIZE_4MBIT     (VRAM_SIZE_4MBIT / 4)
+#define VDP2_VRAM_BSIZE_4_4MBIT         (VDP2_VRAM_SIZE_4MBIT / 4)
 
 /*-
  *            8 Mbit
@@ -55,58 +55,58 @@ extern "C" {
  *  0x100000 +----------+
  */
 
-#define VRAM_ADDR_8MBIT(x, y)           (0x25E00000 + ((x) << 18) + (y))
+#define VDP2_VRAM_ADDR_8MBIT(x, y)      (0x25E00000 + ((x) << 18) + (y))
 
-#define VRAM_BANK_8MBIT(x)              (((x) >> 18) & 0x0007)
+#define VDP2_VRAM_BANK_8MBIT(x)         (((x) >> 18) & 0x0007)
 
-#define VRAM_SIZE_8MBIT                 (0x00100000)
+#define VDP2_VRAM_SIZE_8MBIT            (0x00100000)
 
 /* 8 Mbit 2-split VRAM bank size */
-#define VRAM_2SPLIT_BANK_SIZE_8MBIT     (VRAM_SIZE_8MBIT / 2)
+#define VDP2_VRAM_BSIZE_2_8MBIT         (VRAM_SIZE_8MBIT / 2)
 
 /* 8 Mbit 4-split VRAM bank size */
-#define VRAM_4SPLIT_BANK_SIZE_8MBIT     (VRAM_SIZE_8MBIT / 4)
+#define VDP2_VRAM_BSIZE_4_8MBIT         (VRAM_SIZE_8MBIT / 4)
 
-struct vram_ctl {
-#define VRAM_CTL_COEFFICIENT_TABLE_VRAM 0x0000 /* Store coefficient table in VRAM */
-#define VRAM_CTL_COEFFICIENT_TABLE_CRAM 0x0001 /* Store coefficient table in CRAM */
+struct vdp2_vram_ctl {
+#define VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM    0x0000 /* Store coefficient table in VRAM */
+#define VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM    0x0001 /* Store coefficient table in CRAM */
         uint8_t coefficient_table;
 
-#define VRAM_CTL_SIZE_4MBIT             0x0000
-#define VRAM_CTL_SIZE_8MBIT             0x0001
+#define VDP2_VRAM_CTL_SIZE_4MBIT                0x0000
+#define VDP2_VRAM_CTL_SIZE_8MBIT                0x0001
         uint8_t vram_size; /* VRAM size */
 
-#define VRAM_CTL_MODE_NO_PART_BANK_A    0x0000
-#define VRAM_CTL_MODE_NO_PART_BANK_B    0x0000
-#define VRAM_CTL_MODE_PART_BANK_A       0x0001 /* Partition VRAM-A into two banks */
-#define VRAM_CTL_MODE_PART_BANK_B       0x0002 /* Partition VRAM-B into two banks */
-#define VRAM_CTL_MODE_PART_BANK_BOTH    0x0003
+#define VDP2_VRAM_CTL_MODE_NO_PART_BANK_A       0x0000
+#define VDP2_VRAM_CTL_MODE_NO_PART_BANK_B       0x0000
+#define VDP2_VRAM_CTL_MODE_PART_BANK_A          0x0001 /* Partition VRAM-A into two banks */
+#define VDP2_VRAM_CTL_MODE_PART_BANK_B          0x0002 /* Partition VRAM-B into two banks */
+#define VDP2_VRAM_CTL_MODE_PART_BANK_BOTH       0x0003
         uint8_t vram_mode; /* VRAM mode bank partitions */
 } __aligned(4);
 
-#define VRAM_CYCP_PNDR_NBG0     0x0 /* NBG0 pattern name data read */
-#define VRAM_CYCP_PNDR_NBG1     0x1 /* NBG1 pattern name data read */
-#define VRAM_CYCP_PNDR_NBG2     0x2 /* NBG2 pattern name data read */
-#define VRAM_CYCP_PNDR_NBG3     0x3 /* NBG3 pattern name data read */
-#define VRAM_CYCP_CHPNDR_NBG0   0x4 /* NBG0 character pattern name data read */
-#define VRAM_CYCP_CHPNDR_NBG1   0x5 /* NBG1 character pattern name data read */
-#define VRAM_CYCP_CHPNDR_NBG2   0x6 /* NBG2 character pattern name data read */
-#define VRAM_CYCP_CHPNDR_NBG3   0x7 /* NBG3 character pattern name data read */
-#define VRAM_CYCP_VCSTDR_NBG0   0xC /* NBG0 vertical cell scroll table data read */
-#define VRAM_CYCP_VCSTDR_NBG1   0xD /* NBG0 vertical cell scroll table data read */
-#define VRAM_CYCP_CPU_RW        0xE /* CPU read/write */
-#define VRAM_CYCP_NO_ACCESS     0xF /* No access */
+#define VDP2_VRAM_CYCP_PNDR_NBG0        0x0 /* NBG0 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG1        0x1 /* NBG1 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG2        0x2 /* NBG2 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG3        0x3 /* NBG3 pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG0      0x4 /* NBG0 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG1      0x5 /* NBG1 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG2      0x6 /* NBG2 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG3      0x7 /* NBG3 character pattern name data read */
+#define VDP2_VRAM_CYCP_VCSTDR_NBG0      0xC /* NBG0 vertical cell scroll table data read */
+#define VDP2_VRAM_CYCP_VCSTDR_NBG1      0xD /* NBG0 vertical cell scroll table data read */
+#define VDP2_VRAM_CYCP_CPU_RW           0xE /* CPU read/write */
+#define VDP2_VRAM_CYCP_NO_ACCESS        0xF /* No access */
 
 /* Pattern name data read */
-#define VRAM_CYCP_PNDR(n)       ((n) & 0x03)
+#define VDP2_VRAM_CYCP_PNDR(n)          ((n) & 0x03)
 
 /* Character pattern name data read */
-#define VRAM_CYCP_CHPNDR(n)     (((n) & 0x03) + 0x04)
+#define VDP2_VRAM_CYCP_CHPNDR(n)        (((n) & 0x03) + 0x04)
 
 /* Vertical cell scroll table data read */
-#define VRAM_CYCP_VCSTDR(n)     (((n) & 0x01) + 0x0C)
+#define VDP2_VRAM_CYCP_VCSTDR(n)        (((n) & 0x01) + 0x0C)
 
-struct vram_cycp_bank {
+struct vdp2_vram_cycp_bank {
         /*
          * General guideline for number of accesses required
          *
@@ -135,17 +135,17 @@ struct vram_cycp_bank {
         };
 } __packed;
 
-struct vram_cycp {
-        struct vram_cycp_bank pt[4];
+struct vdp2_vram_cycp {
+        struct vdp2_vram_cycp_bank pt[4];
 } __packed;
 
-extern void vdp2_vram_control_set(const struct vram_ctl *);
+extern void vdp2_vram_control_set(const struct vdp2_vram_ctl *);
 
-extern void vdp2_vram_cycp_set(const struct vram_cycp *);
+extern void vdp2_vram_cycp_set(const struct vdp2_vram_cycp *);
 extern void vdp2_vram_cycp_clear(void);
 
-extern struct vram_cycp_bank vdp2_vram_cycp_bank_get(uint8_t);
-extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vram_cycp_bank *);
+extern struct vdp2_vram_cycp_bank vdp2_vram_cycp_bank_get(uint8_t);
+extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vdp2_vram_cycp_bank *);
 extern void vdp2_vram_cycp_bank_clear(uint8_t);
 
 #ifdef __cplusplus

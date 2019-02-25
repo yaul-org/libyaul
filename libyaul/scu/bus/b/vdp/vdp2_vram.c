@@ -13,23 +13,23 @@
 #include "vdp-internal.h"
 
 void
-vdp2_vram_control_set(const struct vram_ctl *vram_ctl)
+vdp2_vram_control_set(const struct vdp2_vram_ctl *vram_ctl)
 {
 #ifdef DEBUG
         assert(vram_ctl != NULL);
 
-        assert((vram_ctl->vram_size == VRAM_CTL_SIZE_4MBIT) ||
-               (vram_ctl->vram_size == VRAM_CTL_SIZE_8MBIT));
+        assert((vram_ctl->vram_size == VDP2_VRAM_CTL_SIZE_4MBIT) ||
+               (vram_ctl->vram_size == VDP2_VRAM_CTL_SIZE_8MBIT));
 
         assert((vram_ctl->vram_mode & 0xFC) == 0x00);
 
-        assert((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
-              ((vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_CRAM)));
+        assert((vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
+              ((vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM)));
 #endif /* DEBUG */
 
         /* If the coefficient table is set to be stored in CRAM, the
          * color mode must be 1 */
-        if (vram_ctl->coefficient_table == VRAM_CTL_COEFFICIENT_TABLE_CRAM) {
+        if (vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM) {
                 _state_vdp2()->regs.ramctl |= 0x1000;
         }
 
@@ -47,11 +47,11 @@ vdp2_vram_control_set(const struct vram_ctl *vram_ctl)
         MEMORY_WRITE(16, VDP2(VRSIZE), _state_vdp2()->regs.vrsize);
         MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs.ramctl);
 
-        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl, sizeof(struct vram_ctl));
+        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl, sizeof(struct vdp2_vram_ctl));
 }
 
 void
-vdp2_vram_cycp_set(const struct vram_cycp *vram_cycp)
+vdp2_vram_cycp_set(const struct vdp2_vram_cycp *vram_cycp)
 {
         assert(vram_cycp != NULL);
 
@@ -70,16 +70,16 @@ vdp2_vram_cycp_clear(void)
         vdp2_vram_cycp_bank_clear(3);
 }
 
-struct vram_cycp_bank
+struct vdp2_vram_cycp_bank
 vdp2_vram_cycp_bank_get(uint8_t bank)
 {
         assert((bank >= 0) && (bank <= 3));
 
-        return *(struct vram_cycp_bank *)&_state_vdp2()->regs.cyc[bank];
+        return *(struct vdp2_vram_cycp_bank *)&_state_vdp2()->regs.cyc[bank];
 }
 
 void
-vdp2_vram_cycp_bank_set(uint8_t bank, const struct vram_cycp_bank *cycp_bank)
+vdp2_vram_cycp_bank_set(uint8_t bank, const struct vdp2_vram_cycp_bank *cycp_bank)
 {
         assert((bank >= 0) && (bank <= 3));
 

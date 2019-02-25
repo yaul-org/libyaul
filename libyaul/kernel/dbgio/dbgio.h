@@ -38,8 +38,8 @@ typedef struct {
         uint8_t pnd_bank;
         uint8_t pnd_offset;
 
-        struct vram_cycp_bank cpd_cycp;
-        struct vram_cycp_bank pnd_cycp;
+        struct vdp2_vram_cycp_bank cpd_cycp;
+        struct vdp2_vram_cycp_bank pnd_cycp;
 
         uint8_t cram_index;
 } dbgio_vdp2_t;
