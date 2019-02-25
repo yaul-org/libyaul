@@ -34,8 +34,8 @@ vdp2_cram_offset_set(uint8_t scrn, uint32_t cram_addr)
                (scrn == VDP2_SCRN_RBG1) ||
                (scrn == VDP2_SCRN_SPRITE));
 
-        assert((cram_addr >= CRAM_ADDR(0x000)) &&
-               (cram_addr < CRAM_ADDR(CRAM_SIZE >> 1)));
+        assert((cram_addr >= VDP2_CRAM_ADDR(0x000)) &&
+               (cram_addr < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
 #endif /* DEBUG */
 
         /* Fetch CRAM mode */

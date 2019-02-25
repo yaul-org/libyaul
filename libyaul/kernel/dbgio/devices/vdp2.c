@@ -211,7 +211,7 @@ _init(const dbgio_vdp2_t *params)
             params->pnd_offset * _dev_state->page_size);
 
         _dev_state->cp_table = VDP2_VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
-        _dev_state->color_palette = CRAM_ADDR(params->cram_index << 3);
+        _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
 
         struct vdp2_scrn_cell_format cell_format = {
                 .scf_scroll_screen = params->scrn,
