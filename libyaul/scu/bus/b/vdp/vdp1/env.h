@@ -18,14 +18,14 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define ENV_ROTATION_0  0
-#define ENV_ROTATION_90 1
+#define VDP1_ENV_ROTATION_0  0
+#define VDP1_ENV_ROTATION_90 1
 
-#define ENV_BPP_16      0
-#define ENV_BPP_8       1
+#define VDP1_ENV_BPP_16      0
+#define VDP1_ENV_BPP_8       1
 
-#define ENV_COLOR_MODE_PALETTE          0
-#define ENV_COLOR_MODE_RGB_PALETTE      1
+#define VDP1_ENV_COLOR_MODE_PALETTE     0
+#define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
 struct vdp1_env {
         color_rgb555_t env_erase_color;
