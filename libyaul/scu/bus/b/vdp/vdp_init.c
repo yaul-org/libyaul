@@ -62,9 +62,9 @@ _init_vdp1(void)
         default_env->env_erase_points[0].y = 0;
         default_env->env_erase_points[1].x = 320;
         default_env->env_erase_points[1].y = 224;
-        default_env->env_bpp = ENV_BPP_16;
-        default_env->env_rotation = ENV_ROTATION_0;
-        default_env->env_color_mode = ENV_COLOR_MODE_RGB_PALETTE;
+        default_env->env_bpp = VDP1_ENV_BPP_16;
+        default_env->env_rotation = VDP1_ENV_ROTATION_0;
+        default_env->env_color_mode = VDP1_ENV_COLOR_MODE_RGB_PALETTE;
         default_env->env_sprite_type = 0x0;
 
         vdp1_env_default_set();

@@ -50,7 +50,7 @@ vdp1_env_set(const struct vdp1_env *env)
         uint16_t y3;
         y3 = env->env_erase_points[1].y;
 
-        if (env->env_bpp == ENV_BPP_8) {
+        if (env->env_bpp == VDP1_ENV_BPP_8) {
                 x1 >>= 1;
                 x3 >>= 1;
         }
@@ -92,13 +92,13 @@ _env_assert(const struct vdp1_env *env)
 {
         assert(env != NULL);
 
-        assert((env->env_bpp == ENV_BPP_8) || (env->env_bpp == ENV_BPP_16));
+        assert((env->env_bpp == VDP1_ENV_BPP_8) || (env->env_bpp == VDP1_ENV_BPP_16));
 
-        assert((env->env_rotation == ENV_ROTATION_0) ||
-               (env->env_rotation == ENV_ROTATION_90));
+        assert((env->env_rotation == VDP1_ENV_ROTATION_0) ||
+               (env->env_rotation == VDP1_ENV_ROTATION_90));
 
-        assert((env->env_color_mode == ENV_COLOR_MODE_PALETTE) ||
-               (env->env_color_mode == ENV_COLOR_MODE_RGB_PALETTE));
+        assert((env->env_color_mode == VDP1_ENV_COLOR_MODE_PALETTE) ||
+               (env->env_color_mode == VDP1_ENV_COLOR_MODE_RGB_PALETTE));
 
         _env_erase_assert(env);
 
@@ -107,8 +107,8 @@ _env_assert(const struct vdp1_env *env)
         /* If frame buffer bit-depth is 8, only sprite types 0x8 to 0xF are
          * valid. If frame buffer bit-depth is 16, only sprite types 0x0 to 0x7
          * are valid */
-        assert(((env->env_bpp == ENV_BPP_8) && (env->env_sprite_type >= 0x8)) ||
-               ((env->env_bpp == ENV_BPP_16) && (env->env_sprite_type <= 0x7)));
+        assert(((env->env_bpp == VDP1_ENV_BPP_8) && (env->env_sprite_type >= 0x8)) ||
+               ((env->env_bpp == VDP1_ENV_BPP_16) && (env->env_sprite_type <= 0x7)));
 }
 
 static inline void __always_inline
