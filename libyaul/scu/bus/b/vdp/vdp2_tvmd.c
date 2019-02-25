@@ -40,24 +40,24 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
     uint8_t vertical)
 {
         /* Check interlace values */
-        assert((interlace == TVMD_INTERLACE_NONE) ||
-               (interlace == TVMD_INTERLACE_SINGLE) ||
-               (interlace == TVMD_INTERLACE_DOUBLE));
+        assert((interlace == VDP2_TVMD_INTERLACE_NONE) ||
+               (interlace == VDP2_TVMD_INTERLACE_SINGLE) ||
+               (interlace == VDP2_TVMD_INTERLACE_DOUBLE));
 
         /* Check vertical resolution */
-        assert((vertical == TVMD_VERT_224) ||
-               (vertical == TVMD_VERT_240) ||
-               (vertical == TVMD_VERT_256));
+        assert((vertical == VDP2_TVMD_VERT_224) ||
+               (vertical == VDP2_TVMD_VERT_240) ||
+               (vertical == VDP2_TVMD_VERT_256));
 
         /* Check horizontal resolution */
-        assert((horizontal == TVMD_HORZ_NORMAL_A) ||
-               (horizontal == TVMD_HORZ_NORMAL_B) ||
-               (horizontal == TVMD_HORZ_HIRESO_A) ||
-               (horizontal == TVMD_HORZ_HIRESO_B) ||
-               (horizontal == TVMD_HORZ_NORMAL_AE) ||
-               (horizontal == TVMD_HORZ_NORMAL_BE) ||
-               (horizontal == TVMD_HORZ_HIRESO_AE) ||
-               (horizontal == TVMD_HORZ_HIRESO_BE));
+        assert((horizontal == VDP2_TVMD_HORZ_NORMAL_A) ||
+               (horizontal == VDP2_TVMD_HORZ_NORMAL_B) ||
+               (horizontal == VDP2_TVMD_HORZ_HIRESO_A) ||
+               (horizontal == VDP2_TVMD_HORZ_HIRESO_B) ||
+               (horizontal == VDP2_TVMD_HORZ_NORMAL_AE) ||
+               (horizontal == VDP2_TVMD_HORZ_NORMAL_BE) ||
+               (horizontal == VDP2_TVMD_HORZ_HIRESO_AE) ||
+               (horizontal == VDP2_TVMD_HORZ_HIRESO_BE));
 
         uint32_t sys_clock;
         sys_clock = bios_clock_speed_get();
@@ -68,14 +68,14 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         _state_vdp2()->regs.tvmd &= 0xFFCF;
 
         switch (vertical)  {
-        case TVMD_VERT_224:
+        case VDP2_TVMD_VERT_224:
                 height = 224;
                 break;
-        case TVMD_VERT_240:
+        case VDP2_TVMD_VERT_240:
                 height = 240;
                 _state_vdp2()->regs.tvmd |= 0x0010;
                 break;
-        case TVMD_VERT_256:
+        case VDP2_TVMD_VERT_256:
                 height = 256;
                 _state_vdp2()->regs.tvmd |= 0x0020;
                 break;
@@ -87,12 +87,12 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         _state_vdp2()->regs.tvmd &= 0xFF3F;
 
         switch (interlace)  {
-        case TVMD_INTERLACE_NONE:
+        case VDP2_TVMD_INTERLACE_NONE:
                 break;
-        case TVMD_INTERLACE_SINGLE:
+        case VDP2_TVMD_INTERLACE_SINGLE:
                 _state_vdp2()->regs.tvmd |= 0x0080;
                 break;
-        case TVMD_INTERLACE_DOUBLE:
+        case VDP2_TVMD_INTERLACE_DOUBLE:
                 height *= 2;
                 _state_vdp2()->regs.tvmd |= 0x00C0;
                 break;
@@ -107,44 +107,44 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         _state_vdp2()->regs.tvmd &= 0xFFF0;
 
         switch (horizontal) {
-        case TVMD_HORZ_NORMAL_A:
+        case VDP2_TVMD_HORZ_NORMAL_A:
                 width = 320;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 break;
-        case TVMD_HORZ_NORMAL_B:
+        case VDP2_TVMD_HORZ_NORMAL_B:
                 width = 352;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0001;
                 break;
-        case TVMD_HORZ_HIRESO_A:
+        case VDP2_TVMD_HORZ_HIRESO_A:
                 width = 640;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0002;
                 break;
-        case TVMD_HORZ_HIRESO_B:
+        case VDP2_TVMD_HORZ_HIRESO_B:
                 width = 704;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0003;
                 break;
-        case TVMD_HORZ_NORMAL_AE:
+        case VDP2_TVMD_HORZ_NORMAL_AE:
                 width = 320;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0004;
                 break;
-        case TVMD_HORZ_NORMAL_BE:
+        case VDP2_TVMD_HORZ_NORMAL_BE:
                 width = 352;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0005;
                 break;
-        case TVMD_HORZ_HIRESO_AE:
+        case VDP2_TVMD_HORZ_HIRESO_AE:
                 width = 640;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs.tvmd |= 0x0006;
                 break;
-        case TVMD_HORZ_HIRESO_BE:
+        case VDP2_TVMD_HORZ_HIRESO_BE:
                 width = 704;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;

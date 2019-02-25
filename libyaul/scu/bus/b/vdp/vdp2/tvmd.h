@@ -33,28 +33,28 @@ extern "C" {
  * VBLANK=1 | Vertical sync   |
  *          +-----------------+ */
 
-#define TVMD_TV_STANDARD_NTSC   0
-#define TVMD_TV_STANDARD_PAL    1
+#define VDP2_TVMD_TV_STANDARD_NTSC      0
+#define VDP2_TVMD_TV_STANDARD_PAL       1
 
-#define TVMD_TV_FIELD_SCAN_EVEN 0
-#define TVMD_TV_FIELD_SCAN_ODD  1
+#define VDP2_TVMD_TV_FIELD_SCAN_EVEN    0
+#define VDP2_TVMD_TV_FIELD_SCAN_ODD     1
 
-#define TVMD_INTERLACE_NONE     0
-#define TVMD_INTERLACE_SINGLE   1
-#define TVMD_INTERLACE_DOUBLE   2
+#define VDP2_TVMD_INTERLACE_NONE        0
+#define VDP2_TVMD_INTERLACE_SINGLE      1
+#define VDP2_TVMD_INTERLACE_DOUBLE      2
 
-#define TVMD_VERT_224           0
-#define TVMD_VERT_240           1
-#define TVMD_VERT_256           2
+#define VDP2_TVMD_VERT_224      0
+#define VDP2_TVMD_VERT_240      1
+#define VDP2_TVMD_VERT_256      2
 
-#define TVMD_HORZ_NORMAL_A      0 /* 320x */
-#define TVMD_HORZ_NORMAL_B      1 /* 352x */
-#define TVMD_HORZ_HIRESO_A      2 /* 640x */
-#define TVMD_HORZ_HIRESO_B      3 /* 704x */
-#define TVMD_HORZ_NORMAL_AE     4 /* 320x480 */
-#define TVMD_HORZ_NORMAL_BE     5 /* 352x480 */
-#define TVMD_HORZ_HIRESO_AE     6 /* 640x480 */
-#define TVMD_HORZ_HIRESO_BE     7 /* 704x480 */
+#define VDP2_TVMD_HORZ_NORMAL_A         0 /* 320x */
+#define VDP2_TVMD_HORZ_NORMAL_B         1 /* 352x */
+#define VDP2_TVMD_HORZ_HIRESO_A         2 /* 640x */
+#define VDP2_TVMD_HORZ_HIRESO_B         3 /* 704x */
+#define VDP2_TVMD_HORZ_NORMAL_AE        4 /* 320x480 */
+#define VDP2_TVMD_HORZ_NORMAL_BE        5 /* 352x480 */
+#define VDP2_TVMD_HORZ_HIRESO_AE        6 /* 640x480 */
+#define VDP2_TVMD_HORZ_HIRESO_BE        7 /* 704x480 */
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_in(void)
