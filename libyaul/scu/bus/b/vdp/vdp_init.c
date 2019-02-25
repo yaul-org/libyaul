@@ -80,20 +80,20 @@ _init_vdp2(void)
 
         vdp2_tvmd_display_clear();
 
-        vdp2_scrn_scroll_x_set(SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_y_set(SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_x_set(SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_x_set(SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_y_set(SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_x_set(SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(SCRN_NBG1, F16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG0, F16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG0, F16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG2, F16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG2, F16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
 
-        vdp2_scrn_priority_set(SCRN_NBG0, 1);
-        vdp2_scrn_priority_set(SCRN_NBG1, 1);
-        vdp2_scrn_priority_set(SCRN_NBG2, 1);
-        vdp2_scrn_priority_set(SCRN_NBG3, 1);
-        vdp2_scrn_priority_set(SCRN_RBG0, 1);
+        vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
+        vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);
+        vdp2_scrn_priority_set(VDP2_SCRN_NBG2, 1);
+        vdp2_scrn_priority_set(VDP2_SCRN_NBG3, 1);
+        vdp2_scrn_priority_set(VDP2_SCRN_RBG0, 1);
 
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
@@ -104,11 +104,11 @@ _init_vdp2(void)
         vdp2_sprite_priority_set(6, 0);
         vdp2_sprite_priority_set(7, 0);
 
-        vdp2_scrn_reduction_x_set(SCRN_NBG0, Q0_3_8(1.0f));
-        vdp2_scrn_reduction_y_set(SCRN_NBG0, Q0_3_8(1.0f));
+        vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
+        vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
 
-        vdp2_scrn_reduction_x_set(SCRN_NBG1, Q0_3_8(1.0f));
-        vdp2_scrn_reduction_y_set(SCRN_NBG1, Q0_3_8(1.0f));
+        vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
+        vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
 
         const struct vdp2_vram_ctl vram_ctl = {
                 .vram_size = VDP2_VRAM_CTL_SIZE_4MBIT,

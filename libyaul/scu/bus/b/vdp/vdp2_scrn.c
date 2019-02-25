@@ -14,69 +14,69 @@
 #include "vdp-internal.h"
 
 #ifdef DEBUG
-static void _debug_check_cell(const struct scrn_cell_format *);
+static void _debug_check_cell(const struct vdp2_scrn_cell_format *);
 #endif /* DEBUG */
 
-static void _cell_plane_calc(const struct scrn_cell_format *, uint16_t *,
+static void _cell_plane_calc(const struct vdp2_scrn_cell_format *, uint16_t *,
     uint16_t *);
 static uint16_t _cell_pattern_name_control_calc(
-    const struct scrn_cell_format *);
+    const struct vdp2_scrn_cell_format *);
 
-static void _nbg0_scrn_cell_format_set(const struct scrn_cell_format *);
-static void _nbg1_scrn_cell_format_set(const struct scrn_cell_format *);
-static void _nbg2_scrn_cell_format_set(const struct scrn_cell_format *);
-static void _nbg3_scrn_cell_format_set(const struct scrn_cell_format *);
-static void _rbg0_scrn_cell_format_set(const struct scrn_cell_format *);
+static void _nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+static void _nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+static void _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+static void _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+static void _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
 
 #ifdef DEBUG
-static void _debug_check_bitmap(const struct scrn_bitmap_format *);
+static void _debug_check_bitmap(const struct vdp2_scrn_bitmap_format *);
 #endif /* DEBUG */
 
-static void _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
-static void _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
-static void _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *);
+static void _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+static void _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+static void _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
 
 void
-vdp2_scrn_cell_format_set(const struct scrn_cell_format *format)
+vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
         _debug_check_cell(format);
 #endif /* DEBUG */
 
         switch (format->scf_scroll_screen) {
-        case SCRN_NBG0:
+        case VDP2_SCRN_NBG0:
                 _nbg0_scrn_cell_format_set(format);
                 break;
-        case SCRN_NBG1:
+        case VDP2_SCRN_NBG1:
                 _nbg1_scrn_cell_format_set(format);
                 break;
-        case SCRN_NBG2:
+        case VDP2_SCRN_NBG2:
                 _nbg2_scrn_cell_format_set(format);
                 break;
-        case SCRN_NBG3:
+        case VDP2_SCRN_NBG3:
                 _nbg3_scrn_cell_format_set(format);
                 break;
-        case SCRN_RBG0:
+        case VDP2_SCRN_RBG0:
                 _rbg0_scrn_cell_format_set(format);
                break;
         }
 }
 
 void
-vdp2_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 {
 #ifdef DEBUG
         _debug_check_bitmap(format);
 #endif /* DEBUG */
 
         switch (format->sbf_scroll_screen) {
-        case SCRN_NBG0:
+        case VDP2_SCRN_NBG0:
                 _nbg0_scrn_bitmap_format_set(format);
                 break;
-        case SCRN_NBG1:
+        case VDP2_SCRN_NBG1:
                 _nbg1_scrn_bitmap_format_set(format);
                 break;
-        case SCRN_RBG0:
+        case VDP2_SCRN_RBG0:
                 _rbg0_scrn_bitmap_format_set(format);
                 break;
         }
@@ -84,24 +84,24 @@ vdp2_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 
 #ifdef DEBUG
 static void
-_debug_check_bitmap(const struct scrn_bitmap_format *format)
+_debug_check_bitmap(const struct vdp2_scrn_bitmap_format *format)
 {
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->sbf_scroll_screen == SCRN_NBG0) ||
-               (format->sbf_scroll_screen == SCRN_NBG1) ||
-               (format->sbf_scroll_screen == SCRN_RBG0));
+        assert((format->sbf_scroll_screen == VDP2_SCRN_NBG0) ||
+               (format->sbf_scroll_screen == VDP2_SCRN_NBG1) ||
+               (format->sbf_scroll_screen == VDP2_SCRN_RBG0));
 
         /* assert that the lead address to the color palette in CRAM is
          * on a 20-byte boundary */
         assert((format->sbf_color_palette & 0x1F) == 0x00);
 
-        assert((format->sbf_cc_count == SCRN_CCC_PALETTE_16) ||
-               (format->sbf_cc_count == SCRN_CCC_PALETTE_256) ||
-               (format->sbf_cc_count == SCRN_CCC_PALETTE_2048) ||
-               (format->sbf_cc_count == SCRN_CCC_RGB_32768) ||
-               (format->sbf_cc_count == SCRN_CCC_RGB_16770000));
+        assert((format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
+               (format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_2048) ||
+               (format->sbf_cc_count == VDP2_SCRN_CCC_RGB_32768) ||
+               (format->sbf_cc_count == VDP2_SCRN_CCC_RGB_16770000));
 
         assert((format->sbf_bitmap_size.width == 512) ||
                (format->sbf_bitmap_size.width == 1024));
@@ -112,7 +112,7 @@ _debug_check_bitmap(const struct scrn_bitmap_format *format)
 #endif /* DEBUG */
 
 static void
-_nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+_nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 {
         _state_vdp2()->regs.chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
         _state_vdp2()->regs.mpofn &= 0xFFF8;       /* Bits 0,1,2 */
@@ -156,8 +156,8 @@ _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
          * For 16-colors, there are 128 possible banks, but only 8 are
          * available (the lower 4- bits of the palette number is 0). */
         switch (format->sbf_cc_count) {
-        case SCRN_CCC_PALETTE_16:
-        case SCRN_CCC_PALETTE_256:
+        case VDP2_SCRN_CCC_PALETTE_16:
+        case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpna |= palette_number;
                 break;
         }
@@ -171,7 +171,7 @@ _nbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 }
 
 static void
-_nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+_nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 {
         _state_vdp2()->regs.chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
         _state_vdp2()->regs.mpofn &= 0xFF8F;       /* Bits 4,5,6 */
@@ -207,8 +207,8 @@ _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 
         /* Supplementary palette number */
         switch (format->sbf_cc_count) {
-        case SCRN_CCC_PALETTE_16:
-        case SCRN_CCC_PALETTE_256:
+        case VDP2_SCRN_CCC_PALETTE_16:
+        case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpna |= palette_number << 8;
                 break;
         }
@@ -222,7 +222,7 @@ _nbg1_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 }
 
 static void
-_rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
+_rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 {
 #ifdef DEBUG
         assert((format->sbf_bitmap_size.width > 0) &&
@@ -269,8 +269,8 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 
         /* Supplementary palette number */
         switch (format->sbf_cc_count) {
-        case SCRN_CCC_PALETTE_16:
-        case SCRN_CCC_PALETTE_256:
+        case VDP2_SCRN_CCC_PALETTE_16:
+        case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpnb |= palette_number;
                 break;
         }
@@ -302,16 +302,16 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
         bitmap_size = pixel_count;
 
         switch (format->sbf_cc_count) {
-        case SCRN_CCC_PALETTE_16:
+        case VDP2_SCRN_CCC_PALETTE_16:
                 bitmap_size >>= 1;
                 break;
-        case SCRN_CCC_PALETTE_256:
+        case VDP2_SCRN_CCC_PALETTE_256:
                 break;
-        case SCRN_CCC_PALETTE_2048:
-        case SCRN_CCC_RGB_32768:
+        case VDP2_SCRN_CCC_PALETTE_2048:
+        case VDP2_SCRN_CCC_RGB_32768:
                 bitmap_size <<= 1;
                 break;
-        case SCRN_CCC_RGB_16770000:
+        case VDP2_SCRN_CCC_RGB_16770000:
                 bitmap_size <<= 2;
                 break;
         }
@@ -336,17 +336,17 @@ _rbg0_scrn_bitmap_format_set(const struct scrn_bitmap_format *format)
 
 #ifdef DEBUG
 static void
-_debug_check_cell(const struct scrn_cell_format *format)
+_debug_check_cell(const struct vdp2_scrn_cell_format *format)
 {
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->scf_scroll_screen == SCRN_NBG0) ||
-               (format->scf_scroll_screen == SCRN_RBG1) ||
-               (format->scf_scroll_screen == SCRN_NBG1) ||
-               (format->scf_scroll_screen == SCRN_NBG2) ||
-               (format->scf_scroll_screen == SCRN_NBG3) ||
-               (format->scf_scroll_screen == SCRN_RBG0));
+        assert((format->scf_scroll_screen == VDP2_SCRN_NBG0) ||
+               (format->scf_scroll_screen == VDP2_SCRN_RBG1) ||
+               (format->scf_scroll_screen == VDP2_SCRN_NBG1) ||
+               (format->scf_scroll_screen == VDP2_SCRN_NBG2) ||
+               (format->scf_scroll_screen == VDP2_SCRN_NBG3) ||
+               (format->scf_scroll_screen == VDP2_SCRN_RBG0));
 
         /* Assert that the lead address to character pattern table in
          * VRAM is on a 20-byte boundary */
@@ -356,9 +356,9 @@ _debug_check_cell(const struct scrn_cell_format *format)
          * on a 20-byte boundary */
         assert((format->scf_color_palette & 0x1F) == 0x00);
 
-        assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == SCRN_CCC_PALETTE_256) ||
-               (format->scf_cc_count == SCRN_CCC_PALETTE_2048));
+        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
+               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_2048));
 
         /* Check the character number supplement mode */
         assert((format->scf_auxiliary_mode == 0) ||
@@ -382,25 +382,25 @@ _debug_check_cell(const struct scrn_cell_format *format)
          * of the plane. For example, if NBG0 is configured to use 2x2
          * cells, the dimensions of its page(s) will be 32x32 cells
          * (0x800 bytes). */
-        assert((format->scf_map.plane_a & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_b & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_c & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_d & (SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_a & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_b & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_c & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->scf_map.plane_d & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
 }
 #endif /* DEBUG */
 
 static void
 _cell_plane_calc(
-        const struct scrn_cell_format *format,
+        const struct vdp2_scrn_cell_format *format,
         uint16_t *planes,
         uint16_t *map_offset)
 {
         uint16_t plane_count;
-        plane_count = ((format->scf_scroll_screen == SCRN_RBG0) ||
-                       (format->scf_scroll_screen == SCRN_RBG1)) ? 16 : 4;
+        plane_count = ((format->scf_scroll_screen == VDP2_SCRN_RBG0) ||
+                       (format->scf_scroll_screen == VDP2_SCRN_RBG1)) ? 16 : 4;
 
         uint16_t page_size;
-        page_size = SCRN_CALCULATE_PAGE_SIZE(format);
+        page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
 
         uint32_t i;
         for (i = 0; i < plane_count; i++) {
@@ -422,7 +422,7 @@ _cell_plane_calc(
 }
 
 static uint16_t
-_cell_pattern_name_control_calc(const struct scrn_cell_format *format)
+_cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
 {
         uint16_t pncnx;
         pncnx = 0x0000;
@@ -440,10 +440,10 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
         sp_number = 0;
 
         uint16_t character_number;
-        character_number = CHARACTER_NUMBER(format->scf_cp_table);
+        character_number = VDP2_SCRN_PND_CHARACTER_NUM(format->scf_cp_table);
 
         uint16_t palette_number;
-        palette_number = PALETTE_NUMBER(format->scf_color_palette);
+        palette_number = VDP2_SCRN_PND_PALETTE_NUM(format->scf_color_palette);
 
         switch (format->scf_pnd_size) {
         case 1:
@@ -458,11 +458,11 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
 #endif /* DEBUG */
 
                 switch (format->scf_cc_count) {
-                case SCRN_CCC_PALETTE_16:
+                case VDP2_SCRN_CCC_PALETTE_16:
                         sp_number = ((palette_number & 0x0070) >> 4) << 5;
                         break;
-                case SCRN_CCC_PALETTE_256:
-                case SCRN_CCC_PALETTE_2048:
+                case VDP2_SCRN_CCC_PALETTE_256:
+                case VDP2_SCRN_CCC_PALETTE_2048:
                 default:
                         sp_number = 0x0000;
                         break;
@@ -522,7 +522,7 @@ _cell_pattern_name_control_calc(const struct scrn_cell_format *format)
 }
 
 static void
-_nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
+_nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
         _state_vdp2()->regs.chctla &= 0xFF8F;
         _state_vdp2()->regs.chctla &= 0xFFFE;
@@ -563,7 +563,7 @@ _nbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
 }
 
 static void
-_nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
+_nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
         _state_vdp2()->regs.chctla &= 0xCFFF;
         _state_vdp2()->regs.chctla &= 0xFEFF;
@@ -604,11 +604,11 @@ _nbg1_scrn_cell_format_set(const struct scrn_cell_format *format)
 }
 
 static void
-_nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
+_nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
-        assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == SCRN_CCC_PALETTE_256));
+        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0xFFFD;
@@ -650,11 +650,11 @@ _nbg2_scrn_cell_format_set(const struct scrn_cell_format *format)
 }
 
 static void
-_nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
+_nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
-        assert((format->scf_cc_count == SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == SCRN_CCC_PALETTE_256));
+        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0xFFDF;
@@ -696,7 +696,7 @@ _nbg3_scrn_cell_format_set(const struct scrn_cell_format *format)
 }
 
 static void
-_rbg0_scrn_cell_format_set(const struct scrn_cell_format *format)
+_rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
         assert((format->scf_rp_mode == 0) ||

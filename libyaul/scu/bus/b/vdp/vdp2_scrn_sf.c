@@ -16,16 +16,16 @@ vdp2_scrn_sf_codes_set(uint8_t code, uint8_t codes)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
-        assert((code == SCRN_SF_CODE_A) ||
-               (code == SCRN_SF_CODE_B));
+        assert((code == VDP2_SCRN_SF_CODE_A) ||
+               (code == VDP2_SCRN_SF_CODE_B));
 #endif /* DEBUG */
 
         switch (code) {
-        case SCRN_SF_CODE_A:
+        case VDP2_SCRN_SF_CODE_A:
                 _state_vdp2()->regs.sfcode &= 0xFF00;
                 _state_vdp2()->regs.sfcode |= (uint16_t)codes;
                 break;
-        case SCRN_SF_CODE_B:
+        case VDP2_SCRN_SF_CODE_B:
                 _state_vdp2()->regs.sfcode &= 0x00FF;
                 _state_vdp2()->regs.sfcode |= (uint16_t)codes << 8;
                 break;
