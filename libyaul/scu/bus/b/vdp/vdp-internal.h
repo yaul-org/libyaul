@@ -78,7 +78,7 @@ struct state_vdp2 {
                 struct dma_reg_buffer reg_buffer;
         } commit;
 
-        struct vram_ctl vram_ctl;
+        struct vdp2_vram_ctl vram_ctl;
 
         union {
                 uint16_t buffer[144];

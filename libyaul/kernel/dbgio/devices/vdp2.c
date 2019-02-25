@@ -108,24 +108,24 @@ static const dbgio_vdp2_t _default_params = {
         .pnd_offset = 2,
 
         .cpd_cycp = {
-                .t0 = VRAM_CYCP_PNDR_NBG3,
-                .t1 = VRAM_CYCP_NO_ACCESS,
-                .t2 = VRAM_CYCP_NO_ACCESS,
-                .t3 = VRAM_CYCP_NO_ACCESS,
-                .t4 = VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VRAM_CYCP_NO_ACCESS,
-                .t6 = VRAM_CYCP_NO_ACCESS,
-                .t7 = VRAM_CYCP_NO_ACCESS
+                .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
+                .t1 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t2 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t3 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
+                .t5 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t6 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t7 = VDP2_VRAM_CYCP_NO_ACCESS
         },
         .pnd_cycp = {
-                .t0 = VRAM_CYCP_PNDR_NBG3,
-                .t1 = VRAM_CYCP_NO_ACCESS,
-                .t2 = VRAM_CYCP_NO_ACCESS,
-                .t3 = VRAM_CYCP_NO_ACCESS,
-                .t4 = VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VRAM_CYCP_NO_ACCESS,
-                .t6 = VRAM_CYCP_NO_ACCESS,
-                .t7 = VRAM_CYCP_NO_ACCESS
+                .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
+                .t1 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t2 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t3 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
+                .t5 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t6 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t7 = VDP2_VRAM_CYCP_NO_ACCESS
         },
 
         .cram_index = 0
@@ -181,7 +181,7 @@ _init(const dbgio_vdp2_t *params)
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
         /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
          *      bank size */
-        assert(params->cpd_offset < VRAM_4SPLIT_BANK_SIZE_4MBIT);
+        assert(params->cpd_offset < VDP2_VRAM_BSIZE_4_4MBIT);
 
         assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
         /* XXX: Determine the page size and check against the number of
@@ -207,10 +207,10 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->page_height = SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
 
         /* One page per plane */
-        _dev_state->page_base = VRAM_ADDR_4MBIT(params->pnd_bank,
+        _dev_state->page_base = VDP2_VRAM_ADDR_4MBIT(params->pnd_bank,
             params->pnd_offset * _dev_state->page_size);
 
-        _dev_state->cp_table = VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
+        _dev_state->cp_table = VDP2_VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
         _dev_state->color_palette = CRAM_ADDR(params->cram_index << 3);
 
         struct scrn_cell_format cell_format = {
