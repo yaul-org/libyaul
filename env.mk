@@ -45,14 +45,16 @@ endif
 
 SH_ARCH:= sh-elf
 
-SH_AS:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
-SH_AR:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
-SH_CC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_CXX:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
-SH_LD:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_NM:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
-SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
+RTAGS_RC:= $(YAUL_BUILD_ROOT)/.rtags/rc
+
+SH_AS:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
+SH_AR:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
+SH_CC:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_CXX:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
+SH_LD:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_NM:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
 	-pedantic \
@@ -68,10 +70,15 @@ SH_CFLAGS_shared:= \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses \
-	-save-temps=obj \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
+
+# Clang (RTags) has a problem with -save-temps
+ifeq ($(strip $(YAUL_RTAGS)),)
+SH_CFLAGS_shared:= $(SH_CFLAGS_shared) \
+	-save-temps=obj
+endif
 
 SH_CFLAGS:= \
 	-std=c11 \
@@ -99,19 +106,17 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CC) -Wp,-MMD,$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CFLAGS_$1) \
-		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
-		-c $< -o $@
-	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
+		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
+		-c $(abspath $(<)) -o $@
 endef
 
 define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CXX) -Wp,-MMD,$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d $(SH_CXXFLAGS_$1) \
-		$(foreach dir,$(INCLUDE_DIRS),-I./$(dir)) \
-		-c $< -o $@
-	$(ECHO)$(SED) -i -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d
+	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
+		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
+		-c $(abspath $(<)) -o $@
 endef
 
 define macro-sh-build-library
