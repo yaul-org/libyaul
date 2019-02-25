@@ -63,10 +63,10 @@ _set_back_screen(uint32_t vram, const color_rgb555_t *buffer, bool single_color,
         _state_vdp2()->regs.tvmd &= 0x7EFF;
         _state_vdp2()->regs.tvmd |= 0x8100;
 
-        struct dma_xfer *xfer;
+        struct scu_dma_xfer *xfer;
         xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
 
         xfer->len = count * sizeof(color_rgb555_t);
         xfer->dst = vram;
-        xfer->src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)buffer;
+        xfer->src = SCU_DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)buffer;
 }

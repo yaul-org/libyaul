@@ -74,8 +74,8 @@ struct state_vdp2 {
         } nbg3;
 
         struct {
-                struct dma_xfer xfer_table[3] __aligned(4 * 16);
-                struct dma_reg_buffer reg_buffer;
+                struct scu_dma_xfer xfer_table[3] __aligned(4 * 16);
+                struct scu_dma_reg_buffer reg_buffer;
         } commit;
 
         struct vdp2_vram_ctl vram_ctl;

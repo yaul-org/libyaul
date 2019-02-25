@@ -61,8 +61,8 @@ static volatile union {
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
 /* VDP1 SCU-DMA state */
-static struct dma_level_cfg _vdp1_dma_cfg;
-static struct dma_reg_buffer _vdp1_dma_reg_buffer;
+static struct scu_dma_level_cfg _vdp1_dma_cfg;
+static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer;
 
 static struct {
         void (*callback)(void *);
@@ -122,7 +122,7 @@ vdp_sync(int16_t interval __unused)
 
         vdp1_sync_draw_wait();
 
-        struct dma_reg_buffer *reg_buffer;
+        struct scu_dma_reg_buffer *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         int8_t ret;
@@ -244,12 +244,12 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         uint32_t xfer_src;
         xfer_src = CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts;
 
-        _vdp1_dma_cfg.dlc_mode = DMA_MODE_DIRECT;
+        _vdp1_dma_cfg.dlc_mode = SCU_DMA_MODE_DIRECT;
         _vdp1_dma_cfg.dlc_xfer.direct.len = xfer_len;
         _vdp1_dma_cfg.dlc_xfer.direct.dst = xfer_dst;
         _vdp1_dma_cfg.dlc_xfer.direct.src = xfer_src;
-        _vdp1_dma_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
-        _vdp1_dma_cfg.dlc_update = DMA_UPDATE_NONE;
+        _vdp1_dma_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
+        _vdp1_dma_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
 
         scu_dma_config_buffer(&_vdp1_dma_reg_buffer, &_vdp1_dma_cfg);
 
@@ -371,7 +371,7 @@ _init_vdp1(void)
 static void
 _init_vdp2(void)
 {
-        struct dma_xfer *xfer;
+        struct scu_dma_xfer *xfer;
 
         /* Write VDP2(TVMD) first */
         xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
@@ -396,14 +396,14 @@ _init_vdp2(void)
         xfer->dst = 0x00000000;
         xfer->src = 0x00000000;
 
-        struct dma_level_cfg dma_level_cfg = {
-                .dlc_mode = DMA_MODE_INDIRECT,
+        struct scu_dma_level_cfg dma_level_cfg = {
+                .dlc_mode = SCU_DMA_MODE_INDIRECT,
                 .dlc_xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
-                .dlc_stride = DMA_STRIDE_2_BYTES,
-                .dlc_update = DMA_UPDATE_NONE
+                .dlc_stride = SCU_DMA_STRIDE_2_BYTES,
+                .dlc_update = SCU_DMA_UPDATE_NONE
         };
 
-        struct dma_reg_buffer *reg_buffer;
+        struct scu_dma_reg_buffer *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);

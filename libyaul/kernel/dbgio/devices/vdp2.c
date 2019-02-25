@@ -35,7 +35,7 @@
 #define STATE_BUFFER_FORCE_FLUSHING     0x20
 
 typedef struct {
-        struct dma_reg_buffer dma_reg_buffer;
+        struct scu_dma_reg_buffer dma_reg_buffer;
 
         /* Base CPD VRAM address */
         uint32_t cp_table;
@@ -150,9 +150,9 @@ _init(const dbgio_vdp2_t *params)
 {
         struct {
                 /* Holds transfers for font CPD and PAL */
-                struct dma_xfer xfer_tbl[2];
+                struct scu_dma_xfer xfer_tbl[2];
 
-                struct dma_reg_buffer reg_buffer;
+                struct scu_dma_reg_buffer reg_buffer;
         } *dma_font;
 
         static const cons_ops_t cons_ops = {
@@ -253,7 +253,7 @@ _init(const dbgio_vdp2_t *params)
         _font_1bpp_4bpp_decompress(dec_cpd, params->font_cpd, params->font_fg,
             params->font_bg);
 
-        struct dma_level_cfg dma_level_cfg;
+        struct scu_dma_level_cfg dma_level_cfg;
 
         /* Align to a 32-byte boundary */
         /* XXX: Refactor { */
@@ -267,10 +267,10 @@ _init(const dbgio_vdp2_t *params)
         dma_font = (void *)((uint32_t)aligned + aligned_offset);
         /* } */
 
-        dma_level_cfg.dlc_mode = DMA_MODE_INDIRECT;
+        dma_level_cfg.dlc_mode = SCU_DMA_MODE_INDIRECT;
         dma_level_cfg.dlc_xfer.indirect = &dma_font->xfer_tbl[0];
-        dma_level_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
-        dma_level_cfg.dlc_update = DMA_UPDATE_NONE;
+        dma_level_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
+        dma_level_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
 
         /* Font CPD */
         dma_font->xfer_tbl[0].len = FONT_4BPP_SIZE;
@@ -280,7 +280,7 @@ _init(const dbgio_vdp2_t *params)
         /* Font PAL */
         dma_font->xfer_tbl[1].len = FONT_COLOR_COUNT * sizeof(color_rgb555_t);
         dma_font->xfer_tbl[1].dst = _dev_state->color_palette;
-        dma_font->xfer_tbl[1].src = DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
+        dma_font->xfer_tbl[1].src = SCU_DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
         scu_dma_config_buffer(&dma_font->reg_buffer, &dma_level_cfg);
 
@@ -290,12 +290,12 @@ _init(const dbgio_vdp2_t *params)
         assert(ret == 0);
 
         /* 64x32 page PND */
-        dma_level_cfg.dlc_mode = DMA_MODE_DIRECT;
+        dma_level_cfg.dlc_mode = SCU_DMA_MODE_DIRECT;
         dma_level_cfg.dlc_xfer.direct.len = _dev_state->page_size;
         dma_level_cfg.dlc_xfer.direct.dst = (uint32_t)_dev_state->page_base;
         dma_level_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&_dev_state->page_pnd[0];
-        dma_level_cfg.dlc_stride = DMA_STRIDE_2_BYTES;
-        dma_level_cfg.dlc_update = DMA_UPDATE_NONE;
+        dma_level_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
+        dma_level_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
 
         scu_dma_config_buffer(&_dev_state->dma_reg_buffer, &dma_level_cfg);
 

@@ -32,7 +32,7 @@
 struct dma_queue {
         struct dma_queue_request {
                 uint8_t tag;
-                struct dma_reg_buffer reg_buffer;
+                struct scu_dma_reg_buffer reg_buffer;
 
                 void (*handler)(const struct dma_queue_transfer *);
                 struct dma_queue_transfer transfer;
@@ -47,7 +47,7 @@ struct dma_queue {
 
 static void _update_dma_request_pointers(const struct dma_queue_request *);
 static void _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *);
-static void _copy_dma_reg_buffer(struct dma_reg_buffer *, const struct dma_reg_buffer *);
+static void _copy_dma_reg_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_reg_buffer *);
 
 static void _default_handler(const struct dma_queue_transfer *);
 
@@ -94,7 +94,7 @@ dma_queue_init(void)
 }
 
 int8_t
-dma_queue_enqueue(const struct dma_reg_buffer *reg_buffer, uint8_t tag, void (*handler)(const struct dma_queue_transfer *), void *work)
+dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer, uint8_t tag, void (*handler)(const struct dma_queue_transfer *), void *work)
 {
         assert(reg_buffer != NULL);
 
@@ -310,12 +310,12 @@ _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *
 
         dma_queue->busy = true;
 
-        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, DMA_START_FACTOR_ENABLE, &request->reg_buffer, _dma_handler);
+        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE, &request->reg_buffer, _dma_handler);
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
 static inline void __always_inline
-_copy_dma_reg_buffer(struct dma_reg_buffer *dst_buffer, const struct dma_reg_buffer *src_buffer)
+_copy_dma_reg_buffer(struct scu_dma_reg_buffer *dst_buffer, const struct scu_dma_reg_buffer *src_buffer)
 {
         uint32_t *dst;
         dst = &dst_buffer->buffer[0];

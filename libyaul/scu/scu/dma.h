@@ -47,60 +47,60 @@ extern "C" {
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
-#define DMA_MODE_DIRECT         0x00
-#define DMA_MODE_INDIRECT       0x01
+#define SCU_DMA_MODE_DIRECT     0x00
+#define SCU_DMA_MODE_INDIRECT   0x01
 
-#define DMA_START_FACTOR_VBLANK_IN              0x00
-#define DMA_START_FACTOR_VBLANK_OUT             0x01
-#define DMA_START_FACTOR_HBLANK_IN              0x02
-#define DMA_START_FACTOR_TIMER_0                0x03
-#define DMA_START_FACTOR_TIMER_1                0x04
-#define DMA_START_FACTOR_SOUND_REQ              0x05
-#define DMA_START_FACTOR_SPRITE_DRAW_END        0x06
-#define DMA_START_FACTOR_ENABLE                 0x07
+#define SCU_DMA_START_FACTOR_VBLANK_IN          0x00
+#define SCU_DMA_START_FACTOR_VBLANK_OUT         0x01
+#define SCU_DMA_START_FACTOR_HBLANK_IN          0x02
+#define SCU_DMA_START_FACTOR_TIMER_0            0x03
+#define SCU_DMA_START_FACTOR_TIMER_1            0x04
+#define SCU_DMA_START_FACTOR_SOUND_REQ          0x05
+#define SCU_DMA_START_FACTOR_SPRITE_DRAW_END    0x06
+#define SCU_DMA_START_FACTOR_ENABLE             0x07
 
-#define DMA_STRIDE_0_BYTES      0x00
-#define DMA_STRIDE_2_BYTES      0x01
-#define DMA_STRIDE_4_BYTES      0x02
-#define DMA_STRIDE_8_BYTES      0x03
-#define DMA_STRIDE_16_BYTES     0x04
-#define DMA_STRIDE_32_BYTES     0x05
-#define DMA_STRIDE_64_BYTES     0x06
-#define DMA_STRIDE_128_BYTES    0x07
+#define SCU_DMA_STRIDE_0_BYTES          0x00
+#define SCU_DMA_STRIDE_2_BYTES          0x01
+#define SCU_DMA_STRIDE_4_BYTES          0x02
+#define SCU_DMA_STRIDE_8_BYTES          0x03
+#define SCU_DMA_STRIDE_16_BYTES         0x04
+#define SCU_DMA_STRIDE_32_BYTES         0x05
+#define SCU_DMA_STRIDE_64_BYTES         0x06
+#define SCU_DMA_STRIDE_128_BYTES        0x07
 
-#define DMA_UPDATE_NONE 0x00000000
-#define DMA_UPDATE_RUP  0x00010000
-#define DMA_UPDATE_WUP  0x00000100
+#define SCU_DMA_UPDATE_NONE     0x00000000
+#define SCU_DMA_UPDATE_RUP      0x00010000
+#define SCU_DMA_UPDATE_WUP      0x00000100
 
-#define DMA_INDIRECT_TBL_END 0x80000000
+#define SCU_DMA_INDIRECT_TBL_END        0x80000000
 
-#define DMA_BUS_A       0x00
-#define DMA_BUS_B       0x01
-#define DMA_BUS_DSP     0x02
+#define SCU_DMA_BUS_A   0x00
+#define SCU_DMA_BUS_B   0x01
+#define SCU_DMA_BUS_DSP 0x02
 
-#define DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                          \
+#define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                      \
         .len = (_len),                                                         \
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
 
-#define DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                      \
+#define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
         .len = DMA_INDIRECT_TBL_END | (_len),                                  \
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
 
-struct dma_reg_buffer {
+struct scu_dma_reg_buffer {
         uint32_t buffer[5];
 } __packed __aligned(4);
 
-struct dma_xfer {
+struct scu_dma_xfer {
         uint32_t len;
         uint32_t dst;
         uint32_t src;
 } __packed;
 
-struct dma_level_cfg {
+struct scu_dma_level_cfg {
         uint8_t dlc_mode;
 
         union {
@@ -108,7 +108,7 @@ struct dma_level_cfg {
                 void *indirect;
 
                 /* Direct mode */
-                struct dma_xfer direct;
+                struct scu_dma_xfer direct;
         } dlc_xfer;
 
         uint8_t dlc_stride;
@@ -375,8 +375,8 @@ scu_dma_level_end_set(uint8_t level, void (*ihr)(void))
 }
 
 extern void scu_dma_init(void);
-extern void scu_dma_config_buffer(struct dma_reg_buffer *, const struct dma_level_cfg *);
-extern void scu_dma_config_set(uint8_t, uint8_t, const struct dma_reg_buffer *, void (*)(void));
+extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_level_cfg *);
+extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
 extern int8_t scu_dma_level_unused_get(void);
 
 #ifdef __cplusplus
