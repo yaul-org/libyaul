@@ -20,7 +20,7 @@ struct dma_regs {
         uint32_t dnmd;
 } __packed __aligned(4);
 
-static_assert(sizeof(struct dma_regs) == sizeof(struct dma_reg_buffer));
+static_assert(sizeof(struct dma_regs) == sizeof(struct scu_dma_reg_buffer));
 
 void
 scu_dma_init(void)
@@ -44,8 +44,8 @@ scu_dma_init(void)
 }
 
 void
-scu_dma_config_buffer(struct dma_reg_buffer *reg_buffer,
-    const struct dma_level_cfg *cfg)
+scu_dma_config_buffer(struct scu_dma_reg_buffer *reg_buffer,
+    const struct scu_dma_level_cfg *cfg)
 {
         assert(cfg != NULL);
 
@@ -58,7 +58,7 @@ scu_dma_config_buffer(struct dma_reg_buffer *reg_buffer,
         regs->dnmd &= ~0x01010107;
 
         switch (cfg->dlc_mode & 0x01) {
-        case DMA_MODE_DIRECT:
+        case SCU_DMA_MODE_DIRECT:
                 assert(cfg->dlc_xfer.direct.len != 0x00000000);
                 assert(cfg->dlc_xfer.direct.dst != 0x00000000);
                 assert(cfg->dlc_xfer.direct.src != 0x00000000);
@@ -73,7 +73,7 @@ scu_dma_config_buffer(struct dma_reg_buffer *reg_buffer,
                  * Level 2 is able to transfer 4KiB */
                 regs->dnc = cfg->dlc_xfer.direct.len;
                 break;
-        case DMA_MODE_INDIRECT:
+        case SCU_DMA_MODE_INDIRECT:
                 assert(cfg->dlc_xfer.indirect != NULL);
 
                 /* The absolute address must not be cached */
@@ -93,7 +93,7 @@ scu_dma_config_buffer(struct dma_reg_buffer *reg_buffer,
 
 void
 scu_dma_config_set(uint8_t level, uint8_t start_factor,
-    const struct dma_reg_buffer *reg_buffer, void (*ihr)(void))
+    const struct scu_dma_reg_buffer *reg_buffer, void (*ihr)(void))
 {
         assert(reg_buffer != NULL);
 
