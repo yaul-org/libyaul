@@ -481,6 +481,9 @@ extern void vdp2_scrn_display_clear(void);
 extern void vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *);
 
 extern void vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *);
+extern void vdp2_scrn_vcs_unset(uint8_t);
+extern void vdp2_scrn_vcs_clear(void);
+
 
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
