@@ -17,7 +17,8 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
                (scrn == VDP2_SCRN_NBG1) ||
                (scrn == VDP2_SCRN_NBG2) ||
                (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0));
+               (scrn == VDP2_SCRN_RBG0) ||
+               (scrn == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
         /* If performing mosaic processing in NBG0 or NBG1, the vertical
@@ -70,7 +71,8 @@ vdp2_scrn_mosaic_unset(uint8_t scrn)
                (scrn == VDP2_SCRN_NBG1) ||
                (scrn == VDP2_SCRN_NBG2) ||
                (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0));
+               (scrn == VDP2_SCRN_RBG0) ||
+               (scrn == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
         switch (scrn) {
