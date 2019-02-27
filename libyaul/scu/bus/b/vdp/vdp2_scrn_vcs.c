@@ -12,7 +12,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_vcs_set(struct vdp2_scrn_vcs_format *vcs)
+vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *vcs)
 {
         _state_vdp2()->regs.vcstau = VDP2_VRAM_BANK_4MBIT(vcs->vcs_vcsta);
         _state_vdp2()->regs.vcstal = (vcs->vcs_vcsta >> 1) & 0xFFFF;
