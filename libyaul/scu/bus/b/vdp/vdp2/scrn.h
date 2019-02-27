@@ -464,15 +464,21 @@ extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
 extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
 
 extern void vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+
 extern void vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+
 extern void vdp2_scrn_color_offset_clear(void);
 extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t, int16_t, int16_t);
 extern void vdp2_scrn_color_offset_set(uint8_t, uint8_t);
 extern void vdp2_scrn_color_offset_unset(uint8_t);
-extern void vdp2_scrn_display_clear(void);
+
 extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
-extern void vdp2_scrn_ls_set(struct vdp2_scrn_ls_format *);
+extern void vdp2_scrn_display_clear(void);
+
+extern void vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *);
+
+extern void vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *);
 
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
@@ -480,15 +486,18 @@ extern void vdp2_scrn_mosaic_clear(void);
 extern void vdp2_scrn_mosaic_horizontal_set(uint8_t);
 extern void vdp2_scrn_mosaic_vertical_set(uint8_t);
 
-extern uint8_t vdp2_scrn_priority_get(uint8_t);
 extern void vdp2_scrn_priority_set(uint8_t, uint8_t);
+extern uint8_t vdp2_scrn_priority_get(uint8_t);
+
 extern void vdp2_scrn_reduction_set(uint8_t, uint16_t);
-extern void vdp2_scrn_reduction_x_set(uint8_t scrn, q0_3_8_t);
-extern void vdp2_scrn_reduction_y_set(uint8_t scrn, q0_3_8_t);
+extern void vdp2_scrn_reduction_x_set(uint8_t, q0_3_8_t);
+extern void vdp2_scrn_reduction_y_set(uint8_t, q0_3_8_t);
+
 extern void vdp2_scrn_scroll_x_set(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_x_update(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_y_set(uint8_t, fix16_t);
 extern void vdp2_scrn_scroll_y_update(uint8_t, fix16_t);
+
 extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
 
 #ifdef __cplusplus

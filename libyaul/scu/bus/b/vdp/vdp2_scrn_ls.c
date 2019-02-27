@@ -12,7 +12,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_ls_set(struct vdp2_scrn_ls_format *ls)
+vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *ls)
 {
 #ifdef DEBUG
         assert((ls->ls_scrn == VDP2_SCRN_NBG0) ||
