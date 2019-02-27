@@ -55,7 +55,8 @@ extern "C" {
 #define VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz)                             \
         (((chsz) == (1 * 1)) ? (64 * 64) : (32 * 32))
 
-/* Possible values for VDP2_SCRN_CALCULATE_PAGE_SIZE() (in bytes):
+/*-
+ * Possible values for VDP2_SCRN_CALCULATE_PAGE_SIZE() (in bytes):
  * +----------+-----------+---------------+
  * | PND size | Cell size | Size of page  |
  * +----------+-----------+---------------+
@@ -73,7 +74,8 @@ extern "C" {
 #define VDP2_SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                           \
         (VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
 
-/* Possible vales for VDP2_SCRN_CALCULATE_PLANE_SIZE() (in bytes):
+/*-
+ * Possible vales for VDP2_SCRN_CALCULATE_PLANE_SIZE() (in bytes):
  * +------------+----------+-----------+---------------+
  * | Plane size | PND size | Cell size | Size of plane |
  * +------------+----------+-----------+---------------+
@@ -441,20 +443,20 @@ struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
 struct vdp2_scrn_ls_format {
-        uint8_t ls_scrn;        /* Normal background */
-        uint32_t ls_lsta;       /* Line scroll table (lead addr.) */
-        uint8_t ls_int;         /* Dependent on the interlace setting */
+        uint8_t ls_scrn; /* Normal background */
+        uint32_t ls_lsta; /* Line scroll table (lead addr.) */
+        uint8_t ls_int; /* Dependent on the interlace setting */
 
 #define VDP2_SCRN_LS_N0SCX      0x0002
 #define VDP2_SCRN_LS_N1SCX      0x0200
 #define VDP2_SCRN_LS_N0SCY      0x0004
 #define VDP2_SCRN_LS_N1SCY      0x0400
-        uint16_t ls_fun;        /* Enable line scroll */
+        uint16_t ls_fun; /* Enable line scroll */
 };
 
 struct vdp2_scrn_vcs_format {
-        uint8_t vcs_scrn;       /* Normal background */
-        uint32_t vcs_vcsta;     /* Vertical cell scroll table (lead addr.) */
+        uint8_t vcs_scrn; /* Normal background */
+        uint32_t vcs_vcsta; /* Vertical cell scroll table (lead addr.) */
 };
 
 #define VDP2_SCRN_COLOR_OFFSET_A        0
