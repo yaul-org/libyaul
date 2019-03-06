@@ -57,27 +57,27 @@ scu_dma_config_buffer(struct scu_dma_reg_buffer *reg_buffer,
         /* Clear mode, starting factor and update bits */
         regs->dnmd &= ~0x01010107;
 
-        switch (cfg->dlc_mode & 0x01) {
+        switch (cfg->mode & 0x01) {
         case SCU_DMA_MODE_DIRECT:
-                assert(cfg->dlc_xfer.direct.len != 0x00000000);
-                assert(cfg->dlc_xfer.direct.dst != 0x00000000);
-                assert(cfg->dlc_xfer.direct.src != 0x00000000);
+                assert(cfg->xfer.direct.len != 0x00000000);
+                assert(cfg->xfer.direct.dst != 0x00000000);
+                assert(cfg->xfer.direct.src != 0x00000000);
 
                 /* The absolute address must not be cached */
-                regs->dnw = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.dst;
+                regs->dnw = CPU_CACHE_THROUGH | cfg->xfer.direct.dst;
                 /* The absolute address must not be cached */
-                regs->dnr = CPU_CACHE_THROUGH | cfg->dlc_xfer.direct.src;
+                regs->dnr = CPU_CACHE_THROUGH | cfg->xfer.direct.src;
 
                 /* Level 0 is able to transfer 1MiB
                  * Level 1 is able to transfer 4KiB
                  * Level 2 is able to transfer 4KiB */
-                regs->dnc = cfg->dlc_xfer.direct.len;
+                regs->dnc = cfg->xfer.direct.len;
                 break;
         case SCU_DMA_MODE_INDIRECT:
-                assert(cfg->dlc_xfer.indirect != NULL);
+                assert(cfg->xfer.indirect != NULL);
 
                 /* The absolute address must not be cached */
-                regs->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->dlc_xfer.indirect;
+                regs->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->xfer.indirect;
                 regs->dnr = 0x00000000;
                 regs->dnc = 0x00000000;
                 regs->dnmd |= 0x01000000;
@@ -86,9 +86,9 @@ scu_dma_config_buffer(struct scu_dma_reg_buffer *reg_buffer,
 
         /* Since bit 8 being unset is effective only for the CS2 space
          * of the A bus, everything else should set it */
-        regs->dnad = 0x00000100 | (cfg->dlc_stride & 0x07);
+        regs->dnad = 0x00000100 | (cfg->stride & 0x07);
 
-        regs->dnmd |= cfg->dlc_update & 0x00010100;
+        regs->dnmd |= cfg->update & 0x00010100;
 }
 
 void

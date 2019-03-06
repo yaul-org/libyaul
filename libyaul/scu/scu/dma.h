@@ -101,7 +101,7 @@ struct scu_dma_xfer {
 } __packed;
 
 struct scu_dma_level_cfg {
-        uint8_t dlc_mode;
+        uint8_t mode;
 
         union {
                 /* Indirect mode */
@@ -109,10 +109,10 @@ struct scu_dma_level_cfg {
 
                 /* Direct mode */
                 struct scu_dma_xfer direct;
-        } dlc_xfer;
+        } xfer;
 
-        uint8_t dlc_stride;
-        uint32_t dlc_update;
+        uint8_t stride;
+        uint32_t update;
 };
 
 static inline uint32_t __always_inline

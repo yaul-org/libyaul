@@ -267,10 +267,10 @@ _init(const dbgio_vdp2_t *params)
         dma_font = (void *)((uint32_t)aligned + aligned_offset);
         /* } */
 
-        dma_level_cfg.dlc_mode = SCU_DMA_MODE_INDIRECT;
-        dma_level_cfg.dlc_xfer.indirect = &dma_font->xfer_tbl[0];
-        dma_level_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
-        dma_level_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
+        dma_level_cfg.mode = SCU_DMA_MODE_INDIRECT;
+        dma_level_cfg.xfer.indirect = &dma_font->xfer_tbl[0];
+        dma_level_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
+        dma_level_cfg.update = SCU_DMA_UPDATE_NONE;
 
         /* Font CPD */
         dma_font->xfer_tbl[0].len = FONT_4BPP_SIZE;
@@ -290,12 +290,12 @@ _init(const dbgio_vdp2_t *params)
         assert(ret == 0);
 
         /* 64x32 page PND */
-        dma_level_cfg.dlc_mode = SCU_DMA_MODE_DIRECT;
-        dma_level_cfg.dlc_xfer.direct.len = _dev_state->page_size;
-        dma_level_cfg.dlc_xfer.direct.dst = (uint32_t)_dev_state->page_base;
-        dma_level_cfg.dlc_xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&_dev_state->page_pnd[0];
-        dma_level_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
-        dma_level_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
+        dma_level_cfg.mode = SCU_DMA_MODE_DIRECT;
+        dma_level_cfg.xfer.direct.len = _dev_state->page_size;
+        dma_level_cfg.xfer.direct.dst = (uint32_t)_dev_state->page_base;
+        dma_level_cfg.xfer.direct.src = CPU_CACHE_THROUGH | (uint32_t)&_dev_state->page_pnd[0];
+        dma_level_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
+        dma_level_cfg.update = SCU_DMA_UPDATE_NONE;
 
         scu_dma_config_buffer(&_dev_state->dma_reg_buffer, &dma_level_cfg);
 
