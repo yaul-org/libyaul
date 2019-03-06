@@ -28,12 +28,19 @@ extern "C" {
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
 struct vdp1_env {
-        color_rgb555_t env_erase_color;
-        int16_vector2_t env_erase_points[2];
-        uint8_t env_bpp;
-        uint8_t env_rotation;
-        uint8_t env_color_mode;
-        uint8_t env_sprite_type;
+        unsigned int : 8;
+
+        struct {
+                unsigned int : 1;
+                unsigned int bpp : 1;
+                unsigned int rotation : 1;
+                unsigned int color_mode : 1;
+                unsigned int sprite_type : 4;
+        } __packed;
+
+        color_rgb555_t erase_color;
+
+        int16_vector2_t erase_points[2];
 };
 
 extern void vdp1_env_default_set(void);
