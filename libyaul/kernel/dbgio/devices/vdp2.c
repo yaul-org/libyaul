@@ -428,15 +428,15 @@ _buffer_clear(void)
         ch = 2;
 
         struct dmac_ch_cfg dmac_cfg  = {
-                .dcc_ch = ch,
-                .dcc_dst = (uint32_t)&_dev_state->page_pnd[0],
-                .dcc_dst_mode = DMAC_DESTINATION_INCREMENT,
-                .dcc_src_mode = DMAC_SOURCE_FIXED,
-                .dcc_src = _dev_state->pnd_clear,
-                .dcc_len = _dev_state->page_size,
-                .dcc_stride = DMAC_STRIDE_2_BYTES,
-                .dcc_bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
-                .dcc_ihr = NULL
+                .channel = ch,
+                .dst = (uint32_t)&_dev_state->page_pnd[0],
+                .dst_mode = DMAC_DESTINATION_INCREMENT,
+                .src_mode = DMAC_SOURCE_FIXED,
+                .src = _dev_state->pnd_clear,
+                .len = _dev_state->page_size,
+                .stride = DMAC_STRIDE_2_BYTES,
+                .bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr = NULL
         };
 
         cpu_dmac_channel_config_set(&dmac_cfg);
