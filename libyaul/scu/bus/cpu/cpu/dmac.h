@@ -23,42 +23,42 @@ extern "C" {
 #define DMAC_PRIORITY_MODE_ROUND_ROBIN  0x01
 
 struct dmac_ch_cfg {
-        uint8_t dcc_ch;
+        uint8_t channel;
 
 #define DMAC_DESTINATION_FIXED          0x00
 #define DMAC_DESTINATION_INCREMENT      0x01
 #define DMAC_DESTINATION_DECREMENT      0x02
-        uint8_t dcc_src_mode;
+        uint8_t src_mode;
 
 #define DMAC_SOURCE_FIXED       0x00
 #define DMAC_SOURCE_INCREMENT   0x01
 #define DMAC_SOURCE_DECREMENT   0x02
-        uint8_t dcc_dst_mode;
+        uint8_t dst_mode;
 
 #define DMAC_STRIDE_1_BYTE      0x00
 #define DMAC_STRIDE_2_BYTES     0x01
 #define DMAC_STRIDE_4_BYTES     0x02
 #define DMAC_STRIDE_16_BYTES    0x03
-        uint8_t dcc_stride;
+        uint8_t stride;
 
 #define DMAC_BUS_MODE_CYCLE_STEAL       0x00
 #define DMAC_BUS_MODE_BURST             0x01
-        uint8_t dcc_bus_mode;
+        uint8_t bus_mode;
 
-        uint32_t dcc_src;
-        uint32_t dcc_dst;
-        uint32_t dcc_len;
+        uint32_t src;
+        uint32_t dst;
+        uint32_t len;
 
-        void (*dcc_ihr)(void);
+        void (*ihr)(void);
 };
 
 struct dmac_status {
-        unsigned dcs_enabled: 1;
-        unsigned dcs_priority_mode: 1;
-        unsigned dcs_ch_enabled: 2;
-        unsigned dcs_ch_busy: 2;
-        unsigned dcs_address_error: 1;
-        unsigned dcs_nmi_interrupt: 1;
+        unsigned enabled: 1;
+        unsigned priority_mode: 1;
+        unsigned channel_enabled: 2;
+        unsigned channel_busy: 2;
+        unsigned address_error: 1;
+        unsigned nmi_interrupt: 1;
 } __packed;
 
 static inline void __always_inline

@@ -58,10 +58,10 @@ cpu_dmac_status_get(struct dmac_status *status)
         uint32_t reg_dmaor;
         reg_dmaor = MEMORY_READ(32, CPU(DMAOR));
 
-        status->dcs_enabled = reg_dmaor & 0x00000001;
-        status->dcs_priority_mode = (reg_dmaor >> 3) & 0x00000001;
-        status->dcs_address_error = (reg_dmaor >> 2) & 0x00000001;
-        status->dcs_nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
+        status->enabled = reg_dmaor & 0x00000001;
+        status->priority_mode = (reg_dmaor >> 3) & 0x00000001;
+        status->address_error = (reg_dmaor >> 2) & 0x00000001;
+        status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
 
         uint32_t reg_chcr0;
         reg_chcr0 = MEMORY_READ(32, CPU(CHCR0));
@@ -73,7 +73,7 @@ cpu_dmac_status_get(struct dmac_status *status)
         uint8_t ch1_enabled;
         ch1_enabled = reg_chcr1 & 0x00000001;
 
-        status->dcs_ch_enabled = (ch1_enabled << 1) | ch0_enabled;
+        status->channel_enabled = (ch1_enabled << 1) | ch0_enabled;
 
         /*-
          * Truth table to determine if a specific channel is enabled or not
@@ -97,31 +97,31 @@ cpu_dmac_status_get(struct dmac_status *status)
         te = (reg_chcr1 >> 1) & 0x00000001;
         ch1_busy = (((de | te) ^ 1) | de) ^ 1;
 
-        status->dcs_ch_busy = (ch1_busy << 1) | ch0_busy;
+        status->channel_busy = (ch1_busy << 1) | ch0_busy;
 }
 
 void
 cpu_dmac_channel_config_set(const struct dmac_ch_cfg *cfg)
 {
         uint32_t n;
-        n = (cfg->dcc_ch & 0x01) << 4;
+        n = (cfg->channel & 0x01) << 4;
 
-        cpu_dmac_channel_stop(cfg->dcc_ch);
+        cpu_dmac_channel_stop(cfg->channel);
 
         /* Source and destination address modes */
         uint32_t reg_chcr;
-        reg_chcr = ((cfg->dcc_src_mode & 0x03) << 12) |
-                   ((cfg->dcc_dst_mode & 0x03) << 14) |
-                   ((cfg->dcc_stride & 0x03) << 10) |
-                   ((cfg->dcc_bus_mode & 0x01) << 4) |
+        reg_chcr = ((cfg->src_mode & 0x03) << 12) |
+                   ((cfg->dst_mode & 0x03) << 14) |
+                   ((cfg->stride & 0x03) << 10) |
+                   ((cfg->bus_mode & 0x01) << 4) |
                    /* Always enable AR (auto-request mode) */
                    0x00000200;
 
         uint32_t reg_tcr;
-        reg_tcr = cfg->dcc_len;
+        reg_tcr = cfg->len;
 
         uint8_t stride;
-        stride = cfg->dcc_stride & 0x03;
+        stride = cfg->stride & 0x03;
 
         /* Check that the source and destination addresses are
          * stride-byte aligned */
@@ -135,18 +135,18 @@ cpu_dmac_channel_config_set(const struct dmac_ch_cfg *cfg)
         /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
         reg_tcr = (reg_tcr > 0x00FFFFFF) ? 0x00000000 : reg_tcr;
 
-        _dmac_ihr_table[cfg->dcc_ch] = _default_ihr;
+        _dmac_ihr_table[cfg->channel] = _default_ihr;
 
-        if (cfg->dcc_ihr != NULL) {
+        if (cfg->ihr != NULL) {
                 /* Enable interrupt */
                 reg_chcr |= 0x00000004;
 
                 /* Set interrupt handling routine */
-                _dmac_ihr_table[cfg->dcc_ch] = cfg->dcc_ihr;
+                _dmac_ihr_table[cfg->channel] = cfg->ihr;
         }
 
-        MEMORY_WRITE(32, CPU(DAR0 | n), (uint32_t)cfg->dcc_dst);
-        MEMORY_WRITE(32, CPU(SAR0 | n), (uint32_t)cfg->dcc_src);
+        MEMORY_WRITE(32, CPU(DAR0 | n), (uint32_t)cfg->dst);
+        MEMORY_WRITE(32, CPU(SAR0 | n), (uint32_t)cfg->src);
         MEMORY_WRITE(32, CPU(TCR0 | n), reg_tcr);
         MEMORY_WRITE(32, CPU(CHCR0 | n), reg_chcr);
 }
