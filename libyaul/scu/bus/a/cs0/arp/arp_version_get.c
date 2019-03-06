@@ -26,8 +26,8 @@ arp_version_get(void)
         if ((buf = (char *)malloc(ver_len + 1)) == NULL) {
                 return NULL;
         }
-        memset(buf, '\0', ver_len);
-        memcpy(buf, arp_ver, ver_len);
+        (void)memset(buf, '\0', ver_len);
+        (void)memcpy(buf, arp_ver, ver_len);
         buf[ver_len] = '\0';
 
         return buf;

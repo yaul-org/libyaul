@@ -13,14 +13,14 @@
 
 #include "arp-internal.h"
 
-arp_callback_t arp_callback;
+struct arp_callback arp_callback;
 
-static void (*arp_cb)(arp_callback_t *) = NULL;
+static void (*arp_cb)(const struct arp_callback *) = NULL;
 
-static void arp_trampoline(void);
+static void _arp_trampoline(void);
 
 void
-arp_function_callback_set(void (*cb)(arp_callback_t *))
+arp_function_callback_set(void (*cb)(const struct arp_callback *))
 {
         /* Disable interrupts */
         uint32_t sr_mask;
@@ -33,16 +33,15 @@ arp_function_callback_set(void (*cb)(arp_callback_t *))
 
         assert(cb != NULL);
         arp_cb = cb;
-        cpu_intc_ihr_set(32, arp_trampoline);
+        cpu_intc_ihr_set(32, _arp_trampoline);
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);
 }
 
 static void
-arp_trampoline(void)
+_arp_trampoline(void)
 {
-
         arp_cb(&arp_callback);
 
         /* Clear ARP user callback */

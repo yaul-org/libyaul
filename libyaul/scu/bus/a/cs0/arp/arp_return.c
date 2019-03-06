@@ -18,4 +18,6 @@ arp_return(void)
 
         while (true) {
         }
+
+        __builtin_unreachable();
 }
