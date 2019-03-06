@@ -11,7 +11,4 @@
 #include <scu/map.h>
 #include <arp/map.h>
 
-/* ARP user callback */
-extern struct arp_callback arp_callback;
-
 #endif /* !_ARP_INTERNAL_H_ */
