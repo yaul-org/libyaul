@@ -20,9 +20,9 @@ extern "C" {
 struct vdp1_transfer_status {
         union {
                 struct {
-                        unsigned :14;
-                        unsigned cef:1;
-                        unsigned bef:1;
+                        unsigned int :14;
+                        unsigned int cef:1;
+                        unsigned int bef:1;
                 } __packed;
 
                 uint16_t raw;
@@ -32,15 +32,15 @@ struct vdp1_transfer_status {
 struct vdp1_mode_status {
         union {
                 struct {
-                        unsigned version:4;
-                        unsigned :3;
-                        unsigned ptm1:1;
-                        unsigned eos:1;
-                        unsigned die:1;
-                        unsigned dil:1;
-                        unsigned fcm:1;
-                        unsigned vbe:1;
-                        unsigned tvm:3;
+                        unsigned int version:4;
+                        unsigned int :3;
+                        unsigned int ptm1:1;
+                        unsigned int eos:1;
+                        unsigned int die:1;
+                        unsigned int dil:1;
+                        unsigned int fcm:1;
+                        unsigned int vbe:1;
+                        unsigned int tvm:3;
                 } __packed;
 
                 uint16_t raw;

@@ -101,7 +101,7 @@ typedef union {
                 uint8_t v;
                 uint8_t s;
                 uint8_t h;
-                unsigned int : 8;
+                unsigned int :8;
         } __packed;
         uint8_t comp[4];
 } __packed color_uint8_hsv_t;

@@ -30,20 +30,20 @@ extern "C" {
 #define DSP_RAM_PAGE_WORD_COUNT (DSP_RAM_PAGE_SIZE / 4)
 
 struct dsp_status {
-        unsigned int:5;
-        unsigned int:1;
-        unsigned int:1;
-        unsigned int:1;
+        unsigned int :5;
+        unsigned int :1;
+        unsigned int :1;
+        unsigned int :1;
         unsigned int t0:1;
         unsigned int s:1;
         unsigned int z:1;
         unsigned int c:1;
         unsigned int v:1;
         unsigned int e:1;
-        unsigned int:1;
+        unsigned int :1;
         unsigned int ex:1;
-        unsigned int:1;
-        unsigned int:7;
+        unsigned int :1;
+        unsigned int :7;
         unsigned int pc:8;
 } __packed;
 

@@ -28,14 +28,14 @@ extern "C" {
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
 struct vdp1_env {
-        unsigned int : 8;
+        unsigned int :8;
 
         struct {
-                unsigned int : 1;
-                unsigned int bpp : 1;
-                unsigned int rotation : 1;
-                unsigned int color_mode : 1;
-                unsigned int sprite_type : 4;
+                unsigned int :1;
+                unsigned int bpp:1;
+                unsigned int rotation:1;
+                unsigned int color_mode:1;
+                unsigned int sprite_type:4;
         } __packed;
 
         color_rgb555_t erase_color;
