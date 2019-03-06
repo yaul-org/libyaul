@@ -43,7 +43,7 @@ vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _debug_check_cell(format);
 #endif /* DEBUG */
 
-        switch (format->scf_scroll_screen) {
+        switch (format->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _nbg0_scrn_cell_format_set(format);
                 break;
@@ -69,7 +69,7 @@ vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _debug_check_bitmap(format);
 #endif /* DEBUG */
 
-        switch (format->sbf_scroll_screen) {
+        switch (format->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _nbg0_scrn_bitmap_format_set(format);
                 break;
@@ -89,25 +89,25 @@ _debug_check_bitmap(const struct vdp2_scrn_bitmap_format *format)
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->sbf_scroll_screen == VDP2_SCRN_NBG0) ||
-               (format->sbf_scroll_screen == VDP2_SCRN_NBG1) ||
-               (format->sbf_scroll_screen == VDP2_SCRN_RBG0));
+        assert((format->scroll_screen == VDP2_SCRN_NBG0) ||
+               (format->scroll_screen == VDP2_SCRN_NBG1) ||
+               (format->scroll_screen == VDP2_SCRN_RBG0));
 
         /* assert that the lead address to the color palette in CRAM is
          * on a 20-byte boundary */
-        assert((format->sbf_color_palette & 0x1F) == 0x00);
+        assert((format->color_palette & 0x1F) == 0x00);
 
-        assert((format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
-               (format->sbf_cc_count == VDP2_SCRN_CCC_PALETTE_2048) ||
-               (format->sbf_cc_count == VDP2_SCRN_CCC_RGB_32768) ||
-               (format->sbf_cc_count == VDP2_SCRN_CCC_RGB_16770000));
+        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_2048) ||
+               (format->cc_count == VDP2_SCRN_CCC_RGB_32768) ||
+               (format->cc_count == VDP2_SCRN_CCC_RGB_16770000));
 
-        assert((format->sbf_bitmap_size.width == 512) ||
-               (format->sbf_bitmap_size.width == 1024));
+        assert((format->bitmap_size.width == 512) ||
+               (format->bitmap_size.width == 1024));
 
-        assert((format->sbf_bitmap_size.height == 256) ||
-               (format->sbf_bitmap_size.height == 512));
+        assert((format->bitmap_size.height == 256) ||
+               (format->bitmap_size.height == 512));
 }
 #endif /* DEBUG */
 
@@ -121,19 +121,19 @@ _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.sfprmd &= 0xFFFC;
 
         uint16_t cc_count;
-        cc_count = (format->sbf_cc_count & 0x07) << 4;
+        cc_count = (format->cc_count & 0x07) << 4;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
 
         uint16_t palette_number;
-        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+        palette_number = (format->color_palette >> 9) & 0x07;
 
         uint16_t width;
-        width = format->sbf_bitmap_size.width >> 10;
+        width = format->bitmap_size.width >> 10;
 
         uint16_t height;
-        height = format->sbf_bitmap_size.height >> 9;
+        height = format->bitmap_size.height >> 9;
 
         /* Screen display format */
         /* Character color count */
@@ -155,7 +155,7 @@ _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
          *
          * For 16-colors, there are 128 possible banks, but only 8 are
          * available (the lower 4- bits of the palette number is 0). */
-        switch (format->sbf_cc_count) {
+        switch (format->cc_count) {
         case VDP2_SCRN_CCC_PALETTE_16:
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpna |= palette_number;
@@ -163,11 +163,11 @@ _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         }
 
         /* Special function type */
-        _state_vdp2()->regs.bmpna |= (format->sbf_sf_type & 0x03) << 4;
+        _state_vdp2()->regs.bmpna |= (format->sf_type & 0x03) << 4;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->sbf_sf_code & 0x01) << 0;
-        _state_vdp2()->regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 0;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 0;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 0;
 }
 
 static void
@@ -180,19 +180,19 @@ _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.sfprmd &= 0xFFF3;
 
         uint16_t cc_count;
-        cc_count = (format->sbf_cc_count & 0x03) << 12;
+        cc_count = (format->cc_count & 0x03) << 12;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
 
         uint16_t palette_number;
-        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+        palette_number = (format->color_palette >> 9) & 0x07;
 
         uint16_t width;
-        width = format->sbf_bitmap_size.width >> 10;
+        width = format->bitmap_size.width >> 10;
 
         uint16_t height;
-        height = format->sbf_bitmap_size.height >> 9;
+        height = format->bitmap_size.height >> 9;
 
         /* Screen display format */
         /* Character color count */
@@ -206,7 +206,7 @@ _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.mpofn |= bank << 4;
 
         /* Supplementary palette number */
-        switch (format->sbf_cc_count) {
+        switch (format->cc_count) {
         case VDP2_SCRN_CCC_PALETTE_16:
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpna |= palette_number << 8;
@@ -214,27 +214,27 @@ _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         }
 
         /* Special function type */
-        _state_vdp2()->regs.bmpna |= (format->sbf_sf_type & 0x03) << 12;
+        _state_vdp2()->regs.bmpna |= (format->sf_type & 0x03) << 12;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->sbf_sf_code & 0x01) << 1;
-        _state_vdp2()->regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 2;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 1;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 2;
 }
 
 static void
 _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 {
 #ifdef DEBUG
-        assert((format->sbf_bitmap_size.width > 0) &&
-               ((format->sbf_bitmap_size.width & 0x1FF) == 0x0000));
+        assert((format->bitmap_size.width > 0) &&
+               ((format->bitmap_size.width & 0x1FF) == 0x0000));
 
-        assert((format->sbf_bitmap_size.height > 0) &&
-               ((format->sbf_bitmap_size.height & 0x00FF) == 0x0000));
+        assert((format->bitmap_size.height > 0) &&
+               ((format->bitmap_size.height & 0x00FF) == 0x0000));
 
-        assert((format->sbf_rp_mode == 0) ||
-               (format->sbf_rp_mode == 1) ||
-               (format->sbf_rp_mode == 2) ||
-               (format->sbf_rp_mode == 3));
+        assert((format->rp_mode == 0) ||
+               (format->rp_mode == 1) ||
+               (format->rp_mode == 2) ||
+               (format->rp_mode == 3));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0xC0FF; /* Bits 8, 9, 10, 12, 13, 14 */
@@ -245,19 +245,19 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.ramctl &= 0xB300;
 
         uint16_t cc_count;
-        cc_count = (format->sbf_cc_count & 0x03) << 12;
+        cc_count = (format->cc_count & 0x03) << 12;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->sbf_bitmap_pattern);
+        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
 
         uint16_t palette_number;
-        palette_number = (format->sbf_color_palette >> 9) & 0x07;
+        palette_number = (format->color_palette >> 9) & 0x07;
 
         uint16_t width;
-        width = format->sbf_bitmap_size.width >> 10;
+        width = format->bitmap_size.width >> 10;
 
         uint16_t height;
-        height = format->sbf_bitmap_size.height >> 9;
+        height = format->bitmap_size.height >> 9;
 
         /* Screen display format */
         /* Character color count */
@@ -268,7 +268,7 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.chctlb |= height << 10;
 
         /* Supplementary palette number */
-        switch (format->sbf_cc_count) {
+        switch (format->cc_count) {
         case VDP2_SCRN_CCC_PALETTE_16:
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs.bmpnb |= palette_number;
@@ -276,9 +276,9 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         }
 
         /* Rotation parameter mode */
-        _state_vdp2()->regs.rpmd |= format->sbf_rp_mode;
+        _state_vdp2()->regs.rpmd |= format->rp_mode;
 
-        switch (format->sbf_rp_mode) {
+        switch (format->rp_mode) {
         case 0:
                 /* Mode 0: Rotation Parameter A */
 
@@ -297,11 +297,11 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 
         /* Select VRAM bank usage for bitmap pattern data */
         uint32_t pixel_count;
-        pixel_count = format->sbf_bitmap_size.width * format->sbf_bitmap_size.height;
+        pixel_count = format->bitmap_size.width * format->bitmap_size.height;
         uint32_t bitmap_size;
         bitmap_size = pixel_count;
 
-        switch (format->sbf_cc_count) {
+        switch (format->cc_count) {
         case VDP2_SCRN_CCC_PALETTE_16:
                 bitmap_size >>= 1;
                 break;
@@ -317,21 +317,21 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         }
 
         /* VRAM data bank select */
-        _state_vdp2()->regs.ramctl |= format->sbf_usage_banks.a0;
-        _state_vdp2()->regs.ramctl |= format->sbf_usage_banks.a1 << 2;
-        _state_vdp2()->regs.ramctl |= format->sbf_usage_banks.b0 << 4;
-        _state_vdp2()->regs.ramctl |= format->sbf_usage_banks.b1 << 6;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.a0;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.a1 << 2;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.b0 << 4;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.b1 << 6;
 
         /* Rotation parameter table */
-        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->sbf_rotation_table);
-        _state_vdp2()->regs.rptal = format->sbf_rotation_table & 0xFFFE;
+        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->rotation_table_base);
+        _state_vdp2()->regs.rptal = format->rotation_table_base & 0xFFFE;
 
         /* Special function type */
-        _state_vdp2()->regs.bmpnb |= (format->sbf_sf_type & 0x03) << 4;
+        _state_vdp2()->regs.bmpnb |= (format->sf_type & 0x03) << 4;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->sbf_sf_code & 0x01) << 4;
-        _state_vdp2()->regs.sfprmd |= (format->sbf_sf_mode & 0x03) << 8;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 4;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 8;
 }
 
 #ifdef DEBUG
@@ -341,51 +341,51 @@ _debug_check_cell(const struct vdp2_scrn_cell_format *format)
         assert(format != NULL);
 
         /* Check if the background passed is valid */
-        assert((format->scf_scroll_screen == VDP2_SCRN_NBG0) ||
-               (format->scf_scroll_screen == VDP2_SCRN_RBG1) ||
-               (format->scf_scroll_screen == VDP2_SCRN_NBG1) ||
-               (format->scf_scroll_screen == VDP2_SCRN_NBG2) ||
-               (format->scf_scroll_screen == VDP2_SCRN_NBG3) ||
-               (format->scf_scroll_screen == VDP2_SCRN_RBG0));
+        assert((format->scroll_screen == VDP2_SCRN_NBG0) ||
+               (format->scroll_screen == VDP2_SCRN_RBG1) ||
+               (format->scroll_screen == VDP2_SCRN_NBG1) ||
+               (format->scroll_screen == VDP2_SCRN_NBG2) ||
+               (format->scroll_screen == VDP2_SCRN_NBG3) ||
+               (format->scroll_screen == VDP2_SCRN_RBG0));
 
         /* Assert that the lead address to character pattern table in
          * VRAM is on a 20-byte boundary */
-        assert((format->scf_cp_table & 0x1F) == 0x00);
+        assert((format->cp_table & 0x1F) == 0x00);
 
         /* Assert that the lead address to the color palette in CRAM is
          * on a 20-byte boundary */
-        assert((format->scf_color_palette & 0x1F) == 0x00);
+        assert((format->color_palette & 0x1F) == 0x00);
 
-        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
-               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_2048));
+        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_2048));
 
         /* Check the character number supplement mode */
-        assert((format->scf_auxiliary_mode == 0) ||
-               (format->scf_auxiliary_mode == 1));
+        assert((format->auxiliary_mode == 0) ||
+               (format->auxiliary_mode == 1));
 
         /* Check the character size */
-        assert((format->scf_character_size == (1 * 1)) ||
-               (format->scf_character_size == (2 * 2)));
+        assert((format->character_size == (1 * 1)) ||
+               (format->character_size == (2 * 2)));
 
         /* Check the plane size */
-        assert((format->scf_plane_size == (1 * 1)) ||
-               (format->scf_plane_size == (2 * 1)) ||
-               (format->scf_plane_size == (2 * 2)));
+        assert((format->plane_size == (1 * 1)) ||
+               (format->plane_size == (2 * 1)) ||
+               (format->plane_size == (2 * 2)));
 
         /* Check the pattern name data size */
-        assert((format->scf_pnd_size == 1) ||
-               (format->scf_pnd_size == 2));
+        assert((format->pnd_size == 1) ||
+               (format->pnd_size == 2));
 
         /* Check the lead address for each plane */
         /* The lead address must be on a boundary dependent on the size
          * of the plane. For example, if NBG0 is configured to use 2x2
          * cells, the dimensions of its page(s) will be 32x32 cells
          * (0x800 bytes). */
-        assert((format->scf_map.plane_a & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_b & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_c & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->scf_map.plane_d & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->map_bases.plane_a & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->map_bases.plane_b & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->map_bases.plane_c & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
+        assert((format->map_bases.plane_d & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
 }
 #endif /* DEBUG */
 
@@ -396,8 +396,8 @@ _cell_plane_calc(
         uint16_t *map_offset)
 {
         uint16_t plane_count;
-        plane_count = ((format->scf_scroll_screen == VDP2_SCRN_RBG0) ||
-                       (format->scf_scroll_screen == VDP2_SCRN_RBG1)) ? 16 : 4;
+        plane_count = ((format->scroll_screen == VDP2_SCRN_RBG0) ||
+                       (format->scroll_screen == VDP2_SCRN_RBG1)) ? 16 : 4;
 
         uint16_t page_size;
         page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
@@ -406,14 +406,14 @@ _cell_plane_calc(
         for (i = 0; i < plane_count; i++) {
                 /* XXX: There should be a way to mask out the top mask bits */
                 uint32_t offset;
-                offset = format->scf_map.planes[i] - VDP2_VRAM_ADDR_4MBIT(0, 0);
+                offset = format->map_bases.planes[i] - VDP2_VRAM_ADDR_4MBIT(0, 0);
 
                 planes[i] = (offset / page_size) & 0x003F;
         }
 
         /* Calculate the upper 3-bits of the 9-bits "map register" */
         uint32_t offset;
-        offset = format->scf_map.planes[0] - VDP2_VRAM_ADDR_4MBIT(0, 0);
+        offset = format->map_bases.planes[0] - VDP2_VRAM_ADDR_4MBIT(0, 0);
 
         uint16_t map_bits;
         map_bits = offset / page_size;
@@ -440,12 +440,12 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
         sp_number = 0;
 
         uint16_t character_number;
-        character_number = VDP2_SCRN_PND_CHARACTER_NUM(format->scf_cp_table);
+        character_number = VDP2_SCRN_PND_CHARACTER_NUM(format->cp_table);
 
         uint16_t palette_number;
-        palette_number = VDP2_SCRN_PND_PALETTE_NUM(format->scf_color_palette);
+        palette_number = VDP2_SCRN_PND_PALETTE_NUM(format->color_palette);
 
-        switch (format->scf_pnd_size) {
+        switch (format->pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
 #ifdef DEBUG
@@ -457,7 +457,7 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
                  * Mode 2 (1024 colors) */
 #endif /* DEBUG */
 
-                switch (format->scf_cc_count) {
+                switch (format->cc_count) {
                 case VDP2_SCRN_CCC_PALETTE_16:
                         sp_number = ((palette_number & 0x0070) >> 4) << 5;
                         break;
@@ -469,11 +469,11 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
                 }
 
                 /* Character number supplement mode */
-                switch (format->scf_auxiliary_mode) {
+                switch (format->auxiliary_mode) {
                 case 0:
                         /* Auxiliary mode 0; flip function can be used */
                         /* Supplementary character number */
-                        switch (format->scf_character_size) {
+                        switch (format->character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 9~0
                                  * Character number in supplemental data: bits 14 13 12 11 10 */
@@ -490,7 +490,7 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
                 case 1:
                         /* Auxiliary mode 1; flip function cannot be used */
                         /* Supplementary character number */
-                        switch (format->scf_character_size) {
+                        switch (format->character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 11~0
                                  * Character number in supplemental data: bits 14 13 12 __ __ */
@@ -508,7 +508,7 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
                 }
 
                 /* Special function type */
-                sf_type = (format->scf_sf_type & 0x03) << 8;
+                sf_type = (format->sf_type & 0x03) << 8;
 
                 pncnx = 0x8000 | aux | sf_type | sc_number | sp_number;
                 break;
@@ -543,13 +543,13 @@ _nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        _state_vdp2()->regs.chctla |= format->scf_cc_count << 4;
+        _state_vdp2()->regs.chctla |= format->cc_count << 4;
 
         /* Character size */
-        _state_vdp2()->regs.chctla |= format->scf_character_size >> 2;
+        _state_vdp2()->regs.chctla |= format->character_size >> 2;
 
         /* Plane size */
-        _state_vdp2()->regs.plsz |= format->scf_plane_size - 1;
+        _state_vdp2()->regs.plsz |= format->plane_size - 1;
 
         /* Map */
         _state_vdp2()->regs.mpofn |= map_offset;
@@ -558,8 +558,8 @@ _nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.pncn0 = pncn0;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->scf_sf_code & 0x01) << 0;
-        _state_vdp2()->regs.sfprmd |= (format->scf_sf_mode & 0x03) << 0;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 0;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 0;
 }
 
 static void
@@ -584,13 +584,13 @@ _nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        _state_vdp2()->regs.chctla |= format->scf_cc_count << 12;
+        _state_vdp2()->regs.chctla |= format->cc_count << 12;
 
         /* Character size */
-        _state_vdp2()->regs.chctla |= (format->scf_character_size >> 2) << 8;
+        _state_vdp2()->regs.chctla |= (format->character_size >> 2) << 8;
 
         /* Plane size */
-        _state_vdp2()->regs.plsz |= (format->scf_plane_size - 1) << 2;
+        _state_vdp2()->regs.plsz |= (format->plane_size - 1) << 2;
 
         /* Map */
         _state_vdp2()->regs.mpofn |= map_offset << 4;
@@ -599,16 +599,16 @@ _nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.pncn1 = pncn1;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->scf_sf_code & 0x01) << 1;
-        _state_vdp2()->regs.sfprmd |= (format->scf_sf_mode & 0x03) << 2;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 1;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 2;
 }
 
 static void
 _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
-        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256));
+        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0xFFFD;
@@ -630,13 +630,13 @@ _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        _state_vdp2()->regs.chctlb |= format->scf_cc_count << 1;
+        _state_vdp2()->regs.chctlb |= format->cc_count << 1;
 
         /* Character Size */
-        _state_vdp2()->regs.chctlb |= format->scf_character_size >> 2;
+        _state_vdp2()->regs.chctlb |= format->character_size >> 2;
 
         /* Plane Size */
-        _state_vdp2()->regs.plsz |= (format->scf_plane_size - 1) << 4;
+        _state_vdp2()->regs.plsz |= (format->plane_size - 1) << 4;
 
         /* Map */
         _state_vdp2()->regs.mpofn |= map_offset << 8;
@@ -645,16 +645,16 @@ _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.pncn2 = pncn2;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->scf_sf_code & 0x01) << 2;
-        _state_vdp2()->regs.sfprmd |= (format->scf_sf_mode & 0x03) << 4;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 2;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 4;
 }
 
 static void
 _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
-        assert((format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->scf_cc_count == VDP2_SCRN_CCC_PALETTE_256));
+        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
+               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0xFFDF;
@@ -676,13 +676,13 @@ _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        _state_vdp2()->regs.chctlb |= format->scf_cc_count << 5;
+        _state_vdp2()->regs.chctlb |= format->cc_count << 5;
 
         /* Character size */
-        _state_vdp2()->regs.chctlb |= format->scf_character_size << 2;
+        _state_vdp2()->regs.chctlb |= format->character_size << 2;
 
         /* Plane size */
-        _state_vdp2()->regs.plsz |= (format->scf_plane_size - 1) << 6;
+        _state_vdp2()->regs.plsz |= (format->plane_size - 1) << 6;
 
         /* Map */
         _state_vdp2()->regs.mpofn |= map_offset << 12;
@@ -691,18 +691,18 @@ _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.pncn3 = pncn3;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->scf_sf_code & 0x01) << 3;
-        _state_vdp2()->regs.sfprmd |= (format->scf_sf_mode & 0x03) << 6;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 3;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 6;
 }
 
 static void
 _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 {
 #ifdef DEBUG
-        assert((format->scf_rp_mode == 0) ||
-               (format->scf_rp_mode == 1) ||
-               (format->scf_rp_mode == 2) ||
-               (format->scf_rp_mode == 3));
+        assert((format->rp_mode == 0) ||
+               (format->rp_mode == 1) ||
+               (format->rp_mode == 2) ||
+               (format->rp_mode == 3));
 #endif /* DEBUG */
 
         _state_vdp2()->regs.chctlb &= 0x8FFF;
@@ -741,20 +741,20 @@ _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _cell_plane_calc(format, planes, &map_offset);
 
         /* Character color count */
-        _state_vdp2()->regs.chctlb |= format->scf_cc_count << 12;
+        _state_vdp2()->regs.chctlb |= format->cc_count << 12;
 
         /* Character size */
-        _state_vdp2()->regs.chctlb |= (format->scf_character_size >> 2) << 8;
+        _state_vdp2()->regs.chctlb |= (format->character_size >> 2) << 8;
 
         /* Rotation parameter mode */
-        _state_vdp2()->regs.rpmd |= format->scf_rp_mode;
+        _state_vdp2()->regs.rpmd |= format->rp_mode;
 
-        switch (format->scf_rp_mode) {
+        switch (format->rp_mode) {
         case 0:
                 /* Mode 0: Rotation Parameter A */
 
                 /* Plane size */
-                _state_vdp2()->regs.plsz |= (format->scf_plane_size - 1) << 8;
+                _state_vdp2()->regs.plsz |= (format->plane_size - 1) << 8;
 
                 /* Screen over process */
 
@@ -774,7 +774,7 @@ _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
                 /* Mode 1: Rotation Parameter B */
 
                 /* Plane size */
-                _state_vdp2()->regs.plsz |= (format->scf_plane_size - 1) << 12;
+                _state_vdp2()->regs.plsz |= (format->plane_size - 1) << 12;
 
                 /* Screen over process */
 
@@ -800,16 +800,16 @@ _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.pncr = pncr;
 
         /* VRAM data bank select */
-        _state_vdp2()->regs.ramctl |= format->scf_usage_banks.a0;
-        _state_vdp2()->regs.ramctl |= format->scf_usage_banks.a1 << 2;
-        _state_vdp2()->regs.ramctl |= format->scf_usage_banks.b0 << 4;
-        _state_vdp2()->regs.ramctl |= format->scf_usage_banks.b1 << 6;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.a0;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.a1 << 2;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.b0 << 4;
+        _state_vdp2()->regs.ramctl |= format->usage_banks.b1 << 6;
 
         /* Rotation parameter table */
-        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->scf_rotation_tbl);
-        _state_vdp2()->regs.rptal = format->scf_rotation_tbl & 0xFFFE;
+        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->rotation_table);
+        _state_vdp2()->regs.rptal = format->rotation_table & 0xFFFE;
 
         /* Special function */
-        _state_vdp2()->regs.sfsel |= (format->scf_sf_code & 0x01) << 4;
-        _state_vdp2()->regs.sfprmd |= (format->scf_sf_mode & 0x03) << 8;
+        _state_vdp2()->regs.sfsel |= (format->sf_code & 0x01) << 4;
+        _state_vdp2()->regs.sfprmd |= (format->sf_mode & 0x03) << 8;
 }

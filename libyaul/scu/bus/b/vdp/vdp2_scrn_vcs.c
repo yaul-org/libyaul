@@ -15,14 +15,14 @@ void
 vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *vcs)
 {
 #ifdef DEBUG
-        assert((vcs->vcs_scrn == VDP2_SCRN_NBG0) ||
-               (vcs->vcs_scrn == VDP2_SCRN_NBG1));
+        assert((vcs->scroll_screen == VDP2_SCRN_NBG0) ||
+               (vcs->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
-        _state_vdp2()->regs.vcstau = VDP2_VRAM_BANK_4MBIT(vcs->vcs_vcsta);
-        _state_vdp2()->regs.vcstal = (vcs->vcs_vcsta >> 1) & 0xFFFF;
+        _state_vdp2()->regs.vcstau = VDP2_VRAM_BANK_4MBIT(vcs->vcs_table);
+        _state_vdp2()->regs.vcstal = (vcs->vcs_table >> 1) & 0xFFFF;
 
-        switch (vcs->vcs_scrn) {
+        switch (vcs->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs.scrctl &= 0xFFFE;
                 _state_vdp2()->regs.scrctl |= 0x0001;

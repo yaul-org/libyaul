@@ -214,18 +214,18 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
 
         struct vdp2_scrn_cell_format cell_format = {
-                .scf_scroll_screen = params->scrn,
-                .scf_cc_count = VDP2_SCRN_CCC_PALETTE_16,
-                .scf_character_size = 1 * 1,
-                .scf_pnd_size = 1, /* 1-word */
-                .scf_auxiliary_mode = 0,
-                .scf_cp_table = _dev_state->cp_table,
-                .scf_color_palette = _dev_state->color_palette,
-                .scf_plane_size = 1 * 1,
-                .scf_map.plane_a = _dev_state->page_base,
-                .scf_map.plane_b = _dev_state->page_base,
-                .scf_map.plane_c = _dev_state->page_base,
-                .scf_map.plane_d = _dev_state->page_base
+                .scroll_screen = params->scrn,
+                .cc_count = VDP2_SCRN_CCC_PALETTE_16,
+                .character_size = 1 * 1,
+                .pnd_size = 1, /* 1-word */
+                .auxiliary_mode = 0,
+                .cp_table = _dev_state->cp_table,
+                .color_palette = _dev_state->color_palette,
+                .plane_size = 1 * 1,
+                .map_bases.plane_a = _dev_state->page_base,
+                .map_bases.plane_b = _dev_state->page_base,
+                .map_bases.plane_c = _dev_state->page_base,
+                .map_bases.plane_d = _dev_state->page_base
         };
 
         vdp2_scrn_cell_format_set(&cell_format);
@@ -235,8 +235,8 @@ _init(const dbgio_vdp2_t *params)
 
         /* PND value used to clear pages */
         _dev_state->pnd_clear = VDP2_SCRN_PND_CONFIG_0(
-                cell_format.scf_cp_table,
-                cell_format.scf_color_palette,
+                cell_format.cp_table,
+                cell_format.color_palette,
                 /* vf = */ 0,
                 /* hf = */ 0);
 
