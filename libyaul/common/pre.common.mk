@@ -37,6 +37,9 @@ else
 endif
 export V_BEGIN_YELLOW
 
+# Get the Makefile that calls to include this Makefile
+BUILD_ROOT:= $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+
 # Customizable (must be overwritten in user's Makefile)
 SH_PROGRAM?= unknown-program
 SH_OBJECTS?=
@@ -49,6 +52,8 @@ ROMDISK_DEPS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
 
+RTAGS_RC= sh-elf-rc $(BUILD_ROOT)
+
 SH_AS:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-as
 SH_AR:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-ar
 SH_CC:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
@@ -57,6 +62,7 @@ SH_LD:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-gcc
 SH_NM:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-nm
 SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-objcopy
 SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/sh-elf/bin/sh-elf-objdump
+
 M68K_AS:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as
 M68K_AR:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar
 M68K_LD:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ld
@@ -76,8 +82,14 @@ SH_CFLAGS= \
 	-O2 \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
-	-DFIXMATH_NO_ROUNDING=1 \
-	-save-temps
+	-DFIXMATH_NO_ROUNDING=1
+
+# Clang (RTags) has a problem with -save-temps
+ifeq ($(strip $(YAUL_RTAGS)),)
+SH_CFLAGS_shared:= $(SH_CFLAGS_shared) \
+	-save-temps=obj
+endif
+
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 
 SH_CXXFLAGS= $(SH_CFLAGS)
