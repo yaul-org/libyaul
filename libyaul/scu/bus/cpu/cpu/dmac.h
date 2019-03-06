@@ -53,12 +53,12 @@ struct cpu_dmac_cfg {
 };
 
 struct dmac_status {
-        unsigned enabled: 1;
-        unsigned priority_mode: 1;
-        unsigned channel_enabled: 2;
-        unsigned channel_busy: 2;
-        unsigned address_error: 1;
-        unsigned nmi_interrupt: 1;
+        unsigned int enabled:1;
+        unsigned int priority_mode:1;
+        unsigned int channel_enabled:2;
+        unsigned int channel_busy:2;
+        unsigned int address_error:1;
+        unsigned int nmi_interrupt:1;
 } __packed;
 
 static inline void __always_inline

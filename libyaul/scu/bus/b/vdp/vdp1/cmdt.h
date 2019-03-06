@@ -174,8 +174,8 @@ struct vdp1_cmdt_scaled_sprite {
                         int16_vector2_t ul;
 
                         /* Vertex B */
-                        unsigned int : 16;
-                        unsigned int : 16;
+                        unsigned int :16;
+                        unsigned int :16;
 
                         /* Vertex C */
                         int16_vector2_t lr;
@@ -188,8 +188,8 @@ struct vdp1_cmdt_scaled_sprite {
                         int16_vector2_t display;
 
                         /* Vertex C */
-                        unsigned int : 16;
-                        unsigned int : 16;
+                        unsigned int :16;
+                        unsigned int :16;
                 } zoom;
 
                 struct {

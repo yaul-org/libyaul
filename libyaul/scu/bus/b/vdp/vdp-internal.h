@@ -44,10 +44,10 @@ struct state_vdp1 {
                         uint16_t ewlr;          /* Register offset: 0x100008 */
                         uint16_t ewrr;          /* Register offset: 0x10000A */
                         uint16_t endr;          /* Register offset: 0x10000C */
-                        unsigned : 16;          /* Register offset: 0x100010 */
-                        unsigned : 16;          /* Register offset: 0x100012 */
-                        unsigned : 16;          /* Register offset: 0x100014 */
-                        unsigned : 16;          /* Register offset: 0x100016 */
+                        unsigned int :16;       /* Register offset: 0x100010 */
+                        unsigned int :16;       /* Register offset: 0x100012 */
+                        unsigned int :16;       /* Register offset: 0x100014 */
+                        unsigned int :16;       /* Register offset: 0x100016 */
                 };
         } regs;
 };
@@ -90,7 +90,7 @@ struct state_vdp2 {
                         uint16_t vrsize;        /* Register offset: 0x180006 */
                         uint16_t hcnt;          /* Register offset: 0x180008 */
                         uint16_t vcnt;          /* Register offset: 0x18000A */
-                        unsigned : 16;          /* Register offset: 0x18000C */
+                        unsigned int :16;       /* Register offset: 0x18000C */
                         uint16_t ramctl;        /* Register offset: 0x18000E */
 
                         union {
@@ -219,7 +219,7 @@ struct state_vdp2 {
                         uint16_t prina;         /* Register offset: 0x1800F8 */
                         uint16_t prinb;         /* Register offset: 0x1800FA */
                         uint16_t prir;          /* Register offset: 0x1800FC */
-                        unsigned : 16;          /* Register offset: 0x18000C */
+                        unsigned int :16;       /* Register offset: 0x18000C */
                         uint16_t ccrsa;         /* Register offset: 0x180100 */
                         uint16_t ccrsb;         /* Register offset: 0x180102 */
                         uint16_t ccrsc;         /* Register offset: 0x180104 */

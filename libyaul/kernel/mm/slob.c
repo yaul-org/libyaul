@@ -39,9 +39,9 @@ struct slob_page_meta {
         uint32_t spm_bunits; /* Free number of block units */
         struct slob_block *spm_bfree; /* Pointer to first free block */
 
-        unsigned int : 32;
-        unsigned int : 32;
-        unsigned int : 32;
+        unsigned int :32;
+        unsigned int :32;
+        unsigned int :32;
 } __packed;
 
 struct slob_block {
