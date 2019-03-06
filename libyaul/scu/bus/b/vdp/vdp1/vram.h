@@ -24,7 +24,7 @@ extern "C" {
 #define VDP1_VRAM_SIZE 0x00080000 /* In bytes */
 
 struct vdp1_gouraud_table {
-        color_rgb555_t vgt_color[4];
+        color_rgb555_t colors[4];
 } __aligned(8);
 
 struct vdp1_clut {
@@ -49,7 +49,7 @@ struct vdp1_clut {
 
                         color_rgb555_t color;
                 };
-        } vcl_entries[16];
+        } entries[16];
 } __aligned(32);
 
 extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
