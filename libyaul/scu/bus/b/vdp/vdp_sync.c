@@ -244,12 +244,12 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         uint32_t xfer_src;
         xfer_src = CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts;
 
-        _vdp1_dma_cfg.dlc_mode = SCU_DMA_MODE_DIRECT;
-        _vdp1_dma_cfg.dlc_xfer.direct.len = xfer_len;
-        _vdp1_dma_cfg.dlc_xfer.direct.dst = xfer_dst;
-        _vdp1_dma_cfg.dlc_xfer.direct.src = xfer_src;
-        _vdp1_dma_cfg.dlc_stride = SCU_DMA_STRIDE_2_BYTES;
-        _vdp1_dma_cfg.dlc_update = SCU_DMA_UPDATE_NONE;
+        _vdp1_dma_cfg.mode = SCU_DMA_MODE_DIRECT;
+        _vdp1_dma_cfg.xfer.direct.len = xfer_len;
+        _vdp1_dma_cfg.xfer.direct.dst = xfer_dst;
+        _vdp1_dma_cfg.xfer.direct.src = xfer_src;
+        _vdp1_dma_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
+        _vdp1_dma_cfg.update = SCU_DMA_UPDATE_NONE;
 
         scu_dma_config_buffer(&_vdp1_dma_reg_buffer, &_vdp1_dma_cfg);
 
@@ -397,10 +397,10 @@ _init_vdp2(void)
         xfer->src = 0x00000000;
 
         struct scu_dma_level_cfg dma_level_cfg = {
-                .dlc_mode = SCU_DMA_MODE_INDIRECT,
-                .dlc_xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
-                .dlc_stride = SCU_DMA_STRIDE_2_BYTES,
-                .dlc_update = SCU_DMA_UPDATE_NONE
+                .mode = SCU_DMA_MODE_INDIRECT,
+                .xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
+                .stride = SCU_DMA_STRIDE_2_BYTES,
+                .update = SCU_DMA_UPDATE_NONE
         };
 
         struct scu_dma_reg_buffer *reg_buffer;
