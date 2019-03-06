@@ -45,7 +45,7 @@ endif
 
 SH_ARCH:= sh-elf
 
-RTAGS_RC:= $(YAUL_BUILD_ROOT)/.rtags/rc
+RTAGS_RC:= sh-elf-rc $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 
 SH_AS:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
 SH_AR:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)

@@ -98,7 +98,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.romdisk: ./romdisk $(ROMDISK_DEPS)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS)	-d ./romdisk/ -f $@
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS) -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -108,27 +108,27 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CC) $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 
 %.o: %.cc
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 
 %.o: %.C
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 
 %.o: %.cpp
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 
 %.o: %.cxx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_CXX) $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -Wp,-MMD,$*.d -c -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 
 %.o: %.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_AS) $(SH_AFLAGS) -o $@ $<
+	$(ECHO)$(RTAGS_RC) $(SH_AS) $(SH_AFLAGS) -o $@ $<
 
 %.m68k.o: %.m68k.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
