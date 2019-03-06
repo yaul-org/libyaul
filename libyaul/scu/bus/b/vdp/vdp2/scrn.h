@@ -32,16 +32,16 @@ extern "C" {
 #define VDP2_SCRN_CCC_RGB_16770000      4
 
 #define VDP2_SCRN_CALCULATE_PAGE_COUNT(format)                                 \
-        ((format)->scf_plane_size)
+        ((format)->plane_size)
 
 #define VDP2_SCRN_CALCULATE_PAGE_WIDTH(format)                                 \
-        (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
+        (((format)->character_size == (1 * 1)) ? 64 : 32)
 
 #define VDP2_SCRN_CALCULATE_PAGE_HEIGHT(format)                                \
-        (((format)->scf_character_size == (1 * 1)) ? 64 : 32)
+        (((format)->character_size == (1 * 1)) ? 64 : 32)
 
 #define VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format)                             \
-        (((format)->scf_character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
+        (((format)->character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
 
 #define VDP2_SCRN_CALCULATE_PAGE_COUNT_M(plsz)                                 \
         (plsz)
@@ -69,7 +69,7 @@ extern "C" {
  * Page dimension is 64x64 if cell size is 1x1.
  * Page dimension is 32x32 if cell size is 2x2. */
 #define VDP2_SCRN_CALCULATE_PAGE_SIZE(format)                                  \
-        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->scf_pnd_size * 2))
+        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->pnd_size * 2))
 
 #define VDP2_SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                           \
         (VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
@@ -97,7 +97,7 @@ extern "C" {
  */
 
 #define VDP2_SCRN_CALCULATE_PLANE_SIZE(format)                                 \
-        (((format)->scf_plane_size) * VDP2_SCRN_CALCULATE_PAGE_SIZE(format))
+        (((format)->plane_size) * VDP2_SCRN_CALCULATE_PAGE_SIZE(format))
 
 /*-
  * Possible values (plane count) that can fit within a 4Mbit VRAM bank:
@@ -209,31 +209,31 @@ extern "C" {
 #define VDP2_VRAM_USAGE_TYPE_BPD        0x03
 
 struct vdp2_scrn_bitmap_format {
-        uint8_t sbf_scroll_screen; /* Normal/rotational background */
-        uint32_t sbf_cc_count; /* Character color count */
+        uint8_t scroll_screen; /* Normal/rotational background */
+        uint32_t cc_count; /* Character color count */
 
         struct {
                 uint16_t width;
                 uint16_t height;
-        } sbf_bitmap_size; /* Bitmap sizes: 512x256, 512x512, 1024x256,
+        } bitmap_size; /* Bitmap sizes: 512x256, 512x512, 1024x256,
                             * 1024x512 */
-        uint32_t sbf_color_palette; /* Color palette lead address (if
+        uint32_t color_palette; /* Color palette lead address (if
                                      * applicable) */
-        uint32_t sbf_bitmap_pattern; /* Bitmap pattern lead address */
-        uint32_t sbf_sf_type; /* Special function type priority
+        uint32_t bitmap_pattern; /* Bitmap pattern lead address */
+        uint32_t sf_type; /* Special function type priority
                                * Special function type color calculation */
-        uint32_t sbf_sf_code; /* Special function code A
+        uint32_t sf_code; /* Special function code A
                                * Special function code B */
-        uint32_t sbf_sf_mode; /* Mode 0 (per screen)
+        uint32_t sf_mode; /* Mode 0 (per screen)
                                * Mode 1 (per cell)
                                * Mode 2 (per pixel) */
-        uint8_t sbf_rp_mode; /* RBG0 and RBG1 only
+        uint8_t rp_mode; /* RBG0 and RBG1 only
                               * Rotation parameter mode
                               *   Mode 0: Rotation Parameter A
                               *   Mode 1: Rotation Parameter B
                               *   Mode 2: Swap Coefficient Data Read
                               *   Mode 3: Swap via Rotation Parameter Window */
-        uint32_t sbf_rotation_table; /* RBG0 and RBG1 only */
+        uint32_t rotation_table_base; /* RBG0 and RBG1 only */
 
         struct {
                 union {
@@ -249,24 +249,24 @@ struct vdp2_scrn_bitmap_format {
                 };
 
                 uint8_t b1;
-        } sbf_usage_banks; /* RBG0 and RBG1 only */
+        } usage_banks; /* RBG0 and RBG1 only */
 };
 
 struct vdp2_scrn_cell_format {
-        uint32_t scf_scroll_screen; /* Normal/rotational background */
-        uint32_t scf_cc_count; /* Character color count */
-        uint32_t scf_character_size; /* Character size: (1 * 1) or (2 * 2) cells */
-        uint32_t scf_pnd_size; /* Pattern name data size: (1)-word or (2)-words */
-        uint32_t scf_auxiliary_mode; /* Auxiliary mode #0 (flip function) or
+        uint32_t scroll_screen; /* Normal/rotational background */
+        uint32_t cc_count; /* Character color count */
+        uint32_t character_size; /* Character size: (1 * 1) or (2 * 2) cells */
+        uint32_t pnd_size; /* Pattern name data size: (1)-word or (2)-words */
+        uint32_t auxiliary_mode; /* Auxiliary mode #0 (flip function) or
                                       * auxiliary mode #1 (no flip function) */
-        uint32_t scf_cp_table; /* Character pattern table lead address*/
-        uint32_t scf_color_palette; /* Color palette lead address */
-        uint32_t scf_plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
-        uint32_t scf_sf_type; /* Special function type priority
+        uint32_t cp_table; /* Character pattern table lead address*/
+        uint32_t color_palette; /* Color palette lead address */
+        uint32_t plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
+        uint32_t sf_type; /* Special function type priority
                                * Special function type color calculation */
-        uint32_t scf_sf_code; /* Special function code A
+        uint32_t sf_code; /* Special function code A
                                * Special function code B */
-        uint32_t scf_sf_mode; /* Mode 0 (per screen)
+        uint32_t sf_mode; /* Mode 0 (per screen)
                                * Mode 1 (per cell)
                                * Mode 2 (per pixel) */
 
@@ -291,15 +291,15 @@ struct vdp2_scrn_cell_format {
                         uint32_t plane_o; /* For RBG0 and RBG1 use only */
                         uint32_t plane_p; /* For RBG0 and RBG1 use only */
                 } __packed;
-        } scf_map; /* Map lead addresses */
+        } map_bases; /* Map lead addresses */
 
-        uint32_t scf_rp_mode; /* RBG0 and RBG1 only
+        uint32_t rp_mode; /* RBG0 and RBG1 only
                                * Rotation parameter mode
                                *   Mode 0: Rotation Parameter A
                                *   Mode 1: Rotation Parameter B
                                *   Mode 2: Swap Coefficient Data Read
                                *   Mode 3: Swap via Rotation Parameter Window */
-        uint32_t scf_rotation_tbl; /* RBG0 and RBG1 only */
+        uint32_t rotation_table; /* RBG0 and RBG1 only */
 
         struct {
                 union {
@@ -315,7 +315,7 @@ struct vdp2_scrn_cell_format {
                 };
 
                 uint8_t b1;
-        } scf_usage_banks; /* RBG0 and RBG1 only */
+        } usage_banks; /* RBG0 and RBG1 only */
 };
 
 /* Hardware defined */
@@ -443,20 +443,20 @@ struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
 struct vdp2_scrn_ls_format {
-        uint8_t ls_scrn; /* Normal background */
-        uint32_t ls_lsta; /* Line scroll table (lead addr.) */
-        uint8_t ls_int; /* Dependent on the interlace setting */
+        uint8_t scroll_screen; /* Normal background */
+        uint32_t line_scroll_table; /* Line scroll table (lead addr.) */
+        uint8_t interlace_mode; /* Dependent on the interlace setting */
 
 #define VDP2_SCRN_LS_N0SCX      0x0002
 #define VDP2_SCRN_LS_N1SCX      0x0200
 #define VDP2_SCRN_LS_N0SCY      0x0004
 #define VDP2_SCRN_LS_N1SCY      0x0400
-        uint16_t ls_fun; /* Enable line scroll */
+        uint16_t enable; /* Enable line scroll */
 };
 
 struct vdp2_scrn_vcs_format {
-        uint8_t vcs_scrn; /* Normal background */
-        uint32_t vcs_vcsta; /* Vertical cell scroll table (lead addr.) */
+        uint8_t scroll_screen; /* Normal background */
+        uint32_t vcs_table; /* Vertical cell scroll table (lead addr.) */
 };
 
 #define VDP2_SCRN_COLOR_OFFSET_A        0
@@ -483,7 +483,6 @@ extern void vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *);
 extern void vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *);
 extern void vdp2_scrn_vcs_unset(uint8_t);
 extern void vdp2_scrn_vcs_clear(void);
-
 
 extern void vdp2_scrn_mosaic_set(uint8_t);
 extern void vdp2_scrn_mosaic_unset(uint8_t);
