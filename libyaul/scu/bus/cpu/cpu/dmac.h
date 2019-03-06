@@ -22,7 +22,7 @@ extern "C" {
 #define DMAC_PRIORITY_MODE_FIXED        0x00
 #define DMAC_PRIORITY_MODE_ROUND_ROBIN  0x01
 
-struct dmac_ch_cfg {
+struct cpu_dmac_cfg {
         uint8_t channel;
 
 #define DMAC_DESTINATION_FIXED          0x00
@@ -126,7 +126,7 @@ cpu_dmac_stop(void)
 
 extern void cpu_dmac_init(void);
 extern void cpu_dmac_status_get(struct dmac_status *);
-extern void cpu_dmac_channel_config_set(const struct dmac_ch_cfg *);
+extern void cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *);
 extern void cpu_dmac_channel_wait(uint8_t);
 
 #ifdef __cplusplus

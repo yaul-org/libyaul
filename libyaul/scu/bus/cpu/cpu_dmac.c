@@ -101,7 +101,7 @@ cpu_dmac_status_get(struct dmac_status *status)
 }
 
 void
-cpu_dmac_channel_config_set(const struct dmac_ch_cfg *cfg)
+cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *cfg)
 {
         uint32_t n;
         n = (cfg->channel & 0x01) << 4;

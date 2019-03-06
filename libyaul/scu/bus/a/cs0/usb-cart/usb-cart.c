@@ -82,16 +82,16 @@ usb_cart_dma_read(void *buffer, uint32_t len)
                 return;
         }
 
-        const struct dmac_ch_cfg dmac_cfg = {
-                .dcc_ch = 0,
-                .dcc_src_mode = DMAC_SOURCE_FIXED,
-                .dcc_dst_mode = DMAC_DESTINATION_INCREMENT,
-                .dcc_stride = DMAC_STRIDE_1_BYTE,
-                .dcc_bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
-                .dcc_src = USB_CART(FIFO),
-                .dcc_dst = (uint32_t)buffer,
-                .dcc_len = USB_CART_OUT_EP_SIZE,
-                .dcc_ihr = NULL
+        const struct cpu_dmac_cfg dmac_cfg = {
+                .channel = 0,
+                .src_mode = DMAC_SOURCE_FIXED,
+                .dst_mode = DMAC_DESTINATION_INCREMENT,
+                .stride = DMAC_STRIDE_1_BYTE,
+                .bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .src = USB_CART(FIFO),
+                .dst = (uint32_t)buffer,
+                .len = USB_CART_OUT_EP_SIZE,
+                .ihr = NULL
         };
 
         uint32_t aref_bits;
@@ -162,16 +162,16 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
                 return;
         }
 
-        const struct dmac_ch_cfg dmac_cfg = {
-                .dcc_ch = 0,
-                .dcc_src_mode = DMAC_SOURCE_INCREMENT,
-                .dcc_dst_mode = DMAC_DESTINATION_FIXED,
-                .dcc_stride = DMAC_STRIDE_1_BYTE,
-                .dcc_bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
-                .dcc_src = (uint32_t)buffer,
-                .dcc_dst = USB_CART(FIFO),
-                .dcc_len = USB_CART_OUT_EP_SIZE,
-                .dcc_ihr = NULL
+        const struct cpu_dmac_cfg dmac_cfg = {
+                .channel = 0,
+                .src_mode = DMAC_SOURCE_INCREMENT,
+                .dst_mode = DMAC_DESTINATION_FIXED,
+                .stride = DMAC_STRIDE_1_BYTE,
+                .bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .src = (uint32_t)buffer,
+                .dst = USB_CART(FIFO),
+                .len = USB_CART_OUT_EP_SIZE,
+                .ihr = NULL
         };
 
         uint32_t aref_bits;

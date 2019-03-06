@@ -427,7 +427,7 @@ _buffer_clear(void)
         uint8_t ch;
         ch = 2;
 
-        struct dmac_ch_cfg dmac_cfg  = {
+        struct cpu_dmac_cfg dmac_cfg  = {
                 .channel = ch,
                 .dst = (uint32_t)&_dev_state->page_pnd[0],
                 .dst_mode = DMAC_DESTINATION_INCREMENT,
