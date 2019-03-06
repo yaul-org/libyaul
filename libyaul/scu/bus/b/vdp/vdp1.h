@@ -21,8 +21,8 @@ struct vdp1_transfer_status {
         union {
                 struct {
                         unsigned :14;
-                        unsigned vte_cef:1;
-                        unsigned vte_bef:1;
+                        unsigned cef:1;
+                        unsigned bef:1;
                 } __packed;
 
                 uint16_t raw;
@@ -32,15 +32,15 @@ struct vdp1_transfer_status {
 struct vdp1_mode_status {
         union {
                 struct {
-                        unsigned vms_version:4;
+                        unsigned version:4;
                         unsigned :3;
-                        unsigned vms_ptm1:1;
-                        unsigned vms_eos:1;
-                        unsigned vms_die:1;
-                        unsigned vms_dil:1;
-                        unsigned vms_fcm:1;
-                        unsigned vms_vbe:1;
-                        unsigned vms_tvm:3;
+                        unsigned ptm1:1;
+                        unsigned eos:1;
+                        unsigned die:1;
+                        unsigned dil:1;
+                        unsigned fcm:1;
+                        unsigned vbe:1;
+                        unsigned tvm:3;
                 } __packed;
 
                 uint16_t raw;

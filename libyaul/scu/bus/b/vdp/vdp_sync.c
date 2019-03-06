@@ -420,10 +420,10 @@ _vdp1_transfer_over(void)
 
         /* Detect if VDP1 is still drawing (transfer over status) */
         bool transfer_over;
-        transfer_over = (transfer_status.vte_bef == 0x00) &&
-                        (transfer_status.vte_cef == 0x00);
+        transfer_over = (transfer_status.bef == 0x00) &&
+                        (transfer_status.cef == 0x00);
 
-        return ((mode_status.vms_ptm1 != 0x00) && transfer_over);
+        return ((mode_status.ptm1 != 0x00) && transfer_over);
 }
 
 static void
