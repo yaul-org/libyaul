@@ -19,8 +19,8 @@ static void _dmac_ch1_ihr_handler(void);
 
 static void _default_ihr(void);
 
-#define DMAC_IHR_INDEX_CH0      0
-#define DMAC_IHR_INDEX_CH1      1
+#define CPU_DMAC_IHR_INDEX_CH0  0
+#define CPU_DMAC_IHR_INDEX_CH1  1
 
 static void (*_dmac_ihr_table[])(void) = {
         _default_ihr,
@@ -126,9 +126,9 @@ cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *cfg)
         /* Check that the source and destination addresses are
          * stride-byte aligned */
 
-        if (stride >= DMAC_STRIDE_4_BYTES) {
+        if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
                 reg_tcr >>= 2;
-        } else if (stride == DMAC_STRIDE_2_BYTES) {
+        } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
                 reg_tcr >>= 1;
         }
 
@@ -174,7 +174,7 @@ cpu_dmac_channel_wait(uint8_t ch)
 static void __interrupt_handler
 _dmac_ch0_ihr_handler(void)
 {
-        _dmac_ihr_table[DMAC_IHR_INDEX_CH0]();
+        _dmac_ihr_table[CPU_DMAC_IHR_INDEX_CH0]();
 
         MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
 }
@@ -182,7 +182,7 @@ _dmac_ch0_ihr_handler(void)
 static void __interrupt_handler
 _dmac_ch1_ihr_handler(void)
 {
-        _dmac_ihr_table[DMAC_IHR_INDEX_CH1]();
+        _dmac_ihr_table[CPU_DMAC_IHR_INDEX_CH1]();
 
         MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
 }

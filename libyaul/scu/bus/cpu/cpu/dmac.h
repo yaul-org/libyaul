@@ -19,30 +19,30 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define DMAC_PRIORITY_MODE_FIXED        0x00
-#define DMAC_PRIORITY_MODE_ROUND_ROBIN  0x01
+#define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
+#define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
 
 struct cpu_dmac_cfg {
         uint8_t channel;
 
-#define DMAC_DESTINATION_FIXED          0x00
-#define DMAC_DESTINATION_INCREMENT      0x01
-#define DMAC_DESTINATION_DECREMENT      0x02
+#define CPU_DMAC_DESTINATION_FIXED      0x00
+#define CPU_DMAC_DESTINATION_INCREMENT  0x01
+#define CPU_DMAC_DESTINATION_DECREMENT  0x02
         uint8_t src_mode;
 
-#define DMAC_SOURCE_FIXED       0x00
-#define DMAC_SOURCE_INCREMENT   0x01
-#define DMAC_SOURCE_DECREMENT   0x02
+#define CPU_DMAC_SOURCE_FIXED           0x00
+#define CPU_DMAC_SOURCE_INCREMENT       0x01
+#define CPU_DMAC_SOURCE_DECREMENT       0x02
         uint8_t dst_mode;
 
-#define DMAC_STRIDE_1_BYTE      0x00
-#define DMAC_STRIDE_2_BYTES     0x01
-#define DMAC_STRIDE_4_BYTES     0x02
-#define DMAC_STRIDE_16_BYTES    0x03
+#define CPU_DMAC_STRIDE_1_BYTE          0x00
+#define CPU_DMAC_STRIDE_2_BYTES         0x01
+#define CPU_DMAC_STRIDE_4_BYTES         0x02
+#define CPU_DMAC_STRIDE_16_BYTES        0x03
         uint8_t stride;
 
-#define DMAC_BUS_MODE_CYCLE_STEAL       0x00
-#define DMAC_BUS_MODE_BURST             0x01
+#define CPU_DMAC_BUS_MODE_CYCLE_STEAL   0x00
+#define CPU_DMAC_BUS_MODE_BURST         0x01
         uint8_t bus_mode;
 
         uint32_t src;
