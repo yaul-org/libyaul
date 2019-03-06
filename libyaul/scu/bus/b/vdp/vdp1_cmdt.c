@@ -98,15 +98,15 @@ vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x0000;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->cs_mode.raw & 0x9FFF;
+        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 
         _cmdt_cmd_colr_set(cmdt, sprite);
         _cmdt_cmd_srca_set(cmdt, sprite);
         _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
+        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
 
-        cmdt->cmd_xa = sprite->cs_position.x;
-        cmdt->cmd_ya = sprite->cs_position.y;
+        cmdt->cmd_xa = sprite->position.x;
+        cmdt->cmd_ya = sprite->position.y;
 
         return index;
 }
@@ -128,34 +128,34 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x0001;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->cs_mode.raw & 0x9FFF;
+        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 
         _cmdt_cmd_colr_set(cmdt, sprite);
         _cmdt_cmd_srca_set(cmdt, sprite);
         _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
+        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
 
-        if (!sprite->cs_zoom_point.enable) {
+        if (!sprite->zoom_point.enable) {
                 /* Scale with two vertices, A and C. No zoom point */
-                cmdt->cmd_xa = sprite->cs_vertex.a.x;
-                cmdt->cmd_ya = sprite->cs_vertex.a.y;
-                cmdt->cmd_xc = sprite->cs_vertex.c.x;
-                cmdt->cmd_yc = sprite->cs_vertex.c.y;
+                cmdt->cmd_xa = sprite->vertex.a.x;
+                cmdt->cmd_ya = sprite->vertex.a.y;
+                cmdt->cmd_xc = sprite->vertex.c.x;
+                cmdt->cmd_yc = sprite->vertex.c.y;
 
                 return index;
         }
 
         uint16_t zp;
-        zp = (sprite->cs_zoom_point.enable)
-            ? dlog2(sprite->cs_zoom_point.raw & ~0x0010)
+        zp = (sprite->zoom_point.enable)
+            ? dlog2(sprite->zoom_point.raw & ~0x0010)
             : 0x0000;
 
         cmdt->cmd_ctrl |= zp << 8;
 
-        cmdt->cmd_xa = sprite->cs_zoom.point.x;
-        cmdt->cmd_ya = sprite->cs_zoom.point.y;
-        cmdt->cmd_xb = sprite->cs_zoom.display.x;
-        cmdt->cmd_yb = sprite->cs_zoom.display.y;
+        cmdt->cmd_xa = sprite->zoom.point.x;
+        cmdt->cmd_ya = sprite->zoom.point.y;
+        cmdt->cmd_xb = sprite->zoom.display.x;
+        cmdt->cmd_yb = sprite->zoom.display.y;
 
         return index;
 }
@@ -177,12 +177,12 @@ vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x0002;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->cs_mode.raw & 0x9FFF;
+        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 
         _cmdt_cmd_colr_set(cmdt, sprite);
         _cmdt_cmd_srca_set(cmdt, sprite);
         _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->cs_grad);
+        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
 
         /*-
          * CCW starting from vertex D
@@ -194,14 +194,14 @@ vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
          * A------------B
          */
 
-        cmdt->cmd_xa = sprite->cs_vertex.a.x;
-        cmdt->cmd_ya = sprite->cs_vertex.a.y;
-        cmdt->cmd_xb = sprite->cs_vertex.b.x;
-        cmdt->cmd_yb = sprite->cs_vertex.b.y;
-        cmdt->cmd_xc = sprite->cs_vertex.c.x;
-        cmdt->cmd_yc = sprite->cs_vertex.c.y;
-        cmdt->cmd_xd = sprite->cs_vertex.d.x;
-        cmdt->cmd_yd = sprite->cs_vertex.d.y;
+        cmdt->cmd_xa = sprite->vertex.a.x;
+        cmdt->cmd_ya = sprite->vertex.a.y;
+        cmdt->cmd_xb = sprite->vertex.b.x;
+        cmdt->cmd_yb = sprite->vertex.b.y;
+        cmdt->cmd_xc = sprite->vertex.c.x;
+        cmdt->cmd_yc = sprite->vertex.c.y;
+        cmdt->cmd_xd = sprite->vertex.d.x;
+        cmdt->cmd_yd = sprite->vertex.d.y;
 
         return index;
 }
@@ -224,10 +224,10 @@ vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0004;
         cmdt->cmd_link = 0x0000;
         /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = polygon->cp_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polygon->cp_color.raw;
+        cmdt->cmd_pmod = polygon->draw_mode.raw | 0x00C0;
+        cmdt->cmd_colr = polygon->color.raw;
 
-        _cmdt_cmd_grda_set(cmdt, polygon->cp_grad);
+        _cmdt_cmd_grda_set(cmdt, polygon->grad_base);
 
         /*-
          * CCW starting from vertex D
@@ -239,14 +239,14 @@ vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
          * A------------B
          */
 
-        cmdt->cmd_xa = polygon->cp_vertex.a.x;
-        cmdt->cmd_ya = polygon->cp_vertex.a.y;
-        cmdt->cmd_xb = polygon->cp_vertex.b.x;
-        cmdt->cmd_yb = polygon->cp_vertex.b.y;
-        cmdt->cmd_xc = polygon->cp_vertex.c.x;
-        cmdt->cmd_yc = polygon->cp_vertex.c.y;
-        cmdt->cmd_xd = polygon->cp_vertex.d.x;
-        cmdt->cmd_yd = polygon->cp_vertex.d.y;
+        cmdt->cmd_xa = polygon->vertex.a.x;
+        cmdt->cmd_ya = polygon->vertex.a.y;
+        cmdt->cmd_xb = polygon->vertex.b.x;
+        cmdt->cmd_yb = polygon->vertex.b.y;
+        cmdt->cmd_xc = polygon->vertex.c.x;
+        cmdt->cmd_yc = polygon->vertex.c.y;
+        cmdt->cmd_xd = polygon->vertex.d.x;
+        cmdt->cmd_yd = polygon->vertex.d.y;
 
         return index;
 }
@@ -269,20 +269,20 @@ vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0005;
         cmdt->cmd_link = 0x0000;
         /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = polyline->cl_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polyline->cl_color.raw;
+        cmdt->cmd_pmod = polyline->draw_mode.raw | 0x00C0;
+        cmdt->cmd_colr = polyline->color.raw;
 
-        _cmdt_cmd_grda_set(cmdt, polyline->cl_grad);
+        _cmdt_cmd_grda_set(cmdt, polyline->grad_base);
 
         /* CCW starting from vertex D */
-        cmdt->cmd_xd = polyline->cl_vertex.d.x;
-        cmdt->cmd_yd = polyline->cl_vertex.d.y;
-        cmdt->cmd_xa = polyline->cl_vertex.a.x;
-        cmdt->cmd_ya = polyline->cl_vertex.a.y;
-        cmdt->cmd_xb = polyline->cl_vertex.b.x;
-        cmdt->cmd_yb = polyline->cl_vertex.b.y;
-        cmdt->cmd_xc = polyline->cl_vertex.c.x;
-        cmdt->cmd_yc = polyline->cl_vertex.c.y;
+        cmdt->cmd_xd = polyline->vertex.d.x;
+        cmdt->cmd_yd = polyline->vertex.d.y;
+        cmdt->cmd_xa = polyline->vertex.a.x;
+        cmdt->cmd_ya = polyline->vertex.a.y;
+        cmdt->cmd_xb = polyline->vertex.b.x;
+        cmdt->cmd_yb = polyline->vertex.b.y;
+        cmdt->cmd_xc = polyline->vertex.c.x;
+        cmdt->cmd_yc = polyline->vertex.c.y;
 
         return index;
 }
@@ -305,15 +305,15 @@ vdp1_cmdt_line_add(struct vdp1_cmdt_list *cmdt_list,
         cmdt->cmd_ctrl = 0x0006;
         cmdt->cmd_link = 0x0000;
         /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = line->cl_mode.raw | 0x00C0;
-        cmdt->cmd_colr = line->cl_color.raw;
+        cmdt->cmd_pmod = line->draw_mode.raw | 0x00C0;
+        cmdt->cmd_colr = line->color.raw;
 
-        _cmdt_cmd_grda_set(cmdt, line->cl_grad);
+        _cmdt_cmd_grda_set(cmdt, line->grad_base);
 
-        cmdt->cmd_xa = line->cl_vertex.a.x;
-        cmdt->cmd_ya = line->cl_vertex.a.y;
-        cmdt->cmd_xb = line->cl_vertex.b.x;
-        cmdt->cmd_yb = line->cl_vertex.b.y;
+        cmdt->cmd_xa = line->vertex.a.x;
+        cmdt->cmd_ya = line->vertex.a.y;
+        cmdt->cmd_xb = line->vertex.b.x;
+        cmdt->cmd_yb = line->vertex.b.y;
 
         return index;
 }
@@ -334,16 +334,16 @@ vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
         index = cmdt - &cmdt_list->cmdts[0];
 
         int16_t x0;
-        x0 = user_clip->ucc_coords[0].x;
+        x0 = user_clip->coords[0].x;
 
         int16_t y0;
-        y0 = user_clip->ucc_coords[0].y;
+        y0 = user_clip->coords[0].y;
 
         int16_t x1;
-        x1 = user_clip->ucc_coords[1].x;
+        x1 = user_clip->coords[1].x;
 
         int16_t y1;
-        y1 = user_clip->ucc_coords[1].y;
+        y1 = user_clip->coords[1].y;
 
         assert(((x0 <= x1) && (y0 <= y1)));
 
@@ -376,8 +376,8 @@ vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x0009;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xc = system_clip->scc_coord.x;
-        cmdt->cmd_yc = system_clip->scc_coord.y;
+        cmdt->cmd_xc = system_clip->coord.x;
+        cmdt->cmd_yc = system_clip->coord.y;
 
         return index;
 }
@@ -399,8 +399,8 @@ vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *cmdt_list,
 
         cmdt->cmd_ctrl = 0x000A;
         cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xa = local->lc_coord.x;
-        cmdt->cmd_ya = local->lc_coord.y;
+        cmdt->cmd_xa = local->coord.x;
+        cmdt->cmd_ya = local->coord.y;
 
         return index;
 }
@@ -537,21 +537,21 @@ _cmdt_cmd_colr_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
         const struct vdp1_cmdt_normal_sprite *sprite;
         sprite = base_sprite;
 
-        switch (sprite->cs_mode.color_mode) {
+        switch (sprite->draw_mode.color_mode) {
         case 0:
-                cmdt->cmd_colr = sprite->cs_sprite_type.raw & 0xFFF0;
+                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFFF0;
                 break;
         case 1:
-                cmdt->cmd_colr = (uint16_t)((sprite->cs_clut >> 3) & 0xFFFF);
+                cmdt->cmd_colr = (uint16_t)((sprite->clut >> 3) & 0xFFFF);
                 break;
         case 2:
-                cmdt->cmd_colr = sprite->cs_sprite_type.raw & 0xFFC0;
+                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFFC0;
                 break;
         case 3:
-                cmdt->cmd_colr = sprite->cs_sprite_type.raw & 0xFF80;
+                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFF80;
                 break;
         case 4:
-                cmdt->cmd_colr = sprite->cs_sprite_type.raw & 0xFF00;
+                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFF00;
                 break;
         case 5:
                 break;
@@ -564,7 +564,7 @@ _cmdt_cmd_srca_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
         const struct vdp1_cmdt_normal_sprite *sprite;
         sprite = base_sprite;
 
-        cmdt->cmd_srca = (sprite->cs_char >> 3) & 0xFFFF;
+        cmdt->cmd_srca = (sprite->char_base >> 3) & 0xFFFF;
 }
 
 static inline void __always_inline
@@ -574,10 +574,10 @@ _cmdt_cmd_size_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
         sprite = base_sprite;
 
         uint16_t width;
-        width = sprite->cs_width;
+        width = sprite->width;
 
         uint16_t height;
-        height = sprite->cs_height;
+        height = sprite->height;
 
         cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
 }
