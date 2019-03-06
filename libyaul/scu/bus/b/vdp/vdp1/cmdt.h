@@ -26,7 +26,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n)                                  \
+#define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE                                     \
         union {                                                                \
                 struct {                                                       \
                         unsigned int msb_enable:1;                /* Bit 15 */ \
@@ -42,9 +42,9 @@ extern "C" {
                 } __aligned(2);                                                \
                                                                                \
                 uint16_t raw;                                                  \
-        } __CONCAT(n, _mode)
+        } draw_mode
 
-#define VDP1_CMDT_SPRITE_TYPE_DECLARE(n)                                       \
+#define VDP1_CMDT_SPRITE_TYPE_DECLARE                                          \
         union {                                                                \
                 struct vdp2_sprite_type_0 type_0;                              \
                 struct vdp2_sprite_type_1 type_1;                              \
@@ -64,35 +64,35 @@ extern "C" {
                 struct vdp2_sprite_type_f type_f;                              \
                                                                                \
                 uint16_t raw;                                                  \
-        } __CONCAT(n, _sprite_type)
+        } sprite_type
 
-#define VDP1_CMDT_SPRITE_DECLARE(n)                                            \
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n);                                 \
+#define VDP1_CMDT_SPRITE_DECLARE                                               \
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE;                                    \
                                                                                \
         union {                                                                \
                 /* Mode 0, 2, 3, and 4 */                                      \
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(n);                              \
+                VDP1_CMDT_SPRITE_TYPE_DECLARE;                                 \
                                                                                \
                 /* Mode 1 */                                                   \
-                uint32_t __CONCAT(n, _clut);                                   \
+                uint32_t clut;                                                 \
         };                                                                     \
                                                                                \
-        uint32_t __CONCAT(n, _char);                                           \
-        uint16_t __CONCAT(n, _width);                                          \
-        uint16_t __CONCAT(n, _height);                                         \
+        uint32_t char_base;                                                    \
+        uint16_t width;                                                        \
+        uint16_t height;                                                       \
                                                                                \
-        uint32_t __CONCAT(n, _grad)
+        uint32_t grad_base
 
-#define VDP1_CMDT_NON_TEXTURED_DECLARE(n)                                      \
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE(n);                                 \
+#define VDP1_CMDT_NON_TEXTURED_DECLARE                                         \
+        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE;                                    \
                                                                                \
         union {                                                                \
-                VDP1_CMDT_SPRITE_TYPE_DECLARE(n);                              \
+                VDP1_CMDT_SPRITE_TYPE_DECLARE;                                 \
                                                                                \
-                color_rgb555_t __CONCAT(n, _color);                            \
+                color_rgb555_t color;                                          \
         };                                                                     \
                                                                                \
-        uint32_t __CONCAT(n, _grad)
+        uint32_t grad_base
 
 struct vdp1_cmdt;
 
@@ -122,22 +122,22 @@ struct vdp1_cmdt {
 } __aligned(32);
 
 struct vdp1_cmdt_normal_sprite {
-        VDP1_CMDT_SPRITE_DECLARE(cs);
+        VDP1_CMDT_SPRITE_DECLARE;
 
         union {
-                int16_vector2_t cs_position;
+                int16_vector2_t position;
 
                 struct {
                         int16_vector2_t a;
-                } cs_vertex;
+                } vertex;
 
-                int16_t cs_components[2];
-                int16_vector2_t cs_vertices[1];
+                int16_t components[2];
+                int16_vector2_t vertices[1];
         };
 };
 
 struct vdp1_cmdt_scaled_sprite {
-        VDP1_CMDT_SPRITE_DECLARE(cs);
+        VDP1_CMDT_SPRITE_DECLARE;
 
         union {
 #define CMDT_ZOOM_POINT_UPPER_LEFT      0x0030
@@ -166,20 +166,20 @@ struct vdp1_cmdt_scaled_sprite {
                 } __aligned(2);
 
                 uint16_t raw;
-        } cs_zoom_point;
+        } zoom_point;
 
         union {
                 struct {
                         /* Vertex A */
-                        int16_vector2_t cs_ul;
+                        int16_vector2_t ul;
 
                         /* Vertex B */
                         unsigned int : 16;
                         unsigned int : 16;
 
                         /* Vertex C */
-                        int16_vector2_t cs_lr;
-                } cs_scale;
+                        int16_vector2_t lr;
+                } scale;
 
                 struct {
                         /* Vertex A */
@@ -190,21 +190,21 @@ struct vdp1_cmdt_scaled_sprite {
                         /* Vertex C */
                         unsigned int : 16;
                         unsigned int : 16;
-                } cs_zoom;
+                } zoom;
 
                 struct {
                         int16_vector2_t a;
                         int16_vector2_t b;
                         int16_vector2_t c;
-                } cs_vertex;
+                } vertex;
 
-                int16_t cs_components[6];
-                int16_vector2_t cs_vertices[3];
+                int16_t components[6];
+                int16_vector2_t vertices[3];
         };
 };
 
 struct vdp1_cmdt_distorted_sprite {
-        VDP1_CMDT_SPRITE_DECLARE(cs);
+        VDP1_CMDT_SPRITE_DECLARE;
 
         union {
                 struct {
@@ -212,15 +212,15 @@ struct vdp1_cmdt_distorted_sprite {
                         int16_vector2_t b;
                         int16_vector2_t c;
                         int16_vector2_t d;
-                } cs_vertex;
+                } vertex;
 
-                int16_t cs_components[8];
-                int16_vector2_t cs_vertices[4];
+                int16_t components[8];
+                int16_vector2_t vertices[4];
         };
 };
 
 struct vdp1_cmdt_polygon {
-        VDP1_CMDT_NON_TEXTURED_DECLARE(cp);
+        VDP1_CMDT_NON_TEXTURED_DECLARE;
 
         union {
                 struct {
@@ -228,15 +228,15 @@ struct vdp1_cmdt_polygon {
                         int16_vector2_t b;
                         int16_vector2_t c;
                         int16_vector2_t d;
-                } cp_vertex;
+                } vertex;
 
-                int16_t cp_components[8];
-                int16_vector2_t cp_vertices[4];
+                int16_t components[8];
+                int16_vector2_t vertices[4];
         };
 };
 
 struct vdp1_cmdt_polyline {
-        VDP1_CMDT_NON_TEXTURED_DECLARE(cl);
+        VDP1_CMDT_NON_TEXTURED_DECLARE;
 
         union {
                 struct {
@@ -244,37 +244,37 @@ struct vdp1_cmdt_polyline {
                         int16_vector2_t b;
                         int16_vector2_t c;
                         int16_vector2_t d;
-                } cl_vertex;
+                } vertex;
 
-                int16_t cl_components[4];
-                int16_vector2_t cl_vertices[4];
+                int16_t components[4];
+                int16_vector2_t vertices[4];
         };
 };
 
 struct vdp1_cmdt_line {
-        VDP1_CMDT_NON_TEXTURED_DECLARE(cl);
+        VDP1_CMDT_NON_TEXTURED_DECLARE;
 
         union {
                 struct {
                         int16_vector2_t a;
                         int16_vector2_t b;
-                } cl_vertex;
+                } vertex;
 
-                int16_t cl_components[4];
-                int16_vector2_t cl_vertices[8];
+                int16_t components[4];
+                int16_vector2_t vertices[8];
         };
 };
 
 struct vdp1_cmdt_local_coord {
-        int16_vector2_t lc_coord;
+        int16_vector2_t coord;
 };
 
 struct vdp1_cmdt_system_clip_coord {
-        int16_vector2_t scc_coord;
+        int16_vector2_t coord;
 };
 
 struct vdp1_cmdt_user_clip_coord {
-        int16_vector2_t ucc_coords[2];
+        int16_vector2_t coords[2];
 };
 
 static inline uint16_t __always_inline
