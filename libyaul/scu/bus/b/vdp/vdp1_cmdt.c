@@ -96,7 +96,7 @@ vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         uint16_t index;
         index = cmdt - &cmdt_list->cmdts[0];
 
-        cmdt->cmd_ctrl = 0x0000;
+        cmdt->cmd_ctrl = sprite->direction.raw & 0x0030;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 
@@ -126,7 +126,7 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         uint16_t index;
         index = cmdt - &cmdt_list->cmdts[0];
 
-        cmdt->cmd_ctrl = 0x0001;
+        cmdt->cmd_ctrl = (sprite->direction.raw & 0x0030) | 0x0001;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 
@@ -175,7 +175,7 @@ vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
         uint16_t index;
         index = cmdt - &cmdt_list->cmdts[0];
 
-        cmdt->cmd_ctrl = 0x0002;
+        cmdt->cmd_ctrl = (sprite->direction.raw & 0x0030) | 0x0002;
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
 

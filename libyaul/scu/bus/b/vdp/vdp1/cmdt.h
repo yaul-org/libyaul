@@ -77,6 +77,17 @@ extern "C" {
                 uint32_t clut;                                                 \
         };                                                                     \
                                                                                \
+        union {                                                                \
+                struct {                                                       \
+                        unsigned int :10;                                      \
+                        unsigned int horizontal:1;                             \
+                        unsigned int vertical:1;                               \
+                        unsigned int :4;                                       \
+                };                                                             \
+                                                                               \
+                uint16_t raw;                                                  \
+        } direction;                                                           \
+                                                                               \
         uint32_t char_base;                                                    \
         uint16_t width;                                                        \
         uint16_t height;                                                       \
