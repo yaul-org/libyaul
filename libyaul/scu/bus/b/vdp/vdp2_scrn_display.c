@@ -11,6 +11,17 @@
 
 #include "vdp-internal.h"
 
+static const uint8_t _bgon_bits[] __aligned(4) = {
+        0x01, /* NBG0 */
+        0x02, /* NBG1 */
+        0x04, /* NBG2 */
+        0x08, /* NBG3 */
+        0x10, /* RBG0 */
+        0x20, /* RBG1 */
+        0x00,
+        0x00
+};
+
 void
 vdp2_scrn_display_set(uint8_t scrn, bool transparent)
 {
@@ -24,11 +35,12 @@ vdp2_scrn_display_set(uint8_t scrn, bool transparent)
                (scrn == VDP2_SCRN_RBG0));
 #endif /* DEBUG */
 
-        /* Enable and disable scroll screens */
-        _state_vdp2()->regs.bgon |= 1 << scrn;
+        const uint16_t bgon_bits = _bgon_bits[scrn];
+
+        _state_vdp2()->regs.bgon |= bgon_bits;
 
         if (!transparent) {
-                _state_vdp2()->regs.bgon |= 1 << (scrn + 8);
+                _state_vdp2()->regs.bgon |= bgon_bits << 8;
         }
 
 #ifdef DEBUG
@@ -80,7 +92,9 @@ vdp2_scrn_display_unset(uint8_t scrn)
                (scrn == VDP2_SCRN_RBG0));
 #endif /* DEBUG */
 
-        _state_vdp2()->regs.bgon &= ~((1 << scrn) | (1 << (scrn + 8)));
+        const uint16_t bgon_bits = _bgon_bits[scrn];
+
+        _state_vdp2()->regs.bgon &= (~bgon_bits) | (~(bgon_bits << 8));
 }
 
 void
