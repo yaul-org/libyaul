@@ -41,6 +41,6 @@ vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *ls)
                 _state_vdp2()->regs.lsta1l = lstal;
                 break;
         default:
-                return;
+                break;
         }
 }

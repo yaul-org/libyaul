@@ -128,7 +128,9 @@ vdp_sync(int16_t interval __unused)
         int8_t ret;
         ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
             _vdp2_commit_handler, NULL);
+#ifdef DEBUG
         assert(ret == 0);
+#endif /* DEBUG */
 
         uint8_t sr_mask;
         sr_mask = cpu_intc_mask_get();
@@ -205,15 +207,19 @@ vdp_sync(int16_t interval __unused)
 void
 vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 {
+#ifdef DEBUG
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
         assert(cmdt_list->cmdt != NULL);
         assert(cmdt_list->count > 0);
+#endif /* DEBUG */
 
         uint16_t count;
         count = cmdt_list->cmdt - cmdt_list->cmdts;
 
+#ifdef DEBUG
         assert(count > 0);
+#endif /* DEBUG */
 
         /* Wait as previous draw calls haven't yet been committed, or at the
          * very least, have the command list transferred to VRAM */
@@ -224,9 +230,11 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         uint32_t vdp1_vram;
         vdp1_vram = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
 
-        assert (vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
+#ifdef DEBUG
+        assert(vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
 
         assert((cmdt_list->cmdts[count - 1].cmd_ctrl & 0x8000) == 0x8000);
+#endif /* DEBUG */
 
         /* Keep track of how many commands are being sent. Remove the "draw end"
          * command from the count as it needs to be overwritten on next request
@@ -256,10 +264,14 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         int8_t ret;
         ret = dma_queue_enqueue(&_vdp1_dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
+#ifdef DEBUG
         assert(ret == 0);
+#endif /* DEBUG */
 
         ret = dma_queue_flush(DMA_QUEUE_TAG_IMMEDIATE);
+#ifdef DEBUG
         assert(ret >= 0);
+#endif /* DEBUG */
 }
 
 void
@@ -321,7 +333,9 @@ vdp_sync_vblank_out_set(void (*ihr)(void))
 int8_t
 vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 {
+#ifdef DEBUG
         assert(user_callback != NULL);
+#endif /* DEBUG */
 
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
@@ -335,7 +349,9 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
                 return id;
         }
 
+#ifdef DEBUG
         assert(id != USER_CALLBACK_COUNT);
+#endif /* DEBUG */
 
         return -1;
 }
@@ -343,8 +359,10 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 void
 vdp_sync_user_callback_remove(int8_t id)
 {
+#ifdef DEBUG
         assert(id >= 0);
         assert(id < USER_CALLBACK_COUNT);
+#endif /* DEBUG */
 
         _user_callbacks[id].callback = _default_user_callback;
         _user_callbacks[id].work = NULL;
@@ -479,7 +497,9 @@ _vblank_in_handler(void)
 
                 int8_t ret;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
+#ifdef DEBUG
                 assert(ret >= 0);
+#endif /* DEBUG */
         }
 
 no_sync:

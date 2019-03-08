@@ -60,6 +60,8 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
                 _state_vdp2()->regs.mzctl &= 0xFFEF;
                 _state_vdp2()->regs.mzctl |= 0x0010;
                 break;
+        default:
+                break;
         }
 }
 
@@ -91,6 +93,8 @@ vdp2_scrn_mosaic_unset(uint8_t scrn)
                 break;
         case VDP2_SCRN_RBG0:
                 _state_vdp2()->regs.mzctl &= 0xFFEF;
+                break;
+        default:
                 break;
         }
 }

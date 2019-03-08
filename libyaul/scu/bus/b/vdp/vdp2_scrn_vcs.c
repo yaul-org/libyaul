@@ -31,6 +31,8 @@ vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *vcs)
                 _state_vdp2()->regs.scrctl &= 0xFEFF;
                 _state_vdp2()->regs.scrctl |= 0x0100;
                 break;
+        default:
+                break;
         }
 }
 
@@ -48,6 +50,8 @@ vdp2_scrn_vcs_unset(uint8_t scrn)
                 break;
         case VDP2_SCRN_NBG1:
                 _state_vdp2()->regs.scrctl &= 0xFEFF;
+                break;
+        default:
                 break;
         }
 }

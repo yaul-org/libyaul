@@ -95,7 +95,7 @@ vdp2_scrn_scroll_x_set(uint8_t scrn, fix16_t scroll)
                 _state_vdp2()->regs.scxn3 = in;
                 break;
         default:
-                return;
+                break;
         }
 }
 
@@ -142,7 +142,7 @@ vdp2_scrn_scroll_y_set(uint8_t scrn, fix16_t scroll)
                 _state_vdp2()->regs.scyn3 = in;
                 break;
         default:
-                return;
+                break;
         }
 }
 
@@ -195,7 +195,7 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
                 _state_vdp2()->regs.scxn3 = in;
                 break;
         default:
-                return;
+                break;
         }
 }
 
@@ -249,7 +249,7 @@ vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t delta)
                 _state_vdp2()->regs.scyn3 = in;
                 break;
         default:
-                return;
+                break;
         }
 }
 

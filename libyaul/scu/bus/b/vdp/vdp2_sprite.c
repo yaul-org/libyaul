@@ -49,6 +49,6 @@ vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
                 _state_vdp2()->regs.prisd |= priority << shift;
                 break;
         default:
-                return;
+                break;
         }
 }
