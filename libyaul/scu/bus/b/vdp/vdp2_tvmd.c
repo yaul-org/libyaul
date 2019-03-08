@@ -28,8 +28,10 @@ vdp2_tvmd_display_set(void)
 void
 vdp2_tvmd_display_res_get(uint16_t *width, uint16_t *height)
 {
+#ifdef DEBUG
         assert(width != NULL);
         assert(height != NULL);
+#endif /* DEBUG */
 
         *width = _state_vdp2()->tv.resolution.x;
         *height = _state_vdp2()->tv.resolution.y;
@@ -39,6 +41,7 @@ void
 vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
     uint8_t vertical)
 {
+#ifdef DEBUG
         /* Check interlace values */
         assert((interlace == VDP2_TVMD_INTERLACE_NONE) ||
                (interlace == VDP2_TVMD_INTERLACE_SINGLE) ||
@@ -58,6 +61,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                (horizontal == VDP2_TVMD_HORZ_NORMAL_BE) ||
                (horizontal == VDP2_TVMD_HORZ_HIRESO_AE) ||
                (horizontal == VDP2_TVMD_HORZ_HIRESO_BE));
+#endif /* DEBUG */
 
         uint32_t sys_clock;
         sys_clock = bios_clock_speed_get();
@@ -80,8 +84,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 _state_vdp2()->regs.tvmd |= 0x0020;
                 break;
         default:
-                assert(false);
-                return;
+                break;
         }
 
         _state_vdp2()->regs.tvmd &= 0xFF3F;
@@ -97,8 +100,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 _state_vdp2()->regs.tvmd |= 0x00C0;
                 break;
         default:
-                assert(false);
-                return;
+                break;
         }
 
         uint16_t clock_freq;
@@ -151,8 +153,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 _state_vdp2()->regs.tvmd |= 0x0007;
                 break;
         default:
-                assert(false);
-                return;
+                break;
         }
 
         /* Update state */

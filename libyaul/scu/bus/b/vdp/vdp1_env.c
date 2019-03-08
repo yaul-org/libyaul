@@ -16,8 +16,13 @@
 
 #include "vdp-internal.h"
 
+#ifdef DEBUG
 static inline void __always_inline _env_assert(const struct vdp1_env *);
 static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
+#else
+#define _env_assert(x)
+#define _env_erase_assert(x)
+#endif /* DEBUG */
 
 void
 vdp1_env_default_set(void)
@@ -87,6 +92,7 @@ vdp1_env_set(const struct vdp1_env *env)
         MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
 }
 
+#ifdef DEBUG
 static inline void __always_inline
 _env_assert(const struct vdp1_env *env)
 {
@@ -129,3 +135,4 @@ _env_erase_assert(const struct vdp1_env *env)
         assert((env->erase_points[0].x < env->erase_points[1].x) &&
                (env->erase_points[0].y <= env->erase_points[1].y));
 }
+#endif /* DEBUG */

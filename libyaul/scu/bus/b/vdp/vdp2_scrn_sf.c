@@ -29,5 +29,7 @@ vdp2_scrn_sf_codes_set(uint8_t code, uint8_t codes)
                 _state_vdp2()->regs.sfcode &= 0x00FF;
                 _state_vdp2()->regs.sfcode |= (uint16_t)codes << 8;
                 break;
+        default:
+                break;
         }
 }

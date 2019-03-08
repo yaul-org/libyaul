@@ -71,6 +71,6 @@ vdp2_cram_offset_set(uint8_t scrn, uint32_t cram_addr)
                 _state_vdp2()->regs.craofb |= cram_addr << 4;
                 break;
         default:
-                return;
+                break;
         }
 }

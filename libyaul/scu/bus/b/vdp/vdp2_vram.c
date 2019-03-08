@@ -47,13 +47,16 @@ vdp2_vram_control_set(const struct vdp2_vram_ctl *vram_ctl)
         MEMORY_WRITE(16, VDP2(VRSIZE), _state_vdp2()->regs.vrsize);
         MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs.ramctl);
 
-        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl, sizeof(struct vdp2_vram_ctl));
+        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl,
+            sizeof(struct vdp2_vram_ctl));
 }
 
 void
 vdp2_vram_cycp_set(const struct vdp2_vram_cycp *vram_cycp)
 {
+#ifdef DEBUG
         assert(vram_cycp != NULL);
+#endif /* DEBUG */
 
         vdp2_vram_cycp_bank_set(0, &vram_cycp->pt[0]);
         vdp2_vram_cycp_bank_set(1, &vram_cycp->pt[1]);
@@ -73,17 +76,22 @@ vdp2_vram_cycp_clear(void)
 struct vdp2_vram_cycp_bank
 vdp2_vram_cycp_bank_get(uint8_t bank)
 {
+#ifdef DEBUG
         assert((bank >= 0) && (bank <= 3));
+#endif /* DEBUG */
 
         return *(struct vdp2_vram_cycp_bank *)&_state_vdp2()->regs.cyc[bank];
 }
 
 void
-vdp2_vram_cycp_bank_set(uint8_t bank, const struct vdp2_vram_cycp_bank *cycp_bank)
+vdp2_vram_cycp_bank_set(uint8_t bank,
+    const struct vdp2_vram_cycp_bank *cycp_bank)
 {
+#ifdef DEBUG
         assert((bank >= 0) && (bank <= 3));
 
         assert(cycp_bank != NULL);
+#endif /* DEBUG */
 
         _state_vdp2()->regs.cyc[bank] = cycp_bank->raw;
 }
@@ -91,7 +99,9 @@ vdp2_vram_cycp_bank_set(uint8_t bank, const struct vdp2_vram_cycp_bank *cycp_ban
 void
 vdp2_vram_cycp_bank_clear(uint8_t bank)
 {
+#ifdef DEBUG
         assert((bank >= 0) && (bank <= 3));
+#endif /* DEBUG */
 
         _state_vdp2()->regs.cyc[bank] = 0xFFFFFFFF;
 }

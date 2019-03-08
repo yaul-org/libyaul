@@ -81,7 +81,7 @@ vdp2_scrn_color_offset_set(uint8_t scrn, uint8_t select)
                 _state_vdp2()->regs.clofsl |= select << 6;
                 break;
         default:
-                return;
+                break;
         }
 }
 
@@ -123,7 +123,7 @@ vdp2_scrn_color_offset_unset(uint8_t scrn)
                 _state_vdp2()->regs.clofen &= 0xFFBF;
                 break;
         default:
-                return;
+                break;
         }
 }
 
@@ -162,6 +162,6 @@ vdp2_scrn_color_offset_rgb_set(uint8_t select, int16_t r, int16_t g, int16_t b)
                 _state_vdp2()->regs.cobb = b & 0x01FF;
                 break;
         default:
-                return;
+                break;
         }
 }

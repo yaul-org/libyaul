@@ -18,8 +18,10 @@ void
 vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
     uint32_t gouraud_count, uint32_t clut_count)
 {
+#ifdef DEBUG
         /* We have to have at least one command */
         assert(cmdt_count > 0);
+#endif /* DEBUG */
 
         /* One command table is allocated to us */
         uint32_t vram_size;

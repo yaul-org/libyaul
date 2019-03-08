@@ -21,9 +21,15 @@ static inline void __always_inline _cmdt_cmd_colr_set(struct vdp1_cmdt *, const 
 static inline void __always_inline _cmdt_cmd_srca_set(struct vdp1_cmdt *, const void *);
 static inline void __always_inline _cmdt_cmd_size_set(struct vdp1_cmdt *, const void *);
 
+#ifdef DEBUG
 static inline void __always_inline _cmdt_list_assert(const struct vdp1_cmdt_list *);
 static inline void __always_inline _cmdt_list_next_assert(const struct vdp1_cmdt_list *);
 static inline void __always_inline _cmdt_jump_assert(const struct vdp1_cmdt_list *, uint8_t);
+#else
+#define _cmdt_list_assert(x)
+#define _cmdt_list_next_assert(x)
+#define _cmdt_jump_assert(x, y)
+#endif /* DEBUG */
 
 struct vdp1_cmdt_list *
 vdp1_cmdt_list_alloc(uint16_t count)
@@ -582,6 +588,7 @@ _cmdt_cmd_size_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
         cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
 }
 
+#ifdef DEBUG
 static inline void __always_inline
 _cmdt_list_assert(const struct vdp1_cmdt_list *cmdt_list)
 {
@@ -605,3 +612,4 @@ _cmdt_jump_assert(const struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
 
         assert((cmdt_index >= 0) && (cmdt_index < cmdt_list->count));
 }
+#endif /* DEBUG */

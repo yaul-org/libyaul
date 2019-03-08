@@ -21,7 +21,9 @@ vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
 {
         static color_rgb555_t buffer = COLOR_RGB555_INITIALIZER(0, 0, 0);
 
+#ifdef DEBUG
         assert(vram != 0x00000000);
+#endif /* DEBUG */
 
         buffer = color;
 
@@ -31,11 +33,13 @@ vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
 void
 vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb555_t *buffer, uint16_t count)
 {
+#ifdef DEBUG
         assert(vram != 0x00000000);
 
         assert(buffer != NULL);
 
         assert(count > 0);
+#endif /* DEBUG */
 
         _set_back_screen(vram, buffer, false, count);
 }
