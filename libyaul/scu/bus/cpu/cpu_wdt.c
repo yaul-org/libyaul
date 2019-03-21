@@ -21,47 +21,32 @@ static void (*_wdt_iti_ihr)(void) = _default_ihr;
 void
 cpu_wdt_init(uint8_t clock_div)
 {
-        /* For writing to WTCSRW and WTCNTW, use 16-bit writes only:
-         * WTCSRW = 0xA518 | (value & 0xFF)
-         * WTCNTW = 0x5A00 | (value & 0xFF)
-         *
-         * For writing to RSTCSRW, use 16-bit writes only.
-         *
-         * When clearing WOVF bit:
-         * RSTCSRW = 0xA500 | 0x00
-         *
-         * When writing RSTE and RSTS bits:
-         * RSTCSRW = 0x5A00 | (value & 0xFF)
-         *
-         * For reading, use 8-bit reads on *R registers only.
-         */
-
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x7F00);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), INTC_INTERRUPT_WDT_ITI << 8);
 
-        MEMORY_WRITE(16, CPU(WTCSRW), 0xA518 | (clock_div & 0x07));
+        MEMORY_WRITE_WTCSR(clock_div & 0x07);
 
-        MEMORY_WRITE(16, CPU(RSTCSRW), 0xA500);
-        MEMORY_WRITE(16, CPU(RSTCSRW), 0x5A00);
+        MEMORY_CLEAR_WOVF_RSTCSR();
+        MEMORY_CLEAR_RSTCSR(0x00);
 
         cpu_intc_ihr_set(INTC_INTERRUPT_WDT_ITI, _wdt_iti_handler);
 }
 
 void
-cpu_wdt_interval_mode_set(void (*ihr)(void))
+cpu_wdt_timer_mode_set(uint8_t mode, void (*ihr)(void))
 {
         uint8_t wtcr_bits;
         wtcr_bits = MEMORY_READ(8, CPU(WTCSRR));
 
         /* Clear OVF and TME bits */
         wtcr_bits &= ~0xA0;
-        /* Set WTIT bit */
-        wtcr_bits |= 0x40;
+        /* Set WTIT bit (timer mode) if necessary */
+        wtcr_bits |= (mode & 0x1) << 4;
 
-        MEMORY_WRITE(16, CPU(WTCSRW), 0x5A18 | wtcr_bits);
+        MEMORY_WRITE_WTCSR(wtcr_bits);
 
-        MEMORY_WRITE(16, CPU(RSTCSRW), 0xA500);
-        MEMORY_WRITE(16, CPU(RSTCSRW), 0x5A00);
+        MEMORY_CLEAR_WOVF_RSTCSR();
+        MEMORY_CLEAR_RSTCSR(0x00);
 
         _wdt_iti_ihr = _default_ihr;
 
@@ -81,7 +66,10 @@ _wdt_iti_handler(void)
         /* Clear OVF bit */
         wtcr_bits &= ~0x80;
 
-        MEMORY_WRITE(16, CPU(WTCSRW), 0x5A18 | wtcr_bits);
+        MEMORY_WRITE_WTCSR(wtcr_bits);
+
+        /* Reset RSTE bit when WTCNT overflows */
+        /* MEMORY_CLEAR_RSTCSR(0x40); */
 
         /* User is responsible for resetting WDT count */
         _wdt_iti_ihr();
