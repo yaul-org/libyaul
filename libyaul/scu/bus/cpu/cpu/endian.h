@@ -11,22 +11,22 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define htobe16(x)      ((uint16_t)(x))
-#define htole16(x)      bswap16((x))
-#define be16toh(x)      ((uint16_t)(x))
-#define le16toh(x)      bswap16((x))
+#define cpu_htobe16(x)  ((uint16_t)(x))
+#define cpu_htole16(x)  cpu_bswap16((x))
+#define cpu_be16toh(x)  ((uint16_t)(x))
+#define cpu_le16toh(x)  cpu_bswap16((x))
 
-#define htobe32(x)      ((uint32_t)(x))
-#define htole32(x)      bswap32((x))
-#define be32toh(x)      ((uint32_t)(x))
+#define cpu_htobe32(x)  ((uint32_t)(x))
+#define cpu_htole32(x)  cpu_bswap32((x))
+#define cpu_be32toh(x)  ((uint32_t)(x))
 
-#define le32toh(x)      bswap32((x))
+#define cpu_le32toh(x)  cpu_bswap32((x))
 
 /* Via __builtin_bswap32() and __builtin_bswap16(), GCC emits a function
  * with no use of the swap instructions */
 
 static inline uint32_t __always_inline
-bswap16(uint32_t x)
+cpu_bswap16(uint32_t x)
 {
         register uint32_t out;
 
@@ -38,7 +38,7 @@ bswap16(uint32_t x)
 }
 
 static inline uint32_t __always_inline
-bswap32(uint32_t x)
+cpu_bswap32(uint32_t x)
 {
         register uint32_t out;
 
