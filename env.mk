@@ -31,6 +31,10 @@ ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
 endif
 
+ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
+  $(error Undefined YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
+endif
+
 ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
 endif
@@ -73,6 +77,11 @@ SH_CFLAGS_shared:= \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
+
+ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
+SH_CFLAGS_shared += \
+	-DSPIN_ON_ABORT=1
+endif
 
 # Clang (RTags) has a problem with -save-temps
 ifeq ($(strip $(YAUL_RTAGS)),)

@@ -48,7 +48,14 @@ abort(void)
 #else
 #error "Invalid `HAVE_DEV_CARTRIDGE' value"
 #endif
-#else /* !defined(DEBUG) */
+#else /* DEBUG */
+#ifdef SPIN_ON_ABORT
+        while (true) {
+        }
+#else
         smpc_smc_sysres_call();
-#endif /* defined(DEBUG) */
+#endif /* SPIN_ON_ABORT */
+#endif /* DEBUG */
+
+        __builtin_unreachable();
 }
