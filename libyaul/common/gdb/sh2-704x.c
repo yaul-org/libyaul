@@ -419,12 +419,12 @@ _calculate_pc(struct cpu_registers *reg_file)
         disp = 0x00000000;
 
         if (OPCODE_BT(opcode) || OPCODE_BTS(opcode)) {
-                if (reg_file->sr & SR_T_BIT_MASK) {
+                if (reg_file->sr & CPU_SR_T_BIT_MASK) {
                         disp = OPCODE_8_DISP(opcode);
                         pc = reg_file->pc + (disp << 1) + 0x00000004;
                 }
         } else if (OPCODE_BF(opcode) || OPCODE_BFS(opcode)) {
-                if ((reg_file->sr & SR_T_BIT_MASK) == 0x00000000) {
+                if ((reg_file->sr & CPU_SR_T_BIT_MASK) == 0x00000000) {
                         disp = OPCODE_8_DISP(opcode);
                         pc = reg_file->pc + (disp << 1) + 0x00000004;
                 }
