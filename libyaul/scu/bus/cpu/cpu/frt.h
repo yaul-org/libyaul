@@ -16,26 +16,26 @@ extern "C" {
 
 #include <cpu/map.h>
 
-#define FRT_CLOCK_DIV_8                 0x00
-#define FRT_CLOCK_DIV_32                0x01
-#define FRT_CLOCK_DIV_128               0x02
-#define FRT_CLOCK_DIV_RISING_EDGE       0x03
+#define CPU_FRT_CLOCK_DIV_8             0x00
+#define CPU_FRT_CLOCK_DIV_32            0x01
+#define CPU_FRT_CLOCK_DIV_128           0x02
+#define CPU_FRT_CLOCK_DIV_RISING_EDGE   0x03
 
-#define FRT_NTSC_320_8_COUNT_1MS        0x0D1F
-#define FRT_NTSC_320_32_COUNT_1MS       0x0348
-#define FRT_NTSC_320_128_COUNT_1MS      0x00D2
+#define CPU_FRT_NTSC_320_8_COUNT_1MS    0x0D1F
+#define CPU_FRT_NTSC_320_32_COUNT_1MS   0x0348
+#define CPU_FRT_NTSC_320_128_COUNT_1MS  0x00D2
 
-#define FRT_NTSC_352_8_COUNT_1MS        0x0DFC
-#define FRT_NTSC_352_32_COUNT_1MS       0x037F
-#define FRT_NTSC_352_128_COUNT_1MS      0x00E0
+#define CPU_FRT_NTSC_352_8_COUNT_1MS    0x0DFC
+#define CPU_FRT_NTSC_352_32_COUNT_1MS   0x037F
+#define CPU_FRT_NTSC_352_128_COUNT_1MS  0x00E0
 
-#define FRT_PAL_320_8_COUNT_1MS         0x0D08
-#define FRT_PAL_320_32_COUNT_1MS        0x0342
-#define FRT_PAL_320_128_COUNT_1MS       0x00D0
+#define CPU_FRT_PAL_320_8_COUNT_1MS     0x0D08
+#define CPU_FRT_PAL_320_32_COUNT_1MS    0x0342
+#define CPU_FRT_PAL_320_128_COUNT_1MS   0x00D0
 
-#define FRT_PAL_352_8_COUNT_1MS         0x0DFC
-#define FRT_PAL_352_32_COUNT_1MS        0x037F
-#define FRT_PAL_352_128_COUNT_1MS       0x00E0
+#define CPU_FRT_PAL_352_8_COUNT_1MS     0x0DFC
+#define CPU_FRT_PAL_352_32_COUNT_1MS    0x037F
+#define CPU_FRT_PAL_352_128_COUNT_1MS   0x00E0
 
 static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
