@@ -10,6 +10,36 @@
 
 #include <scu/map.h>
 
+/* For writing to WTCSRW and WTCNTW, use 16-bit writes only:
+ * WTCSRW = 0xA518 | (value & 0xFF)
+ * WTCNTW = 0x5A00 | (value & 0xFF)
+ *
+ * For writing to RSTCSRW, use 16-bit writes only.
+ *
+ * When clearing WOVF bit:
+ * RSTCSRW = 0xA500 | 0x00
+ *
+ * When writing RSTE and RSTS bits:
+ * RSTCSRW = 0x5A00 | (value & 0xFF)
+ *
+ * For reading, use 8-bit reads on *R registers only */
+
+#define MEMORY_WRITE_WTCNT(x) do {                                             \
+        (*(volatile uint16_t *)(CPU(WTCNTW)) = (0x5A00 | ((x) & 0x00FF)));     \
+} while (false)
+
+#define MEMORY_WRITE_WTCSR(x) do {                                             \
+        (*(volatile uint16_t *)(CPU(WTCSRW)) = (0xA500 | ((x) & 0x00FF)));     \
+} while (false)
+
+#define MEMORY_CLEAR_WOVF_RSTCSR() do {                                        \
+        (*(volatile uint16_t *)(CPU(RSTCSRW)) = 0xA500);                       \
+} while (false)
+
+#define MEMORY_CLEAR_RSTCSR(x) do {                                            \
+        (*(volatile uint16_t *)(CPU(RSTCSRW)) = (0x5A3F | ((x) & 0x00FF)));    \
+} while (false)
+
 /* Macros specific for processor. */
 #define CPU(x)          (0xFFFFF000 + (x))
 
@@ -38,12 +68,16 @@
 #define VCRD            0x0E68
 #define DRCR0           0x0E71
 #define DRCR1           0x0E72
+
 #define WTCSRW          0x0E80
 #define WTCSRR          0x0E80
+
 #define WTCNTW          0x0E80
 #define WTCNTR          0x0E81
+
 #define RSTCSRW         0x0E82
 #define RSTCSRR         0x0E83
+
 #define FMR             0x0E90
 #define SBYCR           0x0E91
 #define CCR             0x0E92
