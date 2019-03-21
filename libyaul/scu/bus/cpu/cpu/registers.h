@@ -16,11 +16,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define SR_T_BIT_MASK   0x00000001
-#define SR_S_BIT_MASK   0x00000002
-#define SR_I_BIT_MASK   0x000000F0
-#define SR_Q_BIT_MASK   0x00000100
-#define SR_M_BIT_MASK   0x00000200
+#define CPU_SR_T_BIT_MASK       0x00000001
+#define CPU_SR_S_BIT_MASK       0x00000002
+#define CPU_SR_I_BIT_MASK       0x000000F0
+#define CPU_SR_Q_BIT_MASK       0x00000100
+#define CPU_SR_M_BIT_MASK       0x00000200
 
 struct cpu_registers {
         uint32_t sp;
