@@ -22,14 +22,14 @@ void
 cpu_wdt_init(uint8_t clock_div)
 {
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x7F00);
-        MEMORY_WRITE_OR(16, CPU(VCRWDT), INTC_INTERRUPT_WDT_ITI << 8);
+        MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_WDT_ITI << 8);
 
         MEMORY_WRITE_WTCSR(clock_div & 0x07);
 
         MEMORY_CLEAR_WOVF_RSTCSR();
         MEMORY_CLEAR_RSTCSR(0x00);
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_WDT_ITI, _wdt_iti_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI, _wdt_iti_handler);
 }
 
 void

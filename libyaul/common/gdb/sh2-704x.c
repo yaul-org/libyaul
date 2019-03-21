@@ -142,17 +142,17 @@ gdb_sh2_704x_init(void)
         _bp_step.instruction = 0x0000;
         _stepping = false;
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
             internal_gdb_exception_illegal_instruction);
-        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_SLOT,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
             internal_gdb_exception_illegal_slot);
-        cpu_intc_ihr_set(INTC_INTERRUPT_CPU_ADDRESS_ERROR,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
             internal_gdb_exception_cpu_address_error);
-        cpu_intc_ihr_set(INTC_INTERRUPT_DMA_ADDRESS_ERROR,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR,
             internal_gdb_exception_dma_address_error);
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
-        cpu_intc_ihr_set(INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
 
         /* Initialize UBC */
         /*

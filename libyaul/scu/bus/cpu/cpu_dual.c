@@ -72,14 +72,14 @@ cpu_dual_init(uint8_t entry_type)
         cpu_dual_master_clear();
         cpu_dual_slave_clear();
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_FRT_ICI, _master_ici_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_ICI, _master_ici_handler);
 
         smpc_smc_sshoff_call();
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_SLAVE_BASE + INTC_INTERRUPT_FRT_ICI,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_SLAVE_BASE + CPU_INTC_INTERRUPT_FRT_ICI,
             _slave_ici_handler);
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_SLAVE_ENTRY,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_SLAVE_ENTRY,
             _slave_entry_table[entry_type & 0x01]);
 
         smpc_smc_sshon_call();
