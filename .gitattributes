@@ -1,0 +1,9 @@
+# *.bin linguist-language=?
+*.c linguist-language=C
+*.cxx linguist-language=C++
+*.h linguist-language=C
+*.inc linguist-language=C
+*.mk linguist-language=Makefile
+# *.specs linguist-language=?
+*.sx linguist-language=Unix Assembly
+*.x linguist-language=Linker Script
