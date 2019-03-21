@@ -36,8 +36,8 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
 
-        MEMORY_WRITE(16, CPU(VCRC), (INTC_INTERRUPT_FRT_ICI << 8) | INTC_INTERRUPT_FRT_OCI);
-        MEMORY_WRITE(16, CPU(VCRD), INTC_INTERRUPT_FRT_OVI << 8);
+        MEMORY_WRITE(16, CPU(VCRC), (CPU_INTC_INTERRUPT_FRT_ICI << 8) | CPU_INTC_INTERRUPT_FRT_OCI);
+        MEMORY_WRITE(16, CPU(VCRD), CPU_INTC_INTERRUPT_FRT_OVI << 8);
 
         cpu_frt_interrupt_priority_set(15);
 
@@ -49,8 +49,8 @@ cpu_frt_init(uint8_t clock_div)
         cpu_frt_ocb_clear();
         cpu_frt_ovi_clear();
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
-        cpu_intc_ihr_set(INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
 
         cpu_frt_count_set(0);
 }

@@ -75,22 +75,22 @@ void
 cpu_init(void)
 {
         /* Set hardware exception handling routines */
-        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
             _exception_illegal_instruction);
-        cpu_intc_ihr_set(INTC_INTERRUPT_ILLEGAL_SLOT,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
             _exception_illegal_slot);
-        cpu_intc_ihr_set(INTC_INTERRUPT_CPU_ADDRESS_ERROR,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
             _exception_cpu_address_error);
-        cpu_intc_ihr_set(INTC_INTERRUPT_DMA_ADDRESS_ERROR,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR,
             _exception_dma_address_error);
 
         /* Set the appropriate vector numbers for the on-chip peripheral
          * modules */
-        MEMORY_WRITE(16, CPU(VCRA), (INTC_INTERRUPT_SCI_ERI << 8) | INTC_INTERRUPT_SCI_RXI);
-        MEMORY_WRITE(16, CPU(VCRB), (INTC_INTERRUPT_SCI_TXI << 8) | INTC_INTERRUPT_SCI_TEI);
+        MEMORY_WRITE(16, CPU(VCRA), (CPU_INTC_INTERRUPT_SCI_ERI << 8) | CPU_INTC_INTERRUPT_SCI_RXI);
+        MEMORY_WRITE(16, CPU(VCRB), (CPU_INTC_INTERRUPT_SCI_TXI << 8) | CPU_INTC_INTERRUPT_SCI_TEI);
 
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
-        MEMORY_WRITE_OR(16, CPU(VCRWDT), INTC_INTERRUPT_BSC);
+        MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
         cpu_divu_init();
         cpu_frt_init(FRT_CLOCK_DIV_8);

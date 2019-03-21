@@ -25,9 +25,9 @@ cpu_divu_init(void)
 {
         cpu_divu_ovfi_clear();
 
-        MEMORY_WRITE(32, CPU(VCRDIV), INTC_INTERRUPT_DIVU_OVFI);
+        MEMORY_WRITE(32, CPU(VCRDIV), CPU_INTC_INTERRUPT_DIVU_OVFI);
 
-        cpu_intc_ihr_set(INTC_INTERRUPT_DIVU_OVFI, _divu_ovfi_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI, _divu_ovfi_handler);
 }
 
 void

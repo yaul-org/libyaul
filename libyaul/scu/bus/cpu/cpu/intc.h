@@ -16,57 +16,57 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define INTC_INTERRUPT_POWER_ON_RESET_PC        0x00
-#define INTC_INTERRUPT_POWER_ON_RESET_SP        0x01
+#define CPU_INTC_INTERRUPT_POWER_ON_RESET_PC    0x00
+#define CPU_INTC_INTERRUPT_POWER_ON_RESET_SP    0x01
 
-#define INTC_INTERRUPT_MANUAL_RESET_PC          0x02
-#define INTC_INTERRUPT_MANUAL_RESET_SP          0x03
+#define CPU_INTC_INTERRUPT_MANUAL_RESET_PC      0x02
+#define CPU_INTC_INTERRUPT_MANUAL_RESET_SP      0x03
 
-#define INTC_INTERRUPT_ILLEGAL_INSTRUCTION      0x04
-#define INTC_INTERRUPT_ILLEGAL_SLOT             0x06
-#define INTC_INTERRUPT_CPU_ADDRESS_ERROR        0x09
-#define INTC_INTERRUPT_DMA_ADDRESS_ERROR        0x0A
+#define CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION  0x04
+#define CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR    0x06
+#define CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR    0x09
+#define CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR    0x0A
 
-#define INTC_INTERRUPT_NMI                      0x0B
+#define CPU_INTC_INTERRUPT_NMI                  0x0B
 
-#define INTC_INTERRUPT_UBC                      0x0C
-#define INTC_INTERRUPT_BREAK                    0x20
+#define CPU_INTC_INTERRUPT_UBC                  0x0C
+#define CPU_INTC_INTERRUPT_BREAK                0x20
 
-#define INTC_INTERRUPT_SCI_ERI                  0x60
-#define INTC_INTERRUPT_SCI_RXI                  0x61
-#define INTC_INTERRUPT_SCI_TXI                  0x62
-#define INTC_INTERRUPT_SCI_TEI                  0x63
-#define INTC_INTERRUPT_FRT_ICI                  0x64
-#define INTC_INTERRUPT_FRT_OCI                  0x65
-#define INTC_INTERRUPT_FRT_OVI                  0x66
-#define INTC_INTERRUPT_FREE_67                  0x67
-#define INTC_INTERRUPT_WDT_ITI                  0x68
-#define INTC_INTERRUPT_BSC                      0x69
-#define INTC_INTERRUPT_FREE_6A                  0x6A
-#define INTC_INTERRUPT_FREE_6B                  0x6B
-#define INTC_INTERRUPT_DMAC0                    0x6C
-#define INTC_INTERRUPT_DMAC1                    0x6D
-#define INTC_INTERRUPT_DIVU_OVFI                0x6E
-#define INTC_INTERRUPT_FREE_6F                  0x6F
-#define INTC_INTERRUPT_SLAVE_ENTRY              0x94
+#define CPU_INTC_INTERRUPT_SCI_ERI      0x60
+#define CPU_INTC_INTERRUPT_SCI_RXI      0x61
+#define CPU_INTC_INTERRUPT_SCI_TXI      0x62
+#define CPU_INTC_INTERRUPT_SCI_TEI      0x63
+#define CPU_INTC_INTERRUPT_FRT_ICI      0x64
+#define CPU_INTC_INTERRUPT_FRT_OCI      0x65
+#define CPU_INTC_INTERRUPT_FRT_OVI      0x66
+#define CPU_INTC_INTERRUPT_FREE_67      0x67
+#define CPU_INTC_INTERRUPT_WDT_ITI      0x68
+#define CPU_INTC_INTERRUPT_BSC          0x69
+#define CPU_INTC_INTERRUPT_FREE_6A      0x6A
+#define CPU_INTC_INTERRUPT_FREE_6B      0x6B
+#define CPU_INTC_INTERRUPT_DMAC0        0x6C
+#define CPU_INTC_INTERRUPT_DMAC1        0x6D
+#define CPU_INTC_INTERRUPT_DIVU_OVFI    0x6E
+#define CPU_INTC_INTERRUPT_FREE_6F      0x6F
+#define CPU_INTC_INTERRUPT_SLAVE_ENTRY  0x94
 
-#define INTC_INTERRUPT_MASTER_BASE      0x000
-#define INTC_INTERRUPT_SLAVE_BASE       0x100
+#define CPU_INTC_INTERRUPT_MASTER_BASE  0x000
+#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x100
 
-#define INTC_PRIORITY_VBLANK_IN         15
-#define INTC_PRIORITY_VBLANK_OUT        14
-#define INTC_PRIORITY_HBLANK_IN         13
-#define INTC_PRIORITY_TIMER_0           12
-#define INTC_PRIORITY_TIMER_1           11
-#define INTC_PRIORITY_DSP_END           10
-#define INTC_PRIORITY_SOUND_REQUEST     9
-#define INTC_PRIORITY_SYSTEM_MANAGER    8
-#define INTC_PRIORITY_PAD_INTERRUPT     8
-#define INTC_PRIORITY_LEVEL_2_DMA_END   6
-#define INTC_PRIORITY_LEVEL_1_DMA_END   6
-#define INTC_PRIORITY_LEVEL_0_DMA_END   5
-#define INTC_PRIORITY_DMA_ILLEGAL       3
-#define INTC_PRIORITY_SPRITE_END        2
+#define CPU_INTC_PRIORITY_VBLANK_IN             15
+#define CPU_INTC_PRIORITY_VBLANK_OUT            14
+#define CPU_INTC_PRIORITY_HBLANK_IN             13
+#define CPU_INTC_PRIORITY_TIMER_0               12
+#define CPU_INTC_PRIORITY_TIMER_1               11
+#define CPU_INTC_PRIORITY_DSP_END               10
+#define CPU_INTC_PRIORITY_SOUND_REQUEST         9
+#define CPU_INTC_PRIORITY_SYSTEM_MANAGER        8
+#define CPU_INTC_PRIORITY_PAD_INTERRUPT         8
+#define CPU_INTC_PRIORITY_LEVEL_2_DMA           6
+#define CPU_INTC_PRIORITY_LEVEL_1_DMA           6
+#define CPU_INTC_PRIORITY_LEVEL_0_DMA           5
+#define CPU_INTC_PRIORITY_DMA_ILLEGAL           3
+#define CPU_INTC_PRIORITY_SPRITE_END            2
 
 static inline void __always_inline
 cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
