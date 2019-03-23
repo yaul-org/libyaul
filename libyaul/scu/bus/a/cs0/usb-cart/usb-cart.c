@@ -84,10 +84,10 @@ usb_cart_dma_read(void *buffer, uint32_t len)
 
         const struct cpu_dmac_cfg dmac_cfg = {
                 .channel = 0,
-                .src_mode = DMAC_SOURCE_FIXED,
-                .dst_mode = DMAC_DESTINATION_INCREMENT,
-                .stride = DMAC_STRIDE_1_BYTE,
-                .bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .src_mode = CPU_DMAC_SOURCE_FIXED,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .stride = CPU_DMAC_STRIDE_1_BYTE,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
                 .src = USB_CART(FIFO),
                 .dst = (uint32_t)buffer,
                 .len = USB_CART_OUT_EP_SIZE,
@@ -164,10 +164,10 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
 
         const struct cpu_dmac_cfg dmac_cfg = {
                 .channel = 0,
-                .src_mode = DMAC_SOURCE_INCREMENT,
-                .dst_mode = DMAC_DESTINATION_FIXED,
-                .stride = DMAC_STRIDE_1_BYTE,
-                .bus_mode = DMAC_BUS_MODE_CYCLE_STEAL,
+                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
+                .dst_mode = CPU_DMAC_DESTINATION_FIXED,
+                .stride = CPU_DMAC_STRIDE_1_BYTE,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
                 .src = (uint32_t)buffer,
                 .dst = USB_CART(FIFO),
                 .len = USB_CART_OUT_EP_SIZE,
