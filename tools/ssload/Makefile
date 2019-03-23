@@ -5,8 +5,7 @@ PROGRAM:= $(TARGET)$(EXE_EXT)
 
 SUB_BUILD:=$(YAUL_BUILD)/tools/$(TARGET)
 
-CFLAGS:= -O2 \
-	-s \
+CFLAGS:= -s \
 	-Wall \
 	-Wextra \
 	-Wuninitialized \
@@ -43,8 +42,10 @@ LDFLAGS+= $(shell pkg-config --libs libftdi1)
 endif
 endif
 
-ifneq ($(strip $(DEBUG)),)
-CFLAGS+= -DDEBUG
+ifeq ($(strip $(DEBUG)),)
+CFLAGS+= -O2
+else
+CFLAGS+= -DDEBUG -ggdb3 -O0
 endif
 
 OBJS:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
@@ -60,7 +61,9 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OB
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
 		$(foreach LIB,$(LIBS),-l$(LIB)) \
 		$(LDFLAGS)
-	$(ECHO)$(STRIP) -s $@
+	if [ -z "${DEBUG}" ]; then \
+	    $(STRIP) -s $@; \
+	fi
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD):
 	$(ECHO)mkdir -p $@
