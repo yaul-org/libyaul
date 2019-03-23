@@ -62,7 +62,7 @@ ifneq ($(strip $(M68K_PROGRAM)),)
 endif
 
 SH_DEPS:= $(SH_OBJECTS_UNIQ:.o=.d)
-SH_TEMPS:= $(SH_OBJECTS_UNIQ:.o=.i) $(SH_OBJECTS_UNIQ:.o=.s)
+SH_TEMPS:= $(SH_OBJECTS_UNIQ:.o=.i) $(SH_OBJECTS_UNIQ:.o=.ii) $(SH_OBJECTS_UNIQ:.o=.s)
 SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
 
 $(SH_PROGRAM): $(SH_PROGRAM).iso
