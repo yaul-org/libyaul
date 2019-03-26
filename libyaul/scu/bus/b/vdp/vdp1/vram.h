@@ -53,9 +53,16 @@ struct vdp1_clut {
 } __aligned(32);
 
 extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
+
 extern void *vdp1_vram_texture_base_get(void);
+extern uint32_t vdp1_vram_texture_size_get(void);
+
 extern struct vdp1_gouraud_table *vdp1_vram_gouraud_base_get(void);
+extern uint32_t vdp1_vram_gouraud_size_get(void);
+
 extern struct vdp1_clut *vdp1_vram_clut_base_get(void);
+extern uint32_t vdp1_vram_clut_size_get(void);
+
 extern void *vdp1_vram_remaining_get(void);
 
 #ifdef __cplusplus

@@ -69,10 +69,28 @@ vdp1_vram_texture_base_get(void)
         return (void *)_state_vdp1()->vram.texture_base;
 }
 
+uint32_t
+vdp1_vram_texture_size_get(void)
+{
+        return _state_vdp1()->vram.gouraud_base - _state_vdp1()->vram.texture_base;
+}
+
 struct vdp1_gouraud_table *
 vdp1_vram_gouraud_base_get(void)
 {
         return (struct vdp1_gouraud_table *)_state_vdp1()->vram.gouraud_base;
+}
+
+uint32_t
+vdp1_vram_gouraud_size_get(void)
+{
+        return _state_vdp1()->vram.clut_base - _state_vdp1()->vram.gouraud_base;
+}
+
+uint32_t
+vdp1_vram_clut_size_get(void)
+{
+        return VDP1_VRAM(VDP1_VRAM_SIZE) - _state_vdp1()->vram.clut_base;
 }
 
 struct vdp1_clut *
