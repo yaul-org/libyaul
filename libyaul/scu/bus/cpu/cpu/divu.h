@@ -11,6 +11,8 @@
 #include <cpu/instructions.h>
 #include <cpu/map.h>
 
+#include <fix16.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -48,6 +50,19 @@ cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
         MEMORY_WRITE(32, CPU(DVSR), divisor);
         /* Writing to CPU(DVDNT) starts the operation */
         MEMORY_WRITE(32, CPU(DVDNT), dividend);
+}
+
+static inline void __always_inline
+cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
+{
+        uint32_t dh;
+        dh = cpu_instr_swapw(dividend);
+        dh = cpu_instr_extsw(dh);
+
+        uint32_t dl;
+        dl = dividend << 16;
+
+        cpu_divu_64_32_set(dh, dl, divisor);
 }
 
 static inline void __always_inline

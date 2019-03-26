@@ -58,6 +58,18 @@ cpu_instr_clrmac(void)
 }
 
 static inline uint32_t __always_inline
+cpu_instr_extsw(const uint32_t rm)
+{
+        register uint32_t rn;
+
+        __asm__ volatile ("exts.w %[rm], %[rn]"
+            : [rn] "=&r" (rn)
+            : [rm] "r" (rm));
+
+        return rn;
+}
+
+static inline uint32_t __always_inline
 cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 {
         __asm__ volatile ("xtrct %[rm], %[rn]"
