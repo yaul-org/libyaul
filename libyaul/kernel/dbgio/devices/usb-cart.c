@@ -61,8 +61,9 @@ _init(const dbgio_usb_cart_t *params)
         }
         assert(_dev_state != NULL);
 
+        /* Resize the buffer if needed */
         if ((_dev_state->buffer != NULL) &&
-            (_dev_state->buffer_size != params->buffer_size)) {
+            (_dev_state->buffer_size < params->buffer_size)) {
                 free(_dev_state->buffer);
 
                 _dev_state->buffer = NULL;
@@ -92,8 +93,6 @@ _deinit(void)
         free(_dev_state);
 
         _dev_state = NULL;
-
-        _dev_state->state = STATE_IDLE;
 }
 
 static void
