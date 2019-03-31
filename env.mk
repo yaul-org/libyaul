@@ -66,14 +66,20 @@ SH_CFLAGS_shared:= \
 	-ffreestanding \
 	-ffast-math \
 	-fstrict-aliasing \
-	-fomit-frame-pointer \
+	-fdelete-null-pointer-checks \
+	-Wmissing-include-dirs \
+	-Wfatal-errors \
 	-Wall \
-	-Wuninitialized \
+	-Wextra \
+	-Wimplicit-int \
+	-Wduplicated-branches \
+	-Wduplicated-cond \
+	-Wnull-dereference \
 	-Winit-self \
 	-Wuninitialized \
 	-Wshadow \
-	-Wno-unused \
-	-Wno-parentheses \
+	-Wunused \
+	-Wparentheses \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
@@ -103,7 +109,7 @@ SH_CXXFLAGS:= \
 	-fno-use-cxa-atexit \
 	$(SH_CXXFLAGS_shared)
 
-SH_CFLAGS_shared_release:= -O2
+SH_CFLAGS_shared_release:= -O2 -fomit-frame-pointer
 SH_CFLAGS_shared_debug:= -O0 -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
