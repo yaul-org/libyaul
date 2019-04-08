@@ -14,8 +14,8 @@
 
 #define MAX_INTERMEDIATE_CHARS  2
 
-#define ACTION(sc)              ((sc) & 0x0F)
-#define STATE(sc)               ((sc) >> 4)
+#define ACTION(sc)      ((sc) & 0x0F)
+#define STATE(sc)       ((sc) >> 4)
 
 typedef enum {
         VT_PARSE_STATE_ANYWHERE = 0,
@@ -33,7 +33,7 @@ typedef enum {
         VT_PARSE_STATE_GROUND = 12,
         VT_PARSE_STATE_OSC_STRING = 13,
         VT_PARSE_STATE_SOS_PM_APC_STRING = 14
-} vt_parse_state_t;
+} __packed vt_parse_state_t;
 
 typedef enum {
         VT_PARSE_ACTION_CLEAR = 1,
@@ -50,7 +50,7 @@ typedef enum {
         VT_PARSE_ACTION_PRINT = 12,
         VT_PARSE_ACTION_PUT = 13,
         VT_PARSE_ACTION_UNHOOK = 14
-} vt_parse_action_t;
+} __packed vt_parse_action_t;
 
 typedef uint8_t state_change_t;
 
@@ -63,9 +63,9 @@ typedef struct vt_parse {
         vt_parse_callback_t callback;
         uint8_t intermediate_chars[MAX_INTERMEDIATE_CHARS + 1];
         uint8_t ignore_flagged;
-        int32_t params[16];
-        int32_t num_params;
-} vt_parse_t;
+        uint8_t params[16];
+        uint8_t num_params;
+} __aligned(32) vt_parse_t;
 
 static void _do_action(vt_parse_t *, vt_parse_action_t, char);
 static void _do_state_change(vt_parse_t *, state_change_t, char);

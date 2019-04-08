@@ -19,7 +19,7 @@
 
 static inline __always_inline void _action_character_print(int);
 static inline __always_inline void _action_escape_character_print(int);
-static inline __always_inline void _action_csi_dispatch_print(int16_t, int16_t *, int16_t);
+static inline __always_inline void _action_csi_dispatch_print(int8_t, uint8_t *, uint8_t);
 
 static inline __always_inline bool _cursor_column_exceeded(int16_t);
 static inline __always_inline bool _cursor_row_exceeded(uint16_t);
@@ -276,7 +276,7 @@ _action_escape_character_print(int ch)
 }
 
 static inline void __always_inline
-_action_csi_dispatch_print(int16_t ch, int16_t *params, int16_t num_params)
+_action_csi_dispatch_print(int8_t ch, uint8_t *params, uint8_t num_params)
 {
         int16_t col;
         int16_t row;
