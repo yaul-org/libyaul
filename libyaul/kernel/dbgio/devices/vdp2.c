@@ -181,7 +181,7 @@ _init(const dbgio_vdp2_t *params)
         assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
         /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
          *      bank size */
-        assert(params->cpd_offset < VDP2_VRAM_BSIZE_4_4MBIT);
+        assert(params->cpd_offset < VDP2_VRAM_BSIZE_4);
 
         assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
         /* XXX: Determine the page size and check against the number of
@@ -209,10 +209,10 @@ _init(const dbgio_vdp2_t *params)
         _dev_state->page_height = VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
 
         /* One page per plane */
-        _dev_state->page_base = VDP2_VRAM_ADDR_4MBIT(params->pnd_bank,
+        _dev_state->page_base = VDP2_VRAM_ADDR(params->pnd_bank,
             params->pnd_offset * _dev_state->page_size);
 
-        _dev_state->cp_table = VDP2_VRAM_ADDR_4MBIT(params->cpd_bank, params->cpd_offset);
+        _dev_state->cp_table = VDP2_VRAM_ADDR(params->cpd_bank, params->cpd_offset);
         _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
 
         struct vdp2_scrn_cell_format cell_format = {

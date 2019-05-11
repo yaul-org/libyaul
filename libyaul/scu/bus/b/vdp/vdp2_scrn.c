@@ -124,7 +124,7 @@ _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         cc_count = (format->cc_count & 0x07) << 4;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
+        bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
         uint16_t palette_number;
         palette_number = (format->color_palette >> 9) & 0x07;
@@ -183,7 +183,7 @@ _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         cc_count = (format->cc_count & 0x03) << 12;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
+        bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
         uint16_t palette_number;
         palette_number = (format->color_palette >> 9) & 0x07;
@@ -248,7 +248,7 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         cc_count = (format->cc_count & 0x03) << 12;
 
         uint16_t bank;
-        bank = VDP2_VRAM_BANK_4MBIT(format->bitmap_pattern);
+        bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
         uint16_t palette_number;
         palette_number = (format->color_palette >> 9) & 0x07;
@@ -323,7 +323,7 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
         _state_vdp2()->regs.ramctl |= format->usage_banks.b1 << 6;
 
         /* Rotation parameter table */
-        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->rotation_table_base);
+        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK(format->rotation_table_base);
         _state_vdp2()->regs.rptal = format->rotation_table_base & 0xFFFE;
 
         /* Special function type */
@@ -406,14 +406,14 @@ _cell_plane_calc(
         for (i = 0; i < plane_count; i++) {
                 /* XXX: There should be a way to mask out the top mask bits */
                 uint32_t offset;
-                offset = format->map_bases.planes[i] - VDP2_VRAM_ADDR_4MBIT(0, 0);
+                offset = format->map_bases.planes[i] - VDP2_VRAM_ADDR(0, 0);
 
                 planes[i] = (offset / page_size) & 0x003F;
         }
 
         /* Calculate the upper 3-bits of the 9-bits "map register" */
         uint32_t offset;
-        offset = format->map_bases.planes[0] - VDP2_VRAM_ADDR_4MBIT(0, 0);
+        offset = format->map_bases.planes[0] - VDP2_VRAM_ADDR(0, 0);
 
         uint16_t map_bits;
         map_bits = offset / page_size;
@@ -806,7 +806,7 @@ _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
         _state_vdp2()->regs.ramctl |= format->usage_banks.b1 << 6;
 
         /* Rotation parameter table */
-        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK_4MBIT(format->rotation_table);
+        _state_vdp2()->regs.rptau = VDP2_VRAM_BANK(format->rotation_table);
         _state_vdp2()->regs.rptal = format->rotation_table & 0xFFFE;
 
         /* Special function */

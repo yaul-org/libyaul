@@ -121,11 +121,12 @@ extern "C" {
  * |  8          | 2x2        | 2-word   | 2x2        | 0x004000   |
  * +-------------+------------+----------+------------+------------+
  */
-#define VDP2_SCRN_CALCULATE_PLANES_2_4MBIT_CNT(format)                         \
-        (VDP2_VRAM_BSIZE_2_4MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
-#define VDP2_SCRN_CALCULATE_PLANES_4_4MBIT_CNT(format)                         \
-        (VDP2_VRAM_BSIZE_4_4MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_CALCULATE_PLANES_2_CNT(format)                               \
+        (VDP2_VRAM_BSIZE_2 / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
+
+#define VDP2_SCRN_CALCULATE_PLANES_4_CNT(format)                               \
+        (VDP2_VRAM_BSIZE_4 / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
 
 #define VDP2_SCRN_CALCULATE_PLANES_2_8MBIT_CNT(format)                         \
         (VDP2_VRAM_BSIZE_2_8MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))

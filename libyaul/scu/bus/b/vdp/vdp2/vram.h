@@ -30,51 +30,22 @@ extern "C" {
  * 0x080000 +----------+
  */
 
-#define VDP2_VRAM_ADDR_4MBIT(x, y)      (0x25E00000 + ((x) << 17) + (y))
+#define VDP2_VRAM_ADDR(x, y)    (0x25E00000 + ((x) << 17) + (y))
 
-#define VDP2_VRAM_BANK_4MBIT(x)         (((x) >> 17) & 0x0007)
+#define VDP2_VRAM_BANK(x)       (((x) >> 17) & 0x0007)
 
-#define VDP2_VRAM_SIZE_4MBIT            (0x00080000)
+#define VDP2_VRAM_SIZE          (0x00080000)
 
 /* 4 Mbit 2-split VRAM bank size */
-#define VDP2_VRAM_BSIZE_2_4MBIT         (VDP2_VRAM_SIZE_4MBIT / 2)
+#define VDP2_VRAM_BSIZE_2       (VDP2_VRAM_SIZE / 2)
 
 /* 4 Mbit 4-split VRAM bank size */
-#define VDP2_VRAM_BSIZE_4_4MBIT         (VDP2_VRAM_SIZE_4MBIT / 4)
-
-/*-
- *            8 Mbit
- *  0x000000 +----------+
- *           |    A0    |
- *  0x040000 +----------+
- *           |    A1    |
- *  0x080000 +----------+
- *           |    B0    |
- *  0x0C0000 +----------+
- *           |    B1    |
- *  0x100000 +----------+
- */
-
-#define VDP2_VRAM_ADDR_8MBIT(x, y)      (0x25E00000 + ((x) << 18) + (y))
-
-#define VDP2_VRAM_BANK_8MBIT(x)         (((x) >> 18) & 0x0007)
-
-#define VDP2_VRAM_SIZE_8MBIT            (0x00100000)
-
-/* 8 Mbit 2-split VRAM bank size */
-#define VDP2_VRAM_BSIZE_2_8MBIT         (VRAM_SIZE_8MBIT / 2)
-
-/* 8 Mbit 4-split VRAM bank size */
-#define VDP2_VRAM_BSIZE_4_8MBIT         (VRAM_SIZE_8MBIT / 4)
+#define VDP2_VRAM_BSIZE_4       (VDP2_VRAM_SIZE / 4)
 
 struct vdp2_vram_ctl {
 #define VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM    0x0000 /* Store coefficient table in VRAM */
 #define VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM    0x0001 /* Store coefficient table in CRAM */
         uint8_t coefficient_table;
-
-#define VDP2_VRAM_CTL_SIZE_4MBIT                0x0000
-#define VDP2_VRAM_CTL_SIZE_8MBIT                0x0001
-        uint8_t vram_size; /* VRAM size */
 
 #define VDP2_VRAM_CTL_MODE_NO_PART_BANK_A       0x0000
 #define VDP2_VRAM_CTL_MODE_NO_PART_BANK_B       0x0000
