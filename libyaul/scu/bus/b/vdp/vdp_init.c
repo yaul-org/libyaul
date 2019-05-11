@@ -111,7 +111,6 @@ _init_vdp2(void)
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
 
         const struct vdp2_vram_ctl vram_ctl = {
-                .vram_size = VDP2_VRAM_CTL_SIZE_4MBIT,
                 .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
         };
 
@@ -119,7 +118,7 @@ _init_vdp2(void)
 
         vdp2_cram_mode_set(1);
 
-        vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR_4MBIT(0, 0x000000),
+        vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x000000),
             COLOR_RGB555(0, 0, 0));
 
         vdp2_vram_cycp_clear();
