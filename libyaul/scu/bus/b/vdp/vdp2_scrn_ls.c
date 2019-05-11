@@ -22,7 +22,7 @@ vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *ls)
         uint16_t lstau;
         uint16_t lstal;
 
-        lstau = VDP2_VRAM_BANK_4MBIT(ls->line_scroll_table);
+        lstau = VDP2_VRAM_BANK(ls->line_scroll_table);
         lstal = (ls->line_scroll_table >> 1) & 0xFFFF;
 
         switch (ls->scroll_screen) {
