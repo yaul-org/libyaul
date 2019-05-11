@@ -18,9 +18,6 @@ vdp2_vram_control_set(const struct vdp2_vram_ctl *vram_ctl)
 #ifdef DEBUG
         assert(vram_ctl != NULL);
 
-        assert((vram_ctl->vram_size == VDP2_VRAM_CTL_SIZE_4MBIT) ||
-               (vram_ctl->vram_size == VDP2_VRAM_CTL_SIZE_8MBIT));
-
         assert((vram_ctl->vram_mode & 0xFC) == 0x00);
 
         assert((vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
@@ -33,9 +30,6 @@ vdp2_vram_control_set(const struct vdp2_vram_ctl *vram_ctl)
                 _state_vdp2()->regs.ramctl |= 0x1000;
         }
 
-        /* VRAM size */
-        _state_vdp2()->regs.vrsize = vram_ctl->vram_size;
-
         /* Coefficient table storage */
         _state_vdp2()->regs.ramctl &= 0x7FFF;
         _state_vdp2()->regs.ramctl |= vram_ctl->coefficient_table << 15;
@@ -44,7 +38,7 @@ vdp2_vram_control_set(const struct vdp2_vram_ctl *vram_ctl)
         _state_vdp2()->regs.ramctl &= 0xFCFF;
         _state_vdp2()->regs.ramctl |= vram_ctl->vram_mode << 8;
 
-        MEMORY_WRITE(16, VDP2(VRSIZE), _state_vdp2()->regs.vrsize);
+        MEMORY_WRITE(16, VDP2(VRSIZE), 0x0000);
         MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs.ramctl);
 
         (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl,

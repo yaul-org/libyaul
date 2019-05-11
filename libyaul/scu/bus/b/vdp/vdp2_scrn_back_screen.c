@@ -59,7 +59,7 @@ _set_back_screen(uint32_t vram, const color_rgb555_t *buffer, bool single_color,
                 bkclmd = 0x8000;
         }
 
-        _state_vdp2()->regs.bktau = bkclmd | VDP2_VRAM_BANK_4MBIT(vram);
+        _state_vdp2()->regs.bktau = bkclmd | VDP2_VRAM_BANK(vram);
         _state_vdp2()->regs.bktal = (vram >> 1) & 0xFFFF;
 
         /* If BDCLMD (0x0100 is set and DISP has never been set, the
