@@ -10,6 +10,14 @@ ifneq (1,$(words [$(strip $(YAUL_INSTALL_ROOT))]))
   $(error YAUL_INSTALL_ROOT (install root directory) contains spaces)
 endif
 
+ifeq ($(strip $(YAUL_ARCH_SH_PREFIX)),)
+  $(error Undefined YAUL_ARCH_SH_PREFIX (tool-chain prefix))
+endif
+
+ifneq (1,$(words [$(strip $(YAUL_ARCH_SH_PREFIX))]))
+  $(error YAUL_ARCH_SH_PREFIX (tool-chain prefix) contains spaces)
+endif
+
 ifeq ($(strip $(YAUL_BUILD_ROOT)),)
   $(error Undefined YAUL_BUILD_ROOT (build root directory))
 endif
@@ -47,22 +55,18 @@ ifeq ($(strip $(YAUL_PREFIX)),)
 YAUL_PREFIX:= $(YAUL_INSTALL_ROOT)
 endif
 
-SH_ARCH:= sh-elf
+SH_ARCH:= $(YAUL_ARCH_SH_PREFIX)
 
-SH_RC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)-rc
+SH_RTAGS_RC= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-rc $(YAUL_BUILD_ROOT)
 
-ifneq ($(wildcard $(SH_RC)),)
-RTAGS_RC:= $(SH_RC) $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
-endif
-
-SH_AS:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
-SH_AR:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
-SH_CC:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_CXX:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
-SH_LD:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_NM:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
-SH_OBJCOPY:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
+SH_AS:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
+SH_AR:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
+SH_CC:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_CXX:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
+SH_LD:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
+SH_NM:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
 	-pedantic \

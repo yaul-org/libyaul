@@ -80,7 +80,7 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project)
 
 check-toolchain:
 	@printf -- "$(V_BEGIN_YELLOW)toolchain check$(V_END)\n"
-	$(call macro-check-toolchain,sh-elf,as ar ld nm objcopy objdump gcc g++)
+	$(call macro-check-toolchain,$(SH_ARCH),as ar ld nm objcopy objdump gcc g++)
 	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
 
 release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
