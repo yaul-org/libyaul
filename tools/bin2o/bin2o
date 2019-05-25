@@ -9,19 +9,26 @@
 PROGNAME="${0##*/}"
 TMPDIR="${TMPDIR:-/tmp}"
 
-TARGET="sh-elf"
+SH_ARCH="${YAUL_ARCH_SH_PREFIX}"
 AFLAGS="--fatal-warnings --isa=sh2 --big --reduce-memory-overheads"
 ARCH="elf32-sh"
 DATA_SECTION="rodata"
+
+SH_AS="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-as"
+SH_LD="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-ld"
+SH_OBJCOPY="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-objcopy"
+
+[ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
+[ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
+[ -n "${YAUL_ARCH_SH_PREFIX}" ] || panic "Undefined YAUL_ARCH_SH_PREFIX (tool-chain prefix)" 1
+[ -x "${SH_AS}" ] || panic "Invalid executable \`${SH_AS}'" 1
+[ -x "${SH_LD}" ] || panic "Invalid executable \`${SH_LD}'" 1
+[ -x "${SH_OBJCOPY}" ] || panic "Invalid executable \`${SH_OBJCOPY}'" 1
 
 panic () {
     printf -- "${PROGNAME}: Error: ${1}" >&2
     exit ${2}
 }
-
-if [ -z "${YAUL_INSTALL_ROOT}" ]; then
-    panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
-fi
 
 tmp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
 tmp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
@@ -44,7 +51,7 @@ symbol="${2}"
 output="${3}"
 
 # Gotta do a different binary target here depending on the target
-(${YAUL_INSTALL_ROOT}/"${TARGET}"/bin/"${TARGET}"-as ${AFLAGS} \
+("${SH_AS}" ${AFLAGS} \
     -o "${tmp3}" || \
     panic "Couldn't assemble file" 1) << EOF
 .SECTION ".${DATA_SECTION}"
@@ -63,9 +70,9 @@ SECTIONS
 }
 EOF
 
-"${YAUL_INSTALL_ROOT}/${TARGET}/bin/${TARGET}-ld" --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
+${SH_LD} --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
     --format "${ARCH}" "${tmp3}" \
     -o "${tmp2}" -r -T "${tmp1}" || panic "Couldn't link file" 1
 
-"${YAUL_INSTALL_ROOT}/${TARGET}/bin/${TARGET}-objcopy" --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
+${SH_OBJCOPY} --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
     "${tmp2}" "${output}" || panic "Couldn't translate object file" 1
