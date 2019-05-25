@@ -318,6 +318,8 @@ extern uint16_t vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *, const s
 extern uint16_t vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
 extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
 
+extern void vdp1_cmdt_jump_clear(struct vdp1_cmdt_list *, uint8_t);
+
 extern void vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);
 extern void vdp1_cmdt_jump_call(struct vdp1_cmdt_list *, uint8_t, uint8_t);
 extern void vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);

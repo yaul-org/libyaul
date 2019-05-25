@@ -427,6 +427,17 @@ vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
 }
 
 void
+vdp1_cmdt_jump_clear(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+{
+        _cmdt_jump_assert(cmdt_list, cmdt_index);
+
+        struct vdp1_cmdt *cmdt;
+        cmdt = &cmdt_list->cmdts[cmdt_index];
+
+        cmdt->cmd_ctrl &= 0x8FFF;
+}
+
+void
 vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
     uint8_t link_index)
 {
