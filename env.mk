@@ -47,8 +47,8 @@ ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
 endif
 
-# Installation location; by default, this is the same path that
-# contains the tool-chain, but it can be set to another path instead.
+# Installation location; by default, this is the same path that contains the
+# tool-chain, but it can be set to another path instead.
 YAUL_PREFIX?= $(YAUL_INSTALL_ROOT)
 
 ifeq ($(strip $(YAUL_PREFIX)),)
@@ -57,7 +57,9 @@ endif
 
 SH_ARCH:= $(YAUL_ARCH_SH_PREFIX)
 
-SH_RTAGS_RC= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-rc $(YAUL_BUILD_ROOT)
+ifeq ($(strip $(YAUL_RTAGS)),1)
+SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-rc $(YAUL_BUILD_ROOT)
+endif
 
 SH_AS:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
 SH_AR:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
@@ -98,7 +100,7 @@ SH_CFLAGS_shared += \
 endif
 
 # Clang (RTags) has a problem with -save-temps
-ifeq ($(strip $(YAUL_RTAGS)),)
+ifeq ($(strip $(YAUL_RTAGS)),1)
 SH_CFLAGS_shared:= $(SH_CFLAGS_shared) \
 	-save-temps=obj
 endif
@@ -117,8 +119,8 @@ SH_CXXFLAGS:= \
 	-fno-use-cxa-atexit \
 	$(SH_CXXFLAGS_shared)
 
-SH_CFLAGS_shared_release:= -O2 -fomit-frame-pointer
-SH_CFLAGS_shared_debug:= -O0 -g -DDEBUG
+SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer
+SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
