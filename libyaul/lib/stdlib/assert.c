@@ -28,7 +28,7 @@ __assert_func(const char *file, int line, const char *func,
         static bool asserted = false;
 
         bool has_func_str;
-        has_func_str = (func != NULL) || (*func != '\0');
+        has_func_str = (func != NULL) && (*func != '\0');
 
         /* Avoid adding code to clear the screen if we've asserted more than
          * once */
