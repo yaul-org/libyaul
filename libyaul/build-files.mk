@@ -80,8 +80,6 @@ LIB_SRCS+= \
 	lib/stdlib/realloc.c \
 	lib/stdlib/abs.c \
 	\
-	kernel/vfs/fs/iso9660/iso9660.c \
-	\
 	kernel/vfs/fs/romdisk/romdisk.c
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
@@ -236,7 +234,6 @@ INSTALL_HEADER_FILES+= \
 	./kernel/sys/:irq-mux.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/ \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
 
 INSTALL_HEADER_FILES+= \
