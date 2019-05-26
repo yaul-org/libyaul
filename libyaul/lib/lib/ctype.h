@@ -5,6 +5,8 @@
 
 #include <sys/cdefs.h>
 
+#include <stdint.h>
+
 _BEGIN_STD_C
 
 int isalnum(int);
@@ -45,7 +47,7 @@ int isxdigit(int);
 #define isupper(_c)     ((_ctype_lookup(_c) & (_U | _L)) == _U)
 #define isxdigit(_c)    (_ctype_lookup(_c) & (_X | _N))
 
-extern const char _ctype_bitmap[];
+extern const uint8_t _ctype_bitmap[];
 
 _END_STD_C
 
