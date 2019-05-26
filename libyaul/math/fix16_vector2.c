@@ -25,13 +25,13 @@ fix16_vector2_dup(const fix16_vector2_t *v0, fix16_vector2_t *result)
 }
 
 void
-fix16_vector2_normalize(fix16_vector2_t *result)
+fix16_vector2_normalize(fix16_vector2_t *result __unused)
 {
 }
 
 void
-fix16_vector2_normalized(const fix16_vector2_t *v0,
-    fix16_vector2_t *result)
+fix16_vector2_normalized(const fix16_vector2_t *v0 __unused,
+    fix16_vector2_t *result __unused)
 {
 }
 
