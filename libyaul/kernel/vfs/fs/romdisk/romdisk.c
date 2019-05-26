@@ -111,7 +111,10 @@ romdisk_open(void *p, const char *fn)
 
         f_hdr = (const romdisk_file_t *)(mnt->image + f_idx);
 
-        fh = romdisk_fd_alloc();
+        if ((fh = romdisk_fd_alloc()) == NULL) {
+                return NULL;
+        }
+
         fh->rdh = &fhs;
         fh->index = f_idx + mnt->files;
         fh->dir = directory;
