@@ -33,7 +33,7 @@
 
 #include <ctype.h>
 
-const char _ctype_bitmap[1 + 256] = {
+const uint8_t _ctype_bitmap[1 + 256] = {
         0,
         _C,      _C,      _C,      _C,      _C,      _C,      _C,      _C,
         _C,      _C | _S, _C | _S, _C | _S, _C | _S, _C | _S, _C,      _C,
