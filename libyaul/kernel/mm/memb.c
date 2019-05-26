@@ -193,7 +193,7 @@ memb_bounds(struct memb *mb, void *addr)
         return MEMB_PTR_BOUND(mb, addr);
 }
 
-static void __always_inline inline
+static inline void __always_inline
 _incr_block_index(struct memb *mb)
 {
         if (mb->m_bidx >= (mb->m_bnum - 1)) {

@@ -453,7 +453,7 @@ slob_block_units(struct slob_block *sb)
 /*
  * Given a pointer, return the the size of SB.
  */
-static uint32_t
+static uint32_t __unused
 slob_block_units_ptr(void *addr)
 {
         struct slob_block *sb;
