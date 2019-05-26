@@ -71,7 +71,8 @@ fix16_matrix3_transpose(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
 }
 
 void
-fix16_matrix3_inverse(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
+fix16_matrix3_inverse(const fix16_matrix3_t *m0 __unused,
+    fix16_matrix3_t *result __unused)
 {
 }
 
