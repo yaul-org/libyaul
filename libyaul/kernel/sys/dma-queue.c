@@ -45,7 +45,7 @@ struct dma_queue {
         bool busy;
 };
 
-static void _update_dma_request_pointers(const struct dma_queue_request *);
+static void _update_dma_request_pointers(struct dma_queue_request *);
 static void _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *);
 static void _copy_dma_reg_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_reg_buffer *);
 
@@ -54,7 +54,7 @@ static void _default_handler(const struct dma_queue_transfer *);
 static void _dma_handler(void);
 
 static struct dma_queue _dma_queues[DMA_QUEUE_TAG_COUNT];
-static const struct dma_queue_request *_current_request;
+static struct dma_queue_request *_current_request;
 static const struct dma_queue_request *_last_request;
 
 void
@@ -236,7 +236,7 @@ dma_queue_flush(uint8_t tag)
 
         scu_mask &= ~IC_MASK_LEVEL_0_DMA_END;
         /* Level starts at 2 */
-        sr_mask = min(sr_mask, 2);
+        sr_mask = (sr_mask < 2) ? sr_mask : 2;
 
 exit:
         scu_ic_mask_set(scu_mask);
@@ -293,8 +293,8 @@ dma_queue_capacity_get(void)
         return DMA_QUEUE_REQUESTS_MAX_COUNT;
 }
 
-static void __always_inline inline
-_update_dma_request_pointers(const struct dma_queue_request *request)
+static inline void __always_inline
+_update_dma_request_pointers(struct dma_queue_request *request)
 {
         assert(request != NULL);
 
@@ -302,7 +302,7 @@ _update_dma_request_pointers(const struct dma_queue_request *request)
         _current_request = request;
 }
 
-static void __always_inline inline
+static inline void __always_inline
 _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *request)
 {
         assert(dma_queue != NULL);
