@@ -15,9 +15,9 @@
 #define P09 1000 * 1000 * 1000
 #define P10 1000 * 1000 * 1000 * 10
 
-static const char const uppercase_hexchars[] = "0123456789ABCDEF";
-static const char const lowercase_hexchars[] = "0123456789abcdef";
-static const char digits[] =
+static const char uppercase_hexchars[] = "0123456789ABCDEF";
+static const char lowercase_hexchars[] = "0123456789abcdef";
+static const char digits[] __unused =
     "0001020304050607080910111213141516171819"
     "2021222324252627282930313233343536373839"
     "4041424344454647484950515253545556575859"
@@ -28,7 +28,7 @@ static uint16_t digits10(const uint32_t v);
 static uint16_t skip_atoi(const char **s);
 static uint16_t vsprintf(char *buf, const char *fmt, va_list args);
 
-static uint16_t
+static uint16_t __unused
 digits10(const uint32_t v)
 {
     if (v < P01) return 1;
