@@ -44,24 +44,25 @@ extern "C" {
                 uint16_t raw;                                                  \
         } draw_mode
 
-#define VDP1_CMDT_SPRITE_TYPE_DECLARE                                          \
+#define VDP1_CMDT_COLOR_BANK_DECLARE                                           \
         union {                                                                \
-                struct vdp2_sprite_type_0 type_0;                              \
-                struct vdp2_sprite_type_1 type_1;                              \
-                struct vdp2_sprite_type_2 type_2;                              \
-                struct vdp2_sprite_type_3 type_3;                              \
-                struct vdp2_sprite_type_4 type_4;                              \
-                struct vdp2_sprite_type_5 type_5;                              \
-                struct vdp2_sprite_type_6 type_6;                              \
-                struct vdp2_sprite_type_7 type_7;                              \
-                struct vdp2_sprite_type_8 type_8;                              \
-                struct vdp2_sprite_type_9 type_9;                              \
-                struct vdp2_sprite_type_a type_a;                              \
-                struct vdp2_sprite_type_b type_b;                              \
-                struct vdp2_sprite_type_c type_c;                              \
-                struct vdp2_sprite_type_d type_d;                              \
-                struct vdp2_sprite_type_e type_e;                              \
-                struct vdp2_sprite_type_f type_f;                              \
+                struct vdp1_color_bank_type_0 type_0;                          \
+                struct vdp1_color_bank_type_1 type_1;                          \
+                struct vdp1_color_bank_type_2 type_2;                          \
+                struct vdp1_color_bank_type_3 type_3;                          \
+                struct vdp1_color_bank_type_4 type_4;                          \
+                struct vdp1_color_bank_type_5 type_5;                          \
+                struct vdp1_color_bank_type_6 type_6;                          \
+                struct vdp1_color_bank_type_7 type_7;                          \
+                                                                               \
+                struct vdp1_color_bank_type_8 type_8;                          \
+                struct vdp1_color_bank_type_9 type_9;                          \
+                struct vdp1_color_bank_type_a type_a;                          \
+                struct vdp1_color_bank_type_b type_b;                          \
+                struct vdp1_color_bank_type_c type_c;                          \
+                struct vdp1_color_bank_type_d type_d;                          \
+                struct vdp1_color_bank_type_e type_e;                          \
+                struct vdp1_color_bank_type_f type_f;                          \
                                                                                \
                 uint16_t raw;                                                  \
         } sprite_type
@@ -71,7 +72,7 @@ extern "C" {
                                                                                \
         union {                                                                \
                 /* Mode 0, 2, 3, and 4 */                                      \
-                VDP1_CMDT_SPRITE_TYPE_DECLARE;                                 \
+                VDP1_CMDT_COLOR_BANK_DECLARE;                                  \
                                                                                \
                 /* Mode 1 */                                                   \
                 uint32_t clut;                                                 \
@@ -98,12 +99,84 @@ extern "C" {
         VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE;                                    \
                                                                                \
         union {                                                                \
-                VDP1_CMDT_SPRITE_TYPE_DECLARE;                                 \
+                VDP1_CMDT_COLOR_BANK_DECLARE;                                  \
                                                                                \
                 color_rgb555_t color;                                          \
         };                                                                     \
                                                                                \
         uint32_t grad_base
+
+struct vdp1_color_bank_type_0 {
+        struct vdp2_sprite_type_0 data;
+} __packed;
+
+struct vdp1_color_bank_type_1 {
+        struct vdp2_sprite_type_1 data;
+} __packed;
+
+struct vdp1_color_bank_type_2 {
+        struct vdp2_sprite_type_2 data;
+} __packed;
+
+struct vdp1_color_bank_type_3 {
+        struct vdp2_sprite_type_3 data;
+} __packed;
+
+struct vdp1_color_bank_type_4 {
+        struct vdp2_sprite_type_4 data;
+} __packed;
+
+struct vdp1_color_bank_type_5 {
+        struct vdp2_sprite_type_5 data;
+} __packed;
+
+struct vdp1_color_bank_type_6 {
+        struct vdp2_sprite_type_6 data;
+} __packed;
+
+struct vdp1_color_bank_type_7 {
+        struct vdp2_sprite_type_7 data;
+} __packed;
+
+struct vdp1_color_bank_type_8 {
+        unsigned int :8;
+        struct vdp2_sprite_type_8 data;
+} __packed;
+
+struct vdp1_color_bank_type_9 {
+        unsigned int :8;
+        struct vdp2_sprite_type_9 data;
+} __packed;
+
+struct vdp1_color_bank_type_a {
+        unsigned int :8;
+        struct vdp2_sprite_type_a data;
+} __packed;
+
+struct vdp1_color_bank_type_b {
+        unsigned int :8;
+        struct vdp2_sprite_type_b data;
+} __packed;
+
+struct vdp1_color_bank_type_c {
+        unsigned int :8;
+        struct vdp2_sprite_type_c data;
+} __packed;
+
+struct vdp1_color_bank_type_d {
+        unsigned int :8;
+        struct vdp2_sprite_type_d data;
+} __packed;
+
+struct vdp1_color_bank_type_e {
+        unsigned int :8;
+        struct vdp2_sprite_type_e data;
+} __packed;
+
+struct vdp1_color_bank_type_f {
+        unsigned int :8;
+        struct vdp2_sprite_type_f data;
+} __packed;
 
 struct vdp1_cmdt;
 
@@ -331,7 +404,7 @@ extern void vdp1_cmdt_jump_skip_next(struct vdp1_cmdt_list *, uint8_t);
 extern void vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *, uint8_t);
 
 #undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
-#undef VDP1_CMDT_SPRITE_TYPE_DECLARE
+#undef VDP1_CMDT_COLOR_BANK_DECLARE
 #undef VDP1_CMDT_SPRITE_DECLARE
 #undef VDP1_CMDT_NON_TEXTURED_DECLARE
 
