@@ -55,7 +55,7 @@ static void _dma_handler(void);
 
 static struct dma_queue _dma_queues[DMA_QUEUE_TAG_COUNT];
 static struct dma_queue_request *_current_request;
-static const struct dma_queue_request *_last_request;
+static struct dma_queue_request *_last_request;
 
 void
 dma_queue_init(void)
@@ -210,9 +210,6 @@ dma_queue_flush(uint8_t tag)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        uint32_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
         scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK_DISABLE);
 
         struct dma_queue *dma_queue;
@@ -235,12 +232,9 @@ dma_queue_flush(uint8_t tag)
         _start_dma_request(dma_queue, request);
 
         scu_mask &= ~IC_MASK_LEVEL_0_DMA_END;
-        /* Level starts at 2 */
-        sr_mask = (sr_mask < 2) ? sr_mask : 2;
 
 exit:
         scu_ic_mask_set(scu_mask);
-        cpu_intc_mask_set(sr_mask);
 
         return queue_count;
 }
@@ -255,9 +249,6 @@ dma_queue_flush_wait(void)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        uint32_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
         scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK_DISABLE);
 
         uint8_t current_tag;
@@ -267,13 +258,11 @@ dma_queue_flush_wait(void)
         current_dma_queue = &_dma_queues[current_tag];
 
         scu_ic_mask_chg(DMA_QUEUE_SCU_DMA_MASK_ENABLE, IC_MASK_NONE);
-        cpu_intc_mask_set(0);
 
         while (current_dma_queue->busy) {
         }
 
         scu_ic_mask_set(scu_mask);
-        cpu_intc_mask_set(sr_mask);
 }
 
 uint32_t

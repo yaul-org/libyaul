@@ -132,19 +132,14 @@ vdp_sync(int16_t interval __unused)
         assert(ret == 0);
 #endif /* DEBUG */
 
-        uint8_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        cpu_intc_mask_set(15);
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
         _state.sync |= STATE_SYNC;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
-        cpu_intc_mask_set(0);
 
         /* There are times when the list transfer is completed before syncing */
         if ((_state.vdp1 & (STATE_VDP1_REQUEST_XFER_LIST | STATE_VDP1_LIST_XFERRED)) != 0x00) {
@@ -171,7 +166,6 @@ vdp_sync(int16_t interval __unused)
                 vdp2_working = !vdp2_committed;
         } while (vdp1_working || vdp2_working);
 
-        cpu_intc_mask_set(15);
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
         _state.sync &= ~STATE_SYNC;
@@ -181,7 +175,6 @@ vdp_sync(int16_t interval __unused)
         _state.field_count = 0;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
-        cpu_intc_mask_set(0);
 
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
@@ -201,7 +194,6 @@ vdp_sync(int16_t interval __unused)
         _vdp1_last_command = 0x0000;
 
         scu_ic_mask_set(scu_mask);
-        cpu_intc_mask_set(sr_mask);
 }
 
 void
@@ -284,11 +276,6 @@ vdp1_sync_draw_wait(void)
                 return;
         }
 
-        uint8_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(0);
-
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
@@ -309,7 +296,6 @@ vdp1_sync_draw_wait(void)
         }
 
         scu_ic_mask_set(scu_mask);
-        cpu_intc_mask_set(sr_mask);
 }
 
 uint16_t
