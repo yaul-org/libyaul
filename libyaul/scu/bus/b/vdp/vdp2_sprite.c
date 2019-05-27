@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include <vdp2/scrn.h>
+#include <vdp2/vram.h>
 
 #include "vdp-internal.h"
 
@@ -15,7 +16,7 @@ void
 vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
 {
 #ifdef DEBUG
-        assert((sprite_register >= 0) && (sprite_register <= 7));
+        assert(sprite_register <= 7);
 #endif /* DEBUG */
 
         /* When priority is zero, scroll screen is transparent. */

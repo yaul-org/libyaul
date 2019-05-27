@@ -71,7 +71,7 @@ struct vdp2_vram_cycp_bank
 vdp2_vram_cycp_bank_get(uint8_t bank)
 {
 #ifdef DEBUG
-        assert((bank >= 0) && (bank <= 3));
+        assert(bank <= 3);
 #endif /* DEBUG */
 
         return *(struct vdp2_vram_cycp_bank *)&_state_vdp2()->regs.cyc[bank];
@@ -82,7 +82,7 @@ vdp2_vram_cycp_bank_set(uint8_t bank,
     const struct vdp2_vram_cycp_bank *cycp_bank)
 {
 #ifdef DEBUG
-        assert((bank >= 0) && (bank <= 3));
+        assert(bank <= 3);
 
         assert(cycp_bank != NULL);
 #endif /* DEBUG */
@@ -94,7 +94,7 @@ void
 vdp2_vram_cycp_bank_clear(uint8_t bank)
 {
 #ifdef DEBUG
-        assert((bank >= 0) && (bank <= 3));
+        assert(bank <= 3);
 #endif /* DEBUG */
 
         _state_vdp2()->regs.cyc[bank] = 0xFFFFFFFF;

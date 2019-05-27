@@ -13,7 +13,7 @@ void
 vdp2_cram_mode_set(uint8_t mode)
 {
 #ifdef DEBUG
-        assert((mode >= 0) && (mode <= 2));
+        assert(mode <= 2);
 #endif /* DEBUG */
 
         _state_vdp2()->regs.ramctl &= 0xCFFF;
