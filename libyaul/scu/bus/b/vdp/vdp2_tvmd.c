@@ -84,6 +84,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 _state_vdp2()->regs.tvmd |= 0x0020;
                 break;
         default:
+                height = 224;
                 break;
         }
 
@@ -153,6 +154,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 _state_vdp2()->regs.tvmd |= 0x0007;
                 break;
         default:
+                width = 320;
                 break;
         }
 

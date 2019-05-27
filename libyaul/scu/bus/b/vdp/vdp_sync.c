@@ -125,7 +125,7 @@ vdp_sync(int16_t interval __unused)
         struct scu_dma_reg_buffer *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
-        int8_t ret;
+        int8_t ret __unused;
         ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
             _vdp2_commit_handler, NULL);
 #ifdef DEBUG
@@ -261,7 +261,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 
         scu_dma_config_buffer(&_vdp1_dma_reg_buffer, &_vdp1_dma_cfg);
 
-        int8_t ret;
+        int8_t ret __unused;
         ret = dma_queue_enqueue(&_vdp1_dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
 #ifdef DEBUG
@@ -495,7 +495,7 @@ _vblank_in_handler(void)
         if ((_state.vdp2 & (STATE_VDP2_COMITTING | STATE_VDP2_COMMITTED)) == 0x00) {
                 _state.vdp2 |= STATE_VDP2_COMITTING;
 
-                int8_t ret;
+                int8_t ret __unused;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
 #ifdef DEBUG
                 assert(ret >= 0);

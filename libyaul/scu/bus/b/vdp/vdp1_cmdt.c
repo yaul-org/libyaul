@@ -621,6 +621,6 @@ _cmdt_jump_assert(const struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
 {
         _cmdt_list_assert(cmdt_list);
 
-        assert((cmdt_index >= 0) && (cmdt_index < cmdt_list->count));
+        assert(cmdt_index < cmdt_list->count);
 }
 #endif /* DEBUG */
