@@ -14,7 +14,11 @@
 
 #include <sys/dma-queue.h>
 
+#include <string.h>
+
 #include "vdp-internal.h"
+
+#define DEBUG_DMA_QUEUE_ENABLE 0 /* Debug: Use dma-queue to transfer VDP1 command list */
 
 #define USER_CALLBACK_COUNT 16
 
@@ -22,12 +26,12 @@
 #define SCU_MASK_AND    ((~(SCU_MASK_OR)) & IC_MASK_ALL)
 
 #define STATE_SYNC                      0x01 /* Request to synchronize */
-#define STATE_INTERLACE_SINGLE		0x02
-#define STATE_INTERLACE_DOUBLE		0x04
+#define STATE_INTERLACE_SINGLE          0x02
+#define STATE_INTERLACE_DOUBLE          0x04
 
 #define STATE_VDP1_REQUEST_XFER_LIST    0x01 /* VDP1 request to transfer list */
 #define STATE_VDP1_LIST_XFERRED         0x02 /* VDP1 finished transferring list via SCU-DMA */
-#define STATE_VDP1_REQUEST_COMMIT_LIST	0x04 /* VDP1 request to commit list */
+#define STATE_VDP1_REQUEST_COMMIT_LIST  0x04 /* VDP1 request to commit list */
 #define STATE_VDP1_LIST_COMMITTED       0x08 /* VDP1 finished committing list */
 #define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
 #define STATE_VDP1_CHANGED              0x20 /* VDP1 changed frame buffers */
@@ -61,8 +65,8 @@ static volatile union {
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
 /* VDP1 SCU-DMA state */
-static struct scu_dma_level_cfg _vdp1_dma_cfg;
-static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer;
+static struct scu_dma_level_cfg _vdp1_dma_cfg __unused;
+static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer __unused;
 
 static struct {
         void (*callback)(void *);
@@ -237,6 +241,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
         _state.vdp1 &= ~STATE_VDP1_CHANGED;
 
+#if DEBUG_DMA_QUEUE_ENABLE == 1
         uint32_t xfer_len;
         xfer_len = count * sizeof(struct vdp1_cmdt);
         uint32_t xfer_dst;
@@ -264,6 +269,14 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 #ifdef DEBUG
         assert(ret >= 0);
 #endif /* DEBUG */
+#else
+        (void)memcpy((void *)vdp1_vram,
+            (void *)(CPU_CACHE_THROUGH | (uint32_t)cmdt_list->cmdts),
+            count * sizeof(struct vdp1_cmdt));
+
+        /* Call handler directly */
+        _vdp1_dma_handler(NULL);
+#endif /* DEBUG_DMA_QUEUE_ENABLE */
 }
 
 void
