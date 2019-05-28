@@ -167,8 +167,8 @@ _init(const dbgio_vdp2_t *params)
         assert(params->font_cpd != NULL);
         assert(params->font_pal != NULL);
 
-        assert((params->font_fg >= 0) && (params->font_bg <= 15));
-        assert((params->font_bg >= 0) && (params->font_bg <= 15));
+        assert(params->font_bg <= 15);
+        assert(params->font_bg <= 15);
 
         assert((params->scrn == VDP2_SCRN_NBG0) ||
                (params->scrn == VDP2_SCRN_NBG1) ||
@@ -178,18 +178,18 @@ _init(const dbgio_vdp2_t *params)
         assert((params->scrn != VDP2_SCRN_RBG0) &&
                (params->scrn != VDP2_SCRN_RBG1));
 
-        assert((params->cpd_bank >= 0) && (params->cpd_bank <= 3));
+        assert(params->cpd_bank <= 3);
         /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
          *      bank size */
         assert(params->cpd_offset < VDP2_VRAM_BSIZE_4);
 
-        assert((params->pnd_bank >= 0) && (params->pnd_bank <= 3));
+        assert(params->pnd_bank <= 3);
         /* XXX: Determine the page size and check against the number of
          *      available offsets */
 
         /* There are 128 16-color banks, depending on CRAM mode */
         /* XXX: Fetch CRAM mode and check number of available 16-color banks */
-        assert((params->cram_index >= 0) && (params->cram_index < 128));
+        assert(params->cram_index < 128);
 
         if (_dev_state == NULL) {
                 _dev_state = malloc(sizeof(dev_state_t));

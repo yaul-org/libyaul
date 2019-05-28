@@ -111,9 +111,9 @@ dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer, uint8_t tag, void
         struct dma_queue *dma_queue;
         dma_queue = &_dma_queues[tag];
 
-        assert((dma_queue->head >= 0) && (dma_queue->head <= DMA_QUEUE_REQUESTS_MAX_COUNT));
-        assert((dma_queue->tail >= 0) && (dma_queue->tail <= DMA_QUEUE_REQUESTS_MAX_COUNT));
-        assert((dma_queue->count >= 0) && (dma_queue->count <= DMA_QUEUE_REQUESTS_MAX_COUNT));
+        assert(dma_queue->head <= DMA_QUEUE_REQUESTS_MAX_COUNT);
+        assert(dma_queue->tail <= DMA_QUEUE_REQUESTS_MAX_COUNT);
+        assert(dma_queue->count <= DMA_QUEUE_REQUESTS_MAX_COUNT);
 
         if (dma_queue->count >= DMA_QUEUE_REQUESTS_MAX_COUNT) {
                 error = -1;
