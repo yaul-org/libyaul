@@ -1,0 +1,14 @@
+-.git/
+-.images/
+-/build/
+-/yaul.env
+-.#*
+-*~
+-.DS_Store
+-*.a
+-*.bin
+-*.dll
+-*.log
+-*.o
+-romdisk/
+-data/
