@@ -155,30 +155,29 @@ vdp_sync(int16_t interval __unused)
         bool vdp1_working;
         bool vdp2_working;
 
-        do {
+        while (true) {
+                uint8_t state_vdp1;
+                state_vdp1 = _state.vdp1;
+                uint8_t state_vdp2;
+                state_vdp2 = _state.vdp2;
+
                 bool vdp1_request_change;
-                vdp1_request_change = (_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) != 0x00;
+                vdp1_request_change = (state_vdp1 & STATE_VDP1_REQUEST_CHANGE) != 0x00;
 
                 bool vdp1_changed;
-                vdp1_changed = (_state.vdp1 & STATE_VDP1_CHANGED) != 0x00;
-
+                vdp1_changed = (state_vdp1 & STATE_VDP1_CHANGED) != 0x00;
                 vdp1_working = vdp1_request_change && !vdp1_changed;
 
                 bool vdp2_committed;
-                vdp2_committed = (_state.vdp2 & STATE_VDP2_COMMITTED) != 0x00;
-
+                vdp2_committed = (state_vdp2 & STATE_VDP2_COMMITTED) != 0x00;
                 vdp2_working = !vdp2_committed;
-        } while (vdp1_working || vdp2_working);
+
+                if (!vdp1_working && !vdp2_working) {
+                        break;
+                }
+        }
 
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
-
-        _state.sync &= ~STATE_SYNC;
-
-        _state.vdp1 = 0x00;
-        _state.vdp2 = 0x00;
-        _state.field_count = 0;
-
-        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
@@ -193,6 +192,10 @@ vdp_sync(int16_t interval __unused)
 
                 callback(work);
         }
+
+        _state.raw = 0x00000000;
+
+        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
         /* Reset command address to the top */
         _vdp1_last_command = 0x0000;
@@ -426,7 +429,7 @@ _init_vdp2(void)
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 }
 
-static inline bool __always_inline
+static inline bool __always_inline __unused
 _vdp1_transfer_over(void)
 {
         struct vdp1_transfer_status transfer_status;
