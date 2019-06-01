@@ -60,9 +60,18 @@ _internal_exception_show(const char *buffer)
         dbgio_dev_set(DBGIO_DEV_VDP2_SIMPLE);
         dbgio_buffer(buffer);
 
+        vdp2_tvmd_vblank_out_wait();
+        vdp2_tvmd_vblank_in_wait();
         dbgio_flush();
+
+        /* Synchronize VDP2 only.
+         *
+         * Avoid using vdp_sync() as we don't need to sync VDP2 and can no
+         * longer fire off any interrupts */
         vdp2_sync_commit();
 
         while (true) {
         }
+
+        __builtin_unreachable();
 }
