@@ -99,12 +99,6 @@ SH_CFLAGS_shared += \
 	-DSPIN_ON_ABORT=1
 endif
 
-# Clang (RTags) has a problem with -save-temps
-ifeq ($(strip $(YAUL_RTAGS)),1)
-SH_CFLAGS_shared:= $(SH_CFLAGS_shared) \
-	-save-temps=obj
-endif
-
 SH_CFLAGS:= \
 	-std=c11 \
 	$(SH_CFLAGS_shared)
