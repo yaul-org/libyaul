@@ -1,6 +1,6 @@
+/.rtags/
 /build/
 /yaul.env
-/compile_commands.json
 .#*
 *~
 .DS_Store
