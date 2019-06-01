@@ -58,7 +58,7 @@ vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
                 break;
         case VDP2_SCRN_RBG0:
                 _rbg0_scrn_cell_format_set(format);
-               break;
+                break;
         }
 }
 
