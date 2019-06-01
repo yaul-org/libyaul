@@ -31,7 +31,8 @@ vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
 }
 
 void
-vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb555_t *buffer, uint16_t count)
+vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb555_t *buffer,
+    uint16_t count)
 {
 #ifdef DEBUG
         assert(vram != 0x00000000);
@@ -67,10 +68,7 @@ _set_back_screen(uint32_t vram, const color_rgb555_t *buffer, bool single_color,
         _state_vdp2()->regs.tvmd &= 0x7EFF;
         _state_vdp2()->regs.tvmd |= 0x8100;
 
-        struct scu_dma_xfer *xfer;
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
-
-        xfer->len = count * sizeof(color_rgb555_t);
-        xfer->dst = vram;
-        xfer->src = SCU_DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)buffer;
+        _state_vdp2()->back.vram = (void *)vram;
+        _state_vdp2()->back.buffer = (void *)buffer;
+        _state_vdp2()->back.count = count;
 }
