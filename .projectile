@@ -1,6 +1,12 @@
 -.git/
 -.images/
 -/build/
+-/build-scripts/
+-/docs/
+-/libbcl/
+-/libtga/
+-/examples/
+-/tools/
 -/yaul.env
 -.#*
 -*~
@@ -10,5 +16,5 @@
 -*.dll
 -*.log
 -*.o
--romdisk/
--data/
+-*.d
+-*.s
