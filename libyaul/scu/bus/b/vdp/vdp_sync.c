@@ -19,10 +19,13 @@
 
 #include "vdp-internal.h"
 
-#define DEBUG_DMA_QUEUE_ENABLE  0 /* Debug: Use dma-queue to transfer VDP1 command list */
+/* Debug: Use dma-queue to transfer VDP1 command list */
+#define DEBUG_DMA_QUEUE_ENABLE  0
 
+/* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
 
+/* Maximum number of user callbacks */
 #define USER_CALLBACK_COUNT     16
 
 #define SCU_MASK_OR     (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
@@ -71,18 +74,6 @@ static volatile uint16_t _vdp1_last_command = 0x0000;
 static struct scu_dma_level_cfg _vdp1_dma_cfg __unused;
 static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer __unused;
 
-static struct cpu_dmac_cfg _vdp2_dmac_cfg = {
-        .channel= SYNC_DMAC_CHANNEL,
-        .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-        .dst = 0x00000000,
-        .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-        .src = 0x00000000,
-        .len = 0x00000000,
-        .stride = CPU_DMAC_STRIDE_2_BYTES,
-        .bus_mode = CPU_DMAC_BUS_MODE_BURST,
-        .ihr = NULL
-};
-
 static struct {
         void (*callback)(void *);
         void *work;
@@ -104,6 +95,8 @@ static void _init_vdp1(void);
 
 static void _init_vdp2(void);
 static void _init_vdp2_commit_xfer_tables(void);
+static void _vdp2_sync_commit(struct cpu_dmac_cfg *);
+static void _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *);
 
 void
 vdp_sync_init(void)
@@ -338,31 +331,22 @@ vdp1_sync_last_command_get(void)
 }
 
 void
-vdp2_sync(void)
+vdp2_sync_commit(void)
 {
-        /* Transfer VDP2 registers */
-        _vdp2_dmac_cfg.len = sizeof(_state_vdp2()->regs) - 14;
-        _vdp2_dmac_cfg.dst = VDP2(0x000E);
-        _vdp2_dmac_cfg.src = (uint32_t)&_state_vdp2()->regs.buffer[7];
+        static struct cpu_dmac_cfg dmac_cfg = {
+                .channel= SYNC_DMAC_CHANNEL,
+                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
+                .src = 0x00000000,
+                .dst = 0x00000000,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .len = 0x00000000,
+                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr = NULL
+        };
 
-        cpu_dmac_channel_config_set(&_vdp2_dmac_cfg);
-
-        cpu_dmac_enable();
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-
-        MEMORY_WRITE(16, VDP2(0x0000), _state_vdp2()->regs.buffer[0]);
-
-        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-
-        /* Transfer VDP2 back screen table */
-        _vdp2_dmac_cfg.len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
-        _vdp2_dmac_cfg.dst = (uint32_t)_state_vdp2()->back.vram;
-        _vdp2_dmac_cfg.src = (uint32_t)_state_vdp2()->back.buffer;
-
-        cpu_dmac_channel_config_set(&_vdp2_dmac_cfg);
-        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
+        _vdp2_sync_back_screen_table(&dmac_cfg);
+        _vdp2_sync_commit(&dmac_cfg);
 }
 
 void
@@ -656,6 +640,39 @@ _vdp2_commit_handler(const struct dma_queue_transfer *transfer __unused)
 {
         _state.vdp2 |= STATE_VDP2_COMMITTED;
         _state.vdp2 &= ~STATE_VDP2_COMITTING;
+}
+
+static void
+_vdp2_sync_commit(struct cpu_dmac_cfg *dmac_cfg)
+{
+        dmac_cfg->len = sizeof(_state_vdp2()->regs) - 14;
+        dmac_cfg->dst = VDP2(0x000E);
+        dmac_cfg->src = (uint32_t)&_state_vdp2()->regs.buffer[7];
+
+        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
+        cpu_dmac_channel_config_set(dmac_cfg);
+
+        MEMORY_WRITE(16, VDP2(0x0000), _state_vdp2()->regs.buffer[0]);
+
+        cpu_dmac_enable();
+        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
+
+        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
+}
+
+static void
+_vdp2_sync_back_screen_table(struct cpu_dmac_cfg *dmac_cfg)
+{
+        dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
+        dmac_cfg->dst = (uint32_t)_state_vdp2()->back.vram;
+        dmac_cfg->src = (uint32_t)_state_vdp2()->back.buffer;
+
+        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
+        cpu_dmac_channel_config_set(dmac_cfg);
+
+        cpu_dmac_enable();
+        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
+        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
 }
 
 static void
