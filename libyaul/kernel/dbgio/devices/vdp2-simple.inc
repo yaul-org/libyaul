@@ -15,7 +15,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2_simple = {
 };
 
 static void
-_simple_init(const dbgio_vdp2_t *params)
+_simple_init(const dbgio_vdp2_t *params __unused)
 {
 }
 
@@ -25,7 +25,7 @@ _simple_deinit(void)
 }
 
 static void
-_simple_buffer(const char *buffer)
+_simple_buffer(const char *buffer __unused)
 {
 }
 
