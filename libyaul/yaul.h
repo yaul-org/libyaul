@@ -60,7 +60,6 @@
 #include <sys/dma-queue.h>
 #include <sys/irq-mux.h>
 
-#include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
 
 #endif /* !_YAUL_H_ */

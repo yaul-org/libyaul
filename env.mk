@@ -14,6 +14,10 @@ ifeq ($(strip $(YAUL_ARCH_SH_PREFIX)),)
   $(error Undefined YAUL_ARCH_SH_PREFIX (tool-chain prefix))
 endif
 
+ifneq (1,$(words [$(strip $(YAUL_PROG_SH_PREFIX))]))
+  $(error YAUL_PROG_SH_PREFIX (tool-chain program prefix) contains spaces)
+endif
+
 ifneq (1,$(words [$(strip $(YAUL_ARCH_SH_PREFIX))]))
   $(error YAUL_ARCH_SH_PREFIX (tool-chain prefix) contains spaces)
 endif
@@ -50,25 +54,27 @@ endif
 # Installation location; by default, this is the same path that contains the
 # tool-chain, but it can be set to another path instead.
 YAUL_PREFIX?= $(YAUL_INSTALL_ROOT)
-
 ifeq ($(strip $(YAUL_PREFIX)),)
 YAUL_PREFIX:= $(YAUL_INSTALL_ROOT)
 endif
 
-SH_ARCH:= $(YAUL_ARCH_SH_PREFIX)
-
-ifeq ($(strip $(YAUL_RTAGS)),1)
-SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-rc $(YAUL_BUILD_ROOT)
+YAUL_PROG_SH_PREFIX?= $(YAUL_ARCH_SH_PREFIX)
+ifeq ($(strip $(YAUL_PROG_SH_PREFIX)),)
+YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
-SH_AS:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
-SH_AR:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
-SH_CC:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_CXX:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
-SH_LD:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_NM:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
-SH_OBJCOPY:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
+ifeq ($(strip $(YAUL_RTAGS)),1)
+SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-rc $(YAUL_BUILD_ROOT)
+endif
+
+SH_AS:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
+SH_AR:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
+SH_CC:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_CXX:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-g++$(EXE_EXT)
+SH_LD:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_NM:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
 	-pedantic \
@@ -144,23 +150,23 @@ define macro-sh-build-library
 endef
 
 define macro-sh-generate-install-header-rule
-$(YAUL_PREFIX)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2: $1/$2
+$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
-	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(SH_ARCH)/$(SH_ARCH)/}/$$(@F)$(V_END)\n";
+	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/}/$$(@F)$(V_END)\n";
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
-install-$4: $4 $(YAUL_PREFIX)/$(SH_ARCH)/$(SH_ARCH)/include/$3/$2
+install-$4: $4 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2
 endef
 
 define macro-sh-generate-install-lib-rule
-$(YAUL_PREFIX)/$(SH_ARCH)/$(SH_ARCH)/lib/$2: $1
+$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
 	$(ECHO)mkdir -p "$$(@D)"
 	$(ECHO)$(INSTALL) -m 644 $$< $$@
 
-install-$3: $3 $(YAUL_PREFIX)/$(SH_ARCH)/$(SH_ARCH)/lib/$2
+install-$3: $3 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2
 endef
 
 M68K_ARCH:= m68k-elf

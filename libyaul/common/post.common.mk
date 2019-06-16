@@ -145,7 +145,7 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
-IP.BIN: $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/share/yaul/bootstrap/ip.sx
+IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
 	$(ECHO)cat $< | awk ' \
 	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
@@ -180,7 +180,7 @@ IP.BIN: $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/share/yaul/bootstrap/ip.sx
 	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
 	{ print; } \
 	' | $(SH_AS) $(SH_AFLAGS) \
-	-I$(YAUL_INSTALL_ROOT)/$(SH_ARCH)/share/yaul/bootstrap -o $($@_TMP_FILE) -
+	-I$(YAUL_INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
 	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
 	-specs=ip.specs $($@_TMP_FILE) -o $@
 	$(ECHO)$(RM) $($@_TMP_FILE)

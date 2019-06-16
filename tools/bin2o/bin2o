@@ -14,9 +14,17 @@ AFLAGS="--fatal-warnings --isa=sh2 --big --reduce-memory-overheads"
 ARCH="elf32-sh"
 DATA_SECTION="rodata"
 
-SH_AS="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-as"
-SH_LD="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-ld"
-SH_OBJCOPY="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-objcopy"
+# If empty, default to YAUL_ARCH_SH_PREFIX
+YAUL_PROG_SH_PREFIX=$([ -z "${YAUL_PROG_SH_PREFIX}" ] && printf -- "${YAUL_ARCH_SH_PREFIX}")
+
+SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
+SH_LD="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-ld"
+SH_OBJCOPY="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-objcopy"
+
+panic () {
+    printf -- "${PROGNAME}: Error: ${1}\n" >&2
+    exit ${2}
+}
 
 [ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
 [ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
@@ -24,11 +32,6 @@ SH_OBJCOPY="${YAUL_INSTALL_ROOT}/${SH_ARCH}/bin/${SH_ARCH}-objcopy"
 [ -x "${SH_AS}" ] || panic "Invalid executable \`${SH_AS}'" 1
 [ -x "${SH_LD}" ] || panic "Invalid executable \`${SH_LD}'" 1
 [ -x "${SH_OBJCOPY}" ] || panic "Invalid executable \`${SH_OBJCOPY}'" 1
-
-panic () {
-    printf -- "${PROGNAME}: Error: ${1}" >&2
-    exit ${2}
-}
 
 tmp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
 tmp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1

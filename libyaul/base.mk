@@ -57,7 +57,7 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(YAUL_PREFIX)'/'$(SH_ARCH)'"); \
+	    sub(/\$$INSTALL_ROOT/,"'$(YAUL_PREFIX)'/'$(YAUL_ARCH_SH_PREFIX)'"); \
 	} \
 	{ print }' > $@
 
@@ -74,13 +74,13 @@ $(foreach SUPPORT_OBJ,$(SUPPORT_OBJS_base), \
 
 # Install files
 $(foreach SPECS,$(SPECS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(SH_ARCH)/$(SH_ARCH)/lib,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE))))
 
 $(foreach LDSCRIPT,$(LDSCRIPTS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(SH_ARCH)/$(SH_ARCH)/lib/ldscripts,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE))))
 
 $(foreach BOOTSTRAP,$(BOOTSTRAP_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(BOOTSTRAP),$(notdir $(BOOTSTRAP)),$(SH_ARCH)/share/$(TARGET)/bootstrap,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(BOOTSTRAP),$(notdir $(BOOTSTRAP)),share/$(TARGET)/bootstrap,$(TYPE))))
 
 $(foreach USER_FILE,$(USER_FILES_all), \
 	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE))))
