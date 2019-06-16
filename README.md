@@ -69,11 +69,14 @@ directory. Take note of the absolute path to the tool-chain.
    environment:
 
    1. Set the absolute path to the tool-chain in `YAUL_INSTALL_ROOT`.
-   2. Set the absolute path to where the `libyaul` source tree is
+   2. If necessary, set `YAUL_PROG_SH_PREFIX` and `YAUL_ARCH_SH_PREFIX`.
+   3. Set the absolute path to where the `libyaul` source tree is
       located in `YAUL_BUILD_ROOT`.
-   3. Set the type of development cart you own in
+   4. Set the type of development cart you own in
       `YAUL_OPTION_DEV_CARTRIDGE`. If none, set to 0 (zero).
-   4. Set RTags support in `YAUL_RTAGS`. Set `true` or `false`.
+   5. Set whether to system reset or spin on abort() in
+      `YAUL_OPTION_SPIN_ON_ABORT`. To system reset, set to 0 (zero).
+   6. Set RTags support in `YAUL_RTAGS`. Set 1 or 0 (zero).
 
    Setting the wrong values may result in compilation errors.
 
