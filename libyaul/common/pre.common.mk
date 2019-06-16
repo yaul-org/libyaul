@@ -14,6 +14,10 @@ ifneq (1,$(words [$(strip $(YAUL_ARCH_SH_PREFIX))]))
   $(error YAUL_ARCH_SH_PREFIX (tool-chain prefix) contains spaces)
 endif
 
+ifneq (1,$(words [$(strip $(YAUL_PROG_SH_PREFIX))]))
+  $(error YAUL_PROG_SH_PREFIX (tool-chain program prefix) contains spaces)
+endif
+
 # Check options
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
@@ -68,27 +72,34 @@ ROMDISK_DEPS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
 
-SH_ARCH:= $(YAUL_ARCH_SH_PREFIX)
-
-ifeq ($(strip $(YAUL_RTAGS)),1)
-SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-rc $(BUILD_ROOT)
+YAUL_PROG_SH_PREFIX?= $(YAUL_ARCH_SH_PREFIX)
+ifeq ($(strip $(YAUL_PROG_SH_PREFIX)),)
+YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
-SH_AS:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-as$(EXE_EXT)
-SH_AR:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-ar$(EXE_EXT)
-SH_CC:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_CXX:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-g++$(EXE_EXT)
-SH_LD:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-gcc$(EXE_EXT)
-SH_NM:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-nm$(EXE_EXT)
-SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/$(SH_ARCH)/bin/$(SH_ARCH)-objdump$(EXE_EXT)
+ifeq ($(strip $(YAUL_RTAGS)),1)
+SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-rc $(YAUL_BUILD_ROOT)
+endif
 
-M68K_AS:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-as$(EXE_EXT)
-M68K_AR:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ar$(EXE_EXT)
-M68K_LD:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-ld$(EXE_EXT)
-M68K_NM:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-nm$(EXE_EXT)
-M68K_OBJCOPY:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objcopy$(EXE_EXT)
-M68K_OBJDUMP:= $(YAUL_INSTALL_ROOT)/m68k-elf/bin/m68k-elf-objdump$(EXE_EXT)
+SH_AS:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
+SH_AR:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
+SH_CC:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_CXX:=     $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-g++$(EXE_EXT)
+SH_LD:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_NM:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
+
+M68K_ARCH:= m68k-elf
+
+M68K_AS:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-as$(EXE_EXT)
+M68K_AR:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-ar$(EXE_EXT)
+M68K_CC:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-gcc$(EXE_EXT)
+M68K_CXX:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-g++$(EXE_EXT)
+M68K_LD:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-gcc$(EXE_EXT)
+M68K_NM:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-nm$(EXE_EXT)
+M68K_OBJCOPY:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objcopy$(EXE_EXT)
+M68K_OBJDUMP:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objdump$(EXE_EXT)
 
 SH_AFLAGS= --fatal-warnings
 SH_CFLAGS= \
