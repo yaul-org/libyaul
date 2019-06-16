@@ -11,11 +11,11 @@
 
 #define FONT_CHAR_HEIGHT        (8)
 #define FONT_CHAR_WIDTH         (8)
-#define FONT_1BPP_SIZE          (2048)
-#define FONT_4BPP_SIZE          (8192)
-#define FONT_COLOR_COUNT        (16)
+#define FONT_1BPP_CPD_SIZE      (2048)
+#define FONT_4BPP_CPD_SIZE      (8192)
+#define FONT_4BPP_COLOR_COUNT   (16)
 
-const uint8_t _font_cpd[FONT_1BPP_SIZE] __aligned(4) = {
+const uint8_t _font_cpd[FONT_1BPP_CPD_SIZE] __aligned(4) = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x7E, 0x81, 0xA5, 0x81, 0xBD, 0x99, 0x81, 0x7E,
         0x7E, 0xFF, 0xDB, 0xFF, 0xC3, 0xE7, 0xFF, 0x7E,

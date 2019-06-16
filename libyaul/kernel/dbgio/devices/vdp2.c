@@ -26,13 +26,15 @@
 
 #include "vdp2_font.inc"
 
-#define STATE_IDLE                      0x00
-#define STATE_INITIALIZED               0x01
-#define STATE_PARTIALLY_INITIALIZED     0x02
-#define STATE_BUFFER_DIRTY              0x04
-#define STATE_BUFFER_CLEARED            0x08
-#define STATE_BUFFER_FLUSHING           0x10
-#define STATE_BUFFER_FORCE_FLUSHING     0x20
+#define STATE_IDLE                      (0x00)
+#define STATE_INITIALIZED               (0x01)
+#define STATE_PARTIALLY_INITIALIZED     (0x02)
+#define STATE_BUFFER_DIRTY              (0x04)
+#define STATE_BUFFER_CLEARED            (0x08)
+#define STATE_BUFFER_FLUSHING           (0x10)
+#define STATE_BUFFER_FORCE_FLUSHING     (0x20)
+
+#define STATE_MASK_INITIALIZED          (STATE_INITIALIZED | STATE_PARTIALLY_INITIALIZED)
 
 typedef struct {
         uint8_t state;
@@ -51,6 +53,11 @@ typedef struct {
         uint16_t page_height;
         /* PND value for clearing a page */
         uint16_t pnd_clear;
+
+        struct {
+                uint8_t *cpd_buffer;
+                color_rgb555_t *pal_buffer;
+        } font;
 } dev_state_t;
 
 /* Restrictions:
@@ -232,7 +239,7 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd, uint8_t fg,
         };
 
         uint32_t i;
-        for (i = 0; i < FONT_1BPP_SIZE; i++) {
+        for (i = 0; i < FONT_1BPP_CPD_SIZE; i++) {
                 uint32_t j;
                 j = i << 2;
 
@@ -244,6 +251,181 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd, uint8_t fg,
                 dec_cpd[j + 2] = _1bpp_4bpp_convert(&cpd, fgbg);
                 dec_cpd[j + 3] = _1bpp_4bpp_convert(&cpd, fgbg);
         }
+}
+
+static void
+_dev_state_init(const dbgio_vdp2_t *params)
+{
+        assert(params != NULL);
+
+        if (_dev_state == NULL) {
+                _dev_state = malloc(sizeof(dev_state_t));
+                assert(_dev_state != NULL);
+
+                (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
+
+                _dev_state->state = STATE_IDLE;
+        }
+
+        if ((_dev_state->state & STATE_MASK_INITIALIZED) != 0x00) {
+                return;
+        }
+
+        _dev_state->page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
+        _dev_state->page_width = VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
+        _dev_state->page_height = VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
+
+        /* One page per plane */
+        _dev_state->page_base = VDP2_VRAM_ADDR(params->pnd_bank,
+            params->pnd_offset * _dev_state->page_size);
+
+        _dev_state->cp_table = VDP2_VRAM_ADDR(params->cpd_bank, params->cpd_offset);
+        _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
+
+        /* Restricting the page to 64x32 avoids wasting space */
+        _dev_state->page_size >>= 1;
+
+        /* PND value used to clear pages */
+        _dev_state->pnd_clear = VDP2_SCRN_PND_CONFIG_0(
+                _dev_state->cp_table,
+                _dev_state->color_palette,
+                /* vf = */ 0,
+                /* hf = */ 0);
+
+        if (_dev_state->page_pnd == NULL) {
+                _dev_state->page_pnd = malloc(_dev_state->page_size);
+                assert(_dev_state->page_pnd != NULL);
+        }
+
+        if (_dev_state->font.cpd_buffer == NULL) {
+                _dev_state->font.cpd_buffer = malloc(FONT_4BPP_CPD_SIZE);
+                assert(_dev_state->font.cpd_buffer != NULL);
+        }
+
+        if (_dev_state->font.pal_buffer == NULL) {
+                _dev_state->font.pal_buffer = malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+                assert(_dev_state->font.pal_buffer != NULL);
+        }
+}
+
+static inline void __always_inline
+_scroll_screen_init(const dbgio_vdp2_t *params)
+{
+        assert(params != NULL);
+        assert(_dev_state != NULL);
+
+        const struct vdp2_scrn_cell_format cell_format = {
+                .scroll_screen = params->scrn,
+                .cc_count = VDP2_SCRN_CCC_PALETTE_16,
+                .character_size = 1 * 1,
+                .pnd_size = 1, /* 1-word */
+                .auxiliary_mode = 0,
+                .cp_table = _dev_state->cp_table,
+                .color_palette = _dev_state->color_palette,
+                .plane_size = 1 * 1,
+                .map_bases.plane_a = _dev_state->page_base,
+                .map_bases.plane_b = _dev_state->page_base,
+                .map_bases.plane_c = _dev_state->page_base,
+                .map_bases.plane_d = _dev_state->page_base
+        };
+
+        vdp2_scrn_cell_format_set(&cell_format);
+}
+
+static void
+_scroll_screen_reset(void)
+{
+        /* Force reset */
+        vdp2_scrn_priority_set(_params.scrn, 7);
+        vdp2_scrn_scroll_x_set(_params.scrn, F16(0.0f));
+        vdp2_scrn_scroll_y_set(_params.scrn, F16(0.0f));
+        vdp2_scrn_display_set(_params.scrn, /* transparent = */ true);
+
+        vdp2_vram_cycp_bank_set(_params.cpd_bank, &_params.cpd_cycp);
+        vdp2_vram_cycp_bank_set(_params.pnd_bank, &_params.pnd_cycp);
+}
+
+static inline void __always_inline
+_assert_shared_init(const dbgio_vdp2_t *params)
+{
+        assert(params != NULL);
+
+        assert(params->font_cpd != NULL);
+        assert(params->font_pal != NULL);
+
+        assert(params->font_bg <= 15);
+        assert(params->font_bg <= 15);
+
+        assert((params->scrn == VDP2_SCRN_NBG0) ||
+               (params->scrn == VDP2_SCRN_NBG1) ||
+               (params->scrn == VDP2_SCRN_NBG2) ||
+               (params->scrn == VDP2_SCRN_NBG3));
+
+        assert((params->scrn != VDP2_SCRN_RBG0) &&
+               (params->scrn != VDP2_SCRN_RBG1));
+
+        assert(params->cpd_bank <= 3);
+        /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
+         *      bank size */
+        assert(params->cpd_offset < VDP2_VRAM_BSIZE_4);
+
+        assert(params->pnd_bank <= 3);
+        /* XXX: Determine the page size and check against the number of
+         *      available offsets */
+
+        /* There are 128 16-color banks, depending on CRAM mode */
+        /* XXX: Fetch CRAM mode and check number of available 16-color banks */
+        assert(params->cram_index < 128);
+}
+
+static void
+_shared_init(const dbgio_vdp2_t *params)
+{
+        _assert_shared_init(params);
+
+        _dev_state_init(params);
+
+        if ((_dev_state->state & STATE_MASK_INITIALIZED) != 0x00) {
+                return;
+        }
+
+        cons_init(&_cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
+
+        /* Copy user's set device parameters */
+        (void)memcpy(&_params, params, sizeof(dbgio_vdp2_t));
+
+        _scroll_screen_init(params);
+
+        _font_1bpp_4bpp_decompress(_dev_state->font.cpd_buffer,
+            params->font_cpd,
+            params->font_fg, params->font_bg);
+
+        (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
+            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+}
+
+static void
+_shared_buffer(const char *buffer)
+{
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & STATE_MASK_INITIALIZED) == 0x00) {
+                return;
+        }
+
+        /* It's the best we can do for now. If the current buffer is marked for
+         * flushing, we have to silently drop any calls to write to the
+         * buffer */
+        uint8_t state_mask;
+        state_mask = STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
+
+        if ((_dev_state->state & state_mask) == STATE_BUFFER_FLUSHING) {
+                return;
+        }
+
+        cons_buffer(buffer);
 }
 
 #include "vdp2-async.inc"
