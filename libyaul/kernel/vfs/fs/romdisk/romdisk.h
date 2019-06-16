@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include <sys/queue.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
