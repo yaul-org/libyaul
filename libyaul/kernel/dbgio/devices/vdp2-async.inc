@@ -26,7 +26,7 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2_async = {
 static void _cancel_dma_handler(const struct dma_queue_transfer *);
 static void _flush_dma_handler(const struct dma_queue_transfer *);
 
-static void _init_complete(void *);
+static void _init_complete_callback(void *);
 
 static void
 _async_init(const dbgio_vdp2_t *params)
@@ -181,7 +181,7 @@ _async_init(const dbgio_vdp2_t *params)
 
         /* We're truly initialized once the user has made at least one call to
          * vdp_sync() */
-        _init_work.sync_cid = vdp_sync_user_callback_add(_init_complete, NULL);
+        _init_work.sync_cid = vdp_sync_user_callback_add(_init_complete_callback, NULL);
 
         /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
          * flush the cache as the DMA transfer accesses the uncached mirror
@@ -310,7 +310,7 @@ _flush_dma_handler(const struct dma_queue_transfer *transfer)
 }
 
 static void
-_init_complete(void *work __unused)
+_init_complete_callback(void *work __unused)
 {
         if ((_dev_state->state & STATE_PARTIALLY_INITIALIZED) == 0x00) {
                 return;
