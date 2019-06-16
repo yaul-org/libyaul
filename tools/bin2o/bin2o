@@ -14,6 +14,9 @@ AFLAGS="--fatal-warnings --isa=sh2 --big --reduce-memory-overheads"
 ARCH="elf32-sh"
 DATA_SECTION="rodata"
 
+# If empty, default to YAUL_ARCH_SH_PREFIX
+YAUL_PROG_SH_PREFIX=$([ -z "${YAUL_PROG_SH_PREFIX}" ] && printf -- "${YAUL_ARCH_SH_PREFIX}")
+
 SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
 SH_LD="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-ld"
 SH_OBJCOPY="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-objcopy"
