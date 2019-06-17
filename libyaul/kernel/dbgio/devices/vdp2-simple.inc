@@ -21,6 +21,10 @@ _simple_init(const dbgio_vdp2_t *params)
 {
         _shared_init(params);
 
+        if ((_dev_state->state & STATE_MASK_INITIALIZED) != 0x00) {
+                return;
+        }
+
         _dev_state->state = STATE_PARTIALLY_INITIALIZED;
 }
 
