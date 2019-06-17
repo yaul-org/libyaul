@@ -22,6 +22,8 @@
 
 #include <dbgio.h>
 
+static void _vblank_in_handler(void);
+
 void __noreturn
 _internal_exception_show(const char *buffer)
 {
@@ -56,13 +58,28 @@ _internal_exception_show(const char *buffer)
 
         dma_queue_clear();
 
-        dbgio_dev_default_init(DBGIO_DEV_VDP2);
-        dbgio_dev_set(DBGIO_DEV_VDP2);
+        dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
         dbgio_buffer(buffer);
 
-        dbgio_flush();
-        vdp_sync(0);
+        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
+
+        scu_ic_mask_chg(~IC_MASK_VBLANK_IN, IC_MASK_NONE);
+        cpu_intc_mask_set(14);
 
         while (true) {
         }
+
+        __builtin_unreachable();
+}
+
+static void
+_vblank_in_handler(void)
+{
+        dbgio_flush();
+
+        /* Synchronize VDP2 only.
+         *
+         * Avoid using vdp_sync() as we don't need to sync VDP2 and can no
+         * longer fire off any interrupts */
+        vdp2_sync_commit();
 }

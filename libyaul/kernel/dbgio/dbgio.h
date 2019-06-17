@@ -19,10 +19,11 @@ extern "C" {
 
 #define DBGIO_DEV_NULL          0
 #define DBGIO_DEV_VDP1          1
-#define DBGIO_DEV_VDP2          2
-#define DBGIO_DEV_USB_CART      3
+#define DBGIO_DEV_VDP2_SIMPLE   2
+#define DBGIO_DEV_VDP2_ASYNC    3
+#define DBGIO_DEV_USB_CART      4
 
-#define DBGIO_DEV_COUNT         4
+#define DBGIO_DEV_COUNT         5
 
 typedef struct {
         const uint8_t *font_cpd;
@@ -51,8 +52,7 @@ typedef struct {
 extern void dbgio_init(void);
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
-extern void dbgio_dev_deinit(uint8_t);
-extern void dbgio_dev_set(uint8_t);
+extern void dbgio_dev_deinit(void);
 extern void dbgio_buffer(const char *);
 extern void dbgio_flush(void);
 
