@@ -93,6 +93,9 @@ _simple_flush(void)
 
                 free(_dev_state->font.cpd_buffer);
                 free(_dev_state->font.pal_buffer);
+
+                _dev_state->font.cpd_buffer = NULL;
+                _dev_state->font.pal_buffer = NULL;
         }
 
         dmac_cfg.len = _dev_state->page_size;
@@ -111,4 +114,7 @@ _simple_flush(void)
                      STATE_BUFFER_FORCE_FLUSHING;
 
         _dev_state->state &= ~state_mask;
+
+        _dev_state->state &= ~STATE_PARTIALLY_INITIALIZED;
+        _dev_state->state |= STATE_INITIALIZED;
 }

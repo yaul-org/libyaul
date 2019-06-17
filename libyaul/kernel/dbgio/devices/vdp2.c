@@ -51,13 +51,14 @@ typedef struct {
         uint16_t page_size;
         uint16_t page_width;
         uint16_t page_height;
+
         /* PND value for clearing a page */
-        uint16_t pnd_clear;
+        uint16_t pnd_value_clear;
 
         struct {
                 uint8_t *cpd_buffer;
                 color_rgb555_t *pal_buffer;
-        } font;
+        } font __packed;
 } dev_state_t;
 
 /* Restrictions:
@@ -132,7 +133,7 @@ _pnd_write(int16_t col, int16_t row, uint16_t value)
 static inline void __always_inline
 _pnd_clear(int16_t col, int16_t row)
 {
-        _pnd_write(col, row, _dev_state->pnd_clear);
+        _pnd_write(col, row, _dev_state->pnd_value_clear);
 }
 
 static void
@@ -153,7 +154,7 @@ _buffer_clear(void)
                 .dst = (uint32_t)&_dev_state->page_pnd[0],
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .src = _dev_state->pnd_clear,
+                .src = _dev_state->pnd_value_clear,
                 .len = _dev_state->page_size,
                 .stride = CPU_DMAC_STRIDE_2_BYTES,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
@@ -286,7 +287,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
         _dev_state->page_size >>= 1;
 
         /* PND value used to clear pages */
-        _dev_state->pnd_clear = VDP2_SCRN_PND_CONFIG_0(
+        _dev_state->pnd_value_clear = VDP2_SCRN_PND_CONFIG_0(
                 _dev_state->cp_table,
                 _dev_state->color_palette,
                 /* vf = */ 0,

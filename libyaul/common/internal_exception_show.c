@@ -57,7 +57,6 @@ _internal_exception_show(const char *buffer)
         dma_queue_clear();
 
         dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
-        dbgio_dev_set(DBGIO_DEV_VDP2_SIMPLE);
         dbgio_buffer(buffer);
 
         vdp2_tvmd_vblank_out_wait();

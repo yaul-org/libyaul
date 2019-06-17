@@ -28,7 +28,6 @@ dbgio_init(void)
         _dev_ops = NULL;
 
         dbgio_dev_default_init(DBGIO_DEV_NULL);
-        dbgio_dev_set(DBGIO_DEV_NULL);
 }
 
 void
@@ -40,11 +39,17 @@ dbgio_dev_init(uint8_t dev, const void *params)
                (dev == DBGIO_DEV_VDP2_ASYNC) ||
                (dev == DBGIO_DEV_USB_CART));
 
-        assert(_dev_ops_table[dev]->init != NULL);
-
         assert(params != NULL);
 
-        _dev_ops_table[dev]->init(params);
+        assert(_dev_ops_table[dev]->init != NULL);
+
+        if (_dev_ops != _dev_ops_table[dev]) {
+                dbgio_dev_deinit();
+        }
+
+        _dev_ops = _dev_ops_table[dev];
+
+        _dev_ops->init(params);
 }
 
 void
@@ -54,29 +59,17 @@ dbgio_dev_default_init(uint8_t dev)
 }
 
 void
-dbgio_dev_deinit(uint8_t dev)
+dbgio_dev_deinit(void)
 {
-        assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP1) ||
-               (dev == DBGIO_DEV_VDP2_SIMPLE) ||
-               (dev == DBGIO_DEV_VDP2_ASYNC) ||
-               (dev == DBGIO_DEV_USB_CART));
+        if (_dev_ops == NULL) {
+                return;
+        }
 
-        assert(_dev_ops_table[dev]->deinit != NULL);
+        assert(_dev_ops->deinit != NULL);
 
-        _dev_ops_table[dev]->deinit();
-}
+        _dev_ops->deinit();
 
-void
-dbgio_dev_set(uint8_t dev)
-{
-        assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP1) ||
-               (dev == DBGIO_DEV_VDP2_SIMPLE) ||
-               (dev == DBGIO_DEV_VDP2_ASYNC) ||
-               (dev == DBGIO_DEV_USB_CART));
-
-        _dev_ops = _dev_ops_table[dev];
+        _dev_ops = NULL;
 }
 
 void
