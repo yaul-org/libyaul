@@ -52,8 +52,7 @@ typedef struct {
 extern void dbgio_init(void);
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
-extern void dbgio_dev_deinit(uint8_t);
-extern void dbgio_dev_set(uint8_t);
+extern void dbgio_dev_deinit(void);
 extern void dbgio_buffer(const char *);
 extern void dbgio_flush(void);
 

@@ -116,6 +116,9 @@ _async_deinit(void)
                 return;
         }
 
+        /* XXX: Check if we're partially initialized. If so, cancel the queued
+         * DMA requests */
+
         free(_dev_state->page_pnd);
         free(_dev_state);
 
