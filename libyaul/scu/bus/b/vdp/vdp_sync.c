@@ -203,6 +203,8 @@ vdp_sync(int16_t interval __unused)
                 callback(work);
         }
 
+        vdp_sync_user_callback_clear();
+
         _state.raw = 0x00000000;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
