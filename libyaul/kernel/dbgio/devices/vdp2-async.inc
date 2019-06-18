@@ -1,12 +1,5 @@
 /* -*- mode: c -*- */
 
-static struct {
-        /* List of pointers to free */
-        void *free_ptrs[1];
-        /* VDP sync callback ID to remove */
-        int8_t sync_cid;
-} *_init_work;
-
 static struct scu_dma_reg_buffer _dma_reg_buffer;
 
 static void _async_init(const dbgio_vdp2_t *);
@@ -27,6 +20,8 @@ static void _flush_dma_handler(const struct dma_queue_transfer *);
 
 static void _init_complete_callback(void *);
 
+static inline void *_address_align(const void *, const uint16_t);
+
 static void
 _async_init(const dbgio_vdp2_t *params)
 {
@@ -43,20 +38,11 @@ _async_init(const dbgio_vdp2_t *params)
                 return;
         }
 
-        _init_work = malloc(sizeof(*_init_work));
-        assert(_init_work != NULL);
-
-        /* Align to a 32-byte boundary */
-        /* XXX: Refactor { */
         void *aligned;
         aligned = malloc(sizeof(*dma_font) + 32);
         assert(aligned != NULL);
-        _init_work->free_ptrs[0] = aligned;
-
-        uint32_t aligned_offset;
-        aligned_offset = (((uint32_t)aligned + 0x0000001F) & ~0x0000001F) - (uint32_t)aligned;
-        dma_font = (void *)((uint32_t)aligned + aligned_offset);
-        /* } */
+        dma_font = _address_align(aligned, 32);
+        assert(((uintptr_t)dma_font & 0x1F) == 0x00);
 
         struct scu_dma_level_cfg dma_level_cfg;
 
@@ -64,6 +50,8 @@ _async_init(const dbgio_vdp2_t *params)
         dma_level_cfg.xfer.indirect = &dma_font->xfer_tbl[0];
         dma_level_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
         dma_level_cfg.update = SCU_DMA_UPDATE_NONE;
+
+        /* Set up indirect SCU-DMA table entries */
 
         /* Font CPD */
         dma_font->xfer_tbl[0].len = FONT_4BPP_CPD_SIZE;
@@ -79,7 +67,7 @@ _async_init(const dbgio_vdp2_t *params)
 
         int8_t ret;
         ret = dma_queue_enqueue(&dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
-            _cancel_dma_handler, NULL);
+            _cancel_dma_handler, aligned);
         assert(ret == 0);
 
         /* 64x32 page PND */
@@ -94,13 +82,7 @@ _async_init(const dbgio_vdp2_t *params)
 
         /* We're truly initialized once the user has made at least one call to
          * vdp_sync() */
-        _init_work->sync_cid = vdp_sync_user_callback_add(_init_complete_callback, NULL);
-
-        /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
-         * flush the cache as the DMA transfer accesses the uncached mirror
-         * address to the decompressed 4BPP font, which could result in fetching
-         * stale values not yet written back to H-WRAM */
-        cpu_cache_purge();
+        vdp_sync_user_callback_add(_init_complete_callback, aligned);
 
         _dev_state->state = STATE_PARTIALLY_INITIALIZED;
 }
@@ -154,19 +136,32 @@ _async_flush(void)
         assert(ret == 0);
 }
 
+static inline void * __always_inline
+_address_align(const void *address, const uint16_t align)
+{
+        assert((align & (align - 1)) == 0x0000);
+
+        /* XXX: Refactor { */
+        uint32_t aligned_offset;
+        aligned_offset = (((uint32_t)address + (align - 1)) & ~(align - 1)) - (uint32_t)address;
+
+        return (void *)((uint32_t)address + aligned_offset);
+        /* } */
+}
+
 static void
 _cancel_dma_handler(const struct dma_queue_transfer *transfer)
 {
-        if (transfer->dqt_status == DMA_QUEUE_STATUS_COMPLETE) {
+        if (transfer->status == DMA_QUEUE_STATUS_COMPLETE) {
                 return;
         }
 
+        void *free_ptr;
+        free_ptr = transfer->work;
+
         /* When a DMA request is canceled, it's called outside of any
          * internal interrupt handlers, so we're able to call free() */
-        free(_init_work->free_ptrs[0]);
-
-        /* Avoid finalizing device initialization */
-        vdp_sync_user_callback_remove(_init_work->sync_cid);
+        free(free_ptr);
 
         _dev_state->state = STATE_IDLE;
 }
@@ -174,7 +169,7 @@ _cancel_dma_handler(const struct dma_queue_transfer *transfer)
 static void
 _flush_dma_handler(const struct dma_queue_transfer *transfer)
 {
-        if (transfer->dqt_status == DMA_QUEUE_STATUS_COMPLETE) {
+        if (transfer->status == DMA_QUEUE_STATUS_COMPLETE) {
                 uint8_t state_mask;
                 state_mask = STATE_BUFFER_DIRTY |
                              STATE_BUFFER_FLUSHING |
@@ -191,17 +186,17 @@ _flush_dma_handler(const struct dma_queue_transfer *transfer)
 }
 
 static void
-_init_complete_callback(void *work __unused)
+_init_complete_callback(void *work)
 {
         if ((_dev_state->state & STATE_PARTIALLY_INITIALIZED) == 0x00) {
                 return;
         }
 
         /* Free up all buffers allocated during initialization */
+        void *free_ptr;
+        free_ptr = work;
 
-        free(_init_work->free_ptrs[0]);
-
-        free(_init_work);
+        free(free_ptr);
 
         free(_dev_state->font.cpd_buffer);
         free(_dev_state->font.pal_buffer);
