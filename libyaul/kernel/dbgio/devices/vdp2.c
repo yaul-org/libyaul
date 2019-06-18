@@ -410,6 +410,12 @@ _shared_init(const dbgio_vdp2_t *params)
 
         (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
             FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+
+        /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
+         * flush the cache as the DMA transfer accesses the uncached mirror
+         * address to the decompressed 4BPP font, which could result in fetching
+         * stale values not yet written back to H-WRAM */
+        cpu_cache_purge();
 }
 
 static void
