@@ -36,6 +36,9 @@
 
 #define STATE_MASK_INITIALIZED          (STATE_INITIALIZED | STATE_PARTIALLY_INITIALIZED)
 
+/* CPU-DMAC channel used for _simple_flush() and _buffer_clear() */
+#define DEV_DMAC_CHANNEL 0
+
 typedef struct {
         uint8_t state;
 
@@ -139,6 +142,18 @@ _pnd_clear(int16_t col, int16_t row)
 static void
 _buffer_clear(void)
 {
+        static struct cpu_dmac_cfg dmac_cfg = {
+                .channel= DEV_DMAC_CHANNEL,
+                .src_mode = CPU_DMAC_SOURCE_FIXED,
+                .src = 0x00000000,
+                .dst = 0x00000000,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .len = 0x00000000,
+                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr = NULL
+        };
+
         /* Don't try to clear the buffer again if it's already been cleared */
         if ((_dev_state->state & STATE_BUFFER_CLEARED) == STATE_BUFFER_CLEARED) {
                 return;
@@ -146,24 +161,14 @@ _buffer_clear(void)
 
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        uint8_t ch;
-        ch = 2;
+        dmac_cfg.dst = (uint32_t)&_dev_state->page_pnd[0];
+        dmac_cfg.src = _dev_state->pnd_value_clear;
+        dmac_cfg.len = _dev_state->page_size;
 
-        struct cpu_dmac_cfg dmac_cfg  = {
-                .channel = ch,
-                .dst = (uint32_t)&_dev_state->page_pnd[0],
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .src = _dev_state->pnd_value_clear,
-                .len = _dev_state->page_size,
-                .stride = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr = NULL
-        };
-
+        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
         cpu_dmac_channel_config_set(&dmac_cfg);
-        cpu_dmac_channel_start(ch);
-        cpu_dmac_channel_wait(ch);
+        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
+        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
         _dev_state->state |= STATE_BUFFER_CLEARED;
 }
@@ -228,7 +233,8 @@ _1bpp_4bpp_convert(uint8_t *row_1bpp, const uint8_t *fgbg)
 }
 
 static void
-_font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd, uint8_t fg, uint8_t bg)
+_font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
+    uint8_t fg, uint8_t bg)
 {
         assert(dec_cpd != NULL);
         assert(cmp_cpd != NULL);
@@ -304,7 +310,8 @@ _dev_state_init(const dbgio_vdp2_t *params)
         }
 
         if (_dev_state->font.pal_buffer == NULL) {
-                _dev_state->font.pal_buffer = malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+                _dev_state->font.pal_buffer =
+                    malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
                 assert(_dev_state->font.pal_buffer != NULL);
         }
 }

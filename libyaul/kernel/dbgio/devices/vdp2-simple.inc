@@ -1,8 +1,5 @@
 /* -*- mode: c -*- */
 
-/* CPU-DMAC channel used for _simple_flush() */
-#define SIMPLE_FLUSH_DMAC_CHANNEL 0
-
 static void _simple_init(const dbgio_vdp2_t *);
 static void _simple_deinit(void);
 static void _simple_flush(void);
@@ -49,7 +46,7 @@ static void
 _simple_flush(void)
 {
         static struct cpu_dmac_cfg dmac_cfg = {
-                .channel= SIMPLE_FLUSH_DMAC_CHANNEL,
+                .channel= DEV_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_INCREMENT,
                 .src = 0x00000000,
                 .dst = 0x00000000,
@@ -81,19 +78,19 @@ _simple_flush(void)
                 dmac_cfg.dst = (uint32_t)_dev_state->cp_table;
                 dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
 
-                cpu_dmac_channel_wait(SIMPLE_FLUSH_DMAC_CHANNEL);
+                cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
                 cpu_dmac_channel_config_set(&dmac_cfg);
 
-                cpu_dmac_channel_start(SIMPLE_FLUSH_DMAC_CHANNEL);
-                cpu_dmac_channel_wait(SIMPLE_FLUSH_DMAC_CHANNEL);
+                cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
+                cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
                 dmac_cfg.len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t);
                 dmac_cfg.dst = _dev_state->color_palette;
                 dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.pal_buffer;
 
                 cpu_dmac_channel_config_set(&dmac_cfg);
-                cpu_dmac_channel_start(SIMPLE_FLUSH_DMAC_CHANNEL);
-                cpu_dmac_channel_wait(SIMPLE_FLUSH_DMAC_CHANNEL);
+                cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
+                cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
                 free(_dev_state->font.cpd_buffer);
                 free(_dev_state->font.pal_buffer);
@@ -106,11 +103,11 @@ _simple_flush(void)
         dmac_cfg.dst = (uint32_t)_dev_state->page_base;
         dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&_dev_state->page_pnd[0];
 
-        cpu_dmac_channel_wait(SIMPLE_FLUSH_DMAC_CHANNEL);
+        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
         cpu_dmac_channel_config_set(&dmac_cfg);
 
-        cpu_dmac_channel_start(SIMPLE_FLUSH_DMAC_CHANNEL);
-        cpu_dmac_channel_wait(SIMPLE_FLUSH_DMAC_CHANNEL);
+        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
+        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
         uint8_t state_mask;
         state_mask = STATE_BUFFER_DIRTY |
