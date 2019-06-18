@@ -28,8 +28,8 @@ struct dma_queue_transfer {
 #define DMA_QUEUE_STATUS_INCOMPLETE     1
 /* DMA request explicitly canceled */
 #define DMA_QUEUE_STATUS_CANCELED       2
-        uint8_t dqt_status;
-        void *dqt_work;
+        uint8_t status;
+        void *work;
 } __aligned(4);
 
 extern void dma_queue_init(void);

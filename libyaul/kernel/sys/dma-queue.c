@@ -79,8 +79,8 @@ dma_queue_init(void)
 
                         request->handler = _default_handler;
 
-                        request->transfer.dqt_status = DMA_QUEUE_STATUS_INCOMPLETE;
-                        request->transfer.dqt_work = NULL;
+                        request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
+                        request->transfer.work = NULL;
                 }
 
                 dma_queue->head = 0;
@@ -137,8 +137,8 @@ dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer, uint8_t tag, void
 
         request->tag = tag;
         request->handler = (handler != NULL) ? handler : _default_handler;
-        request->transfer.dqt_status = DMA_QUEUE_STATUS_INCOMPLETE;
-        request->transfer.dqt_work = work;
+        request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
+        request->transfer.work = work;
 
         dma_queue->tail++;
         dma_queue->count++;
@@ -178,7 +178,7 @@ dma_queue_tag_clear(uint8_t tag)
                 struct dma_queue_transfer *transfer;
                 transfer = &request->transfer;
 
-                transfer->dqt_status = DMA_QUEUE_STATUS_CANCELED;
+                transfer->status = DMA_QUEUE_STATUS_CANCELED;
 
                 handler(transfer);
         }
@@ -333,7 +333,7 @@ _dma_handler(void)
         struct dma_queue_transfer *transfer;
         transfer = &_current_request->transfer;
 
-        transfer->dqt_status = DMA_QUEUE_STATUS_COMPLETE;
+        transfer->status = DMA_QUEUE_STATUS_COMPLETE;
 
         dma_queue->head++;
         dma_queue->head &= DMA_QUEUE_REQUESTS_MAX_COUNT - 1;
