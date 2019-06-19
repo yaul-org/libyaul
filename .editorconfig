@@ -11,13 +11,18 @@ indent_size = 8
 trim_trailing_whitespace = true
 
 [*.cxx]
+indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
 [*.sx]
+indent_style = space
+indent_size = 8
 trim_trailing_whitespace = true
 
 [*.{env,env.in}]
+indent_style = space
+indent_size = 4
 trim_trailing_whitespace = true
 
 [.travis.yml]
