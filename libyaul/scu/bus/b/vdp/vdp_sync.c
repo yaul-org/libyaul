@@ -541,7 +541,7 @@ _vblank_in_handler(void)
                 xfer->dst = (uint32_t)_state_vdp2()->back.vram;
                 xfer->src = SCU_DMA_INDIRECT_TBL_END |
                             CPU_CACHE_THROUGH |
-                            (uint32_t)_state_vdp2()->back.vram;
+                            (uint32_t)_state_vdp2()->back.buffer;
 
                 int8_t ret __unused;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
