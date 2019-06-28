@@ -14,11 +14,11 @@ _BEGIN_STD_C
 
 #define RAND_MAX __RAND_MAX
 
-void abort(void) __attribute__ ((__noreturn__));
+void abort(void) __noreturn;
 int abs(int);
 int atexit(void (*__func)(void));
 int atoi(const char *nptr);
-void exit(int status) __attribute__ ((__noreturn__));
+void exit(int status) __noreturn;
 void free(void *) _NOTHROW;
 void *malloc(size_t size) _NOTHROW;
 int rand(void);

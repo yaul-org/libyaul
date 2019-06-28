@@ -16,7 +16,7 @@
  */
 
 #ifndef _STDIO_H_
-#define	_STDIO_H_
+#define _STDIO_H_
 
 #include "_ansi.h"
 
@@ -38,14 +38,14 @@ typedef __gnuc_va_list va_list;
 #endif /* !_VA_LIST_DEFINED */
 
 typedef long fpos_t;
-typedef	long off_t;
+typedef long off_t;
 
-#define	EOF (-1)
+#define EOF (-1)
 
 #ifdef __BUFSIZ__
-#define	BUFSIZ __BUFSIZ__
+#define BUFSIZ __BUFSIZ__
 #else
-#define	BUFSIZ 1024
+#define BUFSIZ 1024
 #endif /* __BUFSIZ__ */
 
 #ifndef __VALIST

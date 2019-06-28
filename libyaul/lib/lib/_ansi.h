@@ -1,7 +1,7 @@
 /* Provide support for both ANSI and non-ANSI environments. */
 
-#ifndef	_ANSIDECL_H_
-#define	_ANSIDECL_H_
+#ifndef _ANSIDECL_H_
+#define _ANSIDECL_H_
 
 /* ISO C++ */
 

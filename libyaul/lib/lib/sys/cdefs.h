@@ -113,7 +113,7 @@
                 __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
 #endif /* !static_assert */
 
-#define __interrupt_handler	__attribute__ ((interrupt_handler))
+#define __interrupt_handler     __attribute__ ((interrupt_handler))
 
 /*
  * Compiler-dependent macros to help declare dead (non-returning) and

@@ -590,10 +590,10 @@ struct {                                                                       \
         TRACEBUF                                                               \
 }
 
-#define	QMD_TAILQ_CHECK_HEAD(head, field)
-#define	QMD_TAILQ_CHECK_TAIL(head, headname)
-#define	QMD_TAILQ_CHECK_NEXT(elm, field)
-#define	QMD_TAILQ_CHECK_PREV(elm, field)
+#define QMD_TAILQ_CHECK_HEAD(head, field)
+#define QMD_TAILQ_CHECK_TAIL(head, headname)
+#define QMD_TAILQ_CHECK_NEXT(elm, field)
+#define QMD_TAILQ_CHECK_PREV(elm, field)
 
 /*
  * Tail queue functions.
