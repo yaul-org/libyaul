@@ -20,7 +20,7 @@
 #include "vdp-internal.h"
 
 /* Debug: Use dma-queue to transfer VDP1 command list */
-#define DEBUG_DMA_QUEUE_ENABLE  0
+#define DEBUG_DMA_QUEUE_ENABLE  1
 
 /* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
@@ -74,6 +74,13 @@ static volatile uint16_t _vdp1_last_command = 0x0000;
 static struct scu_dma_level_cfg _vdp1_dma_cfg __unused;
 static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer __unused;
 
+struct vdp1_cmdt_list *_current_cmdt_list;
+
+static struct {
+        void (*callback)(void *);
+        void *work;
+} _vdp1_sync_callback __aligned(16);
+
 static struct {
         void (*callback)(void *);
         void *work;
@@ -89,12 +96,12 @@ static const uint16_t _fbcr_bits[] = {
 static void (*_user_vblank_in_handler)(void);
 static void (*_user_vblank_out_handler)(void);
 
-static void _default_user_callback(void *);
+static void _default_callback(void *);
 
-static void _init_vdp1(void);
+static void _vdp1_init(void);
 
-static void _init_vdp2(void);
-static void _init_vdp2_commit_xfer_tables(void);
+static void _vdp2_init(void);
+static void _vdp2_commit_xfer_tables_init(void);
 static void _vdp2_sync_commit(struct cpu_dmac_cfg *);
 static void _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *);
 
@@ -103,8 +110,8 @@ vdp_sync_init(void)
 {
         scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
 
-        _init_vdp1();
-        _init_vdp2();
+        _vdp1_init();
+        _vdp2_init();
 
         _state.raw = 0x00000000;
 
@@ -197,7 +204,7 @@ vdp_sync(int16_t interval __unused)
                 void *work;
                 work = _user_callbacks[id].work;
 
-                _user_callbacks[id].callback = _default_user_callback;
+                _user_callbacks[id].callback = _default_callback;
                 _user_callbacks[id].work = NULL;
 
                 callback(work);
@@ -215,35 +222,55 @@ vdp_sync(int16_t interval __unused)
         scu_ic_mask_set(scu_mask);
 }
 
+bool
+vdp1_sync_drawing(void)
+{
+        const uint8_t state_mask =
+            STATE_VDP1_REQUEST_COMMIT_LIST | STATE_VDP1_REQUEST_XFER_LIST;
+
+        return ((_state.vdp1 & state_mask) != 0x00);
+}
+
 void
-vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
+vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void *work)
 {
 #ifdef DEBUG
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
         assert(cmdt_list->cmdt != NULL);
         assert(cmdt_list->count > 0);
+        /* assert(!cmdt_list->drawing); */
 #endif /* DEBUG */
 
         uint16_t count;
         count = cmdt_list->cmdt - cmdt_list->cmdts;
 
-#ifdef DEBUG
-        assert(count > 0);
-#endif /* DEBUG */
+        if (count == 0) {
+                return;
+        }
 
         /* Wait as previous draw calls haven't yet been committed, or at the
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
 
-        /* Ensure that we don't exceed the amount of VRAM dedicated to command
-         * lists */
+        /* Mark list as drawing */
+        /* cmdt_list->drawing = true; */
+
+        _current_cmdt_list = cmdt_list;
+
+        _vdp1_sync_callback.callback = (callback != NULL) ? callback : _default_callback;
+        _vdp1_sync_callback.work = work;
+
         uint32_t vdp1_vram;
         vdp1_vram = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
 
 #ifdef DEBUG
+        /* Assert that we don't exceed the amount of VRAM dedicated to command
+         * lists */
         assert(vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
 
+        /* Assert that the last command table in the list is terminated properly
+         * (draw end) */
         assert((cmdt_list->cmdts[count - 1].cmd_ctrl & 0x8000) == 0x8000);
 #endif /* DEBUG */
 
@@ -297,10 +324,7 @@ vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list)
 void
 vdp1_sync_draw_wait(void)
 {
-        const uint8_t state_mask =
-            STATE_VDP1_REQUEST_COMMIT_LIST | STATE_VDP1_REQUEST_XFER_LIST;
-
-        if ((_state.vdp1 & state_mask) == 0x00) {
+        if (!(vdp1_sync_drawing())) {
                 return;
         }
 
@@ -372,7 +396,7 @@ vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
 
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
-                if (_user_callbacks[id].callback != _default_user_callback) {
+                if (_user_callbacks[id].callback != _default_callback) {
                         continue;
                 }
 
@@ -397,7 +421,7 @@ vdp_sync_user_callback_remove(int8_t id)
         assert(id < USER_CALLBACK_COUNT);
 #endif /* DEBUG */
 
-        _user_callbacks[id].callback = _default_user_callback;
+        _user_callbacks[id].callback = _default_callback;
         _user_callbacks[id].work = NULL;
 }
 
@@ -406,13 +430,13 @@ vdp_sync_user_callback_clear(void)
 {
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
-                _user_callbacks[id].callback = _default_user_callback;
+                _user_callbacks[id].callback = _default_callback;
                 _user_callbacks[id].work = NULL;
         }
 }
 
 static void
-_init_vdp1(void)
+_vdp1_init(void)
 {
         _vdp1_last_command = 0x0000;
 
@@ -420,13 +444,13 @@ _init_vdp1(void)
 }
 
 static void
-_init_vdp2(void)
+_vdp2_init(void)
 {
-        _init_vdp2_commit_xfer_tables();
+        _vdp2_commit_xfer_tables_init();
 }
 
 static void
-_init_vdp2_commit_xfer_tables(void)
+_vdp2_commit_xfer_tables_init(void)
 {
         struct scu_dma_xfer *xfer;
 
@@ -613,11 +637,20 @@ _sprite_end_handler(void)
         /* VDP1 request to commit is finished */
         _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
+
+        /* _current_cmdt_list->drawing = false; */
+        _current_cmdt_list = NULL;
+
+        _vdp1_sync_callback.callback(_vdp1_sync_callback.work);
 }
 
 static void
-_vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
+_vdp1_dma_handler(const struct dma_queue_transfer *transfer)
 {
+        if (transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
+                return;
+        }
+
         _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
         _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
 
@@ -638,8 +671,12 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer __unused)
 }
 
 static void
-_vdp2_commit_handler(const struct dma_queue_transfer *transfer __unused)
+_vdp2_commit_handler(const struct dma_queue_transfer *transfer)
 {
+        if (transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
+                return;
+        }
+
         _state.vdp2 |= STATE_VDP2_COMMITTED;
         _state.vdp2 &= ~STATE_VDP2_COMITTING;
 }
@@ -683,6 +720,6 @@ _default_handler(void)
 }
 
 static void
-_default_user_callback(void *work __unused)
+_default_callback(void *work __unused)
 {
 }
