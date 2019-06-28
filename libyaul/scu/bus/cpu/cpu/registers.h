@@ -12,9 +12,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_SR_T_BIT_MASK       0x00000001
 #define CPU_SR_S_BIT_MASK       0x00000002
@@ -186,8 +184,6 @@ cpu_reg_sp_get(void)
         return reg_r15;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_REGISTERS_H_ */

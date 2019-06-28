@@ -331,7 +331,7 @@ hexa_conv:
 }
 
 int
-sprintf(char *__restrict buffer, const char *__restrict fmt, ...)
+sprintf(char * __restrict buffer, const char *__restrict fmt, ...)
 {
     va_list args;
     uint16_t i;

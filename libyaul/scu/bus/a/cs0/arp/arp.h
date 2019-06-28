@@ -14,9 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 struct arp_callback {
         uint8_t function; /* Function recently executed */
@@ -37,8 +35,6 @@ extern void arp_return(void) __noreturn;
 extern void arp_long_send(uint32_t);
 extern void arp_sync(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_ARP_H_ */

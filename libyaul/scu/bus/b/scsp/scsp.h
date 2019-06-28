@@ -8,14 +8,10 @@
 #ifndef _SCSP_H_
 #define _SCSP_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 extern void scsp_init(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SCSP_H_ */

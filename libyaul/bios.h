@@ -8,13 +8,11 @@
 #ifndef _BIOS_H_
 #define _BIOS_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#include <sys/cdefs.h>
+__BEGIN_DECLS
 
 #define CPU_CLOCK_SPEED_26MHZ   0
 #define CPU_CLOCK_SPEED_28MHZ   1
@@ -57,8 +55,6 @@ bios_cd_player_execute(void)
         __builtin_unreachable();
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_BIOS_H_ */

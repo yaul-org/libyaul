@@ -12,9 +12,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 static inline bool __always_inline
 cpu_sync_mutex(uint8_t b)
@@ -74,8 +72,6 @@ cpu_sync_spinlock_clear(uint8_t b)
         cpu_sync_mutex_clear(b);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_SYNC_H_ */

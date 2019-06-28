@@ -8,14 +8,10 @@
 #ifndef _SYS_INIT_H_
 #define _SYS_INIT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 extern void user_init(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SYS_INIT_H_ */

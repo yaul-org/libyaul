@@ -15,9 +15,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 void *iso9660_mount(const char *);
 void *iso9660_open(void *, const char *, int);
@@ -27,8 +25,6 @@ off_t iso9660_seek(void *, off_t, int);
 off_t iso9660_tell(void *);
 size_t iso9660_total(void *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* _ISO9660_H_ */

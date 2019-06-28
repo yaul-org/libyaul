@@ -36,9 +36,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /*
  * Statically declare a block pool.
@@ -78,8 +76,6 @@ int memb_free(struct memb *, void *);
 int32_t memb_size(struct memb *);
 bool memb_bounds(struct memb *, void *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* _MEMB_H_ */

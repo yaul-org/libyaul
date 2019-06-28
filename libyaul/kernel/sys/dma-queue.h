@@ -12,9 +12,7 @@
 
 #include <scu/dma.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define DMA_QUEUE_TAG_IMMEDIATE         0
 #define DMA_QUEUE_TAG_VBLANK_IN         1
@@ -41,8 +39,6 @@ extern void dma_queue_flush_wait(void);
 extern uint32_t dma_queue_count_get(uint8_t);
 extern uint32_t dma_queue_capacity_get(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_DMA_QUEUE_H_ */

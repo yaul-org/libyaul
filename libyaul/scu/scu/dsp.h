@@ -14,9 +14,7 @@
 
 #include <scu/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define DSP_RAM_PAGE_0  0x00
 #define DSP_RAM_PAGE_1  0x01
@@ -77,8 +75,6 @@ extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
 extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
 extern void scu_dsp_status_get(struct dsp_status *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SCU_DSP_H_ */

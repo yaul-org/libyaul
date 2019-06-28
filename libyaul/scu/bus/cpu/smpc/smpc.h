@@ -12,14 +12,10 @@
 #include <smpc/rtc.h>
 #include <smpc/smc.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 extern void smpc_init(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SMPC_H_ */

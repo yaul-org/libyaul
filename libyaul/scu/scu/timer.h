@@ -13,9 +13,7 @@
 
 #include <scu/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
@@ -60,8 +58,6 @@ extern void scu_timer_t0_set(void (*)(void));
 extern void scu_timer_t1_set(void (*)(void));
 extern void scu_timer_t1_line_set(int16_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SCU_TIMER_H_ */

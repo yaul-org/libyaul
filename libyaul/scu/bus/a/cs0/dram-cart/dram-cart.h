@@ -8,13 +8,13 @@
 #ifndef _DRAM_CART_H_
 #define _DRAM_CART_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define DRAM_CART_ID_1MIB  0x5A
 #define DRAM_CART_ID_4MIB  0x5C
@@ -26,8 +26,6 @@ extern void *dram_cart_area_get(void);
 extern uint8_t dram_cart_id_get(void);
 extern size_t dram_cart_size_get(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_DRAM_CART_H_ */

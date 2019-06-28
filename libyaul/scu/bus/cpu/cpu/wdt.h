@@ -8,9 +8,7 @@
 #ifndef _CPU_WDT_H_
 #define _CPU_WDT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_WDT_CLOCK_DIV_2     0
 #define CPU_WDT_CLOCK_DIV_64    1
@@ -73,8 +71,6 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
 extern void cpu_wdt_init(uint8_t);
 extern void cpu_wdt_timer_mode_set(uint8_t, void (*)(void));
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_WDT_H_ */

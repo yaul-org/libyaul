@@ -12,9 +12,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 struct vdp2_sprite_type_0 {
         unsigned int pr:2; /* Bit 15 */ /* Priority bit(s) */
@@ -116,8 +114,6 @@ struct vdp2_sprite_type_f {
 
 extern void vdp2_sprite_priority_set(uint8_t, uint8_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_SPRITE_H_ */

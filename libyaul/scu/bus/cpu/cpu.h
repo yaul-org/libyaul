@@ -20,14 +20,10 @@
 #include <cpu/sync.h>
 #include <cpu/wdt.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 extern void cpu_init(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_H_ */

@@ -12,9 +12,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 static inline void __always_inline
 cpu_instr_trapa(const uint8_t vector)
@@ -88,8 +86,6 @@ cpu_instr_nop(void)
         );
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_INSTRUCTIONS_H_ */

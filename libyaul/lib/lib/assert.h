@@ -3,11 +3,7 @@
 
 #include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#include "_ansi.h"
+__BEGIN_DECLS
 
 #undef assert
 
@@ -27,11 +23,15 @@ extern "C" {
 #endif
 #endif /* !__ASSERT_FUNC */
 
+#ifndef static_assert
+#define static_assert(__e)                                                     \
+        typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                    \
+                __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
+#endif /* !static_assert */
+
 void __assert(const char *, int, const char *) __noreturn;
 void __assert_func(const char *, int, const char *, const char *) __noreturn;
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_ASSERT_H_ */

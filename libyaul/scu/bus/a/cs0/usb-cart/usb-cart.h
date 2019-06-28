@@ -15,9 +15,7 @@
 
 #include <usb-cart/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /* 64-byte packet contains a 2-byte payload */
 #define USB_CART_OUT_EP_SIZE 62
@@ -80,8 +78,6 @@ extern void usb_cart_long_send(uint32_t);
 extern void usb_cart_dma_read(void *, uint32_t);
 extern void usb_cart_dma_send(const void *, uint32_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_USB_CART_H_ */

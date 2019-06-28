@@ -1,12 +1,11 @@
 #ifndef __libfixmath_fract32_h__
 #define __libfixmath_fract32_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <sys/cdefs.h>
 
 #include <stdint.h>
+
+__BEGIN_DECLS
 
 typedef uint32_t fract32_t;
 
@@ -31,8 +30,6 @@ extern uint32_t  fract32_usmul(uint32_t inVal, fract32_t inFract);
 extern int32_t   fract32_smul(int32_t inVal, fract32_t inFract);
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif

@@ -33,38 +33,127 @@
 
 #include <ctype.h>
 
-const uint8_t _ctype_bitmap[1 + 256] = {
-        0,
-        _C,      _C,      _C,      _C,      _C,      _C,      _C,      _C,
-        _C,      _C | _S, _C | _S, _C | _S, _C | _S, _C | _S, _C,      _C,
-        _C,      _C,      _C,      _C,      _C,      _C,      _C,      _C,
-        _C,      _C,      _C,      _C,      _C,      _C,      _C,      _C,
-        _S | _B, _P,      _P,      _P,      _P,      _P,      _P,      _P,
-        _P,      _P,      _P,      _P,      _P,      _P,      _P,      _P,
-        _N,      _N,      _N,      _N,      _N,      _N,      _N,      _N,
-        _N,      _N,      _P,      _P,      _P,      _P,      _P,      _P,
-        _P,      _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U,
-        _U,      _U,      _U,      _U,      _U,      _U,      _U,      _U,
-        _U,      _U,      _U,      _U,      _U,      _U,      _U,      _U,
-        _U,      _U,      _U,      _P,      _P,      _P,      _P,      _P,
-        _P,      _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L,
-        _L,      _L,      _L,      _L,      _L,      _L,      _L,      _L,
-        _L,      _L,      _L,      _L,      _L,      _L,      _L,      _L,
-        _L,      _L,      _L,      _P,      _P,      _P,      _P,      _C,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0,
-        0,       0,       0,       0,       0,       0,       0,       0
+#define _CTYPE_LOOKUP(_c) ((_ctype_bitmap + 1)[(int)(_c) & 0xFFl])
+
+#define _U (0x01)
+#define _L (0x02)
+#define _N (0x04)
+#define _S (0x08)
+#define _P (0x10)
+#define _C (0x20)
+#define _X (0x40)
+#define _B (0x80)
+
+static const uint8_t _ctype_bitmap[1 + 256] __aligned(4) = {
+              0,
+             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+             _C, _C | _S, _C | _S, _C | _S, _C | _S, _C | _S,      _C, _C,
+             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+        _S | _B,      _P,      _P,      _P,      _P,      _P,      _P, _P,
+             _P,      _P,      _P,      _P,      _P,      _P,      _P, _P,
+             _N,      _N,      _N,      _N,      _N,      _N,      _N, _N,
+             _N,      _N,      _P,      _P,      _P,      _P,      _P, _P,
+             _P, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U,
+             _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
+             _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
+             _U,      _U,      _U,      _P,      _P,      _P,      _P, _P,
+             _P, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L,
+             _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
+             _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
+             _L,      _L,      _L,      _P,      _P,      _P,      _P, _C,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0,
+              0,       0,       0,       0,       0,       0,       0,  0
 };
+
+int
+isalnum(int c)
+{
+        return _CTYPE_LOOKUP(c) & (_U | _L | _N);
+}
+
+int
+isalpha(int c)
+{
+        return _CTYPE_LOOKUP(c) & (_U | _L);
+}
+
+int
+isascii(int c)
+{
+        return ((unsigned int)(c) <= 0x7F);
+}
+
+int
+isblank(int c)
+{
+        return (_CTYPE_LOOKUP(c) & _B) || (c == '\t');
+}
+
+int
+iscntrl(int c)
+{
+        return _CTYPE_LOOKUP(c) & _C;
+}
+
+int
+isdigit(int c)
+{
+        return _CTYPE_LOOKUP(c) & _N;
+}
+
+int
+isgraph(int c)
+{
+        return _CTYPE_LOOKUP(c) & (_P | _U | _L | _N);
+}
+
+int
+islower(int c)
+{
+        return (_CTYPE_LOOKUP(c) & (_U | _L)) == _L;
+}
+
+int
+isprint(int c)
+{
+        return _CTYPE_LOOKUP(c) & (_P | _U | _L | _N | _B);
+}
+
+int
+ispunct(int c)
+{
+        return _CTYPE_LOOKUP(c) & _P;
+}
+
+int
+isspace(int c)
+{
+        return _CTYPE_LOOKUP(c) & _S;
+}
+
+int
+isupper(int c)
+{
+        return (_CTYPE_LOOKUP(c) & (_U | _L)) == _U;
+}
+
+int
+isxdigit(int c)
+{
+        return _CTYPE_LOOKUP(c) & (_X | _N);
+}

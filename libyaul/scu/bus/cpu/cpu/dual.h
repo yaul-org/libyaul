@@ -12,9 +12,7 @@
 
 #include <cpu/registers.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_MASTER      0
 #define CPU_SLAVE       1
@@ -57,8 +55,6 @@ extern void cpu_dual_slave_set(void (*)(void));
         cpu_dual_slave_set(NULL);                                              \
 } while (false)
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_DUAL_H */

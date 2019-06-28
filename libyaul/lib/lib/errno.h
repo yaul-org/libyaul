@@ -1,11 +1,11 @@
 #ifndef _ERRNO_H_
 #define _ERRNO_H_
 
+#include <sys/cdefs.h>
+
 typedef int error_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define EPERM           1 /* Not owner */
 #define ENOENT          2 /* No such file or directory */
@@ -95,8 +95,6 @@ extern "C" {
 
 #define __ELASTERROR    2000 /* Users can add values starting here */
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_ERRNO_H_ */

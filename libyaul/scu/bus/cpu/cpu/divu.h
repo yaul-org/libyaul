@@ -13,9 +13,7 @@
 
 #include <fix16.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 static inline bool __always_inline
 cpu_divu_status_get(void)
@@ -83,8 +81,6 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
 extern void cpu_divu_init(void);
 extern void cpu_divu_ovfi_set(void (*)(void));
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_DIVU_H_ */

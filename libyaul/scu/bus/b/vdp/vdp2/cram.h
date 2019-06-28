@@ -12,9 +12,7 @@
 
 #include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /* Color RAM (CRAM) stores color data of sprites and scroll screens.
  *
@@ -56,8 +54,6 @@ extern "C" {
 extern void vdp2_cram_mode_set(uint8_t);
 extern void vdp2_cram_offset_set(uint8_t, uint32_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_CRAM_H_ */

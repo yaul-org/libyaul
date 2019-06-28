@@ -13,9 +13,7 @@
 #include <vdp1/map.h>
 #include <vdp1/vram.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 struct vdp1_transfer_status {
         union {
@@ -63,8 +61,6 @@ vdp1_transfer_status_get(struct vdp1_transfer_status *status)
         status->raw = MEMORY_READ(16, VDP1(EDSR));
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP1_H_ */

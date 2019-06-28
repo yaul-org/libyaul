@@ -3,10 +3,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+__BEGIN_DECLS
 
 #ifndef FIXMATH_NO_64BIT
 static inline  int64_t int64_const(int32_t hi, uint32_t lo) { return (((int64_t)hi << 32) | lo); }
@@ -157,8 +154,6 @@ static inline __fm_int64_t int64_div_i64_i32(__fm_int64_t x, int32_t y) {
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif

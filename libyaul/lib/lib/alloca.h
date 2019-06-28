@@ -1,6 +1,5 @@
-/* Written 2000 by Werner Almesberger */
-/* Rearranged for general inclusion by stdlib.h.
-   2001, Corinna Vinschen <vinschen@redhat.com> */
+/* Written 2000, Werner Almesberger
+ *         2001, Corinna Vinschen <vinschen@redhat.com> */
 
 #ifndef _ALLOCA_H_
 #define _ALLOCA_H_

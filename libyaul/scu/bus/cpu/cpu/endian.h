@@ -7,9 +7,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define cpu_htobe16(x)  ((uint16_t)(x))
 #define cpu_htole16(x)  cpu_bswap16((x))
@@ -56,8 +54,6 @@ cpu_bswap32(uint32_t x)
         return out;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_ENDIAN_H_ */

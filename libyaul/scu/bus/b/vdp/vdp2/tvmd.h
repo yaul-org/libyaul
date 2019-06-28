@@ -15,9 +15,7 @@
 #include <scu/map.h>
 #include <vdp2/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /*          +-----------------+
  * VBLANK=1 | Top blanking    |
@@ -127,8 +125,6 @@ extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
 extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
 extern void vdp2_tvmd_display_set(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_TVMD_H_ */
