@@ -12,9 +12,7 @@
 
 #include <sys/queue.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 struct irq_mux_handle;
 
@@ -40,8 +38,6 @@ extern void irq_mux_handle_add(irq_mux_t *, void (*)(irq_mux_handle_t *), void *
 extern void irq_mux_handle_remove(irq_mux_t *, void (*)(irq_mux_handle_t *));
 extern void irq_mux_init(irq_mux_t *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_IRQ_MUX_H_ */

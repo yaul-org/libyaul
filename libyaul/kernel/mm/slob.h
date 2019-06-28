@@ -11,9 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /*-
  * Restrictions
@@ -59,8 +57,6 @@ void *slob_realloc(void *, size_t);
 void slob_free(void *);
 int slob_stats(struct slob_stats *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* _SLOB_H_ */

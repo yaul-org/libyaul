@@ -12,9 +12,7 @@
 
 #include <cpu/registers.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_INTC_INTERRUPT_POWER_ON_RESET_PC    0x00
 #define CPU_INTC_INTERRUPT_POWER_ON_RESET_SP    0x01
@@ -115,8 +113,6 @@ cpu_intc_mask_set(uint8_t mask)
         cpu_reg_sr_set(reg_sr);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_INTC_H */

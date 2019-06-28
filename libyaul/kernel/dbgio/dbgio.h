@@ -13,9 +13,7 @@
 
 #include <vdp2/vram.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define DBGIO_DEV_NULL          0
 #define DBGIO_DEV_VDP1          1
@@ -56,8 +54,6 @@ extern void dbgio_dev_deinit(void);
 extern void dbgio_buffer(const char *);
 extern void dbgio_flush(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_DBGIO_H_ */

@@ -12,9 +12,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define VDP2_SCRN_NBG0          0 /* Normal background (NBG0) */
 #define VDP2_SCRN_RBG1          5 /* Rotational background (RBG1) */
@@ -505,8 +503,6 @@ extern void vdp2_scrn_scroll_y_update(uint8_t, fix16_t);
 
 extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_SCRN_H_ */

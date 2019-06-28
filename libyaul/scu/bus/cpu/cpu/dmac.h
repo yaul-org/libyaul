@@ -15,9 +15,7 @@
 
 #include <cpu/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
 #define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
@@ -129,8 +127,6 @@ extern void cpu_dmac_status_get(struct dmac_status *);
 extern void cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *);
 extern void cpu_dmac_channel_wait(uint8_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_DMAC_H */

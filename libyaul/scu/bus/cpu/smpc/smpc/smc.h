@@ -14,9 +14,7 @@
 
 #include <smpc/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define SMPC_SMC_MSHON          0x00
 #define SMPC_SMC_SSHON          0x02
@@ -165,8 +163,6 @@ smpc_smc_sysres_call(void)
         __builtin_unreachable();
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SMPC_SMC_H_ */

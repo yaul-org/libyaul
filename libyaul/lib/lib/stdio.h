@@ -18,18 +18,16 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_
 
-#include "_ansi.h"
-
-#include <sys/cdefs.h>
 #include <sys/cdefs.h>
 
 #include <stddef.h>
 
 /* typedef only __gnuc_va_list, used throughout the header */
 #define __need___va_list
+
 #include <stdarg.h>
 
-_BEGIN_STD_C
+__BEGIN_DECLS
 
 /* typedef va_list only when required */
 #ifndef _VA_LIST_DEFINED
@@ -56,10 +54,10 @@ typedef long off_t;
 #define SEEK_CUR 1 /* Set file offset to current plus offset */
 #define SEEK_END 2 /* Set file offset to EOF plus offset */
 
-int printf(const char * __restrict, ...) __attribute__ ((__format__ (__printf__, 1, 2)));
-int sprintf(char * __restrict, const char * __restrict, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
-int snprintf(char * __restrict, size_t, const char * __restrict, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
+int printf(const char * __restrict, ...) __printflike(1, 2);
+int sprintf(char * __restrict, const char * __restrict, ...) __printflike(2, 3);
+int snprintf(char * __restrict, size_t, const char * __restrict, ...) __printflike(3, 4);
 
-_END_STD_C
+__END_DECLS
 
 #endif /* !_STDIO_H_ */

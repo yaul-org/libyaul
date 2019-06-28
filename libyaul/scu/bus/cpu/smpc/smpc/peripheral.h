@@ -15,9 +15,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define MAX_PORTS       2
 #define MAX_PERIPHERALS 6 /* Max number of peripherals connected to a single port */
@@ -438,8 +436,6 @@ extern void smpc_peripheral_init(void);
 extern void smpc_peripheral_intback_issue(void);
 extern void smpc_peripheral_process(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SMPC_PERIPHERAL_H_ */

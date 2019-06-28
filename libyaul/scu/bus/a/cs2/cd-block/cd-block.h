@@ -10,14 +10,10 @@
 
 #include <cd-block/cmd.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 extern void cd_block_init(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CD_BLOCK_H_ */

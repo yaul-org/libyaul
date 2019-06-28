@@ -13,9 +13,7 @@
 
 #include <vdp1/cmdt.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define VDP1_VRAM(x)            (0x25C00000 + (x))
 #define VDP1_FRAME_BUFFER(x, y) (0x25C80000 + (((x) & 0x1) << 18) + (y))
@@ -67,8 +65,6 @@ extern uint32_t vdp1_vram_clut_size_get(void);
 
 extern void *vdp1_vram_remaining_get(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP1_VRAM_H_ */

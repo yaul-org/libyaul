@@ -14,9 +14,7 @@
 
 #include <scu/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define IC_INTERRUPT_VBLANK_IN          0x40
 #define IC_INTERRUPT_VBLANK_OUT         0x41
@@ -170,8 +168,6 @@ scu_ic_priority_table_set(uint32_t *table)
         ((void (*)(uint32_t *))*bios_address)(table);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SCU_IC_H_ */

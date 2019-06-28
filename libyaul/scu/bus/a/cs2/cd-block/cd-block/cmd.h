@@ -8,15 +8,13 @@
 #ifndef _CD_BLOCK_CMD_H_
 #define _CD_BLOCK_CMD_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
 
 extern void cd_block_cmd_abort_file(void);
 extern void cd_block_cmd_init_cd_system(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CD_BLOCK_CMD_H_ */

@@ -18,9 +18,7 @@
 #include <sys/queue.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 struct rd_file_handle;
 
@@ -49,8 +47,6 @@ off_t romdisk_seek(void *, off_t, int);
 off_t romdisk_tell(void *);
 size_t romdisk_total(void *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* _ROMDISK_H_ */

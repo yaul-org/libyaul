@@ -1,13 +1,11 @@
 #ifndef _STRING_H_
 #define _STRING_H_
 
-#include "_ansi.h"
-
 #include <sys/cdefs.h>
 
 #include <stddef.h>
 
-_BEGIN_STD_C
+__BEGIN_DECLS
 
 void *memchr(const void *, int, size_t);
 int memcmp(const void *, const void *, size_t);
@@ -31,6 +29,6 @@ char *strstr(const char *, const char *);
 char *strtok(char * __restrict, const char * __restrict);
 char *strndup(const char *, size_t);
 
-_END_STD_C
+__END_DECLS
 
 #endif /* _STRING_H_ */

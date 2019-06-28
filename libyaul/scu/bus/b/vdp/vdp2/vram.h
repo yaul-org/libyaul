@@ -13,9 +13,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /*-
  *           4 Mbit
@@ -119,8 +117,6 @@ extern struct vdp2_vram_cycp_bank vdp2_vram_cycp_bank_get(uint8_t);
 extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vdp2_vram_cycp_bank *);
 extern void vdp2_vram_cycp_bank_clear(uint8_t);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_VRAM_H_ */

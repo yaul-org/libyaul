@@ -1,9 +1,11 @@
 #ifndef __libfixmath_fix16_h__
 #define __libfixmath_fix16_h__
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#include <sys/cdefs.h>
+
+#include <stdint.h>
+
+__BEGIN_DECLS
 
 /* These options may let the optimizer to remove some calls to the functions.
  * Refer to http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
@@ -19,10 +21,6 @@ extern "C" {
 #define FIXMATH_FUNC_ATTRS
 #endif /* __GNUC__ */
 #endif /* !FIXMATH_FUNC_ATTRS */
-
-#include <sys/cdefs.h>
-
-#include <stdint.h>
 
 typedef int32_t fix16_t;
 
@@ -440,8 +438,6 @@ extern void fix16_matrix4_str(const fix16_matrix4_t *, char *, int);
 extern void fix16_matrix4_transpose(const fix16_matrix4_t *, fix16_matrix4_t *);
 extern void fix16_matrix4_zero(fix16_matrix4_t *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !__libfixmath_fix16_h__ */

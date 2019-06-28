@@ -11,9 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CONS_COLS_MIN   40
 #define CONS_ROWS_MIN   32
@@ -33,8 +31,6 @@ typedef struct {
 extern void cons_init(const cons_ops_t *, uint16_t, uint16_t);
 extern void cons_buffer(const char *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CONS_H_ */

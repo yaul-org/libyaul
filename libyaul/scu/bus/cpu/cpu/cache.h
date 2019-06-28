@@ -12,9 +12,7 @@
 
 #include <cpu/map.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define CPU_CACHE               0x00000000
 #define CPU_CACHE_THROUGH       0x20000000
@@ -134,8 +132,6 @@ cpu_cache_purge(void)
         *reg_ccr = t0 | 0x11;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_CPU_CACHE_H */

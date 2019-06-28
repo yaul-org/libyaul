@@ -22,9 +22,7 @@
 
 #include <color.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE                                     \
         union {                                                                \
@@ -408,8 +406,6 @@ extern void vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *, uint8_t);
 #undef VDP1_CMDT_SPRITE_DECLARE
 #undef VDP1_CMDT_NON_TEXTURED_DECLARE
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP1_CMDT_H_ */

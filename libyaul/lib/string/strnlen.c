@@ -27,9 +27,6 @@
 #include <stdint.h>
 #include <string.h>
 
-/* #include <_ansi.h> */
-/* #include <string.h> */
-
 size_t
 strnlen (const char *str, size_t n)
 {

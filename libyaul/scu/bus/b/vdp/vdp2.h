@@ -14,12 +14,8 @@
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP2_H_ */

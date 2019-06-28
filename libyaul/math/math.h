@@ -1,9 +1,7 @@
 #ifndef _MATH_H_
 #define _MATH_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#include <sys/cdefs.h>
 
 #include "uint32.h"
 #include "int64.h"
@@ -12,6 +10,8 @@ extern "C" {
 #include "int16.h"
 #include "color.h"
 #include "fix.h"
+
+__BEGIN_DECLS
 
 #ifndef min
 #define min(a, b)                                                              \
@@ -73,8 +73,6 @@ pow2(uint32_t value)
         return value;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_MATH_H_ */

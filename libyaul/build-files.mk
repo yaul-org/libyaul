@@ -52,18 +52,6 @@ LIB_SRCS+= \
 	kernel/mm/slob.c \
 	\
 	lib/ctype/ctype.c \
-	lib/ctype/isalpha.c \
-	lib/ctype/isascii.c \
-	lib/ctype/isblank.c \
-	lib/ctype/iscntrl.c \
-	lib/ctype/isdigit.c \
-	lib/ctype/islower.c \
-	lib/ctype/isprint.c \
-	lib/ctype/isgraph.c \
-	lib/ctype/ispunct.c \
-	lib/ctype/isspace.c \
-	lib/ctype/isupper.c \
-	lib/ctype/isxdigit.c \
 	lib/string/memcpy.c \
 	lib/string/memset.c \
 	lib/string/strchr.c \
@@ -194,12 +182,10 @@ INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:_ansi.h:./ \
 	./lib/lib/:alloca.h:./ \
 	./lib/lib/:assert.h:./ \
 	./lib/lib/:ctype.h:./ \
 	./lib/lib/:errno.h:./ \
-	./lib/lib/:inttypes.h:./ \
 	./lib/lib/:stdio.h:./ \
 	./lib/lib/:stdlib.h:./ \
 	./lib/lib/:string.h:./ \

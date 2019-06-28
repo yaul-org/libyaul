@@ -14,9 +14,7 @@
 #include <color.h>
 #include <int16.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define VDP1_ENV_ROTATION_0  0
 #define VDP1_ENV_ROTATION_90 1
@@ -46,8 +44,6 @@ struct vdp1_env {
 extern void vdp1_env_default_set(void);
 extern void vdp1_env_set(const struct vdp1_env *);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP1_ENV_H_ */

@@ -11,9 +11,7 @@
 #include <vdp1.h>
 #include <vdp2.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 #define vdp_sync_vblank_in_clear() do {                                        \
         vdp_sync_vblank_in_set(NULL);                                          \
@@ -42,8 +40,6 @@ extern int8_t vdp_sync_user_callback_add(void (*)(void *), void *);
 extern void vdp_sync_user_callback_remove(int8_t);
 extern void vdp_sync_user_callback_clear(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_VDP_H_ */

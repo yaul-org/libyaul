@@ -18,9 +18,7 @@
 #include <scu/map.h>
 #include <scu/ic.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 /*-
  * SCU DMA should be activated by the Master CPU
@@ -379,8 +377,6 @@ extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_
 extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
 extern int8_t scu_dma_level_unused_get(void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_SCU_DMA_H_ */

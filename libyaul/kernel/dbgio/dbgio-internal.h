@@ -11,9 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+__BEGIN_DECLS
 
 typedef struct {
         uint8_t dev;
@@ -30,8 +28,6 @@ extern const dbgio_dev_ops_t _internal_dev_ops_vdp2_simple;
 extern const dbgio_dev_ops_t _internal_dev_ops_vdp2_async;
 extern const dbgio_dev_ops_t _internal_dev_ops_usb_cart;
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+__END_DECLS
 
 #endif /* !_DBGIO_INTERNAL_H_ */
