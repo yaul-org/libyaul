@@ -77,6 +77,12 @@ cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
+static inline void __always_inline
+cpu_intc_ihr_clear(uint32_t vector)
+{
+        cpu_intc_ihr_set(vector, NULL);
+}
+
 static inline void __always_inline (*cpu_intc_ihr_get(uint32_t vector))(void)
 {
         register uint32_t *bios_address;
