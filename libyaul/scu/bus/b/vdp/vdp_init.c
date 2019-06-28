@@ -45,7 +45,7 @@ vdp_init(void)
 
         vdp1_cmdt_end(&cmdt_list);
 
-        vdp1_sync_draw(&cmdt_list);
+        vdp1_sync_draw(&cmdt_list, NULL, NULL);
         vdp_sync(0);
 
         cpu_intc_mask_set(sr_mask);
