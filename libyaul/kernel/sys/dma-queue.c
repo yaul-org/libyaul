@@ -94,7 +94,10 @@ dma_queue_init(void)
 }
 
 int8_t
-dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer, uint8_t tag, void (*handler)(const struct dma_queue_transfer *), void *work)
+dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer,
+    uint8_t tag,
+    void (*handler)(const struct dma_queue_transfer *),
+    void *work)
 {
         assert(reg_buffer != NULL);
 
@@ -292,7 +295,8 @@ _update_dma_request_pointers(struct dma_queue_request *request)
 }
 
 static inline void __always_inline
-_start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *request)
+_start_dma_request(struct dma_queue *dma_queue,
+    const struct dma_queue_request *request)
 {
         assert(dma_queue != NULL);
         assert(request != NULL);
@@ -304,7 +308,8 @@ _start_dma_request(struct dma_queue *dma_queue, const struct dma_queue_request *
 }
 
 static inline void __always_inline
-_copy_dma_reg_buffer(struct scu_dma_reg_buffer *dst_buffer, const struct scu_dma_reg_buffer *src_buffer)
+_copy_dma_reg_buffer(struct scu_dma_reg_buffer *dst_buffer,
+    const struct scu_dma_reg_buffer *src_buffer)
 {
         uint32_t *dst;
         dst = &dst_buffer->buffer[0];
