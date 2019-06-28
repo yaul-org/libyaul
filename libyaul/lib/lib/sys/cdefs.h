@@ -47,7 +47,7 @@
 #define __has_attribute(x)      0
 #endif /* !__has_attribute */
 #ifndef __has_extension
-#define __has_extension         __has_feature
+#define __has_extension __has_feature
 #endif /* !__has_extension */
 #ifndef __has_feature
 #define __has_feature(x)        0
@@ -132,12 +132,12 @@
 #define __used                  __attribute__ ((__used__))
 #define __packed                __attribute__ ((__packed__))
 #define __weak                  __attribute__ ((__weak__))
-#define __aligned(x)            __attribute__ ((__aligned__(x)))
-#define __section(x)            __attribute__ ((__section__(x)))
-#define __alloc_size(x)         __attribute__ ((__alloc_size__(x)))
+#define __aligned(x)            __attribute__ ((__aligned__ (x)))
+#define __section(x)            __attribute__ ((__section__ (x)))
+#define __alloc_size(x)         __attribute__ ((__alloc_size__ (x)))
 
 #if __has_attribute(__alloc_align__)
-#define __alloc_align(x)        __attribute__ ((__alloc_align__(x)))
+#define __alloc_align(x)        __attribute__ ((__alloc_align__ (x)))
 #else
 #define __alloc_align(x)
 #endif /* __has_attribute(__alloc_align__) */
@@ -168,7 +168,7 @@
 
 #define __noinline              __attribute__ ((__noinline__))
 
-#define __nonnull(x)            __attribute__ ((__nonnull__(x)))
+#define __nonnull(x)            __attribute__ ((__nonnull__ (x)))
 #define __nonnull_all           __attribute__ ((__nonnull__))
 
 #define __fastcall              __attribute__ ((__fastcall__))
@@ -227,9 +227,9 @@
 #define __visibility(x)         __attribute__ ((visibility((x))))
 
 #define __null_sentinel         __attribute__ ((__sentinel__))
-#define __exported              __attribute__ ((__visibility__("default")))
+#define __exported              __attribute__ ((__visibility__ ("default")))
 /* Only default visibility is supported on PE/COFF targets. */
-#define __hidden                __attribute__ ((__visibility__("hidden")))
+#define __hidden                __attribute__ ((__visibility__ ("hidden")))
 
 #define __offsetof(type, field) offsetof(type, field)
 #define __rangeof(type, start, end)                                            \
@@ -252,53 +252,55 @@
  * that are known to support the features properly (old versions of gcc-2
  * didn't permit keeping the keywords out of the application namespace).
  */
+
 #define __printflike(fmtarg, firstvararg)                                      \
             __attribute__ ((__format__ (__printf__, fmtarg, firstvararg)))
-#define __format_arg(fmtarg)    __attribute__ ((__format_arg__ (fmtarg)))
+#define __format_arg(fmtarg)                                                   \
+            __attribute__ ((__format_arg__ (fmtarg)))
 
 #if defined(__GNUC__)
-#define __strong_reference(sym, aliassym)                                       \
-        extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
+#define __strong_reference(sym, aliassym)                                      \
+        extern __typeof(sym) aliassym __attribute__ ((__alias__ (#sym)))
 
 #ifdef __ELF__
 #ifdef __STDC__
-#define __weak_reference(sym,alias)                                            \
+#define __weak_reference(sym, alias)                                           \
         __asm__ (".weak " #alias);                                             \
         __asm__ (".equ "  #alias ", " #sym)
-#define __warn_references(sym,msg)                                             \
+#define __warn_references(sym, msg)                                            \
         __asm__ (".section .gnu.warning." #sym);                               \
         __asm__ (".asciz \"" msg "\"");                                        \
         __asm__ (".previous")
-#define __sym_compat(sym,impl,verid)                                           \
+#define __sym_compat(sym, impl, verid)                                         \
         __asm__ (".symver " #impl ", " #sym "@" #verid)
-#define __sym_default(sym,impl,verid)                                          \
+#define __sym_default(sym, impl, verid)                                        \
         __asm__ (".symver " #impl ", " #sym "@@" #verid)
 #else
-#define __weak_reference(sym,alias)                                            \
+#define __weak_reference(sym, alias)                                           \
         __asm__ (".weak alias");                                               \
         __asm__ (".equ alias, sym")
-#define __warn_references(sym,msg)                                             \
+#define __warn_references(sym, msg)                                            \
         __asm__ (".section .gnu.warning.sym");                                 \
         __asm__ (".asciz \"msg\"");                                            \
         __asm__ (".previous")
-#define __sym_compat(sym,impl,verid)                                           \
+#define __sym_compat(sym, impl, verid)                                         \
         __asm__ (".symver impl, sym@verid")
-#define __sym_default(impl,sym,verid)                                          \
+#define __sym_default(impl, sym, verid)                                        \
         __asm__ (".symver impl, sym@@verid")
 #endif /* __STDC__ */
 #else /* !__ELF__ */
 #ifdef __STDC__
-#define __weak_reference(sym,alias)                                            \
+#define __weak_reference(sym, alias)                                           \
         __asm__ (".stabs \"_" #alias "\",11,0,0,0");                           \
         __asm__ (".stabs \"_" #sym "\",1,0,0,0")
-#define __warn_references(sym,msg)                                             \
+#define __warn_references(sym, msg)                                            \
         __asm__ (".stabs \"" msg "\",30,0,0,0");                               \
         __asm__ (".stabs \"_" #sym "\",1,0,0,0")
 #else
-#define __weak_reference(sym,alias)                                            \
+#define __weak_reference(sym, alias)                                           \
         __asm__ (".stabs \"_/**/alias\",11,0,0,0");                            \
         __asm__ (".stabs \"_/**/sym\",1,0,0,0")
-#define __warn_references(sym,msg)                                             \
+#define __warn_references(sym, msg)                                            \
         __asm__ (".stabs msg,30,0,0,0");                                       \
         __asm__ (".stabs \"_/**/sym\",1,0,0,0")
 #endif /* __STDC__ */
