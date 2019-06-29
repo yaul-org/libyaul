@@ -48,8 +48,8 @@ void *memset(void *dest, int c, size_t n)
         n &= -4;
 
 #ifdef __GNUC__
-        typedef uint32_t __attribute__((__may_alias__)) u32;
-        typedef uint64_t __attribute__((__may_alias__)) u64;
+        typedef uint32_t __may_alias u32;
+        typedef uint64_t __may_alias u64;
 
         u32 c32 = ((u32) - 1) / 255 * (uint8_t)c;
 

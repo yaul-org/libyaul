@@ -17,7 +17,7 @@ void *memchr(const void *src, int c, size_t n)
         for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--);
 
         if (n && *s != c) {
-                typedef size_t __attribute__((__may_alias__)) word;
+                typedef size_t __may_alias word;
                 const word *w;
                 size_t k = ONES * c;
 

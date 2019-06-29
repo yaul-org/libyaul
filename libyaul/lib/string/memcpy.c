@@ -10,7 +10,7 @@ void *memcpy(void *restrict dest, const void *restrict src, size_t n)
 #define LS <<
 #define RS >>
 
-        typedef uint32_t __attribute__((__may_alias__)) u32;
+        typedef uint32_t __may_alias u32;
 
         uint32_t w, x;
 

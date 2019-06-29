@@ -18,7 +18,7 @@ size_t strlcpy(char *d, const char *s, size_t n)
         }
 
 #ifdef __GNUC__
-        typedef size_t __attribute__((__may_alias__)) word;
+        typedef size_t __may_alias word;
         const word *ws;
 
         if (((uintptr_t)s & ALIGN) == ((uintptr_t)d & ALIGN)) {
