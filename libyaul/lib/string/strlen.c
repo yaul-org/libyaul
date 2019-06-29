@@ -14,11 +14,19 @@ size_t strlen(const char *s)
 #ifdef __GNUC__
         typedef size_t __may_alias word;
         const word *w;
-        for (; (uintptr_t)s % ALIGN; s++) if (!*s) return s-a;
+
+        for (; (uintptr_t)s % ALIGN; s++) {
+                if (!*s) {
+                        return s - a;
+                }
+        }
+
         for (w = (const void *)s; !HASZERO(*w); w++);
+
         s = (const void *)w;
 #endif /* __GNUC__ */
 
         for (; *s; s++);
-        return s-a;
+
+        return s - a;
 }
