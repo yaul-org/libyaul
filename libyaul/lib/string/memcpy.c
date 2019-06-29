@@ -1,113 +1,117 @@
-/*-
- * Copyright (c) 1990, 1993 The Regents of the University of California.
- * All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Chris Torek.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-#include <sys/cdefs.h>
-
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
 
-typedef int32_t word; /* "word" used for optimal copy speed */
-
-/*
- * Copy a block of memory, handling overlap.
- * This is the routine that actually implements
- * (the portable versions of) bcopy, memcpy, and memmove.
- */
-
-void *
-memcpy(void *dst0, const void *src0, size_t length)
+void *memcpy(void *restrict dest, const void *restrict src, size_t n)
 {
-        char *dst = dst0;
-        const char *src = src0;
-        size_t t;
+        unsigned char *d = dest;
+        const unsigned char *s = src;
 
-        if ((length == 0) || (dst == src)) { /* nothing to do */
-                return dst0;
+#ifdef __GNUC__
+#define LS <<
+#define RS >>
+
+        typedef uint32_t __attribute__((__may_alias__)) u32;
+        uint32_t w, x;
+
+        for (; (uintptr_t)s % 4 && n; n--) *d++ = *s++;
+
+        if ((uintptr_t)d % 4 == 0) {
+                for (; n>=16; s+=16, d+=16, n-=16) {
+                        *(u32 *)(d+0) = *(u32 *)(s+0);
+                        *(u32 *)(d+4) = *(u32 *)(s+4);
+                        *(u32 *)(d+8) = *(u32 *)(s+8);
+                        *(u32 *)(d+12) = *(u32 *)(s+12);
+                }
+                if (n&8) {
+                        *(u32 *)(d+0) = *(u32 *)(s+0);
+                        *(u32 *)(d+4) = *(u32 *)(s+4);
+                        d += 8; s += 8;
+                }
+                if (n&4) {
+                        *(u32 *)(d+0) = *(u32 *)(s+0);
+                        d += 4; s += 4;
+                }
+                if (n&2) {
+                        *d++ = *s++; *d++ = *s++;
+                }
+                if (n&1) {
+                        *d = *s;
+                }
+                return dest;
         }
 
-        /*
-         * Macros: loop-t-times; and loop-t-times, t>0
-         */
-#define TLOOP(s) if (t) TLOOP1(s)
-#define TLOOP1(s) do { s; } while (--t)
-
-        if ((uint32_t)dst < (uint32_t)src) {
-                /*
-                 * Copy forward.
-                 */
-                t = (uintptr_t)src;     /* only need low bits */
-                if ((t | (uintptr_t)dst) & (sizeof(word) - 1)) {
-                        /*
-                         * Try to align operands. This cannot be done
-                         * unless the low bits match.
-                         */
-                        if ((t ^ (uintptr_t)dst) & (sizeof(word) - 1) || (length < sizeof(word))) {
-                                t = length;
-                        } else {
-                                t = sizeof(word) - (t & (sizeof(word) - 1));
-                        }
-                        length -= t;
-                        TLOOP1(*dst++ = *src++);
+        if (n >= 32) switch ((uintptr_t)d % 4) {
+        case 1:
+                w = *(u32 *)s;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                n -= 3;
+                for (; n>=17; s+=16, d+=16, n-=16) {
+                        x = *(u32 *)(s+1);
+                        *(u32 *)(d+0) = (w LS 24) | (x RS 8);
+                        w = *(u32 *)(s+5);
+                        *(u32 *)(d+4) = (x LS 24) | (w RS 8);
+                        x = *(u32 *)(s+9);
+                        *(u32 *)(d+8) = (w LS 24) | (x RS 8);
+                        w = *(u32 *)(s+13);
+                        *(u32 *)(d+12) = (x LS 24) | (w RS 8);
                 }
-                /*
-                 * Copy whole words, then mop up any trailing bytes.
-                 */
-                t = length / sizeof(word);
-                TLOOP(*(word *)dst = *(word *)src; src += sizeof(word); dst += sizeof(word));
-                t = length & (sizeof(word) - 1);
-                TLOOP(*dst++ = *src++);
-        } else {
-                /*
-                 * Copy backwards. Otherwise essentially the same.
-                 * Alignment works as before, except that it takes
-                 * (t&(sizeof(word) - 1)) bytes to align, not sizeof(word)-(t&(sizeof(word) - 1)).
-                 */
-                src += length;
-                dst += length;
-                t = (uintptr_t)src;
-                if ((t | (uintptr_t)dst) & (sizeof(word) - 1)) {
-                        if ((t ^ (uintptr_t)dst) & (sizeof(word) - 1) || (length <= sizeof(word))) {
-                                t = length;
-                        } else {
-                                t &= (sizeof(word) - 1);
-                        }
-                        length -= t;
-                        TLOOP1(*--dst = *--src);
+                break;
+        case 2:
+                w = *(u32 *)s;
+                *d++ = *s++;
+                *d++ = *s++;
+                n -= 2;
+                for (; n>=18; s+=16, d+=16, n-=16) {
+                        x = *(u32 *)(s+2);
+                        *(u32 *)(d+0) = (w LS 16) | (x RS 16);
+                        w = *(u32 *)(s+6);
+                        *(u32 *)(d+4) = (x LS 16) | (w RS 16);
+                        x = *(u32 *)(s+10);
+                        *(u32 *)(d+8) = (w LS 16) | (x RS 16);
+                        w = *(u32 *)(s+14);
+                        *(u32 *)(d+12) = (x LS 16) | (w RS 16);
                 }
-                t = length / sizeof(word);
-                TLOOP(src -= sizeof(word); dst -= sizeof(word); *(word *)dst = *(word *)src);
-                t = length & (sizeof(word) - 1);
-                TLOOP(*--dst = *--src);
+                break;
+        case 3:
+                w = *(u32 *)s;
+                *d++ = *s++;
+                n -= 1;
+                for (; n>=19; s+=16, d+=16, n-=16) {
+                        x = *(u32 *)(s+3);
+                        *(u32 *)(d+0) = (w LS 8) | (x RS 24);
+                        w = *(u32 *)(s+7);
+                        *(u32 *)(d+4) = (x LS 8) | (w RS 24);
+                        x = *(u32 *)(s+11);
+                        *(u32 *)(d+8) = (w LS 8) | (x RS 24);
+                        w = *(u32 *)(s+15);
+                        *(u32 *)(d+12) = (x LS 8) | (w RS 24);
+                }
+                break;
         }
+        if (n&16) {
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+        }
+        if (n&8) {
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+        }
+        if (n&4) {
+                *d++ = *s++; *d++ = *s++; *d++ = *s++; *d++ = *s++;
+        }
+        if (n&2) {
+                *d++ = *s++; *d++ = *s++;
+        }
+        if (n&1) {
+                *d = *s;
+        }
+        return dest;
+#endif
 
-        return dst0;
+        for (; n; n--) *d++ = *s++;
+        return dest;
 }
