@@ -1,101 +1,90 @@
-/*-
- * Copyright (c) 1990, 1993 The Regents of the University of California.
- * All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Mike Hibler and Chris Torek.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-#include <sys/cdefs.h>
-
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
 
-void *
-memset(void *dst0, int c0, size_t length)
+void *memset(void *dest, int c, size_t n)
 {
-        size_t t;
-        uint32_t c;
-        uint8_t *dst;
+        unsigned char *s = dest;
+        size_t k;
 
-        dst = dst0;
+        /* Fill head and tail with minimal branching. Each
+         * conditional ensures that all the subsequently used
+         * offsets are well-defined and in the dest region. */
 
-        /*
-         * If not enough words, just fill bytes. A length >= 2 words
-         * guarantees that at least one of them is `complete' after any
-         * necessary alignment. For instance:
-         *
-         *      |-----------|-----------|-----------|
-         *      |00|01|02|03|04|05|06|07|08|09|0A|00|
-         *                ^---------------------^
-         *               dst             dst+length-1
-         *
-         * but we use a minimum of 3 here since the overhead of the code
-         * to do word writes is substantial.
-         */
+        if (!n) return dest;
+        s[0] = c;
+        s[n-1] = c;
+        if (n <= 2) return dest;
+        s[1] = c;
+        s[2] = c;
+        s[n-2] = c;
+        s[n-3] = c;
+        if (n <= 6) return dest;
+        s[3] = c;
+        s[n-4] = c;
+        if (n <= 8) return dest;
 
-        if (length < (3 * sizeof(uint32_t))) {
-                while (length != 0) {
-                        *dst++ = c0;
-                        --length;
-                }
+        /* Advance pointer to align it at a 4-byte boundary,
+         * and truncate n to a multiple of 4. The previous code
+         * already took care of any head/tail that get cut off
+         * by the alignment. */
 
-                return dst0;
+        k = -(uintptr_t)s & 3;
+        s += k;
+        n -= k;
+        n &= -4;
+
+#ifdef __GNUC__
+        typedef uint32_t __attribute__((__may_alias__)) u32;
+        typedef uint64_t __attribute__((__may_alias__)) u64;
+
+        u32 c32 = ((u32)-1)/255 * (unsigned char)c;
+
+        /* In preparation to copy 32 bytes at a time, aligned on
+         * an 8-byte bounary, fill head/tail up to 28 bytes each.
+         * As in the initial byte-based head/tail fill, each
+         * conditional below ensures that the subsequent offsets
+         * are valid (e.g. !(n<=24) implies n>=28). */
+
+        *(u32 *)(s+0) = c32;
+        *(u32 *)(s+n-4) = c32;
+        if (n <= 8) return dest;
+        *(u32 *)(s+4) = c32;
+        *(u32 *)(s+8) = c32;
+        *(u32 *)(s+n-12) = c32;
+        *(u32 *)(s+n-8) = c32;
+        if (n <= 24) return dest;
+        *(u32 *)(s+12) = c32;
+        *(u32 *)(s+16) = c32;
+        *(u32 *)(s+20) = c32;
+        *(u32 *)(s+24) = c32;
+        *(u32 *)(s+n-28) = c32;
+        *(u32 *)(s+n-24) = c32;
+        *(u32 *)(s+n-20) = c32;
+        *(u32 *)(s+n-16) = c32;
+
+        /* Align to a multiple of 8 so we can fill 64 bits at a time,
+         * and avoid writing the same bytes twice as much as is
+         * practical without introducing additional branching. */
+
+        k = 24 + ((uintptr_t)s & 4);
+        s += k;
+        n -= k;
+
+        /* If this loop is reached, 28 tail bytes have already been
+         * filled, so any remainder when n drops below 32 can be
+         * safely ignored. */
+
+        u64 c64 = c32 | ((u64)c32 << 32);
+        for (; n >= 32; n-=32, s+=32) {
+                *(u64 *)(s+0) = c64;
+                *(u64 *)(s+8) = c64;
+                *(u64 *)(s+16) = c64;
+                *(u64 *)(s+24) = c64;
         }
+#else
+        /* Pure C fallback with no aliasing violations. */
+        for (; n; n--, s++) *s = c;
+#endif
 
-        if ((c = (uint8_t)c0) != 0) { /* Fill the word. */
-                c = (c << 8) | c; /* uint32_t is 16 bits. */
-                c = (c << 16) | c; /* uint32_t is 32 bits. */
-        }
-
-        /* Align destination by filling in bytes. */
-        if ((t = (long)dst & (sizeof(uint32_t) - 1)) != 0) {
-                t = sizeof(uint32_t) - t;
-                length -= t;
-
-                do {
-                        *dst++ = c0;
-                } while (--t != 0);
-        }
-
-        /* Fill words. Length was >= 2*words so we know t >= 1 here. */
-        t = length / sizeof(uint32_t);
-        do {
-                *(uint32_t *)dst = c;
-                dst += sizeof(uint32_t);
-        } while (--t != 0);
-
-        /* Mop up trailing bytes, if any. */
-        t = length & (sizeof(uint32_t) - 1);
-        if (t != 0) {
-                do {
-                        *dst++ = c0;
-                } while (--t != 0);
-        }
-
-        return dst0;
+        return dest;
 }

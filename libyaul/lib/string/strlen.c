@@ -1,120 +1,24 @@
-/*-
- * Copyright (c) 2009, 2010 Xin LI <delphij@FreeBSD.org>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-#include <sys/cdefs.h>
-
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
+#include <limits.h>
 
-/*-
- * Rationale: it is generally much more efficient to do word length
- * operations and avoid branches on modern computer systems, as
- * compared to byte-length operations with a lot of branches.
- *
- * The expression:
- *
- *      ((x - 0x01....01) & ~x & 0x80....80)
- *
- * would evaluate to a non-zero value iff any of the bytes in the
- * original word is zero.
- *
- * On multi-issue processors, we can divide the above expression into:
- *      a)  (x - 0x01....01)
- *      b) (~x & 0x80....80)
- *      c) a & b
- *
- * Where, a) and b) can be partially computed in parallel.
- *
- * The algorithm above is found on "Hacker's Delight" by
- * Henry S. Warren, Jr.
- */
+#define ALIGN (sizeof(size_t))
+#define ONES ((size_t)-1/UCHAR_MAX)
+#define HIGHS (ONES * (UCHAR_MAX/2+1))
+#define HASZERO(x) ((x)-ONES & ~(x) & HIGHS)
 
-/* Magic numbers for the algorithm */
-static const unsigned long mask01 = 0x01010101;
-static const unsigned long mask80 = 0x80808080;
-
-#define LONGPTR_MASK (sizeof(long) - 1)
-
-/*
- * Helper macro to return string length if we caught the zero byte.
- */
-#define testbyte(x) do {                                                       \
-        if (p[x] == '\0') {                                                    \
-            return (p - str + x);                                              \
-        }                                                                      \
-} while (0)
-
-size_t
-strlen(const char *str)
+size_t strlen(const char *s)
 {
-        const char *p;
-        const uint32_t *lp;
-        long va;
-        long vb;
+        const char *a = s;
 
-        /*
-         * Before trying the hard (unaligned byte-by-byte access) way to
-         * figure out whether there is a nul character, try to see if
-         * there is a nul character is within this accessible word
-         * first.
-         *
-         * p and (p & ~LONGPTR_MASK) must be equally accessible since
-         * they always fall in the same memory page, as long as page
-         * boundaries is integral multiple of word size.
-         */
+#ifdef __GNUC__
+        typedef size_t __may_alias word;
+        const word *w;
+        for (; (uintptr_t)s % ALIGN; s++) if (!*s) return s-a;
+        for (w = (const void *)s; !HASZERO(*w); w++);
+        s = (const void *)w;
+#endif /* __GNUC__ */
 
-        lp = (const uint32_t *)((uintptr_t)str & ~LONGPTR_MASK);
-        va = (*lp - mask01);
-        vb = ((~*lp) & mask80);
-        lp++;
-
-        if (va & vb) {
-                /* Check if we have \0 in the first part */
-                for (p = str; p < (const char *)lp; p++) {
-                        if (*p == '\0') {
-                                return (p - str);
-                        }
-                }
-        }
-
-        /* Scan the rest of the string using word sized operation */
-        for (; ; lp++) {
-                va = (*lp - mask01);
-                vb = ((~*lp) & mask80);
-
-                if (va & vb) {
-                        p = (const char *)lp;
-
-                        testbyte(0);
-                        testbyte(1);
-                        testbyte(2);
-                        testbyte(3);
-                }
-        }
-
-        /* NOTREACHED */
-        return 0;
+        for (; *s; s++);
+        return s-a;
 }
