@@ -1,7 +1,8 @@
 #include <string.h>
 #include <ctype.h>
 
-int strncasecmp(const char *_l, const char *_r, size_t n)
+int
+strncasecmp(const char *_l, const char *_r, size_t n)
 {
         const uint8_t *l = (void *)_l, *r = (void *)_r;
 

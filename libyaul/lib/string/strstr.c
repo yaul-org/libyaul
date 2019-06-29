@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 
-static char *twobyte_strstr(const uint8_t *h, const uint8_t *n)
+static char *
+twobyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint16_t nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
 
@@ -10,7 +11,8 @@ static char *twobyte_strstr(const uint8_t *h, const uint8_t *n)
         return *h ? (char *)h - 1 : 0;
 }
 
-static char *threebyte_strstr(const uint8_t *h, const uint8_t *n)
+static char *
+threebyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8;
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8;
@@ -20,7 +22,8 @@ static char *threebyte_strstr(const uint8_t *h, const uint8_t *n)
         return *h ? (char *)h - 2 : 0;
 }
 
-static char *fourbyte_strstr(const uint8_t *h, const uint8_t *n)
+static char *
+fourbyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8 | h[3];
@@ -36,7 +39,8 @@ static char *fourbyte_strstr(const uint8_t *h, const uint8_t *n)
 #define BITOP(a,b,op) \
  ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
-static char *twoway_strstr(const uint8_t *h, const uint8_t *n)
+static char *
+twoway_strstr(const uint8_t *h, const uint8_t *n)
 {
         const uint8_t *z;
         size_t l, ip, jp, k, p, ms, p0, mem, mem0;
@@ -179,7 +183,8 @@ static char *twoway_strstr(const uint8_t *h, const uint8_t *n)
         }
 }
 
-char *strstr(const char *h, const char *n)
+char *
+strstr(const char *h, const char *n)
 {
         /* Return immediately on empty needle */
         if (!n[0]) {

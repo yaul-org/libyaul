@@ -6,7 +6,8 @@ typedef __may_alias size_t WT;
 #define WS (sizeof(WT))
 #endif /* __GNUC__ */
 
-void *memmove(void *dest, const void *src, size_t n)
+void *
+memmove(void *dest, const void *src, size_t n)
 {
         char *d = dest;
         const char *s = src;
@@ -43,7 +44,6 @@ void *memmove(void *dest, const void *src, size_t n)
                 }
         } else {
 #ifdef __GNUC__
-
                 if ((uintptr_t)s % WS == (uintptr_t)d % WS) {
                         while ((uintptr_t)(d + n) % WS) {
                                 if (!n--) {

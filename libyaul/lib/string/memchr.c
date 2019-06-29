@@ -8,16 +8,19 @@
 #define HIGHS (ONES * (UCHAR_MAX/2+1))
 #define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
-void *memchr(const void *src, int c, size_t n)
+void *
+memchr(const void *src, int c, size_t n)
 {
         const uint8_t *s = src;
         c = (uint8_t)c;
+
 #ifdef __GNUC__
 
         for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--);
 
         if (n && *s != c) {
                 typedef size_t __may_alias word;
+
                 const word *w;
                 size_t k = ONES * c;
 

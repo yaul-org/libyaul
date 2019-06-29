@@ -7,10 +7,12 @@
 #define HIGHS (ONES * (UCHAR_MAX/2+1))
 #define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
-char *__stpcpy(char *restrict d, const char *restrict s)
+char *
+__stpcpy(char *restrict d, const char *restrict s)
 {
 #ifdef __GNUC__
         typedef size_t __may_alias word;
+
         word *wd;
         const word *ws;
 
@@ -29,8 +31,7 @@ char *__stpcpy(char *restrict d, const char *restrict s)
                 d = (void *)wd;
                 s = (const void *)ws;
         }
-
-#endif
+#endif /* __GNUC__ */
 
         for (; (*d = *s); s++, d++);
 

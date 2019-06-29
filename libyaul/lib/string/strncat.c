@@ -1,8 +1,10 @@
 #include <string.h>
 
-char *strncat(char *restrict d, const char *restrict s, size_t n)
+char *
+strncat(char *restrict d, const char *restrict s, size_t n)
 {
         char *a = d;
+
         d += strlen(d);
 
         while (n && *s) {
@@ -10,5 +12,6 @@ char *strncat(char *restrict d, const char *restrict s, size_t n)
         }
 
         *d++ = 0;
+
         return a;
 }

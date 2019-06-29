@@ -1,6 +1,7 @@
 #include <string.h>
 
-char *strcasestr(const char *h, const char *n)
+char *
+strcasestr(const char *h, const char *n)
 {
         size_t l = strlen(n);
 
