@@ -10,7 +10,7 @@
 char *__stpncpy(char *restrict d, const char *restrict s, size_t n)
 {
 #ifdef __GNUC__
-        typedef size_t __attribute__((__may_alias__)) word;
+        typedef size_t __may_alias word;
         word *wd;
         const word *ws;
 

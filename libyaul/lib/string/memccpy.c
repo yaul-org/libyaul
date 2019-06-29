@@ -15,7 +15,7 @@ void *memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
         c = (uint8_t)c;
 
 #ifdef __GNUC__
-        typedef size_t __attribute__((__may_alias__)) word;
+        typedef size_t __may_alias word;
         word *wd;
         const word *ws;
 
