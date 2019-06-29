@@ -9,10 +9,10 @@
 
 void *memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
 {
-        unsigned char *d = dest;
-        const unsigned char *s = src;
+        uint8_t *d = dest;
+        const uint8_t *s = src;
 
-        c = (unsigned char)c;
+        c = (uint8_t)c;
 
 #ifdef __GNUC__
         typedef size_t __attribute__((__may_alias__)) word;

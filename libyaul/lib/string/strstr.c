@@ -1,14 +1,14 @@
 #include <string.h>
 #include <stdint.h>
 
-static char *twobyte_strstr(const unsigned char *h, const unsigned char *n)
+static char *twobyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint16_t nw = n[0]<<8 | n[1], hw = h[0]<<8 | h[1];
         for (h++; *h && hw != nw; hw = hw<<8 | *++h);
         return *h ? (char *)h-1 : 0;
 }
 
-static char *threebyte_strstr(const unsigned char *h, const unsigned char *n)
+static char *threebyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0]<<24 | n[1]<<16 | n[2]<<8;
         uint32_t hw = h[0]<<24 | h[1]<<16 | h[2]<<8;
@@ -16,7 +16,7 @@ static char *threebyte_strstr(const unsigned char *h, const unsigned char *n)
         return *h ? (char *)h-2 : 0;
 }
 
-static char *fourbyte_strstr(const unsigned char *h, const unsigned char *n)
+static char *fourbyte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0]<<24 | n[1]<<16 | n[2]<<8 | n[3];
         uint32_t hw = h[0]<<24 | h[1]<<16 | h[2]<<8 | h[3];
@@ -30,9 +30,9 @@ static char *fourbyte_strstr(const unsigned char *h, const unsigned char *n)
 #define BITOP(a,b,op) \
  ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
-static char *twoway_strstr(const unsigned char *h, const unsigned char *n)
+static char *twoway_strstr(const uint8_t *h, const uint8_t *n)
 {
-        const unsigned char *z;
+        const uint8_t *z;
         size_t l, ip, jp, k, p, ms, p0, mem, mem0;
         size_t byteset[32 / sizeof(size_t)] = { 0 };
         size_t shift[256];
@@ -98,7 +98,7 @@ static char *twoway_strstr(const unsigned char *h, const unsigned char *n)
                 if ((size_t)(z-h) < l) {
                         /* Fast estimate for MIN(l,63) */
                         size_t grow = l | 63;
-                        const unsigned char *z2 = memchr(z, 0, grow);
+                        const uint8_t *z2 = memchr(z, 0, grow);
                         if (z2) {
                                 z = z2;
                                 if ((size_t)(z-h) < l) return 0;
