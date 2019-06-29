@@ -8,7 +8,7 @@
 #define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
 char *
-__strchrnul(const char *s, int c)
+strchrnul(const char *s, int c)
 {
         c = (uint8_t)c;
 
@@ -37,5 +37,3 @@ __strchrnul(const char *s, int c)
 
         return (char *)s;
 }
-
-__weak_alias(__strchrnul, strchrnul);

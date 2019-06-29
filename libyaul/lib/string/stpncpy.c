@@ -8,7 +8,7 @@
 #define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
 char *
-__stpncpy(char *restrict d, const char *restrict s, size_t n)
+stpncpy(char *restrict d, const char *restrict s, size_t n)
 {
 #ifdef __GNUC__
         typedef size_t __may_alias word;
@@ -41,5 +41,3 @@ tail:
         memset(d, 0, n);
         return d;
 }
-
-__weak_alias(__stpncpy, stpncpy);
