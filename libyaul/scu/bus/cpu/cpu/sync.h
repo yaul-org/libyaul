@@ -18,7 +18,7 @@ static inline bool __always_inline
 cpu_sync_mutex(uint8_t b)
 {
         register uint8_t *bios_address;
-        bios_address = (uint8_t *)0x26000B00;
+        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);
 
         register uint32_t result;
         result = 0;
@@ -43,17 +43,14 @@ cpu_sync_mutex(uint8_t b)
 static inline void __always_inline
 cpu_sync_mutex_clear(uint8_t b)
 {
-        register uint8_t *bios_address;
-        bios_address = (uint8_t *)0x26000B00;
-
-        *(bios_address + b) = 0x00;
+        MEMORY_WRITE(8, HWRAM_UNCACHED(0x00000B00 + b), 0x00);
 }
 
 static inline void __always_inline
 cpu_sync_spinlock(uint8_t b)
 {
         register uint8_t *bios_address;
-        bios_address = (uint8_t *)0x26000B00;
+        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);
 
         __asm__ volatile ("\tadd %[b], %[bios_address]\n"
                           "1:\n"
