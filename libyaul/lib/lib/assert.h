@@ -23,11 +23,13 @@ __BEGIN_DECLS
 #endif
 #endif /* !__ASSERT_FUNC */
 
+#if !defined(__cplusplus)
 #ifndef static_assert
 #define static_assert(__e)                                                     \
         typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                    \
                 __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
 #endif /* !static_assert */
+#endif /* !defined(__cplusplus) */
 
 void __assert(const char *, int, const char *) __noreturn;
 void __assert_func(const char *, int, const char *, const char *) __noreturn;

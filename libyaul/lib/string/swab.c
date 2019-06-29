@@ -21,13 +21,18 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <string.h>
+#include <sys/types.h>
 
-char *
-strchr(const char *s, int c)
+void
+swab(const void *restrict _src, void *restrict _dest, ssize_t n)
 {
-        char *r = strchrnul(s, c);
+        const char *src = _src;
+        char *dest = _dest;
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        for (; n > 1; n -= 2) {
+                dest[0] = src[1];
+                dest[1] = src[0];
+                dest += 2;
+                src += 2;
+        }
 }

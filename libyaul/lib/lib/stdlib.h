@@ -7,18 +7,15 @@
 
 __BEGIN_DECLS
 
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
+extern int abs(int);
 
-void abort(void) __noreturn;
-int abs(int);
-int atexit(void (*)(void));
-int atoi(const char *);
-void exit(int) __noreturn;
-void free(void *);
-void *malloc(size_t);
-int rand(void);
-void srand(unsigned);
+extern int atoi(const char *);
+extern long atol(const char *);
+
+extern void *malloc(size_t);
+extern void free(void *);
+
+extern void abort(void) __noreturn;
 
 __END_DECLS
 

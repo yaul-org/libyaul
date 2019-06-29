@@ -52,21 +52,58 @@ LIB_SRCS+= \
 	kernel/mm/slob.c \
 	\
 	lib/ctype/ctype.c \
+	lib/string/bcmp.c \
+	lib/string/bcopy.c \
+	lib/string/bzero.c \
+	lib/string/index.c \
+	lib/string/memccpy.c \
+	lib/string/memchr.c \
+	lib/string/memcmp.c \
 	lib/string/memcpy.c \
+	lib/string/memmem.c \
+	lib/string/memmove.c \
+	lib/string/mempcpy.c \
+	lib/string/memrchr.c \
 	lib/string/memset.c \
+	lib/string/rindex.c \
+	lib/string/stpcpy.c \
+	lib/string/stpncpy.c \
+	lib/string/strcasecmp.c \
+	lib/string/strcasestr.c \
+	lib/string/strcat.c \
 	lib/string/strchr.c \
+	lib/string/strchrnul.c \
 	lib/string/strcmp.c \
+	lib/string/strcpy.c \
+	lib/string/strcspn.c \
+	lib/string/strdup.c \
+	lib/string/strlcat.c \
+	lib/string/strlcpy.c \
 	lib/string/strlen.c \
-	lib/string/strnlen.c \
-	lib/string/strchr.c \
+	lib/string/strncasecmp.c \
+	lib/string/strncat.c \
 	lib/string/strncmp.c \
+	lib/string/strncpy.c \
+	lib/string/strndup.c \
+	lib/string/strnlen.c \
+	lib/string/strpbrk.c \
+	lib/string/strrchr.c \
+	lib/string/strsep.c \
+	lib/string/strspn.c \
+	lib/string/strstr.c \
+	lib/string/strtok.c \
+	lib/string/strtok_r.c \
+	lib/string/strverscmp.c \
+	lib/string/swab.c \
 	lib/stdio/snprintf.c \
 	lib/stdlib/abort.c \
+	lib/stdlib/abs.c \
 	lib/stdlib/assert.c \
+	lib/stdlib/atoi.c \
+	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
 	lib/stdlib/realloc.c \
-	lib/stdlib/abs.c \
 	\
 	kernel/vfs/fs/romdisk/romdisk.c
 

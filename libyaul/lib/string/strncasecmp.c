@@ -21,13 +21,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
+#include <ctype.h>
 
-char *
-strchr(const char *s, int c)
+int
+strncasecmp(const char *_l, const char *_r, size_t n)
 {
-        char *r = strchrnul(s, c);
+        const uint8_t *l = (void *)_l, *r = (void *)_r;
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        if (!n--) {
+                return 0;
+        }
+
+        for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r)); l++, r++, n--);
+
+        return tolower(*l) - tolower(*r);
 }

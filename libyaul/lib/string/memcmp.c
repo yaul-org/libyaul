@@ -21,13 +21,15 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
 
-char *
-strchr(const char *s, int c)
+int
+memcmp(const void *vl, const void *vr, size_t n)
 {
-        char *r = strchrnul(s, c);
+        const uint8_t *l = vl, *r = vr;
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        for (; n && *l == *r; n--, l++, r++);
+
+        return n ? *l - *r : 0;
 }

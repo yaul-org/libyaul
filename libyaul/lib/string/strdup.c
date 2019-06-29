@@ -21,13 +21,18 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 char *
-strchr(const char *s, int c)
+strdup(const char *s)
 {
-        char *r = strchrnul(s, c);
+        size_t l = strlen(s);
+        char *d = malloc(l + 1);
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        if (!d) {
+                return NULL;
+        }
+
+        return memcpy(d, s, l + 1);
 }
