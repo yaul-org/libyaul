@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdint.h>
 
 #define BITOP(a,b,op) \
  ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
@@ -14,7 +15,7 @@ size_t strspn(const char *s, const char *c)
                 return s-a;
         }
 
-        for (; *c && BITOP(byteset, *(unsigned char *)c, |=); c++);
-        for (; *s && BITOP(byteset, *(unsigned char *)s, &); s++);
+        for (; *c && BITOP(byteset, *(uint8_t *)c, |=); c++);
+        for (; *s && BITOP(byteset, *(uint8_t *)s, &); s++);
         return s-a;
 }

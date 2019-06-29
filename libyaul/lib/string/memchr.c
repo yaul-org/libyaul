@@ -10,8 +10,8 @@
 
 void *memchr(const void *src, int c, size_t n)
 {
-        const unsigned char *s = src;
-        c = (unsigned char)c;
+        const uint8_t *s = src;
+        c = (uint8_t)c;
 #ifdef __GNUC__
         for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--);
         if (n && *s != c) {

@@ -3,7 +3,7 @@
 
 void *memset(void *dest, int c, size_t n)
 {
-        unsigned char *s = dest;
+        uint8_t *s = dest;
         size_t k;
 
         /* Fill head and tail with minimal branching. Each
@@ -37,7 +37,7 @@ void *memset(void *dest, int c, size_t n)
         typedef uint32_t __attribute__((__may_alias__)) u32;
         typedef uint64_t __attribute__((__may_alias__)) u64;
 
-        u32 c32 = ((u32)-1)/255 * (unsigned char)c;
+        u32 c32 = ((u32)-1)/255 * (uint8_t)c;
 
         /* In preparation to copy 32 bytes at a time, aligned on
          * an 8-byte bounary, fill head/tail up to 28 bytes each.
