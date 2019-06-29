@@ -55,7 +55,7 @@ struct state_vdp1 {
 
 struct state_vdp2 {
         struct {
-                int16_vector2_t resolution;
+                int16_vec2_t resolution;
         } tv;
 
         struct {
@@ -67,11 +67,11 @@ struct state_vdp2 {
         } nbg1;
 
         struct {
-                int16_vector2_t scroll;
+                int16_vec2_t scroll;
         } nbg2;
 
         struct {
-                int16_vector2_t scroll;
+                int16_vec2_t scroll;
         } nbg3;
 
         struct {

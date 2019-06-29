@@ -207,14 +207,14 @@ struct vdp1_cmdt_normal_sprite {
         VDP1_CMDT_SPRITE_DECLARE;
 
         union {
-                int16_vector2_t position;
+                int16_vec2_t position;
 
                 struct {
-                        int16_vector2_t a;
+                        int16_vec2_t a;
                 } vertex;
 
                 int16_t components[2];
-                int16_vector2_t vertices[1];
+                int16_vec2_t vertices[1];
         };
 };
 
@@ -253,21 +253,21 @@ struct vdp1_cmdt_scaled_sprite {
         union {
                 struct {
                         /* Vertex A */
-                        int16_vector2_t ul;
+                        int16_vec2_t ul;
 
                         /* Vertex B */
                         unsigned int :16;
                         unsigned int :16;
 
                         /* Vertex C */
-                        int16_vector2_t lr;
+                        int16_vec2_t lr;
                 } scale;
 
                 struct {
                         /* Vertex A */
-                        int16_vector2_t point;
+                        int16_vec2_t point;
                         /* Vertex B */
-                        int16_vector2_t display;
+                        int16_vec2_t display;
 
                         /* Vertex C */
                         unsigned int :16;
@@ -275,13 +275,13 @@ struct vdp1_cmdt_scaled_sprite {
                 } zoom;
 
                 struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
+                        int16_vec2_t a;
+                        int16_vec2_t b;
+                        int16_vec2_t c;
                 } vertex;
 
                 int16_t components[6];
-                int16_vector2_t vertices[3];
+                int16_vec2_t vertices[3];
         };
 };
 
@@ -290,14 +290,14 @@ struct vdp1_cmdt_distorted_sprite {
 
         union {
                 struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
+                        int16_vec2_t a;
+                        int16_vec2_t b;
+                        int16_vec2_t c;
+                        int16_vec2_t d;
                 } vertex;
 
                 int16_t components[8];
-                int16_vector2_t vertices[4];
+                int16_vec2_t vertices[4];
         };
 };
 
@@ -306,14 +306,14 @@ struct vdp1_cmdt_polygon {
 
         union {
                 struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
+                        int16_vec2_t a;
+                        int16_vec2_t b;
+                        int16_vec2_t c;
+                        int16_vec2_t d;
                 } vertex;
 
                 int16_t components[8];
-                int16_vector2_t vertices[4];
+                int16_vec2_t vertices[4];
         };
 };
 
@@ -322,14 +322,14 @@ struct vdp1_cmdt_polyline {
 
         union {
                 struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
+                        int16_vec2_t a;
+                        int16_vec2_t b;
+                        int16_vec2_t c;
+                        int16_vec2_t d;
                 } vertex;
 
                 int16_t components[4];
-                int16_vector2_t vertices[4];
+                int16_vec2_t vertices[4];
         };
 };
 
@@ -338,25 +338,25 @@ struct vdp1_cmdt_line {
 
         union {
                 struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
+                        int16_vec2_t a;
+                        int16_vec2_t b;
                 } vertex;
 
                 int16_t components[4];
-                int16_vector2_t vertices[8];
+                int16_vec2_t vertices[8];
         };
 };
 
 struct vdp1_cmdt_local_coord {
-        int16_vector2_t coord;
+        int16_vec2_t coord;
 };
 
 struct vdp1_cmdt_system_clip_coord {
-        int16_vector2_t coord;
+        int16_vec2_t coord;
 };
 
 struct vdp1_cmdt_user_clip_coord {
-        int16_vector2_t coords[2];
+        int16_vec2_t coords[2];
 };
 
 static inline uint16_t __always_inline

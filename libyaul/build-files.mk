@@ -132,8 +132,7 @@ LIB_SRCS+= \
 	math/fix16_vector2.c \
 	math/fix16_vector3.c \
 	math/fix16_vector4.c \
-	math/fract32.c \
-	math/int16_vector2.c \
+	math/int16.c \
 	math/uint32.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_abort_file.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmd_init_cd_system.c \
@@ -235,9 +234,7 @@ INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
 	./math/:fix.h:yaul/math/ \
 	./math/:fix16.h:yaul/math/ \
-	./math/:fract32.h:yaul/math/ \
 	./math/:int16.h:yaul/math/ \
-	./math/:int64.h:yaul/math/ \
 	./math/:math.h:yaul/math/ \
 	./math/:uint32.h:yaul/math/
 

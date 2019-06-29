@@ -4,8 +4,6 @@
 #include <sys/cdefs.h>
 
 #include "uint32.h"
-#include "int64.h"
-#include "fract32.h"
 #include "fix16.h"
 #include "int16.h"
 #include "color.h"
@@ -44,34 +42,6 @@ __BEGIN_DECLS
            (_x <= _y) ? _y : ((_x >= _z) ? _z : _x);                           \
         })
 #endif /* !clamp */
-
-static __inline uint32_t
-dlog2(uint32_t value)
-{
-        uint32_t l;
-
-        l = 0;
-
-        while ((value >> l) > 1) {
-                ++l;
-        }
-
-        return l;
-}
-
-static inline uint32_t __always_inline
-pow2(uint32_t value)
-{
-        value--;
-        value |= value >> 1;
-        value |= value >> 2;
-        value |= value >> 4;
-        value |= value >> 8;
-        value |= value >> 16;
-        value++;
-
-        return value;
-}
 
 __END_DECLS
 

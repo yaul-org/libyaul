@@ -38,7 +38,7 @@ struct vdp1_env {
 
         color_rgb555_t erase_color;
 
-        int16_vector2_t erase_points[2];
+        int16_vec2_t erase_points[2];
 };
 
 extern void vdp1_env_default_set(void);
