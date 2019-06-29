@@ -1,7 +1,8 @@
 #include <string.h>
 
-char *strcpy(char *restrict dest, const char *restrict src)
+char *strcpy(char *restrict dst, const char *restrict src)
 {
-        __stpcpy(dest, src);
-        return dest;
+        stpcpy(dst, src);
+
+        return dst;
 }

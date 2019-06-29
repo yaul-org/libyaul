@@ -95,13 +95,13 @@ static char *twoway_strstr(const unsigned char *h, const unsigned char *n)
         /* Search loop */
         for (;;) {
                 /* Update incremental end-of-haystack pointer */
-                if (z-h < l) {
+                if ((size_t)(z-h) < l) {
                         /* Fast estimate for MIN(l,63) */
                         size_t grow = l | 63;
                         const unsigned char *z2 = memchr(z, 0, grow);
                         if (z2) {
                                 z = z2;
-                                if (z-h < l) return 0;
+                                if ((size_t)(z-h) < l) return 0;
                         } else z += grow;
                 }
 

@@ -20,6 +20,9 @@ extern int isspace(int);
 extern int isupper(int);
 extern int isxdigit(int);
 
+extern int tolower(int);
+extern int toupper(int);
+
 __END_DECLS
 
 #endif /* _CTYPE_H_ */

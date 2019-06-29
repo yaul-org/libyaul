@@ -93,7 +93,7 @@ static char *twoway_memmem(const unsigned char *h, const unsigned char *z, const
         /* Search loop */
         for (;;) {
                 /* If remainder of haystack is shorter than needle, done */
-                if (z-h < l) return 0;
+                if ((size_t)(z-h) < l) return 0;
 
                 /* Check last byte first; advance by shift on mismatch */
                 if (BITOP(byteset, h[l-1], &)) {
