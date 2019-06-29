@@ -21,13 +21,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
 
 char *
-strchr(const char *s, int c)
+strpbrk(const char *s, const char *b)
 {
-        char *r = strchrnul(s, c);
+        s += strcspn(s, b);
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        return *s ? (char *)s : 0;
 }

@@ -1,7 +1,6 @@
 /*-
  * Copyright (c) 1991, 1993
- * The Regents of the University of California.
- * All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Berkeley Software Design, Inc.
@@ -40,15 +39,19 @@
 #ifndef __has_attribute
 #define __has_attribute(x)      0
 #endif /* !__has_attribute */
+
 #ifndef __has_extension
 #define __has_extension __has_feature
 #endif /* !__has_extension */
+
 #ifndef __has_feature
 #define __has_feature(x)        0
 #endif /* !__has_feature */
+
 #ifndef __has_include
 #define __has_include(x)        0
 #endif /* !__has_include */
+
 #ifndef __has_builtin
 #define __has_builtin(x)        0
 #endif /* !__has_builtin */
@@ -191,7 +194,7 @@
 
 #define __alignof(x)            __offsetof(struct { char __a; x __b; }, __b)
 #define __offsetof(type, field) offsetof(type, field)
-#define __rangeof(type, start, end)                                             \
+#define __rangeof(type, start, end)                                            \
         (__offsetof(type, end) - __offsetof(type, start))
 
 /* Compiler-dependent macros to declare that functions take printf-like
@@ -200,9 +203,12 @@
  * They are null except for versions of GCC that are known to support the
  * features properly (old versions of GCC-2 didn't permit keeping the keywords
  * out of the application namespace). */
-#define __printflike(fmtarg, firstvararg)                                      \
-            __attribute__ ((__format__ (__printf__, fmtarg, firstvararg)))
-#define __format_arg(fmtarg)                                                   \
-            __attribute__ ((__format_arg__ (fmtarg)))
+#define __printflike(fmt_arg, first_vararg)                                    \
+        __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
+#define __format_arg(fmt_arg)                                                  \
+        __attribute__ ((__format_arg__ (fmt_arg)))
+
+#define __weak_alias(name, aliasname)                                          \
+        extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
 
 #endif /* !_SYS_CDEFS_H_ */

@@ -21,13 +21,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
 
 char *
-strchr(const char *s, int c)
+strcpy(char *restrict dst, const char *restrict src)
 {
-        char *r = strchrnul(s, c);
+        stpcpy(dst, src);
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        return dst;
 }

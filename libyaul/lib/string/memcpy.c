@@ -1,113 +1,185 @@
 /*-
- * Copyright (c) 1990, 1993 The Regents of the University of California.
- * All rights reserved.
+ * Copyright (c) 2005-2014 Rich Felker, et al.
  *
- * This code is derived from software contributed to Berkeley by
- * Chris Torek.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <sys/cdefs.h>
-
-#include <stdint.h>
 #include <string.h>
-
-typedef int32_t word; /* "word" used for optimal copy speed */
-
-/*
- * Copy a block of memory, handling overlap.
- * This is the routine that actually implements
- * (the portable versions of) bcopy, memcpy, and memmove.
- */
+#include <stdint.h>
 
 void *
-memcpy(void *dst0, const void *src0, size_t length)
+memcpy(void *restrict dest, const void *restrict src, size_t n)
 {
-        char *dst = dst0;
-        const char *src = src0;
-        size_t t;
+        uint8_t *d = dest;
+        const uint8_t *s = src;
 
-        if ((length == 0) || (dst == src)) { /* nothing to do */
-                return dst0;
+#ifdef __GNUC__
+        typedef uint32_t __may_alias a_uint32_t;
+
+        uint32_t w, x;
+
+        for (; (uintptr_t)s % 4 && n; n--) {
+                *d++ = *s++;
         }
 
-        /*
-         * Macros: loop-t-times; and loop-t-times, t>0
-         */
-#define TLOOP(s) if (t) TLOOP1(s)
-#define TLOOP1(s) do { s; } while (--t)
+        if ((uintptr_t)d % 4 == 0) {
+                for (; n >= 16; s += 16, d += 16, n -= 16) {
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
+                        *(a_uint32_t *)(d + 4) = *(a_uint32_t *)(s + 4);
+                        *(a_uint32_t *)(d + 8) = *(a_uint32_t *)(s + 8);
+                        *(a_uint32_t *)(d + 12) = *(a_uint32_t *)(s + 12);
+                }
 
-        if ((uint32_t)dst < (uint32_t)src) {
-                /*
-                 * Copy forward.
-                 */
-                t = (uintptr_t)src;     /* only need low bits */
-                if ((t | (uintptr_t)dst) & (sizeof(word) - 1)) {
-                        /*
-                         * Try to align operands. This cannot be done
-                         * unless the low bits match.
-                         */
-                        if ((t ^ (uintptr_t)dst) & (sizeof(word) - 1) || (length < sizeof(word))) {
-                                t = length;
-                        } else {
-                                t = sizeof(word) - (t & (sizeof(word) - 1));
-                        }
-                        length -= t;
-                        TLOOP1(*dst++ = *src++);
+                if (n & 8) {
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
+                        *(a_uint32_t *)(d + 4) = *(a_uint32_t *)(s + 4);
+                        d += 8;
+                        s += 8;
                 }
-                /*
-                 * Copy whole words, then mop up any trailing bytes.
-                 */
-                t = length / sizeof(word);
-                TLOOP(*(word *)dst = *(word *)src; src += sizeof(word); dst += sizeof(word));
-                t = length & (sizeof(word) - 1);
-                TLOOP(*dst++ = *src++);
-        } else {
-                /*
-                 * Copy backwards. Otherwise essentially the same.
-                 * Alignment works as before, except that it takes
-                 * (t&(sizeof(word) - 1)) bytes to align, not sizeof(word)-(t&(sizeof(word) - 1)).
-                 */
-                src += length;
-                dst += length;
-                t = (uintptr_t)src;
-                if ((t | (uintptr_t)dst) & (sizeof(word) - 1)) {
-                        if ((t ^ (uintptr_t)dst) & (sizeof(word) - 1) || (length <= sizeof(word))) {
-                                t = length;
-                        } else {
-                                t &= (sizeof(word) - 1);
-                        }
-                        length -= t;
-                        TLOOP1(*--dst = *--src);
+
+                if (n & 4) {
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
+                        d += 4;
+                        s += 4;
                 }
-                t = length / sizeof(word);
-                TLOOP(src -= sizeof(word); dst -= sizeof(word); *(word *)dst = *(word *)src);
-                t = length & (sizeof(word) - 1);
-                TLOOP(*--dst = *--src);
+
+                if (n & 2) {
+                        *d++ = *s++;
+                        *d++ = *s++;
+                }
+
+                if (n & 1) {
+                        *d = *s;
+                }
+
+                return dest;
         }
 
-        return dst0;
+        if (n >= 32) {
+                switch ((uintptr_t)d % 4) {
+                case 1:
+                        w = *(a_uint32_t *)s;
+                        *d++ = *s++;
+                        *d++ = *s++;
+                        *d++ = *s++;
+                        n -= 3;
+
+                        for (; n >= 17; s += 16, d += 16, n -= 16) {
+                                x = *(a_uint32_t *)(s + 1);
+                                *(a_uint32_t *)(d + 0) = (w << 24) | (x >> 8);
+                                w = *(a_uint32_t *)(s + 5);
+                                *(a_uint32_t *)(d + 4) = (x << 24) | (w >> 8);
+                                x = *(a_uint32_t *)(s + 9);
+                                *(a_uint32_t *)(d + 8) = (w << 24) | (x >> 8);
+                                w = *(a_uint32_t *)(s + 13);
+                                *(a_uint32_t *)(d + 12) = (x << 24) | (w >> 8);
+                        }
+                        break;
+                case 2:
+                        w = *(a_uint32_t *)s;
+                        *d++ = *s++;
+                        *d++ = *s++;
+                        n -= 2;
+
+                        for (; n >= 18; s += 16, d += 16, n -= 16) {
+                                x = *(a_uint32_t *)(s + 2);
+                                *(a_uint32_t *)(d + 0) = (w << 16) | (x >> 16);
+                                w = *(a_uint32_t *)(s + 6);
+                                *(a_uint32_t *)(d + 4) = (x << 16) | (w >> 16);
+                                x = *(a_uint32_t *)(s + 10);
+                                *(a_uint32_t *)(d + 8) = (w << 16) | (x >> 16);
+                                w = *(a_uint32_t *)(s + 14);
+                                *(a_uint32_t *)(d + 12) = (x << 16) | (w >> 16);
+                        }
+                        break;
+                case 3:
+                        w = *(a_uint32_t *)s;
+                        *d++ = *s++;
+                        n -= 1;
+
+                        for (; n >= 19; s += 16, d += 16, n -= 16) {
+                                x = *(a_uint32_t *)(s + 3);
+                                *(a_uint32_t *)(d + 0) = (w << 8) | (x >> 24);
+                                w = *(a_uint32_t *)(s + 7);
+                                *(a_uint32_t *)(d + 4) = (x << 8) | (w >> 24);
+                                x = *(a_uint32_t *)(s + 11);
+                                *(a_uint32_t *)(d + 8) = (w << 8) | (x >> 24);
+                                w = *(a_uint32_t *)(s + 15);
+                                *(a_uint32_t *)(d + 12) = (x << 8) | (w >> 24);
+                        }
+                        break;
+                }
+        }
+
+        if (n & 16) {
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+        }
+
+        if (n & 8) {
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+        }
+
+        if (n & 4) {
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+                *d++ = *s++;
+        }
+
+        if (n & 2) {
+                *d++ = *s++;
+                *d++ = *s++;
+        }
+
+        if (n & 1) {
+                *d = *s;
+        }
+
+        return dest;
+#endif /* __GNUC__ */
+
+        for (; n; n--) {
+                *d++ = *s++;
+        }
+
+        return dest;
 }

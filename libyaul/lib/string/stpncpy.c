@@ -21,13 +21,46 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
+#include <limits.h>
+
+#define ALIGN (sizeof(size_t)-1)
+#define ONES ((size_t)-1/UCHAR_MAX)
+#define HIGHS (ONES * (UCHAR_MAX/2+1))
+#define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
 char *
-strchr(const char *s, int c)
+stpncpy(char *restrict d, const char *restrict s, size_t n)
 {
-        char *r = strchrnul(s, c);
+#ifdef __GNUC__
+        typedef size_t __may_alias word;
+        word *wd;
+        const word *ws;
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        if (((uintptr_t)s & ALIGN) == ((uintptr_t)d & ALIGN)) {
+                for (; ((uintptr_t)s & ALIGN) && n && (*d = *s); n--, s++, d++);
+
+                if (!n || !*s) {
+                        goto tail;
+                }
+
+                wd = (void *)d;
+                ws = (const void *)s;
+
+                for (; n >= sizeof(size_t) && !HASZERO(*ws);
+                       n -= sizeof(size_t), ws++, wd++) {
+                        *wd = *ws;
+                }
+
+                d = (void *)wd;
+                s = (const void *)ws;
+        }
+#endif /* __GNUC__ */
+
+        for (; n && (*d = *s); n--, s++, d++);
+
+tail:
+        memset(d, 0, n);
+        return d;
 }

@@ -21,13 +21,16 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
 
-char *
-strchr(const char *s, int c)
+size_t
+strlcat(char *d, const char *s, size_t n)
 {
-        char *r = strchrnul(s, c);
+        size_t l = strnlen(d, n);
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        if (l == n) {
+                return l + strlen(s);
+        }
+
+        return l + strlcpy(d + l, s, n - l);
 }

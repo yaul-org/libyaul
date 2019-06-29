@@ -21,13 +21,30 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
 
 char *
-strchr(const char *s, int c)
+strtok(char *restrict s, const char *restrict sep)
 {
-        char *r = strchrnul(s, c);
+        static char *p;
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        if (!s && !(s = p)) {
+                return NULL;
+        }
+
+        s += strspn(s, sep);
+
+        if (!*s) {
+                return p = 0;
+        }
+
+        p = s + strcspn(s, sep);
+
+        if (*p) {
+                *p++ = 0;
+        } else {
+                p = 0;
+        }
+
+        return s;
 }

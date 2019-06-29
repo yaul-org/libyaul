@@ -21,13 +21,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <string.h>
 
-char *
-strchr(const char *s, int c)
+void
+bcopy(const void *s1, void *s2, size_t n)
 {
-        char *r = strchrnul(s, c);
-
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        memmove(s2, s1, n);
 }
