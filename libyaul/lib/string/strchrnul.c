@@ -10,15 +10,25 @@
 char *__strchrnul(const char *s, int c)
 {
         c = (uint8_t)c;
-        if (!c) return (char *)s + strlen(s);
+
+        if (!c) {
+                return (char *)s + strlen(s);
+        }
 
 #ifdef __GNUC__
         typedef size_t __may_alias word;
         const word *w;
-        for (; (uintptr_t)s % ALIGN; s++)
-                if (!*s || *(uint8_t *)s == c) return (char *)s;
+
+        for (; (uintptr_t)s % ALIGN; s++) {
+                if (!*s || *(uint8_t *)s == c) {
+                        return (char *)s;
+                }
+        }
+
         size_t k = ONES * c;
-        for (w = (void *)s; !HASZERO(*w) && !HASZERO(*w^k); w++);
+
+        for (w = (void *)s; !HASZERO(*w) && !HASZERO(*w ^ k); w++);
+
         s = (void *)w;
 #endif /* __GNUC__ */
 
