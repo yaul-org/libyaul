@@ -44,7 +44,8 @@ color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
 }
 
 void
-color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *result)
+color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color,
+    color_rgb555_t *result)
 {
         color_fix16_rgb_t rgb;
         color_fix16_hsv_fix16_rgb_convert(color, &rgb);
@@ -57,7 +58,8 @@ color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color, color_rgb555_t *r
 }
 
 void
-color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *color, color_rgb888_t *result)
+color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *color,
+    color_rgb888_t *result)
 {
         color_fix16_rgb_t rgb;
         color_fix16_hsv_fix16_rgb_convert(color, &rgb);
@@ -76,8 +78,8 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
         fix16_t x;
         /* X=C*(1-|((H/60.0)%2)-1|) */
         x = fix16_mul(c, fix16_sub(F16(1.0f), fix16_abs(fix16_sub(fix16_mod(
-                                fix16_div(color->h, F16(60.0f)),
-                                F16(2.0f)), F16(1.0f)))));
+                                           fix16_div(color->h, F16(60.0f)),
+                                           F16(2.0f)), F16(1.0f)))));
 
         fix16_t m;
         m = fix16_sub(color->v, c);
@@ -119,7 +121,8 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
 }
 
 void
-color_rgb555_fix16_hsv_convert(const color_rgb555_t *color, color_fix16_hsv_t *result)
+color_rgb555_fix16_hsv_convert(const color_rgb555_t *color,
+    color_fix16_hsv_t *result)
 {
         /* Convert from RGB555 to RGB888 */
         color_rgb888_t rgb888;
@@ -129,7 +132,8 @@ color_rgb555_fix16_hsv_convert(const color_rgb555_t *color, color_fix16_hsv_t *r
 }
 
 void
-color_rgb888_fix16_hsv_convert(const color_rgb888_t *color, color_fix16_hsv_t *result)
+color_rgb888_fix16_hsv_convert(const color_rgb888_t *color,
+    color_fix16_hsv_t *result)
 {
         /* Convert from [0..255] to [0..1] scale */
         color_fix16_rgb_t rgb;
@@ -152,6 +156,7 @@ color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
         result->v = max;
 
         delta = fix16_sub(max, min);
+
         if (delta < F16(0.0000153f)) {
                 result->s = F16(0.0f);
                 /* Undefined, maybe NAN? */

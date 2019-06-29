@@ -153,7 +153,7 @@ vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
 
         uint16_t zp;
         zp = (sprite->zoom_point.enable)
-            ? dlog2(sprite->zoom_point.raw & ~0x0010)
+            ? uint32_log2(sprite->zoom_point.raw & ~0x0010)
             : 0x0000;
 
         cmdt->cmd_ctrl |= zp << 8;
