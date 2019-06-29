@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 
-static char *twobyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
+static char *
+twobyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 {
         uint16_t nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
 
@@ -14,7 +15,8 @@ static char *twobyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
         return hw == nw ? (char *)h - 2 : 0;
 }
 
-static char *threebyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
+static char *
+threebyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8;
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8;
@@ -28,7 +30,8 @@ static char *threebyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
         return hw == nw ? (char *)h - 3 : 0;
 }
 
-static char *fourbyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
+static char *
+fourbyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8 | h[3];
@@ -48,7 +51,8 @@ static char *fourbyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 #define BITOP(a,b,op) \
  ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
-static char *twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
+static char *
+twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
 {
         size_t i, ip, jp, k, p, ms, p0, mem, mem0;
         size_t byteset[32 / sizeof(size_t)] = { 0 };
@@ -171,7 +175,8 @@ static char *twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n,
         }
 }
 
-void *memmem(const void *h0, size_t k, const void *n0, size_t l)
+void *
+memmem(const void *h0, size_t k, const void *n0, size_t l)
 {
         const uint8_t *h = h0, *n = n0;
 

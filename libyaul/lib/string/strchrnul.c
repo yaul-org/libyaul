@@ -7,7 +7,8 @@
 #define HIGHS (ONES * (UCHAR_MAX/2+1))
 #define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
 
-char *__strchrnul(const char *s, int c)
+char *
+__strchrnul(const char *s, int c)
 {
         c = (uint8_t)c;
 

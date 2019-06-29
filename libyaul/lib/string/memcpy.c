@@ -1,16 +1,14 @@
 #include <string.h>
 #include <stdint.h>
 
-void *memcpy(void *restrict dest, const void *restrict src, size_t n)
+void *
+memcpy(void *restrict dest, const void *restrict src, size_t n)
 {
         uint8_t *d = dest;
         const uint8_t *s = src;
 
 #ifdef __GNUC__
-#define LS <<
-#define RS >>
-
-        typedef uint32_t __may_alias u32;
+        typedef uint32_t __may_alias a_uint32_t;
 
         uint32_t w, x;
 
@@ -20,21 +18,21 @@ void *memcpy(void *restrict dest, const void *restrict src, size_t n)
 
         if ((uintptr_t)d % 4 == 0) {
                 for (; n >= 16; s += 16, d += 16, n -= 16) {
-                        *(u32 *)(d + 0) = *(u32 *)(s + 0);
-                        *(u32 *)(d + 4) = *(u32 *)(s + 4);
-                        *(u32 *)(d + 8) = *(u32 *)(s + 8);
-                        *(u32 *)(d + 12) = *(u32 *)(s + 12);
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
+                        *(a_uint32_t *)(d + 4) = *(a_uint32_t *)(s + 4);
+                        *(a_uint32_t *)(d + 8) = *(a_uint32_t *)(s + 8);
+                        *(a_uint32_t *)(d + 12) = *(a_uint32_t *)(s + 12);
                 }
 
                 if (n & 8) {
-                        *(u32 *)(d + 0) = *(u32 *)(s + 0);
-                        *(u32 *)(d + 4) = *(u32 *)(s + 4);
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
+                        *(a_uint32_t *)(d + 4) = *(a_uint32_t *)(s + 4);
                         d += 8;
                         s += 8;
                 }
 
                 if (n & 4) {
-                        *(u32 *)(d + 0) = *(u32 *)(s + 0);
+                        *(a_uint32_t *)(d + 0) = *(a_uint32_t *)(s + 0);
                         d += 4;
                         s += 4;
                 }
@@ -54,54 +52,54 @@ void *memcpy(void *restrict dest, const void *restrict src, size_t n)
         if (n >= 32) {
                 switch ((uintptr_t)d % 4) {
                 case 1:
-                        w = *(u32 *)s;
+                        w = *(a_uint32_t *)s;
                         *d++ = *s++;
                         *d++ = *s++;
                         *d++ = *s++;
                         n -= 3;
 
                         for (; n >= 17; s += 16, d += 16, n -= 16) {
-                                x = *(u32 *)(s + 1);
-                                *(u32 *)(d + 0) = (w LS 24) | (x RS 8);
-                                w = *(u32 *)(s + 5);
-                                *(u32 *)(d + 4) = (x LS 24) | (w RS 8);
-                                x = *(u32 *)(s + 9);
-                                *(u32 *)(d + 8) = (w LS 24) | (x RS 8);
-                                w = *(u32 *)(s + 13);
-                                *(u32 *)(d + 12) = (x LS 24) | (w RS 8);
+                                x = *(a_uint32_t *)(s + 1);
+                                *(a_uint32_t *)(d + 0) = (w << 24) | (x >> 8);
+                                w = *(a_uint32_t *)(s + 5);
+                                *(a_uint32_t *)(d + 4) = (x << 24) | (w >> 8);
+                                x = *(a_uint32_t *)(s + 9);
+                                *(a_uint32_t *)(d + 8) = (w << 24) | (x >> 8);
+                                w = *(a_uint32_t *)(s + 13);
+                                *(a_uint32_t *)(d + 12) = (x << 24) | (w >> 8);
                         }
                         break;
                 case 2:
-                        w = *(u32 *)s;
+                        w = *(a_uint32_t *)s;
                         *d++ = *s++;
                         *d++ = *s++;
                         n -= 2;
 
                         for (; n >= 18; s += 16, d += 16, n -= 16) {
-                                x = *(u32 *)(s + 2);
-                                *(u32 *)(d + 0) = (w LS 16) | (x RS 16);
-                                w = *(u32 *)(s + 6);
-                                *(u32 *)(d + 4) = (x LS 16) | (w RS 16);
-                                x = *(u32 *)(s + 10);
-                                *(u32 *)(d + 8) = (w LS 16) | (x RS 16);
-                                w = *(u32 *)(s + 14);
-                                *(u32 *)(d + 12) = (x LS 16) | (w RS 16);
+                                x = *(a_uint32_t *)(s + 2);
+                                *(a_uint32_t *)(d + 0) = (w << 16) | (x >> 16);
+                                w = *(a_uint32_t *)(s + 6);
+                                *(a_uint32_t *)(d + 4) = (x << 16) | (w >> 16);
+                                x = *(a_uint32_t *)(s + 10);
+                                *(a_uint32_t *)(d + 8) = (w << 16) | (x >> 16);
+                                w = *(a_uint32_t *)(s + 14);
+                                *(a_uint32_t *)(d + 12) = (x << 16) | (w >> 16);
                         }
                         break;
                 case 3:
-                        w = *(u32 *)s;
+                        w = *(a_uint32_t *)s;
                         *d++ = *s++;
                         n -= 1;
 
                         for (; n >= 19; s += 16, d += 16, n -= 16) {
-                                x = *(u32 *)(s + 3);
-                                *(u32 *)(d + 0) = (w LS 8) | (x RS 24);
-                                w = *(u32 *)(s + 7);
-                                *(u32 *)(d + 4) = (x LS 8) | (w RS 24);
-                                x = *(u32 *)(s + 11);
-                                *(u32 *)(d + 8) = (w LS 8) | (x RS 24);
-                                w = *(u32 *)(s + 15);
-                                *(u32 *)(d + 12) = (x LS 8) | (w RS 24);
+                                x = *(a_uint32_t *)(s + 3);
+                                *(a_uint32_t *)(d + 0) = (w << 8) | (x >> 24);
+                                w = *(a_uint32_t *)(s + 7);
+                                *(a_uint32_t *)(d + 4) = (x << 8) | (w >> 24);
+                                x = *(a_uint32_t *)(s + 11);
+                                *(a_uint32_t *)(d + 8) = (w << 8) | (x >> 24);
+                                w = *(a_uint32_t *)(s + 15);
+                                *(a_uint32_t *)(d + 12) = (x << 8) | (w >> 24);
                         }
                         break;
                 }
@@ -154,7 +152,7 @@ void *memcpy(void *restrict dest, const void *restrict src, size_t n)
         }
 
         return dest;
-#endif
+#endif /* __GNUC__ */
 
         for (; n; n--) {
                 *d++ = *s++;

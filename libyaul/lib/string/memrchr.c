@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 
-void *__memrchr(const void *m, int c, size_t n)
+void *
+__memrchr(const void *m, int c, size_t n)
 {
         const uint8_t *s = m;
         c = (uint8_t)c;

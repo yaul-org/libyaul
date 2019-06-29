@@ -1,7 +1,8 @@
 #include <ctype.h>
 #include <string.h>
 
-int strverscmp(const char *l0, const char *r0)
+int
+strverscmp(const char *l0, const char *r0)
 {
         const uint8_t *l = (const void *)l0;
         const uint8_t *r = (const void *)r0;

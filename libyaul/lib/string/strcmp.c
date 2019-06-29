@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 
-int strcmp(const char *l, const char *r)
+int
+strcmp(const char *l, const char *r)
 {
         for (; *l == *r && *l; l++, r++);
 

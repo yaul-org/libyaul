@@ -1,6 +1,7 @@
 #include <ctype.h>
 
-int strcasecmp(const char *_l, const char *_r)
+int
+strcasecmp(const char *_l, const char *_r)
 {
         const uint8_t *l = (void *)_l, *r = (void *)_r;
 

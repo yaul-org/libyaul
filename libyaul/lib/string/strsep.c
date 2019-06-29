@@ -1,6 +1,7 @@
 #include <string.h>
 
-char *strsep(char **str, const char *sep)
+char *
+strsep(char **str, const char *sep)
 {
         char *s = *str, *end;
 
@@ -17,5 +18,6 @@ char *strsep(char **str, const char *sep)
         }
 
         *str = end;
+
         return s;
 }

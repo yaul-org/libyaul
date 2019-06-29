@@ -1,6 +1,7 @@
 #include <string.h>
 
-char *strtok(char *restrict s, const char *restrict sep)
+char *
+strtok(char *restrict s, const char *restrict sep)
 {
         static char *p;
 
