@@ -97,11 +97,13 @@ LIB_SRCS+= \
 	lib/string/swab.c \
 	lib/stdio/snprintf.c \
 	lib/stdlib/abort.c \
+	lib/stdlib/abs.c \
 	lib/stdlib/assert.c \
+	lib/stdlib/atoi.c \
+	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
 	lib/stdlib/realloc.c \
-	lib/stdlib/abs.c \
 	\
 	kernel/vfs/fs/romdisk/romdisk.c
 
