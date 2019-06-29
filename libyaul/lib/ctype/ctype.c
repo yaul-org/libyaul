@@ -157,3 +157,23 @@ isxdigit(int c)
 {
         return _CTYPE_LOOKUP(c) & (_X | _N);
 }
+
+int
+tolower(int c)
+{
+        if (isupper(c)) {
+                return c | _C;
+        }
+
+        return c;
+}
+
+int
+toupper(int c)
+{
+        if (islower(c)) {
+                return c & 0x5f;
+        }
+
+        return c;
+}

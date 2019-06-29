@@ -27,6 +27,7 @@ extern char *strncat (char * __restrict, const char * __restrict, size_t);
 
 extern int strcmp (const char *, const char *);
 extern int strncmp (const char *, const char *, size_t);
+extern int strncasecmp (const char *, const char *, size_t);
 
 extern char *strchr (const char *, int);
 extern char *strrchr (const char *, int);
