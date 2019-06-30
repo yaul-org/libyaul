@@ -29,18 +29,18 @@ void
 color_rgb888_fix16_rgb_convert(const color_rgb888_t *color,
     color_fix16_rgb_t *result)
 {
-        result->r = fix16_div(fix16_from_int(color->r), F16(255.0f));
-        result->g = fix16_div(fix16_from_int(color->g), F16(255.0f));
-        result->b = fix16_div(fix16_from_int(color->b), F16(255.0f));
+        result->r = fix16_div(fix16_int32_from(color->r), FIX16(255.0f));
+        result->g = fix16_div(fix16_int32_from(color->g), FIX16(255.0f));
+        result->b = fix16_div(fix16_int32_from(color->b), FIX16(255.0f));
 }
 
 void
 color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
     color_rgb888_t *result)
 {
-        result->r = fix16_to_int(fix16_mul(color->r, F16(255.0f))) & 0xFF;
-        result->g = fix16_to_int(fix16_mul(color->g, F16(255.0f))) & 0xFF;
-        result->b = fix16_to_int(fix16_mul(color->b, F16(255.0f))) & 0xFF;
+        result->r = fix16_int32_to(fix16_mul(color->r, FIX16(255.0f))) & 0xFF;
+        result->g = fix16_int32_to(fix16_mul(color->g, FIX16(255.0f))) & 0xFF;
+        result->b = fix16_int32_to(fix16_mul(color->b, FIX16(255.0f))) & 0xFF;
 }
 
 void
@@ -77,41 +77,41 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
 
         fix16_t x;
         /* X=C*(1-|((H/60.0)%2)-1|) */
-        x = fix16_mul(c, fix16_sub(F16(1.0f), fix16_abs(fix16_sub(fix16_mod(
-                                           fix16_div(color->h, F16(60.0f)),
-                                           F16(2.0f)), F16(1.0f)))));
+        x = fix16_mul(c, fix16_sub(FIX16_ONE, fix16_abs(fix16_sub(fix16_mod(
+                                           fix16_div(color->h, FIX16(60.0f)),
+                                           FIX16(2.0f)), FIX16_ONE))));
 
         fix16_t m;
         m = fix16_sub(color->v, c);
 
         color_fix16_rgb_t rgb;
-        rgb.r = F16(0.0f);
-        rgb.g = F16(0.0f);
-        rgb.b = F16(0.0f);
+        rgb.r = FIX16(0.0f);
+        rgb.g = FIX16(0.0f);
+        rgb.b = FIX16(0.0f);
 
-        if ((color->h >= F16(0.0f)) && (color->h < F16(60.0f))) {
+        if ((color->h >= FIX16(0.0f)) && (color->h < FIX16(60.0f))) {
                 rgb.r = c;
                 rgb.g = x;
-                rgb.b = F16(0.0f);
-        } else if ((color->h >= F16(60.0f)) && (color->h < F16(120.0f))) {
+                rgb.b = FIX16(0.0f);
+        } else if ((color->h >= FIX16(60.0f)) && (color->h < FIX16(120.0f))) {
                 rgb.r = x;
                 rgb.g = c;
-                rgb.b = F16(0.0f);
-        } else if ((color->h >= F16(120.0f)) && (color->h < F16(180.0f))) {
-                rgb.r = F16(0.0f);
+                rgb.b = FIX16(0.0f);
+        } else if ((color->h >= FIX16(120.0f)) && (color->h < FIX16(180.0f))) {
+                rgb.r = FIX16(0.0f);
                 rgb.g = c;
                 rgb.b = x;
-        } else if ((color->h >= F16(180.0f)) && (color->h < F16(240.0f))) {
-                rgb.r = F16(0.0f);
+        } else if ((color->h >= FIX16(180.0f)) && (color->h < FIX16(240.0f))) {
+                rgb.r = FIX16(0.0f);
                 rgb.g = x;
                 rgb.b = c;
-        } else if ((color->h >= F16(240.0f)) && (color->h < F16(300.0f))) {
+        } else if ((color->h >= FIX16(240.0f)) && (color->h < FIX16(300.0f))) {
                 rgb.r = x;
-                rgb.g = F16(0.0f);
+                rgb.g = FIX16(0.0f);
                 rgb.b = c;
-        } else if ((color->h >= F16(300.0f)) && (color->h < F16(360.0f))) {
+        } else if ((color->h >= FIX16(300.0f)) && (color->h < FIX16(360.0f))) {
                 rgb.r = c;
-                rgb.g = F16(0.0f);
+                rgb.g = FIX16(0.0f);
                 rgb.b = x;
         }
 
@@ -157,18 +157,18 @@ color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
 
         delta = fix16_sub(max, min);
 
-        if (delta < F16(0.0000153f)) {
-                result->s = F16(0.0f);
+        if (delta < FIX16(0.0000153f)) {
+                result->s = FIX16(0.0f);
                 /* Undefined, maybe NAN? */
-                result->h = F16(0.0f);
+                result->h = FIX16(0.0f);
                 return;
         }
 
-        if (max <= F16(0.0f)) {
+        if (max <= FIX16(0.0f)) {
                 /* If max is 0, then R = G = B = 0. So, s = 0, v is
                  * undefined */
-                result->s = F16(0.0f);
-                result->h = F16(0.0f);
+                result->s = FIX16(0.0f);
+                result->h = FIX16(0.0f);
                 return;
         }
 
@@ -180,19 +180,19 @@ color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
         } else {
                 if (color->g >= max) {
                         /* Between cyan & yellow */
-                        result->h = fix16_add(F16(2.0f),
+                        result->h = fix16_add(FIX16(2.0f),
                             fix16_div(fix16_sub(color->b, color->r), delta));
                 } else {
                         /* Between magenta & cyan */
-                        result->h = fix16_add(F16(4.0f),
+                        result->h = fix16_add(FIX16(4.0f),
                             fix16_div(fix16_sub(color->r, color->g), delta));
                 }
         }
 
-        result->h = fix16_mul(result->h, F16(60.0f));
+        result->h = fix16_mul(result->h, FIX16(60.0f));
 
-        if (result->h < F16(0.0f)) {
-                result->h = fix16_add(result->h, F16(360.0f));
+        if (result->h < FIX16(0.0f)) {
+                result->h = fix16_add(result->h, FIX16(360.0f));
         }
 }
 

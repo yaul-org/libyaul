@@ -85,9 +85,9 @@ typedef union {
 
 #define COLOR_FIX16_RGB_INITIALIZER(r, g, b)                                   \
     {                                                                          \
-            F16(r),                                                            \
-            F16(g),                                                            \
-            F16(b)                                                             \
+            FIX16(r),                                                          \
+            FIX16(g),                                                          \
+            FIX16(b)                                                           \
     }
 
 static inline fix16_t __always_inline

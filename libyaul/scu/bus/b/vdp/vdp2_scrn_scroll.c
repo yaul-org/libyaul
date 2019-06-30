@@ -160,7 +160,7 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
 #endif /* DEBUG */
 
         fix16_t delta_clamped;
-        delta_clamped = fix16_clamp(delta, F16(-2047.0f), F16(2047.0f));
+        delta_clamped = fix16_clamp(delta, FIX16(-2047.0f), FIX16(2047.0f));
 
         /* All screen scroll values must be identified as positive
          * values */
@@ -213,7 +213,7 @@ vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t delta)
 #endif /* DEBUG */
 
         fix16_t delta_clamped;
-        delta_clamped = fix16_clamp(delta, F16(-2047.0f), F16(2047.0f));
+        delta_clamped = fix16_clamp(delta, FIX16(-2047.0f), FIX16(2047.0f));
 
         /* All screen scroll values must be identified as positive
          * values */
@@ -258,27 +258,27 @@ _set_fixed_point_scroll(fix16_t *scroll, fix16_t amount, uint16_t *in,
     uint16_t *dn)
 {
         int32_t integral;
-        integral = fix16_to_int(amount);
+        integral = fix16_int32_to(amount);
 
         fix16_t fractional;
         fractional = fix16_fractional(amount);
 
         *in = integral;
         *dn = fractional & 0xFF00;
-        *scroll = fix16_add(fix16_from_int(*in), fractional);
+        *scroll = fix16_add(fix16_int32_from(*in), fractional);
 }
 
 static inline void
 _set_integer_x_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
 {
-        *scroll = WRAP_X_INTEGER((int16_t)fix16_to_int(amount));
+        *scroll = WRAP_X_INTEGER((int16_t)fix16_int32_to(amount));
         *in = *scroll;
 }
 
 static inline void
 _set_integer_y_scroll(int16_t *scroll, fix16_t amount, uint16_t *in)
 {
-        *scroll = WRAP_Y_INTEGER((int16_t)fix16_to_int(amount));
+        *scroll = WRAP_Y_INTEGER((int16_t)fix16_int32_to(amount));
         *in = *scroll;
 }
 
@@ -290,19 +290,19 @@ _update_fixed_point_scroll(fix16_t *scroll, fix16_t delta, uint16_t *in,
         scroll_of = fix16_add(*scroll, delta);
 
         int32_t integral;
-        integral = fix16_to_int(scroll_of);
+        integral = fix16_int32_to(scroll_of);
 
         fix16_t fractional;
         fractional = fix16_fractional(scroll_of);
 
         *in = WRAP_INTEGER(integral);
         *dn = fractional & 0xFF00;
-        *scroll = fix16_add(fix16_from_int(*in), fractional);
+        *scroll = fix16_add(fix16_int32_from(*in), fractional);
 }
 
 static inline void
 _update_integer_scroll(int16_t *scroll, fix16_t delta, uint16_t *in)
 {
-        *scroll = WRAP_INTEGER((*scroll + ((int16_t)fix16_to_int(delta))));
+        *scroll = WRAP_INTEGER((*scroll + ((int16_t)fix16_int32_to(delta))));
         *in = *scroll;
 }
