@@ -1,3 +1,5 @@
+/* -*- mode: c -*- */
+
 /*
  * Copyright (c) 2012-2016
  * See LICENSE for details.
@@ -22,13 +24,12 @@
 #endif /* HAVE_DEV_CARTRIDGE */
 
 #include <bios.h>
+
 #include <cpu/intc.h>
 #include <cpu/registers.h>
+#include <cpu/instructions.h>
 
 #include <smpc/smc.h>
-
-#include "gdb.h"
-#include "sh2-704x.h"
 
 extern void internal_gdb_ihr_break(void);
 extern void internal_gdb_exception_cpu_address_error(void);
@@ -124,16 +125,16 @@ static bp_t _bp_step = {
 
 static bp_list_t *_bp_list = NULL;
 
-void
-gdb_sh2_704x_init(void)
+static void
+_gdb_sh2_704x_init(void)
 {
-        _device_init();
-
         /* Disable interrupts */
         uint32_t mask;
         mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
+
+        _device_init();
 
         _bp_list = _bp_list_alloc();
 
@@ -164,24 +165,24 @@ gdb_sh2_704x_init(void)
         cpu_intc_mask_set(mask);
 
         /* Cause a breakpoint to sync with GDB */
-        gdb_sync();
+        cpu_instr_trapa(0x20);
 }
 
-void
-gdb_putc(int c)
+static void
+_gdb_putc(int c)
 {
         _device_write(c);
 }
 
-int
-gdb_getc(void)
+static int
+_gdb_getc(void)
 {
         /* Blocks */
         return _device_read();
 }
 
-void
-gdb_step(struct cpu_registers *reg_file, uint32_t address)
+static void
+_gdb_step(struct cpu_registers *reg_file, uint32_t address)
 {
         uint16_t *p;
 
@@ -200,8 +201,8 @@ gdb_step(struct cpu_registers *reg_file, uint32_t address)
         _stepping = true;
 }
 
-int
-gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
+static int
+_gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 {
         if (addr == 0x00000000) {
                 return -1;
@@ -214,15 +215,17 @@ gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
                 if ((bp = _bp_list_breakpoint_find(_bp_list, (void *)addr)) == NULL) {
                         return -1;
                 }
+
                 _bp_list_breakpoint_free(_bp_list, bp);
+
                 return 0;
         default:
                 return -1;
         }
 }
 
-int
-gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
+static int
+_gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 {
         if (addr == 0x00000000) {
                 return -1;
@@ -240,16 +243,21 @@ gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
         }
 }
 
-void
-gdb_kill(void)
+static void __noreturn
+_gdb_kill(void)
 {
+        /* XXX: Let's use abort() here */
+
+        /* XXX: System reset doesn't seem to work here. Could it be because
+         *      we're inside an interrupt handler? */
+
         smpc_smc_resenab_call();
-        cpu_intc_mask_set(15);
+        cpu_intc_mask_set(0);
         smpc_smc_sysres_call();
 }
 
-void
-gdb_monitor_entry(struct cpu_registers *reg_file)
+static void
+_gdb_monitor_entry(struct cpu_registers *reg_file)
 {
         uint16_t *p;
         uint32_t *pc;
@@ -286,10 +294,9 @@ gdb_monitor_entry(struct cpu_registers *reg_file)
         }
 }
 
-bool
-gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
+static bool
+_gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
 {
-
         switch (n) {
         case REG_R0:
         case REG_R1:
@@ -337,10 +344,9 @@ gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
         }
 }
 
-bool
-gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
+static bool
+_gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
 {
-
         uint32_t *p;
 
         switch (n) {
@@ -467,7 +473,6 @@ _bp_list_alloc(void)
 static bool
 _bp_list_empty(bp_list_t *bpl)
 {
-
         if (TAILQ_EMPTY(bpl)) {
                 return true;
         }
@@ -478,7 +483,6 @@ _bp_list_empty(bp_list_t *bpl)
 static void
 _bp_list_free(bp_list_t **bplp)
 {
-
         assert(*bplp != NULL);
 
         free(*bplp);
@@ -577,6 +581,7 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
+        usb_cart_txe_full();
         return usb_cart_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_byte_read();
@@ -587,6 +592,7 @@ static void
 _device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
+        usb_cart_rxf_wait();
         usb_cart_byte_send(value);
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_byte_xchg(value);

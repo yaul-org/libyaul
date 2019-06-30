@@ -33,8 +33,7 @@ LIB_SRCS:= \
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
-	common/gdb/gdb-ihr.sx \
-	common/gdb/sh2-704x.c
+	common/gdb/gdb-ihr.sx
 endif
 
 LIB_SRCS+= \
