@@ -120,7 +120,7 @@ SH_CXXFLAGS:= \
 	$(SH_CXXFLAGS_shared)
 
 SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer
-SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
+SH_CFLAGS_shared_debug:= -Og -ggdb3 -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
