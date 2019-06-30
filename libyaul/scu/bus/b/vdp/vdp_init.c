@@ -80,14 +80,14 @@ _init_vdp2(void)
 
         vdp2_tvmd_display_clear();
 
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG0, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG0, FIX16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, FIX16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG2, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG2, FIX16(0.0f));
+        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, FIX16(0.0f));
 
         vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);

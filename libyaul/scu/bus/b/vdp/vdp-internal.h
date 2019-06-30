@@ -59,11 +59,11 @@ struct state_vdp2 {
         } tv;
 
         struct {
-                fix16_vector2_t scroll;
+                fix16_vec2_t scroll;
         } nbg0;
 
         struct {
-                fix16_vector2_t scroll;
+                fix16_vec2_t scroll;
         } nbg1;
 
         struct {

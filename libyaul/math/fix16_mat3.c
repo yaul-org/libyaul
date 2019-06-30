@@ -11,30 +11,30 @@
 #include "fix16.h"
 
 void
-fix16_matrix3_zero(fix16_matrix3_t *m0)
+fix16_mat3_zero(fix16_mat3_t *m0)
 {
         (void)memset(&m0->arr[0], 0, sizeof(fix16_t) * 3 * 3);
 }
 
 void
-fix16_matrix3_dup(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
+fix16_mat3_dup(const fix16_mat3_t *m0, fix16_mat3_t *result)
 {
-        (void)memcpy(result, m0, sizeof(fix16_matrix3_t));
+        (void)memcpy(result, m0, sizeof(fix16_mat3_t));
 }
 
 void
-fix16_matrix3_identity(fix16_matrix3_t *m0)
+fix16_mat3_identity(fix16_mat3_t *m0)
 {
-        fix16_matrix3_zero(m0);
+        fix16_mat3_zero(m0);
 
-        m0->frow[0][0] = F16(1.0f);
-        m0->frow[1][1] = F16(1.0f);
-        m0->frow[2][2] = F16(1.0f);
+        m0->frow[0][0] = FIX16_ONE;
+        m0->frow[1][1] = FIX16_ONE;
+        m0->frow[2][2] = FIX16_ONE;
 }
 
 void
-fix16_matrix3_multiply(const fix16_matrix3_t *m0, const fix16_matrix3_t *m1,
-    fix16_matrix3_t *result)
+fix16_mat3_multiply(const fix16_mat3_t *m0, const fix16_mat3_t *m1,
+    fix16_mat3_t *result)
 {
 #define DOT_PRODUCT(i, j)                                                      \
         fix16_add(fix16_add(fix16_mul(m0->frow[i][0], m1->frow[0][j]),         \
@@ -55,7 +55,7 @@ fix16_matrix3_multiply(const fix16_matrix3_t *m0, const fix16_matrix3_t *m1,
 }
 
 void
-fix16_matrix3_transpose(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
+fix16_mat3_transpose(const fix16_mat3_t *m0, fix16_mat3_t *result)
 {
         result->frow[0][0] = m0->frow[0][0];
         result->frow[0][1] = m0->frow[1][0];
@@ -71,13 +71,13 @@ fix16_matrix3_transpose(const fix16_matrix3_t *m0, fix16_matrix3_t *result)
 }
 
 void
-fix16_matrix3_inverse(const fix16_matrix3_t *m0 __unused,
-    fix16_matrix3_t *result __unused)
+fix16_mat3_inverse(const fix16_mat3_t *m0 __unused,
+    fix16_mat3_t *result __unused)
 {
 }
 
 void
-fix16_matrix3_str(const fix16_matrix3_t *m0, char *buf, int decimals)
+fix16_mat3_str(const fix16_mat3_t *m0, char *buf, int decimals)
 {
         uint32_t row_idx;
         for (row_idx = 0; row_idx < 3; row_idx++) {
@@ -87,7 +87,7 @@ fix16_matrix3_str(const fix16_matrix3_t *m0, char *buf, int decimals)
                 *buf++ = '|';
                 buf_start = buf;
                 buf_end = buf;
-                fix16_vector3_str(&m0->row[row_idx], buf, decimals);
+                fix16_vec3_str(&m0->row[row_idx], buf, decimals);
                 for (; *buf_end != '\0'; buf_end++);
                 buf += buf_end - buf_start;
                 *buf++ = '|';
