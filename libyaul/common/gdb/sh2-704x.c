@@ -181,12 +181,12 @@ gdb_getc(void)
 }
 
 void
-gdb_step(struct cpu_registers *reg_file, uint32_t addr)
+gdb_step(struct cpu_registers *reg_file, uint32_t address)
 {
         uint16_t *p;
 
-        if (addr != 0x00000000) {
-                p = (uint16_t *)addr;
+        if (address != 0x00000000) {
+                p = (uint16_t *)address;
         } else {
                 /* Determine where we'll be going */
                 p = (uint16_t *)_calculate_pc(reg_file);
@@ -201,15 +201,13 @@ gdb_step(struct cpu_registers *reg_file, uint32_t addr)
 }
 
 int
-gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind)
+gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 {
-        bp_t *bp;
-
-        kind = kind;
-
         if (addr == 0x00000000) {
                 return -1;
         }
+
+        bp_t *bp;
 
         switch (type) {
         case 0x00:
@@ -224,11 +222,8 @@ gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind)
 }
 
 int
-gdb_break(uint32_t type, uint32_t addr, uint32_t kind)
+gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 {
-
-        kind = kind;
-
         if (addr == 0x00000000) {
                 return -1;
         }
@@ -248,7 +243,6 @@ gdb_break(uint32_t type, uint32_t addr, uint32_t kind)
 void
 gdb_kill(void)
 {
-
         smpc_smc_resenab_call();
         cpu_intc_mask_set(15);
         smpc_smc_sysres_call();

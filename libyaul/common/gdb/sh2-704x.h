@@ -9,14 +9,17 @@
 #define _SH2_704X_H_
 
 #include <cpu/registers.h>
+#include <cpu/instructions.h>
 
 #include <stdbool.h>
 
 __BEGIN_DECLS
 
-#define gdb_sync() do {                                                        \
-        __asm__ __volatile__ ("trapa #0x20");                                  \
-} while (false)
+static inline void __always_inline
+gdb_sync(void)
+{
+        cpu_instr_trapa(0x20);
+}
 
 bool gdb_register_file_read(struct cpu_registers *, uint32_t, uint32_t *);
 bool gdb_register_file_write(struct cpu_registers *, uint32_t, uint32_t);

@@ -57,7 +57,7 @@ gdb_init(void)
 void
 gdb_monitor(struct cpu_registers *reg_file, int sigval)
 {
-        static char buf[GDB_RX_BUF_LEN];
+        static char buffer[GDB_RX_BUF_LEN];
 
         char *hargs;
 
@@ -69,13 +69,14 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
         uint32_t type;
         char *data;
 
-        int err;
+        int error;
 
         _gdb_last_signal(sigval);
         gdb_monitor_entry(reg_file);
 
         while (true) {
-                hargs = &*buf;
+                hargs = &*buffer;
+
                 _get_packet(hargs);
 
                 switch (*hargs++) {
@@ -190,7 +191,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                         hargs = _parse_unsigned_long(hargs, &addr, ',');
                         _parse_unsigned_long(hargs, &kind, '\0');
 
-                        if ((err = gdb_remove_break(type, addr, kind)) < 0) {
+                        if ((error = gdb_remove_break(type, addr, kind)) < 0) {
                                 _put_packet('E', "01", 2);
                                 break;
                         }
@@ -207,7 +208,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
                         hargs = _parse_unsigned_long(hargs, &addr, ',');
                         _parse_unsigned_long(hargs, &kind, '\0');
 
-                        if ((err = gdb_break(type, addr, kind)) < 0) {
+                        if ((error = gdb_break(type, addr, kind)) < 0) {
                                 _put_packet('E', "01", 2);
                                 break;
                         }
@@ -253,7 +254,7 @@ _gdb_command_read_registers(struct cpu_registers *reg_file)
 }
 
 static void
-_gdb_command_read_memory(uint32_t address, uint32_t length)
+_gdb_command_read_memory(uint32_t address, uint32_t len)
 {
         char tx_buf[8];
         size_t tx_len;
@@ -268,7 +269,7 @@ _gdb_command_read_memory(uint32_t address, uint32_t length)
                 gdb_putc('$');
 
                 csum = 0x00;
-                for (i = 0; i < length; i++) {
+                for (i = 0; i < len; i++) {
                         /* Read from memory */
                         p = (uint8_t *)(address + i);
                         r = *p;
@@ -300,7 +301,7 @@ _gdb_last_signal(int sigval)
 /* Packet format
  * $packet-data#checksum */
 static void
-_put_packet(char c, const char *buf, size_t len)
+_put_packet(char c, const char *buffer, size_t len)
 {
         uint8_t csum;
 
@@ -313,7 +314,7 @@ _put_packet(char c, const char *buf, size_t len)
                         gdb_putc(c);
                 }
                 /* Send the data */
-                csum = c + _put_buf(buf, len);
+                csum = c + _put_buf(buffer, len);
 
                 /* Send the footer */
                 gdb_putc('#');
@@ -327,7 +328,7 @@ _put_packet(char c, const char *buf, size_t len)
 /* Packet format
  * $<data>#<checksum> */
 static void
-_get_packet(char *rx_buf)
+_get_packet(char *rx_buffer)
 {
         uint8_t ch;
         uint8_t csum;
@@ -348,7 +349,7 @@ _get_packet(char *rx_buf)
                 csum = 0x00;
                 xmit_csum = 0xFF;
 
-                /* now, read until a # or end of buffer is found */
+                /* Now, read until a # or end of buffer is found */
                 for (len = 0; ; len++) {
                         ch = gdb_getc() & 0x7F;
                         if (ch == '#') {
@@ -356,10 +357,10 @@ _get_packet(char *rx_buf)
                         }
 
                         csum += ch;
-                        rx_buf[len] = ch;
+                        rx_buffer[len] = ch;
                 }
                 /* NULL terminate */
-                rx_buf[len] = '\0';
+                rx_buffer[len] = '\0';
 
                 /* Check if packet has a correct checksum */
                 xmit_csum = _hex_digit_to_integer(gdb_getc() & 0x7F);
@@ -377,15 +378,17 @@ _get_packet(char *rx_buf)
                  * sequence ID */
                 /* Packet format
                  * $sequence-id:packet-data#checksum */
-                if (rx_buf[2] == ':') {
-                        assert(0);
-                        gdb_putc(rx_buf[0]);
-                        gdb_putc(rx_buf[1]);
+                if (rx_buffer[2] == ':') {
+                        /* XXX: Why is this here? */
+                        assert(false);
+
+                        gdb_putc(rx_buffer[0]);
+                        gdb_putc(rx_buffer[1]);
 
                         /* Skip the first 3 characters by removing the
                          * sequence characters */
                         for (i = 3; i < len; i++) {
-                                rx_buf[i - 3] = rx_buf[i];
+                                rx_buffer[i - 3] = rx_buffer[i];
                         }
                 }
         } while (false);
@@ -395,7 +398,6 @@ _get_packet(char *rx_buf)
 static int
 _hex_digit_to_integer(char h)
 {
-
         if ((h >= 'a') && (h <= 'f')) {
                 return h - 'a' + 10;
         }
@@ -519,14 +521,14 @@ _hex_buffer_to_mem(const char *buf, void *mem, size_t len)
 }
 
 static uint8_t
-_put_buf(const char *buf, int len)
+_put_buf(const char *buffer, int len)
 {
         uint8_t sum;
         char c;
 
         sum = 0x00;
         while (len--) {
-                c = *buf++;
+                c = *buffer++;
                 sum += c;
                 gdb_putc(c);
         }
