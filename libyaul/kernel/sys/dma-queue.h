@@ -14,18 +14,19 @@
 
 __BEGIN_DECLS
 
-#define DMA_QUEUE_TAG_IMMEDIATE         0
-#define DMA_QUEUE_TAG_VBLANK_IN         1
-#define DMA_QUEUE_TAG_VBLANK_OUT        2
-#define DMA_QUEUE_TAG_COUNT             3
+#define DMA_QUEUE_TAG_IMMEDIATE         (0)
+#define DMA_QUEUE_TAG_VBLANK_IN         (1)
+#define DMA_QUEUE_TAG_VBLANK_OUT        (2)
+#define DMA_QUEUE_TAG_INVALID           (255)
+#define DMA_QUEUE_TAG_COUNT             (3)
 
 struct dma_queue_transfer {
 /* DMA request has been completed */
-#define DMA_QUEUE_STATUS_COMPLETE       0
+#define DMA_QUEUE_STATUS_COMPLETE       (0)
 /* DMA request not yet processed */
-#define DMA_QUEUE_STATUS_INCOMPLETE     1
+#define DMA_QUEUE_STATUS_INCOMPLETE     (1)
 /* DMA request explicitly canceled */
-#define DMA_QUEUE_STATUS_CANCELED       2
+#define DMA_QUEUE_STATUS_CANCELED       (2)
         uint8_t status;
         void *work;
 } __aligned(4);

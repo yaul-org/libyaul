@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <gdb.h>
+
 #include <cpu/cache.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
@@ -57,15 +59,11 @@ static void _default_handler(void);
 
 static inline bool __always_inline _vdp1_transfer_over(void);
 
-static volatile union {
-        struct {
-                uint8_t sync;
-                uint8_t vdp1;
-                uint8_t vdp2;
-                uint8_t field_count;
-        } __packed;
-
-        uint32_t raw;
+static volatile struct {
+        uint8_t sync;
+        uint8_t vdp1;
+        uint8_t vdp2;
+        uint8_t field_count;
 } _state __aligned(4);
 
 /* Keep track of the current command table operation */
@@ -113,7 +111,10 @@ vdp_sync_init(void)
         _vdp1_init();
         _vdp2_init();
 
-        _state.raw = 0x00000000;
+        _state.sync = 0x00;
+        _state.vdp1 = 0x00;
+        _state.vdp2 = 0x00;
+        _state.field_count = 0x00;
 
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
@@ -212,7 +213,9 @@ vdp_sync(int16_t interval __unused)
 
         vdp_sync_user_callback_clear();
 
-        _state.raw = 0x00000000;
+        _state.sync = 0x00;
+        _state.vdp1 = 0x00;
+        _state.vdp2 = 0x00;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
@@ -342,8 +345,16 @@ vdp1_sync_draw_wait(void)
                 while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
                 }
         } else {
+                uint32_t loops;
+                loops = 0;
+
                 /* Wait until VDP1 has processed the command list */
                 while ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
+                        if (loops >= (2 * 65536)) {
+                                gdb_break();
+                        }
+
+                        loops++;
                 }
         }
 
