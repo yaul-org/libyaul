@@ -5,12 +5,17 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <string.h>
+
 #include <cpu/cache.h>
 #include <cpu/intc.h>
 
 #include <scu/dma.h>
 
 #include <scu-internal.h>
+
+/* Debug: Keep a copy of the SCU-DMA registers for each level */
+#define DEBUG_COPY_DMA_REGS_ENABLE 0
 
 struct dma_regs {
         uint32_t dnr;
@@ -21,6 +26,10 @@ struct dma_regs {
 } __packed __aligned(4);
 
 static_assert(sizeof(struct dma_regs) == sizeof(struct scu_dma_reg_buffer));
+
+#if DEBUG_COPY_DMA_REGS_ENABLE == 1
+static struct dma_regs _dma_regs[3] __used;
+#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
 
 void
 scu_dma_init(void)
@@ -35,10 +44,17 @@ scu_dma_init(void)
 
         scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
 
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, NULL);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, NULL);
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, NULL);
-        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, NULL);
+        scu_dma_level0_end_set(NULL);
+        scu_dma_level1_end_set(NULL);
+        scu_dma_level2_end_set(NULL);
+
+        scu_dma_illegal_set(NULL);
+
+#if DEBUG_COPY_DMA_REGS_ENABLE
+        (void)memset(&_dma_regs[0], 0x00, sizeof(struct dma_regs));
+        (void)memset(&_dma_regs[1], 0x00, sizeof(struct dma_regs));
+        (void)memset(&_dma_regs[2], 0x00, sizeof(struct dma_regs));
+#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
 
         scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
 }
@@ -101,51 +117,61 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 
         assert(start_factor <= 7);
 
-        const struct dma_regs *regs;
-        regs = (struct dma_regs *)&reg_buffer->buffer[0];
+        const struct dma_regs *dma_regs;
+        dma_regs = (struct dma_regs *)&reg_buffer->buffer[0];
+
+#if DEBUG_COPY_DMA_REGS_ENABLE == 1
+        (void)memcpy(&_dma_regs[0], dma_regs, sizeof(struct dma_regs));
+#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
 
         switch (level) {
         case 0:
                 scu_dma_level0_wait();
                 scu_dma_level0_stop();
 
-                MEMORY_WRITE(32, SCU(D0R), regs->dnr);
-                MEMORY_WRITE(32, SCU(D0W), regs->dnw);
-                MEMORY_WRITE(32, SCU(D0C), regs->dnc);
-                MEMORY_WRITE(32, SCU(D0AD), regs->dnad);
-                MEMORY_WRITE(32, SCU(D0MD), regs->dnmd | start_factor);
+                scu_dma_level0_end_set(ihr);
 
-                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
+                MEMORY_WRITE(32, SCU(D0R), dma_regs->dnr);
+                MEMORY_WRITE(32, SCU(D0W), dma_regs->dnw);
+                MEMORY_WRITE(32, SCU(D0C), dma_regs->dnc);
+                MEMORY_WRITE(32, SCU(D0AD), dma_regs->dnad);
+                MEMORY_WRITE(32, SCU(D0MD), dma_regs->dnmd | start_factor);
 
-                MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
+                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
+                        MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
+                }
                 break;
         case 1:
                 scu_dma_level1_wait();
                 scu_dma_level1_stop();
 
-                MEMORY_WRITE(32, SCU(D1R), regs->dnr);
-                MEMORY_WRITE(32, SCU(D1W), regs->dnw);
-                MEMORY_WRITE(32, SCU(D1C), regs->dnc);
-                MEMORY_WRITE(32, SCU(D1AD), regs->dnad);
-                MEMORY_WRITE(32, SCU(D1MD), regs->dnmd | start_factor);
+                scu_dma_level1_end_set(ihr);
 
-                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
+                MEMORY_WRITE(32, SCU(D1R), dma_regs->dnr);
+                MEMORY_WRITE(32, SCU(D1W), dma_regs->dnw);
+                MEMORY_WRITE(32, SCU(D1C), dma_regs->dnc);
+                MEMORY_WRITE(32, SCU(D1AD), dma_regs->dnad);
+                MEMORY_WRITE(32, SCU(D1MD), dma_regs->dnmd | start_factor);
 
-                MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
+                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
+                        MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
+                }
                 break;
         case 2:
                 scu_dma_level2_wait();
                 scu_dma_level2_stop();
 
-                MEMORY_WRITE(32, SCU(D2R), regs->dnr);
-                MEMORY_WRITE(32, SCU(D2W), regs->dnw);
-                MEMORY_WRITE(32, SCU(D2C), regs->dnc);
-                MEMORY_WRITE(32, SCU(D2AD), regs->dnad);
-                MEMORY_WRITE(32, SCU(D2MD), regs->dnmd | start_factor);
+                scu_dma_level2_end_set(ihr);
 
-                scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
+                MEMORY_WRITE(32, SCU(D2R), dma_regs->dnr);
+                MEMORY_WRITE(32, SCU(D2W), dma_regs->dnw);
+                MEMORY_WRITE(32, SCU(D2C), dma_regs->dnc);
+                MEMORY_WRITE(32, SCU(D2AD), dma_regs->dnad);
+                MEMORY_WRITE(32, SCU(D2MD), dma_regs->dnmd | start_factor);
 
-                MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
+                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
+                        MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
+                }
                 break;
         }
 }
