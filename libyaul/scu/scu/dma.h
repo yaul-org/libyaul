@@ -117,7 +117,7 @@ static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
         /* In operation, on standby, or interrupted to background */
-        return MEMORY_READ(32, SCU(DSTA)) & 0x00010003;
+        return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
 }
 
 static inline void __always_inline
@@ -138,40 +138,35 @@ scu_dma_bus_access_wait(const uint8_t bus_mask)
         while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
 }
 
-static inline uint8_t __always_inline
+static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
-        /* In operation or on standby */
-        return (MEMORY_READ(32, SCU(DSTA)) >> 4) & 0x03;
+        /* In operation, on standby, or interrupted */
+        return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
 }
 
-static inline uint8_t __always_inline
+static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
-        /* In operation or on standby */
-        uint32_t reg_dsta;
-        reg_dsta = MEMORY_READ(32, SCU(DSTA));
-
-        reg_dsta >>= 8;
-
-        return ((reg_dsta >> 10) & 0x02) | (reg_dsta & 0x01);
+        /* In operation, on standby, or interrupted */
+        return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
 }
 
-static inline uint8_t __always_inline
+static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
-        /* In operation or on standby */
-        return (MEMORY_READ(32, SCU(DSTA)) >> 16) & 0x03;
+        /* In operation, on standby, or interrupted */
+        return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
 }
 
-static inline uint8_t __always_inline
+static inline uint32_t __always_inline
 scu_dma_level_busy(const uint8_t level)
 {
         switch (level & 0x03) {
-        case 2:
-                return scu_dma_level2_busy();
         case 1:
                 return scu_dma_level1_busy();
+        case 2:
+                return scu_dma_level2_busy();
         case 0:
         default:
                 return scu_dma_level0_busy();
@@ -182,14 +177,14 @@ static inline void __always_inline
 scu_dma_level0_wait(void)
 {
         /* Cannot modify registers while in operation */
-        while ((scu_dma_level0_busy()) != 0x00);
+        while ((scu_dma_level0_busy()) != 0x00000000);
 }
 
 static inline void __always_inline
 scu_dma_level1_wait(void)
 {
         /* Cannot modify registers while in operation */
-        while ((scu_dma_level1_busy()) != 0x00);
+        while ((scu_dma_level1_busy()) != 0x00000000);
 }
 
 static inline void __always_inline
@@ -199,13 +194,13 @@ scu_dma_level2_wait(void)
          * level 2 during DMA level 1 operation. */
 
         /* Cannot modify registers while in operation */
-        while ((scu_dma_level2_busy()) != 0x00);
+        while ((scu_dma_level2_busy()) != 0x00000000);
 }
 
 static inline void __always_inline
 scu_dma_level_wait(const uint8_t level)
 {
-        switch (level) {
+        switch (level & 0x03) {
         case 0:
                 scu_dma_level0_wait();
                 break;
@@ -260,7 +255,7 @@ scu_dma_level2_start(void)
 static inline void __always_inline
 scu_dma_level_fast_start(const uint8_t level)
 {
-        switch (level) {
+        switch (level & 0x03) {
         case 0:
                 scu_dma_level0_fast_start();
                 break;
@@ -276,7 +271,7 @@ scu_dma_level_fast_start(const uint8_t level)
 static inline void __always_inline
 scu_dma_level_start(const uint8_t level)
 {
-        switch (level) {
+        switch (level & 0x03) {
         case 0:
                 scu_dma_level0_start();
                 break;
@@ -310,7 +305,7 @@ scu_dma_level2_stop(void)
 static inline void __always_inline
 scu_dma_level_stop(const uint8_t level)
 {
-        switch (level) {
+        switch (level & 0x03) {
         case 0:
                 scu_dma_level0_stop();
                 break;
