@@ -1,3 +1,26 @@
+/*-
+ * Copyright (c) Authors of libfixmath
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 #ifndef _MATH_FIX16_H_
 #define _MATH_FIX16_H_
 
@@ -21,24 +44,19 @@ __BEGIN_DECLS
         ? ((x) * 65536.0f + 0.5f)                                              \
         : ((x) * 65536.0f - 0.5f)))
 
+#define FIX16_MAX       (0x7FFFFFFF)
+#define FIX16_MIN       (0x80000000)
+#define FIX16_OVERFLOW  (0x80000000)
+
+#define FIX16_PI        (0x0003243F)
+#define FIX16_E         (0x0002B7E1)
+#define FIX16_ONE       (0x00010000)
+
 typedef int32_t fix16_t;
 
-static const fix16_t FOUR_DIV_PI  = 0x145F3;            /*!< Fix16 value of 4/PI */
-static const fix16_t _FOUR_DIV_PI2 = 0xFFFF9840;        /*!< Fix16 value of -4/PI² */
-static const fix16_t X4_CORRECTION_COMPONENT = 0x399A;  /*!< Fix16 value of 0.225 */
-static const fix16_t PI_DIV_4 = 0x0000C90F;             /*!< Fix16 value of PI/4 */
-static const fix16_t THREE_PI_DIV_4 = 0x00025B2F;       /*!< Fix16 value of 3PI/4 */
-
-static const fix16_t fix16_maximum  = 0x7FFFFFFF; /*!< the maximum value of fix16_t */
-static const fix16_t fix16_minimum  = 0x80000000; /*!< the minimum value of fix16_t */
-static const fix16_t fix16_overflow = 0x80000000; /*!< the value used to indicate overflows when FIXMATH_NO_OVERFLOW is not specified */
-
-static const fix16_t FIX16_PI  = 205887;
-static const fix16_t FIX16_E   = 178145;
-static const fix16_t FIX16_ONE = 0x00010000;
-
 static inline fix16_t __always_inline
-fix16_int32_from(int32_t value) {
+fix16_int32_from(int32_t value)
+{
         return value * FIX16_ONE;
 }
 
@@ -179,6 +197,8 @@ extern void fix16_to_str(fix16_t, char *, int);
 
 #include "fix16_vec4.h"
 #include "fix16_mat4.h"
+
+#undef FIXMATH_FUNC_ATTRS
 
 __END_DECLS
 
