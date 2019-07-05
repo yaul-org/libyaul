@@ -313,12 +313,10 @@ _dma_queue_request_start(const struct dma_queue_request *request)
         scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
             &request->reg_buffer, _dma_handler);
 
+        /* We need to purge the cache before starting the transfer */
         cpu_cache_purge();
 
         scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
-
-        /* XXX: Placing a scu_dma_level_wait() fixes the soft lock */
-        /* scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL); */
 }
 
 static void
