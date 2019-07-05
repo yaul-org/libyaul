@@ -16,13 +16,13 @@
 
 #include "gdb.h"
 
-#include "sh2-704x.inc"
+#include "sh2.inc"
 
 #define IS_ALIGNED(t, addr,len)                                                \
         (((len) >= sizeof(uint ## t ## _t)) &&                                 \
         (((uint32_t)(addr) % sizeof(uint ## t ## _t)) == 0))
 
-#define GDB_RX_BUF_LEN  512
+#define GDB_RX_BUF_LEN 512
 
 typedef union {
         uint32_t lbuf;
@@ -48,7 +48,7 @@ static void _gdb_last_signal(int);
 void
 gdb_init(void)
 {
-        _gdb_sh2_704x_init();
+        _gdb_sh2_init();
 }
 
 /* At a minimum, a stub is required to support the `g',
@@ -430,8 +430,8 @@ _low_nibble_to_hex(char c)
 /* Translates a delimited hexadecimal string to an unsigned long (32-bit) */
 static char *_parse_unsigned_long(char *hargs, uint32_t *l, int delim)
 {
-
         *l = 0x00000000;
+
         while (*hargs != delim) {
                 *l = (*l << 4) + _hex_digit_to_integer(*hargs++);
         }

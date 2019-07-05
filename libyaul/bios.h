@@ -55,6 +55,14 @@ bios_cd_player_execute(void)
         __builtin_unreachable();
 }
 
+static inline void __noreturn __always_inline
+bios_execute(void)
+{
+        ((void (*)(void))0x00000420)();
+
+        __builtin_unreachable();
+}
+
 __END_DECLS
 
 #endif /* !_BIOS_H_ */
