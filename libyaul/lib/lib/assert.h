@@ -7,8 +7,10 @@ __BEGIN_DECLS
 
 #undef assert
 
-#define assert(__e) ((__e) ? (void)0 : __assert_func(__FILE__, __LINE__,       \
-        __ASSERT_FUNC, #__e))
+#define assert(e) ((e)                                                         \
+        ? (void)0                                                              \
+        : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                \
+              __STRING(e)))
 
 #ifndef __ASSERT_FUNC
 /* Use g++'s demangled names in C++ */
@@ -31,8 +33,8 @@ __BEGIN_DECLS
 #endif /* !static_assert */
 #endif /* !defined(__cplusplus) */
 
-void __assert(const char *, int, const char *) __noreturn;
-void __assert_func(const char *, int, const char *, const char *) __noreturn;
+extern void _assert(const char * __restrict, const char * __restrict,
+    const char * __restrict, const char * __restrict) __noreturn;
 
 __END_DECLS
 
