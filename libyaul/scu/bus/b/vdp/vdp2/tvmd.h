@@ -11,8 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <sys/irq-mux.h>
 #include <scu/map.h>
+
 #include <vdp2/map.h>
 
 __BEGIN_DECLS
