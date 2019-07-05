@@ -126,7 +126,7 @@ static bp_t _bp_step = {
 static bp_list_t *_bp_list = NULL;
 
 static void
-_gdb_sh2_704x_init(void)
+_gdb_sh2_init(void)
 {
         /* Disable interrupts */
         uint32_t mask;
@@ -164,8 +164,7 @@ _gdb_sh2_704x_init(void)
         /* Enable interrupts */
         cpu_intc_mask_set(mask);
 
-        /* Cause a breakpoint to sync with GDB */
-        cpu_instr_trapa(0x20);
+        gdb_break();
 }
 
 static void
@@ -246,14 +245,13 @@ _gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 static void __noreturn
 _gdb_kill(void)
 {
-        /* XXX: Let's use abort() here */
-
-        /* XXX: System reset doesn't seem to work here. Could it be because
-         *      we're inside an interrupt handler? */
-
         smpc_smc_resenab_call();
         cpu_intc_mask_set(0);
         smpc_smc_sysres_call();
+
+        /* If for some reason calling SMPC system reset doesn't work, we can
+         * always force our way to reset the hardware */
+        bios_execute();
 }
 
 static void
@@ -581,7 +579,7 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_txe_full();
+        usb_cart_txe_wait();
         return usb_cart_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_byte_read();
