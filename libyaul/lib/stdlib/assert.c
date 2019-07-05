@@ -19,6 +19,7 @@ _assert(const char * restrict file, const char * restrict line,
     const char * restrict func,
     const char * restrict failed_expr)
 {
+        /* In the case where we fail an assertion within _assert() */
         static uint32_t assertions = 0;
 
         if (assertions >= ASSERTION_MAX_COUNT) {
