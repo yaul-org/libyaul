@@ -28,7 +28,7 @@ SUPPORT_SRCS:= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
-	common/internal_exception_show.c
+	common/internal_reset.c
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
