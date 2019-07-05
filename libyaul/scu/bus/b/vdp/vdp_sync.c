@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <gdb.h>
+
 #include <cpu/cache.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
@@ -29,21 +31,21 @@
 #define USER_CALLBACK_COUNT     16
 
 #define SCU_MASK_OR     (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
-#define SCU_MASK_AND    ((~(SCU_MASK_OR)) & IC_MASK_ALL)
+#define SCU_MASK_AND    (IC_MASK_ALL & ~SCU_MASK_OR)
 
-#define STATE_SYNC                      0x01 /* Request to synchronize */
-#define STATE_INTERLACE_SINGLE          0x02
-#define STATE_INTERLACE_DOUBLE          0x04
+#define STATE_SYNC                      (0x01) /* Request to synchronize */
+#define STATE_INTERLACE_SINGLE          (0x02)
+#define STATE_INTERLACE_DOUBLE          (0x04)
 
-#define STATE_VDP1_REQUEST_XFER_LIST    0x01 /* VDP1 request to transfer list */
-#define STATE_VDP1_LIST_XFERRED         0x02 /* VDP1 finished transferring list via SCU-DMA */
-#define STATE_VDP1_REQUEST_COMMIT_LIST  0x04 /* VDP1 request to commit list */
-#define STATE_VDP1_LIST_COMMITTED       0x08 /* VDP1 finished committing list */
-#define STATE_VDP1_REQUEST_CHANGE       0x10 /* VDP1 request to change frame buffers */
-#define STATE_VDP1_CHANGED              0x20 /* VDP1 changed frame buffers */
+#define STATE_VDP1_REQUEST_XFER_LIST    (0x01) /* VDP1 request to transfer list */
+#define STATE_VDP1_LIST_XFERRED         (0x02) /* VDP1 finished transferring list via SCU-DMA */
+#define STATE_VDP1_REQUEST_COMMIT_LIST  (0x04) /* VDP1 request to commit list */
+#define STATE_VDP1_LIST_COMMITTED       (0x08) /* VDP1 finished committing list */
+#define STATE_VDP1_REQUEST_CHANGE       (0x10) /* VDP1 request to change frame buffers */
+#define STATE_VDP1_CHANGED              (0x20) /* VDP1 changed frame buffers */
 
-#define STATE_VDP2_COMITTING            0x01 /* VDP2 is committing state via SCU-DMA */
-#define STATE_VDP2_COMMITTED            0x02 /* VDP2 finished committing state */
+#define STATE_VDP2_COMITTING            (0x01) /* VDP2 is committing state via SCU-DMA */
+#define STATE_VDP2_COMMITTED            (0x02) /* VDP2 finished committing state */
 
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
@@ -57,24 +59,19 @@ static void _default_handler(void);
 
 static inline bool __always_inline _vdp1_transfer_over(void);
 
-static volatile union {
-        struct {
-                uint8_t sync;
-                uint8_t vdp1;
-                uint8_t vdp2;
-                uint8_t field_count;
-        } __packed;
-
-        uint32_t raw;
+static volatile struct {
+        uint8_t sync;
+        uint8_t vdp1;
+        uint8_t vdp2;
+        uint8_t field_count;
 } _state __aligned(4);
 
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
+
 /* VDP1 SCU-DMA state */
 static struct scu_dma_level_cfg _vdp1_dma_cfg __unused;
 static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer __unused;
-
-struct vdp1_cmdt_list *_current_cmdt_list;
 
 static struct {
         void (*callback)(void *);
@@ -113,7 +110,10 @@ vdp_sync_init(void)
         _vdp1_init();
         _vdp2_init();
 
-        _state.raw = 0x00000000;
+        _state.sync = 0x00;
+        _state.vdp1 = 0x00;
+        _state.vdp2 = 0x00;
+        _state.field_count = 0x00;
 
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
@@ -212,7 +212,9 @@ vdp_sync(int16_t interval __unused)
 
         vdp_sync_user_callback_clear();
 
-        _state.raw = 0x00000000;
+        _state.sync = 0x00;
+        _state.vdp1 = 0x00;
+        _state.vdp2 = 0x00;
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
@@ -239,7 +241,6 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
         assert(cmdt_list->cmdts != NULL);
         assert(cmdt_list->cmdt != NULL);
         assert(cmdt_list->count > 0);
-        /* assert(!cmdt_list->drawing); */
 #endif /* DEBUG */
 
         uint16_t count;
@@ -252,11 +253,6 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
         /* Wait as previous draw calls haven't yet been committed, or at the
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
-
-        /* Mark list as drawing */
-        /* cmdt_list->drawing = true; */
-
-        _current_cmdt_list = cmdt_list;
 
         _vdp1_sync_callback.callback = (callback != NULL) ? callback : _default_callback;
         _vdp1_sync_callback.work = work;
@@ -333,15 +329,15 @@ vdp1_sync_draw_wait(void)
 
         scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
 
+        while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
+        }
+
         bool interlace_mode_double;
         interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
 
-        if (interlace_mode_double) {
-                /* Wait for transfer only as we can't wait until VDP1 processes
-                 * the command list */
-                while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
-                }
-        } else {
+        /* When in double-density interlace mode, wait for transfer only as we
+         * can't wait until VDP1 processes the command list */
+        if (!interlace_mode_double) {
                 /* Wait until VDP1 has processed the command list */
                 while ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
                 }
@@ -638,9 +634,6 @@ _sprite_end_handler(void)
         _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
 
-        /* _current_cmdt_list->drawing = false; */
-        _current_cmdt_list = NULL;
-
         _vdp1_sync_callback.callback(_vdp1_sync_callback.work);
 }
 
@@ -651,8 +644,8 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer)
                 return;
         }
 
-        _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
         _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
+        _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
 
         /* We can only draw during VBLANK-IN and in 1-cycle mode when in
          * double-density interlace mode */
