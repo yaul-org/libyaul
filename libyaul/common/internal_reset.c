@@ -52,20 +52,20 @@ _internal_reset(void)
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
 
-        scu_ic_ihr_clear(IC_INTERRUPT_VBLANK_IN);
-        scu_ic_ihr_clear(IC_INTERRUPT_VBLANK_OUT);
-        scu_ic_ihr_clear(IC_INTERRUPT_HBLANK_IN);
-        scu_ic_ihr_clear(IC_INTERRUPT_TIMER_0);
-        scu_ic_ihr_clear(IC_INTERRUPT_TIMER_1);
-        scu_ic_ihr_clear(IC_INTERRUPT_DSP_END);
-        scu_ic_ihr_clear(IC_INTERRUPT_SOUND_REQUEST);
-        scu_ic_ihr_clear(IC_INTERRUPT_SYSTEM_MANAGER);
-        scu_ic_ihr_clear(IC_INTERRUPT_PAD_INTERRUPT);
-        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_2_DMA_END);
-        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_1_DMA_END);
-        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_0_DMA_END);
-        scu_ic_ihr_clear(IC_INTERRUPT_DMA_ILLEGAL);
-        scu_ic_ihr_clear(IC_INTERRUPT_SPRITE_END);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_VBLANK_IN);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_VBLANK_OUT);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_HBLANK_IN);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_TIMER_0);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_TIMER_1);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_DSP_END);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_SOUND_REQUEST);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_SYSTEM_MANAGER);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_PAD_INTERRUPT);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_LEVEL_2_DMA_END);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_LEVEL_1_DMA_END);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_LEVEL_0_DMA_END);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_DMA_ILLEGAL);
+        scu_ic_ihr_clear(SCU_IC_INTERRUPT_SPRITE_END);
 
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_ICI);
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OCI);
