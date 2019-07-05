@@ -45,7 +45,6 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
-	kernel/sys/irq-mux.c \
 	\
 	kernel/mm/memb.c \
 	kernel/mm/slob.c \
@@ -252,8 +251,7 @@ INSTALL_HEADER_FILES+= \
 	./kernel/mm/:slob.h:yaul/mm/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/sys/:dma-queue.h:yaul/sys/ \
-	./kernel/sys/:irq-mux.h:yaul/sys/
+	./kernel/sys/:dma-queue.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/

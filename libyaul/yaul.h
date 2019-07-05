@@ -58,7 +58,6 @@
 
 #include <sys/init.h>
 #include <sys/dma-queue.h>
-#include <sys/irq-mux.h>
 
 #include <fs/romdisk/romdisk.h>
 

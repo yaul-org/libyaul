@@ -18,7 +18,6 @@
 
 #include <mm/memb.h>
 
-#include <sys/irq-mux.h>
 #include <sys/queue.h>
 
 #include "smpc-internal.h"
