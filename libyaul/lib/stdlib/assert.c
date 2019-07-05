@@ -41,9 +41,13 @@ _assert(const char * restrict file, const char * restrict line,
 
         dbgio_buffer("Assertion \"");
         dbgio_buffer(failed_expr);
-        dbgio_buffer("\" failed: file \"");
+        dbgio_buffer("\" failed");
+
+        dbgio_buffer(": file \"");
         dbgio_buffer(file);
-        dbgio_buffer("\", line ");
+        dbgio_buffer("\"");
+
+        dbgio_buffer(", line ");
         dbgio_buffer(line);
 
         if ((func != NULL) && (*func != '\0')) {
