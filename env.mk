@@ -83,19 +83,19 @@ SH_CFLAGS_shared:= \
 	-ffast-math \
 	-fstrict-aliasing \
 	-fdelete-null-pointer-checks \
+	-fmerge-all-constants \
 	-Wmissing-include-dirs \
 	-Wfatal-errors \
 	-Wall \
 	-Wextra \
-	-Wimplicit-int \
+	-Wlong-long \
 	-Wduplicated-branches \
 	-Wduplicated-cond \
 	-Wnull-dereference \
 	-Winit-self \
-	-Wuninitialized \
+	-Wbad-function-cast \
 	-Wshadow \
 	-Wunused \
-	-Wparentheses \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
@@ -115,11 +115,12 @@ SH_CXXFLAGS:= \
 	-fno-exceptions \
 	-fno-rtti \
 	-fno-unwind-tables \
+	-fno-asynchronous-unwind-tables \
 	-fno-threadsafe-statics \
 	-fno-use-cxa-atexit \
 	$(SH_CXXFLAGS_shared)
 
-SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer
+SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
 SH_CFLAGS_shared_debug:= -Og -ggdb3 -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
