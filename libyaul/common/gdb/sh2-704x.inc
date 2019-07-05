@@ -1,7 +1,7 @@
 /* -*- mode: c -*- */
 
 /*
- * Copyright (c) 2012-2016
+ * Copyright (c) 2012-2019
  * See LICENSE for details.
  *
  * William A. Gatliff <bgat@billgatliff.com>
