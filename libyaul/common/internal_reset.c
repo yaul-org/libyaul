@@ -8,13 +8,11 @@
 #include <stdlib.h>
 
 #include <cpu/intc.h>
+#include <cpu/dmac.h>
+
+#include <smpc/smc.h>
 
 #include <scu/ic.h>
-
-#include <vdp1.h>
-#include <vdp2.h>
-#include <vdp2/tvmd.h>
-#include <vdp2/vram.h>
 
 #include <vdp.h>
 
@@ -24,8 +22,8 @@
 
 static void _vblank_in_handler(void);
 
-void __noreturn
-_internal_exception_show(const char *buffer)
+void
+_internal_reset(void)
 {
         cpu_intc_mask_set(15);
         scu_ic_mask_chg(SCU_IC_MASK_NONE, SCU_IC_MASK_ALL);
@@ -36,8 +34,6 @@ _internal_exception_show(const char *buffer)
             COLOR_RGB555(0, 7, 0));
 
         vdp2_scrn_display_clear();
-
-        vdp2_tvmd_display_set();
 
         vdp1_env_default_set();
 
@@ -56,27 +52,47 @@ _internal_exception_show(const char *buffer)
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
 
+        scu_ic_ihr_clear(IC_INTERRUPT_VBLANK_IN);
+        scu_ic_ihr_clear(IC_INTERRUPT_VBLANK_OUT);
+        scu_ic_ihr_clear(IC_INTERRUPT_HBLANK_IN);
+        scu_ic_ihr_clear(IC_INTERRUPT_TIMER_0);
+        scu_ic_ihr_clear(IC_INTERRUPT_TIMER_1);
+        scu_ic_ihr_clear(IC_INTERRUPT_DSP_END);
+        scu_ic_ihr_clear(IC_INTERRUPT_SOUND_REQUEST);
+        scu_ic_ihr_clear(IC_INTERRUPT_SYSTEM_MANAGER);
+        scu_ic_ihr_clear(IC_INTERRUPT_PAD_INTERRUPT);
+        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_2_DMA_END);
+        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_1_DMA_END);
+        scu_ic_ihr_clear(IC_INTERRUPT_LEVEL_0_DMA_END);
+        scu_ic_ihr_clear(IC_INTERRUPT_DMA_ILLEGAL);
+        scu_ic_ihr_clear(IC_INTERRUPT_SPRITE_END);
+
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_ICI);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OCI);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OVI);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_WDT_ITI);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC0);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC1);
+        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR);
+
         dma_queue_clear();
 
-        dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
-        dbgio_buffer(buffer);
+        cpu_dmac_stop();
+
+        smpc_smc_cdoff_call();
+        smpc_smc_sshoff_call();
+
+        vdp2_tvmd_display_set();
 
         scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
 
         scu_ic_mask_chg(~SCU_IC_MASK_VBLANK_IN, SCU_IC_MASK_NONE);
         cpu_intc_mask_set(14);
-
-        while (true) {
-        }
-
-        __builtin_unreachable();
 }
 
 static void
 _vblank_in_handler(void)
 {
-        dbgio_flush();
-
         /* Synchronize VDP2 only.
          *
          * Avoid using vdp_sync() as we don't need to sync VDP2 and can no
