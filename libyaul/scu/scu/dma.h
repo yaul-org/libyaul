@@ -329,25 +329,25 @@ scu_dma_stop(void)
 static inline void __always_inline
 scu_dma_illegal_set(void (* const ihr)(void))
 {
-        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
 static inline void __always_inline
 scu_dma_level0_end_set(void (* const ihr)(void))
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
 static inline void __always_inline
 scu_dma_level1_end_set(void (* const ihr)(void))
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
 static inline void __always_inline
 scu_dma_level2_end_set(void (* const ihr)(void))
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
 static inline void __always_inline

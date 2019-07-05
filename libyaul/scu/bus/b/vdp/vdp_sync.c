@@ -30,8 +30,8 @@
 /* Maximum number of user callbacks */
 #define USER_CALLBACK_COUNT     16
 
-#define SCU_MASK_OR     (IC_MASK_VBLANK_IN | IC_MASK_VBLANK_OUT | IC_MASK_SPRITE_END)
-#define SCU_MASK_AND    (IC_MASK_ALL & ~SCU_MASK_OR)
+#define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN | SCU_IC_MASK_VBLANK_OUT | SCU_IC_MASK_SPRITE_END)
+#define SCU_MASK_AND    (SCU_IC_MASK_ALL & ~SCU_MASK_OR)
 
 #define STATE_SYNC                      (0x01) /* Request to synchronize */
 #define STATE_INTERLACE_SINGLE          (0x02)
@@ -105,7 +105,7 @@ static void _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *);
 void
 vdp_sync_init(void)
 {
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 
         _vdp1_init();
         _vdp2_init();
@@ -118,10 +118,10 @@ vdp_sync_init(void)
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
 
-        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
-        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
-        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         vdp_sync_user_callback_clear();
 }
@@ -156,11 +156,11 @@ vdp_sync(int16_t interval __unused)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 
         _state.sync |= STATE_SYNC;
 
-        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         /* There are times when the list transfer is completed before syncing */
         if ((_state.vdp1 & (STATE_VDP1_REQUEST_XFER_LIST | STATE_VDP1_LIST_XFERRED)) != 0x00) {
@@ -194,7 +194,7 @@ vdp_sync(int16_t interval __unused)
                 }
         }
 
-        scu_ic_mask_chg(IC_MASK_ALL, SCU_MASK_OR);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 
         uint32_t id;
         for (id = 0; id < USER_CALLBACK_COUNT; id++) {
@@ -216,7 +216,7 @@ vdp_sync(int16_t interval __unused)
         _state.vdp1 = 0x00;
         _state.vdp2 = 0x00;
 
-        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         /* Reset command address to the top */
         _vdp1_last_command = 0x0000;
@@ -327,7 +327,7 @@ vdp1_sync_draw_wait(void)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(SCU_MASK_AND, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
         }
@@ -436,7 +436,7 @@ _vdp1_init(void)
 {
         _vdp1_last_command = 0x0000;
 
-        scu_ic_ihr_set(IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
 }
 
 static void

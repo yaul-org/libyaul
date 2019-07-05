@@ -37,12 +37,12 @@ scu_dma_init(void)
         scu_dma_stop();
 
         uint32_t scu_mask;
-        scu_mask = IC_MASK_LEVEL_0_DMA_END |
-                   IC_MASK_LEVEL_1_DMA_END |
-                   IC_MASK_LEVEL_2_DMA_END |
-                   IC_MASK_DMA_ILLEGAL;
+        scu_mask = SCU_IC_MASK_LEVEL_0_DMA_END |
+                   SCU_IC_MASK_LEVEL_1_DMA_END |
+                   SCU_IC_MASK_LEVEL_2_DMA_END |
+                   SCU_IC_MASK_DMA_ILLEGAL;
 
-        scu_ic_mask_chg(IC_MASK_ALL, scu_mask);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, scu_mask);
 
         scu_dma_level0_end_set(NULL);
         scu_dma_level1_end_set(NULL);
@@ -56,7 +56,7 @@ scu_dma_init(void)
         (void)memset(&_dma_regs[2], 0x00, sizeof(struct dma_regs));
 #endif /* DEBUG_COPY_DMA_REGS_ENABLE */
 
-        scu_ic_mask_chg(~scu_mask, IC_MASK_NONE);
+        scu_ic_mask_chg(~scu_mask, SCU_IC_MASK_NONE);
 }
 
 void
