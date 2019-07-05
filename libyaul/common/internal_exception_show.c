@@ -28,7 +28,7 @@ void __noreturn
 _internal_exception_show(const char *buffer)
 {
         cpu_intc_mask_set(15);
-        scu_ic_mask_chg(IC_MASK_NONE, IC_MASK_ALL);
+        scu_ic_mask_chg(SCU_IC_MASK_NONE, SCU_IC_MASK_ALL);
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
@@ -61,9 +61,9 @@ _internal_exception_show(const char *buffer)
         dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
         dbgio_buffer(buffer);
 
-        scu_ic_ihr_set(IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
 
-        scu_ic_mask_chg(~IC_MASK_VBLANK_IN, IC_MASK_NONE);
+        scu_ic_mask_chg(~SCU_IC_MASK_VBLANK_IN, SCU_IC_MASK_NONE);
         cpu_intc_mask_set(14);
 
         while (true) {

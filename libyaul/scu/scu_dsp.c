@@ -27,13 +27,13 @@ void
 scu_dsp_init(void)
 {
         /* Disable DSP END interrupt */
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_DSP_END);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
         scu_dsp_program_clear();
 
         scu_dsp_end_clear();
 
-        scu_ic_ihr_set(IC_INTERRUPT_DSP_END, _dsp_end_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_DSP_END, _dsp_end_handler);
 
         _overflow = false;
         _end = true;
@@ -42,14 +42,14 @@ scu_dsp_init(void)
 void
 scu_dsp_end_set(void (*ihr)(void))
 {
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_DSP_END);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
         _dsp_end_ihr = _default_ihr;
 
         if (ihr != NULL) {
                 _dsp_end_ihr = ihr;
 
-                scu_ic_mask_chg(~IC_MASK_DSP_END, IC_MASK_NONE);
+                scu_ic_mask_chg(~SCU_IC_MASK_DSP_END, SCU_IC_MASK_NONE);
         }
 }
 

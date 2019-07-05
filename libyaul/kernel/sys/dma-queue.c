@@ -24,7 +24,7 @@
 
 /* Default SCU DMA level */
 #define DMA_QUEUE_SCU_DMA_LEVEL         0
-#define DMA_QUEUE_SCU_DMA_MASK          IC_MASK_LEVEL_0_DMA_END
+#define DMA_QUEUE_SCU_DMA_MASK          SCU_IC_MASK_LEVEL_0_DMA_END
 
 /* Maximum count of requests in ring buffer to take in */
 #define DMA_QUEUE_REQUESTS_MAX_COUNT    (32)
@@ -117,7 +117,7 @@ dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer,
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         if (_queue_full(dma_queue)) {
                 scu_ic_mask_set(scu_mask);
@@ -152,7 +152,7 @@ dma_queue_tag_clear(uint8_t tag)
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[tag];
 
-        scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         while (!_queue_empty(dma_queue)) {
                 struct dma_queue_request *request;
@@ -188,7 +188,7 @@ dma_queue_flush(uint8_t tag)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         if (_queue_empty(dma_queue)) {
                 goto exit;
@@ -227,7 +227,7 @@ dma_queue_count_get(uint8_t tag)
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         uint32_t size;
         size = _queue_size(dma_queue);

@@ -27,23 +27,23 @@ scu_timer_init(void)
 void
 scu_timer_t0_set(void (*ihr)(void) __unused)
 {
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_TIMER_0);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_TIMER_0);
 
         if (ihr != NULL) {
-                scu_ic_mask_chg(~IC_MASK_TIMER_0, IC_MASK_NONE);
+                scu_ic_mask_chg(~SCU_IC_MASK_TIMER_0, SCU_IC_MASK_NONE);
         }
 
-        cpu_intc_ihr_set(IC_INTERRUPT_TIMER_0, ihr);
+        cpu_intc_ihr_set(SCU_IC_INTERRUPT_TIMER_0, ihr);
 }
 
 void
 scu_timer_t1_set(void (*ihr)(void) __unused)
 {
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_TIMER_1);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_TIMER_1);
 
         if (ihr != NULL) {
-                scu_ic_mask_chg(~IC_MASK_TIMER_1, IC_MASK_NONE);
+                scu_ic_mask_chg(~SCU_IC_MASK_TIMER_1, SCU_IC_MASK_NONE);
         }
 
-        cpu_intc_ihr_set(IC_INTERRUPT_TIMER_1, ihr);
+        cpu_intc_ihr_set(SCU_IC_INTERRUPT_TIMER_1, ihr);
 }

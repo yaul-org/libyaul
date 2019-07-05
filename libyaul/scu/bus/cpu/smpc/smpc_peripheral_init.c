@@ -101,9 +101,9 @@ smpc_peripheral_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_SYSTEM_MANAGER);
-        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER, &_system_manager_handler);
-        scu_ic_mask_chg(~IC_MASK_SYSTEM_MANAGER, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_SYSTEM_MANAGER);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_SYSTEM_MANAGER, &_system_manager_handler);
+        scu_ic_mask_chg(~SCU_IC_MASK_SYSTEM_MANAGER, SCU_IC_MASK_NONE);
 }
 
 void
