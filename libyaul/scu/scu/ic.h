@@ -46,6 +46,7 @@ __BEGIN_DECLS
 #define IC_MASK_LEVEL_0_DMA_END 0x00000800
 #define IC_MASK_DMA_ILLEGAL     0x00001000
 #define IC_MASK_SPRITE_END      0x00002000
+#define IC_MASK_A_BUS           0x00008000
 #define IC_MASK_ALL             0x0000BFFF
 
 #define IC_IST_NONE             0x00000000
