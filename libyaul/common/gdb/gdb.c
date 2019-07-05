@@ -18,9 +18,9 @@
 
 #include "sh2.inc"
 
-#define IS_ALIGNED(t, addr,len)                                                \
+#define IS_POW_2_ALIGNED(t, addr,len)                                          \
         (((len) >= sizeof(uint ## t ## _t)) &&                                 \
-        (((uint32_t)(addr) % sizeof(uint ## t ## _t)) == 0))
+        (((uint32_t)(addr) & (sizeof(uint ## t ## _t) - 1)) == 0))
 
 #define GDB_RX_BUF_LEN 512
 
@@ -457,10 +457,10 @@ _mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
 
         ret_val = 0;
         for (i = 0; len > 0; ) {
-                if (IS_ALIGNED(32, mem, len)) {
+                if (IS_POW_2_ALIGNED(32, mem, len)) {
                         lc_buf.lbuf = *(uint32_t *)mem;
                         cbuf_len = sizeof(uint32_t);
-                } else if (IS_ALIGNED(16, mem, len)) {
+                } else if (IS_POW_2_ALIGNED(16, mem, len)) {
                         lc_buf.sbuf = *(uint16_t *)mem;
                         cbuf_len = sizeof(uint16_t);
                 } else {
@@ -494,14 +494,14 @@ _hex_buffer_to_mem(const char *buf, void *mem, size_t len)
         uint32_t i;
 
         for (i = 0; len > 0; ) {
-                if (IS_ALIGNED(32, mem, len)) {
+                if (IS_POW_2_ALIGNED(32, mem, len)) {
                         cbuf_len = sizeof(uint32_t);
                         for (i = 0; i < cbuf_len; i++) {
                                 lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);
                                 lc_buf.cbuf[i] += _hex_digit_to_integer(*buf++);
                         }
                         *(uint32_t *)mem = lc_buf.lbuf;
-                } else if (IS_ALIGNED(16, mem, len)) {
+                } else if (IS_POW_2_ALIGNED(16, mem, len)) {
                         cbuf_len = sizeof(uint16_t);
                         for (i = 0; i < cbuf_len; i++ ) {
                                 lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);
