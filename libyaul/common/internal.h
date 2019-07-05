@@ -8,6 +8,8 @@
 #ifndef _INTERNAL_H_
 #define _INTERNAL_H_
 
-void __noreturn _internal_exception_show(const char *);
+#include <sys/cdefs.h>
+
+void _internal_reset(void);
 
 #endif /* !_INTERNAL_H_ */

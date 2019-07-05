@@ -54,6 +54,7 @@ abort(void)
         }
 #else
         smpc_smc_sysres_call();
+        bios_execute();
 #endif /* SPIN_ON_ABORT */
 #endif /* DEBUG */
 
