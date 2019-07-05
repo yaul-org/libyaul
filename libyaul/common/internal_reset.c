@@ -73,7 +73,6 @@ _internal_reset(void)
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_WDT_ITI);
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC0);
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC1);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR);
 
         dma_queue_clear();
 
