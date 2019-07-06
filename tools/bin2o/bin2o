@@ -9,21 +9,23 @@
 PROGNAME="${0##*/}"
 TMPDIR="${TMPDIR:-/tmp}"
 
-SH_ARCH="${YAUL_ARCH_SH_PREFIX}"
 AFLAGS="--fatal-warnings --isa=sh2 --big --reduce-memory-overheads"
 ARCH="elf32-sh"
 DATA_SECTION="rodata"
 
 # If empty, default to YAUL_ARCH_SH_PREFIX
-YAUL_PROG_SH_PREFIX=$([ -z "${YAUL_PROG_SH_PREFIX}" ] && printf -- "${YAUL_ARCH_SH_PREFIX}")
+# If empty, default to YAUL_ARCH_SH_PREFIX
+if [ -z "${YAUL_PROG_SH_PREFIX}" ]; then
+    YAUL_PROG_SH_PREFIX=$(printf "%s" "${YAUL_ARCH_SH_PREFIX}")
+fi
 
 SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
 SH_LD="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-ld"
 SH_OBJCOPY="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-objcopy"
 
 panic () {
-    printf -- "${PROGNAME}: Error: ${1}\n" >&2
-    exit ${2}
+    printf -- "${PROGNAME}: Error: %s\\n" "${1}" >&2
+    exit "${2}"
 }
 
 [ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
@@ -33,19 +35,19 @@ panic () {
 [ -x "${SH_LD}" ] || panic "Invalid executable \`${SH_LD}'" 1
 [ -x "${SH_OBJCOPY}" ] || panic "Invalid executable \`${SH_OBJCOPY}'" 1
 
-tmp1="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
-tmp2="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
-tmp3="`mktemp "${TMPDIR}/XXXX"`" || panic "Couldn't create file" 1
+tmp1="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+tmp2="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+tmp3="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 
 clean_up () {
     rm -f "${tmp1}" "${tmp2}" "${tmp3}"
     exit 0
 }
 
-trap clean_up 0 1 2 9 15
+trap clean_up 0 1 2 15
 
 if [ ${#} != 3 ]; then
-    printf -- "Usage: ${PROGNAME} input-file symbol-name output-file\n" >&2
+    printf -- "Usage: %s input-file symbol-name output-file\\n" "${PROGNAME}" >&2
     exit 2
 fi
 
