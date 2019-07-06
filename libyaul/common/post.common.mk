@@ -146,44 +146,15 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
 IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
-	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
-	$(ECHO)cat $< | awk ' \
-	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
-	/\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
-	/\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
-	/\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
-	/\.ascii \"\$$TITLE\"/ { \
-	    L = 7; \
-	    # Truncate to 112 characters \
-	    s = "$(IP_TITLE)"; \
-	    # Strip out control characters \
-	    gsub(/[\t\r\v\n\f]/, "", s); \
-	    s = substr(s, 0, 112); \
-	    t = s; \
-	    q = length(s); \
-	    l = q; \
-	    while (l > 0) { \
-		printf ".ascii \"%-16.16s\"\n", t; \
-		a = ((l - 16) >= 0) ? 16 : l; \
-		l -= a; \
-		t = substr(t, a + 1, q - a); \
-		L--; \
-	    } \
-	    while (L > 0) { \
-		printf ".ascii \"                \"\n"; \
-		L--; \
-	    } \
-	    next; \
-	} \
-	/\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
-	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
-	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
-	{ print; } \
-	' | $(SH_AS) $(SH_AFLAGS) \
-	-I$(YAUL_INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
-	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
-	-specs=ip.specs $($@_TMP_FILE) -o $@
-	$(ECHO)$(RM) $($@_TMP_FILE)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+		"$(IP_VERSION)" \
+		$(IP_RELEASE_DATE) \
+		"$(IP_AREAS)" \
+		"$(IP_PERIPHERALS)" \
+		"$(IP_TITLE)" \
+		$(IP_MASTER_STACK_ADDR) \
+		$(IP_SLAVE_STACK_ADDR) \
+		$(IP_1ST_READ_ADDR)
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
