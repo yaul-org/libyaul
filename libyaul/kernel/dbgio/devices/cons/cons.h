@@ -24,7 +24,8 @@ __BEGIN_DECLS
 typedef struct {
         void (*clear)(void);
         void (*area_clear)(int16_t, int16_t, int16_t, int16_t);
-        void (*line_clear)(int16_t, int16_t, int16_t);
+        void (*line_clear)(int16_t);
+        void (*line_partial_clear)(int16_t, int16_t, int16_t);
         void (*write)(int16_t, int16_t, uint8_t);
 } cons_ops_t;
 
