@@ -87,6 +87,10 @@ cons_buffer(const char *buffer)
 
         size_t len;
 
+        if (*buffer == '\0') {
+                return;
+        }
+
         if ((len = strlen(buffer)) == 0) {
                 return;
         }
@@ -114,8 +118,8 @@ _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 }
 
 /*
- * Return true if the current cursor position plus an X amount of
- * columns is out of bounds.
+ * Return true if the current cursor position plus an X amount of columns is out
+ * of bounds.
  */
 static inline bool __always_inline
 _cursor_column_exceeded(int16_t x)
@@ -127,8 +131,8 @@ _cursor_column_exceeded(int16_t x)
 }
 
 /*
- * Return true if the current cursor position plus an Y amount of rows
- * is out of bounds.
+ * Return true if the current cursor position plus an Y amount of rows is out of
+ * bounds.
  */
 static inline bool __always_inline
 _cursor_row_exceeded(uint16_t y)
@@ -158,8 +162,7 @@ _cursor_row_set(int16_t y)
 }
 
 /*
- * Set the cursor to ROW and return TRUE iff the ROW has not been
- * exceeded.
+ * Set the cursor to ROW and return TRUE iff the ROW has not been exceeded.
  */
 static inline bool __always_inline
 _cursor_row_cond_set(int16_t row)
@@ -182,8 +185,7 @@ _cursor_column_advance(int16_t x)
 }
 
 /*
- * Set the cursor an X amount of columns iff it does not exceed
- * _cons.cols.
+ * Set the cursor an X amount of columns iff it does not exceed _cons.cols.
  */
 static inline void __always_inline
 _cursor_column_set(int16_t x)
@@ -192,8 +194,7 @@ _cursor_column_set(int16_t x)
 }
 
 /*
- * Set the cursor to COL and return TRUE iff the COL has not been
- * exceeded.
+ * Set the cursor to COL and return TRUE iff the COL has not been exceeded.
  */
 static inline bool __always_inline
 _cursor_column_cond_set(int16_t col)
@@ -207,8 +208,8 @@ _cursor_column_cond_set(int16_t col)
 }
 
 /*
- * Set both the COL and ROW of the cursor and return TRUE iff the COL
- * and ROW both have not been exceeded.
+ * Set both the COL and ROW of the cursor and return TRUE iff the COL and ROW
+ * both have not been exceeded.
  */
 static inline bool __always_inline
 _cursor_cond_set(int16_t col, int16_t row)
@@ -230,6 +231,10 @@ _action_character_print(int ch)
         if (_cursor_column_exceeded(0)) {
                 _cursor_column_set(0);
                 _cursor_row_advance(1);
+        }
+
+        if (_cursor_row_exceeded(0)) {
+                return;
         }
 
         _cons.ops.write(_cons.cursor.col, _cons.cursor.row, ch);
