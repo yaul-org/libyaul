@@ -380,7 +380,9 @@ _action_csi_dispatch_print(int8_t ch, uint8_t *params, uint8_t num_params)
                 col = ((params[1] - 1) < 0) ? 0 : params[1] - 1;
                 row = ((params[0] - 1) < 0) ? 0 : params[0] - 1;
 
-                _cursor_cond_set(col, row);
+                /* Don't bother clamping */
+                _cursor_column_set(col);
+                _cursor_row_set(row);
                 break;
         case 'J':
                 /* ESC [ Ps J */
