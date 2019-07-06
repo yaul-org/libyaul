@@ -55,6 +55,9 @@ typedef struct {
         uint16_t page_width;
         uint16_t page_height;
 
+        /* PND value */
+        uint16_t pnd_value;
+
         /* PND value for clearing a page */
         uint16_t pnd_value_clear;
 
@@ -181,8 +184,6 @@ _buffer_area_clear(int16_t col_start, int16_t col_end, int16_t row_start,
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        /* XXX: Should we check if attempting to clear the entire buffer? */
-
         int16_t row;
         for (row = row_start; row < row_end; row++) {
                 int16_t col;
@@ -220,15 +221,15 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
         _dev_state->state |= STATE_BUFFER_DIRTY;
         _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
-        uint16_t pnd;
-        pnd = VDP2_SCRN_PND_CONFIG_0(
-                /* Each cell is 32 bytes */
-                _dev_state->cp_table | (ch << 5),
-                _dev_state->color_palette,
-                /* vf = */ 0,
-                /* hf = */ 0);
+        /* We can get away with this because of the imposed limitations of the
+         * device.
+         *
+         * Pattern name data must be 1-word, character size must be 1x1, and no
+         * character flipping */
+        _dev_state->pnd_value &= 0xF000;
+        _dev_state->pnd_value |= ch;
 
-        _pnd_write(col, row, pnd);
+        _pnd_write(col, row, _dev_state->pnd_value);
 }
 
 static inline uint8_t __always_inline
@@ -304,6 +305,12 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
         /* Restricting the page to 64x32 avoids wasting space */
         _dev_state->page_size >>= 1;
+
+        _dev_state->pnd_value = VDP2_SCRN_PND_CONFIG_0(
+                _dev_state->cp_table,
+                _dev_state->color_palette,
+                /* vf = */ 0,
+                /* hf = */ 0);
 
         /* PND value used to clear pages */
         _dev_state->pnd_value_clear = VDP2_SCRN_PND_CONFIG_0(
