@@ -82,10 +82,6 @@ vdp1_env_set(const struct vdp1_env *env)
          * The frame buffer bit-depth are 16-bits and 8-bits, respectively */
         _state_vdp2()->regs.spctl |= env->sprite_type & 0x000F;
 
-        /* Force stop drawing */
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
-
         MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs.tvmr);
         MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs.ewdr);
         MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs.ewlr);
