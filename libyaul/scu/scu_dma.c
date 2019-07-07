@@ -158,6 +158,9 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
                 }
                 break;
         case 2:
+                /* To prevent operation errors, do not activate DMA level 2
+                 * during DMA level 1 operation. */
+
                 scu_dma_level2_wait();
                 scu_dma_level2_stop();
 

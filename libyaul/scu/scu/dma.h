@@ -190,9 +190,6 @@ scu_dma_level1_wait(void)
 static inline void __always_inline
 scu_dma_level2_wait(void)
 {
-        /* To prevent operation errors, do not activate DMA
-         * level 2 during DMA level 1 operation. */
-
         /* Cannot modify registers while in operation */
         while ((scu_dma_level2_busy()) != 0x00000000);
 }
@@ -248,6 +245,10 @@ scu_dma_level1_start(void)
 static inline void __always_inline
 scu_dma_level2_start(void)
 {
+        /* To prevent operation errors, do not activate DMA
+         * level 2 during DMA level 1 operation. */
+
+        scu_dma_level1_wait();
         scu_dma_level2_wait();
         scu_dma_level2_fast_start();
 }
