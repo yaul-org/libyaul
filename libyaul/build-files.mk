@@ -45,6 +45,7 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
+	kernel/sys/callback-list.c \
 	\
 	kernel/mm/memb.c \
 	kernel/mm/slob.c \

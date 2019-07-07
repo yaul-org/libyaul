@@ -37,7 +37,7 @@ extern void vdp_sync_vblank_in_set(void (*)(void));
 extern void vdp_sync_vblank_out_set(void (*)(void));
 
 extern int8_t vdp_sync_user_callback_add(void (*)(void *), void *);
-extern void vdp_sync_user_callback_remove(int8_t);
+extern void vdp_sync_user_callback_remove(const uint8_t);
 extern void vdp_sync_user_callback_clear(void);
 
 __END_DECLS
