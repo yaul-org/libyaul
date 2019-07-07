@@ -57,8 +57,6 @@ static void _vdp2_commit_handler(const struct dma_queue_transfer *);
 
 static void _default_handler(void);
 
-static inline bool __always_inline _vdp1_transfer_over(void);
-
 static volatile struct {
         uint8_t sync;
         uint8_t vdp1;
@@ -157,9 +155,7 @@ vdp_sync(int16_t interval __unused)
         scu_mask = scu_ic_mask_get();
 
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
-
         _state.sync |= STATE_SYNC;
-
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         /* There are times when the list transfer is completed before syncing */
@@ -227,8 +223,13 @@ vdp_sync(int16_t interval __unused)
 bool
 vdp1_sync_drawing(void)
 {
-        const uint8_t state_mask =
-            STATE_VDP1_REQUEST_COMMIT_LIST | STATE_VDP1_REQUEST_XFER_LIST;
+        if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) != 0x00) {
+                return false;
+        }
+
+        const uint8_t state_mask = STATE_VDP1_REQUEST_COMMIT_LIST |
+                                   STATE_VDP1_REQUEST_XFER_LIST |
+                                   STATE_VDP1_LIST_XFERRED;
 
         return ((_state.vdp1 & state_mask) != 0x00);
 }
@@ -276,6 +277,7 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
         _vdp1_last_command += count - 1;
 
         _state.vdp1 |= STATE_VDP1_REQUEST_XFER_LIST;
+        _state.vdp1 &= ~STATE_VDP1_LIST_XFERRED;
         _state.vdp1 &= ~STATE_VDP1_LIST_COMMITTED;
         _state.vdp1 &= ~STATE_VDP1_CHANGED;
 
@@ -486,23 +488,6 @@ _vdp2_commit_xfer_tables_init(void)
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 }
 
-static inline bool __always_inline __unused
-_vdp1_transfer_over(void)
-{
-        struct vdp1_transfer_status transfer_status;
-        vdp1_transfer_status_get(&transfer_status);
-
-        struct vdp1_mode_status mode_status;
-        vdp1_mode_status_get(&mode_status);
-
-        /* Detect if VDP1 is still drawing (transfer over status) */
-        bool transfer_over;
-        transfer_over = (transfer_status.bef == 0x00) &&
-                        (transfer_status.cef == 0x00);
-
-        return ((mode_status.ptm1 != 0x00) && transfer_over);
-}
-
 static void
 _vblank_in_handler(void)
 {
@@ -515,10 +500,7 @@ _vblank_in_handler(void)
         bool interlace_mode;
         interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
-        bool vdp1_list_xferred;
-        vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
-
-        if (interlace_mode && vdp1_list_xferred) {
+        if (interlace_mode) {
                 /* When in single/double-density interlace mode and field count
                  * is zero, commit VDP2 state only once */
                 if (_state.field_count == 2) {
@@ -547,8 +529,14 @@ _vblank_in_handler(void)
                  * However, VDP1(FBCR) must not be entirely cleared. This caused
                  * a lot of glitching when in double-density interlace mode */
                 MEMORY_WRITE(16, VDP1(FBCR), _fbcr_bits[field_scan]);
-                MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-                MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
+
+                bool vdp1_list_xferred;
+                vdp1_list_xferred = (_state.vdp1 & STATE_VDP1_LIST_XFERRED) != 0x00;
+
+                if (vdp1_list_xferred) {
+                        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+                        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
+                }
         }
 
         if ((_state.vdp2 & (STATE_VDP2_COMITTING | STATE_VDP2_COMMITTED)) == 0x00) {
@@ -583,18 +571,17 @@ _vblank_out_handler(void)
                 goto no_sync;
         }
 
-        if ((_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) == 0x00) {
-                goto no_sync;
-        }
-
         bool interlace_mode;
         interlace_mode = (_state.sync & (STATE_INTERLACE_SINGLE | STATE_INTERLACE_DOUBLE)) != 0x00;
 
-        if (interlace_mode) {
-                if ((_state.vdp1 & STATE_VDP1_LIST_COMMITTED) == 0x00) {
-                        goto no_change;
+        if (!interlace_mode) {
+                if ((_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) == 0x00) {
+                        goto no_sync;
                 }
 
+                /* Manual mode (change) */
+                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+        } else {
                 bool interlace_mode_double;
                 interlace_mode_double = (_state.sync & STATE_INTERLACE_DOUBLE) != 0x00;
 
@@ -612,9 +599,6 @@ _vblank_out_handler(void)
                 if (_state.field_count < 2) {
                         goto no_change;
                 }
-        } else {
-                /* Manual mode (change) */
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
         }
 
         _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
@@ -631,7 +615,9 @@ static void
 _sprite_end_handler(void)
 {
         /* VDP1 request to commit is finished */
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
+
+        /* Don't clear STATE_VDP1_REQUEST_COMMIT_LIST as we need to know that
+         * we've requested to commit */
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
 
         _vdp1_sync_callback.callback(_vdp1_sync_callback.work);
@@ -644,7 +630,8 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer)
                 return;
         }
 
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_XFER_LIST;
+        /* Don't clear STATE_VDP1_REQUEST_XFER_LIST as we want to know that
+         * we've requested to transfer a command list */
         _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
 
         /* We can only draw during VBLANK-IN and in 1-cycle mode when in
