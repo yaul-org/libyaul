@@ -1,10 +1,11 @@
 * {
-    font-family: Helvetica;
+    font-family: Arial;
     font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
     line-height: calc(1.3em + (1.5 - 1.2) * ((100vw - 300px)/(1600 - 300)));
 }
 
 h1.title {
+    font-size: 150%;
     text-align: center;
 }
 
@@ -44,6 +45,7 @@ body {
 }
 
 code {
+    font-size: 75%;
     font-family: monospace;
     background: #EDEDED;
 }
@@ -53,22 +55,44 @@ li {
     max-width: 59.0em;
 }
 
-span.todo,
-span.done {
+.todo.TODO {
+    font-size: 65%;
     text-decoration: none;
     border-radius: 5px;
     padding: 3px;
     color: white;
-}
-
-span.todo {
-    font-size: 65%;
     background: #dd0000;
 }
 
-span.done {
+.todo.DONE {
     font-size: 65%;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 3px;
+    color: white;
     background: #00dd00;
+}
+
+.todo.REMOVE {
+    font-size: 65%;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 3px;
+    color: black;
+    background: #cccccc;
+}
+
+.todo.IN_PROGRESS {
+    font-size: 65%;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 3px;
+    color: black;
+}
+
+/* For .todo.DONE and .todo.REMOVE */
+del {
+    color: #999999;
 }
 
 blockquote {
