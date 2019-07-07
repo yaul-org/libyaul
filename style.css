@@ -73,7 +73,9 @@ li {
     background: #00dd00;
 }
 
-.todo.REMOVE {
+.done.REWORK,
+.todo.REMOVE,
+.todo.IN_PROGRESS {
     font-size: 65%;
     text-decoration: none;
     border-radius: 5px;
@@ -82,13 +84,15 @@ li {
     background: #cccccc;
 }
 
-.todo.IN_PROGRESS {
+.todo.WAITING {
     font-size: 65%;
     text-decoration: none;
     border-radius: 5px;
     padding: 3px;
     color: black;
+    background: #ffa500;
 }
+
 
 /* For .todo.DONE and .todo.REMOVE */
 del {
