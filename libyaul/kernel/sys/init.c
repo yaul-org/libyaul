@@ -80,13 +80,13 @@ _init(void)
         dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
-        dma_queue_init();
+        user_init();
 
-        dbgio_init();
+        dma_queue_init();
 
         vdp_init();
 
-        user_init();
+        dbgio_init();
 }
 
 static void __section(".fini") __used __noreturn
