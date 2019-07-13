@@ -73,8 +73,7 @@ typedef struct {
  * 3. Screen priority is always 7
  * 4. 1x1 plane size is enforced
  * 5. Page 0 of plane A will always be used
- * 6. Resets scroll position to (0, 0)
- */
+ * 6. Resets scroll position to (0, 0) */
 
 static const dbgio_vdp2_t _default_params = {
         .font_cpd = &_font_cpd[0],
@@ -148,7 +147,7 @@ static void
 _buffer_clear(void)
 {
         static struct cpu_dmac_cfg dmac_cfg = {
-                .channel= DEV_DMAC_CHANNEL,
+                .channel = DEV_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .src = 0x00000000,
                 .dst = 0x00000000,
@@ -233,44 +232,43 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
 }
 
 static inline uint8_t __always_inline
-_1bpp_4bpp_convert(uint8_t *row_1bpp, const uint8_t *fgbg)
+_1bpp_4bpp_convert(const uint8_t byte, const uint8_t *fgbg)
 {
-        uint8_t out_4bpp;
-        out_4bpp = 0x00;
+        const uint8_t ubyte = (byte >> 1) & 0x01;
+        const uint8_t lbyte = byte & 0x01;
 
-        out_4bpp |= (fgbg[*row_1bpp & 0x01] & 0x0F) << 4;
-        *row_1bpp >>= 1;
-        out_4bpp |= fgbg[*row_1bpp & 0x01] & 0x0F;
-        *row_1bpp >>= 1;
-
-        return out_4bpp;
+        return (fgbg[lbyte] << 4) | fgbg[ubyte];
 }
 
 static void
 _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
-    uint8_t fg, uint8_t bg)
+    const uint8_t fg, const uint8_t bg)
 {
         assert(dec_cpd != NULL);
         assert(cmp_cpd != NULL);
         assert(((uintptr_t)cmp_cpd & 0x00000003) == 0x00000000);
 
         const uint8_t fgbg[] = {
-                bg,
-                fg
+                bg & 0x0F,
+                fg & 0x0F
         };
 
-        uint32_t i;
-        for (i = 0; i < FONT_1BPP_CPD_SIZE; i++) {
-                uint32_t j;
-                j = i << 2;
+        uint8_t cpd;
 
-                uint8_t cpd;
+        uint32_t i;
+        uint32_t j;
+        for (i = 0, j = 0; i < FONT_1BPP_CPD_SIZE; i++) {
                 cpd = cmp_cpd[i];
 
-                dec_cpd[j + 0] = _1bpp_4bpp_convert(&cpd, fgbg);
-                dec_cpd[j + 1] = _1bpp_4bpp_convert(&cpd, fgbg);
-                dec_cpd[j + 2] = _1bpp_4bpp_convert(&cpd, fgbg);
-                dec_cpd[j + 3] = _1bpp_4bpp_convert(&cpd, fgbg);
+                dec_cpd[j + 0] = _1bpp_4bpp_convert(cpd, fgbg);
+                cpd >>= 2;
+                dec_cpd[j + 1] = _1bpp_4bpp_convert(cpd, fgbg);
+                cpd >>= 2;
+                dec_cpd[j + 2] = _1bpp_4bpp_convert(cpd, fgbg);
+                cpd >>= 2;
+                dec_cpd[j + 3] = _1bpp_4bpp_convert(cpd, fgbg);
+
+                j += 4;
         }
 }
 
@@ -426,7 +424,8 @@ _shared_init(const dbgio_vdp2_t *params)
 
         _font_1bpp_4bpp_decompress(_dev_state->font.cpd_buffer,
             params->font_cpd,
-            params->font_fg, params->font_bg);
+            params->font_fg,
+            params->font_bg);
 
         (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
             FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
