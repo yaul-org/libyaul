@@ -34,7 +34,6 @@
 void __weak
 user_init(void)
 {
-        slob_init();
 }
 
 static void __used
@@ -69,6 +68,8 @@ _call_global_dtors(void)
 static void __used __section(".init")
 _init(void)
 {
+        slob_init();
+
         _call_global_ctors();
 
         cpu_init();
@@ -80,13 +81,12 @@ _init(void)
         dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
-        user_init();
-
         dma_queue_init();
 
         vdp_init();
-
         dbgio_init();
+
+        user_init();
 }
 
 static void __section(".fini") __used __noreturn

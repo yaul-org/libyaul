@@ -149,6 +149,12 @@ scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
         *reg_ist = (*reg_ist & and_mask) | or_mask;
 }
 
+static inline void __always_inline
+scu_ic_status_set(uint32_t value)
+{
+        MEMORY_WRITE(32, SCU(IST), value);
+}
+
 static inline const uint32_t * __always_inline
 scu_ic_priority_table_get(void)
 {

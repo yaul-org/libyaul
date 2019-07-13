@@ -83,9 +83,9 @@ __BEGIN_DECLS
 }
 
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
-        .len = DMA_INDIRECT_TBL_END | (_len),                                  \
+        .len = _len,                                                           \
         .dst = (uint32_t)(_dst),                                               \
-        .src = (uint32_t)(_src)                                                \
+        .src = DMA_INDIRECT_TBL_END | (uint32_t)(_src)                         \
 }
 
 struct scu_dma_reg_buffer {
