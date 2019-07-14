@@ -89,7 +89,6 @@ _init(void)
         user_init();
 
         cpu_cache_purge();
-        cpu_intc_mask_set(0);
 }
 
 static void __section(".fini") __used __noreturn

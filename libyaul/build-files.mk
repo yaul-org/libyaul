@@ -163,6 +163,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
 	\
+	scu/bus/cpu/cpu_cache.c \
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_dual.c \
