@@ -18,7 +18,7 @@
 #include "vdp-internal.h"
 
 static void _init_vdp1(void);
-static void _vdp1_memory_clear(const uint32_t, const uint16_t, const uint32_t);
+static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
 
 static void _init_vdp2(void);
 
@@ -57,12 +57,12 @@ _init_vdp1(void)
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
         MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
 
-        _vdp1_memory_clear(VDP1_VRAM(0x0000), 0x8000, VDP1_VRAM_SIZE);
-        _vdp1_memory_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+        _memory_area_clear(VDP1_VRAM(0x0000), 0x8000, VDP1_VRAM_SIZE);
+        _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
 }
 
 static void
-_vdp1_memory_clear(const uint32_t address, const uint16_t value,
+_memory_area_clear(const uint32_t address, const uint16_t value,
     const uint32_t len)
 {
         static struct cpu_dmac_cfg dmac_cfg = {
@@ -78,7 +78,7 @@ _vdp1_memory_clear(const uint32_t address, const uint16_t value,
         };
 
         dmac_cfg.dst = CPU_CACHE_THROUGH | address;
-        dmac_cfg.src = &value;
+        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&value;
         dmac_cfg.len = len;
 
         cpu_dmac_channel_wait(0);
@@ -101,29 +101,11 @@ _init_vdp2(void)
 
         vdp2_tvmd_display_clear();
 
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
-
         vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG2, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG3, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_RBG0, 1);
-
-        vdp2_sprite_priority_set(0, 0);
-        vdp2_sprite_priority_set(1, 0);
-        vdp2_sprite_priority_set(2, 0);
-        vdp2_sprite_priority_set(3, 0);
-        vdp2_sprite_priority_set(4, 0);
-        vdp2_sprite_priority_set(5, 0);
-        vdp2_sprite_priority_set(6, 0);
-        vdp2_sprite_priority_set(7, 0);
 
         vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
@@ -139,6 +121,9 @@ _init_vdp2(void)
             COLOR_RGB555(0, 0, 0));
 
         vdp2_vram_cycp_clear();
+
+        _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
+        _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
