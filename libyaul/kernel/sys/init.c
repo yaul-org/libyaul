@@ -22,6 +22,7 @@
 #include <cpu.h>
 #include <scu.h>
 #include <vdp.h>
+#include <smpc.h>
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart.h>
@@ -74,6 +75,8 @@ _init(void)
 
         cpu_init();
         scu_init();
+        smpc_init();
+        smpc_peripheral_init();
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         usb_cart_init();
