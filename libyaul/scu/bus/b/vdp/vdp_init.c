@@ -25,8 +25,10 @@ static void _init_vdp2(void);
 void
 vdp_init(void)
 {
-        _init_vdp1();
+        /* VDP2 must be initialized first before VDP1 as the VDP1 writes to VDP2
+         * registers */
         _init_vdp2();
+        _init_vdp1();
 
         vdp_sync_init();
 }
