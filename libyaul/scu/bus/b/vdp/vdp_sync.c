@@ -22,7 +22,7 @@
 #include "vdp-internal.h"
 
 /* Debug: Use dma-queue to transfer VDP1 command list */
-#define DEBUG_DMA_QUEUE_ENABLE  1
+#define DEBUG_DMA_QUEUE_ENABLE  0
 
 /* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
@@ -626,7 +626,7 @@ _sprite_end_handler(void)
 static void
 _vdp1_dma_handler(const struct dma_queue_transfer *transfer)
 {
-        if (transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
+        if (transfer != NULL && transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
                 return;
         }
 
@@ -653,7 +653,7 @@ _vdp1_dma_handler(const struct dma_queue_transfer *transfer)
 static void
 _vdp2_commit_handler(const struct dma_queue_transfer *transfer)
 {
-        if (transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
+        if (transfer != NULL && transfer->status != DMA_QUEUE_STATUS_COMPLETE) {
                 return;
         }
 
@@ -664,6 +664,7 @@ _vdp2_commit_handler(const struct dma_queue_transfer *transfer)
 static void
 _vdp2_sync_commit(struct cpu_dmac_cfg *dmac_cfg)
 {
+        assert(dmac_cfg != NULL);
         dmac_cfg->len = sizeof(_state_vdp2()->regs) - 14;
         dmac_cfg->dst = VDP2(0x000E);
         dmac_cfg->src = (uint32_t)&_state_vdp2()->regs.buffer[7];
@@ -682,6 +683,7 @@ _vdp2_sync_commit(struct cpu_dmac_cfg *dmac_cfg)
 static void
 _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *dmac_cfg)
 {
+        assert(dmac_cfg != NULL);
         dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
         dmac_cfg->dst = (uint32_t)_state_vdp2()->back.vram;
         dmac_cfg->src = (uint32_t)_state_vdp2()->back.buffer;
