@@ -97,7 +97,7 @@ cpu_init(void)
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
         cpu_divu_init();
-        cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
+        cpu_frt_init(false, CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         cpu_dmac_init();
         cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
