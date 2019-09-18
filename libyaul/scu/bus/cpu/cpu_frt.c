@@ -31,7 +31,7 @@ static void (*_frt_oc_ihr_table[])(void) = {
 };
 
 void
-cpu_frt_init(uint8_t clock_div)
+cpu_frt_init(bool slave, uint8_t clock_div)
 {
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
@@ -45,12 +45,18 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
-        cpu_frt_oca_clear();
-        cpu_frt_ocb_clear();
-        cpu_frt_ovi_clear();
+        if (!slave) {
+                cpu_frt_oca_clear();
+                cpu_frt_ocb_clear();
+                cpu_frt_ovi_clear();
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
+        } else {
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI + 0x100, _frt_oci_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI + 0x100, _frt_ovi_handler);
+
+        }
 
         cpu_frt_count_set(0);
 }
