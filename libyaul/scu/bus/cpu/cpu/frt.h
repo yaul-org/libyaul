@@ -91,7 +91,7 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
         cpu_frt_ovi_set(NULL);                                                 \
 } while (false)
 
-extern void cpu_frt_init(uint8_t);
+extern void cpu_frt_init(bool, uint8_t);
 extern void cpu_frt_oca_set(uint16_t, void (*)(void));
 extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
 extern void cpu_frt_ovi_set(void (*)(void));
