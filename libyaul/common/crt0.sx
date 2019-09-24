@@ -13,17 +13,11 @@
 .type _start, @function
 
 _start:
-        /* Set stack pointer for master CPU */
-        mov.l .LC7, r15
         mov #0xF0, r1
+        mov.l .LC6, r15         ! Set stack pointer for master CPU
+        ldc r1, sr              ! Disable interrupts
         mov.l .LC0, r2
-        mov r15, r14
-
-        /* Disable interrupts */
-        mov.l .LC1, r3
-        ldc r1, sr
-
-        /* Clear 'BSS' section */
+        mov.l .LC1, r3          ! Start of clear 'BSS' section
         mov r3, r8
         mov.l .LC3, r7
         mov #0x00, r5
@@ -36,40 +30,18 @@ _start:
         mov.l r5, @-r3
         cmp/eq r2, r3
         bf .L1
-.L2:
-        /* Initializer */
-        jsr @r7
+.L2:                            ! End of clear 'BSS' section
+        jsr @r7                 ! Initializer
         nop
-
-        /* Enable interrupts */
-        mov #0x00, r2
-        mov.l .LC6, r1
+        mov #0x00, r2           ! Enable interrupts
         ldc r2, sr
         mov.l .LC5, r3
-        mov #0x00, r4
-        mov #0x00, r5
-        mov #0x00, r6
-
-        /* Disable cache, purge, and enable cache */
-        mov.b @r1, r0
-        and #0xFE, r0
-        mov.b r0, @r1
-        or #0x10, r0
-        mov.b r0, @r1
-        or #0x01, r0
-        mov.b r0, @r1
-
-        /* Jump to user */
-        jsr @r3
-        mov #0x00, r7
-
-        /* Disable interrupts */
-        mov #0xF0, r2
-        mov.l .LC4, r1
+        jsr @r3                 ! Jump to user
+        nop
+        mov #0xF0, r2           ! Disable interrupts
         ldc r2, sr
-
-        /* Finalizer */
-        jmp @r1
+        mov.l .LC4, r1
+        jmp @r1                 ! Finalizer
         nop
 
 .align 4
@@ -90,7 +62,4 @@ _start:
 .long _main
 
 .LC6:
-.long 0xFFFFFE92
-
-.LC7:
 .long __master_stack

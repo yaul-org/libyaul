@@ -39,9 +39,11 @@ static ihr_entry_t* _dmac_ihr_table_get(void);
 void
 cpu_dmac_init(void)
 {
-        cpu_dmac_disable();
+        cpu_dmac_channel_wait(0);
+        cpu_dmac_channel_wait(1);
         cpu_dmac_channel_stop(0);
         cpu_dmac_channel_stop(1);
+        cpu_dmac_disable();
 
         MEMORY_WRITE(32, CPU(VCRDMA0), CPU_INTC_INTERRUPT_DMAC0);
         MEMORY_WRITE(32, CPU(VCRDMA1), CPU_INTC_INTERRUPT_DMAC1);

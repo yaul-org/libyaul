@@ -45,6 +45,7 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
+	kernel/sys/callback-list.c \
 	\
 	kernel/mm/memb.c \
 	kernel/mm/slob.c \
@@ -162,6 +163,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
 	\
+	scu/bus/cpu/cpu_cache.c \
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_dual.c \

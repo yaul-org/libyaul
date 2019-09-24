@@ -55,6 +55,8 @@ vdp1_cmdt_list_free(struct vdp1_cmdt_list *cmdt_list)
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
 
+        cmdt_list->count = 0;
+
         free(cmdt_list->cmdts);
         free(cmdt_list);
 }

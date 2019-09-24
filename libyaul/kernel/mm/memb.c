@@ -57,7 +57,7 @@ memb_init(struct memb *mb)
 
         mb->m_size = 0;
 
-        memset(mb->m_bpool, 0x00, mb->m_bsize * mb->m_bnum);
+        (void)memset(mb->m_bpool, 0x00, mb->m_bsize * mb->m_bnum);
 }
 
 /*-

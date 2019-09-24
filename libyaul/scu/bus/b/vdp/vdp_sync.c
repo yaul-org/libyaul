@@ -16,6 +16,7 @@
 #include <vdp.h>
 
 #include <sys/dma-queue.h>
+#include <sys/callback-list.h>
 
 #include <string.h>
 
@@ -55,8 +56,6 @@ static void _vdp1_dma_handler(const struct dma_queue_transfer *);
 
 static void _vdp2_commit_handler(const struct dma_queue_transfer *);
 
-static void _default_handler(void);
-
 static volatile struct {
         uint8_t sync;
         uint8_t vdp1;
@@ -71,15 +70,12 @@ static volatile uint16_t _vdp1_last_command = 0x0000;
 static struct scu_dma_level_cfg _vdp1_dma_cfg __unused;
 static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer __unused;
 
-static struct {
-        void (*callback)(void *);
-        void *work;
-} _vdp1_sync_callback __aligned(16);
+static struct callback _user_vdp1_sync_callback;
 
-static struct {
-        void (*callback)(void *);
-        void *work;
-} _user_callbacks[USER_CALLBACK_COUNT] __aligned(16);
+static struct callback _user_vblank_in_callback;
+static struct callback _user_vblank_out_callback;
+
+static struct callback_list * _user_callback_list;
 
 static const uint16_t _fbcr_bits[] = {
         /* Render even-numbered lines */
@@ -87,11 +83,6 @@ static const uint16_t _fbcr_bits[] = {
         /* Render odd-numbered lines */
         0x000C
 };
-
-static void (*_user_vblank_in_handler)(void);
-static void (*_user_vblank_out_handler)(void);
-
-static void _default_callback(void *);
 
 static void _vdp1_init(void);
 
@@ -104,6 +95,12 @@ void
 vdp_sync_init(void)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
+
+        _user_callback_list = callback_list_alloc(USER_CALLBACK_COUNT);
+
+        callback_init(&_user_vdp1_sync_callback);
+        callback_init(&_user_vblank_in_callback);
+        callback_init(&_user_vblank_out_callback);
 
         _vdp1_init();
         _vdp2_init();
@@ -120,8 +117,6 @@ vdp_sync_init(void)
         scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
-
-        vdp_sync_user_callback_clear();
 }
 
 void
@@ -192,21 +187,7 @@ vdp_sync(int16_t interval __unused)
 
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 
-        uint32_t id;
-        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
-                void (*callback)(void *);
-                callback = _user_callbacks[id].callback;
-
-                void *work;
-                work = _user_callbacks[id].work;
-
-                _user_callbacks[id].callback = _default_callback;
-                _user_callbacks[id].work = NULL;
-
-                callback(work);
-        }
-
-        vdp_sync_user_callback_clear();
+        callback_list_process(_user_callback_list, true);
 
         _state.sync = 0x00;
         _state.vdp1 = 0x00;
@@ -255,8 +236,7 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
          * very least, have the command list transferred to VRAM */
         vdp1_sync_draw_wait();
 
-        _vdp1_sync_callback.callback = (callback != NULL) ? callback : _default_callback;
-        _vdp1_sync_callback.work = work;
+        callback_set(&_user_vdp1_sync_callback, callback, work);
 
         uint32_t vdp1_vram;
         vdp1_vram = VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
@@ -374,63 +354,33 @@ vdp2_sync_commit(void)
 }
 
 void
-vdp_sync_vblank_in_set(void (*ihr)(void))
+vdp_sync_vblank_in_set(void (*callback_func)(void))
 {
-        _user_vblank_in_handler = (ihr != NULL) ? ihr : _default_handler;
+        callback_set(&_user_vblank_in_callback, (void (*)(void *))callback_func, NULL);
 }
 
 void
-vdp_sync_vblank_out_set(void (*ihr)(void))
+vdp_sync_vblank_out_set(void (*callback_func)(void))
 {
-        _user_vblank_out_handler = (ihr != NULL) ? ihr : _default_handler;
+        callback_set(&_user_vblank_out_callback, (void (*)(void *))callback_func, NULL);
 }
 
 int8_t
-vdp_sync_user_callback_add(void (*user_callback)(void *), void *work)
+vdp_sync_user_callback_add(void (*callback)(void *), void *work)
 {
-#ifdef DEBUG
-        assert(user_callback != NULL);
-#endif /* DEBUG */
-
-        uint32_t id;
-        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
-                if (_user_callbacks[id].callback != _default_callback) {
-                        continue;
-                }
-
-                _user_callbacks[id].callback = user_callback;
-                _user_callbacks[id].work = work;
-
-                return id;
-        }
-
-#ifdef DEBUG
-        assert(id != USER_CALLBACK_COUNT);
-#endif /* DEBUG */
-
-        return -1;
+        return callback_list_callback_add(_user_callback_list, callback, work);
 }
 
 void
-vdp_sync_user_callback_remove(int8_t id)
+vdp_sync_user_callback_remove(const uint8_t id)
 {
-#ifdef DEBUG
-        assert(id >= 0);
-        assert(id < USER_CALLBACK_COUNT);
-#endif /* DEBUG */
-
-        _user_callbacks[id].callback = _default_callback;
-        _user_callbacks[id].work = NULL;
+        callback_list_callback_remove(_user_callback_list, id);
 }
 
 void
 vdp_sync_user_callback_clear(void)
 {
-        uint32_t id;
-        for (id = 0; id < USER_CALLBACK_COUNT; id++) {
-                _user_callbacks[id].callback = _default_callback;
-                _user_callbacks[id].work = NULL;
-        }
+        callback_list_clear(_user_callback_list);
 }
 
 static void
@@ -559,7 +509,7 @@ _vblank_in_handler(void)
         }
 
 no_sync:
-        _user_vblank_in_handler();
+        callback_call(&_user_vblank_in_callback);
 }
 
 static void
@@ -608,7 +558,7 @@ _vblank_out_handler(void)
 
 no_change:
 no_sync:
-        _user_vblank_out_handler();
+        callback_call(&_user_vblank_out_callback);
 }
 
 static void
@@ -620,7 +570,7 @@ _sprite_end_handler(void)
          * we've requested to commit */
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
 
-        _vdp1_sync_callback.callback(_vdp1_sync_callback.work);
+        callback_call(&_user_vdp1_sync_callback);
 }
 
 static void
@@ -694,14 +644,4 @@ _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *dmac_cfg)
         cpu_dmac_enable();
         cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
         cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-}
-
-static void
-_default_handler(void)
-{
-}
-
-static void
-_default_callback(void *work __unused)
-{
 }

@@ -109,28 +109,8 @@ cpu_cache_way_mode_set(uint8_t mode)
         *reg_ccr = t0 | mode | 0x01;
 }
 
-static inline void __always_inline
-cpu_cache_purge_line(void *addr)
-{
-        uint32_t *purge_addr;
-        purge_addr = (uint32_t *)(CPU_CACHE_PURGE | (uintptr_t)addr);
-
-        *purge_addr = 0x00000000;
-}
-
-static inline void __always_inline
-cpu_cache_purge(void)
-{
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
-
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x01;
-
-        *reg_ccr = t0;
-        *reg_ccr = t0 | 0x10;
-        *reg_ccr = t0 | 0x11;
-}
+extern void cpu_cache_purge_line(void *) __section(".uncached");
+extern void cpu_cache_purge(void) __section(".uncached");
 
 __END_DECLS
 
