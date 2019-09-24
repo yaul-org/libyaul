@@ -17,7 +17,13 @@ static void _wdt_iti_handler(void);
 
 static void _default_ihr(void);
 
-static void (*_wdt_iti_ihr)(void) = _default_ihr;
+typedef void (*ihr_entry_t)(void);
+
+static ihr_entry_t _master_wdt_iti_ihr = _default_ihr;
+static ihr_entry_t _slave_wdt_iti_ihr = _default_ihr;
+
+static ihr_entry_t *_wdt_iti_ihr_get(void);
+
 void
 cpu_wdt_init(uint8_t clock_div)
 {
@@ -29,7 +35,9 @@ cpu_wdt_init(uint8_t clock_div)
         MEMORY_CLEAR_WOVF_RSTCSR();
         MEMORY_CLEAR_RSTCSR(0x00);
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI, _wdt_iti_handler);
+        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
+
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI + interrupt_offset, _wdt_iti_handler);
 }
 
 void
@@ -48,13 +56,31 @@ cpu_wdt_timer_mode_set(uint8_t mode, void (*ihr)(void))
         MEMORY_CLEAR_WOVF_RSTCSR();
         MEMORY_CLEAR_RSTCSR(0x00);
 
-        _wdt_iti_ihr = _default_ihr;
+        ihr_entry_t *wdt_iti_ihr;
+        wdt_iti_ihr = _wdt_iti_ihr_get();
+
+        *wdt_iti_ihr = _default_ihr;
 
         if (ihr != NULL) {
-                _wdt_iti_ihr = ihr;
+                *wdt_iti_ihr = ihr;
         }
 
         cpu_wdt_count_set(0);
+}
+
+static ihr_entry_t *
+_wdt_iti_ihr_get(void)
+{
+        const uint8_t which_cpu = cpu_dual_executor_get();
+
+        switch (which_cpu) {
+                case CPU_MASTER:
+                        return &_master_wdt_iti_ihr;
+                case CPU_SLAVE:
+                        return &_slave_wdt_iti_ihr;
+        }
+
+        return NULL;
 }
 
 static void __interrupt_handler
@@ -72,7 +98,10 @@ _wdt_iti_handler(void)
         /* MEMORY_CLEAR_RSTCSR(0x40); */
 
         /* User is responsible for resetting WDT count */
-        _wdt_iti_ihr();
+        ihr_entry_t *wdt_iti_ihr;
+        wdt_iti_ihr = _wdt_iti_ihr_get();
+
+        (*wdt_iti_ihr)();
 }
 
 static void
