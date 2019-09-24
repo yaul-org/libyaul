@@ -142,7 +142,7 @@ static void
 _slave_init(void)
 {
         cpu_divu_init();
-        cpu_frt_init(true, CPU_FRT_CLOCK_DIV_8);
+        cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
 
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         cpu_dmac_init();

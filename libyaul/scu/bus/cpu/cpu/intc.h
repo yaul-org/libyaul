@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include <cpu/registers.h>
+#include <cpu/dual.h>
 
 __BEGIN_DECLS
 
@@ -48,8 +49,8 @@ __BEGIN_DECLS
 #define CPU_INTC_INTERRUPT_FREE_6F      0x6F
 #define CPU_INTC_INTERRUPT_SLAVE_ENTRY  0x94
 
-#define CPU_INTC_INTERRUPT_MASTER_BASE  0x000
-#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x100
+#define CPU_INTC_INTERRUPT_MASTER_BASE  0x0000
+#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x0100
 
 #define CPU_INTC_PRIORITY_VBLANK_IN             15
 #define CPU_INTC_PRIORITY_VBLANK_OUT            14
@@ -111,6 +112,16 @@ cpu_intc_mask_set(uint8_t mask)
         reg_sr |= (mask & 0x0F) << 4;
 
         cpu_reg_sr_set(reg_sr);
+}
+
+static inline uint32_t __always_inline
+cpu_intc_interrupt_offset_get(void)
+{
+        const uint8_t which_cpu = cpu_dual_executor_get();
+
+        /* Master CPU's vector table offset is at 0x0000: CPU_INTC_INTERRUPT_MASTER_BASE
+         *  Slave CPU's vector table offset is at 0x0100: CPU_INTC_INTERRUPT_SLAVE_BASE */
+        return (which_cpu << 8);
 }
 
 __END_DECLS

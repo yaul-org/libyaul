@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <scu/map.h>
+#include <cpu/frt.h>
 #include <cpu/registers.h>
 
 __BEGIN_DECLS
