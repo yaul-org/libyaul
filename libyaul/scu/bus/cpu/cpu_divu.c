@@ -18,7 +18,12 @@ static void _divu_ovfi_handler(void);
 
 static void _default_ihr(void);
 
-static void (*_divu_ovfi_ihr)(void) = _default_ihr;
+typedef void (*ihr_entry_t)(void);
+
+static ihr_entry_t _master_divu_ovfi_ihr = _default_ihr;
+static ihr_entry_t _slave_divu_ovfi_ihr = _default_ihr;
+
+static ihr_entry_t *_divu_ovfi_ihr_get(void);
 
 void
 cpu_divu_init(void)
@@ -27,7 +32,9 @@ cpu_divu_init(void)
 
         MEMORY_WRITE(32, CPU(VCRDIV), CPU_INTC_INTERRUPT_DIVU_OVFI);
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI, _divu_ovfi_handler);
+        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
+
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI + interrupt_offset, _divu_ovfi_handler);
 }
 
 void
@@ -38,10 +45,13 @@ cpu_divu_ovfi_set(void (*ihr)(void))
 
         *reg_dvcr &= ~0x00000003;
 
-        _divu_ovfi_ihr = _default_ihr;
+        ihr_entry_t *divu_ovfi_ihr;
+        divu_ovfi_ihr = _divu_ovfi_ihr_get();
+
+        *divu_ovfi_ihr = _default_ihr;
 
         if (ihr != NULL) {
-                _divu_ovfi_ihr = ihr;
+                *divu_ovfi_ihr = ihr;
 
                 *reg_dvcr |= 0x00000002;
         }
@@ -52,7 +62,25 @@ _divu_ovfi_handler(void)
 {
         MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);
 
-        _divu_ovfi_ihr();
+        ihr_entry_t *divu_ovfi_ihr;
+        divu_ovfi_ihr = _divu_ovfi_ihr_get();
+
+        (*divu_ovfi_ihr)();
+}
+
+static ihr_entry_t *
+_divu_ovfi_ihr_get(void)
+{
+        const uint8_t which_cpu = cpu_dual_executor_get();
+
+        switch (which_cpu) {
+                case CPU_MASTER:
+                        return &_master_divu_ovfi_ihr;
+                case CPU_SLAVE:
+                        return &_slave_divu_ovfi_ihr;
+        }
+
+        return NULL;
 }
 
 static void
