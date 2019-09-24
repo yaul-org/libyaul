@@ -42,7 +42,10 @@ vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb555_t *buffer,
         assert(count > 0);
 #endif /* DEBUG */
 
-        _set_back_screen(vram, buffer, false, count);
+        bool single_color;
+        single_color = (count == 1);
+
+        _set_back_screen(vram, buffer, single_color, count);
 }
 
 static inline void

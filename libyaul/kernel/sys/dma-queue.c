@@ -93,7 +93,7 @@ dma_queue_init(void)
 
                         request->handler = _default_handler;
 
-                        request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
+                        request->transfer.status = DMA_QUEUE_STATUS_UNKNOWN;
                         request->transfer.work = NULL;
                 }
         }

@@ -27,6 +27,8 @@ struct dma_queue_transfer {
 #define DMA_QUEUE_STATUS_INCOMPLETE     (1)
 /* DMA request explicitly canceled */
 #define DMA_QUEUE_STATUS_CANCELED       (2)
+/* DMA request unknown */
+#define DMA_QUEUE_STATUS_UNKNOWN        (255)
         uint8_t status;
         void *work;
 } __aligned(4);

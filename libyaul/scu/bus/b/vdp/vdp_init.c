@@ -8,6 +8,7 @@
 #include <bios.h>
 
 #include <cpu/cache.h>
+#include <cpu/dmac.h>
 #include <cpu/intc.h>
 
 #include <vdp.h>
@@ -17,43 +18,26 @@
 #include "vdp-internal.h"
 
 static void _init_vdp1(void);
+static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
 
 static void _init_vdp2(void);
 
 void
 vdp_init(void)
 {
-        /* Reset all buffered registers and initialize to sane values */
-        (void)memset(&_state_vdp1()->regs, 0x00, sizeof(_state_vdp1()->regs));
-        (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
-
-        vdp_sync_init();
-
+        /* VDP2 must be initialized first before VDP1 as the VDP1 writes to VDP2
+         * registers */
+        _init_vdp2();
         _init_vdp1();
 
-        _init_vdp2();
-
-        uint8_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(0);
-
-        struct vdp1_cmdt_list cmdt_list;
-        struct vdp1_cmdt cmdt;
-
-        vdp1_cmdt_list_init(&cmdt_list, &cmdt, 1);
-
-        vdp1_cmdt_end(&cmdt_list);
-
-        vdp1_sync_draw(&cmdt_list, NULL, NULL);
-        vdp_sync(0);
-
-        cpu_intc_mask_set(sr_mask);
+        vdp_sync_init();
 }
 
 static void
 _init_vdp1(void)
 {
+        (void)memset(&_state_vdp1()->regs, 0x00, sizeof(_state_vdp1()->regs));
+
         struct vdp1_env *default_env;
         default_env = &_state_vdp1()->env;
 
@@ -70,24 +54,54 @@ _init_vdp1(void)
         vdp1_env_default_set();
 
         vdp1_vram_partitions_set(2048, 0x0006BFE0, 1024, 256);
+
+        MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
+
+        _memory_area_clear(VDP1_VRAM(0x0000), 0x8000, VDP1_VRAM_SIZE);
+        _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+}
+
+static void
+_memory_area_clear(const uint32_t address, const uint16_t value,
+    const uint32_t len)
+{
+        static struct cpu_dmac_cfg dmac_cfg = {
+                .channel = 0,
+                .src_mode = CPU_DMAC_SOURCE_FIXED,
+                .src = 0x00000000,
+                .dst = 0x00000000,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .len = 0x00000000,
+                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr = NULL
+        };
+
+        dmac_cfg.dst = CPU_CACHE_THROUGH | address;
+        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&value;
+        dmac_cfg.len = len;
+
+        cpu_dmac_channel_wait(0);
+        cpu_dmac_channel_config_set(&dmac_cfg);
+        cpu_dmac_channel_start(0);
+        cpu_dmac_channel_wait(0);
 }
 
 static void
 _init_vdp2(void)
 {
+        static const struct vdp2_vram_ctl vram_ctl = {
+                .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
+        };
+
+        (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
+
         _state_vdp2()->tv.resolution.x = 0;
         _state_vdp2()->tv.resolution.y = 0;
 
         vdp2_tvmd_display_clear();
-
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG0, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG2, F16(0.0f));
-        vdp2_scrn_scroll_x_set(VDP2_SCRN_NBG1, F16(0.0f));
-        vdp2_scrn_scroll_y_set(VDP2_SCRN_NBG1, F16(0.0f));
 
         vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);
@@ -95,24 +109,11 @@ _init_vdp2(void)
         vdp2_scrn_priority_set(VDP2_SCRN_NBG3, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_RBG0, 1);
 
-        vdp2_sprite_priority_set(0, 0);
-        vdp2_sprite_priority_set(1, 0);
-        vdp2_sprite_priority_set(2, 0);
-        vdp2_sprite_priority_set(3, 0);
-        vdp2_sprite_priority_set(4, 0);
-        vdp2_sprite_priority_set(5, 0);
-        vdp2_sprite_priority_set(6, 0);
-        vdp2_sprite_priority_set(7, 0);
-
         vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG0, Q0_3_8(1.0f));
 
         vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
-
-        const struct vdp2_vram_ctl vram_ctl = {
-                .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
-        };
 
         vdp2_vram_control_set(&vram_ctl);
 
@@ -122,6 +123,9 @@ _init_vdp2(void)
             COLOR_RGB555(0, 0, 0));
 
         vdp2_vram_cycp_clear();
+
+        _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
+        _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
