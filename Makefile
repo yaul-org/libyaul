@@ -46,8 +46,8 @@ endef
 
 define macro-check-toolchain
 	$(ECHO)for tool in $2; do \
-	    printf -- "$(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool}$(EXE_EXT)\n"; \
-	    if [ ! -e $(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
+	    printf -- "$(YAUL_INSTALL_ROOT)/bin/$1-$${tool}$(EXE_EXT)\n"; \
+	    if [ ! -e $(YAUL_INSTALL_ROOT)/bin/$1-$${tool} ]; then \
 		printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
 		exit 1; \
 	    fi; \
@@ -80,8 +80,8 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project)
 
 check-toolchain:
 	@printf -- "$(V_BEGIN_YELLOW)toolchain check$(V_END)\n"
-	$(call macro-check-toolchain,$(SH_ARCH),as ar ld nm objcopy objdump gcc g++)
-	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
+	$(call macro-check-toolchain,$(YAUL_ARCH_SH_PREFIX),as ar ld nm objcopy objdump gcc g++)
+	$(call macro-check-toolchain,$(M68K_ARCH),as ar ld nm objcopy objdump)
 
 release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
