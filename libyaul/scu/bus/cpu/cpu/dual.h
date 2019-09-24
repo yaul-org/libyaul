@@ -43,9 +43,27 @@ cpu_dual_notification_wait(void)
         *reg_ftcsr &= ~0x80;
 }
 
+static inline void * __always_inline
+cpu_dual_master_stack_get(void)
+{
+        extern uint32_t _master_stack;
+
+        return (void *)&_master_stack;
+}
+
+static inline void * __always_inline
+cpu_dual_slave_stack_get(void)
+{
+        extern uint32_t _slave_stack;
+
+        return (void *)&_slave_stack;
+}
+
 extern void cpu_dual_init(uint8_t);
 extern void cpu_dual_master_set(void (*)(void));
 extern void cpu_dual_slave_set(void (*)(void));
+
+extern int8_t cpu_dual_executor_get(void);
 
 #define cpu_dual_master_clear() do {                                           \
         cpu_dual_master_set(NULL);                                             \

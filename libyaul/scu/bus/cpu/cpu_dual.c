@@ -116,6 +116,28 @@ cpu_dual_slave_set(void (*entry)(void))
         }
 }
 
+int8_t
+cpu_dual_executor_get(void)
+{
+        extern uint32_t _master_stack;
+        extern uint32_t _master_stack_end;
+
+        extern uint32_t _slave_stack;
+        extern uint32_t _slave_stack_end;
+
+        const uint32_t stack = cpu_reg_sp_get();
+
+        if ((stack >= (uint32_t)&_master_stack_end) && (stack <= (uint32_t)&_master_stack)) {
+                return CPU_MASTER;
+        }
+
+        if ((stack >= (uint32_t)&_slave_stack_end) && (stack <= (uint32_t)&_slave_stack)) {
+                return CPU_SLAVE;
+        }
+
+        return -1;
+}
+
 static void
 _slave_init(void)
 {
