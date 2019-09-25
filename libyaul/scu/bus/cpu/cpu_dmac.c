@@ -53,8 +53,12 @@ cpu_dmac_init(void)
         MEMORY_WRITE(8, CPU(DRCR0), 0x00);
         MEMORY_WRITE(8, CPU(DRCR1), 0x00);
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0, _dmac_ch0_ihr_handler);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1, _dmac_ch1_ihr_handler);
+        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
+
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0 + interrupt_offset,
+            _dmac_ch0_ihr_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1 + interrupt_offset,
+            _dmac_ch1_ihr_handler);
 
         cpu_dmac_enable();
 }
