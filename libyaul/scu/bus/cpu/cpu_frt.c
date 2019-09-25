@@ -22,26 +22,25 @@ static void _default_ihr(void);
 #define FRT_IHR_INDEX_NONE      0
 #define FRT_IHR_INDEX_OCBI      1
 #define FRT_IHR_INDEX_OCAI      2
+#define FRT_IHR_INDEX_OVI       3
 
 typedef void (*ihr_entry_t)(void);
 
-static ihr_entry_t _master_frt_ovi_ihr = _default_ihr;
-static ihr_entry_t _slave_frt_ovi_ihr = _default_ihr;
-
-static ihr_entry_t _master_frt_oc_ihr_table[] = {
+static ihr_entry_t _master_frt_ihr_table[] = {
+        _default_ihr,
         _default_ihr,
         _default_ihr,
         _default_ihr
 };
 
-static ihr_entry_t _slave_frt_oc_ihr_table[] = {
+static ihr_entry_t _slave_frt_ihr_table[] = {
+        _default_ihr,
         _default_ihr,
         _default_ihr,
         _default_ihr
 };
 
-static ihr_entry_t* _frt_oc_ihr_table_get(void);
-static ihr_entry_t* _frt_ovi_ihr_get(void);
+static ihr_entry_t* _frt_ihr_table_get(void);
 
 void
 cpu_frt_init(uint8_t clock_div)
@@ -82,10 +81,10 @@ cpu_frt_oca_set(uint16_t count, void (*ihr)(void))
         MEMORY_WRITE(8, CPU(OCRAH), 0);
         MEMORY_WRITE(8, CPU(OCRAL), 0);
 
-        ihr_entry_t *frt_oc_ihr_table;
-        frt_oc_ihr_table = _frt_oc_ihr_table_get();
+        ihr_entry_t *frt_ihr_table;
+        frt_ihr_table = _frt_ihr_table_get();
 
-        frt_oc_ihr_table[FRT_IHR_INDEX_OCAI] = _default_ihr;
+        frt_ihr_table[FRT_IHR_INDEX_OCAI] = _default_ihr;
 
         if ((count > 0) && (ihr != NULL)) {
                 MEMORY_WRITE_AND(8, CPU(TOCR), ~0x10);
@@ -96,7 +95,7 @@ cpu_frt_oca_set(uint16_t count, void (*ihr)(void))
                 MEMORY_WRITE_OR(8, CPU(TOCR), 0x02);
                 MEMORY_WRITE_OR(8, CPU(TIER), 0x08);
 
-                frt_oc_ihr_table[FRT_IHR_INDEX_OCAI] = ihr;
+                frt_ihr_table[FRT_IHR_INDEX_OCAI] = ihr;
         }
 }
 
@@ -115,10 +114,10 @@ cpu_frt_ocb_set(uint16_t count, void (*ihr)(void))
         MEMORY_WRITE(8, CPU(OCRBH), 0);
         MEMORY_WRITE(8, CPU(OCRBL), 0);
 
-        ihr_entry_t *frt_oc_ihr_table;
-        frt_oc_ihr_table = _frt_oc_ihr_table_get();
+        ihr_entry_t *frt_ihr_table;
+        frt_ihr_table = _frt_ihr_table_get();
 
-        frt_oc_ihr_table[FRT_IHR_INDEX_OCBI] = _default_ihr;
+        frt_ihr_table[FRT_IHR_INDEX_OCBI] = _default_ihr;
 
         if ((count > 0) && (ihr != NULL)) {
                 MEMORY_WRITE(8, CPU(OCRBH), (uint8_t)(count >> 8));
@@ -127,7 +126,7 @@ cpu_frt_ocb_set(uint16_t count, void (*ihr)(void))
                 MEMORY_WRITE_OR(8, CPU(TOCR), 0x01);
                 MEMORY_WRITE_OR(8, CPU(TIER), 0x04);
 
-                frt_oc_ihr_table[FRT_IHR_INDEX_OCBI] = ihr;
+                frt_ihr_table[FRT_IHR_INDEX_OCBI] = ihr;
         }
 }
 
@@ -141,43 +140,28 @@ cpu_frt_ovi_set(void (*ihr)(void))
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        ihr_entry_t *frt_ovi_ihr;
-        frt_ovi_ihr = _frt_ovi_ihr_get();
+        ihr_entry_t *frt_ihr_table;
+        frt_ihr_table = _frt_ihr_table_get();
 
-        *frt_ovi_ihr = _default_ihr;
+        frt_ihr_table[FRT_IHR_INDEX_OVI] = _default_ihr;
 
         if (ihr != NULL) {
-                *frt_ovi_ihr = ihr;
+                frt_ihr_table[FRT_IHR_INDEX_OVI] = ihr;
 
                 *reg_tier |= 0x02;
         }
 }
 
 static ihr_entry_t *
-_frt_oc_ihr_table_get(void)
+_frt_ihr_table_get(void)
 {
         const uint8_t which_cpu = cpu_dual_executor_get();
 
         switch (which_cpu) {
                 case CPU_MASTER:
-                        return _master_frt_oc_ihr_table;
+                        return _master_frt_ihr_table;
                 case CPU_SLAVE:
-                        return _slave_frt_oc_ihr_table;
-        }
-
-        return NULL;
-}
-
-static ihr_entry_t *
-_frt_ovi_ihr_get(void)
-{
-        const uint8_t which_cpu = cpu_dual_executor_get();
-
-        switch (which_cpu) {
-                case CPU_MASTER:
-                        return &_master_frt_ovi_ihr;
-                case CPU_SLAVE:
-                        return &_slave_frt_ovi_ihr;
+                        return _slave_frt_ihr_table;
         }
 
         return NULL;
@@ -204,11 +188,11 @@ _frt_oci_handler(void)
         *reg_tier &= ~ocf_bits;
         *reg_ftcsr = ftcsr_bits & ~0x0C;
 
-        ihr_entry_t *frt_oc_ihr_table;
-        frt_oc_ihr_table = _frt_oc_ihr_table_get();
+        ihr_entry_t *frt_ihr_table;
+        frt_ihr_table = _frt_ihr_table_get();
 
-        frt_oc_ihr_table[(ocf_bits & 0x08) >> 2]();
-        frt_oc_ihr_table[(ocf_bits & 0x04) >> 2]();
+        frt_ihr_table[(ocf_bits & 0x08) >> 2]();
+        frt_ihr_table[(ocf_bits & 0x04) >> 2]();
 
         *reg_tier |= ocf_bits;
 }
@@ -223,10 +207,10 @@ _frt_ovi_handler(void)
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        ihr_entry_t *frt_ovi_ihr;
-        frt_ovi_ihr = _frt_ovi_ihr_get();
+        ihr_entry_t *frt_ihr_table;
+        frt_ihr_table = _frt_ihr_table_get();
 
-        (*frt_ovi_ihr)();
+        frt_ihr_table[FRT_IHR_INDEX_OVI]();
 
         *reg_tier |= 0x02;
 }
