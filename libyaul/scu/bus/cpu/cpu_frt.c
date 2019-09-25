@@ -25,7 +25,8 @@ static void _default_ihr(void);
 
 typedef void (*ihr_entry_t)(void);
 
-static ihr_entry_t _frt_ovi_ihr = _default_ihr;
+static ihr_entry_t _master_frt_ovi_ihr = _default_ihr;
+static ihr_entry_t _slave_frt_ovi_ihr = _default_ihr;
 
 static ihr_entry_t _master_frt_oc_ihr_table[] = {
         _default_ihr,
@@ -40,6 +41,7 @@ static ihr_entry_t _slave_frt_oc_ihr_table[] = {
 };
 
 static ihr_entry_t* _frt_oc_ihr_table_get(void);
+static ihr_entry_t* _frt_ovi_ihr_get(void);
 
 void
 cpu_frt_init(uint8_t clock_div)
@@ -139,10 +141,13 @@ cpu_frt_ovi_set(void (*ihr)(void))
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        _frt_ovi_ihr = _default_ihr;
+        ihr_entry_t *frt_ovi_ihr;
+        frt_ovi_ihr = _frt_ovi_ihr_get();
+
+        *frt_ovi_ihr = _default_ihr;
 
         if (ihr != NULL) {
-                _frt_ovi_ihr = ihr;
+                *frt_ovi_ihr = ihr;
 
                 *reg_tier |= 0x02;
         }
@@ -158,6 +163,21 @@ _frt_oc_ihr_table_get(void)
                         return _master_frt_oc_ihr_table;
                 case CPU_SLAVE:
                         return _slave_frt_oc_ihr_table;
+        }
+
+        return NULL;
+}
+
+static ihr_entry_t *
+_frt_ovi_ihr_get(void)
+{
+        const uint8_t which_cpu = cpu_dual_executor_get();
+
+        switch (which_cpu) {
+                case CPU_MASTER:
+                        return &_master_frt_ovi_ihr;
+                case CPU_SLAVE:
+                        return &_slave_frt_ovi_ihr;
         }
 
         return NULL;
@@ -203,7 +223,10 @@ _frt_ovi_handler(void)
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        _frt_ovi_ihr();
+        ihr_entry_t *frt_ovi_ihr;
+        frt_ovi_ihr = _frt_ovi_ihr_get();
+
+        (*frt_ovi_ihr)();
 
         *reg_tier |= 0x02;
 }
