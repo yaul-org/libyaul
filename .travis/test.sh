@@ -1,5 +1,13 @@
 #!/bin/bash -e
 
+VARIABLES=("BUILD_TYPE" \
+           "YAUL_INSTALL_ROOT" \
+           "YAUL_PROG_SH_PREFIX" \
+           "YAUL_ARCH_SH_PREFIX" \
+           "YAUL_BUILD_ROOT" \
+           "YAUL_BUILD" \
+           "YAUL_OPTION_DEV_CARTRIDGE")
+
 change_env_value() {
     local _variable="${1}"
     local _value="${2}"
@@ -8,7 +16,7 @@ change_env_value() {
     mv yaul.env.tmp yaul.env
 }
 
-for var in "BUILD_TYPE" "YAUL_INSTALL_ROOT" "YAUL_BUILD_ROOT" "YAUL_BUILD" "YAUL_OPTION_DEV_CARTRIDGE"; do
+for var in ${VARIABLES[@]}; do
     if ! set 2>&1 | grep -q -E "^${var}=.+$"; then
         printf -- "Environment variable \`${var}' was not set\n"
         exit 1
