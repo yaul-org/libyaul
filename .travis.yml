@@ -5,6 +5,8 @@ language: c
 env:
   global:
     - YAUL_INSTALL_ROOT=/tool-chains/sh2eb-elf
+    - YAUL_PROG_SH_PREFIX=sh2eb-elf
+    - YAUL_ARCH_SH_PREFIX=
     - YAUL_BUILD_ROOT=/tmp
     - YAUL_BUILD=build
   matrix:
