@@ -117,11 +117,16 @@ cpu_intc_mask_set(uint8_t mask)
 static inline uint32_t __always_inline
 cpu_intc_interrupt_offset_get(void)
 {
-        const uint8_t which_cpu = cpu_dual_executor_get();
+        const int8_t which_cpu = cpu_dual_executor_get();
 
-        /* Master CPU's vector table offset is at 0x0000: CPU_INTC_INTERRUPT_MASTER_BASE
-         *  Slave CPU's vector table offset is at 0x0100: CPU_INTC_INTERRUPT_SLAVE_BASE */
-        return (which_cpu << 8);
+        switch (which_cpu) {
+                case CPU_MASTER:
+                        return CPU_INTC_INTERRUPT_MASTER_BASE;
+                case CPU_SLAVE:
+                        return CPU_INTC_INTERRUPT_SLAVE_BASE;
+                default:
+                        return CPU_INTC_INTERRUPT_MASTER_BASE;
+        }
 }
 
 __END_DECLS
