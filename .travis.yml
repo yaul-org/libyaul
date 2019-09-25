@@ -4,7 +4,7 @@ language: c
 
 env:
   global:
-    - YAUL_INSTALL_ROOT=/tool-chains
+    - YAUL_INSTALL_ROOT=/tool-chains/sh2eb-elf
     - YAUL_BUILD_ROOT=/tmp
     - YAUL_BUILD=build
   matrix:
@@ -22,9 +22,9 @@ env:
     - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
 
 before_script:
-  - wget -4 --retry-connrefused --waitretry=300 -O tool-chain.tar.bz2 "https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB"
+  - wget -4 --retry-connrefused --waitretry=300 -O "tool-chain.tar.bz2" "https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB"
   - sudo mkdir /tool-chains
-  - sudo tar mxvfjp tool-chain.tar.bz2 -C /tool-chains/
+  - sudo tar mxvfjp "tool-chain.tar.bz2" -C /tool-chains/
   - git submodule init
   - git submodule update -f
 
