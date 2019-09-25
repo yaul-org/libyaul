@@ -44,11 +44,11 @@ define macro-install
 	done
 endef
 
-define macro-check-toolchain
+define macro-check-tool-chain
 	$(ECHO)for tool in $2; do \
 	    printf -- "$(YAUL_INSTALL_ROOT)/bin/$1-$${tool}$(EXE_EXT)\n"; \
 	    if [ ! -e $(YAUL_INSTALL_ROOT)/bin/$1-$${tool} ]; then \
-		printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
+		printf -- "$1 tool-chain has not been installed properly (see build-scripts/)\n" >&2; \
 		exit 1; \
 	    fi; \
 	done
@@ -71,17 +71,16 @@ endef
 	install-tools \
 	clean-tools \
 	list-targets \
-	check-toolchain
+	check-tool-chain
 
 all: release debug tools
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
-check-toolchain:
-	@printf -- "$(V_BEGIN_YELLOW)toolchain check$(V_END)\n"
-	$(call macro-check-toolchain,$(YAUL_ARCH_SH_PREFIX),as ar ld nm objcopy objdump gcc g++)
-	$(call macro-check-toolchain,$(M68K_ARCH),as ar ld nm objcopy objdump)
+check-tool-chain:
+	@printf -- "$(V_BEGIN_YELLOW)tool-chain check$(V_END)\n"
+	$(call macro-check-tool-chain,$(YAUL_ARCH_SH_PREFIX),as ar ld nm objcopy objdump gcc g++)
 
 release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
@@ -90,7 +89,7 @@ release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	done
 
 $(YAUL_BUILD_ROOT)/$(YAUL_BUILD):
-	@$(MAKE) -s check-toolchain
+	@$(MAKE) -s check-tool-chain
 	$(ECHO)mkdir -p $@
 
 install: install-release install-tools
