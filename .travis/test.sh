@@ -2,7 +2,7 @@
 
 VARIABLES=("BUILD_TYPE" \
            "YAUL_INSTALL_ROOT" \
-           "YAUL_PROG_SH_PREFIX" \
+           "YAUL_ARCH_SH_PREFIX" \
            "YAUL_BUILD_ROOT" \
            "YAUL_BUILD" \
            "YAUL_OPTION_DEV_CARTRIDGE")
