@@ -1,69 +1,78 @@
 #!/usr/bin/env python3
 
-import click
 import json
 import os
 import sys
 
-CONTEXT_SETTINGS = dict(help_option_names = ['-h', '--help'])
+try:
+    import click
+except ImportError:
+    print("{}: Missing \"click\" package. Install from <https://pypi.org/project/click/>".format(sys.argv[0]), file = sys.stderr)
+    sys.exit(1)
 
 PRUNE_COMPILER_FLAGS = [
+    # This flag causes major issues with Clang. Having this flag present in the
+    # JSON compilation database results in fatal errors
     "-save-temps"
 ]
 
-@click.command(context_settings = CONTEXT_SETTINGS)
-@click.option('-i', '--input-file', 'input_file', type = click.Path(exists = True, file_okay = True, dir_okay = False, readable = True, allow_dash = False, resolve_path = True),
+@click.command(context_settings = dict(help_option_names = ['-h', '--help']))
+@click.option('-i', '--input-file', 'input_file',
+              type = click.Path(exists = True,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
               help = 'Input file.', required = True, multiple = False)
-@click.option('-d', '--directory', 'directory', type = click.Path(exists = True, file_okay = False, dir_okay = True, allow_dash = False, resolve_path = True),
+@click.option('-d', '--directory', 'directory',
+              type = click.Path(exists = True,
+                                file_okay = False,
+                                dir_okay = True,
+                                allow_dash = False,
+                                resolve_path = True),
               help = 'Build directory.', required = True, multiple = False)
-@click.option('-o', '--output-cdb', 'output_cdb', type = click.File('a+'),
+@click.option('-o', '--output-cdb', 'out_stream', type = click.File('a+'),
               help = 'Output compile DB.', required = True, multiple = False)
 @click.argument('flags', nargs = -1, type = click.UNPROCESSED)
-def cli(input_file, directory, output_cdb, flags):
+def cli(input_file, directory, out_stream, flags):
+    def build_cdb(out_stream):
+        try:
+            out_stream.seek(0)
+            return json.load(out_stream)
+        except Exception as exception:
+            return []
+
+    def write_cdb(cdb, out_stream, pretty_print = True):
+        out_stream.seek(0)
+        out_stream.truncate()
+        json.dump(cdb, out_stream, indent = (4 if pretty_print else None))
+
+    def prune_flags(flags):
+        return tuple([flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS])
+
+    def new_cdb_entry(input_file, directory, flags):
+        return {
+            'file': input_file,
+            'directory': directory,
+            'arguments': list(flags)
+        }
+
+    def append_cdb(cdb, new_cdb_entry):
+        return [cdb_entry for cdb_entry in cdb
+                if cdb_entry['file'] != new_cdb_entry['file']] + [new_cdb_entry]
+
     # Parse output CDB
-    cdb = build_cdb(output_cdb)
+    cdb = build_cdb(out_stream)
     # print("cdb: {}".format(cdb))
     pruned_flags = prune_flags(flags)
     # print("pruned_flags: {}".format(pruned_flags))
-    cdb_entry = create_cdb_entry(input_file, directory, pruned_flags)
+    cdb_entry = new_cdb_entry(input_file, directory, pruned_flags)
     # print("cdb_entry: {}".format(cdb_entry))
-    cdb = append_cdb_entry(cdb, cdb_entry)
-    # print("cdb: {}".format(cdb))
-    write_cdb(cdb, output_cdb)
-
-def build_cdb(output_cdb):
-    try:
-        output_cdb.seek(0)
-        cdb = json.load(output_cdb)
-        return cdb
-    except Exception as exception:
-        return []
-
-def write_cdb(cdb, output_cdb):
-    output_cdb.seek(0)
-    output_cdb.truncate()
-    json.dump(cdb, output_cdb, indent = 4)
-
-def prune_flags(flags):
-    pruned_flags = ()
-    for flag in flags:
-        if flag in PRUNE_COMPILER_FLAGS:
-            continue
-        pruned_flags = pruned_flags + (flag,)
-    return pruned_flags
-
-def create_cdb_entry(input_file, directory, flags):
-    return {
-        'file': input_file,
-        'directory': directory,
-        'arguments': list(flags)
-    }
-
-def append_cdb_entry(cdb, cdb_entry):
-    for old_cdb_entry in cdb:
-        if old_cdb_entry['file'] == cdb_entry['file']:
-            return cdb
-    return cdb + [cdb_entry]
+    updated_cdb = append_cdb(cdb, cdb_entry)
+    # print("updated_cdb: {}".format(updated_cdb))
+    if len(updated_cdb) > len(cdb):
+        write_cdb(updated_cdb, out_stream, pretty_print = False)
 
 if __name__ == "__main__":
     cli()
