@@ -13,6 +13,9 @@ USER_FILES:= \
 	common/pre.common.mk \
 	common/post.common.mk
 
+HELPER_FILES:= \
+	common/update-cdb
+
 LDSCRIPTS:= \
 	common/ldscripts/yaul.x \
 	common/ldscripts/ip.x

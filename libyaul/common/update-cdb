@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+
+import click
+import json
+import os
+import sys
+
+CONTEXT_SETTINGS = dict(help_option_names = ['-h', '--help'])
+
+PRUNE_COMPILER_FLAGS = [
+    "-save-temps"
+]
+
+@click.command(context_settings = CONTEXT_SETTINGS)
+@click.option('-i', '--input-file', 'input_file', type = click.Path(exists = True, file_okay = True, dir_okay = False, readable = True, allow_dash = False, resolve_path = True),
+              help = 'Input file.', required = True, multiple = False)
+@click.option('-d', '--directory', 'directory', type = click.Path(exists = True, file_okay = False, dir_okay = True, allow_dash = False, resolve_path = True),
+              help = 'Build directory.', required = True, multiple = False)
+@click.option('-o', '--output-cdb', 'output_cdb', type = click.File('a+'),
+              help = 'Output compile DB.', required = True, multiple = False)
+@click.argument('flags', nargs = -1, type = click.UNPROCESSED)
+def cli(input_file, directory, output_cdb, flags):
+    # Parse output CDB
+    cdb = build_cdb(output_cdb)
+    # print("cdb: {}".format(cdb))
+    pruned_flags = prune_flags(flags)
+    # print("pruned_flags: {}".format(pruned_flags))
+    cdb_entry = create_cdb_entry(input_file, directory, pruned_flags)
+    # print("cdb_entry: {}".format(cdb_entry))
+    cdb = append_cdb_entry(cdb, cdb_entry)
+    # print("cdb: {}".format(cdb))
+    write_cdb(cdb, output_cdb)
+
+def build_cdb(output_cdb):
+    try:
+        output_cdb.seek(0)
+        cdb = json.load(output_cdb)
+        return cdb
+    except Exception as exception:
+        return []
+
+def write_cdb(cdb, output_cdb):
+    output_cdb.seek(0)
+    output_cdb.truncate()
+    json.dump(cdb, output_cdb, indent = 4)
+
+def prune_flags(flags):
+    pruned_flags = ()
+    for flag in flags:
+        if flag in PRUNE_COMPILER_FLAGS:
+            continue
+        pruned_flags = pruned_flags + (flag,)
+    return pruned_flags
+
+def create_cdb_entry(input_file, directory, flags):
+    return {
+        'file': input_file,
+        'directory': directory,
+        'arguments': list(flags)
+    }
+
+def append_cdb_entry(cdb, cdb_entry):
+    for old_cdb_entry in cdb:
+        if old_cdb_entry['file'] == cdb_entry['file']:
+            return cdb
+    return cdb + [cdb_entry]
+
+if __name__ == "__main__":
+    cli()

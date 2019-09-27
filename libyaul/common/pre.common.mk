@@ -18,6 +18,10 @@ ifneq (1,$(words [$(strip $(YAUL_PROG_SH_PREFIX))]))
   $(error YAUL_PROG_SH_PREFIX (tool-chain program prefix) contains spaces)
 endif
 
+ifeq ($(strip $(YAUL_CDB)),)
+  $(error Undefined YAUL_CDB (update JSON compile command database))
+endif
+
 # Check options
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
@@ -77,10 +81,6 @@ ifeq ($(strip $(YAUL_PROG_SH_PREFIX)),)
 YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
-ifeq ($(strip $(YAUL_RTAGS)),1)
-SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-rc $(YAUL_BUILD_ROOT)
-endif
-
 SH_AS:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
 SH_AR:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
 SH_CC:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
@@ -113,12 +113,6 @@ SH_CFLAGS= \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
-
-# Clang (RTags) has a problem with -save-temps
-ifeq ($(strip $(YAUL_RTAGS)),)
-SH_CFLAGS_shared:= $(SH_CFLAGS_shared) \
-	-save-temps=obj
-endif
 
 SH_LDFLAGS= -Wl,-Map,$(SH_PROGRAM).map
 

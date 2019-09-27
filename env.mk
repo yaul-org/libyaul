@@ -38,6 +38,10 @@ ifneq (1,$(words [$(strip $(YAUL_BUILD))]))
   $(error BUILD (build directory) contains spaces)
 endif
 
+ifeq ($(strip $(YAUL_CDB)),)
+  $(error Undefined YAUL_CDB (update JSON compile command database))
+endif
+
 # Check options
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
@@ -63,18 +67,14 @@ ifeq ($(strip $(YAUL_PROG_SH_PREFIX)),)
 YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
-ifeq ($(strip $(YAUL_RTAGS)),1)
-SH_RTAGS_RC:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-rc $(YAUL_BUILD_ROOT)
-endif
-
-SH_AS:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
-SH_AR:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
-SH_CC:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
-SH_CXX:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-g++$(EXE_EXT)
-SH_LD:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
-SH_NM:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-nm$(EXE_EXT)
-SH_OBJCOPY:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
-SH_OBJDUMP:= $(SH_RTAGS_RC) $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
+SH_AS:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
+SH_AR:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
+SH_CC:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_CXX:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-g++$(EXE_EXT)
+SH_LD:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
+SH_NM:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-nm$(EXE_EXT)
+SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
+SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
 	-pedantic \
@@ -129,12 +129,28 @@ SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
 SH_CXXFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CXXFLAGS)
 SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 
+CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
+
+ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
+define update-build-commands
+	@$(YAUL_BUILD_ROOT)/libyaul/common/update-cdb -i $1 -d $2 -o $3 -- $4
+endef
+else
+define update-build-commands
+endef
+endif
+
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
+	$(call update-build-commands,\
+		$(abspath $(<)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 define macro-sh-build-c++-object
@@ -143,6 +159,11 @@ define macro-sh-build-c++-object
 	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
+	$(call update-build-commands,\
+		$(abspath $(<)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CXXFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 define macro-sh-build-library
