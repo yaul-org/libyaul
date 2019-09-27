@@ -20,12 +20,13 @@ LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
 BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
+HELPER_FILES_all = $(HELPER_FILES)
 
 define macro-generate-install-file-rule
 $(YAUL_INSTALL_ROOT)/$3/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
 	@mkdir -p $$(@D)
-	$(ECHO)$(INSTALL) -m 644 $$< $$@
+	$(ECHO)$(INSTALL) -m $5 $$< $$@
 
 install-$4: $4 $(YAUL_INSTALL_ROOT)/$3/$2
 endef
@@ -74,16 +75,19 @@ $(foreach SUPPORT_OBJ,$(SUPPORT_OBJS_base), \
 
 # Install files
 $(foreach SPECS,$(SPECS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE),644)))
 
 $(foreach LDSCRIPT,$(LDSCRIPTS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),644)))
 
 $(foreach BOOTSTRAP,$(BOOTSTRAP_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(BOOTSTRAP),$(notdir $(BOOTSTRAP)),share/$(TARGET)/bootstrap,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(BOOTSTRAP),$(notdir $(BOOTSTRAP)),share/$(TARGET)/bootstrap,$(TYPE),644)))
 
 $(foreach USER_FILE,$(USER_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE))))
+	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),644)))
+
+$(foreach HELPER_FILE,$(HELPER_FILES_all), \
+	$(eval $(call macro-generate-install-file-rule,$(HELPER_FILE),$(notdir $(HELPER_FILE)),share,$(TYPE),755)))
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
@@ -93,6 +97,7 @@ clean:
 		$(FIND) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 	$(ECHO)$(RM) $(LIB_FILE_base)
+	$(ECHO)$(RM) $(CDB_FILE)
 
 -include $(SUPPORT_DEPS_base)
 -include $(LIB_DEPS_base)

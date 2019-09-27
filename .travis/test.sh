@@ -32,7 +32,7 @@ change_env_value "YAUL_PROG_SH_PREFIX" "${YAUL_PROG_SH_PREFIX}"
 change_env_value "YAUL_ARCH_SH_PREFIX" "${YAUL_ARCH_SH_PREFIX}"
 change_env_value "YAUL_BUILD_ROOT" "${YAUL_BUILD_ROOT}"
 change_env_value "YAUL_BUILD" "${YAUL_BUILD}"
-change_env_value "YAUL_RTAGS" 0
+change_env_value "YAUL_CDB" 1
 change_env_value "YAUL_OPTION_DEV_CARTRIDGE" "${YAUL_OPTION_DEV_CARTRIDGE}"
 
 . ./yaul.env

@@ -104,7 +104,7 @@ $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(projec
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
 create-pacman-package:
-	@echo "X"
+	@echo "$@: Not implemented"
 
 clean: clean-release clean-debug clean-tools
 

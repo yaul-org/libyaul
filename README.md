@@ -76,7 +76,7 @@ directory. Take note of the absolute path to the tool-chain.
       `YAUL_OPTION_DEV_CARTRIDGE`. If none, set to 0 (zero).
    5. Set whether to system reset or spin on abort() in
       `YAUL_OPTION_SPIN_ON_ABORT`. To system reset, set to 0 (zero).
-   6. Set RTags support in `YAUL_RTAGS`. Set 1 or 0 (zero).
+   6. Enable RTags/Irony support by setting `YAUL_CDB` to 1. To disable, set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.
 
@@ -95,17 +95,12 @@ directory. Take note of the absolute path to the tool-chain.
 
 ## Building Yaul
 
-1. If `YAUL_RTAGS` is set to `true` in your environment file, start the RTags
-   daemon (`rdm`).
-
-       $ .rtags/rdm &
-
-2. Initialize and update all submodules.
+1. Initialize and update all submodules.
 
        $ git submodule init
        $ git submodule update -f --recursive
 
-3. Build and install the supported libraries.
+2. Build and install the supported libraries.
 
        $ SILENT=1 make install-release
 
@@ -115,7 +110,7 @@ directory. Take note of the absolute path to the tool-chain.
 
    To find more about other targets, call `make list-targets`.
 
-4. Build and install the tools.
+3. Build and install the tools.
 
        $ SILENT=1 make install-tools
 
