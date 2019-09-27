@@ -35,6 +35,7 @@ addons:
     update: true
     packages:
       - libftdi1-dev
+      - python3-click
 
 script:
   - .travis/test.sh
