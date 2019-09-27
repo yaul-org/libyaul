@@ -121,7 +121,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	$(call update-build-commands,\
 		$(abspath $(<)),\
 		$(abspath $(<D)),\
-		"compile_commands.json",\
+		compile_commands.json,\
 		$(SH_CFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cc
@@ -130,7 +130,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	$(call update-build-commands,\
 		$(abspath $(<)),\
 		$(abspath $(<D)),\
-		"compile_commands.json",\
+		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.C
@@ -139,7 +139,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	$(call update-build-commands,\
 		$(abspath $(<)),\
 		$(abspath $(<D)),\
-		"compile_commands.json",\
+		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cpp
@@ -148,7 +148,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	$(call update-build-commands,\
 		$(abspath $(<)),\
 		$(abspath $(<D)),\
-		"compile_commands.json",\
+		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cxx
@@ -157,7 +157,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	$(call update-build-commands,\
 		$(abspath $(<)),\
 		$(abspath $(<D)),\
-		"compile_commands.json",\
+		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.sx
@@ -208,7 +208,8 @@ clean:
 	    $(SH_DEPS_NO_LINK) \
 	    root.romdisk \
 	    IP.BIN \
-	    IP.BIN.map
+	    IP.BIN.map \
+	    compile_commands.json
 ifneq ($(strip $(M68K_PROGRAM)),)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
