@@ -39,3 +39,8 @@ change_env_value "YAUL_OPTION_DEV_CARTRIDGE" "${YAUL_OPTION_DEV_CARTRIDGE}"
 
 make ${BUILD_TYPE}
 sudo make install-${BUILD_TYPE}
+
+make tools
+sudo make install-tools
+
+make examples
