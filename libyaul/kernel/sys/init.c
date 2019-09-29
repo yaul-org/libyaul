@@ -15,7 +15,11 @@
 
 #include <dbgio/dbgio.h>
 
+#if defined(MALLOC_IMPL_TLSF)
+#include <mm/tlsf.h>
+#elif defined(MALLOC_IMPL_SLOB)
 #include <mm/slob.h>
+#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
 
 #include <sys/dma-queue.h>
 
@@ -31,6 +35,8 @@
 #endif /* HAVE_DEV_CARTRIDGE */
 
 #include <dram-cart.h>
+
+#include <internal.h>
 
 void __weak
 user_init(void)
@@ -69,7 +75,19 @@ _call_global_dtors(void)
 static void __used __section(".init")
 _init(void)
 {
+#if defined(MALLOC_IMPL_TLSF)
+        static tlsf_t pools[TLSF_POOL_COUNT];
+
+        master_state()->tlsf_pools = &pools[0];
+
+        master_state()->tlsf_pools[TLSF_POOL_PRIVATE] =
+            tlsf_create_with_pool((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
+
+        master_state()->tlsf_pools[TLSF_POOL_GENERAL] =
+            tlsf_create_with_pool((void *)TLSF_POOL_GENERAL_START, TLSF_POOL_GENERAL_SIZE);
+#elif defined(MALLOC_IMPL_SLOB)
         slob_init();
+#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
 
         _call_global_ctors();
 

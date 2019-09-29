@@ -31,6 +31,8 @@
 
 #include <smpc/smc.h>
 
+#include <internal.h>
+
 extern void internal_gdb_ihr_break(void);
 extern void internal_gdb_exception_cpu_address_error(void);
 extern void internal_gdb_exception_dma_address_error(void);
@@ -458,7 +460,7 @@ _bp_list_alloc(void)
 {
         bp_list_t *bpl;
 
-        if ((bpl = (bp_list_t *)malloc(sizeof(bp_list_t))) == NULL) {
+        if ((bpl = (bp_list_t *)_internal_malloc(sizeof(bp_list_t))) == NULL) {
                 return NULL;
         }
 
@@ -483,7 +485,7 @@ _bp_list_free(bp_list_t **bplp)
 {
         assert(*bplp != NULL);
 
-        free(*bplp);
+        _internal_free(*bplp);
         *bplp = NULL;
 }
 
@@ -492,7 +494,7 @@ _bp_list_breakpoint_alloc(void)
 {
         bp_t *bp;
 
-        if ((bp = (bp_t *)malloc(sizeof(bp_t))) == NULL) {
+        if ((bp = (bp_t *)_internal_malloc(sizeof(bp_t))) == NULL) {
                 return NULL;
         }
 
@@ -517,7 +519,7 @@ _bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
         *p = bp->instruction;
 
         TAILQ_REMOVE(bpl, bp, entries);
-        free(bp);
+        _internal_free(bp);
 }
 
 static int

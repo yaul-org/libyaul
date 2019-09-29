@@ -13,6 +13,8 @@
 
 #include <sys/callback-list.h>
 
+#include <internal.h>
+
 static void _default_callback(void *);
 
 struct callback_list *
@@ -21,11 +23,11 @@ callback_list_alloc(const uint8_t count)
         assert(count > 0);
 
         struct callback_list *callback_list;
-        callback_list = malloc(sizeof(struct callback_list));
+        callback_list = _internal_malloc(sizeof(struct callback_list));
         assert(callback_list != NULL);
 
         struct callback *callbacks;
-        callbacks = malloc(count * sizeof(struct callback));
+        callbacks = _internal_malloc(count * sizeof(struct callback));
         assert(callbacks != NULL);
 
         callback_list_init(callback_list, callbacks, count);
@@ -42,8 +44,8 @@ callback_list_free(struct callback_list *callback_list)
 
         callback_list->count = 0;
 
-        free(callback_list->callbacks);
-        free(callback_list);
+        _internal_free(callback_list->callbacks);
+        _internal_free(callback_list);
 }
 
 void
