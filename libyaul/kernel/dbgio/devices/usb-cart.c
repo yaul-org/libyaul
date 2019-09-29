@@ -16,6 +16,8 @@
 
 #include "../dbgio-internal.h"
 
+#include <internal.h>
+
 #define STATE_IDLE              0x00
 #define STATE_INITIALIZED       0x01
 #define STATE_BUFFER_DIRTY      0x02
@@ -55,7 +57,7 @@ _init(const dbgio_usb_cart_t *params)
         assert(params != NULL);
 
         if (_dev_state == NULL) {
-                _dev_state = malloc(sizeof(dev_state_t));
+                _dev_state = _internal_malloc(sizeof(dev_state_t));
 
                 (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
         }
@@ -64,13 +66,13 @@ _init(const dbgio_usb_cart_t *params)
         /* Resize the buffer if needed */
         if ((_dev_state->buffer != NULL) &&
             (_dev_state->buffer_size < params->buffer_size)) {
-                free(_dev_state->buffer);
+                _internal_free(_dev_state->buffer);
 
                 _dev_state->buffer = NULL;
         }
 
         if (_dev_state->buffer == NULL) {
-                _dev_state->buffer = malloc(params->buffer_size);
+                _dev_state->buffer = _internal_malloc(params->buffer_size);
 
                 (void)memset(_dev_state->buffer, '\0', params->buffer_size);
         }
@@ -89,8 +91,8 @@ _deinit(void)
                 return;
         }
 
-        free(_dev_state->buffer);
-        free(_dev_state);
+        _internal_free(_dev_state->buffer);
+        _internal_free(_dev_state);
 
         _dev_state = NULL;
 }

@@ -13,6 +13,8 @@
 
 #include "romdisk.h"
 
+#include <internal.h>
+
 #define ROMFS_MAGIC             "-rom1fs-"
 #define MAX_RD_FILES            16
 
@@ -80,7 +82,7 @@ romdisk_mount(const char *mnt_point __unused,
         }
 
         hdr = (romdisk_hdr_t *)image;
-        if ((mnt = (rd_image_t *)malloc(sizeof(rd_image_t))) == NULL) {
+        if ((mnt = (rd_image_t *)_internal_malloc(sizeof(rd_image_t))) == NULL) {
                 return NULL;
         }
 
@@ -370,7 +372,7 @@ static rd_file_handle_t *
 romdisk_fd_alloc(void)
 {
         rd_file_handle_t *fh;
-        fh = (rd_file_handle_t *)malloc(sizeof(rd_file_handle_t));
+        fh = (rd_file_handle_t *)_internal_malloc(sizeof(rd_file_handle_t));
 
         if (fh == NULL) {
                 return NULL;
@@ -405,5 +407,5 @@ romdisk_fd_free(rd_file_handle_t *fd)
         }
 
         TAILQ_REMOVE(&fhs, fh, handles);
-        free(fh);
+        _internal_free(fh);
 }

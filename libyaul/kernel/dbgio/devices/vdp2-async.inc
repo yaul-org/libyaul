@@ -39,7 +39,7 @@ _async_init(const dbgio_vdp2_t *params)
         }
 
         void *aligned;
-        aligned = malloc(sizeof(*dma_font) + 32);
+        aligned = _internal_malloc(sizeof(*dma_font) + 32);
         assert(aligned != NULL);
         dma_font = _address_align(aligned, 32);
         assert(((uintptr_t)dma_font & 0x1F) == 0x00);
@@ -101,8 +101,8 @@ _async_deinit(void)
         /* XXX: Check if we're partially initialized. If so, cancel the queued
          * DMA requests */
 
-        free(_dev_state->page_pnd);
-        free(_dev_state);
+        _internal_free(_dev_state->page_pnd);
+        _internal_free(_dev_state);
 
         _dev_state = NULL;
 }
@@ -161,7 +161,7 @@ _cancel_dma_handler(const struct dma_queue_transfer *transfer)
 
         /* When a DMA request is canceled, it's called outside of any
          * internal interrupt handlers, so we're able to call free() */
-        free(free_ptr);
+        _internal_free(free_ptr);
 
         _dev_state->state = STATE_IDLE;
 }
@@ -196,10 +196,10 @@ _init_complete_callback(void *work)
         void *free_ptr;
         free_ptr = work;
 
-        free(free_ptr);
+        _internal_free(free_ptr);
 
-        free(_dev_state->font.cpd_buffer);
-        free(_dev_state->font.pal_buffer);
+        _internal_free(_dev_state->font.cpd_buffer);
+        _internal_free(_dev_state->font.pal_buffer);
 
         _dev_state->font.cpd_buffer = NULL;
         _dev_state->font.pal_buffer = NULL;

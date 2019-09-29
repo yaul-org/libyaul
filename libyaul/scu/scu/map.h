@@ -44,10 +44,12 @@
 #define HWRAM(x)                (0x06000000 + (x))
 #define HWRAM_UNCACHED(x)       (0x26000000 + (x))
 #define HWRAM_PURGE_CACHE(x)    (0x46000000 + (x))
+#define HWRAM_SIZE              0x100000
 
 #define LWRAM(x)                (0x00200000 + (x))
 #define LWRAM_UNCACHED(x)       (0x20200000 + (x))
 #define LWRAM_PURGE_CACHE(x)    (0x40200000 + (x))
+#define LWRAM_SIZE              0x100000
 
 #define MINIT                   (0x21000000)
 #define SINIT                   (0x21800000)

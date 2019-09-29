@@ -28,9 +28,14 @@ SPECS:= \
 SUPPORT_SRCS:= \
 	common/crt0.sx \
 	common/c++-support.cxx \
+
+# Keep this in SUPPORT_SRCS as the object file is copied to the tool-chain
+SUPPORT_SRCS+= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
+	kernel/internal.c \
+	kernel/mm/internal.c \
 	common/internal_reset.c
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
@@ -50,9 +55,19 @@ LIB_SRCS+= \
 	kernel/sys/dma-queue.c \
 	kernel/sys/callback-list.c \
 	\
-	kernel/mm/memb.c \
-	kernel/mm/slob.c \
-	\
+	kernel/mm/memb.c
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+LIB_SRCS+= \
+	kernel/mm/tlsf.c
+endif
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
+LIB_SRCS+= \
+	kernel/mm/slob.c
+endif
+
+LIB_SRCS+= \
 	lib/ctype/ctype.c \
 	lib/string/bcmp.c \
 	lib/string/bcopy.c \
@@ -105,8 +120,9 @@ LIB_SRCS+= \
 	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
-	lib/stdlib/realloc.c \
-	\
+	lib/stdlib/realloc.c
+
+LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
@@ -252,8 +268,17 @@ INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:memb.h:yaul/mm/
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+INSTALL_HEADER_FILES+= \
+	./kernel/mm/:tlsf.h:yaul/mm/
+endif
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
+INSTALL_HEADER_FILES+= \
 	./kernel/mm/:slob.h:yaul/mm/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/

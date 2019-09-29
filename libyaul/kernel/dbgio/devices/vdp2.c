@@ -22,6 +22,8 @@
 
 #include "../dbgio-internal.h"
 
+#include <internal.h>
+
 #include "cons/cons.h"
 
 #include "vdp2_font.inc"
@@ -278,7 +280,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
         assert(params != NULL);
 
         if (_dev_state == NULL) {
-                _dev_state = malloc(sizeof(dev_state_t));
+                _dev_state = _internal_malloc(sizeof(dev_state_t));
                 assert(_dev_state != NULL);
 
                 (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
@@ -318,18 +320,18 @@ _dev_state_init(const dbgio_vdp2_t *params)
                 /* hf = */ 0);
 
         if (_dev_state->page_pnd == NULL) {
-                _dev_state->page_pnd = malloc(_dev_state->page_size);
+                _dev_state->page_pnd = _internal_malloc(_dev_state->page_size);
                 assert(_dev_state->page_pnd != NULL);
         }
 
         if (_dev_state->font.cpd_buffer == NULL) {
-                _dev_state->font.cpd_buffer = malloc(FONT_4BPP_CPD_SIZE);
+                _dev_state->font.cpd_buffer = _internal_malloc(FONT_4BPP_CPD_SIZE);
                 assert(_dev_state->font.cpd_buffer != NULL);
         }
 
         if (_dev_state->font.pal_buffer == NULL) {
                 _dev_state->font.pal_buffer =
-                    malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+                    _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
                 assert(_dev_state->font.pal_buffer != NULL);
         }
 }

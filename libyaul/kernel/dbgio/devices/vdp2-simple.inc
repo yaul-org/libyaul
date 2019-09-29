@@ -36,8 +36,8 @@ _simple_deinit(void)
                 return;
         }
 
-        free(_dev_state->page_pnd);
-        free(_dev_state);
+        _internal_free(_dev_state->page_pnd);
+        _internal_free(_dev_state);
 
         _dev_state = NULL;
 }
@@ -92,8 +92,8 @@ _simple_flush(void)
                 cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
                 cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
-                free(_dev_state->font.cpd_buffer);
-                free(_dev_state->font.pal_buffer);
+                _internal_free(_dev_state->font.cpd_buffer);
+                _internal_free(_dev_state->font.pal_buffer);
 
                 _dev_state->font.cpd_buffer = NULL;
                 _dev_state->font.pal_buffer = NULL;

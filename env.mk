@@ -5,53 +5,80 @@ endif
 ifeq ($(strip $(YAUL_INSTALL_ROOT)),)
   $(error Undefined YAUL_INSTALL_ROOT (install root directory))
 endif
-
 ifneq (1,$(words [$(strip $(YAUL_INSTALL_ROOT))]))
-  $(error YAUL_INSTALL_ROOT (install root directory) contains spaces)
+	$(error YAUL_INSTALL_ROOT (install root directory) contains spaces)
+endif
+ifneq ($(shell test -e $(YAUL_INSTALL_ROOT) && echo -n $${?}),0)
+  $(error Path YAUL_INSTALL_ROOT (install root directory) does not exist)
+endif
+ifneq ($(shell test -d $(YAUL_INSTALL_ROOT) && echo -n $${?}),0)
+  $(error Path YAUL_INSTALL_ROOT (install root directory) is not a directory)
 endif
 
 ifeq ($(strip $(YAUL_ARCH_SH_PREFIX)),)
   $(error Undefined YAUL_ARCH_SH_PREFIX (tool-chain prefix))
+endif
+ifneq (1,$(words [$(strip $(YAUL_ARCH_SH_PREFIX))]))
+  $(error YAUL_ARCH_SH_PREFIX (tool-chain prefix) contains spaces)
 endif
 
 ifneq (1,$(words [$(strip $(YAUL_PROG_SH_PREFIX))]))
   $(error YAUL_PROG_SH_PREFIX (tool-chain program prefix) contains spaces)
 endif
 
-ifneq (1,$(words [$(strip $(YAUL_ARCH_SH_PREFIX))]))
-  $(error YAUL_ARCH_SH_PREFIX (tool-chain prefix) contains spaces)
-endif
-
 ifeq ($(strip $(YAUL_BUILD_ROOT)),)
   $(error Undefined YAUL_BUILD_ROOT (build root directory))
 endif
-
 ifneq (1,$(words [$(strip $(YAUL_BUILD_ROOT))]))
   $(error YAUL_BUILD_ROOT (build root directory) contains spaces)
 endif
-
-ifeq ($(strip $(YAUL_BUILD)),)
-  $(error Undefined BUILD (build directory))
+ifneq ($(shell test -e $(YAUL_BUILD_ROOT) && echo -n $${?}),0)
+  $(error Path YAUL_BUILD_ROOT (build root directory) does not exist)
+endif
+ifneq ($(shell test -d $(YAUL_BUILD_ROOT) && echo -n $${?}),0)
+  $(error Path YAUL_BUILD_ROOT (build root directory) is not a directory)
 endif
 
+ifeq ($(strip $(YAUL_BUILD)),)
+  $(error Undefined YAUL_BUILD (build directory))
+endif
 ifneq (1,$(words [$(strip $(YAUL_BUILD))]))
-  $(error BUILD (build directory) contains spaces)
+  $(error YAUL_BUILD (build directory) contains spaces)
 endif
 
 ifeq ($(strip $(YAUL_CDB)),)
   $(error Undefined YAUL_CDB (update JSON compile command database))
 endif
+ifneq ($(YAUL_CDB),$(filter $(YAUL_CDB),0 1))
+  $(error Invalid value for YAUL_CDB (update JSON compile command database))
+endif
 
 # Check options
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
+  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
+endif
+ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1))
+  $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
+endif
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),)
+  $(error Undefined YAUL_OPTION_MALLOC_IMPL (malloc implementation))
+endif
+ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
+  $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
+endif
+ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf slob))
+  $(error Invalid value for YAUL_OPTION_MALLOC_IMPL (malloc implementation))
 endif
 
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
   $(error Undefined YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
 endif
+ifneq ($(YAUL_OPTION_SPIN_ON_ABORT),$(filter $(YAUL_OPTION_SPIN_ON_ABORT),0 1))
+  $(error Invalid value for YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
+endif
 
-ifeq '$(OS)' "Windows_NT"
+ifeq ($(OS),Windows_NT)
 EXE_EXT:= .exe
 endif
 
@@ -88,7 +115,6 @@ SH_CFLAGS_shared:= \
 	-Wfatal-errors \
 	-Wall \
 	-Wextra \
-	-Wlong-long \
 	-Wduplicated-branches \
 	-Wduplicated-cond \
 	-Wnull-dereference \
@@ -99,6 +125,15 @@ SH_CFLAGS_shared:= \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+SH_CFLAGS_shared += \
+	-DMALLOC_IMPL_TLSF
+endif
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
+SH_CFLAGS_shared += \
+	-DMALLOC_IMPL_SLOB
+endif
 
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
 SH_CFLAGS_shared += \
