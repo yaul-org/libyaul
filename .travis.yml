@@ -29,6 +29,9 @@ env:
     - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=tools
     - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
 
+git:
+  submodules: true
+
 before_script:
   - wget -4 --retry-connrefused --waitretry=300 -O "tool-chain.tar.bz2" "https://drive.google.com/uc?export=download&id=1VWZv3lJ1_U02p4Sg7rZU7yn4igBdw2b7"
   - sudo mkdir /tool-chains
@@ -44,4 +47,5 @@ addons:
       - python3-click
 
 script:
-  - .travis/test.sh
+  - .travis/build-library.sh
+  - .travis/build-examples.sh
