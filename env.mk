@@ -57,7 +57,7 @@ endif
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
 endif
-ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1))
+ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1 2))
   $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
 endif
 
