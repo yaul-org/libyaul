@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -165,7 +166,7 @@ process_args(struct ftdi_gdb_context *fgc, int argc, char *argv[])
                         if ((is_string_integer(
                                         optval, &val, /* base = */ 16)) < 0) {
                                 (void)fprintf(stderr, "%s\n", (errno == ERANGE)
-                                    ? sys_errlist[errno]
+                                    ? strerror(errno)
                                     : "Invalid value");
 
                                 return -1;
@@ -188,7 +189,7 @@ process_args(struct ftdi_gdb_context *fgc, int argc, char *argv[])
                         if ((is_string_integer(
                                         optval, &val, /* base = */ 16)) < 0) {
                                 (void)fprintf(stderr, "%s\n", (errno == ERANGE)
-                                    ? sys_errlist[errno]
+                                    ? strerror(errno)
                                     : "Invalid integer");
 
                                 return -1;
@@ -212,7 +213,7 @@ process_args(struct ftdi_gdb_context *fgc, int argc, char *argv[])
                         if ((is_string_integer(
                                         optval, &val, /* base = */ 10)) < 0) {
                                 (void)fprintf(stderr, "%s\n", (errno == ERANGE)
-                                    ? sys_errlist[errno]
+                                    ? strerror(errno)
                                     : "Invalid integer");
 
                                 return -1;
@@ -300,7 +301,7 @@ init_ftdi(struct ftdi_gdb_context *fgc)
         fgc->fgc_ftdictx = ftdi_context;
 
         if ((fgc->fgc_txbuf = (unsigned char *)malloc(BUF_MAXLEN)) == NULL) {
-                (void)fprintf(stderr, "fatal: %s\n", sys_errlist[errno]);
+                (void)fprintf(stderr, "fatal: %s\n", strerror(errno));
 
                 close_ftdi(fgc);
 
