@@ -35,10 +35,14 @@ cpu_wdt_init(uint8_t clock_div)
         MEMORY_CLEAR_WOVF_RSTCSR();
         MEMORY_CLEAR_RSTCSR(0x00);
 
-        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
+        const uint8_t which_cpu = cpu_dual_executor_get();
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI + interrupt_offset,
-            _wdt_iti_handler);
+        if (which_cpu == CPU_MASTER) {
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI, _wdt_iti_handler);
+
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_WDT_ITI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+                    _wdt_iti_handler);
+        }
 }
 
 void

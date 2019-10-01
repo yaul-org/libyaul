@@ -127,11 +127,13 @@ cpu_dual_executor_get(void)
 
         const uint32_t stack = cpu_reg_sp_get();
 
-        if ((stack >= (uint32_t)&_master_stack_end) && (stack <= (uint32_t)&_master_stack)) {
+        if ((stack >= (uint32_t)&_master_stack_end) &&
+            (stack <= (uint32_t)&_master_stack)) {
                 return CPU_MASTER;
         }
 
-        if ((stack >= (uint32_t)&_slave_stack_end) && (stack <= (uint32_t)&_slave_stack)) {
+        if ((stack >= (uint32_t)&_slave_stack_end) &&
+            (stack <= (uint32_t)&_slave_stack)) {
                 return CPU_SLAVE;
         }
 
