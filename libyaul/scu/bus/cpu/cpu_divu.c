@@ -32,9 +32,14 @@ cpu_divu_init(void)
 
         MEMORY_WRITE(32, CPU(VCRDIV), CPU_INTC_INTERRUPT_DIVU_OVFI);
 
-        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
+        const uint8_t which_cpu = cpu_dual_executor_get();
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI + interrupt_offset, _divu_ovfi_handler);
+        if (which_cpu == CPU_MASTER) {
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI, _divu_ovfi_handler);
+
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+                    _divu_ovfi_handler);
+        }
 }
 
 void

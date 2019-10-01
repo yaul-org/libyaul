@@ -114,21 +114,6 @@ cpu_intc_mask_set(uint8_t mask)
         cpu_reg_sr_set(reg_sr);
 }
 
-static inline uint32_t __always_inline
-cpu_intc_interrupt_offset_get(void)
-{
-        const int8_t which_cpu = cpu_dual_executor_get();
-
-        switch (which_cpu) {
-                case CPU_MASTER:
-                        return CPU_INTC_INTERRUPT_MASTER_BASE;
-                case CPU_SLAVE:
-                        return CPU_INTC_INTERRUPT_SLAVE_BASE;
-                default:
-                        return CPU_INTC_INTERRUPT_MASTER_BASE;
-        }
-}
-
 __END_DECLS
 
 #endif /* !_CPU_INTC_H */

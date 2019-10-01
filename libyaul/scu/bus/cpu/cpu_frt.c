@@ -57,14 +57,21 @@ cpu_frt_init(uint8_t clock_div)
         MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
         MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
 
-        const uint32_t interrupt_offset = cpu_intc_interrupt_offset_get();
-
         cpu_frt_oca_clear();
         cpu_frt_ocb_clear();
         cpu_frt_ovi_clear();
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI + interrupt_offset, _frt_oci_handler);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI + interrupt_offset, _frt_ovi_handler);
+        const uint8_t which_cpu = cpu_dual_executor_get();
+
+        if (which_cpu == CPU_MASTER) {
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
+
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+                    _frt_oci_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+                    _frt_ovi_handler);
+        }
 
         cpu_frt_count_set(0);
 }
