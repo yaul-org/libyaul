@@ -166,9 +166,9 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 
 CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
 
-ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
+ifeq ($(strip $(YAUL_CDB)),1)
 define update-build-commands
-	@$(THIS_ROOT)/libyaul/common/update-cdb -i $1 -d $2 -o $3 -- $4
+	@$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 else
 define update-build-commands
@@ -182,7 +182,9 @@ define macro-sh-build-object
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
 	$(call update-build-commands,\
+		$(SH_CC),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
 		$(SH_CFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
@@ -195,7 +197,9 @@ define macro-sh-build-c++-object
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
 	$(call update-build-commands,\
+	  $(SH_CXX),\
 		$(abspath $(<)),\
+	  $(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
 		$(SH_CXXFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
