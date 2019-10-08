@@ -71,7 +71,7 @@ SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v $(foreach specs,$(SH_SPECS),-
 	awk '/^\s/ { sub(/^\s+/,"-I"); print }')
 
 define update-build-commands
-	@$(YAUL_INSTALL_ROOT)/share/update-cdb -i $1 -d $2 -o $3 -- $4
+	@$(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
 $(SH_PROGRAM): $(SH_PROGRAM).iso
@@ -119,7 +119,9 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(call update-build-commands,\
+		$(SH_CC),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		compile_commands.json,\
 		$(SH_CFLAGS) $(SH_INCLUDE_DIRS))
@@ -128,7 +130,9 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(call update-build-commands,\
+		$(SH_CC),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))

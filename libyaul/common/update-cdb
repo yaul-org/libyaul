@@ -3,8 +3,26 @@
 import json
 import os
 import sys
+import locale
 
 try:
+    # If you are dealing with an environment where Python 3 thinks you are
+    # restricted to ASCII data, Click will raise an exception:
+    #
+    # Click will abort further execution because Python 3 was configured to use
+    # ASCII as encoding for the environment. Either switch to Python 2 or
+    # consult the Python 3 section of the docs for mitigation selfteps.
+    #
+    # Solution (hack) is to determine the locale and set it
+    user_locale = ".".join(list(locale.getlocale()))
+
+    # getenv() availability: most flavors of Unix, Windows
+    if not os.getenv("LANG"):
+        # Confusing, but it is actually preferable to assign to items of 'os.environ'
+        os.environ["LANG"] = user_locale
+    if not os.getenv("LC_ALL"):
+        os.environ["LC_ALL"] = user_locale
+
     import click
 except ImportError:
     print("{}: Missing \"click\" package. Install from <https://pypi.org/project/click/>".format(sys.argv[0]), file = sys.stderr)
@@ -17,6 +35,14 @@ PRUNE_COMPILER_FLAGS = [
 ]
 
 @click.command(context_settings = dict(help_option_names = ['-h', '--help']))
+@click.option('-c', '--compiler-executable', 'compiler_executable',
+              type = click.Path(exists = True,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Compiler executable.', required = True, multiple = False)
 @click.option('-i', '--input-file', 'input_file',
               type = click.Path(exists = True,
                                 file_okay = True,
@@ -25,6 +51,14 @@ PRUNE_COMPILER_FLAGS = [
                                 allow_dash = False,
                                 resolve_path = True),
               help = 'Input file.', required = True, multiple = False)
+@click.option('-o', '--output-file', 'output_file',
+              type = click.Path(exists = False,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Output file.', required = True, multiple = False)
 @click.option('-d', '--directory', 'directory',
               type = click.Path(exists = True,
                                 file_okay = False,
@@ -32,10 +66,10 @@ PRUNE_COMPILER_FLAGS = [
                                 allow_dash = False,
                                 resolve_path = True),
               help = 'Build directory.', required = True, multiple = False)
-@click.option('-o', '--output-cdb', 'out_stream', type = click.File('a+'),
+@click.option('-O', '--output-cdb', 'out_stream', type = click.File('a+'),
               help = 'Output compile DB.', required = True, multiple = False)
 @click.argument('flags', nargs = -1, type = click.UNPROCESSED)
-def cli(input_file, directory, out_stream, flags):
+def cli(compiler_executable, input_file, output_file, directory, out_stream, flags):
     def build_cdb(out_stream):
         try:
             out_stream.seek(0)
@@ -51,11 +85,13 @@ def cli(input_file, directory, out_stream, flags):
     def prune_flags(flags):
         return tuple([flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS])
 
-    def new_cdb_entry(input_file, directory, flags):
+    def new_cdb_entry(compiler_executable, input_file, output_file, directory, flags):
+        arguments = [compiler_executable] + list(flags) + ["-c", input_file, "-o", output_file]
         return {
             'file': input_file,
             'directory': directory,
-            'arguments': list(flags)
+            'command': " ".join(arguments),
+            'arguments': arguments
         }
 
     def append_cdb(cdb, new_cdb_entry):
@@ -67,7 +103,7 @@ def cli(input_file, directory, out_stream, flags):
     # print("cdb: {}".format(cdb))
     pruned_flags = prune_flags(flags)
     # print("pruned_flags: {}".format(pruned_flags))
-    cdb_entry = new_cdb_entry(input_file, directory, pruned_flags)
+    cdb_entry = new_cdb_entry(compiler_executable, input_file, output_file, directory, pruned_flags)
     # print("cdb_entry: {}".format(cdb_entry))
     updated_cdb = append_cdb(cdb, cdb_entry)
     # print("updated_cdb: {}".format(updated_cdb))
