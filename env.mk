@@ -168,7 +168,7 @@ CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
 
 ifeq ($(strip $(YAUL_CDB)),1)
 define update-build-commands
-	@$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	$(ECHO)$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 else
 define update-build-commands
