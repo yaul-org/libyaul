@@ -141,7 +141,9 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(call update-build-commands,\
+		$(SH_CXX),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
@@ -150,7 +152,9 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(call update-build-commands,\
+		$(SH_CXX),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
@@ -159,7 +163,9 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(call update-build-commands,\
+		$(SH_CXX),\
 		$(abspath $(<)),\
+		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		compile_commands.json,\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
