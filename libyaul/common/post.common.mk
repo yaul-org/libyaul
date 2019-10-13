@@ -71,7 +71,7 @@ SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v $(foreach specs,$(SH_SPECS),-
 	awk '/^\s/ { sub(/^\s+/,"-I"); print }')
 
 define update-build-commands
-	@$(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
 $(SH_PROGRAM): $(SH_PROGRAM).iso
