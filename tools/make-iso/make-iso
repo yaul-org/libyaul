@@ -1,78 +1,105 @@
-#!/bin/bash
+#!/bin/sh
 
-# Copyright (c) 2012-2016
+# Copyright (c) 2012-2019
 # See LICENSE for details.
 #
 # Israel Jacquez <mrkotfw@gmail.com>
 
 PROGNAME="${0##*/}"
+TMPDIR="${TMPDIR:-/tmp}"
 
-panic() {
-    printf -- "${PROGNAME}: Error: ${1}\n" >&2
-    exit ${2}
+XORRISO="${YAUL_INSTALL_ROOT}/bin/xorriso"
+
+OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\""
+
+tmp1="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+
+panic () {
+    printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
+    exit "${2}"
 }
 
 warning() {
-    printf -- "${PROGNAME}: Warning: ${1}\n" >&2
+    printf -- "%s: Warning: %s\\n" "${PROGNAME}" "${1}" >&2
 }
 
-if [ ${#} -lt 2 ] || [ ${#} -gt 2 ]; then
-    printf -- "Usage: ${PROGNAME} cd-directory image-output-name\n" >&2
+my_readlink() {
+    # Not a true implementation of readlink
+    printf -- "%s" $(cd $(dirname "${1}") 2>/dev/null && pwd -P && echo "/$(basename ${1})")
+}
+
+clean_up () {
+    rm -f "${tmp1}"
+}
+
+trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
+trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
+
+if ! [ ${#} -eq 2 ]; then
+    printf -- "Usage: %s cd-directory image-output-name\n" "${PROGNAME}" >&2
     exit 2
 fi
 
+[ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
+[ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
+[ -x "${XORRISO}" ] || panic "Invalid executable \`${XORRISO}'" 1
+
+directory=$(my_readlink "${1}")
 image="${2}"
-directory="${1}"
 
 # Check if the CD directory exists and is a directory
-if [ ! -d "${directory}" ]; then
-    panic "Directory \`${directory}' does not exist" 1
+if [ -L "${directory}" ]; then
+    panic "${directory}: Directory must not be a symbolic link" 1
+fi
+if ! [ -d "${directory}" ]; then
+    panic "${directory}: Directory does not exist" 1
+fi
+if ! [ -r "${directory}" ]; then
+    panic "${directory}: Directory is not readable" 1
+fi
+if ! [ -x "${directory}" ]; then
+    panic "${directory}: Directory is inaccessible" 1
 fi
 
 # Check if all the files are present
-for file in "./IP.BIN"; do
-    if [ -f "${file}" ]; then
-        continue
+for file in "IP.BIN" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}/CPY.TXT"; do
+    # Needs to be portable (alternative to readlink)
+    realpath=$(my_readlink "${file}")
+
+    if [ -z "${realpath}" ]; then
+        panic "$(basename "${file}"): Unable to dereference symbolic link" 1
     fi
-    panic "File \``basename "${file}"`' does not exist in \``dirname "${file}"`'" 1
+
+    if [ -d "${realpath}" ]; then
+        panic "$(basename "${realpath}"): Not a file" 1
+    fi
+
+    if ! [ -f "${realpath}" ]; then
+        panic "$(basename "${realpath}"): Does not exist in $(dirname "${realpath}")" 1
+    fi
+
+    if ! [ -r "${realpath}" ]; then
+        panic "$(basename "${realpath}"): File is not readable" 1
+    fi
 done
+unset realpath
 
-# Check if genisoimage is installed
-# Check if isoimage is installed
-
-options=(-quiet
-    -sysid "\"SEGA SEGASATURN\""
-    -volid ""
-    -volset ""
-    -publisher "\"SEGA ENTERPRISES, LTD.\""
-    -preparer "\"SEGA ENTERPRISES, LTD.\""
-    -appid "\"SEGA ENTERPRISES, LTD.\""
-    -iso-level 1
-    -input-charset iso8859-1
-    -no-bak
-    -m "'.*'"
-    -o "\"${image}.iso\""
-    -generic-boot "\"IP.BIN\"")
-
-if [ -e "${directory}/ABS.TXT" ]; then
-    options+=(-abstract "ABS.TXT")
-else
-    warning "Abstract file \`ABS.TXT' not found"
+# Check if ${XORRISO} is installed
+iso_tool_realpath=$(my_readlink "${XORRISO}")
+if ! [ -f "${iso_tool_realpath}" ] && ! [ -L "${iso_tool_realpath}" ]; then
+    panic "${XORRISO}: Does not exist" 1
 fi
 
-if [ -e "${directory}/BIB.TXT" ]; then
-    options+=(-biblio "BIB.TXT")
-else
-    warning "Bibliography file \`BIB.TXT' not found"
+if ! [ -x "${iso_tool_realpath}" ]; then
+    panic "${XORRISO}: Not an executable" 1
 fi
+unset iso_tool_realpath
 
-if [ -e "${directory}/CPY.TXT" ]; then
-    options+=(-copyright "CPY.TXT")
-else
-    warning "Copyright file \`CPY.TXT' not found"
+if ! (eval "${XORRISO}" "${OPTIONS}" -o "${image}.iso" "${directory}*") >"${tmp1}" 2>&1; then
+    panic "Unable to create \"${image}.iso\"
+>>>
+$(cat "${tmp1}")
+<<<" 1
 fi
-
-# Generate image
-echo "genisoimage ${options[@]} \"${directory}\"" | sh
-# Output directory structure in image
-isoinfo -f -i "${image}.iso" 2>&1
+cat "${tmp1}"
+clean_up
