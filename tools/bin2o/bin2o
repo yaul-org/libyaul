@@ -14,7 +14,6 @@ ARCH="elf32-sh"
 DATA_SECTION="rodata"
 
 # If empty, default to YAUL_ARCH_SH_PREFIX
-# If empty, default to YAUL_ARCH_SH_PREFIX
 if [ -z "${YAUL_PROG_SH_PREFIX}" ]; then
     YAUL_PROG_SH_PREFIX=$(printf "%s" "${YAUL_ARCH_SH_PREFIX}")
 fi
