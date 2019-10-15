@@ -6,7 +6,6 @@
 # Israel Jacquez <mrkotfw@gmail.com>
 
 PROGNAME="${0##*/}"
-TMPDIR="${TMPDIR:-/tmp}"
 
 XORRISO="${YAUL_INSTALL_ROOT}/bin/xorriso"
 

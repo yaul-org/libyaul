@@ -6,7 +6,7 @@
 # Israel Jacquez <mrkotfw@gmail.com>
 
 PROGNAME="${0##*/}"
-TMP_FILEDIR="${TMP_FILEDIR:-/TMP_FILE}"
+TMPDIR="${TMPDIR:-/tmp}"
 
 # If empty, default to YAUL_ARCH_SH_PREFIX
 if [ -z "${YAUL_PROG_SH_PREFIX}" ]; then
@@ -34,9 +34,9 @@ fi
 [ -x "${SH_AS}" ] || panic "Invalid executable \`${SH_AS}'" 1
 [ -x "${SH_CC}" ] || panic "Invalid executable \`${SH_CC}'" 1
 
-TMP1_FILE="$(mktemp "${TMP_FILEDIR}/XXXX")" || panic "Couldn't create file" 1
-TMP2_FILE="$(mktemp "${TMP_FILEDIR}/XXXX")" || panic "Couldn't create file" 1
-TMP3_FILE="$(mktemp "${TMP_FILEDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP1_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP2_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP3_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 
 clean_up () {
     rm -f "${TMP1_FILE}"
