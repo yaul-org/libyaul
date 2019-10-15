@@ -35,16 +35,20 @@ panic () {
 [ -x "${SH_LD}" ] || panic "Invalid executable \`${SH_LD}'" 1
 [ -x "${SH_OBJCOPY}" ] || panic "Invalid executable \`${SH_OBJCOPY}'" 1
 
-tmp1="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
-tmp2="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
-tmp3="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP1_FILE="$(mktemp "${TMPDIR}/XXXX" 2>/dev/null)" || panic "Couldn't create file" 1
+TMP2_FILE="$(mktemp "${TMPDIR}/XXXX" 2>/dev/null)" || panic "Couldn't create file" 1
+TMP3_FILE="$(mktemp "${TMPDIR}/XXXX" 2>/dev/null)" || panic "Couldn't create file" 1
+TMP4_FILE="$(mktemp "${TMPDIR}/XXXX" 2>/dev/null)" || panic "Couldn't create file" 1
 
 clean_up () {
-    rm -f "${tmp1}" "${tmp2}" "${tmp3}"
-    exit 0
+    rm -f "${TMP1_FILE}"
+    rm -f "${TMP2_FILE}"
+    rm -f "${TMP3_FILE}"
+    rm -f "${TMP4_FILE}"
 }
 
-trap clean_up 0 1 2 15
+trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
+trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
 
 if [ ${#} != 3 ]; then
     printf -- "Usage: %s input-file symbol-name output-file\\n" "${PROGNAME}" >&2
@@ -57,13 +61,13 @@ output="${3}"
 
 # Gotta do a different binary target here depending on the target
 ("${SH_AS}" ${AFLAGS} \
-    -o "${tmp3}" || \
+    -o "${TMP3_FILE}" || \
     panic "Couldn't assemble file" 1) << EOF
 .SECTION ".${DATA_SECTION}"
 .ALIGN 2
 EOF
 
-cat > "${tmp1}" << EOF
+cat > "${TMP1_FILE}" << EOF
 SECTIONS
 {
   .${DATA_SECTION} :
@@ -75,9 +79,21 @@ SECTIONS
 }
 EOF
 
-${SH_LD} --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
-    --format "${ARCH}" "${tmp3}" \
-    -o "${tmp2}" -r -T "${tmp1}" || panic "Couldn't link file" 1
+"${SH_LD}" --no-warn-mismatch --format binary --oformat "${ARCH}" "${input}" \
+    --format "${ARCH}" "${TMP3_FILE}" \
+    -o "${TMP2_FILE}" -r -T "${TMP1_FILE}" >"${TMP4_FILE}" 2>&1  || {
+    panic "Couldn't link file
+>>>
+$(cat "${TMP4_FILE}")
+<<<" 1
+}
 
-${SH_OBJCOPY} --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
-    "${tmp2}" "${output}" || panic "Couldn't translate object file" 1
+"${SH_OBJCOPY}" --set-section-flags ".${DATA_SECTION}=alloc,load,data,readonly" \
+    "${TMP2_FILE}" "${output}" >"${TMP4_FILE}" 2>&1 || {
+    panic "Couldn't translate object file
+>>>
+$(cat "${TMP4_FILE}")
+<<<" 1
+}
+
+clean_up
