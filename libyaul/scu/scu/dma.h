@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+/// @defgroup SCU_DMA
+
 #ifndef _SCU_DMA_H_
 #define _SCU_DMA_H_
 
@@ -45,36 +47,112 @@ __BEGIN_DECLS
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
+/// @addtogroup SCU_DMA
+/// @{
+
+/// Transfer direct mode.
+/// @see scu_dma_level_cfg::mode
 #define SCU_DMA_MODE_DIRECT     0x00
+/// Transfer indirect mode.
+/// @see scu_dma_level_cfg::mode
 #define SCU_DMA_MODE_INDIRECT   0x01
 
+/// Start the transfer on the start of VBLANK-IN.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_VBLANK_IN          0x00
+/// Start the transfer on the start of VBLANK-OUT.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_VBLANK_OUT         0x01
+/// Start the transfer on the start of HBLANK-IN.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_HBLANK_IN          0x02
+/// Start the transfer on the start of SCU-Timer 0.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_TIMER_0            0x03
+/// Start the transfer on the start of SCU-Timer 1.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_TIMER_1            0x04
+/// Start the transfer on the start of...?
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_SOUND_REQ          0x05
+/// Start the transfer on the start of VDP1 sprite draw end.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 #define SCU_DMA_START_FACTOR_SPRITE_DRAW_END    0x06
+/// Start the transfer when explicitly started.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set,
+///      scu_dma_level0_fast_start,
+///      scu_dma_level1_fast_start,
+///      scu_dma_level2_fast_start
+///      scu_dma_level0_start,
+///      scu_dma_level1_start,
+///      scu_dma_level2_start,
+///      scu_dma_level_start
 #define SCU_DMA_START_FACTOR_ENABLE             0x07
 
+/// Transfer stride by 0 bytes.
+///
+/// Describe it here!
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_0_BYTES          0x00
+/// Transfer stride by 2 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_2_BYTES          0x01
+/// Transfer stride by 4 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_4_BYTES          0x02
+/// Transfer stride by 8 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_8_BYTES          0x03
+/// Transfer stride by 16 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_16_BYTES         0x04
+/// Transfer stride by 32 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_32_BYTES         0x05
+// Transfer stride by 64 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_64_BYTES         0x06
+/// Transfer stride by 128 bytes.
+/// @see scu_dma_level_cfg::stride
 #define SCU_DMA_STRIDE_128_BYTES        0x07
 
+/// Keep the source and destination address fixed.
+/// @see scu_dma_level_cfg::update
 #define SCU_DMA_UPDATE_NONE     0x00000000
+/// Increment the source, but keep the destination address fixed.
+/// @see scu_dma_level_cfg::update
 #define SCU_DMA_UPDATE_RUP      0x00010000
+/// Increment both source and destination addresses.
+/// @see scu_dma_level_cfg::update
 #define SCU_DMA_UPDATE_WUP      0x00000100
-
-#define SCU_DMA_INDIRECT_TBL_END        0x80000000
 
 #define SCU_DMA_BUS_A   0x00
 #define SCU_DMA_BUS_B   0x01
 #define SCU_DMA_BUS_DSP 0x02
+
+/// Bit bitwise OR'd with the last entry's scu_dma_xfer::len when SCU-DMA
+/// transfer is indirect-mode.
+/// @see scu_dma_xfer
+/// @warning Not setting this bit on the last entry will lock up the hardware.
+#define SCU_DMA_INDIRECT_TBL_END        0x80000000
+
+/// @}
 
 #define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                      \
         .len = (_len),                                                         \
@@ -92,24 +170,65 @@ struct scu_dma_reg_buffer {
         uint32_t buffer[5];
 } __packed __aligned(4);
 
+/// @struct scu_dma_xfer
+/// @brief Defines a SCU-DMA transfer entry.
 struct scu_dma_xfer {
+        /// Transfer length.
+        /// @note Keep in mind of the following restrictions:
+        /// - Level 0 is able to transfer 1MiB.
+        /// - Level 1 is able to transfer 4KiB.
+        /// - Level 2 is able to transfer 4KiB.
         uint32_t len;
+        /// Absolute destination address.
+        ///
+        /// Address must be uncached.
         uint32_t dst;
+        /// Absolute source address.
+        ///
+        /// Address must be uncached.
         uint32_t src;
 } __packed;
 
+/// @struct scu_dma_level_cfg
+/// @brief Describes an instance of a SCU-DMA configuration.
+///
+/// Here is where you can describe how a direct transfer would work.
+///
+/// Here is where you can describe how an indirect transfer would work.
+///
+/// Here is where you would explain the issues with indirect transfer mode.
+///
+/// @see scu_dma_config_buffer,
+///      scu_dma_config_set
 struct scu_dma_level_cfg {
+        /// Transfer mode.
+        /// @see SCU_DMA_MODE_DIRECT,
+        ///      SCU_DMA_MODE_INDIRECT
         uint8_t mode;
 
+        /// Set either a single (direct) transfer or indirect transfer table.
         union {
-                /* Indirect mode */
                 void *indirect;
-
-                /* Direct mode */
                 struct scu_dma_xfer direct;
         } xfer;
 
+        /// Transfer stride.
+        ///
+        /// @todo Explain what SCU_DMA_STRIDE_0_BYTES is used for.
+        /// @see SCU_DMA_STRIDE_0_BYTES,
+        ///      SCU_DMA_STRIDE_2_BYTES,
+        ///      SCU_DMA_STRIDE_4_BYTES,
+        ///      SCU_DMA_STRIDE_8_BYTES,
+        ///      SCU_DMA_STRIDE_16_BYTES,
+        ///      SCU_DMA_STRIDE_32_BYTES,
+        ///      SCU_DMA_STRIDE_64_BYTES,
+        ///      SCU_DMA_STRIDE_128_BYTES
         uint8_t stride;
+
+        /// Source and destination update mode.
+        /// @see SCU_DMA_UPDATE_NONE,
+        ///      SCU_DMA_UPDATE_RUP,
+        ///      SCU_DMA_UPDATE_WUP
         uint32_t update;
 };
 
