@@ -47,7 +47,7 @@ __BEGIN_DECLS
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
-/// @addtogroup SCU_DMA
+/// @addtogroup SCU_DMA_DEFINES
 /// @{
 
 /// Transfer direct mode.
@@ -142,42 +142,58 @@ __BEGIN_DECLS
 /// @see scu_dma_level_cfg::update
 #define SCU_DMA_UPDATE_WUP      0x00000100
 
+/// Not yet documented.
 #define SCU_DMA_BUS_A   0x00
+/// Not yet documented.
 #define SCU_DMA_BUS_B   0x01
+/// Not yet documented.
 #define SCU_DMA_BUS_DSP 0x02
 
-/// Bit bitwise OR'd with the last entry's scu_dma_xfer::len when SCU-DMA
-/// transfer is indirect-mode.
+/// When SCU-DMA transfer is indirect-mode, the value is bitwise OR'd with the
+/// last entry's scu_dma_xfer::len member.
 /// @see scu_dma_xfer
 /// @warning Not setting this bit on the last entry will lock up the hardware.
 #define SCU_DMA_INDIRECT_TBL_END        0x80000000
 
 /// @}
 
+/// @addtogroup SCU_DMA_HELPERS
+/// @{
+
+/// Not yet documented.
 #define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                      \
         .len = (_len),                                                         \
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
 
+/// Not yet documented.
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
         .len = _len,                                                           \
         .dst = (uint32_t)(_dst),                                               \
         .src = DMA_INDIRECT_TBL_END | (uint32_t)(_src)                         \
 }
 
+/// @}
+
+/// @addtogroup SCU_DMA_STRUCTURES
+/// @{
+
+/// @struct
+/// @brief Used when buffering a SCU-DMA transfer with @ref scu_dma_config_buffer
+/// @see scu_dma_config_buffer
 struct scu_dma_reg_buffer {
         uint32_t buffer[5];
 } __packed __aligned(4);
 
-/// @struct scu_dma_xfer
+/// @struct
 /// @brief Defines a SCU-DMA transfer entry.
 struct scu_dma_xfer {
         /// Transfer length.
         /// @note Keep in mind of the following restrictions:
-        /// - Level 0 is able to transfer 1MiB.
-        /// - Level 1 is able to transfer 4KiB.
-        /// - Level 2 is able to transfer 4KiB.
+        /// - Level 0 is able to transfer up to 1MiB.
+        /// - Level 1 is able to transfer up to 4KiB.
+        /// - Level 2 is able to transfer up to 4KiB.
         uint32_t len;
         /// Absolute destination address.
         ///
@@ -189,7 +205,7 @@ struct scu_dma_xfer {
         uint32_t src;
 } __packed;
 
-/// @struct scu_dma_level_cfg
+/// @struct
 /// @brief Describes an instance of a SCU-DMA configuration.
 ///
 /// Here is where you can describe how a direct transfer would work.
@@ -231,7 +247,13 @@ struct scu_dma_level_cfg {
         ///      SCU_DMA_UPDATE_WUP
         uint32_t update;
 };
+/// @}
 
+/// @addtogroup SCU_DMA_INLINE_FUNCTIONS
+/// @{
+
+/// @function
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
@@ -239,24 +261,32 @@ scu_dma_dsp_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_dsp_wait(void)
 {
         while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 scu_dma_bus_access_busy(void)
 {
         return (MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03;
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_bus_access_wait(const uint8_t bus_mask)
 {
         while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
@@ -264,6 +294,8 @@ scu_dma_level0_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
@@ -271,6 +303,8 @@ scu_dma_level1_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
@@ -278,6 +312,8 @@ scu_dma_level2_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level_busy(const uint8_t level)
 {
@@ -292,6 +328,8 @@ scu_dma_level_busy(const uint8_t level)
         }
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_wait(void)
 {
@@ -299,6 +337,8 @@ scu_dma_level0_wait(void)
         while ((scu_dma_level0_busy()) != 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_wait(void)
 {
@@ -306,6 +346,8 @@ scu_dma_level1_wait(void)
         while ((scu_dma_level1_busy()) != 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_wait(void)
 {
@@ -313,6 +355,8 @@ scu_dma_level2_wait(void)
         while ((scu_dma_level2_busy()) != 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_wait(const uint8_t level)
 {
@@ -329,24 +373,32 @@ scu_dma_level_wait(const uint8_t level)
         }
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_fast_start(void)
 {
         MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_start(void)
 {
@@ -354,6 +406,8 @@ scu_dma_level0_start(void)
         scu_dma_level0_fast_start();
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_start(void)
 {
@@ -361,17 +415,20 @@ scu_dma_level1_start(void)
         scu_dma_level1_fast_start();
 }
 
+/// @function
+/// @brief Not yet documented.
+/// @warning To prevent operation errors, do not activate DMA level 2 during DMA
+/// level 1 operation.
 static inline void __always_inline
 scu_dma_level2_start(void)
 {
-        /* To prevent operation errors, do not activate DMA
-         * level 2 during DMA level 1 operation. */
-
         scu_dma_level1_wait();
         scu_dma_level2_wait();
         scu_dma_level2_fast_start();
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_fast_start(const uint8_t level)
 {
@@ -388,6 +445,8 @@ scu_dma_level_fast_start(const uint8_t level)
         }
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_start(const uint8_t level)
 {
@@ -404,24 +463,32 @@ scu_dma_level_start(const uint8_t level)
         }
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_stop(void)
 {
         MEMORY_WRITE(32, SCU(D0EN), 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_stop(void)
 {
         MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_stop(void)
 {
         MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_stop(const uint8_t level)
 {
@@ -438,6 +505,8 @@ scu_dma_level_stop(const uint8_t level)
         }
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_stop(void)
 {
@@ -446,30 +515,40 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_illegal_set(void (* const ihr)(void))
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_end_set(void (* const ihr)(void))
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_end_set(void (* const ihr)(void))
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_end_set(void (* const ihr)(void))
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
+/// @function
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
 {
@@ -487,10 +566,29 @@ scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
         }
 }
 
+/// @}
+
+/// @addtogroup SCU_DMA_FUNCTIONS
+/// @{
+
+/// @function
+/// @brief Not yet documented.
 extern void scu_dma_init(void);
+
+/// @function
+/// @brief Not yet documented.
 extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_level_cfg *);
+
+/// @function
+/// @brief Not yet documented.
 extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
+
+/// @function
+/// @brief Determines which level is unused.
+/// @returns The first unused level number in ascending order.
 extern int8_t scu_dma_level_unused_get(void);
+
+/// @}
 
 __END_DECLS
 
