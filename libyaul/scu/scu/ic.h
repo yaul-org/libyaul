@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+/// @defgroup SCU_IC
+
 #ifndef _SCU_IC_H_
 #define _SCU_IC_H_
 
@@ -15,6 +17,9 @@
 #include <scu/map.h>
 
 __BEGIN_DECLS
+
+/// @addtogroup SCU_IC_INTERRUPT_DEFINES
+/// @{
 
 #define SCU_IC_INTERRUPT_VBLANK_IN              0x40
 #define SCU_IC_INTERRUPT_VBLANK_OUT             0x41
@@ -31,6 +36,12 @@ __BEGIN_DECLS
 #define SCU_IC_INTERRUPT_DMA_ILLEGAL            0x4C
 #define SCU_IC_INTERRUPT_SPRITE_END             0x4D
 
+/// @}
+
+/// @addtogroup SCU_IC_MASK_DEFINES
+/// @{
+
+/// Value of 0 (zero).
 #define SCU_IC_MASK_NONE                0x00000000
 #define SCU_IC_MASK_VBLANK_IN           0x00000001
 #define SCU_IC_MASK_VBLANK_OUT          0x00000002
@@ -47,8 +58,15 @@ __BEGIN_DECLS
 #define SCU_IC_MASK_DMA_ILLEGAL         0x00001000
 #define SCU_IC_MASK_SPRITE_END          0x00002000
 #define SCU_IC_MASK_A_BUS               0x00008000
+/// Defines all mask values.
 #define SCU_IC_MASK_ALL                 0x0000BFFF
 
+/// @}
+
+/// @addtogroup SCU_IC_IST_DEFINES
+/// @{
+
+/// Value of 0 (zero).
 #define SCU_IC_IST_NONE                 0x00000000
 #define SCU_IC_IST_VBLANK_IN            0x00000001
 #define SCU_IC_IST_VBLANK_OUT           0x00000002
@@ -81,6 +99,13 @@ __BEGIN_DECLS
 #define SCU_IC_IST_EXTERNAL_02          0x40000000
 #define SCU_IC_IST_EXTERNAL_01          0x80000000
 
+/// @}
+
+/// @addtogroup SCU_IC_INLINE_FUNCTIONS
+/// @{
+
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline void __always_inline
 scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
 {
@@ -90,12 +115,15 @@ scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
         ((void (*)(uint8_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
+/// Not yet documented.
 static inline void __always_inline
 scu_ic_ihr_clear(uint8_t vector)
 {
         scu_ic_ihr_set(vector, NULL);
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline void __always_inline (*scu_ic_ihr_get(uint8_t vector))(void)
 {
         register uint32_t *bios_address;
@@ -104,6 +132,8 @@ static inline void __always_inline (*scu_ic_ihr_get(uint8_t vector))(void)
         return ((void (*(*)(uint8_t))(void))*bios_address)(vector);
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline void __always_inline
 scu_ic_mask_set(uint32_t mask)
 {
@@ -113,6 +143,8 @@ scu_ic_mask_set(uint32_t mask)
         ((void (*)(uint32_t))*bios_address)(mask);
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline void __always_inline
 scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
 {
@@ -122,6 +154,8 @@ scu_ic_mask_chg(uint32_t and_mask, uint32_t or_mask)
         ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline uint32_t __always_inline
 scu_ic_mask_get(void)
 {
@@ -131,6 +165,7 @@ scu_ic_mask_get(void)
         return *bios_address;
 }
 
+/// Not yet documented.
 static inline uint32_t __always_inline
 scu_ic_status_get(void)
 {
@@ -140,6 +175,7 @@ scu_ic_status_get(void)
         return ist;
 }
 
+/// Not yet documented.
 static inline void __always_inline
 scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
 {
@@ -149,12 +185,15 @@ scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
         *reg_ist = (*reg_ist & and_mask) | or_mask;
 }
 
+/// Not yet documented.
 static inline void __always_inline
 scu_ic_status_set(uint32_t value)
 {
         MEMORY_WRITE(32, SCU(IST), value);
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline const uint32_t * __always_inline
 scu_ic_priority_table_get(void)
 {
@@ -165,6 +204,8 @@ scu_ic_priority_table_get(void)
         return bios_address;
 }
 
+/// Not yet documented.
+/// @note This is a BIOS call.
 static inline void __always_inline
 scu_ic_priority_table_set(uint32_t *table)
 {
@@ -174,6 +215,8 @@ scu_ic_priority_table_set(uint32_t *table)
 
         ((void (*)(uint32_t *))*bios_address)(table);
 }
+
+/// @}
 
 __END_DECLS
 
