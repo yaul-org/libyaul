@@ -7,7 +7,7 @@
 
 PROGNAME="${0##*/}"
 
-XORRISO="${YAUL_INSTALL_ROOT}/bin/xorriso"
+XORRISO="/usr/bin/xorriso"
 
 OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\""
 
@@ -97,7 +97,7 @@ unset iso_tool_realpath
 if ! (eval "${XORRISO}" "${OPTIONS}" -o "${image}.iso" "${directory}*") >"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
-$(cat "${TMP1_FILE}")
+$(sed -E 's/^/>>> /g' "${TMP1_FILE}")
 <<<" 1
 fi
 cat "${TMP1_FILE}"
