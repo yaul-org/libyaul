@@ -22,6 +22,9 @@ __BEGIN_DECLS
 #define CPU_DUAL_ENTRY_POLLING 0
 #define CPU_DUAL_ENTRY_ICI     1
 
+#define MINIT (0x21000000)
+#define SINIT (0x21800000)
+
 static inline void __always_inline
 cpu_dual_master_notify(void)
 {
