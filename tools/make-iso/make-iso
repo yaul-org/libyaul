@@ -16,7 +16,7 @@ panic () {
     exit "${2}"
 }
 
-TMP1_FILE="$(mktemp "${TMPDIR}/tmp.XXXX")" || panic "Couldn't create file" 1
+TMP1_FILE="$(mktemp "${TMPDIR:-/tmp}/tmp.XXXX")" || panic "Couldn't create file" 1
 
 my_readlink() {
     # Not a true implementation of readlink
