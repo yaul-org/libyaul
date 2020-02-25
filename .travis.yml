@@ -39,7 +39,7 @@ addons:
     packages:
       - libftdi1-dev  # Required for tools/ssload
       - python3-click # Required for libyaul/commmon/update-cdb
-      - genisoimage   # Required for tools/make-iso
+      - xorriso       # Required for tools/make-iso
 
 script:
   - .travis/test.sh
