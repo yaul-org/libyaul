@@ -9,18 +9,14 @@ PROGNAME="${0##*/}"
 
 XORRISO="/usr/bin/xorriso"
 
-OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\""
-
-TMP1_FILE="$(mktemp "${TMP_FILEDIR}/XXXX")" || panic "Couldn't create file" 1
+XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\""
 
 panic () {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
     exit "${2}"
 }
 
-warning() {
-    printf -- "%s: Warning: %s\\n" "${PROGNAME}" "${1}" >&2
-}
+TMP1_FILE="$(mktemp "${TMPDIR}/tmp.XXXX")" || panic "Couldn't create file" 1
 
 my_readlink() {
     # Not a true implementation of readlink
@@ -94,7 +90,7 @@ if ! [ -x "${iso_tool_realpath}" ]; then
 fi
 unset iso_tool_realpath
 
-if ! (eval "${XORRISO}" "${OPTIONS}" -o "${image}.iso" "${directory}*") >"${TMP1_FILE}" 2>&1; then
+if ! (eval "${XORRISO}" "${XORRISO_OPTIONS}" -o "${image}.iso" "${directory}*") >"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
 $(sed -E 's/^/>>> /g' "${TMP1_FILE}")
