@@ -188,6 +188,7 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	    fi \
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(MAKE_ISO_REDIRECT).iso"
 
 IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
