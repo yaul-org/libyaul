@@ -26,12 +26,12 @@ Verify that the following packages are installed.
  - Via _Pacman_:
 
        pacman -S \
-       git make gcc wget unzip zip p7zip diffutils dos2unix patch
+       git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
  - Via _APT_ (Debian, Ubuntu, and related Linux distributions):
 
        apt-get install \
-       git make gcc wget unzip zip p7zip diffutils dos2unix patch
+       git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
 ### OS X
 
