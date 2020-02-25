@@ -21,10 +21,10 @@
 
 #### Notes about MinGW
 
-  It doesn't work unless libftdi-0.20 is used. Building all versions of libftdi1
-  yield issues.
+  It doesn't work unless `libftdi-0.20` is used. Building all versions of
+  `libftdi1` yields issues.
 
-  Below are the steps used to build libftdi1. Note, the
+  Below are the steps used to build `libftdi1`. Note, the
   `mingw32/mingw-w64-i686-cmake` package is required.
 
     cmake \
