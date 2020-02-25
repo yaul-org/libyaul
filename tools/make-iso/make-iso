@@ -100,5 +100,5 @@ if ! (eval "${XORRISO}" "${OPTIONS}" -o "${image}.iso" "${directory}*") >"${TMP1
 $(sed -E 's/^/>>> /g' "${TMP1_FILE}")
 <<<" 1
 fi
-cat "${TMP1_FILE}"
+
 clean_up
