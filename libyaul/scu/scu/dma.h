@@ -5,8 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-/// @defgroup SCU_DMA
-
 #ifndef _SCU_DMA_H_
 #define _SCU_DMA_H_
 
