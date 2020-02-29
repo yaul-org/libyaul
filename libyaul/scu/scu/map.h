@@ -12,10 +12,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/// @defgroup SCU_MAP_HELPERS
+/// @defgroup SCU_MAP_OFFSETS
+/// @defgroup SCU_MAP_REGISTERS
+
 /// @addtogroup SCU_MAP_HELPERS
 /// @{
 
-/// Read value of size @p t from address @x
+/// Read value of size @p t from address @p x.
 #define MEMORY_READ(t, x)               (*(volatile uint ## t ## _t *)(x))
 
 /// Write value @p y to address @p x of size @p t.
@@ -83,6 +87,9 @@
 
 /// @}
 
+/// @addtogroup SCU_MAP_REGISTERS
+/// @{
+
 #define D0R     0x0000
 #define D0W     0x0004
 #define D0C     0x0008
@@ -118,5 +125,7 @@
 #define AREF    0x00B8
 #define RSEL    0x00C4
 #define VER     0x00C8
+
+/// @}
 
 #endif /* !_SCU_MAP_H_ */

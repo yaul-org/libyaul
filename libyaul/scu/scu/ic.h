@@ -18,22 +18,41 @@
 
 __BEGIN_DECLS
 
+/// @defgroup SCU_IC_INTERRUPT_DEFINES
+/// @defgroup SCU_IC_MASK_DEFINES
+/// @defgroup SCU_IC_IST_DEFINES
+/// @defgroup SCU_IC_INLINE_FUNCTIONS
+
 /// @addtogroup SCU_IC_INTERRUPT_DEFINES
 /// @{
 
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_VBLANK_IN              0x40
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_VBLANK_OUT             0x41
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_HBLANK_IN              0x42
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_TIMER_0                0x43
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_TIMER_1                0x44
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_DSP_END                0x45
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_SOUND_REQUEST          0x46
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_SYSTEM_MANAGER         0x47
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_PAD_INTERRUPT          0x48
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_LEVEL_2_DMA_END        0x49
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_LEVEL_1_DMA_END        0x4A
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_LEVEL_0_DMA_END        0x4B
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_DMA_ILLEGAL            0x4C
+/// Not yet documented.
 #define SCU_IC_INTERRUPT_SPRITE_END             0x4D
 
 /// @}

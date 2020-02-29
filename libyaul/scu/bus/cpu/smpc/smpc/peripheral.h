@@ -17,9 +17,17 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_SMPC_PERIPHERAL_DEFINES
+/// @defgroup CPU_SMPC_PERIPHERAL_FUNCTIONS
+
+/// @addtogroup CPU_SMPC_PERIPHERAL_DEFINES
+/// @{
+
 #define MAX_PORTS       2
 #define MAX_PERIPHERALS 6 /* Max number of peripherals connected to a single port */
 #define MAX_PERIPHERAL_DATA_SIZE 255
+
+/// @}
 
 #define KEY_0                   0x45
 #define KEY_1                   0x16
@@ -424,6 +432,15 @@ struct smpc_peripheral_port {
         struct smpc_peripherals peripherals;
 };
 
+/// @addtogroup CPU_SMPC_PERIPHERAL_FUNCTIONS
+/// @{
+
+extern void smpc_peripheral_init(void);
+extern void smpc_peripheral_intback_issue(void);
+extern void smpc_peripheral_process(void);
+
+/// @}
+
 extern void smpc_peripheral_analog_get(struct smpc_peripheral const *,
     struct smpc_peripheral_analog * const);
 extern void smpc_peripheral_analog_port(uint8_t port,
@@ -432,9 +449,6 @@ extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
     struct smpc_peripheral_digital * const);
 extern void smpc_peripheral_digital_port(uint8_t,
     struct smpc_peripheral_digital * const);
-extern void smpc_peripheral_init(void);
-extern void smpc_peripheral_intback_issue(void);
-extern void smpc_peripheral_process(void);
 
 __END_DECLS
 
