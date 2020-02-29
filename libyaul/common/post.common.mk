@@ -74,9 +74,9 @@ define update-build-commands
 	$(ECHO)$(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
-$(SH_PROGRAM): $(SH_PROGRAM).iso
+$(SH_PROGRAM): $(SH_PROGRAM).cue
 
-all: $(SH_PROGRAM).iso
+all: $(SH_PROGRAM).cue
 
 example: all
 
@@ -189,6 +189,10 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
+$(SH_PROGRAM).cue: $(SH_PROGRAM).iso
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
+
 IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
 		"$(IP_VERSION)" \
@@ -204,6 +208,7 @@ clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
 	    $(SH_PROGRAM).bin \
+	    $(SH_PROGRAM).cue \
 	    $(SH_PROGRAM).iso \
 	    $(SH_OBJECTS_UNIQ) \
 	    $(SH_DEPS) \

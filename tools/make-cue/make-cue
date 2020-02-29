@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Copyright (c) 2012-2019
+# See LICENSE for details.
+#
+# Israel Jacquez <mrkotfw@gmail.com>
+
+PROGNAME="${0##*/}"
+
+panic () {
+    printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
+    exit "${2}"
+}
+
+TMP1_FILE="$(mktemp "${TMPDIR:-/tmp}/tmp.XXXX")" || panic "Couldn't create file" 1
+
+my_readlink() {
+    # Not a true implementation of readlink
+    printf -- "%s" $(cd $(dirname "${1}") 2>/dev/null && pwd -P && echo "/$(basename ${1})")
+}
+
+clean_up () {
+    :
+}
+
+trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
+trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
+
+if ! [ ${#} -eq 1 ]; then
+    printf -- "Usage: %s image-output-name\n" "${PROGNAME}" >&2
+    exit 2
+fi
+
+[ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
+[ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
+
+image=$(my_readlink "${1}")
+basename_image=$(basename "${image}")
+cue="${image%%.iso}.cue"
+
+# Check if the image file exists
+if [ -z "${image}" ]; then
+    panic "Unable to dereference symbolic link" 1
+fi
+
+if [ ! -f "${image}" ] && [ ! "${image}" ]; then
+    panic "${image}: Image \"${image}\" does not exist" 1
+fi
+
+cat > "${cue}" <<EOF
+FILE "${basename_image}" BINARY
+  TRACK 01 MODE1/2048
+    INDEX 01 00:00:00
+EOF
+
+clean_up

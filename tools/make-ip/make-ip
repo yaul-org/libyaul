@@ -14,7 +14,9 @@ if [ -z "${YAUL_PROG_SH_PREFIX}" ]; then
 fi
 
 SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
+SH_AS_ARGS="--fatal-warnings -I"${YAUL_INSTALL_ROOT}/share/yaul/bootstrap""
 SH_CC="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-gcc"
+SH_CC_ARGS="-Wl,-Map,IP.BIN.map -nostdlib -m2 -mb -nostartfiles -specs=ip.specs"
 
 panic () {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
@@ -32,16 +34,18 @@ fi
 [ -x "${SH_AS}" ] || panic "Invalid executable \`${SH_AS}'" 1
 [ -x "${SH_CC}" ] || panic "Invalid executable \`${SH_CC}'" 1
 
-tmp1="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
-tmp2="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP1_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP2_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+TMP3_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 
 clean_up () {
-    rm -f "${tmp1}"
-    rm -f "${tmp2}"
-    exit 0
+    rm -f "${TMP1_FILE}"
+    rm -f "${TMP2_FILE}"
+    rm -f "${TMP3_FILE}"
 }
 
-trap clean_up 0 1 2 15
+trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
+trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
 
 # Sanitize for string
 IP_VERSION="${1}"
@@ -60,41 +64,56 @@ IP_SLAVE_STACK_ADDR=${7}
 # Sanitize for integer value
 IP_1ST_READ_ADDR=${8}
 
-awk '
-    /\.ascii \"\$VERSION\"/ { sub(/\$VERSION/, "'"${IP_VERSION}"'"); }
-    /\.ascii \"\$RELEASE_DATE\"/ { sub(/\$RELEASE_DATE/, "'"${IP_RELEASE_DATE}"'"); }
-    /\.ascii \"\$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "'"${IP_AREAS}"'"; next; }
-    /\.ascii \"\$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "'"${IP_PERIPHERALS}"'"; next; }
-    /\.ascii \"\$TITLE\"/ {
-        L = 7;
-        # Truncate to 112 characters
-        s = "'"${IP_TITLE}"'";
-        # Strip out control characters
-        gsub(/[\t\r\v\n\f]/, "", s);
-        s = substr(s, 0, 112);
-        t = s;
-        q = length(s);
-        l = q;
-        while (l > 0) {
-            printf ".ascii \"%-16.16s\"\n", t;
-            a = ((l - 16) >= 0) ? 16 : l;
-            l -= a;
-            t = substr(t, a + 1, q - a);
-            L--;
-        }
-        while (L > 0) {
-            printf ".ascii \"                \"\n";
-            L--;
-        }
-        next;
-    }
-    /\.long \$MASTER_STACK_ADDR/ { sub(/\$MASTER_STACK_ADDR/, "'"${IP_MASTER_STACK_ADDR}"'"); }
-    /\.long \$SLAVE_STACK_ADDR/ { sub(/\$SLAVE_STACK_ADDR/, "'"${IP_SLAVE_STACK_ADDR}"'"); }
-    /\.long \$1ST_READ_ADDR/ { sub(/\$1ST_READ_ADDR/, "'"${IP_1ST_READ_ADDR}"'"); }
-    { print; }' "${YAUL_INSTALL_ROOT}/share/yaul/bootstrap/ip.sx" > "${tmp2}"
+(awk '/\.ascii \"\$VERSION\"/ { sub(/\$VERSION/, "'"${IP_VERSION}"'"); }
+      /\.ascii \"\$RELEASE_DATE\"/ { sub(/\$RELEASE_DATE/, "'"${IP_RELEASE_DATE}"'"); }
+      /\.ascii \"\$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "'"${IP_AREAS}"'"; next; }
+      /\.ascii \"\$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "'"${IP_PERIPHERALS}"'"; next; }
+      /\.ascii \"\$TITLE\"/ {
+          L = 7;
+          # Truncate to 112 characters
+          s = "'"${IP_TITLE}"'";
+          # Strip out control characters
+          gsub(/[\t\r\v\n\f]/, "", s);
+          s = substr(s, 0, 112);
+          t = s;
+          q = length(s);
+          l = q;
+          while (l > 0) {
+              printf ".ascii \"%-16.16s\"\n", t;
+              a = ((l - 16) >= 0) ? 16 : l;
+              l -= a;
+              t = substr(t, a + 1, q - a);
+              L--;
+          }
+          while (L > 0) {
+              printf ".ascii \"                \"\n";
+              L--;
+          }
+          next;
+      }
+      /\.long \$MASTER_STACK_ADDR/ { sub(/\$MASTER_STACK_ADDR/, "'"${IP_MASTER_STACK_ADDR}"'"); }
+      /\.long \$SLAVE_STACK_ADDR/ { sub(/\$SLAVE_STACK_ADDR/, "'"${IP_SLAVE_STACK_ADDR}"'"); }
+      /\.long \$1ST_READ_ADDR/ { sub(/\$1ST_READ_ADDR/, "'"${IP_1ST_READ_ADDR}"'"); }
+      { print; }' \
+          "${YAUL_INSTALL_ROOT}/share/yaul/bootstrap/ip.sx") >"${TMP2_FILE}" 2>"${TMP3_FILE}" || {
+     panic "Can't generate IP.BIN .sx file
+>>>
+$(cat "${TMP3_FILE}")
+<<<" 1
+ }
 
-"${SH_AS}" --fatal-warnings -I"${YAUL_INSTALL_ROOT}/share/yaul/bootstrap" -o "${tmp1}" "${tmp2}"
-"${SH_CC}" -Wl,-Map,IP.BIN.map -nostdlib -m2 -mb -nostartfiles -specs=ip.specs "${tmp1}" -o IP.BIN
+("${SH_AS}" ${SH_AS_ARGS} -o "${TMP1_FILE}" "${TMP2_FILE}") >"${TMP3_FILE}" 2>&1 || {
+    panic "Can't build IP.BIN (${SH_AS})
+>>>
+$(cat "${TMP3_FILE}")
+<<<" 1
+}
 
-rm -f "${tmp1}"
-rm -f "${tmp2}"
+("${SH_CC}" ${SH_CC_ARGS} "${TMP1_FILE}" -o IP.BIN) >"${TMP3_FILE}" 2>&1 || {
+    panic "Can't build IP.BIN (${SH_CC})
+>>>
+$(cat "${TMP3_FILE}")
+<<<" 1
+}
+
+clean_up
