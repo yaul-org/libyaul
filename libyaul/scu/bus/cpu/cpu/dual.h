@@ -16,27 +16,49 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_DUAL_DEFINES
+/// @defgroup CPU_DUAL_INLINE_FUNCTIONS
+/// @defgroup CPU_DUAL_HELPERS
+/// @defgroup CPU_DUAL_FUNCTIONS
+
+/// @addtogroup CPU_DUAL_DEFINES
+/// @{
+
+/// Not yet documented.
 #define CPU_MASTER      0
+/// Not yet documented.
 #define CPU_SLAVE       1
 
+/// Not yet documented.
 #define CPU_DUAL_ENTRY_POLLING 0
+/// Not yet documented.
 #define CPU_DUAL_ENTRY_ICI     1
 
+/// Not yet documented.
 #define MINIT (0x21000000)
+/// Not yet documented.
 #define SINIT (0x21800000)
 
+/// @}
+
+/// @addtogroup CPU_DUAL_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dual_master_notify(void)
 {
         MEMORY_WRITE(16, SINIT, 0xFFFF);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dual_slave_notify(void)
 {
         MEMORY_WRITE(16, MINIT, 0xFFFF);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dual_notification_wait(void)
 {
@@ -48,6 +70,7 @@ cpu_dual_notification_wait(void)
         *reg_ftcsr &= ~0x80;
 }
 
+/// @brief Not yet documented.
 static inline void * __always_inline
 cpu_dual_master_stack_get(void)
 {
@@ -56,6 +79,7 @@ cpu_dual_master_stack_get(void)
         return (void *)&_master_stack;
 }
 
+/// @brief Not yet documented.
 static inline void * __always_inline
 cpu_dual_slave_stack_get(void)
 {
@@ -64,19 +88,38 @@ cpu_dual_slave_stack_get(void)
         return (void *)&_slave_stack;
 }
 
-extern void cpu_dual_init(uint8_t);
-extern void cpu_dual_master_set(void (*)(void));
-extern void cpu_dual_slave_set(void (*)(void));
+/// @}
 
-extern int8_t cpu_dual_executor_get(void);
+/// @addtogroup CPU_DUAL_HELPERS
 
+/// @brief Not yet documented.
 #define cpu_dual_master_clear() do {                                           \
         cpu_dual_master_set(NULL);                                             \
 } while (false)
 
+/// @brief Not yet documented.
 #define cpu_dual_slave_clear() do {                                            \
         cpu_dual_slave_set(NULL);                                              \
 } while (false)
+
+/// @}
+
+/// @addtogroup CPU_DUAL_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
+extern void cpu_dual_init(uint8_t);
+
+/// @brief Not yet documented.
+extern void cpu_dual_master_set(void (*)(void));
+
+/// @brief Not yet documented.
+extern void cpu_dual_slave_set(void (*)(void));
+
+/// @brief Not yet documented.
+extern int8_t cpu_dual_executor_get(void);
+
+/// @}
 
 __END_DECLS
 

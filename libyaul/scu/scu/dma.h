@@ -20,6 +20,12 @@
 
 __BEGIN_DECLS
 
+/// @defgroup SCU_DMA_DEFINES
+/// @defgroup SCU_DMA_HELPERS
+/// @defgroup SCU_DMA_STRUCTURES
+/// @defgroup SCU_DMA_INLINE_FUNCTIONS
+/// @defgroup SCU_DMA_FUNCTIONS
+
 /*-
  * SCU DMA should be activated by the Master CPU
  *
@@ -250,7 +256,6 @@ struct scu_dma_level_cfg {
 /// @addtogroup SCU_DMA_INLINE_FUNCTIONS
 /// @{
 
-/// @function
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
@@ -259,7 +264,6 @@ scu_dma_dsp_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_dsp_wait(void)
@@ -267,7 +271,6 @@ scu_dma_dsp_wait(void)
         while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline uint8_t __always_inline
 scu_dma_bus_access_busy(void)
@@ -275,7 +278,6 @@ scu_dma_bus_access_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03;
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_bus_access_wait(const uint8_t bus_mask)
@@ -283,7 +285,6 @@ scu_dma_bus_access_wait(const uint8_t bus_mask)
         while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
@@ -292,7 +293,6 @@ scu_dma_level0_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
@@ -301,7 +301,6 @@ scu_dma_level1_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
@@ -310,7 +309,6 @@ scu_dma_level2_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level_busy(const uint8_t level)
@@ -326,7 +324,6 @@ scu_dma_level_busy(const uint8_t level)
         }
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_wait(void)
@@ -335,7 +332,6 @@ scu_dma_level0_wait(void)
         while ((scu_dma_level0_busy()) != 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_wait(void)
@@ -344,7 +340,6 @@ scu_dma_level1_wait(void)
         while ((scu_dma_level1_busy()) != 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_wait(void)
@@ -353,7 +348,6 @@ scu_dma_level2_wait(void)
         while ((scu_dma_level2_busy()) != 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_wait(const uint8_t level)
@@ -371,7 +365,6 @@ scu_dma_level_wait(const uint8_t level)
         }
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_fast_start(void)
@@ -379,7 +372,6 @@ scu_dma_level0_fast_start(void)
         MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_fast_start(void)
@@ -387,7 +379,6 @@ scu_dma_level1_fast_start(void)
         MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_fast_start(void)
@@ -395,7 +386,6 @@ scu_dma_level2_fast_start(void)
         MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_start(void)
@@ -404,7 +394,6 @@ scu_dma_level0_start(void)
         scu_dma_level0_fast_start();
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_start(void)
@@ -413,7 +402,6 @@ scu_dma_level1_start(void)
         scu_dma_level1_fast_start();
 }
 
-/// @function
 /// @brief Not yet documented.
 /// @warning To prevent operation errors, do not activate DMA level 2 during DMA
 /// level 1 operation.
@@ -425,7 +413,6 @@ scu_dma_level2_start(void)
         scu_dma_level2_fast_start();
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_fast_start(const uint8_t level)
@@ -443,7 +430,6 @@ scu_dma_level_fast_start(const uint8_t level)
         }
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_start(const uint8_t level)
@@ -461,7 +447,6 @@ scu_dma_level_start(const uint8_t level)
         }
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_stop(void)
@@ -469,7 +454,6 @@ scu_dma_level0_stop(void)
         MEMORY_WRITE(32, SCU(D0EN), 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_stop(void)
@@ -477,7 +461,6 @@ scu_dma_level1_stop(void)
         MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_stop(void)
@@ -485,7 +468,6 @@ scu_dma_level2_stop(void)
         MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_stop(const uint8_t level)
@@ -503,7 +485,6 @@ scu_dma_level_stop(const uint8_t level)
         }
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_stop(void)
@@ -513,7 +494,6 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_illegal_set(void (* const ihr)(void))
@@ -521,7 +501,6 @@ scu_dma_illegal_set(void (* const ihr)(void))
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level0_end_set(void (* const ihr)(void))
@@ -529,7 +508,6 @@ scu_dma_level0_end_set(void (* const ihr)(void))
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level1_end_set(void (* const ihr)(void))
@@ -537,7 +515,6 @@ scu_dma_level1_end_set(void (* const ihr)(void))
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level2_end_set(void (* const ihr)(void))
@@ -545,7 +522,6 @@ scu_dma_level2_end_set(void (* const ihr)(void))
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
-/// @function
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
@@ -569,19 +545,15 @@ scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
 /// @addtogroup SCU_DMA_FUNCTIONS
 /// @{
 
-/// @function
 /// @brief Not yet documented.
 extern void scu_dma_init(void);
 
-/// @function
 /// @brief Not yet documented.
 extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_level_cfg *);
 
-/// @function
 /// @brief Not yet documented.
 extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
 
-/// @function
 /// @brief Determines which level is unused.
 /// @returns The first unused level number in ascending order.
 extern int8_t scu_dma_level_unused_get(void);
