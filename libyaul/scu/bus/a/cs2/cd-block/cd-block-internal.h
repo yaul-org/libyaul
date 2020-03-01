@@ -12,7 +12,7 @@
 #include <scu-internal.h>
 
 /* Specific macros */
-#define CD_BLOCK(x)     (0x25890000 + (x))
+#define CD_BLOCK(x)     (0x25890000UL + (x))
 
 /* Helpers */
 #define FAD2LBA(x)      ((x) - 150)
@@ -69,13 +69,13 @@ struct cd_block_status {
 };
 
 /* CD-block */
-#define DTR             0x0000
-#define HIRQ            0x0008
-#define HIRQ_MASK       0x000C
-#define CR1             0x0018
-#define CR2             0x001C
-#define CR3             0x0020
-#define CR4             0x0024
+#define DTR             0x0000UL
+#define HIRQ            0x0008UL
+#define HIRQ_MASK       0x000CUL
+#define CR1             0x0018UL
+#define CR2             0x001CUL
+#define CR3             0x0020UL
+#define CR4             0x0024UL
 
 int cd_block_cmd_execute(struct cd_block_regs *, struct cd_block_regs *);
 
