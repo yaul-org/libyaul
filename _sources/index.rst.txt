@@ -135,8 +135,21 @@ VDP1
 
 .. toctree::
   :maxdepth: 1
+  :caption: Environment
 
-  vdp1
+  vdp1_env
+
+.. toctree::
+  :maxdepth: 1
+  :caption: Command tables
+
+  vdp1_cmdt
+
+.. toctree::
+  :maxdepth: 1
+  :caption: VRAM
+
+  vdp1_vram
 
 VDP2
 ----
@@ -145,3 +158,6 @@ VDP2
   :maxdepth: 1
 
   vdp2
+
+VDP1 & VDP2 (shared)
+--------------------
