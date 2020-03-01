@@ -23,8 +23,11 @@ __BEGIN_DECLS
 /// @addtogroup CPU_SMPC_PERIPHERAL_DEFINES
 /// @{
 
+/// Not yet documented.
 #define MAX_PORTS       2
+/// Not yet documented.
 #define MAX_PERIPHERALS 6 /* Max number of peripherals connected to a single port */
+/// Not yet documented.
 #define MAX_PERIPHERAL_DATA_SIZE 255
 
 /// @}
@@ -435,8 +438,13 @@ struct smpc_peripheral_port {
 /// @addtogroup CPU_SMPC_PERIPHERAL_FUNCTIONS
 /// @{
 
+/// @brief Not yet documented.
 extern void smpc_peripheral_init(void);
+
+/// @brief Not yet documented.
 extern void smpc_peripheral_intback_issue(void);
+
+/// @brief Not yet documented.
 extern void smpc_peripheral_process(void);
 
 /// @}
