@@ -15,18 +15,39 @@
 
 __BEGIN_DECLS
 
+/// @defgroup VDP1_VRAM_DEFINES
+/// @defgroup VDP1_VRAM_STRUCTURES
+/// @defgroup VDP1_VRAM_FUNCTIONS
+
+/// @addtogroup VDP1_VRAM_DEFINES
+/// @{
+
+/// Not yet documented.
 #define VDP1_VRAM(x)            (0x25C00000 + (x))
+/// Not yet documented.
 #define VDP1_FB_POINT(x, y)     (0x25C80000 + (((x) & 0x1) << 18) + (y))
+/// Not yet documented.
 #define VDP1_CMD_TABLE(x, y)    (0x25C00000 + ((x) << 5) + (((y) << 1) & 0x1F))
 
+/// Not yet documented.
 #define VDP1_VRAM_SIZE  0x00080000 /* In bytes */
 
+/// Not yet documented.
 #define VDP1_FB_SIZE    0x00040000
 
+/// @}
+
+/// @addtogroup VDP1_VRAM_STRUCTURES
+/// @{
+
+/// @compound
+/// @brief Not yet documented.
 struct vdp1_gouraud_table {
         color_rgb555_t colors[4];
 } __aligned(8);
 
+/// @compound
+/// @brief Not yet documented.
 struct vdp1_clut {
         struct {
                 union {
@@ -54,18 +75,33 @@ struct vdp1_clut {
         } entries[16];
 } __aligned(32);
 
+/// @}
+
+/// @addtogroup VDP1_VRAM_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
 
+/// @brief Not yet documented.
 extern void *vdp1_vram_texture_base_get(void);
+/// @brief Not yet documented.
 extern uint32_t vdp1_vram_texture_size_get(void);
 
+/// @brief Not yet documented.
 extern struct vdp1_gouraud_table *vdp1_vram_gouraud_base_get(void);
+/// @brief Not yet documented.
 extern uint32_t vdp1_vram_gouraud_size_get(void);
 
+/// @brief Not yet documented.
 extern struct vdp1_clut *vdp1_vram_clut_base_get(void);
+/// @brief Not yet documented.
 extern uint32_t vdp1_vram_clut_size_get(void);
 
+/// @brief Not yet documented.
 extern void *vdp1_vram_remaining_get(void);
+
+/// @}
 
 __END_DECLS
 
