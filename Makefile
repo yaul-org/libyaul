@@ -55,25 +55,24 @@ define macro-check-tool-chain
 endef
 
 .PHONY: all \
-	release \
-	debug \
-	install \
-	install-release \
-	install-debug \
-	distclean \
-	create-pacman-package \
+	check-tool-chain \
 	clean \
-	clean-release \
 	clean-debug \
-	examples \
 	clean-examples \
-	tools \
-	install-tools \
+	clean-release \
 	clean-tools \
+	debug \
+	distclean \
+	examples \
+	install \
+	install-debug \
+	install-release \
+	install-tools \
 	list-targets \
-	check-tool-chain
+	release \
+	tools
 
-all: release debug tools
+all: release debug tools examples
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
@@ -103,10 +102,7 @@ install-debug: debug
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
-create-pacman-package:
-	@echo "$@: Not implemented"
-
-clean: clean-release clean-debug clean-tools
+clean: clean-release clean-debug clean-tools clean-examples
 
 distclean: clean-examples
 	$(ECHO)$(RM) -r $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
