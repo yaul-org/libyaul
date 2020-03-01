@@ -21,14 +21,14 @@ __BEGIN_DECLS
  * possible only in word units and long word units. Access in bytes is not
  * allowed */
 
-#define VDP2_CRAM_ADDR(x)       (0x25F00000 + ((x) << 1))
+#define VDP2_CRAM_ADDR(x)       (0x25F00000UL + ((x) << 1))
 
 #define VDP2_CRAM_MODE_0_OFFSET(x, y, z)                                       \
-        (0x25F00000 + ((x) << 9) + ((y) << 5) + ((z) << 1))
+        (0x25F00000UL + ((x) << 9) + ((y) << 5) + ((z) << 1))
 #define VDP2_CRAM_MODE_1_OFFSET(x, y, z)                                       \
         VDP2_CRAM_MODE_0_OFFSET(x, y, z)
 #define VDP2_CRAM_MODE_2_OFFSET(x, y, z)                                       \
-        (0x25F00000 + ((x) << 10) + ((y) << 6) + ((z) << 2))
+        (0x25F00000UL + ((x) << 10) + ((y) << 6) + ((z) << 2))
 
 /*-
  * CRAM Modes
