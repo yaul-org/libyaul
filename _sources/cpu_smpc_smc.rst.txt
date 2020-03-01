@@ -1,0 +1,13 @@
+Defines
+*******
+
+.. doxygengroup:: CPU_SMPC_SMC_DEFINES
+   :project: yaul
+   :content-only:
+
+Inline functions
+****************
+
+.. doxygengroup:: CPU_SMPC_SMC_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:

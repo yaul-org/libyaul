@@ -1,0 +1,42 @@
+Defines
+*******
+
+.. doxygengroup:: SCU_DMA_DEFINES
+   :project: yaul
+   :content-only:
+
+Helpers
+*******
+
+.. doxygengroup:: SCU_DMA_HELPERS
+   :project: yaul
+   :content-only:
+
+Structures
+**********
+
+.. doxygenstruct:: scu_dma_xfer
+   :project: yaul
+   :members:
+
+.. doxygenstruct:: scu_dma_level_cfg
+   :project: yaul
+   :members:
+
+.. doxygenstruct:: scu_dma_reg_buffer
+   :project: yaul
+   :members:
+
+Inline functions
+****************
+
+.. doxygengroup:: SCU_DMA_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: SCU_DMA_FUNCTIONS
+   :project: yaul
+   :content-only:

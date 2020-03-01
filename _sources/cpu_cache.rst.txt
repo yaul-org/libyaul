@@ -1,0 +1,20 @@
+Defines
+*******
+
+.. doxygengroup:: CPU_CACHE_DEFINES
+   :project: yaul
+   :content-only:
+
+Inline functions
+****************
+
+.. doxygengroup:: CPU_CACHE_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: CPU_CACHE_FUNCTIONS
+   :project: yaul
+   :content-only:

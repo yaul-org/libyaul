@@ -1,0 +1,30 @@
+Defines
+*******
+
+Interrupt number
+################
+
+.. doxygengroup:: SCU_IC_INTERRUPT_DEFINES
+   :project: yaul
+   :content-only:
+
+Interrupt mask values
+#####################
+
+.. doxygengroup:: SCU_IC_MASK_DEFINES
+   :project: yaul
+   :content-only:
+
+Interrupt status values
+#######################
+
+.. doxygengroup:: SCU_IC_IST_DEFINES
+   :project: yaul
+   :content-only:
+
+Inline functions
+****************
+
+.. doxygengroup:: SCU_IC_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:

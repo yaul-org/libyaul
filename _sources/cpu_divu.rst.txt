@@ -1,0 +1,20 @@
+Inline functions
+****************
+
+.. doxygengroup:: CPU_DIVU_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Helpers
+*******
+
+.. doxygengroup:: CPU_DIVU_HELPERS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: CPU_DIVU_FUNCTIONS
+   :project: yaul
+   :content-only:

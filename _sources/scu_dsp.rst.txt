@@ -1,0 +1,34 @@
+Defines
+*******
+
+.. doxygengroup:: SCU_DSP_DEFINES
+   :project: yaul
+   :content-only:
+
+Helpers
+*******
+
+.. doxygengroup:: SCU_DSP_HELPERS
+   :project: yaul
+   :content-only:
+
+Structures
+**********
+
+.. doxygenstruct:: dsp_status
+   :project: yaul
+   :members:
+
+Inline functions
+****************
+
+.. doxygengroup:: SCU_DSP_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: SCU_DSP_FUNCTIONS
+   :project: yaul
+   :content-only:

@@ -1,0 +1,27 @@
+Defines
+*******
+
+.. doxygengroup:: CPU_DUAL_DEFINES
+   :project: yaul
+   :content-only:
+
+Inline functions
+****************
+
+.. doxygengroup:: CPU_DUAL_INLINE_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Helpers
+*******
+
+.. doxygengroup:: CPU_DUAL_HELPERS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: CPU_DUAL_FUNCTIONS
+   :project: yaul
+   :content-only:
