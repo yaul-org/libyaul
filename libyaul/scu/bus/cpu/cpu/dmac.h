@@ -183,7 +183,7 @@ cpu_dmac_stop(void)
 
 /// @}
 
-/// @addtogroup CPU_DMAC_INLINE_FUNCTIONS
+/// @addtogroup CPU_DMAC_FUNCTIONS
 /// @{
 
 /// @brief Not yet documented.
