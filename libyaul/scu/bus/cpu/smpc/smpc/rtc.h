@@ -8,6 +8,8 @@
 #ifndef _SMPC_RTC_H_
 #define _SMPC_RTC_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
 __BEGIN_DECLS
