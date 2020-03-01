@@ -14,7 +14,6 @@
 #include <smpc/peripheral.h>
 #include <smpc/rtc.h>
 #include <smpc/smc.h>
-#include <vdp2.h>
 
 #include <mm/memb.h>
 
