@@ -22,16 +22,16 @@ List Functions
    :project: yaul
    :content-only:
 
-Functions
-*********
-
-.. doxygengroup:: VDP1_CMDT_CMDT_FUNCTIONS
-   :project: yaul
-   :content-only:
-
 Link Functions
 **************
 
 .. doxygengroup:: VDP1_CMDT_LINK_FUNCTIONS
+   :project: yaul
+   :content-only:
+
+Functions
+*********
+
+.. doxygengroup:: VDP1_CMDT_CMDT_FUNCTIONS
    :project: yaul
    :content-only:
