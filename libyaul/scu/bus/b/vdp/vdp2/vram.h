@@ -28,11 +28,11 @@ __BEGIN_DECLS
  * 0x080000 +----------+
  */
 
-#define VDP2_VRAM_ADDR(x, y)    (0x25E00000 + ((x) << 17) + (y))
+#define VDP2_VRAM_ADDR(x, y)    (0x25E00000UL + ((x) << 17) + (y))
 
 #define VDP2_VRAM_BANK(x)       (((x) >> 17) & 0x0007)
 
-#define VDP2_VRAM_SIZE          (0x00080000)
+#define VDP2_VRAM_SIZE          (0x00080000UL)
 
 /* 4 Mbit 2-split VRAM bank size */
 #define VDP2_VRAM_BSIZE_2       (VDP2_VRAM_SIZE / 2)
