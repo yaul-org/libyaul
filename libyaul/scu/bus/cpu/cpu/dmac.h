@@ -63,7 +63,7 @@ __BEGIN_DECLS
 /// @addtogroup CPU_DMAC_STRUCTURES
 /// @{
 
-/// @struct
+/// @compound
 /// @brief Not yet documented.
 struct cpu_dmac_cfg {
         /// Not yet documented.
@@ -88,7 +88,7 @@ struct cpu_dmac_cfg {
         void (*ihr)(void);
 };
 
-/// @struct
+/// @compound
 /// @brief Not yet documented.
 struct dmac_status {
         /// Not yet documented.

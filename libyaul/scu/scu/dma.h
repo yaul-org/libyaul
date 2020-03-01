@@ -183,14 +183,15 @@ __BEGIN_DECLS
 /// @addtogroup SCU_DMA_STRUCTURES
 /// @{
 
-/// @struct
+/// @compound
 /// @brief Used when buffering a SCU-DMA transfer with @ref scu_dma_config_buffer
 /// @see scu_dma_config_buffer
 struct scu_dma_reg_buffer {
+        /// Not yet documented.
         uint32_t buffer[5];
 } __packed __aligned(4);
 
-/// @struct
+/// @compound
 /// @brief Defines a SCU-DMA transfer entry.
 struct scu_dma_xfer {
         /// Transfer length.
@@ -209,7 +210,7 @@ struct scu_dma_xfer {
         uint32_t src;
 } __packed;
 
-/// @struct
+/// @compound
 /// @brief Describes an instance of a SCU-DMA configuration.
 ///
 /// Here is where you can describe how a direct transfer would work.

@@ -49,7 +49,7 @@ __BEGIN_DECLS
 /// @addtogroup SCU_DSP_STRUCTURES
 /// @{
 
-/// @struct
+/// @compound
 /// @brief Not yet documented.
 struct dsp_status {
         unsigned int :5;
@@ -97,6 +97,7 @@ scu_dsp_program_pause(bool pause)
 /// @addtogroup SCU_DSP_HELPERS
 /// @{
 
+/// @brief Not yet documented.
 #define scu_dsp_end_clear() do {                                               \
         scu_dsp_end_set(NULL);                                                 \
 } while (false)
