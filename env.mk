@@ -144,7 +144,8 @@ SH_CFLAGS:= \
 	-std=c11 \
 	$(SH_CFLAGS_shared)
 
-SH_CXXFLAGS_shared:=
+SH_CXXFLAGS_shared:= \
+	$(SH_CFLAGS_shared)
 
 SH_CXXFLAGS:= \
 	-fno-exceptions \
@@ -167,11 +168,42 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
 
 ifeq ($(strip $(YAUL_CDB)),1)
-define update-cdb
-	$(ECHO)$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+# $1 -> Absolute path to compiler executable
+# $2 -> Absolute path to input file
+# $3 -> Absolute path to output file
+# $4 -> Absolute build path
+# $5 -> Absolute path to output compile DB file
+define macro-update-cdb
+	$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+endef
+
+# $1 -> Space delimited list of object files
+# $2 -> File extension (c, cxx)
+# $3 -> Absolute path to compiler executable ($(SH_CC), $(SH_CXX))
+# $4 -> Space delimited list of compiler flags ($(SH_CFLAGS_release), $(SH_CFLAGS_debug), ...)
+# $5 -> Build type (release, debug)
+# $6 -> Absolute path to output compile DB file
+define macro-loop-update-cdb
+	@for object_file in $1; do \
+	    source_filename=$$(basename "$${object_file%%.o}.$2"); \
+	    build_directory=$$(dirname "$${object_file}"); \
+	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5/}; \
+	    source_file=$${source_directory}/$${source_filename}; \
+	    printf -- "$(V_BEGIN_YELLOW)$${source_file#$(YAUL_BUILD_ROOT)/}$(V_END)\n"; \
+	    $(call macro-update-cdb,\
+	      $3,\
+	      $${source_file},\
+	      $${object_file},\
+	      $${build_directory},\
+	      $6,\
+	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))); \
+	done
 endef
 else
-define update-cdb
+define macro-update-cdb
+endef
+
+define macro-loop-update-cdb
 endef
 endif
 
@@ -181,7 +213,7 @@ define macro-sh-build-object
 	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
-	$(call update-cdb,\
+	$(ECHO)$(call macro-update-cdb,\
 		$(SH_CC),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
@@ -196,7 +228,7 @@ define macro-sh-build-c++-object
 	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c $(abspath $(<)) -o $@
-	$(call update-cdb,\
+	$(ECHO)$(call macro-update-cdb,\
 		$(SH_CXX),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
