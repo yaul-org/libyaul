@@ -4,17 +4,41 @@ SUB_BUILD:=$(YAUL_BUILD)/lib$(TARGET)
 
 LIB_FILE_base:= $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
 
-LIB_OBJS:= $(patsubst %.c,%.o,$(patsubst %.sx,%.o,$(LIB_SRCS)))
+LIB_SRCS_C:= $(filter %.c,$(LIB_SRCS))
+LIB_SRCS_CXX:= $(filter %.cxx,$(LIB_SRCS))
+LIB_SRCS_S:= $(filter %.sx,$(LIB_SRCS))
+
+LIB_OBJS_C:= $(patsubst %.c,%.o,$(LIB_SRCS_C))
+LIB_OBJS_CXX:= $(patsubst %.cxx,%.o,$(LIB_SRCS_CXX))
+LIB_OBJS_S:= $(patsubst %.sx,%.o,$(LIB_SRCS_S))
+
+LIB_OBJS_C_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS_C))
+LIB_OBJS_CXX_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS_CXX))
+LIB_OBJS_S_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS_S))
+
+LIB_OBJS:= $(LIB_OBJS_C) $(LIB_OBJS_CXX) $(LIB_OBJS_S)
 LIB_DEPS:= $(LIB_OBJS:.o=.d)
 
-LIB_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
-LIB_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
+LIB_OBJS_base:= $(LIB_OBJS_C_base) $(LIB_OBJS_CXX_base) $(LIB_OBJS_S_base)
+LIB_DEPS_base:= $(LIB_OBJS_base:.o=.d)
 
-SUPPORT_OBJS:= $(patsubst %.c,%.o,$(patsubst %.cxx,%.o,$(patsubst %.sx,%.o,$(SUPPORT_SRCS))))
+SUPPORT_SRCS_C:= $(filter %.c,$(SUPPORT_SRCS))
+SUPPORT_SRCS_CXX:= $(filter %.cxx,$(SUPPORT_SRCS))
+SUPPORT_SRCS_S:= $(filter %.sx,$(SUPPORT_SRCS))
+
+SUPPORT_OBJS_C:= $(patsubst %.c,%.o,$(SUPPORT_SRCS_C))
+SUPPORT_OBJS_CXX:= $(patsubst %.cxx,%.o,$(SUPPORT_SRCS_CXX))
+SUPPORT_OBJS_S:= $(patsubst %.sx,%.o,$(SUPPORT_SRCS_S))
+
+SUPPORT_OBJS_C_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS_C))
+SUPPORT_OBJS_CXX_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS_CXX))
+SUPPORT_OBJS_S_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS_S))
+
+SUPPORT_OBJS:= $(SUPPORT_OBJS_C) $(SUPPORT_OBJS_CXX) $(SUPPORT_OBJS_S)
 SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 
-SUPPORT_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_OBJS))
-SUPPORT_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(SUPPORT_DEPS))
+SUPPORT_OBJS_base:= $(SUPPORT_OBJS_C_base) $(SUPPORT_OBJS_CXX_base) $(SUPPORT_OBJS_S_base)
+SUPPORT_DEPS_base:= $(SUPPORT_OBJS_base:.o=.d)
 
 LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
@@ -31,7 +55,7 @@ $(YAUL_INSTALL_ROOT)/$3/$2: $1
 install-$4: $4 $(YAUL_INSTALL_ROOT)/$3/$2
 endef
 
-.PHONY: all $(TYPE) install-$(TYPE)
+.PHONY: all $(TYPE) install-$(TYPE) clean generate-cdb
 
 .SUFFIXES:= .c .cxx .sx .o .x
 
@@ -91,6 +115,12 @@ $(foreach HELPER_FILE,$(HELPER_FILES_all), \
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
+
+generate-cdb:
+	$(ECHO)$(RM) $(CDB_FILE)
+	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),$(TYPE),$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),$(TYPE),$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(SH_CXX),$(SH_CXXFLAGS_release),$(TYPE),$(CDB_FILE))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
