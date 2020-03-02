@@ -10,7 +10,7 @@ LIB_DEPS:= $(LIB_SRCS:.c=.d)
 LIB_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
 LIB_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
 
-.PHONY: all $(TYPE) clean install-$(TYPE)
+.PHONY: all $(TYPE) clean install-$(TYPE) generate-cdb
 
 .SUFFIXES:= .c .o
 
@@ -36,6 +36,9 @@ $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
+
+generate-cdb:
+	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_base),c,$(SH_CC),$(SH_CFLAGS_release),release,$(CDB_FILE))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \

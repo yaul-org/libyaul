@@ -46,6 +46,11 @@ BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
 HELPER_FILES_all = $(HELPER_FILES)
 
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
+# $5 ->
 define macro-generate-install-file-rule
 $(YAUL_INSTALL_ROOT)/$3/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
@@ -55,7 +60,7 @@ $(YAUL_INSTALL_ROOT)/$3/$2: $1
 install-$4: $4 $(YAUL_INSTALL_ROOT)/$3/$2
 endef
 
-.PHONY: all $(TYPE) install-$(TYPE) clean generate-cdb
+.PHONY: all $(TYPE) clean install-$(TYPE) generate-cdb
 
 .SUFFIXES:= .c .cxx .sx .o .x
 
@@ -117,10 +122,9 @@ $(foreach HELPER_FILE,$(HELPER_FILES_all), \
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
 generate-cdb:
-	$(ECHO)$(RM) $(CDB_FILE)
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),$(TYPE),$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),$(TYPE),$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(SH_CXX),$(SH_CXXFLAGS_release),$(TYPE),$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(SH_CC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(SH_CXX),$(SH_CXXFLAGS_release),release,$(CDB_FILE))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \

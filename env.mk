@@ -174,7 +174,12 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $4 -> Absolute build path
 # $5 -> Absolute path to output compile DB file
 define macro-update-cdb
-	$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	set -e; \
+	    input_file=$$(printf -- "$2" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
+	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
+	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
 # $1 -> Space delimited list of object files
@@ -184,11 +189,13 @@ endef
 # $5 -> Build type (release, debug)
 # $6 -> Absolute path to output compile DB file
 define macro-loop-update-cdb
-	@for object_file in $1; do \
+	set -e; \
+	for object_file in $1; do \
 	    source_filename=$$(basename "$${object_file%%.o}.$2"); \
 	    build_directory=$$(dirname "$${object_file}"); \
-	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5/}; \
+	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5}; \
 	    source_file=$${source_directory}/$${source_filename}; \
+	    source_file=$$(printf -- "$${source_file}" | tr -s '/' '/'); \
 	    printf -- "$(V_BEGIN_YELLOW)$${source_file#$(YAUL_BUILD_ROOT)/}$(V_END)\n"; \
 	    $(call macro-update-cdb,\
 	      $3,\
@@ -196,7 +203,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))); \
+	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))) >/dev/null 2>&1; \
 	done
 endef
 else
@@ -207,6 +214,7 @@ define macro-loop-update-cdb
 endef
 endif
 
+# $1 -> Build type (release, debug)
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
@@ -222,6 +230,7 @@ define macro-sh-build-object
 		$(SH_CFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
+# $1 -> Build type (release, debug)
 define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
@@ -237,11 +246,16 @@ define macro-sh-build-c++-object
 		$(SH_CXXFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
+# No arguments
 define macro-sh-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(SH_AR) rcs $@ $^
 endef
 
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
 define macro-sh-generate-install-header-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
@@ -253,6 +267,9 @@ $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 install-$4: $4 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2
 endef
 
+# $1 ->
+# $2 ->
+# $3 ->
 define macro-sh-generate-install-lib-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
