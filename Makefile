@@ -132,11 +132,11 @@ clean-examples:
 tools:
 	$(ECHO)($(MAKE) -C tools all) || exit $${?}
 
-# XXX: Change "libyaul" for $(PROJECTS) when ready
 generate-cdb:
-	$(ECHO)for project in libyaul; do \
+	$(ECHO)$(RM) $(CDB_FILE)
+	$(ECHO)for project in $(PROJECTS); do \
 	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
-	    ($(MAKE) -C $${project} -f debug.mk generate-cdb) || exit $${?}; \
+	    ($(MAKE) -C $${project} -f release.mk generate-cdb) || exit $${?}; \
 	done
 
 install-tools: tools

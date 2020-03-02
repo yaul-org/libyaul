@@ -187,8 +187,9 @@ define macro-loop-update-cdb
 	@for object_file in $1; do \
 	    source_filename=$$(basename "$${object_file%%.o}.$2"); \
 	    build_directory=$$(dirname "$${object_file}"); \
-	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5/}; \
+	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5}; \
 	    source_file=$${source_directory}/$${source_filename}; \
+	    source_file=$$(printf -- "$${source_file}" | tr -s '/' '/'); \
 	    printf -- "$(V_BEGIN_YELLOW)$${source_file#$(YAUL_BUILD_ROOT)/}$(V_END)\n"; \
 	    $(call macro-update-cdb,\
 	      $3,\
