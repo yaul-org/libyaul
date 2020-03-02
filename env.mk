@@ -174,7 +174,12 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $4 -> Absolute build path
 # $5 -> Absolute path to output compile DB file
 define macro-update-cdb
-	$(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	set -e; \
+	    input_file=$$(printf -- "$2" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
+	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
+	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
 # $1 -> Space delimited list of object files
@@ -184,7 +189,8 @@ endef
 # $5 -> Build type (release, debug)
 # $6 -> Absolute path to output compile DB file
 define macro-loop-update-cdb
-	@for object_file in $1; do \
+	set -e; \
+	for object_file in $1; do \
 	    source_filename=$$(basename "$${object_file%%.o}.$2"); \
 	    build_directory=$$(dirname "$${object_file}"); \
 	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5}; \
@@ -197,7 +203,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))); \
+	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))) >/dev/null 2>&1; \
 	done
 endef
 else
