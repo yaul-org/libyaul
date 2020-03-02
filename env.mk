@@ -214,6 +214,7 @@ define macro-loop-update-cdb
 endef
 endif
 
+# $1 -> Build type (release, debug)
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
@@ -229,6 +230,7 @@ define macro-sh-build-object
 		$(SH_CFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
+# $1 -> Build type (release, debug)
 define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
@@ -244,11 +246,16 @@ define macro-sh-build-c++-object
 		$(SH_CXXFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
+# No arguments
 define macro-sh-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(SH_AR) rcs $@ $^
 endef
 
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
 define macro-sh-generate-install-header-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
@@ -260,6 +267,9 @@ $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 install-$4: $4 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2
 endef
 
+# $1 ->
+# $2 ->
+# $3 ->
 define macro-sh-generate-install-lib-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"

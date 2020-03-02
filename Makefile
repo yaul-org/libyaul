@@ -8,6 +8,8 @@ include env.mk
 THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export THIS_ROOT
 
+# $1 ->
+# $2 ->
 define macro-generate-build-rule
 .PHONY: $1-$2
 
@@ -17,6 +19,8 @@ $1-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk $2) || exit $${?}
 endef
 
+# $1 ->
+# $2 ->
 define macro-generate-install-rule
 .PHONY: $1-install-$2
 
@@ -27,6 +31,7 @@ $1-install-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
 
+# $1 ->
 define macro-generate-generate-cdb-rule
 .PHONY: $1-generate-cdb
 
@@ -35,6 +40,8 @@ $1-generate-cdb:
 	$(ECHO)($(MAKE) -C $1 -f release.mk generate-cdb) || exit $${?}
 endef
 
+# $1 ->
+# $2 ->
 define macro-generate-clean-rule
 .PHONY: $1-clean-$2
 
@@ -43,6 +50,7 @@ $1-clean-$2: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)($(MAKE) -C $1 -f $2.mk clean) || exit $${?}
 endef
 
+# No arguments
 define macro-install
 	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
@@ -52,6 +60,8 @@ define macro-install
 	done
 endef
 
+# $1 ->
+# $2 ->
 define macro-check-tool-chain
 	$(ECHO)for tool in $2; do \
 	    printf -- "$(YAUL_INSTALL_ROOT)/bin/$1-$${tool}$(EXE_EXT)\n"; \

@@ -46,6 +46,11 @@ BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
 USER_FILES_all = $(USER_FILES)
 HELPER_FILES_all = $(HELPER_FILES)
 
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
+# $5 ->
 define macro-generate-install-file-rule
 $(YAUL_INSTALL_ROOT)/$3/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
