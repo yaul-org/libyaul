@@ -16,6 +16,26 @@
 
 #include "vdp-internal.h"
 
+static struct vdp1_env _default_env = {
+        .erase_color = COLOR_RGB555_INITIALIZER(0, 0, 0),
+        .erase_points[0] = {
+                0,
+                0
+        },
+        .erase_points[1] = {
+                /* Updated during runtime */
+                0,
+                /* Updated during runtime */
+                0
+        },
+        .bpp = VDP1_ENV_BPP_16,
+        .rotation = VDP1_ENV_ROTATION_0,
+        .color_mode = VDP1_ENV_COLOR_MODE_RGB_PALETTE,
+        .sprite_type = 0x0
+};
+
+static struct vdp1_env _current_env;
+
 #ifdef DEBUG
 static inline void __always_inline _env_assert(const struct vdp1_env *);
 static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
@@ -24,19 +44,40 @@ static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
 #define _env_erase_assert(x)
 #endif /* DEBUG */
 
+static inline void __always_inline _env_current_update(const struct vdp1_env *);
+
+void
+vdp1_env_init(void)
+{
+        _state_vdp1()->current_env = &_current_env;
+
+        _env_current_update(&_default_env);
+}
+
 void
 vdp1_env_default_set(void)
 {
-        const struct vdp1_env *default_env;
-        default_env = &_state_vdp1()->env;
+        /* If the system is PAL, or if there is a resolution change, update the
+         * resolution */
 
-        vdp1_env_set(default_env);
+        uint16_t width;
+        width = _state_vdp2()->tv.resolution.x;
+
+        uint16_t height;
+        height = _state_vdp2()->tv.resolution.y;
+
+        _default_env.erase_points[1].x = width;
+        _default_env.erase_points[1].y = height;
+
+        vdp1_env_set(&_default_env);
 }
 
 void
 vdp1_env_set(const struct vdp1_env *env)
 {
         _env_assert(env);
+
+        _env_current_update(env);
 
         /* Always clear TVM and VBE bits */
         _state_vdp1()->regs.tvmr = (env->rotation << 1) | env->bpp;
@@ -86,6 +127,11 @@ vdp1_env_set(const struct vdp1_env *env)
         MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs.ewdr);
         MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs.ewlr);
         MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
+}
+
+static inline void __always_inline
+_env_current_update(const struct vdp1_env *env) {
+        (void)memcpy(&_current_env, env, sizeof(struct vdp1_env));
 }
 
 #ifdef DEBUG
