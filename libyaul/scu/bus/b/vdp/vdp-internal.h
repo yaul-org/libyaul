@@ -32,7 +32,7 @@ struct state_vdp1 {
                 uint32_t remaining_base;
         } vram;
 
-        struct vdp1_env env;
+        struct vdp1_env const *current_env;
 
         union {
                 uint16_t buffer[11];
