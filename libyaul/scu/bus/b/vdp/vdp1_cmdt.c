@@ -5,31 +5,19 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <cpu/cache.h>
+#include <cpu/instructions.h>
+
+#include <vdp1/cmdt.h>
+#include <vdp1/vram.h>
+
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <vdp1/cmdt.h>
-#include <vdp1/vram.h>
-
 #include "vdp-internal.h"
-
-static inline void __always_inline _cmdt_cmd_grda_set(struct vdp1_cmdt *, uint32_t);
-static inline void __always_inline _cmdt_cmd_colr_set(struct vdp1_cmdt *, const void *);
-static inline void __always_inline _cmdt_cmd_srca_set(struct vdp1_cmdt *, const void *);
-static inline void __always_inline _cmdt_cmd_size_set(struct vdp1_cmdt *, const void *);
-
-#ifdef DEBUG
-static inline void __always_inline _cmdt_list_assert(const struct vdp1_cmdt_list *);
-static inline void __always_inline _cmdt_list_next_assert(const struct vdp1_cmdt_list *);
-static inline void __always_inline _cmdt_jump_assert(const struct vdp1_cmdt_list *, uint8_t);
-#else
-#define _cmdt_list_assert(x)
-#define _cmdt_list_next_assert(x)
-#define _cmdt_jump_assert(x, y)
-#endif /* DEBUG */
 
 struct vdp1_cmdt_list *
 vdp1_cmdt_list_alloc(uint16_t count)
@@ -69,18 +57,7 @@ vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts, u
         assert(count > 0);
 
         cmdt_list->cmdts = cmdts;
-        cmdt_list->cmdt = cmdt_list->cmdts;
-        cmdt_list->count = count;
-}
-
-void
-vdp1_cmdt_list_reset(struct vdp1_cmdt_list *cmdt_list)
-{
-        assert(cmdt_list != NULL);
-        assert(cmdt_list->cmdts != NULL);
-        assert(cmdt_list->count > 0);
-
-        cmdt_list->cmdt = cmdt_list->cmdts;
+        cmdt_list->count = 0;
 }
 
 struct vdp1_cmdt *
@@ -89,540 +66,244 @@ vdp1_cmdt_base_get(void)
         return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
 }
 
-uint16_t
-vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_normal_sprite *sprite)
+void
+vdp1_cmdt_param_draw_mode_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_draw_mode draw_mode)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
+        /* Values 0x4, 0x5, 0x6 for comm indicate a non-textured command table,
+         * and we want to set the bits 7 and 6 without branching */
+        uint16_t comm;
+        comm = (cmdt->cmd_ctrl & 0x0004);
 
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
+        uint32_t pmod_bits;
+        pmod_bits = (comm << 5) | (comm << 4);
 
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
-        cmdt->cmd_ctrl = sprite->direction.raw & 0x0030;
-        cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
-
-        _cmdt_cmd_colr_set(cmdt, sprite);
-        _cmdt_cmd_srca_set(cmdt, sprite);
-        _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
-
-        cmdt->cmd_xa = sprite->position.x;
-        cmdt->cmd_ya = sprite->position.y;
-
-        return index;
+        cmdt->cmd_pmod = pmod_bits | draw_mode.raw;
 }
 
-uint16_t
-vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_scaled_sprite *sprite)
+void
+vdp1_cmdt_param_zoom_set(struct vdp1_cmdt *cmdt, const uint8_t zoom_point)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
-        cmdt->cmd_ctrl = (sprite->direction.raw & 0x0030) | 0x0001;
-        cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
-
-        _cmdt_cmd_colr_set(cmdt, sprite);
-        _cmdt_cmd_srca_set(cmdt, sprite);
-        _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
-
-        if (!sprite->zoom_point.enable) {
-                /* Scale with two vertices, A and C. No zoom point */
-                cmdt->cmd_xa = sprite->vertex.a.x;
-                cmdt->cmd_ya = sprite->vertex.a.y;
-                cmdt->cmd_xc = sprite->vertex.c.x;
-                cmdt->cmd_yc = sprite->vertex.c.y;
-
-                return index;
-        }
-
-        uint16_t zp;
-        zp = (sprite->zoom_point.enable)
-            ? dlog2(sprite->zoom_point.raw & ~0x0010)
-            : 0x0000;
-
-        cmdt->cmd_ctrl |= zp << 8;
-
-        cmdt->cmd_xa = sprite->zoom.point.x;
-        cmdt->cmd_ya = sprite->zoom.point.y;
-        cmdt->cmd_xb = sprite->zoom.display.x;
-        cmdt->cmd_yb = sprite->zoom.display.y;
-
-        return index;
+        cmdt->cmd_ctrl &= 0xF0F0;
+        cmdt->cmd_ctrl |= (zoom_point << 8) | 0x0001;
 }
 
-uint16_t
-vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_distorted_sprite *sprite)
+void
+vdp1_cmdt_param_char_base_set(struct vdp1_cmdt *cmdt, uint32_t base)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
-        cmdt->cmd_ctrl = (sprite->direction.raw & 0x0030) | 0x0002;
-        cmdt->cmd_link = 0x0000;
-        cmdt->cmd_pmod = sprite->draw_mode.raw & 0x9FFF;
-
-        _cmdt_cmd_colr_set(cmdt, sprite);
-        _cmdt_cmd_srca_set(cmdt, sprite);
-        _cmdt_cmd_size_set(cmdt, sprite);
-        _cmdt_cmd_grda_set(cmdt, sprite->grad_base);
-
-        /*-
-         * CCW starting from vertex D
-         * D------------C
-         * |            |
-         * |            |
-         * |            |
-         * |            |
-         * A------------B
-         */
-
-        cmdt->cmd_xa = sprite->vertex.a.x;
-        cmdt->cmd_ya = sprite->vertex.a.y;
-        cmdt->cmd_xb = sprite->vertex.b.x;
-        cmdt->cmd_yb = sprite->vertex.b.y;
-        cmdt->cmd_xc = sprite->vertex.c.x;
-        cmdt->cmd_yc = sprite->vertex.c.y;
-        cmdt->cmd_xd = sprite->vertex.d.x;
-        cmdt->cmd_yd = sprite->vertex.d.y;
-
-        return index;
+        cmdt->cmd_srca = (base >> 3) & 0xFFFF;
 }
 
-uint16_t
-vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_polygon *polygon)
+void
+vdp1_cmdt_param_color_set(struct vdp1_cmdt *cmdt, color_rgb555_t color)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
+        cmdt->cmd_colr = color.raw;
+}
 
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
+void
+vdp1_cmdt_param_color_mode0_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_color_bank color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_colr = color_bank.raw & 0xFFF0;
+}
 
-        cmdt_list->cmdt++;
+void
+vdp1_cmdt_param_color_mode1_set(struct vdp1_cmdt *cmdt, uint32_t base)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0008;
+        cmdt->cmd_colr = (uint16_t)((base >> 3) & 0xFFFF);
+}
 
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
+void
+vdp1_cmdt_param_color_mode2_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_color_bank color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0010;
+        cmdt->cmd_colr = color_bank.raw & 0xFFF0;
+}
 
+void
+vdp1_cmdt_param_color_mode3_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_color_bank color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+       cmdt->cmd_pmod |= 0x0018;
+        cmdt->cmd_colr = color_bank.raw & 0xFF80;
+}
+
+void
+vdp1_cmdt_param_color_mode4_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_color_bank color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0020;
+        cmdt->cmd_colr = color_bank.raw & 0xFF00;
+}
+
+void
+vdp1_cmdt_param_size_set(struct vdp1_cmdt *cmdt, uint16_t width, uint16_t height)
+{
+        cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
+}
+
+void
+vdp1_cmdt_param_horizontal_flip_set(struct vdp1_cmdt *cmdt, bool flip)
+{
+        cmdt->cmd_ctrl &= 0xFFBF;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x1)  << 6;
+}
+
+void
+vdp1_cmdt_param_vertical_flip_set(struct vdp1_cmdt *cmdt, bool flip)
+{
+        cmdt->cmd_ctrl &= 0xFFDF;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x1) << 5;
+}
+
+void
+vdp1_cmdt_param_vertex_set(struct vdp1_cmdt *cmdt,
+    uint16_t vertex_index,
+    const int16_vector2_t *p)
+{
+        int16_vector2_t *vertex;
+        vertex = (int16_vector2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
+
+        vertex->x = p->x;
+        vertex->y = p->y;
+}
+
+void
+vdp1_cmdt_param_gouraud_base_set(struct vdp1_cmdt *cmdt, uint32_t base)
+{
+        /* Gouraud shading processing is valid when a color calculation mode is
+         * specified */
+        cmdt->cmd_grda = (base >> 3) & 0xFFFF;
+}
+
+void
+vdp1_cmdt_normal_sprite_set(struct vdp1_cmdt *cmdt)
+{
+        cmdt->cmd_ctrl = 0x0000;
+}
+
+void
+vdp1_cmdt_scaled_sprite_set(struct vdp1_cmdt *cmdt)
+{
+        cmdt->cmd_ctrl = 0x0001;
+}
+
+void
+vdp1_cmdt_distorted_sprite_set(struct vdp1_cmdt *cmdt)
+{
+        cmdt->cmd_ctrl = 0x0002;
+}
+
+void
+vdp1_cmdt_polygon_set(struct vdp1_cmdt *cmdt)
+{
         cmdt->cmd_ctrl = 0x0004;
-        cmdt->cmd_link = 0x0000;
-        /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = polygon->draw_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polygon->color.raw;
-
-        _cmdt_cmd_grda_set(cmdt, polygon->grad_base);
-
-        /*-
-         * CCW starting from vertex D
-         * D------------C
-         * |            |
-         * |            |
-         * |            |
-         * |            |
-         * A------------B
-         */
-
-        cmdt->cmd_xa = polygon->vertex.a.x;
-        cmdt->cmd_ya = polygon->vertex.a.y;
-        cmdt->cmd_xb = polygon->vertex.b.x;
-        cmdt->cmd_yb = polygon->vertex.b.y;
-        cmdt->cmd_xc = polygon->vertex.c.x;
-        cmdt->cmd_yc = polygon->vertex.c.y;
-        cmdt->cmd_xd = polygon->vertex.d.x;
-        cmdt->cmd_yd = polygon->vertex.d.y;
-
-        return index;
 }
 
-uint16_t
-vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_polyline *polyline)
+void
+vdp1_cmdt_polyline_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
         cmdt->cmd_ctrl = 0x0005;
-        cmdt->cmd_link = 0x0000;
-        /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = polyline->draw_mode.raw | 0x00C0;
-        cmdt->cmd_colr = polyline->color.raw;
-
-        _cmdt_cmd_grda_set(cmdt, polyline->grad_base);
-
-        /* CCW starting from vertex D */
-        cmdt->cmd_xd = polyline->vertex.d.x;
-        cmdt->cmd_yd = polyline->vertex.d.y;
-        cmdt->cmd_xa = polyline->vertex.a.x;
-        cmdt->cmd_ya = polyline->vertex.a.y;
-        cmdt->cmd_xb = polyline->vertex.b.x;
-        cmdt->cmd_yb = polyline->vertex.b.y;
-        cmdt->cmd_xc = polyline->vertex.c.x;
-        cmdt->cmd_yc = polyline->vertex.c.y;
-
-        return index;
 }
 
-uint16_t
-vdp1_cmdt_line_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_line *line)
+void
+vdp1_cmdt_line_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
         cmdt->cmd_ctrl = 0x0006;
-        cmdt->cmd_link = 0x0000;
-        /* Force bit 6 and 7 to be set */
-        cmdt->cmd_pmod = line->draw_mode.raw | 0x00C0;
-        cmdt->cmd_colr = line->color.raw;
-
-        _cmdt_cmd_grda_set(cmdt, line->grad_base);
-
-        cmdt->cmd_xa = line->vertex.a.x;
-        cmdt->cmd_ya = line->vertex.a.y;
-        cmdt->cmd_xb = line->vertex.b.x;
-        cmdt->cmd_yb = line->vertex.b.y;
-
-        return index;
 }
 
-uint16_t
-vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_user_clip_coord *user_clip)
+void
+vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
-        int16_t x0;
-        x0 = user_clip->coords[0].x;
-
-        int16_t y0;
-        y0 = user_clip->coords[0].y;
-
-        int16_t x1;
-        x1 = user_clip->coords[1].x;
-
-        int16_t y1;
-        y1 = user_clip->coords[1].y;
-
-        assert(((x0 <= x1) && (y0 <= y1)));
-
         cmdt->cmd_ctrl = 0x0008;
-        cmdt->cmd_link = 0x0000;
-        /* Upper-left (x1, y1) */
-        cmdt->cmd_xa = x0 & 0x03FF;
-        cmdt->cmd_ya = y0 & 0x01FF;
-        /* Lower-right (x2, y2) */
-        cmdt->cmd_xc = x1 & 0x03FF;
-        cmdt->cmd_yc = y1 & 0x01FF;
-
-        return index;
 }
 
-uint16_t
-vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_system_clip_coord *system_clip)
+void
+vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
         cmdt->cmd_ctrl = 0x0009;
-        cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xc = system_clip->coord.x;
-        cmdt->cmd_yc = system_clip->coord.y;
-
-        return index;
 }
 
-uint16_t
-vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *cmdt_list,
-    const struct vdp1_cmdt_local_coord *local)
+void
+vdp1_cmdt_local_coord_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        uint16_t index;
-        index = cmdt - &cmdt_list->cmdts[0];
-
         cmdt->cmd_ctrl = 0x000A;
-        cmdt->cmd_link = 0x0000;
-        cmdt->cmd_xa = local->coord.x;
-        cmdt->cmd_ya = local->coord.y;
-
-        return index;
 }
 
 void
-vdp1_cmdt_end(struct vdp1_cmdt_list *cmdt_list)
+vdp1_cmdt_end_set(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_list_assert(cmdt_list);
-        _cmdt_list_next_assert(cmdt_list);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = cmdt_list->cmdt;
-
-        cmdt_list->cmdt++;
-
-        cmdt->cmd_ctrl |= 0x8000;
-        cmdt->cmd_link = 0x0000;
+        cmdt->cmd_ctrl = 0x8000;
 }
 
 void
-vdp1_cmdt_jump_clear(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+vdp1_cmdt_jump_clear(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
 }
 
 void
-vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
-    uint8_t link_index)
+vdp1_cmdt_jump_assign(struct vdp1_cmdt *cmdt, uint16_t link_index)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x1000;
         cmdt->cmd_link = link_index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_call(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
-    uint8_t link_index)
+vdp1_cmdt_jump_call(struct vdp1_cmdt *cmdt, uint16_t link_index)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x2000;
         cmdt->cmd_link = link_index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
-    uint8_t link_index)
+vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt *cmdt, uint16_t link_index)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x5000;
         cmdt->cmd_link = link_index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_skip_call(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index,
-    uint8_t link_index)
+vdp1_cmdt_jump_skip_call(struct vdp1_cmdt *cmdt, uint16_t link_index)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x6000;
         cmdt->cmd_link = link_index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_next(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+vdp1_cmdt_jump_next(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
 }
 
 void
-vdp1_cmdt_jump_return(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+vdp1_cmdt_jump_return(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x3000;
 }
 
 void
-vdp1_cmdt_jump_skip_next(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+vdp1_cmdt_jump_skip_next(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x4000;
 }
 
 void
-vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
+vdp1_cmdt_jump_skip_return(struct vdp1_cmdt *cmdt)
 {
-        _cmdt_jump_assert(cmdt_list, cmdt_index);
-
-        struct vdp1_cmdt *cmdt;
-        cmdt = &cmdt_list->cmdts[cmdt_index];
-
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x7000;
 }
-
-static inline void __always_inline
-_cmdt_cmd_grda_set(struct vdp1_cmdt *cmdt, uint32_t grad)
-{
-        /* Gouraud shading processing is valid when a color calculation
-         * mode is specified */
-        cmdt->cmd_grda = (grad >> 3) & 0xFFFF;
-}
-
-static inline void __always_inline
-_cmdt_cmd_colr_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
-{
-        const struct vdp1_cmdt_normal_sprite *sprite;
-        sprite = base_sprite;
-
-        switch (sprite->draw_mode.color_mode) {
-        case 0:
-                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFFF0;
-                break;
-        case 1:
-                cmdt->cmd_colr = (uint16_t)((sprite->clut >> 3) & 0xFFFF);
-                break;
-        case 2:
-                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFFC0;
-                break;
-        case 3:
-                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFF80;
-                break;
-        case 4:
-                cmdt->cmd_colr = sprite->sprite_type.raw & 0xFF00;
-                break;
-        case 5:
-                break;
-        }
-}
-
-static inline void __always_inline
-_cmdt_cmd_srca_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
-{
-        const struct vdp1_cmdt_normal_sprite *sprite;
-        sprite = base_sprite;
-
-        cmdt->cmd_srca = (sprite->char_base >> 3) & 0xFFFF;
-}
-
-static inline void __always_inline
-_cmdt_cmd_size_set(struct vdp1_cmdt *cmdt, const void *base_sprite)
-{
-        const struct vdp1_cmdt_normal_sprite *sprite;
-        sprite = base_sprite;
-
-        uint16_t width;
-        width = sprite->width;
-
-        uint16_t height;
-        height = sprite->height;
-
-        cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
-}
-
-#ifdef DEBUG
-static inline void __always_inline
-_cmdt_list_assert(const struct vdp1_cmdt_list *cmdt_list)
-{
-        assert(cmdt_list != NULL);
-        assert(cmdt_list->cmdts != NULL);
-        assert(cmdt_list->cmdt != NULL);
-        assert(cmdt_list->cmdt >= cmdt_list->cmdts);
-        assert(cmdt_list->count > 0);
-}
-
-static inline void __always_inline
-_cmdt_list_next_assert(const struct vdp1_cmdt_list *cmdt_list)
-{
-        assert((uint16_t)((cmdt_list->cmdt + 1) - cmdt_list->cmdts) <= cmdt_list->count);
-}
-
-static inline void __always_inline
-_cmdt_jump_assert(const struct vdp1_cmdt_list *cmdt_list, uint8_t cmdt_index)
-{
-        _cmdt_list_assert(cmdt_list);
-
-        assert(cmdt_index < cmdt_list->count);
-}
-#endif /* DEBUG */
