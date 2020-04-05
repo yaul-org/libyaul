@@ -221,12 +221,10 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
 #ifdef DEBUG
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
-        assert(cmdt_list->cmdt != NULL);
-        assert(cmdt_list->count > 0);
 #endif /* DEBUG */
 
         uint16_t count;
-        count = cmdt_list->cmdt - cmdt_list->cmdts;
+        count = cmdt_list->count;
 
         if (count == 0) {
                 return;
@@ -245,10 +243,6 @@ vdp1_sync_draw(struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void 
         /* Assert that we don't exceed the amount of VRAM dedicated to command
          * lists */
         assert(vdp1_vram < (uint32_t)(vdp1_vram_texture_base_get()));
-
-        /* Assert that the last command table in the list is terminated properly
-         * (draw end) */
-        assert((cmdt_list->cmdts[count - 1].cmd_ctrl & 0x8000) == 0x8000);
 #endif /* DEBUG */
 
         /* Keep track of how many commands are being sent. Remove the "draw end"
