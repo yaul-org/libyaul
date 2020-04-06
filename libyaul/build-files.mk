@@ -120,6 +120,7 @@ LIB_SRCS+= \
 	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
+	lib/stdlib/memalign.c \
 	lib/stdlib/realloc.c
 
 LIB_SRCS+= \

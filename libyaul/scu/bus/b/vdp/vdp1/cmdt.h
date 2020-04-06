@@ -213,6 +213,17 @@ struct vdp1_cmdt_list {
         uint16_t count;
 } __aligned(4);
 
+struct vdp1_cmdt_orderlist {
+        struct {
+                unsigned int end:1;
+                unsigned int :30;
+        } control __aligned(4);
+
+        unsigned int :32;
+
+        struct vdp1_cmdt *cmdt;
+} __aligned(4);
+
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
 {
@@ -225,11 +236,16 @@ vdp1_cmdt_last_get(void)
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;
 }
 
+extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
+
 extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
 extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
 extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *, uint16_t);
 
-extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
+extern struct vdp1_cmdt_orderlist *vdp1_cmdt_orderlist_alloc(uint16_t);
+extern void vdp1_cmdt_orderlist_free(struct vdp1_cmdt_orderlist *);
+extern void vdp1_cmdt_orderlist_init(struct vdp1_cmdt_orderlist *, uint16_t);
+extern void vdp1_cmdt_orderlist_vram_patch(struct vdp1_cmdt_orderlist *, const uint32_t, const uint16_t);
 
 extern void vdp1_cmdt_normal_sprite_set(struct vdp1_cmdt *);
 extern void vdp1_cmdt_scaled_sprite_set(struct vdp1_cmdt *);
