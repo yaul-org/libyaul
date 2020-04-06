@@ -19,6 +19,12 @@
 
 #include "vdp-internal.h"
 
+struct vdp1_cmdt *
+vdp1_cmdt_base_get(void)
+{
+        return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
+}
+
 struct vdp1_cmdt_list *
 vdp1_cmdt_list_alloc(uint16_t count)
 {
@@ -60,10 +66,68 @@ vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts, u
         cmdt_list->count = 0;
 }
 
-struct vdp1_cmdt *
-vdp1_cmdt_base_get(void)
+struct vdp1_cmdt_orderlist *
+vdp1_cmdt_orderlist_alloc(uint16_t count)
 {
-        return (struct vdp1_cmdt *)_state_vdp1()->vram.cmdt_base;
+        assert(count > 0);
+
+        uint32_t size;
+        size = count * sizeof(struct vdp1_cmdt);
+
+        uint32_t aligned_boundary;
+        aligned_boundary = dlog2(size);
+
+        if ((aligned_boundary & (aligned_boundary - 1)) != 0x00000000) {
+                aligned_boundary++;
+        }
+
+        struct vdp1_cmdt_orderlist *cmdt_orderlist;
+        cmdt_orderlist = memalign(sizeof(struct vdp1_cmdt_orderlist), aligned_boundary);
+        assert(cmdt_orderlist != NULL);
+
+        vdp1_cmdt_orderlist_init(cmdt_orderlist, count);
+
+        return cmdt_orderlist;
+}
+
+void
+vdp1_cmdt_orderlist_free(struct vdp1_cmdt_orderlist *cmdt_orderlist)
+{
+        assert(cmdt_orderlist != NULL);
+
+        free(cmdt_orderlist);
+}
+
+void
+vdp1_cmdt_orderlist_init(struct vdp1_cmdt_orderlist *cmdt_orderlist, uint16_t count)
+{
+        assert(cmdt_orderlist != NULL);
+        assert(count > 0);
+
+        struct scu_dma_xfer *xfer_table;
+        xfer_table = (struct scu_dma_xfer *)cmdt_orderlist;
+
+        for (uint32_t i = 0; i < count; i++) {
+                xfer_table[i].len = sizeof(struct vdp1_cmdt);
+                xfer_table[i].dst = 0x00000000;
+                xfer_table[i].src = 0x00000000;
+        }
+}
+
+void
+vdp1_cmdt_orderlist_vram_patch(struct vdp1_cmdt_orderlist *cmdt_orderlist, const uint32_t base, const uint16_t count)
+{
+        assert(cmdt_orderlist != NULL);
+        assert(count > 0);
+
+        struct scu_dma_xfer *xfer_table;
+        xfer_table = (struct scu_dma_xfer *)cmdt_orderlist;
+
+        for (uint32_t i = 0; i < count; i++) {
+                xfer_table[i].dst = base + (i * sizeof(struct vdp1_cmdt));
+        }
+
+        xfer_table[count - 1].len |= SCU_DMA_INDIRECT_TBL_END;
 }
 
 void
