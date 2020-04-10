@@ -13,6 +13,9 @@
 
 __BEGIN_DECLS
 
+#define VDP1_SYNC_INTERVAL_60HZ         (0)
+#define VDP1_SYNC_INTERVAL_VARIABLE     (-1)
+
 #define vdp_sync_vblank_in_clear() do {                                        \
         vdp_sync_vblank_in_set(NULL);                                          \
 } while (false)
@@ -24,10 +27,11 @@ __BEGIN_DECLS
 extern void vdp_init(void);
 
 extern void vdp_sync_init(void);
-extern void vdp_sync(int16_t);
+extern void vdp_sync(void);
 
 extern bool vdp1_sync_drawing(void);
-extern void vdp1_sync_draw(struct vdp1_cmdt_list *, void (*)(void *), void *);
+extern void vdp1_sync_interval_set(int8_t);
+extern void vdp1_sync_draw(const struct vdp1_cmdt_list *, void (*)(void *), void *);
 extern void vdp1_sync_draw_wait(void);
 extern uint16_t vdp1_sync_last_command_get(void);
 
