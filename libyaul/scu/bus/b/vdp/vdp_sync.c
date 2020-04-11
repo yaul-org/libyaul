@@ -31,12 +31,24 @@
 /* Maximum number of user callbacks */
 #define USER_CALLBACK_COUNT     8
 
-#define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN | SCU_IC_MASK_VBLANK_OUT | SCU_IC_MASK_SPRITE_END)
+#if DEBUG_DMA_QUEUE_ENABLE == 0
+#define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN |                               \
+                         SCU_IC_MASK_VBLANK_OUT |                              \
+                         SCU_IC_MASK_SPRITE_END)
+#else
+#define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN |                               \
+                         SCU_IC_MASK_VBLANK_OUT |                              \
+                         SCU_IC_MASK_SPRITE_END |                              \
+                         SCU_IC_MASK_LEVEL_0_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_1_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_2_DMA_END)
+#endif /* DEBUG_DMA_QUEUE_ENABLE */
 #define SCU_MASK_AND    (SCU_IC_MASK_ALL & ~SCU_MASK_OR)
 
-#define STATE_SYNC                      (0x01) /* Request to synchronize */
-#define STATE_INTERLACE_SINGLE          (0x02)
-#define STATE_INTERLACE_DOUBLE          (0x04)
+#define STATE_SYNC                      (0x02) /* Request to synchronize */
+#define STATE_INTERLACE_SINGLE          (0x04)
+#define STATE_INTERLACE_DOUBLE          (0x08)
+#define STATE_MASK                      (0x0E)
 
 #define STATE_VDP1_MODE_AUTO            (0x00)
 #define STATE_VDP1_MODE_FIXED           (0x01)
@@ -53,6 +65,7 @@
 
 #define STATE_VDP2_COMITTING            (0x01) /* VDP2 is committing state via SCU-DMA */
 #define STATE_VDP2_COMMITTED            (0x02) /* VDP2 finished committing state */
+#define STATE_VDP2_MASK                 (0x03)
 
 typedef struct {
         const struct vdp1_cmdt *cmdts;
@@ -168,9 +181,7 @@ static void _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *);
 void
 vdp_sync_init(void)
 {
-#if DEBUG_DMA_QUEUE_ENABLE == 1
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
 
         _user_callback_list = callback_list_alloc(USER_CALLBACK_COUNT);
 
@@ -191,9 +202,7 @@ vdp_sync_init(void)
         scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
         scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
-#if DEBUG_DMA_QUEUE_ENABLE == 1
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
 }
 
 void
@@ -249,9 +258,9 @@ vdp_sync(void)
 
         callback_list_process(_user_callback_list, true);
 
-        _state.sync = 0x00;
+        _state.sync &= ~STATE_MASK;
         _state.vdp1 &= ~STATE_VDP1_MASK;
-        _state.vdp2 = 0x00;
+        _state.vdp2 &= ~STATE_VDP2_MASK;
 
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
