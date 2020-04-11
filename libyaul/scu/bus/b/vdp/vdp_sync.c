@@ -464,6 +464,8 @@ _vdp1_mode_auto_sprite_end(const void *args_ptr __unused)
 {
         _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
 
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+
         callback_call(&_user_vdp1_sync_callback);
 }
 
