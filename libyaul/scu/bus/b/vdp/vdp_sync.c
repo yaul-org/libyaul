@@ -92,7 +92,7 @@ static struct callback _user_vblank_out_callback;
 
 static struct callback_list * _user_callback_list;
 
-static const uint16_t _fbcr_bits[] = {
+static const uint16_t _fbcr_bits[] __unused = {
         /* Render even-numbered lines */
         0x0008,
         /* Render odd-numbered lines */
@@ -560,15 +560,15 @@ _vdp1_cmdt_list_transfer(const struct vdp1_cmdt *cmdts,
     const uint32_t vdp1_vram,
     const uint16_t count)
 {
-#if DEBUG_DMA_QUEUE_ENABLE == 1
         const uint32_t xfer_len = count * sizeof(struct vdp1_cmdt);
         const uint32_t xfer_dst = vdp1_vram;
-        const uint32_t xfer_src = CPU_CACHE_THROUGH | (uint32_t)cmdts;
+        const uint32_t xfer_src = (uint32_t)cmdts;
 
+#if DEBUG_DMA_QUEUE_ENABLE == 1
         _vdp1_dma_cfg.mode = SCU_DMA_MODE_DIRECT;
         _vdp1_dma_cfg.xfer.direct.len = xfer_len;
         _vdp1_dma_cfg.xfer.direct.dst = xfer_dst;
-        _vdp1_dma_cfg.xfer.direct.src = xfer_src;
+        _vdp1_dma_cfg.xfer.direct.src = CPU_CACHE_THROUGH | xfer_src;
         _vdp1_dma_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
         _vdp1_dma_cfg.update = SCU_DMA_UPDATE_NONE;
 
@@ -586,9 +586,7 @@ _vdp1_cmdt_list_transfer(const struct vdp1_cmdt *cmdts,
         assert(ret >= 0);
 #endif /* DEBUG */
 #else
-        (void)memcpy((void *)vdp1_vram,
-            (void *)(CPU_CACHE_THROUGH | (uint32_t)cmdts),
-            count * sizeof(struct vdp1_cmdt));
+        (void)memcpy((void *)xfer_dst, (void *)xfer_src, xfer_len);
 
         /* Call handler directly */
         _vdp1_dma_call(NULL);
