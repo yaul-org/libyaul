@@ -265,8 +265,7 @@ vdp_sync(void)
 
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
-        /* Reset command address to the top */
-        _vdp1_last_command = 0x0000;
+        vdp1_sync_last_command_set(0);
 
         scu_ic_mask_set(scu_mask);
 }
@@ -423,7 +422,7 @@ _vdp1_init(void)
 
         vdp1_sync_interval_set(VDP1_SYNC_INTERVAL_60HZ);
 
-        _vdp1_last_command = 0x0000;
+        vdp1_sync_last_command_set(0);
 }
 
 static inline void __always_inline
@@ -475,7 +474,7 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
         scu_ic_mask_set(scu_mask);
 
         const uint32_t vdp1_vram =
-            VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
+            VDP1_VRAM(vdp1_sync_last_command_get() * sizeof(struct vdp1_cmdt));
 
         switch (args->transfer_type) {
         case TRANSFER_TYPE_BUFFER:
@@ -609,7 +608,8 @@ _vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
          *
          * Remove the "draw end" command from the count as it needs to be
          * overwritten on next request to sync VDP1 */
-        _vdp1_last_command += count - 1;
+        const uint16_t last_command = vdp1_sync_last_command_get();
+        vdp1_sync_last_command_set(last_command + (count - 1));
 
         const uint32_t xfer_len = count * sizeof(struct vdp1_cmdt);
         const uint32_t xfer_dst = vdp1_vram;
@@ -657,7 +657,7 @@ _vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *cmdt_orderlist)
 {
         /* Reset it. We don't have any control over where in VRAM command tables
          * are being sent */
-        _vdp1_last_command = 0;
+        vdp1_sync_last_command_set(0);
 
         const struct scu_dma_xfer *xfer_table __unused =
             (const struct scu_dma_xfer *)&cmdt_orderlist;
