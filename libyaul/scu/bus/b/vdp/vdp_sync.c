@@ -67,7 +67,12 @@
 #define STATE_VDP2_COMMITTED            (0x02) /* VDP2 finished committing state */
 #define STATE_VDP2_MASK                 (0x03)
 
+#define TRANSFER_TYPE_BUFFER            (0)
+#define TRANSFER_TYPE_ORDERLIST         (1)
+
 typedef struct {
+        uint8_t transfer_type;
+        const struct vdp1_cmdt_orderlist *cmdt_orderlist;
         const struct vdp1_cmdt *cmdts;
         const uint16_t count;
         void (*callback)(void *);
@@ -170,8 +175,9 @@ static inline __always_inline void _vdp1_sprite_end_call(const void *);
 static inline __always_inline void _vdp1_vblank_in_call(const void *);
 static inline __always_inline void _vdp1_vblank_out_call(const void *);
 
-static void _vdp1_cmdt_list_transfer(const struct vdp1_cmdt *,
+static void _vdp1_cmdt_transfer(const struct vdp1_cmdt *,
     const uint32_t, const uint16_t);
+static void _vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *);
 
 static void _vdp2_init(void);
 static void _vdp2_commit_xfer_tables_init(void);
@@ -312,6 +318,7 @@ vdp1_sync_cmdt_put(const struct vdp1_cmdt *cmdts, const uint16_t count,
         }
 
         const vdp1_sync_put_args_t args = {
+                .transfer_type = TRANSFER_TYPE_BUFFER,
                 .cmdts = cmdts,
                 .count = count,
                 .callback = callback,
@@ -325,13 +332,42 @@ void
 vdp1_sync_cmdt_list_put(const struct vdp1_cmdt_list *cmdt_list,
     void (*callback)(void *), void *work)
 {
+#ifdef DEBUG
+        assert(cmdt_list != NULL);
+        assert(cmdt_list->cmdts != NULL);
+#endif /* DEBUG */
+
         vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, callback, work);
+}
+
+void
+vdp1_sync_cmdt_orderlist_put(const struct vdp1_cmdt_orderlist *cmdt_orderlist,
+    void (*callback)(void *), void *work)
+{
+#ifdef DEBUG
+        assert(cmdt_orderlist != NULL);
+#endif /* DEBUG */
+
+        const vdp1_sync_put_args_t args = {
+                .transfer_type = TRANSFER_TYPE_ORDERLIST,
+                .cmdt_orderlist = cmdt_orderlist,
+                .callback = callback,
+                .work = work
+        };
+
+        _vdp1_sync_put_call(&args);
 }
 
 uint16_t
 vdp1_sync_last_command_get(void)
 {
         return _vdp1_last_command;
+}
+
+void
+vdp1_sync_last_command_set(const uint16_t index)
+{
+        _vdp1_last_command = index;
 }
 
 void
@@ -446,13 +482,14 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
         const uint32_t vdp1_vram =
             VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
 
-        /* Keep track of how many commands are being sent.
-         *
-         * Remove the "draw end" command from the count as it needs to be
-         * overwritten on next request to sync VDP1 */
-        _vdp1_last_command += args->count - 1;
-
-        _vdp1_cmdt_list_transfer(args->cmdts, vdp1_vram, args->count);
+        switch (args->transfer_type) {
+        case TRANSFER_TYPE_BUFFER:
+                _vdp1_cmdt_transfer(args->cmdts, vdp1_vram, args->count);
+                break;
+        case TRANSFER_TYPE_ORDERLIST:
+                _vdp1_cmdt_orderlist_transfer(args->cmdt_orderlist);
+                break;
+        }
 }
 
 static void
@@ -569,10 +606,16 @@ _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
 }
 
 static void
-_vdp1_cmdt_list_transfer(const struct vdp1_cmdt *cmdts,
+_vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
     const uint32_t vdp1_vram,
     const uint16_t count)
 {
+        /* Keep track of how many commands are being sent.
+         *
+         * Remove the "draw end" command from the count as it needs to be
+         * overwritten on next request to sync VDP1 */
+        _vdp1_last_command += count - 1;
+
         const uint32_t xfer_len = count * sizeof(struct vdp1_cmdt);
         const uint32_t xfer_dst = vdp1_vram;
         const uint32_t xfer_src = (uint32_t)cmdts;
@@ -600,6 +643,38 @@ _vdp1_cmdt_list_transfer(const struct vdp1_cmdt *cmdts,
 #endif /* DEBUG */
 #else
         (void)memcpy((void *)xfer_dst, (void *)xfer_src, xfer_len);
+
+        /* Call handler directly */
+        _vdp1_dma_call(NULL);
+#endif /* DEBUG_DMA_QUEUE_ENABLE */
+}
+
+static void
+_vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *cmdt_orderlist)
+{
+        /* Reset it. We don't have any control over where in VRAM command tables
+         * are being sent */
+        _vdp1_last_command = 0;
+
+#if DEBUG_DMA_QUEUE_ENABLE == 1
+        assert(false && "Not yet implemented");
+#else
+        const struct scu_dma_xfer *xfer_table =
+            (const struct scu_dma_xfer *)&cmdt_orderlist;
+
+        const struct scu_dma_xfer *current_xfer = xfer_table;
+
+        while ((current_xfer->len & SCU_DMA_INDIRECT_TBL_END) != 0x00000000) {
+                const uint32_t xfer_len =
+                    (current_xfer->len & ~SCU_DMA_INDIRECT_TBL_END) *
+                    sizeof(struct vdp1_cmdt);
+                const uint32_t xfer_dst = current_xfer->dst;
+                const uint32_t xfer_src = current_xfer->src;
+
+                (void)memcpy((void *)xfer_dst, (void *)xfer_src, xfer_len);
+
+                current_xfer++;
+        }
 
         /* Call handler directly */
         _vdp1_dma_call(NULL);
