@@ -199,6 +199,20 @@ vdp_sync_init(void)
 void
 vdp_sync(void)
 {
+        struct scu_dma_reg_buffer *reg_buffer;
+        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+
+        int8_t ret __unused;
+        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+            _vdp2_dma_handler, NULL);
+#ifdef DEBUG
+        assert(ret == 0);
+#endif /* DEBUG */
+
+        const uint32_t scu_mask = scu_ic_mask_get();
+
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
+
         _state.sync &= ~STATE_INTERLACE_SINGLE;
         _state.sync &= ~STATE_INTERLACE_DOUBLE;
 
@@ -211,43 +225,20 @@ vdp_sync(void)
                 break;
         }
 
-        struct scu_dma_reg_buffer *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer;
-
-        int8_t ret __unused;
-        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
-            _vdp2_dma_handler, NULL);
-#ifdef DEBUG
-        assert(ret == 0);
-#endif /* DEBUG */
-
-        uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
         _state.sync |= STATE_SYNC;
+
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
         /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
          * been committed */
-        bool vdp1_working;
-        bool vdp2_working;
-
         while (true) {
-                uint8_t state_vdp1;
-                state_vdp1 = _state.vdp1;
-                uint8_t state_vdp2;
-                state_vdp2 = _state.vdp2;
+                const bool vdp1_state_mask = STATE_VDP1_REQUEST_XFER_LIST |
+                                             STATE_VDP1_CHANGED;
+                const bool vdp1_working =
+                    (_state.vdp1 & vdp1_state_mask) == STATE_VDP1_REQUEST_XFER_LIST;
 
-                bool vdp1_request_xfer_list;
-                vdp1_request_xfer_list = (state_vdp1 & STATE_VDP1_REQUEST_XFER_LIST) != 0x00;
-                bool vdp1_changed;
-                vdp1_changed = (state_vdp1 & STATE_VDP1_CHANGED) != 0x00;
-                vdp1_working = vdp1_request_xfer_list && !vdp1_changed;
-
-                bool vdp2_committed;
-                vdp2_committed = (state_vdp2 & STATE_VDP2_COMMITTED) != 0x00;
-                vdp2_working = !vdp2_committed;
+                const bool vdp2_working =
+                    (_state.vdp2 & STATE_VDP2_COMMITTED) == 0x00;
 
                 if (!vdp1_working && !vdp2_working) {
                         break;
