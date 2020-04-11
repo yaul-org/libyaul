@@ -72,7 +72,7 @@ typedef struct {
         const uint16_t count;
         void (*callback)(void *);
         void *work;
-} vdp1_sync_draw_args_t;
+} vdp1_sync_put_args_t;
 
 typedef void (*vdp1_func_ptr)(const void *);
 
@@ -112,19 +112,19 @@ static const uint16_t _fbcr_bits[] __unused = {
         0x000C
 };
 
-static void _vdp1_mode_auto_sync_draw(const void *);
+static void _vdp1_mode_auto_sync_put(const void *);
 static void _vdp1_mode_auto_dma(const void *);
 static void _vdp1_mode_auto_sprite_end(const void *);
 static void _vdp1_mode_auto_vblank_in(const void *);
 static void _vdp1_mode_auto_vblank_out(const void *);
 
-static void _vdp1_mode_fixed_sync_draw(const void *);
+static void _vdp1_mode_fixed_sync_put(const void *);
 static void _vdp1_mode_fixed_dma(const void *);
 static void _vdp1_mode_fixed_sprite_end(const void *);
 static void _vdp1_mode_fixed_vblank_in(const void *);
 static void _vdp1_mode_fixed_vblank_out(const void *);
 
-static void _vdp1_mode_variable_sync_draw(const void *);
+static void _vdp1_mode_variable_sync_put(const void *);
 static void _vdp1_mode_variable_dma(const void *);
 static void _vdp1_mode_variable_sprite_end(const void *);
 static void _vdp1_mode_variable_vblank_in(const void *);
@@ -132,7 +132,7 @@ static void _vdp1_mode_variable_vblank_out(const void *);
 
 /* Interface to either of the three modes */
 static const struct {
-        vdp1_func_ptr sync_draw;
+        vdp1_func_ptr sync_put;
         vdp1_func_ptr dma;
         vdp1_func_ptr sprite_end;
         vdp1_func_ptr vblank_in;
@@ -140,19 +140,19 @@ static const struct {
 }
 _vdp1_mode_table[] = {
         {
-                .sync_draw = _vdp1_mode_auto_sync_draw,
+                .sync_put = _vdp1_mode_auto_sync_put,
                 .dma = _vdp1_mode_auto_dma,
                 .sprite_end = _vdp1_mode_auto_sprite_end,
                 .vblank_in = _vdp1_mode_auto_vblank_in,
                 .vblank_out = _vdp1_mode_auto_vblank_out
         }, {
-                .sync_draw = _vdp1_mode_fixed_sync_draw,
+                .sync_put = _vdp1_mode_fixed_sync_put,
                 .dma = _vdp1_mode_fixed_dma,
                 .sprite_end = _vdp1_mode_fixed_sprite_end,
                 .vblank_in = _vdp1_mode_fixed_vblank_in,
                 .vblank_out = _vdp1_mode_fixed_vblank_out
         }, {
-                .sync_draw = _vdp1_mode_variable_sync_draw,
+                .sync_put = _vdp1_mode_variable_sync_put,
                 .dma = _vdp1_mode_variable_dma,
                 .sprite_end = _vdp1_mode_variable_sprite_end,
                 .vblank_in = _vdp1_mode_variable_vblank_in,
@@ -164,7 +164,7 @@ _vdp1_mode_table[] = {
 
 static void _vdp1_init(void);
 
-static inline __always_inline void _vdp1_sync_draw_call(const void *);
+static inline __always_inline void _vdp1_sync_put_call(const void *);
 static inline __always_inline void _vdp1_dma_call(const void *);
 static inline __always_inline void _vdp1_sprite_end_call(const void *);
 static inline __always_inline void _vdp1_vblank_in_call(const void *);
@@ -271,9 +271,12 @@ vdp_sync(void)
 }
 
 bool
-vdp1_sync_drawing(void)
+vdp1_sync_rendering(void)
 {
-        return false;
+        const uint8_t state_mask = STATE_VDP1_REQUEST_COMMIT_LIST |
+                                   STATE_VDP1_LIST_COMMITTED;
+
+        return (_state.vdp1 & state_mask) == STATE_VDP1_REQUEST_COMMIT_LIST;
 }
 
 void
@@ -297,32 +300,32 @@ vdp1_sync_interval_set(const int8_t interval)
 }
 
 void
-vdp1_sync_draw(const struct vdp1_cmdt_list *cmdt_list, void (*callback)(void *), void *work)
+vdp1_sync_cmdt_put(const struct vdp1_cmdt *cmdts, const uint16_t count,
+    void (*callback)(void *), void *work)
 {
 #ifdef DEBUG
-        assert(cmdt_list != NULL);
-        assert(cmdt_list->cmdts != NULL);
+        assert(cmdts != NULL);
 #endif /* DEBUG */
-
-        const uint16_t count = cmdt_list->count;
 
         if (count == 0) {
                 return;
         }
 
-        const vdp1_sync_draw_args_t args = {
-                .cmdts = cmdt_list->cmdts,
+        const vdp1_sync_put_args_t args = {
+                .cmdts = cmdts,
                 .count = count,
                 .callback = callback,
                 .work = work
         };
 
-        _vdp1_sync_draw_call(&args);
+        _vdp1_sync_put_call(&args);
 }
 
 void
-vdp1_sync_draw_wait(void)
+vdp1_sync_cmdt_list_put(const struct vdp1_cmdt_list *cmdt_list,
+    void (*callback)(void *), void *work)
 {
+        vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, callback, work);
 }
 
 uint16_t
@@ -393,9 +396,9 @@ _vdp1_init(void)
 }
 
 static inline void __always_inline
-_vdp1_sync_draw_call(const void *args_ptr)
+_vdp1_sync_put_call(const void *args_ptr)
 {
-        _current_vdp1_mode->sync_draw(args_ptr);
+        _current_vdp1_mode->sync_put(args_ptr);
 }
 
 static inline void __always_inline
@@ -423,9 +426,9 @@ _vdp1_vblank_out_call(const void *args_ptr)
 }
 
 static void
-_vdp1_mode_auto_sync_draw(const void *args_ptr)
+_vdp1_mode_auto_sync_put(const void *args_ptr)
 {
-        const vdp1_sync_draw_args_t *args = args_ptr;
+        const vdp1_sync_put_args_t *args = args_ptr;
 
         /* Wait until the previous command table list transfer is done */
         if ((_state.vdp1 & STATE_VDP1_REQUEST_XFER_LIST) != 0x00) {
@@ -443,9 +446,10 @@ _vdp1_mode_auto_sync_draw(const void *args_ptr)
         const uint32_t vdp1_vram =
             VDP1_VRAM(_vdp1_last_command * sizeof(struct vdp1_cmdt));
 
-        /* Keep track of how many commands are being sent. Remove the "draw end"
-         * command from the count as it needs to be overwritten on next request
-         * to sync VDP1 */
+        /* Keep track of how many commands are being sent.
+         *
+         * Remove the "draw end" command from the count as it needs to be
+         * overwritten on next request to sync VDP1 */
         _vdp1_last_command += args->count - 1;
 
         _vdp1_cmdt_list_transfer(args->cmdts, vdp1_vram, args->count);
@@ -515,7 +519,7 @@ _vdp1_mode_auto_vblank_out(const void *args_ptr __unused)
 }
 
 static void
-_vdp1_mode_fixed_sync_draw(const void *args_ptr __unused)
+_vdp1_mode_fixed_sync_put(const void *args_ptr __unused)
 {
 }
 
@@ -540,7 +544,7 @@ _vdp1_mode_fixed_vblank_out(const void *args_ptr __unused)
 }
 
 static void
-_vdp1_mode_variable_sync_draw(const void *args_ptr __unused)
+_vdp1_mode_variable_sync_put(const void *args_ptr __unused)
 {
 }
 
