@@ -99,11 +99,6 @@ static volatile struct {
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
 
-#if DEBUG_DMA_QUEUE_ENABLE == 1
-static struct scu_dma_level_cfg _vdp1_dma_cfg;
-static struct scu_dma_reg_buffer _vdp1_dma_reg_buffer;
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
-
 static struct callback _user_vdp1_sync_callback;
 static struct callback _user_vblank_in_callback;
 static struct callback _user_vblank_out_callback;
@@ -621,17 +616,25 @@ _vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
         const uint32_t xfer_src = (uint32_t)cmdts;
 
 #if DEBUG_DMA_QUEUE_ENABLE == 1
-        _vdp1_dma_cfg.mode = SCU_DMA_MODE_DIRECT;
-        _vdp1_dma_cfg.xfer.direct.len = xfer_len;
-        _vdp1_dma_cfg.xfer.direct.dst = xfer_dst;
-        _vdp1_dma_cfg.xfer.direct.src = CPU_CACHE_THROUGH | xfer_src;
-        _vdp1_dma_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
-        _vdp1_dma_cfg.update = SCU_DMA_UPDATE_NONE;
+        static struct scu_dma_level_cfg dma_cfg = {
+                .mode = SCU_DMA_MODE_DIRECT,
+                .xfer.direct.len = 0x00000000,
+                .xfer.direct.dst = 0x00000000,
+                .xfer.direct.src = 0x00000000,
+                .stride = SCU_DMA_STRIDE_2_BYTES,
+                .update = SCU_DMA_UPDATE_NONE
+        };
 
-        scu_dma_config_buffer(&_vdp1_dma_reg_buffer, &_vdp1_dma_cfg);
+        static struct scu_dma_reg_buffer dma_reg_buffer;
+
+        dma_cfg.xfer.direct.len = xfer_len;
+        dma_cfg.xfer.direct.dst = xfer_dst;
+        dma_cfg.xfer.direct.src = CPU_CACHE_THROUGH | xfer_src;
+
+        scu_dma_config_buffer(&dma_reg_buffer, &dma_cfg);
 
         int8_t ret __unused;
-        ret = dma_queue_enqueue(&_vdp1_dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE,
+        ret = dma_queue_enqueue(&dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
 #ifdef DEBUG
         assert(ret == 0);
@@ -656,12 +659,12 @@ _vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *cmdt_orderlist)
          * are being sent */
         _vdp1_last_command = 0;
 
+        const struct scu_dma_xfer *xfer_table __unused =
+            (const struct scu_dma_xfer *)&cmdt_orderlist;
+
 #if DEBUG_DMA_QUEUE_ENABLE == 1
         assert(false && "Not yet implemented");
 #else
-        const struct scu_dma_xfer *xfer_table =
-            (const struct scu_dma_xfer *)&cmdt_orderlist;
-
         const struct scu_dma_xfer *current_xfer = xfer_table;
 
         while ((current_xfer->len & SCU_DMA_INDIRECT_TBL_END) != 0x00000000) {
