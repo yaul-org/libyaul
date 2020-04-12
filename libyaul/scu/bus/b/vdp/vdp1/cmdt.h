@@ -240,7 +240,7 @@ extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
 
 extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
 extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
-extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *, uint16_t);
+extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *);
 
 extern struct vdp1_cmdt_orderlist *vdp1_cmdt_orderlist_alloc(uint16_t);
 extern void vdp1_cmdt_orderlist_free(struct vdp1_cmdt_orderlist *);
