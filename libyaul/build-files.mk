@@ -154,8 +154,7 @@ LIB_SRCS+= \
 	math/fract32.c \
 	math/int16_vector2.c \
 	math/uint32.c \
-	scu/bus/a/cs2/cd-block/cd-block_cmd_abort_file.c \
-	scu/bus/a/cs2/cd-block/cd-block_cmd_init_cd_system.c \
+	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
 	scu/bus/a/cs2/cd-block/cd-block_init.c \
 	\
