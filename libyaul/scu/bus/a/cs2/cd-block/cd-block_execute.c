@@ -3,6 +3,7 @@
  * See LICENSE for details.
  *
  * Theo Beraku
+ * Romulo Fernandes Machado <abra185@gmail.com>
  */
 
 #include <cd-block.h>
@@ -28,8 +29,8 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
-
         error = -1;
+
         /* Check if we can continue */
         if (busy()) {
                 goto busy;
@@ -48,9 +49,8 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         /* Wait */
         for (w = 0; w < 0x00240000; w++) {
                 /* Check if we can continue */
-                if (busy()) {
-                        /* CD-block is busy */
-                        continue;
+                if (!busy()) {
+                        break;
                 }
         }
 
@@ -68,8 +68,9 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         /* Verify if the command executed was successful */
         cd_status = status->cr1;
         cd_status >>= 8;
+
         /* Checking if waiting or if command was rejected */
-        if ((cd_status & 0x80) == 0x80) {
+        if (cd_status == 0xFF || cd_status & 0x80) {
                 goto busy;
         }
 
@@ -86,5 +87,6 @@ static bool
 busy(void)
 {
         /* Is the CD-block busy? */
-        return ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & 0x0001) == 0x0000);
+        return ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & CMOK) == 0x0000);
 }
+
