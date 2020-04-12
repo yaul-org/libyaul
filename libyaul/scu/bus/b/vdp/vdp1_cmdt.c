@@ -38,7 +38,7 @@ vdp1_cmdt_list_alloc(uint16_t count)
         cmdts = malloc(count * sizeof(struct vdp1_cmdt));
         assert(cmdts != NULL);
 
-        vdp1_cmdt_list_init(cmdt_list, cmdts, count);
+        vdp1_cmdt_list_init(cmdt_list, cmdts);
 
         return cmdt_list;
 }
@@ -56,11 +56,10 @@ vdp1_cmdt_list_free(struct vdp1_cmdt_list *cmdt_list)
 }
 
 void
-vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts, uint16_t count)
+vdp1_cmdt_list_init(struct vdp1_cmdt_list *cmdt_list, struct vdp1_cmdt *cmdts)
 {
         assert(cmdt_list != NULL);
         assert(cmdts != NULL);
-        assert(count > 0);
 
         cmdt_list->cmdts = cmdts;
         cmdt_list->count = 0;
