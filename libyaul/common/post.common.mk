@@ -70,9 +70,26 @@ SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
 SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v $(foreach specs,$(SH_SPECS),-specs=$(specs)) - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,"-I"); print }')
 
-define update-build-commands
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+CDB_FILE:= compile_commands.json
+
+ifeq ($(strip $(YAUL_CDB)),1)
+# $1 -> Absolute path to compiler executable
+# $2 -> Absolute path to input file
+# $3 -> Absolute path to output file
+# $4 -> Absolute build path
+# $5 -> Absolute path to output compile DB file
+define macro-update-cdb
+	set -e; \
+	    input_file=$$(printf -- "$2" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
+	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
+	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
+else
+define macro-update-cdb
+endef
+endif
 
 $(SH_PROGRAM): $(SH_PROGRAM).cue
 
@@ -118,56 +135,56 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
-	$(call update-build-commands,\
+	$(call macro-update-cdb,\
 		$(SH_CC),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
-		compile_commands.json,\
+		$(CDB_FILE),\
 		$(SH_CFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cc
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
-	$(call update-build-commands,\
+	$(call macro-update-cdb,\
 		$(SH_CXX),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
-		compile_commands.json,\
+		$(CDB_FILE),\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.C
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
-	$(call update-build-commands,\
+	$(call macro-update-cdb,\
 		$(SH_CXX),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
-		compile_commands.json,\
+		$(CDB_FILE),\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cpp
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
-	$(call update-build-commands,\
+	$(call macro-update-cdb,\
 		$(SH_CXX),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
-		compile_commands.json,\
+		$(CDB_FILE),\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cxx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
-	$(call update-build-commands,\
+	$(call macro-update-cdb,\
 		$(SH_CXX),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
-		compile_commands.json,\
+		$(CDB_FILE),\
 		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
 
 %.o: %.sx
@@ -224,7 +241,7 @@ clean:
 	    root.romdisk \
 	    IP.BIN \
 	    IP.BIN.map \
-	    compile_commands.json
+	    $(CDB_FILE)
 ifneq ($(strip $(M68K_PROGRAM)),)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
