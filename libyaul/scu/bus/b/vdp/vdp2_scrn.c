@@ -14,30 +14,30 @@
 #include "vdp-internal.h"
 
 #ifdef DEBUG
-static void _debug_check_cell(const struct vdp2_scrn_cell_format *);
+static void _debug_check_cell(const vdp2_scrn_cell_format_t *);
 #endif /* DEBUG */
 
-static void _cell_plane_calc(const struct vdp2_scrn_cell_format *, uint16_t *,
+static void _cell_plane_calc(const vdp2_scrn_cell_format_t *, uint16_t *,
     uint16_t *);
 static uint16_t _cell_pattern_name_control_calc(
-    const struct vdp2_scrn_cell_format *);
+    const vdp2_scrn_cell_format_t *);
 
-static void _nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
-static void _nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
-static void _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
-static void _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
-static void _rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+static void _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+static void _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+static void _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+static void _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+static void _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
 #ifdef DEBUG
-static void _debug_check_bitmap(const struct vdp2_scrn_bitmap_format *);
+static void _debug_check_bitmap(const vdp2_scrn_bitmap_format_t *);
 #endif /* DEBUG */
 
-static void _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
-static void _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
-static void _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+static void _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
+static void _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
+static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 
 void
-vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
 #ifdef DEBUG
         _debug_check_cell(format);
@@ -63,7 +63,7 @@ vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 }
 
 void
-vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
+vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
 #ifdef DEBUG
         _debug_check_bitmap(format);
@@ -84,7 +84,7 @@ vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 
 #ifdef DEBUG
 static void
-_debug_check_bitmap(const struct vdp2_scrn_bitmap_format *format)
+_debug_check_bitmap(const vdp2_scrn_bitmap_format_t *format)
 {
         assert(format != NULL);
 
@@ -112,7 +112,7 @@ _debug_check_bitmap(const struct vdp2_scrn_bitmap_format *format)
 #endif /* DEBUG */
 
 static void
-_nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
+_nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
         _state_vdp2()->regs.chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
         _state_vdp2()->regs.mpofn &= 0xFFF8;       /* Bits 0,1,2 */
@@ -171,7 +171,7 @@ _nbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 }
 
 static void
-_nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
+_nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
         _state_vdp2()->regs.chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
         _state_vdp2()->regs.mpofn &= 0xFF8F;       /* Bits 4,5,6 */
@@ -222,7 +222,7 @@ _nbg1_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 }
 
 static void
-_rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
+_rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
 #ifdef DEBUG
         assert((format->bitmap_size.width > 0) &&
@@ -336,7 +336,7 @@ _rbg0_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *format)
 
 #ifdef DEBUG
 static void
-_debug_check_cell(const struct vdp2_scrn_cell_format *format)
+_debug_check_cell(const vdp2_scrn_cell_format_t *format)
 {
         assert(format != NULL);
 
@@ -391,7 +391,7 @@ _debug_check_cell(const struct vdp2_scrn_cell_format *format)
 
 static void
 _cell_plane_calc(
-        const struct vdp2_scrn_cell_format *format,
+        const vdp2_scrn_cell_format_t *format,
         uint16_t *planes,
         uint16_t *map_offset)
 {
@@ -422,7 +422,7 @@ _cell_plane_calc(
 }
 
 static uint16_t
-_cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
+_cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
 {
         uint16_t pncnx;
         pncnx = 0x0000;
@@ -522,7 +522,7 @@ _cell_pattern_name_control_calc(const struct vdp2_scrn_cell_format *format)
 }
 
 static void
-_nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+_nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
         _state_vdp2()->regs.chctla &= 0xFF8F;
         _state_vdp2()->regs.chctla &= 0xFFFE;
@@ -563,7 +563,7 @@ _nbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 }
 
 static void
-_nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+_nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
         _state_vdp2()->regs.chctla &= 0xCFFF;
         _state_vdp2()->regs.chctla &= 0xFEFF;
@@ -604,7 +604,7 @@ _nbg1_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 }
 
 static void
-_nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+_nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
 #ifdef DEBUG
         assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
@@ -650,7 +650,7 @@ _nbg2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 }
 
 static void
-_nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+_nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
 #ifdef DEBUG
         assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
@@ -696,7 +696,7 @@ _nbg3_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
 }
 
 static void
-_rbg0_scrn_cell_format_set(const struct vdp2_scrn_cell_format *format)
+_rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
 #ifdef DEBUG
         assert((format->rp_mode == 0) ||

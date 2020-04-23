@@ -15,7 +15,7 @@
 
 __BEGIN_DECLS
 
-struct vdp1_transfer_status {
+typedef struct vdp1_transfer_status {
         union {
                 struct {
                         unsigned int :14;
@@ -25,9 +25,9 @@ struct vdp1_transfer_status {
 
                 uint16_t raw;
         };
-} __packed __aligned(2);
+} __packed __aligned(2) vdp1_transfer_status_t;
 
-struct vdp1_mode_status {
+typedef struct vdp1_mode_status {
         union {
                 struct {
                         unsigned int version:4;
@@ -43,10 +43,10 @@ struct vdp1_mode_status {
 
                 uint16_t raw;
         };
-} __packed __aligned(2);
+} __packed __aligned(2) vdp1_mode_status_t;
 
 static inline void __always_inline
-vdp1_mode_status_get(struct vdp1_mode_status *status)
+vdp1_mode_status_get(vdp1_mode_status_t *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
@@ -54,7 +54,7 @@ vdp1_mode_status_get(struct vdp1_mode_status *status)
 }
 
 static inline void __always_inline
-vdp1_transfer_status_get(struct vdp1_transfer_status *status)
+vdp1_transfer_status_get(vdp1_transfer_status_t *status)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */

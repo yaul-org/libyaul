@@ -88,17 +88,19 @@ __BEGIN_DECLS
         .src = DMA_INDIRECT_TBL_END | (uint32_t)(_src)                         \
 }
 
-struct scu_dma_reg_buffer {
-        uint32_t buffer[5];
-} __packed __aligned(4);
+typedef void (*scu_dma_ihr)(void);
 
-struct scu_dma_xfer {
+typedef struct scu_dma_reg_buffer {
+        uint32_t buffer[5];
+} __packed __aligned(4) scu_dma_reg_buffer_t;
+
+typedef struct scu_dma_xfer {
         uint32_t len;
         uint32_t dst;
         uint32_t src;
-} __packed;
+} __packed scu_dma_xfer_t;
 
-struct scu_dma_level_cfg {
+typedef struct scu_dma_level_cfg {
         uint8_t mode;
 
         union {
@@ -106,12 +108,12 @@ struct scu_dma_level_cfg {
                 void *indirect;
 
                 /* Direct mode */
-                struct scu_dma_xfer direct;
+                scu_dma_xfer_t direct;
         } xfer;
 
         uint8_t stride;
         uint32_t update;
-};
+} scu_dma_level_cfg_t;
 
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
@@ -328,31 +330,31 @@ scu_dma_stop(void)
 }
 
 static inline void __always_inline
-scu_dma_illegal_set(void (* const ihr)(void))
+scu_dma_illegal_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level0_end_set(void (* const ihr)(void))
+scu_dma_level0_end_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level1_end_set(void (* const ihr)(void))
+scu_dma_level1_end_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level2_end_set(void (* const ihr)(void))
+scu_dma_level2_end_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
+scu_dma_level_end_set(const uint8_t level, scu_dma_ihr ihr)
 {
         switch (level & 0x03) {
         case 2:
@@ -369,8 +371,10 @@ scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
 }
 
 extern void scu_dma_init(void);
-extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_level_cfg *);
-extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
+extern void scu_dma_config_buffer(scu_dma_reg_buffer_t *,
+    const scu_dma_level_cfg_t *);
+extern void scu_dma_config_set(uint8_t, uint8_t,
+    const scu_dma_reg_buffer_t *, scu_dma_ihr);
 extern int8_t scu_dma_level_unused_get(void);
 
 __END_DECLS

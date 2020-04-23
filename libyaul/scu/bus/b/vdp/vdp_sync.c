@@ -72,10 +72,10 @@
 
 typedef struct {
         uint8_t transfer_type;
-        const struct vdp1_cmdt_orderlist *cmdt_orderlist;
-        const struct vdp1_cmdt *cmdts;
+        const vdp1_cmdt_orderlist_t *cmdt_orderlist;
+        const vdp1_cmdt_t *cmdts;
         const uint16_t count;
-        void (*callback)(void *);
+        vdp1_sync_callback callback;
         void *work;
 } vdp1_sync_put_args_t;
 
@@ -86,8 +86,8 @@ static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
 
 /* Unused when DEBUG_DMA_QUEUE_ENABLE is set to 0 */
-static void _vdp1_dma_handler(const struct dma_queue_transfer *) __used;
-static void _vdp2_dma_handler(const struct dma_queue_transfer *);
+static void _vdp1_dma_handler(const dma_queue_transfer_t *) __used;
+static void _vdp2_dma_handler(const dma_queue_transfer_t *);
 
 static volatile struct {
         uint8_t sync;
@@ -99,11 +99,11 @@ static volatile struct {
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
 
-static struct callback _user_vdp1_sync_callback;
-static struct callback _user_vblank_in_callback;
-static struct callback _user_vblank_out_callback;
+static callback_t _user_vdp1_sync_callback;
+static callback_t _user_vblank_in_callback;
+static callback_t _user_vblank_out_callback;
 
-static struct callback_list * _user_callback_list;
+static callback_list_t * _user_callback_list;
 
 static const uint16_t _fbcr_bits[] __unused = {
         /* Render even-numbered lines */
@@ -170,14 +170,14 @@ static inline __always_inline void _vdp1_sprite_end_call(const void *);
 static inline __always_inline void _vdp1_vblank_in_call(const void *);
 static inline __always_inline void _vdp1_vblank_out_call(const void *);
 
-static void _vdp1_cmdt_transfer(const struct vdp1_cmdt *,
+static void _vdp1_cmdt_transfer(const vdp1_cmdt_t *,
     const uint32_t, const uint16_t);
-static void _vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *);
+static void _vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *);
 
 static void _vdp2_init(void);
 static void _vdp2_commit_xfer_tables_init(void);
-static void _vdp2_sync_commit(struct cpu_dmac_cfg *);
-static void _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *);
+static void _vdp2_sync_commit(cpu_dmac_cfg_t *);
+static void _vdp2_sync_back_screen_table(cpu_dmac_cfg_t *);
 
 void
 vdp_sync_init(void)
@@ -209,7 +209,7 @@ vdp_sync_init(void)
 void
 vdp_sync(void)
 {
-        struct scu_dma_reg_buffer *reg_buffer;
+        scu_dma_reg_buffer_t *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         int8_t ret __unused;
@@ -300,8 +300,8 @@ vdp1_sync_interval_set(const int8_t interval)
 }
 
 void
-vdp1_sync_cmdt_put(const struct vdp1_cmdt *cmdts, const uint16_t count,
-    void (*callback)(void *), void *work)
+vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
+    vdp1_sync_callback callback, void *work)
 {
 #ifdef DEBUG
         assert(cmdts != NULL);
@@ -323,8 +323,8 @@ vdp1_sync_cmdt_put(const struct vdp1_cmdt *cmdts, const uint16_t count,
 }
 
 void
-vdp1_sync_cmdt_list_put(const struct vdp1_cmdt_list *cmdt_list,
-    void (*callback)(void *), void *work)
+vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
+    vdp1_sync_callback callback, void *work)
 {
 #ifdef DEBUG
         assert(cmdt_list != NULL);
@@ -335,8 +335,8 @@ vdp1_sync_cmdt_list_put(const struct vdp1_cmdt_list *cmdt_list,
 }
 
 void
-vdp1_sync_cmdt_orderlist_put(const struct vdp1_cmdt_orderlist *cmdt_orderlist,
-    void (*callback)(void *), void *work)
+vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
+    vdp1_sync_callback callback, void *work)
 {
 #ifdef DEBUG
         assert(cmdt_orderlist != NULL);
@@ -367,7 +367,7 @@ vdp1_sync_last_command_set(const uint16_t index)
 void
 vdp2_sync_commit(void)
 {
-        static struct cpu_dmac_cfg dmac_cfg = {
+        static cpu_dmac_cfg_t dmac_cfg = {
                 .channel= SYNC_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_INCREMENT,
                 .src = 0x00000000,
@@ -384,19 +384,19 @@ vdp2_sync_commit(void)
 }
 
 void
-vdp_sync_vblank_in_set(void (*callback_func)(void))
+vdp_sync_vblank_in_set(vdp_sync_callback callback)
 {
-        callback_set(&_user_vblank_in_callback, (void (*)(void *))callback_func, NULL);
+        callback_set(&_user_vblank_in_callback, callback, NULL);
 }
 
 void
-vdp_sync_vblank_out_set(void (*callback_func)(void))
+vdp_sync_vblank_out_set(vdp_sync_callback callback)
 {
-        callback_set(&_user_vblank_out_callback, (void (*)(void *))callback_func, NULL);
+        callback_set(&_user_vblank_out_callback, callback, NULL);
 }
 
 int8_t
-vdp_sync_user_callback_add(void (*callback)(void *), void *work)
+vdp_sync_user_callback_add(vdp_sync_callback callback, void *work)
 {
         return callback_list_callback_add(_user_callback_list, callback, work);
 }
@@ -474,7 +474,7 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
         scu_ic_mask_set(scu_mask);
 
         const uint32_t vdp1_vram =
-            VDP1_VRAM(vdp1_sync_last_command_get() * sizeof(struct vdp1_cmdt));
+            VDP1_VRAM(vdp1_sync_last_command_get() * sizeof(vdp1_cmdt_t));
 
         switch (args->transfer_type) {
         case TRANSFER_TYPE_BUFFER:
@@ -598,7 +598,7 @@ _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
 }
 
 static void
-_vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
+_vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
     const uint32_t vdp1_vram,
     const uint16_t count)
 {
@@ -609,12 +609,12 @@ _vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
         const uint16_t last_command = vdp1_sync_last_command_get();
         vdp1_sync_last_command_set(last_command + (count - 1));
 
-        const uint32_t xfer_len = count * sizeof(struct vdp1_cmdt);
+        const uint32_t xfer_len = count * sizeof(vdp1_cmdt_t);
         const uint32_t xfer_dst = vdp1_vram;
         const uint32_t xfer_src = (uint32_t)cmdts;
 
 #if DEBUG_DMA_QUEUE_ENABLE == 1
-        static struct scu_dma_level_cfg dma_cfg = {
+        static scu_dma_level_cfg_t dma_cfg = {
                 .mode = SCU_DMA_MODE_DIRECT,
                 .xfer.direct.len = 0x00000000,
                 .xfer.direct.dst = 0x00000000,
@@ -623,7 +623,7 @@ _vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
                 .update = SCU_DMA_UPDATE_NONE
         };
 
-        static struct scu_dma_reg_buffer dma_reg_buffer;
+        static scu_dma_reg_buffer_t dma_reg_buffer;
 
         dma_cfg.xfer.direct.len = xfer_len;
         dma_cfg.xfer.direct.dst = xfer_dst;
@@ -651,24 +651,24 @@ _vdp1_cmdt_transfer(const struct vdp1_cmdt *cmdts,
 }
 
 static void
-_vdp1_cmdt_orderlist_transfer(const struct vdp1_cmdt_orderlist *cmdt_orderlist)
+_vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
 {
         /* Reset it. We don't have any control over where in VRAM command tables
          * are being sent */
         vdp1_sync_last_command_set(0);
 
-        const struct scu_dma_xfer *xfer_table __unused =
-            (const struct scu_dma_xfer *)&cmdt_orderlist;
+        const scu_dma_xfer_t *xfer_table __unused =
+            (const scu_dma_xfer_t *)&cmdt_orderlist;
 
 #if DEBUG_DMA_QUEUE_ENABLE == 1
         assert(false && "Not yet implemented");
 #else
-        const struct scu_dma_xfer *current_xfer = xfer_table;
+        const scu_dma_xfer_t *current_xfer = xfer_table;
 
         while ((current_xfer->len & SCU_DMA_INDIRECT_TBL_END) != 0x00000000) {
                 const uint32_t xfer_len =
                     (current_xfer->len & ~SCU_DMA_INDIRECT_TBL_END) *
-                    sizeof(struct vdp1_cmdt);
+                    sizeof(vdp1_cmdt_t);
                 const uint32_t xfer_dst = current_xfer->dst;
                 const uint32_t xfer_src = current_xfer->src;
 
@@ -689,7 +689,7 @@ _sprite_end_handler(void)
 }
 
 static void
-_vdp1_dma_handler(const struct dma_queue_transfer *transfer)
+_vdp1_dma_handler(const dma_queue_transfer_t *transfer)
 {
         if ((transfer != NULL) && (transfer->status != DMA_QUEUE_STATUS_COMPLETE)) {
                 return;
@@ -707,7 +707,7 @@ _vdp2_init(void)
 static void
 _vdp2_commit_xfer_tables_init(void)
 {
-        struct scu_dma_xfer *xfer;
+        scu_dma_xfer_t *xfer;
 
         /* Write VDP2(TVMD) first */
         xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
@@ -732,21 +732,21 @@ _vdp2_commit_xfer_tables_init(void)
         xfer->dst = 0x00000000;
         xfer->src = 0x00000000;
 
-        struct scu_dma_level_cfg dma_level_cfg = {
+        scu_dma_level_cfg_t dma_level_cfg = {
                 .mode = SCU_DMA_MODE_INDIRECT,
                 .xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
                 .stride = SCU_DMA_STRIDE_2_BYTES,
                 .update = SCU_DMA_UPDATE_NONE
         };
 
-        struct scu_dma_reg_buffer *reg_buffer;
+        scu_dma_reg_buffer_t *reg_buffer;
         reg_buffer = &_state_vdp2()->commit.reg_buffer;
 
         scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
 }
 
 static void
-_vdp2_sync_commit(struct cpu_dmac_cfg *dmac_cfg)
+_vdp2_sync_commit(cpu_dmac_cfg_t *dmac_cfg)
 {
         assert(dmac_cfg != NULL);
         dmac_cfg->len = sizeof(_state_vdp2()->regs) - 14;
@@ -765,7 +765,7 @@ _vdp2_sync_commit(struct cpu_dmac_cfg *dmac_cfg)
 }
 
 static void
-_vdp2_sync_back_screen_table(struct cpu_dmac_cfg *dmac_cfg)
+_vdp2_sync_back_screen_table(cpu_dmac_cfg_t *dmac_cfg)
 {
         assert(dmac_cfg != NULL);
         dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
@@ -781,7 +781,7 @@ _vdp2_sync_back_screen_table(struct cpu_dmac_cfg *dmac_cfg)
 }
 
 static void
-_vdp2_dma_handler(const struct dma_queue_transfer *transfer)
+_vdp2_dma_handler(const dma_queue_transfer_t *transfer)
 {
         if ((transfer != NULL) && (transfer->status != DMA_QUEUE_STATUS_COMPLETE)) {
                 return;
@@ -804,7 +804,7 @@ _vblank_in_handler(void)
         if ((_state.vdp2 & (STATE_VDP2_COMITTING | STATE_VDP2_COMMITTED)) == 0x00) {
                 _state.vdp2 |= STATE_VDP2_COMITTING;
 
-                struct scu_dma_xfer *xfer;
+                scu_dma_xfer_t *xfer;
                 xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
 
                 xfer->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);

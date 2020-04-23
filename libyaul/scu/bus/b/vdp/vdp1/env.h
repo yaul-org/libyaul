@@ -25,7 +25,7 @@ __BEGIN_DECLS
 #define VDP1_ENV_COLOR_MODE_PALETTE     0
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
-struct vdp1_env {
+typedef struct vdp1_env {
         unsigned int :8;
 
         struct {
@@ -39,12 +39,12 @@ struct vdp1_env {
         color_rgb555_t erase_color;
 
         int16_vector2_t erase_points[2];
-};
+} vdp1_env_t;
 
 extern void vdp1_env_init(void);
-extern void vdp1_env_default_init(struct vdp1_env *);
+extern void vdp1_env_default_init(vdp1_env_t *);
 extern void vdp1_env_default_set(void);
-extern void vdp1_env_set(const struct vdp1_env *);
+extern void vdp1_env_set(const vdp1_env_t *);
 
 __END_DECLS
 

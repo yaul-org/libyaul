@@ -42,7 +42,7 @@ static const dbgio_usb_cart_t _default_params = {
 
 static dev_state_t *_dev_state;
 
-const dbgio_dev_ops_t _internal_dev_ops_usb_cart = {
+const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
         .dev = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,

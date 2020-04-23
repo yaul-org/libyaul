@@ -148,9 +148,9 @@ __BEGIN_DECLS
 #define TYPE_MD         0x0E
 #define TYPE_UNKNOWN    0x0F
 
-TAILQ_HEAD(smpc_peripherals, smpc_peripheral);
+typedef TAILQ_HEAD(smpc_peripherals, smpc_peripheral) smpc_peripherals_t;
 
-struct smpc_peripheral_keyboard {
+typedef struct smpc_peripheral_keyboard {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under
          * multi-terminal */
@@ -188,9 +188,9 @@ struct smpc_peripheral_keyboard {
 
                 uint8_t keycode;
         } __packed button;
-} __packed __may_alias;
+} __packed __may_alias smpc_peripheral_keyboard_t;
 
-struct smpc_peripheral_mouse {
+typedef struct smpc_peripheral_mouse {
         bool connected;
         /* If no children, port is 1 or 2. Otherwise, port is under multi-terminal */
         uint8_t port;
@@ -210,9 +210,9 @@ struct smpc_peripheral_mouse {
                 uint8_t x;
                 uint8_t y;
         } __packed button;
-} __packed __may_alias;
+} __packed __may_alias smpc_peripheral_mouse_t;
 
-struct smpc_peripheral_analog {
+typedef struct smpc_peripheral_analog {
         bool connected; /* Number of peripherals connected */
         uint8_t port;
         uint8_t type;
@@ -317,9 +317,9 @@ struct smpc_peripheral_analog {
 #undef REPR_DIGITAL
 
         struct smpc_peripheral_port *parent;
-} __packed;
+} __packed smpc_peripheral_analog_t;
 
-struct smpc_peripheral_racing {
+typedef struct smpc_peripheral_racing {
         bool connected;
         uint8_t port;
         uint8_t type;
@@ -343,9 +343,9 @@ struct smpc_peripheral_racing {
 
                 uint8_t wheel;
         } __packed button;
-} __packed __may_alias;
+} __packed __may_alias smpc_peripheral_racing_t;
 
-struct smpc_peripheral_digital {
+typedef struct smpc_peripheral_digital {
         bool connected; /* Number of peripherals connected */
         uint8_t port;
         uint8_t type;
@@ -402,7 +402,10 @@ struct smpc_peripheral_digital {
 #undef REPR
 
         struct smpc_peripheral_port *parent;
-} __packed;
+} __packed smpc_peripheral_digital_t;
+
+typedef struct smpc_peripheral smpc_peripheral_t;
+typedef struct smpc_peripheral_port smpc_peripheral_port_t;
 
 struct smpc_peripheral {
         uint8_t connected; /* Number of peripherals connected */
@@ -414,24 +417,24 @@ struct smpc_peripheral {
         /* Previous frame peripheral data table */
         uint8_t previous_data[MAX_PERIPHERAL_DATA_SIZE + 1];
         /* NULL if this peripheral is directly connected */
-        struct smpc_peripheral_port *parent;
+        smpc_peripheral_port_t *parent;
 
         TAILQ_ENTRY(smpc_peripheral) peripherals;
 } __packed;
 
 struct smpc_peripheral_port {
-        struct smpc_peripheral *peripheral;
-        struct smpc_peripherals peripherals;
+        smpc_peripheral_t *peripheral;
+        smpc_peripherals_t peripherals;
 };
 
-extern void smpc_peripheral_analog_get(struct smpc_peripheral const *,
-    struct smpc_peripheral_analog * const);
+extern void smpc_peripheral_analog_get(smpc_peripheral_t const *,
+    smpc_peripheral_analog_t * const);
 extern void smpc_peripheral_analog_port(uint8_t port,
-    struct smpc_peripheral_analog * const);
-extern void smpc_peripheral_digital_get(struct smpc_peripheral const *,
-    struct smpc_peripheral_digital * const);
+    smpc_peripheral_analog_t * const);
+extern void smpc_peripheral_digital_get(smpc_peripheral_t const *,
+    smpc_peripheral_digital_t * const);
 extern void smpc_peripheral_digital_port(uint8_t,
-    struct smpc_peripheral_digital * const);
+    smpc_peripheral_digital_t * const);
 extern void smpc_peripheral_init(void);
 extern void smpc_peripheral_intback_issue(void);
 extern void smpc_peripheral_process(void);

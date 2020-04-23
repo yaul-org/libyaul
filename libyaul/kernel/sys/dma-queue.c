@@ -30,11 +30,13 @@
 #define DMA_QUEUE_REQUESTS_MAX_COUNT    (32)
 #define DMA_QUEUE_REQUESTS_MASK         (DMA_QUEUE_REQUESTS_MAX_COUNT - 1)
 
-struct dma_queue_request {
-        struct scu_dma_reg_buffer reg_buffer;
+typedef void (*dma_queue_request_handler)(const dma_queue_transfer_t *);
 
-        void (*handler)(const struct dma_queue_transfer *);
-        struct dma_queue_transfer transfer;
+struct dma_queue_request {
+        scu_dma_reg_buffer_t reg_buffer;
+
+        dma_queue_request_handler handler;
+        dma_queue_transfer_t transfer;
 } __aligned(8);
 
 struct dma_queue {
@@ -57,7 +59,7 @@ static inline struct dma_queue_request * _queue_dequeue(struct dma_queue *) __al
 
 static inline void _dma_queue_request_start(const struct dma_queue_request *) __always_inline;
 
-static void _default_handler(const struct dma_queue_transfer *);
+static void _default_handler(const dma_queue_transfer_t *);
 
 static void _dma_handler(void);
 static void _dma_illegal_handler(void);
@@ -102,9 +104,9 @@ dma_queue_init(void)
 }
 
 int8_t
-dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer,
+dma_queue_enqueue(const scu_dma_reg_buffer_t *reg_buffer,
     uint8_t tag,
-    void (*handler)(const struct dma_queue_transfer *),
+    dma_queue_request_handler handler,
     void *work)
 {
         assert(reg_buffer != NULL);
@@ -130,7 +132,7 @@ dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer,
         assert(request != NULL);
         scu_ic_mask_set(scu_mask);
 
-        (void)memcpy(&request->reg_buffer, reg_buffer, sizeof(struct scu_dma_reg_buffer));
+        (void)memcpy(&request->reg_buffer, reg_buffer, sizeof(scu_dma_reg_buffer_t));
 
         request->handler = (handler != NULL) ? handler : _default_handler;
         request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
@@ -353,6 +355,6 @@ _dma_illegal_handler(void)
 }
 
 static void
-_default_handler(const struct dma_queue_transfer *work __unused)
+_default_handler(const dma_queue_transfer_t *work __unused)
 {
 }

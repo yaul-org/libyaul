@@ -78,79 +78,79 @@ __BEGIN_DECLS
 #define CMDT_VTX_USER_CLIP_LR           (2)
 #define CMDT_VTX_USER_CLIP_COUNT        (2)
 
-struct vdp1_color_bank_type_0 {
-        struct vdp2_sprite_type_0 data;
-} __packed;
+typedef struct vdp1_color_bank_type_0 {
+        vdp2_sprite_type_0_t data;
+} __packed vdp1_color_bank_type_0_t;
 
-struct vdp1_color_bank_type_1 {
-        struct vdp2_sprite_type_1 data;
-} __packed;
+typedef struct vdp1_color_bank_type_1 {
+        vdp2_sprite_type_1_t data;
+} __packed vdp1_color_bank_type_1_t;
 
-struct vdp1_color_bank_type_2 {
-        struct vdp2_sprite_type_2 data;
-} __packed;
+typedef struct vdp1_color_bank_type_2 {
+        vdp2_sprite_type_2_t data;
+} __packed vdp1_color_bank_type_2_t;
 
-struct vdp1_color_bank_type_3 {
-        struct vdp2_sprite_type_3 data;
-} __packed;
+typedef struct vdp1_color_bank_type_3 {
+        vdp2_sprite_type_3_t data;
+} __packed vdp1_color_bank_type_3_t;
 
-struct vdp1_color_bank_type_4 {
-        struct vdp2_sprite_type_4 data;
-} __packed;
+typedef struct vdp1_color_bank_type_4 {
+        vdp2_sprite_type_4_t data;
+} __packed vdp1_color_bank_type_4_t;
 
-struct vdp1_color_bank_type_5 {
-        struct vdp2_sprite_type_5 data;
-} __packed;
+typedef struct vdp1_color_bank_type_5 {
+        vdp2_sprite_type_5_t data;
+} __packed vdp1_color_bank_type_5_t;
 
-struct vdp1_color_bank_type_6 {
-        struct vdp2_sprite_type_6 data;
-} __packed;
+typedef struct vdp1_color_bank_type_6 {
+        vdp2_sprite_type_6_t data;
+} __packed vdp1_color_bank_type_6_t;
 
-struct vdp1_color_bank_type_7 {
-        struct vdp2_sprite_type_7 data;
-} __packed;
+typedef struct vdp1_color_bank_type_7 {
+        vdp2_sprite_type_7_t data;
+} __packed vdp1_color_bank_type_7_t;
 
-struct vdp1_color_bank_type_8 {
+typedef struct vdp1_color_bank_type_8 {
         unsigned int :8;
-        struct vdp2_sprite_type_8 data;
-} __packed;
+        vdp2_sprite_type_8_t data;
+} __packed vdp1_color_bank_type_8_t;
 
-struct vdp1_color_bank_type_9 {
+typedef struct vdp1_color_bank_type_9 {
         unsigned int :8;
-        struct vdp2_sprite_type_9 data;
-} __packed;
+        vdp2_sprite_type_9_t data;
+} __packed vdp1_color_bank_type_9_t;
 
-struct vdp1_color_bank_type_a {
+typedef struct vdp1_color_bank_type_a {
         unsigned int :8;
-        struct vdp2_sprite_type_a data;
-} __packed;
+        vdp2_sprite_type_a_t data;
+} __packed vdp1_color_bank_type_a_t;
 
-struct vdp1_color_bank_type_b {
+typedef struct vdp1_color_bank_type_b {
         unsigned int :8;
-        struct vdp2_sprite_type_b data;
-} __packed;
+        vdp2_sprite_type_b_t data;
+} __packed vdp1_color_bank_type_b_t;
 
-struct vdp1_color_bank_type_c {
+typedef struct vdp1_color_bank_type_c {
         unsigned int :8;
-        struct vdp2_sprite_type_c data;
-} __packed;
+        vdp2_sprite_type_c_t data;
+} __packed vdp1_color_bank_type_c_t;
 
-struct vdp1_color_bank_type_d {
+typedef struct vdp1_color_bank_type_d {
         unsigned int :8;
-        struct vdp2_sprite_type_d data;
-} __packed;
+        vdp2_sprite_type_d_t data;
+} __packed vdp1_color_bank_type_d_t;
 
-struct vdp1_color_bank_type_e {
+typedef struct vdp1_color_bank_type_e {
         unsigned int :8;
-        struct vdp2_sprite_type_e data;
-} __packed;
+        vdp2_sprite_type_e_t data;
+} __packed vdp1_color_bank_type_e_t;
 
-struct vdp1_color_bank_type_f {
+typedef struct vdp1_color_bank_type_f {
         unsigned int :8;
-        struct vdp2_sprite_type_f data;
-} __packed;
+        vdp2_sprite_type_f_t data;
+} __packed vdp1_color_bank_type_f_t;
 
-struct vdp1_cmdt {
+typedef struct vdp1_cmdt {
         uint16_t cmd_ctrl;
         uint16_t cmd_link;
         uint16_t cmd_pmod;
@@ -167,9 +167,9 @@ struct vdp1_cmdt {
         int16_t cmd_yd;
         uint16_t cmd_grda;
         uint16_t reserved;
-} __aligned(32);
+} __aligned(32) vdp1_cmdt_t;
 
-typedef union {
+typedef union vdp1_cmdt_draw_mode {
         struct {
                 unsigned int msb_enable:1;              /* Bit 15 */
                 unsigned int :2;
@@ -184,36 +184,36 @@ typedef union {
         } bits __aligned(2);
 
         uint16_t raw;
-} vdp1_cmdt_draw_mode;
+} vdp1_cmdt_draw_mode_t;
 
-typedef union {
-        struct vdp1_color_bank_type_0 type_0;
-        struct vdp1_color_bank_type_1 type_1;
-        struct vdp1_color_bank_type_2 type_2;
-        struct vdp1_color_bank_type_3 type_3;
-        struct vdp1_color_bank_type_4 type_4;
-        struct vdp1_color_bank_type_5 type_5;
-        struct vdp1_color_bank_type_6 type_6;
-        struct vdp1_color_bank_type_7 type_7;
+typedef union vdp1_cmdt_color_bank {
+        vdp1_color_bank_type_0_t type_0;
+        vdp1_color_bank_type_1_t type_1;
+        vdp1_color_bank_type_2_t type_2;
+        vdp1_color_bank_type_3_t type_3;
+        vdp1_color_bank_type_4_t type_4;
+        vdp1_color_bank_type_5_t type_5;
+        vdp1_color_bank_type_6_t type_6;
+        vdp1_color_bank_type_7_t type_7;
 
-        struct vdp1_color_bank_type_8 type_8;
-        struct vdp1_color_bank_type_9 type_9;
-        struct vdp1_color_bank_type_a type_a;
-        struct vdp1_color_bank_type_b type_b;
-        struct vdp1_color_bank_type_c type_c;
-        struct vdp1_color_bank_type_d type_d;
-        struct vdp1_color_bank_type_e type_e;
-        struct vdp1_color_bank_type_f type_f;
+        vdp1_color_bank_type_8_t type_8;
+        vdp1_color_bank_type_9_t type_9;
+        vdp1_color_bank_type_a_t type_a;
+        vdp1_color_bank_type_b_t type_b;
+        vdp1_color_bank_type_c_t type_c;
+        vdp1_color_bank_type_d_t type_d;
+        vdp1_color_bank_type_e_t type_e;
+        vdp1_color_bank_type_f_t type_f;
 
         uint16_t raw;
-} vdp1_cmdt_color_bank;
+} vdp1_cmdt_color_bank_t;
 
-struct vdp1_cmdt_list {
-        struct vdp1_cmdt *cmdts;
+typedef struct vdp1_cmdt_list {
+        vdp1_cmdt_t *cmdts;
         uint16_t count;
-} __aligned(4);
+} __aligned(4) vdp1_cmdt_list_t;
 
-struct vdp1_cmdt_orderlist {
+typedef struct vdp1_cmdt_orderlist {
         struct {
                 unsigned int end:1;
                 unsigned int :30;
@@ -221,8 +221,8 @@ struct vdp1_cmdt_orderlist {
 
         unsigned int :32;
 
-        struct vdp1_cmdt *cmdt;
-} __aligned(4);
+        vdp1_cmdt_t *cmdt;
+} __aligned(4) vdp1_cmdt_orderlist_t;
 
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
@@ -236,56 +236,56 @@ vdp1_cmdt_last_get(void)
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;
 }
 
-extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
+extern vdp1_cmdt_t *vdp1_cmdt_base_get(void);
 
-extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
-extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
-extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *);
+extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t);
+extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *);
+extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *, vdp1_cmdt_t *);
 
-extern struct vdp1_cmdt_orderlist *vdp1_cmdt_orderlist_alloc(uint16_t);
-extern void vdp1_cmdt_orderlist_free(struct vdp1_cmdt_orderlist *);
-extern void vdp1_cmdt_orderlist_init(struct vdp1_cmdt_orderlist *, uint16_t);
-extern void vdp1_cmdt_orderlist_vram_patch(struct vdp1_cmdt_orderlist *, const uint32_t, const uint16_t);
+extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t);
+extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *);
+extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
+extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *, const uint32_t, const uint16_t);
 
-extern void vdp1_cmdt_normal_sprite_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_scaled_sprite_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_distorted_sprite_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_polygon_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_polyline_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_line_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_user_clip_coord_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_system_clip_coord_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_local_coord_set(struct vdp1_cmdt *);
-extern void vdp1_cmdt_end_set(struct vdp1_cmdt *);
+extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_polygon_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_polyline_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_line_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_end_set(vdp1_cmdt_t *);
 
-extern void vdp1_cmdt_param_draw_mode_set(struct vdp1_cmdt *, const vdp1_cmdt_draw_mode);
-extern void vdp1_cmdt_param_zoom_set(struct vdp1_cmdt *, const uint8_t);
-extern void vdp1_cmdt_param_char_base_set(struct vdp1_cmdt *, uint32_t);
-extern void vdp1_cmdt_param_color_set(struct vdp1_cmdt *, color_rgb555_t);
-extern void vdp1_cmdt_param_color_bank_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
-extern void vdp1_cmdt_param_color_mode0_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
-extern void vdp1_cmdt_param_color_mode1_set(struct vdp1_cmdt *, uint32_t);
-extern void vdp1_cmdt_param_color_mode2_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
-extern void vdp1_cmdt_param_color_mode3_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
-extern void vdp1_cmdt_param_color_mode4_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
-extern void vdp1_cmdt_param_size_set(struct vdp1_cmdt *, uint16_t, uint16_t);
-extern void vdp1_cmdt_param_horizontal_flip_set(struct vdp1_cmdt *, bool);
-extern void vdp1_cmdt_param_vertical_flip_set(struct vdp1_cmdt *, bool);
-extern void vdp1_cmdt_param_vertex_set(struct vdp1_cmdt *, uint16_t, const int16_vector2_t *);
-extern void vdp1_cmdt_param_vertices_set(struct vdp1_cmdt *, const int16_vector2_t *);
-extern void vdp1_cmdt_param_gouraud_base_set(struct vdp1_cmdt *, uint32_t);
+extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, const vdp1_cmdt_draw_mode_t);
+extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, const uint8_t);
+extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb555_t);
+extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_size_set(vdp1_cmdt_t *, uint16_t, uint16_t);
+extern void vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *, bool);
+extern void vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *, bool);
+extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vector2_t *);
+extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vector2_t *);
+extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, uint32_t);
 
-extern void vdp1_cmdt_jump_clear(struct vdp1_cmdt *);
+extern void vdp1_cmdt_jump_clear(vdp1_cmdt_t *);
 
-extern void vdp1_cmdt_jump_assign(struct vdp1_cmdt *, uint16_t);
-extern void vdp1_cmdt_jump_call(struct vdp1_cmdt *, uint16_t);
-extern void vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt *, uint16_t);
-extern void vdp1_cmdt_jump_skip_call(struct vdp1_cmdt *, uint16_t);
+extern void vdp1_cmdt_jump_assign(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_call(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *, uint16_t);
 
-extern void vdp1_cmdt_jump_next(struct vdp1_cmdt *);
-extern void vdp1_cmdt_jump_return(struct vdp1_cmdt *);
-extern void vdp1_cmdt_jump_skip_next(struct vdp1_cmdt *);
-extern void vdp1_cmdt_jump_skip_return(struct vdp1_cmdt *);
+extern void vdp1_cmdt_jump_next(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_return(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_skip_next(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *);
 
 __END_DECLS
 

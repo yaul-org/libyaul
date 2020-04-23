@@ -63,7 +63,7 @@ static void
 _memory_area_clear(const uint32_t address, const uint16_t value,
     const uint32_t len)
 {
-        static struct cpu_dmac_cfg dmac_cfg = {
+        static cpu_dmac_cfg_t dmac_cfg = {
                 .channel = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .src = 0x00000000,
@@ -88,7 +88,7 @@ _memory_area_clear(const uint32_t address, const uint16_t value,
 static void
 _init_vdp2(void)
 {
-        static const struct vdp2_vram_ctl vram_ctl = {
+        static const vdp2_vram_ctl_t vram_ctl = {
                 .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
         };
 

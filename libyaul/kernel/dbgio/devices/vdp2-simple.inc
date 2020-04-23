@@ -4,7 +4,7 @@ static void _simple_init(const dbgio_vdp2_t *);
 static void _simple_deinit(void);
 static void _simple_flush(void);
 
-const dbgio_dev_ops_t _internal_dev_ops_vdp2_simple = {
+const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple = {
         .dev = DBGIO_DEV_VDP2_SIMPLE,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_simple_init,
@@ -45,7 +45,7 @@ _simple_deinit(void)
 static void
 _simple_flush(void)
 {
-        static struct cpu_dmac_cfg dmac_cfg = {
+        static cpu_dmac_cfg_t dmac_cfg = {
                 .channel= DEV_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_INCREMENT,
                 .src = 0x00000000,

@@ -280,7 +280,7 @@ free:
  *   - STATS is NULL
  */
 int
-slob_stats(struct slob_stats *stats)
+slob_stats(slob_stats_t *stats)
 {
         if (stats == NULL) {
                 return -1;

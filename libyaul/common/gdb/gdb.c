@@ -42,7 +42,7 @@ static void _put_packet(char, const char *, size_t);
 
 /* GDB commands */
 static void _gdb_command_read_memory(uint32_t, uint32_t);
-static void _gdb_command_read_registers(struct cpu_registers *);
+static void _gdb_command_read_registers(cpu_registers_t *);
 static void _gdb_last_signal(int);
 
 void
@@ -56,7 +56,7 @@ gdb_init(void)
  *
  * All other commands are optional */
 void
-gdb_monitor(struct cpu_registers *reg_file, int sigval)
+gdb_monitor(cpu_registers_t *reg_file, int sigval)
 {
         static char buffer[GDB_RX_BUF_LEN];
 
@@ -227,7 +227,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 }
 
 static void
-_gdb_command_read_registers(struct cpu_registers *reg_file)
+_gdb_command_read_registers(cpu_registers_t *reg_file)
 {
         char tx_buf[8];
         size_t tx_len;

@@ -12,8 +12,8 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_analog_get(struct smpc_peripheral const *peripheral,
-    struct smpc_peripheral_analog * const analog)
+smpc_peripheral_analog_get(smpc_peripheral_t const *peripheral,
+    smpc_peripheral_analog_t * const analog)
 {
         assert(peripheral != NULL);
         assert(analog != NULL);

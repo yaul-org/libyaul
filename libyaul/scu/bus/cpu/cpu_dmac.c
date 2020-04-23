@@ -22,19 +22,17 @@ static void _default_ihr(void);
 #define CPU_DMAC_IHR_INDEX_CH0  0
 #define CPU_DMAC_IHR_INDEX_CH1  1
 
-typedef void (*ihr_entry_t)(void);
-
-static ihr_entry_t _master_dmac_ihr_table[] = {
+static cpu_dmac_ihr _master_dmac_ihr_table[] = {
         _default_ihr,
         _default_ihr
 };
 
-static ihr_entry_t _slave_dmac_ihr_table[] = {
+static cpu_dmac_ihr _slave_dmac_ihr_table[] = {
         _default_ihr,
         _default_ihr
 };
 
-static ihr_entry_t* _dmac_ihr_table_get(void);
+static cpu_dmac_ihr* _dmac_ihr_table_get(void);
 
 void
 cpu_dmac_init(void)
@@ -69,7 +67,7 @@ cpu_dmac_init(void)
 }
 
 void
-cpu_dmac_status_get(struct dmac_status *status)
+cpu_dmac_status_get(cpu_dmac_status_t *status)
 {
         if (status == NULL) {
                 return;
@@ -121,7 +119,7 @@ cpu_dmac_status_get(struct dmac_status *status)
 }
 
 void
-cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *cfg)
+cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 {
         uint32_t n;
         n = (cfg->channel & 0x01) << 4;
@@ -155,7 +153,7 @@ cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *cfg)
         /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
         reg_tcr = (reg_tcr > 0x00FFFFFF) ? 0x00000000 : reg_tcr;
 
-        ihr_entry_t *dmac_ihr_table;
+        cpu_dmac_ihr *dmac_ihr_table;
         dmac_ihr_table = _dmac_ihr_table_get();
 
         dmac_ihr_table[cfg->channel] = _default_ihr;
@@ -194,7 +192,7 @@ cpu_dmac_channel_wait(uint8_t ch)
         while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000);
 }
 
-static ihr_entry_t *
+static cpu_dmac_ihr *
 _dmac_ihr_table_get(void)
 {
         const uint8_t which_cpu = cpu_dual_executor_get();
@@ -212,7 +210,7 @@ _dmac_ihr_table_get(void)
 static void __interrupt_handler
 _dmac_ch0_ihr_handler(void)
 {
-        ihr_entry_t *dmac_ihr_table;
+        cpu_dmac_ihr *dmac_ihr_table;
         dmac_ihr_table = _dmac_ihr_table_get();
 
         dmac_ihr_table[CPU_DMAC_IHR_INDEX_CH0]();
@@ -223,7 +221,7 @@ _dmac_ch0_ihr_handler(void)
 static void __interrupt_handler
 _dmac_ch1_ihr_handler(void)
 {
-        ihr_entry_t *dmac_ihr_table;
+        cpu_dmac_ihr *dmac_ihr_table;
         dmac_ihr_table = _dmac_ihr_table_get();
 
         dmac_ihr_table[CPU_DMAC_IHR_INDEX_CH1]();

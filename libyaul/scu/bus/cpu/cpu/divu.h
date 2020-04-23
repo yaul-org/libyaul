@@ -15,6 +15,8 @@
 
 __BEGIN_DECLS
 
+typedef void (*cpu_divu_ihr)(void);
+
 static inline bool __always_inline
 cpu_divu_status_get(void)
 {
@@ -79,7 +81,7 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
 } while (false)
 
 extern void cpu_divu_init(void);
-extern void cpu_divu_ovfi_set(void (*)(void));
+extern void cpu_divu_ovfi_set(cpu_divu_ihr);
 
 __END_DECLS
 

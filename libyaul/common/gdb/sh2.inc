@@ -93,7 +93,7 @@ extern void internal_gdb_ihr_ubc(void);
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t _calculate_pc(struct cpu_registers *);
+static uint32_t _calculate_pc(cpu_registers_t *);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -183,7 +183,7 @@ _gdb_getc(void)
 }
 
 static void
-_gdb_step(struct cpu_registers *reg_file, uint32_t address)
+_gdb_step(cpu_registers_t *reg_file, uint32_t address)
 {
         uint16_t *p;
 
@@ -257,7 +257,7 @@ _gdb_kill(void)
 }
 
 static void
-_gdb_monitor_entry(struct cpu_registers *reg_file)
+_gdb_monitor_entry(cpu_registers_t *reg_file)
 {
         uint16_t *p;
         uint32_t *pc;
@@ -295,7 +295,7 @@ _gdb_monitor_entry(struct cpu_registers *reg_file)
 }
 
 static bool
-_gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
+_gdb_register_file_read(cpu_registers_t *reg_file, uint32_t n, uint32_t *r)
 {
         switch (n) {
         case REG_R0:
@@ -345,7 +345,7 @@ _gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
 }
 
 static bool
-_gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
+_gdb_register_file_write(cpu_registers_t *reg_file, uint32_t n, uint32_t r)
 {
         uint32_t *p;
 
@@ -404,7 +404,7 @@ _gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
  *
  * Returns the destination address */
 static uint32_t
-_calculate_pc(struct cpu_registers *reg_file)
+_calculate_pc(cpu_registers_t *reg_file)
 {
         uint16_t opcode;
         uint32_t pc;

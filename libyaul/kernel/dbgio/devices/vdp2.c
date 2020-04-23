@@ -41,7 +41,7 @@
 /* CPU-DMAC channel used for _simple_flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
 
-typedef struct {
+struct dev_state {
         uint8_t state;
 
         /* Base CPD VRAM address */
@@ -67,7 +67,7 @@ typedef struct {
                 uint8_t *cpd_buffer;
                 color_rgb555_t *pal_buffer;
         } font __packed;
-} dev_state_t;
+};
 
 /* Restrictions:
  * 1. Screen will always be displayed
@@ -114,7 +114,7 @@ static const dbgio_vdp2_t _default_params = {
 static dbgio_vdp2_t _params;
 
 /* Device state for both async and direct VDP2 devices */
-static dev_state_t *_dev_state;
+static struct dev_state *_dev_state;
 
 static void _buffer_clear(void);
 static void _buffer_area_clear(int16_t, int16_t, int16_t, int16_t);
@@ -148,7 +148,7 @@ _pnd_clear(int16_t col, int16_t row)
 static void
 _buffer_clear(void)
 {
-        static struct cpu_dmac_cfg dmac_cfg = {
+        static cpu_dmac_cfg_t dmac_cfg = {
                 .channel = DEV_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .src = 0x00000000,
@@ -280,10 +280,10 @@ _dev_state_init(const dbgio_vdp2_t *params)
         assert(params != NULL);
 
         if (_dev_state == NULL) {
-                _dev_state = _internal_malloc(sizeof(dev_state_t));
+                _dev_state = _internal_malloc(sizeof(struct dev_state));
                 assert(_dev_state != NULL);
 
-                (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
+                (void)memset(_dev_state, 0x00, sizeof(struct dev_state));
 
                 _dev_state->state = STATE_IDLE;
         }
@@ -342,7 +342,7 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         assert(params != NULL);
         assert(_dev_state != NULL);
 
-        const struct vdp2_scrn_cell_format cell_format = {
+        const vdp2_scrn_cell_format_t cell_format = {
                 .scroll_screen = params->scrn,
                 .cc_count = VDP2_SCRN_CCC_PALETTE_16,
                 .character_size = 1 * 1,

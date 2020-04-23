@@ -19,7 +19,7 @@ static void _flush(void);
 
 const uint32_t _default_params;
 
-const dbgio_dev_ops_t _internal_dev_ops_null = {
+const struct dbgio_dev_ops _internal_dev_ops_null = {
         .dev = DBGIO_DEV_NULL,
         .default_params = &_default_params,
         .init = _init,

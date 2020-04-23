@@ -13,20 +13,25 @@
 
 __BEGIN_DECLS
 
-typedef struct {
+typedef void (*dev_ops_init)(const void *);
+typedef void (*dev_ops_deinit)(void);
+typedef void (*dev_ops_buffer)(const char *);
+typedef void (*dev_ops_flush)(void);
+
+struct dbgio_dev_ops {
         uint8_t dev;
         const void *default_params;
-        void (*init)(const void *);
-        void (*deinit)(void);
-        void (*buffer)(const char *);
-        void (*flush)(void);
-} dbgio_dev_ops_t;
+        dev_ops_init init;
+        dev_ops_deinit deinit;
+        dev_ops_buffer buffer;
+        dev_ops_flush flush;
+};
 
-extern const dbgio_dev_ops_t _internal_dev_ops_null;
-extern const dbgio_dev_ops_t _internal_dev_ops_vdp1;
-extern const dbgio_dev_ops_t _internal_dev_ops_vdp2_simple;
-extern const dbgio_dev_ops_t _internal_dev_ops_vdp2_async;
-extern const dbgio_dev_ops_t _internal_dev_ops_usb_cart;
+extern const struct dbgio_dev_ops _internal_dev_ops_null;
+extern const struct dbgio_dev_ops _internal_dev_ops_vdp1;
+extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple;
+extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_async;
+extern const struct dbgio_dev_ops _internal_dev_ops_usb_cart;
 
 __END_DECLS
 

@@ -20,7 +20,7 @@ __BEGIN_DECLS
 #define DMA_QUEUE_TAG_INVALID           (255)
 #define DMA_QUEUE_TAG_COUNT             (3)
 
-struct dma_queue_transfer {
+typedef struct dma_queue_transfer {
 /* DMA request has been completed */
 #define DMA_QUEUE_STATUS_COMPLETE       (0)
 /* DMA request not yet processed */
@@ -31,10 +31,10 @@ struct dma_queue_transfer {
 #define DMA_QUEUE_STATUS_UNKNOWN        (255)
         uint8_t status;
         void *work;
-} __aligned(4);
+} __aligned(4) dma_queue_transfer_t;
 
 extern void dma_queue_init(void);
-extern int8_t dma_queue_enqueue(const struct scu_dma_reg_buffer *, uint8_t, void (*)(const struct dma_queue_transfer *), void *);
+extern int8_t dma_queue_enqueue(const scu_dma_reg_buffer_t *, uint8_t, void (*)(const dma_queue_transfer_t *), void *);
 extern void dma_queue_tag_clear(uint8_t);
 extern void dma_queue_clear(void);
 extern uint32_t dma_queue_flush(uint8_t);

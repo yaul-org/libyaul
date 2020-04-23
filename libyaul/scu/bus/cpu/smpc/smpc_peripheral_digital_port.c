@@ -12,9 +12,9 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_digital_port(uint8_t port, struct smpc_peripheral_digital * const peripheral)
+smpc_peripheral_digital_port(uint8_t port, smpc_peripheral_digital_t * const peripheral)
 {
-        struct smpc_peripheral *port_peripheral;
+        smpc_peripheral_t *port_peripheral;
 
         assert((port == 1) || (port == 2));
 
