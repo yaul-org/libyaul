@@ -13,21 +13,24 @@ typedef union {
         uint16_t raw;
 } __aligned (2) color_rgb555_t;
 
-#define COLOR_RGB555(r, g, b)                                                  \
-    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(r, g, b))
+#define COLOR_RGB555(msb, r, g, b)                                             \
+    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(msb, r, g, b))
 
-#define COLOR_RGB555_INITIALIZER(r, g, b)                                      \
+#define COLOR_RGB555_CLEAR                                                     \
+    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(0, 0, 0, 0))
+
+#define COLOR_RGB555_INITIALIZER(msb, r, g, b)                                 \
     {                                                                          \
             {                                                                  \
-                    1, /* MSB */                                               \
+                    msb,                                                       \
                     b,                                                         \
                     g,                                                         \
                     r                                                          \
             }                                                                  \
     }
 
-#define COLOR_RGB888_RGB555(r, g, b)                                           \
-    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(r >> 3, g >> 3, b >> 3))
+#define COLOR_RGB888_RGB555(msb, r, g, b)                                      \
+    ((color_rgb555_t)COLOR_RGB555_INITIALIZER(msb, r >> 3, g >> 3, b >> 3))
 
 static inline uint8_t color_rgb_min(const color_rgb555_t *color __attribute__ ((unused))) {
         return 0;

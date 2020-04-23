@@ -19,7 +19,7 @@ static inline void _set_back_screen(uint32_t, const color_rgb555_t *, bool, uint
 void
 vdp2_scrn_back_screen_color_set(uint32_t vram, color_rgb555_t color)
 {
-        static color_rgb555_t buffer = COLOR_RGB555_INITIALIZER(0, 0, 0);
+        static color_rgb555_t buffer = COLOR_RGB555(1, 0, 0, 0);
 
 #ifdef DEBUG
         assert(vram != 0x00000000);

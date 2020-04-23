@@ -164,6 +164,13 @@ vdp1_cmdt_param_color_set(struct vdp1_cmdt *cmdt, color_rgb555_t color)
 }
 
 void
+vdp1_cmdt_param_color_bank_set(struct vdp1_cmdt *cmdt,
+    const vdp1_cmdt_color_bank color_bank)
+{
+        cmdt->cmd_colr = color_bank.raw;
+}
+
+void
 vdp1_cmdt_param_color_mode0_set(struct vdp1_cmdt *cmdt,
     const vdp1_cmdt_color_bank color_bank)
 {
