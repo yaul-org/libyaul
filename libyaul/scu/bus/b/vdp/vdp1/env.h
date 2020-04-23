@@ -42,6 +42,7 @@ struct vdp1_env {
 };
 
 extern void vdp1_env_init(void);
+extern void vdp1_env_default_init(struct vdp1_env *);
 extern void vdp1_env_default_set(void);
 extern void vdp1_env_set(const struct vdp1_env *);
 
