@@ -262,6 +262,7 @@ extern void vdp1_cmdt_param_draw_mode_set(struct vdp1_cmdt *, const vdp1_cmdt_dr
 extern void vdp1_cmdt_param_zoom_set(struct vdp1_cmdt *, const uint8_t);
 extern void vdp1_cmdt_param_char_base_set(struct vdp1_cmdt *, uint32_t);
 extern void vdp1_cmdt_param_color_set(struct vdp1_cmdt *, color_rgb555_t);
+extern void vdp1_cmdt_param_color_bank_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
 extern void vdp1_cmdt_param_color_mode0_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);
 extern void vdp1_cmdt_param_color_mode1_set(struct vdp1_cmdt *, uint32_t);
 extern void vdp1_cmdt_param_color_mode2_set(struct vdp1_cmdt *, const vdp1_cmdt_color_bank);

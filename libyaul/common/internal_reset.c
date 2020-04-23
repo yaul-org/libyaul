@@ -31,7 +31,7 @@ _internal_reset(void)
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x01FFFE),
-            COLOR_RGB555(0, 7, 0));
+            COLOR_RGB555(1, 0, 7, 0));
 
         vdp2_scrn_display_clear();
 
