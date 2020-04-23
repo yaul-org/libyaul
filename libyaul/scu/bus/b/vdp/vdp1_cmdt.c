@@ -239,6 +239,12 @@ vdp1_cmdt_param_vertex_set(struct vdp1_cmdt *cmdt,
 }
 
 void
+vdp1_cmdt_param_vertices_set(struct vdp1_cmdt *cmdt, const int16_vector2_t *p)
+{
+        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vector2_t) * 4);
+}
+
+void
 vdp1_cmdt_param_gouraud_base_set(struct vdp1_cmdt *cmdt, uint32_t base)
 {
         /* Gouraud shading processing is valid when a color calculation mode is

@@ -271,6 +271,7 @@ extern void vdp1_cmdt_param_size_set(struct vdp1_cmdt *, uint16_t, uint16_t);
 extern void vdp1_cmdt_param_horizontal_flip_set(struct vdp1_cmdt *, bool);
 extern void vdp1_cmdt_param_vertical_flip_set(struct vdp1_cmdt *, bool);
 extern void vdp1_cmdt_param_vertex_set(struct vdp1_cmdt *, uint16_t, const int16_vector2_t *);
+extern void vdp1_cmdt_param_vertices_set(struct vdp1_cmdt *, const int16_vector2_t *);
 extern void vdp1_cmdt_param_gouraud_base_set(struct vdp1_cmdt *, uint32_t);
 
 extern void vdp1_cmdt_jump_clear(struct vdp1_cmdt *);
