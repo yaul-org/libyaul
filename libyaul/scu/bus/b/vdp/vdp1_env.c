@@ -46,6 +46,8 @@ static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
 
 static inline void __always_inline _env_current_update(const struct vdp1_env *);
 
+static void _env_default_erase_update(void);
+
 void
 vdp1_env_init(void)
 {
@@ -55,19 +57,19 @@ vdp1_env_init(void)
 }
 
 void
+vdp1_env_default_init(struct vdp1_env *env)
+{
+        assert(env != NULL);
+
+        _env_default_erase_update();
+
+        (void)memcpy(env, &_default_env, sizeof(struct vdp1_env));
+}
+
+void
 vdp1_env_default_set(void)
 {
-        /* If the system is PAL, or if there is a resolution change, update the
-         * resolution */
-
-        uint16_t width;
-        width = _state_vdp2()->tv.resolution.x;
-
-        uint16_t height;
-        height = _state_vdp2()->tv.resolution.y;
-
-        _default_env.erase_points[1].x = width;
-        _default_env.erase_points[1].y = height;
+        _env_default_erase_update();
 
         vdp1_env_set(&_default_env);
 }
@@ -132,6 +134,22 @@ vdp1_env_set(const struct vdp1_env *env)
 static inline void __always_inline
 _env_current_update(const struct vdp1_env *env) {
         (void)memcpy(&_current_env, env, sizeof(struct vdp1_env));
+}
+
+static void
+_env_default_erase_update(void)
+{
+        /* If the system is PAL, or if there is a resolution change, update the
+         * resolution */
+
+        uint16_t width;
+        width = _state_vdp2()->tv.resolution.x;
+
+        uint16_t height;
+        height = _state_vdp2()->tv.resolution.y;
+
+        _default_env.erase_points[1].x = width;
+        _default_env.erase_points[1].y = height;
 }
 
 #ifdef DEBUG
