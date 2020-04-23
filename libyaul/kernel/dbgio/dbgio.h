@@ -23,7 +23,7 @@ __BEGIN_DECLS
 
 #define DBGIO_DEV_COUNT         5
 
-typedef struct {
+typedef struct dbgio_vdp2 {
         const uint8_t *font_cpd;
         const uint16_t *font_pal;
         uint8_t font_fg;
@@ -37,13 +37,13 @@ typedef struct {
         uint8_t pnd_bank;
         uint8_t pnd_offset;
 
-        struct vdp2_vram_cycp_bank cpd_cycp;
-        struct vdp2_vram_cycp_bank pnd_cycp;
+        vdp2_vram_cycp_bank_t cpd_cycp;
+        vdp2_vram_cycp_bank_t pnd_cycp;
 
         uint8_t cram_index;
 } dbgio_vdp2_t;
 
-typedef struct {
+typedef struct dbgio_usb_cart {
         uint16_t buffer_size;
 } dbgio_usb_cart_t;
 

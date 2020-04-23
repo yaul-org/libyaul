@@ -1,12 +1,12 @@
 /* -*- mode: c -*- */
 
-static struct scu_dma_reg_buffer _dma_reg_buffer;
+static scu_dma_reg_buffer_t _dma_reg_buffer;
 
 static void _async_init(const dbgio_vdp2_t *);
 static void _async_deinit(void);
 static void _async_flush(void);
 
-const dbgio_dev_ops_t _internal_dev_ops_vdp2_async = {
+const struct dbgio_dev_ops _internal_dev_ops_vdp2_async = {
         .dev = DBGIO_DEV_VDP2_ASYNC,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_async_init,
@@ -15,8 +15,8 @@ const dbgio_dev_ops_t _internal_dev_ops_vdp2_async = {
         .flush = _async_flush
 };
 
-static void _cancel_dma_handler(const struct dma_queue_transfer *);
-static void _flush_dma_handler(const struct dma_queue_transfer *);
+static void _cancel_dma_handler(const dma_queue_transfer_t *);
+static void _flush_dma_handler(const dma_queue_transfer_t *);
 
 static void _init_complete_callback(void *);
 
@@ -27,9 +27,8 @@ _async_init(const dbgio_vdp2_t *params)
 {
         struct {
                 /* Holds transfers for font CPD and PAL */
-                struct scu_dma_xfer xfer_tbl[2];
-
-                struct scu_dma_reg_buffer reg_buffer;
+                scu_dma_xfer_t xfer_tbl[2];
+                scu_dma_reg_buffer_t reg_buffer;
         } *dma_font;
 
         _shared_init(params);
@@ -44,7 +43,7 @@ _async_init(const dbgio_vdp2_t *params)
         dma_font = _address_align(aligned, 32);
         assert(((uintptr_t)dma_font & 0x1F) == 0x00);
 
-        struct scu_dma_level_cfg dma_level_cfg;
+        scu_dma_level_cfg_t dma_level_cfg;
 
         dma_level_cfg.mode = SCU_DMA_MODE_INDIRECT;
         dma_level_cfg.xfer.indirect = &dma_font->xfer_tbl[0];
@@ -150,7 +149,7 @@ _address_align(const void *address, const uint16_t align)
 }
 
 static void
-_cancel_dma_handler(const struct dma_queue_transfer *transfer)
+_cancel_dma_handler(const dma_queue_transfer_t *transfer)
 {
         if (transfer->status == DMA_QUEUE_STATUS_COMPLETE) {
                 return;
@@ -167,7 +166,7 @@ _cancel_dma_handler(const struct dma_queue_transfer *transfer)
 }
 
 static void
-_flush_dma_handler(const struct dma_queue_transfer *transfer)
+_flush_dma_handler(const dma_queue_transfer_t *transfer)
 {
         if (transfer->status == DMA_QUEUE_STATUS_COMPLETE) {
                 uint8_t state_mask;

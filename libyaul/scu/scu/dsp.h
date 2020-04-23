@@ -27,7 +27,9 @@ __BEGIN_DECLS
 #define DSP_RAM_PAGE_SIZE       0x0100
 #define DSP_RAM_PAGE_WORD_COUNT (DSP_RAM_PAGE_SIZE / 4)
 
-struct dsp_status {
+typedef void (*scu_dsp_ihr)(void);
+
+typedef struct scu_dsp_status {
         unsigned int :5;
         unsigned int :1;
         unsigned int :1;
@@ -43,7 +45,7 @@ struct dsp_status {
         unsigned int :1;
         unsigned int :7;
         unsigned int pc:8;
-} __packed;
+} __packed scu_dsp_status_t;
 
 static inline void __always_inline
 scu_dsp_program_pause(bool pause)
@@ -60,7 +62,7 @@ scu_dsp_program_pause(bool pause)
 } while (false)
 
 extern void scu_dsp_init(void);
-extern void scu_dsp_end_set(void (*)(void));
+extern void scu_dsp_end_set(scu_dsp_ihr);
 extern void scu_dsp_program_load(const void *, uint32_t);
 extern void scu_dsp_program_clear(void);
 extern void scu_dsp_program_pc_set(uint8_t);
@@ -73,7 +75,7 @@ extern bool scu_dsp_program_end(void);
 extern void scu_dsp_program_end_wait(void);
 extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
 extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
-extern void scu_dsp_status_get(struct dsp_status *);
+extern void scu_dsp_status_get(scu_dsp_status_t *);
 
 __END_DECLS
 

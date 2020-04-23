@@ -81,8 +81,10 @@ __BEGIN_DECLS
 #define SCU_IC_IST_EXTERNAL_02          0x40000000
 #define SCU_IC_IST_EXTERNAL_01          0x80000000
 
+typedef void (*scu_ic_ihr)(void);
+
 static inline void __always_inline
-scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
+scu_ic_ihr_set(uint8_t vector, scu_ic_ihr ihr)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000300;
@@ -96,7 +98,8 @@ scu_ic_ihr_clear(uint8_t vector)
         scu_ic_ihr_set(vector, NULL);
 }
 
-static inline void __always_inline (*scu_ic_ihr_get(uint8_t vector))(void)
+static inline scu_ic_ihr
+scu_ic_ihr_get(uint8_t vector)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000304;

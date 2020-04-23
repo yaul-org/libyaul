@@ -20,23 +20,6 @@
 
 __BEGIN_DECLS
 
-struct rd_file_handle;
-
-typedef TAILQ_HEAD(rd_file, rd_file_handle) rd_file_t;
-
-typedef struct rd_file_handle rd_file_handle_t;
-
-struct rd_file_handle {
-        rd_file_t *rdh;
-        uint32_t index;         /* ROMFS image index */
-        bool dir;               /* If a directory */
-        int32_t ptr;            /* Current read position in bytes */
-        size_t len;             /* Length of file in bytes */
-        void *mnt;              /* Which mount instance are we using? */
-
-        TAILQ_ENTRY(rd_file_handle) handles;
-};
-
 void romdisk_init(void);
 void *romdisk_mount(const char *, const uint8_t *);
 void *romdisk_open(void *, const char *);

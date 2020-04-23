@@ -41,13 +41,13 @@
          ((int8_t *)(ptr) < ((int8_t *)(name)->m_bpool +                       \
              ((name)->m_bnum * (name)->m_bsize))))
 
-static void _incr_block_index(struct memb *);
+static void _incr_block_index(memb_t *);
 
 /*
  * Initialize a block pool MB.
  */
 void
-memb_init(struct memb *mb)
+memb_init(memb_t *mb)
 {
         uint32_t bidx;
 
@@ -70,7 +70,7 @@ memb_init(struct memb *mb)
  *   - There are no free block(s) to allocate
  */
 void *
-memb_alloc(struct memb *mb)
+memb_alloc(memb_t *mb)
 {
         uint32_t bidx;
         uint32_t cur_bidx;
@@ -126,7 +126,7 @@ allocate:
  * address is not within the bounds of the block pool MB.
  */
 int
-memb_free(struct memb *mb, void *addr)
+memb_free(memb_t *mb, void *addr)
 {
         if (mb == NULL) {
                 return -1;
@@ -173,7 +173,7 @@ memb_free(struct memb *mb, void *addr)
  * -1 is returned.
  */
 int32_t
-memb_size(struct memb *mb)
+memb_size(memb_t *mb)
 {
         if (mb == NULL) {
                 return -1;
@@ -188,13 +188,13 @@ memb_size(struct memb *mb)
  *
  */
 bool
-memb_bounds(struct memb *mb, void *addr)
+memb_bounds(memb_t *mb, void *addr)
 {
         return MEMB_PTR_BOUND(mb, addr);
 }
 
 static inline void __always_inline
-_incr_block_index(struct memb *mb)
+_incr_block_index(memb_t *mb)
 {
         if (mb->m_bidx >= (mb->m_bnum - 1)) {
                 mb->m_bidx = 0;

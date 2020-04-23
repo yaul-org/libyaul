@@ -16,7 +16,7 @@
 
 #include "vdp-internal.h"
 
-static struct vdp1_env _default_env = {
+static vdp1_env_t _default_env = {
         .erase_color = COLOR_RGB1555_CLEAR,
         .erase_points[0] = {
                 0,
@@ -34,17 +34,17 @@ static struct vdp1_env _default_env = {
         .sprite_type = 0x0
 };
 
-static struct vdp1_env _current_env;
+static vdp1_env_t _current_env;
 
 #ifdef DEBUG
-static inline void __always_inline _env_assert(const struct vdp1_env *);
-static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
+static inline void __always_inline _env_assert(const vdp1_env_t *);
+static inline void __always_inline _env_erase_assert(const vdp1_env_t *);
 #else
 #define _env_assert(x)
 #define _env_erase_assert(x)
 #endif /* DEBUG */
 
-static inline void __always_inline _env_current_update(const struct vdp1_env *);
+static inline void __always_inline _env_current_update(const vdp1_env_t *);
 
 static void _env_default_erase_update(void);
 
@@ -57,13 +57,13 @@ vdp1_env_init(void)
 }
 
 void
-vdp1_env_default_init(struct vdp1_env *env)
+vdp1_env_default_init(vdp1_env_t *env)
 {
         assert(env != NULL);
 
         _env_default_erase_update();
 
-        (void)memcpy(env, &_default_env, sizeof(struct vdp1_env));
+        (void)memcpy(env, &_default_env, sizeof(vdp1_env_t));
 }
 
 void
@@ -75,7 +75,7 @@ vdp1_env_default_set(void)
 }
 
 void
-vdp1_env_set(const struct vdp1_env *env)
+vdp1_env_set(const vdp1_env_t *env)
 {
         _env_assert(env);
 
@@ -132,8 +132,8 @@ vdp1_env_set(const struct vdp1_env *env)
 }
 
 static inline void __always_inline
-_env_current_update(const struct vdp1_env *env) {
-        (void)memcpy(&_current_env, env, sizeof(struct vdp1_env));
+_env_current_update(const vdp1_env_t *env) {
+        (void)memcpy(&_current_env, env, sizeof(vdp1_env_t));
 }
 
 static void
@@ -154,7 +154,7 @@ _env_default_erase_update(void)
 
 #ifdef DEBUG
 static inline void __always_inline
-_env_assert(const struct vdp1_env *env)
+_env_assert(const vdp1_env_t *env)
 {
         assert(env != NULL);
 
@@ -178,7 +178,7 @@ _env_assert(const struct vdp1_env *env)
 }
 
 static inline void __always_inline
-_env_erase_assert(const struct vdp1_env *env)
+_env_erase_assert(const vdp1_env_t *env)
 {
         assert((env->erase_points[0].x >= 0) &&
                (env->erase_points[0].y >= 0));

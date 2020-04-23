@@ -13,37 +13,39 @@
 
 __BEGIN_DECLS
 
-struct callback {
-        void (*callback)(void *);
-        void *work;
-} __packed;
+typedef void (*callback_handler)(void *);
 
-struct callback_list {
-        struct callback *callbacks;
+typedef struct callback {
+        callback_handler handler;
+        void *work;
+} __packed callback_t;
+
+typedef struct callback_list {
+        callback_t *callbacks;
         uint8_t count;
-};
+} callback_list_t;
 
 static inline void __always_inline
-callback_call(struct callback *callback)
+callback_call(callback_t *callback)
 {
         assert(callback != NULL);
-        assert(callback->callback != NULL);
+        assert(callback->handler != NULL);
 
-        callback->callback(callback->work);
+        callback->handler(callback->work);
 }
 
-extern struct callback_list *callback_list_alloc(const uint8_t);
-extern void callback_list_free(struct callback_list *);
-extern void callback_list_init(struct callback_list *, struct callback *, const uint8_t);
+extern callback_list_t *callback_list_alloc(const uint8_t);
+extern void callback_list_free(callback_list_t *);
+extern void callback_list_init(callback_list_t *, callback_t *, const uint8_t);
 
-extern void callback_list_process(struct callback_list *, bool);
+extern void callback_list_process(callback_list_t *, bool);
 
-extern uint8_t callback_list_callback_add(struct callback_list *, void (*)(void *), void *);
-extern void callback_list_callback_remove(struct callback_list *, const uint8_t);
-extern void callback_list_clear(struct callback_list *);
+extern uint8_t callback_list_callback_add(callback_list_t *, callback_handler, void *);
+extern void callback_list_callback_remove(callback_list_t *, const uint8_t);
+extern void callback_list_clear(callback_list_t *);
 
-extern void callback_init(struct callback *);
-extern void callback_set(struct callback *, void (*)(void *), void *);
+extern void callback_init(callback_t *);
+extern void callback_set(callback_t *, callback_handler, void *);
 
 __END_DECLS
 

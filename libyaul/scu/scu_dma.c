@@ -25,7 +25,7 @@ struct dma_regs {
         uint32_t dnmd;
 } __packed __aligned(4);
 
-static_assert(sizeof(struct dma_regs) == sizeof(struct scu_dma_reg_buffer));
+static_assert(sizeof(struct dma_regs) == sizeof(scu_dma_reg_buffer_t));
 
 #if DEBUG_COPY_DMA_REGS_ENABLE == 1
 static struct dma_regs _dma_regs[3] __used;
@@ -60,8 +60,8 @@ scu_dma_init(void)
 }
 
 void
-scu_dma_config_buffer(struct scu_dma_reg_buffer *reg_buffer,
-    const struct scu_dma_level_cfg *cfg)
+scu_dma_config_buffer(scu_dma_reg_buffer_t *reg_buffer,
+    const scu_dma_level_cfg_t *cfg)
 {
         assert(cfg != NULL);
 
@@ -109,7 +109,7 @@ scu_dma_config_buffer(struct scu_dma_reg_buffer *reg_buffer,
 
 void
 scu_dma_config_set(uint8_t level, uint8_t start_factor,
-    const struct scu_dma_reg_buffer *reg_buffer, void (*ihr)(void))
+    const scu_dma_reg_buffer_t *reg_buffer, scu_dma_ihr ihr)
 {
         assert(reg_buffer != NULL);
 

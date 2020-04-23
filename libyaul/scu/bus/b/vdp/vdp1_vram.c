@@ -25,16 +25,16 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
 
         /* One command table is allocated to us */
         uint32_t vram_size;
-        vram_size = VDP1_VRAM_SIZE - sizeof(struct vdp1_cmdt);
+        vram_size = VDP1_VRAM_SIZE - sizeof(vdp1_cmdt_t);
 
         uint32_t cmdt_size;
-        cmdt_size = cmdt_count * sizeof(struct vdp1_cmdt);
+        cmdt_size = cmdt_count * sizeof(vdp1_cmdt_t);
 
         uint32_t gouraud_size;
-        gouraud_size = gouraud_count * sizeof(struct vdp1_gouraud_table);
+        gouraud_size = gouraud_count * sizeof(vdp1_gouraud_table_t);
 
         uint32_t clut_size;
-        clut_size = clut_count * sizeof(struct vdp1_clut);
+        clut_size = clut_count * sizeof(vdp1_clut_t);
 
         uint32_t total_size;
         total_size = cmdt_size + texture_size + gouraud_size + clut_size;
@@ -42,7 +42,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         assert(total_size <= vram_size);
 
         uint32_t vram_base;
-        vram_base = VDP1_VRAM(sizeof(struct vdp1_cmdt));
+        vram_base = VDP1_VRAM(sizeof(vdp1_cmdt_t));
 
         _state_vdp1()->vram.cmdt_base = vram_base;
         vram_base += cmdt_size;
@@ -75,10 +75,10 @@ vdp1_vram_texture_size_get(void)
         return _state_vdp1()->vram.gouraud_base - _state_vdp1()->vram.texture_base;
 }
 
-struct vdp1_gouraud_table *
+vdp1_gouraud_table_t *
 vdp1_vram_gouraud_base_get(void)
 {
-        return (struct vdp1_gouraud_table *)_state_vdp1()->vram.gouraud_base;
+        return (vdp1_gouraud_table_t *)_state_vdp1()->vram.gouraud_base;
 }
 
 uint32_t
@@ -93,10 +93,10 @@ vdp1_vram_clut_size_get(void)
         return VDP1_VRAM(VDP1_VRAM_SIZE) - _state_vdp1()->vram.clut_base;
 }
 
-struct vdp1_clut *
+vdp1_clut_t *
 vdp1_vram_clut_base_get(void)
 {
-        return (struct vdp1_clut *)_state_vdp1()->vram.clut_base;
+        return (vdp1_clut_t *)_state_vdp1()->vram.clut_base;
 }
 
 void *

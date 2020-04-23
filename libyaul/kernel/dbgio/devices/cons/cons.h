@@ -21,12 +21,18 @@ __BEGIN_DECLS
 
 #define CONS_TAB_WIDTH  2
 
-typedef struct {
-        void (*clear)(void);
-        void (*area_clear)(int16_t, int16_t, int16_t, int16_t);
-        void (*line_clear)(int16_t);
-        void (*line_partial_clear)(int16_t, int16_t, int16_t);
-        void (*write)(int16_t, int16_t, uint8_t);
+typedef void (*cons_ops_clear)(void);
+typedef void (*cons_ops_area_clear)(int16_t, int16_t, int16_t, int16_t);
+typedef void (*cons_ops_line_clear)(int16_t);
+typedef void (*cons_ops_line_partial_clear)(int16_t, int16_t, int16_t);
+typedef void (*cons_ops_write)(int16_t, int16_t, uint8_t);
+
+typedef struct con_ops {
+        cons_ops_clear clear;
+        cons_ops_area_clear area_clear;
+        cons_ops_line_clear line_clear;
+        cons_ops_line_partial_clear line_partial_clear;
+        cons_ops_write write;
 } cons_ops_t;
 
 extern void cons_init(const cons_ops_t *, uint16_t, uint16_t);

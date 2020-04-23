@@ -67,8 +67,10 @@ __BEGIN_DECLS
 #define CPU_INTC_PRIORITY_DMA_ILLEGAL           3
 #define CPU_INTC_PRIORITY_SPRITE_END            2
 
+typedef void (*cpu_intc_ihr)(void);
+
 static inline void __always_inline
-cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
+cpu_intc_ihr_set(uint32_t vector, cpu_intc_ihr ihr)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000310;
@@ -82,7 +84,8 @@ cpu_intc_ihr_clear(uint32_t vector)
         cpu_intc_ihr_set(vector, NULL);
 }
 
-static inline void __always_inline (*cpu_intc_ihr_get(uint32_t vector))(void)
+static inline cpu_intc_ihr __always_inline
+cpu_intc_ihr_get(uint32_t vector)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000314;

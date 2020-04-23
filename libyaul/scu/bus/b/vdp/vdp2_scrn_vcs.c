@@ -13,7 +13,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *vcs)
+vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs)
 {
 #ifdef DEBUG
         assert((vcs->scroll_screen == VDP2_SCRN_NBG0) ||

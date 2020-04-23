@@ -22,6 +22,8 @@ __BEGIN_DECLS
 #define CPU_WDT_TIMER_MODE_INTERVAL 0
 #define CPU_WDT_TIMER_MODE_WATCHDOG 1
 
+typedef void (*cpu_wdt_ihr)(void);
+
 static inline void __always_inline
 cpu_wdt_count_set(uint8_t count)
 {
@@ -69,7 +71,7 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
 }
 
 extern void cpu_wdt_init(uint8_t);
-extern void cpu_wdt_timer_mode_set(uint8_t, void (*)(void));
+extern void cpu_wdt_timer_mode_set(uint8_t, cpu_wdt_ihr);
 
 __END_DECLS
 

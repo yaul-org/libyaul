@@ -207,7 +207,7 @@ __BEGIN_DECLS
 #define VDP2_VRAM_USAGE_TYPE_CPD        0x03
 #define VDP2_VRAM_USAGE_TYPE_BPD        0x03
 
-struct vdp2_scrn_bitmap_format {
+typedef struct vdp2_scrn_bitmap_format {
         uint8_t scroll_screen; /* Normal/rotational background */
         uint32_t cc_count; /* Character color count */
 
@@ -249,9 +249,9 @@ struct vdp2_scrn_bitmap_format {
 
                 uint8_t b1;
         } usage_banks; /* RBG0 and RBG1 only */
-};
+} vdp2_scrn_bitmap_format_t;
 
-struct vdp2_scrn_cell_format {
+typedef struct vdp2_scrn_cell_format {
         uint32_t scroll_screen; /* Normal/rotational background */
         uint32_t cc_count; /* Character color count */
         uint32_t character_size; /* Character size: (1 * 1) or (2 * 2) cells */
@@ -315,10 +315,10 @@ struct vdp2_scrn_cell_format {
 
                 uint8_t b1;
         } usage_banks; /* RBG0 and RBG1 only */
-};
+} vdp2_scrn_cell_format_t;
 
 /* Hardware defined */
-struct vdp2_scrn_rotation_table {
+typedef struct vdp2_scrn_rotation_table {
         /* Screen start coordinates */
         uint32_t xst;
         uint32_t yst;
@@ -379,7 +379,7 @@ struct vdp2_scrn_rotation_table {
         uint32_t kast;       /* Coefficient table start address */
         uint32_t delta_kast; /* Addr. increment coeff. table (per line) */
         uint32_t delta_kax;  /* Addr. increment coeff. table (per dot) */
-} __packed;
+} __packed vdp2_scrn_rotation_table_t;
 
 #define VDP2_SCRN_SF_TYPE_NONE                  0
 #define VDP2_SCRN_SF_TYPE_COLOR_CALCULATION     1
@@ -441,7 +441,7 @@ struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MIN         VDP2_SCRN_REDUCTION_STEP
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
-struct vdp2_scrn_ls_format {
+typedef struct vdp2_scrn_ls_format {
         uint8_t scroll_screen; /* Normal background */
         uint32_t line_scroll_table; /* Line scroll table (lead addr.) */
         uint8_t interlace_mode; /* Dependent on the interlace setting */
@@ -451,12 +451,12 @@ struct vdp2_scrn_ls_format {
 #define VDP2_SCRN_LS_N0SCY      0x0004
 #define VDP2_SCRN_LS_N1SCY      0x0400
         uint16_t enable; /* Enable line scroll */
-};
+} vdp2_scrn_ls_format_t;
 
-struct vdp2_scrn_vcs_format {
+typedef struct vdp2_scrn_vcs_format {
         uint8_t scroll_screen; /* Normal background */
         uint32_t vcs_table; /* Vertical cell scroll table (lead addr.) */
-};
+} vdp2_scrn_vcs_format_t;
 
 #define VDP2_SCRN_COLOR_OFFSET_A        0
 #define VDP2_SCRN_COLOR_OFFSET_B        1
@@ -464,9 +464,9 @@ struct vdp2_scrn_vcs_format {
 extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
 extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
 
-extern void vdp2_scrn_bitmap_format_set(const struct vdp2_scrn_bitmap_format *);
+extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 
-extern void vdp2_scrn_cell_format_set(const struct vdp2_scrn_cell_format *);
+extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
 extern void vdp2_scrn_color_offset_clear(void);
 extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t, int16_t, int16_t);
@@ -477,9 +477,9 @@ extern void vdp2_scrn_display_set(uint8_t, bool);
 extern void vdp2_scrn_display_unset(uint8_t);
 extern void vdp2_scrn_display_clear(void);
 
-extern void vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *);
+extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *);
 
-extern void vdp2_scrn_vcs_set(const struct vdp2_scrn_vcs_format *);
+extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *);
 extern void vdp2_scrn_vcs_unset(uint8_t);
 extern void vdp2_scrn_vcs_clear(void);
 

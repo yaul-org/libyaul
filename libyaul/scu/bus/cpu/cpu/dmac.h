@@ -20,7 +20,9 @@ __BEGIN_DECLS
 #define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
 #define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
 
-struct cpu_dmac_cfg {
+typedef void (*cpu_dmac_ihr)(void);
+
+typedef struct cpu_dmac_cfg {
         uint8_t channel;
 
 #define CPU_DMAC_DESTINATION_FIXED      0x00
@@ -47,17 +49,17 @@ struct cpu_dmac_cfg {
         uint32_t dst;
         uint32_t len;
 
-        void (*ihr)(void);
-};
+        cpu_dmac_ihr ihr;
+} cpu_dmac_cfg_t;
 
-struct dmac_status {
+typedef struct cpu_dmac_status {
         unsigned int enabled:1;
         unsigned int priority_mode:1;
         unsigned int channel_enabled:2;
         unsigned int channel_busy:2;
         unsigned int address_error:1;
         unsigned int nmi_interrupt:1;
-} __packed;
+} __packed cpu_dmac_status_t;
 
 static inline void __always_inline
 cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
@@ -123,8 +125,8 @@ cpu_dmac_stop(void)
 }
 
 extern void cpu_dmac_init(void);
-extern void cpu_dmac_status_get(struct dmac_status *);
-extern void cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *);
+extern void cpu_dmac_status_get(cpu_dmac_status_t *);
+extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *);
 extern void cpu_dmac_channel_wait(uint8_t);
 
 __END_DECLS

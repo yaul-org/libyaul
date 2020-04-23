@@ -15,6 +15,8 @@
 
 __BEGIN_DECLS
 
+typedef void (*scu_timer_ihr)(void);
+
 static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
 {
@@ -54,8 +56,8 @@ scu_timer_line_enable(void)
 } while (false)
 
 extern void scu_timer_init(void);
-extern void scu_timer_t0_set(void (*)(void));
-extern void scu_timer_t1_set(void (*)(void));
+extern void scu_timer_t0_set(scu_timer_ihr);
+extern void scu_timer_t1_set(scu_timer_ihr);
 extern void scu_timer_t1_line_set(int16_t);
 
 __END_DECLS

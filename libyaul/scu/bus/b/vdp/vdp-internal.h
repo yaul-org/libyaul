@@ -32,7 +32,7 @@ struct state_vdp1 {
                 uint32_t remaining_base;
         } vram;
 
-        struct vdp1_env const *current_env;
+        vdp1_env_t const *current_env;
 
         union {
                 uint16_t buffer[11];
@@ -80,7 +80,7 @@ struct state_vdp2 {
                 uint32_t count;
         } back;
 
-        struct vdp2_vram_ctl vram_ctl;
+        vdp2_vram_ctl_t vram_ctl;
 
         union {
                 uint16_t buffer[144];
@@ -243,8 +243,8 @@ struct state_vdp2 {
 
         struct {
                 /* Align each SCU-DMA transfer table on a 64-byte boundary */
-                struct scu_dma_xfer xfer_table[COMMIT_XFER_COUNT] __aligned(4 * 16);
-                struct scu_dma_reg_buffer reg_buffer;
+                scu_dma_xfer_t xfer_table[COMMIT_XFER_COUNT] __aligned(4 * 16);
+                scu_dma_reg_buffer_t reg_buffer;
         } commit;
 };
 

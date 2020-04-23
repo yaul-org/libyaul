@@ -12,9 +12,9 @@
 
 #include "dbgio-internal.h"
 
-static const dbgio_dev_ops_t *_dev_ops;
+static const struct dbgio_dev_ops *_dev_ops;
 
-static const dbgio_dev_ops_t *_dev_ops_table[] = {
+static const struct dbgio_dev_ops *_dev_ops_table[] = {
         &_internal_dev_ops_null,
         NULL,
         &_internal_dev_ops_vdp2_simple,

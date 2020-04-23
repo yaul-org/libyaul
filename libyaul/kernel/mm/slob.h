@@ -36,7 +36,7 @@ __BEGIN_DECLS
 #define SLOB_PAGE_BREAK_1ST 0x1000
 #define SLOB_PAGE_BREAK_2ND 0x2000
 
-struct slob_stats {
+typedef struct slob_stats {
         /* Number of free bytes (across all SLOB pages) */
         uint32_t ss_avail;
 
@@ -49,13 +49,13 @@ struct slob_stats {
 
         /* Total number of SLOB pages */
         uint32_t ss_pages;
-};
+} slob_stats_t;
 
 void slob_init(void);
 void *slob_alloc(size_t);
 void *slob_realloc(void *, size_t);
 void slob_free(void *);
-int slob_stats(struct slob_stats *);
+int slob_stats(slob_stats_t *);
 
 __END_DECLS
 

@@ -9,7 +9,7 @@
 
 #include "smpc-internal.h"
 
-struct smpc_peripheral_port *
+smpc_peripheral_port_t *
 smpc_peripheral_raw_port(uint8_t port)
 {
 

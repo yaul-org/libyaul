@@ -18,7 +18,7 @@ static void _default_ihr(void);
 static bool _overflow = false;
 static bool _end = true;
 
-static void (*_dsp_end_ihr)(void) = _default_ihr;
+static scu_dsp_ihr _dsp_end_ihr = _default_ihr;
 
 static inline uint32_t _read_ppaf(void);
 static inline void _update_flags(uint32_t);
@@ -40,7 +40,7 @@ scu_dsp_init(void)
 }
 
 void
-scu_dsp_end_set(void (*ihr)(void))
+scu_dsp_end_set(scu_dsp_ihr ihr)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
@@ -249,7 +249,7 @@ scu_dsp_data_write(uint8_t ram_page, uint8_t offset, void *data, uint32_t count)
 }
 
 void
-scu_dsp_status_get(struct dsp_status *status)
+scu_dsp_status_get(scu_dsp_status_t *status)
 {
         if (status == NULL) {
                 return;

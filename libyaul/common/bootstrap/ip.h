@@ -36,7 +36,7 @@
 #define IP_HEADER_BUP_INFO_BRAM_EVEN_BYTES      "E"
 #define IP_HEADER_BUP_INFO_BRAM_WORDS           "W"
 
-struct ip_header_data {
+typedef struct ip_header_data {
         uint8_t hardware_id[16];
         uint8_t manufacture_id[16];
         uint8_t product_id[10];
@@ -67,9 +67,9 @@ struct ip_header_data {
         /* Reserved area #3 */
         unsigned int :32;
         unsigned int :32;
-} __packed;
+} __packed ip_header_data_t;
 
-struct ip_header_boot {
+typedef struct ip_header_boot {
         uint8_t hardware_id[16];
         uint8_t manufacture_id[16];
         uint8_t product_id[10];
@@ -107,6 +107,6 @@ struct ip_header_boot {
         unsigned int :32;
         unsigned int :32;
         unsigned int :32;
-} __packed;
+} __packed ip_header_boot_t;
 
 #endif /* !_IP_H_ */

@@ -35,6 +35,8 @@ __BEGIN_DECLS
 #define CPU_FRT_PAL_352_32_COUNT_1MS    0x037F
 #define CPU_FRT_PAL_352_128_COUNT_1MS   0x00E0
 
+typedef void (*cpu_frt_ihr)(void);
+
 static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
 {
@@ -92,9 +94,9 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 } while (false)
 
 extern void cpu_frt_init(uint8_t);
-extern void cpu_frt_oca_set(uint16_t, void (*)(void));
-extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
-extern void cpu_frt_ovi_set(void (*)(void));
+extern void cpu_frt_oca_set(uint16_t, cpu_frt_ihr);
+extern void cpu_frt_ocb_set(uint16_t, cpu_frt_ihr);
+extern void cpu_frt_ovi_set(cpu_frt_ihr);
 
 __END_DECLS
 

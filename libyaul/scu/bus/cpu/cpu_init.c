@@ -70,9 +70,9 @@ void _exception_illegal_slot(void) __used;
 void _exception_cpu_address_error(void) __used;
 void _exception_dma_address_error(void) __used;
 
-static const char *_exception_message_format(const struct cpu_registers * restrict,
+static const char *_exception_message_format(const cpu_registers_t * restrict,
     const char *restrict);
-static void _ihr_exception_show(const struct cpu_registers * restrict,
+static void _ihr_exception_show(const cpu_registers_t * restrict,
     const char * restrict);
 
 void
@@ -104,7 +104,7 @@ cpu_init(void)
 }
 
 static void
-_ihr_exception_show(const struct cpu_registers * restrict regs, const char * restrict exception_name)
+_ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
         _internal_reset();
 
@@ -118,7 +118,7 @@ _ihr_exception_show(const struct cpu_registers * restrict regs, const char * res
 }
 
 static void __noreturn __used
-_ihr_exception_illegal_instruction(const struct cpu_registers *regs)
+_ihr_exception_illegal_instruction(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "Illegal instruction");
 
@@ -126,7 +126,7 @@ _ihr_exception_illegal_instruction(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_illegal_slot(const struct cpu_registers *regs)
+_ihr_exception_illegal_slot(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "Illegal slot");
 
@@ -134,7 +134,7 @@ _ihr_exception_illegal_slot(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_cpu_address_error(const struct cpu_registers *regs)
+_ihr_exception_cpu_address_error(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "CPU address error");
 
@@ -142,7 +142,7 @@ _ihr_exception_cpu_address_error(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_dma_address_error(const struct cpu_registers *regs)
+_ihr_exception_dma_address_error(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "DMA address error");
 
@@ -155,7 +155,7 @@ EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
 EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
 
 static const char *
-_exception_message_format(const struct cpu_registers * restrict regs,
+_exception_message_format(const cpu_registers_t * restrict regs,
     const char *restrict exception_name)
 {
         static char buffer[1024];

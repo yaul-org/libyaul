@@ -56,11 +56,11 @@ typedef uint8_t state_change_t;
 
 struct vt_parse;
 
-typedef void (*vt_parse_callback_t)(struct vt_parse *, vt_parse_action_t, int);
+typedef void (*vt_parse_callback)(struct vt_parse *, vt_parse_action_t, int);
 
 typedef struct vt_parse {
         vt_parse_state_t state;
-        vt_parse_callback_t callback;
+        vt_parse_callback callback;
         uint8_t intermediate_chars[MAX_INTERMEDIATE_CHARS + 1];
         uint8_t ignore_flagged;
         uint8_t params[16];
@@ -73,7 +73,7 @@ static void _do_state_change(vt_parse_t *, state_change_t, char);
 #include "vt_parse_table.inc"
 
 static void
-_vt_parse_init(vt_parse_t *parser, vt_parse_callback_t callback)
+_vt_parse_init(vt_parse_t *parser, vt_parse_callback callback)
 {
         parser->state = VT_PARSE_STATE_GROUND;
         parser->intermediate_chars[0] = '\0';
