@@ -57,6 +57,7 @@ void _internal_reset(void);
 
 void *_internal_malloc(size_t);
 void *_internal_realloc(void *, size_t);
+void *_internal_memalign(size_t, size_t);
 void _internal_free(void *);
 
 #endif /* !_KERNEL_INTERNAL_H_ */

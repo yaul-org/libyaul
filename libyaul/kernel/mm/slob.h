@@ -54,6 +54,7 @@ typedef struct slob_stats {
 void slob_init(void);
 void *slob_alloc(size_t);
 void *slob_realloc(void *, size_t);
+void *slob_memalign(size_t, size_t);
 void slob_free(void *);
 int slob_stats(slob_stats_t *);
 
