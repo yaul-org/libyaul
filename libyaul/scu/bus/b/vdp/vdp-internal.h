@@ -244,7 +244,7 @@ struct state_vdp2 {
         struct {
                 /* Align each SCU-DMA transfer table on a 64-byte boundary */
                 scu_dma_xfer_t xfer_table[COMMIT_XFER_COUNT] __aligned(4 * 16);
-                scu_dma_reg_buffer_t reg_buffer;
+                scu_dma_handle_t handle;
         } commit;
 };
 

@@ -45,6 +45,8 @@ __BEGIN_DECLS
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
+#define SCU_DMA_LEVEL_COUNT     3
+
 #define SCU_DMA_MODE_DIRECT     0x00
 #define SCU_DMA_MODE_INDIRECT   0x01
 
@@ -90,9 +92,13 @@ __BEGIN_DECLS
 
 typedef void (*scu_dma_ihr)(void);
 
-typedef struct scu_dma_reg_buffer {
-        uint32_t buffer[5];
-} __packed __aligned(4) scu_dma_reg_buffer_t;
+typedef struct scu_dma_handle {
+        uint32_t dnr;
+        uint32_t dnw;
+        uint32_t dnc;
+        uint32_t dnad;
+        uint32_t dnmd;
+} __packed __aligned(4) scu_dma_handle_t;
 
 typedef struct scu_dma_xfer {
         uint32_t len;
@@ -371,10 +377,10 @@ scu_dma_level_end_set(const uint8_t level, scu_dma_ihr ihr)
 }
 
 extern void scu_dma_init(void);
-extern void scu_dma_config_buffer(scu_dma_reg_buffer_t *,
+extern void scu_dma_config_buffer(scu_dma_handle_t *,
     const scu_dma_level_cfg_t *);
 extern void scu_dma_config_set(uint8_t, uint8_t,
-    const scu_dma_reg_buffer_t *, scu_dma_ihr);
+    const scu_dma_handle_t *, scu_dma_ihr);
 extern int8_t scu_dma_level_unused_get(void);
 
 __END_DECLS
