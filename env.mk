@@ -258,7 +258,7 @@ endef
 # $4 ->
 define macro-sh-generate-install-header-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
-	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
+	$(ECHO)[ -z "$(SILENT)" ] || set -x; \
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
 	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/}/$$(@F)$(V_END)\n";
