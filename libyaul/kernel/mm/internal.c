@@ -49,6 +49,23 @@ _internal_realloc(void *old, size_t new_len)
         return ret;
 }
 
+void *
+_internal_memalign(size_t n, size_t align)
+{
+        void *ret;
+
+#if defined(MALLOC_IMPL_TLSF)
+        tlsf_t pool;
+        pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
+
+        ret = tlsf_memalign(pool, n, align);
+#elif defined(MALLOC_IMPL_SLOB)
+        ret = slob_memalign(n, align);
+#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+
+        return ret;
+}
+
 void
 _internal_free(void *addr)
 {

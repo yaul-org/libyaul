@@ -166,6 +166,12 @@ slob_realloc(void *old __unused, size_t nsize __unused)
         return NULL;
 }
 
+void *
+slob_memalign(size_t n __unused, size_t align __unused)
+{
+        return NULL;
+}
+
 /*
  * Free memory associated with the pointer ADDR.
  */
