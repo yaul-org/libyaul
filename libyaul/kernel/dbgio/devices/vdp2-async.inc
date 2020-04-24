@@ -1,6 +1,6 @@
 /* -*- mode: c -*- */
 
-static scu_dma_reg_buffer_t _dma_reg_buffer;
+static scu_dma_handle_t _dma_handle;
 
 static void _async_init(const dbgio_vdp2_t *);
 static void _async_deinit(void);
@@ -28,7 +28,7 @@ _async_init(const dbgio_vdp2_t *params)
         struct {
                 /* Holds transfers for font CPD and PAL */
                 scu_dma_xfer_t xfer_tbl[2];
-                scu_dma_reg_buffer_t reg_buffer;
+                scu_dma_handle_t handle;
         } *dma_font;
 
         _shared_init(params);
@@ -62,10 +62,10 @@ _async_init(const dbgio_vdp2_t *params)
         dma_font->xfer_tbl[1].dst = _dev_state->color_palette;
         dma_font->xfer_tbl[1].src = SCU_DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
-        scu_dma_config_buffer(&dma_font->reg_buffer, &dma_level_cfg);
+        scu_dma_config_buffer(&dma_font->handle, &dma_level_cfg);
 
         int8_t ret;
-        ret = dma_queue_enqueue(&dma_font->reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+        ret = dma_queue_enqueue(&dma_font->handle, DMA_QUEUE_TAG_VBLANK_IN,
             _cancel_dma_handler, aligned);
         assert(ret == 0);
 
@@ -77,7 +77,7 @@ _async_init(const dbgio_vdp2_t *params)
         dma_level_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
         dma_level_cfg.update = SCU_DMA_UPDATE_NONE;
 
-        scu_dma_config_buffer(&_dma_reg_buffer, &dma_level_cfg);
+        scu_dma_config_buffer(&_dma_handle, &dma_level_cfg);
 
         /* We're truly initialized once the user has made at least one call to
          * vdp_sync() */
@@ -130,7 +130,7 @@ _async_flush(void)
         _scroll_screen_reset();
 
         int8_t ret;
-        ret = dma_queue_enqueue(&_dma_reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+        ret = dma_queue_enqueue(&_dma_handle, DMA_QUEUE_TAG_VBLANK_IN,
             _flush_dma_handler, NULL);
         assert(ret == 0);
 }

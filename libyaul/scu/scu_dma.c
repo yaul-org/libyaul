@@ -15,21 +15,11 @@
 #include <scu-internal.h>
 
 /* Debug: Keep a copy of the SCU-DMA registers for each level */
-#define DEBUG_COPY_DMA_REGS_ENABLE 0
+#define DEBUG_COPY_DMA_HANDLES_ENABLE 0
 
-struct dma_regs {
-        uint32_t dnr;
-        uint32_t dnw;
-        uint32_t dnc;
-        uint32_t dnad;
-        uint32_t dnmd;
-} __packed __aligned(4);
-
-static_assert(sizeof(struct dma_regs) == sizeof(scu_dma_reg_buffer_t));
-
-#if DEBUG_COPY_DMA_REGS_ENABLE == 1
-static struct dma_regs _dma_regs[3] __used;
-#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
+#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
+static scu_dma_handle_t _dma_handles[SCU_DMA_LEVEL_COUNT];
+#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
 void
 scu_dma_init(void)
@@ -50,28 +40,25 @@ scu_dma_init(void)
 
         scu_dma_illegal_set(NULL);
 
-#if DEBUG_COPY_DMA_REGS_ENABLE
-        (void)memset(&_dma_regs[0], 0x00, sizeof(struct dma_regs));
-        (void)memset(&_dma_regs[1], 0x00, sizeof(struct dma_regs));
-        (void)memset(&_dma_regs[2], 0x00, sizeof(struct dma_regs));
-#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
+#if DEBUG_COPY_DMA_HANDLES_ENABLE
+        (void)memset(&_dma_handles[0], 0x00, sizeof(scu_dma_handle_t));
+        (void)memset(&_dma_handles[1], 0x00, sizeof(scu_dma_handle_t));
+        (void)memset(&_dma_handles[2], 0x00, sizeof(scu_dma_handle_t));
+#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
         scu_ic_mask_chg(~scu_mask, SCU_IC_MASK_NONE);
 }
 
 void
-scu_dma_config_buffer(scu_dma_reg_buffer_t *reg_buffer,
+scu_dma_config_buffer(scu_dma_handle_t *handle,
     const scu_dma_level_cfg_t *cfg)
 {
         assert(cfg != NULL);
 
-        assert(reg_buffer != NULL);
-
-        struct dma_regs *regs;
-        regs = (struct dma_regs *)&reg_buffer->buffer[0];
+        assert(handle != NULL);
 
         /* Clear mode, starting factor and update bits */
-        regs->dnmd &= ~0x01010107;
+        handle->dnmd &= ~0x01010107;
 
         switch (cfg->mode & 0x01) {
         case SCU_DMA_MODE_DIRECT:
@@ -80,49 +67,46 @@ scu_dma_config_buffer(scu_dma_reg_buffer_t *reg_buffer,
                 assert(cfg->xfer.direct.src != 0x00000000);
 
                 /* The absolute address must not be cached */
-                regs->dnw = CPU_CACHE_THROUGH | cfg->xfer.direct.dst;
+                handle->dnw = CPU_CACHE_THROUGH | cfg->xfer.direct.dst;
                 /* The absolute address must not be cached */
-                regs->dnr = CPU_CACHE_THROUGH | cfg->xfer.direct.src;
+                handle->dnr = CPU_CACHE_THROUGH | cfg->xfer.direct.src;
 
                 /* Level 0 is able to transfer 1MiB
                  * Level 1 is able to transfer 4KiB
                  * Level 2 is able to transfer 4KiB */
-                regs->dnc = cfg->xfer.direct.len;
+                handle->dnc = cfg->xfer.direct.len;
                 break;
         case SCU_DMA_MODE_INDIRECT:
                 assert(cfg->xfer.indirect != NULL);
 
                 /* The absolute address must not be cached */
-                regs->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->xfer.indirect;
-                regs->dnr = 0x00000000;
-                regs->dnc = 0x00000000;
-                regs->dnmd |= 0x01000000;
+                handle->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->xfer.indirect;
+                handle->dnr = 0x00000000;
+                handle->dnc = 0x00000000;
+                handle->dnmd |= 0x01000000;
                 break;
         }
 
         /* Since bit 8 being unset is effective only for the CS2 space
          * of the A bus, everything else should set it */
-        regs->dnad = 0x00000100 | (cfg->stride & 0x07);
+        handle->dnad = 0x00000100 | (cfg->stride & 0x07);
 
-        regs->dnmd |= cfg->update & 0x00010100;
+        handle->dnmd |= cfg->update & 0x00010100;
 }
 
 void
 scu_dma_config_set(uint8_t level, uint8_t start_factor,
-    const scu_dma_reg_buffer_t *reg_buffer, scu_dma_ihr ihr)
+    const scu_dma_handle_t *handle, scu_dma_ihr ihr)
 {
-        assert(reg_buffer != NULL);
+        assert(handle != NULL);
 
         assert(level <= 2);
 
         assert(start_factor <= 7);
 
-        const struct dma_regs *dma_regs;
-        dma_regs = (struct dma_regs *)&reg_buffer->buffer[0];
-
-#if DEBUG_COPY_DMA_REGS_ENABLE == 1
-        (void)memcpy(&_dma_regs[0], dma_regs, sizeof(struct dma_regs));
-#endif /* DEBUG_COPY_DMA_REGS_ENABLE */
+#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
+        (void)memcpy(&_dma_handles[level], handle, sizeof(scu_dma_handle_t));
+#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
         switch (level) {
         case 0:
@@ -131,11 +115,11 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 
                 scu_dma_level0_end_set(ihr);
 
-                MEMORY_WRITE(32, SCU(D0R), dma_regs->dnr);
-                MEMORY_WRITE(32, SCU(D0W), dma_regs->dnw);
-                MEMORY_WRITE(32, SCU(D0C), dma_regs->dnc);
-                MEMORY_WRITE(32, SCU(D0AD), dma_regs->dnad);
-                MEMORY_WRITE(32, SCU(D0MD), dma_regs->dnmd | start_factor);
+                MEMORY_WRITE(32, SCU(D0R), handle->dnr);
+                MEMORY_WRITE(32, SCU(D0W), handle->dnw);
+                MEMORY_WRITE(32, SCU(D0C), handle->dnc);
+                MEMORY_WRITE(32, SCU(D0AD), handle->dnad);
+                MEMORY_WRITE(32, SCU(D0MD), handle->dnmd | start_factor);
 
                 if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
                         MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
@@ -147,11 +131,11 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 
                 scu_dma_level1_end_set(ihr);
 
-                MEMORY_WRITE(32, SCU(D1R), dma_regs->dnr);
-                MEMORY_WRITE(32, SCU(D1W), dma_regs->dnw);
-                MEMORY_WRITE(32, SCU(D1C), dma_regs->dnc);
-                MEMORY_WRITE(32, SCU(D1AD), dma_regs->dnad);
-                MEMORY_WRITE(32, SCU(D1MD), dma_regs->dnmd | start_factor);
+                MEMORY_WRITE(32, SCU(D1R), handle->dnr);
+                MEMORY_WRITE(32, SCU(D1W), handle->dnw);
+                MEMORY_WRITE(32, SCU(D1C), handle->dnc);
+                MEMORY_WRITE(32, SCU(D1AD), handle->dnad);
+                MEMORY_WRITE(32, SCU(D1MD), handle->dnmd | start_factor);
 
                 if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
                         MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
@@ -166,11 +150,11 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 
                 scu_dma_level2_end_set(ihr);
 
-                MEMORY_WRITE(32, SCU(D2R), dma_regs->dnr);
-                MEMORY_WRITE(32, SCU(D2W), dma_regs->dnw);
-                MEMORY_WRITE(32, SCU(D2C), dma_regs->dnc);
-                MEMORY_WRITE(32, SCU(D2AD), dma_regs->dnad);
-                MEMORY_WRITE(32, SCU(D2MD), dma_regs->dnmd | start_factor);
+                MEMORY_WRITE(32, SCU(D2R), handle->dnr);
+                MEMORY_WRITE(32, SCU(D2W), handle->dnw);
+                MEMORY_WRITE(32, SCU(D2C), handle->dnc);
+                MEMORY_WRITE(32, SCU(D2AD), handle->dnad);
+                MEMORY_WRITE(32, SCU(D2MD), handle->dnmd | start_factor);
 
                 if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
                         MEMORY_WRITE(32, SCU(D2EN), 0x00000100);

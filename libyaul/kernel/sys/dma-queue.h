@@ -34,7 +34,7 @@ typedef struct dma_queue_transfer {
 } __aligned(4) dma_queue_transfer_t;
 
 extern void dma_queue_init(void);
-extern int8_t dma_queue_enqueue(const scu_dma_reg_buffer_t *, uint8_t, void (*)(const dma_queue_transfer_t *), void *);
+extern int8_t dma_queue_enqueue(const scu_dma_handle_t *, uint8_t, void (*)(const dma_queue_transfer_t *), void *);
 extern void dma_queue_tag_clear(uint8_t);
 extern void dma_queue_clear(void);
 extern uint32_t dma_queue_flush(uint8_t);

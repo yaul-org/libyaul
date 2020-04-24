@@ -209,11 +209,11 @@ vdp_sync_init(void)
 void
 vdp_sync(void)
 {
-        scu_dma_reg_buffer_t *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+        scu_dma_handle_t *handle;
+        handle = &_state_vdp2()->commit.handle;
 
         int8_t ret __unused;
-        ret = dma_queue_enqueue(reg_buffer, DMA_QUEUE_TAG_VBLANK_IN,
+        ret = dma_queue_enqueue(handle, DMA_QUEUE_TAG_VBLANK_IN,
             _vdp2_dma_handler, NULL);
 #ifdef DEBUG
         assert(ret == 0);
@@ -739,10 +739,10 @@ _vdp2_commit_xfer_tables_init(void)
                 .update = SCU_DMA_UPDATE_NONE
         };
 
-        scu_dma_reg_buffer_t *reg_buffer;
-        reg_buffer = &_state_vdp2()->commit.reg_buffer;
+        scu_dma_handle_t *handle;
+        handle = &_state_vdp2()->commit.handle;
 
-        scu_dma_config_buffer(reg_buffer, &dma_level_cfg);
+        scu_dma_config_buffer(handle, &dma_level_cfg);
 }
 
 static void

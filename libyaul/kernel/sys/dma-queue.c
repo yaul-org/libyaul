@@ -33,7 +33,7 @@
 typedef void (*dma_queue_request_handler)(const dma_queue_transfer_t *);
 
 struct dma_queue_request {
-        scu_dma_reg_buffer_t reg_buffer;
+        scu_dma_handle_t handle;
 
         dma_queue_request_handler handler;
         dma_queue_transfer_t transfer;
@@ -91,8 +91,6 @@ dma_queue_init(void)
                         struct dma_queue_request *request;
                         request = &dma_queue->requests[i];
 
-                        (void)memset(&request->reg_buffer, 0x00, sizeof(request->reg_buffer));
-
                         request->handler = _default_handler;
 
                         request->transfer.status = DMA_QUEUE_STATUS_UNKNOWN;
@@ -104,12 +102,11 @@ dma_queue_init(void)
 }
 
 int8_t
-dma_queue_enqueue(const scu_dma_reg_buffer_t *reg_buffer,
-    uint8_t tag,
+dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
     dma_queue_request_handler handler,
     void *work)
 {
-        assert(reg_buffer != NULL);
+        assert(handle != NULL);
 
         assert(tag < DMA_QUEUE_TAG_COUNT);
 
@@ -132,7 +129,7 @@ dma_queue_enqueue(const scu_dma_reg_buffer_t *reg_buffer,
         assert(request != NULL);
         scu_ic_mask_set(scu_mask);
 
-        (void)memcpy(&request->reg_buffer, reg_buffer, sizeof(scu_dma_reg_buffer_t));
+        (void)memcpy(&request->handle, handle, sizeof(scu_dma_handle_t));
 
         request->handler = (handler != NULL) ? handler : _default_handler;
         request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
@@ -313,7 +310,7 @@ static inline void __always_inline
 _dma_queue_request_start(const struct dma_queue_request *request)
 {
         scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
-            &request->reg_buffer, _dma_handler);
+            &request->handle, _dma_handler);
 
         /* We need to purge the cache before starting the transfer */
         cpu_cache_purge();
