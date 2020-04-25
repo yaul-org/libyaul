@@ -17,11 +17,6 @@
 
 #include "vdp-internal.h"
 
-#define VDP1_VRAM_CMDT_COUNT    (2048)
-#define VDP1_VRAM_TEXTURE_SIZE  (0x0006BFE0)
-#define VDP1_VRAM_GOURAUD_COUNT (1024)
-#define VDP1_VRAM_CLUT_COUNT    (256)
-
 static void _init_vdp1(void);
 static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
 
@@ -49,10 +44,10 @@ _init_vdp1(void)
         vdp1_env_init();
         vdp1_env_default_set();
 
-        vdp1_vram_partitions_set(VDP1_VRAM_CMDT_COUNT,
-            VDP1_VRAM_TEXTURE_SIZE,
-            VDP1_VRAM_GOURAUD_COUNT,
-            VDP1_VRAM_CLUT_COUNT);
+        vdp1_vram_partitions_set(VDP1_VRAM_DEFAULT_CMDT_COUNT,
+            VDP1_VRAM_DEFAULT_TEXTURE_SIZE,
+            VDP1_VRAM_DEFAULT_GOURAUD_COUNT,
+            VDP1_VRAM_DEFAULT_CLUT_COUNT);
 
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
