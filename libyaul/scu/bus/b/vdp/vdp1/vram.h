@@ -15,6 +15,11 @@
 
 __BEGIN_DECLS
 
+#define VDP1_VRAM_DEFAULT_CMDT_COUNT    (2048)
+#define VDP1_VRAM_DEFAULT_TEXTURE_SIZE  (0x0006BFE0)
+#define VDP1_VRAM_DEFAULT_GOURAUD_COUNT (1024)
+#define VDP1_VRAM_DEFAULT_CLUT_COUNT    (256)
+
 #define VDP1_FB_POINT(x, y)     (0x25C80000UL + (((x) & 0x1) << 18) + (y))
 #define VDP1_CMD_TABLE(x, y)    (0x25C00000UL + ((x) << 5) + (((y) << 1) & 0x1F))
 
