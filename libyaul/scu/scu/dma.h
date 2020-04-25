@@ -376,7 +376,6 @@ scu_dma_level_end_set(const uint8_t level, scu_dma_ihr ihr)
         }
 }
 
-extern void scu_dma_init(void);
 extern void scu_dma_config_buffer(scu_dma_handle_t *,
     const scu_dma_level_cfg_t *);
 extern void scu_dma_config_set(uint8_t, uint8_t,

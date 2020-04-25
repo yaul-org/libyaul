@@ -14,4 +14,9 @@
 #include <scu/dma.h>
 #include <scu/map.h>
 
+extern void _internal_scu_init(void);
+extern void _internal_scu_dma_init(void);
+extern void _internal_scu_dsp_init(void);
+extern void _internal_scu_timer_init(void);
+
 #endif /* !_SCU_INTERNAL_H_ */

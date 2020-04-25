@@ -13,28 +13,13 @@
 
 #include <sys/cdefs.h>
 
-#include <dbgio/dbgio.h>
+#include <cpu/cache.h>
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
 #elif defined(MALLOC_IMPL_SLOB)
 #include <mm/slob.h>
 #endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
-
-#include <sys/dma-queue.h>
-
-#include <cpu.h>
-#include <scu.h>
-#include <vdp.h>
-#include <smpc.h>
-
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <arp.h>
-#endif /* HAVE_DEV_CARTRIDGE */
-
-#include <dram-cart.h>
 
 #include <internal.h>
 
@@ -91,21 +76,21 @@ _init(void)
 
         _call_global_ctors();
 
-        cpu_init();
-        scu_init();
-        smpc_init();
-        smpc_peripheral_init();
+        _internal_cpu_init();
+        _internal_scu_init();
+        _internal_smpc_init();
+        _internal_smpc_peripheral_init();
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_init();
+        _internal_usb_cart_init();
 #else
-        dram_cart_init();
+        _internal_dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
-        dma_queue_init();
+        _internal_dma_queue_init();
 
-        vdp_init();
-        dbgio_init();
+        _internal_vdp_init();
+        _internal_dbgio_init();
 
         user_init();
 

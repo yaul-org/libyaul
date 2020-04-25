@@ -435,7 +435,6 @@ extern void smpc_peripheral_digital_get(smpc_peripheral_t const *,
     smpc_peripheral_digital_t * const);
 extern void smpc_peripheral_digital_port(uint8_t,
     smpc_peripheral_digital_t * const);
-extern void smpc_peripheral_init(void);
 extern void smpc_peripheral_intback_issue(void);
 extern void smpc_peripheral_process(void);
 

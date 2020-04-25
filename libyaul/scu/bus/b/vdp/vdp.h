@@ -28,9 +28,6 @@ typedef void (*vdp1_sync_callback)(void *);
 
 typedef void (*vdp_sync_callback)(void *);
 
-extern void vdp_init(void);
-
-extern void vdp_sync_init(void);
 extern void vdp_sync(void);
 
 extern bool vdp1_sync_rendering(void);

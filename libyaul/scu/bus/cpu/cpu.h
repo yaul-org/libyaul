@@ -22,8 +22,6 @@
 
 __BEGIN_DECLS
 
-extern void cpu_init(void);
-
 __END_DECLS
 
 #endif /* !_CPU_H_ */

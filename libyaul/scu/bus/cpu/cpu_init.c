@@ -76,7 +76,7 @@ static void _ihr_exception_show(const cpu_registers_t * restrict,
     const char * restrict);
 
 void
-cpu_init(void)
+_internal_cpu_init(void)
 {
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
@@ -96,10 +96,10 @@ cpu_init(void)
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
-        cpu_divu_init();
+        _internal_cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
-        cpu_dmac_init();
+        _internal_cpu_dmac_init();
         cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
 }
 

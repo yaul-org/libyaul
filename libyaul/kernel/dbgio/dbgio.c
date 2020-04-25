@@ -23,7 +23,7 @@ static const struct dbgio_dev_ops *_dev_ops_table[] = {
 };
 
 void
-dbgio_init(void)
+_internal_dbgio_init(void)
 {
         _dev_ops = NULL;
 

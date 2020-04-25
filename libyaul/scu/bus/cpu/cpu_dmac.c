@@ -35,7 +35,7 @@ static cpu_dmac_ihr _slave_dmac_ihr_table[] = {
 static cpu_dmac_ihr* _dmac_ihr_table_get(void);
 
 void
-cpu_dmac_init(void)
+_internal_cpu_dmac_init(void)
 {
         cpu_dmac_channel_wait(0);
         cpu_dmac_channel_wait(1);

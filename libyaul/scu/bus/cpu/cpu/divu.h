@@ -80,7 +80,6 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
         cpu_divu_ovfi_set(NULL);                                               \
 } while (false)
 
-extern void cpu_divu_init(void);
 extern void cpu_divu_ovfi_set(cpu_divu_ihr);
 
 __END_DECLS

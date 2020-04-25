@@ -180,7 +180,7 @@ static void _vdp2_sync_commit(cpu_dmac_cfg_t *);
 static void _vdp2_sync_back_screen_table(cpu_dmac_cfg_t *);
 
 void
-vdp_sync_init(void)
+_internal_vdp_sync_init(void)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 

@@ -571,8 +571,10 @@ _bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
 static void
 _device_init(void)
 {
+        /* This is useful to have USB cart initialized here explicitly, as we
+         * could be debugging kernel/sys/init.c */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_init();
+        _internal_usb_cart_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #endif /* HAVE_DEV_CARTRIDGE */
 }

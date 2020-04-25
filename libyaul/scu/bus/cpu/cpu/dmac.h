@@ -124,7 +124,6 @@ cpu_dmac_stop(void)
         cpu_dmac_channel_stop(1);
 }
 
-extern void cpu_dmac_init(void);
 extern void cpu_dmac_status_get(cpu_dmac_status_t *);
 extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *);
 extern void cpu_dmac_channel_wait(uint8_t);

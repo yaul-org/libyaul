@@ -8,6 +8,6 @@
 #include "smpc-internal.h"
 
 void
-smpc_init(void)
+_internal_smpc_init(void)
 {
 }

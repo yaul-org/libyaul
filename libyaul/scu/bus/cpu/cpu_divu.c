@@ -24,7 +24,7 @@ static cpu_divu_ihr _slave_divu_ovfi_ihr = _default_ihr;
 static cpu_divu_ihr *_divu_ovfi_ihr_get(void);
 
 void
-cpu_divu_init(void)
+_internal_cpu_divu_init(void)
 {
         cpu_divu_ovfi_clear();
 

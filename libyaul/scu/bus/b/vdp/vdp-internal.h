@@ -264,4 +264,6 @@ _state_vdp2(void)
         return &_internal_state_vdp2;
 }
 
+extern void _internal_vdp_init(void);
+
 #endif /* !_VDP_INTERNAL_H_ */

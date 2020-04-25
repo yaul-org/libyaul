@@ -55,7 +55,6 @@ scu_timer_line_enable(void)
         scu_timer_t1_set(NULL);                                                \
 } while (false)
 
-extern void scu_timer_init(void);
 extern void scu_timer_t0_set(scu_timer_ihr);
 extern void scu_timer_t1_set(scu_timer_ihr);
 extern void scu_timer_t1_line_set(int16_t);

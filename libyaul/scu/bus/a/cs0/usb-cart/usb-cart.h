@@ -70,8 +70,6 @@ usb_cart_byte_send(uint8_t c)
         MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
 
-extern void usb_cart_init(void);
-
 extern uint8_t usb_cart_byte_xchg(uint8_t);
 
 extern uint32_t usb_cart_long_read(void);
