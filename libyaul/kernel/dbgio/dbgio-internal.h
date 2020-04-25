@@ -33,6 +33,8 @@ extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple;
 extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_async;
 extern const struct dbgio_dev_ops _internal_dev_ops_usb_cart;
 
+extern void _internal_dbgio_init(void);
+
 __END_DECLS
 
 #endif /* !_DBGIO_INTERNAL_H_ */

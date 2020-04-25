@@ -10,6 +10,18 @@
 
 #include <sys/cdefs.h>
 
+#include <cpu-internal.h>
+#include <dbgio-internal.h>
+#include <dram-cart-internal.h>
+#include <smpc-internal.h>
+#include <vdp-internal.h>
+
+#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
+#include <usb-cart-internal.h>
+#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
+#include <arp.h>
+#endif /* HAVE_DEV_CARTRIDGE */
+
 #ifdef MALLOC_IMPL_TLSF
 #include <mm/tlsf.h>
 
@@ -59,5 +71,7 @@ void *_internal_malloc(size_t);
 void *_internal_realloc(void *, size_t);
 void *_internal_memalign(size_t, size_t);
 void _internal_free(void *);
+
+extern void _internal_dma_queue_init(void);
 
 #endif /* !_KERNEL_INTERNAL_H_ */

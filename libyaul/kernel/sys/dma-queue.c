@@ -71,7 +71,7 @@ static struct {
 } _state;
 
 void
-dma_queue_init(void)
+_internal_dma_queue_init(void)
 {
         scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL);
         scu_dma_level_stop(DMA_QUEUE_SCU_DMA_LEVEL);

@@ -61,7 +61,6 @@ scu_dsp_program_pause(bool pause)
         scu_dsp_end_set(NULL);                                                 \
 } while (false)
 
-extern void scu_dsp_init(void);
 extern void scu_dsp_end_set(scu_dsp_ihr);
 extern void scu_dsp_program_load(const void *, uint32_t);
 extern void scu_dsp_program_clear(void);

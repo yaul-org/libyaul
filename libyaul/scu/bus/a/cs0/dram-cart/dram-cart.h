@@ -21,7 +21,6 @@ __BEGIN_DECLS
 
 #define DRAM_CART_BANKS    0x04
 
-extern void dram_cart_init(void);
 extern void *dram_cart_area_get(void);
 extern uint8_t dram_cart_id_get(void);
 extern size_t dram_cart_size_get(void);

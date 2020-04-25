@@ -13,6 +13,4 @@
 #include <scu/ic.h>
 #include <scu/timer.h>
 
-extern void scu_init(void);
-
 #endif /* !_SCU_H_ */

@@ -28,14 +28,17 @@ static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
 static void _init_vdp2(void);
 
 void
-vdp_init(void)
+_internal_vdp_init(void)
 {
+        /* Should only be internal to vdp_init.c */
+        extern void _internal_vdp_sync_init(void);
+
         /* VDP2 must be initialized first before VDP1 as the VDP1 writes to VDP2
          * registers */
         _init_vdp2();
         _init_vdp1();
 
-        vdp_sync_init();
+        _internal_vdp_sync_init();
 }
 
 static void

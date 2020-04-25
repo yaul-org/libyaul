@@ -22,7 +22,7 @@ static scu_dma_handle_t _dma_handles[SCU_DMA_LEVEL_COUNT];
 #endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
 void
-scu_dma_init(void)
+_internal_scu_dma_init(void)
 {
         scu_dma_stop();
 

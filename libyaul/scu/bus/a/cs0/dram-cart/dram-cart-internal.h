@@ -10,4 +10,6 @@
 
 #include <dram-cart/map.h>
 
+extern void _internal_dram_cart_init(void);
+
 #endif /* _DRAM_CART_INTERNAL_H_ */
