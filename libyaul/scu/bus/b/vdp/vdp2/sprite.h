@@ -14,6 +14,70 @@
 
 __BEGIN_DECLS
 
+#define VDP2_SRPITE_TYPE_0_PR_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_0_CC_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_0_DC_MASK      ((1 << 11) - 1)
+
+#define VDP2_SRPITE_TYPE_1_PR_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_1_CC_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_1_DC_MASK      ((1 << 11) - 1)
+
+#define VDP2_SRPITE_TYPE_2_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_2_PR_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_2_CC_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_2_DC_MASK      ((1 << 11) - 1)
+
+#define VDP2_SRPITE_TYPE_3_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_3_PR_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_3_CC_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_3_DC_MASK      ((1 << 11) - 1)
+
+#define VDP2_SRPITE_TYPE_4_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_4_PR_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_4_CC_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_4_DC_MASK      ((1 << 10) - 1)
+
+#define VDP2_SRPITE_TYPE_5_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_5_PR_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_5_CC_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_5_DC_MASK      ((1 << 11) - 1)
+
+#define VDP2_SRPITE_TYPE_6_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_6_PR_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_6_CC_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_6_DC_MASK      ((1 << 10) - 1)
+
+#define VDP2_SRPITE_TYPE_7_SDW_MASK     ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_7_PR_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_7_CC_MASK      ((1 << 3) - 1)
+#define VDP2_SPRITE_TYPE_7_DC_MASK      ((1 << 9) - 1)
+
+#define VDP2_SRPITE_TYPE_8_PR_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_8_DC_MASK      ((1 << 7) - 1)
+
+#define VDP2_SRPITE_TYPE_9_PR_MASK      ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_9_CC_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_9_DC_MASK      ((1 << 6) - 1)
+
+#define VDP2_SRPITE_TYPE_A_PR_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_A_DC_MASK      ((1 << 6) - 1)
+
+#define VDP2_SRPITE_TYPE_B_CC_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_B_DC_MASK      ((1 << 6) - 1)
+
+#define VDP2_SRPITE_TYPE_C_SP_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_C_DC_MASK      ((1 << 7) - 1)
+
+#define VDP2_SRPITE_TYPE_D_SP_MASK      ((1 << 1) - 1)
+#define VDP2_SRPITE_TYPE_D_SC_MASK      ((1 << 1) - 1)
+#define VDP2_SPRITE_TYPE_D_DC_MASK      ((1 << 6) - 1)
+
+#define VDP2_SRPITE_TYPE_E_SP_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_E_DC_MASK      ((1 << 6) - 1)
+
+#define VDP2_SRPITE_TYPE_F_SC_MASK      ((1 << 2) - 1)
+#define VDP2_SPRITE_TYPE_F_DC_MASK      ((1 << 6) - 1)
+
 typedef struct vdp2_sprite_type_0 {
         unsigned int pr:2; /* Bit 15 */ /* Priority bit(s) */
         unsigned int cc:3; /* Color calculation ratio bit(s) */
