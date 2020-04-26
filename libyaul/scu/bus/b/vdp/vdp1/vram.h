@@ -58,7 +58,26 @@ typedef struct vdp1_clut {
         } entries[16];
 } __aligned(32) vdp1_clut_t;
 
+typedef struct vdp1_vram_partitions {
+        vdp1_cmdt_t *cmdt_base;
+        uint32_t cmdt_size;
+
+        void *texture_base;
+        uint32_t texture_size;
+
+        vdp1_gouraud_table_t *gouraud_base;
+        uint32_t gouraud_size;
+
+        vdp1_clut_t *clut_base;
+        uint32_t clut_size;
+
+        void *remaining_base;
+        uint32_t remaining_size;
+} vdp1_vram_partitions_t;
+
 extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
+
+extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *);
 
 extern void *vdp1_vram_texture_base_get(void);
 extern uint32_t vdp1_vram_texture_size_get(void);

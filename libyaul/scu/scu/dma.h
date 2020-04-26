@@ -72,7 +72,7 @@ __BEGIN_DECLS
 #define SCU_DMA_UPDATE_RUP      0x00010000
 #define SCU_DMA_UPDATE_WUP      0x00000100
 
-#define SCU_DMA_INDIRECT_TBL_END        0x80000000
+#define SCU_DMA_INDIRECT_TABLE_END      (0x80000000)
 
 #define SCU_DMA_BUS_A   0x00
 #define SCU_DMA_BUS_B   0x01
@@ -87,7 +87,7 @@ __BEGIN_DECLS
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
         .len = _len,                                                           \
         .dst = (uint32_t)(_dst),                                               \
-        .src = DMA_INDIRECT_TBL_END | (uint32_t)(_src)                         \
+        .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
 }
 
 typedef void (*scu_dma_ihr)(void);
@@ -111,7 +111,7 @@ typedef struct scu_dma_level_cfg {
 
         union {
                 /* Indirect mode */
-                void *indirect;
+                scu_dma_xfer_t *indirect;
 
                 /* Direct mode */
                 scu_dma_xfer_t direct;

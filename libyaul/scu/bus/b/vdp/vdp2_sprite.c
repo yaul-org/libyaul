@@ -31,23 +31,23 @@ vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
         switch (sprite_register) {
         case 0:
         case 1:
-                _state_vdp2()->regs.prisa &= reg_mask;
-                _state_vdp2()->regs.prisa |= priority << shift;
+                _state_vdp2()->regs->prisa &= reg_mask;
+                _state_vdp2()->regs->prisa |= priority << shift;
                 break;
         case 2:
         case 3:
-                _state_vdp2()->regs.prisb &= reg_mask;
-                _state_vdp2()->regs.prisb |= priority << shift;
+                _state_vdp2()->regs->prisb &= reg_mask;
+                _state_vdp2()->regs->prisb |= priority << shift;
                 break;
         case 4:
         case 5:
-                _state_vdp2()->regs.prisc &= reg_mask;
-                _state_vdp2()->regs.prisc |= priority << shift;
+                _state_vdp2()->regs->prisc &= reg_mask;
+                _state_vdp2()->regs->prisc |= priority << shift;
                 break;
         case 6:
         case 7:
-                _state_vdp2()->regs.prisd &= reg_mask;
-                _state_vdp2()->regs.prisd |= priority << shift;
+                _state_vdp2()->regs->prisd &= reg_mask;
+                _state_vdp2()->regs->prisd |= priority << shift;
                 break;
         default:
                 break;

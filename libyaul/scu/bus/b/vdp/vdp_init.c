@@ -22,6 +22,11 @@ static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
 
 static void _init_vdp2(void);
 
+static vdp1_registers_t _vdp1_registers;
+static vdp1_vram_partitions_t _vdp1_vram_partitions;
+
+static vdp2_registers_t _vdp2_registers;
+
 void
 _internal_vdp_init(void)
 {
@@ -39,15 +44,18 @@ _internal_vdp_init(void)
 static void
 _init_vdp1(void)
 {
-        (void)memset(&_state_vdp1()->regs, 0x00, sizeof(_state_vdp1()->regs));
+        _state_vdp1()->regs = &_vdp1_registers;
+        _state_vdp1()->vram_partitions = &_vdp1_vram_partitions;
+
+        (void)memset(_state_vdp1()->regs, 0x00, sizeof(vdp1_registers_t));
 
         vdp1_env_init();
         vdp1_env_default_set();
 
         vdp1_vram_partitions_set(VDP1_VRAM_DEFAULT_CMDT_COUNT,
-            VDP1_VRAM_DEFAULT_TEXTURE_SIZE,
-            VDP1_VRAM_DEFAULT_GOURAUD_COUNT,
-            VDP1_VRAM_DEFAULT_CLUT_COUNT);
+                                 VDP1_VRAM_DEFAULT_TEXTURE_SIZE,
+                                 VDP1_VRAM_DEFAULT_GOURAUD_COUNT,
+                                 VDP1_VRAM_DEFAULT_CLUT_COUNT);
 
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
@@ -86,11 +94,11 @@ _memory_area_clear(const uint32_t address, const uint16_t value,
 static void
 _init_vdp2(void)
 {
-        static const vdp2_vram_ctl_t vram_ctl = {
-                .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
-        };
+        extern void _internal_vdp2_vram_init(void);
 
-        (void)memset(&_state_vdp2()->regs, 0x00, sizeof(_state_vdp2()->regs));
+        _state_vdp2()->regs = &_vdp2_registers;
+
+        (void)memset(_state_vdp2()->regs, 0x00, sizeof(vdp2_registers_t));
 
         _state_vdp2()->tv.resolution.x = 0;
         _state_vdp2()->tv.resolution.y = 0;
@@ -109,17 +117,15 @@ _init_vdp2(void)
         vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
 
-        vdp2_vram_control_set(&vram_ctl);
+        _internal_vdp2_vram_init();
+
+        _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
+        _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
 
         vdp2_cram_mode_set(1);
 
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x000000),
             COLOR_RGB1555(1, 0, 0, 0));
-
-        vdp2_vram_cycp_clear();
-
-        _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
-        _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);

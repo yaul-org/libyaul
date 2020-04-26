@@ -82,9 +82,9 @@ vdp1_env_set(const vdp1_env_t *env)
         _env_current_update(env);
 
         /* Always clear TVM and VBE bits */
-        _state_vdp1()->regs.tvmr = (env->rotation << 1) | env->bpp;
+        _state_vdp1()->regs->tvmr = (env->rotation << 1) | env->bpp;
 
-        _state_vdp1()->regs.ewdr = env->erase_color.raw;
+        _state_vdp1()->regs->ewdr = env->erase_color.raw;
 
         uint16_t x1;
         x1 = env->erase_points[0].x >> 3;
@@ -103,32 +103,32 @@ vdp1_env_set(const vdp1_env_t *env)
                 x3 >>= 1;
         }
 
-        if ((_state_vdp2()->regs.tvmd & 0xC0) == 0xC0) {
+        if ((_state_vdp2()->regs->tvmd & 0xC0) == 0xC0) {
                 y1 >>= 1;
                 y3 >>= 1;
         }
 
-        _state_vdp1()->regs.ewlr = (x1 << 9) | y1;
-        _state_vdp1()->regs.ewrr = (x3 << 9) | y3;
+        _state_vdp1()->regs->ewlr = (x1 << 9) | y1;
+        _state_vdp1()->regs->ewrr = (x3 << 9) | y3;
 
         uint16_t spclmd;
         spclmd = env->color_mode << 5;
 
-        _state_vdp2()->regs.spctl &= 0x3710;
+        _state_vdp2()->regs->spctl &= 0x3710;
         /* Disable sprite window (SPWINEN) when SPCLMD bit is set */
-        _state_vdp2()->regs.spctl ^= (spclmd >> 1);
-        _state_vdp2()->regs.spctl |= spclmd;
+        _state_vdp2()->regs->spctl ^= (spclmd >> 1);
+        _state_vdp2()->regs->spctl |= spclmd;
 
         /* Types 0x0 to 0x7 are for low resolution (320 or 352), and types 0x8
          * to 0xF are for high resolution (640 or 704).
          *
          * The frame buffer bit-depth are 16-bits and 8-bits, respectively */
-        _state_vdp2()->regs.spctl |= env->sprite_type & 0x000F;
+        _state_vdp2()->regs->spctl |= env->sprite_type & 0x000F;
 
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs.tvmr);
-        MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs.ewdr);
-        MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs.ewlr);
-        MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
+        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+        MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs->ewdr);
+        MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs->ewlr);
+        MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs->ewrr);
 }
 
 static inline void __always_inline

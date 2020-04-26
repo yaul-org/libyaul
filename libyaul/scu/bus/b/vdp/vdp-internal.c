@@ -7,5 +7,5 @@
 
 #include "vdp-internal.h"
 
-struct state_vdp1 _internal_state_vdp1 __aligned(16);
-struct state_vdp2 _internal_state_vdp2 __aligned(16);
+struct state_vdp1 _internal_state_vdp1;
+struct state_vdp2 _internal_state_vdp2;

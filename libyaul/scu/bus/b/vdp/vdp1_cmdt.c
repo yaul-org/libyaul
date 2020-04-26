@@ -19,12 +19,6 @@
 
 #include "vdp-internal.h"
 
-vdp1_cmdt_t *
-vdp1_cmdt_base_get(void)
-{
-        return (vdp1_cmdt_t *)_state_vdp1()->vram.cmdt_base;
-}
-
 vdp1_cmdt_list_t *
 vdp1_cmdt_list_alloc(uint16_t count)
 {
@@ -126,7 +120,7 @@ vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist, const uint
                 xfer_table[i].dst = base + (i * sizeof(vdp1_cmdt_t));
         }
 
-        xfer_table[count - 1].len |= SCU_DMA_INDIRECT_TBL_END;
+        xfer_table[count - 1].len |= SCU_DMA_INDIRECT_TABLE_END;
 }
 
 void
