@@ -461,8 +461,9 @@ typedef struct vdp2_scrn_vcs_format {
 #define VDP2_SCRN_COLOR_OFFSET_A        0
 #define VDP2_SCRN_COLOR_OFFSET_B        1
 
-extern void vdp2_scrn_back_screen_color_set(uint32_t, color_rgb555_t);
-extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *, uint16_t);
+extern void vdp2_scrn_back_screen_color_set(uint32_t, const color_rgb555_t);
+extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb555_t *,
+    const uint16_t);
 
 extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 
