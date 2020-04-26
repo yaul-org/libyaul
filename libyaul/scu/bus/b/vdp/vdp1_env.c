@@ -17,7 +17,7 @@
 #include "vdp-internal.h"
 
 static vdp1_env_t _default_env = {
-        .erase_color = COLOR_RGB1555_CLEAR,
+        .erase_color = COLOR_RGB1555_INITIALIZER(0, 0, 0, 0),
         .erase_points[0] = {
                 0,
                 0
