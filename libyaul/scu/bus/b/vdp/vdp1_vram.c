@@ -7,6 +7,8 @@
 
 #include <assert.h>
 
+#include <string.h>
+
 #include <vdp1/env.h>
 #include <vdp1/map.h>
 #include <vdp1/cmdt.h>
@@ -39,68 +41,45 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         uint32_t total_size;
         total_size = cmdt_size + texture_size + gouraud_size + clut_size;
 
+        uint32_t remaining_size;
+        remaining_size = VDP1_VRAM(VDP1_VRAM_SIZE) - total_size;
+
         assert(total_size <= vram_size);
 
         uint32_t vram_base;
         vram_base = VDP1_VRAM(sizeof(vdp1_cmdt_t));
 
-        _state_vdp1()->vram.cmdt_base = vram_base;
+        vdp1_vram_partitions_t *vram_partitions;
+        vram_partitions = _state_vdp1()->vram_partitions;
+
+        vram_partitions->cmdt_base = (vdp1_cmdt_t *)vram_base;
+        vram_partitions->cmdt_size = cmdt_size;
         vram_base += cmdt_size;
 
-        _state_vdp1()->vram.texture_base = vram_base;
+        vram_partitions->texture_base = (void *)vram_base;
+        vram_partitions->texture_size = texture_size;
         vram_base += texture_size;
 
-        _state_vdp1()->vram.gouraud_base = vram_base;
+        vram_partitions->gouraud_base = (vdp1_gouraud_table_t *)vram_base;
+        vram_partitions->gouraud_size = gouraud_size;
         vram_base += gouraud_size;
 
-        _state_vdp1()->vram.clut_base = vram_base;
+        vram_partitions->clut_base = (vdp1_clut_t *)vram_base;
+        vram_partitions->clut_size = clut_size;
         vram_base += clut_size;
 
-        /* Get the remaining amount left over */
-        _state_vdp1()->vram.remaining_base =
-            (((VDP1_VRAM(VDP1_VRAM_SIZE) - vram_base) == 0)
-                ? 0x00000000
-                : vram_base);
+        if (remaining_size == 0) {
+                vram_partitions->remaining_base = NULL;
+        } else {
+                vram_partitions->remaining_base = (void *)vram_base;
+        }
+
+        vram_partitions->remaining_size = remaining_size;
 }
 
-void *
-vdp1_vram_texture_base_get(void)
+void
+vdp1_vram_partitions_get(vdp1_vram_partitions_t *vram_partitions)
 {
-        return (void *)_state_vdp1()->vram.texture_base;
-}
-
-uint32_t
-vdp1_vram_texture_size_get(void)
-{
-        return _state_vdp1()->vram.gouraud_base - _state_vdp1()->vram.texture_base;
-}
-
-vdp1_gouraud_table_t *
-vdp1_vram_gouraud_base_get(void)
-{
-        return (vdp1_gouraud_table_t *)_state_vdp1()->vram.gouraud_base;
-}
-
-uint32_t
-vdp1_vram_gouraud_size_get(void)
-{
-        return _state_vdp1()->vram.clut_base - _state_vdp1()->vram.gouraud_base;
-}
-
-uint32_t
-vdp1_vram_clut_size_get(void)
-{
-        return VDP1_VRAM(VDP1_VRAM_SIZE) - _state_vdp1()->vram.clut_base;
-}
-
-vdp1_clut_t *
-vdp1_vram_clut_base_get(void)
-{
-        return (vdp1_clut_t *)_state_vdp1()->vram.clut_base;
-}
-
-void *
-vdp1_vram_remaining_get(void)
-{
-        return (void *)_state_vdp1()->vram.remaining_base;
+        (void)memcpy(vram_partitions, _state_vdp1()->vram_partitions,
+            sizeof(vdp1_vram_partitions_t));
 }

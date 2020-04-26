@@ -236,8 +236,6 @@ vdp1_cmdt_last_get(void)
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;
 }
 
-extern vdp1_cmdt_t *vdp1_cmdt_base_get(void);
-
 extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t);
 extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *);
 extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *, vdp1_cmdt_t *);

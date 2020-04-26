@@ -52,13 +52,13 @@ _back_screen_set(uint32_t vram, const color_rgb555_t *buffer, const uint16_t cou
          * transfer a color buffer */
         const uint16_t bkclmd = (count == 1) ? 0x0000 : 0x8000;
 
-        _state_vdp2()->regs.bktau = bkclmd | VDP2_VRAM_BANK(vram);
-        _state_vdp2()->regs.bktal = (vram >> 1) & 0xFFFF;
+        _state_vdp2()->regs->bktau = bkclmd | VDP2_VRAM_BANK(vram);
+        _state_vdp2()->regs->bktal = (vram >> 1) & 0xFFFF;
 
         /* If BDCLMD (0x0100 is set and DISP has never been set, the back screen
          * will not display properly */
-        _state_vdp2()->regs.tvmd &= 0x7EFF;
-        _state_vdp2()->regs.tvmd |= 0x8100;
+        _state_vdp2()->regs->tvmd &= 0x7EFF;
+        _state_vdp2()->regs->tvmd |= 0x8100;
 
         _state_vdp2()->back.vram = (void *)vram;
         _state_vdp2()->back.buffer = (void *)buffer;

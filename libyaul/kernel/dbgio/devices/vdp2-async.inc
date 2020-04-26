@@ -27,7 +27,7 @@ _async_init(const dbgio_vdp2_t *params)
 {
         struct {
                 /* Holds transfers for font CPD and PAL */
-                scu_dma_xfer_t xfer_tbl[2];
+                scu_dma_xfer_t xfer_table[2];
                 scu_dma_handle_t handle;
         } *dma_font;
 
@@ -46,21 +46,21 @@ _async_init(const dbgio_vdp2_t *params)
         scu_dma_level_cfg_t dma_level_cfg;
 
         dma_level_cfg.mode = SCU_DMA_MODE_INDIRECT;
-        dma_level_cfg.xfer.indirect = &dma_font->xfer_tbl[0];
+        dma_level_cfg.xfer.indirect = &dma_font->xfer_table[0];
         dma_level_cfg.stride = SCU_DMA_STRIDE_2_BYTES;
         dma_level_cfg.update = SCU_DMA_UPDATE_NONE;
 
         /* Set up indirect SCU-DMA table entries */
 
         /* Font CPD */
-        dma_font->xfer_tbl[0].len = FONT_4BPP_CPD_SIZE;
-        dma_font->xfer_tbl[0].dst = (uint32_t)_dev_state->cp_table;
-        dma_font->xfer_tbl[0].src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
+        dma_font->xfer_table[0].len = FONT_4BPP_CPD_SIZE;
+        dma_font->xfer_table[0].dst = (uint32_t)_dev_state->cp_table;
+        dma_font->xfer_table[0].src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
 
         /* Font PAL */
-        dma_font->xfer_tbl[1].len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t);
-        dma_font->xfer_tbl[1].dst = _dev_state->color_palette;
-        dma_font->xfer_tbl[1].src = SCU_DMA_INDIRECT_TBL_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
+        dma_font->xfer_table[1].len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t);
+        dma_font->xfer_table[1].dst = _dev_state->color_palette;
+        dma_font->xfer_table[1].src = SCU_DMA_INDIRECT_TABLE_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
         scu_dma_config_buffer(&dma_font->handle, &dma_level_cfg);
 

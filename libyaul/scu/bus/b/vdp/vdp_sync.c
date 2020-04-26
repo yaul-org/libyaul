@@ -31,18 +31,12 @@
 /* Maximum number of user callbacks */
 #define USER_CALLBACK_COUNT     8
 
-#if DEBUG_DMA_QUEUE_ENABLE == 0
-#define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN |                               \
-                         SCU_IC_MASK_VBLANK_OUT |                              \
-                         SCU_IC_MASK_SPRITE_END)
-#else
 #define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN |                               \
                          SCU_IC_MASK_VBLANK_OUT |                              \
                          SCU_IC_MASK_SPRITE_END |                              \
                          SCU_IC_MASK_LEVEL_0_DMA_END |                         \
                          SCU_IC_MASK_LEVEL_1_DMA_END |                         \
                          SCU_IC_MASK_LEVEL_2_DMA_END)
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
 #define SCU_MASK_AND    (SCU_IC_MASK_ALL & ~SCU_MASK_OR)
 
 #define STATE_SYNC                      (0x02) /* Request to synchronize */
@@ -86,7 +80,7 @@ static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
 
 /* Unused when DEBUG_DMA_QUEUE_ENABLE is set to 0 */
-static void _vdp1_dma_handler(const dma_queue_transfer_t *) __used;
+static void _vdp1_dma_handler(const dma_queue_transfer_t *);
 static void _vdp2_dma_handler(const dma_queue_transfer_t *);
 
 static volatile struct {
@@ -170,12 +164,14 @@ static inline __always_inline void _vdp1_sprite_end_call(const void *);
 static inline __always_inline void _vdp1_vblank_in_call(const void *);
 static inline __always_inline void _vdp1_vblank_out_call(const void *);
 
-static void _vdp1_cmdt_transfer(const vdp1_cmdt_t *,
-    const uint32_t, const uint16_t);
+static void _vdp1_cmdt_transfer(const vdp1_cmdt_t *, const uint32_t,
+    const uint16_t);
 static void _vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *);
 
+static scu_dma_handle_t _commit_handle;
+static scu_dma_xfer_t _commit_xfer_table[COMMIT_XFER_COUNT] __aligned(COMMIT_XFER_TABLE_ALIGNMENT);
+
 static void _vdp2_init(void);
-static void _vdp2_commit_xfer_tables_init(void);
 static void _vdp2_sync_commit(cpu_dmac_cfg_t *);
 static void _vdp2_sync_back_screen_table(cpu_dmac_cfg_t *);
 
@@ -210,7 +206,7 @@ void
 vdp_sync(void)
 {
         scu_dma_handle_t *handle;
-        handle = &_state_vdp2()->commit.handle;
+        handle = _state_vdp2()->commit.handle;
 
         int8_t ret __unused;
         ret = dma_queue_enqueue(handle, DMA_QUEUE_TAG_VBLANK_IN,
@@ -226,7 +222,7 @@ vdp_sync(void)
         _state.sync &= ~STATE_INTERLACE_SINGLE;
         _state.sync &= ~STATE_INTERLACE_DOUBLE;
 
-        switch ((_state_vdp2()->regs.tvmd >> 6) & 0x3) {
+        switch ((_state_vdp2()->regs->tvmd >> 6) & 0x3) {
         case 0x2:
                 _state.sync |= STATE_INTERLACE_SINGLE;
                 break;
@@ -602,18 +598,6 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
     const uint32_t vdp1_vram,
     const uint16_t count)
 {
-        /* Keep track of how many commands are being sent.
-         *
-         * Remove the "draw end" command from the count as it needs to be
-         * overwritten on next request to sync VDP1 */
-        const uint16_t last_command = vdp1_sync_last_command_get();
-        vdp1_sync_last_command_set(last_command + (count - 1));
-
-        const uint32_t xfer_len = count * sizeof(vdp1_cmdt_t);
-        const uint32_t xfer_dst = vdp1_vram;
-        const uint32_t xfer_src = (uint32_t)cmdts;
-
-#if DEBUG_DMA_QUEUE_ENABLE == 1
         static scu_dma_level_cfg_t dma_cfg = {
                 .mode = SCU_DMA_MODE_DIRECT,
                 .xfer.direct.len = 0x00000000,
@@ -625,6 +609,17 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
 
         static scu_dma_handle_t handle;
 
+        /* Keep track of how many commands are being sent.
+         *
+         * Remove the "draw end" command from the count as it needs to be
+         * overwritten on next request to sync VDP1 */
+        const uint16_t last_command = vdp1_sync_last_command_get();
+        vdp1_sync_last_command_set(last_command + (count - 1));
+
+        const uint32_t xfer_len = count * sizeof(vdp1_cmdt_t);
+        const uint32_t xfer_dst = vdp1_vram;
+        const uint32_t xfer_src = (uint32_t)cmdts;
+
         dma_cfg.xfer.direct.len = xfer_len;
         dma_cfg.xfer.direct.dst = xfer_dst;
         dma_cfg.xfer.direct.src = CPU_CACHE_THROUGH | xfer_src;
@@ -632,54 +627,21 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
         scu_dma_config_buffer(&handle, &dma_cfg);
 
         int8_t ret __unused;
+
         ret = dma_queue_enqueue(&handle, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
-#ifdef DEBUG
         assert(ret == 0);
-#endif /* DEBUG */
 
         ret = dma_queue_flush(DMA_QUEUE_TAG_IMMEDIATE);
-#ifdef DEBUG
         assert(ret >= 0);
-#endif /* DEBUG */
-#else
-        (void)memcpy((void *)xfer_dst, (void *)xfer_src, xfer_len);
-
-        /* Call handler directly */
-        _vdp1_dma_call(NULL);
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
 }
 
 static void
-_vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
+_vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist __unused)
 {
         /* Reset it. We don't have any control over where in VRAM command tables
          * are being sent */
         vdp1_sync_last_command_set(0);
-
-        const scu_dma_xfer_t *xfer_table __unused =
-            (const scu_dma_xfer_t *)&cmdt_orderlist;
-
-#if DEBUG_DMA_QUEUE_ENABLE == 1
-        assert(false && "Not yet implemented");
-#else
-        const scu_dma_xfer_t *current_xfer = xfer_table;
-
-        while ((current_xfer->len & SCU_DMA_INDIRECT_TBL_END) != 0x00000000) {
-                const uint32_t xfer_len =
-                    (current_xfer->len & ~SCU_DMA_INDIRECT_TBL_END) *
-                    sizeof(vdp1_cmdt_t);
-                const uint32_t xfer_dst = current_xfer->dst;
-                const uint32_t xfer_src = current_xfer->src;
-
-                (void)memcpy((void *)xfer_dst, (void *)xfer_src, xfer_len);
-
-                current_xfer++;
-        }
-
-        /* Call handler directly */
-        _vdp1_dma_call(NULL);
-#endif /* DEBUG_DMA_QUEUE_ENABLE */
 }
 
 static void
@@ -701,62 +663,74 @@ _vdp1_dma_handler(const dma_queue_transfer_t *transfer)
 static void
 _vdp2_init(void)
 {
-        _vdp2_commit_xfer_tables_init();
-}
+        _state_vdp2()->commit.handle = &_commit_handle;
+        _state_vdp2()->commit.xfer_table = &_commit_xfer_table[0];
 
-static void
-_vdp2_commit_xfer_tables_init(void)
-{
+        scu_dma_xfer_t *xfer_table;
+        xfer_table = &_state_vdp2()->commit.xfer_table[0];
+
         scu_dma_xfer_t *xfer;
 
         /* Write VDP2(TVMD) first */
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
+        xfer = &xfer_table[COMMIT_XFER_VDP2_REG_TVMD];
         xfer->len = 2;
         xfer->dst = VDP2(0x0000);
-        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.tvmd;
+        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs->tvmd;
 
         /* Skip committing the first 7 VDP2 registers:
-         * TVMD
-         * EXTEN
-         * TVSTAT R/O
-         * VRSIZE R/W
-         * HCNT   R/O
-         * VCNT   R/O */
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_VDP2_REGS];
-        xfer->len = sizeof(_state_vdp2()->regs) - 14;
+         * 0x0000 TVMD
+         * 0x0002 EXTEN
+         * 0x0004 TVSTAT R/O
+         * 0x0006 VRSIZE R/W
+         * 0x0008 HCNT   R/O
+         * 0x000A VCNT   R/O
+         * 0x000C Reserved
+         * 0x000E RAMCTL */
+        xfer = &xfer_table[COMMIT_XFER_VDP2_REGS];
+        xfer->len = sizeof(vdp2_registers_t) - 14;
         xfer->dst = VDP2(0x000E);
-        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs.buffer[7];
+        xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs->buffer[7];
 
-        xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
+        xfer = &xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
         xfer->len = 0;
         xfer->dst = 0x00000000;
         xfer->src = 0x00000000;
 
-        scu_dma_level_cfg_t dma_level_cfg = {
+        scu_dma_level_cfg_t dma_cfg = {
                 .mode = SCU_DMA_MODE_INDIRECT,
-                .xfer.indirect = &_state_vdp2()->commit.xfer_table[0],
+                .xfer.indirect = xfer_table,
                 .stride = SCU_DMA_STRIDE_2_BYTES,
                 .update = SCU_DMA_UPDATE_NONE
         };
 
         scu_dma_handle_t *handle;
-        handle = &_state_vdp2()->commit.handle;
+        handle = _state_vdp2()->commit.handle;
 
-        scu_dma_config_buffer(handle, &dma_level_cfg);
+        scu_dma_config_buffer(handle, &dma_cfg);
 }
 
 static void
 _vdp2_sync_commit(cpu_dmac_cfg_t *dmac_cfg)
 {
         assert(dmac_cfg != NULL);
-        dmac_cfg->len = sizeof(_state_vdp2()->regs) - 14;
+
+        /* Skip committing the first 7 VDP2 registers:
+         * 0x0000 TVMD
+         * 0x0002 EXTEN
+         * 0x0004 TVSTAT R/O
+         * 0x0006 VRSIZE R/W
+         * 0x0008 HCNT   R/O
+         * 0x000A VCNT   R/O
+         * 0x000C Reserved
+         * 0x000E RAMCTL */
+        dmac_cfg->len = sizeof(vdp2_registers_t) - 14;
         dmac_cfg->dst = VDP2(0x000E);
-        dmac_cfg->src = (uint32_t)&_state_vdp2()->regs.buffer[7];
+        dmac_cfg->src = (uint32_t)&_state_vdp2()->regs->buffer[7];
 
         cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
         cpu_dmac_channel_config_set(dmac_cfg);
 
-        MEMORY_WRITE(16, VDP2(0x0000), _state_vdp2()->regs.buffer[0]);
+        MEMORY_WRITE(16, VDP2(0x0000), _state_vdp2()->regs->tvmd);
 
         cpu_dmac_enable();
         cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
@@ -768,6 +742,7 @@ static void
 _vdp2_sync_back_screen_table(cpu_dmac_cfg_t *dmac_cfg)
 {
         assert(dmac_cfg != NULL);
+
         dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
         dmac_cfg->dst = (uint32_t)_state_vdp2()->back.vram;
         dmac_cfg->src = (uint32_t)_state_vdp2()->back.buffer;
@@ -809,7 +784,7 @@ _vblank_in_handler(void)
 
                 xfer->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
                 xfer->dst = (uint32_t)_state_vdp2()->back.vram;
-                xfer->src = SCU_DMA_INDIRECT_TBL_END |
+                xfer->src = SCU_DMA_INDIRECT_TABLE_END |
                             CPU_CACHE_THROUGH |
                             (uint32_t)_state_vdp2()->back.buffer;
 

@@ -16,13 +16,13 @@
 void
 vdp2_tvmd_display_clear(void)
 {
-        _state_vdp2()->regs.tvmd &= 0x7EFF;
+        _state_vdp2()->regs->tvmd &= 0x7EFF;
 }
 
 void
 vdp2_tvmd_display_set(void)
 {
-        _state_vdp2()->regs.tvmd |= 0x8000;
+        _state_vdp2()->regs->tvmd |= 0x8000;
 }
 
 void
@@ -69,7 +69,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         uint16_t width;
         uint16_t height;
 
-        _state_vdp2()->regs.tvmd &= 0xFFCF;
+        _state_vdp2()->regs->tvmd &= 0xFFCF;
 
         switch (vertical)  {
         case VDP2_TVMD_VERT_224:
@@ -77,28 +77,28 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 break;
         case VDP2_TVMD_VERT_240:
                 height = 240;
-                _state_vdp2()->regs.tvmd |= 0x0010;
+                _state_vdp2()->regs->tvmd |= 0x0010;
                 break;
         case VDP2_TVMD_VERT_256:
                 height = 256;
-                _state_vdp2()->regs.tvmd |= 0x0020;
+                _state_vdp2()->regs->tvmd |= 0x0020;
                 break;
         default:
                 height = 224;
                 break;
         }
 
-        _state_vdp2()->regs.tvmd &= 0xFF3F;
+        _state_vdp2()->regs->tvmd &= 0xFF3F;
 
         switch (interlace)  {
         case VDP2_TVMD_INTERLACE_NONE:
                 break;
         case VDP2_TVMD_INTERLACE_SINGLE:
-                _state_vdp2()->regs.tvmd |= 0x0080;
+                _state_vdp2()->regs->tvmd |= 0x0080;
                 break;
         case VDP2_TVMD_INTERLACE_DOUBLE:
                 height *= 2;
-                _state_vdp2()->regs.tvmd |= 0x00C0;
+                _state_vdp2()->regs->tvmd |= 0x00C0;
                 break;
         default:
                 break;
@@ -107,7 +107,7 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         uint16_t clock_freq;
         clock_freq = CPU_CLOCK_SPEED_26MHZ;
 
-        _state_vdp2()->regs.tvmd &= 0xFFF0;
+        _state_vdp2()->regs->tvmd &= 0xFFF0;
 
         switch (horizontal) {
         case VDP2_TVMD_HORZ_NORMAL_A:
@@ -117,41 +117,41 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
         case VDP2_TVMD_HORZ_NORMAL_B:
                 width = 352;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0001;
+                _state_vdp2()->regs->tvmd |= 0x0001;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_A:
                 width = 640;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0002;
+                _state_vdp2()->regs->tvmd |= 0x0002;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_B:
                 width = 704;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0003;
+                _state_vdp2()->regs->tvmd |= 0x0003;
                 break;
         case VDP2_TVMD_HORZ_NORMAL_AE:
                 width = 320;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0004;
+                _state_vdp2()->regs->tvmd |= 0x0004;
                 break;
         case VDP2_TVMD_HORZ_NORMAL_BE:
                 width = 352;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0005;
+                _state_vdp2()->regs->tvmd |= 0x0005;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_AE:
                 width = 640;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_26MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0006;
+                _state_vdp2()->regs->tvmd |= 0x0006;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_BE:
                 width = 704;
                 height = 480;
                 clock_freq = CPU_CLOCK_SPEED_28MHZ;
-                _state_vdp2()->regs.tvmd |= 0x0007;
+                _state_vdp2()->regs->tvmd |= 0x0007;
                 break;
         default:
                 width = 320;
