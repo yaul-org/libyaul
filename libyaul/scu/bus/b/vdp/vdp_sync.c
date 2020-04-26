@@ -23,7 +23,7 @@
 #include "vdp-internal.h"
 
 /* Debug: Use dma-queue to transfer VDP1 command list */
-#define DEBUG_DMA_QUEUE_ENABLE  1
+#define DEBUG_DMA_QUEUE_ENABLE  0
 
 /* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
