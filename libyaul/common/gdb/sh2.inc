@@ -155,7 +155,8 @@ _gdb_sh2_init(void)
             internal_gdb_exception_dma_address_error);
 
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
+
+        cpu_intc_ihr_set(GDB_TRAPA_VECTOR_NUMBER, internal_gdb_ihr_break);
 
         /* Initialize UBC */
         /*
@@ -196,7 +197,7 @@ _gdb_step(cpu_registers_t *reg_file, uint32_t address)
 
         _bp_step.addr = (void *)p;
         _bp_step.instruction = *p;
-        *p = INSTRN_TRAPA(0x20);
+        *p = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* We're stepping, be aware of breakpoints and watchpoints */
         _stepping = true;
@@ -540,7 +541,7 @@ _bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
 
         bp->addr = addr;
         bp->instruction = *(uint16_t *)addr;
-        *(uint16_t *)addr = INSTRN_TRAPA(0x20);
+        *(uint16_t *)addr = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* Insert */
         TAILQ_INSERT_TAIL(bpl, bp, entries);
