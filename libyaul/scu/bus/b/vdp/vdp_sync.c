@@ -23,7 +23,7 @@
 #include "vdp-internal.h"
 
 /* Debug: Use dma-queue to transfer VDP1 command list */
-#define DEBUG_DMA_QUEUE_ENABLE  0
+#define DEBUG_DMA_QUEUE_ENABLE  1
 
 /* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
@@ -623,16 +623,16 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
                 .update = SCU_DMA_UPDATE_NONE
         };
 
-        static scu_dma_reg_buffer_t dma_reg_buffer;
+        static scu_dma_handle_t handle;
 
         dma_cfg.xfer.direct.len = xfer_len;
         dma_cfg.xfer.direct.dst = xfer_dst;
         dma_cfg.xfer.direct.src = CPU_CACHE_THROUGH | xfer_src;
 
-        scu_dma_config_buffer(&dma_reg_buffer, &dma_cfg);
+        scu_dma_config_buffer(&handle, &dma_cfg);
 
         int8_t ret __unused;
-        ret = dma_queue_enqueue(&dma_reg_buffer, DMA_QUEUE_TAG_IMMEDIATE,
+        ret = dma_queue_enqueue(&handle, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
 #ifdef DEBUG
         assert(ret == 0);
