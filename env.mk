@@ -119,7 +119,6 @@ SH_CFLAGS_shared:= \
 	-Wduplicated-cond \
 	-Wnull-dereference \
 	-Winit-self \
-	-Wbad-function-cast \
 	-Wshadow \
 	-Wunused \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
@@ -142,6 +141,7 @@ endif
 
 SH_CFLAGS:= \
 	-std=c11 \
+	-Wbad-function-cast \
 	$(SH_CFLAGS_shared)
 
 SH_CXXFLAGS_shared:= \
