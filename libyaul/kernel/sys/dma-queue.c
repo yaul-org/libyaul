@@ -53,9 +53,9 @@ static inline void _queue_init(struct dma_queue *) __always_inline;
 static inline uint32_t _queue_size(const struct dma_queue *) __always_inline;
 static inline bool _queue_full(const struct dma_queue *) __always_inline;
 static inline bool _queue_empty(const struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_top(struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_enqueue(struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_dequeue(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_top(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_enqueue(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_dequeue(struct dma_queue *) __always_inline;
 
 static inline void _dma_queue_request_start(const struct dma_queue_request *) __always_inline;
 
