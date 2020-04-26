@@ -29,7 +29,6 @@ __BEGIN_DECLS
 #define CPU_INTC_INTERRUPT_NMI                  0x0B
 
 #define CPU_INTC_INTERRUPT_UBC                  0x0C
-#define CPU_INTC_INTERRUPT_BREAK                0x20
 
 #define CPU_INTC_INTERRUPT_SCI_ERI      0x60
 #define CPU_INTC_INTERRUPT_SCI_RXI      0x61
