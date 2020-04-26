@@ -23,6 +23,10 @@ void __weak operator delete[](void* ptr) {
     free(ptr);
 }
 
+void __weak operator delete[](void* ptr __unused, unsigned int) {
+    /* Not yet implemented */
+}
+
 /*-
  * <https://en.cppreference.com/w/cpp/memory/new/operator_delete>
  *
