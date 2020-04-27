@@ -22,7 +22,7 @@
 
 #define COMMIT_XFER_VDP2_REG_TVMD       (0)
 #define COMMIT_XFER_VDP2_REGS           (1)
-#define COMMIT_XFER_BACK_SCREEN_BUFFER  (2)
+#define COMMIT_XFER_BACK_SCREEN         (2)
 #define COMMIT_XFER_COUNT               (3)
 #define COMMIT_XFER_TABLE_ALIGNMENT     (4 * 16)
 
@@ -85,5 +85,7 @@ _state_vdp2(void)
 }
 
 extern void _internal_vdp_init(void);
+
+extern void _internal_vdp2_xfer_table_update(uint32_t);
 
 #endif /* !_VDP_INTERNAL_H_ */
