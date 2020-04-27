@@ -49,11 +49,14 @@ static inline void __always_inline _env_current_update(const vdp1_env_t *);
 static void _env_default_erase_update(void);
 
 void
-vdp1_env_init(void)
+_internal_vdp1_env_init(void)
 {
         _state_vdp1()->current_env = &_current_env;
 
         _env_current_update(&_default_env);
+
+        vdp1_env_stop();
+        vdp1_env_default_set();
 }
 
 void
@@ -129,6 +132,15 @@ vdp1_env_set(const vdp1_env_t *env)
         MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs->ewdr);
         MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs->ewlr);
         MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs->ewrr);
+}
+
+void
+vdp1_env_stop(void)
+{
+        MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
 }
 
 static inline void __always_inline

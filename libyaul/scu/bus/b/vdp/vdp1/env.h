@@ -41,10 +41,11 @@ typedef struct vdp1_env {
         int16_vector2_t erase_points[2];
 } vdp1_env_t;
 
-extern void vdp1_env_init(void);
 extern void vdp1_env_default_init(vdp1_env_t *);
 extern void vdp1_env_default_set(void);
 extern void vdp1_env_set(const vdp1_env_t *);
+
+extern void vdp1_env_stop(void);
 
 __END_DECLS
 
