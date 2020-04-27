@@ -65,7 +65,7 @@ struct dev_state {
 
         struct {
                 uint8_t *cpd_buffer;
-                color_rgb555_t *pal_buffer;
+                color_rgb1555_t *pal_buffer;
         } font __packed;
 };
 
@@ -331,7 +331,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
         if (_dev_state->font.pal_buffer == NULL) {
                 _dev_state->font.pal_buffer =
-                    _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+                    _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
                 assert(_dev_state->font.pal_buffer != NULL);
         }
 }
@@ -430,7 +430,7 @@ _shared_init(const dbgio_vdp2_t *params)
             params->font_bg);
 
         (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
-            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t));
+            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
 
         /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
          * flush the cache as the DMA transfer accesses the uncached mirror
