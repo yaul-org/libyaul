@@ -26,16 +26,24 @@ void
 _internal_reset(void)
 {
         cpu_intc_mask_set(15);
-        scu_ic_mask_chg(SCU_IC_MASK_NONE, SCU_IC_MASK_ALL);
+
+        scu_dma_stop();
+        scu_dsp_program_stop();
+
+        cpu_dmac_stop();
+        cpu_dmac_disable();
+
+        smpc_smc_cdoff_call();
+        smpc_smc_sshoff_call();
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x01FFFE),
             COLOR_RGB1555(1, 0, 7, 0));
 
-        vdp2_scrn_display_clear();
+        vdp1_env_stop();
 
-        vdp1_env_default_set();
+        vdp2_scrn_display_clear();
 
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
@@ -73,13 +81,6 @@ _internal_reset(void)
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_WDT_ITI);
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC0);
         cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC1);
-
-        dma_queue_clear();
-
-        cpu_dmac_stop();
-
-        smpc_smc_cdoff_call();
-        smpc_smc_sshoff_call();
 
         vdp2_tvmd_display_set();
 
