@@ -16,8 +16,6 @@
 
 #include <vdp.h>
 
-#include <sys/dma-queue.h>
-
 #include <dbgio.h>
 
 static void _vblank_in_handler(void);
