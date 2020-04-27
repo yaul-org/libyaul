@@ -67,8 +67,10 @@ SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
 
 # Parse out included paths from GCC when the specs files are used. This is used
 # to explictly populate each command database entry with include paths
-SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v $(foreach specs,$(SH_SPECS),-specs=$(specs)) - 2>&1 | \
+SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v -nostdinc $(foreach specs,$(SH_SPECS),-specs=$(specs)) - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,"-I"); print }')
+SH_SYSTEM_INCLUDE_DIRS=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
+	awk '/^\s/ { sub(/^\s+/,"-isystem "); print }')
 
 CDB_FILE:= compile_commands.json
 
@@ -141,7 +143,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CFLAGS) $(SH_INCLUDE_DIRS))
+		$(SH_CFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cc
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -152,7 +154,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.C
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -163,7 +165,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cpp
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -174,7 +176,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cxx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -185,7 +187,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CXXFLAGS) $(SH_INCLUDE_DIRS))
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
