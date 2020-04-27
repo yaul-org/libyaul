@@ -63,4 +63,6 @@ _back_screen_set(uint32_t vram, const color_rgb1555_t *buffer, const uint16_t co
         _state_vdp2()->back.vram = (void *)vram;
         _state_vdp2()->back.buffer = (void *)buffer;
         _state_vdp2()->back.count = count;
+
+        _internal_vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);
 }
