@@ -84,7 +84,7 @@ _simple_flush(void)
                 cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
                 cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
-                dmac_cfg.len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t);
+                dmac_cfg.len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t);
                 dmac_cfg.dst = _dev_state->color_palette;
                 dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.pal_buffer;
 

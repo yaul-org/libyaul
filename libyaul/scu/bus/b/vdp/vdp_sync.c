@@ -743,7 +743,7 @@ _vdp2_sync_back_screen_table(cpu_dmac_cfg_t *dmac_cfg)
 {
         assert(dmac_cfg != NULL);
 
-        dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
+        dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t);
         dmac_cfg->dst = (uint32_t)_state_vdp2()->back.vram;
         dmac_cfg->src = (uint32_t)_state_vdp2()->back.buffer;
 
@@ -782,7 +782,7 @@ _vblank_in_handler(void)
                 scu_dma_xfer_t *xfer;
                 xfer = &_state_vdp2()->commit.xfer_table[COMMIT_XFER_BACK_SCREEN_BUFFER];
 
-                xfer->len = _state_vdp2()->back.count * sizeof(color_rgb555_t);
+                xfer->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t);
                 xfer->dst = (uint32_t)_state_vdp2()->back.vram;
                 xfer->src = SCU_DMA_INDIRECT_TABLE_END |
                             CPU_CACHE_THROUGH |

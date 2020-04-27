@@ -259,7 +259,7 @@ extern void vdp1_cmdt_end_set(vdp1_cmdt_t *);
 extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, const vdp1_cmdt_draw_mode_t);
 extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, const uint8_t);
 extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, uint32_t);
-extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb555_t);
+extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb1555_t);
 extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
 extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
 extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, uint32_t);

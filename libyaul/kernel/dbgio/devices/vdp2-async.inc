@@ -58,7 +58,7 @@ _async_init(const dbgio_vdp2_t *params)
         dma_font->xfer_table[0].src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
 
         /* Font PAL */
-        dma_font->xfer_table[1].len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb555_t);
+        dma_font->xfer_table[1].len = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t);
         dma_font->xfer_table[1].dst = _dev_state->color_palette;
         dma_font->xfer_table[1].src = SCU_DMA_INDIRECT_TABLE_END | CPU_CACHE_THROUGH | (uint32_t)params->font_pal;
 
