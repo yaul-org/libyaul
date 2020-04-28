@@ -521,6 +521,7 @@ _vdp1_mode_auto_vblank_in(const void *args_ptr __unused)
         /* If we're still transferring, then abort */
         if ((state_vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
                 assert(false && "Exceeded transfer time");
+
                 return;
         }
 
@@ -637,7 +638,6 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
         scu_dma_config_buffer(&handle, &dma_cfg);
 
         int8_t ret __unused;
-
         ret = dma_queue_enqueue(&handle, DMA_QUEUE_TAG_IMMEDIATE,
             _vdp1_dma_handler, NULL);
         assert(ret == 0);
@@ -663,9 +663,7 @@ _sprite_end_handler(void)
 static void
 _vdp1_dma_handler(const dma_queue_transfer_t *transfer)
 {
-        assert(transfer->status == DMA_QUEUE_STATUS_COMPLETE);
-
-        if ((transfer != NULL) && (transfer->status != DMA_QUEUE_STATUS_COMPLETE)) {
+        if ((transfer != NULL) && ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00)) {
                 return;
         }
 
@@ -725,7 +723,7 @@ _vdp2_back_screen_transfer(cpu_dmac_cfg_t *dmac_cfg)
 static void
 _vdp2_dma_handler(const dma_queue_transfer_t *transfer)
 {
-        if ((transfer != NULL) && (transfer->status != DMA_QUEUE_STATUS_COMPLETE)) {
+        if ((transfer != NULL) && ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00)) {
                 return;
         }
 

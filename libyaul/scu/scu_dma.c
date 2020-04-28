@@ -96,7 +96,7 @@ scu_dma_config_buffer(scu_dma_handle_t *handle,
 
 void
 scu_dma_config_set(uint8_t level, uint8_t start_factor,
-    const scu_dma_handle_t *handle, scu_dma_ihr ihr)
+    const scu_dma_handle_t *handle, scu_dma_ihr ihr __unused)
 {
         assert(handle != NULL);
 
@@ -113,8 +113,6 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
                 scu_dma_level0_wait();
                 scu_dma_level0_stop();
 
-                scu_dma_level0_end_set(ihr);
-
                 MEMORY_WRITE(32, SCU(D0R), handle->dnr);
                 MEMORY_WRITE(32, SCU(D0W), handle->dnw);
                 MEMORY_WRITE(32, SCU(D0C), handle->dnc);
@@ -128,8 +126,6 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
         case 1:
                 scu_dma_level1_wait();
                 scu_dma_level1_stop();
-
-                scu_dma_level1_end_set(ihr);
 
                 MEMORY_WRITE(32, SCU(D1R), handle->dnr);
                 MEMORY_WRITE(32, SCU(D1W), handle->dnw);
@@ -147,8 +143,6 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 
                 scu_dma_level2_wait();
                 scu_dma_level2_stop();
-
-                scu_dma_level2_end_set(ihr);
 
                 MEMORY_WRITE(32, SCU(D2R), handle->dnr);
                 MEMORY_WRITE(32, SCU(D2W), handle->dnw);
