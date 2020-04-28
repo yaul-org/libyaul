@@ -20,7 +20,7 @@ static void _default_ihr(void);
 static cpu_wdt_ihr _master_wdt_iti_ihr = _default_ihr;
 static cpu_wdt_ihr _slave_wdt_iti_ihr = _default_ihr;
 
-static cpu_wdt_ihr *_wdt_iti_ihr_get(void);
+static cpu_wdt_ihr *_wdt_executor_iti_ihr_get(void);
 
 void
 cpu_wdt_init(uint8_t clock_div)
@@ -60,7 +60,7 @@ cpu_wdt_timer_mode_set(uint8_t mode, cpu_wdt_ihr ihr)
         MEMORY_CLEAR_RSTCSR(0x00);
 
         cpu_wdt_ihr *wdt_iti_ihr;
-        wdt_iti_ihr = _wdt_iti_ihr_get();
+        wdt_iti_ihr = _wdt_executor_iti_ihr_get();
 
         *wdt_iti_ihr = _default_ihr;
 
@@ -72,7 +72,7 @@ cpu_wdt_timer_mode_set(uint8_t mode, cpu_wdt_ihr ihr)
 }
 
 static cpu_wdt_ihr *
-_wdt_iti_ihr_get(void)
+_wdt_executor_iti_ihr_get(void)
 {
         const uint8_t which_cpu = cpu_dual_executor_get();
 
@@ -102,7 +102,7 @@ _wdt_iti_handler(void)
 
         /* User is responsible for resetting WDT count */
         cpu_wdt_ihr *wdt_iti_ihr;
-        wdt_iti_ihr = _wdt_iti_ihr_get();
+        wdt_iti_ihr = _wdt_executor_iti_ihr_get();
 
         (*wdt_iti_ihr)();
 }
