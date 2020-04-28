@@ -116,6 +116,30 @@ cpu_intc_mask_set(uint8_t mask)
         cpu_reg_sr_set(reg_sr);
 }
 
+static inline uint16_t __always_inline
+cpu_intc_priority_a_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRA));
+}
+
+static inline uint16_t __always_inline
+cpu_intc_priority_b_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRB));
+}
+
+static inline void __always_inline
+cpu_intc_priority_a_set(uint16_t ipra)
+{
+        MEMORY_WRITE(16, CPU(IPRA), ipra);
+}
+
+static inline void __always_inline
+cpu_intc_priority_b_set(uint16_t iprb)
+{
+        MEMORY_WRITE(16, CPU(IPRA), iprb);
+}
+
 __END_DECLS
 
 #endif /* !_CPU_INTC_H */

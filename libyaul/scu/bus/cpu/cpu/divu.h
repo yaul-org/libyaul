@@ -65,15 +65,19 @@ cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
         cpu_divu_64_32_set(dh, dl, divisor);
 }
 
+static inline uint8_t __always_inline
+cpu_divu_interrupt_priority_get(void)
+{
+        uint16_t ipra = MEMORY_READ(16, CPU(IPRA));
+
+        return ((ipra >> 12) & 0x0F);
+}
+
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
-        register uint16_t ipra;
-        ipra = MEMORY_READ(16, CPU(IPRA));
-
-        ipra = (ipra & 0x0FFF) | ((priority & 0x0F) << 12);
-
-        MEMORY_WRITE(16, CPU(IPRA), ipra);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0x7FFF);
+        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
 #define cpu_divu_ovfi_clear() do {                                             \

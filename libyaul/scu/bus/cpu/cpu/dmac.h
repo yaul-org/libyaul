@@ -20,7 +20,7 @@ __BEGIN_DECLS
 #define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
 #define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
 
-typedef void (*cpu_dmac_ihr)(void);
+typedef void (*cpu_dmac_ihr)(void *);
 
 typedef struct cpu_dmac_cfg {
         uint8_t channel;
@@ -50,6 +50,7 @@ typedef struct cpu_dmac_cfg {
         uint32_t len;
 
         cpu_dmac_ihr ihr;
+        void *ihr_work;
 } cpu_dmac_cfg_t;
 
 typedef struct cpu_dmac_status {
@@ -83,10 +84,19 @@ cpu_dmac_disable(void)
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
 }
 
+static inline uint8_t __always_inline
+cpu_dmac_interrupt_priority_get(void)
+{
+        uint16_t ipra;
+        ipra = MEMORY_READ(16, CPU(IPRA));
+
+        return ((ipra >> 8) & 0x0F);
+}
+
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), ~0x1F00);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF7FF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 
