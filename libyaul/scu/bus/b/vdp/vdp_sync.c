@@ -663,6 +663,8 @@ _sprite_end_handler(void)
 static void
 _vdp1_dma_handler(const dma_queue_transfer_t *transfer)
 {
+        assert(transfer->status == DMA_QUEUE_STATUS_COMPLETE);
+
         if ((transfer != NULL) && (transfer->status != DMA_QUEUE_STATUS_COMPLETE)) {
                 return;
         }
