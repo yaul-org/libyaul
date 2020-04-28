@@ -7,8 +7,10 @@
 
 #include <stdlib.h>
 
-#include <cpu/intc.h>
+#include <cpu/divu.h>
 #include <cpu/dmac.h>
+#include <cpu/frt.h>
+#include <cpu/intc.h>
 
 #include <smpc/smc.h>
 
@@ -73,12 +75,14 @@ _internal_reset(void)
         scu_ic_ihr_clear(SCU_IC_INTERRUPT_DMA_ILLEGAL);
         scu_ic_ihr_clear(SCU_IC_INTERRUPT_SPRITE_END);
 
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_ICI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OCI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OVI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_WDT_ITI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC0);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC1);
+        cpu_dual_master_clear();
+        cpu_dual_slave_clear();
+
+        cpu_divu_ovfi_clear();
+
+        cpu_frt_oca_clear();
+        cpu_frt_ocb_clear();
+        cpu_frt_ovi_clear();
 
         vdp2_tvmd_display_set();
 
