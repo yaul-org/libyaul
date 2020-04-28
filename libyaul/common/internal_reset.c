@@ -18,10 +18,6 @@
 
 #include <vdp.h>
 
-#include <dbgio.h>
-
-static void _vblank_in_handler(void);
-
 void
 _internal_reset(void)
 {
@@ -85,19 +81,4 @@ _internal_reset(void)
         cpu_frt_ovi_clear();
 
         vdp2_tvmd_display_set();
-
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
-
-        scu_ic_mask_chg(~SCU_IC_MASK_VBLANK_IN, SCU_IC_MASK_NONE);
-        cpu_intc_mask_set(14);
-}
-
-static void
-_vblank_in_handler(void)
-{
-        /* Synchronize VDP2 only.
-         *
-         * Avoid using vdp_sync() as we don't need to sync VDP2 and can no
-         * longer fire off any interrupts */
-        vdp2_sync_commit();
 }
