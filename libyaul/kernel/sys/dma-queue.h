@@ -21,14 +21,16 @@ __BEGIN_DECLS
 #define DMA_QUEUE_TAG_COUNT             (3)
 
 typedef struct dma_queue_transfer {
-/* DMA request has been completed */
-#define DMA_QUEUE_STATUS_COMPLETE       (0)
-/* DMA request not yet processed */
-#define DMA_QUEUE_STATUS_INCOMPLETE     (1)
-/* DMA request explicitly canceled */
-#define DMA_QUEUE_STATUS_CANCELED       (2)
 /* DMA request unknown */
-#define DMA_QUEUE_STATUS_UNKNOWN        (255)
+#define DMA_QUEUE_STATUS_UNKNOWN        (0x00)
+/* DMA request not yet processed */
+#define DMA_QUEUE_STATUS_UNPROCESSED    (0x01)
+/* DMA request is being processed */
+#define DMA_QUEUE_STATUS_PROCESSING     (0x02)
+/* DMA request explicitly canceled */
+#define DMA_QUEUE_STATUS_CANCELED       (0x04)
+/* DMA request has been completed */
+#define DMA_QUEUE_STATUS_COMPLETE       (0x08)
         uint8_t status;
         void *work;
 } __aligned(4) dma_queue_transfer_t;

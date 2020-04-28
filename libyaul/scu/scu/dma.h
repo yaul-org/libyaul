@@ -122,6 +122,12 @@ typedef struct scu_dma_level_cfg {
 } scu_dma_level_cfg_t;
 
 static inline uint32_t __always_inline
+scu_dma_status_get(void)
+{
+        return MEMORY_READ(32, SCU(DSTA));
+}
+
+static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
         /* In operation, on standby, or interrupted to background */

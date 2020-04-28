@@ -8,9 +8,9 @@
 #include <assert.h>
 #include <string.h>
 
-#include <cpu/registers.h>
-#include <cpu/intc.h>
 #include <cpu/cache.h>
+#include <cpu/intc.h>
+#include <cpu/registers.h>
 
 #include <sys/dma-queue.h>
 
@@ -119,7 +119,6 @@ dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
         (void)memcpy(&request->handle, handle, sizeof(scu_dma_handle_t));
 
         request->handler = (handler != NULL) ? handler : _default_handler;
-        request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
         request->transfer.work = work;
 
 exit:
@@ -145,7 +144,7 @@ dma_queue_tag_clear(uint8_t tag)
                 struct dma_queue_request *request;
                 request = _queue_dequeue(dma_queue);
 
-                request->transfer.status = DMA_QUEUE_STATUS_CANCELED;
+                request->transfer.status |= DMA_QUEUE_STATUS_CANCELED;
 
                 request->handler(&request->transfer);
         }
@@ -196,6 +195,8 @@ dma_queue_flush(uint8_t tag)
 
         struct dma_queue_request *request;
         request = _queue_dequeue(dma_queue);
+
+        request->handler(&request->transfer);
 
         _queue_request_start(request);
 
@@ -299,6 +300,8 @@ _queue_enqueue(struct dma_queue *dma_queue)
         struct dma_queue_request *request;
         request = &dma_queue->requests[next_tail];
 
+        request->transfer.status = DMA_QUEUE_STATUS_UNPROCESSED;
+
         dma_queue->tail++;
 
         return request;
@@ -314,6 +317,9 @@ _queue_dequeue(struct dma_queue *dma_queue)
         struct dma_queue_request *request;
         request = &dma_queue->requests[next_head & DMA_QUEUE_REQUESTS_MASK];
 
+        request->transfer.status &= ~DMA_QUEUE_STATUS_UNPROCESSED;
+        request->transfer.status |= DMA_QUEUE_STATUS_PROCESSING;
+
         dma_queue->head++;
 
         return request;
@@ -323,9 +329,9 @@ static inline void __always_inline
 _queue_request_start(const struct dma_queue_request *request)
 {
         scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
-            &request->handle, _dma_handler);
+            &request->handle, NULL);
 
-        scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
+        scu_dma_level_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
 static void
@@ -340,7 +346,8 @@ _dma_handler(void)
         volatile struct dma_queue_request *current_request;
         current_request = top_request;
 
-        current_request->transfer.status = DMA_QUEUE_STATUS_COMPLETE;
+        current_request->transfer.status &= ~DMA_QUEUE_STATUS_PROCESSING;
+        current_request->transfer.status |= DMA_QUEUE_STATUS_COMPLETE;
 
         top_request->handler(&top_request->transfer);
 

@@ -74,7 +74,7 @@ _async_flush(void)
 static void
 _flush_dma_handler(const dma_queue_transfer_t *transfer)
 {
-        if (transfer->status == DMA_QUEUE_STATUS_COMPLETE) {
+        if ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) != 0x00) {
                 uint8_t state_mask;
                 state_mask = STATE_BUFFER_DIRTY |
                              STATE_BUFFER_FLUSHING |
