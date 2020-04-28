@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <cpu/intc.h>
 #include <vdp.h>
 
 #include <dbgio.h>
@@ -40,7 +41,10 @@ _assert(const char * restrict file, const char * restrict line,
 
                 vdp2_tvmd_vblank_in_wait();
 
+                cpu_intc_mask_set(14);
                 dbgio_dev_font_load();
+                dbgio_dev_font_load_wait();
+                cpu_intc_mask_set(15);
 
                 dbgio_buffer("[H[2J");
         }
