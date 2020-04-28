@@ -38,8 +38,12 @@
 /* CPU-DMAC channel used for _simple_flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
 
+struct dev_font_state;
+
 struct dev_state {
         uint8_t state;
+
+        struct dev_font_state *font_state;
 
         /* Base CPD VRAM address */
         uint32_t cp_table;
@@ -59,11 +63,17 @@ struct dev_state {
 
         /* PND value for clearing a page */
         uint16_t pnd_value_clear;
+};
 
-        struct {
-                uint8_t *cpd_buffer;
-                color_rgb1555_t *pal_buffer;
-        } font __packed;
+struct dev_font_state {
+        uint8_t *cpd_buffer;
+        color_rgb1555_t *pal_buffer;
+};
+
+struct dev_font_load_state {
+        uint8_t intc_priority_a;
+
+        font_load_callback callback;
 };
 
 /* Restrictions:
@@ -282,6 +292,13 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
                 (void)memset(_dev_state, 0x00, sizeof(struct dev_state));
 
+                _dev_state->font_state =
+                    _internal_malloc(sizeof(struct dev_font_state));
+                assert(_dev_state->font_state != NULL);
+
+                (void)memset(_dev_state->font_state, 0x00,
+                    sizeof(struct dev_font_state));
+
                 _dev_state->state = STATE_IDLE;
         }
 
@@ -322,15 +339,18 @@ _dev_state_init(const dbgio_vdp2_t *params)
                 assert(_dev_state->page_pnd != NULL);
         }
 
-        if (_dev_state->font.cpd_buffer == NULL) {
-                _dev_state->font.cpd_buffer = _internal_malloc(FONT_4BPP_CPD_SIZE);
-                assert(_dev_state->font.cpd_buffer != NULL);
+        struct dev_font_state *font_state;
+        font_state = _dev_state->font_state;
+
+        if (font_state->cpd_buffer == NULL) {
+                font_state->cpd_buffer = _internal_malloc(FONT_4BPP_CPD_SIZE);
+                assert(font_state->cpd_buffer != NULL);
         }
 
-        if (_dev_state->font.pal_buffer == NULL) {
-                _dev_state->font.pal_buffer =
+        if (font_state->pal_buffer == NULL) {
+                font_state->pal_buffer =
                     _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
-                assert(_dev_state->font.pal_buffer != NULL);
+                assert(font_state->pal_buffer != NULL);
         }
 }
 
@@ -423,12 +443,15 @@ _shared_init(const dbgio_vdp2_t *params)
 
         _scroll_screen_init(params);
 
-        _font_1bpp_4bpp_decompress(_dev_state->font.cpd_buffer,
+        struct dev_font_state *font_state;
+        font_state = _dev_state->font_state;
+
+        _font_1bpp_4bpp_decompress(font_state->cpd_buffer,
             params->font_cpd,
             params->font_fg,
             params->font_bg);
 
-        (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
+        (void)memcpy(font_state->pal_buffer, params->font_pal,
             FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
 }
 
@@ -443,9 +466,12 @@ _shared_deinit(void)
                 return;
         }
 
-        _internal_free(_dev_state->font.cpd_buffer);
-        _internal_free(_dev_state->font.pal_buffer);
         _internal_free(_dev_state->page_pnd);
+
+        _internal_free(_dev_state->font_state->cpd_buffer);
+        _internal_free(_dev_state->font_state->pal_buffer);
+        _internal_free(_dev_state->font_state);
+
         _internal_free(_dev_state);
 
         _dev_state = NULL;
@@ -475,6 +501,18 @@ _shared_buffer(const char *buffer)
         cons_buffer(buffer);
 }
 
+void
+_shared_font_load_cpd_callback(void *work)
+{
+        const struct dev_font_load_state *font_load_state = work;
+
+        if (font_load_state->callback != NULL) {
+                font_load_state->callback();
+        }
+
+        cpu_intc_priority_a_set(font_load_state->intc_priority_a);
+}
+
 static void
 _shared_font_load(font_load_callback callback)
 {
@@ -486,9 +524,15 @@ _shared_font_load(font_load_callback callback)
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
                 .len = 0x00000000,
                 .stride = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr = NULL
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL
         };
+
+        static struct dev_font_load_state font_load_state;
+
+        const uint8_t intc_mask __unused = cpu_intc_mask_get();
+
+        /* Be sure to have interrupts enabled */
+        assert(intc_mask < 15);
 
         if (_dev_state == NULL) {
                 return;
@@ -498,20 +542,31 @@ _shared_font_load(font_load_callback callback)
                 return;
         }
 
-        /* Font is small enough */
+        struct dev_font_state *font_state;
+        font_state = _dev_state->font_state;
+
+        /* Font palette (32 bytes) is small enough that we'd spend more time
+         * setting up a CPU-DMAC transfer, than by just transferring the palette
+         * directly */
         (void)memcpy((void *)_dev_state->color_palette,
-            _dev_state->font.pal_buffer,
+            font_state->pal_buffer,
             FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
 
         dmac_cfg.len = FONT_4BPP_CPD_SIZE;
         dmac_cfg.dst = (uint32_t)_dev_state->cp_table;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
-        dmac_cfg.ihr = callback;
+        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)font_state->cpd_buffer;
+        dmac_cfg.ihr = _shared_font_load_cpd_callback;
+        dmac_cfg.ihr_work = &font_load_state;
 
         cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
         cpu_dmac_channel_config_set(&dmac_cfg);
 
         cpu_dmac_enable();
+
+        font_load_state.callback = callback;
+        font_load_state.intc_priority_a = cpu_intc_priority_a_get();
+
+        cpu_dmac_interrupt_priority_set(15);
 
         /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
          * flush the cache as the DMA transfer accesses the uncached mirror
