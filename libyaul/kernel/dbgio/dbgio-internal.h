@@ -13,8 +13,11 @@
 
 __BEGIN_DECLS
 
+typedef void (*font_load_callback)(void);
+
 typedef void (*dev_ops_init)(const void *);
 typedef void (*dev_ops_deinit)(void);
+typedef void (*dev_ops_font_load)(font_load_callback);
 typedef void (*dev_ops_buffer)(const char *);
 typedef void (*dev_ops_flush)(void);
 
@@ -23,6 +26,7 @@ struct dbgio_dev_ops {
         const void *default_params;
         dev_ops_init init;
         dev_ops_deinit deinit;
+        dev_ops_font_load font_load;
         dev_ops_buffer buffer;
         dev_ops_flush flush;
 };

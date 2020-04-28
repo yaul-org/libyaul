@@ -35,7 +35,7 @@ typedef struct dbgio_vdp2 {
         uint32_t cpd_offset;
 
         uint8_t pnd_bank;
-        uint8_t pnd_offset;
+        uint8_t map_index;
 
         vdp2_vram_cycp_bank_t cpd_cycp;
         vdp2_vram_cycp_bank_t pnd_cycp;
@@ -50,6 +50,8 @@ typedef struct dbgio_usb_cart {
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
 extern void dbgio_dev_deinit(void);
+extern void dbgio_dev_font_load(void);
+extern void dbgio_dev_font_load_wait(void);
 extern void dbgio_buffer(const char *);
 extern void dbgio_flush(void);
 

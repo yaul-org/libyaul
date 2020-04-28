@@ -13,16 +13,16 @@
 
 #include <cpu/cache.h>
 #include <cpu/dmac.h>
+#include <cpu/intc.h>
 
 #include <vdp.h>
 
 #include <sys/dma-queue.h>
 
 #include <dbgio.h>
+#include <internal.h>
 
 #include "../dbgio-internal.h"
-
-#include <internal.h>
 
 #include "cons/cons.h"
 
@@ -30,13 +30,10 @@
 
 #define STATE_IDLE                      (0x00)
 #define STATE_INITIALIZED               (0x01)
-#define STATE_PARTIALLY_INITIALIZED     (0x02)
-#define STATE_BUFFER_DIRTY              (0x04)
-#define STATE_BUFFER_CLEARED            (0x08)
-#define STATE_BUFFER_FLUSHING           (0x10)
-#define STATE_BUFFER_FORCE_FLUSHING     (0x20)
-
-#define STATE_MASK_INITIALIZED          (STATE_INITIALIZED | STATE_PARTIALLY_INITIALIZED)
+#define STATE_BUFFER_DIRTY              (0x02)
+#define STATE_BUFFER_CLEARED            (0x04)
+#define STATE_BUFFER_FLUSHING           (0x08)
+#define STATE_BUFFER_FORCE_FLUSHING     (0x10)
 
 /* CPU-DMAC channel used for _simple_flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
@@ -86,26 +83,26 @@ static const dbgio_vdp2_t _default_params = {
         .cpd_bank = 3,
         .cpd_offset = 0x00000,
         .pnd_bank = 3,
-        .pnd_offset = 2,
+        .map_index = 2,
         .cpd_cycp = {
                 .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
-                .t1 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t2 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t3 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t1 = VDP2_VRAM_CYCP_CPU_RW,
+                .t2 = VDP2_VRAM_CYCP_CPU_RW,
+                .t3 = VDP2_VRAM_CYCP_CPU_RW,
                 .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t6 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t7 = VDP2_VRAM_CYCP_NO_ACCESS
+                .t5 = VDP2_VRAM_CYCP_CPU_RW,
+                .t6 = VDP2_VRAM_CYCP_CPU_RW,
+                .t7 = VDP2_VRAM_CYCP_CPU_RW
         },
         .pnd_cycp = {
                 .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
-                .t1 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t2 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t3 = VDP2_VRAM_CYCP_NO_ACCESS,
+                .t1 = VDP2_VRAM_CYCP_CPU_RW,
+                .t2 = VDP2_VRAM_CYCP_CPU_RW,
+                .t3 = VDP2_VRAM_CYCP_CPU_RW,
                 .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t6 = VDP2_VRAM_CYCP_NO_ACCESS,
-                .t7 = VDP2_VRAM_CYCP_NO_ACCESS
+                .t5 = VDP2_VRAM_CYCP_CPU_RW,
+                .t6 = VDP2_VRAM_CYCP_CPU_RW,
+                .t7 = VDP2_VRAM_CYCP_CPU_RW
         },
         .cram_index = 0
 };
@@ -288,7 +285,8 @@ _dev_state_init(const dbgio_vdp2_t *params)
                 _dev_state->state = STATE_IDLE;
         }
 
-        if ((_dev_state->state & STATE_MASK_INITIALIZED) != 0x00) {
+        /* Return if we're already initialized */
+        if ((_dev_state->state & STATE_INITIALIZED) != 0x00) {
                 return;
         }
 
@@ -298,7 +296,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
         /* One page per plane */
         _dev_state->page_base = VDP2_VRAM_ADDR(params->pnd_bank,
-            params->pnd_offset * _dev_state->page_size);
+            params->map_index * _dev_state->page_size);
 
         _dev_state->cp_table = VDP2_VRAM_ADDR(params->cpd_bank, params->cpd_offset);
         _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
@@ -413,7 +411,8 @@ _shared_init(const dbgio_vdp2_t *params)
 
         _dev_state_init(params);
 
-        if ((_dev_state->state & STATE_MASK_INITIALIZED) != 0x00) {
+        /* Return if we're already initialized */
+        if ((_dev_state->state & STATE_INITIALIZED) != 0x00) {
                 return;
         }
 
@@ -431,12 +430,25 @@ _shared_init(const dbgio_vdp2_t *params)
 
         (void)memcpy(_dev_state->font.pal_buffer, params->font_pal,
             FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
+}
 
-        /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
-         * flush the cache as the DMA transfer accesses the uncached mirror
-         * address to the decompressed 4BPP font, which could result in fetching
-         * stale values not yet written back to H-WRAM */
-        cpu_cache_purge();
+static void
+_shared_deinit(void)
+{
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
+                return;
+        }
+
+        _internal_free(_dev_state->font.cpd_buffer);
+        _internal_free(_dev_state->font.pal_buffer);
+        _internal_free(_dev_state->page_pnd);
+        _internal_free(_dev_state);
+
+        _dev_state = NULL;
 }
 
 static void
@@ -446,7 +458,7 @@ _shared_buffer(const char *buffer)
                 return;
         }
 
-        if ((_dev_state->state & STATE_MASK_INITIALIZED) == 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
                 return;
         }
 
@@ -461,6 +473,53 @@ _shared_buffer(const char *buffer)
         }
 
         cons_buffer(buffer);
+}
+
+static void
+_shared_font_load(font_load_callback callback)
+{
+        static cpu_dmac_cfg_t dmac_cfg = {
+                .channel = DEV_DMAC_CHANNEL,
+                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
+                .src = 0x00000000,
+                .dst = 0x00000000,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .len = 0x00000000,
+                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr = NULL
+        };
+
+        if (_dev_state == NULL) {
+                return;
+        }
+
+        if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
+                return;
+        }
+
+        /* Font is small enough */
+        (void)memcpy((void *)_dev_state->color_palette,
+            _dev_state->font.pal_buffer,
+            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
+
+        dmac_cfg.len = FONT_4BPP_CPD_SIZE;
+        dmac_cfg.dst = (uint32_t)_dev_state->cp_table;
+        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)_dev_state->font.cpd_buffer;
+        dmac_cfg.ihr = callback;
+
+        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
+        cpu_dmac_channel_config_set(&dmac_cfg);
+
+        cpu_dmac_enable();
+
+        /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
+         * flush the cache as the DMA transfer accesses the uncached mirror
+         * address to the decompressed 4BPP font, which could result in fetching
+         * stale values not yet written back to H-WRAM */
+        cpu_cache_purge();
+
+        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
 }
 
 #include "vdp2-async.inc"
