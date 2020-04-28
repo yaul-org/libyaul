@@ -35,11 +35,7 @@ _assert(const char * restrict file, const char * restrict line,
                 dbgio_dev_deinit();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
 
-                if (vdp2_tvmd_display()) {
-                        vdp2_tvmd_vblank_out_wait();
-                }
-
-                vdp2_tvmd_vblank_in_wait();
+                vdp2_tvmd_vblank_in_next_wait(1);
 
                 cpu_intc_mask_set(14);
                 dbgio_dev_font_load();
@@ -73,12 +69,7 @@ _assert(const char * restrict file, const char * restrict line,
 
         dbgio_buffer("\n");
 
-        if (vdp2_tvmd_display()) {
-                vdp2_tvmd_vblank_out_wait();
-        }
-
-        vdp2_tvmd_vblank_in_wait();
-
+        vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
         vdp2_sync_commit();
 

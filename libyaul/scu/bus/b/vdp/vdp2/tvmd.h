@@ -131,6 +131,8 @@ extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
 extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
 
+extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
+
 __END_DECLS
 
 #endif /* !_VDP2_TVMD_H_ */
