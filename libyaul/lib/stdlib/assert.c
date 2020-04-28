@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <vdp.h>
+
 #include <dbgio.h>
 
 #include <internal.h>
@@ -20,25 +22,34 @@ _assert(const char * restrict file, const char * restrict line,
     const char * restrict failed_expr)
 {
         /* In the case where we fail an assertion within _assert() */
-        static uint32_t assertions = 0;
+        static uint32_t assertion_count = 0;
 
-        if (assertions >= ASSERTION_MAX_COUNT) {
+        if (assertion_count >= ASSERTION_MAX_COUNT) {
                 abort();
         }
 
-        if (assertions == 0) {
+        if (assertion_count == 0) {
                 _internal_reset();
 
+                dbgio_dev_deinit();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
+
+                if (vdp2_tvmd_display()) {
+                        vdp2_tvmd_vblank_out_wait();
+                }
+
+                vdp2_tvmd_vblank_in_wait();
+
+                dbgio_dev_font_load();
 
                 dbgio_buffer("[H[2J");
         }
 
-        if (assertions > 0) {
+        if (assertion_count > 0) {
                 dbgio_buffer("\n");
         }
 
-        assertions++;
+        assertion_count++;
 
         dbgio_buffer("Assertion \"");
         dbgio_buffer(failed_expr);
@@ -58,7 +69,14 @@ _assert(const char * restrict file, const char * restrict line,
 
         dbgio_buffer("\n");
 
+        if (vdp2_tvmd_display()) {
+                vdp2_tvmd_vblank_out_wait();
+        }
+
+        vdp2_tvmd_vblank_in_wait();
+
         dbgio_flush();
+        vdp2_sync_commit();
 
         abort();
 }
