@@ -168,3 +168,15 @@ vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
                 bios_clock_speed_chg(clock_freq);
         }
 }
+
+void
+vdp2_tvmd_vblank_in_next_wait(uint32_t count)
+{
+        for (uint32_t i = 0; i < count; i++) {
+                if (vdp2_tvmd_display()) {
+                        vdp2_tvmd_vblank_out_wait();
+                }
+
+                vdp2_tvmd_vblank_in_wait();
+        }
+}
