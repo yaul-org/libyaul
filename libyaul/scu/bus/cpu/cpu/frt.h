@@ -68,17 +68,22 @@ cpu_frt_input_capture_get(void)
         return (reg_ficrh << 8) | reg_ficrl;
 }
 
-static inline void __always_inline
-cpu_frt_interrupt_priority_set(uint8_t priority)
+static inline uint8_t __always_inline
+cpu_frt_interrupt_priority_get(void)
 {
-        /* Set the interrupt priority level for FRT (shared amongst all
-         * FRT related interrupts */
         uint16_t iprb;
         iprb = MEMORY_READ(16, CPU(IPRB));
 
-        iprb = (iprb & 0x00FF) | ((priority & 0x0F) << 8);
+        return ((iprb >> 8) & 0x0F);
+}
 
-        MEMORY_WRITE(16, CPU(IPRB), iprb);
+static inline void __always_inline
+cpu_frt_interrupt_priority_set(uint8_t priority)
+{
+        /* Set the interrupt priority level for FRT (shared amongst all FRT
+         * related interrupts */
+        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF7FF);
+        MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
 #define cpu_frt_oca_clear() do {                                               \
