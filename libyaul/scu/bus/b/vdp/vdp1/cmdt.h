@@ -269,8 +269,8 @@ extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, const vdp1_cmdt_color
 extern void vdp1_cmdt_param_size_set(vdp1_cmdt_t *, uint16_t, uint16_t);
 extern void vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *, bool);
 extern void vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *, bool);
-extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vector2_t *);
-extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vector2_t *);
+extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vec2_t *);
+extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vec2_t *);
 extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, uint32_t);
 
 extern void vdp1_cmdt_jump_clear(vdp1_cmdt_t *);
