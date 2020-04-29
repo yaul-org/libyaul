@@ -130,8 +130,7 @@ static const struct {
         vdp1_func_ptr sprite_end;
         vdp1_func_ptr vblank_in;
         vdp1_func_ptr vblank_out;
-}
-_vdp1_mode_table[] = {
+} _vdp1_mode_table[] = {
         {
                 .sync_put = _vdp1_mode_auto_sync_put,
                 .dma = _vdp1_mode_auto_dma,
@@ -151,9 +150,7 @@ _vdp1_mode_table[] = {
                 .vblank_in = _vdp1_mode_variable_vblank_in,
                 .vblank_out = _vdp1_mode_variable_vblank_out
         }
-},
-/* Pointer to the current VDP1 mode */
-*_current_vdp1_mode;
+}, *_current_vdp1_mode; /* Pointer to the current VDP1 mode */
 
 static void _vdp1_init(void);
 
@@ -216,9 +213,7 @@ vdp_sync(void)
         int8_t ret __unused;
         ret = dma_queue_enqueue(handle, DMA_QUEUE_TAG_VBLANK_IN,
             _vdp2_dma_handler, NULL);
-#ifdef DEBUG
         assert(ret == 0);
-#endif /* DEBUG */
 
         _state.sync &= ~STATE_INTERLACE_SINGLE;
         _state.sync &= ~STATE_INTERLACE_DOUBLE;
@@ -255,7 +250,7 @@ vdp_sync(void)
 
         cpu_intc_mask_set(15);
 
-        callback_list_process(_user_callback_list, true);
+        callback_list_process(_user_callback_list, /* clear = */ true);
 
         _state.sync &= ~STATE_MASK;
         _state.vdp1 &= ~STATE_VDP1_MASK;
@@ -300,9 +295,7 @@ void
 vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
     vdp1_sync_callback callback, void *work)
 {
-#ifdef DEBUG
         assert(cmdts != NULL);
-#endif /* DEBUG */
 
         if (count == 0) {
                 return;
@@ -323,10 +316,8 @@ void
 vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
     vdp1_sync_callback callback, void *work)
 {
-#ifdef DEBUG
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
-#endif /* DEBUG */
 
         vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, callback, work);
 }
@@ -335,9 +326,7 @@ void
 vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
     vdp1_sync_callback callback, void *work)
 {
-#ifdef DEBUG
         assert(cmdt_orderlist != NULL);
-#endif /* DEBUG */
 
         const vdp1_sync_put_args_t args = {
                 .transfer_type = TRANSFER_TYPE_ORDERLIST,
@@ -663,7 +652,7 @@ _sprite_end_handler(void)
 static void
 _vdp1_dma_handler(const dma_queue_transfer_t *transfer)
 {
-        if ((transfer != NULL) && ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00)) {
+        if ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00) {
                 return;
         }
 
@@ -723,7 +712,7 @@ _vdp2_back_screen_transfer(cpu_dmac_cfg_t *dmac_cfg)
 static void
 _vdp2_dma_handler(const dma_queue_transfer_t *transfer)
 {
-        if ((transfer != NULL) && ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00)) {
+        if ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) == 0x00) {
                 return;
         }
 
@@ -746,9 +735,7 @@ _vblank_in_handler(void)
 
                 int8_t ret __unused;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
-#ifdef DEBUG
                 assert(ret >= 0);
-#endif /* DEBUG */
         }
 
 no_sync:
