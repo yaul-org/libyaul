@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -12,7 +12,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *ls)
+vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls)
 {
 #ifdef DEBUG
         assert((ls->scroll_screen == VDP2_SCRN_NBG0) ||
@@ -27,18 +27,18 @@ vdp2_scrn_ls_set(const struct vdp2_scrn_ls_format *ls)
 
         switch (ls->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs.scrctl &= 0x3F01;
-                _state_vdp2()->regs.scrctl |= ls->enable;
+                _state_vdp2()->regs->scrctl &= 0x3F01;
+                _state_vdp2()->regs->scrctl |= ls->enable;
 
-                _state_vdp2()->regs.lsta0u = lstau;
-                _state_vdp2()->regs.lsta0l = lstal;
+                _state_vdp2()->regs->lsta0u = lstau;
+                _state_vdp2()->regs->lsta0l = lstal;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs.scrctl &= 0x3F01;
-                _state_vdp2()->regs.scrctl |= ls->enable;
+                _state_vdp2()->regs->scrctl &= 0x3F01;
+                _state_vdp2()->regs->scrctl |= ls->enable;
 
-                _state_vdp2()->regs.lsta1u = lstau;
-                _state_vdp2()->regs.lsta1l = lstal;
+                _state_vdp2()->regs->lsta1u = lstau;
+                _state_vdp2()->regs->lsta1l = lstal;
                 break;
         default:
                 break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -14,6 +14,8 @@
 #include <fix16.h>
 
 __BEGIN_DECLS
+
+typedef void (*cpu_divu_ihr)(void);
 
 static inline bool __always_inline
 cpu_divu_status_get(void)
@@ -63,23 +65,26 @@ cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
         cpu_divu_64_32_set(dh, dl, divisor);
 }
 
+static inline uint8_t __always_inline
+cpu_divu_interrupt_priority_get(void)
+{
+        uint16_t ipra = MEMORY_READ(16, CPU(IPRA));
+
+        return ((ipra >> 12) & 0x0F);
+}
+
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
-        register uint16_t ipra;
-        ipra = MEMORY_READ(16, CPU(IPRA));
-
-        ipra = (ipra & 0x0FFF) | ((priority & 0x0F) << 12);
-
-        MEMORY_WRITE(16, CPU(IPRA), ipra);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0x7FFF);
+        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
 #define cpu_divu_ovfi_clear() do {                                             \
         cpu_divu_ovfi_set(NULL);                                               \
 } while (false)
 
-extern void cpu_divu_init(void);
-extern void cpu_divu_ovfi_set(void (*)(void));
+extern void cpu_divu_ovfi_set(cpu_divu_ihr);
 
 __END_DECLS
 

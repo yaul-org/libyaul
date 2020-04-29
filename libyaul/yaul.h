@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -54,7 +54,12 @@
 #include <math.h>
 
 #include <mm/memb.h>
+
+#if defined(MALLOC_IMPL_TLSF)
+#include <mm/tlsf.h>
+#elif defined(MALLOC_IMPL_SLOB)
 #include <mm/slob.h>
+#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
 
 #include <sys/init.h>
 #include <sys/dma-queue.h>

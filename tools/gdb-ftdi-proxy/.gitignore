@@ -1,0 +1,4 @@
+/gdb-ftdi-proxy
+/gdb-ftdi-proxy.exe
+*.o
+*.d

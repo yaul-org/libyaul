@@ -13,6 +13,7 @@ extern int atoi(const char *);
 extern long atol(const char *);
 
 extern void *malloc(size_t);
+extern void *memalign(size_t, size_t);
 extern void free(void *);
 
 extern void abort(void) __noreturn;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -54,6 +54,7 @@ abort(void)
         }
 #else
         smpc_smc_sysres_call();
+        bios_execute();
 #endif /* SPIN_ON_ABORT */
 #endif /* DEBUG */
 

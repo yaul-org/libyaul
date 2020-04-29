@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -12,7 +12,7 @@
 
 /* Command type: RTC */
 uint8_t
-smpc_rtc_settime_call(struct smpc_time *time)
+smpc_rtc_settime_call(cpu_smpc_time_t *time)
 {
 
         time->month = (time->month) ? time->month : 0x1;

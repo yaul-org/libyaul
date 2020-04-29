@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -75,24 +75,24 @@ vdp2_scrn_scroll_x_set(uint8_t scrn, fix16_t scroll)
         case VDP2_SCRN_NBG0:
                 _set_fixed_point_scroll(&_state_vdp2()->nbg0.scroll.x, scroll, &in, &dn);
 
-                _state_vdp2()->regs.scxin0 = in;
-                _state_vdp2()->regs.scxdn0 = dn;
+                _state_vdp2()->regs->scxin0 = in;
+                _state_vdp2()->regs->scxdn0 = dn;
                 break;
         case VDP2_SCRN_NBG1:
                 _set_fixed_point_scroll(&_state_vdp2()->nbg1.scroll.x, scroll, &in, &dn);
 
-                _state_vdp2()->regs.scxin1 = in;
-                _state_vdp2()->regs.scxdn1 = dn;
+                _state_vdp2()->regs->scxin1 = in;
+                _state_vdp2()->regs->scxdn1 = dn;
                 break;
         case VDP2_SCRN_NBG2:
                 _set_integer_x_scroll(&_state_vdp2()->nbg2.scroll.x, scroll, &in);
 
-                _state_vdp2()->regs.scxn2 = in;
+                _state_vdp2()->regs->scxn2 = in;
                 break;
         case VDP2_SCRN_NBG3:
                 _set_integer_x_scroll(&_state_vdp2()->nbg3.scroll.x, scroll, &in);
 
-                _state_vdp2()->regs.scxn3 = in;
+                _state_vdp2()->regs->scxn3 = in;
                 break;
         default:
                 break;
@@ -122,24 +122,24 @@ vdp2_scrn_scroll_y_set(uint8_t scrn, fix16_t scroll)
         case VDP2_SCRN_NBG0:
                 _set_fixed_point_scroll(&_state_vdp2()->nbg0.scroll.y, scroll, &in, &dn);
 
-                _state_vdp2()->regs.scyin0 = in;
-                _state_vdp2()->regs.scydn0 = dn;
+                _state_vdp2()->regs->scyin0 = in;
+                _state_vdp2()->regs->scydn0 = dn;
                 break;
         case VDP2_SCRN_NBG1:
                 _set_fixed_point_scroll(&_state_vdp2()->nbg1.scroll.y, scroll, &in, &dn);
 
-                _state_vdp2()->regs.scyin1 = in;
-                _state_vdp2()->regs.scydn1 = dn;
+                _state_vdp2()->regs->scyin1 = in;
+                _state_vdp2()->regs->scydn1 = dn;
                 break;
         case VDP2_SCRN_NBG2:
                 _set_integer_y_scroll(&_state_vdp2()->nbg2.scroll.y, scroll, &in);
 
-                _state_vdp2()->regs.scyn2 = in;
+                _state_vdp2()->regs->scyn2 = in;
                 break;
         case VDP2_SCRN_NBG3:
                 _set_integer_y_scroll(&_state_vdp2()->nbg3.scroll.y, scroll, &in);
 
-                _state_vdp2()->regs.scyn3 = in;
+                _state_vdp2()->regs->scyn3 = in;
                 break;
         default:
                 break;
@@ -173,26 +173,26 @@ vdp2_scrn_scroll_x_update(uint8_t scrn, fix16_t delta)
                 _update_fixed_point_scroll(&_state_vdp2()->nbg0.scroll.x,
                     delta_clamped, &in, &dn);
 
-                _state_vdp2()->regs.scxin0 = in;
-                _state_vdp2()->regs.scxdn0 = dn;
+                _state_vdp2()->regs->scxin0 = in;
+                _state_vdp2()->regs->scxdn0 = dn;
                 break;
         case VDP2_SCRN_NBG1:
                 _update_fixed_point_scroll(&_state_vdp2()->nbg1.scroll.x,
                     delta_clamped, &in, &dn);
 
-                _state_vdp2()->regs.scxin1 = in;
-                _state_vdp2()->regs.scxdn1 = dn;
+                _state_vdp2()->regs->scxin1 = in;
+                _state_vdp2()->regs->scxdn1 = dn;
                 break;
         case VDP2_SCRN_NBG2:
                 _update_integer_scroll(&_state_vdp2()->nbg2.scroll.x, delta_clamped, &in);
 
-                _state_vdp2()->regs.scxn2 = in;
+                _state_vdp2()->regs->scxn2 = in;
                 break;
         case VDP2_SCRN_NBG3:
                 _update_integer_scroll(&_state_vdp2()->nbg3.scroll.x, delta_clamped,
                     &in);
 
-                _state_vdp2()->regs.scxn3 = in;
+                _state_vdp2()->regs->scxn3 = in;
                 break;
         default:
                 break;
@@ -226,27 +226,27 @@ vdp2_scrn_scroll_y_update(uint8_t scrn, fix16_t delta)
                 _update_fixed_point_scroll(&_state_vdp2()->nbg0.scroll.y,
                     delta_clamped, &in, &dn);
 
-                _state_vdp2()->regs.scyin0 = in;
-                _state_vdp2()->regs.scydn0 = dn;
+                _state_vdp2()->regs->scyin0 = in;
+                _state_vdp2()->regs->scydn0 = dn;
                 break;
         case VDP2_SCRN_NBG1:
                 _update_fixed_point_scroll(&_state_vdp2()->nbg1.scroll.y,
                     delta_clamped, &in, &dn);
 
-                _state_vdp2()->regs.scyin1 = in;
-                _state_vdp2()->regs.scydn1 = dn;
+                _state_vdp2()->regs->scyin1 = in;
+                _state_vdp2()->regs->scydn1 = dn;
                 break;
         case VDP2_SCRN_NBG2:
                 _update_integer_scroll(&_state_vdp2()->nbg2.scroll.y,
                     delta_clamped, &in);
 
-                _state_vdp2()->regs.scyn2 = in;
+                _state_vdp2()->regs->scyn2 = in;
                 break;
         case VDP2_SCRN_NBG3:
                 _update_integer_scroll(&_state_vdp2()->nbg3.scroll.y,
                     delta_clamped, &in);
 
-                _state_vdp2()->regs.scyn3 = in;
+                _state_vdp2()->regs->scyn3 = in;
                 break;
         default:
                 break;

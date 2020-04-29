@@ -2,13 +2,16 @@ PROJECTS:= \
 	bin2c \
 	bin2o \
 	genromfs \
-	make-iso
+	make-cue \
+	make-iso \
+	make-ip
 
 include ../env.mk
 
 # Build ssload only if we have a development cartridge to use
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 PROJECTS+= \
+	gdb-ftdi-proxy \
 	ssload
 endif
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -14,7 +14,6 @@
 #include <smpc/peripheral.h>
 #include <smpc/rtc.h>
 #include <smpc/smc.h>
-#include <vdp2.h>
 
 #include <mm/memb.h>
 
@@ -58,10 +57,10 @@
 #define PC_GET_DATA(x)          (OREG_OFFSET((x)))
 #define PC_GET_DATA_BYTE(x, y)  (((uint8_t *)OREG_OFFSET((x)))[(y)])
 
-struct smpc_time time;
+cpu_smpc_time_t time;
 
-struct smpc_peripheral_port smpc_peripheral_port_1;
-struct smpc_peripheral_port smpc_peripheral_port_2;
+smpc_peripheral_port_t smpc_peripheral_port_1;
+smpc_peripheral_port_t smpc_peripheral_port_2;
 
 static volatile bool _collection_complete = false;
 static volatile uint32_t _oreg_offset = 0;
@@ -71,21 +70,21 @@ static volatile uint32_t _oreg_offset = 0;
  * status (time, cartridge code, area code, etc.) */
 static uint8_t _oreg_buf[(MAX_PERIPHERALS * (MAX_PERIPHERAL_DATA_SIZE + 1)) + SMPC_OREGS];
 
-static void port_peripherals_free(struct smpc_peripheral_port *);
-static struct smpc_peripheral *peripheral_alloc(void);
-static void peripheral_free(struct smpc_peripheral *);
-static int32_t peripheral_update(struct smpc_peripheral_port *,
-    struct smpc_peripheral *, uint8_t);
+static void port_peripherals_free(smpc_peripheral_port_t *);
+static smpc_peripheral_t *peripheral_alloc(void);
+static void peripheral_free(smpc_peripheral_t *);
+static int32_t peripheral_update(smpc_peripheral_port_t *,
+    smpc_peripheral_t *, uint8_t);
 
 static void _system_manager_handler(void);
 
 /* A memory pool that holds two peripherals directly connected to each
  * port that also hold MAX_PERIPHERALS (6) each making a total of 14
  * possible peripherals connected at one time */
-MEMB(peripherals, struct smpc_peripheral, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
+MEMB(peripherals, smpc_peripheral_t, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
 
 void
-smpc_peripheral_init(void)
+_internal_smpc_peripheral_init(void)
 {
         memb_init(&peripherals);
 
@@ -101,9 +100,9 @@ smpc_peripheral_init(void)
         MEMORY_WRITE(8, SMPC(DDR1), 0x00);
         MEMORY_WRITE(8, SMPC(PDR1), 0x00);
 
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_SYSTEM_MANAGER);
-        scu_ic_ihr_set(IC_INTERRUPT_SYSTEM_MANAGER, &_system_manager_handler);
-        scu_ic_mask_chg(~IC_MASK_SYSTEM_MANAGER, IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_SYSTEM_MANAGER);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_SYSTEM_MANAGER, &_system_manager_handler);
+        scu_ic_mask_chg(~SCU_IC_MASK_SYSTEM_MANAGER, SCU_IC_MASK_NONE);
 }
 
 void
@@ -120,7 +119,7 @@ smpc_peripheral_intback_issue(void)
 void
 smpc_peripheral_process(void)
 {
-        static struct smpc_peripheral_port *ports[] = {
+        static smpc_peripheral_port_t *ports[] = {
                 &smpc_peripheral_port_1,
                 &smpc_peripheral_port_2,
                 NULL
@@ -169,7 +168,7 @@ smpc_peripheral_process(void)
         _oreg_offset = SMPC_OREGS;
 
         for (port_idx = 0; ports[port_idx] != NULL; port_idx++) {
-                struct smpc_peripheral_port *port;
+                smpc_peripheral_port_t *port;
 
                 port = ports[port_idx];
 
@@ -193,7 +192,7 @@ smpc_peripheral_process(void)
 
                         port->peripheral->connected = 0;
                         for (sub_port = 1; connected > 0; connected--, sub_port++) {
-                                struct smpc_peripheral *peripheral;
+                                smpc_peripheral_t *peripheral;
 
                                 peripheral = peripheral_alloc();
                                 assert(peripheral != NULL);
@@ -213,12 +212,12 @@ smpc_peripheral_process(void)
 }
 
 static void
-port_peripherals_free(struct smpc_peripheral_port *port)
+port_peripherals_free(smpc_peripheral_port_t *port)
 {
         assert(port != NULL);
 
-        struct smpc_peripheral *peripheral;
-        struct smpc_peripheral *tmp_peripheral;
+        smpc_peripheral_t *peripheral;
+        smpc_peripheral_t *tmp_peripheral;
 
         for (peripheral = TAILQ_FIRST(&port->peripherals);
              (peripheral != NULL) && (tmp_peripheral = TAILQ_NEXT(peripheral, peripherals), 1);
@@ -229,10 +228,10 @@ port_peripherals_free(struct smpc_peripheral_port *port)
         }
 }
 
-static struct smpc_peripheral *
+static smpc_peripheral_t *
 peripheral_alloc(void)
 {
-        struct smpc_peripheral *peripheral;
+        smpc_peripheral_t *peripheral;
 
         peripheral = memb_alloc(&peripherals);
         assert(peripheral != NULL);
@@ -244,15 +243,15 @@ peripheral_alloc(void)
 }
 
 static void
-peripheral_free(struct smpc_peripheral *peripheral)
+peripheral_free(smpc_peripheral_t *peripheral)
 {
         assert(peripheral != NULL);
         assert((memb_free(&peripherals, peripheral)) == 0);
 }
 
 static int32_t
-peripheral_update(struct smpc_peripheral_port *parent,
-    struct smpc_peripheral *peripheral,
+peripheral_update(smpc_peripheral_port_t *parent,
+    smpc_peripheral_t *peripheral,
     uint8_t port)
 {
         uint8_t multitap_id;

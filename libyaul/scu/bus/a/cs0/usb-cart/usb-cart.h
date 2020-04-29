@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -59,16 +59,16 @@ usb_cart_txe_wait(void)
 static inline uint8_t __always_inline
 usb_cart_byte_read(void)
 {
+        usb_cart_rxf_wait();
         return MEMORY_READ(8, USB_CART(FIFO));
 }
 
 static inline void __always_inline
 usb_cart_byte_send(uint8_t c)
 {
+        usb_cart_txe_wait();
         MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
-
-extern void usb_cart_init(void);
 
 extern uint8_t usb_cart_byte_xchg(uint8_t);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -120,10 +120,18 @@ vdp2_tvmd_field_scan_get(void)
         return (MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001;
 }
 
+static inline bool __always_inline
+vdp2_tvmd_display(void)
+{
+        return (((MEMORY_READ(16, VDP2(TVMD))) & 0x8000) == 0x8000);
+}
+
 extern void vdp2_tvmd_display_clear(void);
+extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
 extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
-extern void vdp2_tvmd_display_set(void);
+
+extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
 
 __END_DECLS
 

@@ -56,11 +56,11 @@ typedef uint8_t state_change_t;
 
 struct vt_parse;
 
-typedef void (*vt_parse_callback_t)(struct vt_parse *, vt_parse_action_t, int);
+typedef void (*vt_parse_callback)(struct vt_parse *, vt_parse_action_t, int);
 
 typedef struct vt_parse {
         vt_parse_state_t state;
-        vt_parse_callback_t callback;
+        vt_parse_callback callback;
         uint8_t intermediate_chars[MAX_INTERMEDIATE_CHARS + 1];
         uint8_t ignore_flagged;
         uint8_t params[16];
@@ -73,7 +73,7 @@ static void _do_state_change(vt_parse_t *, state_change_t, char);
 #include "vt_parse_table.inc"
 
 static void
-_vt_parse_init(vt_parse_t *parser, vt_parse_callback_t callback)
+_vt_parse_init(vt_parse_t *parser, vt_parse_callback callback)
 {
         parser->state = VT_PARSE_STATE_GROUND;
         parser->intermediate_chars[0] = '\0';
@@ -97,9 +97,11 @@ _vt_parse(vt_parse_t *parser, const char *data, int32_t len)
                  * the current state */
 
                 change = _vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][ch];
+
                 if (!change) {
                         change = _vt_parse_state_table[parser->state][ch];
                 }
+
                 _do_state_change(parser, change, data[i]);
         }
 }
@@ -132,7 +134,7 @@ void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                 /* Append the character to the intermediate params */
                 num_intermediate_chars =
                     strlen((char *)parser->intermediate_chars);
-                if (num_intermediate_chars + 1 > MAX_INTERMEDIATE_CHARS) {
+                if ((num_intermediate_chars + 1) > MAX_INTERMEDIATE_CHARS) {
                         parser->ignore_flagged = 1;
                 } else {
                         parser->intermediate_chars[num_intermediate_chars++] = ch;
@@ -171,8 +173,7 @@ void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
 static void
 _do_state_change(vt_parse_t *parser, state_change_t change, char ch)
 {
-        /* A state change is an action and/or a new state to transition
-         * to */
+        /* A state change is an action and/or a new state to transition to */
         vt_parse_state_t new_state;
         new_state = STATE(change);
 
@@ -180,12 +181,10 @@ _do_state_change(vt_parse_t *parser, state_change_t change, char ch)
         action = ACTION(change);
 
         if (new_state) {
-                /*
-                 * Perform up to three actions:
+                /* Perform up to three actions:
                  *   1. the exit action of the old state
                  *   2. the action associated with the transition
-                 *   3. the entry actionk of the new action
-                 */
+                 *   3. the entry actionk of the new action */
 
                 vt_parse_action_t exit_action;
                 vt_parse_action_t entry_action;

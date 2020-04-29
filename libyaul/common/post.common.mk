@@ -65,9 +65,37 @@ SH_DEPS:= $(SH_OBJECTS_UNIQ:.o=.d)
 SH_TEMPS:= $(SH_OBJECTS_UNIQ:.o=.i) $(SH_OBJECTS_UNIQ:.o=.ii) $(SH_OBJECTS_UNIQ:.o=.s)
 SH_DEPS_NO_LINK:= $(SH_OBJECTS_NO_LINK_UNIQ:.o=.d)
 
-$(SH_PROGRAM): $(SH_PROGRAM).iso
+# Parse out included paths from GCC when the specs files are used. This is used
+# to explictly populate each command database entry with include paths
+SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v -nostdinc $(foreach specs,$(SH_SPECS),-specs=$(specs)) - 2>&1 | \
+	awk '/^\s/ { sub(/^\s+/,"-I"); print }')
+SH_SYSTEM_INCLUDE_DIRS=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
+	awk '/^\s/ { sub(/^\s+/,"-isystem "); print }')
 
-all: $(SH_PROGRAM).iso
+CDB_FILE:= compile_commands.json
+
+ifeq ($(strip $(YAUL_CDB)),1)
+# $1 -> Absolute path to compiler executable
+# $2 -> Absolute path to input file
+# $3 -> Absolute path to output file
+# $4 -> Absolute build path
+# $5 -> Absolute path to output compile DB file
+define macro-update-cdb
+	set -e; \
+	    input_file=$$(printf -- "$2" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
+	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
+	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+endef
+else
+define macro-update-cdb
+endef
+endif
+
+$(SH_PROGRAM): $(SH_PROGRAM).cue
+
+all: $(SH_PROGRAM).cue
 
 example: all
 
@@ -108,27 +136,62 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.o: %.c
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(call macro-update-cdb,\
+		$(SH_CC),\
+		$(abspath $(<)),\
+		$(abspath $(@)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cc
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(call macro-update-cdb,\
+		$(SH_CXX),\
+		$(abspath $(<)),\
+		$(abspath $(@)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.C
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(call macro-update-cdb,\
+		$(SH_CXX),\
+		$(abspath $(<)),\
+		$(abspath $(@)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cpp
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(call macro-update-cdb,\
+		$(SH_CXX),\
+		$(abspath $(<)),\
+		$(abspath $(@)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.cxx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
+	$(ECHO)$(call macro-update-cdb,\
+		$(SH_CXX),\
+		$(abspath $(<)),\
+		$(abspath $(@)),\
+		$(abspath $(<D)),\
+		$(CDB_FILE),\
+		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 
 %.o: %.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(SH_RTAGS_RC) $(SH_AS) $(SH_AFLAGS) -o $@ $<
+	$(ECHO)$(SH_AS) $(SH_AFLAGS) -o $@ $<
 
 %.m68k.o: %.m68k.sx
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -145,50 +208,26 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
+$(SH_PROGRAM).cue: $(SH_PROGRAM).iso
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
+
 IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
-	$(ECHO)$(eval $@_TMP_FILE:= $(shell mktemp))
-	$(ECHO)cat $< | awk ' \
-	/\.ascii \"\$$VERSION\"/ { sub(/\$$VERSION/, "$(IP_VERSION)"); } \
-	/\.ascii \"\$$RELEASE_DATE\"/ { sub(/\$$RELEASE_DATE/, "$(IP_RELEASE_DATE)"); } \
-	/\.ascii \"\$$AREAS\"/ { printf ".ascii \"%-10.10s\"\n", "$(IP_AREAS)"; next; } \
-	/\.ascii \"\$$PERIPHERALS\"/ { printf ".ascii \"%-16.16s\"\n", "$(IP_PERIPHERALS)"; next; } \
-	/\.ascii \"\$$TITLE\"/ { \
-	    L = 7; \
-	    # Truncate to 112 characters \
-	    s = "$(IP_TITLE)"; \
-	    # Strip out control characters \
-	    gsub(/[\t\r\v\n\f]/, "", s); \
-	    s = substr(s, 0, 112); \
-	    t = s; \
-	    q = length(s); \
-	    l = q; \
-	    while (l > 0) { \
-		printf ".ascii \"%-16.16s\"\n", t; \
-		a = ((l - 16) >= 0) ? 16 : l; \
-		l -= a; \
-		t = substr(t, a + 1, q - a); \
-		L--; \
-	    } \
-	    while (L > 0) { \
-		printf ".ascii \"                \"\n"; \
-		L--; \
-	    } \
-	    next; \
-	} \
-	/\.long \$$MASTER_STACK_ADDR/ { sub(/\$$MASTER_STACK_ADDR/, "$(IP_MASTER_STACK_ADDR)"); } \
-	/\.long \$$SLAVE_STACK_ADDR/ { sub(/\$$SLAVE_STACK_ADDR/, "$(IP_SLAVE_STACK_ADDR)"); } \
-	/\.long \$$1ST_READ_ADDR/ { sub(/\$$1ST_READ_ADDR/, "$(IP_1ST_READ_ADDR)"); } \
-	{ print; } \
-	' | $(SH_AS) $(SH_AFLAGS) \
-	-I$(YAUL_INSTALL_ROOT)/share/yaul/bootstrap -o $($@_TMP_FILE) -
-	$(ECHO)$(SH_CC) -Wl,-Map,$@.map -nostdlib -m2 -mb -nostartfiles \
-	-specs=ip.specs $($@_TMP_FILE) -o $@
-	$(ECHO)$(RM) $($@_TMP_FILE)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+		"$(IP_VERSION)" \
+		$(IP_RELEASE_DATE) \
+		"$(IP_AREAS)" \
+		"$(IP_PERIPHERALS)" \
+		"$(IP_TITLE)" \
+		$(IP_MASTER_STACK_ADDR) \
+		$(IP_SLAVE_STACK_ADDR) \
+		$(IP_1ST_READ_ADDR)
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
 	    $(SH_PROGRAM).bin \
+	    $(SH_PROGRAM).cue \
 	    $(SH_PROGRAM).iso \
 	    $(SH_OBJECTS_UNIQ) \
 	    $(SH_DEPS) \
@@ -203,7 +242,8 @@ clean:
 	    $(SH_DEPS_NO_LINK) \
 	    root.romdisk \
 	    IP.BIN \
-	    IP.BIN.map
+	    IP.BIN.map \
+	    $(CDB_FILE)
 ifneq ($(strip $(M68K_PROGRAM)),)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \

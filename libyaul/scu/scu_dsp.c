@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -18,38 +18,38 @@ static void _default_ihr(void);
 static bool _overflow = false;
 static bool _end = true;
 
-static void (*_dsp_end_ihr)(void) = _default_ihr;
+static scu_dsp_ihr _dsp_end_ihr = _default_ihr;
 
 static inline uint32_t _read_ppaf(void);
 static inline void _update_flags(uint32_t);
 
 void
-scu_dsp_init(void)
+_internal_scu_dsp_init(void)
 {
         /* Disable DSP END interrupt */
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_DSP_END);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
         scu_dsp_program_clear();
 
         scu_dsp_end_clear();
 
-        scu_ic_ihr_set(IC_INTERRUPT_DSP_END, _dsp_end_handler);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_DSP_END, _dsp_end_handler);
 
         _overflow = false;
         _end = true;
 }
 
 void
-scu_dsp_end_set(void (*ihr)(void))
+scu_dsp_end_set(scu_dsp_ihr ihr)
 {
-        scu_ic_mask_chg(IC_MASK_ALL, IC_MASK_DSP_END);
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
         _dsp_end_ihr = _default_ihr;
 
         if (ihr != NULL) {
                 _dsp_end_ihr = ihr;
 
-                scu_ic_mask_chg(~IC_MASK_DSP_END, IC_MASK_NONE);
+                scu_ic_mask_chg(~SCU_IC_MASK_DSP_END, SCU_IC_MASK_NONE);
         }
 }
 
@@ -249,7 +249,7 @@ scu_dsp_data_write(uint8_t ram_page, uint8_t offset, void *data, uint32_t count)
 }
 
 void
-scu_dsp_status_get(struct dsp_status *status)
+scu_dsp_status_get(scu_dsp_status_t *status)
 {
         if (status == NULL) {
                 return;

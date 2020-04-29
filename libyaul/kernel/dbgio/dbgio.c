@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -12,9 +12,18 @@
 
 #include "dbgio-internal.h"
 
-static const dbgio_dev_ops_t *_dev_ops;
+#define STATE_IDLE                      (0x00)
+#define STATE_FONT_LOAD_REQUESTED       (0x01)
+#define STATE_FONT_LOAD_COMPLETED       (0x02)
 
-static const dbgio_dev_ops_t *_dev_ops_table[] = {
+static void _font_load_callback(void);
+
+static struct {
+        volatile uint32_t state;
+        const struct dbgio_dev_ops *dev_ops;
+} _dbgio_state;
+
+static const struct dbgio_dev_ops *_dev_ops_table[] = {
         &_internal_dev_ops_null,
         NULL,
         &_internal_dev_ops_vdp2_simple,
@@ -23,9 +32,9 @@ static const dbgio_dev_ops_t *_dev_ops_table[] = {
 };
 
 void
-dbgio_init(void)
+_internal_dbgio_init(void)
 {
-        _dev_ops = NULL;
+        _dbgio_state.state = STATE_IDLE;
 
         dbgio_dev_default_init(DBGIO_DEV_NULL);
 }
@@ -43,13 +52,13 @@ dbgio_dev_init(uint8_t dev, const void *params)
 
         assert(_dev_ops_table[dev]->init != NULL);
 
-        if (_dev_ops != _dev_ops_table[dev]) {
+        if (_dbgio_state.dev_ops != _dev_ops_table[dev]) {
                 dbgio_dev_deinit();
         }
 
-        _dev_ops = _dev_ops_table[dev];
+        _dbgio_state.dev_ops = _dev_ops_table[dev];
 
-        _dev_ops->init(params);
+        _dbgio_state.dev_ops->init(params);
 }
 
 void
@@ -61,21 +70,52 @@ dbgio_dev_default_init(uint8_t dev)
 void
 dbgio_dev_deinit(void)
 {
-        if (_dev_ops == NULL) {
+        if (_dbgio_state.dev_ops == NULL) {
                 return;
         }
 
-        assert(_dev_ops->deinit != NULL);
+        assert(_dbgio_state.dev_ops->deinit != NULL);
 
-        _dev_ops->deinit();
+        _dbgio_state.dev_ops->deinit();
 
-        _dev_ops = NULL;
+        _dbgio_state.state = STATE_IDLE;
+        _dbgio_state.dev_ops = NULL;
+}
+
+void
+dbgio_dev_font_load(void)
+{
+        assert(_dbgio_state.dev_ops != NULL);
+
+        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) != 0x00) {
+                return;
+        }
+
+        _dbgio_state.state &= ~STATE_FONT_LOAD_COMPLETED;
+        _dbgio_state.state |= STATE_FONT_LOAD_REQUESTED;
+
+        _dbgio_state.dev_ops->font_load(_font_load_callback);
+}
+
+void
+dbgio_dev_font_load_wait(void)
+{
+        assert(_dbgio_state.dev_ops != NULL);
+
+        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) == 0x00) {
+                return;
+        }
+
+        while ((_dbgio_state.state & STATE_FONT_LOAD_COMPLETED) == 0x00) {
+        }
+
+        _dbgio_state.state &= ~STATE_FONT_LOAD_REQUESTED;
 }
 
 void
 dbgio_buffer(const char *buffer)
 {
-        assert(_dev_ops != NULL);
+        assert(_dbgio_state.dev_ops != NULL);
 
         assert(buffer != NULL);
 
@@ -83,13 +123,19 @@ dbgio_buffer(const char *buffer)
                 return;
         }
 
-        _dev_ops->buffer(buffer);
+        _dbgio_state.dev_ops->buffer(buffer);
 }
 
 void
 dbgio_flush(void)
 {
-        assert(_dev_ops != NULL);
+        assert(_dbgio_state.dev_ops != NULL);
 
-        _dev_ops->flush();
+        _dbgio_state.dev_ops->flush();
+}
+
+static void
+_font_load_callback(void)
+{
+        _dbgio_state.state |= STATE_FONT_LOAD_COMPLETED;
 }

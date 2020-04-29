@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016
+ * Copyright (c) 2012-2019
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com
@@ -8,6 +8,7 @@
 #include <sys/cdefs.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <bios.h>
 
@@ -19,6 +20,8 @@
 #include <cpu/map.h>
 #include <cpu/registers.h>
 #include <cpu/wdt.h>
+
+#include <dbgio.h>
 
 #include <internal.h>
 
@@ -67,12 +70,13 @@ void _exception_illegal_slot(void) __used;
 void _exception_cpu_address_error(void) __used;
 void _exception_dma_address_error(void) __used;
 
-static void _format_exception_message(struct cpu_registers *, char *, const char *);
-
-static char _buffer[1024];
+static const char *_exception_message_format(const cpu_registers_t * restrict,
+    const char *restrict);
+static void _ihr_exception_show(const cpu_registers_t * restrict,
+    const char * restrict);
 
 void
-cpu_init(void)
+_internal_cpu_init(void)
 {
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
@@ -92,43 +96,57 @@ cpu_init(void)
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
-        cpu_divu_init();
+        _internal_cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
-        cpu_dmac_init();
+        _internal_cpu_dmac_init();
         cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
 }
 
-static void __noreturn __used 
-_ihr_exception_illegal_instruction(struct cpu_registers *regs)
+static void
+_ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
-        _format_exception_message(regs, _buffer, "Illegal instruction");
+        _internal_reset();
 
-        _internal_exception_show(_buffer);
+        const char *buffer;
+        buffer = _exception_message_format(regs, exception_name);
+
+        dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
+
+        dbgio_buffer(buffer);
+        dbgio_flush();
 }
 
-static void __noreturn __used 
-_ihr_exception_illegal_slot(struct cpu_registers *regs)
+static void __noreturn __used
+_ihr_exception_illegal_instruction(const cpu_registers_t *regs)
 {
-        _format_exception_message(regs, _buffer, "Illegal slot");
+        _ihr_exception_show(regs, "Illegal instruction");
 
-        _internal_exception_show(_buffer);
+        abort();
 }
 
-static void __noreturn __used 
-_ihr_exception_cpu_address_error(struct cpu_registers *regs)
+static void __noreturn __used
+_ihr_exception_illegal_slot(const cpu_registers_t *regs)
 {
-        _format_exception_message(regs, _buffer, "CPU address error");
+        _ihr_exception_show(regs, "Illegal slot");
 
-        _internal_exception_show(_buffer);
+        abort();
 }
 
-static void __noreturn __used 
-_ihr_exception_dma_address_error(struct cpu_registers *regs)
+static void __noreturn __used
+_ihr_exception_cpu_address_error(const cpu_registers_t *regs)
 {
-        _format_exception_message(regs, _buffer, "DMA address error");
+        _ihr_exception_show(regs, "CPU address error");
 
-        _internal_exception_show(_buffer);
+        abort();
+}
+
+static void __noreturn __used
+_ihr_exception_dma_address_error(const cpu_registers_t *regs)
+{
+        _ihr_exception_show(regs, "DMA address error");
+
+        abort();
 }
 
 EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
@@ -136,13 +154,14 @@ EXCEPTION_TRAMPOLINE_EMIT(illegal_slot);
 EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
 EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
 
-static void
-_format_exception_message(struct cpu_registers *regs,
-    char *buffer,
-    const char *exception_name)
+static const char *
+_exception_message_format(const cpu_registers_t * restrict regs,
+    const char *restrict exception_name)
 {
+        static char buffer[1024];
+
         (void)sprintf(buffer,
-            "[1;44mException occurred: %s[m\n\n"
+            "[H[2J[1;44mException occurred: %s[m\n\n"
             "\t r0 = 0x%08X  r11 = 0x%08X\n"
             "\t r1 = 0x%08X  r12 = 0x%08X\n"
             "\t r2 = 0x%08X  r13 = 0x%08X\n"
@@ -180,4 +199,6 @@ _format_exception_message(struct cpu_registers *regs,
             (uint32_t)((regs->sr >> 4) & 0x01),
             (uint32_t)((regs->sr >> 1) & 0x01),
             (uint32_t)((regs->sr >> 0) & 0x01));
+
+        return buffer;
 }

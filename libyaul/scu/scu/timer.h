@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -14,6 +14,8 @@
 #include <scu/map.h>
 
 __BEGIN_DECLS
+
+typedef void (*scu_timer_ihr)(void);
 
 static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
@@ -53,9 +55,8 @@ scu_timer_line_enable(void)
         scu_timer_t1_set(NULL);                                                \
 } while (false)
 
-extern void scu_timer_init(void);
-extern void scu_timer_t0_set(void (*)(void));
-extern void scu_timer_t1_set(void (*)(void));
+extern void scu_timer_t0_set(scu_timer_ihr);
+extern void scu_timer_t1_set(scu_timer_ihr);
 extern void scu_timer_t1_line_set(int16_t);
 
 __END_DECLS

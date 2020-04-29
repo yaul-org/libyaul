@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -45,6 +45,8 @@ __BEGIN_DECLS
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
+#define SCU_DMA_LEVEL_COUNT     3
+
 #define SCU_DMA_MODE_DIRECT     0x00
 #define SCU_DMA_MODE_INDIRECT   0x01
 
@@ -70,7 +72,7 @@ __BEGIN_DECLS
 #define SCU_DMA_UPDATE_RUP      0x00010000
 #define SCU_DMA_UPDATE_WUP      0x00000100
 
-#define SCU_DMA_INDIRECT_TBL_END        0x80000000
+#define SCU_DMA_INDIRECT_TABLE_END      (0x80000000)
 
 #define SCU_DMA_BUS_A   0x00
 #define SCU_DMA_BUS_B   0x01
@@ -83,35 +85,47 @@ __BEGIN_DECLS
 }
 
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
-        .len = DMA_INDIRECT_TBL_END | (_len),                                  \
+        .len = _len,                                                           \
         .dst = (uint32_t)(_dst),                                               \
-        .src = (uint32_t)(_src)                                                \
+        .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
 }
 
-struct scu_dma_reg_buffer {
-        uint32_t buffer[5];
-} __packed __aligned(4);
+typedef void (*scu_dma_ihr)(void);
 
-struct scu_dma_xfer {
+typedef struct scu_dma_handle {
+        uint32_t dnr;
+        uint32_t dnw;
+        uint32_t dnc;
+        uint32_t dnad;
+        uint32_t dnmd;
+} __packed __aligned(4) scu_dma_handle_t;
+
+typedef struct scu_dma_xfer {
         uint32_t len;
         uint32_t dst;
         uint32_t src;
-} __packed;
+} __packed scu_dma_xfer_t;
 
-struct scu_dma_level_cfg {
+typedef struct scu_dma_level_cfg {
         uint8_t mode;
 
         union {
                 /* Indirect mode */
-                void *indirect;
+                scu_dma_xfer_t *indirect;
 
                 /* Direct mode */
-                struct scu_dma_xfer direct;
+                scu_dma_xfer_t direct;
         } xfer;
 
         uint8_t stride;
         uint32_t update;
-};
+} scu_dma_level_cfg_t;
+
+static inline uint32_t __always_inline
+scu_dma_status_get(void)
+{
+        return MEMORY_READ(32, SCU(DSTA));
+}
 
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
@@ -190,9 +204,6 @@ scu_dma_level1_wait(void)
 static inline void __always_inline
 scu_dma_level2_wait(void)
 {
-        /* To prevent operation errors, do not activate DMA
-         * level 2 during DMA level 1 operation. */
-
         /* Cannot modify registers while in operation */
         while ((scu_dma_level2_busy()) != 0x00000000);
 }
@@ -248,6 +259,10 @@ scu_dma_level1_start(void)
 static inline void __always_inline
 scu_dma_level2_start(void)
 {
+        /* To prevent operation errors, do not activate DMA
+         * level 2 during DMA level 1 operation. */
+
+        scu_dma_level1_wait();
         scu_dma_level2_wait();
         scu_dma_level2_fast_start();
 }
@@ -327,31 +342,31 @@ scu_dma_stop(void)
 }
 
 static inline void __always_inline
-scu_dma_illegal_set(void (* const ihr)(void))
+scu_dma_illegal_set(scu_dma_ihr ihr)
 {
-        scu_ic_ihr_set(IC_INTERRUPT_DMA_ILLEGAL, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level0_end_set(void (* const ihr)(void))
+scu_dma_level0_end_set(scu_dma_ihr ihr)
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level1_end_set(void (* const ihr)(void))
+scu_dma_level1_end_set(scu_dma_ihr ihr)
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level2_end_set(void (* const ihr)(void))
+scu_dma_level2_end_set(scu_dma_ihr ihr)
 {
-        scu_ic_ihr_set(IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
 }
 
 static inline void __always_inline
-scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
+scu_dma_level_end_set(const uint8_t level, scu_dma_ihr ihr)
 {
         switch (level & 0x03) {
         case 2:
@@ -367,9 +382,10 @@ scu_dma_level_end_set(const uint8_t level, void (* const ihr)(void))
         }
 }
 
-extern void scu_dma_init(void);
-extern void scu_dma_config_buffer(struct scu_dma_reg_buffer *, const struct scu_dma_level_cfg *);
-extern void scu_dma_config_set(uint8_t, uint8_t, const struct scu_dma_reg_buffer *, void (*)(void));
+extern void scu_dma_config_buffer(scu_dma_handle_t *,
+    const scu_dma_level_cfg_t *);
+extern void scu_dma_config_set(uint8_t, uint8_t,
+    const scu_dma_handle_t *, scu_dma_ihr);
 extern int8_t scu_dma_level_unused_get(void);
 
 __END_DECLS

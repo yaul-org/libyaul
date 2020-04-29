@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-struct smpc_time {
+typedef struct cpu_smpc_time {
         uint16_t year;
         uint8_t day;
         uint8_t month;
@@ -18,6 +18,6 @@ struct smpc_time {
         uint8_t hours;
         uint8_t minutes;
         uint8_t seconds;
-};
+} cpu_smpc_time_t;
 
 #endif /* !_SMPC_RTC_H_ */

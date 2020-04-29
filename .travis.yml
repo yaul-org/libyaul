@@ -4,29 +4,42 @@ language: c
 
 env:
   global:
-    - YAUL_INSTALL_ROOT=/tool-chains
+    - YAUL_INSTALL_ROOT=/tool-chains/sh2eb-elf
+    - YAUL_PROG_SH_PREFIX=
+    - YAUL_ARCH_SH_PREFIX=sh2eb-elf
     - YAUL_BUILD_ROOT=/tmp
     - YAUL_BUILD=build
   matrix:
-    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release
-    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=1
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=1
 
-    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release
-    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=1
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=1
 
-    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release
-    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=release YAUL_OPTION_SPIN_ON_ABORT=1
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=0
+    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=debug YAUL_OPTION_SPIN_ON_ABORT=1
 
-    - YAUL_OPTION_DEV_CARTRIDGE=0 BUILD_TYPE=tools
-    - YAUL_OPTION_DEV_CARTRIDGE=1 BUILD_TYPE=tools
-    - YAUL_OPTION_DEV_CARTRIDGE=2 BUILD_TYPE=tools
+git:
+  submodules: true
 
 before_script:
-  - wget -4 --retry-connrefused --waitretry=300 -O tool-chain.tar.bz2 "https://drive.google.com/uc?export=download&id=1Fk5eIC6x6y2qNBMNCtgv8ZzrS_1386kB"
+  - wget -4 --retry-connrefused --waitretry=300 -O "tool-chain.tar.bz2" "https://drive.google.com/uc?export=download&id=1VWZv3lJ1_U02p4Sg7rZU7yn4igBdw2b7"
   - sudo mkdir /tool-chains
-  - sudo tar mxvfjp tool-chain.tar.bz2 -C /tool-chains/
-  - git submodule init
-  - git submodule update -f
+  - sudo tar mxvfjp "tool-chain.tar.bz2" -C /tool-chains/
+
+addons:
+  apt:
+    update: true
+    packages:
+      - libftdi1-dev  # Required for tools/ssload
+      - python3-click # Required for libyaul/commmon/update-cdb
+      - xorriso       # Required for tools/make-iso
 
 script:
   - .travis/test.sh

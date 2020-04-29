@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -9,14 +9,14 @@
 
 #include "smpc-internal.h"
 
-struct smpc_peripheral_keyboard *
+smpc_peripheral_keyboard_t *
 smpc_peripheral_keyboard_port(uint8_t port)
 {
-        struct smpc_peripheral_keyboard *port_1;
-        struct smpc_peripheral_keyboard *port_2;
+        smpc_peripheral_keyboard_t *port_1;
+        smpc_peripheral_keyboard_t *port_2;
 
-        port_1 = (struct smpc_peripheral_keyboard *)smpc_peripheral_port_1.peripheral;
-        port_2 = (struct smpc_peripheral_keyboard *)smpc_peripheral_port_2.peripheral;
+        port_1 = (smpc_peripheral_keyboard_t *)smpc_peripheral_port_1.peripheral;
+        port_2 = (smpc_peripheral_keyboard_t *)smpc_peripheral_port_2.peripheral;
 
         switch (port) {
         case 1:

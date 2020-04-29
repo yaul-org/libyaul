@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2004, Swedish Institute of Computer Science.
+ * Copyright (c) 2004 Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
         structure __CONCAT1(name, _memb_mem)[(num)] __unused;                  \
                                                                                \
-static struct memb name __unused = {                                           \
+static memb_t name __unused = {                                                \
         sizeof(structure),                                                     \
         num,                                                                   \
         &__CONCAT(name, _memb_refcnt)[0],                                      \
@@ -56,25 +56,25 @@ static struct memb name __unused = {                                           \
         (void *)&__CONCAT(name, _memb_mem)[0]                                  \
 }
 
-enum memb_ref_type {
+typedef enum memb_ref_type {
         MEMB_REF_AVAILABLE,
         MEMB_REF_RESERVED
-};
+} memb_ref_type_t;
 
-struct memb {
+typedef struct memb {
         uint32_t m_bsize; /* Size (in bytes) of a unit block */
         uint32_t m_bnum; /* Number of unit blocks in the block pool */
-        enum memb_ref_type *m_breftype; /* Reference type array */
+        memb_ref_type_t *m_breftype; /* Reference type array */
         uint32_t m_bidx; /* Index to next unreferenced block */
         uint32_t m_size; /* Number of allocated unit blocks */
         void *m_bpool;
-};
+} memb_t;
 
-void memb_init(struct memb *);
-void *memb_alloc(struct memb *);
-int memb_free(struct memb *, void *);
-int32_t memb_size(struct memb *);
-bool memb_bounds(struct memb *, void *);
+void memb_init(memb_t *);
+void *memb_alloc(memb_t *);
+int memb_free(memb_t *, void *);
+int32_t memb_size(memb_t *);
+bool memb_bounds(memb_t *, void *);
 
 __END_DECLS
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -14,7 +14,7 @@
 
 static void _nop(void);
 
-const dbgio_dev_ops_t _internal_dev_ops_vdp1 = {
+const struct dbgio_dev_ops _internal_dev_ops_vdp1 = {
         .dev = DBGIO_DEV_VDP1,
         .default_params = NULL,
         .init = (void (*)(const void *))_nop,

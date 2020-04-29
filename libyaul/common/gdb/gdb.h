@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -12,10 +12,12 @@
 
 __BEGIN_DECLS
 
+#define GDB_TRAPA_VECTOR_NUMBER 32
+
 static inline void __always_inline
 gdb_break(void)
 {
-        cpu_instr_trapa(0x20);
+        cpu_instr_trapa(GDB_TRAPA_VECTOR_NUMBER);
 }
 
 extern void gdb_init(void);

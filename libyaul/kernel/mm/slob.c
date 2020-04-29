@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -166,6 +166,12 @@ slob_realloc(void *old __unused, size_t nsize __unused)
         return NULL;
 }
 
+void *
+slob_memalign(size_t n __unused, size_t align __unused)
+{
+        return NULL;
+}
+
 /*
  * Free memory associated with the pointer ADDR.
  */
@@ -280,7 +286,7 @@ free:
  *   - STATS is NULL
  */
 int
-slob_stats(struct slob_stats *stats)
+slob_stats(slob_stats_t *stats)
 {
         if (stats == NULL) {
                 return -1;

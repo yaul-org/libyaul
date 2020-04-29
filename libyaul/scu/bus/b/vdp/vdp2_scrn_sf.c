@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -22,12 +22,12 @@ vdp2_scrn_sf_codes_set(uint8_t code, uint8_t codes)
 
         switch (code) {
         case VDP2_SCRN_SF_CODE_A:
-                _state_vdp2()->regs.sfcode &= 0xFF00;
-                _state_vdp2()->regs.sfcode |= (uint16_t)codes;
+                _state_vdp2()->regs->sfcode &= 0xFF00;
+                _state_vdp2()->regs->sfcode |= (uint16_t)codes;
                 break;
         case VDP2_SCRN_SF_CODE_B:
-                _state_vdp2()->regs.sfcode &= 0x00FF;
-                _state_vdp2()->regs.sfcode |= (uint16_t)codes << 8;
+                _state_vdp2()->regs->sfcode &= 0x00FF;
+                _state_vdp2()->regs->sfcode |= (uint16_t)codes << 8;
                 break;
         default:
                 break;
