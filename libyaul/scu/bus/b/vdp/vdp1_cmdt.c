@@ -68,7 +68,7 @@ vdp1_cmdt_orderlist_alloc(uint16_t count)
         size = count * sizeof(vdp1_cmdt_t);
 
         uint32_t aligned_boundary;
-        aligned_boundary = dlog2(size);
+        aligned_boundary = uint32_log2(size);
 
         if ((aligned_boundary & (aligned_boundary - 1)) != 0x00000000) {
                 aligned_boundary++;
