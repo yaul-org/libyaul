@@ -30,35 +30,41 @@
 #define SCU_MASK_OR     (SCU_IC_MASK_VBLANK_IN |                               \
                          SCU_IC_MASK_VBLANK_OUT |                              \
                          SCU_IC_MASK_SPRITE_END |                              \
-                         SCU_IC_MASK_LEVEL_0_DMA_END |                         \
-                         SCU_IC_MASK_LEVEL_1_DMA_END |                         \
-                         SCU_IC_MASK_LEVEL_2_DMA_END)
+                         SCU_IC_MASK_LEVEL_0_DMA_END)
 #define SCU_MASK_AND    (SCU_IC_MASK_ALL & ~SCU_MASK_OR)
 
-#define STATE_SYNC                      (0x02) /* Request to synchronize */
-#define STATE_INTERLACE_SINGLE          (0x04)
-#define STATE_INTERLACE_DOUBLE          (0x08)
-#define STATE_MASK                      (0x0E)
+#define SYNC_FLAG_SYNC                  (0x01) /* Request to synchronize */
+#define SYNC_FLAG_INTERLACE_SINGLE      (0x02)
+#define SYNC_FLAG_INTERLACE_DOUBLE      (0x04)
+#define SYNC_FLAG_MASK                  (0x07)
 
-#define STATE_VDP1_MODE_AUTO            (0x00)
-#define STATE_VDP1_MODE_FIXED           (0x01)
-#define STATE_VDP1_MODE_VARIABLE        (0x02)
-#define STATE_VDP1_MODE_MASK            (0x03)
+#define VDP1_INTERVAL_MODE_AUTO         (0x00)
+#define VDP1_INTERVAL_MODE_FIXED        (0x01)
+#define VDP1_INTERVAL_MODE_VARIABLE     (0x02)
+#define VDP1_INTERVAL_MODE_MASK         (0x03)
 
-#define STATE_VDP1_REQUEST_XFER_LIST    (0x04) /* VDP1 request to transfer list */
-#define STATE_VDP1_LIST_XFERRED         (0x08) /* VDP1 finished transferring list via SCU-DMA */
-#define STATE_VDP1_REQUEST_COMMIT_LIST  (0x10) /* VDP1 request to commit list */
-#define STATE_VDP1_LIST_COMMITTED       (0x20) /* VDP1 finished committing list */
-#define STATE_VDP1_REQUEST_CHANGE       (0x40) /* VDP1 request to change frame buffers */
-#define STATE_VDP1_CHANGED              (0x80) /* VDP1 changed frame buffers */
-#define STATE_VDP1_MASK                 (0xFC)
+#define VDP1_FB_MODE_ERASE_CHANGE       (0x00)
+#define VDP1_FB_MODE_CHANGE_ONLY        (0x01)
+#define VDP1_FB_MODE_MASK               (0x01)
 
-#define STATE_VDP2_COMITTING            (0x01) /* VDP2 is committing state via SCU-DMA */
-#define STATE_VDP2_COMMITTED            (0x02) /* VDP2 finished committing state */
-#define STATE_VDP2_MASK                 (0x03)
+#define VDP1_FLAG_IDLE                  (0x00)
+#define VDP1_FLAG_REQUEST_XFER_LIST     (0x01) /* VDP1 request to transfer list */
+#define VDP1_FLAG_LIST_XFERRED          (0x02) /* VDP1 finished transferring list via SCU-DMA */
+#define VDP1_FLAG_REQUEST_COMMIT_LIST   (0x04) /* VDP1 request to commit list */
+#define VDP1_FLAG_LIST_COMMITTED        (0x08) /* VDP1 finished committing list */
+#define VDP1_FLAG_REQUEST_CHANGE        (0x10) /* VDP1 request to change frame buffers */
+#define VDP1_FLAG_CHANGED               (0x20) /* VDP1 changed frame buffers */
+#define VDP1_FLAG_MASK                  (0x3F)
+
+#define VDP2_FLAG_IDLE                  (0x00)
+#define VDP2_FLAG_COMITTING             (0x01) /* VDP2 is committing state via SCU-DMA */
+#define VDP2_FLAG_COMMITTED             (0x02) /* VDP2 finished committing state */
+#define VDP2_FLAG_MASK                  (0x03)
 
 #define TRANSFER_TYPE_BUFFER            (0)
 #define TRANSFER_TYPE_ORDERLIST         (1)
+
+typedef void (*vdp1_func_ptr)(const void *);
 
 typedef struct {
         uint8_t transfer_type;
@@ -69,21 +75,27 @@ typedef struct {
         void *work;
 } vdp1_sync_put_args_t;
 
-typedef void (*vdp1_func_ptr)(const void *);
+struct vdp1_state {
+        unsigned int interval_mode:3;
+        unsigned int previous_fb_mode:2;
+        unsigned int fb_mode:2;
+        unsigned int field_count:1;
+        unsigned int flags:6;
+} __packed;
 
-static void _vblank_in_handler(void);
-static void _vblank_out_handler(void);
-static void _sprite_end_handler(void);
-
-static void _vdp1_dma_handler(const dma_queue_transfer_t *);
-static void _vdp2_dma_handler(const dma_queue_transfer_t *);
+struct vdp2_state {
+        uint8_t flags;
+} __packed;
 
 static volatile struct {
-        uint8_t sync;
-        uint8_t vdp1;
-        uint8_t vdp2;
-        uint8_t field_count;
+        struct vdp1_state vdp1;
+        struct vdp2_state vdp2;
+        uint8_t flags;
 } _state __aligned(4);
+
+static_assert(sizeof(struct vdp1_state) == 2);
+static_assert(sizeof(struct vdp2_state) == 1);
+static_assert(sizeof(_state) == 4);
 
 /* Keep track of the current command table operation */
 static volatile uint16_t _vdp1_last_command = 0x0000;
@@ -164,6 +176,12 @@ static void _vdp2_init(void);
 static void _vdp2_registers_transfer(cpu_dmac_cfg_t *);
 static void _vdp2_back_screen_transfer(cpu_dmac_cfg_t *);
 
+static void _vblank_in_handler(void);
+static void _vblank_out_handler(void);
+static void _sprite_end_handler(void);
+static void _vdp1_dma_handler(const dma_queue_transfer_t *);
+static void _vdp2_dma_handler(const dma_queue_transfer_t *);
+
 void
 _internal_vdp_sync_init(void)
 {
@@ -175,10 +193,15 @@ _internal_vdp_sync_init(void)
         callback_init(&_user_vblank_in_callback);
         callback_init(&_user_vblank_out_callback);
 
-        _state.sync = 0x00;
-        _state.vdp1 = 0x00;
-        _state.vdp2 = 0x00;
-        _state.field_count = 0x00;
+        _state.flags = 0x00;
+
+        _state.vdp1.flags = VDP1_FLAG_IDLE;
+        _state.vdp1.field_count = 0;
+        _state.vdp1.previous_fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
+        _state.vdp1.fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
+
+        _state.vdp1.interval_mode = VDP1_INTERVAL_MODE_AUTO;
+        _state.vdp2.flags = VDP2_FLAG_IDLE;
 
         _vdp1_init();
         _vdp2_init();
@@ -211,19 +234,19 @@ vdp_sync(void)
             _vdp2_dma_handler, NULL);
         assert(ret == 0);
 
-        _state.sync &= ~STATE_INTERLACE_SINGLE;
-        _state.sync &= ~STATE_INTERLACE_DOUBLE;
+        _state.flags &= ~SYNC_FLAG_INTERLACE_SINGLE;
+        _state.flags &= ~SYNC_FLAG_INTERLACE_DOUBLE;
 
         switch ((_state_vdp2()->regs->tvmd >> 6) & 0x3) {
         case 0x2:
-                _state.sync |= STATE_INTERLACE_SINGLE;
+                _state.flags |= SYNC_FLAG_INTERLACE_SINGLE;
                 break;
         case 0x3:
-                _state.sync |= STATE_INTERLACE_DOUBLE;
+                _state.flags |= SYNC_FLAG_INTERLACE_DOUBLE;
                 break;
         }
 
-        _state.sync |= STATE_SYNC;
+        _state.flags |= SYNC_FLAG_SYNC;
 
         scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
         cpu_intc_mask_set(intc_mask);
@@ -231,13 +254,13 @@ vdp_sync(void)
         /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
          * been committed */
         while (true) {
-                const uint8_t vdp1_state_mask = STATE_VDP1_REQUEST_XFER_LIST |
-                                                STATE_VDP1_CHANGED;
+                const uint8_t vdp1_flag_mask = VDP1_FLAG_REQUEST_XFER_LIST |
+                                               VDP1_FLAG_CHANGED;
                 const bool vdp1_working =
-                    (_state.vdp1 & vdp1_state_mask) == STATE_VDP1_REQUEST_XFER_LIST;
+                    (_state.vdp1.flags & vdp1_flag_mask) == VDP1_FLAG_REQUEST_XFER_LIST;
 
                 const bool vdp2_working =
-                    (_state.vdp2 & STATE_VDP2_COMMITTED) == 0x00;
+                    (_state.vdp2.flags & VDP2_FLAG_COMMITTED) == 0x00;
 
                 if (!vdp1_working && !vdp2_working) {
                         break;
@@ -248,9 +271,9 @@ vdp_sync(void)
 
         callback_list_process(_user_callback_list, /* clear = */ true);
 
-        _state.sync &= ~STATE_MASK;
-        _state.vdp1 &= ~STATE_VDP1_MASK;
-        _state.vdp2 &= ~STATE_VDP2_MASK;
+        _state.flags &= ~SYNC_FLAG_MASK;
+        _state.vdp1.flags &= ~VDP1_FLAG_MASK;
+        _state.vdp2.flags &= ~VDP2_FLAG_MASK;
 
         vdp1_sync_last_command_set(0);
 
@@ -261,10 +284,10 @@ vdp_sync(void)
 bool
 vdp1_sync_rendering(void)
 {
-        const uint8_t state_mask = STATE_VDP1_REQUEST_COMMIT_LIST |
-                                   STATE_VDP1_LIST_COMMITTED;
+        const uint8_t flag_mask = VDP1_FLAG_REQUEST_COMMIT_LIST |
+                                  VDP1_FLAG_LIST_COMMITTED;
 
-        return (_state.vdp1 & state_mask) == STATE_VDP1_REQUEST_COMMIT_LIST;
+        return (_state.vdp1.flags & flag_mask) == VDP1_FLAG_REQUEST_COMMIT_LIST;
 }
 
 void
@@ -274,17 +297,28 @@ vdp1_sync_interval_set(const int8_t interval)
 
         /* XXX: This should take into account PAL systems */
         if ((interval == VDP1_SYNC_INTERVAL_60HZ) || (interval > 60)) {
-                mode = STATE_VDP1_MODE_AUTO;
+                mode = VDP1_INTERVAL_MODE_AUTO;
         } else if (interval <= VDP1_SYNC_INTERVAL_VARIABLE) {
-                mode = STATE_VDP1_MODE_VARIABLE;
+                mode = VDP1_INTERVAL_MODE_VARIABLE;
         } else {
-                mode = STATE_VDP1_MODE_FIXED;
+                mode = VDP1_INTERVAL_MODE_FIXED;
         }
 
-        _state.vdp1 &= ~STATE_VDP1_MODE_MASK;
-        _state.vdp1 |= mode;
+        _state.vdp1.interval_mode = mode;
 
         _current_vdp1_mode = &_vdp1_mode_table[mode];
+}
+
+uint8_t
+vdp1_sync_mode_get(void)
+{
+        return _state.vdp1.fb_mode;
+}
+
+void
+vdp1_sync_mode_set(const uint8_t mode)
+{
+        _state.vdp1.fb_mode = mode & VDP1_SYNC_MODE_MASK;
 }
 
 void
@@ -361,8 +395,8 @@ vdp2_sync_commit(void)
                 .ihr = NULL
         };
 
-        _state.vdp2 &= ~STATE_VDP2_COMMITTED;
-        _state.vdp2 |= STATE_VDP2_COMITTING;
+        _state.vdp2.flags &= ~VDP2_FLAG_COMMITTED;
+        _state.vdp2.flags |= VDP2_FLAG_COMITTING;
 
         cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
         cpu_dmac_enable();
@@ -370,7 +404,7 @@ vdp2_sync_commit(void)
         _vdp2_back_screen_transfer(&dmac_cfg);
         _vdp2_registers_transfer(&dmac_cfg);
 
-        _state.vdp2 |= STATE_VDP2_COMMITTED;
+        _state.vdp2.flags |= VDP2_FLAG_COMMITTED;
 }
 
 void
@@ -410,6 +444,7 @@ _vdp1_init(void)
 
         scu_ic_ihr_set(SCU_IC_INTERRUPT_SPRITE_END, _sprite_end_handler);
 
+        vdp1_sync_mode_set(VDP1_SYNC_MODE_ERASE_CHANGE);
         vdp1_sync_interval_set(VDP1_SYNC_INTERVAL_60HZ);
 
         vdp1_sync_last_command_set(0);
@@ -451,16 +486,16 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
         const vdp1_sync_put_args_t *args = args_ptr;
 
         /* Wait until the previous command table list transfer is done */
-        if ((_state.vdp1 & STATE_VDP1_REQUEST_XFER_LIST) != 0x00) {
-                while ((_state.vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_XFER_LIST) != 0x00) {
+                while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) == 0x00) {
                 }
         }
 
         const uint32_t intc_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
-        _state.vdp1 &= ~STATE_VDP1_MASK;
-        _state.vdp1 |= STATE_VDP1_REQUEST_XFER_LIST;
+        _state.vdp1.flags &= ~VDP1_FLAG_MASK;
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_XFER_LIST;
 
         cpu_intc_mask_set(intc_mask);
 
@@ -480,15 +515,15 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
 static void
 _vdp1_mode_auto_dma(const void *args_ptr __unused)
 {
-        /* Don't clear STATE_VDP1_REQUEST_XFER_LIST as we want to know that
+        /* Don't clear VDP1_FLAG_REQUEST_XFER_LIST as we want to know that
          * we've requested to transfer a command list */
-        _state.vdp1 |= STATE_VDP1_LIST_XFERRED;
+        _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
 }
 
 static void
 _vdp1_mode_auto_sprite_end(const void *args_ptr __unused)
 {
-        _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
+        _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
 
         callback_call(&_user_vdp1_sync_callback);
 }
@@ -496,22 +531,22 @@ _vdp1_mode_auto_sprite_end(const void *args_ptr __unused)
 static void
 _vdp1_mode_auto_vblank_in(const void *args_ptr __unused)
 {
-        uint8_t state_vdp1;
-        state_vdp1 = _state.vdp1;
+        uint8_t flags_vdp1;
+        flags_vdp1 = _state.vdp1.flags;
 
-        if ((state_vdp1 & STATE_VDP1_REQUEST_XFER_LIST) == 0x00) {
+        if ((flags_vdp1 & VDP1_FLAG_REQUEST_XFER_LIST) == 0x00) {
                 return;
         }
 
         /* If we're still transferring, then abort */
-        if ((state_vdp1 & STATE_VDP1_LIST_XFERRED) == 0x00) {
+        if ((flags_vdp1 & VDP1_FLAG_LIST_XFERRED) == 0x00) {
                 assert(false && "Exceeded transfer time");
 
                 return;
         }
 
-        _state.vdp1 |= STATE_VDP1_REQUEST_COMMIT_LIST;
-        _state.vdp1 |= STATE_VDP1_REQUEST_CHANGE;
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_CHANGE;
 
         /* Going from manual to 1-cycle mode requires the FCM and FCT
          * bits to be cleared. Otherwise, we get weird behavior from the
@@ -528,15 +563,24 @@ _vdp1_mode_auto_vblank_in(const void *args_ptr __unused)
 static void
 _vdp1_mode_auto_vblank_out(const void *args_ptr __unused)
 {
-        if ((_state.vdp1 & STATE_VDP1_REQUEST_CHANGE) == 0x00) {
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_CHANGE) == 0x00) {
                 return;
         }
 
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_COMMIT_LIST;
-        _state.vdp1 &= ~STATE_VDP1_REQUEST_CHANGE;
+        _state.vdp1.flags &= ~VDP1_FLAG_REQUEST_COMMIT_LIST;
+        _state.vdp1.flags &= ~VDP1_FLAG_REQUEST_CHANGE;
 
-        _state.vdp1 |= STATE_VDP1_LIST_COMMITTED;
-        _state.vdp1 |= STATE_VDP1_CHANGED;
+        _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
+        _state.vdp1.flags |= VDP1_FLAG_CHANGED;
+
+        switch (_state.vdp1.fb_mode) {
+        case VDP1_FB_MODE_ERASE_CHANGE:
+                MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+                break;
+        case VDP1_FB_MODE_CHANGE_ONLY:
+                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+                break;
+        }
 }
 
 static void
@@ -712,22 +756,22 @@ _vdp2_dma_handler(const dma_queue_transfer_t *transfer)
                 return;
         }
 
-        _state.vdp2 |= STATE_VDP2_COMMITTED;
-        _state.vdp2 &= ~STATE_VDP2_COMITTING;
+        _state.vdp2.flags |= VDP2_FLAG_COMMITTED;
+        _state.vdp2.flags &= ~VDP2_FLAG_COMITTING;
 }
 
 static void
 _vblank_in_handler(void)
 {
         /* VBLANK-IN interrupt runs at scanline #224 */
-        if ((_state.sync & STATE_SYNC) == 0x00) {
+        if ((_state.flags & SYNC_FLAG_SYNC) == 0x00) {
                 goto no_sync;
         }
 
         _vdp1_vblank_in_call(NULL);
 
-        if ((_state.vdp2 & (STATE_VDP2_COMITTING | STATE_VDP2_COMMITTED)) == 0x00) {
-                _state.vdp2 |= STATE_VDP2_COMITTING;
+        if ((_state.vdp2.flags & (VDP2_FLAG_COMITTING | VDP2_FLAG_COMMITTED)) == 0x00) {
+                _state.vdp2.flags |= VDP2_FLAG_COMITTING;
 
                 int8_t ret __unused;
                 ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
@@ -743,7 +787,7 @@ _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
-        if ((_state.sync & STATE_SYNC) == 0x00) {
+        if ((_state.flags & SYNC_FLAG_SYNC) == 0x00) {
                 goto no_sync;
         }
 
