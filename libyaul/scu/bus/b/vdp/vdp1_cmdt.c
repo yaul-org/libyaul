@@ -230,19 +230,19 @@ vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *cmdt, bool flip)
 void
 vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *cmdt,
     uint16_t vertex_index,
-    const int16_vector2_t *p)
+    const int16_vec2_t *p)
 {
-        int16_vector2_t *vertex;
-        vertex = (int16_vector2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
+        int16_vec2_t *vertex;
+        vertex = (int16_vec2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
 
         vertex->x = p->x;
         vertex->y = p->y;
 }
 
 void
-vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vector2_t *p)
+vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vec2_t *p)
 {
-        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vector2_t) * 4);
+        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vec2_t) * 4);
 }
 
 void
