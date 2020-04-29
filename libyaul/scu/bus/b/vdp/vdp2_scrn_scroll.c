@@ -265,7 +265,7 @@ _set_fixed_point_scroll(fix16_t *scroll, fix16_t amount, uint16_t *in,
 
         *in = integral;
         *dn = fractional & 0xFF00;
-        *scroll = fix16_add(fix16_int32_from(*in), fractional);
+        *scroll = fix16_int32_from(*in) + fractional;
 }
 
 static inline void
@@ -287,7 +287,7 @@ _update_fixed_point_scroll(fix16_t *scroll, fix16_t delta, uint16_t *in,
     uint16_t *dn)
 {
         fix16_t scroll_of;
-        scroll_of = fix16_add(*scroll, delta);
+        scroll_of = *scroll + delta;
 
         int32_t integral;
         integral = fix16_int32_to(scroll_of);
@@ -297,7 +297,7 @@ _update_fixed_point_scroll(fix16_t *scroll, fix16_t delta, uint16_t *in,
 
         *in = WRAP_INTEGER(integral);
         *dn = fractional & 0xFF00;
-        *scroll = fix16_add(fix16_int32_from(*in), fractional);
+        *scroll = fix16_int32_from(*in) + fractional;
 }
 
 static inline void

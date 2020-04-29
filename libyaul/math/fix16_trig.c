@@ -24,43 +24,43 @@
 #include "fix16.h"
 
 fix16_t
-fix16_sin(fix16_t radians __unused)
+fix16_sin(const fix16_t radians __unused)
 {
         return FIX16(0.0f);
 }
 
 fix16_t
-fix16_cos(fix16_t radians)
+fix16_cos(const fix16_t radians)
 {
         return fix16_sin(radians + (FIX16_PI >> 1));
 }
 
 fix16_t
-fix16_tan(fix16_t radians __unused)
+fix16_tan(const fix16_t radians __unused)
 {
         return FIX16(0.0f);
 }
 
 fix16_t
-fix16_asin(fix16_t x __unused)
+fix16_asin(const fix16_t x __unused)
 {
         return FIX16(0.0f);
 }
 
 fix16_t
-fix16_acos(fix16_t x)
+fix16_acos(const fix16_t x)
 {
         return ((FIX16_PI >> 1) - fix16_asin(x));
 }
 
 fix16_t
-fix16_atan(fix16_t x)
+fix16_atan(const fix16_t x)
 {
         return fix16_atan2(x, FIX16_ONE);
 }
 
 fix16_t
-fix16_atan2(fix16_t x __unused, fix16_t y __unused)
+fix16_atan2(const fix16_t x __unused, const fix16_t y __unused)
 {
         return FIX16(0.0f);
 }

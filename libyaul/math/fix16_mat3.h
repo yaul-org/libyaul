@@ -1,4 +1,8 @@
+#ifndef _MATH_FIX16_MAT3_H_
+#define _MATH_FIX16_MAT3_H_
+
 union fix16_vec3;
+
 typedef union fix16_vec3 fix16_vec3_t;
 
 /* Row-major matrix */
@@ -16,8 +20,9 @@ typedef union fix16_mat3 {
 
 extern void fix16_mat3_dup(const fix16_mat3_t *, fix16_mat3_t *);
 extern void fix16_mat3_identity(fix16_mat3_t *);
-extern void fix16_mat3_inverse(const fix16_mat3_t *, fix16_mat3_t *);
-extern void fix16_mat3_multiply(const fix16_mat3_t *, const fix16_mat3_t *, fix16_mat3_t *);
 extern void fix16_mat3_str(const fix16_mat3_t *, char *, int);
-extern void fix16_mat3_transpose(const fix16_mat3_t *, fix16_mat3_t *);
+extern void fix16_mat3_transpose(const fix16_mat3_t * __restrict,
+    fix16_mat3_t * __restrict);
 extern void fix16_mat3_zero(fix16_mat3_t *);
+
+#endif /* _MATH_FIX16_MAT3_H_ */

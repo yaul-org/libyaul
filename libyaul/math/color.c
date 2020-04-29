@@ -26,21 +26,24 @@ color_rgb888_rgb1555_convert(const color_rgb888_t *color, color_rgb1555_t *resul
 }
 
 void
-color_rgb888_fix16_rgb_convert(const color_rgb888_t *color,
-    color_fix16_rgb_t *result)
+color_rgb888_fix16_rgb_convert(const color_rgb888_t *color __unused,
+    color_fix16_rgb_t *result __unused)
 {
+        /* XXX: Not yet implemented */
+#if 0
         result->r = fix16_div(fix16_int32_from(color->r), FIX16(255.0f));
         result->g = fix16_div(fix16_int32_from(color->g), FIX16(255.0f));
         result->b = fix16_div(fix16_int32_from(color->b), FIX16(255.0f));
+#endif
 }
 
 void
 color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
     color_rgb888_t *result)
 {
-        result->r = fix16_int32_to(fix16_mul(color->r, FIX16(255.0f))) & 0xFF;
-        result->g = fix16_int32_to(fix16_mul(color->g, FIX16(255.0f))) & 0xFF;
-        result->b = fix16_int32_to(fix16_mul(color->b, FIX16(255.0f))) & 0xFF;
+        result->r = fix16_int32_to(color->r * FIX16(255.0f)) & 0xFF;
+        result->g = fix16_int32_to(color->g * FIX16(255.0f)) & 0xFF;
+        result->b = fix16_int32_to(color->b * FIX16(255.0f)) & 0xFF;
 }
 
 void
@@ -68,17 +71,19 @@ color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *color,
 }
 
 void
-color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
-    color_fix16_rgb_t *result)
+color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color __unused,
+    color_fix16_rgb_t *result __unused)
 {
+        /* XXX: Not yet implemented */
+#if 0
         fix16_t c;
         c = fix16_mul(color->v, color->s);
 
         fix16_t x;
         /* X=C*(1-|((H/60.0)%2)-1|) */
         x = fix16_mul(c, fix16_sub(FIX16_ONE, fix16_abs(fix16_sub(fix16_mod(
-                                           fix16_div(color->h, FIX16(60.0f)),
-                                           FIX16(2.0f)), FIX16_ONE))));
+                                fix16_div(color->h, FIX16(60.0f)),
+                                FIX16(2.0f)), FIX16_ONE))));
 
         fix16_t m;
         m = fix16_sub(color->v, c);
@@ -117,10 +122,12 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
         result->r = fix16_add(rgb.r, m);
         result->g = fix16_add(rgb.g, m);
         result->b = fix16_add(rgb.b, m);
+#endif
 }
 
 void
-color_rgb1555_fix16_hsv_convert(const color_rgb1555_t *color, color_fix16_hsv_t *result)
+color_rgb1555_fix16_hsv_convert(const color_rgb1555_t *color,
+    color_fix16_hsv_t *result)
 {
         /* Convert from RGB1555 to RGB888 */
         color_rgb888_t rgb888;
@@ -141,9 +148,11 @@ color_rgb888_fix16_hsv_convert(const color_rgb888_t *color,
 }
 
 void
-color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
-    color_fix16_hsv_t *result)
+color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color __unused,
+    color_fix16_hsv_t *result __unused)
 {
+        /* XXX: Not yet implemented */
+#if 0
         fix16_t min;
         fix16_t max;
         fix16_t delta;
@@ -192,6 +201,7 @@ color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
         if (result->h < FIX16(0.0f)) {
                 result->h = fix16_add(result->h, FIX16(360.0f));
         }
+#endif
 }
 
 void

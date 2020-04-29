@@ -26,5 +26,6 @@
 fix16_t
 fix16_sqrt(fix16_t value __unused)
 {
+        /* XXX: Not yet implemented */
         return FIX16(0.0f);
 }

@@ -1,3 +1,6 @@
+#ifndef _MATH_FIX16_VEC4_H_
+#define _MATH_FIX16_VEC4_H_
+
 #define FIX16_VEC4_INITIALIZER(x, y, z, w)                                     \
     {                                                                          \
             FIX16(x),                                                          \
@@ -6,7 +9,7 @@
             FIX16(w),                                                          \
     }
 
-typedef union {
+typedef union fix16_vec4 {
         struct {
                 fix16_t x;
                 fix16_t y;
@@ -38,8 +41,7 @@ fix16_vec4_dup(const fix16_vec4_t * __restrict v0,
 
 static inline void
 fix16_vec4_add(const fix16_vec4_t * __restrict v0,
-    const fix16_vec4_t * __restrict v1,
-    fix16_vec4_t * __restrict result)
+    const fix16_vec4_t * __restrict v1, fix16_vec4_t * __restrict result)
 {
         result->x = v0->x + v1->x;
         result->y = v0->y + v1->y;
@@ -49,8 +51,7 @@ fix16_vec4_add(const fix16_vec4_t * __restrict v0,
 
 static inline void
 fix16_vec4_sub(const fix16_vec4_t * __restrict v0,
-    const fix16_vec4_t * __restrict v1,
-    fix16_vec4_t * __restrict result)
+    const fix16_vec4_t * __restrict v1, fix16_vec4_t * __restrict result)
 {
         result->x = v0->x - v1->x;
         result->y = v0->y - v1->y;
@@ -68,8 +69,7 @@ fix16_vec4_scale(const fix16_t scalar, fix16_vec4_t *result)
 }
 
 static inline void
-fix16_vec4_scaled(const fix16_t scalar,
-    const fix16_vec4_t * __restrict v0,
+fix16_vec4_scaled(const fix16_t scalar, const fix16_vec4_t * __restrict v0,
     fix16_vec4_t * __restrict result)
 {
         result->x = scalar * v0->x;
@@ -79,7 +79,9 @@ fix16_vec4_scaled(const fix16_t scalar,
 }
 
 extern fix16_t fix16_vec4_length(const fix16_vec4_t *);
-extern void fix16_vec4_cross(const fix16_vec4_t * __restrict, const fix16_vec4_t * __restrict, fix16_vec4_t * __restrict);
 extern void fix16_vec4_normalize(fix16_vec4_t *);
-extern void fix16_vec4_normalized(const fix16_vec4_t * __restrict, fix16_vec4_t * __restrict);
+extern void fix16_vec4_normalized(const fix16_vec4_t * __restrict,
+    fix16_vec4_t * __restrict);
 extern void fix16_vec4_str(const fix16_vec4_t *, char *, uint8_t);
+
+#endif /* _MATH_FIX16_VEC4_H_ */

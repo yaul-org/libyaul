@@ -64,7 +64,6 @@ int16_vec2_scaled(const int8_t scalar, int16_vec2_t *in_out)
         in_out->y = scalar * in_out->y;
 }
 
-extern int16_t int16_vec2_dot(const int16_vec2_t *, const int16_vec2_t *);
 extern void int16_vec2_str(const int16_vec2_t *, char *);
 
 #endif /* !_MATH_INT16_H_ */
