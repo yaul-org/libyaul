@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -21,8 +21,6 @@
 #include <cpu/wdt.h>
 
 __BEGIN_DECLS
-
-extern void cpu_init(void);
 
 __END_DECLS
 

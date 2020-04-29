@@ -4,7 +4,7 @@ Yet Another Useless [Saturn] Library
   <img width="460" height="300" src=".images/logo.png">
 </p>
 
-[![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)][4]
+[![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)]( https://discord.gg/S434dWA)
 
 Yaul is an open source development kit for the SEGA Saturn. The SDK as a whole
 aims to minimize the _painful_ experience that is developing for the Saturn by
@@ -14,14 +14,10 @@ providing lightweight abstractions between your program and the hardware.
 
 ### Windows
 
-If MSYS2 is not installed on your system, download the installer from the
-[MSYS2][2] web page and follow the instructions [here][3].
+Download the _Yaul MSYS2 64-bit_ installer from the release [page][2].
 
-Once MSYS2 is installed, install the following packages via the pacman
-package manager:
-
-    pacman -S \
-    git make gcc wget unzip zip p7zip diffutils dos2unix patch tar
+Once _Yaul MSYS2 64-bit_ is installed, your entire environment is set up!
+Examples can be found in `/opt/libyaul/examples`.
 
 ### Linux
 
@@ -30,12 +26,12 @@ Verify that the following packages are installed.
  - Via _Pacman_:
 
        pacman -S \
-       git make gcc wget unzip zip p7zip diffutils dos2unix patch
+       git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
- - Via _APT_:
+ - Via _APT_ (Debian, Ubuntu, and related Linux distributions):
 
        apt-get install \
-       git make gcc wget unzip zip p7zip diffutils dos2unix patch
+       git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
 ### OS X
 
@@ -50,10 +46,27 @@ source.
 
 ### Download pre-built
 
-A prebuilt tool-chain can be downloaded in [Downloads][1]. Create a directory
-`tool-chain` and extract the contents of the archive into it. For Windows users,
-the `tool-chain` must reside under the MSYS2 system root path
-(i.e. `C:\msys64`). Take note of the absolute path to the tool-chain.
+A prebuilt tool-chain can be downloaded from the table below. Create a directory
+`tool-chain` and extract the contents of the archive into it.
+
+If you're on Windows, and you've downloaded _Yaul MSYS2 64-bit_, the tool-chain
+is already installed in `/opt/x-tools`.
+
+| Platform         | Architecture | Tool-chain Link |
+|------------------|--------------|-----------------|
+| Linux            | i686         | [Available][3]  |
+| Linux            | x86_64       | [Available][4]  |
+| Windows (MinGW)  | i686         | [Available][5]  |
+| Windows (MinGW)  | x86_64       | [Available][6]  |
+| Windows (Cygwin) | x86          | Not available   |
+| Windows (Cygwin) | x86_64       | Not available   |
+| Mac OS X         | x86_64       | Not available   |
+
+### M68k
+
+_Currently unavailable._
+
+
 
 ### Build from source
 
@@ -70,13 +83,14 @@ directory. Take note of the absolute path to the tool-chain.
 
    1. Set the absolute path to the tool-chain in `YAUL_INSTALL_ROOT`.
    2. If necessary, set `YAUL_PROG_SH_PREFIX` and `YAUL_ARCH_SH_PREFIX`.
-   3. Set the absolute path to where the `libyaul` source tree is
-      located in `YAUL_BUILD_ROOT`.
-   4. Set the type of development cart you own in
-      `YAUL_OPTION_DEV_CARTRIDGE`. If none, set to 0 (zero).
+   3. Set the absolute path to where the `libyaul` source tree is located in
+      `YAUL_BUILD_ROOT`.
+   4. Set the type of development cart you own in `YAUL_OPTION_DEV_CARTRIDGE`.
+      If none, set to 0 (zero).
    5. Set whether to system reset or spin on abort() in
       `YAUL_OPTION_SPIN_ON_ABORT`. To system reset, set to 0 (zero).
-   6. Set RTags support in `YAUL_RTAGS`. Set 1 or 0 (zero).
+   6. Enable RTags/Irony support by setting `YAUL_CDB` to 1. To disable, set to
+      0 (zero).
 
    Setting the wrong values may result in compilation errors.
 
@@ -95,17 +109,12 @@ directory. Take note of the absolute path to the tool-chain.
 
 ## Building Yaul
 
-1. If `YAUL_RTAGS` is set to `true` in your environment file, start the RTags
-   daemon (`rdm`).
-
-       $ .rtags/rdm &
-
-2. Initialize and update all submodules.
+1. Initialize and update all submodules.
 
        $ git submodule init
        $ git submodule update -f --recursive
 
-3. Build and install the supported libraries.
+2. Build and install the supported libraries.
 
        $ SILENT=1 make install-release
 
@@ -115,22 +124,22 @@ directory. Take note of the absolute path to the tool-chain.
 
    To find more about other targets, call `make list-targets`.
 
-4. Build and install the tools.
+3. Build and install the tools.
 
        $ SILENT=1 make install-tools
 
 ## Building and running an example
 
-You can now build any of the given examples in the [`libyaul-examples`][5]
+You can now build any of the given examples in the [`libyaul-examples`][1]
 submodule.
 
 ## Contact
 
-You can find me (*@mrkotfw*) on [Discord][4].
+You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 
-[1]: http://yaul.org/downloads
-[2]: https://www.msys2.org/
-[3]: https://github.com/msys2/msys2/wiki/MSYS2-installation
-[4]: https://discord.gg/S434dWA
-[5]: https://github.com/ijacquez/libyaul-examples
-[6]: https://github.com/nickdiego/compiledb
+[1]: https://github.com/ijacquez/libyaul-examples
+[2]: https://github.com/ijacquez/libyaul-installer/releases
+[3]: https://drive.google.com/open?id=1Cg73hDwp_EuQCEol5praZa33QrEvdY5_
+[4]: https://drive.google.com/open?id=1YVcXcZLlcYezajkNUksylSxtLwx9zrl-
+[5]: https://drive.google.com/open?id=1eEIvAVY0tmmkldRSF5d557W831Qh15d2
+[6]: https://drive.google.com/open?id=1hkQ6PKWDM29Xv0ZhJzUBRg0Xvz09UFMI

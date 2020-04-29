@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -35,6 +35,8 @@ __BEGIN_DECLS
 #define CPU_FRT_PAL_352_32_COUNT_1MS    0x037F
 #define CPU_FRT_PAL_352_128_COUNT_1MS   0x00E0
 
+typedef void (*cpu_frt_ihr)(void);
+
 static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
 {
@@ -66,17 +68,22 @@ cpu_frt_input_capture_get(void)
         return (reg_ficrh << 8) | reg_ficrl;
 }
 
-static inline void __always_inline
-cpu_frt_interrupt_priority_set(uint8_t priority)
+static inline uint8_t __always_inline
+cpu_frt_interrupt_priority_get(void)
 {
-        /* Set the interrupt priority level for FRT (shared amongst all
-         * FRT related interrupts */
         uint16_t iprb;
         iprb = MEMORY_READ(16, CPU(IPRB));
 
-        iprb = (iprb & 0x00FF) | ((priority & 0x0F) << 8);
+        return ((iprb >> 8) & 0x0F);
+}
 
-        MEMORY_WRITE(16, CPU(IPRB), iprb);
+static inline void __always_inline
+cpu_frt_interrupt_priority_set(uint8_t priority)
+{
+        /* Set the interrupt priority level for FRT (shared amongst all FRT
+         * related interrupts */
+        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF7FF);
+        MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
 #define cpu_frt_oca_clear() do {                                               \
@@ -92,9 +99,9 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 } while (false)
 
 extern void cpu_frt_init(uint8_t);
-extern void cpu_frt_oca_set(uint16_t, void (*)(void));
-extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
-extern void cpu_frt_ovi_set(void (*)(void));
+extern void cpu_frt_oca_set(uint16_t, cpu_frt_ihr);
+extern void cpu_frt_ocb_set(uint16_t, cpu_frt_ihr);
+extern void cpu_frt_ovi_set(cpu_frt_ihr);
 
 __END_DECLS
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -17,19 +17,19 @@
 
 #include "vt_parse.inc"
 
-static inline __always_inline void _action_character_print(int);
-static inline __always_inline void _action_escape_character_print(int);
-static inline __always_inline void _action_csi_dispatch_print(int8_t, uint8_t *, uint8_t);
+static void _action_character_print(int);
+static void _action_escape_character_print(int);
+static void _action_csi_dispatch_print(const int8_t, const uint8_t *, const uint8_t);
 
-static inline __always_inline bool _cursor_column_exceeded(int16_t);
-static inline __always_inline bool _cursor_row_exceeded(uint16_t);
-static inline __always_inline void _cursor_column_advance(int16_t);
-static inline __always_inline bool _cursor_column_cond_set(int16_t);
-static inline __always_inline void _cursor_column_set(int16_t);
-static inline __always_inline void _cursor_row_advance(uint16_t);
-static inline __always_inline bool _cursor_row_cond_set(int16_t);
-static inline __always_inline void _cursor_row_set(int16_t);
-static inline __always_inline bool _cursor_cond_set(int16_t, int16_t);
+static inline bool _cursor_column_exceeded(int16_t) __always_inline;
+static inline bool _cursor_row_exceeded(uint16_t) __always_inline;
+static inline void _cursor_column_advance(int16_t) __always_inline;
+static inline bool _cursor_column_cond_set(int16_t) __always_inline;
+static inline void _cursor_column_set(int16_t) __always_inline;
+static inline void _cursor_row_advance(uint16_t) __always_inline;
+static inline bool _cursor_row_cond_set(int16_t) __always_inline;
+static inline void _cursor_row_set(int16_t) __always_inline;
+static inline bool _cursor_cond_set(int16_t, int16_t) __always_inline;
 
 static void _vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
 
@@ -87,6 +87,10 @@ cons_buffer(const char *buffer)
 
         size_t len;
 
+        if (*buffer == '\0') {
+                return;
+        }
+
         if ((len = strlen(buffer)) == 0) {
                 return;
         }
@@ -114,8 +118,8 @@ _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 }
 
 /*
- * Return true if the current cursor position plus an X amount of
- * columns is out of bounds.
+ * Return true if the current cursor position plus an X amount of columns is out
+ * of bounds.
  */
 static inline bool __always_inline
 _cursor_column_exceeded(int16_t x)
@@ -127,8 +131,8 @@ _cursor_column_exceeded(int16_t x)
 }
 
 /*
- * Return true if the current cursor position plus an Y amount of rows
- * is out of bounds.
+ * Return true if the current cursor position plus an Y amount of rows is out of
+ * bounds.
  */
 static inline bool __always_inline
 _cursor_row_exceeded(uint16_t y)
@@ -158,8 +162,7 @@ _cursor_row_set(int16_t y)
 }
 
 /*
- * Set the cursor to ROW and return TRUE iff the ROW has not been
- * exceeded.
+ * Set the cursor to ROW and return TRUE iff the ROW has not been exceeded.
  */
 static inline bool __always_inline
 _cursor_row_cond_set(int16_t row)
@@ -182,8 +185,7 @@ _cursor_column_advance(int16_t x)
 }
 
 /*
- * Set the cursor an X amount of columns iff it does not exceed
- * _cons.cols.
+ * Set the cursor an X amount of columns iff it does not exceed _cons.cols.
  */
 static inline void __always_inline
 _cursor_column_set(int16_t x)
@@ -192,8 +194,7 @@ _cursor_column_set(int16_t x)
 }
 
 /*
- * Set the cursor to COL and return TRUE iff the COL has not been
- * exceeded.
+ * Set the cursor to COL and return TRUE iff the COL has not been exceeded.
  */
 static inline bool __always_inline
 _cursor_column_cond_set(int16_t col)
@@ -207,8 +208,8 @@ _cursor_column_cond_set(int16_t col)
 }
 
 /*
- * Set both the COL and ROW of the cursor and return TRUE iff the COL
- * and ROW both have not been exceeded.
+ * Set both the COL and ROW of the cursor and return TRUE iff the COL and ROW
+ * both have not been exceeded.
  */
 static inline bool __always_inline
 _cursor_cond_set(int16_t col, int16_t row)
@@ -224,7 +225,7 @@ _cursor_cond_set(int16_t col, int16_t row)
         return false;
 }
 
-static inline void __always_inline
+static void
 _action_character_print(int ch)
 {
         if (_cursor_column_exceeded(0)) {
@@ -232,11 +233,16 @@ _action_character_print(int ch)
                 _cursor_row_advance(1);
         }
 
+        if (_cursor_row_exceeded(0)) {
+                return;
+        }
+
         _cons.ops.write(_cons.cursor.col, _cons.cursor.row, ch);
+
         _cursor_column_advance(1);
 }
 
-static inline void __always_inline
+static void
 _action_escape_character_print(int ch)
 {
         int16_t tab;
@@ -275,163 +281,257 @@ _action_escape_character_print(int ch)
         }
 }
 
-static inline void __always_inline
-_action_csi_dispatch_print(int8_t ch, uint8_t *params, uint8_t num_params)
+static void
+_action_csi_a(const uint8_t *params, const uint8_t num_params)
+{
+        /* A parameter value of zero or one moves the active
+         * position one line upward */
+        if (num_params == 0) {
+                return;
+        }
+
+        int16_t row;
+        row = (params[0] == 0) ? 1 : params[0];
+
+        if (_cursor_row_exceeded(-row)) {
+                row = _cons.cursor.row;
+        }
+
+        _cursor_row_advance(-row);
+}
+
+
+static void
+_action_csi_b(const uint8_t *params, const uint8_t num_params)
+{
+        /* A parameter value of zero or one moves the active position one line
+         * downward */
+        if (num_params == 0) {
+                return;
+        }
+
+        int16_t row;
+        row = (params[0] == 0) ? 1 : params[0];
+
+        if (_cursor_row_exceeded(row)) {
+                row = _cons.rows - _cons.cursor.row - 1;
+        }
+
+        _cursor_row_advance(row);
+}
+
+static void
+_action_csi_c(const uint8_t *params, const uint8_t num_params)
+{
+        /* A parameter value of zero or one moves the active position one
+         * position to the right. A parameter value of n moves the active
+         * position n positions to the right */
+
+        if (num_params == 0) {
+                return;
+        }
+
+        int16_t col;
+        col = (params[0] == 0) ? 1 : params[0];
+
+        if (_cursor_column_exceeded(col)) {
+                col = _cons.cols - _cons.cursor.col - 1;
+        }
+
+        _cursor_column_advance(col);
+}
+
+static void
+_action_csi_d(const uint8_t *params, const uint8_t num_params)
+{
+        /* A parameter value of zero or one moves the active position one
+         * position to the left. A parameter value of n moves the active
+         * position n positions to the left */
+
+        if (num_params == 0) {
+                return;
+        }
+
+        int16_t col;
+        col = (params[0] == 0) ? 1 : params[0];
+
+        if (_cursor_column_exceeded(-col)) {
+                col = _cons.cursor.col;
+        }
+
+        _cursor_column_advance(-col);
+}
+
+static void
+_action_csi_h(const uint8_t *params, const uint8_t num_params)
+{
+        /* Both parameters are absolute: [0.._cons.cols] and [0.._cons.rows].
+         * However, relative to the user, the values range from (0.._cons.cols]
+         * and (0.._cons.rows]. */
+
+        /* This sequence has two parameter values, the first specifying the line
+         * position and the second specifying the column position */
+        if (num_params == 0) {
+                _cursor_column_set(0);
+                _cursor_row_set(0);
+
+                return;
+        }
+
+        if (((num_params & 1) != 0) || (num_params > 2)) {
+                return;
+        }
+
+        int16_t col;
+        col = ((params[1] - 1) < 0) ? 0 : params[1] - 1;
+        int16_t row;
+        row = ((params[0] - 1) < 0) ? 0 : params[0] - 1;
+
+        /* Don't bother clamping */
+        _cursor_column_set(col);
+        _cursor_row_set(row);
+}
+
+static void
+_action_csi_j(const uint8_t *params, const uint8_t num_params)
 {
         int16_t col;
+        col = _cons.cursor.col;
         int16_t row;
+        row = _cons.cursor.row;
 
+        uint8_t number;
+        number = (num_params > 0) ? params[0] : 0;
+
+        switch (number) {
+        case 0:
+                /* Erase from the active position to the end of the screen,
+                 * inclusive (default). */
+
+                /* If the cursor is at the top left, just clear the entire
+                 * screen */
+                if ((col == 0) && (row == 0)) {
+                        _cons.ops.clear();
+                        break;
+                }
+
+                /* If the column or row difference is zero, don't erase */
+                if (((_cons.cols - col) <= 0) ||
+                    ((_cons.rows - row) <= 0)) {
+                        break;
+                }
+
+                _cons.ops.area_clear(col, _cons.cols, row, _cons.rows);
+                break;
+        case 1:
+                /* Erase from start of the screen to the active position,
+                 * inclusive. */
+                if ((col == 0) || (row == 0)) {
+                        break;
+                }
+
+                if (_cursor_column_exceeded(0)) {
+                        col = _cons.cols;
+                }
+
+                if (_cursor_row_exceeded(0)) {
+                        row = _cons.rows;
+                }
+
+                _cons.ops.area_clear(0, col, 0, row);
+                break;
+        case 2:
+                /* Erase all of the display -- all lines are erased, changed to
+                 * single-width, and the cursor does not move. */
+                _cons.ops.clear();
+                break;
+        default:
+                break;
+        }
+}
+
+static void
+_action_csi_k(const uint8_t *params, const uint8_t num_params)
+{
+        if (_cursor_row_exceeded(0)) {
+                return;
+        }
+
+        uint8_t number;
+        number = (num_params > 0) ? params[0] : 0;
+
+        int16_t col;
+        col = _cons.cursor.col;
+        int16_t row;
+        row = _cons.cursor.row;
+
+        switch (number) {
+        case 0:
+                /* Erase from the active position to the end of the line,
+                 * inclusive (default) */
+
+                /* If the column is zero, or exceeded screen, don't erase */
+                if ((_cons.cols - col) <= 0) {
+                        break;
+                }
+
+                if (col == 0) {
+                        _cons.ops.line_clear(row);
+                } else {
+                        _cons.ops.line_partial_clear(col, _cons.cols, row);
+                }
+                break;
+        case 1:
+                /* Erase from the start of the screen to the active position,
+                 * inclusive */
+                if (col == 0) {
+                        break;
+                }
+
+                col = (_cursor_column_exceeded(0)) ? _cons.cols : col;
+
+                _cons.ops.line_partial_clear(0, col, row);
+                break;
+        case 2:
+                /* Erase all of the line, inclusive */
+                _cons.ops.line_clear(row);
+                break;
+        default:
+                break;
+        }
+}
+
+static void
+_action_csi_dispatch_print(const int8_t ch, const uint8_t *params, const uint8_t num_params)
+{
         switch (ch) {
         case 'A':
                 /* ESC [ Pn A */
-
-                /* A parameter value of zero or one moves the active
-                 * position one line upward */
-                if (num_params == 0) {
-                        break;
-                }
-
-                row = (params[0] == 0) ? 1 : params[0];
-                if (_cursor_row_exceeded(-row)) {
-                        row = _cons.cursor.row;
-                }
-
-                _cursor_row_advance(-row);
+                _action_csi_a(params, num_params);
                 break;
         case 'B':
                 /* ESC [ Pn B */
-
-                /* A parameter value of zero or one moves the active
-                 * position one line downward */
-                if (num_params == 0) {
-                        break;
-                }
-
-                row = (params[0] == 0) ? 1 : params[0];
-                if (_cursor_row_exceeded(row)) {
-                        row = _cons.rows - _cons.cursor.row - 1;
-                }
-
-                _cursor_row_advance(row);
+                _action_csi_b(params, num_params);
                 break;
         case 'C':
                 /* ESC [ Pn C */
-
-                /* A parameter value of zero or one moves the active
-                 * position one position to the right. A parameter value
-                 * of n moves the active position n positions to the
-                 * right */
-
-                if (num_params == 0) {
-                        break;
-                }
-
-                col = (params[0] == 0) ? 1 : params[0];
-                if (_cursor_column_exceeded(col)) {
-                        col = _cons.cols - _cons.cursor.col - 1;
-                }
-
-                _cursor_column_advance(col);
+                _action_csi_c(params, num_params);
                 break;
         case 'D':
                 /* ESC [ Pn D */
-
-                /* A parameter value of zero or one moves the active
-                 * position one position to the left. A parameter value
-                 * of n moves the active position n positions to the
-                 * left */
-
-                if (num_params == 0) {
-                        break;
-                }
-
-                col = (params[0] == 0) ? 1 : params[0];
-                if (_cursor_column_exceeded(-col)) {
-                        col = _cons.cursor.col;
-                }
-
-                _cursor_column_advance(-col);
+                _action_csi_d(params, num_params);
                 break;
         case 'H':
                 /* ESC [ Pn ; Pn H */
-
-                /* Both parameters are absolute: [0.._cons.cols] and
-                 * [0.._cons.rows]. However, relative to the user, the values
-                 * range from (0.._cons.cols] and (0.._cons.rows]. */
-
-                /* This sequence has two parameter values, the first
-                 * specifying the line position and the second
-                 * specifying the column position */
-                if (num_params == 0) {
-                        _cursor_column_set(0);
-                        _cursor_row_set(0);
-                        break;
-                }
-
-                if (((num_params & 1) != 0) || (num_params > 2)) {
-                        break;
-                }
-
-                col = ((params[1] - 1) < 0) ? 0 : params[1] - 1;
-                row = ((params[0] - 1) < 0) ? 0 : params[0] - 1;
-
-                _cursor_cond_set(col, row);
+                _action_csi_h(params, num_params);
                 break;
         case 'J':
                 /* ESC [ Ps J */
-                if (num_params == 0) {
-                        break;
-                }
-
-                switch (params[0]) {
-                case 0:
-                        /* Erase from the active position to the end of
-                         * the screen, inclusive (default). */
-                        _cons.ops.area_clear(_cons.cursor.col, _cons.cols,
-                            _cons.cursor.row, _cons.rows);
-                        break;
-                case 1:
-                        /* Erase from start of the screen to the active
-                         * position, inclusive. */
-                        _cons.ops.area_clear(0, _cons.cursor.col, 0,
-                            _cons.cursor.row);
-                        break;
-                case 2:
-                        /* Erase all of the display –- all lines are
-                         * erased, changed to single-width, and the
-                         * cursor does not move. */
-                        _cons.ops.clear();
-                        break;
-                default:
-                        break;
-                }
+                _action_csi_j(params, num_params);
                 break;
         case 'K':
                 /* ESC [ Ps K */
-                if (num_params == 0) {
-                        break;
-                }
-
-                switch (params[0]) {
-                case 0:
-                        /* Erase from the active position to the end of
-                         * the line, inclusive (default) */
-                        _cons.ops.line_clear(_cons.cursor.col, _cons.cols,
-                            _cons.cursor.row);
-                        break;
-                case 1:
-                        /* Erase from the start of the screen to the
-                         * active position, inclusive */
-                        _cons.ops.line_clear(0, _cons.cursor.col,
-                            _cons.cursor.row);
-                        break;
-                case 2:
-                        /* Erase all of the line, inclusive */
-                        _cons.ops.line_clear(0, _cons.cols, _cons.cursor.row);
-                        break;
-                default:
-                        break;
-                }
+                _action_csi_k(params, num_params);
                 break;
         case 'm':
                 /* ESC [ Ps ; . . . ; Ps m */

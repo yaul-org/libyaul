@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import sys
+import locale
+
+try:
+    # If you are dealing with an environment where Python 3 thinks you are
+    # restricted to ASCII data, Click will raise an exception:
+    #
+    # Click will abort further execution because Python 3 was configured to use
+    # ASCII as encoding for the environment. Either switch to Python 2 or
+    # consult the Python 3 section of the docs for mitigation selfteps.
+    #
+    # Solution (hack) is to determine the locale and set it
+    user_locale = ".".join(list(locale.getlocale()))
+
+    # getenv() availability: most flavors of Unix, Windows
+    if not os.getenv("LANG"):
+        # Confusing, but it is actually preferable to assign to items of 'os.environ'
+        os.environ["LANG"] = user_locale
+    if not os.getenv("LC_ALL"):
+        os.environ["LC_ALL"] = user_locale
+
+    import click
+except ImportError:
+    print("{}: Missing \"click\" package. Install from <https://pypi.org/project/click/>".format(sys.argv[0]), file = sys.stderr)
+    sys.exit(1)
+
+PRUNE_COMPILER_FLAGS = [
+    # This flag causes major issues with Clang. Having this flag present in the
+    # JSON compilation database results in fatal errors
+    "-save-temps"
+]
+
+@click.command(context_settings = dict(help_option_names = ['-h', '--help']))
+@click.option('-c', '--compiler-executable', 'compiler_executable',
+              type = click.Path(exists = True,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Compiler executable.', required = True, multiple = False)
+@click.option('-i', '--input-file', 'input_file',
+              type = click.Path(exists = True,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Input file.', required = True, multiple = False)
+@click.option('-o', '--output-file', 'output_file',
+              type = click.Path(exists = False,
+                                file_okay = True,
+                                dir_okay = False,
+                                readable = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Output file.', required = True, multiple = False)
+@click.option('-d', '--directory', 'directory',
+              type = click.Path(exists = True,
+                                file_okay = False,
+                                dir_okay = True,
+                                allow_dash = False,
+                                resolve_path = True),
+              help = 'Build directory.', required = True, multiple = False)
+@click.option('-O', '--output-cdb', 'out_stream', type = click.File('a+'),
+              help = 'Output compile DB.', required = True, multiple = False)
+@click.argument('flags', nargs = -1, type = click.UNPROCESSED)
+def cli(compiler_executable, input_file, output_file, directory, out_stream, flags):
+    def build_cdb(out_stream):
+        try:
+            out_stream.seek(0)
+            return json.load(out_stream)
+        except Exception as exception:
+            return []
+
+    def write_cdb(cdb, out_stream, pretty_print = True):
+        out_stream.seek(0)
+        out_stream.truncate()
+        json.dump(cdb, out_stream, indent = (4 if pretty_print else None))
+
+    def prune_flags(flags):
+        return tuple([flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS])
+
+    def new_cdb_entry(compiler_executable, input_file, output_file, directory, flags):
+        arguments = [compiler_executable] + list(flags) + ["-c", input_file, "-o", output_file]
+        return {
+            # The main translation unit source processed by this compilation
+            # step. This is used by tools as the key into the compilation
+            # database. There can be multiple command objects for the same file,
+            # for example if the same source file is compiled with different
+            # configurations.
+            'file': input_file,
+
+            # The working directory of the compilation. All paths specified in
+            # the command or file fields must be either absolute or relative to
+            # this directory.
+            'directory': directory,
+
+            # The compile command executed. After JSON unescaping, this must be
+            # a valid command to rerun the exact compilation step for the
+            # translation unit in the environment the build system uses.
+            # Parameters use shell quoting and shell escaping of quotes, with
+            # '"' and '\' being the only special characters.
+            #
+            # Shell expansion is not supported.
+            'command': " ".join(arguments),
+
+            # The compile command executed as list of strings. Either arguments
+            # or command is required.
+            #
+            # It's best to support both as some tool may read one but not the
+            # other.
+            'arguments': arguments
+        }
+
+    def append_cdb(cdb, new_cdb_entry):
+        return [cdb_entry for cdb_entry in cdb
+                if cdb_entry['file'] != new_cdb_entry['file']] + [new_cdb_entry]
+
+    # Parse output CDB
+    cdb = build_cdb(out_stream)
+    # print("cdb: {}".format(cdb))
+    pruned_flags = prune_flags(flags)
+    # print("pruned_flags: {}".format(pruned_flags))
+    cdb_entry = new_cdb_entry(compiler_executable, input_file, output_file, directory, pruned_flags)
+    # print("cdb_entry: {}".format(cdb_entry))
+    updated_cdb = append_cdb(cdb, cdb_entry)
+    # print("updated_cdb: {}".format(updated_cdb))
+    if len(updated_cdb) > len(cdb):
+        write_cdb(updated_cdb, out_stream, pretty_print = False)
+
+if __name__ == "__main__":
+    cli()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <scu/map.h>
+#include <cpu/frt.h>
 #include <cpu/registers.h>
 
 __BEGIN_DECLS
@@ -19,6 +21,9 @@ __BEGIN_DECLS
 
 #define CPU_DUAL_ENTRY_POLLING 0
 #define CPU_DUAL_ENTRY_ICI     1
+
+typedef void (*cpu_dual_master_entry)(void);
+typedef void (*cpu_dual_slave_entry)(void);
 
 static inline void __always_inline
 cpu_dual_master_notify(void)
@@ -43,9 +48,27 @@ cpu_dual_notification_wait(void)
         *reg_ftcsr &= ~0x80;
 }
 
+static inline void * __always_inline
+cpu_dual_master_stack_get(void)
+{
+        extern uint32_t _master_stack;
+
+        return (void *)&_master_stack;
+}
+
+static inline void * __always_inline
+cpu_dual_slave_stack_get(void)
+{
+        extern uint32_t _slave_stack;
+
+        return (void *)&_slave_stack;
+}
+
 extern void cpu_dual_init(uint8_t);
-extern void cpu_dual_master_set(void (*)(void));
-extern void cpu_dual_slave_set(void (*)(void));
+extern void cpu_dual_master_set(cpu_dual_master_entry);
+extern void cpu_dual_slave_set(cpu_dual_master_entry);
+
+extern int8_t cpu_dual_executor_get(void);
 
 #define cpu_dual_master_clear() do {                                           \
         cpu_dual_master_set(NULL);                                             \

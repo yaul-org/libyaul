@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include <cpu/registers.h>
+#include <cpu/dual.h>
 
 __BEGIN_DECLS
 
@@ -28,7 +29,6 @@ __BEGIN_DECLS
 #define CPU_INTC_INTERRUPT_NMI                  0x0B
 
 #define CPU_INTC_INTERRUPT_UBC                  0x0C
-#define CPU_INTC_INTERRUPT_BREAK                0x20
 
 #define CPU_INTC_INTERRUPT_SCI_ERI      0x60
 #define CPU_INTC_INTERRUPT_SCI_RXI      0x61
@@ -48,8 +48,8 @@ __BEGIN_DECLS
 #define CPU_INTC_INTERRUPT_FREE_6F      0x6F
 #define CPU_INTC_INTERRUPT_SLAVE_ENTRY  0x94
 
-#define CPU_INTC_INTERRUPT_MASTER_BASE  0x000
-#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x100
+#define CPU_INTC_INTERRUPT_MASTER_BASE  0x0000
+#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x0100
 
 #define CPU_INTC_PRIORITY_VBLANK_IN             15
 #define CPU_INTC_PRIORITY_VBLANK_OUT            14
@@ -66,8 +66,10 @@ __BEGIN_DECLS
 #define CPU_INTC_PRIORITY_DMA_ILLEGAL           3
 #define CPU_INTC_PRIORITY_SPRITE_END            2
 
+typedef void (*cpu_intc_ihr)(void);
+
 static inline void __always_inline
-cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
+cpu_intc_ihr_set(uint32_t vector, cpu_intc_ihr ihr)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000310;
@@ -81,7 +83,8 @@ cpu_intc_ihr_clear(uint32_t vector)
         cpu_intc_ihr_set(vector, NULL);
 }
 
-static inline void __always_inline (*cpu_intc_ihr_get(uint32_t vector))(void)
+static inline cpu_intc_ihr __always_inline
+cpu_intc_ihr_get(uint32_t vector)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000314;
@@ -111,6 +114,30 @@ cpu_intc_mask_set(uint8_t mask)
         reg_sr |= (mask & 0x0F) << 4;
 
         cpu_reg_sr_set(reg_sr);
+}
+
+static inline uint16_t __always_inline
+cpu_intc_priority_a_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRA));
+}
+
+static inline uint16_t __always_inline
+cpu_intc_priority_b_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRB));
+}
+
+static inline void __always_inline
+cpu_intc_priority_a_set(uint16_t ipra)
+{
+        MEMORY_WRITE(16, CPU(IPRA), ipra);
+}
+
+static inline void __always_inline
+cpu_intc_priority_b_set(uint16_t iprb)
+{
+        MEMORY_WRITE(16, CPU(IPRA), iprb);
 }
 
 __END_DECLS

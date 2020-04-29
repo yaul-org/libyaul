@@ -8,6 +8,8 @@ include env.mk
 THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export THIS_ROOT
 
+# $1 ->
+# $2 ->
 define macro-generate-build-rule
 .PHONY: $1-$2
 
@@ -17,6 +19,8 @@ $1-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk $2) || exit $${?}
 endef
 
+# $1 ->
+# $2 ->
 define macro-generate-install-rule
 .PHONY: $1-install-$2
 
@@ -27,6 +31,17 @@ $1-install-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
 
+# $1 ->
+define macro-generate-generate-cdb-rule
+.PHONY: $1-generate-cdb
+
+$1-generate-cdb:
+	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)generate-cdb$(V_END)\n"
+	$(ECHO)($(MAKE) -C $1 -f release.mk generate-cdb) || exit $${?}
+endef
+
+# $1 ->
+# $2 ->
 define macro-generate-clean-rule
 .PHONY: $1-clean-$2
 
@@ -35,6 +50,7 @@ $1-clean-$2: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)($(MAKE) -C $1 -f $2.mk clean) || exit $${?}
 endef
 
+# No arguments
 define macro-install
 	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
 	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
@@ -44,44 +60,46 @@ define macro-install
 	done
 endef
 
-define macro-check-toolchain
+# $1 ->
+# $2 ->
+define macro-check-tool-chain
 	$(ECHO)for tool in $2; do \
-	    printf -- "$(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool}$(EXE_EXT)\n"; \
-	    if [ ! -e $(YAUL_INSTALL_ROOT)/$1/bin/$1-$${tool} ]; then \
-		printf -- "$1 toolchain has not been installed properly (see build-scripts/)\n" >&2; \
+	    printf -- "$(YAUL_INSTALL_ROOT)/bin/$1-$${tool}$(EXE_EXT)\n"; \
+	    if [ ! -e $(YAUL_INSTALL_ROOT)/bin/$1-$${tool} ]; then \
+		printf -- "$1 tool-chain has not been installed properly (see build-scripts/)\n" >&2; \
 		exit 1; \
 	    fi; \
 	done
 endef
 
 .PHONY: all \
-	release \
-	debug \
-	install \
-	install-release \
-	install-debug \
-	distclean \
-	create-pacman-package \
+	check-tool-chain \
 	clean \
-	clean-release \
+	clean-cdb \
 	clean-debug \
-	examples \
 	clean-examples \
-	tools \
-	install-tools \
+	clean-release \
 	clean-tools \
+	debug \
+	distclean \
+	examples \
+	generate-cdb \
+	install \
+	install-debug \
+	install-release \
+	install-tools \
 	list-targets \
-	check-toolchain
+	release \
+	tools
 
-all: release debug tools
+all: release debug tools examples
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
 
-check-toolchain:
-	@printf -- "$(V_BEGIN_YELLOW)toolchain check$(V_END)\n"
-	$(call macro-check-toolchain,$(SH_ARCH),as ar ld nm objcopy objdump gcc g++)
-	$(call macro-check-toolchain,m68k-elf,as ar ld nm objcopy objdump)
+check-tool-chain:
+	@printf -- "$(V_BEGIN_YELLOW)tool-chain check$(V_END)\n"
+	$(call macro-check-tool-chain,$(YAUL_ARCH_SH_PREFIX),as ar ld nm objcopy objdump gcc g++)
 
 release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	$(ECHO)for project in $(PROJECTS); do \
@@ -90,7 +108,7 @@ release debug: $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 	done
 
 $(YAUL_BUILD_ROOT)/$(YAUL_BUILD):
-	@$(MAKE) -s check-toolchain
+	@$(MAKE) -s check-tool-chain
 	$(ECHO)mkdir -p $@
 
 install: install-release install-tools
@@ -104,12 +122,9 @@ install-debug: debug
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
-create-pacman-package:
-	@echo "X"
+clean: clean-release clean-debug clean-tools clean-examples clean-cdb
 
-clean: clean-release clean-debug clean-tools
-
-distclean: clean-examples
+distclean: clean-examples clean-cdb
 	$(ECHO)$(RM) -r $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 
 clean-release:
@@ -141,6 +156,13 @@ install-tools: tools
 
 clean-tools:
 	$(ECHO)($(MAKE) -C tools clean) || exit $${?}
+
+$(foreach project,$(PROJECTS),$(eval $(call macro-generate-generate-cdb-rule,$(project))))
+
+generate-cdb: clean-cdb $(patsubst %,%-generate-cdb,$(PROJECTS))
+
+clean-cdb:
+	$(RM) $(CDB_FILE)
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \

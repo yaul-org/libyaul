@@ -1,7 +1,7 @@
 /* -*- mode: c -*- */
 
 /*
- * Copyright (c) 2012-2016
+ * Copyright (c) 2012-2019
  * See LICENSE for details.
  *
  * William A. Gatliff <bgat@billgatliff.com>
@@ -30,6 +30,8 @@
 #include <cpu/instructions.h>
 
 #include <smpc/smc.h>
+
+#include <internal.h>
 
 extern void internal_gdb_ihr_break(void);
 extern void internal_gdb_exception_cpu_address_error(void);
@@ -91,7 +93,7 @@ extern void internal_gdb_ihr_ubc(void);
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t _calculate_pc(struct cpu_registers *);
+static uint32_t _calculate_pc(cpu_registers_t *);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -126,7 +128,7 @@ static bp_t _bp_step = {
 static bp_list_t *_bp_list = NULL;
 
 static void
-_gdb_sh2_704x_init(void)
+_gdb_sh2_init(void)
 {
         /* Disable interrupts */
         uint32_t mask;
@@ -153,7 +155,8 @@ _gdb_sh2_704x_init(void)
             internal_gdb_exception_dma_address_error);
 
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
+
+        cpu_intc_ihr_set(GDB_TRAPA_VECTOR_NUMBER, internal_gdb_ihr_break);
 
         /* Initialize UBC */
         /*
@@ -164,8 +167,7 @@ _gdb_sh2_704x_init(void)
         /* Enable interrupts */
         cpu_intc_mask_set(mask);
 
-        /* Cause a breakpoint to sync with GDB */
-        cpu_instr_trapa(0x20);
+        gdb_break();
 }
 
 static void
@@ -182,7 +184,7 @@ _gdb_getc(void)
 }
 
 static void
-_gdb_step(struct cpu_registers *reg_file, uint32_t address)
+_gdb_step(cpu_registers_t *reg_file, uint32_t address)
 {
         uint16_t *p;
 
@@ -195,7 +197,7 @@ _gdb_step(struct cpu_registers *reg_file, uint32_t address)
 
         _bp_step.addr = (void *)p;
         _bp_step.instruction = *p;
-        *p = INSTRN_TRAPA(0x20);
+        *p = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* We're stepping, be aware of breakpoints and watchpoints */
         _stepping = true;
@@ -246,18 +248,17 @@ _gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 static void __noreturn
 _gdb_kill(void)
 {
-        /* XXX: Let's use abort() here */
-
-        /* XXX: System reset doesn't seem to work here. Could it be because
-         *      we're inside an interrupt handler? */
-
         smpc_smc_resenab_call();
         cpu_intc_mask_set(0);
         smpc_smc_sysres_call();
+
+        /* If for some reason calling SMPC system reset doesn't work, we can
+         * always force our way to reset the hardware */
+        bios_execute();
 }
 
 static void
-_gdb_monitor_entry(struct cpu_registers *reg_file)
+_gdb_monitor_entry(cpu_registers_t *reg_file)
 {
         uint16_t *p;
         uint32_t *pc;
@@ -295,7 +296,7 @@ _gdb_monitor_entry(struct cpu_registers *reg_file)
 }
 
 static bool
-_gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
+_gdb_register_file_read(cpu_registers_t *reg_file, uint32_t n, uint32_t *r)
 {
         switch (n) {
         case REG_R0:
@@ -345,7 +346,7 @@ _gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
 }
 
 static bool
-_gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
+_gdb_register_file_write(cpu_registers_t *reg_file, uint32_t n, uint32_t r)
 {
         uint32_t *p;
 
@@ -404,7 +405,7 @@ _gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
  *
  * Returns the destination address */
 static uint32_t
-_calculate_pc(struct cpu_registers *reg_file)
+_calculate_pc(cpu_registers_t *reg_file)
 {
         uint16_t opcode;
         uint32_t pc;
@@ -460,7 +461,7 @@ _bp_list_alloc(void)
 {
         bp_list_t *bpl;
 
-        if ((bpl = (bp_list_t *)malloc(sizeof(bp_list_t))) == NULL) {
+        if ((bpl = (bp_list_t *)_internal_malloc(sizeof(bp_list_t))) == NULL) {
                 return NULL;
         }
 
@@ -485,7 +486,7 @@ _bp_list_free(bp_list_t **bplp)
 {
         assert(*bplp != NULL);
 
-        free(*bplp);
+        _internal_free(*bplp);
         *bplp = NULL;
 }
 
@@ -494,7 +495,7 @@ _bp_list_breakpoint_alloc(void)
 {
         bp_t *bp;
 
-        if ((bp = (bp_t *)malloc(sizeof(bp_t))) == NULL) {
+        if ((bp = (bp_t *)_internal_malloc(sizeof(bp_t))) == NULL) {
                 return NULL;
         }
 
@@ -519,7 +520,7 @@ _bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
         *p = bp->instruction;
 
         TAILQ_REMOVE(bpl, bp, entries);
-        free(bp);
+        _internal_free(bp);
 }
 
 static int
@@ -540,7 +541,7 @@ _bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
 
         bp->addr = addr;
         bp->instruction = *(uint16_t *)addr;
-        *(uint16_t *)addr = INSTRN_TRAPA(0x20);
+        *(uint16_t *)addr = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* Insert */
         TAILQ_INSERT_TAIL(bpl, bp, entries);
@@ -571,8 +572,10 @@ _bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
 static void
 _device_init(void)
 {
+        /* This is useful to have USB cart initialized here explicitly, as we
+         * could be debugging kernel/sys/init.c */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_init();
+        _internal_usb_cart_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #endif /* HAVE_DEV_CARTRIDGE */
 }
@@ -581,7 +584,7 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_txe_full();
+        usb_cart_txe_wait();
         return usb_cart_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_byte_read();

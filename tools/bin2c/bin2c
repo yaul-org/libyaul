@@ -8,22 +8,22 @@
 PROGNAME="${0##*/}"
 
 input_file="${1}"
-input_size=`stat -c %s "${input_file}" 2> /dev/null`
+input_size=$(/usr/bin/stat -c "%s" "${input_file}" 2> /dev/null)
 prefix="${2}"
 output_file="${3}"
-output_dir=`dirname "${output_file}"`
+output_dir=$(dirname "${output_file}")
 
-# Hard coded for now
-w=7
-pad="        ";
+# XXX: Hard coded values should be exposed as arguments
+PARAM_WIDTH=7
+PARAM_PAD="        "
 
 panic () {
-    printf -- "${PROGNAME}: Error: ${1}\n" >&2
-    exit ${2}
+    printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
+    exit "${2}"
 }
 
 if [ ${#} != 3 ]; then
-    printf -- "Usage: ${PROGNAME} input-file prefix output-file\n" >&2
+    printf -- "Usage: %s input-file prefix output-file\\n" "${PROGNAME}" >&2
     exit 2
 fi
 
@@ -31,19 +31,25 @@ fi
 if ! [ -f "${input_file}" ]; then
     panic "${input_file}: No such file or directory" 2
 fi
+if [ -z "${input_file}" ]; then
+    panic "${input_ile}: Unable to obtain file size" 2
+fi
+# Check input file size
+if [ ${input_size} -eq 0 ]; then
+    panic "${input_file}: File is empty" 2
+fi
 
 # Check prefix
-printf -- "${prefix}" | grep -q -E '^[a-zA-Z_][a-zA-Z0-9_]*$'
-if ! [ ${?} -eq 0 ]; then
+if ! printf -- "%s" "${prefix}" | grep -q -E '^[a-zA-Z_][a-zA-Z0-9_]*$'; then
     panic "Invalid prefix (must be a C variable name)" 2
 fi
 # Check if prefix is too long
-if [ $((`printf -- "${prefix}" | wc -c` + 5)) -ge 32 ]; then
+if [ $(($(printf -- "%s" "${prefix}" | wc -c) + 5)) -ge 32 ]; then
     panic "Prefix is too long" 2
 fi
 
 # Check output file
-if ! [[ -d "${output_dir}" ]] || ! [[ -x "${output_dir}" ]]; then
+if ! [ -d "${output_dir}" ] || ! [ -x "${output_dir}" ]; then
     panic "Ouput path is inaccessible" 2
 fi
 
@@ -56,7 +62,7 @@ FNR == 1 {
   print "";
   print "const uint8_t '"${prefix}"'_data['"${input_size}"'] = {";
 
-  w = '"${w}"'; # Width size
+  w = '"${PARAM_WIDTH}"'; # Width size
   n = 0; # Line number
   b = 1; # Test if blank
 
@@ -65,7 +71,7 @@ FNR == 1 {
     c = getline;
 
     # Determine if we need to pad or not (if we are in a new line)
-    printf ((b == 0) ? " " : "'"${pad}"'") p;
+    printf ((b == 0) ? " " : "'"${PARAM_PAD}"'") p;
 
     if (c == 1) {
        printf ",";

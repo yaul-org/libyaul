@@ -1,64 +1,77 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <sys/cdefs.h>
-
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 
 #include <cpu/intc.h>
-#include <cpu/dmac.h>
+#include <vdp.h>
 
-#include <scu/dma.h>
+#include <dbgio.h>
 
 #include <internal.h>
 
+#define ASSERTION_MAX_COUNT 3
+
 void __noreturn
-__assert_func(const char *file, int line, const char *func,
-    const char *failed_expr)
+_assert(const char * restrict file, const char * restrict line,
+    const char * restrict func,
+    const char * restrict failed_expr)
 {
-        static char buffer[4096];
-        static bool asserted = false;
+        /* In the case where we fail an assertion within _assert() */
+        static uint32_t assertion_count = 0;
 
-        bool has_func_str;
-        has_func_str = (func != NULL) && (*func != '\0');
-
-        /* Avoid adding code to clear the screen if we've asserted more than
-         * once */
-        const char *clear_screen;
-        clear_screen = (!asserted) ? "" : "[H[2J";
-
-        (void)sprintf(buffer,
-            "%s"
-            "Assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
-            clear_screen,
-            failed_expr,
-            file,
-            line,
-            ((has_func_str) ? ", function: " : ""),
-            ((has_func_str) ? func : ""));
-
-        /* If we crash within an assert, then let's fallback to simply copying
-         * the assert buffer to L-WRAM */
-        if (asserted) {
-                cpu_intc_mask_set(15);
-
-                cpu_dmac_stop();
-                scu_dma_stop();
-
-                (void)memcpy((void *)LWRAM_UNCACHED(0), buffer, sizeof(buffer));
-
+        if (assertion_count >= ASSERTION_MAX_COUNT) {
                 abort();
         }
 
-        asserted = true;
+        if (assertion_count == 0) {
+                _internal_reset();
 
-        _internal_exception_show(buffer);
+                dbgio_dev_deinit();
+                dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
+
+                vdp2_tvmd_vblank_in_next_wait(1);
+
+                cpu_intc_mask_set(14);
+                dbgio_dev_font_load();
+                dbgio_dev_font_load_wait();
+                cpu_intc_mask_set(15);
+
+                dbgio_buffer("[H[2J");
+        }
+
+        if (assertion_count > 0) {
+                dbgio_buffer("\n");
+        }
+
+        assertion_count++;
+
+        dbgio_buffer("Assertion \"");
+        dbgio_buffer(failed_expr);
+        dbgio_buffer("\" failed");
+
+        dbgio_buffer(": file \"");
+        dbgio_buffer(file);
+        dbgio_buffer("\"");
+
+        dbgio_buffer(", line ");
+        dbgio_buffer(line);
+
+        if ((func != NULL) && (*func != '\0')) {
+                dbgio_buffer(", function: ");
+                dbgio_buffer(func);
+        }
+
+        dbgio_buffer("\n");
+
+        vdp2_tvmd_vblank_in_next_wait(1);
+        dbgio_flush();
+        vdp2_sync_commit();
+
+        abort();
 }

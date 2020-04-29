@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -51,6 +51,14 @@ bios_cd_player_execute(void)
         bios_address = (uint32_t *)0x0600026C;
 
         ((void (*)(void))*bios_address)();
+
+        __builtin_unreachable();
+}
+
+static inline void __noreturn __always_inline
+bios_execute(void)
+{
+        ((void (*)(void))0x00000420)();
 
         __builtin_unreachable();
 }

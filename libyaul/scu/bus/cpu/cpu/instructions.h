@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -63,6 +63,38 @@ cpu_instr_extsw(const uint32_t rm)
         __asm__ volatile ("exts.w %[rm], %[rn]"
             : [rn] "=&r" (rn)
             : [rm] "r" (rm));
+
+        return rn;
+}
+
+static inline uint32_t __always_inline
+cpu_instr_neg(uint32_t rm)
+{
+        register uint32_t rn;
+
+        __asm__ volatile ("neg %[rm], %[rn]"
+            : [rn] "=&r" (rn)
+            : [rm] "r" (rm));
+
+        return rn;
+}
+
+static inline uint32_t __always_inline
+cpu_instr_rotl(uint32_t rn)
+{
+        __asm__ volatile ("rotl %[rn]"
+            : [rn] "=&r" (rn)
+            : "0" (rn));
+
+        return rn;
+}
+
+static inline uint32_t __always_inline
+cpu_instr_rotr(uint32_t rn)
+{
+        __asm__ volatile ("rotr %[rn]"
+            : [rn] "=&r" (rn)
+            : "0" (rn));
 
         return rn;
 }

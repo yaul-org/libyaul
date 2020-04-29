@@ -13,6 +13,9 @@ USER_FILES:= \
 	common/pre.common.mk \
 	common/post.common.mk
 
+HELPER_FILES:= \
+	common/update-cdb
+
 LDSCRIPTS:= \
 	common/ldscripts/yaul.x \
 	common/ldscripts/ip.x
@@ -25,10 +28,15 @@ SPECS:= \
 SUPPORT_SRCS:= \
 	common/crt0.sx \
 	common/c++-support.cxx \
+
+# Keep this in SUPPORT_SRCS as the object file is copied to the tool-chain
+SUPPORT_SRCS+= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
-	common/internal_exception_show.c
+	kernel/internal.c \
+	kernel/mm/internal.c \
+	common/internal_reset.c
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
@@ -45,10 +53,21 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
+	kernel/sys/callback-list.c \
 	\
-	kernel/mm/memb.c \
-	kernel/mm/slob.c \
-	\
+	kernel/mm/memb.c
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+LIB_SRCS+= \
+	kernel/mm/tlsf.c
+endif
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
+LIB_SRCS+= \
+	kernel/mm/slob.c
+endif
+
+LIB_SRCS+= \
 	lib/ctype/ctype.c \
 	lib/string/bcmp.c \
 	lib/string/bcopy.c \
@@ -101,8 +120,10 @@ LIB_SRCS+= \
 	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
 	lib/stdlib/malloc.c \
-	lib/stdlib/realloc.c \
-	\
+	lib/stdlib/memalign.c \
+	lib/stdlib/realloc.c
+
+LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
@@ -131,8 +152,7 @@ LIB_SRCS+= \
 	math/fix16_mat4.c \
 	math/int16.c \
 	math/uint32.c \
-	scu/bus/a/cs2/cd-block/cd-block_cmd_abort_file.c \
-	scu/bus/a/cs2/cd-block/cd-block_cmd_init_cd_system.c \
+	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
 	scu/bus/a/cs2/cd-block/cd-block_init.c \
 	\
@@ -160,6 +180,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
 	\
+	scu/bus/cpu/cpu_cache.c \
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_dual.c \
@@ -248,8 +269,17 @@ INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:memb.h:yaul/mm/
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+INSTALL_HEADER_FILES+= \
+	./kernel/mm/:tlsf.h:yaul/mm/
+endif
+
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
+INSTALL_HEADER_FILES+= \
 	./kernel/mm/:slob.h:yaul/mm/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/

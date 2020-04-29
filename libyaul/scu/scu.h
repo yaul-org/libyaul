@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -12,7 +12,5 @@
 #include <scu/dsp.h>
 #include <scu/ic.h>
 #include <scu/timer.h>
-
-extern void scu_init(void);
 
 #endif /* !_SCU_H_ */

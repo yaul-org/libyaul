@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -15,6 +15,8 @@
 #include <usb-cart.h>
 
 #include "../dbgio-internal.h"
+
+#include <internal.h>
 
 #define STATE_IDLE              0x00
 #define STATE_INITIALIZED       0x01
@@ -40,7 +42,7 @@ static const dbgio_usb_cart_t _default_params = {
 
 static dev_state_t *_dev_state;
 
-const dbgio_dev_ops_t _internal_dev_ops_usb_cart = {
+const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
         .dev = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
@@ -55,7 +57,7 @@ _init(const dbgio_usb_cart_t *params)
         assert(params != NULL);
 
         if (_dev_state == NULL) {
-                _dev_state = malloc(sizeof(dev_state_t));
+                _dev_state = _internal_malloc(sizeof(dev_state_t));
 
                 (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
         }
@@ -64,13 +66,13 @@ _init(const dbgio_usb_cart_t *params)
         /* Resize the buffer if needed */
         if ((_dev_state->buffer != NULL) &&
             (_dev_state->buffer_size < params->buffer_size)) {
-                free(_dev_state->buffer);
+                _internal_free(_dev_state->buffer);
 
                 _dev_state->buffer = NULL;
         }
 
         if (_dev_state->buffer == NULL) {
-                _dev_state->buffer = malloc(params->buffer_size);
+                _dev_state->buffer = _internal_malloc(params->buffer_size);
 
                 (void)memset(_dev_state->buffer, '\0', params->buffer_size);
         }
@@ -89,8 +91,8 @@ _deinit(void)
                 return;
         }
 
-        free(_dev_state->buffer);
-        free(_dev_state);
+        _internal_free(_dev_state->buffer);
+        _internal_free(_dev_state);
 
         _dev_state = NULL;
 }

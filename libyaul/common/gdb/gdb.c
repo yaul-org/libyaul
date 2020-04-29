@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016
+ * Copyright (c) 2012-2019
  * See LICENSE for details.
  *
  * William A. Gatliff <bgat@billgatliff.com>
@@ -16,13 +16,13 @@
 
 #include "gdb.h"
 
-#include "sh2-704x.inc"
+#include "sh2.inc"
 
-#define IS_ALIGNED(t, addr,len)                                                \
+#define IS_POW_2_ALIGNED(t, addr,len)                                          \
         (((len) >= sizeof(uint ## t ## _t)) &&                                 \
-        (((uint32_t)(addr) % sizeof(uint ## t ## _t)) == 0))
+        (((uint32_t)(addr) & (sizeof(uint ## t ## _t) - 1)) == 0))
 
-#define GDB_RX_BUF_LEN  512
+#define GDB_RX_BUF_LEN 512
 
 typedef union {
         uint32_t lbuf;
@@ -42,13 +42,13 @@ static void _put_packet(char, const char *, size_t);
 
 /* GDB commands */
 static void _gdb_command_read_memory(uint32_t, uint32_t);
-static void _gdb_command_read_registers(struct cpu_registers *);
+static void _gdb_command_read_registers(cpu_registers_t *);
 static void _gdb_last_signal(int);
 
 void
 gdb_init(void)
 {
-        _gdb_sh2_704x_init();
+        _gdb_sh2_init();
 }
 
 /* At a minimum, a stub is required to support the `g',
@@ -56,7 +56,7 @@ gdb_init(void)
  *
  * All other commands are optional */
 void
-gdb_monitor(struct cpu_registers *reg_file, int sigval)
+gdb_monitor(cpu_registers_t *reg_file, int sigval)
 {
         static char buffer[GDB_RX_BUF_LEN];
 
@@ -227,7 +227,7 @@ gdb_monitor(struct cpu_registers *reg_file, int sigval)
 }
 
 static void
-_gdb_command_read_registers(struct cpu_registers *reg_file)
+_gdb_command_read_registers(cpu_registers_t *reg_file)
 {
         char tx_buf[8];
         size_t tx_len;
@@ -430,8 +430,8 @@ _low_nibble_to_hex(char c)
 /* Translates a delimited hexadecimal string to an unsigned long (32-bit) */
 static char *_parse_unsigned_long(char *hargs, uint32_t *l, int delim)
 {
-
         *l = 0x00000000;
+
         while (*hargs != delim) {
                 *l = (*l << 4) + _hex_digit_to_integer(*hargs++);
         }
@@ -457,10 +457,10 @@ _mem_to_hex_buffer(const void *mem, char *h_buf, size_t len)
 
         ret_val = 0;
         for (i = 0; len > 0; ) {
-                if (IS_ALIGNED(32, mem, len)) {
+                if (IS_POW_2_ALIGNED(32, mem, len)) {
                         lc_buf.lbuf = *(uint32_t *)mem;
                         cbuf_len = sizeof(uint32_t);
-                } else if (IS_ALIGNED(16, mem, len)) {
+                } else if (IS_POW_2_ALIGNED(16, mem, len)) {
                         lc_buf.sbuf = *(uint16_t *)mem;
                         cbuf_len = sizeof(uint16_t);
                 } else {
@@ -494,14 +494,14 @@ _hex_buffer_to_mem(const char *buf, void *mem, size_t len)
         uint32_t i;
 
         for (i = 0; len > 0; ) {
-                if (IS_ALIGNED(32, mem, len)) {
+                if (IS_POW_2_ALIGNED(32, mem, len)) {
                         cbuf_len = sizeof(uint32_t);
                         for (i = 0; i < cbuf_len; i++) {
                                 lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);
                                 lc_buf.cbuf[i] += _hex_digit_to_integer(*buf++);
                         }
                         *(uint32_t *)mem = lc_buf.lbuf;
-                } else if (IS_ALIGNED(16, mem, len)) {
+                } else if (IS_POW_2_ALIGNED(16, mem, len)) {
                         cbuf_len = sizeof(uint16_t);
                         for (i = 0; i < cbuf_len; i++ ) {
                                 lc_buf.cbuf[i] = (_hex_digit_to_integer(*buf++) << 4);

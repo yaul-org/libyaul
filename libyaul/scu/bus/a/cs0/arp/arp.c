@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -18,16 +18,18 @@
 
 #include "arp-internal.h"
 
-struct arp_callback _arp_callback;
+typedef void (*arp_function)(void);
 
-static void (*_arp_cb)(const struct arp_callback *) = NULL;
+static arp_callback_t _arp_callback;
+
+static arp_callback_handler _arp_cb = NULL;
 
 static void _arp_trampoline(void);
 static void _arp_function_nop(void);
 static void _arp_function_01(void);
 static void _arp_function_09(void);
 
-static void (*_arp_function_table[])(void) = {
+static arp_function _arp_function_table[] = {
         _arp_function_nop,
         _arp_function_01,
         _arp_function_nop,
@@ -92,7 +94,7 @@ arp_byte_xchg(uint8_t c)
 }
 
 void
-arp_function_callback_set(void (*cb)(const struct arp_callback *))
+arp_function_callback_set(arp_callback_handler cb)
 {
         /* Disable interrupts */
         uint32_t sr_mask;

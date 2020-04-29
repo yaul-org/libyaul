@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -23,7 +23,7 @@ __BEGIN_DECLS
 
 #define DBGIO_DEV_COUNT         5
 
-typedef struct {
+typedef struct dbgio_vdp2 {
         const uint8_t *font_cpd;
         const uint16_t *font_pal;
         uint8_t font_fg;
@@ -35,22 +35,23 @@ typedef struct {
         uint32_t cpd_offset;
 
         uint8_t pnd_bank;
-        uint8_t pnd_offset;
+        uint8_t map_index;
 
-        struct vdp2_vram_cycp_bank cpd_cycp;
-        struct vdp2_vram_cycp_bank pnd_cycp;
+        vdp2_vram_cycp_bank_t cpd_cycp;
+        vdp2_vram_cycp_bank_t pnd_cycp;
 
         uint8_t cram_index;
 } dbgio_vdp2_t;
 
-typedef struct {
+typedef struct dbgio_usb_cart {
         uint16_t buffer_size;
 } dbgio_usb_cart_t;
 
-extern void dbgio_init(void);
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
 extern void dbgio_dev_deinit(void);
+extern void dbgio_dev_font_load(void);
+extern void dbgio_dev_font_load_wait(void);
 extern void dbgio_buffer(const char *);
 extern void dbgio_flush(void);
 

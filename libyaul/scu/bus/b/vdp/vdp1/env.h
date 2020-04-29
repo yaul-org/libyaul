@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -25,7 +25,7 @@ __BEGIN_DECLS
 #define VDP1_ENV_COLOR_MODE_PALETTE     0
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
-struct vdp1_env {
+typedef struct vdp1_env {
         unsigned int :8;
 
         struct {
@@ -36,13 +36,16 @@ struct vdp1_env {
                 unsigned int sprite_type:4;
         } __packed;
 
-        color_rgb555_t erase_color;
+        color_rgb1555_t erase_color;
 
         int16_vec2_t erase_points[2];
-};
+} vdp1_env_t;
 
+extern void vdp1_env_default_init(vdp1_env_t *);
 extern void vdp1_env_default_set(void);
-extern void vdp1_env_set(const struct vdp1_env *);
+extern void vdp1_env_set(const vdp1_env_t *);
+
+extern void vdp1_env_stop(void);
 
 __END_DECLS
 

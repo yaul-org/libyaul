@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -15,7 +15,7 @@ static void *_base = NULL;
 static bool _detect_dram_cart(void);
 
 void
-dram_cart_init(void)
+_internal_dram_cart_init(void)
 {
         /* Write to A-Bus "dummy" area */
         MEMORY_WRITE(16, DUMMY(UNKNOWN), 0x0001);

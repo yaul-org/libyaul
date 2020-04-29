@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Israel Jacquez
+ * Copyright (c) 2012-2019 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -20,7 +20,7 @@ __BEGIN_DECLS
 #define CPU_SR_Q_BIT_MASK       0x00000100
 #define CPU_SR_M_BIT_MASK       0x00000200
 
-struct cpu_registers {
+typedef struct cpu_registers {
         uint32_t sp;
         uint32_t r[15]; /* Registers r0..r14 */
         uint32_t macl;
@@ -30,7 +30,7 @@ struct cpu_registers {
         uint32_t pr;
         uint32_t pc;
         uint32_t sr;
-} __packed;
+} __packed cpu_registers_t;
 
 static inline void __always_inline
 cpu_reg_gbr_set(uint32_t reg_gbr)

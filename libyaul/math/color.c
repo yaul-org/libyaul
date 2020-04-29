@@ -10,7 +10,7 @@
 #include "color.h"
 
 void
-color_rgb555_rgb888_convert(const color_rgb555_t *color, color_rgb888_t *result)
+color_rgb1555_rgb888_convert(const color_rgb1555_t *color, color_rgb888_t *result)
 {
         result->r = (color->r << 3) | (color->r & 0x07);
         result->g = (color->g << 3) | (color->g & 0x07);
@@ -18,7 +18,7 @@ color_rgb555_rgb888_convert(const color_rgb555_t *color, color_rgb888_t *result)
 }
 
 void
-color_rgb888_rgb555_convert(const color_rgb888_t *color, color_rgb555_t *result)
+color_rgb888_rgb1555_convert(const color_rgb888_t *color, color_rgb1555_t *result)
 {
         result->r = (color->r >> 3) & 0x1F;
         result->g = (color->g >> 3) & 0x1F;
@@ -44,8 +44,7 @@ color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
 }
 
 void
-color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color,
-    color_rgb555_t *result)
+color_fix16_hsv_rgb1555_convert(const color_fix16_hsv_t *color, color_rgb1555_t *result)
 {
         color_fix16_rgb_t rgb;
         color_fix16_hsv_fix16_rgb_convert(color, &rgb);
@@ -54,7 +53,7 @@ color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *color,
         color_rgb888_t rgb888;
         color_fix16_rgb_rgb888_convert(&rgb, &rgb888);
 
-        color_rgb888_rgb555_convert(&rgb888, result);
+        color_rgb888_rgb1555_convert(&rgb888, result);
 }
 
 void
@@ -121,12 +120,11 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
 }
 
 void
-color_rgb555_fix16_hsv_convert(const color_rgb555_t *color,
-    color_fix16_hsv_t *result)
+color_rgb1555_fix16_hsv_convert(const color_rgb1555_t *color, color_fix16_hsv_t *result)
 {
-        /* Convert from RGB555 to RGB888 */
+        /* Convert from RGB1555 to RGB888 */
         color_rgb888_t rgb888;
-        color_rgb555_rgb888_convert(color, &rgb888);
+        color_rgb1555_rgb888_convert(color, &rgb888);
 
         color_rgb888_fix16_hsv_convert(&rgb888, result);
 }
