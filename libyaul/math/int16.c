@@ -10,12 +10,6 @@
 
 #include "int16.h"
 
-int16_t
-int16_vec2_dot(const int16_vec2_t *v0, const int16_vec2_t *v1)
-{
-        return (v0->x * v1->x) + (v0->y * v1->y);
-}
-
 void
 int16_vec2_str(const int16_vec2_t *v0, char *buf)
 {

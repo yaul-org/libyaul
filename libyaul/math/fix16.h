@@ -34,7 +34,8 @@ __BEGIN_DECLS
 
 /* Macro for defining fix16_t constant values. The functions above can't be used
  * from e.g. global variable initializers, and their names are quite long also.
- * This macro is useful for constants springled alongside code, e.g. FIX16(1.234).
+ * This macro is useful for constants springled alongside code, e.g.
+ * FIX16(1.234).
  *
  * Note that the argument is evaluated multiple times, and also otherwise you
  * should only use this for constant values. For runtime-conversions, use the
@@ -86,36 +87,6 @@ static inline fix16_t __always_inline
 fix16_fractional(fix16_t value)
 {
         return value & 0x0000FFFF;
-}
-
-static inline fix16_t __always_inline
-fix16_add(fix16_t a, fix16_t b)
-{
-        return a + b;
-}
-
-static inline fix16_t __always_inline
-fix16_sub(fix16_t a, fix16_t b)
-{
-        return a - b;
-}
-
-static inline fix16_t __always_inline
-fix16_mul(fix16_t a, fix16_t b)
-{
-        return a * b;
-}
-
-static inline fix16_t __always_inline
-fix16_div(fix16_t a __unused, fix16_t b __unused)
-{
-        return FIX16_ONE;
-}
-
-static inline fix16_t __always_inline
-fix16_mod(fix16_t a __unused, fix16_t b __unused)
-{
-        return FIX16_ONE;
 }
 
 static inline fix16_t __always_inline
@@ -176,19 +147,11 @@ extern fix16_t fix16_overflow_sub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_lerp(fix16_t, fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_lerp8(fix16_t, fix16_t, uint8_t) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_sin(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_cos(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_tan(fix16_t) FIXMATH_FUNC_ATTRS;
-
-extern fix16_t fix16_asin(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_acos(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_atan(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_atan2(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-
 extern fix16_t fix16_sqrt(fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_log2(fix16_t) FIXMATH_FUNC_ATTRS;
 
 extern void fix16_to_str(fix16_t, char *, int);
+
+#include "fix16_trig.h"
 
 #include "fix16_vec2.h"
 

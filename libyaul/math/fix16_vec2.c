@@ -11,72 +11,16 @@
 #include "fix16.h"
 
 void
-fix16_vec2_zero(fix16_vec2_t *result)
-{
-        result->x = FIX16(0.0f);
-        result->y = FIX16(0.0f);
-}
-
-void
-fix16_vec2_dup(const fix16_vec2_t *v0, fix16_vec2_t *result)
-{
-        result->x = v0->x;
-        result->y = v0->y;
-}
-
-void
 fix16_vec2_normalize(fix16_vec2_t *result __unused)
 {
-}
-
-void
-fix16_vec2_normalized(const fix16_vec2_t *v0 __unused,
-    fix16_vec2_t *result __unused)
-{
+        /* XXX: Not yet implemented */
 }
 
 fix16_t
-fix16_vec2_length(const fix16_vec2_t *v0)
+fix16_vec2_length(const fix16_vec2_t *v0 __unused)
 {
-        return fix16_sqrt(fix16_add(fix16_mul(v0->x, v0->x),
-                fix16_mul(v0->y, v0->y)));
-}
-
-void
-fix16_vec2_add(const fix16_vec2_t *v0, const fix16_vec2_t *v1,
-    fix16_vec2_t *result)
-{
-        result->x = fix16_add(v0->x, v1->x);
-        result->y = fix16_add(v0->y, v1->y);
-}
-
-void
-fix16_vec2_sub(const fix16_vec2_t *v0, const fix16_vec2_t *v1,
-    fix16_vec2_t *result)
-{
-        result->x = fix16_sub(v0->x, v1->x);
-        result->y = fix16_sub(v0->y, v1->y);
-}
-
-void
-fix16_vec2_scale(fix16_t scalar, fix16_vec2_t *result)
-{
-        result->x = fix16_mul(scalar, result->x);
-        result->y = fix16_mul(scalar, result->y);
-}
-
-void
-fix16_vec2_scaled(fix16_t scalar, const fix16_vec2_t *v0,
-    fix16_vec2_t *result)
-{
-        result->x = fix16_mul(scalar, v0->x);
-        result->y = fix16_mul(scalar, v0->y);
-}
-
-fix16_t
-fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1)
-{
-        return fix16_add(fix16_mul(v0->x, v1->x), fix16_mul(v0->y, v1->y));
+        /* XXX: Not yet implemented */
+        return FIX16(0.0f);
 }
 
 void

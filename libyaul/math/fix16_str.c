@@ -67,14 +67,15 @@ fix16_to_str(fix16_t value, char *buf, int decimals)
 
         /* Separate the integer and decimal parts of the value */
         unsigned intpart = uvalue >> 16;
-        uint32_t fracpart = uvalue & 0xFFFF;
+        uint32_t frac_part = uvalue & 0xFFFF;
         uint32_t scale = _scales[decimals & 7];
-        fracpart = fix16_mul(fracpart, scale);
 
-        if (fracpart >= scale) {
+        frac_part = frac_part * scale;
+
+        if (frac_part >= scale) {
                 /* Handle carry from decimal part */
                 intpart++;
-                fracpart -= scale;
+                frac_part -= scale;
         }
 
         /* Format integer part */
@@ -83,7 +84,7 @@ fix16_to_str(fix16_t value, char *buf, int decimals)
         /* Format decimal part (if any) */
         if (scale != 1) {
                 *buf++ = '.';
-                buf = _itoa_loop(buf, scale / 10, fracpart, false);
+                buf = _itoa_loop(buf, scale / 10, frac_part, false);
         }
 
         *buf = '\0';

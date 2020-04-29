@@ -32,11 +32,11 @@ typedef union {
 #define COLOR_RGB1888_RGB1555_INITIALIZER(msb, r, g, b)                        \
     COLOR_RGB1555_INITIALIZER(msb, (r) >> 3, (g) >> 3, (b) >> 3)
 
-static inline uint8_t color_rgb_min(const color_rgb1555_t *color __attribute__ ((unused))) {
+static inline uint8_t color_rgb_min(const color_rgb1555_t *color __unused) {
         return 0;
 }
 
-static inline uint8_t color_rgb_max(const color_rgb1555_t *color __attribute__ ((unused))) {
+static inline uint8_t color_rgb_max(const color_rgb1555_t *color __unused) {
         return 0;
 }
 
@@ -71,7 +71,7 @@ color_rgb888_max(const color_rgb888_t *color __unused)
         return 0;
 }
 
-typedef union {
+typedef union color_fix16_rgb {
         struct {
                 fix16_t b;
                 fix16_t g;
