@@ -22,9 +22,6 @@
 
 #include "vdp-internal.h"
 
-/* Debug: Use dma-queue to transfer VDP1 command list */
-#define DEBUG_DMA_QUEUE_ENABLE  0
-
 /* CPU-DMAC channel used for vdp2_sync() */
 #define SYNC_DMAC_CHANNEL       0
 
@@ -78,7 +75,6 @@ static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 static void _sprite_end_handler(void);
 
-/* Unused when DEBUG_DMA_QUEUE_ENABLE is set to 0 */
 static void _vdp1_dma_handler(const dma_queue_transfer_t *);
 static void _vdp2_dma_handler(const dma_queue_transfer_t *);
 
