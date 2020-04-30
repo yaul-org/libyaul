@@ -6,8 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _MATH_FIX16_VEC4_H_
-#define _MATH_FIX16_VEC4_H_
+#ifndef _FIX16_INCLUDE_ONCE
+#error "Header file must not be directly included"
+#endif /* !_FIX16_INCLUDE_ONCE */
 
 #define FIX16_VEC4_INITIALIZER(x, y, z, w)                                     \
     {                                                                          \
@@ -70,9 +71,9 @@ fix16_vec4_sub(const fix16_vec4_t * __restrict v0,
 static inline void
 fix16_vec4_scale(const fix16_t scalar, fix16_vec4_t *result)
 {
-        result->x = scalar * result->x;
-        result->y = scalar * result->y;
-        result->z = scalar * result->z;
+        result->x = fix16_mul(scalar, result->x);
+        result->y = fix16_mul(scalar, result->y);
+        result->z = fix16_mul(scalar, result->z);
         result->w = FIX16_ONE;
 }
 
@@ -80,9 +81,9 @@ static inline void
 fix16_vec4_scaled(const fix16_t scalar, const fix16_vec4_t * __restrict v0,
     fix16_vec4_t * __restrict result)
 {
-        result->x = scalar * v0->x;
-        result->y = scalar * v0->y;
-        result->z = scalar * v0->z;
+        result->x = fix16_mul(scalar, v0->x);
+        result->y = fix16_mul(scalar, v0->y);
+        result->z = fix16_mul(scalar, v0->z);
         result->w = FIX16_ONE;
 }
 
@@ -118,5 +119,3 @@ extern void fix16_vec4_normalized(const fix16_vec4_t * __restrict,
     fix16_vec4_t * __restrict);
 extern fix16_t fix16_vec4_dot(const fix16_vec4_t *, const fix16_vec4_t *);
 extern void fix16_vec4_str(const fix16_vec4_t *, char *, uint8_t);
-    
-#endif /* _MATH_FIX16_VEC4_H_ */

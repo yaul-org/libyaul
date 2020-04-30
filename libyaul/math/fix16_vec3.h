@@ -6,8 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _MATH_FIX16_VEC3_H_
-#define _MATH_FIX16_VEC3_H_
+#ifndef _FIX16_INCLUDE_ONCE
+#error "Header file must not be directly included"
+#endif /* !_FIX16_INCLUDE_ONCE */
 
 #define FIX16_VEC3_INITIALIZER(x, y, z)                                        \
     {                                                                          \
@@ -66,18 +67,18 @@ fix16_vec3_sub(const fix16_vec3_t * __restrict v0,
 static inline void __always_inline
 fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
 {
-        result->x = scalar * result->x;
-        result->y = scalar * result->y;
-        result->z = scalar * result->z;
+        result->x = fix16_mul(scalar, result->x);
+        result->y = fix16_mul(scalar, result->y);
+        result->z = fix16_mul(scalar, result->z);
 }
 
 static inline void __always_inline
 fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t * __restrict v,
     fix16_vec3_t * __restrict result)
 {
-        result->x = scalar * v->x;
-        result->y = scalar * v->y;
-        result->z = scalar * v->z;
+        result->x = fix16_mul(scalar, v->x);
+        result->y = fix16_mul(scalar, v->y);
+        result->z = fix16_mul(scalar, v->z);
 }
 
 static inline fix16_t __always_inline
@@ -112,5 +113,3 @@ extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict,
     fix16_vec3_t * __restrict);
 extern fix16_t fix16_vec3_dot(const fix16_vec3_t *, const fix16_vec3_t *);
 extern void fix16_vec3_str(const fix16_vec3_t *, char *, int);
-
-#endif /* _MATH_FIX16_VEC3_H_ */

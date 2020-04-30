@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2012-2014 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef _MATH_INT16_H_
 #define _MATH_INT16_H_
 

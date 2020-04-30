@@ -1,5 +1,14 @@
-#ifndef _MATH_FIX16_MAT3_H_
-#define _MATH_FIX16_MAT3_H_
+/*
+ * Copyright (c) 2012-2014 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ * Romulo Fernandes <abra185@gmail.com>
+ */
+
+#ifndef _FIX16_INCLUDE_ONCE
+#error "Header file must not be directly included"
+#endif /* !_FIX16_INCLUDE_ONCE */
 
 union fix16_vec3;
 
@@ -24,5 +33,3 @@ extern void fix16_mat3_str(const fix16_mat3_t *, char *, int);
 extern void fix16_mat3_transpose(const fix16_mat3_t * __restrict,
     fix16_mat3_t * __restrict);
 extern void fix16_mat3_zero(fix16_mat3_t *);
-
-#endif /* _MATH_FIX16_MAT3_H_ */
