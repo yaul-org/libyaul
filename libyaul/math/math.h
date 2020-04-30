@@ -3,11 +3,11 @@
 
 #include <sys/cdefs.h>
 
-#include "uint32.h"
-#include "fix16.h"
-#include "int16.h"
 #include "color.h"
 #include "fix.h"
+#include "fix16.h"
+#include "int16.h"
+#include "uint32.h"
 
 __BEGIN_DECLS
 
