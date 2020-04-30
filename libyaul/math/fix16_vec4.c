@@ -30,6 +30,12 @@ fix16_vec4_length(const fix16_vec4_t *v0 __unused)
         return FIX16(0.0f);
 }
 
+fix16_t
+fix16_vec4_dot(const fix16_vec4_t *a, const fix16_vec4_t *b)
+{
+        return fix16_vec4_inline_dot(a, b);
+}
+
 void
 fix16_vec4_str(const fix16_vec4_t *v0, char *buf, uint8_t decimals)
 {

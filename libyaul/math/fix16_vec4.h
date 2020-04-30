@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2012-2014 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ * Romulo Fernandes <abra185@gmail.com>
+ */
+
 #ifndef _MATH_FIX16_VEC4_H_
 #define _MATH_FIX16_VEC4_H_
 
@@ -78,10 +86,41 @@ fix16_vec4_scaled(const fix16_t scalar, const fix16_vec4_t * __restrict v0,
         result->w = FIX16_ONE;
 }
 
+static inline fix16_t __always_inline
+fix16_vec4_inline_dot(const fix16_vec4_t *a, const fix16_vec4_t *b)
+{
+        /* We need to copy a and b parameters because the registers addresses
+         * will be modified by mac.l after every instruction. */
+        register uint32_t aux0;
+        register uint32_t aux1;
+        register uint32_t aux2;
+        register uint32_t aux3;
+
+        __asm__ volatile ("\tclrmac\n"
+                          "\tmov %[a], %[aux0]\n"
+                          "\tmov %[b], %[aux1]\n"
+                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
+                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
+                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
+                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
+                          "\tsts mach, %[aux2]\n"
+                          "\tsts macl, %[aux3]\n"
+                          "\txtrct %[aux2], %[aux3]\n"
+            : [aux0] "=&r" (aux0),
+              [aux1] "=&r" (aux1),
+              [aux2] "=&r" (aux2),
+              [aux3] "=&r" (aux3)
+            : [a] "r" (a),
+              [b] "r" (b));
+
+        return aux3;
+}
+
 extern fix16_t fix16_vec4_length(const fix16_vec4_t *);
 extern void fix16_vec4_normalize(fix16_vec4_t *);
 extern void fix16_vec4_normalized(const fix16_vec4_t * __restrict,
     fix16_vec4_t * __restrict);
+extern fix16_t fix16_vec4_dot(const fix16_vec4_t *, const fix16_vec4_t *);
 extern void fix16_vec4_str(const fix16_vec4_t *, char *, uint8_t);
-
+    
 #endif /* _MATH_FIX16_VEC4_H_ */
