@@ -141,6 +141,26 @@ fix16_deg_rad_to(fix16_t degrees)
         return degrees * fix16_deg2rad;
 }
 
+static inline uint32_t __always_inline
+fix16_mul(const fix16_t a, const fix16_t b)
+{
+        register uint32_t mach;
+        register fix16_t out;
+
+        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                          "\tsts mach, %[mach]\n"
+                          "\tsts macl, %[out]\n"
+                          "\nxtrct %[mach], %[out]"
+            /* Output */
+            : [mach] "=&r" (mach),
+              [out] "=&r" (out)
+            /* Input */
+            : [a] "r" (a),
+              [b] "r" (b)
+            : "mach", "macl");
+
+        return out;
+}
 
 extern fix16_t fix16_overflow_add(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_overflow_sub(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
