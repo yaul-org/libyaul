@@ -23,6 +23,12 @@ fix16_vec2_length(const fix16_vec2_t *v0 __unused)
         return FIX16(0.0f);
 }
 
+fix16_t
+fix16_vec2_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
+{
+        return fix16_vec2_inline_dot(a, b);
+}
+
 void
 fix16_vec2_str(const fix16_vec2_t *v0, char *buf, int decimals)
 {
