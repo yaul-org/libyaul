@@ -6,8 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _MATH_FIX16_VEC2_H_
-#define _MATH_FIX16_VEC2_H_
+#ifndef _FIX16_INCLUDE_ONCE
+#error "Header file must not be directly included"
+#endif /* !_FIX16_INCLUDE_ONCE */
 
 #define FIX16_VEC2_INITIALIZER(x, y)                                           \
     {                                                                          \
@@ -60,16 +61,16 @@ fix16_vec2_sub(const fix16_vec2_t * __restrict v0,
 static inline void __always_inline
 fix16_vec2_scale(const fix16_t scalar, fix16_vec2_t *result)
 {
-        result->x = scalar * result->x;
-        result->y = scalar * result->y;
+        result->x = fix16_mul(scalar, result->x);
+        result->y = fix16_mul(scalar, result->y);
 }
 
 static inline void __always_inline
 fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
     fix16_vec2_t * __restrict result)
 {
-        result->x = scalar * v0->x;
-        result->y = scalar * v0->y;
+        result->x = fix16_mul(scalar, v0->x);
+        result->y = fix16_mul(scalar, v0->y);
 }
 
 static inline fix16_t __always_inline
@@ -101,5 +102,3 @@ extern void fix16_vec2_normalize(fix16_vec2_t *);
 extern void fix16_vec2_normalized(const fix16_vec2_t *, fix16_vec2_t *);
 extern fix16_t fix16_vec2_dot(const fix16_vec2_t *, const fix16_vec2_t *);
 extern void fix16_vec2_str(const fix16_vec2_t *, char *, int);
-
-#endif /* _MATH_FIX16_VEC2_H_ */

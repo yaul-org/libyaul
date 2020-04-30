@@ -39,7 +39,7 @@ __BEGIN_DECLS
  *
  * Note that the argument is evaluated multiple times, and also otherwise you
  * should only use this for constant values. For runtime-conversions, use the
- * functions above. */
+ * inlined functions below */
 
 #define FIX16(x) ((fix16_t)(((x) >= 0)                                         \
         ? ((x) * 65536.0f + 0.5f)                                              \
@@ -52,8 +52,31 @@ __BEGIN_DECLS
 #define FIX16_PI        (0x0003243F)
 #define FIX16_E         (0x0002B7E1)
 #define FIX16_ONE       (0x00010000)
+#define FIX16_RAD2DEG   (0x00394BB8)
+#define FIX16_DEG2RAD   (0x00000478)
 
 typedef int32_t fix16_t;
+
+static inline uint32_t __always_inline
+fix16_mul(const fix16_t a, const fix16_t b)
+{
+        register uint32_t mach;
+        register fix16_t out;
+
+        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                          "\tsts mach, %[mach]\n"
+                          "\tsts macl, %[out]\n"
+                          "\nxtrct %[mach], %[out]"
+            /* Output */
+            : [mach] "=&r" (mach),
+              [out] "=&r" (out)
+            /* Input */
+            : [a] "r" (a),
+              [b] "r" (b)
+            : "mach", "macl");
+
+        return out;
+}
 
 static inline fix16_t __always_inline
 fix16_int32_from(int32_t value)
@@ -78,45 +101,45 @@ fix16_round_int32_to(const fix16_t value)
 }
 
 static inline fix16_t __always_inline
-fix16_integral(fix16_t value)
+fix16_integral(const fix16_t value)
 {
         return value & 0xFFFF0000;
 }
 
 static inline fix16_t __always_inline
-fix16_fractional(fix16_t value)
+fix16_fractional(const fix16_t value)
 {
         return value & 0x0000FFFF;
 }
 
 static inline fix16_t __always_inline
-fix16_abs(fix16_t value)
+fix16_abs(const fix16_t value)
 {
         return ((value < 0) ? -value : value);
 }
 
 static inline fix16_t __always_inline
-fix16_floor(fix16_t value)
+fix16_floor(const fix16_t value)
 {
         return (value & 0xFFFF0000UL);
 }
 
 static inline fix16_t __always_inline
-fix16_ceil(fix16_t value)
+fix16_ceil(const fix16_t value)
 {
         return (value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16_ONE : 0);
 }
 
 static inline fix16_t __always_inline
-fix16_min(fix16_t x, fix16_t y)
+fix16_min(const fix16_t x, const fix16_t y)
 {
-        return (x < y ? x : y);
+        return ((x < y) ? x : y);
 }
 
 static inline fix16_t __always_inline
-fix16_max(fix16_t x, fix16_t y)
+fix16_max(const fix16_t x, const fix16_t y)
 {
-        return (x > y ? x : y);
+        return ((x > y) ? x : y);
 }
 
 static inline fix16_t __always_inline
@@ -128,38 +151,13 @@ fix16_clamp(fix16_t value, fix16_t value_low, fix16_t value_high)
 static inline fix16_t __always_inline
 fix16_rad_deg_to(fix16_t radians)
 {
-        static const fix16_t fix16_rad2deg = 3754936;
-
-        return radians * fix16_rad2deg;
+        return fix16_mul(radians, FIX16_RAD2DEG);
 }
 
 static inline fix16_t __always_inline
 fix16_deg_rad_to(fix16_t degrees)
 {
-        static const fix16_t fix16_deg2rad = 1144;
-
-        return degrees * fix16_deg2rad;
-}
-
-static inline uint32_t __always_inline
-fix16_mul(const fix16_t a, const fix16_t b)
-{
-        register uint32_t mach;
-        register fix16_t out;
-
-        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                          "\tsts mach, %[mach]\n"
-                          "\tsts macl, %[out]\n"
-                          "\nxtrct %[mach], %[out]"
-            /* Output */
-            : [mach] "=&r" (mach),
-              [out] "=&r" (out)
-            /* Input */
-            : [a] "r" (a),
-              [b] "r" (b)
-            : "mach", "macl");
-
-        return out;
+        return fix16_mul(degrees, FIX16_DEG2RAD);
 }
 
 extern fix16_t fix16_overflow_add(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
@@ -172,15 +170,18 @@ extern fix16_t fix16_sqrt(const fix16_t) FIXMATH_FUNC_ATTRS;
 
 extern void fix16_to_str(fix16_t, char *, int);
 
+#define _FIX16_INCLUDE_ONCE
+
 #include "fix16_trig.h"
 
 #include "fix16_vec2.h"
-
 #include "fix16_vec3.h"
-#include "fix16_mat3.h"
-
 #include "fix16_vec4.h"
+
+#include "fix16_mat3.h"
 #include "fix16_mat4.h"
+
+#undef _FIX16_INCLUDE_ONCE
 
 #undef FIXMATH_FUNC_ATTRS
 

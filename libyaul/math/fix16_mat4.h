@@ -1,5 +1,14 @@
-#ifndef _MATH_FIX16_MAT4_H_
-#define _MATH_FIX16_MAT4_H_
+/*
+ * Copyright (c) 2012-2014 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ * Romulo Fernandes <abra185@gmail.com>
+ */
+
+#ifndef _FIX16_INCLUDE_ONCE
+#error "Header file must not be directly included"
+#endif /* !_FIX16_INCLUDE_ONCE */
 
 /* Row-major matrix */
 typedef union fix16_mat4 {
@@ -22,5 +31,3 @@ extern void fix16_mat4_str(const fix16_mat4_t *, char *, int);
 extern void fix16_mat4_transpose(const fix16_mat4_t * __restrict,
     fix16_mat4_t * __restrict);
 extern void fix16_mat4_zero(fix16_mat4_t *);
-
-#endif /* _MATH_FIX16_MAT4_H_ */
