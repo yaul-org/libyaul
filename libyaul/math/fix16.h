@@ -141,13 +141,14 @@ fix16_deg_rad_to(fix16_t degrees)
         return degrees * fix16_deg2rad;
 }
 
-extern fix16_t fix16_overflow_add(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_overflow_sub(fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_lerp(fix16_t, fix16_t, fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_lerp8(fix16_t, fix16_t, uint8_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_add(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_sub(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_sqrt(fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp(const fix16_t, const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp8(const fix16_t, const fix16_t, const uint8_t) FIXMATH_FUNC_ATTRS;
+
+extern fix16_t fix16_sqrt(const fix16_t) FIXMATH_FUNC_ATTRS;
 
 extern void fix16_to_str(fix16_t, char *, int);
 
