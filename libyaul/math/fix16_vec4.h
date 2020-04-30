@@ -117,6 +117,7 @@ fix16_vec4_inline_dot(const fix16_vec4_t *a, const fix16_vec4_t *b)
 }
 
 extern fix16_t fix16_vec4_length(const fix16_vec4_t *);
+extern fix16_t fix16_vec4_sqr_length(const fix16_vec2_t *);
 extern void fix16_vec4_normalize(fix16_vec4_t *);
 extern void fix16_vec4_normalized(const fix16_vec4_t * __restrict,
     fix16_vec4_t * __restrict);

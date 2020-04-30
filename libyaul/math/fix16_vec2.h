@@ -101,6 +101,7 @@ fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 }
 
 extern fix16_t fix16_vec2_length(const fix16_vec2_t *);
+extern fix16_t fix16_vec2_sqr_length(const fix16_vec2_t *);
 extern void fix16_vec2_normalize(fix16_vec2_t *);
 extern void fix16_vec2_normalized(const fix16_vec2_t *, fix16_vec2_t *);
 extern fix16_t fix16_vec2_dot(const fix16_vec2_t *, const fix16_vec2_t *);

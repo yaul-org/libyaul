@@ -31,6 +31,13 @@ fix16_vec4_length(const fix16_vec4_t *v0 __unused)
 }
 
 fix16_t
+fix16_vec4_sqr_length(const fix16_vec2_t *v0 __unused)
+{
+        /* XXX: Not yet implemented */
+        return FIX16(0.0f);
+}
+
+fix16_t
 fix16_vec4_dot(const fix16_vec4_t *a, const fix16_vec4_t *b)
 {
         return fix16_vec4_inline_dot(a, b);
