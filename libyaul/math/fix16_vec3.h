@@ -83,30 +83,25 @@ fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t * __restrict v,
 static inline fix16_t __always_inline
 fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
 {
-        /* We need to copy a and b parameters because the registers addresses
-         * will be modified by mac.l after every instruction. */
         register uint32_t aux0;
         register uint32_t aux1;
-        register uint32_t aux2;
-        register uint32_t aux3;
 
         __asm__ volatile ("\tclrmac\n"
-                          "\tmov %[a], %[aux0]\n"
-                          "\tmov %[b], %[aux1]\n"
-                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
-                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
-                          "\tmac.l @%[aux0]+, @%[aux1]+\n"
-                          "\tsts mach, %[aux2]\n"
-                          "\tsts macl, %[aux3]\n"
-                          "\txtrct %[aux2], %[aux3]\n"
-            : [aux0] "=&r" (aux0),
-              [aux1] "=&r" (aux1),
-              [aux2] "=&r" (aux2),
-              [aux3] "=&r" (aux3)
-            : [a] "r" (a),
-              [b] "r" (b));
+                          "\tmac.l @%[a]+, @%[b]+\n"
+                          "\tmac.l @%[a]+, @%[b]+\n"
+                          "\tmac.l @%[a]+, @%[b]+\n"
+                          "\tsts mach, %[aux0]\n"
+                          "\tsts macl, %[aux1]\n"
+                          "\txtrct %[aux0], %[aux1]\n"
+            : [a] "+r" (a),
+              [b] "+r" (b),
+              [aux0] "=&r" (aux0),
+              [aux1] "=&r" (aux1)
+            : "m" (*a),
+              "m" (*b)
+            : "mach", "macl", "memory");
 
-        return aux3;
+        return aux1;
 }
 
 extern fix16_t fix16_vec3_length(const fix16_vec3_t *);
