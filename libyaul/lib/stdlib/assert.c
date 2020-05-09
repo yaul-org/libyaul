@@ -42,32 +42,32 @@ _assert(const char * restrict file, const char * restrict line,
                 dbgio_dev_font_load_wait();
                 cpu_intc_mask_set(15);
 
-                dbgio_buffer("[H[2J");
+                dbgio_puts("[H[2J");
         }
 
         if (assertion_count > 0) {
-                dbgio_buffer("\n");
+                dbgio_puts("\n");
         }
 
         assertion_count++;
 
-        dbgio_buffer("Assertion \"");
-        dbgio_buffer(failed_expr);
-        dbgio_buffer("\" failed");
+        dbgio_puts("Assertion \"");
+        dbgio_puts(failed_expr);
+        dbgio_puts("\" failed");
 
-        dbgio_buffer(": file \"");
-        dbgio_buffer(file);
-        dbgio_buffer("\"");
+        dbgio_puts(": file \"");
+        dbgio_puts(file);
+        dbgio_puts("\"");
 
-        dbgio_buffer(", line ");
-        dbgio_buffer(line);
+        dbgio_puts(", line ");
+        dbgio_puts(line);
 
         if ((func != NULL) && (*func != '\0')) {
-                dbgio_buffer(", function: ");
-                dbgio_buffer(func);
+                dbgio_puts(", function: ");
+                dbgio_puts(func);
         }
 
-        dbgio_buffer("\n");
+        dbgio_puts("\n");
 
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();

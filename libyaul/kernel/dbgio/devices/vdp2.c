@@ -478,7 +478,7 @@ _shared_deinit(void)
 }
 
 static void
-_shared_buffer(const char *buffer)
+_shared_puts(const char *buffer)
 {
         if (_dev_state == NULL) {
                 return;
