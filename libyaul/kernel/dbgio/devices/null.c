@@ -14,7 +14,7 @@
 
 static void _init(const void *);
 static void _deinit(void);
-static void _buffer(const char *);
+static void _puts(const char *);
 static void _flush(void);
 
 const uint32_t _default_params;
@@ -24,7 +24,7 @@ const struct dbgio_dev_ops _internal_dev_ops_null = {
         .default_params = &_default_params,
         .init = _init,
         .deinit = _deinit,
-        .buffer = _buffer,
+        .puts = _puts,
         .flush = _flush
 };
 
@@ -39,7 +39,7 @@ _deinit(void)
 }
 
 static void
-_buffer(const char *buffer __unused)
+_puts(const char *buffer __unused)
 {
 }
 

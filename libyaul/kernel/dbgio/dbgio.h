@@ -8,6 +8,8 @@
 #ifndef _DBGIO_H_
 #define _DBGIO_H_
 
+#include <sys/cdefs.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -50,9 +52,12 @@ typedef struct dbgio_usb_cart {
 extern void dbgio_dev_init(uint8_t, const void *);
 extern void dbgio_dev_default_init(uint8_t);
 extern void dbgio_dev_deinit(void);
+
 extern void dbgio_dev_font_load(void);
 extern void dbgio_dev_font_load_wait(void);
-extern void dbgio_buffer(const char *);
+
+extern void dbgio_puts(const char *);
+extern void dbgio_printf(const char *, ...) __printflike(1, 2);
 extern void dbgio_flush(void);
 
 __END_DECLS

@@ -25,7 +25,7 @@
 
 static void _init(const dbgio_usb_cart_t *);
 static void _deinit(void);
-static void _buffer(const char *);
+static void _puts(const char *);
 static void _flush(void);
 
 typedef struct {
@@ -47,7 +47,7 @@ const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
         .default_params = &_default_params,
         .init = (void (*)(const void *))_init,
         .deinit = _deinit,
-        .buffer = _buffer,
+        .puts = _puts,
         .flush = _flush
 };
 
@@ -98,7 +98,7 @@ _deinit(void)
 }
 
 static void
-_buffer(const char *buffer)
+_puts(const char *buffer)
 {
         size_t len;
         len = strlen(buffer);
