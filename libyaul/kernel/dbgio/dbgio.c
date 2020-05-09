@@ -6,15 +6,21 @@
  */
 
 #include <assert.h>
+#include <stdarg.h>
 #include <stdio.h>
 
 #include <dbgio.h>
+
+#include <internal.h>
 
 #include "dbgio-internal.h"
 
 #define STATE_IDLE                      (0x00)
 #define STATE_FONT_LOAD_REQUESTED       (0x01)
 #define STATE_FONT_LOAD_COMPLETED       (0x02)
+
+/* This is enough for a 320x256 character resolution */
+#define SPRINTF_BUFFER_SIZE             (1280)
 
 static void _font_load_callback(void);
 
@@ -31,12 +37,18 @@ static const struct dbgio_dev_ops *_dev_ops_table[] = {
         &_internal_dev_ops_usb_cart,
 };
 
+static char *_sprintf_buffer;
+
 void
 _internal_dbgio_init(void)
 {
         _dbgio_state.state = STATE_IDLE;
 
         dbgio_dev_default_init(DBGIO_DEV_NULL);
+
+        if (_sprintf_buffer == NULL) {
+                _sprintf_buffer = _internal_malloc(SPRINTF_BUFFER_SIZE);
+        }
 }
 
 void
@@ -113,7 +125,7 @@ dbgio_dev_font_load_wait(void)
 }
 
 void
-dbgio_buffer(const char *buffer)
+dbgio_puts(const char *buffer)
 {
         assert(_dbgio_state.dev_ops != NULL);
 
@@ -123,7 +135,25 @@ dbgio_buffer(const char *buffer)
                 return;
         }
 
-        _dbgio_state.dev_ops->buffer(buffer);
+        _dbgio_state.dev_ops->puts(buffer);
+}
+
+void
+dbgio_printf(const char *format, ...)
+{
+        assert(_dbgio_state.dev_ops != NULL);
+
+        va_list args;
+
+        va_start(args, format);
+        (void)vsprintf(_sprintf_buffer, format, args);
+        va_end(args);
+
+        if (*_sprintf_buffer == '\0') {
+                return;
+        }
+
+        _dbgio_state.dev_ops->puts(_sprintf_buffer);
 }
 
 void

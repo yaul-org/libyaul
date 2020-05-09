@@ -113,7 +113,7 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
 
         dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
 
-        dbgio_buffer(buffer);
+        dbgio_puts(buffer);
         dbgio_flush();
 }
 
