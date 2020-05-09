@@ -14,6 +14,12 @@ providing lightweight abstractions between your program and the hardware.
 
 ### Windows
 
+<p align="center">
+  <a href="https://github.com/ijacquez/libyaul-installer/releases">
+    <img width="256" height="256" src=".images/yaul-installer.png">
+  </a>
+</p>
+
 Download the _Yaul MSYS2 64-bit_ installer from the release [page][2].
 
 Once _Yaul MSYS2 64-bit_ is installed, your entire environment is set up!
