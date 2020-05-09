@@ -81,7 +81,7 @@ cd_block_auth()
                         return ret;
         
                 sprintf(tmpBuf, "Return - %d\n", flags);
-                dbgio_buffer(tmpBuf);
+                dbgio_puts(tmpBuf);
                 dbgio_flush();
                 vdp_sync(0);
 

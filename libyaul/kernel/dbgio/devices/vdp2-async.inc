@@ -11,7 +11,7 @@ const struct dbgio_dev_ops _internal_dev_ops_vdp2_async = {
         .init = (dev_ops_init)_async_init,
         .deinit = _shared_deinit,
         .font_load = _shared_font_load,
-        .buffer = _shared_buffer,
+        .puts = _shared_puts,
         .flush = _async_flush
 };
 
