@@ -1,7 +1,7 @@
 Yet Another Useless [Saturn] Library
 ===
 <p align="center">
-  <img width="460" height="300" src=".images/logo.png">
+  <img width="700" height="630" src=".images/logo.png">
 </p>
 
 [![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)]( https://discord.gg/S434dWA)
@@ -16,7 +16,7 @@ providing lightweight abstractions between your program and the hardware.
 
 <p align="center">
   <a href="https://github.com/ijacquez/libyaul-installer/releases">
-    <img width="256" height="256" src=".images/yaul-installer.png">
+    <img width="64" height="64" src=".images/yaul-installer.png">
   </a>
 </p>
 
