@@ -119,9 +119,11 @@ LIB_SRCS+= \
 	lib/stdlib/atoi.c \
 	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
+	lib/stdlib/labs.c \
 	lib/stdlib/malloc.c \
 	lib/stdlib/memalign.c \
-	lib/stdlib/realloc.c
+	lib/stdlib/realloc.c \
+	lib/stdlib/strtol.c
 
 LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
