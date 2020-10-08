@@ -39,6 +39,7 @@ struct dma_queue {
 
         volatile int8_t head;
         volatile int8_t tail;
+        volatile int8_t flush_tail;
 } __aligned(16);
 
 static_assert(sizeof(struct dma_queue_request) == 32);
@@ -191,6 +192,9 @@ dma_queue_flush(uint8_t tag)
                 goto exit;
         }
 
+        /* Mark what is going to be flushed */
+        dma_queue->flush_tail = dma_queue->tail;
+
         _state.current_tag = tag;
 
         struct dma_queue_request *request;
@@ -251,6 +255,7 @@ _queue_init(const uint8_t tag, struct dma_queue *dma_queue)
         dma_queue->requests = &_dma_queue_request_pools[tag][0];
         dma_queue->head = -1;
         dma_queue->tail = -1;
+        dma_queue->flush_tail = -1;
 
         for (uint32_t i = 0; i < DMA_QUEUE_REQUESTS_MAX_COUNT; i++) {
                 struct dma_queue_request *request;
@@ -279,6 +284,13 @@ static inline bool __always_inline
 _queue_empty(const struct dma_queue *dma_queue)
 {
         return (dma_queue->head == dma_queue->tail);
+}
+
+/* Determine if the queue is empty, relative to where the flush tail is. */
+static inline bool __always_inline
+_queue_flush_empty(const struct dma_queue *dma_queue)
+{
+        return (dma_queue->head == dma_queue->flush_tail);
 }
 
 static inline struct dma_queue_request * __always_inline
@@ -351,7 +363,7 @@ _dma_handler(void)
 
         top_request->handler(&top_request->transfer);
 
-        if (_queue_empty(dma_queue)) {
+        if (_queue_flush_empty(dma_queue)) {
                 _state.current_tag = DMA_QUEUE_TAG_INVALID;
 
                 return;
