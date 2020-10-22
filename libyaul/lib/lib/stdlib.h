@@ -8,12 +8,17 @@
 __BEGIN_DECLS
 
 extern int abs(int);
+extern long labs(long);
 
 extern int atoi(const char *);
 extern long atol(const char *);
 
+unsigned long strtoul(const char *__restrict, char **__restrict, int);
+long strtol(const char *__restrict, char **__restrict, int);
+
 extern void *malloc(size_t);
 extern void *memalign(size_t, size_t);
+extern void *realloc(void *, size_t);
 extern void free(void *);
 
 extern void abort(void) __noreturn;

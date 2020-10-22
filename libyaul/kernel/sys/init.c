@@ -17,9 +17,7 @@
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
 #include <internal.h>
 
@@ -70,9 +68,7 @@ _init(void)
 
         master_state()->tlsf_pools[TLSF_POOL_GENERAL] =
             tlsf_create_with_pool((void *)TLSF_POOL_GENERAL_START, TLSF_POOL_GENERAL_SIZE);
-#elif defined(MALLOC_IMPL_SLOB)
-        slob_init();
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
         _call_global_ctors();
 

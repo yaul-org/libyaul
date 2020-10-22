@@ -90,8 +90,6 @@ __BEGIN_DECLS
         .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
 }
 
-typedef void (*scu_dma_ihr)(void);
-
 typedef struct scu_dma_handle {
         uint32_t dnr;
         uint32_t dnw;
@@ -120,6 +118,29 @@ typedef struct scu_dma_level_cfg {
         uint8_t stride;
         uint32_t update;
 } scu_dma_level_cfg_t;
+
+typedef void (*scu_dma_ihr)(void);
+typedef void (*scu_dma_callback)(void *);
+
+void scu_dma_level0_fast_start(void);
+void scu_dma_level1_fast_start(void);
+void scu_dma_level2_fast_start(void);
+
+void scu_dma_level0_start(void);
+void scu_dma_level1_start(void);
+void scu_dma_level2_start(void);
+
+void scu_dma_level0_stop(void);
+void scu_dma_level1_stop(void);
+void scu_dma_level2_stop(void);
+
+extern void scu_dma_level0_wait(void);
+extern void scu_dma_level1_wait(void);
+extern void scu_dma_level2_wait(void);
+
+extern void scu_dma_level0_end_set(scu_dma_callback, void *);
+extern void scu_dma_level1_end_set(scu_dma_callback, void *);
+extern void scu_dma_level2_end_set(scu_dma_callback, void *);
 
 static inline uint32_t __always_inline
 scu_dma_status_get(void)
@@ -188,27 +209,6 @@ scu_dma_level_busy(const uint8_t level)
 }
 
 static inline void __always_inline
-scu_dma_level0_wait(void)
-{
-        /* Cannot modify registers while in operation */
-        while ((scu_dma_level0_busy()) != 0x00000000);
-}
-
-static inline void __always_inline
-scu_dma_level1_wait(void)
-{
-        /* Cannot modify registers while in operation */
-        while ((scu_dma_level1_busy()) != 0x00000000);
-}
-
-static inline void __always_inline
-scu_dma_level2_wait(void)
-{
-        /* Cannot modify registers while in operation */
-        while ((scu_dma_level2_busy()) != 0x00000000);
-}
-
-static inline void __always_inline
 scu_dma_level_wait(const uint8_t level)
 {
         switch (level & 0x03) {
@@ -222,49 +222,6 @@ scu_dma_level_wait(const uint8_t level)
                 scu_dma_level2_wait();
                 break;
         }
-}
-
-static inline void __always_inline
-scu_dma_level0_fast_start(void)
-{
-        MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
-}
-
-static inline void __always_inline
-scu_dma_level1_fast_start(void)
-{
-        MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
-}
-
-static inline void __always_inline
-scu_dma_level2_fast_start(void)
-{
-        MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
-}
-
-static inline void __always_inline
-scu_dma_level0_start(void)
-{
-        scu_dma_level0_wait();
-        scu_dma_level0_fast_start();
-}
-
-static inline void __always_inline
-scu_dma_level1_start(void)
-{
-        scu_dma_level1_wait();
-        scu_dma_level1_fast_start();
-}
-
-static inline void __always_inline
-scu_dma_level2_start(void)
-{
-        /* To prevent operation errors, do not activate DMA
-         * level 2 during DMA level 1 operation. */
-
-        scu_dma_level1_wait();
-        scu_dma_level2_wait();
-        scu_dma_level2_fast_start();
 }
 
 static inline void __always_inline
@@ -300,24 +257,6 @@ scu_dma_level_start(const uint8_t level)
 }
 
 static inline void __always_inline
-scu_dma_level0_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D0EN), 0x00000000);
-}
-
-static inline void __always_inline
-scu_dma_level1_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
-}
-
-static inline void __always_inline
-scu_dma_level2_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
-}
-
-static inline void __always_inline
 scu_dma_level_stop(const uint8_t level)
 {
         switch (level & 0x03) {
@@ -342,50 +281,32 @@ scu_dma_stop(void)
 }
 
 static inline void __always_inline
+scu_dma_level_end_set(const uint8_t level, scu_dma_callback callback, void *work)
+{
+        switch (level & 0x03) {
+        case 2:
+                scu_dma_level2_end_set(callback, work);
+                break;
+        case 1:
+                scu_dma_level1_end_set(callback, work);
+                break;
+        case 0:
+        default:
+                scu_dma_level0_end_set(callback, work);
+                break;
+        }
+}
+
+static inline void __always_inline
 scu_dma_illegal_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
-static inline void __always_inline
-scu_dma_level0_end_set(scu_dma_ihr ihr)
-{
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, ihr);
-}
-
-static inline void __always_inline
-scu_dma_level1_end_set(scu_dma_ihr ihr)
-{
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, ihr);
-}
-
-static inline void __always_inline
-scu_dma_level2_end_set(scu_dma_ihr ihr)
-{
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, ihr);
-}
-
-static inline void __always_inline
-scu_dma_level_end_set(const uint8_t level, scu_dma_ihr ihr)
-{
-        switch (level & 0x03) {
-        case 2:
-                scu_dma_level2_end_set(ihr);
-                break;
-        case 1:
-                scu_dma_level1_end_set(ihr);
-                break;
-        case 0:
-        default:
-                scu_dma_level0_end_set(ihr);
-                break;
-        }
-}
-
 extern void scu_dma_config_buffer(scu_dma_handle_t *,
     const scu_dma_level_cfg_t *);
 extern void scu_dma_config_set(uint8_t, uint8_t,
-    const scu_dma_handle_t *, scu_dma_ihr);
+    const scu_dma_handle_t *, scu_dma_callback);
 extern int8_t scu_dma_level_unused_get(void);
 
 __END_DECLS
