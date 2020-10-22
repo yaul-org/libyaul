@@ -28,7 +28,7 @@
 .long $SLAVE_STACK_ADDR         ! Stack-S
 .LC0:
 .long $1ST_READ_ADDR            ! 1st read address
-.long 0x00000000                ! 1st read size
+.long $1ST_READ_SIZE            ! 1st read size
 .long 0x00000000                ! Reserved
 .long 0x00000000                ! Reserved
 .incbin "sys_sec.bin"

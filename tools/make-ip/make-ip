@@ -23,8 +23,8 @@ panic () {
     exit "${2}"
 }
 
-if [ ${#} != 8 ]; then
-    printf -- "Usage: %s %s\\n" "${PROGNAME}" "version release-date areas peripherals title master-stack-addr slave-stack-addr 1st-read-addr" >&2
+if [ ${#} != 9 ]; then
+    printf -- "Usage: %s %s\\n" "${PROGNAME}" "version release-date areas peripherals title master-stack-addr slave-stack-addr 1st-read-addr ip-read-size" >&2
     exit 2
 fi
 
@@ -63,6 +63,8 @@ IP_MASTER_STACK_ADDR=${6}
 IP_SLAVE_STACK_ADDR=${7}
 # Sanitize for integer value
 IP_1ST_READ_ADDR=${8}
+# Sanitize for integer value
+IP_1ST_READ_SIZE=${9}  
 
 (awk '/\.ascii \"\$VERSION\"/ { sub(/\$VERSION/, "'"${IP_VERSION}"'"); }
       /\.ascii \"\$RELEASE_DATE\"/ { sub(/\$RELEASE_DATE/, "'"${IP_RELEASE_DATE}"'"); }
@@ -94,6 +96,7 @@ IP_1ST_READ_ADDR=${8}
       /\.long \$MASTER_STACK_ADDR/ { sub(/\$MASTER_STACK_ADDR/, "'"${IP_MASTER_STACK_ADDR}"'"); }
       /\.long \$SLAVE_STACK_ADDR/ { sub(/\$SLAVE_STACK_ADDR/, "'"${IP_SLAVE_STACK_ADDR}"'"); }
       /\.long \$1ST_READ_ADDR/ { sub(/\$1ST_READ_ADDR/, "'"${IP_1ST_READ_ADDR}"'"); }
+      /\.long \$1ST_READ_SIZE/ { sub(/\$1ST_READ_SIZE/, "'"${IP_1ST_READ_SIZE}"'"); }
       { print; }' \
           "${YAUL_INSTALL_ROOT}/share/yaul/bootstrap/ip.sx") >"${TMP2_FILE}" 2>"${TMP3_FILE}" || {
      panic "Can't generate IP.BIN .sx file
