@@ -67,7 +67,7 @@ endif
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif
-ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf slob))
+ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf))
   $(error Invalid value for YAUL_OPTION_MALLOC_IMPL (malloc implementation))
 endif
 
@@ -128,10 +128,6 @@ SH_CFLAGS_shared:= \
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 SH_CFLAGS_shared += \
 	-DMALLOC_IMPL_TLSF
-endif
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
-SH_CFLAGS_shared += \
-	-DMALLOC_IMPL_SLOB
 endif
 
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)

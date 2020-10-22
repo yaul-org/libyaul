@@ -364,3 +364,16 @@ sprintf(char * __restrict buffer, const char *__restrict fmt, ...)
 
     return i;
 }
+
+int
+snprintf(char * __restrict buffer, size_t n, const char * __restrict fmt, ...)
+{
+    va_list args;
+    uint16_t i;
+
+    va_start(args, fmt);
+    i = vsprintf(buffer, fmt, args);
+    va_end(args);
+
+    return i;
+}

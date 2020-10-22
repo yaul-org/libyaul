@@ -9,6 +9,7 @@ __BEGIN_DECLS
 
 extern int isalnum(int);
 extern int isalpha(int);
+extern int isascii(int);
 extern int isblank(int);
 extern int iscntrl(int);
 extern int isdigit(int);
