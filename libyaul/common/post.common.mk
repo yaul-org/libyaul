@@ -221,7 +221,8 @@ IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 		"$(IP_TITLE)" \
 		$(IP_MASTER_STACK_ADDR) \
 		$(IP_SLAVE_STACK_ADDR) \
-		$(IP_1ST_READ_ADDR)
+		$(IP_1ST_READ_ADDR) \
+		$(IP_1ST_READ_SIZE)
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
