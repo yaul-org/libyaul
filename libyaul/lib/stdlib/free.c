@@ -2,9 +2,7 @@
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
 #include <internal.h>
 
@@ -16,7 +14,5 @@ free(void *addr)
         pool = master_state()->tlsf_pools[TLSF_POOL_GENERAL];
 
         tlsf_free(pool, addr);
-#elif defined(MALLOC_IMPL_SLOB)
-        slob_free(addr);
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 }

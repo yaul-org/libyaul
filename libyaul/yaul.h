@@ -57,9 +57,7 @@
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
 #include <sys/init.h>
 #include <sys/dma-queue.h>

@@ -62,11 +62,6 @@ LIB_SRCS+= \
 	kernel/mm/tlsf.c
 endif
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
-LIB_SRCS+= \
-	kernel/mm/slob.c
-endif
-
 LIB_SRCS+= \
 	lib/ctype/ctype.c \
 	lib/string/bcmp.c \
@@ -275,11 +270,6 @@ INSTALL_HEADER_FILES+= \
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:tlsf.h:yaul/mm/
-endif
-
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
-INSTALL_HEADER_FILES+= \
-	./kernel/mm/:slob.h:yaul/mm/
 endif
 
 INSTALL_HEADER_FILES+= \
