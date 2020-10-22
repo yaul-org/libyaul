@@ -2,9 +2,7 @@
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
 #include <internal.h>
 
@@ -18,9 +16,7 @@ realloc(void *old, size_t new_len)
         pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
 
         ret = tlsf_realloc(pool, old, new_len);
-#elif defined(MALLOC_IMPL_SLOB)
-        ret = slob_realloc(old, new_len);
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
         return ret;
 }
