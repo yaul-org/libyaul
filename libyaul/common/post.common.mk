@@ -208,7 +208,13 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
-$(SH_PROGRAM).cue: $(SH_PROGRAM).iso
+$(SH_PROGRAM).ss: $(SH_PROGRAM).bin IP.BIN
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)cp IP.BIN $@
+	$(ECHO)truncate $@ -s 4096
+	$(ECHO)cat $(SH_PROGRAM).bin >> $@
+
+$(SH_PROGRAM).cue: $(SH_PROGRAM).iso $(SH_PROGRAM).ss
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
 
