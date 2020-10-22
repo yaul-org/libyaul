@@ -54,7 +54,7 @@ static inline struct dma_queue_request *_queue_enqueue(struct dma_queue *) __alw
 static inline struct dma_queue_request *_queue_dequeue(struct dma_queue *) __always_inline;
 static inline void _queue_request_start(const struct dma_queue_request *) __always_inline;
 
-static void _dma_handler(void);
+static void _dma_handler(void *);
 static void _dma_illegal_handler(void);
 
 static void _default_handler(const dma_queue_transfer_t *);
@@ -75,7 +75,7 @@ _internal_dma_queue_init(void)
 
         scu_dma_illegal_set(_dma_illegal_handler);
 
-        scu_dma_level0_end_set(_dma_handler);
+        scu_dma_level0_end_set(_dma_handler, NULL);
 
         _state.current_tag = DMA_QUEUE_TAG_INVALID;
         _state.dma_queues = &_dma_queues[0];
@@ -347,7 +347,7 @@ _queue_request_start(const struct dma_queue_request *request)
 }
 
 static void
-_dma_handler(void)
+_dma_handler(void *work __unused)
 {
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[_state.current_tag];
