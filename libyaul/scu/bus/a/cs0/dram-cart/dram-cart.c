@@ -69,28 +69,28 @@ static bool
 _detect_dram_cart(void)
 {
         /*
-         *             8-Mbit DRAM            32-Mbit DRAM
+         *              8-Mbit DRAM            32-Mbit DRAM
          *             +--------------------+ +--------------------+
-         * 0x224000000 | DRAM #0            | | DRAM #0            |
+         * 0x2240'0000 | DRAM #0            | | DRAM #0            |
          *             +--------------------+ |                    |
-         * 0x224800000 | DRAM #0 (mirrored) | |                    |
+         * 0x2248'0000 | DRAM #0 (mirrored) | |                    |
          *             +--------------------+ |                    |
-         * 0x225000000 | DRAM #0 (mirrored) | |                    |
+         * 0x2250'0000 | DRAM #0 (mirrored) | |                    |
          *             +--------------------+ |                    |
-         * 0x225800000 | DRAM #0 (mirrored) | |                    |
+         * 0x2258'0000 | DRAM #0 (mirrored) | |                    |
          *             +--------------------+ +--------------------+
-         * 0x226000000 | DRAM #1            | | DRAM #1            |
+         * 0x2260'0000 | DRAM #1            | | DRAM #1            |
          *             +--------------------+ |                    |
-         * 0x226800000 | DRAM #1 (mirrored) | |                    |
+         * 0x2268'0000 | DRAM #1 (mirrored) | |                    |
          *             +--------------------+ |                    |
-         * 0x227000000 | DRAM #1 (mirrored) | |                    |
+         * 0x2270'0000 | DRAM #1 (mirrored) | |                    |
          *             +--------------------+ |                    |
-         * 0x227800000 | DRAM #1 (mirrored) | |                    |
-         * 0x227FFFFFF +--------------------+ +--------------------+
+         * 0x2278'0000 | DRAM #1 (mirrored) | |                    |
+         * 0x227F'FFFF +--------------------+ +--------------------+
          */
 
         /* Check the ID */
-        _id = MEMORY_READ(8, CS0(ID));
+        _id = MEMORY_READ(8, CS1(ID));
         _id &= 0xFF;
 
         if ((_id != DRAM_CART_ID_1MIB) && (_id != DRAM_CART_ID_4MIB)) {

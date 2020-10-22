@@ -11,7 +11,7 @@
 #include <scu/map.h>
 
 /* DRAM cart registers */
-#define ID              0x04FFFFFFUL
+#define ID              0x00FFFFFFUL
 #define UNKNOWN         0x007EFFFEUL
 
 /* Specific macros */
