@@ -210,8 +210,12 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 
 $(SH_PROGRAM).ss: $(SH_PROGRAM).bin IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)cp IP.BIN $@
-	$(ECHO)cat $(SH_PROGRAM).bin >> $@
+	$$(if ! [ $$(($(IP_1ST_READ_SIZE))) -eq 0 ]; then \
+			$(ECHO)cp IP.BIN $@ ;\
+			$(ECHO)cat $(SH_PROGRAM).bin >> $@ ;\
+		else \
+			$(ECHO)touch $@ ;\
+		fi )
 
 $(SH_PROGRAM).cue: $(SH_PROGRAM).iso $(SH_PROGRAM).ss
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -247,6 +251,7 @@ clean:
 	    $(SH_PROGRAM).bin \
 	    $(SH_PROGRAM).cue \
 	    $(SH_PROGRAM).iso \
+	    $(SH_PROGRAM).ss \
 	    $(SH_OBJECTS_UNIQ) \
 	    $(SH_DEPS) \
 	    $(SH_DEPS_NO_LINK) \
