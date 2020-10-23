@@ -7,23 +7,36 @@
 
 #include <sys/cdefs.h>
 
-#if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#endif /* MALLOC_IMPL_TLSF */
 
 #include <internal.h>
+
+void
+_internal_mm_init(void)
+{
+        static tlsf_t pools[TLSF_POOL_COUNT];
+
+        master_state()->tlsf_pools = &pools[0];
+
+        master_state()->tlsf_pools[TLSF_POOL_PRIVATE] =
+            tlsf_create_with_pool((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
+
+#if defined(MALLOC_IMPL_TLSF)
+        master_state()->tlsf_pools[TLSF_POOL_USER] =
+            tlsf_create_with_pool((void *)TLSF_POOL_USER_START, TLSF_POOL_USER_SIZE);
+#else
+        master_state()->tlsf_pools[TLSF_POOL_USER] = NULL;
+#endif /* MALLOC_IMPL_TLSF */
+}
 
 void *
 _internal_malloc(size_t n)
 {
-        void *ret;
-
-#if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
         pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
 
+        void *ret;
         ret = tlsf_malloc(pool, n);
-#endif /* MALLOC_IMPL_TLSF */
 
         return ret;
 }
@@ -31,14 +44,11 @@ _internal_malloc(size_t n)
 void *
 _internal_realloc(void *old, size_t new_len)
 {
-        void *ret;
-
-#if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
         pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
 
+        void *ret;
         ret = tlsf_realloc(pool, old, new_len);
-#endif /* MALLOC_IMPL_TLSF */
 
         return ret;
 }
@@ -46,14 +56,11 @@ _internal_realloc(void *old, size_t new_len)
 void *
 _internal_memalign(size_t n, size_t align)
 {
-        void *ret;
-
-#if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
         pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
 
+        void *ret;
         ret = tlsf_memalign(pool, n, align);
-#endif /* MALLOC_IMPL_TLSF */
 
         return ret;
 }
@@ -61,10 +68,8 @@ _internal_memalign(size_t n, size_t align)
 void
 _internal_free(void *addr)
 {
-#if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
         pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
 
         tlsf_free(pool, addr);
-#endif /* MALLOC_IMPL_TLSF */
 }

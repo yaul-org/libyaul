@@ -22,29 +22,28 @@
 #include <arp.h>
 #endif /* HAVE_DEV_CARTRIDGE */
 
-#ifdef MALLOC_IMPL_TLSF
 #include <mm/tlsf.h>
 
 #define TLSF_POOL_PRIVATE       (0)
 #define TLSF_POOL_PRIVATE_START ((uint32_t)&_end)
-#define TLSF_POOL_PRIVATE_END   (TLSF_POOL_PRIVATE_START + 0x10000)
+#define TLSF_POOL_PRIVATE_END   (TLSF_POOL_PRIVATE_START + 0x8000)
 #define TLSF_POOL_PRIVATE_SIZE  (TLSF_POOL_PRIVATE_END - TLSF_POOL_PRIVATE_START)
 
-#define TLSF_POOL_GENERAL       (1)
-#define TLSF_POOL_GENERAL_START (TLSF_POOL_PRIVATE_END)
-#define TLSF_POOL_GENERAL_END   (HWRAM(0) + HWRAM_SIZE)
-#define TLSF_POOL_GENERAL_SIZE  (TLSF_POOL_GENERAL_END - TLSF_POOL_GENERAL_START)
-
-#define TLSF_POOL_COUNT         (2)
-#endif /* MALLOC_IMPL_TLSF */
-
-struct state {
-        char which;
+#define TLSF_POOL_USER          (1)
 
 #ifdef MALLOC_IMPL_TLSF
+#define TLSF_POOL_USER_START    (TLSF_POOL_PRIVATE_END)
+#define TLSF_POOL_USER_END      (HWRAM(HWRAM_SIZE))
+#define TLSF_POOL_USER_SIZE     (TLSF_POOL_USER_END - TLSF_POOL_USER_START)
+#endif /* MALLOC_IMPL_TLSF */
+
+#define TLSF_POOL_COUNT         (2)
+
+struct state {
+        uint8_t which;
+
         /* Both master and slave contain their own pools */
         tlsf_t *tlsf_pools;
-#endif /* MALLOC_IMPL_TLSF */
 };
 
 static inline struct state * __always_inline
@@ -66,6 +65,8 @@ slave_state(void)
 extern void *_end;
 
 void _internal_reset(void);
+
+void _internal_mm_init(void);
 
 void *_internal_malloc(size_t);
 void *_internal_realloc(void *, size_t);

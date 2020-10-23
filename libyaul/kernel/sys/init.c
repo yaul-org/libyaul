@@ -15,10 +15,6 @@
 
 #include <cpu/cache.h>
 
-#if defined(MALLOC_IMPL_TLSF)
-#include <mm/tlsf.h>
-#endif /* MALLOC_IMPL_TLSF */
-
 #include <internal.h>
 
 void __weak
@@ -58,18 +54,8 @@ _call_global_dtors(void)
 static void __used __section(".init")
 _init(void)
 {
-#if defined(MALLOC_IMPL_TLSF)
-        static tlsf_t pools[TLSF_POOL_COUNT];
-
-        master_state()->tlsf_pools = &pools[0];
-
-        master_state()->tlsf_pools[TLSF_POOL_PRIVATE] =
-            tlsf_create_with_pool((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
-
-        master_state()->tlsf_pools[TLSF_POOL_GENERAL] =
-            tlsf_create_with_pool((void *)TLSF_POOL_GENERAL_START, TLSF_POOL_GENERAL_SIZE);
-#endif /* MALLOC_IMPL_TLSF */
-
+        _internal_mm_init();
+        
         _call_global_ctors();
 
         _internal_cpu_init();

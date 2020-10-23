@@ -7,16 +7,17 @@
 #include <internal.h>
 
 void * __weak
-malloc(size_t n)
+malloc(size_t n __unused) /* Keep as __unused */
 {
-        void *ret;
-
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
-        pool = master_state()->tlsf_pools[TLSF_POOL_GENERAL];
+        pool = master_state()->tlsf_pools[TLSF_POOL_USER];
 
+        void *ret;
         ret = tlsf_malloc(pool, n);
-#endif /* MALLOC_IMPL_TLSF */
 
         return ret;
+#else
+        assert(false && "Missing implementation. Override malloc symbol");
+#endif /* MALLOC_IMPL_TLSF */
 }
