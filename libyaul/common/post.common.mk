@@ -218,8 +218,9 @@ $(SH_PROGRAM).cue: $(SH_PROGRAM).iso $(SH_PROGRAM).ss
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
 
-IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(YAUL_INSTALL_ROOT)/bin/make-ip	\
 		"$(IP_VERSION)" \
 		$(IP_RELEASE_DATE) \
 		"$(IP_AREAS)" \
@@ -228,7 +229,17 @@ IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 		$(IP_MASTER_STACK_ADDR) \
 		$(IP_SLAVE_STACK_ADDR) \
 		$(IP_1ST_READ_ADDR) \
-		$(IP_1ST_READ_SIZE)
+		$$(if [ $$(($(IP_1ST_READ_SIZE))) -eq 0 ]; then \
+			printf 0x00000000; \
+			else if  [ $$(($(IP_1ST_READ_SIZE))) -eq -1 ]; then \
+				if  [ $$(stat -c "%s" $(SH_PROGRAM).bin) -lt $$((0x20000)) ]; then \
+				printf 0x00020000; \
+				else printf $$(stat -c "%s" $(SH_PROGRAM).bin); \
+				fi \
+			else \
+				printf $$(($(IP_1ST_READ_SIZE))); \
+			fi \
+			fi )
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
