@@ -211,7 +211,6 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 $(SH_PROGRAM).ss: $(SH_PROGRAM).bin IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)cp IP.BIN $@
-	$(ECHO)truncate $@ -s 4096
 	$(ECHO)cat $(SH_PROGRAM).bin >> $@
 
 $(SH_PROGRAM).cue: $(SH_PROGRAM).iso $(SH_PROGRAM).ss
@@ -231,15 +230,16 @@ IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
 		$(IP_1ST_READ_ADDR) \
 		$$(if [ $$(($(IP_1ST_READ_SIZE))) -eq 0 ]; then \
 			printf 0x00000000; \
-			else if  [ $$(($(IP_1ST_READ_SIZE))) -eq -1 ]; then \
-				if  [ $$(stat -c "%s" $(SH_PROGRAM).bin) -lt $$((0x20000)) ]; then \
-				printf 0x00020000; \
-				else printf $$(stat -c "%s" $(SH_PROGRAM).bin); \
-				fi \
-			else \
-				printf $$(($(IP_1ST_READ_SIZE))); \
-			fi \
-			fi )
+            else if  [ $$(($(IP_1ST_READ_SIZE))) -eq -1 ]; then \
+                if  [ $$(stat -c "%s" $(SH_PROGRAM).bin) -lt $$((0x20000)) ]; then \
+                    printf 0x00020000; \
+                else \
+                    printf $$(stat -c "%s" $(SH_PROGRAM).bin); \
+                fi \
+            else \
+                printf $$(($(IP_1ST_READ_SIZE))); \
+            fi \
+        fi )
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"

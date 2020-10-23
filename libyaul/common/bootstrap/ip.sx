@@ -52,4 +52,4 @@
 .LC1:
 .long .LC0
 
-.fill 244
+.fill 256 ! Making IP.BIN bigger than 4K according to CD spec.
