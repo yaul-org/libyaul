@@ -61,9 +61,6 @@ ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1 2)
   $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
 endif
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),)
-  $(error Undefined YAUL_OPTION_MALLOC_IMPL (malloc implementation))
-endif
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif

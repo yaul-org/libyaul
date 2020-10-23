@@ -57,10 +57,9 @@ LIB_SRCS+= \
 	\
 	kernel/mm/memb.c
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+# TLSF is required
 LIB_SRCS+= \
 	kernel/mm/tlsf.c
-endif
 
 LIB_SRCS+= \
 	lib/ctype/ctype.c \
@@ -267,10 +266,9 @@ INSTALL_HEADER_FILES+= \
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:memb.h:yaul/mm/
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+# TLSF is required
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:tlsf.h:yaul/mm/
-endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/
