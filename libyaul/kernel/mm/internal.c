@@ -11,12 +11,21 @@
 
 #include <internal.h>
 
+#define TLSF_POOL_PRIVATE_START ((uint32_t)&_private_pool[0])
+#define TLSF_POOL_PRIVATE_SIZE  (0x8000)
+
+#define TLSF_POOL_USER_START    ((uint32_t)&_end)
+#define TLSF_POOL_USER_END      (HWRAM(HWRAM_SIZE))
+#define TLSF_POOL_USER_SIZE     (TLSF_POOL_USER_END - TLSF_POOL_USER_START)
+
+static uint8_t _private_pool[TLSF_POOL_PRIVATE_SIZE];
+
+static tlsf_t _pools[TLSF_POOL_COUNT];
+
 void
 _internal_mm_init(void)
 {
-        static tlsf_t pools[TLSF_POOL_COUNT];
-
-        master_state()->tlsf_pools = &pools[0];
+        master_state()->tlsf_pools = &_pools[0];
 
         master_state()->tlsf_pools[TLSF_POOL_PRIVATE] =
             tlsf_create_with_pool((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
