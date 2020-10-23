@@ -103,6 +103,8 @@ _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 {
         switch (action) {
         case VT_PARSE_ACTION_PRINT:
+        case VT_PARSE_ACTION_IGNORE:
+        case VT_PARSE_ACTION_INVALID:
                 _action_character_print(ch);
                 break;
         case VT_PARSE_ACTION_EXECUTE:
@@ -277,6 +279,9 @@ _action_escape_character_print(int ch)
                 break;
         case '\v':
                 _cursor_row_advance(1);
+                break;
+        default:
+                _action_character_print(ch);
                 break;
         }
 }

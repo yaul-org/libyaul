@@ -36,6 +36,7 @@ typedef enum {
 } __packed vt_parse_state_t;
 
 typedef enum {
+        VT_PARSE_ACTION_INVALID = 0,
         VT_PARSE_ACTION_CLEAR = 1,
         VT_PARSE_ACTION_COLLECT = 2,
         VT_PARSE_ACTION_CSI_DISPATCH = 3,
@@ -128,7 +129,7 @@ void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                 parser->callback(parser, action, ch);
                 break;
         case VT_PARSE_ACTION_IGNORE:
-                /* Do nothing */
+                parser->callback(parser, action, ch);
                 break;
         case VT_PARSE_ACTION_COLLECT:
                 /* Append the character to the intermediate params */
@@ -165,8 +166,8 @@ void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
                 parser->ignore_flagged = 0;
                 break;
         default:
-                assert(false);
-                return;
+                parser->callback(parser, action, ch);
+                break;
         }
 }
 
