@@ -93,6 +93,9 @@ unset iso_tool_realpath
 # Echo options used
 printf -- "%s %s" "${XORRISO}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
 
+# Force delete the existing ISO
+rm -r "${image}.iso"
+
 if ! (eval "${XORRISO}" "${XORRISO_OPTIONS}" -- -outdev "${image}.iso" -cd / -map "${directory}" /) >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
