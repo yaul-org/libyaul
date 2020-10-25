@@ -52,9 +52,12 @@
 #define I_PRODUCT       0x6001
 #define I_SERIAL        "AL00P4JX"
 
-#define CMD_DOWNLOAD    1
-#define CMD_UPLOAD      2
-#define CMD_EXECUTE     6
+#define CMD_DOWNLOAD            1
+#define CMD_UPLOAD              2
+#define CMD_EXECUTE_OLD         3
+#define CMD_GET_BUFF_ADDR       4
+#define CMD_COPY_EXECUTE        5
+#define CMD_EXECUTE             6
 
 typedef uint8_t crc_t;
 
@@ -117,9 +120,6 @@ static int receive_checksum(const uint8_t *, size_t);
 static int send_checksum(const uint8_t *, size_t);
 static crc_t crc_calculate(const uint8_t *, size_t);
 
-/*
- * USB Cartridge
- */
 static int
 dev_init(void)
 {
@@ -170,9 +170,6 @@ error:
         return -1;
 }
 
-/*
- * USB Cartridge
- */
 static int
 dev_shutdown(void)
 {
@@ -187,9 +184,6 @@ dev_shutdown(void)
         return 0;
 }
 
-/*
- * USB Cartridge
- */
 static int
 device_read(uint8_t *read_buffer, uint32_t len)
 {
@@ -220,9 +214,6 @@ device_read(uint8_t *read_buffer, uint32_t len)
         return 0;
 }
 
-/*
- * USB Cartridge
- */
 static int
 device_write(uint8_t *write_buffer, uint32_t len)
 {
@@ -248,9 +239,6 @@ device_write(uint8_t *write_buffer, uint32_t len)
         return 0;
 }
 
-/*
- * USB Cartridge
- */
 static int
 upload_file(const char *input_file, uint32_t base_address)
 {
@@ -265,9 +253,6 @@ upload_file(const char *input_file, uint32_t base_address)
         return ret;
 }
 
-/*
- * USB Cartridge
- */
 static int
 download_file(const char *output_file, uint32_t base_address,
     uint32_t len)
@@ -330,9 +315,6 @@ exit:
         return exit_code;
 }
 
-/*
- * USB Cartridge
- */
 static int
 execute_file(const char *input_file, uint32_t base_address)
 {
@@ -347,9 +329,6 @@ execute_file(const char *input_file, uint32_t base_address)
         return ret;
 }
 
-/*
- * USB Cartridge
- */
 static int
 upload_execute_file(const char *input_file, uint32_t base_address, bool execute)
 {
@@ -437,9 +416,6 @@ exit:
         return exit_code;
 }
 
-/*
- * USB Cartridge
- */
 static int
 upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
@@ -454,9 +430,6 @@ upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
         return ret;
 }
 
-/*
- * USB Cartridge
- */
 static const char *
 error_stringify(void)
 {
@@ -531,9 +504,6 @@ exit:
         return exit_code;
 }
 
-/*
- * USB Cartridge
- */
 static int
 download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
@@ -581,9 +551,6 @@ exit:
         return exit_code;
 }
 
-/*
- * USB Cartridge
- */
 static int
 execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
@@ -597,9 +564,6 @@ execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
         return ret;
 }
 
-/*
- * USB Cartridge
- */
 static int
 upload_execute_buffer(void *buffer, uint32_t base_address,
     uint32_t len, bool execute)
@@ -651,25 +615,17 @@ exit:
         return exit_code;
 }
 
-/*
- *
- */
-static void
-convert_error(void)
-{
-}
-
 static int
 send_command(uint32_t command, uint32_t address, size_t len)
 {
         static char *command2str[] = {
                 NULL,
-                "DOWNLOAD",
-                "UPLOAD",
-                NULL,
-                NULL,
-                NULL,
-                "EXECUTE"
+                "CMD_DOWNLOAD",     
+                "CMD_UPLOAD",
+                "CMD_EXECUTE_OLD",
+                "CMD_GET_BUFF_ADDR",
+                "CMD_COPY_EXECUTE",
+                "CMD_EXECUTE"
         };
 
         usb_cartridge_error = USB_CARTRIDGE_OK;
