@@ -39,6 +39,8 @@
 #define FILESERVER_CMD_QUIT     (0x7F)
 #define FILESERVER_CMD_INVALID  (0xFF)
 
+#define FILESERVER_RET_ERROR    (0xFF)
+
 static uint8_t _sector_buffer[FILESERVER_SECTOR_SIZE];
 
 typedef struct path_entry path_entry_t;
@@ -185,35 +187,35 @@ _fileserver_cmd_file(const struct device_driver *device)
                 return;
         }
 
-        DEBUG_PRINTF("----------------> filename: \"%s\"\n", filename);
+        verbose_printf("Requesting to read file \"%s\"\n", filename);
 
         const path_entry_t *path_entry;
         path_entry = _path_entry_find(filename);
 
         if (path_entry == NULL) {
-                DEBUG_PRINTF("----------------> path_entry not found\n");
+                verbose_printf("Error: File not found\n");
                 /* Error */
                 return;
         }
-
-        DEBUG_PRINTF("----------------> path_entry: %p, size: %lu\n", path_entry, path_entry->size);
 
         uint32_t sector_offset;
         uint32_t sector_count;
 
         if (!(_long_read(device, &sector_offset))) {
+                verbose_printf("Error: Timed out attempting to read sector offset\n");
                 /* Error */
                 return;
         }
 
-        DEBUG_PRINTF("----------------> sector_offset: %lu\n", sector_offset);
+        verbose_printf("Requested sector offset: %lu\n", sector_offset);
 
         if (!(_long_read(device, &sector_count))) {
                 /* Error */
+                verbose_printf("Error: Timed out attempting to read sector count\n");
                 return;
         }
 
-        DEBUG_PRINTF("----------------> sector_count: %lu\n", sector_count);
+        verbose_printf("Requested sector count: %lu\n", sector_count);
 
         for (uint32_t i = 0; i < sector_count; i++) {
                 if (i >= path_entry->size) {
@@ -227,36 +229,46 @@ _fileserver_cmd_file(const struct device_driver *device)
                 (void)memset(_sector_buffer, 0x00, FILESERVER_SECTOR_SIZE);
                 (void)memcpy(_sector_buffer, buffer_offset, FILESERVER_SECTOR_SIZE);
 
-                DEBUG_PRINTF("Sending buffer\n");
+                for (uint32_t try = 0; try < FILESERVER_TRIES; try++) {
+                        verbose_printf("Sending buffer\n");
 
-                if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
-                        /* Error */
-                        return;
-                }
+                        if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
+                                verbose_printf("Error: Timed out sending buffer\n");
+                                /* Error */
+                                return;
+                        }
 
-                DEBUG_PRINTF("Sent buffer\n");
+                        verbose_printf("Sent buffer\n");
 
-                DEBUG_PRINTF("Waiting for CRC\n");
+                        verbose_printf("Waiting for CRC\n");
 
-                /* Read CRC for this sector */
-                crc_t read_sector_crc;
-                if (!(_byte_read(device, &read_sector_crc))) {
-                        /* Error */
-                        return;
-                }
+                        /* Read CRC for this sector */
+                        crc_t read_sector_crc;
+                        if (!(_byte_read(device, &read_sector_crc))) {
+                                verbose_printf("Error: Timed out attempting to read CRC byte\n");
+                                /* Error */
+                                return;
+                        }
 
-                crc_t sector_crc;
-                sector_crc = crc_calculate(_sector_buffer, FILESERVER_SECTOR_SIZE);
+                        crc_t sector_crc;
+                        sector_crc = crc_calculate(_sector_buffer, FILESERVER_SECTOR_SIZE);
 
-                DEBUG_PRINTF("CRC match: 0x%02X, 0x%02X\n", read_sector_crc, sector_crc);
+                        verbose_printf("CRC match: 0x%02X <?> 0x%02X\n", read_sector_crc, sector_crc);
 
-                if (sector_crc != read_sector_crc) {
-                        /* Error */
-                        return;
+                        if (sector_crc == read_sector_crc) {
+                                device->send(&read_sector_crc, 1);
+                                break;
+                        }
+
+                        verbose_printf("Error: CRC mismatch. Trying again\n");
+
+                        device->send(FILESERVER_RET_ERROR, 1);
+
+                        sleep(FILESERVER_SLEEP);
                 }
         }
 
-        DEBUG_PRINTF("----------------> Done\n");
+        verbose_printf("Request complete\n");
 }
 
 static void
@@ -422,7 +434,7 @@ _build_path_entries(const char *dirpath)
                 read_status_t read_status;
                 read_status = _path_entry_file_read(path_entry);
 
-                DEBUG_PRINTF("[1;31mpath_entry path: \"%s\", size: %lu[m\n", path_entry->path, path_entry->size);
+                verbose_printf("Serving file: \"%s\", sector count: %lu\n", path_entry->path, path_entry->size);
 
                 if (read_status != READ_STATUS_OK) {
                         /* Error */
