@@ -52,12 +52,12 @@
 #define I_PRODUCT       0x6001
 #define I_SERIAL        "AL00P4JX"
 
-#define CMD_DOWNLOAD            1
-#define CMD_UPLOAD              2
-#define CMD_EXECUTE_OLD         3
-#define CMD_GET_BUFF_ADDR       4
-#define CMD_COPY_EXECUTE        5
-#define CMD_EXECUTE             6
+#define CMD_DOWNLOAD            (1)
+#define CMD_UPLOAD              (2)
+#define CMD_EXECUTE             (3)
+#define CMD_GET_BUFF_ADDR       (4)
+#define CMD_COPY_EXECUTE        (5)
+#define CMD_EXECUTE_EXT         (6)
 
 typedef uint8_t crc_t;
 
@@ -93,35 +93,34 @@ static const char *usb_cartridge_error_strings[] = {
         "USB_CARTRIDGE_INSUFFICIENT_MEMORY"
 };
 
-static int dev_init(void);
-static int dev_shutdown(void);
+static int _dev_init(void);
+static int _dev_shutdown(void);
 
 static int _usb_cart_read(void *, uint32_t);
 static int _usb_cart_send(void *, uint32_t);
 
-static int download_buffer(void *, uint32_t, uint32_t);
-static int upload_buffer(void *, uint32_t, uint32_t);
-static int execute_buffer(void *, uint32_t, uint32_t);
+static int _download_buffer(void *, uint32_t, uint32_t);
+static int _upload_buffer(void *, uint32_t, uint32_t);
+static int _execute_buffer(void *, uint32_t, uint32_t);
 
-static int download_file(const char *, uint32_t, uint32_t);
-static int upload_file(const char *, uint32_t);
-static int execute_file(const char *, uint32_t);
+static int _download_file(const char *, uint32_t, uint32_t);
+static int _upload_file(const char *, uint32_t);
+static int _execute_file(const char *, uint32_t);
 
-static int upload_execute_buffer(void *, uint32_t, uint32_t, bool);
-static int upload_execute_file(const char *, uint32_t, bool);
+static int _upload_execute_buffer(void *, uint32_t, uint32_t, bool);
+static int _upload_execute_file(const char *, uint32_t, bool);
 
-static int device_read(uint8_t *, uint32_t);
-static int device_write(uint8_t *, uint32_t);
+static int _device_read(uint8_t *, uint32_t);
+static int _device_write(uint8_t *, uint32_t);
 
 /* Helpers */
-static void convert_error(void);
-static int send_command(uint32_t, uint32_t, size_t);
-static int receive_checksum(const uint8_t *, size_t);
-static int send_checksum(const uint8_t *, size_t);
-static crc_t crc_calculate(const uint8_t *, size_t);
+static int _send_command(uint32_t, uint32_t, size_t);
+static int _receive_checksum(const uint8_t *, size_t);
+static int _send_checksum(const uint8_t *, size_t);
+static crc_t _crc_calculate(const uint8_t *, size_t);
 
 static int
-dev_init(void)
+_dev_init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -171,7 +170,7 @@ error:
 }
 
 static int
-dev_shutdown(void)
+_dev_shutdown(void)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -185,7 +184,7 @@ dev_shutdown(void)
 }
 
 static int
-device_read(uint8_t *read_buffer, uint32_t len)
+_device_read(uint8_t *read_buffer, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Request read of %iB\n", len);
@@ -215,7 +214,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
 }
 
 static int
-device_write(uint8_t *write_buffer, uint32_t len)
+_device_write(uint8_t *write_buffer, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);
@@ -240,12 +239,12 @@ device_write(uint8_t *write_buffer, uint32_t len)
 }
 
 static int
-upload_file(const char *input_file, uint32_t base_address)
+_upload_file(const char *input_file, uint32_t base_address)
 {
         DEBUG_PRINTF("Enter\n");
 
         int ret;
-        ret = upload_execute_file(input_file, base_address,
+        ret = _upload_execute_file(input_file, base_address,
             /* execute = */ false);
 
         DEBUG_PRINTF("Exit\n");
@@ -254,7 +253,7 @@ upload_file(const char *input_file, uint32_t base_address)
 }
 
 static int
-download_file(const char *output_file, uint32_t base_address,
+_download_file(const char *output_file, uint32_t base_address,
     uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
@@ -288,7 +287,7 @@ download_file(const char *output_file, uint32_t base_address,
         memset(buffer, 0x00, len);
 
         int ret;
-        if ((ret = download_buffer(buffer, base_address, len)) < 0) {
+        if ((ret = _download_buffer(buffer, base_address, len)) < 0) {
                 goto error;
         }
 
@@ -316,12 +315,12 @@ exit:
 }
 
 static int
-execute_file(const char *input_file, uint32_t base_address)
+_execute_file(const char *input_file, uint32_t base_address)
 {
         DEBUG_PRINTF("Enter\n");
 
         int ret;
-        ret = upload_execute_file(input_file, base_address,
+        ret = _upload_execute_file(input_file, base_address,
             /* execute = */ true);
 
         DEBUG_PRINTF("Exit\n");
@@ -330,7 +329,7 @@ execute_file(const char *input_file, uint32_t base_address)
 }
 
 static int
-upload_execute_file(const char *input_file, uint32_t base_address, bool execute)
+_upload_execute_file(const char *input_file, uint32_t base_address, bool execute)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -391,7 +390,7 @@ upload_execute_file(const char *input_file, uint32_t base_address, bool execute)
         }
 
         int ret;
-        if ((ret = upload_execute_buffer(buffer, base_address, len, execute)) < 0) {
+        if ((ret = _upload_execute_buffer(buffer, base_address, len, execute)) < 0) {
                 goto error;
         }
 
@@ -417,12 +416,12 @@ exit:
 }
 
 static int
-upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
+_upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
         int ret;
-        ret = upload_execute_buffer(buffer, base_address, len,
+        ret = _upload_execute_buffer(buffer, base_address, len,
             /* execute = */ false);
 
         DEBUG_PRINTF("Exit\n");
@@ -453,7 +452,7 @@ _usb_cart_read(void *buffer, uint32_t len)
                 goto error;
         }
 
-        if ((device_read(buffer, len)) < 0) {
+        if ((_device_read(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -487,7 +486,7 @@ _usb_cart_send(void *buffer, uint32_t len)
                 goto error;
         }
 
-        if ((device_write(buffer, len)) < 0) {
+        if ((_device_write(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -505,7 +504,7 @@ exit:
 }
 
 static int
-download_buffer(void *buffer, uint32_t base_address, uint32_t len)
+_download_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -526,15 +525,15 @@ download_buffer(void *buffer, uint32_t base_address, uint32_t len)
                 goto error;
         }
 
-        if ((send_command(CMD_DOWNLOAD, base_address, len)) < 0) {
+        if ((_send_command(CMD_DOWNLOAD, base_address, len)) < 0) {
                 goto error;
         }
 
-        if ((device_read(buffer, len)) < 0) {
+        if ((_device_read(buffer, len)) < 0) {
                 goto error;
         }
 
-        if ((receive_checksum(buffer, len)) < 0) {
+        if ((_receive_checksum(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -552,11 +551,11 @@ exit:
 }
 
 static int
-execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
+_execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
 {
         DEBUG_PRINTF("Enter\n");
 
-        int ret = upload_execute_buffer(buffer, base_address, len,
+        int ret = _upload_execute_buffer(buffer, base_address, len,
             /* execute = */ true);
 
         DEBUG_PRINTF("Exit\n");
@@ -565,7 +564,7 @@ execute_buffer(void *buffer, uint32_t base_address, uint32_t len)
 }
 
 static int
-upload_execute_buffer(void *buffer, uint32_t base_address,
+_upload_execute_buffer(void *buffer, uint32_t base_address,
     uint32_t len, bool execute)
 {
         DEBUG_PRINTF("Enter\n");
@@ -588,17 +587,17 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
         }
 
         uint8_t command;
-        command = (execute) ? CMD_EXECUTE : CMD_UPLOAD;
+        command = (execute) ? CMD_EXECUTE_EXT : CMD_UPLOAD;
 
-        if ((send_command(command, base_address, len)) < 0) {
+        if ((_send_command(command, base_address, len)) < 0) {
                 goto error;
         } 
 
-        if ((device_write(buffer, len)) < 0) {
+        if ((_device_write(buffer, len)) < 0) {
                 goto error;
         }
 
-        if ((send_checksum(buffer, len)) < 0) {
+        if ((_send_checksum(buffer, len)) < 0) {
                 goto error;
         }
 
@@ -616,21 +615,22 @@ exit:
 }
 
 static int
-send_command(uint32_t command, uint32_t address, size_t len)
+_send_command(uint32_t command, uint32_t address, size_t len)
 {
         static char *command2str[] = {
                 NULL,
                 "CMD_DOWNLOAD",     
                 "CMD_UPLOAD",
-                "CMD_EXECUTE_OLD",
+                "CMD_EXECUTE",
                 "CMD_GET_BUFF_ADDR",
                 "CMD_COPY_EXECUTE",
-                "CMD_EXECUTE"
+                "CMD_EXECUTE_EXT"
         };
 
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
-        static uint8_t buffer[13];
+        uint8_t buffer[13];
+        uint8_t buffer_len;
 
         DEBUG_PRINTF("Command: \"%s\" (0x%02X)\n", command2str[command],
             command);
@@ -649,27 +649,33 @@ send_command(uint32_t command, uint32_t address, size_t len)
         buffer[ 7] = LEN_01(len);
         buffer[ 8] = LEN_LSB(len);
 
-        buffer[ 9] = 0;
-        buffer[10] = 0;
-        buffer[11] = 0;
-        buffer[12] = 0;
+        buffer_len = 9;
 
-        return device_write(buffer, sizeof(buffer));
+        if (command == CMD_EXECUTE_EXT) {
+                buffer[ 9] = 0;
+                buffer[10] = 0;
+                buffer[11] = 0;
+                buffer[12] = 0;
+
+                buffer_len = 13;
+        }
+
+        return _device_write(buffer, buffer_len);
 }
 
 static int
-receive_checksum(const uint8_t *buffer, size_t buffer_len)
+_receive_checksum(const uint8_t *buffer, size_t buffer_len)
 {
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         crc_t checksum;
-        checksum = crc_calculate(buffer, buffer_len);
+        checksum = _crc_calculate(buffer, buffer_len);
 
         uint8_t read_buffer[1];
         read_buffer[0] = 0x00;
 
         int ret;
-        if ((ret = device_read(read_buffer, sizeof(read_buffer))) < 0) {
+        if ((ret = _device_read(read_buffer, sizeof(read_buffer))) < 0) {
                 return ret;
         }
 
@@ -686,23 +692,23 @@ receive_checksum(const uint8_t *buffer, size_t buffer_len)
 }
 
 static int
-send_checksum(const uint8_t *buffer, size_t buffer_len)
+_send_checksum(const uint8_t *buffer, size_t buffer_len)
 {
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
         int ret;
 
         uint8_t write_buffer[1];
-        write_buffer[0] = (uint8_t)crc_calculate(buffer, buffer_len);
+        write_buffer[0] = (uint8_t)_crc_calculate(buffer, buffer_len);
 
-        if ((ret = device_write(write_buffer, sizeof(write_buffer))) < 0) {
+        if ((ret = _device_write(write_buffer, sizeof(write_buffer))) < 0) {
                 return ret;
         }
 
         uint8_t read_buffer[1];
         read_buffer[0] = 0x00;
 
-        if ((ret = device_read(read_buffer, sizeof(read_buffer))) < 0) {
+        if ((ret = _device_read(read_buffer, sizeof(read_buffer))) < 0) {
                 return ret;
         }
 
@@ -715,7 +721,7 @@ send_checksum(const uint8_t *buffer, size_t buffer_len)
 }
 
 static crc_t
-crc_calculate(const uint8_t *buffer, size_t buffer_len)
+_crc_calculate(const uint8_t *buffer, size_t buffer_len)
 {
         /* Generated by pycrc v0.7.10. <http://www.tty1.net/pycrc> */
 
@@ -778,15 +784,15 @@ crc_calculate(const uint8_t *buffer, size_t buffer_len)
 
 const struct device_driver device_usb_cartridge = {
         .name = "USB Flash Cartridge",
-        .init = dev_init,
-        .shutdown = dev_shutdown,
+        .init = _dev_init,
+        .shutdown = _dev_shutdown,
         .error_stringify = error_stringify,
         .read = _usb_cart_read,
         .send = _usb_cart_send,
-        .download_buffer = download_buffer,
-        .download_file = download_file,
-        .upload_buffer = upload_buffer,
-        .upload_file = upload_file,
-        .execute_buffer = execute_buffer,
-        .execute_file = execute_file
+        .download_buffer = _download_buffer,
+        .download_file = _download_file,
+        .upload_buffer = _upload_buffer,
+        .upload_file = _upload_file,
+        .execute_buffer = _execute_buffer,
+        .execute_file = _execute_file
 };
