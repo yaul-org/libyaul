@@ -154,7 +154,7 @@ _long_read(const struct device_driver *device, uint32_t *value)
         bool read;
         read = _variable_read(device, value, sizeof(uint32_t));
 
-        *value = TOLSB(*value);
+        *value = TO_LE(*value);
 
         return read;
 }
@@ -170,11 +170,9 @@ _byte_read(const struct device_driver *device, uint8_t *value)
 static void
 _fileserver_cmd_file(const struct device_driver *device)
 {
-        /* Host receive - sector offset - 4B
-         * Host Receive - sector count  - 4B
-         *
-         *  Per sector
-         *
+        /* Host receive - command       - 1B
+         * Host receive - filename      - 32B
+         * Host receive - sector offset - 4B
          * Host send    - sector        - 2048B
          * Host send    - checksum      - 1B */
 
@@ -199,7 +197,6 @@ _fileserver_cmd_file(const struct device_driver *device)
         }
 
         uint32_t sector_offset;
-        uint32_t sector_count;
 
         if (!(_long_read(device, &sector_offset))) {
                 verbose_printf("Error: Timed out attempting to read sector offset\n");
@@ -209,63 +206,53 @@ _fileserver_cmd_file(const struct device_driver *device)
 
         verbose_printf("Requested sector offset: %lu\n", sector_offset);
 
-        if (!(_long_read(device, &sector_count))) {
+        if (sector_offset >= path_entry->size) {
                 /* Error */
-                verbose_printf("Error: Timed out attempting to read sector count\n");
                 return;
         }
 
-        verbose_printf("Requested sector count: %lu\n", sector_count);
+        const uint8_t *buffer_offset;
+        buffer_offset = &path_entry->buffer[sector_offset * FILESERVER_SECTOR_SIZE];
 
-        for (uint32_t i = 0; i < sector_count; i++) {
-                if (i >= path_entry->size) {
+        (void)memset(_sector_buffer, 0x00, FILESERVER_SECTOR_SIZE);
+        (void)memcpy(_sector_buffer, buffer_offset, FILESERVER_SECTOR_SIZE);
+
+        for (uint32_t try = 0; try < FILESERVER_TRIES; try++) {
+                verbose_printf("Sending buffer\n");
+
+                if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
+                        verbose_printf("Error: Timed out sending buffer\n");
                         /* Error */
                         return;
                 }
 
-                const uint8_t *buffer_offset;
-                buffer_offset = &path_entry->buffer[i * FILESERVER_SECTOR_SIZE];
+                verbose_printf("Sent buffer\n");
 
-                (void)memset(_sector_buffer, 0x00, FILESERVER_SECTOR_SIZE);
-                (void)memcpy(_sector_buffer, buffer_offset, FILESERVER_SECTOR_SIZE);
+                verbose_printf("Waiting for CRC\n");
 
-                for (uint32_t try = 0; try < FILESERVER_TRIES; try++) {
-                        verbose_printf("Sending buffer\n");
-
-                        if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
-                                verbose_printf("Error: Timed out sending buffer\n");
-                                /* Error */
-                                return;
-                        }
-
-                        verbose_printf("Sent buffer\n");
-
-                        verbose_printf("Waiting for CRC\n");
-
-                        /* Read CRC for this sector */
-                        crc_t read_sector_crc;
-                        if (!(_byte_read(device, &read_sector_crc))) {
-                                verbose_printf("Error: Timed out attempting to read CRC byte\n");
-                                /* Error */
-                                return;
-                        }
-
-                        crc_t sector_crc;
-                        sector_crc = crc_calculate(_sector_buffer, FILESERVER_SECTOR_SIZE);
-
-                        verbose_printf("CRC match: 0x%02X <?> 0x%02X\n", read_sector_crc, sector_crc);
-
-                        if (sector_crc == read_sector_crc) {
-                                device->send(&read_sector_crc, 1);
-                                break;
-                        }
-
-                        verbose_printf("Error: CRC mismatch. Trying again\n");
-
-                        device->send(FILESERVER_RET_ERROR, 1);
-
-                        sleep(FILESERVER_SLEEP);
+                /* Read CRC for this sector */
+                crc_t read_sector_crc;
+                if (!(_byte_read(device, &read_sector_crc))) {
+                        verbose_printf("Error: Timed out attempting to read CRC byte\n");
+                        /* Error */
+                        return;
                 }
+
+                crc_t sector_crc;
+                sector_crc = crc_calculate(_sector_buffer, FILESERVER_SECTOR_SIZE);
+
+                verbose_printf("CRC match: 0x%02X <?> 0x%02X\n", read_sector_crc, sector_crc);
+
+                if (sector_crc == read_sector_crc) {
+                        device->send(&read_sector_crc, 1);
+                        break;
+                }
+
+                verbose_printf("Error: CRC mismatch. Trying again\n");
+
+                device->send(FILESERVER_RET_ERROR, 1);
+
+                sleep(FILESERVER_SLEEP);
         }
 
         verbose_printf("Request complete\n");
@@ -274,6 +261,41 @@ _fileserver_cmd_file(const struct device_driver *device)
 static void
 _fileserver_cmd_size(const struct device_driver *device)
 {
+        /* Host receive - command       - 1B
+         * Host receive - filename      - 32B
+         * Host send    - file size     - 4B */
+
+        static char filename[32];
+
+        int ret;
+
+        if (!(_variable_read(device, filename, sizeof(filename)))) {
+                /* Error */
+                return;
+        }
+
+        verbose_printf("Requesting sector count for file \"%s\"\n", filename);
+
+        const path_entry_t *path_entry;
+        path_entry = _path_entry_find(filename);
+
+        uint32_t sector_count;
+
+        if (path_entry != NULL) {
+                sector_count = TO_BE(path_entry->size);
+
+                verbose_printf("Sending (LE: 0x%08X) (BE: 0x%08X)\n", path_entry->size, sector_count);
+        } else {
+                verbose_printf("Error: File not found\n");
+                /* Error */
+                sector_count = -1;
+        }
+
+        if ((ret = device->send(&sector_count, sizeof(sector_count))) < 0) {
+                verbose_printf("Error: Timed out sending sector size\n");
+                /* Error */
+                return;
+        }
 }
 
 static void
