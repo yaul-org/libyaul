@@ -42,12 +42,21 @@ struct path_entry {
 
 static path_entry_t _path_entries[PATH_ENTRY_COUNT];
 
+typedef enum {
+        READ_STATUS_OK,
+        READ_STATUS_STAT_ERROR,
+        READ_STATUS_FILETYPE_CHANGE,
+        READ_STATUS_OPEN_ERROR,
+        READ_STATUS_OOM,
+        READ_STATUS_READ_ERROR
+} read_status_t;
+
 static int _validate_dirpath(const char *dirpath);
 
 static void _build_path_entries(const char *dirpath);
 static void _purge_path_entries(void);
 
-static void _path_entry_file_read(path_entry_t *);
+static read_status_t _path_entry_file_read(path_entry_t *);
 static void _path_entry_cache_purge(path_entry_t *);
 
 void
@@ -82,7 +91,7 @@ _validate_dirpath(const char *dirpath)
         return 0;
 }
 
-static void
+static read_status_t
 _path_entry_file_read(path_entry_t *path_entry)
 {
         struct stat statbuf;
@@ -90,21 +99,27 @@ _path_entry_file_read(path_entry_t *path_entry)
         /* Attempt to get the modification time */
         int ret;
         if ((ret = stat(path_entry->path, &statbuf)) < 0) {
-                /* Error */
-                return;
+                return READ_STATUS_STAT_ERROR;
+        }
+
+        if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
+                return READ_STATUS_FILETYPE_CHANGE;
         }
 
         if ((path_entry->time == statbuf.st_mtime) &&
             (path_entry->buffer != NULL)) {
-                return;
+                /* No error - we're up to date */
+                return  READ_STATUS_OK;
         }
 
         path_entry->size = statbuf.st_size;
         path_entry->time = statbuf.st_mtime;
 
+        read_status_t read_status = READ_STATUS_OK;
+
         FILE *fp;
         if ((fp = fopen(path_entry->path, "rb")) == NULL) {
-                /* Error */
+                read_status = READ_STATUS_OPEN_ERROR;
                 goto error;
         }
 
@@ -112,7 +127,7 @@ _path_entry_file_read(path_entry_t *path_entry)
         if ((buffer = malloc(path_entry->size)) == NULL) {
                 fclose(fp);
 
-                /* Error */
+                read_status = READ_STATUS_OOM;
                 goto error;
         }
 
@@ -124,16 +139,18 @@ _path_entry_file_read(path_entry_t *path_entry)
         fclose(fp);
 
         if (size_read != path_entry->size) {
-                /* Error */
+                read_status = READ_STATUS_READ_ERROR;
                 goto error;
         }
 
         crc_calculate(buffer, path_entry->size);
 
-        return;
+        return read_status;
 
 error:
         _path_entry_cache_purge(path_entry);
+
+        return read_status;
 }
 
 static void
@@ -199,13 +216,26 @@ _build_path_entries(const char *dirpath)
                         continue;
                 }
 
-                path_entry_t *path_entry = &_path_entries[i];
+                if (i >= PATH_ENTRY_COUNT) {
+                        /* Warning/note */
+                        continue;
+                }
+
+                path_entry_t *path_entry;
+                path_entry = &_path_entries[i];
 
                 (void)strncpy(path_entry->path, path, PATH_ENTRY_PATH_LENGTH);
                 path_entry->path[PATH_ENTRY_PATH_LENGTH - 1] = '\0';
 
                 _path_entry_cache_purge(path_entry);
-                _path_entry_file_read(path_entry);
+
+                read_status_t read_status;
+                read_status = _path_entry_file_read(path_entry);
+
+                if (read_status != READ_STATUS_OK) {
+                        /* Error */
+                        return;
+                }
         }
 
         closedir(dir);
