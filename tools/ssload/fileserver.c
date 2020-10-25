@@ -7,14 +7,16 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <dirent.h>
 #include <libgen.h>
 #include <limits.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <dirent.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -28,13 +30,24 @@
 /* Maximum number of path entries */
 #define PATH_ENTRY_COUNT        (4096)
 
+#define FILESERVER_SLEEP        (16666)
+
+#define FILESERVER_SECTOR_SIZE  (2048)
+
+#define FILESERVER_CMD_FILE     (0x00)
+#define FILESERVER_CMD_SIZE     (0x01)
+#define FILESERVER_CMD_QUIT     (0x7F)
+#define FILESERVER_CMD_INVALID  (0xFF)
+
+static uint8_t _sector_buffer[FILESERVER_SECTOR_SIZE];
+
 typedef struct path_entry path_entry_t;
 
 struct path_entry {
         char path[PATH_ENTRY_PATH_LENGTH];
 
         size_t size;
-        void *buffer;
+        uint8_t *buffer;
 
         time_t time;
         crc_t checksum;
@@ -51,6 +64,10 @@ typedef enum {
         READ_STATUS_READ_ERROR
 } read_status_t;
 
+static void _fileserver_cmd_file(const struct device_driver *);
+static void _fileserver_cmd_size(const struct device_driver *);
+static void _fileserver_cmd_quit(const struct device_driver *);
+
 static int _validate_dirpath(const char *dirpath);
 
 static void _build_path_entries(const char *dirpath);
@@ -58,14 +75,18 @@ static void _purge_path_entries(void);
 
 static read_status_t _path_entry_file_read(path_entry_t *);
 static void _path_entry_cache_purge(path_entry_t *);
+static path_entry_t *_path_entry_find(const char *);
 
 void
 fileserver(const struct device_driver *device, const char *dirpath)
 {
+        static uint8_t buffer[256];
+
         verbose_printf("Starting file server: \"%s\"\n", dirpath);
 
-        /* Check validity of directory path (OS specific) */
         int ret;
+
+        /* Check validity of directory path (OS specific) */
         if ((ret = _validate_dirpath(dirpath)) < 0) {
                 /* Error */
                 return;
@@ -79,9 +100,173 @@ fileserver(const struct device_driver *device, const char *dirpath)
         /* Start serving */
         while (true) {
                 verbose_printf("Waiting...\n");
-                break;
+
+                if ((ret = device->read(buffer, 1)) < 0) {
+                        sleep(FILESERVER_SLEEP);
+                        continue;
+                }
+
+                DEBUG_PRINTF("Command: 0x%02X\n", buffer[0]);
+
+                switch (buffer[0]) {
+                case FILESERVER_CMD_FILE:
+                        _fileserver_cmd_file(device);
+                        break;
+                case FILESERVER_CMD_SIZE:
+                        _fileserver_cmd_size(device);
+                        break;
+                case FILESERVER_CMD_QUIT:
+                        _fileserver_cmd_quit(device);
+                        goto shutdown;
+                }
         }
 
+shutdown:
+        ;
+}
+
+#define FILESERVER_TRIES 1000
+
+static bool
+_variable_read(const struct device_driver *device, uint8_t *buffer, uint32_t buffer_len)
+{
+        (void)memset(buffer, 0x00, buffer_len);
+
+        for (uint32_t i = 0; i < FILESERVER_TRIES; i++) {
+                int ret;
+                if ((ret = device->read(buffer, buffer_len)) >= 0) {
+                        return true;
+                }
+
+                sleep(FILESERVER_SLEEP);
+        }
+
+        return false;
+}
+
+static bool
+_long_read(const struct device_driver *device, uint32_t *value)
+{
+        *value = 0;
+
+        bool read;
+        read = _variable_read(device, value, sizeof(uint32_t));
+
+        *value = TOLSB(*value);
+
+        return read;
+}
+
+static bool
+_byte_read(const struct device_driver *device, uint8_t *value)
+{
+        *value = 0;
+
+        return _variable_read(device, value, sizeof(uint8_t));
+}
+
+static void
+_fileserver_cmd_file(const struct device_driver *device)
+{
+        /* Host receive - sector offset - 4B
+         * Host Receive - sector count  - 4B
+         *
+         *  Per sector
+         *
+         * Host send    - sector        - 2048B
+         * Host send    - checksum      - 1B */
+
+        static char filename[32];
+
+        int ret;
+
+        if (!(_variable_read(device, filename, sizeof(filename)))) {
+                /* Error */
+                return;
+        }
+
+        DEBUG_PRINTF("----------------> filename: \"%s\"\n", filename);
+
+        const path_entry_t *path_entry;
+        path_entry = _path_entry_find(filename);
+
+        if (path_entry == NULL) {
+                DEBUG_PRINTF("----------------> path_entry not found\n");
+                /* Error */
+                return;
+        }
+
+        DEBUG_PRINTF("----------------> path_entry: %p, size: %lu\n", path_entry, path_entry->size);
+
+        uint32_t sector_offset;
+        uint32_t sector_count;
+
+        if (!(_long_read(device, &sector_offset))) {
+                /* Error */
+                return;
+        }
+
+        DEBUG_PRINTF("----------------> sector_offset: %lu\n", sector_offset);
+
+        if (!(_long_read(device, &sector_count))) {
+                /* Error */
+                return;
+        }
+
+        DEBUG_PRINTF("----------------> sector_count: %lu\n", sector_count);
+
+        for (uint32_t i = 0; i < sector_count; i++) {
+                if (i >= path_entry->size) {
+                        /* Error */
+                        return;
+                }
+
+                const uint8_t *buffer_offset;
+                buffer_offset = &path_entry->buffer[i * FILESERVER_SECTOR_SIZE];
+
+                (void)memset(_sector_buffer, 0x00, FILESERVER_SECTOR_SIZE);
+                (void)memcpy(_sector_buffer, buffer_offset, FILESERVER_SECTOR_SIZE);
+
+                DEBUG_PRINTF("Sending buffer\n");
+
+                if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
+                        /* Error */
+                        return;
+                }
+
+                DEBUG_PRINTF("Sent buffer\n");
+
+                DEBUG_PRINTF("Waiting for CRC\n");
+
+                /* Read CRC for this sector */
+                crc_t read_sector_crc;
+                if (!(_byte_read(device, &read_sector_crc))) {
+                        /* Error */
+                        return;
+                }
+
+                crc_t sector_crc;
+                sector_crc = crc_calculate(_sector_buffer, FILESERVER_SECTOR_SIZE);
+
+                DEBUG_PRINTF("CRC match: 0x%02X, 0x%02X\n", read_sector_crc, sector_crc);
+
+                if (sector_crc != read_sector_crc) {
+                        /* Error */
+                        return;
+                }
+        }
+
+        DEBUG_PRINTF("----------------> Done\n");
+}
+
+static void
+_fileserver_cmd_size(const struct device_driver *device)
+{
+}
+
+static void
+_fileserver_cmd_quit(const struct device_driver *device)
+{
         _purge_path_entries();
 }
 
@@ -112,7 +297,7 @@ _path_entry_file_read(path_entry_t *path_entry)
                 return  READ_STATUS_OK;
         }
 
-        path_entry->size = statbuf.st_size;
+        path_entry->size = (size_t)(ceilf((float)statbuf.st_size / (float)FILESERVER_SECTOR_SIZE));
         path_entry->time = statbuf.st_mtime;
 
         read_status_t read_status = READ_STATUS_OK;
@@ -124,26 +309,28 @@ _path_entry_file_read(path_entry_t *path_entry)
         }
 
         void *buffer;
-        if ((buffer = malloc(path_entry->size)) == NULL) {
+        if ((buffer = malloc(path_entry->size * FILESERVER_SECTOR_SIZE)) == NULL) {
                 fclose(fp);
 
                 read_status = READ_STATUS_OOM;
                 goto error;
         }
 
+        (void)memset(buffer, 0x00, path_entry->size * FILESERVER_SECTOR_SIZE);
+
         path_entry->buffer = buffer;
 
         size_t size_read;
-        size_read = fread(buffer, 1, path_entry->size, fp);
+        size_read = fread(buffer, 1, statbuf.st_size, fp);
 
         fclose(fp);
 
-        if (size_read != path_entry->size) {
+        if (size_read != statbuf.st_size) {
                 read_status = READ_STATUS_READ_ERROR;
                 goto error;
         }
 
-        crc_calculate(buffer, path_entry->size);
+        crc_calculate(buffer, path_entry->size * FILESERVER_SECTOR_SIZE);
 
         return read_status;
 
@@ -175,8 +362,11 @@ _path_entry_find(const char *filename)
                 path_entry = &_path_entries[i];
 
                 if (*path_entry->path == '\0') {
-                        return NULL;
+                        DEBUG_PRINTF("i: %i\n", i);
+                        continue;
                 }
+
+                DEBUG_PRINTF("i: %i, filename: \"%s\" <?> \"%s\"\n", i, path_entry->path, filename);
 
                 if ((strstr(path_entry->path, filename)) != NULL) {
                         return path_entry;
@@ -201,7 +391,7 @@ _build_path_entries(const char *dirpath)
 
         struct dirent *dirent;
 
-        for (int i = 0; (dirent = readdir(dir)) != NULL; i++) {
+        for (int i = 0; (dirent = readdir(dir)) != NULL; ) {
                 struct stat statbuf;
 
                 (void)sprintf(path, "%s/%s", dirpath, dirent->d_name); 
@@ -232,12 +422,17 @@ _build_path_entries(const char *dirpath)
                 read_status_t read_status;
                 read_status = _path_entry_file_read(path_entry);
 
+                DEBUG_PRINTF("[1;31mpath_entry path: \"%s\", size: %lu[m\n", path_entry->path, path_entry->size);
+
                 if (read_status != READ_STATUS_OK) {
                         /* Error */
-                        return;
+                        goto error;
                 }
+
+                i++;
         }
 
+error:
         closedir(dir);
 }
 
