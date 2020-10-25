@@ -120,7 +120,15 @@ LIB_SRCS+= \
 	lib/stdlib/strtol.c
 
 LIB_SRCS+= \
+	lib/crc/crc.c
+
+LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
+
+ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+LIB_SRCS+= \
+	kernel/vfs/fs/fileclient/fileclient.c
+endif
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
@@ -241,10 +249,15 @@ INSTALL_HEADER_FILES+= \
 	./lib/lib/:stdio.h:./ \
 	./lib/lib/:stdlib.h:./ \
 	./lib/lib/:string.h:./ \
+
+INSTALL_HEADER_FILES+= \
 	./lib/lib/sys/:cdefs.h:./sys/ \
 	./lib/lib/sys/:queue.h:./sys/ \
 	./lib/lib/sys/:types.h:./sys/ \
 	./kernel/sys/:init.h:./sys/
+
+INSTALL_HEADER_FILES+= \
+	./lib/lib/:crc.h:./ \
 
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
@@ -275,6 +288,11 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
+
+ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+INSTALL_HEADER_FILES+= \
+	./kernel/vfs/fs/fileclient/:fileclient.h:yaul/fs/fileclient/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./scu/:scu.h:yaul/scu/ \

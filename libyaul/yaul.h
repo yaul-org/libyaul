@@ -64,4 +64,8 @@
 
 #include <fs/romdisk/romdisk.h>
 
+#if HAVE_DEV_CARTRIDGE != 0
+#include <fs/fileclient/fileclient.h>
+#endif /* HAVE_DEV_CARTRIDGE */
+
 #endif /* !_YAUL_H_ */
