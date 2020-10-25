@@ -33,6 +33,7 @@ struct performance_stats {
         struct timeval _time_end;
 };
 
+void fileserver(const struct device_driver *, const char *dirpath);
 void console(const struct device_driver *);
 
 static struct {
@@ -42,10 +43,10 @@ static struct {
         bool x_set;
         bool u_set;
         bool d_set;
-        char *filepath;
+        char *xud_filepath;
 
         bool i_set;
-        char *iso_filepath;
+        char *fileserver_dirpath;
 
         bool a_set;
         uint32_t address;
@@ -60,17 +61,17 @@ static struct {
 
         bool p_set;
         uint32_t device;
-} options = {
+} _global_options = {
         .h_set = false,
         .v_set = false,
 
         .x_set = false,
         .u_set = false,
         .d_set = false,
-        .filepath = NULL,
+        .xud_filepath = NULL,
 
         .i_set = false,
-        .iso_filepath = NULL,
+        .fileserver_dirpath = NULL,
 
         .a_set = false,
         .address = 0x06004000,
@@ -87,12 +88,12 @@ static struct {
         .device = DEVICE_DRIVER_DATALINK
 };
 
-static void usage(void);
+static void _usage(void);
 
-static int32_t calculate_file_size(const char *);
+static int32_t _calculate_file_size(const char *);
 
-static void performance_stats_begin(struct performance_stats *, uint32_t);
-static void performance_stats_end(struct performance_stats *);
+static void _performance_stats_begin(struct performance_stats *, uint32_t);
+static void _performance_stats_end(struct performance_stats *);
 
 int
 main(int argc, char **argv)
@@ -104,7 +105,7 @@ main(int argc, char **argv)
         exit_code = 0;
 
         if (argc == 1) {
-                usage();
+                _usage();
         }
 
         int32_t action_cnt;
@@ -122,29 +123,29 @@ main(int argc, char **argv)
         while ((option = getopt(argc, argv, "hvx:u:d:a:s:ni:g:p:")) > 0) {
                 switch (option) {
                 case 'h':
-                        options.h_set = true;
+                        _global_options.h_set = true;
                         break;
                 case 'v':
-                        options.v_set = true;
+                        _global_options.v_set = true;
                         break;
                 case 'x':
-                        options.x_set = true;
+                        _global_options.x_set = true;
                         action_cnt++;
-                        options.filepath = strdup(optarg);
+                        _global_options.xud_filepath = strdup(optarg);
                         break;
                 case 'u':
-                        options.u_set = true;
+                        _global_options.u_set = true;
                         action_cnt++;
-                        options.filepath = strdup(optarg);
+                        _global_options.xud_filepath = strdup(optarg);
                         break;
                 case 'd':
-                        options.d_set = true;
+                        _global_options.d_set = true;
                         action_cnt++;
-                        options.filepath = strdup(optarg);
+                        _global_options.xud_filepath = strdup(optarg);
                         break;
                 case 'a':
-                        options.a_set = true;
-                        options.address = (uint32_t)strtoul(optarg, &endptr, 16);
+                        _global_options.a_set = true;
+                        _global_options.address = (uint32_t)strtoul(optarg, &endptr, 16);
                         if (*endptr != '\0') {
                                 (void)fprintf(stderr, "%s: Invalid address specified\n",
                                     PROGNAME);
@@ -152,8 +153,8 @@ main(int argc, char **argv)
                         }
                         break;
                 case 's':
-                        options.s_set = true;
-                        options.size = (uint32_t)strtoul(optarg, &endptr, 16);
+                        _global_options.s_set = true;
+                        _global_options.size = (uint32_t)strtoul(optarg, &endptr, 16);
                         if (*endptr != '\0') {
                                 (void)fprintf(stderr, "%s: Invalid size specified\n",
                                     PROGNAME);
@@ -161,24 +162,24 @@ main(int argc, char **argv)
                         }
                         break;
                 case 'n':
-                        options.n_set = true;
+                        _global_options.n_set = true;
                         break;
                 case 'i':
-                        options.i_set = true;
-                        options.iso_filepath = strdup(optarg);
+                        _global_options.i_set = true;
+                        _global_options.fileserver_dirpath = strdup(optarg);
                         break;
                 case 'g':
-                        options.g_set = true;
-                        options.port = atoi(optarg);
+                        _global_options.g_set = true;
+                        _global_options.port = atoi(optarg);
                         break;
                 case 'p':
-                        options.p_set = true;
+                        _global_options.p_set = true;
                         if ((strncmp(optarg, DEVICE_DRIVER_DATALINK_STRING,
                                     strlen(DEVICE_DRIVER_DATALINK_STRING))) == 0) {
-                                options.device = DEVICE_DRIVER_DATALINK;
+                                _global_options.device = DEVICE_DRIVER_DATALINK;
                         } else if ((strncmp(optarg, DEVICE_DRIVER_USB_CARTRIDGE_STRING,
                                     strlen(DEVICE_DRIVER_USB_CARTRIDGE_STRING))) == 0) {
-                                options.device = DEVICE_DRIVER_USB_CARTRIDGE;
+                                _global_options.device = DEVICE_DRIVER_USB_CARTRIDGE;
                         } else {
                                 (void)fprintf(stderr, "Invalid device specified\n");
                                 goto error;
@@ -196,12 +197,12 @@ main(int argc, char **argv)
                         case 'p':
                                 (void)fprintf(stderr, "%s: Missing argument for option `-%c'\n",
                                     PROGNAME, optopt);
-                                usage();
+                                _usage();
                                 break;
                         default:
                                 (void)fprintf(stderr, "%s: Unknown option `-%c'\n",
                                     PROGNAME, optopt);
-                                usage();
+                                _usage();
                                 break;
                         }
                         break;
@@ -216,26 +217,26 @@ main(int argc, char **argv)
                         (void)fprintf(stderr, "%s: Unknown option `%s'\n",
                             PROGNAME, argv[idx]);
                 }
-                usage();
+                _usage();
         }
 
         /* Don't allow more than one action to be set */
         if (action_cnt < 1) {
                 (void)fprintf(stderr, "%s: More than one type of action has been requested\n",
                     PROGNAME);
-                usage();
+                _usage();
         }
 
         /* Sanity checks */
-        if (options.d_set) {
-                if (!options.s_set) {
+        if (_global_options.d_set) {
+                if (!_global_options.s_set) {
                         (void)fprintf(stderr, "%s: Size option `-s' needs to be specified\n",
                             PROGNAME);
-                        usage();
+                        _usage();
                 }
         }
-        if (options.a_set) {
-                if (options.address == 0) {
+        if (_global_options.a_set) {
+                if (_global_options.address == 0) {
                         (void)fprintf(stderr, "%s: Invalid address specified\n",
                             PROGNAME);
                         goto error;
@@ -244,18 +245,18 @@ main(int argc, char **argv)
                 if (action_cnt == 0) {
                         (void)fprintf(stderr, "%s: One action (`-x', `-u', or `-d') needs to be specified\n",
                             PROGNAME);
-                        usage();
+                        _usage();
                 }
         }
-        if (options.s_set) {
-                if (!options.d_set) {
+        if (_global_options.s_set) {
+                if (!_global_options.d_set) {
                         (void)fprintf(stderr, "%s: Size can be set only with action `-d'\n",
                             PROGNAME);
-                        usage();
+                        _usage();
                 }
         }
 
-        device = device_drivers[options.device];
+        device = device_drivers[_global_options.device];
 
         verbose_printf("Using: %s\n", device->name);
 
@@ -268,87 +269,86 @@ main(int argc, char **argv)
 
         struct performance_stats performance_stats;
 
-        if (options.x_set) {
+        if (_global_options.x_set) {
                 char *filename;
-                filename = basename(options.filepath);
+                filename = basename(_global_options.xud_filepath);
 
                 verbose_printf("Uploading (and executing) file `%s' to 0x%08X...",
                     filename,
-                    options.address);
+                    _global_options.address);
 
                 uint32_t size;
-                size = calculate_file_size(options.filepath);
+                size = _calculate_file_size(_global_options.xud_filepath);
 
                 int ret;
-                performance_stats_begin(&performance_stats, size); {
-                        if ((ret = device->execute_file(options.filepath,
-                                    options.address)) < 0) {
+                _performance_stats_begin(&performance_stats, size); {
+                        if ((ret = device->execute_file(_global_options.xud_filepath,
+                                    _global_options.address)) < 0) {
                                 verbose_printf(" FAILED\n");
                                 goto error;
                         }
-                } performance_stats_end(&performance_stats);
+                } _performance_stats_end(&performance_stats);
                 verbose_printf(" OK\n");
         }
 
-        if (options.u_set) {
+        if (_global_options.u_set) {
                 char *filename;
-                filename = basename(options.filepath);
+                filename = basename(_global_options.xud_filepath);
 
                 verbose_printf("Uploading file `%s' to 0x%08X...", filename,
-                    options.address);
+                    _global_options.address);
 
                 uint32_t size;
-                size = calculate_file_size(options.filepath);
+                size = _calculate_file_size(_global_options.xud_filepath);
 
                 int ret;
-                performance_stats_begin(&performance_stats, size); {
-                        if ((ret = device->upload_file(options.filepath,
-                                    options.address)) < 0) {
+                _performance_stats_begin(&performance_stats, size); {
+                        if ((ret = device->upload_file(_global_options.xud_filepath,
+                                    _global_options.address)) < 0) {
                                 verbose_printf(" FAILED\n");
                                 goto error;
                         }
-                } performance_stats_end(&performance_stats);
+                } _performance_stats_end(&performance_stats);
                 verbose_printf(" OK\n");
         }
 
-        if (options.d_set) {
+        if (_global_options.d_set) {
                 char *filename;
-                filename = basename(options.filepath);
+                filename = basename(_global_options.xud_filepath);
 
                 verbose_printf("Downloading from 0x%08X to file `%s'...",
-                    options.address,
+                    _global_options.address,
                     filename);
 
                 int ret;
-                performance_stats_begin(&performance_stats, options.size); {
-                        if ((ret = device->download_file(options.filepath,
-                                    options.address, options.size)) < 0) {
+                _performance_stats_begin(&performance_stats, _global_options.size); {
+                        if ((ret = device->download_file(_global_options.xud_filepath,
+                                    _global_options.address, _global_options.size)) < 0) {
                                 verbose_printf(" FAILED\n");
                                 goto error;
                         }
-                } performance_stats_end(&performance_stats);
+                } _performance_stats_end(&performance_stats);
                 verbose_printf(" OK\n");
         }
 
-        if (options.g_set) {
+        if (_global_options.g_set) {
                 (void)fprintf(stderr, "%s: Not yet implemented\n", PROGNAME);
                 exit(1);
         }
 
-        if (options.i_set) {
-                (void)fprintf(stderr, "%s: Not yet implemented\n", PROGNAME);
-                exit(1);
+        if (_global_options.i_set) {
+                fileserver(device, _global_options.fileserver_dirpath);
         }
 
-        if (options.x_set || options.u_set || options.d_set) {
+        if (_global_options.x_set || _global_options.u_set || _global_options.d_set) {
                 verbose_printf("Transfer time: %.3gs\n",
                     performance_stats.ps_transfer_time);
                 verbose_printf("Transfer speed: %.3g KiB/s\n",
                     performance_stats.ps_transfer_speed);
         }
 
-        if (!options.n_set) {
-                if (options.x_set) {
+        if (!_global_options.n_set) {
+                if (_global_options.x_set) {
                         verbose_printf("\n");
                         console(device);
                 }
@@ -365,11 +365,11 @@ error:
         }
 
 exit:
-        if (options.filepath != NULL) {
-                free(options.filepath);
+        if (_global_options.xud_filepath != NULL) {
+                free(_global_options.xud_filepath);
         }
-        if (options.iso_filepath != NULL) {
-                free(options.iso_filepath);
+        if (_global_options.fileserver_dirpath != NULL) {
+                free(_global_options.fileserver_dirpath);
         }
 
         if (device != NULL) {
@@ -384,7 +384,7 @@ exit:
 int
 verbose_printf(const char *format, ...)
 {
-        if (!options.v_set) {
+        if (!_global_options.v_set) {
                 return 0;
         }
 
@@ -402,7 +402,7 @@ verbose_printf(const char *format, ...)
 }
 
 static void
-usage(void)
+_usage(void)
 {
         (void)fprintf(stderr,
             "Usage %s options\n"
@@ -415,7 +415,7 @@ usage(void)
             "   -a address\tSet address to ADDRESS (base 16, default: 0x06004000)\n"
             "   -s size\tSet size to SIZE (base 16)\n"
             "   -n\t\tDisable starting console\n"
-            "   -i iso\tEnable ISO9660 filesystem redirection support using image ISO\n"
+            "   -i path\tEnable filesystem redirection support\n"
             "   -g port\tStart GDB proxy on TCP port PORT\n"
             "   -p device\tChoose device DEVICE (`datalink' or `usb-cartridge')"
 #ifdef DEBUG
@@ -429,7 +429,7 @@ usage(void)
 }
 
 static void
-performance_stats_begin(struct performance_stats *performance_stats,
+_performance_stats_begin(struct performance_stats *performance_stats,
     uint32_t transfer_size)
 {
         gettimeofday(&performance_stats->_time_start, NULL);
@@ -437,7 +437,7 @@ performance_stats_begin(struct performance_stats *performance_stats,
 }
 
 static void
-performance_stats_end(struct performance_stats *performance_stats)
+_performance_stats_end(struct performance_stats *performance_stats)
 {
         gettimeofday(&performance_stats->_time_end, NULL);
 
@@ -458,7 +458,7 @@ performance_stats_end(struct performance_stats *performance_stats)
 }
 
 static int32_t
-calculate_file_size(const char *input_file)
+_calculate_file_size(const char *input_file)
 {
         int32_t size;
         size = 0;
