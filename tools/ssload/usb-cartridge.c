@@ -54,7 +54,7 @@
 
 #define CMD_DOWNLOAD    1
 #define CMD_UPLOAD      2
-#define CMD_EXECUTE     3
+#define CMD_EXECUTE     6
 
 typedef uint8_t crc_t;
 
@@ -125,67 +125,6 @@ dev_init(void)
 {
         DEBUG_PRINTF("Enter\n");
 
-#ifdef HAVE_LIBFTD2XX
-        ft_error = FT_OK;
-
-        const char **devices_list;
-        devices_list = enumerate_devices();
-
-        if (devices_list == NULL) {
-                goto error;
-        }
-
-        const char *device_serial;
-        device_serial = NULL;
-
-        int device_idx;
-        for (device_idx = 0; device_idx < MAX_ENUMERATE_DEVICES; device_idx++) {
-                if (devices_list[device_idx] == NULL) {
-                        break;
-                }
-
-                if ((strncmp(devices_list[device_idx], I_SERIAL, sizeof(I_SERIAL))) == 0) {
-                        device_serial = devices_list[device_idx];
-                }
-
-                DEBUG_PRINTF("Device #%02X SN: %s\n", device_idx,
-                    devices_list[device_idx]);
-        }
-
-        if (device_serial == NULL) {
-                ft_error = FT_DEVICE_NOT_FOUND;
-                goto error;
-        }
-
-        DEBUG_PRINTF("Opening device with serial number \"%s\"\n",
-            device_serial);
-
-        if ((ft_error = FT_OpenEx((PVOID *)device_serial, FT_OPEN_BY_SERIAL_NUMBER,
-                    &ft_handle)) != FT_OK) {
-                DEBUG_PRINTF("Remove Linux kernel modules, ftdi_sio, and usbserial\n");
-                goto error;
-        }
-
-        if ((ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX)) != FT_OK) {
-                goto error;
-        }
-
-        if ((ft_error = FT_SetBitMode(ft_handle, 0x00, 0x00)) != FT_OK) {
-                goto error;
-        }
-
-        if ((ft_error = FT_SetTimeouts(ft_handle, RX_TIMEOUT, TX_TIMEOUT)) != FT_OK) {
-                goto error;
-        }
-
-exit:
-        return 0;
-
-error:
-        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-
-        return -1;
-#else
 #define USB_READ_PACKET_SIZE    (64 * 1024)
 #define USB_WRITE_PACKET_SIZE   (4 * 1024)
 #define USB_PAYLOAD(x)          ((x) - (((x) / 64) * 2))
@@ -229,7 +168,6 @@ error:
         ftdi_usb_close(&ftdi_ctx);
 
         return -1;
-#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -240,34 +178,13 @@ dev_shutdown(void)
 {
         DEBUG_PRINTF("Enter\n");
 
-#ifdef HAVE_LIBFTD2XX
-        if (ft_handle == NULL) {
-                return 0;
-        }
-
-        /* USB cartridge isn't happy when the buffers aren't purged */
-        DEBUG_PRINTF("Purging (RX/TX) buffers\n");
-        ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
-        if (ft_error != FT_OK) {
-                convert_error();
-                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-                return -1;
-        }
-
-        DEBUG_PRINTF("Closing\n");
-        if ((ft_error = FT_Close(ft_handle)) != FT_OK) {
-                return -1;
-        }
-
-        return 0;
-#else
         if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
                 return -1;
         }
 
         ftdi_usb_close(&ftdi_ctx);
+
         return 0;
-#endif /* HAVE_LIBFTD2XX */
 }
 
 /*
@@ -284,61 +201,6 @@ device_read(uint8_t *read_buffer, uint32_t len)
         uint32_t read;
         read = 0;
 
-#ifdef HAVE_LIBFTD2XX
-#define MAX_TRIES (128 * 1024)
-
-        ft_error = FT_OK;
-
-        do {
-                DEBUG_PRINTF("Checking Queue status\n");
-
-                DWORD queued_amount;
-                queued_amount = 0;
-
-                uint32_t timeout;
-                timeout = 0;
-
-                do {
-                        ft_error = FT_GetQueueStatus(ft_handle, &queued_amount);
-                        if (ft_error != FT_OK) {
-                                convert_error();
-                                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-                                return -1;
-                        }
-
-                        if (queued_amount == 0) {
-                                timeout++;
-                        }
-
-                        if (timeout > MAX_TRIES) {
-                                DEBUG_PRINTF("Exceeded number of tries (%i tries))\n",
-                                    MAX_TRIES);
-                                queued_amount = 1;
-                                break;
-                        }
-                } while (queued_amount == 0);
-
-                DEBUG_PRINTF("Queued amount: %luiB\n", queued_amount);
-
-                DWORD size;
-                ft_error = FT_Read(ft_handle, read_buffer, queued_amount, &size);
-                if (ft_error != FT_OK) {
-                        convert_error();
-                        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-                        return -1;
-                }
-
-                read += size;
-
-                DEBUG_PRINTF("read: %u, size: %lui\n", read, size);
-        } while (read < len);
-
-        if (read != len) {
-                DEBUG_PRINTF("Amount bytes read exceeded request length\n");
-                usb_cartridge_error = USB_CARTRIDGE_INSUFFICIENT_READ_DATA;
-                return -1;
-        }
-#else
         while ((len - read) > 0) {
                 DEBUG_PRINTF("Call to ftdi_read_data(%i)\n", len);
                 DEBUG_PRINTF("Read %iB\n", read);
@@ -352,7 +214,6 @@ device_read(uint8_t *read_buffer, uint32_t len)
                 }
                 read += amount;
         }
-#endif /* HAVE_LIBFTD2XX */
 
         DEBUG_PRINTF("%iB read\n", read);
 
@@ -373,27 +234,6 @@ device_write(uint8_t *write_buffer, uint32_t len)
         uint32_t written;
         written = 0;
 
-#ifdef HAVE_LIBFTD2XX
-        ft_error = FT_Purge(ft_handle, FT_PURGE_RX | FT_PURGE_TX);
-        if (ft_error != FT_OK) {
-                convert_error();
-                DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-                return -1;
-        }
-
-        do {
-                DWORD size;
-                ft_error = FT_Write(ft_handle, write_buffer, len, &size);
-                if (ft_error != FT_OK) {
-                        convert_error();
-                        DEBUG_PRINTF("FT API error: %s\n", ft_error_strings[ft_error]);
-
-                        return -1;
-                }
-
-                written += size;
-        } while (written < len);
-#else
         while ((len - written) > 0) {
                 int amount;
                 if ((amount = ftdi_write_data(&ftdi_ctx, write_buffer, len)) < 0) {
@@ -402,7 +242,6 @@ device_write(uint8_t *write_buffer, uint32_t len)
                 }
                 written += amount;
         }
-#endif /* HAVE_LIBFTD2XX */
 
         DEBUG_PRINTF("%iB written\n", len);
 
@@ -621,11 +460,7 @@ upload_buffer(void *buffer, uint32_t base_address, uint32_t len)
 static const char *
 error_stringify(void)
 {
-#ifdef HAVE_LIBFTD2XX
-        return "<error>";
-#else
         return ftdi_get_error_string(&ftdi_ctx);
-#endif /* HAVE_LIBFTD2XX */
 }
 
 static int
@@ -788,9 +623,12 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
                 goto error;
         }
 
-        if ((send_command(CMD_UPLOAD, base_address, len)) < 0) {
+        uint8_t command;
+        command = (execute) ? CMD_EXECUTE : CMD_UPLOAD;
+
+        if ((send_command(command, base_address, len)) < 0) {
                 goto error;
-        }
+        } 
 
         if ((device_write(buffer, len)) < 0) {
                 goto error;
@@ -798,12 +636,6 @@ upload_execute_buffer(void *buffer, uint32_t base_address,
 
         if ((send_checksum(buffer, len)) < 0) {
                 goto error;
-        }
-
-        if (execute) {
-                if ((send_command(CMD_EXECUTE, base_address, len)) < 0) {
-                        goto error;
-                }
         }
 
         goto exit;
@@ -825,26 +657,6 @@ exit:
 static void
 convert_error(void)
 {
-#ifdef HAVE_LIBFTD2XX
-        switch (ft_error) {
-        case FT_OK:
-                usb_cartridge_error = USB_CARTRIDGE_OK;
-                break;
-        case FT_DEVICE_NOT_FOUND:
-                usb_cartridge_error = USB_CARTRIDGE_DEVICE_NOT_FOUND;
-                break;
-        case FT_DEVICE_NOT_OPENED:
-                usb_cartridge_error = USB_CARTRIDGE_DEVICE_NOT_OPENED;
-                break;
-        case FT_IO_ERROR:
-                usb_cartridge_error = USB_CARTRIDGE_IO_ERROR;
-                break;
-        default:
-                usb_cartridge_error = USB_CARTRIDGE_DEVICE_ERROR;
-                break;
-        }
-#else
-#endif /* HAVE_LIBFTD2XX */
 }
 
 static int
@@ -854,27 +666,37 @@ send_command(uint32_t command, uint32_t address, size_t len)
                 NULL,
                 "DOWNLOAD",
                 "UPLOAD",
+                NULL,
+                NULL,
+                NULL,
                 "EXECUTE"
         };
 
         usb_cartridge_error = USB_CARTRIDGE_OK;
 
-        uint8_t buffer[9];
+        static uint8_t buffer[13];
 
         DEBUG_PRINTF("Command: \"%s\" (0x%02X)\n", command2str[command],
             command);
         DEBUG_PRINTF("Address: 0x%08X\n", address);
         DEBUG_PRINTF("Size: %iB (0x%08X)\n", (uint32_t)len, (uint32_t)len);
 
-        buffer[0] = command;
-        buffer[1] = ADDRESS_MSB(address);
-        buffer[2] = ADDRESS_02(address);
-        buffer[3] = ADDRESS_01(address);
-        buffer[4] = ADDRESS_LSB(address);
-        buffer[5] = LEN_MSB(len);
-        buffer[6] = LEN_02(len);
-        buffer[7] = LEN_01(len);
-        buffer[8] = LEN_LSB(len);
+        buffer[ 0] = command;
+
+        buffer[ 1] = ADDRESS_MSB(address);
+        buffer[ 2] = ADDRESS_02(address);
+        buffer[ 3] = ADDRESS_01(address);
+        buffer[ 4] = ADDRESS_LSB(address);
+
+        buffer[ 5] = LEN_MSB(len);
+        buffer[ 6] = LEN_02(len);
+        buffer[ 7] = LEN_01(len);
+        buffer[ 8] = LEN_LSB(len);
+
+        buffer[ 9] = 0;
+        buffer[10] = 0;
+        buffer[11] = 0;
+        buffer[12] = 0;
 
         return device_write(buffer, sizeof(buffer));
 }
