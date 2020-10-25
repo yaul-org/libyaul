@@ -21,19 +21,7 @@
 
 #### Notes about MinGW
 
-  It doesn't work unless `libftdi-0.20` is used. Building all versions of
-  `libftdi1` yields issues.
-
-  Below are the steps used to build `libftdi1`. Note, the
-  `mingw32/mingw-w64-i686-cmake` package is required.
-
-    cmake \
-        -DCMAKE_SYSTEM_NAME=Windows \
-        -DCMAKE_FIND_ROOT_PATH=c:/path/to/msys64/mingw32 \
-        -DLIBUSB_LIBRARIES=c:/path/to/msys64/mingw32/lib/libusb-1.0.dll.a \
-        -DLIBUSB_INCLUDE_DIR=c:/path/to/msys64/mingw32/include/libusb-1.0 \
-        -DCMAKE_C_COMPILER=/mingw32/bin/gcc.exe \
-        -DCMAKE_CXX_COMPILER=/mingw32/bin/g++.exe -G "Unix Makefiles" ..
+  Define `HAVE_LIBUSB_WIN32` in order to compile under MinGW64.
 
 #### Notes about Linux
 
