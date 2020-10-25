@@ -22,6 +22,8 @@
 void
 console(const struct device_driver *device)
 {
+        /* Install necessary signal handlers */
+
         int ret;
 
         uint32_t size;

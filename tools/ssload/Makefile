@@ -17,9 +17,11 @@ CFLAGS:= -s \
 LDFLAGS:=
 
 SRCS:= ssload.c \
+	crc.c \
 	console.c \
 	datalink.c \
 	drivers.c \
+	fileserver.c \
 	shared.c \
 	usb-cartridge.c
 INCLUDES:=
