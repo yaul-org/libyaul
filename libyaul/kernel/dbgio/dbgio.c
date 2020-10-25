@@ -34,7 +34,11 @@ static const struct dbgio_dev_ops *_dev_ops_table[] = {
         NULL,
         &_internal_dev_ops_vdp2_simple,
         &_internal_dev_ops_vdp2_async,
+#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         &_internal_dev_ops_usb_cart,
+#else
+        NULL,
+#endif /* HAVE_DEV_CARTRIDGE */
 };
 
 static char *_sprintf_buffer;

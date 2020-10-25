@@ -73,7 +73,7 @@ struct dev_font_state {
 struct dev_font_load_state {
         uint8_t intc_priority_a;
 
-        font_load_callback callback;
+        font_load_callback_t callback;
 };
 
 /* Restrictions:
@@ -514,7 +514,7 @@ _shared_font_load_cpd_callback(void *work)
 }
 
 static void
-_shared_font_load(font_load_callback callback)
+_shared_font_load(font_load_callback_t callback)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
                 .channel = DEV_DMAC_CHANNEL,

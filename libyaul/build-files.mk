@@ -49,7 +49,13 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/null.c \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
-	kernel/dbgio/devices/usb-cart.c \
+
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
+LIB_SRCS+= \
+	kernel/dbgio/devices/usb-cart.c
+endif
+
+LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
