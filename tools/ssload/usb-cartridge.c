@@ -56,7 +56,7 @@
 #define CMD_DOWNLOAD            (1)
 #define CMD_UPLOAD              (2)
 #define CMD_EXECUTE             (3)
-#define CMD_GET_BUFF_ADDR       (4)
+#define CMD_GET_BUFFER_ADDRESS  (4)
 #define CMD_COPY_EXECUTE        (5)
 #define CMD_EXECUTE_EXT         (6)
 
