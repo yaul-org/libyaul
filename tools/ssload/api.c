@@ -54,3 +54,41 @@ api_handle(const struct device_driver *device)
                 usleep(API_USLEEP);
         }
 }
+
+bool
+api_byte_read(const struct device_driver *device, uint8_t *value)
+{
+        *value = 0;
+
+        return api_variable_read(device, value, sizeof(uint8_t));
+}
+
+bool
+api_long_read(const struct device_driver *device, uint32_t *value)
+{
+        *value = 0;
+
+        bool read;
+        read = api_variable_read(device, value, sizeof(uint32_t));
+
+        *value = TO_LE(*value);
+
+        return read;
+}
+
+bool
+api_variable_read(const struct device_driver *device, void *buffer, uint32_t buffer_len)
+{
+        (void)memset(buffer, 0x00, buffer_len);
+
+        for (uint32_t i = 0; i < API_RETRIES_COUNT; i++) {
+                int ret;
+                if ((ret = device->read(buffer, buffer_len)) >= 0) {
+                        return true;
+                }
+
+                usleep(API_USLEEP);
+        }
+        
+        return false;
+}

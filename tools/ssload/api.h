@@ -16,6 +16,11 @@
 
 #define API_RET_ERROR   (0xFF)
 
-#define API_USLEEP      (16666)
+#define API_RETRIES_COUNT       (1000)
+#define API_USLEEP              (16666)
+
+bool api_variable_read(const struct device_driver *, void *, uint32_t);
+bool api_byte_read(const struct device_driver *, uint8_t *);
+bool api_long_read(const struct device_driver *, uint32_t *);
 
 #endif /* !API_H_ */

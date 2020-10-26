@@ -92,7 +92,7 @@ static int32_t _calculate_file_size(const char *);
 static void _performance_stats_begin(struct performance_stats *, uint32_t);
 static void _performance_stats_end(struct performance_stats *);
 
-void api_handle(struct device_driver *device);
+void api_handle(const struct device_driver *);
 
 void fileserver_init(const char *);
 void console_init(void);

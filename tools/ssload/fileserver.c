@@ -111,46 +111,6 @@ fileserver_quit(const struct device_driver *device)
         _fileserver_cmd_quit(device);
 }
 
-#define FILESERVER_TRIES 1000
-
-static bool
-_variable_read(const struct device_driver *device, uint8_t *buffer, uint32_t buffer_len)
-{
-        (void)memset(buffer, 0x00, buffer_len);
-
-        for (uint32_t i = 0; i < FILESERVER_TRIES; i++) {
-                int ret;
-                if ((ret = device->read(buffer, buffer_len)) >= 0) {
-                        return true;
-                }
-
-                usleep(API_USLEEP);
-        }
-
-        return false;
-}
-
-static bool
-_long_read(const struct device_driver *device, uint32_t *value)
-{
-        *value = 0;
-
-        bool read;
-        read = _variable_read(device, value, sizeof(uint32_t));
-
-        *value = TO_LE(*value);
-
-        return read;
-}
-
-static bool
-_byte_read(const struct device_driver *device, uint8_t *value)
-{
-        *value = 0;
-
-        return _variable_read(device, value, sizeof(uint8_t));
-}
-
 static void
 _fileserver_cmd_file(const struct device_driver *device)
 {
@@ -164,7 +124,7 @@ _fileserver_cmd_file(const struct device_driver *device)
 
         int ret;
 
-        if (!(_variable_read(device, filename, sizeof(filename)))) {
+        if (!(api_variable_read(device, filename, sizeof(filename)))) {
                 /* Error */
                 return;
         }
@@ -182,7 +142,7 @@ _fileserver_cmd_file(const struct device_driver *device)
 
         uint32_t sector_offset;
 
-        if (!(_long_read(device, &sector_offset))) {
+        if (!(api_long_read(device, &sector_offset))) {
                 verbose_printf("Error: Timed out attempting to read sector offset\n");
                 /* Error */
                 return;
@@ -201,7 +161,7 @@ _fileserver_cmd_file(const struct device_driver *device)
         (void)memset(_sector_buffer, 0x00, FILESERVER_SECTOR_SIZE);
         (void)memcpy(_sector_buffer, buffer_offset, FILESERVER_SECTOR_SIZE);
 
-        for (uint32_t try = 0; try < FILESERVER_TRIES; try++) {
+        for (uint32_t try = 0; try < API_RETRIES_COUNT; try++) {
                 verbose_printf("Sending buffer\n");
 
                 if ((ret = device->send(_sector_buffer, FILESERVER_SECTOR_SIZE)) < 0) {
@@ -216,7 +176,7 @@ _fileserver_cmd_file(const struct device_driver *device)
 
                 /* Read CRC for this sector */
                 crc_t read_sector_crc;
-                if (!(_byte_read(device, &read_sector_crc))) {
+                if (!(api_byte_read(device, &read_sector_crc))) {
                         verbose_printf("Error: Timed out attempting to read CRC byte\n");
                         /* Error */
                         return;
@@ -234,7 +194,10 @@ _fileserver_cmd_file(const struct device_driver *device)
 
                 verbose_printf("Error: CRC mismatch. Trying again\n");
 
-                device->send(API_RET_ERROR, 1);
+                uint8_t ret_byte;
+                ret_byte = API_RET_ERROR;
+
+                device->send(&ret_byte, 1);
 
                 usleep(API_USLEEP);
         }
@@ -253,7 +216,7 @@ _fileserver_cmd_size(const struct device_driver *device)
 
         int ret;
 
-        if (!(_variable_read(device, filename, sizeof(filename)))) {
+        if (!(api_variable_read(device, filename, sizeof(filename)))) {
                 /* Error */
                 return;
         }
@@ -338,7 +301,7 @@ _path_entry_file_read(path_entry_t *path_entry)
 
         path_entry->buffer = buffer;
 
-        size_t size_read;
+        ssize_t size_read;
         size_read = fread(buffer, 1, statbuf.st_size, fp);
 
         fclose(fp);
