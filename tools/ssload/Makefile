@@ -27,7 +27,7 @@ SRCS:= ssload.c \
 	usb-cartridge.c
 INCLUDES:=
 LIB_DIRS:=
-LIBS:=
+LIBS:= m
 
 ifneq ($(strip $(HAVE_LIBFTD2XX)),)
 CFLAGS+= -DHAVE_LIBFTD2XX=1
