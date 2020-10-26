@@ -4,12 +4,8 @@
 
 #include "fileclient.h"
 
+#include <ssload.h>
 #include <crc.h>
-
-#define FILESERVER_CMD_FILE     (0x00)
-#define FILESERVER_CMD_SIZE     (0x01)
-#define FILESERVER_CMD_QUIT     (0x7F)
-#define FILESERVER_CMD_INVALID  (0xFF)
 
 static char _filename_buffer[32];
 
@@ -19,7 +15,7 @@ void
 fileclient_sector_request(const char *filename, const uint32_t sector_offset,
     void *dst)
 {
-        usb_cart_byte_send(FILESERVER_CMD_FILE);
+        usb_cart_byte_send(SSLOAD_API_CMD_FILE);
 
         _filename_send(filename);
 
@@ -52,7 +48,7 @@ fileclient_sector_request(const char *filename, const uint32_t sector_offset,
 uint32_t
 fileclient_sector_count_request(const char *filename)
 {
-        usb_cart_byte_send(FILESERVER_CMD_SIZE);
+        usb_cart_byte_send(SSLOAD_API_CMD_SIZE);
 
         _filename_send(filename);
 

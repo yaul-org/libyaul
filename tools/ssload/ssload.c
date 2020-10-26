@@ -33,9 +33,6 @@ struct performance_stats {
         struct timeval _time_end;
 };
 
-void fileserver(const struct device_driver *, const char *dirpath);
-void console(const struct device_driver *);
-
 static struct {
         bool h_set;
         bool v_set;
@@ -94,6 +91,11 @@ static int32_t _calculate_file_size(const char *);
 
 static void _performance_stats_begin(struct performance_stats *, uint32_t);
 static void _performance_stats_end(struct performance_stats *);
+
+void api_handle(struct device_driver *device);
+
+void fileserver_init(const char *);
+void console_init(void);
 
 int
 main(int argc, char **argv)
@@ -336,10 +338,6 @@ main(int argc, char **argv)
                 exit(1);
         }
 
-        if (_global_options.i_set) {
-                fileserver(device, _global_options.fileserver_dirpath);
-        }
-
         if (_global_options.x_set || _global_options.u_set || _global_options.d_set) {
                 verbose_printf("Transfer time: %.3gs\n",
                     performance_stats.ps_transfer_time);
@@ -347,11 +345,17 @@ main(int argc, char **argv)
                     performance_stats.ps_transfer_speed);
         }
 
-        if (!_global_options.n_set) {
-                if (_global_options.x_set) {
-                        verbose_printf("\n");
-                        console(device);
+        if (_global_options.x_set &&
+            (_global_options.i_set || !_global_options.n_set)) {
+                if (_global_options.i_set) {
+                        fileserver_init(_global_options.fileserver_dirpath);
                 }
+
+                if (!_global_options.n_set) {
+                        console_init();
+                }
+
+                api_handle(device);
         }
 
         goto exit;
