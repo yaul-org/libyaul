@@ -68,6 +68,13 @@ ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf))
   $(error Invalid value for YAUL_OPTION_MALLOC_IMPL (malloc implementation))
 endif
 
+ifeq ($(strip $(YAUL_OPTION_BUILD_GDB)),)
+  $(error Undefined YAUL_OPTION_BUILD_GDB (build GDB))
+endif
+ifneq ($(YAUL_OPTION_BUILD_GDB),$(filter $(YAUL_OPTION_BUILD_GDB),0 1))
+  $(error Invalid value for YAUL_OPTION_BUILD_GDB (build GDB))
+endif
+
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
   $(error Undefined YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
 endif
