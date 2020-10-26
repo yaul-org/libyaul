@@ -1,5 +1,9 @@
 # -*- mode: makefile -*-
 
+FLAG_BUILD_GDB:= $(shell test "x$(YAUL_OPTION_DEV_CARTRIDGE)" != x0 -a \
+                              \( "x$(TYPE)" = xdebug -o \
+                                 "x$(YAUL_OPTION_BUILD_GDB)" != x0 \) && printf "yes")
+
 BOOTSTRAP_FILES:= \
 	common/bootstrap/ip.sx \
 	common/bootstrap/sys_aree.bin \
@@ -38,7 +42,7 @@ LIB_SRCS:= \
 	kernel/mm/internal.c \
 	common/internal_reset.c
 
-ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/gdb-ihr.sx
@@ -276,8 +280,12 @@ INSTALL_HEADER_FILES+= \
 	./math/:uint32.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
-	./common/bootstrap/:ip.h:yaul/common/ \
+	./common/bootstrap/:ip.h:yaul/common/
+
+ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
+INSTALL_HEADER_FILES+= \
 	./common/gdb/:gdb.h:yaul/common/gdb/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
