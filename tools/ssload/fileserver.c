@@ -24,22 +24,14 @@
 #include "drivers.h"
 #include "shared.h"
 #include "crc.h"
+#include "api.h"
 
 /* Maximum length of a path per path entry */
 #define PATH_ENTRY_PATH_LENGTH  (256)
 /* Maximum number of path entries */
 #define PATH_ENTRY_COUNT        (4096)
 
-#define FILESERVER_SLEEP        (16666)
-
 #define FILESERVER_SECTOR_SIZE  (2048)
-
-#define FILESERVER_CMD_FILE     (0x00)
-#define FILESERVER_CMD_SIZE     (0x01)
-#define FILESERVER_CMD_QUIT     (0x7F)
-#define FILESERVER_CMD_INVALID  (0xFF)
-
-#define FILESERVER_RET_ERROR    (0xFF)
 
 static uint8_t _sector_buffer[FILESERVER_SECTOR_SIZE];
 
@@ -80,10 +72,8 @@ static void _path_entry_cache_purge(path_entry_t *);
 static path_entry_t *_path_entry_find(const char *);
 
 void
-fileserver(const struct device_driver *device, const char *dirpath)
+fileserver_init(const char *dirpath)
 {
-        static uint8_t buffer[256];
-
         verbose_printf("Starting file server: \"%s\"\n", dirpath);
 
         int ret;
@@ -98,33 +88,27 @@ fileserver(const struct device_driver *device, const char *dirpath)
 
         /* Build the path entries (OS specific) */
         _build_path_entries(dirpath);
+}
 
-        /* Start serving */
-        while (true) {
-                verbose_printf("Waiting...\n");
+void
+fileserver_exec(const struct device_driver *device, uint8_t command)
+{
+        static uint8_t buffer[256];
 
-                if ((ret = device->read(buffer, 1)) < 0) {
-                        sleep(FILESERVER_SLEEP);
-                        continue;
-                }
-
-                DEBUG_PRINTF("Command: 0x%02X\n", buffer[0]);
-
-                switch (buffer[0]) {
-                case FILESERVER_CMD_FILE:
-                        _fileserver_cmd_file(device);
-                        break;
-                case FILESERVER_CMD_SIZE:
-                        _fileserver_cmd_size(device);
-                        break;
-                case FILESERVER_CMD_QUIT:
-                        _fileserver_cmd_quit(device);
-                        goto shutdown;
-                }
+        switch (command) {
+        case API_CMD_FILE:
+                _fileserver_cmd_file(device);
+                break;
+        case API_CMD_SIZE:
+                _fileserver_cmd_size(device);
+                break;
         }
+}
 
-shutdown:
-        ;
+void
+fileserver_quit(const struct device_driver *device)
+{
+        _fileserver_cmd_quit(device);
 }
 
 #define FILESERVER_TRIES 1000
@@ -140,7 +124,7 @@ _variable_read(const struct device_driver *device, uint8_t *buffer, uint32_t buf
                         return true;
                 }
 
-                sleep(FILESERVER_SLEEP);
+                usleep(API_USLEEP);
         }
 
         return false;
@@ -250,9 +234,9 @@ _fileserver_cmd_file(const struct device_driver *device)
 
                 verbose_printf("Error: CRC mismatch. Trying again\n");
 
-                device->send(FILESERVER_RET_ERROR, 1);
+                device->send(API_RET_ERROR, 1);
 
-                sleep(FILESERVER_SLEEP);
+                usleep(API_USLEEP);
         }
 
         verbose_printf("Request complete\n");

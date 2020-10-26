@@ -17,6 +17,7 @@ CFLAGS:= -s \
 LDFLAGS:=
 
 SRCS:= ssload.c \
+	api.c \
 	crc.c \
 	console.c \
 	datalink.c \
