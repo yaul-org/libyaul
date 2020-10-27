@@ -179,7 +179,7 @@ define macro-update-cdb
 	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 >/dev/null 2>&1
 endef
 
 # $1 -> Space delimited list of object files
