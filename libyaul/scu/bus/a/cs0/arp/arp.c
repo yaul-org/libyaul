@@ -18,18 +18,16 @@
 
 #include "arp-internal.h"
 
-typedef void (*arp_function)(void);
+typedef void (*arp_function_t)(void);
 
-static arp_callback_t _arp_callback;
+static arp_callback_t _callback;
+static arp_callback_handler_t _handler = NULL;
 
-static arp_callback_handler _arp_cb = NULL;
-
-static void _arp_trampoline(void);
 static void _arp_function_nop(void);
 static void _arp_function_01(void);
 static void _arp_function_09(void);
 
-static arp_function _arp_function_table[] = {
+static const arp_function_t _arp_function_table[] = {
         _arp_function_nop,
         _arp_function_01,
         _arp_function_nop,
@@ -48,18 +46,32 @@ static arp_function _arp_function_table[] = {
         _arp_function_nop
 };
 
+static inline void __always_inline
+_invoke_callback(void)
+{
+        if (_handler != NULL) {
+                _handler(&_callback);
+        }
+
+        /* Clear ARP user callback */
+        _callback.function = 0x00;
+        _callback.ptr = NULL;
+        _callback.exec = false;
+        _callback.len = 0;
+}
+
 bool
 arp_busy_status(void)
 {
         uint8_t status;
-        bool busy;
-
         status = MEMORY_READ(8, ARP(STATUS));
         status &= 0x01;
+
+        bool busy;
         busy = (status == 0x00);
 
         if (!busy) {
-                MEMORY_WRITE(8, ARP(status), 0x0);
+                MEMORY_WRITE(8, ARP(status), 0x00);
         }
 
         return busy;
@@ -68,10 +80,9 @@ arp_busy_status(void)
 uint8_t
 arp_byte_read(void)
 {
-        uint8_t b;
-
         while ((arp_busy_status()));
 
+        uint8_t b;
         b = MEMORY_READ(8, ARP(INPUT));
         /* Write back */
         MEMORY_WRITE(8, ARP(OUTPUT), b);
@@ -94,7 +105,7 @@ arp_byte_xchg(uint8_t c)
 }
 
 void
-arp_function_callback_set(arp_callback_handler cb)
+arp_function_callback_set(arp_callback_handler_t handler)
 {
         /* Disable interrupts */
         uint32_t sr_mask;
@@ -103,11 +114,9 @@ arp_function_callback_set(arp_callback_handler cb)
         cpu_intc_mask_set(15);
 
         /* Clear ARP callback */
-        memset(&_arp_callback.ptr, 0x00, sizeof(_arp_callback));
+        memset(&_callback.ptr, 0x00, sizeof(_callback));
 
-        assert(cb != NULL);
-        _arp_cb = cb;
-        cpu_intc_ihr_set(32, _arp_trampoline);
+        _handler = handler;
 
         /* Enable interrupts */
         cpu_intc_mask_set(sr_mask);
@@ -116,7 +125,6 @@ arp_function_callback_set(arp_callback_handler cb)
 void
 arp_function_nonblock(void)
 {
-
         if (!(arp_sync_nonblock())) {
                 return;
         }
@@ -131,8 +139,8 @@ uint32_t
 arp_long_read(void)
 {
         uint32_t b;
-
         b = 0;
+
         b |= (arp_byte_xchg(0x00)) << 24;
         b |= (arp_byte_xchg(0x00)) << 16;
         b |= (arp_byte_xchg(0x00)) << 8;
@@ -144,7 +152,6 @@ arp_long_read(void)
 void
 arp_long_send(uint32_t w)
 {
-
         arp_byte_xchg(w >> 24);
         arp_byte_xchg(w >> 16);
         arp_byte_xchg(w >> 8);
@@ -165,7 +172,6 @@ arp_return(void)
 void
 arp_sync(void)
 {
-
         while (!(arp_sync_nonblock()));
 }
 
@@ -213,24 +219,12 @@ arp_version_get(void)
 }
 
 static void
-_arp_trampoline(void)
-{
-        _arp_cb(&_arp_callback);
-
-        /* Clear ARP user callback */
-        _arp_callback.function = 0x00;
-        _arp_callback.ptr = NULL;
-        _arp_callback.exec = false;
-        _arp_callback.len = 0;
-}
-
-static void
 _arp_function_nop(void)
 {
 }
 
-/* Read byte from memory and send to client (download
- * from client's perspective) */
+/* Read byte from memory and send to client (download from client's
+ * perspective) */
 static void
 _arp_function_01(void)
 {
@@ -254,18 +248,17 @@ _arp_function_01(void)
                         arp_byte_xchg('O');
                         arp_byte_xchg('K');
 
-                        /* Call ARP user callback */
-                        cpu_instr_trapa(32);
+                        _invoke_callback();
                         return;
                 }
 
                 /* Set for ARP callback */
-                if (_arp_callback.ptr == NULL) {
-                        _arp_callback.ptr = (void *)address;
+                if (_callback.ptr == NULL) {
+                        _callback.ptr = (void *)address;
                 }
-                _arp_callback.function = 0x01;
-                _arp_callback.exec = false;
-                _arp_callback.len += len;
+                _callback.function = 0x01;
+                _callback.exec = false;
+                _callback.len += len;
 
                 checksum = 0;
                 for (; len > 0; len--, address++) {
@@ -300,12 +293,12 @@ _arp_function_09(void)
         exec = (b == 0x01);
 
         /* Set for ARP callback */
-        if (_arp_callback.ptr == NULL) {
-                _arp_callback.ptr = (void *)(addr - len);
+        if (_callback.ptr == NULL) {
+                _callback.ptr = (void *)(addr - len);
         }
-        _arp_callback.function = 0x09;
-        _arp_callback.exec = exec;
-        _arp_callback.len += len;
+        _callback.function = 0x09;
+        _callback.exec = exec;
+        _callback.len += len;
 
         /* XXX: Blocking */
         for (; len > 0; len--, addr++) {
@@ -316,8 +309,7 @@ _arp_function_09(void)
 
         /* Only call the ARP user callback for when we get the last
          * chunk of data which just happens to be the start address */
-        if ((uint32_t)_arp_callback.ptr == this_addr) {
-                /* Call ARP user callback */
-                cpu_instr_trapa(32);
+        if ((uint32_t)_callback.ptr == this_addr) {
+                _invoke_callback();
         }
 }
