@@ -135,6 +135,9 @@ LIB_SRCS+= \
 LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
 
+LIB_SRCS+= \
+	kernel/vfs/fs/iso9660/iso9660.c
+
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
 	kernel/vfs/fs/fileclient/fileclient.c
@@ -302,6 +305,9 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
+
+INSTALL_HEADER_FILES+= \
+	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 INSTALL_HEADER_FILES+= \
