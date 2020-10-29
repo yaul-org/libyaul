@@ -5,251 +5,240 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+
+#ifndef __linux__
+#include <cd-block.h>
+
+#include <scu/map.h>
+#endif /* __linux__ */
 
 #include "iso9660-internal.h"
 
 #include "iso9660.h"
 
-typedef struct {
-        iso9660_dirent_t dirent_root;
-        uint16_t logical_block;
-} iso9660_mnt_t;
+static struct {
+        iso9660_pvd_t pvd;
+} _state;
 
-extern int normalize_path(const char *, uint32_t x, uint32_t y,
-    char ([y])[x]);
-
-static const iso9660_dirent_t *iso9660_find(const iso9660_mnt_t *,
-    const char *);
-static const iso9660_dirent_t *iso9660_find_file(const iso9660_mnt_t *,
-    const char *);
-static const iso9660_dirent_t *iso9660_find_directory(const iso9660_mnt_t *,
-    const char *);
-
-void *
-iso9660_open(void *p, const char *path, int mode __unused)
+static inline uint32_t __always_inline
+_length_sector_round(uint32_t length)
 {
-        iso9660_mnt_t *mnt;
-        mnt = (iso9660_mnt_t *)p;
-
-        const iso9660_dirent_t *dirent;
-        dirent = iso9660_find_file(mnt, path);
-
-        return (void *)dirent;
+        return ((length + 0x07FF) >> 11);
 }
 
-void
-iso9660_close(void *fh __unused)
+static void _dirent_root_walk(iso9660_toc_walk_t, void *);
+static bool _dirent_interleave(const iso9660_dirent_t *);
+
+static void _toc_read_walker(const iso9660_toc_entry_t *, void *);
+
+#ifdef __linux__
+#define DEBUG
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static void
+_bread(uint32_t sector, void *ptr)
 {
+        static uint8_t buffer[2048];
+
+        FILE *fp;
+        fp = fopen("test4.iso", "rb");
+        assert(fp != NULL);
+
+        fseek(fp, sector * 2048, SEEK_SET);
+
+        (void)memset(buffer, 0, sizeof(buffer));
+        (void)fread(buffer, 1, sizeof(buffer), fp);
+
+        fclose(fp);
+
+        (void)memcpy(ptr, buffer, sizeof(buffer));
+        (void)printf("sector: $%x\n", sector);
 }
 
-ssize_t
-iso9660_read(void *p __unused, void *buf __unused, size_t bytes __unused)
+int
+main(void)
 {
-        iso9660_mnt_t *mnt __unused;
-        iso9660_dirent_t *xp __unused;
+        iso9660_toc_t toc;
+        iso9660_toc_read(&toc, -1);
 
-        mnt = (iso9660_mnt_t *)p;
+        for (uint32_t i = 0; i < toc.entries_count; i++) {
+                (void)printf("\"%s\", %luB, %u\n", toc.entries[i].name, toc.entries[i].size, toc.entries[i].sector_count);
+        }
 
         return 0;
 }
+#else
+static volatile uint8_t *_lwram __used = (volatile uint8_t *)LWRAM(0);
 
-void *
-iso9660_mount(const char *mnt_point __unused)
+static void
+_bread(uint32_t sector, void *ptr)
 {
-        iso9660_mnt_t *mnt;
-        mnt = NULL;
+        cd_block_read_data(LBA2FAD(sector), 2048, ptr);
 
+        /* (void)memcpy((void *)LWRAM(0), ptr, 2048); */
+}
+#endif /* __linux__ */
+
+void
+iso9660_toc_read(iso9660_toc_t *toc, int32_t count)
+{
+        int32_t clamped_count;
+        clamped_count = count;
+
+        if (clamped_count <= 0) {
+                clamped_count = ISO9660_TOC_ENTRIES_COUNT;
+        } else if (clamped_count > ISO9660_TOC_ENTRIES_COUNT) {
+                clamped_count = ISO9660_TOC_ENTRIES_COUNT;
+        }
+
+        toc->entries = malloc(sizeof(iso9660_toc_entry_t) * clamped_count);
+        assert(toc->entries != NULL);
+
+        toc->entries_pooled_count = (uint32_t)clamped_count;
+        toc->entries_count = 0;
+
+        iso9660_toc_walk(_toc_read_walker, toc);
+}
+
+void
+iso9660_toc_walk(iso9660_toc_walk_t walker, void *args)
+{
         /* Skip IP.BIN (16 sectors) */
-        const struct iso_volume_descriptor *vd;
-        vd = (const struct iso_volume_descriptor *)bread(16);
+        _bread(16, &_state.pvd);
+
+        /* We are interested in the Primary Volume Descriptor, which points us
+         * to the root directory and path tables, which both allow us to find
+         * any file on the CD */
 
         /* Must be a "Primary Volume Descriptor" */
-        if (isonum_711(vd->type) != ISO_VD_PRIMARY) {
-                goto error;
-        }
+        assert(isonum_711(_state.pvd.type) == ISO_VD_PRIMARY);
+
         /* Must match 'CD001' */
-        if ((strncmp((const char *)vd->id, ISO_STANDARD_ID,
-                    sizeof(vd->id) + 1)) == 0) {
-                goto error;
-        }
+#ifdef DEBUG
+        const char *cd001_str;
+        cd001_str = (const char *)_state.pvd.id;
+        size_t cd001_len;
+        cd001_len = sizeof(_state.pvd.id) + 1;
 
-        /* We are interested in the Primary Volume Descriptor, which
-         * points us to the root directory and path tables, which both
-         * allow us to find any file on the CD */
-        const struct iso_primary_descriptor *pd;
-        pd = (const struct iso_primary_descriptor *)vd;
+        assert((strncmp(cd001_str, ISO_STANDARD_ID, cd001_len)) != 0);
+#endif /* DEBUG */
 
-        if ((mnt = (iso9660_mnt_t *)malloc(sizeof(iso9660_mnt_t))) == NULL) {
-                goto error;
+        /* Logical block size must be 2048 bytes */
+        assert(isonum_723(_state.pvd.logical_block_size) == 2048);
+
+        _dirent_root_walk(walker, args);
+}
+
+static void
+_toc_read_walker(const iso9660_toc_entry_t *entry, void *args)
+{
+        iso9660_toc_t *toc;
+        toc = args;
+
+        if (toc->entries_count >= toc->entries_pooled_count) {
+                return;
         }
+        
+        iso9660_toc_entry_t *this_entry;
+        this_entry = &toc->entries[toc->entries_count];
+
+        (void)memcpy(this_entry, entry, sizeof(iso9660_toc_entry_t));
+
+        toc->entries_count++;
+}
+
+static bool
+_dirent_interleave(const iso9660_dirent_t *dirent)
+{ 
+        return ((isonum_711(dirent->interleave)) != 0x00);
+}
+
+static void
+_dirent_root_walk(iso9660_toc_walk_t walker, void *args)
+{
+        static uint8_t sector_buffer[2048] __aligned(4);
+
+        iso9660_dirent_t dirent_root;
 
         /* Populate filesystem mount structure */
         /* Copy of directory record */
-        (void)memcpy(&mnt->dirent_root, pd->root_directory_record,
-            sizeof(mnt->dirent_root));
+        (void)memcpy(&dirent_root, _state.pvd.root_directory_record, sizeof(dirent_root));
 
-        /* Logical block size must be either 2048 or 2352 bytes */
-        mnt->logical_block = isonum_723(pd->logical_block_size);
-        if ((mnt->logical_block != 2048) && (mnt->logical_block != 2352)) {
-                goto error;
-        }
-
-        return mnt;
-
-error:
-        if (mnt != NULL) {
-                free(mnt);
-        }
-
-        return NULL;
-}
-
-static const iso9660_dirent_t *
-iso9660_find_file(const iso9660_mnt_t *mnt, const char *path)
-{
-        const iso9660_dirent_t *dirent;
-        dirent = iso9660_find(mnt, path);
-        if (dirent == NULL) {
-                /* XXX: errno = */
-                return NULL;
-        }
-
-        uint8_t file_flags;
-        file_flags = isonum_711(dirent->file_flags);
-
-        uint8_t flags;
-        flags = DIRENT_FILE_FLAGS_HIDDEN | DIRENT_FILE_FLAGS_DIRECTORY;
-        if ((file_flags & flags) != DIRENT_FILE_FLAGS_FILE) {
-                /* XXX: errno = */
-                return NULL;
-        }
-
-        return dirent;
-}
-
-static const iso9660_dirent_t *
-iso9660_find_directory(const iso9660_mnt_t *mnt, const char *path)
-{
-        const iso9660_dirent_t *dirent;
-        dirent = iso9660_find(mnt, path);
-        if (dirent == NULL) {
-                /* XXX: errno = */
-                return NULL;
-        }
-
-        uint8_t file_flags;
-        file_flags = isonum_711(dirent->file_flags);
-
-        uint8_t flags;
-        flags = DIRENT_FILE_FLAGS_HIDDEN | DIRENT_FILE_FLAGS_DIRECTORY;
-        if ((file_flags & flags) != DIRENT_FILE_FLAGS_DIRECTORY) {
-                /* XXX: errno = */
-                return NULL;
-        }
-
-        return dirent;
-}
-
-static const iso9660_dirent_t *
-iso9660_find(const iso9660_mnt_t *mnt, const char *path)
-{
-        static char path_normalized[ISO_DIR_LEVEL_MAX][ISO_FILENAME_MAX_LENGTH];
-
-        if ((normalize_path(path, ISO_FILENAME_MAX_LENGTH, ISO_DIR_LEVEL_MAX,
-                    path_normalized)) < 0) {
-                /* XXX: errno = */
-                return NULL;
-        }
-
+        /* Start walking the root directory */
         uint32_t sector;
-        sector = isonum_733(mnt->dirent_root.extent);
+        sector = isonum_733(dirent_root.extent);
 
         const iso9660_dirent_t *dirent;
         dirent = NULL;
 
-        const iso9660_dirent_t *match_dirent;
-        match_dirent = NULL;
+        int32_t dirent_sectors;
+        dirent_sectors = INT32_MAX;
 
-        uint32_t component_idx;
-        for (component_idx = 0; component_idx < ISO_DIR_LEVEL_MAX;
-             component_idx++) {
-                const char *component;
-                component = &path_normalized[component_idx][0];
-                size_t component_len;
-                component_len = strlen(component);
+        while (true) {
+                if ((dirent == NULL) || (isonum_711(dirent->length) == 0)) {
+                        dirent_sectors--;
 
-                if (*component == '\0') {
-                        return match_dirent;
+                        if (dirent_sectors == 0) {
+                                break;
+                        }
+
+                        _bread(sector, sector_buffer);
+
+                        dirent = (const iso9660_dirent_t *)&sector_buffer[0];
+
+                        if (dirent->name[0] == '\0') {
+                                uint32_t data_length;
+                                data_length = isonum_733(dirent->data_length);
+
+                                dirent_sectors = _length_sector_round(data_length);
+                        }
+
+                        /* Interleave mode must be disabled */
+                        assert(!(_dirent_interleave(dirent)));
+
+                        /* Next sector */
+                        sector++;
                 }
 
-                uint32_t dirent_cnt;
-                dirent_cnt = 0;
+                /* Check for Current directory ('\0') or parent directory ('\1') */
+                if ((dirent->name[0] != '\0') && (dirent->name[0] != '\1')) {
+                        uint8_t file_flags;
+                        file_flags = isonum_711(dirent->file_flags);
 
-                bool match;
-                match = false;
-
-                do {
-                        if ((dirent == NULL) || (isonum_711(dirent->length) == 0)) {
-                                dirent = (const iso9660_dirent_t *)bread(sector);
-
-                                if (dirent->name[0] == '\0') {
-                                        dirent_cnt++;
-                                }
-
+                        if ((file_flags & DIRENT_FILE_FLAGS_FILE) == DIRENT_FILE_FLAGS_FILE) {
                                 /* Interleave mode must be disabled */
-                                if ((isonum_711(dirent->file_unit_size) != 0) ||
-                                    (isonum_711(dirent->interleave) != 0)) {
-                                        /* XXX: errno = */
-                                        return NULL;
-                                }
+                                if (!(_dirent_interleave(dirent))) {
+                                        iso9660_toc_entry_t toc_entry;
 
-                                /* If the third directory entry name found in
-                                 * the current or immediate directory entry name
-                                 * in the subsequent sector is '\0', then the
-                                 * end of the current directory has been
-                                 * reached. */
-                                if (dirent_cnt == 3) {
-                                        return NULL;
-                                }
+                                        toc_entry.size = isonum_733(dirent->data_length);
+                                        toc_entry.starting_fad = isonum_733(dirent->extent);
+                                        toc_entry.sector_count = _length_sector_round(toc_entry.size);
 
-                                dirent_cnt = 0;
+                                        uint8_t name_len;
+                                        name_len = isonum_711(dirent->file_id_len);
 
-                                /* Next sector */
-                                sector++;
-                        }
+                                        /* Minus the ';1' */
+                                        (void)memset(toc_entry.name, '\0', sizeof(toc_entry.name));
+                                        (void)memcpy(toc_entry.name, dirent->name, name_len - 2);
 
-                        /* Check for Current directory ('\0') or
-                         * parent directory ('\1') */
-                        if ((dirent->name[0] == '\0') || (dirent->name[0] == '\1')) {
-                                dirent_cnt++;
-                        } else if ((strncmp(component, dirent->name, component_len)) == 0) {
-                                uint8_t file_flags;
-                                file_flags = isonum_711(dirent->file_flags);
-
-                                bool file;
-                                file = (file_flags & DIRENT_FILE_FLAGS_HIDDEN) ==
-                                    DIRENT_FILE_FLAGS_FILE;
-                                bool directory;
-                                directory = (file_flags & DIRENT_FILE_FLAGS_DIRECTORY) ==
-                                    DIRENT_FILE_FLAGS_DIRECTORY;
-
-                                if (file || directory) {
-                                        match = true;
-                                        match_dirent = dirent;
-                                        sector = isonum_733(match_dirent->extent);
-                                        dirent = NULL;
+                                        if (walker != NULL) {
+                                                walker(&toc_entry, args);
+                                        }
                                 }
                         }
+                }
 
-                        if (dirent != NULL) {
-                                dirent = (const iso9660_dirent_t *)((uintptr_t)dirent +
-                                    isonum_711(dirent->length));
-                        }
-                } while (!match);
+                if (dirent != NULL) {
+                        uintptr_t p;
+                        p = (uintptr_t)dirent + isonum_711(dirent->length);
+
+                        dirent = (const iso9660_dirent_t *)p;
+                }
         }
-
-        return match_dirent;
 }

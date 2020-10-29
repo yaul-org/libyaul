@@ -8,22 +8,45 @@
 #ifndef _ISO9660_H_
 #define _ISO9660_H_
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <errno.h>
+
+/* XXX: Remove */
+#ifdef __linux__
+#define __aligned(n) __attribute__ ((aligned(n)))
+#endif /* __linux__ */
 
 __BEGIN_DECLS
 
-void *iso9660_mount(const char *);
-void *iso9660_open(void *, const char *, int);
-void iso9660_close(void *);
-ssize_t iso9660_read(void *, void *, size_t);
-off_t iso9660_seek(void *, off_t, int);
-off_t iso9660_tell(void *);
-size_t iso9660_total(void *);
+/* The maximum number of TOC entries to read */
+#define ISO9660_TOC_ENTRIES_COUNT (4096)
+
+/* Remove */
+typedef uint32_t fad_t;
+
+typedef struct iso9660_toc_entry iso9660_toc_entry_t;
+
+typedef void (*iso9660_toc_walk_t)(const iso9660_toc_entry_t *, void *);
+
+struct iso9660_toc_entry {
+        char name[16];
+        fad_t starting_fad;
+        size_t size;
+        uint16_t sector_count;
+} __aligned(32);
+
+typedef struct {
+        iso9660_toc_entry_t *entries;
+        uint32_t entries_pooled_count;
+        uint32_t entries_count;
+} iso9660_toc_t;
+
+extern void iso9660_toc_read(iso9660_toc_t *, int32_t);
+extern void iso9660_toc_walk(iso9660_toc_walk_t, void *);
 
 __END_DECLS
 
