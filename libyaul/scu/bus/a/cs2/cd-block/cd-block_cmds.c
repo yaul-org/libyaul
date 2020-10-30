@@ -123,7 +123,7 @@ cd_block_cmd_get_toc(uint8_t *cdStatus, uint16_t *tocsize)
 }
 
 int 
-cd_block_cmd_get_session_info(uint8_t sessionNumber, uint8_t *cdStatus,
+cd_block_cmd_get_session_info(uint8_t sessionNumber __unused, uint8_t *cdStatus,
                 uint8_t *numSessions, uint32_t *sessionLBA)
 {
         int ret;
@@ -167,7 +167,7 @@ cd_block_cmd_init_cd_system(int16_t standby)
 }
 
 int 
-cd_block_cmd_open_tray(int16_t standby)
+cd_block_cmd_open_tray(int16_t standby __unused)
 {
         int ret;
         struct cd_block_regs regs;
@@ -206,25 +206,27 @@ cd_block_cmd_end_data_transfer(void)
 }
 
 int 
-cd_block_cmd_play_disk(int32_t mode, int32_t startFAD, int32_t numSectors)
+cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors)
 {
-        int ret;
-        struct cd_block_regs regs;
+        /* Clear flags */
+        MEMORY_WRITE_AND(16, CD_BLOCK(HIRQ), ~(PEND | CSCT));
+        MEMORY_WRITE_OR(16, CD_BLOCK(HIRQ), CMOK);
+
         struct cd_block_regs status;
+        struct cd_block_regs regs;
 
-        // Clear flags
-        MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(PEND | CSCT) | CMOK);
-
-        // The OR on 0x80 for lower byte happens so the system interprets our
-        // data as FAD position instead of Track number.
+        /* The OR on 0x80 for lower byte happens so the system interprets our
+         * data as FAD position instead of Track number */
         regs.hirq_mask = 0;
-        regs.cr1 = 0x1080 | (startFAD >> 16);
-        regs.cr2 = startFAD;
-        regs.cr3 = (mode << 8) | 0x80 | (numSectors >> 16);
-        regs.cr4 = numSectors;
+        regs.cr1 = 0x1080 | (start_fad >> 16);
+        regs.cr2 = start_fad;
+        regs.cr3 = (mode << 8) | 0x80 | (num_sectors >> 16);
+        regs.cr4 = num_sectors;
 
-        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0)
+        int ret;
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
+        }
 
         return cd_block_check_return_status(&status);
 }
@@ -452,20 +454,22 @@ cd_block_cmd_get_buffer_size(uint8_t *cdStatus, uint16_t *blockFreeSpace,
 }
 
 int 
-cd_block_cmd_get_sector_number(uint8_t buffNum)
+cd_block_cmd_get_sector_number(uint8_t buffer_number)
 {
-        int ret;
         struct cd_block_regs regs;
-        struct cd_block_regs status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x5100;
         regs.cr2 = 0x0000;
-        regs.cr3 = (buffNum << 8);
+        regs.cr3 = (buffer_number << 8);
         regs.cr4 = 0x0000;
 
-        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0)
+        struct cd_block_regs status;
+
+        int ret;
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return 0;
+        }
 
         return status.cr4;
 }
@@ -480,9 +484,7 @@ cd_block_cmd_get_sector_number(uint8_t buffNum)
 int 
 cd_block_cmd_set_sector_length(uint16_t size) 
 {
-        int ret;
         struct cd_block_regs regs;
-        struct cd_block_regs status;
 
         regs.hirq_mask = ESEL;
         regs.cr1 = 0x6000 | (size & 0xFF);
@@ -490,8 +492,12 @@ cd_block_cmd_set_sector_length(uint16_t size)
         regs.cr3 = 0x0000;
         regs.cr4 = 0x0000;
 
-        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0)
+        struct cd_block_regs status;
+
+        int ret;
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
+        }
 
         return cd_block_check_return_status(&status);
 }

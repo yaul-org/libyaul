@@ -9,8 +9,9 @@
 #ifndef _CD_BLOCK_CMD_H_
 #define _CD_BLOCK_CMD_H_
 
-#include <sys/cdefs.h>
 #include <stdint.h>
+
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -22,6 +23,8 @@ __BEGIN_DECLS
 /* Helpers */
 #define FAD2LBA(x)      ((x) - 150)
 #define LBA2FAD(x)      ((x) + 150)
+
+typedef uint32_t fad_t; 
 
 struct cd_block_hardware_info {
         uint8_t cdStatus;
@@ -64,7 +67,7 @@ extern int cd_block_cmd_get_session_info(uint8_t sessionNumber, uint8_t *cdStatu
 extern int cd_block_cmd_init_cd_system(int16_t standby);
 extern int cd_block_cmd_open_tray(int16_t standby);
 extern int cd_block_cmd_end_data_transfer(void);
-extern int cd_block_cmd_play_disk(int32_t mode, int32_t startFAD, int32_t numSectors);
+extern int cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors);
 extern int cd_block_cmd_seek_disk(uint32_t startPlayPos);
 extern int cd_block_cmd_scan_disk(uint8_t scanDirection, uint8_t *cdStatus);
 extern int cd_block_cmd_get_subcode(uint8_t type, uint8_t *cdStatus, uint16_t *sizeInWords, uint16_t *flags);

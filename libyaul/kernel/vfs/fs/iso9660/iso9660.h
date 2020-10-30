@@ -15,24 +15,27 @@
 #include <stdint.h>
 #include <stdio.h>
 
+
 /* XXX: Remove */
 #ifdef __linux__
 #define __aligned(n) __attribute__ ((aligned(n)))
+
+typedef uint32_t fad_t;
+#else
+#include <cd-block.h>
 #endif /* __linux__ */
 
 __BEGIN_DECLS
 
-/* The maximum number of TOC entries to read */
-#define ISO9660_TOC_ENTRIES_COUNT (4096)
+/* The maximum number of file list entries to read */
+#define ISO9660_FILELIST_ENTRIES_COUNT (4096)
 
 /* Remove */
-typedef uint32_t fad_t;
+typedef struct iso9660_filelist_entry iso9660_filelist_entry_t;
 
-typedef struct iso9660_toc_entry iso9660_toc_entry_t;
+typedef void (*iso9660_filelist_walk_t)(const iso9660_filelist_entry_t *, void *);
 
-typedef void (*iso9660_toc_walk_t)(const iso9660_toc_entry_t *, void *);
-
-struct iso9660_toc_entry {
+struct iso9660_filelist_entry {
         char name[16];
         fad_t starting_fad;
         size_t size;
@@ -40,13 +43,13 @@ struct iso9660_toc_entry {
 } __aligned(32);
 
 typedef struct {
-        iso9660_toc_entry_t *entries;
+        iso9660_filelist_entry_t *entries;
         uint32_t entries_pooled_count;
         uint32_t entries_count;
-} iso9660_toc_t;
+} iso9660_filelist_t;
 
-extern void iso9660_toc_read(iso9660_toc_t *, int32_t);
-extern void iso9660_toc_walk(iso9660_toc_walk_t, void *);
+extern void iso9660_filelist_read(iso9660_filelist_t *, int32_t);
+extern void iso9660_filelist_walk(iso9660_filelist_walk_t, void *);
 
 __END_DECLS
 

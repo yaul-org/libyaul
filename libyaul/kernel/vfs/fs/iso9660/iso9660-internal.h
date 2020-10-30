@@ -106,7 +106,8 @@ typedef struct {
 static inline __always_inline uint16_t
 be16dec(const void *buf)
 {
-        const uint8_t *p = (const uint8_t *)buf;
+        const uint8_t *p;
+        p = (const uint8_t *)buf;
 
         return (uint16_t)((p[0] << 8) | p[1]);
 }
@@ -114,23 +115,26 @@ be16dec(const void *buf)
 static inline __always_inline uint32_t
 be32dec(const void *buf)
 {
-        const uint8_t *p = (const uint8_t *)buf;
+        const uint8_t *p;
+        p = (const uint8_t *)buf;
 
         return ((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
 }
 
 static inline __always_inline uint16_t
-le16dec(const void *pp)
+le16dec(const void *buf)
 {
-        unsigned char const *p = (unsigned char const *)pp;
+        uint8_t const *p;
+        p = (uint8_t const *)buf;
 
         return ((p[1] << 8) | p[0]);
 }
 
 static inline __always_inline uint32_t
-le32dec(const void *pp)
+le32dec(const void *buf)
 {
-        unsigned char const *p = (unsigned char const *)pp;
+        uint8_t const *p;
+        p = (uint8_t const *)buf;
 
         return ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]);
 }
@@ -151,20 +155,6 @@ isonum_723(const uint8_t *p)
 #else
         return le16dec(p);
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-}
-
-/* 7.3.1: unsigned little-endian 32-bit value */
-static inline __always_inline __unused uint32_t
-isonum_731(const uint8_t *p __unused)
-{
-        return 0;
-}
-
-/* 7.3.2: unsigned big-endian 32-bit value */
-static inline __always_inline __unused uint32_t
-isonum_732(const uint8_t *p __unused)
-{
-        return 0;
 }
 
 /* 7.3.3: unsigned both-endian (little, then big) 32-bit value */
