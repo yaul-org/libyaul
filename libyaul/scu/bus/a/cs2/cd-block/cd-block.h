@@ -9,9 +9,11 @@
 #ifndef _CD_BLOCK_H_
 #define _CD_BLOCK_H_
 
+#include <stdint.h>
+
 #include <cd-block/cmd.h>
 
-#include <stdint.h>
+#define ISO9660_SECTOR_SIZE (2048)
 
 __BEGIN_DECLS
 

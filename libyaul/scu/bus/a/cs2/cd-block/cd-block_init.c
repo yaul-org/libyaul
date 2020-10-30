@@ -14,7 +14,6 @@
 
 #include "cd-block-internal.h"
 
-#define ISO9660_SECTOR_SIZE 2048
 #define CD_STATUS_TIMEOUT 0xAA
 
 #ifndef MIN
