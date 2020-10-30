@@ -10,8 +10,8 @@
 #define _CD_BLOCK_H_
 
 #include <cd-block/cmd.h>
-#include <stdint.h>
 
+#include <stdint.h>
 
 __BEGIN_DECLS
 
@@ -29,27 +29,22 @@ extern int cd_block_init(int16_t standby);
 extern int cd_block_bypass_copy_protection();
 
 /**
- * Transfer data from cdblock buffer to memory.
+ * Transfer data from CD-block buffer to memory.
  * 
- * @param offset Offset from current FAD.
- * @param buffnum Number of buffer to start reading.
- * @param sizeInBytes Number of bytes to transfer.
- * @param outputBuffer Buffer where data will be recorded.
+ * @param offset        Offset from current FAD.
+ * @param buffer_number Number of buffer to start reading.
+ * @param output_buffer Buffer where data will be recorded.
  */
-extern int cd_block_transfer_data(uint16_t offset, 
-        uint16_t buffnum, uint32_t sizeInBytes, uint8_t* outputBuffer);
+extern int cd_block_data_transfer(uint16_t offset, uint16_t buffer_number, uint8_t *output_buffer);
 
 /**
- * Read bytes from a sector to a memory location. This function initialize
- * and spins the disk to retrieve data.
+ * Read a sector to a memory location. This function initialize and spins the
+ * disk to retrieve data.
  * 
- * @param fad Fad to start reading from.
- * @param buffnum Number of buffer to start reading.
- * @param sizeInBytes Number of bytes to transfer.
- * @param outputBuffer Buffer where data will be recorded.
+ * @param fad           FAD to start reading from.
+ * @param output_buffer Buffer where data will be recorded.
  */
-extern int cd_block_read_data(uint16_t fad, uint32_t sizeInBytes, 
-        uint8_t* outputBuffer);
+extern int cd_block_sector_read(uint32_t fad, uint8_t *output_buffer);
 
 __END_DECLS
 

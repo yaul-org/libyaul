@@ -15,20 +15,20 @@
 /* Specific macros */
 #define CD_BLOCK(x)     (0x25890000UL + (x))
 
-#define CMOK            0x0001 /* Command dispatch possible */
-#define DRDY            0x0002 /* Data transfer preparations complete */
-#define CSCT            0x0004 /* Finished reading 1 sector */
-#define BFUL            0x0008 /* CD buffer full */
-#define PEND            0x0010 /* CD playback completed */
-#define DCHG            0x0020 /* Disc change or tray open */
-#define ESEL            0x0040 /* Selector settings processing complete */
-#define EHST            0x0080 /* Host I/O processing complete */
-#define ECPY            0x0100 /* Duplication/move processing complete */
-#define EFLS            0x0200 /* File system processing complete */
-#define SCDQ            0x0400 /* Subcode Q update completed */
-#define MPED            0x0800 /* MPEG-related processing complete */
-#define MPCM            0x1000 /* MPEG action uncertain */
-#define MPST            0x2000 /* MPEG interrupt status report */
+#define CMOK    0x0001 /* Command dispatch possible */
+#define DRDY    0x0002 /* Data transfer preparations complete */
+#define CSCT    0x0004 /* Finished reading 1 sector */
+#define BFUL    0x0008 /* CD buffer full */
+#define PEND    0x0010 /* CD playback completed */
+#define DCHG    0x0020 /* Disc change or tray open */
+#define ESEL    0x0040 /* Selector settings processing complete */
+#define EHST    0x0080 /* Host I/O processing complete */
+#define ECPY    0x0100 /* Duplication/move processing complete */
+#define EFLS    0x0200 /* File system processing complete */
+#define SCDQ    0x0400 /* Subcode Q update completed */
+#define MPED    0x0800 /* MPEG-related processing complete */
+#define MPCM    0x1000 /* MPEG action uncertain */
+#define MPST    0x2000 /* MPEG interrupt status report */
 
 struct cd_block_regs {
         uint16_t dtr;

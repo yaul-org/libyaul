@@ -30,21 +30,33 @@ _length_sector_round(uint32_t length)
         return ((length + 0x07FF) >> 11);
 }
 
-static void _dirent_root_walk(iso9660_toc_walk_t, void *);
+static void _dirent_root_walk(iso9660_filelist_walk_t, void *);
 static bool _dirent_interleave(const iso9660_dirent_t *);
 
-static void _toc_read_walker(const iso9660_toc_entry_t *, void *);
+static void _filelist_read_walker(const iso9660_filelist_entry_t *, void *);
 
 #ifdef __linux__
 #define DEBUG
+
+#define LBA2FAD(x) (x)
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define LWRAM(x) (0x20200000 + (x))
+#define MEMORY_WRITE(n, x, a)                                                   \
+\
+if (x != LWRAM(0)) {                                                            \
+            (void)printf("0x%08X -> 0x%08X\n", x, a);                           \
+    }
 
 static void
 _bread(uint32_t sector, void *ptr)
 {
         static uint8_t buffer[2048];
+
+        assert(sizeof(buffer) == 2048);
 
         FILE *fp;
         fp = fopen("test4.iso", "rb");
@@ -58,56 +70,64 @@ _bread(uint32_t sector, void *ptr)
         fclose(fp);
 
         (void)memcpy(ptr, buffer, sizeof(buffer));
-        (void)printf("sector: $%x\n", sector);
+        (void)printf("sector: 0x%x = %i\n", sector, sector);
+}
+
+void
+vdp_sync(void)
+{
+}
+
+void
+dbgio_flush(void)
+{
 }
 
 int
 main(void)
 {
-        iso9660_toc_t toc;
-        iso9660_toc_read(&toc, -1);
+        iso9660_filelist_t filelist;
+        iso9660_filelist_read(&filelist, -1);
 
-        for (uint32_t i = 0; i < toc.entries_count; i++) {
-                (void)printf("\"%s\", %luB, %u\n", toc.entries[i].name, toc.entries[i].size, toc.entries[i].sector_count);
+        for (uint32_t i = 0; i < filelist.entries_count; i++) {
+                (void)printf("\"%s\", %luB, %u\n", filelist.entries[i].name, filelist.entries[i].size, filelist.entries[i].sector_count);
         }
 
         return 0;
 }
 #else
-static volatile uint8_t *_lwram __used = (volatile uint8_t *)LWRAM(0);
-
 static void
 _bread(uint32_t sector, void *ptr)
 {
-        cd_block_read_data(LBA2FAD(sector), 2048, ptr);
-
-        /* (void)memcpy((void *)LWRAM(0), ptr, 2048); */
+        int ret;
+        ret = cd_block_sector_read(LBA2FAD(sector), ptr);
+        assert(ret == 0);
 }
 #endif /* __linux__ */
 
 void
-iso9660_toc_read(iso9660_toc_t *toc, int32_t count)
+iso9660_filelist_read(iso9660_filelist_t *filelist, int32_t count)
 {
         int32_t clamped_count;
         clamped_count = count;
 
         if (clamped_count <= 0) {
-                clamped_count = ISO9660_TOC_ENTRIES_COUNT;
-        } else if (clamped_count > ISO9660_TOC_ENTRIES_COUNT) {
-                clamped_count = ISO9660_TOC_ENTRIES_COUNT;
+                clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
+        } else if (clamped_count > ISO9660_FILELIST_ENTRIES_COUNT) {
+                clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
         }
 
-        toc->entries = malloc(sizeof(iso9660_toc_entry_t) * clamped_count);
-        assert(toc->entries != NULL);
+        filelist->entries = malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
+        assert(filelist->entries != NULL);
 
-        toc->entries_pooled_count = (uint32_t)clamped_count;
-        toc->entries_count = 0;
+        filelist->entries_pooled_count = (uint32_t)clamped_count;
+        filelist->entries_count = 0;
 
-        iso9660_toc_walk(_toc_read_walker, toc);
+        iso9660_filelist_walk(_filelist_read_walker, filelist);
 }
 
 void
-iso9660_toc_walk(iso9660_toc_walk_t walker, void *args)
+iso9660_filelist_walk(iso9660_filelist_walk_t walker, void *args)
 {
         /* Skip IP.BIN (16 sectors) */
         _bread(16, &_state.pvd);
@@ -136,21 +156,21 @@ iso9660_toc_walk(iso9660_toc_walk_t walker, void *args)
 }
 
 static void
-_toc_read_walker(const iso9660_toc_entry_t *entry, void *args)
+_filelist_read_walker(const iso9660_filelist_entry_t *entry, void *args)
 {
-        iso9660_toc_t *toc;
-        toc = args;
+        iso9660_filelist_t *filelist;
+        filelist = args;
 
-        if (toc->entries_count >= toc->entries_pooled_count) {
+        if (filelist->entries_count >= filelist->entries_pooled_count) {
                 return;
         }
         
-        iso9660_toc_entry_t *this_entry;
-        this_entry = &toc->entries[toc->entries_count];
+        iso9660_filelist_entry_t *this_entry;
+        this_entry = &filelist->entries[filelist->entries_count];
 
-        (void)memcpy(this_entry, entry, sizeof(iso9660_toc_entry_t));
+        (void)memcpy(this_entry, entry, sizeof(iso9660_filelist_entry_t));
 
-        toc->entries_count++;
+        filelist->entries_count++;
 }
 
 static bool
@@ -159,10 +179,11 @@ _dirent_interleave(const iso9660_dirent_t *dirent)
         return ((isonum_711(dirent->interleave)) != 0x00);
 }
 
+static uint8_t _sector_buffer[2048] __aligned(0x800);
+
 static void
-_dirent_root_walk(iso9660_toc_walk_t walker, void *args)
+_dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
 {
-        static uint8_t sector_buffer[2048] __aligned(4);
 
         iso9660_dirent_t dirent_root;
 
@@ -180,17 +201,26 @@ _dirent_root_walk(iso9660_toc_walk_t walker, void *args)
         int32_t dirent_sectors;
         dirent_sectors = INT32_MAX;
 
+        /* Keep track of where we are within the sector */
+        uint32_t dirent_offset;
+        dirent_offset = 0;
+
         while (true) {
-                if ((dirent == NULL) || (isonum_711(dirent->length) == 0)) {
+                uint8_t dirent_length;
+                dirent_length = (dirent != NULL) ? isonum_711(dirent->length) : 0;
+
+                if ((dirent == NULL) || (dirent_length == 0) || ((dirent_offset + dirent_length) >= 2048)) {
                         dirent_sectors--;
 
                         if (dirent_sectors == 0) {
                                 break;
                         }
 
-                        _bread(sector, sector_buffer);
+                        dirent_offset = 0;
 
-                        dirent = (const iso9660_dirent_t *)&sector_buffer[0];
+                        _bread(sector, _sector_buffer);
+
+                        dirent = (const iso9660_dirent_t *)&_sector_buffer[0];
 
                         if (dirent->name[0] == '\0') {
                                 uint32_t data_length;
@@ -213,32 +243,34 @@ _dirent_root_walk(iso9660_toc_walk_t walker, void *args)
 
                         if ((file_flags & DIRENT_FILE_FLAGS_FILE) == DIRENT_FILE_FLAGS_FILE) {
                                 /* Interleave mode must be disabled */
-                                if (!(_dirent_interleave(dirent))) {
-                                        iso9660_toc_entry_t toc_entry;
+                                assert(!(_dirent_interleave(dirent)));
 
-                                        toc_entry.size = isonum_733(dirent->data_length);
-                                        toc_entry.starting_fad = isonum_733(dirent->extent);
-                                        toc_entry.sector_count = _length_sector_round(toc_entry.size);
+                                if (walker != NULL) {
+                                        iso9660_filelist_entry_t filelist_entry;
+
+                                        filelist_entry.size = isonum_733(dirent->data_length);
+                                        filelist_entry.starting_fad = LBA2FAD(isonum_733(dirent->extent));
+                                        filelist_entry.sector_count = _length_sector_round(filelist_entry.size);
 
                                         uint8_t name_len;
                                         name_len = isonum_711(dirent->file_id_len);
 
                                         /* Minus the ';1' */
-                                        (void)memset(toc_entry.name, '\0', sizeof(toc_entry.name));
-                                        (void)memcpy(toc_entry.name, dirent->name, name_len - 2);
+                                        (void)memset(filelist_entry.name, '\0', sizeof(filelist_entry.name));
+                                        (void)memcpy(filelist_entry.name, dirent->name, name_len - 2);
 
-                                        if (walker != NULL) {
-                                                walker(&toc_entry, args);
-                                        }
+                                        walker(&filelist_entry, args);
                                 }
                         }
                 }
 
                 if (dirent != NULL) {
                         uintptr_t p;
-                        p = (uintptr_t)dirent + isonum_711(dirent->length);
+                        p = (uintptr_t)dirent + dirent_length;
 
                         dirent = (const iso9660_dirent_t *)p;
+
+                        dirent_offset += dirent_length;
                 }
         }
 }
