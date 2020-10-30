@@ -10,11 +10,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifndef __linux__
 #include <cd-block.h>
 
 #include <scu/map.h>
-#endif /* __linux__ */
 
 #include "iso9660-internal.h"
 
@@ -35,76 +33,10 @@ static bool _dirent_interleave(const iso9660_dirent_t *);
 
 static void _filelist_read_walker(const iso9660_filelist_entry_t *, void *);
 
-#ifdef __linux__
-#define DEBUG
+static void _bread(uint32_t, void *);
 
-#define LBA2FAD(x) (x)
+static uint8_t _sector_buffer[ISO9660_SECTOR_SIZE] __aligned(ISO9660_SECTOR_SIZE);
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define LWRAM(x) (0x20200000 + (x))
-#define MEMORY_WRITE(n, x, a)                                                   \
-\
-if (x != LWRAM(0)) {                                                            \
-            (void)printf("0x%08X -> 0x%08X\n", x, a);                           \
-    }
-
-static void
-_bread(uint32_t sector, void *ptr)
-{
-        static uint8_t buffer[2048];
-
-        assert(sizeof(buffer) == 2048);
-
-        FILE *fp;
-        fp = fopen("test4.iso", "rb");
-        assert(fp != NULL);
-
-        fseek(fp, sector * 2048, SEEK_SET);
-
-        (void)memset(buffer, 0, sizeof(buffer));
-        (void)fread(buffer, 1, sizeof(buffer), fp);
-
-        fclose(fp);
-
-        (void)memcpy(ptr, buffer, sizeof(buffer));
-        (void)printf("sector: 0x%x = %i\n", sector, sector);
-}
-
-void
-vdp_sync(void)
-{
-}
-
-void
-dbgio_flush(void)
-{
-}
-
-int
-main(void)
-{
-        iso9660_filelist_t filelist;
-        iso9660_filelist_read(&filelist, -1);
-
-        for (uint32_t i = 0; i < filelist.entries_count; i++) {
-                (void)printf("\"%s\", %luB, %u\n", filelist.entries[i].name, filelist.entries[i].size, filelist.entries[i].sector_count);
-        }
-
-        return 0;
-}
-#else
-static void
-_bread(uint32_t sector, void *ptr)
-{
-        int ret;
-        ret = cd_block_sector_read(LBA2FAD(sector), ptr);
-        assert(ret == 0);
-}
-#endif /* __linux__ */
-
 void
 iso9660_filelist_read(iso9660_filelist_t *filelist, int32_t count)
 {
@@ -149,8 +81,8 @@ iso9660_filelist_walk(iso9660_filelist_walk_t walker, void *args)
         assert((strncmp(cd001_str, ISO_STANDARD_ID, cd001_len)) != 0);
 #endif /* DEBUG */
 
-        /* Logical block size must be 2048 bytes */
-        assert(isonum_723(_state.pvd.logical_block_size) == 2048);
+        /* Logical block size must be ISO9660_SECTOR_SIZE bytes */
+        assert(isonum_723(_state.pvd.logical_block_size) == ISO9660_SECTOR_SIZE);
 
         _dirent_root_walk(walker, args);
 }
@@ -178,8 +110,6 @@ _dirent_interleave(const iso9660_dirent_t *dirent)
 { 
         return ((isonum_711(dirent->interleave)) != 0x00);
 }
-
-static uint8_t _sector_buffer[2048] __aligned(0x800);
 
 static void
 _dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
@@ -209,7 +139,7 @@ _dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
                 uint8_t dirent_length;
                 dirent_length = (dirent != NULL) ? isonum_711(dirent->length) : 0;
 
-                if ((dirent == NULL) || (dirent_length == 0) || ((dirent_offset + dirent_length) >= 2048)) {
+                if ((dirent == NULL) || (dirent_length == 0) || ((dirent_offset + dirent_length) >= ISO9660_SECTOR_SIZE)) {
                         dirent_sectors--;
 
                         if (dirent_sectors == 0) {
@@ -273,4 +203,12 @@ _dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
                         dirent_offset += dirent_length;
                 }
         }
+}
+
+static void
+_bread(uint32_t sector, void *ptr)
+{
+        int ret;
+        ret = cd_block_sector_read(LBA2FAD(sector), ptr);
+        assert(ret == 0);
 }

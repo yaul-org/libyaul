@@ -15,16 +15,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-
-/* XXX: Remove */
-#ifdef __linux__
-#define __aligned(n) __attribute__ ((aligned(n)))
-
-typedef uint32_t fad_t;
-#else
-#include <cd-block.h>
-#endif /* __linux__ */
-
 __BEGIN_DECLS
 
 /* The maximum number of file list entries to read */
