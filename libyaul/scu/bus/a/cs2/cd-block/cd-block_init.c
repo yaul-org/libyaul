@@ -28,15 +28,15 @@ cd_block_get_cd_status_flags(uint8_t *flags)
 {
         assert(flags != NULL);
 
-        struct cd_block_status cdStatus;
+        struct cd_block_status cd_status;
 
         int ret;
 
-        if ((ret = cd_block_cmd_get_cd_status(&cdStatus)) != 0) {
+        if ((ret = cd_block_cmd_get_cd_status(&cd_status)) != 0) {
                 return ret;
         }
 
-        *flags = cdStatus.cdStatus;
+        *flags = cd_status.cd_status;
 
         return 0;
 }
@@ -144,16 +144,16 @@ cd_block_init(int16_t standby)
 }
 
 int
-cd_move_sector_data_cd_auth(uint8_t dstFilter, uint16_t sectorPos,
-    uint8_t selNum, uint16_t numSectors)
+cd_move_sector_data_cd_auth(uint8_t dst_filter, uint16_t sector_pos,
+    uint8_t sel_num, uint16_t num_sectors)
 {
         int i;
         int ret;
-        struct cd_block_status cdStatus;
-        uint16_t isAuthenticated;
+        struct cd_block_status cd_status;
+        uint16_t is_authenticated;
 
-        cd_block_cmd_move_sector_data(dstFilter, sectorPos, selNum,
-                                      numSectors);
+        cd_block_cmd_move_sector_data(dst_filter, sector_pos, sel_num,
+                                      num_sectors);
 
         // Clear hirq flags
         MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));
@@ -173,19 +173,19 @@ cd_move_sector_data_cd_auth(uint8_t dstFilter, uint16_t sectorPos,
                 for (i = 0; i < 100000; i++)
                         ;
 
-                if (cd_block_cmd_get_cd_status(&cdStatus) != 0) {
+                if (cd_block_cmd_get_cd_status(&cd_status) != 0) {
                         continue;
                 }
 
-                if (cdStatus.cdStatus == CD_STATUS_PAUSE) {
+                if (cd_status.cd_status == CD_STATUS_PAUSE) {
                         break;
-                } else if (cdStatus.cdStatus == CD_STATUS_FATAL) {
+                } else if (cd_status.cd_status == CD_STATUS_FATAL) {
                         return -CD_STATUS_FATAL;
                 }
         }
 
         // Was Authentication successful?
-        if (cd_block_cmd_is_auth(&isAuthenticated) == 0) {
+        if (cd_block_cmd_is_auth(&is_authenticated) == 0) {
                 return -1;
         }
 
