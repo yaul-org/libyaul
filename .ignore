@@ -1,0 +1,14 @@
+.#*
+*~
+.DS_Store
+*.a
+*.bin
+*.dll
+*.log
+*.o
+*.d
+*.s
+
+/docs/
+/examples/
+/build-scripts/
