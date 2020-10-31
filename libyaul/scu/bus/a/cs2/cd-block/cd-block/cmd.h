@@ -27,12 +27,12 @@ __BEGIN_DECLS
 typedef uint32_t fad_t; 
 
 struct cd_block_hardware_info {
-        uint8_t cdStatus;
-        uint8_t hwFlag;
-        uint8_t hwVersion; 
-        uint8_t mpegVersion; 
-        uint8_t driveVersion; 
-        uint8_t driveRevision;
+        uint8_t cd_status;
+        uint8_t hw_flag;
+        uint8_t hw_version; 
+        uint8_t mpeg_version; 
+        uint8_t drive_version; 
+        uint8_t drive_revision;
 };
 
 #define CD_STATUS_BUSY          0x00
@@ -52,28 +52,28 @@ struct cd_block_hardware_info {
 #define CD_STATUS_REJECT        0xFF
 
 struct cd_block_status {
-        uint8_t cdStatus;
-        uint8_t flagAndRepeatCount;
-        uint8_t ctrlAddr;
-        uint8_t trackNumber;
-        uint8_t indexNumber;
+        uint8_t cd_status;
+        uint8_t flag_and_repeat_count;
+        uint8_t ctrl_addr;
+        uint8_t track_number;
+        uint8_t index_number;
         uint32_t fad;
 };
 
-extern int cd_block_cmd_get_cd_status(struct cd_block_status *cdStatus);
+extern int cd_block_cmd_get_cd_status(struct cd_block_status *cd_status);
 extern int cd_block_cmd_get_hardware_info(struct cd_block_hardware_info *info);
-extern int cd_block_cmd_get_toc(uint8_t *cdStatus, uint16_t *tocsize);
-extern int cd_block_cmd_get_session_info(uint8_t sessionNumber, uint8_t *cdStatus, uint8_t *numSessions, uint32_t *sessionLBA);
+extern int cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize);
+extern int cd_block_cmd_get_session_info(uint8_t session_number, uint8_t *cd_status, uint8_t *num_sessions, uint32_t *session_lBA);
 extern int cd_block_cmd_init_cd_system(int16_t standby);
 extern int cd_block_cmd_open_tray(int16_t standby);
 extern int cd_block_cmd_end_data_transfer(void);
 extern int cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors);
-extern int cd_block_cmd_seek_disk(uint32_t startPlayPos);
-extern int cd_block_cmd_scan_disk(uint8_t scanDirection, uint8_t *cdStatus);
-extern int cd_block_cmd_get_subcode(uint8_t type, uint8_t *cdStatus, uint16_t *sizeInWords, uint16_t *flags);
+extern int cd_block_cmd_seek_disk(uint32_t start_play_pos);
+extern int cd_block_cmd_scan_disk(uint8_t scan_direction, uint8_t *cd_status);
+extern int cd_block_cmd_get_subcode(uint8_t type, uint8_t *cd_status, uint16_t *size_in_words, uint16_t *flags);
 extern int cd_block_cmd_set_cd_device_connection(uint8_t filter);
-extern int cd_block_cmd_get_cd_device_connection(uint8_t *cdStatus, uint8_t *filterNum);
-extern int cd_block_cmd_get_last_buffer_destination(uint8_t *cdStatus, uint8_t *buffNum);
+extern int cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *filter_num);
+extern int cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num);
 extern int cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range);
 
 // TODO:
@@ -85,9 +85,9 @@ extern int cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t 
 // Set Filter Connection(0x46)
 // Get Filter Connection(0x47)
 
-extern int cd_block_cmd_reset_selector(uint8_t flags, uint8_t selNum);
-extern int cd_block_cmd_get_buffer_size(uint8_t *cdStatus, uint16_t *blockFreeSpace, uint8_t *maxSelectors, uint16_t *maxBlocks);
-extern int cd_block_cmd_get_sector_number(uint8_t buffNum);
+extern int cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num);
+extern int cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space, uint8_t *max_selectors, uint16_t *max_blocks);
+extern int cd_block_cmd_get_sector_number(uint8_t buff_num);
 
 // TODO:
 // Calculate Actual Size(0x52)
@@ -97,12 +97,12 @@ extern int cd_block_cmd_get_sector_number(uint8_t buffNum);
 // Get FAD Search Results(0x56)
 
 extern int cd_block_cmd_set_sector_length(uint16_t size);
-extern int cd_block_cmd_get_sector_data(uint16_t secOffset, uint8_t bufNum, uint16_t secNum);
-extern int cd_block_cmd_delete_sector_data(uint16_t secPosition, uint8_t bufNum, uint16_t secNum);
-extern int cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buffNum, uint16_t secNum);
-extern int cd_block_cmd_put_sector_data(uint8_t buffNum, uint16_t secNum);
-extern int cd_block_cmd_copy_sector_data(uint8_t dstFilter, uint16_t secOffset, uint8_t buffNum, uint16_t secNum);
-extern int cd_block_cmd_move_sector_data(uint8_t dstFilter, uint16_t secOffset, uint8_t buffNum, uint16_t secNum);
+extern int cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num, uint16_t sec_num);
+extern int cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num, uint16_t sec_num);
+extern int cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num, uint16_t sec_num);
+extern int cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num);
+extern int cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset, uint8_t buff_num, uint16_t sec_num);
+extern int cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset, uint8_t buff_num, uint16_t sec_num);
 
 // TODO:
 // Get Copy Error(0x67)
@@ -114,7 +114,7 @@ extern int cd_block_cmd_move_sector_data(uint8_t dstFilter, uint16_t secOffset, 
 
 extern int cd_block_cmd_abort_file(void);
 extern int cd_block_cmd_auth_disk(void);
-extern int cd_block_cmd_is_auth(uint16_t *diskTypeAuth);
+extern int cd_block_cmd_is_auth(uint16_t *disk_type_auth);
 
 __END_DECLS
 
