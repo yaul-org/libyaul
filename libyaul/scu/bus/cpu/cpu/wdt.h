@@ -10,32 +10,57 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_WDT_DEFINES
+/// @defgroup CPU_WDT_INLINE_FUNCTIONS
+/// @defgroup CPU_WDT_FUNCTIONS
+
+/// @addtogroup CPU_WDT_DEFINES
+/// @{
+
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_2     0
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_64    1
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_128   2
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_256   3
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_512   4
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_1024  5
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_4096  6
+/// Not yet documented.
 #define CPU_WDT_CLOCK_DIV_8192  7
 
+/// Not yet documented.
 #define CPU_WDT_TIMER_MODE_INTERVAL 0
+/// Not yet documented.
 #define CPU_WDT_TIMER_MODE_WATCHDOG 1
+
+/// @}
 
 typedef void (*cpu_wdt_ihr)(void);
 
+/// @addtogroup CPU_WDT_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_wdt_count_set(uint8_t count)
 {
         MEMORY_WRITE_WTCNT(count);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 cpu_wdt_count_get(void)
 {
         return MEMORY_READ(8, CPU(WTCNTR));
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_wdt_enable(void)
 {
@@ -48,6 +73,7 @@ cpu_wdt_enable(void)
         MEMORY_WRITE_WTCSR(wtcr_bits);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_wdt_disable(void)
 {
@@ -59,6 +85,7 @@ cpu_wdt_disable(void)
         MEMORY_WRITE_WTCSR(wtcr_bits);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 cpu_wdt_interrupt_priority_get(void)
 {
@@ -75,8 +102,18 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
 
+/// @}
+
+/// @addtogroup CPU_WDT_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 extern void cpu_wdt_init(uint8_t);
+
+/// @brief Not yet documented.
 extern void cpu_wdt_timer_mode_set(uint8_t, cpu_wdt_ihr);
+
+/// @}
 
 __END_DECLS
 
