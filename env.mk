@@ -220,9 +220,9 @@ define macro-sh-build-object
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
-		-c $(abspath $(<)) -o $@
+		-c -o $@ $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CC),\
+		/usr/bin/gcc,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -236,9 +236,9 @@ define macro-sh-build-c++-object
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
-		-c $(abspath $(<)) -o $@
+		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
