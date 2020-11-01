@@ -20,7 +20,7 @@ _hirq_flag_wait(uint16_t flag)
 }
 
 static int
-_return_status_check(struct cd_block_regs *status)
+_return_status_check(cd_block_regs_t *status)
 {
         assert(status != NULL);
 
@@ -42,11 +42,11 @@ _return_status_check(struct cd_block_regs *status)
 }
 
 int
-cd_block_cmd_status_get(struct cd_block_status *cd_status)
+cd_block_cmd_status_get(cd_block_status_t *cd_status)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0000;
@@ -71,11 +71,11 @@ cd_block_cmd_status_get(struct cd_block_status *cd_status)
 }
 
 int
-cd_block_cmd_get_hardware_info(struct cd_block_hardware_info *info)
+cd_block_cmd_get_hardware_info(cd_block_hardware_info_t *info)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0100;
@@ -103,8 +103,8 @@ int
 cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0200;
@@ -134,8 +134,8 @@ cd_block_cmd_get_session_info(uint8_t session_number __unused, uint8_t *cd_statu
     uint8_t *num_sessions, uint32_t *session_lBA)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0300;
@@ -165,8 +165,8 @@ cd_block_cmd_get_session_info(uint8_t session_number __unused, uint8_t *cd_statu
 int
 cd_block_cmd_init_cd_system(int16_t standby)
 {
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0400;
@@ -181,8 +181,8 @@ int
 cd_block_cmd_open_tray(int16_t standby __unused)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0500;
@@ -201,8 +201,8 @@ int
 cd_block_cmd_end_data_transfer(void)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x0600;
@@ -227,8 +227,8 @@ cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors)
         MEMORY_WRITE_AND(16, CD_BLOCK(HIRQ), ~(PEND | CSCT));
         MEMORY_WRITE_OR(16, CD_BLOCK(HIRQ), CMOK);
 
-        struct cd_block_regs status;
-        struct cd_block_regs regs;
+        cd_block_regs_t status;
+        cd_block_regs_t regs;
 
         /* The OR on 0x80 for lower byte happens so the system interprets our
          * data as FAD position instead of Track number */
@@ -251,8 +251,8 @@ int
 cd_block_cmd_seek_disk(uint32_t start_play_pos)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x1180 | ((start_play_pos >> 16) & 0xFF);
@@ -271,8 +271,8 @@ int
 cd_block_cmd_scan_disk(uint8_t scan_direction, uint8_t *cd_status)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x1200 | scan_direction;
@@ -296,8 +296,8 @@ cd_block_cmd_get_subcode(uint8_t type, uint8_t *cd_status,
     uint16_t *size_in_words, uint16_t *flags)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x2000 | type;
@@ -328,8 +328,8 @@ int
 cd_block_cmd_set_cd_device_connection(uint8_t filter)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = ESEL;
         regs.cr1 = 0x3000;
@@ -348,8 +348,8 @@ int
 cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *filter_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x3100;
@@ -376,8 +376,8 @@ int
 cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x3200;
@@ -404,8 +404,8 @@ int
 cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x4000 | (fad >> 16);
@@ -435,8 +435,8 @@ int
 cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = EFLS;
         regs.cr1 = 0x4800 | flags;
@@ -458,8 +458,8 @@ cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space,
     uint8_t *max_selectors, uint16_t *max_blocks)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x5000;
@@ -493,7 +493,7 @@ cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space,
 int
 cd_block_cmd_get_sector_number(uint8_t buffer_number)
 {
-        struct cd_block_regs regs;
+        cd_block_regs_t regs;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x5100;
@@ -501,7 +501,7 @@ cd_block_cmd_get_sector_number(uint8_t buffer_number)
         regs.cr3 = (buffer_number << 8);
         regs.cr4 = 0x0000;
 
-        struct cd_block_regs status;
+        cd_block_regs_t status;
 
         int ret;
 
@@ -522,7 +522,7 @@ cd_block_cmd_get_sector_number(uint8_t buffer_number)
 int
 cd_block_cmd_set_sector_length(uint16_t size)
 {
-        struct cd_block_regs regs;
+        cd_block_regs_t regs;
 
         regs.hirq_mask = ESEL;
         regs.cr1 = 0x6000 | (size & 0xFF);
@@ -530,7 +530,7 @@ cd_block_cmd_set_sector_length(uint16_t size)
         regs.cr3 = 0x0000;
         regs.cr4 = 0x0000;
 
-        struct cd_block_regs status;
+        cd_block_regs_t status;
 
         int ret;
 
@@ -546,8 +546,8 @@ cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num,
     uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x6100;
@@ -567,8 +567,8 @@ cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num,
     uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6200;
@@ -588,8 +588,8 @@ cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num,
     uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6300;
@@ -608,8 +608,8 @@ int
 cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6400;
@@ -629,8 +629,8 @@ cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset,
     uint8_t buff_num, uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x6500 | dst_filter;
@@ -650,8 +650,8 @@ cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset,
     uint8_t buff_num, uint16_t sec_num)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x6600 | dst_filter;
@@ -670,8 +670,8 @@ int
 cd_block_cmd_get_copy_error(uint8_t *cd_status, uint8_t *error_code)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0x6700;
@@ -705,8 +705,8 @@ int
 cd_block_cmd_abort_file(void)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         /* Abort file */
         regs.hirq_mask = EFLS;
@@ -725,8 +725,8 @@ cd_block_cmd_abort_file(void)
 int
 cd_block_cmd_auth_disk(void)
 {
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = EFLS;
         regs.cr1 = 0xE000;
@@ -741,8 +741,8 @@ int
 cd_block_cmd_is_auth(uint16_t *disk_type_auth)
 {
         int ret;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
 
         regs.hirq_mask = 0;
         regs.cr1 = 0xE100;

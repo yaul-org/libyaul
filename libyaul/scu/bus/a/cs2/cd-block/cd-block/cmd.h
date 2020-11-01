@@ -26,14 +26,14 @@ __BEGIN_DECLS
 
 typedef uint32_t fad_t; 
 
-struct cd_block_hardware_info {
+typedef struct cd_block_hardware_info {
         uint8_t cd_status;
         uint8_t hw_flag;
         uint8_t hw_version; 
         uint8_t mpeg_version; 
         uint8_t drive_version; 
         uint8_t drive_revision;
-};
+} cd_block_hardware_info_t;
 
 #define CD_STATUS_BUSY          0x00
 #define CD_STATUS_PAUSE         0x01
@@ -51,17 +51,17 @@ struct cd_block_hardware_info {
 #define CD_STATUS_WAIT          0x80
 #define CD_STATUS_REJECT        0xFF
 
-struct cd_block_status {
+typedef struct cd_block_status {
         uint8_t cd_status;
         uint8_t flag_and_repeat_count;
         uint8_t ctrl_addr;
         uint8_t track_number;
         uint8_t index_number;
         uint32_t fad;
-};
+} cd_block_status_t;
 
-extern int cd_block_cmd_status_get(struct cd_block_status *cd_status);
-extern int cd_block_cmd_get_hardware_info(struct cd_block_hardware_info *info);
+extern int cd_block_cmd_status_get(cd_block_status_t *cd_status);
+extern int cd_block_cmd_get_hardware_info(cd_block_hardware_info_t *info);
 extern int cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize);
 extern int cd_block_cmd_get_session_info(uint8_t session_number, uint8_t *cd_status, uint8_t *num_sessions, uint32_t *session_lBA);
 extern int cd_block_cmd_init_cd_system(int16_t standby);
