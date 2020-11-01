@@ -220,12 +220,16 @@ typedef struct {
 extern void sega3d_tlist_alloc(uint16_t count);
 extern void sega3d_tlist_free(void);
 extern void sega3d_tlist_set(TEXTURE *textures, uint16_t count);
+extern uint16_t sega3d_tlist_count_get(void);
 extern uint16_t sega3d_tlist_cursor_get(void);
 extern void sega3d_tlist_cursor_reset(void);
 extern TEXTURE *sega3d_tlist_tex_append(void);
 extern TEXTURE *sega3d_tlist_tex_get(uint16_t cursor);
 
+extern void sega3d_matrix_push(void);
+extern void sega3d_matrix_pop(void);
+
 extern uint16_t sega3d_polycount_get(const PDATA *pdata);
-extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list);
+extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, uint16_t offset);
 
 #endif /* SEGA3D_H_ */
