@@ -13,14 +13,14 @@
 #include "cd-block-internal.h"
 
 static void
-cd_block_loop_wait_hirq_flag(uint16_t flag)
+_hirq_flag_wait(uint16_t flag)
 {
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & flag) == 0) {
         }
 }
 
 static int
-cd_block_check_return_status(struct cd_block_regs *status)
+_return_status_check(struct cd_block_regs *status)
 {
         assert(status != NULL);
 
@@ -42,7 +42,7 @@ cd_block_check_return_status(struct cd_block_regs *status)
 }
 
 int
-cd_block_cmd_get_cd_status(struct cd_block_status *cd_status)
+cd_block_cmd_status_get(struct cd_block_status *cd_status)
 {
         int ret;
         struct cd_block_regs regs;
@@ -116,7 +116,7 @@ cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize)
                 return ret;
         }
 
-        cd_block_loop_wait_hirq_flag(DRDY);
+        _hirq_flag_wait(DRDY);
 
         if (cd_status != NULL) {
                 *cd_status = status.cr1 >> 8;
@@ -194,7 +194,7 @@ cd_block_cmd_open_tray(int16_t standby __unused)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -244,7 +244,7 @@ cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -264,7 +264,7 @@ cd_block_cmd_seek_disk(uint32_t start_play_pos)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -288,7 +288,7 @@ cd_block_cmd_scan_disk(uint8_t scan_direction, uint8_t *cd_status)
                 *cd_status = status.cr1 >> 8;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -341,7 +341,7 @@ cd_block_cmd_set_cd_device_connection(uint8_t filter)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -417,19 +417,19 @@ cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range)
                 return ret;
         }
 
-        cd_block_loop_wait_hirq_flag(ESEL);
+        _hirq_flag_wait(ESEL);
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
-// TODO:
-// Get Filter Range(0x41)
-// Set Filter Subheader Conditions(0x42)
-// Get Filter Subheader Conditions(0x43)
-// Set Filter Mode(0x44)
-// Get Filter Mode(0x45)
-// Set Filter Connection(0x46)
-// Get Filter Connection(0x47)
+/* TODO:
+ * Get Filter Range                0x41
+ * Set Filter Subheader Conditions 0x42
+ * Get Filter Subheader Conditions 0x43
+ * Set Filter Mode                 0x44
+ * Get Filter Mode                 0x45
+ * Set Filter Connection           0x46
+ * Get Filter Connection           0x47 */
 
 int
 cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
@@ -448,9 +448,9 @@ cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
                 return ret;
         }
 
-        cd_block_loop_wait_hirq_flag(ESEL);
+        _hirq_flag_wait(ESEL);
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -487,7 +487,7 @@ cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space,
                 *max_blocks = status.cr4;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -512,12 +512,12 @@ cd_block_cmd_get_sector_number(uint8_t buffer_number)
         return status.cr4;
 }
 
-// TODO:
-// Calculate Actual Size(0x52)
-// Get Actual Size(0x53)
-// Get Sector Info(0x54)
-// Execute FAD Search(0x55)
-// Get FAD Search Results(0x56)
+/* TODO:
+ * Calculate Actual Size  0x52
+ * Get Actual Size        0x53
+ * Get Sector Info        0x54
+ * Execute FAD Search     0x55
+ * Get FAD Search Results 0x56 */
 
 int
 cd_block_cmd_set_sector_length(uint16_t size)
@@ -538,7 +538,7 @@ cd_block_cmd_set_sector_length(uint16_t size)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -559,7 +559,7 @@ cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num,
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -580,7 +580,7 @@ cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num,
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -601,7 +601,7 @@ cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num,
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -621,7 +621,7 @@ cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -642,7 +642,7 @@ cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset,
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -663,7 +663,7 @@ cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset,
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -694,12 +694,12 @@ cd_block_cmd_get_copy_error(uint8_t *cd_status, uint8_t *error_code)
         return 0;
 }
 
-// TODO:
-// Change Directory(0x70)
-// Read Directory(0x71)
-// Get File System Scope(0x72)
-// Get File Info(0x73)
-// Read File(0x74)
+/* TODO:
+ * Change Directory      0x70
+ * Read Directory        0x71
+ * Get File System Scope 0x72
+ * Get File Info         0x73
+ * Read File             0x74 */
 
 int
 cd_block_cmd_abort_file(void)
@@ -719,7 +719,7 @@ cd_block_cmd_abort_file(void)
                 return ret;
         }
 
-        return cd_block_check_return_status(&status);
+        return _return_status_check(&status);
 }
 
 int
@@ -758,11 +758,11 @@ cd_block_cmd_is_auth(uint16_t *disk_type_auth)
                 *disk_type_auth = status.cr2;
         }
 
-        // Disc type Authenticated:
-        // 0x00: No CD/Not Authenticated
-        // 0x01: Audio CD
-        // 0x02: Regular Data CD(not Saturn disc)
-        // 0x03: Copied/Pirated Saturn Disc
-        // 0x04: Original Saturn Disc
+        /* Disc type Authenticated:
+         *   0x00: No CD or not authenticated
+         *   0x01: Audio CD
+         *   0x02: Regular data CD(not Saturn disc)
+         *   0x03: Copied or pirated Saturn disc
+         *   0x04: Original Saturn disc */
         return ((status.cr2 != 0x00) && (status.cr2 != 0x03));
 }
