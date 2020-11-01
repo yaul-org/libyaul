@@ -15,6 +15,8 @@
 
 #include <cpu/cache.h>
 
+#include <cd-block.h>
+
 #include <internal.h>
 
 void __weak
@@ -73,6 +75,15 @@ _init(void)
 
         _internal_vdp_init();
         _internal_dbgio_init();
+
+        /* XXX: Fix hard coded value */
+        cd_block_init(0x0002);
+
+        if ((cd_block_cmd_is_auth(NULL)) == 0) {
+                cd_block_security_bypass();
+        }
+
+        cpu_cache_purge();
 
         user_init();
 
