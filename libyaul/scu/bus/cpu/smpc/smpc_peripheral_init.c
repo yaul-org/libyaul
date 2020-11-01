@@ -172,11 +172,9 @@ smpc_peripheral_process(void)
 
                 port = ports[port_idx];
 
-                int32_t previous_connected; /* Previous connected peripherals */
                 int32_t connected;
 
                 /* Update peripheral connected directly to the port */
-                previous_connected = port->peripheral->connected;
                 if ((connected = peripheral_update(/* parent = */ NULL,
                             port->peripheral, port_idx + 1)) < 0) {
                         /* Couldn't parse data; invalid peripheral */
@@ -256,6 +254,7 @@ peripheral_update(smpc_peripheral_port_t *parent,
 {
         uint8_t multitap_id;
         uint32_t connected;
+        connected = 0;
 
         if (parent == NULL) {
                 multitap_id = PC_GET_MULTITAP_ID(_oreg_offset);
@@ -350,8 +349,6 @@ peripheral_update(smpc_peripheral_port_t *parent,
                  * 16-bytes or more. */
         }
         _oreg_offset++;
-
-        uint32_t data_idx;
 
         switch (size) {
         case 0x02:

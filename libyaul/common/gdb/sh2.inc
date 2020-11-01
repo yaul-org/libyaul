@@ -93,7 +93,7 @@ extern void internal_gdb_ihr_ubc(void);
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t _calculate_pc(cpu_registers_t *);
+static uintptr_t _calculate_pc(cpu_registers_t *);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -186,17 +186,16 @@ _gdb_getc(void)
 static void
 _gdb_step(cpu_registers_t *reg_file, uint32_t address)
 {
-        uint16_t *p;
+        /* Determine where we'll be going */
+        uintptr_t pc;
+        pc = (address != 0x00000000) ? address : _calculate_pc(reg_file);
 
-        if (address != 0x00000000) {
-                p = (uint16_t *)address;
-        } else {
-                /* Determine where we'll be going */
-                p = (uint16_t *)_calculate_pc(reg_file);
-        }
+        uint16_t *p;
+        p = (uint16_t *)pc;
 
         _bp_step.addr = (void *)p;
         _bp_step.instruction = *p;
+
         *p = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* We're stepping, be aware of breakpoints and watchpoints */
@@ -404,7 +403,7 @@ _gdb_register_file_write(cpu_registers_t *reg_file, uint32_t n, uint32_t r)
  * when it runs
  *
  * Returns the destination address */
-static uint32_t
+static uintptr_t
 _calculate_pc(cpu_registers_t *reg_file)
 {
         uint16_t opcode;

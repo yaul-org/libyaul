@@ -72,8 +72,6 @@ is already installed in `/opt/x-tools`.
 
 _Currently unavailable._
 
-
-
 ### Build from source
 
 If building from source, follow the instructions found in the `build-scripts`
@@ -95,8 +93,8 @@ directory. Take note of the absolute path to the tool-chain.
       If none, set to 0 (zero).
    5. Set whether to system reset or spin on abort() in
       `YAUL_OPTION_SPIN_ON_ABORT`. To system reset, set to 0 (zero).
-   6. Enable RTags/Irony support by setting `YAUL_CDB` to 1. To disable, set to
-      0 (zero).
+   6. Enable RTags/Irony/ccls support by setting `YAUL_CDB` to 1. To disable,
+      set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.
 

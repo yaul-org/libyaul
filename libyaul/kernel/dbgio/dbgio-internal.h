@@ -13,22 +13,22 @@
 
 __BEGIN_DECLS
 
-typedef void (*font_load_callback)(void);
+typedef void (*font_load_callback_t)(void);
 
-typedef void (*dev_ops_init)(const void *);
-typedef void (*dev_ops_deinit)(void);
-typedef void (*dev_ops_font_load)(font_load_callback);
-typedef void (*dev_ops_puts)(const char *);
-typedef void (*dev_ops_flush)(void);
+typedef void (*dev_ops_init_t)(const void *);
+typedef void (*dev_ops_deinit_t)(void);
+typedef void (*dev_ops_font_load_t)(font_load_callback_t);
+typedef void (*dev_ops_puts_t)(const char *);
+typedef void (*dev_ops_flush_t)(void);
 
 struct dbgio_dev_ops {
         uint8_t dev;
         const void *default_params;
-        dev_ops_init init;
-        dev_ops_deinit deinit;
-        dev_ops_font_load font_load;
-        dev_ops_puts puts;
-        dev_ops_flush flush;
+        dev_ops_init_t init;
+        dev_ops_deinit_t deinit;
+        dev_ops_font_load_t font_load;
+        dev_ops_puts_t puts;
+        dev_ops_flush_t flush;
 };
 
 extern const struct dbgio_dev_ops _internal_dev_ops_null;

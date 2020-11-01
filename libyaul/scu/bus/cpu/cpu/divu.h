@@ -15,6 +15,14 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_DIVU_INLINE_FUNCTIONS
+/// @defgroup CPU_DIVU_HELPERS
+/// @defgroup CPU_DIVU_FUNCTIONS
+
+/// @addtogroup CPU_DIVU_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 typedef void (*cpu_divu_ihr)(void);
 
 static inline bool __always_inline
@@ -23,18 +31,21 @@ cpu_divu_status_get(void)
         return MEMORY_READ(32, CPU(DVCR)) & 0x00000001;
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 cpu_divu_quotient_get(void)
 {
         return MEMORY_READ(32, CPU(DVDNTL));
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 cpu_divu_remainder_get(void)
 {
         return MEMORY_READ(32, CPU(DVDNTH));
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_divu_64_32_set(uint32_t dividendh, uint32_t dividendl, uint32_t divisor)
 {
@@ -44,6 +55,7 @@ cpu_divu_64_32_set(uint32_t dividendh, uint32_t dividendl, uint32_t divisor)
         MEMORY_WRITE(32, CPU(DVDNTL), dividendl);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
 {
@@ -52,6 +64,7 @@ cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
         MEMORY_WRITE(32, CPU(DVDNT), dividend);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
 {
@@ -65,6 +78,7 @@ cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
         cpu_divu_64_32_set(dh, dl, divisor);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 cpu_divu_interrupt_priority_get(void)
 {
@@ -73,6 +87,7 @@ cpu_divu_interrupt_priority_get(void)
         return ((ipra >> 12) & 0x0F);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
@@ -80,11 +95,25 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
+/// @}
+
+/// @addtogroup CPU_DIVU_HELPERS
+/// @{
+
+/// @brief Not yet documented.
 #define cpu_divu_ovfi_clear() do {                                             \
         cpu_divu_ovfi_set(NULL);                                               \
 } while (false)
 
+/// @}
+
+/// @addtogroup CPU_DIVU_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 extern void cpu_divu_ovfi_set(cpu_divu_ihr);
+
+/// @}
 
 __END_DECLS
 

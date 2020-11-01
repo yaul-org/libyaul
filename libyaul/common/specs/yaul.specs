@@ -14,6 +14,7 @@
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/dbgio)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/math)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/lib)) \
+-I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/fs/fileclient)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/fs/romdisk)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs0/arp)) \

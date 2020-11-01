@@ -8,7 +8,7 @@ static void _async_flush(void);
 const struct dbgio_dev_ops _internal_dev_ops_vdp2_async = {
         .dev = DBGIO_DEV_VDP2_ASYNC,
         .default_params = &_default_params,
-        .init = (dev_ops_init)_async_init,
+        .init = (dev_ops_init_t)_async_init,
         .deinit = _shared_deinit,
         .font_load = _shared_font_load,
         .puts = _shared_puts,

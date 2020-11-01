@@ -16,15 +16,35 @@
 
 __BEGIN_DECLS
 
+/// @defgroup VDP1_ENV_DEFINES
+/// @defgroup VDP1_ENV_STRUCTURES
+/// @defgroup VDP1_ENV_FUNCTIONS
+
+/// @addtogroup VDP1_ENV_DEFINES
+/// @{
+
+/// Not yet documented.
 #define VDP1_ENV_ROTATION_0  0
+/// Not yet documented.
 #define VDP1_ENV_ROTATION_90 1
 
+/// Not yet documented.
 #define VDP1_ENV_BPP_16      0
+/// Not yet documented.
 #define VDP1_ENV_BPP_8       1
 
+/// Not yet documented.
 #define VDP1_ENV_COLOR_MODE_PALETTE     0
+/// Not yet documented.
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
 
+/// @}
+
+/// @addtogroup VDP1_ENV_STRUCTURES
+/// @{
+
+/// @compound
+/// @brief Not yet documented.
 typedef struct vdp1_env {
         unsigned int :8;
 
@@ -41,11 +61,21 @@ typedef struct vdp1_env {
         int16_vec2_t erase_points[2];
 } vdp1_env_t;
 
+/// @}
+
+/// @addtogroup VDP1_ENV_FUNCTIONS
+/// @{
+/// @brief Not yet documented.
 extern void vdp1_env_default_init(vdp1_env_t *);
+
+/// @brief Not yet documented.
 extern void vdp1_env_default_set(void);
+/// @brief Not yet documented.
 extern void vdp1_env_set(const vdp1_env_t *);
 
 extern void vdp1_env_stop(void);
+
+/// @}
 
 __END_DECLS
 

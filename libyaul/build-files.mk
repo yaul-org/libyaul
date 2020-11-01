@@ -1,5 +1,9 @@
 # -*- mode: makefile -*-
 
+FLAG_BUILD_GDB:= $(shell test "x$(YAUL_OPTION_DEV_CARTRIDGE)" != x0 -a \
+                              \( "x$(TYPE)" = xdebug -o \
+                                 "x$(YAUL_OPTION_BUILD_GDB)" != x0 \) && printf "yes")
+
 BOOTSTRAP_FILES:= \
 	common/bootstrap/ip.sx \
 	common/bootstrap/sys_aree.bin \
@@ -38,7 +42,7 @@ LIB_SRCS:= \
 	kernel/mm/internal.c \
 	common/internal_reset.c
 
-ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 LIB_SRCS+= \
 	common/gdb/gdb.c \
 	common/gdb/gdb-ihr.sx
@@ -49,7 +53,13 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/null.c \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
-	kernel/dbgio/devices/usb-cart.c \
+
+ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
+LIB_SRCS+= \
+	kernel/dbgio/devices/usb-cart.c
+endif
+
+LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
@@ -57,10 +67,9 @@ LIB_SRCS+= \
 	\
 	kernel/mm/memb.c
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+# TLSF is required
 LIB_SRCS+= \
 	kernel/mm/tlsf.c
-endif
 
 LIB_SRCS+= \
 	lib/ctype/ctype.c \
@@ -121,7 +130,18 @@ LIB_SRCS+= \
 	lib/stdlib/strtol.c
 
 LIB_SRCS+= \
+	lib/crc/crc.c
+
+LIB_SRCS+= \
 	kernel/vfs/fs/romdisk/romdisk.c
+
+LIB_SRCS+= \
+	kernel/vfs/fs/iso9660/iso9660.c
+
+ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+LIB_SRCS+= \
+	kernel/vfs/fs/fileclient/fileclient.c
+endif
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
@@ -240,10 +260,15 @@ INSTALL_HEADER_FILES+= \
 	./lib/lib/:stdio.h:./ \
 	./lib/lib/:stdlib.h:./ \
 	./lib/lib/:string.h:./ \
+
+INSTALL_HEADER_FILES+= \
 	./lib/lib/sys/:cdefs.h:./sys/ \
 	./lib/lib/sys/:queue.h:./sys/ \
 	./lib/lib/sys/:types.h:./sys/ \
 	./kernel/sys/:init.h:./sys/
+
+INSTALL_HEADER_FILES+= \
+	./lib/lib/:crc.h:./ \
 
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
@@ -260,8 +285,12 @@ INSTALL_HEADER_FILES+= \
 	./math/:uint32.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
-	./common/bootstrap/:ip.h:yaul/common/ \
+	./common/bootstrap/:ip.h:yaul/common/
+
+ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
+INSTALL_HEADER_FILES+= \
 	./common/gdb/:gdb.h:yaul/common/gdb/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
@@ -269,16 +298,23 @@ INSTALL_HEADER_FILES+= \
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:memb.h:yaul/mm/
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
+# TLSF is required
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:tlsf.h:yaul/mm/
-endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
+
+INSTALL_HEADER_FILES+= \
+	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/
+
+ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
+INSTALL_HEADER_FILES+= \
+	./kernel/vfs/fs/fileclient/:fileclient.h:yaul/fs/fileclient/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./scu/:scu.h:yaul/scu/ \
