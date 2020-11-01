@@ -46,6 +46,7 @@ __BEGIN_DECLS
 
 /// Not yet documented.
 #define CPU_INTC_INTERRUPT_UBC                  0x0C
+
 /// Not yet documented.
 #define CPU_INTC_INTERRUPT_BREAK                0x20
 
@@ -125,12 +126,14 @@ __BEGIN_DECLS
 
 /// @}
 
+typedef void (*cpu_intc_ihr)(void);
+
 /// @addtogroup CPU_INTC_INLINE_FUNCTIONS
 /// @{
 
 /// @brief Not yet documented.
 static inline void __always_inline
-cpu_intc_ihr_set(uint32_t vector, void (*ihr)(void))
+cpu_intc_ihr_set(uint32_t vector, cpu_intc_ihr ihr)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000310;
@@ -146,7 +149,8 @@ cpu_intc_ihr_clear(uint32_t vector)
 }
 
 /// @brief Not yet documented.
-static inline void __always_inline (*cpu_intc_ihr_get(uint32_t vector))(void)
+static inline cpu_intc_ihr __always_inline
+cpu_intc_ihr_get(uint32_t vector)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000314;
@@ -181,6 +185,30 @@ cpu_intc_mask_set(uint8_t mask)
 }
 
 /// @}
+
+static inline uint16_t __always_inline
+cpu_intc_priority_a_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRA));
+}
+
+static inline uint16_t __always_inline
+cpu_intc_priority_b_get(void)
+{
+        return MEMORY_READ(16, CPU(IPRB));
+}
+
+static inline void __always_inline
+cpu_intc_priority_a_set(uint16_t ipra)
+{
+        MEMORY_WRITE(16, CPU(IPRA), ipra);
+}
+
+static inline void __always_inline
+cpu_intc_priority_b_set(uint16_t iprb)
+{
+        MEMORY_WRITE(16, CPU(IPRA), iprb);
+}
 
 __END_DECLS
 

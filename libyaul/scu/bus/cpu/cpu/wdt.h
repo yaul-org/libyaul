@@ -41,6 +41,8 @@ __BEGIN_DECLS
 
 /// @}
 
+typedef void (*cpu_wdt_ihr)(void);
+
 /// @addtogroup CPU_WDT_INLINE_FUNCTIONS
 /// @{
 
@@ -84,15 +86,20 @@ cpu_wdt_disable(void)
 }
 
 /// @brief Not yet documented.
-static inline void __always_inline
-cpu_wdt_interrupt_priority_set(uint8_t priority)
+static inline uint8_t __always_inline
+cpu_wdt_interrupt_priority_get(void)
 {
         uint16_t ipra;
         ipra = MEMORY_READ(16, CPU(IPRA));
 
-        ipra = (ipra & 0xFF0F) | ((priority & 0x0F) << 4);
+        return ((ipra >> 4) & 0x0F);
+}
 
-        MEMORY_WRITE(16, CPU(IPRA), ipra);
+static inline void __always_inline
+cpu_wdt_interrupt_priority_set(uint8_t priority)
+{
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF7F);
+        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
 
 /// @}
@@ -104,7 +111,7 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
 extern void cpu_wdt_init(uint8_t);
 
 /// @brief Not yet documented.
-extern void cpu_wdt_timer_mode_set(uint8_t, void (*)(void));
+extern void cpu_wdt_timer_mode_set(uint8_t, cpu_wdt_ihr);
 
 /// @}
 

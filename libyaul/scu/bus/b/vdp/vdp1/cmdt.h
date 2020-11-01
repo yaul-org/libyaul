@@ -24,225 +24,133 @@
 
 __BEGIN_DECLS
 
-/// @defgroup VDP1_CMDT_DEFINES
-/// @defgroup VDP1_CMDT_COLOR_STRUCTURES
-/// @defgroup VDP1_CMDT_STRUCTURES
-/// @defgroup VDP1_CMDT_CMDT_STRUCTURES
-/// @defgroup VDP1_CMDT_INLINE_FUNCTIONS
-/// @defgroup VDP1_CMDT_LIST_FUNCTIONS
-/// @defgroup VDP1_CMDT_CMDT_FUNCTIONS
-/// @defgroup VDP1_CMDT_LINK_FUNCTIONS
+#define CMDT_ZOOM_POINT_NONE            (0x0)
+#define CMDT_ZOOM_POINT_UPPER_LEFT      (0x5)
+#define CMDT_ZOOM_POINT_UPPER_CENTER    (0x6)
+#define CMDT_ZOOM_POINT_UPPER_RIGHT     (0x7)
+#define CMDT_ZOOM_POINT_CENTER_LEFT     (0x9)
+#define CMDT_ZOOM_POINT_CENTER          (0xA)
+#define CMDT_ZOOM_POINT_CENTER_RIGHT    (0xB)
+#define CMDT_ZOOM_POINT_LOWER_LEFT      (0xD)
+#define CMDT_ZOOM_POINT_LOWER_CENTER    (0xE)
+#define CMDT_ZOOM_POINT_LOWER_RIGHT     (0xF)
 
-/// @addtogroup VDP1_CMDT_DEFINES
-/// @{
+#define CMDT_VTX_NORMAL_SPRITE          (0)
+#define CMDT_VTX_NORMAL_SPRITE_COUNT    (1)
 
-#define CMDT_ZOOM_POINT_UPPER_LEFT      0x0030
-#define CMDT_ZOOM_POINT_UPPER_CENTER    0x0050
-#define CMDT_ZOOM_POINT_UPPER_RIGHT     0x0090
-#define CMDT_ZOOM_POINT_CENTER_LEFT     0x0210
-#define CMDT_ZOOM_POINT_CENTER          0x0410
-#define CMDT_ZOOM_POINT_CENTER_RIGHT    0x0810
-#define CMDT_ZOOM_POINT_LOWER_LEFT      0x2010
-#define CMDT_ZOOM_POINT_LOWER_CENTER    0x4010
-#define CMDT_ZOOM_POINT_LOWER_RIGHT     0x8010
+#define CMDT_VTX_SCALE_SPRITE_UL        (0)
+#define CMDT_VTX_SCALE_SPRITE_LR        (2)
+#define CMDT_VTX_SCALE_SPRITE_COUNT     (2)
 
-/// @}
+#define CMDT_VTX_ZOOM_SPRITE_POINT      (0)
+#define CMDT_VTX_ZOOM_SPRITE_DISPLAY    (1)
+#define CMDT_VTX_ZOOM_SPRITE_COUNT      (2)
 
-#define VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE                                     \
-        union {                                                                \
-                struct {                                                       \
-                        unsigned int msb_enable:1;                /* Bit 15 */ \
-                        unsigned int :2;                                       \
-                        unsigned int hss_enable:1;                /* Bit 12 */ \
-                        unsigned int pre_clipping_disable:1;      /* Bit 11 */ \
-                        unsigned int user_clipping_mode:2;     /* Bits 10-9 */ \
-                        unsigned int mesh_enable:1;                /* Bit 8 */ \
-                        unsigned int end_code_disable:1;           /* Bit 7 */ \
-                        unsigned int trans_pixel_disable:1;        /* Bit 6 */ \
-                        unsigned int color_mode:3;              /* Bits 5-3 */ \
-                        unsigned int cc_mode:3;                 /* Bits 2-0 */ \
-                } __aligned(2);                                                \
-                                                                               \
-                uint16_t raw;                                                  \
-        } draw_mode
+#define CMDT_VTX_DISTORTED_SPRITE_A     (0)
+#define CMDT_VTX_DISTORTED_SPRITE_B     (1)
+#define CMDT_VTX_DISTORTED_SPRITE_C     (2)
+#define CMDT_VTX_DISTORTED_SPRITE_D     (3)
+#define CMDT_VTX_DISTORTED_SPRITE_COUNT (4)
 
-#define VDP1_CMDT_COLOR_BANK_DECLARE                                           \
-        union {                                                                \
-                struct vdp1_color_bank_type_0 type_0;                          \
-                struct vdp1_color_bank_type_1 type_1;                          \
-                struct vdp1_color_bank_type_2 type_2;                          \
-                struct vdp1_color_bank_type_3 type_3;                          \
-                struct vdp1_color_bank_type_4 type_4;                          \
-                struct vdp1_color_bank_type_5 type_5;                          \
-                struct vdp1_color_bank_type_6 type_6;                          \
-                struct vdp1_color_bank_type_7 type_7;                          \
-                                                                               \
-                struct vdp1_color_bank_type_8 type_8;                          \
-                struct vdp1_color_bank_type_9 type_9;                          \
-                struct vdp1_color_bank_type_a type_a;                          \
-                struct vdp1_color_bank_type_b type_b;                          \
-                struct vdp1_color_bank_type_c type_c;                          \
-                struct vdp1_color_bank_type_d type_d;                          \
-                struct vdp1_color_bank_type_e type_e;                          \
-                struct vdp1_color_bank_type_f type_f;                          \
-                                                                               \
-                uint16_t raw;                                                  \
-        } sprite_type
+#define CMDT_VTX_POLYGON_A              (0)
+#define CMDT_VTX_POLYGON_B              (1)
+#define CMDT_VTX_POLYGON_C              (2)
+#define CMDT_VTX_POLYGON_D              (3)
+#define CMDT_VTX_POLYGON_COUNT          (4)
 
-#define VDP1_CMDT_SPRITE_DECLARE                                               \
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE;                                    \
-                                                                               \
-        union {                                                                \
-                /* Mode 0, 2, 3, and 4 */                                      \
-                VDP1_CMDT_COLOR_BANK_DECLARE;                                  \
-                                                                               \
-                /* Mode 1 */                                                   \
-                uint32_t clut;                                                 \
-        };                                                                     \
-                                                                               \
-        union {                                                                \
-                struct {                                                       \
-                        unsigned int :10;                                      \
-                        unsigned int horizontal:1;                             \
-                        unsigned int vertical:1;                               \
-                        unsigned int :4;                                       \
-                };                                                             \
-                                                                               \
-                uint16_t raw;                                                  \
-        } direction;                                                           \
-                                                                               \
-        uint32_t char_base;                                                    \
-        uint16_t width;                                                        \
-        uint16_t height;                                                       \
-                                                                               \
-        uint32_t grad_base
+#define CMDT_VTX_POLYLINE_A             (0)
+#define CMDT_VTX_POLYLINE_B             (1)
+#define CMDT_VTX_POLYLINE_C             (2)
+#define CMDT_VTX_POLYLINE_D             (3)
+#define CMDT_VTX_POLYLINE_COUNT         (4)
 
-#define VDP1_CMDT_NON_TEXTURED_DECLARE                                         \
-        VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE;                                    \
-                                                                               \
-        union {                                                                \
-                VDP1_CMDT_COLOR_BANK_DECLARE;                                  \
-                                                                               \
-                color_rgb555_t color;                                          \
-        };                                                                     \
-                                                                               \
-        uint32_t grad_base
+#define CMDT_VTX_LINE_A                 (0)
+#define CMDT_VTX_LINE_B                 (1)
+#define CMDT_VTX_LINE_COUNT             (2)
 
-/// @addtogroup VDP1_CMDT_COLOR_STRUCTURES
-/// @{
+#define CMDT_VTX_LOCAL_COORD            (0)
+#define CMDT_VTX_LOCAL_COORD_COUNT      (1)
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_0 {
-        struct vdp2_sprite_type_0 data;
-} __packed;
+#define CMDT_VTX_SYSTEM_CLIP            (2)
+#define CMDT_VTX_SYSTEM_CLIP_COUNT      (1)
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_1 {
-        struct vdp2_sprite_type_1 data;
-} __packed;
+#define CMDT_VTX_USER_CLIP_UL           (0)
+#define CMDT_VTX_USER_CLIP_LR           (2)
+#define CMDT_VTX_USER_CLIP_COUNT        (2)
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_2 {
-        struct vdp2_sprite_type_2 data;
-} __packed;
+typedef struct vdp1_color_bank_type_0 {
+        vdp2_sprite_type_0_t data;
+} __packed vdp1_color_bank_type_0_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_3 {
-        struct vdp2_sprite_type_3 data;
-} __packed;
+typedef struct vdp1_color_bank_type_1 {
+        vdp2_sprite_type_1_t data;
+} __packed vdp1_color_bank_type_1_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_4 {
-        struct vdp2_sprite_type_4 data;
-} __packed;
+typedef struct vdp1_color_bank_type_2 {
+        vdp2_sprite_type_2_t data;
+} __packed vdp1_color_bank_type_2_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_5 {
-        struct vdp2_sprite_type_5 data;
-} __packed;
+typedef struct vdp1_color_bank_type_3 {
+        vdp2_sprite_type_3_t data;
+} __packed vdp1_color_bank_type_3_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_6 {
-        struct vdp2_sprite_type_6 data;
-} __packed;
+typedef struct vdp1_color_bank_type_4 {
+        vdp2_sprite_type_4_t data;
+} __packed vdp1_color_bank_type_4_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_7 {
-        struct vdp2_sprite_type_7 data;
-} __packed;
+typedef struct vdp1_color_bank_type_5 {
+        vdp2_sprite_type_5_t data;
+} __packed vdp1_color_bank_type_5_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_8 {
+typedef struct vdp1_color_bank_type_6 {
+        vdp2_sprite_type_6_t data;
+} __packed vdp1_color_bank_type_6_t;
+
+typedef struct vdp1_color_bank_type_7 {
+        vdp2_sprite_type_7_t data;
+} __packed vdp1_color_bank_type_7_t;
+
+typedef struct vdp1_color_bank_type_8 {
         unsigned int :8;
-        struct vdp2_sprite_type_8 data;
-} __packed;
+        vdp2_sprite_type_8_t data;
+} __packed vdp1_color_bank_type_8_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_9 {
+typedef struct vdp1_color_bank_type_9 {
         unsigned int :8;
-        struct vdp2_sprite_type_9 data;
-} __packed;
+        vdp2_sprite_type_9_t data;
+} __packed vdp1_color_bank_type_9_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_a {
+typedef struct vdp1_color_bank_type_a {
         unsigned int :8;
-        struct vdp2_sprite_type_a data;
-} __packed;
+        vdp2_sprite_type_a_t data;
+} __packed vdp1_color_bank_type_a_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_b {
+typedef struct vdp1_color_bank_type_b {
         unsigned int :8;
-        struct vdp2_sprite_type_b data;
-} __packed;
+        vdp2_sprite_type_b_t data;
+} __packed vdp1_color_bank_type_b_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_c {
+typedef struct vdp1_color_bank_type_c {
         unsigned int :8;
-        struct vdp2_sprite_type_c data;
-} __packed;
+        vdp2_sprite_type_c_t data;
+} __packed vdp1_color_bank_type_c_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_d {
+typedef struct vdp1_color_bank_type_d {
         unsigned int :8;
-        struct vdp2_sprite_type_d data;
-} __packed;
+        vdp2_sprite_type_d_t data;
+} __packed vdp1_color_bank_type_d_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_e {
+typedef struct vdp1_color_bank_type_e {
         unsigned int :8;
-        struct vdp2_sprite_type_e data;
-} __packed;
+        vdp2_sprite_type_e_t data;
+} __packed vdp1_color_bank_type_e_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_color_bank_type_f {
+typedef struct vdp1_color_bank_type_f {
         unsigned int :8;
-        struct vdp2_sprite_type_f data;
-} __packed;
+        vdp2_sprite_type_f_t data;
+} __packed vdp1_color_bank_type_f_t;
 
-/// @}
-
-/// @addtogroup VDP1_CMDT_STRUCTURES
-/// @{
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt {
+typedef struct vdp1_cmdt {
         uint16_t cmd_ctrl;
         uint16_t cmd_link;
         uint16_t cmd_pmod;
@@ -259,189 +167,62 @@ struct vdp1_cmdt {
         int16_t cmd_yd;
         uint16_t cmd_grda;
         uint16_t reserved;
-} __aligned(32);
+} __aligned(32) vdp1_cmdt_t;
 
-/// @}
+typedef union vdp1_cmdt_draw_mode {
+        struct {
+                unsigned int msb_enable:1;              /* Bit 15 */
+                unsigned int :2;
+                unsigned int hss_enable:1;              /* Bit 12 */
+                unsigned int pre_clipping_disable:1;    /* Bit 11 */
+                unsigned int user_clipping_mode:2;   /* Bits 10-9 */
+                unsigned int mesh_enable:1;              /* Bit 8 */
+                unsigned int end_code_disable:1;         /* Bit 7 */
+                unsigned int trans_pixel_disable:1;      /* Bit 6 */
+                unsigned int color_mode:3;            /* Bits 5-3 */
+                unsigned int cc_mode:3;               /* Bits 2-0 */
+        } bits __aligned(2);
 
-/// @addtogroup VDP1_CMDT_CMDT_STRUCTURES
-/// @{
+        uint16_t raw;
+} vdp1_cmdt_draw_mode_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_list {
-        struct vdp1_cmdt *cmdts;
-        struct vdp1_cmdt *cmdt;
+typedef union vdp1_cmdt_color_bank {
+        vdp1_color_bank_type_0_t type_0;
+        vdp1_color_bank_type_1_t type_1;
+        vdp1_color_bank_type_2_t type_2;
+        vdp1_color_bank_type_3_t type_3;
+        vdp1_color_bank_type_4_t type_4;
+        vdp1_color_bank_type_5_t type_5;
+        vdp1_color_bank_type_6_t type_6;
+        vdp1_color_bank_type_7_t type_7;
+
+        vdp1_color_bank_type_8_t type_8;
+        vdp1_color_bank_type_9_t type_9;
+        vdp1_color_bank_type_a_t type_a;
+        vdp1_color_bank_type_b_t type_b;
+        vdp1_color_bank_type_c_t type_c;
+        vdp1_color_bank_type_d_t type_d;
+        vdp1_color_bank_type_e_t type_e;
+        vdp1_color_bank_type_f_t type_f;
+
+        uint16_t raw;
+} vdp1_cmdt_color_bank_t;
+
+typedef struct vdp1_cmdt_list {
+        vdp1_cmdt_t *cmdts;
         uint16_t count;
-} __aligned(4);
+} __aligned(4) vdp1_cmdt_list_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_normal_sprite {
-        VDP1_CMDT_SPRITE_DECLARE;
+typedef struct vdp1_cmdt_orderlist {
+        struct {
+                unsigned int end:1;
+                unsigned int :30;
+        } control __aligned(4);
 
-        union {
-                int16_vector2_t position;
+        unsigned int :32;
 
-                struct {
-                        int16_vector2_t a;
-                } vertex;
-
-                int16_t components[2];
-                int16_vector2_t vertices[1];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_scaled_sprite {
-        VDP1_CMDT_SPRITE_DECLARE;
-
-        union {
-                struct {
-                        unsigned int lower_right:1;
-                        unsigned int lower_center:1;
-                        unsigned int lower_left:1;
-                        unsigned int :1;
-                        unsigned int center_right:1;
-                        unsigned int center:1;
-                        unsigned int center_left:1;
-                        unsigned int :1;
-                        unsigned int upper_right:1;
-                        unsigned int upper_center:1;
-                        unsigned int upper_left:1;
-                        unsigned int enable:1;
-                } __aligned(2);
-
-                uint16_t raw;
-        } zoom_point;
-
-        union {
-                struct {
-                        /* Vertex A */
-                        int16_vector2_t ul;
-
-                        /* Vertex B */
-                        unsigned int :16;
-                        unsigned int :16;
-
-                        /* Vertex C */
-                        int16_vector2_t lr;
-                } scale;
-
-                struct {
-                        /* Vertex A */
-                        int16_vector2_t point;
-                        /* Vertex B */
-                        int16_vector2_t display;
-
-                        /* Vertex C */
-                        unsigned int :16;
-                        unsigned int :16;
-                } zoom;
-
-                struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                } vertex;
-
-                int16_t components[6];
-                int16_vector2_t vertices[3];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_distorted_sprite {
-        VDP1_CMDT_SPRITE_DECLARE;
-
-        union {
-                struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
-                } vertex;
-
-                int16_t components[8];
-                int16_vector2_t vertices[4];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_polygon {
-        VDP1_CMDT_NON_TEXTURED_DECLARE;
-
-        union {
-                struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
-                } vertex;
-
-                int16_t components[8];
-                int16_vector2_t vertices[4];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_polyline {
-        VDP1_CMDT_NON_TEXTURED_DECLARE;
-
-        union {
-                struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                        int16_vector2_t c;
-                        int16_vector2_t d;
-                } vertex;
-
-                int16_t components[4];
-                int16_vector2_t vertices[4];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_line {
-        VDP1_CMDT_NON_TEXTURED_DECLARE;
-
-        union {
-                struct {
-                        int16_vector2_t a;
-                        int16_vector2_t b;
-                } vertex;
-
-                int16_t components[4];
-                int16_vector2_t vertices[8];
-        };
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_local_coord {
-        int16_vector2_t coord;
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_system_clip_coord {
-        int16_vector2_t coord;
-};
-
-/// @compound
-/// @brief Not yet documented.
-struct vdp1_cmdt_user_clip_coord {
-        int16_vector2_t coords[2];
-};
-
-/// @}
-
-/// @addtogroup VDP1_CMDT_INLINE_FUNCTIONS
-/// @{
+        vdp1_cmdt_t *cmdt;
+} __aligned(4) vdp1_cmdt_orderlist_t;
 
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
@@ -455,81 +236,54 @@ vdp1_cmdt_last_get(void)
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;
 }
 
-/// @}
+extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t);
+extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *);
+extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *, vdp1_cmdt_t *);
 
-/// @addtogroup VDP1_CMDT_LIST_FUNCTIONS
-/// @{
+extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t);
+extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *);
+extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
+extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *, const uint32_t, const uint16_t);
 
-/// @brief Not yet documented.
-extern struct vdp1_cmdt_list *vdp1_cmdt_list_alloc(uint16_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_list_free(struct vdp1_cmdt_list *);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_list_init(struct vdp1_cmdt_list *, struct vdp1_cmdt *, uint16_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_list_reset(struct vdp1_cmdt_list *);
+extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_polygon_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_polyline_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_line_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_end_set(vdp1_cmdt_t *);
 
-/// @}
+extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, const vdp1_cmdt_draw_mode_t);
+extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, const uint8_t);
+extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb1555_t);
+extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_size_set(vdp1_cmdt_t *, uint16_t, uint16_t);
+extern void vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *, bool);
+extern void vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *, bool);
+extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vector2_t *);
+extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vector2_t *);
+extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, uint32_t);
 
-/// @addtogroup VDP1_CMDT_CMDT_FUNCTIONS
-/// @{
+extern void vdp1_cmdt_jump_clear(vdp1_cmdt_t *);
 
-/// @brief Not yet documented.
-extern struct vdp1_cmdt *vdp1_cmdt_base_get(void);
+extern void vdp1_cmdt_jump_assign(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_call(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *, uint16_t);
 
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_normal_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_normal_sprite *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_scaled_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_scaled_sprite *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_distorted_sprite_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_distorted_sprite *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_polygon_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polygon *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_polyline_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_polyline *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_line_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_line *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_user_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_user_clip_coord *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_system_clip_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_system_clip_coord *);
-/// @brief Not yet documented.
-extern uint16_t vdp1_cmdt_local_coord_add(struct vdp1_cmdt_list *, const struct vdp1_cmdt_local_coord *);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_end(struct vdp1_cmdt_list *);
-
-/// @}
-
-/// @addtogroup VDP1_CMDT_LINK_FUNCTIONS
-/// @{
-
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_clear(struct vdp1_cmdt_list *, uint8_t);
-
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_call(struct vdp1_cmdt_list *, uint8_t, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_skip_assign(struct vdp1_cmdt_list *, uint8_t, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_skip_call(struct vdp1_cmdt_list *, uint8_t, uint8_t);
-
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_next(struct vdp1_cmdt_list *, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_return(struct vdp1_cmdt_list *, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_skip_next(struct vdp1_cmdt_list *, uint8_t);
-/// @brief Not yet documented.
-extern void vdp1_cmdt_jump_skip_return(struct vdp1_cmdt_list *, uint8_t);
-
-/// @}
-
-#undef VDP1_CMDT_DRAW_MODE_STRUCT_DECLARE
-#undef VDP1_CMDT_COLOR_BANK_DECLARE
-#undef VDP1_CMDT_SPRITE_DECLARE
-#undef VDP1_CMDT_NON_TEXTURED_DECLARE
+extern void vdp1_cmdt_jump_next(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_return(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_skip_next(vdp1_cmdt_t *);
+extern void vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *);
 
 __END_DECLS
 

@@ -6,137 +6,126 @@
  */
 
 #include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <string.h>
-#include <stdlib.h>
-#include <math.h>
 
-#include <cpu/registers.h>
-#include <cpu/intc.h>
 #include <cpu/cache.h>
+#include <cpu/intc.h>
+#include <cpu/registers.h>
 
 #include <sys/dma-queue.h>
 
 #include <scu-internal.h>
 
-#include <gdb.h>
-
 /* Default SCU DMA level */
-#define DMA_QUEUE_SCU_DMA_LEVEL         0
-#define DMA_QUEUE_SCU_DMA_MASK          SCU_IC_MASK_LEVEL_0_DMA_END
+#define DMA_QUEUE_SCU_DMA_LEVEL         (0)
+#define DMA_QUEUE_SCU_DMA_MASK          (SCU_IC_MASK_LEVEL_0_DMA_END)
 
 /* Maximum count of requests in ring buffer to take in */
 #define DMA_QUEUE_REQUESTS_MAX_COUNT    (32)
 #define DMA_QUEUE_REQUESTS_MASK         (DMA_QUEUE_REQUESTS_MAX_COUNT - 1)
 
-struct dma_queue_request {
-        struct scu_dma_reg_buffer reg_buffer;
+/* XXX: Move this! */
+typedef void (*dma_queue_request_handler)(const dma_queue_transfer_t *);
 
-        void (*handler)(const struct dma_queue_transfer *);
-        struct dma_queue_transfer transfer;
+struct dma_queue_request {
+        scu_dma_handle_t handle;
+
+        dma_queue_request_handler handler;
+        dma_queue_transfer_t transfer;
 } __aligned(8);
 
 struct dma_queue {
-        struct dma_queue_request requests[DMA_QUEUE_REQUESTS_MAX_COUNT];
+        struct dma_queue_request *requests;
 
         volatile int8_t head;
         volatile int8_t tail;
+        volatile int8_t flush_tail;
 } __aligned(16);
 
 static_assert(sizeof(struct dma_queue_request) == 32);
-static_assert(sizeof(struct dma_queue) == 1040);
+static_assert(sizeof(struct dma_queue) == 16);
 
-static inline void _queue_init(struct dma_queue *) __always_inline;
+static inline void _queue_init(const uint8_t, struct dma_queue *) __always_inline;
 static inline uint32_t _queue_size(const struct dma_queue *) __always_inline;
 static inline bool _queue_full(const struct dma_queue *) __always_inline;
 static inline bool _queue_empty(const struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_top(struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_enqueue(struct dma_queue *) __always_inline;
-static inline struct dma_queue_request * _queue_dequeue(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_top(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_enqueue(struct dma_queue *) __always_inline;
+static inline struct dma_queue_request *_queue_dequeue(struct dma_queue *) __always_inline;
+static inline void _queue_request_start(const struct dma_queue_request *) __always_inline;
 
-static inline void _dma_queue_request_start(const struct dma_queue_request *) __always_inline;
-
-static void _default_handler(const struct dma_queue_transfer *);
-
-static void _dma_handler(void);
+static void _dma_handler(void *);
 static void _dma_illegal_handler(void);
 
-static struct {
-        struct dma_queue dma_queues[DMA_QUEUE_TAG_COUNT];
+static void _default_handler(const dma_queue_transfer_t *);
 
+static struct dma_queue_request _dma_queue_request_pools[DMA_QUEUE_TAG_COUNT][DMA_QUEUE_REQUESTS_MAX_COUNT];
+static struct dma_queue _dma_queues[DMA_QUEUE_TAG_COUNT];
+
+static struct {
         volatile uint8_t current_tag;
+        struct dma_queue *dma_queues;
 } _state;
 
 void
-dma_queue_init(void)
+_internal_dma_queue_init(void)
 {
         scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL);
         scu_dma_level_stop(DMA_QUEUE_SCU_DMA_LEVEL);
 
         scu_dma_illegal_set(_dma_illegal_handler);
 
-        scu_dma_level0_end_set(_dma_handler);
+        scu_dma_level0_end_set(_dma_handler, NULL);
 
-        uint32_t tag;
-        for (tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
+        _state.current_tag = DMA_QUEUE_TAG_INVALID;
+        _state.dma_queues = &_dma_queues[0];
+
+        for (uint32_t tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
                 struct dma_queue *dma_queue;
                 dma_queue = &_state.dma_queues[tag];
 
-                _queue_init(dma_queue);
-
-                for (uint32_t i = 0; i < DMA_QUEUE_REQUESTS_MAX_COUNT; i++) {
-                        struct dma_queue_request *request;
-                        request = &dma_queue->requests[i];
-
-                        (void)memset(&request->reg_buffer, 0x00, sizeof(request->reg_buffer));
-
-                        request->handler = _default_handler;
-
-                        request->transfer.status = DMA_QUEUE_STATUS_UNKNOWN;
-                        request->transfer.work = NULL;
-                }
+                _queue_init(tag, dma_queue);
         }
-
-        _state.current_tag = DMA_QUEUE_TAG_INVALID;
 }
 
 int8_t
-dma_queue_enqueue(const struct scu_dma_reg_buffer *reg_buffer,
-    uint8_t tag,
-    void (*handler)(const struct dma_queue_transfer *),
+dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
+    dma_queue_request_handler handler,
     void *work)
 {
-        assert(reg_buffer != NULL);
+        assert(handle != NULL);
 
         assert(tag < DMA_QUEUE_TAG_COUNT);
+
+        int8_t status;
+        status = 0;
+
+        const uint32_t intc_mask = cpu_intc_mask_get();
+        cpu_intc_mask_set(15);
 
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[tag];
 
-        uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
-
         if (_queue_full(dma_queue)) {
-                scu_ic_mask_set(scu_mask);
+                status = -1;
 
-                return -1;
+                goto exit;
         }
 
         struct dma_queue_request *request;
         request = _queue_enqueue(dma_queue);
-        assert(request != NULL);
-        scu_ic_mask_set(scu_mask);
 
-        (void)memcpy(&request->reg_buffer, reg_buffer, sizeof(struct scu_dma_reg_buffer));
+        assert(request != NULL);
+
+        (void)memcpy(&request->handle, handle, sizeof(scu_dma_handle_t));
 
         request->handler = (handler != NULL) ? handler : _default_handler;
-        request->transfer.status = DMA_QUEUE_STATUS_INCOMPLETE;
         request->transfer.work = work;
 
-        return 0;
+exit:
+        cpu_intc_mask_set(intc_mask);
+
+        return status;
 }
 
 void
@@ -146,33 +135,35 @@ dma_queue_tag_clear(uint8_t tag)
 
         dma_queue_flush_wait();
 
-        uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
+        const uint32_t intc_mask = cpu_intc_mask_get();
+        cpu_intc_mask_set(15);
 
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[tag];
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         while (!_queue_empty(dma_queue)) {
                 struct dma_queue_request *request;
                 request = _queue_dequeue(dma_queue);
 
-                request->transfer.status = DMA_QUEUE_STATUS_CANCELED;
+                request->transfer.status |= DMA_QUEUE_STATUS_CANCELED;
 
                 request->handler(&request->transfer);
         }
 
-        scu_ic_mask_set(scu_mask);
+        cpu_intc_mask_set(intc_mask);
 }
 
 void
 dma_queue_clear(void)
 {
-        uint32_t tag;
-        for (tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
+        const uint32_t intc_mask = cpu_intc_mask_get();
+        cpu_intc_mask_set(15);
+
+        for (uint32_t tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
                 dma_queue_tag_clear(tag);
         }
+
+        cpu_intc_mask_set(intc_mask);
 }
 
 uint32_t
@@ -182,31 +173,48 @@ dma_queue_flush(uint8_t tag)
 
         dma_queue_flush_wait();
 
-        struct dma_queue *dma_queue;
-        dma_queue = &_state.dma_queues[tag];
+        int8_t status;
+        status = 0;
+
+        uint32_t intc_mask;
+        intc_mask = cpu_intc_mask_get();
+        cpu_intc_mask_set(15);
 
         uint32_t scu_mask;
         scu_mask = scu_ic_mask_get();
 
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
+        struct dma_queue *dma_queue;
+        dma_queue = &_state.dma_queues[tag];
 
         if (_queue_empty(dma_queue)) {
+                status = -1;
+
                 goto exit;
         }
+
+        /* Mark what is going to be flushed */
+        dma_queue->flush_tail = dma_queue->tail;
 
         _state.current_tag = tag;
 
         struct dma_queue_request *request;
         request = _queue_dequeue(dma_queue);
 
-        _dma_queue_request_start(request);
+        request->handler(&request->transfer);
+
+        _queue_request_start(request);
 
         scu_mask &= ~DMA_QUEUE_SCU_DMA_MASK;
 
+        if (intc_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
+                intc_mask = CPU_INTC_PRIORITY_SPRITE_END;
+        }
+
 exit:
+        cpu_intc_mask_set(intc_mask);
         scu_ic_mask_set(scu_mask);
 
-        return 0;
+        return status;
 }
 
 void
@@ -221,18 +229,16 @@ dma_queue_count_get(uint8_t tag)
 {
         assert(tag < DMA_QUEUE_TAG_COUNT);
 
+        const uint32_t intc_mask = cpu_intc_mask_get();
+        cpu_intc_mask_set(15);
+
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[tag];
-
-        uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, DMA_QUEUE_SCU_DMA_MASK);
 
         uint32_t size;
         size = _queue_size(dma_queue);
 
-        scu_ic_mask_set(scu_mask);
+        cpu_intc_mask_set(intc_mask);
 
         return size;
 }
@@ -244,10 +250,22 @@ dma_queue_capacity_get(void)
 }
 
 static inline void __always_inline
-_queue_init(struct dma_queue *dma_queue)
+_queue_init(const uint8_t tag, struct dma_queue *dma_queue)
 {
+        dma_queue->requests = &_dma_queue_request_pools[tag][0];
         dma_queue->head = -1;
         dma_queue->tail = -1;
+        dma_queue->flush_tail = -1;
+
+        for (uint32_t i = 0; i < DMA_QUEUE_REQUESTS_MAX_COUNT; i++) {
+                struct dma_queue_request *request;
+                request = &dma_queue->requests[i];
+
+                request->handler = _default_handler;
+
+                request->transfer.status = DMA_QUEUE_STATUS_UNKNOWN;
+                request->transfer.work = NULL;
+        }
 }
 
 static inline uint32_t __always_inline
@@ -266,6 +284,13 @@ static inline bool __always_inline
 _queue_empty(const struct dma_queue *dma_queue)
 {
         return (dma_queue->head == dma_queue->tail);
+}
+
+/* Determine if the queue is empty, relative to where the flush tail is. */
+static inline bool __always_inline
+_queue_flush_empty(const struct dma_queue *dma_queue)
+{
+        return (dma_queue->head == dma_queue->flush_tail);
 }
 
 static inline struct dma_queue_request * __always_inline
@@ -287,6 +312,8 @@ _queue_enqueue(struct dma_queue *dma_queue)
         struct dma_queue_request *request;
         request = &dma_queue->requests[next_tail];
 
+        request->transfer.status = DMA_QUEUE_STATUS_UNPROCESSED;
+
         dma_queue->tail++;
 
         return request;
@@ -302,25 +329,25 @@ _queue_dequeue(struct dma_queue *dma_queue)
         struct dma_queue_request *request;
         request = &dma_queue->requests[next_head & DMA_QUEUE_REQUESTS_MASK];
 
+        request->transfer.status &= ~DMA_QUEUE_STATUS_UNPROCESSED;
+        request->transfer.status |= DMA_QUEUE_STATUS_PROCESSING;
+
         dma_queue->head++;
 
         return request;
 }
 
 static inline void __always_inline
-_dma_queue_request_start(const struct dma_queue_request *request)
+_queue_request_start(const struct dma_queue_request *request)
 {
         scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
-            &request->reg_buffer, _dma_handler);
+            &request->handle, NULL);
 
-        /* We need to purge the cache before starting the transfer */
-        cpu_cache_purge();
-
-        scu_dma_level_fast_start(DMA_QUEUE_SCU_DMA_LEVEL);
+        scu_dma_level_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
 static void
-_dma_handler(void)
+_dma_handler(void *work __unused)
 {
         struct dma_queue *dma_queue;
         dma_queue = &_state.dma_queues[_state.current_tag];
@@ -331,19 +358,21 @@ _dma_handler(void)
         volatile struct dma_queue_request *current_request;
         current_request = top_request;
 
-        current_request->transfer.status = DMA_QUEUE_STATUS_COMPLETE;
+        current_request->transfer.status &= ~DMA_QUEUE_STATUS_PROCESSING;
+        current_request->transfer.status |= DMA_QUEUE_STATUS_COMPLETE;
 
         top_request->handler(&top_request->transfer);
 
-        if (_queue_empty(dma_queue)) {
+        if (_queue_flush_empty(dma_queue)) {
                 _state.current_tag = DMA_QUEUE_TAG_INVALID;
+
                 return;
         }
 
         const struct dma_queue_request *next_request;
         next_request = _queue_dequeue(dma_queue);
 
-        _dma_queue_request_start(next_request);
+        _queue_request_start(next_request);
 }
 
 static void
@@ -353,6 +382,6 @@ _dma_illegal_handler(void)
 }
 
 static void
-_default_handler(const struct dma_queue_transfer *work __unused)
+_default_handler(const dma_queue_transfer_t *work __unused)
 {
 }

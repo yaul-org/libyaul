@@ -93,7 +93,7 @@ extern void internal_gdb_ihr_ubc(void);
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uint32_t _calculate_pc(struct cpu_registers *);
+static uintptr_t _calculate_pc(cpu_registers_t *);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -155,7 +155,8 @@ _gdb_sh2_init(void)
             internal_gdb_exception_dma_address_error);
 
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_BREAK, internal_gdb_ihr_break);
+
+        cpu_intc_ihr_set(GDB_TRAPA_VECTOR_NUMBER, internal_gdb_ihr_break);
 
         /* Initialize UBC */
         /*
@@ -183,20 +184,19 @@ _gdb_getc(void)
 }
 
 static void
-_gdb_step(struct cpu_registers *reg_file, uint32_t address)
+_gdb_step(cpu_registers_t *reg_file, uint32_t address)
 {
-        uint16_t *p;
+        /* Determine where we'll be going */
+        uintptr_t pc;
+        pc = (address != 0x00000000) ? address : _calculate_pc(reg_file);
 
-        if (address != 0x00000000) {
-                p = (uint16_t *)address;
-        } else {
-                /* Determine where we'll be going */
-                p = (uint16_t *)_calculate_pc(reg_file);
-        }
+        uint16_t *p;
+        p = (uint16_t *)pc;
 
         _bp_step.addr = (void *)p;
         _bp_step.instruction = *p;
-        *p = INSTRN_TRAPA(0x20);
+
+        *p = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* We're stepping, be aware of breakpoints and watchpoints */
         _stepping = true;
@@ -257,7 +257,7 @@ _gdb_kill(void)
 }
 
 static void
-_gdb_monitor_entry(struct cpu_registers *reg_file)
+_gdb_monitor_entry(cpu_registers_t *reg_file)
 {
         uint16_t *p;
         uint32_t *pc;
@@ -295,7 +295,7 @@ _gdb_monitor_entry(struct cpu_registers *reg_file)
 }
 
 static bool
-_gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
+_gdb_register_file_read(cpu_registers_t *reg_file, uint32_t n, uint32_t *r)
 {
         switch (n) {
         case REG_R0:
@@ -345,7 +345,7 @@ _gdb_register_file_read(struct cpu_registers *reg_file, uint32_t n, uint32_t *r)
 }
 
 static bool
-_gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
+_gdb_register_file_write(cpu_registers_t *reg_file, uint32_t n, uint32_t r)
 {
         uint32_t *p;
 
@@ -403,8 +403,8 @@ _gdb_register_file_write(struct cpu_registers *reg_file, uint32_t n, uint32_t r)
  * when it runs
  *
  * Returns the destination address */
-static uint32_t
-_calculate_pc(struct cpu_registers *reg_file)
+static uintptr_t
+_calculate_pc(cpu_registers_t *reg_file)
 {
         uint16_t opcode;
         uint32_t pc;
@@ -540,7 +540,7 @@ _bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
 
         bp->addr = addr;
         bp->instruction = *(uint16_t *)addr;
-        *(uint16_t *)addr = INSTRN_TRAPA(0x20);
+        *(uint16_t *)addr = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
 
         /* Insert */
         TAILQ_INSERT_TAIL(bpl, bp, entries);
@@ -571,8 +571,10 @@ _bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
 static void
 _device_init(void)
 {
+        /* This is useful to have USB cart initialized here explicitly, as we
+         * could be debugging kernel/sys/init.c */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_init();
+        _internal_usb_cart_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #endif /* HAVE_DEV_CARTRIDGE */
 }

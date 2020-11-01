@@ -9,14 +9,14 @@
 
 #include "smpc-internal.h"
 
-struct smpc_peripheral_mouse *
+smpc_peripheral_mouse_t *
 smpc_peripheral_mouse_port(uint8_t port)
 {
-        struct smpc_peripheral_mouse *port_1;
-        struct smpc_peripheral_mouse *port_2;
+        smpc_peripheral_mouse_t *port_1;
+        smpc_peripheral_mouse_t *port_2;
 
-        port_1 = (struct smpc_peripheral_mouse *)smpc_peripheral_port_1.peripheral;
-        port_2 = (struct smpc_peripheral_mouse *)smpc_peripheral_port_2.peripheral;
+        port_1 = (smpc_peripheral_mouse_t *)smpc_peripheral_port_1.peripheral;
+        port_2 = (smpc_peripheral_mouse_t *)smpc_peripheral_port_2.peripheral;
 
         switch (port) {
         case 1:

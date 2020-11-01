@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+#include <sys/cdefs.h>
+
 #include <cpu/map.h>
 
 __BEGIN_DECLS
@@ -59,8 +61,10 @@ __BEGIN_DECLS
 
 /// @}
 
-/// @addtogroup CPU_FRT_INLINE_FUNCTIONS
+typedef void (*cpu_frt_ihr)(void);
+
 /// @{
+/// @addtogroup CPU_FRT_INLINE_FUNCTIONS
 
 /// @brief Not yet documented.
 static inline void __always_inline
@@ -97,17 +101,23 @@ cpu_frt_input_capture_get(void)
 }
 
 /// @brief Not yet documented.
-static inline void __always_inline
-cpu_frt_interrupt_priority_set(uint8_t priority)
+static inline uint8_t __always_inline
+cpu_frt_interrupt_priority_get(void)
 {
-        /* Set the interrupt priority level for FRT (shared amongst all
-         * FRT related interrupts */
         uint16_t iprb;
         iprb = MEMORY_READ(16, CPU(IPRB));
 
-        iprb = (iprb & 0x00FF) | ((priority & 0x0F) << 8);
+        return ((iprb >> 8) & 0x0F);
+}
 
-        MEMORY_WRITE(16, CPU(IPRB), iprb);
+/// @brief Not yet documented.
+static inline void __always_inline
+cpu_frt_interrupt_priority_set(uint8_t priority)
+{
+        /* Set the interrupt priority level for FRT (shared amongst all FRT
+         * related interrupts */
+        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF7FF);
+        MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
 /// @}
@@ -137,15 +147,12 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 
 /// @brief Not yet documented.
 extern void cpu_frt_init(uint8_t);
-
 /// @brief Not yet documented.
-extern void cpu_frt_oca_set(uint16_t, void (*)(void));
-
+extern void cpu_frt_oca_set(uint16_t, cpu_frt_ihr);
 /// @brief Not yet documented.
-extern void cpu_frt_ocb_set(uint16_t, void (*)(void));
-
+extern void cpu_frt_ocb_set(uint16_t, cpu_frt_ihr);
 /// @brief Not yet documented.
-extern void cpu_frt_ovi_set(void (*)(void));
+extern void cpu_frt_ovi_set(cpu_frt_ihr);
 
 /// @}
 

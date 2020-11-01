@@ -23,6 +23,8 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief Not yet documented.
+typedef void (*cpu_divu_ihr)(void);
+
 static inline bool __always_inline
 cpu_divu_status_get(void)
 {
@@ -77,15 +79,20 @@ cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
 }
 
 /// @brief Not yet documented.
+static inline uint8_t __always_inline
+cpu_divu_interrupt_priority_get(void)
+{
+        uint16_t ipra = MEMORY_READ(16, CPU(IPRA));
+
+        return ((ipra >> 12) & 0x0F);
+}
+
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
-        register uint16_t ipra;
-        ipra = MEMORY_READ(16, CPU(IPRA));
-
-        ipra = (ipra & 0x0FFF) | ((priority & 0x0F) << 12);
-
-        MEMORY_WRITE(16, CPU(IPRA), ipra);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0x7FFF);
+        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
 /// @}
@@ -104,10 +111,7 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
 /// @{
 
 /// @brief Not yet documented.
-extern void cpu_divu_init(void);
-
-/// @brief Not yet documented.
-extern void cpu_divu_ovfi_set(void (*)(void));
+extern void cpu_divu_ovfi_set(cpu_divu_ihr);
 
 /// @}
 

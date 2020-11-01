@@ -2,25 +2,22 @@
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
+#endif /* MALLOC_IMPL_TLSF */
 
 #include <internal.h>
 
 void * __weak
-realloc(void *old, size_t new_len)
+realloc(void *old __unused, size_t new_len __unused) /* Keep as __unused */
 {
-        void *ret;
-
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t pool;
-        pool = master_state()->tlsf_pools[TLSF_POOL_PRIVATE];
+        pool = master_state()->tlsf_pools[TLSF_POOL_USER];
 
+        void *ret;
         ret = tlsf_realloc(pool, old, new_len);
-#elif defined(MALLOC_IMPL_SLOB)
-        ret = slob_realloc(old, new_len);
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
 
         return ret;
+#else
+        assert(false && "Missing implementation. Override realloc symbol");
+#endif /* MALLOC_IMPL_TLSF */
 }

@@ -1,7 +1,7 @@
 Yet Another Useless [Saturn] Library
 ===
 <p align="center">
-  <img width="460" height="300" src=".images/logo.png">
+  <img width="700" height="630" src=".images/logo.png">
 </p>
 
 [![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)]( https://discord.gg/S434dWA)
@@ -13,6 +13,12 @@ providing lightweight abstractions between your program and the hardware.
 ## Pre-installation requirements
 
 ### Windows
+
+<p align="center">
+  <a href="https://github.com/ijacquez/libyaul-installer/releases">
+    <img width="64" height="64" src=".images/yaul-installer.png">
+  </a>
+</p>
 
 Download the _Yaul MSYS2 64-bit_ installer from the release [page][2].
 
@@ -66,8 +72,6 @@ is already installed in `/opt/x-tools`.
 
 _Currently unavailable._
 
-
-
 ### Build from source
 
 If building from source, follow the instructions found in the `build-scripts`
@@ -89,8 +93,8 @@ directory. Take note of the absolute path to the tool-chain.
       If none, set to 0 (zero).
    5. Set whether to system reset or spin on abort() in
       `YAUL_OPTION_SPIN_ON_ABORT`. To system reset, set to 0 (zero).
-   6. Enable RTags/Irony support by setting `YAUL_CDB` to 1. To disable, set to
-      0 (zero).
+   6. Enable RTags/Irony/ccls support by setting `YAUL_CDB` to 1. To disable,
+      set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.
 

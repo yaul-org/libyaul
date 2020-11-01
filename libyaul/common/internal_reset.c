@@ -7,8 +7,10 @@
 
 #include <stdlib.h>
 
-#include <cpu/intc.h>
+#include <cpu/divu.h>
 #include <cpu/dmac.h>
+#include <cpu/frt.h>
+#include <cpu/intc.h>
 
 #include <smpc/smc.h>
 
@@ -16,26 +18,28 @@
 
 #include <vdp.h>
 
-#include <sys/dma-queue.h>
-
-#include <dbgio.h>
-
-static void _vblank_in_handler(void);
-
 void
 _internal_reset(void)
 {
         cpu_intc_mask_set(15);
-        scu_ic_mask_chg(SCU_IC_MASK_NONE, SCU_IC_MASK_ALL);
+
+        scu_dma_stop();
+        scu_dsp_program_stop();
+
+        cpu_dmac_stop();
+        cpu_dmac_disable();
+
+        smpc_smc_cdoff_call();
+        smpc_smc_sshoff_call();
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x01FFFE),
-            COLOR_RGB555(0, 7, 0));
+            COLOR_RGB1555(1, 0, 7, 0));
+
+        vdp1_env_stop();
 
         vdp2_scrn_display_clear();
-
-        vdp1_env_default_set();
 
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
@@ -67,34 +71,14 @@ _internal_reset(void)
         scu_ic_ihr_clear(SCU_IC_INTERRUPT_DMA_ILLEGAL);
         scu_ic_ihr_clear(SCU_IC_INTERRUPT_SPRITE_END);
 
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_ICI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OCI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_FRT_OVI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_WDT_ITI);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC0);
-        cpu_intc_ihr_clear(CPU_INTC_INTERRUPT_DMAC1);
+        cpu_dual_master_clear();
+        cpu_dual_slave_clear();
 
-        dma_queue_clear();
+        cpu_divu_ovfi_clear();
 
-        cpu_dmac_stop();
-
-        smpc_smc_cdoff_call();
-        smpc_smc_sshoff_call();
+        cpu_frt_oca_clear();
+        cpu_frt_ocb_clear();
+        cpu_frt_ovi_clear();
 
         vdp2_tvmd_display_set();
-
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_IN, _vblank_in_handler);
-
-        scu_ic_mask_chg(~SCU_IC_MASK_VBLANK_IN, SCU_IC_MASK_NONE);
-        cpu_intc_mask_set(14);
-}
-
-static void
-_vblank_in_handler(void)
-{
-        /* Synchronize VDP2 only.
-         *
-         * Avoid using vdp_sync() as we don't need to sync VDP2 and can no
-         * longer fire off any interrupts */
-        vdp2_sync_commit();
 }

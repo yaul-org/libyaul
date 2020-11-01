@@ -49,7 +49,6 @@ static const char digits[] __unused =
 
 static uint16_t digits10(const uint32_t v);
 static uint16_t skip_atoi(const char **s);
-static uint16_t vsprintf(char *buf, const char *fmt, va_list args);
 
 static uint16_t __unused
 digits10(const uint32_t v)
@@ -80,7 +79,7 @@ skip_atoi(const char **s)
     return i;
 }
 
-static uint16_t
+int 
 vsprintf(char *buf, const char *fmt, va_list args)
 {
     char tmp_buffer[12];
@@ -355,6 +354,19 @@ hexa_conv:
 
 int
 sprintf(char * __restrict buffer, const char *__restrict fmt, ...)
+{
+    va_list args;
+    uint16_t i;
+
+    va_start(args, fmt);
+    i = vsprintf(buffer, fmt, args);
+    va_end(args);
+
+    return i;
+}
+
+int
+snprintf(char * __restrict buffer, size_t n __unused, const char * __restrict fmt, ...)
 {
     va_list args;
     uint16_t i;

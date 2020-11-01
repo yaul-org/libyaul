@@ -193,13 +193,15 @@
 #define __predict_true(exp)     __builtin_expect((exp), 1)
 #define __predict_false(exp)    __builtin_expect((exp), 0)
 
-#define __alignof(x)            __offsetof(struct { char __a; x __b; }, __b)
-#define __offsetof(type, field) offsetof(type, field)
+#define __alignof(x)                                                           \
+        __offsetof(struct { char __a; x __b; }, __b)
+#define __offsetof(type, field)                                                \
+        offsetof(type, field)
 #define __rangeof(type, start, end)                                            \
         (__offsetof(type, end) - __offsetof(type, start))
 
-/* Compiler-dependent macros to declare that functions take printf-like
- * or scanf-like arguments.
+/* Compiler-dependent macros to declare that functions take printf-like or
+ * scanf-like arguments.
  *
  * They are null except for versions of GCC that are known to support the
  * features properly (old versions of GCC-2 didn't permit keeping the keywords

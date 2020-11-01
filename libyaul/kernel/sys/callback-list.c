@@ -15,19 +15,19 @@
 
 #include <internal.h>
 
-static void _default_callback(void *);
+static void _default_handler(void *);
 
-struct callback_list *
+callback_list_t *
 callback_list_alloc(const uint8_t count)
 {
         assert(count > 0);
 
-        struct callback_list *callback_list;
-        callback_list = _internal_malloc(sizeof(struct callback_list));
+        callback_list_t *callback_list;
+        callback_list = _internal_malloc(sizeof(callback_list_t));
         assert(callback_list != NULL);
 
-        struct callback *callbacks;
-        callbacks = _internal_malloc(count * sizeof(struct callback));
+        callback_t *callbacks;
+        callbacks = _internal_malloc(count * sizeof(callback_t));
         assert(callbacks != NULL);
 
         callback_list_init(callback_list, callbacks, count);
@@ -37,7 +37,7 @@ callback_list_alloc(const uint8_t count)
 }
 
 void
-callback_list_free(struct callback_list *callback_list)
+callback_list_free(callback_list_t *callback_list)
 {
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
@@ -49,7 +49,7 @@ callback_list_free(struct callback_list *callback_list)
 }
 
 void
-callback_list_init(struct callback_list *callback_list, struct callback *callbacks, const uint8_t count)
+callback_list_init(callback_list_t *callback_list, callback_t *callbacks, const uint8_t count)
 {
         assert(callback_list != NULL);
         assert(callbacks != NULL);
@@ -60,7 +60,7 @@ callback_list_init(struct callback_list *callback_list, struct callback *callbac
 }
 
 void
-callback_list_process(struct callback_list *callback_list, bool clear)
+callback_list_process(callback_list_t *callback_list, bool clear)
 {
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
@@ -68,8 +68,8 @@ callback_list_process(struct callback_list *callback_list, bool clear)
 
         uint8_t id;
         for (id = 0; id < callback_list->count; id++) {
-                void (*callback)(void *);
-                callback = callback_list->callbacks[id].callback;
+                callback_handler handler;
+                handler = callback_list->callbacks[id].handler;
 
                 void *work;
                 work = callback_list->callbacks[id].work;
@@ -78,12 +78,12 @@ callback_list_process(struct callback_list *callback_list, bool clear)
                         callback_init(&callback_list->callbacks[id]);
                 }
 
-                callback(work);
+                handler(work);
         }
 }
 
 uint8_t
-callback_list_callback_add(struct callback_list *callback_list, void (*callback)(void *), void *work)
+callback_list_callback_add(callback_list_t *callback_list, callback_handler handler, void *work)
 {
 #ifdef DEBUG
         assert(callback_list != NULL);
@@ -93,11 +93,11 @@ callback_list_callback_add(struct callback_list *callback_list, void (*callback)
 
         uint8_t id;
         for (id = 0; id < callback_list->count; id++) {
-                if (callback_list->callbacks[id].callback != _default_callback) {
+                if (callback_list->callbacks[id].handler != _default_handler) {
                         continue;
                 }
 
-                callback_set(&callback_list->callbacks[id], callback, work);
+                callback_set(&callback_list->callbacks[id], handler, work);
 
                 return id;
         }
@@ -110,7 +110,7 @@ callback_list_callback_add(struct callback_list *callback_list, void (*callback)
 }
 
 void
-callback_list_callback_remove(struct callback_list *callback_list, const uint8_t id)
+callback_list_callback_remove(callback_list_t *callback_list, const uint8_t id)
 {
 #ifdef DEBUG
         assert(callback_list != NULL);
@@ -119,12 +119,12 @@ callback_list_callback_remove(struct callback_list *callback_list, const uint8_t
         assert(id < callback_list->count);
 #endif /* DEBUG */
 
-        callback_list->callbacks[id].callback = _default_callback;
+        callback_list->callbacks[id].handler = _default_handler;
         callback_list->callbacks[id].work = NULL;
 }
 
 void
-callback_list_clear(struct callback_list *callback_list)
+callback_list_clear(callback_list_t *callback_list)
 {
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
@@ -137,24 +137,24 @@ callback_list_clear(struct callback_list *callback_list)
 }
 
 void
-callback_init(struct callback *callback)
+callback_init(callback_t *callback)
 {
         assert(callback != NULL);
 
-        callback->callback = _default_callback;
+        callback->handler = _default_handler;
         callback->work = NULL;
 }
 
 void
-callback_set(struct callback *callback, void (*callback_func)(void *), void *work)
+callback_set(callback_t *callback, callback_handler handler, void *work)
 {
         assert(callback != NULL);
 
-        callback->callback = (callback_func != NULL) ? callback_func : _default_callback;
+        callback->handler = (handler != NULL) ? handler : _default_handler;
         callback->work = work;
 }
 
 static void
-_default_callback(void *work __unused)
+_default_handler(void *work __unused)
 {
 }

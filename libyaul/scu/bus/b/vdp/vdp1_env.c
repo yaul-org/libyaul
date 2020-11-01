@@ -16,32 +16,78 @@
 
 #include "vdp-internal.h"
 
+static vdp1_env_t _default_env = {
+        .erase_color = COLOR_RGB1555_INITIALIZER(0, 0, 0, 0),
+        .erase_points[0] = {
+                0,
+                0
+        },
+        .erase_points[1] = {
+                /* Updated during runtime */
+                0,
+                /* Updated during runtime */
+                0
+        },
+        .bpp = VDP1_ENV_BPP_16,
+        .rotation = VDP1_ENV_ROTATION_0,
+        .color_mode = VDP1_ENV_COLOR_MODE_RGB_PALETTE,
+        .sprite_type = 0x0
+};
+
+static vdp1_env_t _current_env;
+
 #ifdef DEBUG
-static inline void __always_inline _env_assert(const struct vdp1_env *);
-static inline void __always_inline _env_erase_assert(const struct vdp1_env *);
+static inline void __always_inline _env_assert(const vdp1_env_t *);
+static inline void __always_inline _env_erase_assert(const vdp1_env_t *);
 #else
 #define _env_assert(x)
 #define _env_erase_assert(x)
 #endif /* DEBUG */
 
-void
-vdp1_env_default_set(void)
-{
-        const struct vdp1_env *default_env;
-        default_env = &_state_vdp1()->env;
+static inline void __always_inline _env_current_update(const vdp1_env_t *);
 
-        vdp1_env_set(default_env);
+static void _env_default_erase_update(void);
+
+void
+_internal_vdp1_env_init(void)
+{
+        _state_vdp1()->current_env = &_current_env;
+
+        _env_current_update(&_default_env);
+
+        vdp1_env_stop();
+        vdp1_env_default_set();
 }
 
 void
-vdp1_env_set(const struct vdp1_env *env)
+vdp1_env_default_init(vdp1_env_t *env)
+{
+        assert(env != NULL);
+
+        _env_default_erase_update();
+
+        (void)memcpy(env, &_default_env, sizeof(vdp1_env_t));
+}
+
+void
+vdp1_env_default_set(void)
+{
+        _env_default_erase_update();
+
+        vdp1_env_set(&_default_env);
+}
+
+void
+vdp1_env_set(const vdp1_env_t *env)
 {
         _env_assert(env);
 
-        /* Always clear TVM and VBE bits */
-        _state_vdp1()->regs.tvmr = (env->rotation << 1) | env->bpp;
+        _env_current_update(env);
 
-        _state_vdp1()->regs.ewdr = env->erase_color.raw;
+        /* Always clear TVM and VBE bits */
+        _state_vdp1()->regs->tvmr = (env->rotation << 1) | env->bpp;
+
+        _state_vdp1()->regs->ewdr = env->erase_color.raw;
 
         uint16_t x1;
         x1 = env->erase_points[0].x >> 3;
@@ -60,37 +106,67 @@ vdp1_env_set(const struct vdp1_env *env)
                 x3 >>= 1;
         }
 
-        if ((_state_vdp2()->regs.tvmd & 0xC0) == 0xC0) {
+        if ((_state_vdp2()->regs->tvmd & 0xC0) == 0xC0) {
                 y1 >>= 1;
                 y3 >>= 1;
         }
 
-        _state_vdp1()->regs.ewlr = (x1 << 9) | y1;
-        _state_vdp1()->regs.ewrr = (x3 << 9) | y3;
+        _state_vdp1()->regs->ewlr = (x1 << 9) | y1;
+        _state_vdp1()->regs->ewrr = (x3 << 9) | y3;
 
         uint16_t spclmd;
         spclmd = env->color_mode << 5;
 
-        _state_vdp2()->regs.spctl &= 0x3710;
+        _state_vdp2()->regs->spctl &= 0x3710;
         /* Disable sprite window (SPWINEN) when SPCLMD bit is set */
-        _state_vdp2()->regs.spctl ^= (spclmd >> 1);
-        _state_vdp2()->regs.spctl |= spclmd;
+        _state_vdp2()->regs->spctl ^= (spclmd >> 1);
+        _state_vdp2()->regs->spctl |= spclmd;
 
         /* Types 0x0 to 0x7 are for low resolution (320 or 352), and types 0x8
          * to 0xF are for high resolution (640 or 704).
          *
          * The frame buffer bit-depth are 16-bits and 8-bits, respectively */
-        _state_vdp2()->regs.spctl |= env->sprite_type & 0x000F;
+        _state_vdp2()->regs->spctl |= env->sprite_type & 0x000F;
 
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs.tvmr);
-        MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs.ewdr);
-        MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs.ewlr);
-        MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs.ewrr);
+        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+        MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs->ewdr);
+        MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs->ewlr);
+        MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs->ewrr);
+}
+
+void
+vdp1_env_stop(void)
+{
+        MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
+        MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
+}
+
+static inline void __always_inline
+_env_current_update(const vdp1_env_t *env) {
+        (void)memcpy(&_current_env, env, sizeof(vdp1_env_t));
+}
+
+static void
+_env_default_erase_update(void)
+{
+        /* If the system is PAL, or if there is a resolution change, update the
+         * resolution */
+
+        uint16_t width;
+        width = _state_vdp2()->tv.resolution.x;
+
+        uint16_t height;
+        height = _state_vdp2()->tv.resolution.y;
+
+        _default_env.erase_points[1].x = width;
+        _default_env.erase_points[1].y = height;
 }
 
 #ifdef DEBUG
 static inline void __always_inline
-_env_assert(const struct vdp1_env *env)
+_env_assert(const vdp1_env_t *env)
 {
         assert(env != NULL);
 
@@ -114,7 +190,7 @@ _env_assert(const struct vdp1_env *env)
 }
 
 static inline void __always_inline
-_env_erase_assert(const struct vdp1_env *env)
+_env_erase_assert(const vdp1_env_t *env)
 {
         assert((env->erase_points[0].x >= 0) &&
                (env->erase_points[0].y >= 0));

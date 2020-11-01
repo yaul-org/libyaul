@@ -21,7 +21,7 @@ __BEGIN_DECLS
 
 /// @struct
 /// @brief Not yet documented.
-struct smpc_time {
+typedef struct cpu_smpc_time {
         /// Not yet documented.
         uint16_t year;
         /// Not yet documented.
@@ -36,7 +36,7 @@ struct smpc_time {
         uint8_t minutes;
         /// Not yet documented.
         uint8_t seconds;
-};
+} cpu_smpc_time_t;
 
 /// @}
 

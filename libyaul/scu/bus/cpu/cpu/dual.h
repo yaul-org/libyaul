@@ -34,15 +34,13 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define CPU_DUAL_ENTRY_ICI     1
 
-/// Not yet documented.
-#define MINIT (0x21000000)
-/// Not yet documented.
-#define SINIT (0x21800000)
-
 /// @}
 
 /// @addtogroup CPU_DUAL_INLINE_FUNCTIONS
 /// @{
+
+typedef void (*cpu_dual_master_entry)(void);
+typedef void (*cpu_dual_slave_entry)(void);
 
 /// @brief Not yet documented.
 static inline void __always_inline
@@ -89,6 +87,15 @@ cpu_dual_slave_stack_get(void)
 }
 
 /// @}
+
+/// @brief Not yet documented.
+extern void cpu_dual_init(uint8_t);
+
+/// @brief Not yet documented.
+extern void cpu_dual_master_set(cpu_dual_master_entry);
+
+/// @brief Not yet documented.
+extern void cpu_dual_slave_set(cpu_dual_master_entry);
 
 /// @addtogroup CPU_DUAL_HELPERS
 

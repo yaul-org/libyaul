@@ -26,6 +26,16 @@
 #define LEN_01(x)       (ADDRESS_01(x))
 #define LEN_LSB(x)      (ADDRESS_LSB(x))
 
+#define TO_LE(x)        ((ADDRESS_LSB(x) << 24) |                              \
+                         (ADDRESS_02(x) << 16) |                               \
+                         (ADDRESS_01(x) << 8) |                                \
+                         ADDRESS_MSB(x))               
+
+#define TO_BE(x)        ((ADDRESS_LSB(x) << 24) |                              \
+                         (ADDRESS_02(x) << 16) |                               \
+                         (ADDRESS_01(x) << 8) |                                \
+                         ADDRESS_MSB(x))               
+
 #ifdef HAVE_LIBFTD2XX
 #define MAX_ENUMERATE_DEVICES 16
 

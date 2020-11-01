@@ -33,7 +33,7 @@
 
 #include <ctype.h>
 
-#define _CTYPE_LOOKUP(_c) ((_ctype_bitmap + 1)[(int)(_c) & 0xFFl])
+#define _CTYPE_LOOKUP(_c) ((_ctype_bitmap + 1)[(int)(_c) & 0xFF])
 
 #define _U (0x01)
 #define _L (0x02)
@@ -83,86 +83,86 @@ static const uint8_t _ctype_bitmap[1 + 256] __aligned(4) = {
 int
 isalnum(int c)
 {
-        return _CTYPE_LOOKUP(c) & (_U | _L | _N);
+        return ((_CTYPE_LOOKUP(c) & (_U | _L | _N)) != 0);
 }
 
 int
 isalpha(int c)
 {
-        return _CTYPE_LOOKUP(c) & (_U | _L);
+        return ((_CTYPE_LOOKUP(c) & (_U | _L)) != 0);
 }
 
 int
 isascii(int c)
 {
-        return ((unsigned int)(c) <= 0x7F);
+        return (((uint32_t)c) <= 0x7F);
 }
 
 int
 isblank(int c)
 {
-        return (_CTYPE_LOOKUP(c) & _B) || (c == '\t');
+        return ((_CTYPE_LOOKUP(c) & _B) == _B) || (c == '\t');
 }
 
 int
 iscntrl(int c)
 {
-        return _CTYPE_LOOKUP(c) & _C;
+        return ((_CTYPE_LOOKUP(c) & _C) == _C);
 }
 
 int
 isdigit(int c)
 {
-        return _CTYPE_LOOKUP(c) & _N;
+        return ((_CTYPE_LOOKUP(c) & _N) == _N);
 }
 
 int
 isgraph(int c)
 {
-        return _CTYPE_LOOKUP(c) & (_P | _U | _L | _N);
+        return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N)) != 0);
 }
 
 int
 islower(int c)
 {
-        return (_CTYPE_LOOKUP(c) & (_U | _L)) == _L;
+        return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _L);
 }
 
 int
 isprint(int c)
 {
-        return _CTYPE_LOOKUP(c) & (_P | _U | _L | _N | _B);
+        return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N | _B)) != 0);
 }
 
 int
 ispunct(int c)
 {
-        return _CTYPE_LOOKUP(c) & _P;
+        return ((_CTYPE_LOOKUP(c) & _P) == _P);
 }
 
 int
 isspace(int c)
 {
-        return _CTYPE_LOOKUP(c) & _S;
+        return ((_CTYPE_LOOKUP(c) & _S) == _S);
 }
 
 int
 isupper(int c)
 {
-        return (_CTYPE_LOOKUP(c) & (_U | _L)) == _U;
+        return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _U);
 }
 
 int
 isxdigit(int c)
 {
-        return _CTYPE_LOOKUP(c) & (_X | _N);
+        return ((_CTYPE_LOOKUP(c) & (_X | _N)) != 0);
 }
 
 int
 tolower(int c)
 {
         if (isupper(c)) {
-                return c | _C;
+                return (c | _C);
         }
 
         return c;
@@ -172,7 +172,7 @@ int
 toupper(int c)
 {
         if (islower(c)) {
-                return c & 0x5f;
+                return (c & 0x5F);
         }
 
         return c;
