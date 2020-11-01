@@ -31,6 +31,7 @@
 #define CS1(x)                  (0x24000000UL + (x))
 #define DUMMY(x)                (0x25000000UL + (x))
 #define CS2(x)                  (0x25800000UL + (x))
+#define CD_BLOCK(x)             (0x25890000UL + (x))
 #define SCSP(x)                 (0x25B00000UL + (x))
 #define VDP1_VRAM(x)            (0x25C00000UL + (x))
 #define VDP1_FB(x)              (0x25C80000UL + (x))
