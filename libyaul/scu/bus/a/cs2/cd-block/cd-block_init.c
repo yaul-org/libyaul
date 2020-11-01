@@ -114,7 +114,9 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
 int
 cd_block_security_bypass()
 {
-        int i, j, ret;
+        int i;
+        int j;
+        int ret;
         struct cd_block_regs regs __unused;
         struct cd_block_regs status __unused;
 
@@ -144,7 +146,7 @@ cd_block_security_bypass()
 
         cd_block_cmd_is_auth(NULL);
 
-        while (MEMORY_READ(16, CD_BLOCK(HIRQ) & ECPY) == 0) {
+        while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & ECPY) == 0) {
         }
 
         if ((ret = cd_block_cmd_end_data_transfer()) != 0) {

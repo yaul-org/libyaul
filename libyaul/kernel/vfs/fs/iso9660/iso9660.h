@@ -11,6 +11,8 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
+#include <cd-block.h>
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>

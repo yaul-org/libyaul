@@ -19,6 +19,7 @@ smpc_peripheral_digital_port(uint8_t port, smpc_peripheral_digital_t * const per
         assert((port == 1) || (port == 2));
 
         switch (port) {
+        default:
         case 1:
                 port_peripheral = smpc_peripheral_port_1.peripheral;
                 break;
