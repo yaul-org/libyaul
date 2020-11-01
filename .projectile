@@ -1,5 +1,6 @@
 -.git/
 -.images/
+-/.rtags/
 -/build/
 -/build-scripts/
 -/docs/
