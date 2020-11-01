@@ -7,6 +7,11 @@
 
 #include <stdint.h>
 
+#include <vdp1/cmdt.h>
+
+/* XXX: Hack: There is a strange compilation warning with ATTRIBUTE */
+#pragma GCC diagnostic ignored "-Wpedantic" 
+
 #define M_PI (3.1415926535897932f)
 
 #define toFIXED(a)                              ((FIXED)(65536.0f * (a)))
@@ -190,13 +195,13 @@ typedef struct {
         VECTOR *vntbl;
 } XPDATA;
 
-typedef struct obj {
+typedef struct OBJECT {
         PDATA *pat;
         FIXED pos[XYZ];
         ANGLE ang[XYZ];
         FIXED scl[XYZ];
-        struct obj *child;
-        struct obj *sibling;
+        struct OBJECT *child;
+        struct OBJECT *sibling;
 } OBJECT;
 
 typedef struct {
@@ -211,5 +216,16 @@ typedef struct {
         Uint16 cmode;
         void *pcsrc;
 } PICTURE;
+
+extern void sega3d_tlist_alloc(uint16_t count);
+extern void sega3d_tlist_free(void);
+extern void sega3d_tlist_set(TEXTURE *textures, uint16_t count);
+extern uint16_t sega3d_tlist_cursor_get(void);
+extern void sega3d_tlist_cursor_reset(void);
+extern TEXTURE *sega3d_tlist_tex_append(void);
+extern TEXTURE *sega3d_tlist_tex_get(uint16_t cursor);
+
+extern uint16_t sega3d_polycount_get(const PDATA *pdata);
+extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list);
 
 #endif /* SEGA3D_H_ */
