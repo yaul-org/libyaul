@@ -16,6 +16,7 @@
 
 #include "../dbgio-internal.h"
 
+#include <ssload.h>
 #include <internal.h>
 
 #define STATE_IDLE              0x00
@@ -25,8 +26,9 @@
 
 static void _init(const dbgio_usb_cart_t *);
 static void _deinit(void);
-static void _buffer(const char *);
+static void _puts(const char *);
 static void _flush(void);
+static void _font_load(font_load_callback_t);
 
 typedef struct {
         uint8_t *buffer;
@@ -42,12 +44,13 @@ static const dbgio_usb_cart_t _default_params = {
 
 static dev_state_t *_dev_state;
 
-const dbgio_dev_ops_t _internal_dev_ops_usb_cart = {
+const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
         .dev = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
-        .init = (void (*)(const void *))_init,
+        .init = (dev_ops_init_t)_init,
         .deinit = _deinit,
-        .buffer = _buffer,
+        .font_load = _font_load,
+        .puts = _puts,
         .flush = _flush
 };
 
@@ -98,13 +101,16 @@ _deinit(void)
 }
 
 static void
-_buffer(const char *buffer)
+_puts(const char *buffer)
 {
         size_t len;
         len = strlen(buffer);
 
+        uint32_t current_len;
+        current_len = (uint32_t)(_dev_state->buffer_p - _dev_state->buffer);
+
         uint32_t new_len;
-        new_len = (uint32_t)(_dev_state->buffer_p - _dev_state->buffer) + len;
+        new_len = current_len + len;
 
         if (new_len >= _dev_state->buffer_size) {
                 return;
@@ -129,12 +135,25 @@ _flush(void)
         uint32_t len;
         len = _dev_state->buffer_p - _dev_state->buffer;
 
-        uint32_t i;
-        for (i = 0; i < len; i++) {
-                usb_cart_byte_send(_dev_state->buffer[i]);
+        if (len > 0) {
+                usb_cart_byte_send(SSLOAD_API_CMD_LOG);
+
+                usb_cart_long_send(len);
+
+                for (uint32_t i = 0; i < len; i++) {
+                        usb_cart_byte_send(_dev_state->buffer[i]);
+                }
+
+                _dev_state->buffer_p = _dev_state->buffer;
         }
 
-        _dev_state->buffer_p = _dev_state->buffer;
-
         _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
+}
+
+static void
+_font_load(font_load_callback_t callback)
+{
+        if (callback != NULL) {
+                callback();
+        }
 }

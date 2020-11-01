@@ -13,7 +13,7 @@
 #include <scu/ic.h>
 
 void
-scu_timer_init(void)
+_internal_scu_timer_init(void)
 {
         scu_timer_disable();
 
@@ -25,7 +25,7 @@ scu_timer_init(void)
 }
 
 void
-scu_timer_t0_set(void (*ihr)(void) __unused)
+scu_timer_t0_set(scu_timer_ihr ihr)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_TIMER_0);
 
@@ -37,7 +37,7 @@ scu_timer_t0_set(void (*ihr)(void) __unused)
 }
 
 void
-scu_timer_t1_set(void (*ihr)(void) __unused)
+scu_timer_t1_set(scu_timer_ihr ihr)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_TIMER_1);
 

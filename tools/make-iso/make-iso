@@ -9,7 +9,7 @@ PROGNAME="${0##*/}"
 
 XORRISO="/usr/bin/xorriso"
 
-XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\""
+XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
 
 panic () {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
@@ -90,11 +90,19 @@ if ! [ -x "${iso_tool_realpath}" ]; then
 fi
 unset iso_tool_realpath
 
-if ! (eval "${XORRISO}" "${XORRISO_OPTIONS}" -o "${image}.iso" "${directory}*") >"${TMP1_FILE}" 2>&1; then
+# Echo options used
+printf -- "%s %s" "${XORRISO}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
+
+# Force delete the existing ISO
+rm -r "${image}.iso"
+
+if ! (eval "${XORRISO}" "${XORRISO_OPTIONS}" -- -outdev "${image}.iso" -cd / -map "${directory}" /) >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
-$(sed -E 's/^/>>> /g' "${TMP1_FILE}")
+$(sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}")
 <<<" 1
 fi
+
+sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}"
 
 clean_up

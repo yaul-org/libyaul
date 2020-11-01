@@ -13,28 +13,9 @@
 
 #include <sys/cdefs.h>
 
-#include <dbgio/dbgio.h>
+#include <cpu/cache.h>
 
-#if defined(MALLOC_IMPL_TLSF)
-#include <mm/tlsf.h>
-#elif defined(MALLOC_IMPL_SLOB)
-#include <mm/slob.h>
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
-
-#include <sys/dma-queue.h>
-
-#include <cpu.h>
-#include <scu.h>
-#include <vdp.h>
-#include <smpc.h>
-
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <arp.h>
-#endif /* HAVE_DEV_CARTRIDGE */
-
-#include <dram-cart.h>
+#include <cd-block.h>
 
 #include <internal.h>
 
@@ -75,37 +56,34 @@ _call_global_dtors(void)
 static void __used __section(".init")
 _init(void)
 {
-#if defined(MALLOC_IMPL_TLSF)
-        static tlsf_t pools[TLSF_POOL_COUNT];
-
-        master_state()->tlsf_pools = &pools[0];
-
-        master_state()->tlsf_pools[TLSF_POOL_PRIVATE] =
-            tlsf_create_with_pool((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
-
-        master_state()->tlsf_pools[TLSF_POOL_GENERAL] =
-            tlsf_create_with_pool((void *)TLSF_POOL_GENERAL_START, TLSF_POOL_GENERAL_SIZE);
-#elif defined(MALLOC_IMPL_SLOB)
-        slob_init();
-#endif /* MALLOC_IMPL_TLSF || MALLOC_IMPL_SLOB */
-
+        _internal_mm_init();
+        
         _call_global_ctors();
 
-        cpu_init();
-        scu_init();
-        smpc_init();
-        smpc_peripheral_init();
+        _internal_cpu_init();
+        _internal_scu_init();
+        _internal_smpc_init();
+        _internal_smpc_peripheral_init();
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_init();
+        _internal_usb_cart_init();
 #else
-        dram_cart_init();
+        _internal_dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
-        dma_queue_init();
+        _internal_dma_queue_init();
 
-        vdp_init();
-        dbgio_init();
+        _internal_vdp_init();
+        _internal_dbgio_init();
+
+        /* XXX: Fix hard coded value */
+        cd_block_init(0x0002);
+
+        if ((cd_block_cmd_is_auth(NULL)) == 0) {
+                cd_block_security_bypass();
+        }
+
+        cpu_cache_purge();
 
         user_init();
 

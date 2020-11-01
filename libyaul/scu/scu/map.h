@@ -51,6 +51,8 @@
 /// Specify offset @p x for address space.
 #define CS2(x)                  (0x25800000UL + (x))
 /// Specify offset @p x for address space.
+#define CD_BLOCK(x)             (0x25890000UL + (x))
+/// Specify offset @p x for address space.
 #define SCSP(x)                 (0x25B00000UL + (x))
 /// Specify offset @p x for address space.
 #define VDP1_VRAM(x)            (0x25C00000UL + (x))
@@ -84,6 +86,11 @@
 #define LWRAM_PURGE_CACHE(x)    (0x40200000UL + (x))
 /// Total size of L-WRAM in bytes.
 #define LWRAM_SIZE              0x00100000UL
+
+/// Master address
+#define MINIT                   (0x21000000UL)
+/// Slave address
+#define SINIT                   (0x21800000UL)
 
 /// @}
 

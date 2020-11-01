@@ -45,7 +45,7 @@ __BEGIN_DECLS
 
 /// @compound
 /// @brief Not yet documented.
-struct vdp1_env {
+typedef struct vdp1_env {
         unsigned int :8;
 
         struct {
@@ -56,20 +56,24 @@ struct vdp1_env {
                 unsigned int sprite_type:4;
         } __packed;
 
-        color_rgb555_t erase_color;
+        color_rgb1555_t erase_color;
 
         int16_vector2_t erase_points[2];
-};
+} vdp1_env_t;
 
 /// @}
 
 /// @addtogroup VDP1_ENV_FUNCTIONS
 /// @{
+/// @brief Not yet documented.
+extern void vdp1_env_default_init(vdp1_env_t *);
 
 /// @brief Not yet documented.
 extern void vdp1_env_default_set(void);
 /// @brief Not yet documented.
-extern void vdp1_env_set(const struct vdp1_env *);
+extern void vdp1_env_set(const vdp1_env_t *);
+
+extern void vdp1_env_stop(void);
 
 /// @}
 

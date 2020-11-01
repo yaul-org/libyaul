@@ -8,6 +8,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <cpu/intc.h>
+#include <vdp.h>
+
 #include <dbgio.h>
 
 #include <internal.h>
@@ -20,45 +23,55 @@ _assert(const char * restrict file, const char * restrict line,
     const char * restrict failed_expr)
 {
         /* In the case where we fail an assertion within _assert() */
-        static uint32_t assertions = 0;
+        static uint32_t assertion_count = 0;
 
-        if (assertions >= ASSERTION_MAX_COUNT) {
+        if (assertion_count >= ASSERTION_MAX_COUNT) {
                 abort();
         }
 
-        if (assertions == 0) {
+        if (assertion_count == 0) {
                 _internal_reset();
 
+                dbgio_dev_deinit();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
 
-                dbgio_buffer("[H[2J");
+                vdp2_tvmd_vblank_in_next_wait(1);
+
+                cpu_intc_mask_set(14);
+                dbgio_dev_font_load();
+                dbgio_dev_font_load_wait();
+                cpu_intc_mask_set(15);
+
+                dbgio_puts("[H[2J");
         }
 
-        if (assertions > 0) {
-                dbgio_buffer("\n");
+        if (assertion_count > 0) {
+                dbgio_puts("\n");
         }
 
-        assertions++;
+        assertion_count++;
 
-        dbgio_buffer("Assertion \"");
-        dbgio_buffer(failed_expr);
-        dbgio_buffer("\" failed");
+        dbgio_puts("Assertion \"");
+        dbgio_puts(failed_expr);
+        dbgio_puts("\" failed");
 
-        dbgio_buffer(": file \"");
-        dbgio_buffer(file);
-        dbgio_buffer("\"");
+        dbgio_puts(": file \"");
+        dbgio_puts(file);
+        dbgio_puts("\"");
 
-        dbgio_buffer(", line ");
-        dbgio_buffer(line);
+        dbgio_puts(", line ");
+        dbgio_puts(line);
 
         if ((func != NULL) && (*func != '\0')) {
-                dbgio_buffer(", function: ");
-                dbgio_buffer(func);
+                dbgio_puts(", function: ");
+                dbgio_puts(func);
         }
 
-        dbgio_buffer("\n");
+        dbgio_puts("\n");
 
+        vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
+        vdp2_sync_commit();
 
         abort();
 }

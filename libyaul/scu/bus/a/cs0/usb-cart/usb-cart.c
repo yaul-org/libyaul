@@ -18,7 +18,7 @@
 #include "usb-cart-internal.h"
 
 void
-usb_cart_init(void)
+_internal_usb_cart_init(void)
 {
         /* Disabling A-bus refresh adds ~20 KiB/s */
         MEMORY_WRITE(32, SCU(AREF), 0x00000000);
@@ -82,7 +82,7 @@ usb_cart_dma_read(void *buffer, uint32_t len)
                 return;
         }
 
-        const struct cpu_dmac_cfg dmac_cfg = {
+        const cpu_dmac_cfg_t dmac_cfg = {
                 .channel = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
@@ -162,7 +162,7 @@ usb_cart_dma_send(const void *buffer, uint32_t len)
                 return;
         }
 
-        const struct cpu_dmac_cfg dmac_cfg = {
+        const cpu_dmac_cfg_t dmac_cfg = {
                 .channel = 0,
                 .src_mode = CPU_DMAC_SOURCE_INCREMENT,
                 .dst_mode = CPU_DMAC_DESTINATION_FIXED,

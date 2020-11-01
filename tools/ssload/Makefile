@@ -17,14 +17,17 @@ CFLAGS:= -s \
 LDFLAGS:=
 
 SRCS:= ssload.c \
+	api.c \
+	crc.c \
 	console.c \
 	datalink.c \
 	drivers.c \
+	fileserver.c \
 	shared.c \
 	usb-cartridge.c
 INCLUDES:=
-LIB_DIRS:= /usr/lib
-LIBS:=
+LIB_DIRS:=
+LIBS:= m
 
 ifneq ($(strip $(HAVE_LIBFTD2XX)),)
 CFLAGS+= -DHAVE_LIBFTD2XX=1
@@ -32,13 +35,17 @@ INCLUDES+= ./libftd2xx/release
 LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
 LIBS+= ftd2xx dl pthread rt
 else
-ifneq ($(strip $(HAVE_LIBFTDI1_32BIT)),)
-INCLUDES+= libftdi1-1.4/include/libftdi1 libusb-1.0/include/libusb-1.0
-LIB_DIRS+= libftdi1-1.4/lib libusb-1.0/lib
-LIBS+= ftdi1 usb-1.0
+ifneq ($(strip $(HAVE_LIBUSB_WIN32)),)
+SRCS+= support/windows/ftdi.c
+INCLUDES+= support/windows/
+INCLUDES+= support/windows/libusb-win32-1.2.6.0/include
+LIB_DIRS+= support/windows/libusb-win32-1.2.6.0/lib
+LIBS+= usb
+LDFLAGS+= -static
 else
-CFLAGS+= $(shell pkg-config --cflags libftdi1)
-LDFLAGS+= $(shell pkg-config --libs libftdi1)
+LIB_DIRS+= /usr/lib
+CFLAGS+= $(shell pkg-config --cflags libftdi1 2>/dev/null)
+LDFLAGS+= $(shell pkg-config --static --libs libftdi1 2>/dev/null)
 endif
 endif
 
@@ -61,7 +68,7 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OB
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
 		$(foreach LIB,$(LIBS),-l$(LIB)) \
 		$(LDFLAGS)
-	if [ -z "${DEBUG}" ]; then \
+	$(ECHO)if [ -z "${DEBUG}" ]; then \
 	    $(STRIP) -s $@; \
 	fi
 

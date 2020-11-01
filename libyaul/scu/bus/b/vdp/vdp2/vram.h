@@ -40,7 +40,7 @@ __BEGIN_DECLS
 /* 4 Mbit 4-split VRAM bank size */
 #define VDP2_VRAM_BSIZE_4       (VDP2_VRAM_SIZE / 4)
 
-struct vdp2_vram_ctl {
+typedef struct vdp2_vram_ctl {
 #define VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM    0x0000 /* Store coefficient table in VRAM */
 #define VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM    0x0001 /* Store coefficient table in CRAM */
         uint8_t coefficient_table;
@@ -51,7 +51,7 @@ struct vdp2_vram_ctl {
 #define VDP2_VRAM_CTL_MODE_PART_BANK_B          0x0002 /* Partition VRAM-B into two banks */
 #define VDP2_VRAM_CTL_MODE_PART_BANK_BOTH       0x0003
         uint8_t vram_mode; /* VRAM mode bank partitions */
-} __aligned(4);
+} __aligned(4) vdp2_vram_ctl_t;
 
 #define VDP2_VRAM_CYCP_PNDR_NBG0        0x0 /* NBG0 pattern name data read */
 #define VDP2_VRAM_CYCP_PNDR_NBG1        0x1 /* NBG1 pattern name data read */
@@ -75,7 +75,7 @@ struct vdp2_vram_ctl {
 /* Vertical cell scroll table data read */
 #define VDP2_VRAM_CYCP_VCSTDR(n)        (((n) & 0x01) + 0x0C)
 
-struct vdp2_vram_cycp_bank {
+typedef struct vdp2_vram_cycp_bank {
         /*
          * General guideline for number of accesses required
          *
@@ -102,19 +102,19 @@ struct vdp2_vram_cycp_bank {
                         unsigned int t7:4; /* Timing T7 */
                 } __packed;
         };
-} __packed;
+} __packed vdp2_vram_cycp_bank_t;
 
-struct vdp2_vram_cycp {
-        struct vdp2_vram_cycp_bank pt[4];
-} __packed;
+typedef struct vdp2_vram_cycp {
+        vdp2_vram_cycp_bank_t pt[4];
+} __packed vdp2_vram_cycp_t;
 
-extern void vdp2_vram_control_set(const struct vdp2_vram_ctl *);
+extern void vdp2_vram_control_set(const vdp2_vram_ctl_t *);
 
-extern void vdp2_vram_cycp_set(const struct vdp2_vram_cycp *);
+extern void vdp2_vram_cycp_set(const vdp2_vram_cycp_t *);
 extern void vdp2_vram_cycp_clear(void);
 
-extern struct vdp2_vram_cycp_bank vdp2_vram_cycp_bank_get(uint8_t);
-extern void vdp2_vram_cycp_bank_set(uint8_t, const struct vdp2_vram_cycp_bank *);
+extern vdp2_vram_cycp_bank_t vdp2_vram_cycp_bank_get(uint8_t);
+extern void vdp2_vram_cycp_bank_set(uint8_t, const vdp2_vram_cycp_bank_t *);
 extern void vdp2_vram_cycp_bank_clear(uint8_t);
 
 __END_DECLS

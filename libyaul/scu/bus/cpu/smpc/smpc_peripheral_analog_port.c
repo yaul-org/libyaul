@@ -12,13 +12,14 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_analog_port(uint8_t port, struct smpc_peripheral_analog * const peripheral)
+smpc_peripheral_analog_port(uint8_t port, smpc_peripheral_analog_t * const peripheral)
 {
-        struct smpc_peripheral *port_peripheral;
+        smpc_peripheral_t *port_peripheral;
 
         assert((port == 1) || (port == 2));
 
         switch (port) {
+        default:
         case 1:
                 port_peripheral = smpc_peripheral_port_1.peripheral;
                 break;

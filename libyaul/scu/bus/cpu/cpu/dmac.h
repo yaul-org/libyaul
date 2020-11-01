@@ -17,100 +17,51 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_DMAC_DEFINES
-/// @defgroup CPU_DMAC_STRUCTURES
-/// @defgroup CPU_DMAC_INLINE_FUNCTIONS
-/// @defgroup CPU_DMAC_FUNCTIONS
-
-/// @addtogroup CPU_DMAC_DEFINES
-/// @{
-
-/// Not yet documented.
 #define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
-/// Not yet documented.
 #define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
 
-/// Not yet documented.
-#define CPU_DMAC_DESTINATION_FIXED      0x00
-/// Not yet documented.
-#define CPU_DMAC_DESTINATION_INCREMENT  0x01
-/// Not yet documented.
-#define CPU_DMAC_DESTINATION_DECREMENT  0x02
+typedef void (*cpu_dmac_ihr)(void *);
 
-/// Not yet documented.
-#define CPU_DMAC_SOURCE_FIXED           0x00
-/// Not yet documented.
-#define CPU_DMAC_SOURCE_INCREMENT       0x01
-/// Not yet documented.
-#define CPU_DMAC_SOURCE_DECREMENT       0x02
-
-/// Not yet documented.
-#define CPU_DMAC_STRIDE_1_BYTE          0x00
-/// Not yet documented.
-#define CPU_DMAC_STRIDE_2_BYTES         0x01
-/// Not yet documented.
-#define CPU_DMAC_STRIDE_4_BYTES         0x02
-/// Not yet documented.
-#define CPU_DMAC_STRIDE_16_BYTES        0x03
-
-/// Not yet documented.
-#define CPU_DMAC_BUS_MODE_CYCLE_STEAL   0x00
-/// Not yet documented.
-#define CPU_DMAC_BUS_MODE_BURST         0x01
-
-/// @}
-
-/// @addtogroup CPU_DMAC_STRUCTURES
-/// @{
-
-/// @compound
-/// @brief Not yet documented.
-struct cpu_dmac_cfg {
-        /// Not yet documented.
+typedef struct cpu_dmac_cfg {
         uint8_t channel;
-        /// Not yet documented.
+
+#define CPU_DMAC_DESTINATION_FIXED      0x00
+#define CPU_DMAC_DESTINATION_INCREMENT  0x01
+#define CPU_DMAC_DESTINATION_DECREMENT  0x02
         uint8_t src_mode;
-        /// Not yet documented.
+
+#define CPU_DMAC_SOURCE_FIXED           0x00
+#define CPU_DMAC_SOURCE_INCREMENT       0x01
+#define CPU_DMAC_SOURCE_DECREMENT       0x02
         uint8_t dst_mode;
-        /// Not yet documented.
+
+#define CPU_DMAC_STRIDE_1_BYTE          0x00
+#define CPU_DMAC_STRIDE_2_BYTES         0x01
+#define CPU_DMAC_STRIDE_4_BYTES         0x02
+#define CPU_DMAC_STRIDE_16_BYTES        0x03
         uint8_t stride;
-        /// Not yet documented.
+
+#define CPU_DMAC_BUS_MODE_CYCLE_STEAL   0x00
+#define CPU_DMAC_BUS_MODE_BURST         0x01
         uint8_t bus_mode;
 
-        /// Not yet documented.
         uint32_t src;
-        /// Not yet documented.
         uint32_t dst;
-        /// Not yet documented.
         uint32_t len;
 
-        /// Not yet documented.
-        void (*ihr)(void);
-};
+        cpu_dmac_ihr ihr;
+        void *ihr_work;
+} cpu_dmac_cfg_t;
 
-/// @compound
-/// @brief Not yet documented.
-struct dmac_status {
-        /// Not yet documented.
+typedef struct cpu_dmac_status {
         unsigned int enabled:1;
-        /// Not yet documented.
         unsigned int priority_mode:1;
-        /// Not yet documented.
         unsigned int channel_enabled:2;
-        /// Not yet documented.
         unsigned int channel_busy:2;
-        /// Not yet documented.
         unsigned int address_error:1;
-        /// Not yet documented.
         unsigned int nmi_interrupt:1;
-} __packed;
+} __packed cpu_dmac_status_t;
 
-/// @}
-
-/// @addtogroup CPU_DMAC_INLINE_FUNCTIONS
-/// @{
-
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
 {
@@ -120,7 +71,6 @@ cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
         MEMORY_WRITE(32, CPU(TCR0 | n), tcr_bits);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_enable(void)
 {
@@ -128,22 +78,28 @@ cpu_dmac_enable(void)
         MEMORY_WRITE_OR(32, CPU(DMAOR), 0x00000001);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_disable(void)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
 }
 
-/// @brief Not yet documented.
+static inline uint8_t __always_inline
+cpu_dmac_interrupt_priority_get(void)
+{
+        uint16_t ipra;
+        ipra = MEMORY_READ(16, CPU(IPRA));
+
+        return ((ipra >> 8) & 0x0F);
+}
+
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), ~0x1F00);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF7FF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_priority_mode_set(uint8_t mode)
 {
@@ -151,7 +107,6 @@ cpu_dmac_priority_mode_set(uint8_t mode)
         MEMORY_WRITE_OR(32, CPU(DMAOR), (mode & 0x01) << 3);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_channel_start(uint8_t ch)
 {
@@ -162,7 +117,6 @@ cpu_dmac_channel_start(uint8_t ch)
         MEMORY_WRITE_OR(32, CPU(CHCR0 | n), 0x00000001);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_channel_stop(uint8_t ch)
 {
@@ -173,7 +127,6 @@ cpu_dmac_channel_stop(uint8_t ch)
         MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000001);
 }
 
-/// @brief Not yet documented.
 static inline void __always_inline
 cpu_dmac_stop(void)
 {
@@ -181,24 +134,9 @@ cpu_dmac_stop(void)
         cpu_dmac_channel_stop(1);
 }
 
-/// @}
-
-/// @addtogroup CPU_DMAC_FUNCTIONS
-/// @{
-
-/// @brief Not yet documented.
-extern void cpu_dmac_init(void);
-
-/// @brief Not yet documented.
-extern void cpu_dmac_status_get(struct dmac_status *);
-
-/// @brief Not yet documented.
-extern void cpu_dmac_channel_config_set(const struct cpu_dmac_cfg *);
-
-/// @brief Not yet documented.
+extern void cpu_dmac_status_get(cpu_dmac_status_t *);
+extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *);
 extern void cpu_dmac_channel_wait(uint8_t);
-
-/// @}
 
 __END_DECLS
 

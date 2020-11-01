@@ -70,13 +70,13 @@ void _exception_illegal_slot(void) __used;
 void _exception_cpu_address_error(void) __used;
 void _exception_dma_address_error(void) __used;
 
-static const char *_exception_message_format(const struct cpu_registers * restrict,
+static const char *_exception_message_format(const cpu_registers_t * restrict,
     const char *restrict);
-static void _ihr_exception_show(const struct cpu_registers * restrict,
+static void _ihr_exception_show(const cpu_registers_t * restrict,
     const char * restrict);
 
 void
-cpu_init(void)
+_internal_cpu_init(void)
 {
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
@@ -96,15 +96,15 @@ cpu_init(void)
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
-        cpu_divu_init();
+        _internal_cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
-        cpu_dmac_init();
+        _internal_cpu_dmac_init();
         cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
 }
 
 static void
-_ihr_exception_show(const struct cpu_registers * restrict regs, const char * restrict exception_name)
+_ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
         _internal_reset();
 
@@ -113,12 +113,12 @@ _ihr_exception_show(const struct cpu_registers * restrict regs, const char * res
 
         dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
 
-        dbgio_buffer(buffer);
+        dbgio_puts(buffer);
         dbgio_flush();
 }
 
 static void __noreturn __used
-_ihr_exception_illegal_instruction(const struct cpu_registers *regs)
+_ihr_exception_illegal_instruction(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "Illegal instruction");
 
@@ -126,7 +126,7 @@ _ihr_exception_illegal_instruction(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_illegal_slot(const struct cpu_registers *regs)
+_ihr_exception_illegal_slot(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "Illegal slot");
 
@@ -134,7 +134,7 @@ _ihr_exception_illegal_slot(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_cpu_address_error(const struct cpu_registers *regs)
+_ihr_exception_cpu_address_error(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "CPU address error");
 
@@ -142,7 +142,7 @@ _ihr_exception_cpu_address_error(const struct cpu_registers *regs)
 }
 
 static void __noreturn __used
-_ihr_exception_dma_address_error(const struct cpu_registers *regs)
+_ihr_exception_dma_address_error(const cpu_registers_t *regs)
 {
         _ihr_exception_show(regs, "DMA address error");
 
@@ -155,7 +155,7 @@ EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
 EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
 
 static const char *
-_exception_message_format(const struct cpu_registers * restrict regs,
+_exception_message_format(const cpu_registers_t * restrict regs,
     const char *restrict exception_name)
 {
         static char buffer[1024];

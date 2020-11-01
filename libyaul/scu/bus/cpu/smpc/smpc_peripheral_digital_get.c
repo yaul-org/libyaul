@@ -12,8 +12,8 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_digital_get(struct smpc_peripheral const *peripheral,
-    struct smpc_peripheral_digital * const digital)
+smpc_peripheral_digital_get(smpc_peripheral_t const *peripheral,
+    smpc_peripheral_digital_t * const digital)
 {
         assert(peripheral != NULL);
         assert(digital != NULL);

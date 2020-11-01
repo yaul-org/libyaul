@@ -120,13 +120,15 @@ __BEGIN_DECLS
 
 /// @}
 
+typedef void (*scu_ic_ihr)(void);
+
 /// @addtogroup SCU_IC_INLINE_FUNCTIONS
 /// @{
 
 /// Not yet documented.
 /// @note This is a BIOS call.
 static inline void __always_inline
-scu_ic_ihr_set(uint8_t vector, void (*ihr)(void))
+scu_ic_ihr_set(uint8_t vector, scu_ic_ihr ihr)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000300;
@@ -143,7 +145,8 @@ scu_ic_ihr_clear(uint8_t vector)
 
 /// Not yet documented.
 /// @note This is a BIOS call.
-static inline void __always_inline (*scu_ic_ihr_get(uint8_t vector))(void)
+static inline scu_ic_ihr
+scu_ic_ihr_get(uint8_t vector)
 {
         register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000304;

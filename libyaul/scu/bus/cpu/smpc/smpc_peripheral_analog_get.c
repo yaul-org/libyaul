@@ -8,12 +8,13 @@
 #include <smpc/peripheral.h>
 
 #include <assert.h>
+#include <string.h>
 
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_analog_get(struct smpc_peripheral const *peripheral,
-    struct smpc_peripheral_analog * const analog)
+smpc_peripheral_analog_get(smpc_peripheral_t const *peripheral,
+    smpc_peripheral_analog_t * const analog)
 {
         assert(peripheral != NULL);
         assert(analog != NULL);
@@ -23,7 +24,7 @@ smpc_peripheral_analog_get(struct smpc_peripheral const *peripheral,
         analog->type = peripheral->type;
         analog->size = peripheral->size;
 
-        memset(&analog->previous.pressed.raw[0], &peripheral->previous_data[0],
+        (void)memset(&analog->previous.pressed.raw[0], &peripheral->previous_data[0],
             (sizeof(analog->previous.pressed.raw) / sizeof(analog->previous.pressed.raw[0])));
         memset(&analog->pressed.raw[0], &peripheral->data[0],
             (sizeof(analog->pressed.raw) / sizeof(analog->pressed.raw[0])));

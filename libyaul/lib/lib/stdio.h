@@ -68,6 +68,7 @@ typedef long off_t;
 
 int printf(const char * __restrict, ...) __printflike(1, 2);
 int sprintf(char * __restrict, const char * __restrict, ...) __printflike(2, 3);
+int vsprintf(char * __restrict, const char * __restrict, va_list);
 int snprintf(char * __restrict, size_t, const char * __restrict, ...) __printflike(3, 4);
 
 __END_DECLS

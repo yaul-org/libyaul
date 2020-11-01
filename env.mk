@@ -61,14 +61,18 @@ ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1 2)
   $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
 endif
 
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),)
-  $(error Undefined YAUL_OPTION_MALLOC_IMPL (malloc implementation))
-endif
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif
-ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf slob))
+ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf))
   $(error Invalid value for YAUL_OPTION_MALLOC_IMPL (malloc implementation))
+endif
+
+ifeq ($(strip $(YAUL_OPTION_BUILD_GDB)),)
+  $(error Undefined YAUL_OPTION_BUILD_GDB (build GDB))
+endif
+ifneq ($(YAUL_OPTION_BUILD_GDB),$(filter $(YAUL_OPTION_BUILD_GDB),0 1))
+  $(error Invalid value for YAUL_OPTION_BUILD_GDB (build GDB))
 endif
 
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
@@ -119,7 +123,6 @@ SH_CFLAGS_shared:= \
 	-Wduplicated-cond \
 	-Wnull-dereference \
 	-Winit-self \
-	-Wbad-function-cast \
 	-Wshadow \
 	-Wunused \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
@@ -130,10 +133,6 @@ ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 SH_CFLAGS_shared += \
 	-DMALLOC_IMPL_TLSF
 endif
-ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),slob)
-SH_CFLAGS_shared += \
-	-DMALLOC_IMPL_SLOB
-endif
 
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
 SH_CFLAGS_shared += \
@@ -142,6 +141,7 @@ endif
 
 SH_CFLAGS:= \
 	-std=c11 \
+	-Wbad-function-cast \
 	$(SH_CFLAGS_shared)
 
 SH_CXXFLAGS_shared:= \
@@ -179,7 +179,7 @@ define macro-update-cdb
 	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 >/dev/null 2>&1
 endef
 
 # $1 -> Space delimited list of object files
@@ -220,9 +220,9 @@ define macro-sh-build-object
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
-		-c $(abspath $(<)) -o $@
+		-c -o $@ $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CC),\
+		/usr/bin/gcc,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -236,9 +236,9 @@ define macro-sh-build-c++-object
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
-		-c $(abspath $(<)) -o $@
+		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -258,7 +258,7 @@ endef
 # $4 ->
 define macro-sh-generate-install-header-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
-	$(ECHO)[ "$(SILENT)" != 1 ] && set -x; \
+	$(ECHO)[ -z "$(SILENT)" ] && set -x; \
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
 	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/}/$$(@F)$(V_END)\n";

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2019 Israel Jacquez
- * See LDSPENSE for details.
+ * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
  */
@@ -46,12 +46,14 @@ __BEGIN_DECLS
 
 /// @}
 
+typedef void (*scu_dsp_ihr)(void);
+
 /// @addtogroup SCU_DSP_STRUCTURES
 /// @{
 
 /// @compound
 /// @brief Not yet documented.
-struct dsp_status {
+typedef struct scu_dsp_status {
         unsigned int :5;
         unsigned int :1;
         unsigned int :1;
@@ -75,7 +77,7 @@ struct dsp_status {
         unsigned int :7;
         /// Not yet documented.
         unsigned int pc:8;
-} __packed;
+} __packed scu_dsp_status_t;
 
 /// @}
 
@@ -108,12 +110,9 @@ scu_dsp_program_pause(bool pause)
 /// @{
 
 /// @brief Not yet documented.
-extern void scu_dsp_init(void);
+extern void scu_dsp_end_set(scu_dsp_ihr);
 
-/// @brief Not yet documented.
-extern void scu_dsp_end_set(void (*)(void));
-
-/// @brief Not yet documented.
+/// Not yet documented.
 extern void scu_dsp_program_load(const void *, uint32_t);
 
 /// @brief Not yet documented.
@@ -148,9 +147,8 @@ extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
 
 /// @brief Not yet documented.
 extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
-
 /// @brief Not yet documented.
-extern void scu_dsp_status_get(struct dsp_status *);
+extern void scu_dsp_status_get(scu_dsp_status_t *);
 
 /// @}
 
