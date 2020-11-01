@@ -1,3 +1,5 @@
+MAIN_TARGET= yaul
+
 ifneq (1,$(words [$(shell pwd)]))
   $(error Current directory ($(shell pwd)) contains spaces)
 endif
@@ -165,6 +167,27 @@ SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
 SH_CXXFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CXXFLAGS)
 SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 
+# These include directories are strictly from libyaul, and are meant to be
+# shared amongst the other libraries
+SHARED_INCLUDE_DIRS:= \
+	../lib$(MAIN_TARGET)/. \
+	../lib$(MAIN_TARGET)/common \
+	../lib$(MAIN_TARGET)/common/gdb \
+	../lib$(MAIN_TARGET)/lib/lib \
+	../lib$(MAIN_TARGET)/kernel \
+	../lib$(MAIN_TARGET)/kernel/dbgio \
+	../lib$(MAIN_TARGET)/kernel/vfs \
+	../lib$(MAIN_TARGET)/math \
+	../lib$(MAIN_TARGET)/scu \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs0/arp \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs0/dram-cart \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs0/usb-cart \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs2/cd-block \
+	../lib$(MAIN_TARGET)/scu/bus/b/scsp \
+	../lib$(MAIN_TARGET)/scu/bus/b/vdp \
+	../lib$(MAIN_TARGET)/scu/bus/cpu \
+	../lib$(MAIN_TARGET)/scu/bus/cpu/smpc
+
 CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
 
 ifeq ($(strip $(YAUL_CDB)),1)
@@ -203,7 +226,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir)))) >/dev/null 2>&1; \
+	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir)))) >/dev/null 2>&1; \
 	done
 endef
 else
@@ -219,7 +242,7 @@ define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
-		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
+		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c -o $@ $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
 		/usr/bin/gcc,\
@@ -227,7 +250,7 @@ define macro-sh-build-object
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
+		$(SH_CFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 # $1 -> Build type (release, debug)
@@ -235,7 +258,7 @@ define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
 	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
-		$(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))) \
+		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
 		/usr/bin/g++,\
@@ -243,7 +266,7 @@ define macro-sh-build-c++-object
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
 		$(CDB_FILE),\
-		$(SH_CXXFLAGS_$1) $(foreach dir,$(INCLUDE_DIRS),-I$(abspath $(dir))))
+		$(SH_CXXFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 # No arguments
@@ -323,5 +346,3 @@ ifneq ($(strip $(NOCOLOR)),)
   V_BEGIN_WHITE=
   V_END=
 endif
-
-MAIN_TARGET= yaul
