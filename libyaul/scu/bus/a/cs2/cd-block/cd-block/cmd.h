@@ -15,10 +15,10 @@
 
 __BEGIN_DECLS
 
-#define SECTOR_LENGTH_2048 0
-#define SECTOR_LENGTH_2336 1
-#define SECTOR_LENGTH_2340 2
-#define SECTOR_LENGTH_2352 3
+#define SECTOR_LENGTH_2048      (0)
+#define SECTOR_LENGTH_2336      (1)
+#define SECTOR_LENGTH_2340      (2)
+#define SECTOR_LENGTH_2352      (3)
 
 /* Helpers */
 #define FAD2LBA(x)      ((x) - 150)
@@ -60,7 +60,7 @@ struct cd_block_status {
         uint32_t fad;
 };
 
-extern int cd_block_cmd_get_cd_status(struct cd_block_status *cd_status);
+extern int cd_block_cmd_status_get(struct cd_block_status *cd_status);
 extern int cd_block_cmd_get_hardware_info(struct cd_block_hardware_info *info);
 extern int cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize);
 extern int cd_block_cmd_get_session_info(uint8_t session_number, uint8_t *cd_status, uint8_t *num_sessions, uint32_t *session_lBA);
@@ -76,25 +76,9 @@ extern int cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *fi
 extern int cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num);
 extern int cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range);
 
-// TODO:
-// Get Filter Range(0x41)
-// Set Filter Subheader Conditions(0x42)
-// Get Filter Subheader Conditions(0x43)
-// Set Filter Mode(0x44)
-// Get Filter Mode(0x45)
-// Set Filter Connection(0x46)
-// Get Filter Connection(0x47)
-
 extern int cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num);
 extern int cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space, uint8_t *max_selectors, uint16_t *max_blocks);
 extern int cd_block_cmd_get_sector_number(uint8_t buff_num);
-
-// TODO:
-// Calculate Actual Size(0x52)
-// Get Actual Size(0x53)
-// Get Sector Info(0x54)
-// Execute FAD Search(0x55)
-// Get FAD Search Results(0x56)
 
 extern int cd_block_cmd_set_sector_length(uint16_t size);
 extern int cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num, uint16_t sec_num);
@@ -103,14 +87,6 @@ extern int cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buf
 extern int cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num);
 extern int cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset, uint8_t buff_num, uint16_t sec_num);
 extern int cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset, uint8_t buff_num, uint16_t sec_num);
-
-// TODO:
-// Get Copy Error(0x67)
-// Change Directory(0x70)
-// Read Directory(0x71)
-// Get File System Scope(0x72)
-// Get File Info(0x73)
-// Read File(0x74)
 
 extern int cd_block_cmd_abort_file(void);
 extern int cd_block_cmd_auth_disk(void);

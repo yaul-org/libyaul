@@ -16,96 +16,12 @@
 
 #define CD_STATUS_TIMEOUT 0xAA
 
-#ifndef MIN
-#define MIN(X,Y) (X < Y ? X : Y)
-#endif
+#define FAKE_SECTOR_SIZE        2352
+#define FAKE_NUM_SECTORS        150
 
-#define FAKE_SECTOR_SIZE 2352
-#define FAKE_NUM_SECTORS 150
-
-static int
-cd_block_get_cd_status_flags(uint8_t *flags)
-{
-        assert(flags != NULL);
-
-        struct cd_block_status cd_status;
-
-        int ret;
-
-        if ((ret = cd_block_cmd_get_cd_status(&cd_status)) != 0) {
-                return ret;
-        }
-
-        *flags = cd_status.cd_status;
-
-        return 0;
-}
-
-static int
-cd_block_wait_hirq_flag(uint16_t flag)
-{
-        volatile uint32_t i;
-
-        for (i = 0; i < 0x240000; ++i) {
-                if (MEMORY_READ(16, CD_BLOCK(HIRQ)) & flag) {
-                        return 0;
-                }
-        }
-
-        return -1;
-}
-
-static int __used
-cd_block_auth()
-{
-        volatile int i;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
-        uint8_t flags;
-
-        MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));
-
-        /* Auth */
-        regs.hirq_mask = EFLS;
-        regs.cr1 = 0xE000;
-        regs.cr2 = 0x0000;
-        regs.cr3 = 0x0000;
-        regs.cr4 = 0x0000;
-
-        volatile int ret;
-
-        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
-                return ret;
-        }
-
-        while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & EFLS) == 0) {
-        }
-
-        /* Wait for initial seeking */
-        while (true) {
-                for (i = 0; i < 131072; ++i) {
-                        cpu_instr_nop();
-                }
-
-                if ((ret = cd_block_get_cd_status_flags(&flags)) != 0) {
-                        return ret;
-                }
-
-                if (flags == CD_STATUS_PAUSE) {
-                        return 0;
-                }
-
-                if (flags == CD_STATUS_FATAL) {
-                        return -CD_STATUS_FATAL;
-                }
-
-                if (flags == CD_STATUS_REJECT) {
-                        return -CD_STATUS_REJECT;
-                }
-        }
-
-        return 0;
-}
+static int _status_flags_get(uint8_t *);
+static int _hirq_flag_wait(uint16_t);
+static int _cd_block_auth(void);
 
 int
 cd_block_init(int16_t standby)
@@ -136,15 +52,16 @@ cd_block_init(int16_t standby)
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & ESEL) == 0) {
         }
 
-        // Bypass Auth.
-        // if ((ret = cd_block_auth()) != 0)
-        //         return ret;
+        /* Bypass auth */
+        /* if ((ret = cd_block_auth()) != 0) { */
+        /*         return ret; */
+        /* } */
 
         return 0;
 }
 
 int
-cd_move_sector_data_cd_auth(uint8_t dst_filter, uint16_t sector_pos,
+cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
     uint8_t sel_num, uint16_t num_sectors)
 {
         int i;
@@ -155,36 +72,38 @@ cd_move_sector_data_cd_auth(uint8_t dst_filter, uint16_t sector_pos,
         cd_block_cmd_move_sector_data(dst_filter, sector_pos, sel_num,
                                       num_sectors);
 
-        // Clear hirq flags
+        /* Clear hirq flags */
         MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));
 
-        // Authenticate disc
+        /* Authenticate disc */
         if ((ret = cd_block_cmd_auth_disk()) != 0) {
                 return ret;
         }
 
-        // Wait till operation is finished
+        /* Wait till operation is finished */
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & EFLS) == 0)
                 ;
 
-        // Wait until drive has finished seeking
+        /* Wait until drive has finished seeking */
         for (;;) {
-                // Wait a bit
-                for (i = 0; i < 100000; i++)
-                        ;
+                /* Wait a bit */
+                for (i = 0; i < 100000; i++) {
+                }
 
-                if (cd_block_cmd_get_cd_status(&cd_status) != 0) {
+                if (cd_block_cmd_status_get(&cd_status) != 0) {
                         continue;
                 }
 
                 if (cd_status.cd_status == CD_STATUS_PAUSE) {
                         break;
-                } else if (cd_status.cd_status == CD_STATUS_FATAL) {
+                }
+
+                if (cd_status.cd_status == CD_STATUS_FATAL) {
                         return -CD_STATUS_FATAL;
                 }
         }
 
-        // Was Authentication successful?
+        /* Was Authentication successful? */
         if (cd_block_cmd_is_auth(&is_authenticated) == 0) {
                 return -1;
         }
@@ -193,7 +112,7 @@ cd_move_sector_data_cd_auth(uint8_t dst_filter, uint16_t sector_pos,
 }
 
 int
-cd_block_bypass_copy_protection()
+cd_block_security_bypass()
 {
         int i, j, ret;
         struct cd_block_regs regs __unused;
@@ -203,7 +122,7 @@ cd_block_bypass_copy_protection()
                 return ret;
         }
 
-        // Write 150 x 2353 sectors.
+        /* Write 150 x 2353 sectors */
         if ((ret = cd_block_cmd_put_sector_data(0, 150)) != 0) {
                 return ret;
         }
@@ -218,15 +137,15 @@ cd_block_bypass_copy_protection()
                 return ret;
         }
 
-        while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & EHST) == 0)
-                ;
+        while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & EHST) == 0) {
+        }
 
-        cd_move_sector_data_cd_auth(0, 0, 0, 50);
+        cd_sector_data_cd_auth_move(0, 0, 0, 50);
 
         cd_block_cmd_is_auth(NULL);
 
-        while (MEMORY_READ(16, CD_BLOCK(HIRQ) & ECPY) == 0)
-                ;
+        while (MEMORY_READ(16, CD_BLOCK(HIRQ) & ECPY) == 0) {
+        }
 
         if ((ret = cd_block_cmd_end_data_transfer()) != 0) {
                 return ret;
@@ -244,7 +163,7 @@ cd_block_bypass_copy_protection()
 }
 
 int
-cd_block_data_transfer(uint16_t offset, uint16_t buffer_number, uint8_t *output_buffer)
+cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_buffer)
 {
         assert(output_buffer != NULL);
 
@@ -256,7 +175,7 @@ cd_block_data_transfer(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         }
 
         /* Wait for data */
-        if ((cd_block_wait_hirq_flag(DRDY | EHST)) != 0) {
+        if ((_hirq_flag_wait(DRDY | EHST)) != 0) {
                 return CD_STATUS_TIMEOUT;
         }
 
@@ -307,10 +226,93 @@ cd_block_sector_read(uint32_t fad, uint8_t *output_buffer)
         while ((cd_block_cmd_get_sector_number(0)) == 0) {
         }
 
-        if ((ret = cd_block_data_transfer(0, 0, output_buffer)) != 0) {
+        if ((ret = cd_block_transfer_data(0, 0, output_buffer)) != 0) {
                 return ret;
         }
 
         return 0;
 }
 
+static int
+_status_flags_get(uint8_t *flags)
+{
+        assert(flags != NULL);
+
+        struct cd_block_status cd_status;
+
+        int ret;
+
+        if ((ret = cd_block_cmd_status_get(&cd_status)) != 0) {
+                return ret;
+        }
+
+        *flags = cd_status.cd_status;
+
+        return 0;
+}
+
+static int
+_hirq_flag_wait(uint16_t flag)
+{
+        volatile uint32_t i;
+
+        for (i = 0; i < 0x240000; ++i) {
+                if (MEMORY_READ(16, CD_BLOCK(HIRQ)) & flag) {
+                        return 0;
+                }
+        }
+
+        return -1;
+}
+
+static int __used
+_cd_block_auth(void)
+{
+        volatile int i;
+        struct cd_block_regs regs;
+        struct cd_block_regs status;
+        uint8_t flags;
+
+        MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));
+
+        /* Auth */
+        regs.hirq_mask = EFLS;
+        regs.cr1 = 0xE000;
+        regs.cr2 = 0x0000;
+        regs.cr3 = 0x0000;
+        regs.cr4 = 0x0000;
+
+        volatile int ret;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & EFLS) == 0) {
+        }
+
+        /* Wait for initial seeking */
+        while (true) {
+                for (i = 0; i < 131072; ++i) {
+                        cpu_instr_nop();
+                }
+
+                if ((ret = _status_flags_get(&flags)) != 0) {
+                        return ret;
+                }
+
+                if (flags == CD_STATUS_PAUSE) {
+                        return 0;
+                }
+
+                if (flags == CD_STATUS_FATAL) {
+                        return -CD_STATUS_FATAL;
+                }
+
+                if (flags == CD_STATUS_REJECT) {
+                        return -CD_STATUS_REJECT;
+                }
+        }
+
+        return 0;
+}
