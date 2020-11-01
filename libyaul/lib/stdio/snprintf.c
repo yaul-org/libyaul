@@ -366,7 +366,7 @@ sprintf(char * __restrict buffer, const char *__restrict fmt, ...)
 }
 
 int
-snprintf(char * __restrict buffer, size_t n, const char * __restrict fmt, ...)
+snprintf(char * __restrict buffer, size_t n __unused, const char * __restrict fmt, ...)
 {
     va_list args;
     uint16_t i;

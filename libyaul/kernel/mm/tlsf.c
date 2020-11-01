@@ -14,22 +14,22 @@
 #endif
 
 /*
-** Architecture-specific bit manipulation routines.
-**
-** TLSF achieves O(1) cost for malloc and free operations by limiting
-** the search for a free block to a free list of guaranteed size
-** adequate to fulfill the request, combined with efficient free list
-** queries using bitmasks and architecture-specific bit-manipulation
-** routines.
-**
-** Most modern processors provide instructions to count leading zeroes
-** in a word, find the lowest and highest set bit, etc. These
-** specific implementations will be used when available, falling back
-** to a reasonably efficient generic implementation.
-**
-** NOTE: TLSF spec relies on ffs/fls returning value 0..31.
-** ffs/fls return 1-32 by default, returning 0 for error.
-*/
+ * Architecture-specific bit manipulation routines.
+ *
+ * TLSF achieves O(1) cost for malloc and free operations by limiting
+ * the search for a free block to a free list of guaranteed size
+ * adequate to fulfill the request, combined with efficient free list
+ * queries using bitmasks and architecture-specific bit-manipulation
+ * routines.
+ *
+ * Most modern processors provide instructions to count leading zeroes
+ * in a word, find the lowest and highest set bit, etc. These
+ * specific implementations will be used when available, falling back
+ * to a reasonably efficient generic implementation.
+ *
+ * NOTE: TLSF spec relies on ffs/fls returning value 0..31.
+ * ffs/fls return 1-32 by default, returning 0 for error.
+ */
 
 /*
 ** Detect whether or not we are building for a 32- or 64-bit (LP/LLP)

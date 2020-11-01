@@ -5,6 +5,8 @@ import os
 import sys
 import locale
 
+PRUNED_FILE_EXTS = [".sx", ".cxx"]
+
 try:
     # If you are dealing with an environment where Python 3 thinks you are
     # restricted to ASCII data, Click will raise an exception:
@@ -25,7 +27,12 @@ try:
 
     import click
 except ImportError:
-    print("{}: Missing \"click\" package. Install from <https://pypi.org/project/click/>".format(sys.argv[0]), file = sys.stderr)
+    print(
+        '{}: Missing "click" package. Install from <https://pypi.org/project/click/>'.format(
+            sys.argv[0]
+        ),
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 PRUNE_COMPILER_FLAGS = [
@@ -34,41 +41,77 @@ PRUNE_COMPILER_FLAGS = [
     "-save-temps"
 ]
 
-@click.command(context_settings = dict(help_option_names = ['-h', '--help']))
-@click.option('-c', '--compiler-executable', 'compiler_executable',
-              type = click.Path(exists = True,
-                                file_okay = True,
-                                dir_okay = False,
-                                readable = True,
-                                allow_dash = False,
-                                resolve_path = True),
-              help = 'Compiler executable.', required = True, multiple = False)
-@click.option('-i', '--input-file', 'input_file',
-              type = click.Path(exists = True,
-                                file_okay = True,
-                                dir_okay = False,
-                                readable = True,
-                                allow_dash = False,
-                                resolve_path = True),
-              help = 'Input file.', required = True, multiple = False)
-@click.option('-o', '--output-file', 'output_file',
-              type = click.Path(exists = False,
-                                file_okay = True,
-                                dir_okay = False,
-                                readable = True,
-                                allow_dash = False,
-                                resolve_path = True),
-              help = 'Output file.', required = True, multiple = False)
-@click.option('-d', '--directory', 'directory',
-              type = click.Path(exists = True,
-                                file_okay = False,
-                                dir_okay = True,
-                                allow_dash = False,
-                                resolve_path = True),
-              help = 'Build directory.', required = True, multiple = False)
-@click.option('-O', '--output-cdb', 'out_stream', type = click.File('a+'),
-              help = 'Output compile DB.', required = True, multiple = False)
-@click.argument('flags', nargs = -1, type = click.UNPROCESSED)
+
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    "-c",
+    "--compiler-executable",
+    "compiler_executable",
+    type=click.Path(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=False,
+        resolve_path=False,
+    ),
+    help="Compiler executable.",
+    required=True,
+    multiple=False,
+)
+@click.option(
+    "-i",
+    "--input-file",
+    "input_file",
+    type=click.Path(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=False,
+        resolve_path=True,
+    ),
+    help="Input file.",
+    required=True,
+    multiple=False,
+)
+@click.option(
+    "-o",
+    "--output-file",
+    "output_file",
+    type=click.Path(
+        exists=False,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=False,
+        resolve_path=True,
+    ),
+    help="Output file.",
+    required=True,
+    multiple=False,
+)
+@click.option(
+    "-d",
+    "--directory",
+    "directory",
+    type=click.Path(
+        exists=True, file_okay=False, dir_okay=True, allow_dash=False, resolve_path=True
+    ),
+    help="Build directory.",
+    required=True,
+    multiple=False,
+)
+@click.option(
+    "-O",
+    "--output-cdb",
+    "out_stream",
+    type=click.File("a+"),
+    help="Output compile DB.",
+    required=True,
+    multiple=False,
+)
+@click.argument("flags", nargs=-1, type=click.UNPROCESSED)
 def cli(compiler_executable, input_file, output_file, directory, out_stream, flags):
     def build_cdb(out_stream):
         try:
@@ -77,29 +120,29 @@ def cli(compiler_executable, input_file, output_file, directory, out_stream, fla
         except Exception as exception:
             return []
 
-    def write_cdb(cdb, out_stream, pretty_print = True):
+    def write_cdb(cdb, out_stream, pretty_print=True):
         out_stream.seek(0)
         out_stream.truncate()
-        json.dump(cdb, out_stream, indent = (4 if pretty_print else None))
+        json.dump(cdb, out_stream, indent=(4 if pretty_print else None))
 
     def prune_flags(flags):
         return tuple([flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS])
 
     def new_cdb_entry(compiler_executable, input_file, output_file, directory, flags):
-        arguments = [compiler_executable] + list(flags) + ["-c", input_file, "-o", output_file]
+        arguments = (
+            [compiler_executable] + list(flags) + ["-c", input_file, "-o", output_file]
+        )
         return {
             # The main translation unit source processed by this compilation
             # step. This is used by tools as the key into the compilation
             # database. There can be multiple command objects for the same file,
             # for example if the same source file is compiled with different
             # configurations.
-            'file': input_file,
-
+            "file": input_file,
             # The working directory of the compilation. All paths specified in
             # the command or file fields must be either absolute or relative to
             # this directory.
-            'directory': directory,
-
+            "directory": directory,
             # The compile command executed. After JSON unescaping, this must be
             # a valid command to rerun the exact compilation step for the
             # translation unit in the environment the build system uses.
@@ -107,31 +150,37 @@ def cli(compiler_executable, input_file, output_file, directory, out_stream, fla
             # '"' and '\' being the only special characters.
             #
             # Shell expansion is not supported.
-            'command': " ".join(arguments),
-
+            "command": " ".join(arguments),
             # The compile command executed as list of strings. Either arguments
             # or command is required.
             #
             # It's best to support both as some tool may read one but not the
             # other.
-            'arguments': arguments
+            "arguments": arguments,
         }
 
     def append_cdb(cdb, new_cdb_entry):
-        return [cdb_entry for cdb_entry in cdb
-                if cdb_entry['file'] != new_cdb_entry['file']] + [new_cdb_entry]
+        return [
+            cdb_entry for cdb_entry in cdb if cdb_entry["file"] != new_cdb_entry["file"]
+        ] + [new_cdb_entry]
 
+    _, ext_input_file = os.path.splitext(input_file)
+    if ext_input_file.lower() in PRUNED_FILE_EXTS:
+        return
     # Parse output CDB
     cdb = build_cdb(out_stream)
     # print("cdb: {}".format(cdb))
     pruned_flags = prune_flags(flags)
     # print("pruned_flags: {}".format(pruned_flags))
-    cdb_entry = new_cdb_entry(compiler_executable, input_file, output_file, directory, pruned_flags)
+    cdb_entry = new_cdb_entry(
+        compiler_executable, input_file, output_file, directory, pruned_flags
+    )
     # print("cdb_entry: {}".format(cdb_entry))
     updated_cdb = append_cdb(cdb, cdb_entry)
     # print("updated_cdb: {}".format(updated_cdb))
     if len(updated_cdb) > len(cdb):
-        write_cdb(updated_cdb, out_stream, pretty_print = False)
+        write_cdb(updated_cdb, out_stream, pretty_print=False)
+
 
 if __name__ == "__main__":
     cli()

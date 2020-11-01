@@ -1,11 +1,12 @@
 -.git/
 -.images/
+-/.rtags/
 -/build/
 -/build-scripts/
 -/docs/
 -/libbcl/
 -/libtga/
--/examples/
+/examples/
 -/tools/
 -/yaul.env
 -.#*

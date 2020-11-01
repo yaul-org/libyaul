@@ -16,23 +16,51 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_SMPC_SMC_DEFINES
+/// @defgroup CPU_SMPC_SMC_INLINE_FUNCTIONS
+
+/// @addtogroup CPU_SMPC_SMC_DEFINES
+/// @{
+
+/// Not yet documented.
 #define SMPC_SMC_MSHON          0x00
+/// Not yet documented.
 #define SMPC_SMC_SSHON          0x02
+/// Not yet documented.
 #define SMPC_SMC_SSHOFF         0x03
+/// Not yet documented.
 #define SMPC_SMC_SNDON          0x06
+/// Not yet documented.
 #define SMPC_SMC_SNDOFF         0x07
+/// Not yet documented.
 #define SMPC_SMC_CDON           0x08
+/// Not yet documented.
 #define SMPC_SMC_CDOFF          0x09
+/// Not yet documented.
 #define SMPC_SMC_SYSRES         0x0D
+/// Not yet documented.
 #define SMPC_SMC_CKCHG352       0x0E
+/// Not yet documented.
 #define SMPC_SMC_CKCHG320       0x0F
+/// Not yet documented.
 #define SMPC_SMC_NMIREQ         0x18
+/// Not yet documented.
 #define SMPC_SMC_RESENAB        0x19
+/// Not yet documented.
 #define SMPC_SMC_RESDISA        0x1A
+/// Not yet documented.
 #define SMPC_SMC_INTBACK        0x10
+/// Not yet documented.
 #define SMPC_SMC_SETSMEM        0x17
+/// Not yet documented.
 #define SMPC_RTC_SETTIME        0x16
 
+/// @}
+
+/// @addtogroup CPU_SMPC_SMC_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Not yet documented.
 static inline void __always_inline
 smpc_smc_wait(bool enter)
 {
@@ -46,6 +74,7 @@ smpc_smc_wait(bool enter)
         }
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_call(uint8_t cmd)
 {
@@ -58,30 +87,35 @@ smpc_smc_call(uint8_t cmd)
         return MEMORY_READ(8, OREG(31));
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_cdoff_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CDOFF);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_cdon_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CDON);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_ckchg320_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CKCHG320);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_ckchg352_call(void)
 {
         return smpc_smc_call(SMPC_SMC_CKCHG352);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 smpc_smc_intback_call(uint8_t ireg0, uint8_t ireg1)
 {
@@ -162,6 +196,8 @@ smpc_smc_sysres_call(void)
 
         __builtin_unreachable();
 }
+
+/// @}
 
 __END_DECLS
 

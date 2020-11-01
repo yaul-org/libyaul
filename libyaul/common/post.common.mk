@@ -86,7 +86,7 @@ define macro-update-cdb
 	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
+	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 >/dev/null 2>&1
 endef
 else
 define macro-update-cdb
@@ -208,12 +208,17 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
 
+$(SH_PROGRAM).ss: $(SH_PROGRAM).bin CART-IP.BIN
+	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
+	$(ECHO)cat CART-IP.BIN $(SH_PROGRAM).bin > $@
+
 $(SH_PROGRAM).cue: $(SH_PROGRAM).iso
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
 
-IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
+IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
 	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+	    "$(SH_PROGRAM).bin" \
 		"$(IP_VERSION)" \
 		$(IP_RELEASE_DATE) \
 		"$(IP_AREAS)" \
@@ -222,7 +227,20 @@ IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx
 		$(IP_MASTER_STACK_ADDR) \
 		$(IP_SLAVE_STACK_ADDR) \
 		$(IP_1ST_READ_ADDR) \
-		$(IP_1ST_READ_SIZE)
+	    $(IP_1ST_READ_SIZE)
+
+CART-IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+	    "$(SH_PROGRAM).bin" \
+		"$(IP_VERSION)" \
+		$(IP_RELEASE_DATE) \
+		"$(IP_AREAS)" \
+		"$(IP_PERIPHERALS)" \
+		"$(IP_TITLE)" \
+		$(IP_MASTER_STACK_ADDR) \
+		$(IP_SLAVE_STACK_ADDR) \
+		$(IP_1ST_READ_ADDR) \
+	    -1 && mv -f IP.BIN CART-IP.BIN
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
@@ -230,6 +248,7 @@ clean:
 	    $(SH_PROGRAM).bin \
 	    $(SH_PROGRAM).cue \
 	    $(SH_PROGRAM).iso \
+	    $(SH_PROGRAM).ss \
 	    $(SH_OBJECTS_UNIQ) \
 	    $(SH_DEPS) \
 	    $(SH_DEPS_NO_LINK) \

@@ -62,6 +62,11 @@
 #include <sys/init.h>
 #include <sys/dma-queue.h>
 
+#include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
+
+#if HAVE_DEV_CARTRIDGE != 0
+#include <fs/fileclient/fileclient.h>
+#endif /* HAVE_DEV_CARTRIDGE */
 
 #endif /* !_YAUL_H_ */
