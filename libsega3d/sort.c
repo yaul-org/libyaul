@@ -39,12 +39,13 @@ _internal_sort_add(void *packet, int32_t pz)
         }
 
         /* Get the node */
-        sort_single_t *free_link = _state.list[pz].first_single;
+        sort_single_t *free_link;
+        free_link = _state.list[pz].first_single;
 
         /* There was a package here already in this Z */
-        if (free_link) {
+        if (free_link != NULL) {
                 /* Loop until we get a free node */
-                while (free_link->next_single) {
+                while (free_link->next_single != NULL) {
                         free_link = (sort_single_t *)free_link->next_single;
                 }
 
@@ -67,7 +68,7 @@ _internal_sort_add(void *packet, int32_t pz)
                 *first_single = (sort_single_t *)&_state.single_pool[_state.index];
 
                 (*first_single)->packet = packet;
-                (*first_single)->next_single = 0;
+                (*first_single)->next_single = NULL;
 
                 _state.index++;
         }
@@ -97,7 +98,7 @@ _internal_sort_iterate(iterate_fn fn)
                 sort_single_t *single_next =
                     (sort_single_t *)(*first_single)->next_single;
 
-                if (single_next->next_single) {
+                if (single_next->next_single != NULL) {
                         while (single_next->next_single) {
                                 /* Send commmand here */
                                 (*fn)(single_next);
