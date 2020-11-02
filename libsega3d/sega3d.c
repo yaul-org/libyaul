@@ -9,10 +9,14 @@
 
 #include <sys/cdefs.h>
 
+#include <cpu/divu.h>
+
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
 extern void _internal_matrix_init(void);
+
+static FIXED _distance = toFIXED(-200.0f);
 
 void
 sega3d_init(void)
@@ -79,18 +83,26 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
 
         const FIXED tx = (*matrix)[3][0];
         const FIXED ty = (*matrix)[3][1];
-        const FIXED tz __unused = (*matrix)[3][2];
+        const FIXED tz = (*matrix)[3][2];
 
-        const FIXED sx = (*matrix)[0][0];
-        const FIXED sy = (*matrix)[1][1];
-        const FIXED sz __unused = (*matrix)[2][2];
+        const FIXED row2_x = (*matrix)[2][0];
+        const FIXED row2_y = (*matrix)[2][1];
+        const FIXED row2_z = (*matrix)[2][2];
+
+        const FIXED row1_x = (*matrix)[1][0];
+        const FIXED row1_y = (*matrix)[1][1];
+        const FIXED row1_z = (*matrix)[1][2];
+
+        const FIXED row0_x = (*matrix)[0][0];
+        const FIXED row0_y = (*matrix)[0][1];
+        const FIXED row0_z = (*matrix)[0][2];
+
+        const POINT *points;
+        points = pdata->pntbl;
 
         for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 POLYGON *polygon;
-                polygon = pdata->pltbl;
-
-                const POINT *points;
-                points = pdata->pntbl;
+                polygon = &pdata->pltbl[i];
 
                 vdp1_cmdt_t *cmdt;
                 cmdt = &base_cmdt[i];
@@ -103,12 +115,29 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
 
                         const FIXED px = (*point)[X];
                         const FIXED py = (*point)[Y];
+                        const FIXED pz = (*point)[Z];
 
-                        int16_vector2_t xy;
-                        xy.x = (tx + fix16_mul(sx, px)) >> 16;
-                        xy.y = (ty + fix16_mul(sy, py)) >> 16;
+                        FIXED proj[XYZ];
 
-                        vdp1_cmdt_param_vertex_set(cmdt, v, &xy);
+                        proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
+
+                        const FIXED divisor = (_distance - proj[Z]);
+
+                        cpu_divu_fix16_set(_distance, divisor);
+
+                        proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
+                        proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
+
+                        const FIXED quotient = cpu_divu_quotient_get();
+
+                        proj[X] = fix16_mul(proj[X], quotient);
+                        proj[Y] = fix16_mul(proj[Y], quotient);
+
+                        int16_vector2_t proj_2d;
+                        proj_2d.x = (proj[X] >> 16);
+                        proj_2d.y = (proj[Y] >> 16);
+
+                        vdp1_cmdt_param_vertex_set(cmdt, v, &proj_2d);
                 }
         }
 }
