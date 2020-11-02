@@ -26,8 +26,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
 #endif /* DEBUG */
 
         /* One command table is allocated to us */
-        uint32_t vram_size;
-        vram_size = VDP1_VRAM_SIZE - sizeof(vdp1_cmdt_t);
+        const int32_t vram_size = VDP1_VRAM_SIZE - sizeof(vdp1_cmdt_t);
 
         uint32_t cmdt_size;
         cmdt_size = cmdt_count * sizeof(vdp1_cmdt_t);
@@ -38,13 +37,13 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         uint32_t clut_size;
         clut_size = clut_count * sizeof(vdp1_clut_t);
 
-        uint32_t total_size;
+        int32_t total_size;
         total_size = cmdt_size + texture_size + gouraud_size + clut_size;
 
-        uint32_t remaining_size;
-        remaining_size = VDP1_VRAM(VDP1_VRAM_SIZE) - total_size;
+        int32_t remaining_size;
+        remaining_size = vram_size - total_size;
 
-        assert(total_size <= vram_size);
+        assert(remaining_size >= 0);
 
         uint32_t vram_base;
         vram_base = VDP1_VRAM(sizeof(vdp1_cmdt_t));
