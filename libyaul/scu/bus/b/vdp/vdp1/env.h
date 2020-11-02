@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <vdp1/cmdt.h>
+
 #include <color.h>
 #include <int16.h>
 
@@ -73,7 +75,12 @@ extern void vdp1_env_default_set(void);
 /// @brief Not yet documented.
 extern void vdp1_env_set(const vdp1_env_t *);
 
+/// @brief Not yet documented.
 extern void vdp1_env_stop(void);
+
+/// @brief Not yet documented.
+extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
+    const int16_vector2_t *);
 
 /// @}
 
