@@ -4,11 +4,10 @@
 
 #include "sega3d-internal.h"
 
-#define MATRIX_MAX (20)
 
 typedef struct {
         uint8_t index; 
-        MATRIX matrices[MATRIX_MAX];
+        MATRIX matrices[MATRIX_STACK_MAX];
 } matrix_stack_t;
 
 static matrix_stack_t _matrix_stack;
@@ -16,32 +15,32 @@ static matrix_stack_t _matrix_stack;
 void
 _internal_matrix_init(void)
 {
-        for (uint8_t i = 0; i < MATRIX_MAX; i++) {
+        for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
                 MATRIX *matrix;
                 matrix = &_matrix_stack.matrices[i];
 
-                (*matrix)[0][0] = 1;
-                (*matrix)[0][1] = 0;
-                (*matrix)[0][2] = 0;
+                (*matrix)[0][0] = toFIXED(1.0f);
+                (*matrix)[0][1] = toFIXED(0.0f);
+                (*matrix)[0][2] = toFIXED(0.0f);
 
-                (*matrix)[1][0] = 0;
-                (*matrix)[1][1] = 1;
-                (*matrix)[1][2] = 0;
+                (*matrix)[1][0] = toFIXED(0.0f);
+                (*matrix)[1][1] = toFIXED(1.0f);
+                (*matrix)[1][2] = toFIXED(0.0f);
 
-                (*matrix)[2][0] = 0;
-                (*matrix)[2][1] = 0;
-                (*matrix)[2][2] = 1;
+                (*matrix)[2][0] = toFIXED(0.0f);
+                (*matrix)[2][1] = toFIXED(0.0f);
+                (*matrix)[2][2] = toFIXED(1.0f);
 
-                (*matrix)[3][0] = 0;
-                (*matrix)[3][1] = 0;
-                (*matrix)[3][2] = 1;
+                (*matrix)[3][0] = toFIXED(0.0f);
+                (*matrix)[3][1] = toFIXED(0.0f);
+                (*matrix)[3][2] = toFIXED(1.0f);
         }
 }
 
 void
 sega3d_matrix_push(matrix_type_t matrix_type)
 {
-        assert(_matrix_stack.index < (MATRIX_MAX - 1));
+        assert(_matrix_stack.index < (MATRIX_STACK_MAX - 1));
 
         MATRIX *src_matrix;
         src_matrix = &_matrix_stack.matrices[_matrix_stack.index];
