@@ -143,6 +143,32 @@ vdp1_env_stop(void)
         MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
 }
 
+void
+vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
+    const int16_vector2_t *local_coords)
+{
+        assert(cmdts != NULL);
+
+        int16_vector2_t stack_local_coords;
+        
+        if (local_coords == NULL) {
+                local_coords = &stack_local_coords;
+
+                stack_local_coords.x = _state_vdp2()->tv.resolution.x / 2;
+                stack_local_coords.y = _state_vdp2()->tv.resolution.y / 2;
+        }
+
+        int16_vector2_t system_clip_coords;
+        system_clip_coords.x = _state_vdp2()->tv.resolution.x;
+        system_clip_coords.y = _state_vdp2()->tv.resolution.y;
+
+        vdp1_cmdt_system_clip_coord_set(&cmdts[0]);
+        vdp1_cmdt_param_vertex_set(&cmdts[0], CMDT_VTX_SYSTEM_CLIP, &system_clip_coords);
+
+        vdp1_cmdt_local_coord_set(&cmdts[1]);
+        vdp1_cmdt_param_vertex_set(&cmdts[1], CMDT_VTX_LOCAL_COORD, local_coords);
+}
+
 static inline void __always_inline
 _env_current_update(const vdp1_env_t *env) {
         (void)memcpy(&_current_env, env, sizeof(vdp1_env_t));
