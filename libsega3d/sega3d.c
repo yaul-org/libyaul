@@ -77,6 +77,14 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
         const MATRIX *matrix __unused;
         matrix = sega3d_matrix_top();
 
+        const FIXED tx = (*matrix)[3][0];
+        const FIXED ty = (*matrix)[3][1];
+        const FIXED tz __unused = (*matrix)[3][2];
+
+        const FIXED sx = (*matrix)[0][0];
+        const FIXED sy = (*matrix)[1][1];
+        const FIXED sz __unused = (*matrix)[2][2];
+
         for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 POLYGON *polygon;
                 polygon = pdata->pltbl;
@@ -93,9 +101,12 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
                         const POINT *point;
                         point = &points[vertex];
 
+                        const FIXED px = (*point)[X];
+                        const FIXED py = (*point)[Y];
+
                         int16_vector2_t xy;
-                        xy.x = ((*matrix)[3][0] + (*point)[X]) >> 16;
-                        xy.y = ((*matrix)[3][1] + (*point)[Y]) >> 16;
+                        xy.x = (tx + fix16_mul(sx, px)) >> 16;
+                        xy.y = (ty + fix16_mul(sy, py)) >> 16;
 
                         vdp1_cmdt_param_vertex_set(cmdt, v, &xy);
                 }
