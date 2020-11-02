@@ -13,10 +13,24 @@
 
 #include "sgl.h"
 
+typedef struct sega3d_object sega3d_object_t;
+
+typedef void (*sega3d_iterate_fn)(sega3d_object_t *, const vdp1_cmdt_t *);
+
 typedef enum {
         MATRIX_TYPE_PUSH     = 0,
         MATRIX_TYPE_MOVE_PTR = 1
 } matrix_type_t;
+
+struct sega3d_object {
+        void *pdata;
+        vdp1_cmdt_list_t *cmdt_list;
+        uint16_t offset;
+
+        sega3d_iterate_fn iterate_fn;
+
+        void *data;
+};
 
 extern void sega3d_init(void);
 
@@ -37,8 +51,12 @@ extern void sega3d_matrix_copy(void);
 extern void sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz);
 extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
 
-extern Uint16 sega3d_polycount_get(const PDATA *pdata);
-extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset);
-extern void sega3d_cmdt_transform(PDATA *pdata);
+extern Uint16 sega3d_object_polycount_get(sega3d_object_t *object);
+extern void sega3d_object_prepare(sega3d_object_t *object);
+extern void sega3d_object_transform(sega3d_object_t *object);
+extern void sega3d_object_iterate(sega3d_object_t *object);
+
+/// Standard iteration functions
+extern void sega3d_standard_iterate(sega3d_object_t *object, const vdp1_cmdt_t *cmdt);
 
 #endif /* SEGA3D_H_ */
