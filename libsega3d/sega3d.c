@@ -12,6 +12,14 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
+extern void _internal_matrix_init(void);
+
+void
+sega3d_init(void)
+{
+        _internal_matrix_init();
+}
+
 Uint16
 sega3d_polycount_get(const PDATA *pdata)
 {
@@ -57,5 +65,39 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
 
                 cmdt->cmd_srca = texture->CGadr;
                 cmdt->cmd_size = texture->HVsize;
+        }
+}
+
+void
+sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
+{
+        vdp1_cmdt_t *base_cmdt;
+        base_cmdt = &cmdt_list->cmdts[offset];
+
+        const MATRIX *matrix __unused;
+        matrix = sega3d_matrix_top();
+
+        for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
+                POLYGON *polygon;
+                polygon = pdata->pltbl;
+
+                const POINT *points;
+                points = pdata->pntbl;
+
+                vdp1_cmdt_t *cmdt;
+                cmdt = &base_cmdt[i];
+
+                for (uint32_t v = 0; v < 4; v++) {
+                        uint16_t vertex;
+                        vertex = polygon->Vertices[v];
+                        const POINT *point;
+                        point = &points[vertex];
+
+                        int16_vector2_t xy;
+                        xy.x = ((*matrix)[3][0] + (*point)[X]) >> 16;
+                        xy.y = ((*matrix)[3][1] + (*point)[Y]) >> 16;
+
+                        vdp1_cmdt_param_vertex_set(cmdt, v, &xy);
+                }
         }
 }
