@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <string.h>
 
 #include "sega3d.h"
 

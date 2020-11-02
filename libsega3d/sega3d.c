@@ -16,11 +16,15 @@
 
 extern void _internal_matrix_init(void);
 
-static FIXED _distance = toFIXED(-200.0f);
+struct {
+        FIXED distance;
+} _state;
 
 void
 sega3d_init(void)
 {
+        _state.distance = -PROJECTION_DISTANCE;
+
         _internal_matrix_init();
 }
 
@@ -123,9 +127,9 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
 
                         proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
 
-                        const FIXED divisor = (_distance - proj[Z]);
+                        const FIXED divisor = (_state.distance - proj[Z]);
 
-                        cpu_divu_fix16_set(_distance, divisor);
+                        cpu_divu_fix16_set(_state.distance, divisor);
 
                         proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
                         proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
