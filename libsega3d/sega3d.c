@@ -36,6 +36,32 @@ static struct {
 
 static void _sort_iterate(sort_single_t *p_single);
 
+static inline FIXED __always_inline __used
+_vertex_transform(const FIXED *p, const FIXED *matrix)
+{
+        register int32_t tmp1;
+        register int32_t tmp2;
+        register int32_t pt;
+
+        __asm__ volatile (
+                "clrmac\n"
+                "mov %[p], %[pt]\n"
+                "mov %[matrix], %[tmp1]\n"
+                "mac.l @%[pt]+, @%[tmp1]+\n"
+                "mac.l @%[pt]+, @%[tmp1]+\n"
+                "mac.l @%[pt]+, @%[tmp1]+\n"
+                "sts macl, %[tmp2]\n"
+                "mov.l @%[tmp1]+, %[pt]\n" 
+                "add %[tmp2], %[pt]\n" 
+                : [tmp1] "=&r" (tmp1),
+                  [tmp2] "=&r" (tmp2),
+                  [pt] "=&r" (pt)
+                : [p] "r" (p),
+                  [matrix] "r" (matrix));
+
+        return pt;
+}
+
 void
 sega3d_init(void)
 {
@@ -112,17 +138,17 @@ sega3d_cmdt_transform(PDATA *pdata)
         const FIXED ty = (*matrix)[3][1];
         const FIXED tz = (*matrix)[3][2];
 
-        const FIXED row2_x = (*matrix)[2][0];
-        const FIXED row2_y = (*matrix)[2][1];
-        const FIXED row2_z = (*matrix)[2][2];
-
-        const FIXED row1_x = (*matrix)[1][0];
-        const FIXED row1_y = (*matrix)[1][1];
-        const FIXED row1_z = (*matrix)[1][2];
-
         const FIXED row0_x = (*matrix)[0][0];
-        const FIXED row0_y = (*matrix)[0][1];
-        const FIXED row0_z = (*matrix)[0][2];
+        const FIXED row0_y = (*matrix)[1][0];
+        const FIXED row0_z = (*matrix)[2][0];
+
+        const FIXED row1_x = (*matrix)[0][1];
+        const FIXED row1_y = (*matrix)[1][1];
+        const FIXED row1_z = (*matrix)[2][1];
+
+        const FIXED row2_x = (*matrix)[0][2];
+        const FIXED row2_y = (*matrix)[1][2];
+        const FIXED row2_z = (*matrix)[2][2];
 
         const POINT *points;
         points = pdata->pntbl;
@@ -135,7 +161,7 @@ sega3d_cmdt_transform(PDATA *pdata)
                 copy_cmdt = &_state.copy_cmdt_list->cmdts[i];
 
                 /* Keep track of the projected Z values for averaging */
-                FIXED z_projs[4];
+                FIXED z_projs[4] __unused;
                 FIXED z_avg;
                 z_avg = 0;
 
@@ -149,11 +175,11 @@ sega3d_cmdt_transform(PDATA *pdata)
                         const FIXED py = (*point)[Y];
                         const FIXED pz = (*point)[Z];
 
-                        FIXED proj[XY];
+                        FIXED proj[XYZ];
 
-                        z_projs[v] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
+                        proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
 
-                        const FIXED divisor = (_state.distance - z_projs[v]);
+                        const FIXED divisor = (_state.distance - proj[Z]);
 
                         /* Fire up CPU-DIVU to calculate reciprocal */
                         cpu_divu_fix16_set(_state.distance, divisor);
@@ -161,15 +187,16 @@ sega3d_cmdt_transform(PDATA *pdata)
                         proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
                         proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
 
-                        z_avg += z_projs[v];
-
                         /* Fetch results */
                         const FIXED inverse_z = cpu_divu_quotient_get();
 
-                        cpu_divu_fix16_set(toFIXED(1.0f), toFIXED(3.0f));
-
                         proj[X] = fix16_mul(proj[X], inverse_z);
                         proj[Y] = fix16_mul(proj[Y], inverse_z);
+                        proj[Z] = fix16_mul(proj[Z], inverse_z);
+
+                        z_projs[v] = proj[Z];
+
+                        z_avg += proj[Z];
 
                         int16_vector2_t proj_2d;
                         proj_2d.x = (proj[X] >> 16);
@@ -178,12 +205,12 @@ sega3d_cmdt_transform(PDATA *pdata)
                         vdp1_cmdt_param_vertex_set(copy_cmdt, v, &proj_2d);
                 }
 
-                const FIXED z_center = fix16_mul(z_avg, toFIXED(0.333333f));
+                const FIXED z_center = fix16_mul(z_avg, toFIXED(0.25f));
 
-                _internal_sort_add(copy_cmdt, z_center);
+                _internal_sort_add(copy_cmdt, z_center >> 16);
         }
 
-        _state.copy_cmdt_list->count = 0;
+        _state.transform_cmdt_list.count = 0;
 
         _internal_sort_iterate(_sort_iterate);
 }
