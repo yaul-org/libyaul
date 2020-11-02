@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#include "sega3d.h"
+
 #include <vdp1/cmdt.h>
 
 typedef enum {
