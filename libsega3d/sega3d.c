@@ -12,14 +12,14 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
-uint16_t
+Uint16
 sega3d_polycount_get(const PDATA *pdata)
 {
         return pdata->nbPolygon;
 }
 
 void
-sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, uint16_t offset)
+sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
 {
         assert(pdata != NULL);
         assert(cmdt_list != NULL);

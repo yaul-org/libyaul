@@ -1,50 +1,82 @@
+#include <string.h>
+
 #include "sega3d.h"
 
 #include "sega3d-internal.h"
 
-/*
- * Increments the matrix stack pointer and copies the current matrix to that
- * position. Up to 20 levels of matrices can be nested, but an error is returned
- * if this number is exceeded.
- */
+#define MATRIX_MAX (20)
 
-/* Increments the matrix stack pointer and sets the unit matrix at that
- * location. An error is returned when excessive nesting occurs. */
-
-/* Increments the matrix stack pointer. Up to 20 matrices can be nested, but an
- * error is returned if this number is exceeded. */
+static struct {
+        uint8_t index; 
+        MATRIX matrices[MATRIX_MAX];
+} _state;
 
 void
-sega3d_matrix_push(/* matrix_type_t matrix_type */)
+sega3d_matrix_push(matrix_type_t matrix_type)
 {
+        assert(_state.index < (MATRIX_MAX - 1));
+
+        MATRIX *src_matrix;
+        src_matrix = &_state.matrices[_state.index];
+
+        _state.index++;
+
+        if (matrix_type == MATRIX_TYPE_PUSH) {
+                MATRIX *dst_matrix;
+                dst_matrix = &_state.matrices[_state.index];
+
+                (void)memcpy(dst_matrix, src_matrix, sizeof(MATRIX));
+        }
 }
 
 void
-sega3d_matrix_pop(/* matrix_type_t matrix_type */)
+sega3d_matrix_pop(void)
 {
-}
+        assert(_state.index > 0);
 
-/* void slLoadMatrix(MATRIX *mtptr) */
-/* Copies a specified matrix to the current matrix. */
-void
-sega3d_matrix_load(void)
-{
-}
-
-/* Copies the penultimate matrix to the current matrix. When the matrix is not
- * nested, an error is returned. */
-void
-sega3d_matrix_dup(void)
-{
+        _state.index--;
 }
 
 void
-sega3d_matrix_translate()
+sega3d_matrix_load(const MATRIX *matrix)
 {
+        assert(matrix != NULL);
+
+        (void)memcpy(&_state.matrices[0], matrix, sizeof(MATRIX));
 }
 
-/* void slUnitMatrix(MATRIX *mtptr) */
-/* void slUnitAngle(MATRIX *mtptr) */
-/* void slUnitTranslate(MATRIX *mtptr) */
+void
+sega3d_matrix_copy(void)
+{
+        assert(_state.index >= 1);
 
-/* void slTranslate(FIXED tx, FIXED ty, FIXED tz) */
+        MATRIX *src_matrix;
+        src_matrix = &_state.matrices[_state.index - 1];
+
+        MATRIX *dst_matrix;
+        dst_matrix = &_state.matrices[_state.index];
+
+        (void)memcpy(dst_matrix, src_matrix, sizeof(MATRIX));
+}
+
+void
+sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
+{
+        MATRIX *matrix;
+        matrix = &_state.matrices[_state.index];
+
+        (*matrix)[3][0] = tx;
+        (*matrix)[3][1] = ty;
+        (*matrix)[3][2] = tz;
+}
+
+void
+sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz)
+{
+        MATRIX *matrix;
+        matrix = &_state.matrices[_state.index];
+
+        (*matrix)[0][0] = sx;
+        (*matrix)[1][1] = sy;
+        (*matrix)[2][2] = sz;
+}

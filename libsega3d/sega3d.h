@@ -7,10 +7,12 @@
 
 #include <stdint.h>
 
+#include <fix16.h>
+
 #include <vdp1/cmdt.h>
 
 /* XXX: Hack: There is a strange compilation warning with ATTRIBUTE */
-#pragma GCC diagnostic ignored "-Wpedantic" 
+#pragma GCC diagnostic ignored "-Wpedantic"
 
 #define M_PI (3.1415926535897932f)
 
@@ -66,39 +68,39 @@
 #define FUNC_BasePosition       (10)
 #define FUNC_End                (-1)
 
-#define MSBon           (1 << 15)       /* フレームバッファに書き込むＭＳＢを１にする */
-#define HSSon           (1 << 12)       /* ハイスピードシュリンク有効 */
-#define HSSoff          (0 << 12)       /* ハイスピードシュリンク無効(default) */
-#define No_Window       (0 << 9)        /* ウィンドウの制限を受けない(default)*/
-#define Window_In       (2 << 9)        /* ウィンドウの内側に表示 */
-#define Window_Out      (3 << 9)        /* ウィンドウの外側に表示 */
-#define MESHoff         (0 << 8)        /* 通常表示(default) */
-#define MESHon          (1 << 8)        /* メッシュで表示 */
-#define ECdis           (1 << 7)        /* エンドコードをパレットのひとつとして使用 */
-#define ECenb           (0 << 7)        /* エンドコード有効 */
-#define SPdis           (1 << 6)        /* スペースコードをパレットのひとつとして使用 */
-#define SPenb           (0 << 6)        /* スペースは表示しない(default) */
-#define CL16Bnk         (0 << 3)        /* カラーバンク１６色モード (default) */
-#define CL16Look        (1 << 3)        /* カラールックアップ１６色モード */
-#define CL64Bnk         (2 << 3)        /* カラーバンク６４色モード */
-#define CL128Bnk        (3 << 3)        /* カラーバンク１２８色モード */
-#define CL256Bnk        (4 << 3)        /* カラーバンク２５６色モード */
-#define CL32KRGB        (5 << 3)        /* ＲＧＢ３２Ｋ色モード */
-#define CL_Replace      0               /* 重ね書き(上書き)モード */
-#define CL_Shadow       1               /* 影モード */
-#define CL_Half         2               /* 半輝度モード */
-#define CL_Trans        3               /* 半透明モード */
-#define CL_Gouraud      4               /* グーローシェーディングモード */
+#define MSBon           (1 << 15)
+#define HSSon           (1 << 12)
+#define HSSoff          (0 << 12)
+#define No_Window       (0 << 9)
+#define Window_In       (2 << 9)
+#define Window_Out      (3 << 9)
+#define MESHoff         (0 << 8)
+#define MESHon          (1 << 8)
+#define ECdis           (1 << 7)
+#define ECenb           (0 << 7)
+#define SPdis           (1 << 6)
+#define SPenb           (0 << 6)
+#define CL16Bnk         (0 << 3)
+#define CL16Look        (1 << 3)
+#define CL64Bnk         (2 << 3)
+#define CL128Bnk        (3 << 3)
+#define CL256Bnk        (4 << 3)
+#define CL32KRGB        (5 << 3)
+#define CL_Replace      0
+#define CL_Shadow       1
+#define CL_Half         2
+#define CL_Trans        3
+#define CL_Gouraud      4
 
-#define UseTexture      (1 << 2)        /* テクスチャを貼るポリゴン */
-#define UseLight        (1 << 3)        /* 光源の影響を受けるポリゴン */
-#define UsePalette      (1 << 5)        /* ポリゴンのカラー */
+#define UseTexture      (1 << 2)
+#define UseLight        (1 << 3)
+#define UsePalette      (1 << 5)
 
-#define UseNearClip     (1 << 6)        /* ニア・クリッピングをする */
-#define UseGouraud      (1 << 7)        /* リアルグーロー */
-#define UseDepth        (1 << 4)        /* デプスキュー */
+#define UseNearClip     (1 << 6)
+#define UseGouraud      (1 << 7)
+#define UseDepth        (1 << 4)
 
-#define UseClip         UseNearClip     /* ニア・クリッピングをする */
+#define UseClip         UseNearClip
 
 #define sprHflip        ((1 << 4) | FUNC_Texture | (UseTexture << 16))
 #define sprVflip        ((1 << 5) | FUNC_Texture | (UseTexture << 16))
@@ -108,17 +110,17 @@
 #define sprPolyLine     (FUNC_PolyLine | ((ECdis | SPdis) << 24))
 #define sprLine         (FUNC_Line | ((ECdis | SPdis) << 24))
 
-#define No_Texture      0 /* テクスチャを使用しない時 */
-#define No_Option       0 /* オプションを使用しない時 */
-#define No_Gouraud      0 /* グーローシェーディングを使用しない時 */
-#define No_Palet        0 /* カラーパレットの指定がいらない時 */
+#define No_Texture      0
+#define No_Option       0
+#define No_Gouraud      0
+#define No_Palet        0
 #define GouraudRAM      (0x00080000 - (32 * 8)) /* 光源の影響用のグーローバッファ */
 
-#define COL_16          (2 + 1) /* カラーバンク１６色モード */
-#define COL_64          (2 + 0) /* カラーバンク６４色モード */
-#define COL_128         (2 + 0) /* カラーバンク１２８色モード */
-#define COL_256         (2 + 0) /* カラーバンク２５６色モード */
-#define COL_32K         (2 - 1) /* ＲＧＢ３２Ｋ色モード */
+#define COL_16          (2 + 1)
+#define COL_64          (2 + 0)
+#define COL_128         (2 + 0)
+#define COL_256         (2 + 0)
+#define COL_32K         (2 - 1)
 
 typedef unsigned char Uint8;
 typedef signed char Sint8;
@@ -130,6 +132,14 @@ typedef int Int;
 typedef int Bool;
 
 typedef Uint16 TEXDAT;
+
+enum mtrx {
+        M00, M01, M02,
+        M10, M11, M12,
+        M20, M21, M22,
+        M30, M31, M32,
+        MTRX
+};
 
 enum ps {
         X,
@@ -145,15 +155,15 @@ enum ps {
 };
 
 enum base {
-        SORT_BFR,       /* 直前に表示したポリゴンの位置を使う */
-        SORT_MIN,       /* ４点の内、一番手前の点を使う */
-        SORT_MAX,       /* ４点の内一番遠い点を使う */
-        SORT_CEN        /* ４点の平均位置を使う */
+        SORT_BFR,
+        SORT_MIN,
+        SORT_MAX,
+        SORT_CEN
 };
 
 enum pln {
-        Single_Plane = 0,       /* 片面ポリゴン*/
-        Dual_Plane = 1          /* 両面ポリゴン(表裏判定の結果を見ない) */
+        Single_Plane = 0,
+        Dual_Plane   = 1
 };
 
 typedef Sint16 ANGLE;
@@ -217,19 +227,28 @@ typedef struct {
         void *pcsrc;
 } PICTURE;
 
-extern void sega3d_tlist_alloc(uint16_t count);
+typedef enum {
+        MATRIX_TYPE_PUSH     = 0,
+        MATRIX_TYPE_MOVE_PTR = 1
+} matrix_type_t;
+
+extern void sega3d_tlist_alloc(Uint16 count);
 extern void sega3d_tlist_free(void);
-extern void sega3d_tlist_set(TEXTURE *textures, uint16_t count);
-extern uint16_t sega3d_tlist_count_get(void);
-extern uint16_t sega3d_tlist_cursor_get(void);
+extern void sega3d_tlist_set(TEXTURE *textures, Uint16 count);
+extern Uint16 sega3d_tlist_count_get(void);
+extern Uint16 sega3d_tlist_cursor_get(void);
 extern void sega3d_tlist_cursor_reset(void);
 extern TEXTURE *sega3d_tlist_tex_append(void);
-extern TEXTURE *sega3d_tlist_tex_get(uint16_t cursor);
+extern TEXTURE *sega3d_tlist_tex_get(Uint16 cursor);
 
-extern void sega3d_matrix_push(void);
+extern void sega3d_matrix_push(matrix_type_t matrix_type);
 extern void sega3d_matrix_pop(void);
+extern void sega3d_matrix_load(const MATRIX *matrix);
+extern void sega3d_matrix_copy(void);
+extern void sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz);
+extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
 
-extern uint16_t sega3d_polycount_get(const PDATA *pdata);
-extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, uint16_t offset);
+extern Uint16 sega3d_polycount_get(const PDATA *pdata);
+extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset);
 
 #endif /* SEGA3D_H_ */
