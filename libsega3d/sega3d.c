@@ -100,7 +100,7 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
 
                 const ATTR *attr;
                 attr = &pdata->attbl[i];
-                
+
                 cmdt->cmd_ctrl = attr->dir; /* We care about (Dir) and (Comm) bits */
                 cmdt->cmd_link = 0x0000;
                 cmdt->cmd_pmod = attr->atrb;
