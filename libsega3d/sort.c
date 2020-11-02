@@ -24,6 +24,8 @@ _internal_sort_clear(void)
         _state.index = 0;
 
         (void)memset(_state.list, 0, sizeof(sort_list_t) * Z_RANGE);
+        /* XXX: Maybe we can remove this? Is there really a need to reset the
+         *      pool? */
         (void)memset(_state.single_pool, 0, sizeof(sort_single_t) * PACKET_SIZE);
 }
 

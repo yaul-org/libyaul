@@ -27,14 +27,16 @@ static struct {
 
         FIXED distance;
 
-        /* Current command table buffer pointed by sega3d_cmdt_transform */
-        vdp1_cmdt_list_t transform_cmdt_list;
+        /* Current object */
+        sega3d_object_t *object;
+        /* Set iteration function */
+        sega3d_iterate_fn iterate_fn;
 
         /* Buffered for copying */
         vdp1_cmdt_list_t *copy_cmdt_list;
 } _state;
 
-static void _sort_iterate(sort_single_t *p_single);
+static void _sort_iterate(sort_single_t *single);
 
 static inline FIXED __always_inline __used
 _vertex_transform(const FIXED *p, const FIXED *matrix)
@@ -79,21 +81,27 @@ sega3d_init(void)
 }
 
 Uint16
-sega3d_polycount_get(const PDATA *pdata)
+sega3d_object_polycount_get(sega3d_object_t *object)
 {
+        const PDATA *pdata;
+        pdata = object->pdata;
+        
         return pdata->nbPolygon;
 }
 
 void
-sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
+sega3d_object_prepare(sega3d_object_t *object)
 {
+        const PDATA *pdata;
+        pdata = object->pdata;
+
+        vdp1_cmdt_list_t *cmdt_list;
+        cmdt_list = object->cmdt_list;
+
         assert(pdata != NULL);
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
-
-        _state.transform_cmdt_list.cmdts = &cmdt_list->cmdts[offset];
-        _state.transform_cmdt_list.count = 0;
-
+        
         for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 vdp1_cmdt_t *cmdt;
                 cmdt = &_state.copy_cmdt_list->cmdts[i];
@@ -134,9 +142,12 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
 }
 
 void
-sega3d_cmdt_transform(PDATA *pdata)
+sega3d_object_transform(sega3d_object_t *object)
 {
         _internal_sort_clear();
+
+        const PDATA *pdata;
+        pdata = object->pdata;
 
         const MATRIX *matrix;
         matrix = sega3d_matrix_top();
@@ -216,25 +227,40 @@ sega3d_cmdt_transform(PDATA *pdata)
 
                 _internal_sort_add(copy_cmdt, z_center >> 16);
         }
+}
 
-        _state.transform_cmdt_list.count = 0;
+void
+sega3d_object_iterate(sega3d_object_t *object)
+{
+        _state.object = object;
+        _state.iterate_fn = object->iterate_fn;
+
+        if (_state.iterate_fn == NULL) {
+                _state.iterate_fn = sega3d_standard_iterate;
+        }
 
         _internal_sort_iterate(_sort_iterate);
 }
 
-static void __used
-_sort_iterate(sort_single_t *single)
+void
+sega3d_standard_iterate(sega3d_object_t *object, const vdp1_cmdt_t *cmdt)
 {
         vdp1_cmdt_list_t *transform_cmdt_list;
-        transform_cmdt_list = &_state.transform_cmdt_list;
+        transform_cmdt_list = object->cmdt_list;
 
+        vdp1_cmdt_t *transform_cmdt;
+        transform_cmdt = &transform_cmdt_list->cmdts[object->offset + transform_cmdt_list->count];
+
+        *transform_cmdt = *cmdt;
+
+        transform_cmdt_list->count++;
+}
+
+static void
+_sort_iterate(sort_single_t *single)
+{
         const vdp1_cmdt_t *sort_cmdt;
         sort_cmdt = single->packet;
 
-        vdp1_cmdt_t *transform_cmdt;
-        transform_cmdt = &transform_cmdt_list->cmdts[transform_cmdt_list->count];
-
-        *transform_cmdt = *sort_cmdt;
-
-        transform_cmdt_list->count++;
+        _state.iterate_fn(_state.object, sort_cmdt);
 }
