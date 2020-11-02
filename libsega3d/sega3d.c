@@ -6,6 +6,8 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include <sys/cdefs.h>
 
@@ -18,15 +20,34 @@ extern void _internal_matrix_init(void);
 
 extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
+extern void _internal_sort_iterate(iterate_fn fn);
 
-struct {
+static struct {
+        bool initialized;
+
         FIXED distance;
+
+        /* Current command table buffer pointed by sega3d_cmdt_transform */
+        vdp1_cmdt_list_t transform_cmdt_list;
+
+        /* Buffered for copying */
+        vdp1_cmdt_list_t *copy_cmdt_list;
 } _state;
+
+static void _sort_iterate(sort_single_t *p_single);
 
 void
 sega3d_init(void)
 {
+        /* Prevent re-initialization */
+        if (_state.initialized) {
+                return;
+        }
+
+        _state.initialized = true;
         _state.distance = -PROJECTION_DISTANCE;
+        _state.copy_cmdt_list = vdp1_cmdt_list_alloc(PACKET_SIZE);
+        assert(_state.copy_cmdt_list != NULL);
 
         _internal_matrix_init();
 }
@@ -44,14 +65,12 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
 
-        cmdt_list->count = pdata->nbPolygon;
+        _state.transform_cmdt_list.cmdts = &cmdt_list->cmdts[offset];
+        _state.transform_cmdt_list.count = 0;
 
-        vdp1_cmdt_t *base_cmdts;
-        base_cmdts = &cmdt_list->cmdts[offset];
-
-        for (uint32_t i = 0; i < cmdt_list->count; i++) {
+        for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 vdp1_cmdt_t *cmdt;
-                cmdt = &base_cmdts[i];
+                cmdt = &_state.copy_cmdt_list->cmdts[i];
 
                 const ATTR *attr;
                 attr = &pdata->attbl[i];
@@ -82,12 +101,11 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
 }
 
 void
-sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
+sega3d_cmdt_transform(PDATA *pdata)
 {
-        vdp1_cmdt_t *base_cmdt;
-        base_cmdt = &cmdt_list->cmdts[offset];
+        _internal_sort_clear();
 
-        const MATRIX *matrix __unused;
+        const MATRIX *matrix;
         matrix = sega3d_matrix_top();
 
         const FIXED tx = (*matrix)[3][0];
@@ -113,8 +131,13 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
                 POLYGON *polygon;
                 polygon = &pdata->pltbl[i];
 
-                vdp1_cmdt_t *cmdt;
-                cmdt = &base_cmdt[i];
+                vdp1_cmdt_t *copy_cmdt;
+                copy_cmdt = &_state.copy_cmdt_list->cmdts[i];
+
+                /* Keep track of the projected Z values for averaging */
+                FIXED z_projs[4];
+                FIXED z_avg;
+                z_avg = 0;
 
                 for (uint32_t v = 0; v < 4; v++) {
                         uint16_t vertex;
@@ -126,27 +149,58 @@ sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset)
                         const FIXED py = (*point)[Y];
                         const FIXED pz = (*point)[Z];
 
-                        FIXED proj[XYZ];
+                        FIXED proj[XY];
 
-                        proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
+                        z_projs[v] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
 
-                        const FIXED divisor = (_state.distance - proj[Z]);
+                        const FIXED divisor = (_state.distance - z_projs[v]);
 
+                        /* Fire up CPU-DIVU to calculate reciprocal */
                         cpu_divu_fix16_set(_state.distance, divisor);
 
                         proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
                         proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
 
-                        const FIXED quotient = cpu_divu_quotient_get();
+                        z_avg += z_projs[v];
 
-                        proj[X] = fix16_mul(proj[X], quotient);
-                        proj[Y] = fix16_mul(proj[Y], quotient);
+                        /* Fetch results */
+                        const FIXED inverse_z = cpu_divu_quotient_get();
+
+                        cpu_divu_fix16_set(toFIXED(1.0f), toFIXED(3.0f));
+
+                        proj[X] = fix16_mul(proj[X], inverse_z);
+                        proj[Y] = fix16_mul(proj[Y], inverse_z);
 
                         int16_vector2_t proj_2d;
                         proj_2d.x = (proj[X] >> 16);
                         proj_2d.y = (proj[Y] >> 16);
 
-                        vdp1_cmdt_param_vertex_set(cmdt, v, &proj_2d);
+                        vdp1_cmdt_param_vertex_set(copy_cmdt, v, &proj_2d);
                 }
+
+                const FIXED z_center = fix16_mul(z_avg, toFIXED(0.333333f));
+
+                _internal_sort_add(copy_cmdt, z_center);
         }
+
+        _state.copy_cmdt_list->count = 0;
+
+        _internal_sort_iterate(_sort_iterate);
+}
+
+static void __used
+_sort_iterate(sort_single_t *single)
+{
+        vdp1_cmdt_list_t *transform_cmdt_list;
+        transform_cmdt_list = &_state.transform_cmdt_list;
+
+        const vdp1_cmdt_t *sort_cmdt;
+        sort_cmdt = single->packet;
+
+        vdp1_cmdt_t *transform_cmdt;
+        transform_cmdt = &transform_cmdt_list->cmdts[transform_cmdt_list->count];
+
+        *transform_cmdt = *sort_cmdt;
+
+        transform_cmdt_list->count++;
 }

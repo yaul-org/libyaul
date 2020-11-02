@@ -39,6 +39,6 @@ extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
 
 extern Uint16 sega3d_polycount_get(const PDATA *pdata);
 extern void sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset);
-extern void sega3d_cmdt_transform(PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offset);
+extern void sega3d_cmdt_transform(PDATA *pdata);
 
 #endif /* SEGA3D_H_ */
