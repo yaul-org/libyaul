@@ -106,6 +106,13 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
                 cmdt->cmd_pmod = attr->atrb;
                 cmdt->cmd_colr = attr->colno;
 
+                /* For debugging */
+                if (false) {
+                        cmdt->cmd_ctrl = 0x0005;
+                        cmdt->cmd_pmod = 0x00C0;
+                        cmdt->cmd_colr = 0xFFFF;
+                }
+
                 /* Even when there is not texture list, there is the default
                  * texture that zeroes out CMDSRCA and CMDSIZE */
                 const TEXTURE *texture;
