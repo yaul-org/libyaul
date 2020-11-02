@@ -21,4 +21,18 @@ typedef enum {
 
 #define MATRIX_STACK_MAX (20)
 
+#define Z_RANGE         4096
+#define PACKET_SIZE     2048
+
+typedef struct sort_single {
+        void *packet;
+        struct sort_single *next_single;
+} sort_single_t;
+
+typedef struct {
+        sort_single_t *first_single;
+} sort_list_t;
+
+typedef void (*iterate_fn)(sort_single_t *);
+
 #endif /* SEGA3D_INTERNAL_H_ */
