@@ -69,6 +69,8 @@ sega3d_cmdt_prepare(const PDATA *pdata, vdp1_cmdt_list_t *cmdt_list, Uint16 offs
 
                 cmdt->cmd_srca = texture->CGadr;
                 cmdt->cmd_size = texture->HVsize;
+
+                cmdt->cmd_grda = attr->gstb;
         }
 }
 
