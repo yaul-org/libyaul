@@ -16,6 +16,9 @@
 
 extern void _internal_matrix_init(void);
 
+extern void _internal_sort_clear(void);
+extern void _internal_sort_add(void *packet, int32_t pz);
+
 struct {
         FIXED distance;
 } _state;
