@@ -22,7 +22,7 @@ typedef enum {
 #define MATRIX_STACK_MAX (20)
 
 #define Z_RANGE         4096
-#define PACKET_SIZE     2048
+#define PACKET_SIZE     4096
 
 typedef struct sort_single {
         void *packet;
