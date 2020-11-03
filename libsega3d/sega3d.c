@@ -16,6 +16,7 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
+extern void _internal_tlist_init(void);
 extern void _internal_matrix_init(void);
 
 extern void _internal_sort_clear(void);
@@ -77,6 +78,7 @@ sega3d_init(void)
         _state.copy_cmdt_list = vdp1_cmdt_list_alloc(PACKET_SIZE);
         assert(_state.copy_cmdt_list != NULL);
 
+        _internal_tlist_init();
         _internal_matrix_init();
 }
 
