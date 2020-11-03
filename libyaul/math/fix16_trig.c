@@ -8,39 +8,32 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include <cpu/divu.h>
+
 #include "math.h"
 #include "fix16.h"
 
-static fix16_sin_table_t _sin_table __unused;
-static fix16_cos_table_t _cos_table __unused;
-static fix16_atan2_table_t _atan2_table __unused;
-
 #include "fix16_sin.inc" 
 
-void
-fix16_trig_tables_set(const fix16_sin_table_t *sin_table __unused,
-    const fix16_cos_table_t *cos_table __unused,
-    const fix16_atan2_table_t *atan2_table __unused)
+static inline int32_t __always_inline 
+_rad2brad_convert(const fix16_t radians)
 {
-        assert(false && "Not implemented");
+        const fix16_t converted =
+            fix16_mul(radians, FIX16(FIX16_LUT_TABLE_COUNT / (2.0f * M_PI)));
+
+        return (fix16_int32_to(converted) + FIX16_LUT_TABLE_COUNT);
 }
 
 fix16_t
 fix16_sin(const fix16_t radians)
 {
-        fix16_t converted;
-        converted = fix16_mul(radians, FIX16(FIX16_LUT_TABLE_COUNT / (2.0f * M_PI)));
-
-        return fix16_bradians_sin(fix16_int32_to(converted));
+        return fix16_bradians_sin(_rad2brad_convert(radians));
 }
 
 fix16_t
 fix16_cos(const fix16_t radians)
 {
-        fix16_t converted;
-        converted = fix16_mul(radians, FIX16(FIX16_LUT_TABLE_COUNT / (2.0f * M_PI)));
-
-        return fix16_bradians_cos(fix16_int32_to(converted));
+        return fix16_bradians_cos(_rad2brad_convert(radians));
 }
 
 fix16_t
@@ -56,11 +49,19 @@ fix16_bradians_cos(const int32_t bradians)
 }
 
 fix16_t
-fix16_tan(const fix16_t radians __unused)
+fix16_tan(const fix16_t radians)
 {
-        assert(false && "Not implemented");
+        const int32_t bradians = _rad2brad_convert(radians);
+        const fix16_t cos = fix16_bradians_cos(bradians);
 
-        return FIX16(0.0f);
+        cpu_divu_fix16_set(FIX16(1.0f), cos);
+
+        const fix16_t sin = fix16_bradians_sin(bradians);
+
+        const fix16_t quotient = cpu_divu_quotient_get();
+        const fix16_t result = fix16_mul(sin, quotient);
+
+        return result;
 }
 
 fix16_t
@@ -84,7 +85,7 @@ fix16_atan(const fix16_t x)
 {
         assert(false && "Not implemented");
 
-        return fix16_atan2(x, FIX16_ONE);
+        return fix16_atan2(x, FIX16(1.0f));
 }
 
 fix16_t

@@ -11,21 +11,6 @@
 
 #define FIX16_LUT_TABLE_COUNT (1024)
 
-typedef struct fix16_sin_table {
-        const fix16_t *table;
-} fix16_sin_table_t;
-
-typedef struct fix16_cos_table {
-        const fix16_t *table;
-} fix16_cos_table_t;
-
-typedef struct fix16_atan2_table {
-        const fix16_t *table;
-} fix16_atan2_table_t;
-
-extern void fix16_trig_tables_set(const fix16_sin_table_t *,
-    const fix16_cos_table_t *, const fix16_atan2_table_t *);
-
 extern fix16_t fix16_sin(const fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_cos(const fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_tan(const fix16_t) FIXMATH_FUNC_ATTRS;
