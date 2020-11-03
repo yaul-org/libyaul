@@ -57,6 +57,9 @@ extern void sega3d_matrix_load(const MATRIX *matrix);
 extern void sega3d_matrix_copy(void);
 extern void sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz);
 extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
+extern void sega3d_matrix_rotate_x(const ANGLE angle);
+extern void sega3d_matrix_rotate_y(const ANGLE angle);
+extern void sega3d_matrix_rotate_z(const ANGLE angle);
 
 extern Uint16 sega3d_object_polycount_get(sega3d_object_t *object);
 extern void sega3d_object_prepare(sega3d_object_t *object);
