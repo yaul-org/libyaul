@@ -8,6 +8,7 @@
 *.o
 *.d
 *.s
+*.iso
 
 /docs/
 /examples/

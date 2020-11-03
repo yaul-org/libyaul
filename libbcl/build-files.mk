@@ -7,8 +7,5 @@ LIB_SRCS:= huffman.c \
 	rle.c \
 	shannonfano.c
 
-INCLUDE_DIRS:= \
-	../lib$(MAIN_TARGET)/lib/lib
-
 INSTALL_HEADER_FILES:= \
 	./:bcl.h:./bcl/
