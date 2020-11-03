@@ -211,16 +211,16 @@ sega3d_object_transform(sega3d_object_t *object)
 
                         z_avg += proj[Z];
 
-                        int16_vector2_t proj_2d;
-                        proj_2d.x = (proj[X] >> 16);
-                        proj_2d.y = (proj[Y] >> 16);
+                        int16_vec2_t proj_2d;
+                        proj_2d.x = fix16_int32_to(proj[X]);
+                        proj_2d.y = fix16_int32_to(proj[Y]);
 
                         vdp1_cmdt_param_vertex_set(copy_cmdt, v, &proj_2d);
                 }
 
                 const FIXED z_center = fix16_mul(z_avg, toFIXED(0.25f));
 
-                _internal_sort_add(copy_cmdt, z_center >> 16);
+                _internal_sort_add(copy_cmdt, fix16_int32_to(z_center));
         }
 }
 

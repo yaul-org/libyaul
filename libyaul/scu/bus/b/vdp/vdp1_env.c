@@ -145,11 +145,11 @@ vdp1_env_stop(void)
 
 void
 vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
-    const int16_vector2_t *local_coords)
+    const int16_vec2_t *local_coords)
 {
         assert(cmdts != NULL);
 
-        int16_vector2_t stack_local_coords;
+        int16_vec2_t stack_local_coords;
         
         if (local_coords == NULL) {
                 local_coords = &stack_local_coords;
@@ -158,7 +158,7 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
                 stack_local_coords.y = _state_vdp2()->tv.resolution.y / 2;
         }
 
-        int16_vector2_t system_clip_coords;
+        int16_vec2_t system_clip_coords;
         system_clip_coords.x = _state_vdp2()->tv.resolution.x;
         system_clip_coords.y = _state_vdp2()->tv.resolution.y;
 

@@ -80,7 +80,7 @@ extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
 extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
-    const int16_vector2_t *);
+    const int16_vec2_t *);
 
 /// @}
 
