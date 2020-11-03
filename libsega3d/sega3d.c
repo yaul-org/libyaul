@@ -95,12 +95,7 @@ sega3d_object_prepare(sega3d_object_t *object)
         const PDATA *pdata;
         pdata = object->pdata;
 
-        vdp1_cmdt_list_t *cmdt_list;
-        cmdt_list = object->cmdt_list;
-
         assert(pdata != NULL);
-        assert(cmdt_list != NULL);
-        assert(cmdt_list->cmdts != NULL);
         
         for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 vdp1_cmdt_t *cmdt;
@@ -115,7 +110,7 @@ sega3d_object_prepare(sega3d_object_t *object)
                 cmdt->cmd_colr = attr->colno;
 
                 /* For debugging */
-                if (false) {
+                if ((object->flags & SEGA3D_OBJECT_FLAGS_WIREFRAME) == SEGA3D_OBJECT_FLAGS_WIREFRAME) {
                         cmdt->cmd_ctrl = 0x0005;
                         cmdt->cmd_pmod = 0x00C0;
                         cmdt->cmd_colr = 0xFFFF;
@@ -235,6 +230,8 @@ sega3d_object_iterate(sega3d_object_t *object)
         _state.object = object;
         _state.iterate_fn = object->iterate_fn;
 
+        _state.object->count = 0;
+
         if (_state.iterate_fn == NULL) {
                 _state.iterate_fn = sega3d_standard_iterate;
         }
@@ -245,15 +242,15 @@ sega3d_object_iterate(sega3d_object_t *object)
 void
 sega3d_standard_iterate(sega3d_object_t *object, const vdp1_cmdt_t *cmdt)
 {
-        vdp1_cmdt_list_t *transform_cmdt_list;
-        transform_cmdt_list = object->cmdt_list;
+        vdp1_cmdt_t *transform_cmdts;
+        transform_cmdts = object->cmdts;
 
         vdp1_cmdt_t *transform_cmdt;
-        transform_cmdt = &transform_cmdt_list->cmdts[object->offset + transform_cmdt_list->count];
+        transform_cmdt = &transform_cmdts[object->offset + object->count];
 
         *transform_cmdt = *cmdt;
 
-        transform_cmdt_list->count++;
+        object->count++;
 }
 
 static void
