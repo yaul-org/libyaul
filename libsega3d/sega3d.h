@@ -22,11 +22,18 @@ typedef enum {
         MATRIX_TYPE_MOVE_PTR = 1
 } matrix_type_t;
 
+typedef enum {
+        SEGA3D_OBJECT_FLAGS_NONE      = 0,
+        SEGA3D_OBJECT_FLAGS_WIREFRAME = 1 << 0,
+} sega3d_flags_t;
+
 struct sega3d_object {
         void *pdata;
-        vdp1_cmdt_list_t *cmdt_list;
+        vdp1_cmdt_t *cmdts;
         uint16_t offset;
+        uint16_t count;
 
+        sega3d_flags_t flags;
         sega3d_iterate_fn iterate_fn;
 
         void *data;
