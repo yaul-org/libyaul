@@ -26,6 +26,8 @@
 
 #include "fix16.h"
 
+static char *_itoa_loop(char *buf, uint32_t scale, uint32_t value, bool skip);
+
 static const uint32_t _scales[8] = {
         /* 5 decimals is enough for full fix16_t precision */
         1,
@@ -38,48 +40,30 @@ static const uint32_t _scales[8] = {
         100000
 };
 
-static char *
-_itoa_loop(char *buf, uint32_t scale, uint32_t value, bool skip)
-{
-        while (scale) {
-                unsigned digit = (value / scale);
-
-                if (!skip || digit || scale == 1) {
-                        skip = false;
-                        *buf++ = '0' + digit;
-                        value %= scale;
-                }
-
-                scale /= 10;
-        }
-
-        return buf;
-}
-
 void
 fix16_to_str(fix16_t value, char *buf, int decimals)
 {
-        uint32_t uvalue = (value >= 0) ? value : -value;
+        const uint32_t uvalue = (value >= 0) ? value : -value;
 
         if (value < 0) {
                 *buf++ = '-';
         }
 
         /* Separate the integer and decimal parts of the value */
-        unsigned intpart = uvalue >> 16;
+        unsigned int_part = uvalue >> 16;
         uint32_t frac_part = uvalue & 0xFFFF;
         uint32_t scale = _scales[decimals & 7];
 
-        frac_part = frac_part * scale;
+        frac_part = fix16_mul(frac_part, scale);
 
         if (frac_part >= scale) {
                 /* Handle carry from decimal part */
-                intpart++;
+                int_part++;
                 frac_part -= scale;
         }
 
         /* Format integer part */
-        buf = _itoa_loop(buf, 10000, intpart, true);
+        buf = _itoa_loop(buf, 10000, int_part, true);
 
         /* Format decimal part (if any) */
         if (scale != 1) {
@@ -88,4 +72,24 @@ fix16_to_str(fix16_t value, char *buf, int decimals)
         }
 
         *buf = '\0';
+}
+
+static char *
+_itoa_loop(char *buf, uint32_t scale, uint32_t value, bool skip)
+{
+        while (scale) {
+                unsigned digit = (value / scale);
+
+                if (!skip || digit || (scale == 1)) {
+                        skip = false;
+
+                        *buf++ = '0' + digit;
+
+                        value %= scale;
+                }
+
+                scale /= 10;
+        }
+
+        return buf;
 }
