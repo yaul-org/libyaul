@@ -223,25 +223,6 @@ LIB_SRCS+= \
 	scu/scu_dsp.c \
 	scu/scu_timer.c
 
-INCLUDE_DIRS:= \
-	. \
-	common \
-	common/gdb \
-	lib/lib \
-	kernel \
-	kernel/dbgio \
-	kernel/vfs \
-	math \
-	scu \
-	scu/bus/a/cs0/arp \
-	scu/bus/a/cs0/dram-cart \
-	scu/bus/a/cs0/usb-cart \
-	scu/bus/a/cs2/cd-block \
-	scu/bus/b/scsp \
-	scu/bus/b/vdp \
-	scu/bus/cpu \
-	scu/bus/cpu/smpc
-
 HEADER_FILES:= \
 	./yaul.h \
 	./common/bootstrap/ip.h
