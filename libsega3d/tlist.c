@@ -18,6 +18,12 @@ static TEXTURE _default_texture[] = {
 };
 
 void
+_internal_tlist_init(void)
+{
+        sega3d_tlist_set(NULL, 0);
+}
+
+void
 sega3d_tlist_alloc(uint16_t count)
 {
         assert(count > 0);
