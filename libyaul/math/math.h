@@ -11,6 +11,10 @@
 
 __BEGIN_DECLS
 
+#ifndef M_PI
+#define M_PI (3.1415926535897932f)
+#endif /* !M_PI */
+
 #ifndef min
 #define min(a, b)                                                              \
         ({ __typeof__ (a) _a = (a);                                            \
