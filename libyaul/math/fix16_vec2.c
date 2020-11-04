@@ -69,13 +69,13 @@ fix16_vec2_str(const fix16_vec2_t *v0, char *buf, int decimals)
         buf_ptr = buf;
 
         *buf_ptr++ = '(';
-        fix16_to_str(v0->x, component_buf, decimals);
+        fix16_str(v0->x, component_buf, decimals);
         component_buf_len = strlen(component_buf);
         memcpy(buf_ptr, component_buf, component_buf_len);
         buf_ptr += component_buf_len;
         *buf_ptr++ = ',';
 
-        fix16_to_str(v0->y, component_buf, decimals);
+        fix16_str(v0->y, component_buf, decimals);
         component_buf_len = strlen(component_buf);
         memcpy(buf_ptr, component_buf, component_buf_len);
         buf_ptr += component_buf_len;

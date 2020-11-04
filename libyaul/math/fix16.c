@@ -21,6 +21,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <assert.h>
+#include <stdbool.h>
+
 #include "fix16.h"
 
 fix16_t
@@ -28,12 +31,13 @@ fix16_overflow_add(const fix16_t a, const fix16_t b)
 {
         /* Use unsigned integers because overflow with signed integers is an
          * undefined operation <http://www.airs.com/blog/archives/120> */
-        uint32_t _a = a, _b = b;
-        uint32_t sum = _a + _b;
+        uint32_t ta = a;
+        uint32_t tb = b;
+        uint32_t sum = ta + tb;
 
         /* Overflow can only happen if sign of a == sign of b, and then it
          * causes sign of sum != sign of a */
-        if ((((_a ^ _b) & 0x80000000) == 0) && (((_a ^ sum) & 0x80000000) != 0)) {
+        if ((((ta ^ tb) & 0x80000000) == 0) && (((ta ^ sum) & 0x80000000) != 0)) {
                 return FIX16_OVERFLOW;
         }
 
@@ -43,13 +47,13 @@ fix16_overflow_add(const fix16_t a, const fix16_t b)
 fix16_t
 fix16_overflow_sub(const fix16_t a, const fix16_t b)
 {
-        uint32_t _a = a;
-        uint32_t _b = b;
-        uint32_t diff = _a - _b;
+        uint32_t ta = a;
+        uint32_t tb = b;
+        uint32_t diff = ta - tb;
 
         /* Overflow can only happen if sign of a != sign of b, and then it
          * causes sign of diff != sign of a. */
-        if ((((_a ^ _b) & 0x80000000) != 0) && (((_a ^ diff) & 0x80000000) != 0)) {
+        if ((((ta ^ tb) & 0x80000000) != 0) && (((ta ^ diff) & 0x80000000) != 0)) {
                 return FIX16_OVERFLOW;
         }
 
@@ -59,16 +63,15 @@ fix16_overflow_sub(const fix16_t a, const fix16_t b)
 fix16_t
 fix16_lerp(const fix16_t a, const fix16_t b, const fix16_t t)
 {
-        fix16_t t_clamped;
-        t_clamped = fix16_clamp(FIX16(0.0f), FIX16_ONE, t);
-
-        return (a * (FIX16_ONE - t_clamped)) + (b * t_clamped);
+        return (fix16_mul(a, (FIX16_ONE - t)) + fix16_mul(b, t));
 }
 
 fix16_t
-fix16_lerp8(const fix16_t a __unused, const fix16_t b __unused,
-    const uint8_t t __unused)
+fix16_lerp8(const fix16_t a, const fix16_t b, const uint8_t t)
 {
-        /* XXX: Not yet implemented */
-        return FIX16(0.0f);
+        /* Make sure when t =   0 => 0.0f
+         *                t = 255 => 1.0f */
+        const fix16_t fixed_t = fix16_int32_from((t + 1) >> 8);
+
+        return (fix16_mul(a, (FIX16_ONE - t)) + fix16_mul(b, fixed_t));
 }
