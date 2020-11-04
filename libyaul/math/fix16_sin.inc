@@ -1,6 +1,10 @@
 /* -*- mode: c -*- */
 
-static const fix16_t _lut_brads_sin[FIX16_LUT_TABLE_COUNT] = {
+#ifndef _FIX16_TRIG_INCLUDE_ONCE
+#error "Include file must not be directly included"
+#endif /* !_FIX16_TRIG_INCLUDE_ONCE */
+
+static const fix16_t _lut_brads_sin[FIX16_LUT_SIN_TABLE_COUNT] __aligned(16) = {
         /* Degree    0  0.00000f */ 0x00000000,
         /* Degree    1  0.00614f */ 0x00000192,
         /* Degree    2  0.01227f */ 0x00000324,

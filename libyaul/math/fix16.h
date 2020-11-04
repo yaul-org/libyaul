@@ -49,7 +49,10 @@ __BEGIN_DECLS
 #define FIX16_MIN       (0x80000000)
 #define FIX16_OVERFLOW  (0x80000000)
 
-#define FIX16_PI        (0x0003243F)
+#define FIX16_2PI       (0x00064881)
+#define FIX16_PI        (0x00032440)
+#define FIX16_PI_2      (0x00019220)
+#define FIX16_PI_4      (0x0000C910)
 #define FIX16_E         (0x0002B7E1)
 #define FIX16_ONE       (0x00010000)
 #define FIX16_RAD2DEG   (0x00394BB8)
@@ -133,6 +136,12 @@ static inline fix16_t __always_inline
 fix16_abs(const fix16_t value)
 {
         return ((value < 0) ? -value : value);
+}
+
+static inline fix16_t __always_inline
+fix16_sign(const fix16_t value)
+{
+        return ((value < 0) ? -FIX16_ONE : FIX16_ONE);
 }
 
 static inline fix16_t __always_inline
