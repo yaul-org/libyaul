@@ -233,19 +233,19 @@ color_fix16_hsv_str(const color_fix16_hsv_t *c0, char *buf, int32_t decimals)
         buf_ptr = buf;
 
         *buf_ptr++ = '(';
-        fix16_to_str(c0->h, component_buf, decimals);
+        fix16_str(c0->h, component_buf, decimals);
         component_buf_len = strlen(component_buf);
         (void)memcpy(buf_ptr, component_buf, component_buf_len);
         buf_ptr += component_buf_len;
         *buf_ptr++ = ',';
 
-        fix16_to_str(c0->s, component_buf, decimals);
+        fix16_str(c0->s, component_buf, decimals);
         component_buf_len = strlen(component_buf);
         (void)memcpy(buf_ptr, component_buf, component_buf_len);
         buf_ptr += component_buf_len;
         *buf_ptr++ = ',';
 
-        fix16_to_str(c0->v, component_buf, decimals);
+        fix16_str(c0->v, component_buf, decimals);
         component_buf_len = strlen(component_buf);
         (void)memcpy(buf_ptr, component_buf, component_buf_len);
         buf_ptr += component_buf_len;

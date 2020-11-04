@@ -41,7 +41,7 @@ static const uint32_t _scales[8] = {
 };
 
 void
-fix16_to_str(fix16_t value, char *buf, int decimals)
+fix16_str(fix16_t value, char *buf, int decimals)
 {
         const uint32_t uvalue = (value >= 0) ? value : -value;
 
