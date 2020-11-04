@@ -119,7 +119,7 @@ sega3d_matrix_rotate_x(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
         const FIXED sin = fix16_bradians_sin(bradians);
         const FIXED cos = fix16_bradians_cos(bradians);
 
@@ -144,7 +144,7 @@ sega3d_matrix_rotate_y(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
         const FIXED sin_value = fix16_bradians_sin(bradians);
         const FIXED cos_value = fix16_bradians_cos(bradians);
 
@@ -169,7 +169,7 @@ sega3d_matrix_rotate_z(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
         const FIXED sin_value = fix16_bradians_sin(bradians);
         const FIXED cos_value = fix16_bradians_cos(bradians);
 

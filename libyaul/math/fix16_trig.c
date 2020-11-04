@@ -13,39 +13,48 @@
 #include "math.h"
 #include "fix16.h"
 
-#include "fix16_sin.inc" 
+#define _FIX16_TRIG_INCLUDE_ONCE
+#include "fix16_sin.inc"
+#include "fix16_atan.inc"
+#undef _FIX16_TRIG_INCLUDE_ONCE
 
-static inline int32_t __always_inline 
-_rad2brad_convert(const fix16_t radians)
+static inline int32_t __always_inline
+_rad2brad_convert(fix16_t radians)
 {
         const fix16_t converted =
-            fix16_mul(radians, FIX16(FIX16_LUT_TABLE_COUNT / (2.0f * M_PI)));
+            fix16_mul(radians, FIX16(FIX16_LUT_SIN_TABLE_COUNT / (2.0f * M_PI)));
 
-        return (fix16_int32_to(converted) + FIX16_LUT_TABLE_COUNT);
+        return (fix16_int32_to(converted) + FIX16_LUT_SIN_TABLE_COUNT);
 }
 
 fix16_t
-fix16_sin(const fix16_t radians)
+fix16_sin(fix16_t radians)
 {
         return fix16_bradians_sin(_rad2brad_convert(radians));
 }
 
 fix16_t
-fix16_cos(const fix16_t radians)
+fix16_cos(fix16_t radians)
 {
         return fix16_bradians_cos(_rad2brad_convert(radians));
 }
 
 fix16_t
-fix16_bradians_sin(const int32_t bradians)
+fix16_bradians_sin(int32_t bradians)
 {
-        return _lut_brads_sin[(bradians + FIX16_LUT_TABLE_COUNT) & (FIX16_LUT_TABLE_COUNT - 1)];
+        const uint32_t index =
+            (bradians + FIX16_LUT_SIN_TABLE_COUNT);
+
+        return _lut_brads_sin[index & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
 }
 
 fix16_t
-fix16_bradians_cos(const int32_t bradians)
+fix16_bradians_cos(int32_t bradians)
 {
-        return _lut_brads_sin[(bradians + (FIX16_LUT_TABLE_COUNT / 4) + FIX16_LUT_TABLE_COUNT) & (FIX16_LUT_TABLE_COUNT - 1)];
+        const uint32_t index =
+            (bradians + (FIX16_LUT_SIN_TABLE_COUNT / 4) + FIX16_LUT_SIN_TABLE_COUNT);
+
+        return _lut_brads_sin[index & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
 }
 
 fix16_t
@@ -65,33 +74,42 @@ fix16_tan(const fix16_t radians)
 }
 
 fix16_t
-fix16_asin(const fix16_t x __unused)
+fix16_atan2(fix16_t y, fix16_t x)
 {
-        assert(false && "Not implemented");
+        if (y == 0) {
+                return ((x >= 0) ? 0 : FIX16_PI);
+        }
 
-        return FIX16(0.0f);
-}
+        int32_t phi;
+        phi = 0;
 
-fix16_t
-fix16_acos(const fix16_t x)
-{
-        assert(false && "Not implemented");
+        if (y < 0) {
+                x = -x;
+                y = -y;
+                phi += 4;
+        }
 
-        return ((FIX16_PI >> 1) - fix16_asin(x));
-}
+        if (x <= 0) {
+                const fix16_t t = x;
 
-fix16_t
-fix16_atan(const fix16_t x)
-{
-        assert(false && "Not implemented");
+                x = y;
+                y = -t;
+                phi += 2;
+        }
 
-        return fix16_atan2(x, FIX16(1.0f));
-}
+        if (x <= y) {
+                const fix16_t t = y - x;
 
-fix16_t
-fix16_atan2(const fix16_t x __unused, const fix16_t y __unused)
-{
-        assert(false && "Not implemented");
+                x = x + y;
+                y = t;
+                phi++;
+        }
 
-        return FIX16(0.0f);
+        cpu_divu_fix16_set(y, x);
+
+        const fix16_t q = cpu_divu_quotient_get();
+        const int32_t index = fix16_int32_to(q * FIX16_LUT_ATAN_TABLE_COUNT);
+        const fix16_t dphi = _lut_brads_atan[index];
+
+        return ((phi * (FIX16_PI / 4)) + dphi);
 }

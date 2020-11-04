@@ -9,16 +9,14 @@
 #error "Header file must not be directly included"
 #endif /* !_FIX16_INCLUDE_ONCE */
 
-#define FIX16_LUT_TABLE_COUNT (1024)
+#define FIX16_LUT_SIN_TABLE_COUNT       (1024)
+#define FIX16_LUT_ATAN_TABLE_COUNT      (256)
 
-extern fix16_t fix16_sin(const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_cos(const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_tan(const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_sin(fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_cos(fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_tan(fix16_t) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_bradians_sin(const int32_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_bradians_cos(const int32_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_atan2(fix16_t y, fix16_t x) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_asin(const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_acos(const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_atan(const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_atan2(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_bradians_sin(int32_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_bradians_cos(int32_t) FIXMATH_FUNC_ATTRS;
