@@ -202,10 +202,8 @@ extern void fix16_to_str(fix16_t, char *, int);
 
 #include "fix16_vec2.h"
 #include "fix16_vec3.h"
-#include "fix16_vec4.h"
 
 #include "fix16_mat3.h"
-#include "fix16_mat4.h"
 
 #undef _FIX16_INCLUDE_ONCE
 
