@@ -8,32 +8,49 @@
 
 #include <string.h>
 
+#include <cpu/divu.h>
+
 #include "fix16.h"
 
 void
 fix16_vec3_normalize(fix16_vec3_t *result __unused)
 {
-        /* XXX: Not yet implemented */
+        const fix16_t length = fix16_vec3_length(result);
+
+        cpu_divu_fix16_set(FIX16(1.0f), length);
+
+        const fix16_t scale = cpu_divu_quotient_get();
+
+        fix16_vec3_scale(scale, result);
 }
 
 void
-fix16_vec3_normalized(const fix16_vec3_t *v0 __unused,
-    fix16_vec3_t *result __unused)
+fix16_vec3_normalized(const fix16_vec3_t * __restrict v0, fix16_vec3_t * __restrict result)
 {
-        /* XXX: Not yet implemented */
+        const fix16_t length = fix16_vec3_length(v0);
+
+        cpu_divu_fix16_set(FIX16(1.0f), length);
+
+        const fix16_t scale = cpu_divu_quotient_get();
+
+        fix16_vec3_scaled(scale, v0, result);
 }
 
 fix16_t
-fix16_vec3_length(const fix16_vec3_t *v0 __unused)
+fix16_vec3_length(const fix16_vec3_t *v0)
 {
-        return FIX16(0.0f);
+        const fix16_t r = fix16_vec3_inline_dot(v0, v0);
+        const fix16_t sqrt = fix16_sqrt(r);
+
+        return sqrt;
 }
 
 fix16_t
-fix16_vec3_sqr_length(const fix16_vec2_t *v0 __unused)
+fix16_vec3_sqr_length(const fix16_vec3_t *v0)
 {
-        /* XXX: Not yet implemented */
-        return FIX16(0.0f);
+        const fix16_t r = fix16_vec3_inline_dot(v0, v0);
+
+        return r;
 }
 
 fix16_t
