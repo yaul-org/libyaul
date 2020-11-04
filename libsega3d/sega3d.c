@@ -16,6 +16,7 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
+extern void _internal_tlist_init(void);
 extern void _internal_matrix_init(void);
 
 extern void _internal_sort_clear(void);
@@ -77,6 +78,7 @@ sega3d_init(void)
         _state.copy_cmdt_list = vdp1_cmdt_list_alloc(PACKET_SIZE);
         assert(_state.copy_cmdt_list != NULL);
 
+        _internal_tlist_init();
         _internal_matrix_init();
 }
 
@@ -211,16 +213,16 @@ sega3d_object_transform(sega3d_object_t *object)
 
                         z_avg += proj[Z];
 
-                        int16_vector2_t proj_2d;
-                        proj_2d.x = (proj[X] >> 16);
-                        proj_2d.y = (proj[Y] >> 16);
+                        int16_vec2_t proj_2d;
+                        proj_2d.x = fix16_int32_to(proj[X]);
+                        proj_2d.y = fix16_int32_to(proj[Y]);
 
                         vdp1_cmdt_param_vertex_set(copy_cmdt, v, &proj_2d);
                 }
 
                 const FIXED z_center = fix16_mul(z_avg, toFIXED(0.25f));
 
-                _internal_sort_add(copy_cmdt, z_center >> 16);
+                _internal_sort_add(copy_cmdt, fix16_int32_to(z_center));
         }
 }
 

@@ -1,84 +1,77 @@
+/*-
+ * Copyright (c) 2019 Christophe Meessen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE. */
+
+/*-
+ * Computing the square root of an integer or a fixed point integer into a fixed
+ * point integer. A fixed point is a 32 bit value with the comma between the
+ * bits 15 and 16, where bit 0 is the less significant bit of the value.
+ *
+ * The algorithm uses the property that computing x² is trivial compared to the
+ * sqrt. It will thus search the biggest x so that x² <= v, assuming we compute
+ * sqrt(v).
+ *
+ * The algorithm tests each bit of x starting with the most significant toward
+ * the less significant. It tests if the bit must be set or not.
+ *
+ * The algorithm uses the relation (x + a)² = x² + 2ax + a² to add the bit
+ * efficiently. Instead of computing x² it keeps track of (x + a)² - x².
+ *
+ * When computing sqrt(v), r = v - x², q = 2ax, b = a² and t = 2ax + a2.
+ *
+ * Note that the input integers are signed and that the sign bit is used in the
+ * computation. To accept unsigned integer as input, unfolding the initial loop
+ * is required to handle this particular case. See the usenet discussion for the
+ * proposed solution.
+ *
+ * Algorithm and code Author Christophe Meessen 1993. */
+
 #include "fix16.h"
 
-/* The square root algorithm is quite directly from
- * http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
- * An important difference is that it is split to two parts
- * in order to use only 32-bit operations.
- *
- * Note that for negative numbers we return -sqrt(-inValue).
- * Not sure if someone relies on this behaviour, but not going
- * to break it for now. It doesn't slow the code much overall.
- */
-fix16_t fix16_sqrt(fix16_t inValue)
+fix16_t
+fix16_sqrt(fix16_t value)
 {
-	uint8_t  neg = (inValue < 0);
-	uint32_t num = (neg ? -inValue : inValue);
-	uint32_t result = 0;
-	uint32_t bit;
-	uint8_t  n;
-	
-	// Many numbers will be less than 15, so
-	// this gives a good balance between time spent
-	// in if vs. time spent in the while loop
-	// when searching for the starting value.
-	if (num & 0xFFF00000)
-		bit = (uint32_t)1 << 30;
-	else
-		bit = (uint32_t)1 << 18;
-	
-	while (bit > num) bit >>= 2;
-	
-	// The main part is executed twice, in order to avoid
-	// using 64 bit values in computations.
-	for (n = 0; n < 2; n++)
-	{
-		// First we get the top 24 bits of the answer.
-		while (bit)
-		{
-			if (num >= result + bit)
-			{
-				num -= result + bit;
-				result = (result >> 1) + bit;
-			}
-			else
-			{
-				result = (result >> 1);
-			}
-			bit >>= 2;
-		}
-		
-		if (n == 0)
-		{
-			// Then process it again to get the lowest 8 bits.
-			if (num > 65535)
-			{
-				// The remainder 'num' is too large to be shifted left
-				// by 16, so we have to add 1 to result manually and
-				// adjust 'num' accordingly.
-				// num = a - (result + 0.5)^2
-				//	 = num + result^2 - (result + 0.5)^2
-				//	 = num - result - 0.5
-				num -= result;
-				num = (num << 16) - 0x8000;
-				result = (result << 16) + 0x8000;
-			}
-			else
-			{
-				num <<= 16;
-				result <<= 16;
-			}
-			
-			bit = 1 << 14;
-		}
-	}
+        uint32_t t;
 
-#ifndef FIXMATH_NO_ROUNDING
-	// Finally, if next bit would have been 1, round the result upwards.
-	if (num > result)
-	{
-		result++;
-	}
-#endif
-	
-	return (neg ? -(fix16_t)result : (fix16_t)result);
+        uint32_t r;
+        r = value;
+
+        uint32_t b;
+        b = 0x40000000;
+
+        uint32_t q;
+        q = 0;
+
+        while (b > 0x40) {
+                t = q + b;
+
+                if (r >= t) {
+                        r -= t;
+                        q = t + b; /* Equivalent to q += 2 * b */
+                }
+
+                r <<= 1;
+                b >>= 1;
+        }
+
+        q >>= 8;
+
+        return q;
 }

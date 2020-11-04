@@ -68,7 +68,7 @@ vdp1_cmdt_orderlist_alloc(uint16_t count)
         size = count * sizeof(vdp1_cmdt_t);
 
         uint32_t aligned_boundary;
-        aligned_boundary = dlog2(size);
+        aligned_boundary = uint32_log2(size);
 
         if ((aligned_boundary & (aligned_boundary - 1)) != 0x00000000) {
                 aligned_boundary++;
@@ -230,19 +230,19 @@ vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *cmdt, bool flip)
 void
 vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *cmdt,
     uint16_t vertex_index,
-    const int16_vector2_t *p)
+    const int16_vec2_t *p)
 {
-        int16_vector2_t *vertex;
-        vertex = (int16_vector2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
+        int16_vec2_t *vertex;
+        vertex = (int16_vec2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
 
         vertex->x = p->x;
         vertex->y = p->y;
 }
 
 void
-vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vector2_t *p)
+vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vec2_t *p)
 {
-        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vector2_t) * 4);
+        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vec2_t) * 4);
 }
 
 void

@@ -383,8 +383,8 @@ _scroll_screen_reset(void)
 {
         /* Force reset */
         vdp2_scrn_priority_set(_params.scrn, 7);
-        vdp2_scrn_scroll_x_set(_params.scrn, F16(0.0f));
-        vdp2_scrn_scroll_y_set(_params.scrn, F16(0.0f));
+        vdp2_scrn_scroll_x_set(_params.scrn, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(_params.scrn, FIX16(0.0f));
         vdp2_scrn_display_set(_params.scrn, /* transparent = */ true);
 
         vdp2_vram_cycp_bank_set(_params.cpd_bank, &_params.cpd_cycp);

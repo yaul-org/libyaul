@@ -42,23 +42,23 @@ struct state_vdp2 {
         } commit;
 
         struct {
-                int16_vector2_t resolution;
+                int16_vec2_t resolution;
         } tv;
 
         struct {
-                fix16_vector2_t scroll;
+                fix16_vec2_t scroll;
         } nbg0;
 
         struct {
-                fix16_vector2_t scroll;
+                fix16_vec2_t scroll;
         } nbg1;
 
         struct {
-                int16_vector2_t scroll;
+                int16_vec2_t scroll;
         } nbg2;
 
         struct {
-                int16_vector2_t scroll;
+                int16_vec2_t scroll;
         } nbg3;
 
         struct {
