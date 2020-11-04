@@ -112,3 +112,78 @@ sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz)
         (*matrix)[1][1] = sy;
         (*matrix)[2][2] = sz;
 }
+
+void
+sega3d_matrix_rotate_x(const ANGLE angle)
+{
+        FIXED *matrix;
+        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const FIXED sin = fix16_bradians_sin(bradians);
+        const FIXED cos = fix16_bradians_cos(bradians);
+
+        const FIXED m01 = matrix[M01];
+        const FIXED m02 = matrix[M02];
+        const FIXED m11 = matrix[M11];
+        const FIXED m12 = matrix[M12];
+        const FIXED m21 = matrix[M21];
+        const FIXED m22 = matrix[M22];
+
+        matrix[M01] =  fix16_mul(m01, cos) + fix16_mul(m02, sin);
+        matrix[M02] = -fix16_mul(m01, sin) + fix16_mul(m02, cos);
+        matrix[M11] =  fix16_mul(m11, cos) + fix16_mul(m12, sin);
+        matrix[M12] = -fix16_mul(m11, sin) + fix16_mul(m12, cos);
+        matrix[M21] =  fix16_mul(m21, cos) + fix16_mul(m22, sin);
+        matrix[M22] = -fix16_mul(m21, sin) + fix16_mul(m22, cos);
+}
+
+void
+sega3d_matrix_rotate_y(const ANGLE angle)
+{
+        FIXED *matrix;
+        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const FIXED sin_value = fix16_bradians_sin(bradians);
+        const FIXED cos_value = fix16_bradians_cos(bradians);
+
+        const FIXED m00 = matrix[M00];
+        const FIXED m02 = matrix[M02];
+        const FIXED m10 = matrix[M10];
+        const FIXED m12 = matrix[M12];
+        const FIXED m20 = matrix[M20];
+        const FIXED m22 = matrix[M22];
+
+        matrix[M00] = fix16_mul(m00, cos_value) - fix16_mul(m02, sin_value);
+        matrix[M02] = fix16_mul(m00, sin_value) + fix16_mul(m02, cos_value);
+        matrix[M10] = fix16_mul(m10, cos_value) - fix16_mul(m12, sin_value);
+        matrix[M12] = fix16_mul(m10, sin_value) + fix16_mul(m12, cos_value);
+        matrix[M20] = fix16_mul(m20, cos_value) - fix16_mul(m22, sin_value);
+        matrix[M22] = fix16_mul(m20, sin_value) + fix16_mul(m22, cos_value);
+}
+
+void
+sega3d_matrix_rotate_z(const ANGLE angle)
+{
+        FIXED *matrix;
+        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+
+        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const FIXED sin_value = fix16_bradians_sin(bradians);
+        const FIXED cos_value = fix16_bradians_cos(bradians);
+
+        const FIXED m00 = matrix[M00];
+        const FIXED m01 = matrix[M01];
+        const FIXED m10 = matrix[M10];
+        const FIXED m11 = matrix[M11];
+        const FIXED m20 = matrix[M20];
+        const FIXED m21 = matrix[M21];
+
+        matrix[M00] =  fix16_mul(m00, cos_value) + fix16_mul(m01, sin_value);
+        matrix[M01] = -fix16_mul(m00, sin_value) + fix16_mul(m01, cos_value);
+        matrix[M10] =  fix16_mul(m10, cos_value) + fix16_mul(m11, sin_value);
+        matrix[M11] = -fix16_mul(m10, sin_value) + fix16_mul(m11, cos_value);
+        matrix[M20] =  fix16_mul(m20, cos_value) + fix16_mul(m21, sin_value);
+        matrix[M21] = -fix16_mul(m20, sin_value) + fix16_mul(m21, cos_value);
+}

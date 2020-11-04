@@ -60,7 +60,7 @@ typedef struct vdp1_env {
 
         color_rgb1555_t erase_color;
 
-        int16_vector2_t erase_points[2];
+        int16_vec2_t erase_points[2];
 } vdp1_env_t;
 
 /// @}
@@ -80,7 +80,7 @@ extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
 extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
-    const int16_vector2_t *);
+    const int16_vec2_t *);
 
 /// @}
 
