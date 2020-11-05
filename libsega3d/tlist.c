@@ -20,6 +20,10 @@ static TEXTURE _default_texture[] = {
 void
 _internal_tlist_init(void)
 {
+        _tlist.flags = TLIST_FLAGS_NONE;
+
+        sega3d_tlist_cursor_reset();
+
         sega3d_tlist_set(NULL, 0);
 }
 

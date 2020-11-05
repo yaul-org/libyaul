@@ -83,7 +83,7 @@ sega3d_init(void)
 }
 
 Uint16
-sega3d_object_polycount_get(sega3d_object_t *object)
+sega3d_object_polycount_get(const sega3d_object_t *object)
 {
         const PDATA *pdata;
         pdata = object->pdata;

@@ -8,7 +8,9 @@
 /* XXX: Hack: There is a strange compilation warning with ATTRIBUTE */
 #pragma GCC diagnostic ignored "-Wpedantic"
 
+#ifndef M_PI
 #define M_PI (3.1415926535897932f)
+#endif /* !M_PI */
 
 #define toFIXED(a)                              ((FIXED)(65536.0f * (a)))
 #define POStoFIXED(x, y, z)                     { toFIXED(x), toFIXED(y), toFIXED(z) }
@@ -38,14 +40,36 @@
 #define VERTICES(v0, v1, v2, v3)                {v0, v1, v2, v3} }
 #define C_RGB(r, g, b)                          (((b) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((r) & 0x1F) | 0x8000)
 
+/// Define this if using TEXDEF
+#ifndef cgaddress
 #define cgaddress       0x10000
+#endif /* !cgaddress */
+
+/// Define this if using TEXDEF
+#ifndef pal
 #define pal             COL_32K
-#define TEXDEF(h, v, presize)                   { h, v, (cgaddress + (((presize) * 4) >> (pal))) / 8, (((h) & 0x01F8) << 5 | (v)) }
+#endif /* !pal */
+
+#define TEXDEF(h, v, presize) {                                                \
+        h,                                                                     \
+        v,                                                                     \
+        (cgaddress + (((presize) * 4) >> (pal))) / 8,                          \
+        ((((h) & 0x01F8) << 5) | (v))                                          \
+}
 #define PICDEF(texno, cmode, pcsrc)             { (Uint16)(texno), (Uint16)(cmode), (void *)(pcsrc) }
 
+#ifndef CGADDRESS
 #define CGADDRESS       0x10000
+#endif /* !CGADDRESS */
 #define AdjCG(cga, hs, vs, col)                 ((cga) + (((((hs) * (vs) * 4) >> (col)) + 0x1F) & 0x7FFE0))
-#define TEXTBL(hs, vs, cga)                     { hs, vs, (cga) >> 3, ((hs) & 0x01F8) << 5 | (vs) }
+
+#define TEXTBL(hs, vs, cga) {                                                  \
+        hs,                                                                    \
+        vs,                                                                    \
+        (cga) >> 3,                                                            \
+        (((hs) & 0x01F8) << 5) | (vs)                                          \
+}
+
 #define PICTBL(texno, cmode, pcsrc)             { (Uint16)(texno), (Uint16)(cmode), (void *)(pcsrc) }
 
 #define TRANSLATION(x, y, z)                    { toFIXED(x), toFIXED(y), toFIXED(z) }
