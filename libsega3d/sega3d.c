@@ -11,6 +11,8 @@
 
 #include <sys/cdefs.h>
 
+#include <vdp2/tvmd.h>
+
 #include <cpu/divu.h>
 
 #include "sega3d.h"
@@ -26,7 +28,10 @@ extern void _internal_sort_iterate(iterate_fn fn);
 static struct {
         bool initialized;
 
-        FIXED distance;
+        sega3d_info_t view;
+
+        FIXED cached_inv_top;
+        FIXED cached_inv_right;
 
         /* Current object */
         sega3d_object_t *object;
@@ -74,12 +79,60 @@ sega3d_init(void)
         }
 
         _state.initialized = true;
-        _state.distance = -PROJECTION_DISTANCE;
+
+        sega3d_perspective_set(DEGtoANG(90.0f));
+
         _state.copy_cmdt_list = vdp1_cmdt_list_alloc(PACKET_SIZE);
         assert(_state.copy_cmdt_list != NULL);
 
         _internal_tlist_init();
         _internal_matrix_init();
+}
+
+void
+sega3d_perspective_set(ANGLE fov)
+{
+#define AW_2 FIX16(12.446f) /* ([film-aperature-width = 0.980] * inch->mm) / 2) */
+#define AH_2 FIX16(9.3345f) /* ([film-aperature-height = 0.735] * inch->mm) / 2) */
+
+        const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1; 
+
+        uint16_t i_width;
+        uint16_t i_height;
+
+        vdp2_tvmd_display_res_get(&i_width, &i_height);
+
+        /* Let's maintain a 4:3 ratio */
+        if (i_height < 240) {
+                i_height = 240;
+        }
+
+        const FIXED screen_width = fix16_int32_from(i_width);
+        const FIXED screen_height = fix16_int32_from(i_height);
+
+        cpu_divu_fix16_set(screen_width, screen_height);
+        _state.view.ratio = cpu_divu_quotient_get();
+
+        cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
+        _state.view.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
+
+        cpu_divu_fix16_set(AH_2, _state.view.focal_length);
+        _state.view.top = cpu_divu_quotient_get();
+        _state.view.right = -fix16_mul(-_state.view.top, _state.view.ratio);
+        _state.view.left = -_state.view.right;
+        _state.view.bottom = -_state.view.top;
+
+        cpu_divu_fix16_set(screen_height, _state.view.top << 1);
+        _state.cached_inv_top = cpu_divu_quotient_get();
+
+        cpu_divu_fix16_set(screen_width, _state.view.right << 1);
+        _state.cached_inv_right = cpu_divu_quotient_get();
+}
+
+void
+sega3d_info_get(sega3d_info_t *info)
+{
+        (void)memcpy(info, &_state.view, sizeof(sega3d_info_t));
 }
 
 Uint16
@@ -175,6 +228,9 @@ sega3d_object_transform(sega3d_object_t *object)
                 vdp1_cmdt_t *copy_cmdt;
                 copy_cmdt = &_state.copy_cmdt_list->cmdts[i];
 
+                int16_vec2_t *cmd_vertex;
+                cmd_vertex = (int16_vec2_t *)(&copy_cmdt->cmd_xa);
+
                 /* Keep track of the projected Z values for averaging */
                 FIXED z_projs[4] __unused;
                 FIXED z_avg;
@@ -194,30 +250,28 @@ sega3d_object_transform(sega3d_object_t *object)
 
                         proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
 
-                        const FIXED divisor = (_state.distance - proj[Z]);
+                        /* Fire up CPU-DIVU to calculate reciprocal */
+                        cpu_divu_fix16_set(_state.cached_inv_right, proj[Z]);
+                        proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
+                        /* Fetch results */
+                        const FIXED right_inverse_z = cpu_divu_quotient_get();
+
+                        proj[X] = fix16_mul(proj[X], right_inverse_z);
 
                         /* Fire up CPU-DIVU to calculate reciprocal */
-                        cpu_divu_fix16_set(_state.distance, divisor);
-
-                        proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
+                        cpu_divu_fix16_set(_state.cached_inv_top, proj[Z]);
                         proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
-
                         /* Fetch results */
-                        const FIXED inverse_z = cpu_divu_quotient_get();
+                        const FIXED top_inverse_z = cpu_divu_quotient_get();
 
-                        proj[X] = fix16_mul(proj[X], inverse_z);
-                        proj[Y] = fix16_mul(proj[Y], inverse_z);
-                        proj[Z] = fix16_mul(proj[Z], inverse_z);
+                        proj[Y] = fix16_mul(proj[Y], top_inverse_z);
+
+                        cmd_vertex[v].x = fix16_int32_to(proj[X]);
+                        cmd_vertex[v].y = fix16_int32_to(proj[Y]);
 
                         z_projs[v] = proj[Z];
 
                         z_avg += proj[Z];
-
-                        int16_vec2_t proj_2d;
-                        proj_2d.x = fix16_int32_to(proj[X]);
-                        proj_2d.y = fix16_int32_to(proj[Y]);
-
-                        vdp1_cmdt_param_vertex_set(copy_cmdt, v, &proj_2d);
                 }
 
                 const FIXED z_center = fix16_mul(z_avg, toFIXED(0.25f));
