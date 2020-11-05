@@ -27,6 +27,15 @@ typedef enum {
         SEGA3D_OBJECT_FLAGS_WIREFRAME = 1 << 0,
 } sega3d_flags_t;
 
+typedef struct {
+        FIXED top;
+        FIXED left;
+        FIXED right;
+        FIXED bottom;
+        FIXED ratio;
+        FIXED focal_length;
+} sega3d_info_t;
+
 struct sega3d_object {
         void *pdata;
         vdp1_cmdt_t *cmdts;
@@ -60,6 +69,9 @@ extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
 extern void sega3d_matrix_rotate_x(const ANGLE angle);
 extern void sega3d_matrix_rotate_y(const ANGLE angle);
 extern void sega3d_matrix_rotate_z(const ANGLE angle);
+
+extern void sega3d_perspective_set(ANGLE fov);
+extern void sega3d_info_get(sega3d_info_t *info);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_prepare(sega3d_object_t *object);
