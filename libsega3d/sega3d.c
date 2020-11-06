@@ -204,10 +204,12 @@ sega3d_object_prepare(sega3d_object_t *object)
                 texture = sega3d_tlist_tex_get(attr->texno);
 
 #ifdef DEBUG
+                const uint16_t tlist_count = sega3d_tlist_count_get();
+
                 /* If the texture number is zero, it could imply no texture.
                  * Even if the texture list is empty, it's considered valid */
-                if (attr->texno != 0) {
-                        assert(attr->texno < sega3d_tlist_count_get());
+                if ((tlist_count > 0) && (attr->texno != 0)) {
+                        assert(attr->texno < tlist_count);
                 }
 #endif /* DEBUG */
 
