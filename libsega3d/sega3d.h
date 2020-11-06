@@ -33,6 +33,7 @@ typedef struct {
         FIXED right;
         FIXED bottom;
         FIXED ratio;
+        FIXED near;
         FIXED focal_length;
 } sega3d_info_t;
 
