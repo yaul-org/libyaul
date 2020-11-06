@@ -66,6 +66,8 @@ static struct {
 
 static void _sort_iterate(sort_single_t *single);
 
+static bool _transform_cull_test(const sega3d_object_t *object, uint32_t index);
+
 static inline FIXED __always_inline __used
 _vertex_transform(const FIXED *p, const FIXED *matrix)
 {
@@ -145,6 +147,10 @@ sega3d_perspective_set(ANGLE fov)
         cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
         _state.view.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
 
+        _state.view.view[X] = 0;
+        _state.view.view[Y] = 0;
+        _state.view.view[Z] = -_state.view.focal_length;
+        
         _state.view.near = _state.view.focal_length;
 
         cpu_divu_fix16_set(AH_2, _state.view.focal_length);
@@ -224,7 +230,7 @@ sega3d_object_prepare(sega3d_object_t *object)
         }
 }
 
-void
+void __section("copy-function")
 sega3d_object_transform(sega3d_object_t *object)
 {
         _internal_sort_clear();
@@ -254,12 +260,12 @@ sega3d_object_transform(sega3d_object_t *object)
         const POINT *points;
         points = pdata->pntbl;
 
-        for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
+        for (uint32_t index = 0; index < pdata->nbPolygon; index++) {
                 POLYGON *polygon;
-                polygon = &pdata->pltbl[i];
+                polygon = &pdata->pltbl[index];
 
                 vdp1_cmdt_t *copy_cmdt;
-                copy_cmdt = &_state.copy_cmdt_list->cmdts[i];
+                copy_cmdt = &_state.copy_cmdt_list->cmdts[index];
 
                 int16_vec2_t *cmd_vertex;
                 cmd_vertex = (int16_vec2_t *)(&copy_cmdt->cmd_xa);
@@ -267,9 +273,18 @@ sega3d_object_transform(sega3d_object_t *object)
                 transform_t trans;
                 trans.z_avg = 0;
 
+                if ((object->flags & SEGA3D_OBJECT_FLAGS_NO_CULL) == SEGA3D_OBJECT_FLAGS_NONE) {
+                        bool cull = _transform_cull_test(object, index);
+
+                        if (cull) {
+                                continue;
+                        }
+                }
+
                 for (uint32_t v = 0; v < 4; v++) {
-                        uint16_t vertex;
+                        int16_t vertex;
                         vertex = polygon->Vertices[v];
+
                         const FIXED *point = (const FIXED *)&points[vertex];
 
                         trans.p[Z] = _vertex_transform(point, &dst_matrix[8]);
@@ -370,4 +385,43 @@ _sort_iterate(sort_single_t *single)
         sort_cmdt = single->packet;
 
         _state.iterate_fn(_state.object, sort_cmdt);
+}
+
+static bool
+_transform_cull_test(const sega3d_object_t *object, uint32_t index)
+{
+        const PDATA *pdata;
+        pdata = object->pdata;
+
+        POLYGON *polygon;
+        polygon = &pdata->pltbl[index];
+        const POINT *points;
+        points = pdata->pntbl;
+
+        const FIXED *src_matrix = (const FIXED *)sega3d_matrix_top();
+        
+        int16_t cull_vi;
+        cull_vi = polygon->Vertices[0];
+
+        const FIXED *cull_p = (const FIXED *)&points[cull_vi];
+
+        FIXED view_p[XYZ];
+
+        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_ROT) == SEGA3D_OBJECT_FLAGS_CULL_ROT) {
+                view_p[X] = -src_matrix[M30];
+                view_p[Y] = -src_matrix[M31]; 
+                view_p[Z] = -src_matrix[M32];
+        } else {
+                view_p[X] = -src_matrix[M30];
+                view_p[Y] = -src_matrix[M31]; 
+                view_p[Z] = -src_matrix[M32];
+        }
+
+        const fix16_t cull_point = fix16_vec3_dot((const fix16_vec3_t *)cull_p,
+            (const fix16_vec3_t *)&polygon->norm);
+
+        const fix16_t cull_view = fix16_vec3_dot((const fix16_vec3_t *)view_p,
+            (const fix16_vec3_t *)&polygon->norm);
+
+        return (cull_view < cull_point);
 }
