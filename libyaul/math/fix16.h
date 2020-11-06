@@ -194,7 +194,7 @@ extern fix16_t fix16_lerp8(const fix16_t, const fix16_t, const uint8_t) FIXMATH_
 
 extern fix16_t fix16_sqrt(const fix16_t) FIXMATH_FUNC_ATTRS;
 
-extern void fix16_str(fix16_t, char *, int);
+extern uint32_t fix16_str(fix16_t, char *, int);
 
 #define _FIX16_INCLUDE_ONCE
 
