@@ -40,10 +40,12 @@ static const uint32_t _scales[8] = {
         100000
 };
 
-void
+uint32_t
 fix16_str(fix16_t value, char *buf, int decimals)
 {
         const uint32_t uvalue = (value >= 0) ? value : -value;
+
+        const char *start_buf = buf;
 
         if (value < 0) {
                 *buf++ = '-';
@@ -72,6 +74,8 @@ fix16_str(fix16_t value, char *buf, int decimals)
         }
 
         *buf = '\0';
+
+        return (buf - start_buf);
 }
 
 static char *
