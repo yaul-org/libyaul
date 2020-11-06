@@ -24,7 +24,12 @@ typedef enum {
 
 typedef enum {
         SEGA3D_OBJECT_FLAGS_NONE      = 0,
+        /// Display wireframe
         SEGA3D_OBJECT_FLAGS_WIREFRAME = 1 << 0,
+        /// Disable culling
+        SEGA3D_OBJECT_FLAGS_NO_CULL   = 1 << 1,
+        /// Cull taking into account rotation of polygons
+        SEGA3D_OBJECT_FLAGS_CULL_ROT  = 1 << 2
 } sega3d_flags_t;
 
 typedef struct {
@@ -35,6 +40,7 @@ typedef struct {
         FIXED ratio;
         FIXED near;
         FIXED focal_length;
+        VECTOR view;
 } sega3d_info_t;
 
 struct sega3d_object {
