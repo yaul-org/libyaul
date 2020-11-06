@@ -7,7 +7,7 @@
 
 typedef struct {
         uint8_t index; 
-        MATRIX matrices[MATRIX_STACK_MAX];
+        MATRIX matrices[MATRIX_STACK_MAX] __aligned(16);
 } matrix_stack_t;
 
 static matrix_stack_t _matrix_stack;
@@ -78,7 +78,16 @@ sega3d_matrix_load(const MATRIX *matrix)
 }
 
 void
-sega3d_matrix_copy(void)
+sega3d_matrix_copy(MATRIX *matrix)
+{
+        MATRIX *src_matrix;
+        src_matrix = &_matrix_stack.matrices[_matrix_stack.index];
+
+        (void)memcpy(matrix, src_matrix, sizeof(MATRIX));
+}
+
+void
+sega3d_matrix_copy_push(void)
 {
         assert(_matrix_stack.index >= 1);
 

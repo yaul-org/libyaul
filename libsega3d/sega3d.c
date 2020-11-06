@@ -73,21 +73,25 @@ _vertex_transform(const FIXED *p, const FIXED *matrix)
         register int32_t tmp2;
         register int32_t pt;
 
-        __asm__ volatile (
-                "clrmac\n"
-                "mov %[p], %[pt]\n"
-                "mov %[matrix], %[tmp1]\n"
-                "mac.l @%[pt]+, @%[tmp1]+\n"
-                "mac.l @%[pt]+, @%[tmp1]+\n"
-                "mac.l @%[pt]+, @%[tmp1]+\n"
-                "sts macl, %[tmp2]\n"
-                "mov.l @%[tmp1]+, %[pt]\n" 
-                "add %[tmp2], %[pt]\n" 
-                : [tmp1] "=&r" (tmp1),
-                  [tmp2] "=&r" (tmp2),
-                  [pt] "=&r" (pt)
-                : [p] "r" (p),
-                  [matrix] "r" (matrix));
+        __asm__ volatile ("\tclrmac\n"
+                          "\tmov %[p], %[pt]\n"
+                          "\tmov %[matrix], %[tmp1]\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmov.l @%[tmp1]+, %[pt]\n" 
+                          "\tsts mach, %[tmp1]\n"
+                          "\tsts macl, %[tmp2]\n"
+                          "\txtrct %[tmp1], %[tmp2]\n"
+                          "add %[tmp2], %[pt]\n"
+            /* Output */ 
+            : [tmp1] "=&r" (tmp1),
+              [tmp2] "=&r" (tmp2),
+              [pt]   "=&r" (pt)
+            /* Input */
+            : [p]      "r" (p),
+              [matrix] "r" (matrix)
+            : "mach", "macl");
 
         return pt;
 }
@@ -228,24 +232,24 @@ sega3d_object_transform(sega3d_object_t *object)
         const PDATA *pdata;
         pdata = object->pdata;
 
-        const MATRIX *matrix;
-        matrix = sega3d_matrix_top();
+        const FIXED *src_matrix = (const FIXED *)sega3d_matrix_top();
 
-        const FIXED tx = (*matrix)[3][0];
-        const FIXED ty = (*matrix)[3][1];
-        const FIXED tz = (*matrix)[3][2];
+        FIXED dst_matrix[MTRX] __aligned(16);
 
-        const FIXED row0_x = (*matrix)[0][0];
-        const FIXED row0_y = (*matrix)[1][0];
-        const FIXED row0_z = (*matrix)[2][0];
+        dst_matrix[ 0] = src_matrix[M00];
+        dst_matrix[ 1] = src_matrix[M01];
+        dst_matrix[ 2] = src_matrix[M02];
+        dst_matrix[ 3] = src_matrix[M30];
 
-        const FIXED row1_x = (*matrix)[0][1];
-        const FIXED row1_y = (*matrix)[1][1];
-        const FIXED row1_z = (*matrix)[2][1];
+        dst_matrix[ 4] = src_matrix[M10];
+        dst_matrix[ 5] = src_matrix[M11];
+        dst_matrix[ 6] = src_matrix[M12];
+        dst_matrix[ 7] = src_matrix[M31];
 
-        const FIXED row2_x = (*matrix)[0][2];
-        const FIXED row2_y = (*matrix)[1][2];
-        const FIXED row2_z = (*matrix)[2][2];
+        dst_matrix[ 8] = src_matrix[M20];
+        dst_matrix[ 9] = src_matrix[M21];
+        dst_matrix[10] = src_matrix[M22];
+        dst_matrix[11] = src_matrix[M32];
 
         const POINT *points;
         points = pdata->pntbl;
@@ -266,14 +270,9 @@ sega3d_object_transform(sega3d_object_t *object)
                 for (uint32_t v = 0; v < 4; v++) {
                         uint16_t vertex;
                         vertex = polygon->Vertices[v];
-                        const POINT *point;
-                        point = &points[vertex];
+                        const FIXED *point = (const FIXED *)&points[vertex];
 
-                        const FIXED px = (*point)[X];
-                        const FIXED py = (*point)[Y];
-                        const FIXED pz = (*point)[Z];
-
-                        trans.p[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
+                        trans.p[Z] = _vertex_transform(point, &dst_matrix[8]);
 
                         trans.clip_flags[v] = CLIP_FLAGS_NONE;
 
@@ -288,7 +287,7 @@ sega3d_object_transform(sega3d_object_t *object)
 
                         trans.z_avg += trans.p[Z];
 
-                        trans.p[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
+                        trans.p[X] = _vertex_transform(point, &dst_matrix[0]);
                         trans.inverse_right = cpu_divu_quotient_get();
                         trans.p[X] = fix16_mul(trans.p[X], trans.inverse_right);
 
@@ -303,7 +302,7 @@ sega3d_object_transform(sega3d_object_t *object)
                                 trans.clip_flags[v] |= CLIP_FLAGS_RIGHT;
                         }
 
-                        trans.p[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
+                        trans.p[Y] = _vertex_transform(point, &dst_matrix[4]);
                         trans.inverse_top = cpu_divu_quotient_get();
 
                         trans.p[Y] = fix16_mul(trans.p[Y], trans.inverse_top);

@@ -86,7 +86,7 @@ fix16_mul(const fix16_t a, const fix16_t b)
         __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
                           "\tsts mach, %[mach]\n"
                           "\tsts macl, %[out]\n"
-                          "\nxtrct %[mach], %[out]\n"
+                          "\txtrct %[mach], %[out]\n"
             /* Output */
             : [mach] "=&r" (mach),
               [out] "=&r" (out)
