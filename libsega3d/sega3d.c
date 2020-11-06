@@ -18,6 +18,26 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
+typedef enum {
+        CLIP_FLAGS_NONE   = 0,
+        CLIP_FLAGS_NEAR   = 1 << 0,
+        CLIP_FLAGS_FAR    = 1 << 1,
+        CLIP_FLAGS_LEFT   = 1 << 2,
+        CLIP_FLAGS_RIGHT  = 1 << 3,
+        CLIP_FLAGS_TOP    = 1 << 4,
+        CLIP_FLAGS_BOTTOM = 1 << 5,
+} clip_flags_t;
+
+typedef struct {
+        FIXED p[XYZ];
+        FIXED proj[XY];
+        FIXED inverse_top;
+        FIXED inverse_right;
+        FIXED z_avg;
+        clip_flags_t clip_flags[4];
+        color_rgb1555_t color;
+} transform_t;
+
 extern void _internal_tlist_init(void);
 extern void _internal_matrix_init(void);
 
@@ -32,6 +52,8 @@ static struct {
 
         FIXED cached_inv_top;
         FIXED cached_inv_right;
+        int16_t cached_sw_2;
+        int16_t cached_sh_2;
 
         /* Current object */
         sega3d_object_t *object;
@@ -110,11 +132,16 @@ sega3d_perspective_set(ANGLE fov)
         const FIXED screen_width = fix16_int32_from(i_width);
         const FIXED screen_height = fix16_int32_from(i_height);
 
+        _state.cached_sw_2 = i_width / 2;
+        _state.cached_sh_2 = i_height / 2;
+
         cpu_divu_fix16_set(screen_width, screen_height);
         _state.view.ratio = cpu_divu_quotient_get();
 
         cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
         _state.view.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
+
+        _state.view.near = _state.view.focal_length;
 
         cpu_divu_fix16_set(AH_2, _state.view.focal_length);
         _state.view.top = cpu_divu_quotient_get();
@@ -231,10 +258,8 @@ sega3d_object_transform(sega3d_object_t *object)
                 int16_vec2_t *cmd_vertex;
                 cmd_vertex = (int16_vec2_t *)(&copy_cmdt->cmd_xa);
 
-                /* Keep track of the projected Z values for averaging */
-                FIXED z_projs[4] __unused;
-                FIXED z_avg;
-                z_avg = 0;
+                transform_t trans;
+                trans.z_avg = 0;
 
                 for (uint32_t v = 0; v < 4; v++) {
                         uint16_t vertex;
@@ -246,35 +271,63 @@ sega3d_object_transform(sega3d_object_t *object)
                         const FIXED py = (*point)[Y];
                         const FIXED pz = (*point)[Z];
 
-                        FIXED proj[XYZ];
+                        trans.p[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
 
-                        proj[Z] = (tz + fix16_mul(row2_x, px) + fix16_mul(row2_y, py) + fix16_mul(row2_z, pz));
+                        trans.clip_flags[v] = CLIP_FLAGS_NONE;
 
-                        /* Fire up CPU-DIVU to calculate reciprocal */
-                        cpu_divu_fix16_set(_state.cached_inv_right, proj[Z]);
-                        proj[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
-                        /* Fetch results */
-                        const FIXED right_inverse_z = cpu_divu_quotient_get();
+                        /* In case the projected Z value is on or behind the near plane */
+                        if (trans.p[Z] <= _state.view.near) {
+                                trans.clip_flags[v] |= CLIP_FLAGS_NEAR;
 
-                        proj[X] = fix16_mul(proj[X], right_inverse_z);
+                                trans.p[Z] = _state.view.near;
+                        }
 
-                        /* Fire up CPU-DIVU to calculate reciprocal */
-                        cpu_divu_fix16_set(_state.cached_inv_top, proj[Z]);
-                        proj[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
-                        /* Fetch results */
-                        const FIXED top_inverse_z = cpu_divu_quotient_get();
+                        cpu_divu_fix16_set(_state.cached_inv_right, trans.p[Z]);
 
-                        proj[Y] = fix16_mul(proj[Y], top_inverse_z);
+                        trans.z_avg += trans.p[Z];
 
-                        cmd_vertex[v].x = fix16_int32_to(proj[X]);
-                        cmd_vertex[v].y = fix16_int32_to(proj[Y]);
+                        trans.p[X] = (tx + fix16_mul(row0_x, px) + fix16_mul(row0_y, py) + fix16_mul(row0_z, pz));
+                        trans.inverse_right = cpu_divu_quotient_get();
+                        trans.p[X] = fix16_mul(trans.p[X], trans.inverse_right);
 
-                        z_projs[v] = proj[Z];
+                        cpu_divu_fix16_set(_state.cached_inv_top, trans.p[Z]);
 
-                        z_avg += proj[Z];
+                        trans.proj[X] = fix16_int32_to(trans.p[X]);
+
+                        if (trans.proj[X] < -_state.cached_sw_2) {
+                                trans.clip_flags[v] |= CLIP_FLAGS_LEFT;
+                        }
+                        if (trans.proj[X] > _state.cached_sw_2) {
+                                trans.clip_flags[v] |= CLIP_FLAGS_RIGHT;
+                        }
+
+                        trans.p[Y] = (ty + fix16_mul(row1_x, px) + fix16_mul(row1_y, py) + fix16_mul(row1_z, pz));
+                        trans.inverse_top = cpu_divu_quotient_get();
+
+                        trans.p[Y] = fix16_mul(trans.p[Y], trans.inverse_top);
+                        trans.proj[Y] = fix16_int32_to(trans.p[Y]);
+
+                        if (trans.proj[Y] > _state.cached_sh_2) {
+                                trans.clip_flags[v] |= CLIP_FLAGS_TOP;
+                        }
+                        if (trans.proj[Y] < -_state.cached_sh_2) {
+                                trans.clip_flags[v] |= CLIP_FLAGS_BOTTOM;
+                        }
+
+                        cmd_vertex[v].x = trans.proj[X];
+                        cmd_vertex[v].y = trans.proj[Y];
                 }
 
-                const FIXED z_center = fix16_mul(z_avg, toFIXED(0.25f));
+                const clip_flags_t clip_flags = (trans.clip_flags[0] &
+                                                 trans.clip_flags[1] &
+                                                 trans.clip_flags[2] &
+                                                 trans.clip_flags[3]);
+
+                if (clip_flags != CLIP_FLAGS_NONE) {
+                        continue;
+                }
+
+                const FIXED z_center = trans.z_avg >> 2; /* Divide by 4 */
 
                 _internal_sort_add(copy_cmdt, fix16_int32_to(z_center));
         }
