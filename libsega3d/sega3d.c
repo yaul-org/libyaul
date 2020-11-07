@@ -18,6 +18,10 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
+#define DEPTH_FOG_POW           (6)
+#define DEPTH_FOG_COLOR_COUNT   (32)
+#define DEPTH_FOG_COUNT         (64)
+
 typedef enum {
         CLIP_FLAGS_NONE   = 0,
         CLIP_FLAGS_NEAR   = 1 << 0,
@@ -28,6 +32,12 @@ typedef enum {
         CLIP_FLAGS_BOTTOM = 1 << 5,
 } clip_flags_t;
 
+typedef enum {
+        FLAGS_NONE        = 0,
+        FLAGS_INITIALIZED = 1 << 0,
+        FLAGS_FOG_ENABLED = 1 << 1,
+} flags_t;
+
 typedef struct {
         FIXED proj_xy[XY];
         FIXED proj_z[4];
@@ -35,6 +45,7 @@ typedef struct {
         FIXED scale_inv_top;
         FIXED scale_inv_right;
         FIXED z_avg;
+        FIXED z_center;
         clip_flags_t clip_flags[4];
         color_rgb1555_t color;
 } transform_t;
@@ -46,10 +57,57 @@ extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
 extern void _internal_sort_iterate(iterate_fn fn);
 
+static const color_rgb1555_t _depth_fog_colors[DEPTH_FOG_COLOR_COUNT] = {
+        COLOR_RGB1555(1,  0, 16, 16),
+        COLOR_RGB1555(1,  1, 16, 16),
+        COLOR_RGB1555(1,  2, 16, 16),
+        COLOR_RGB1555(1,  3, 16, 16),
+        COLOR_RGB1555(1,  4, 16, 16),
+        COLOR_RGB1555(1,  5, 16, 16),
+        COLOR_RGB1555(1,  6, 16, 16),
+        COLOR_RGB1555(1,  7, 16, 16),
+        COLOR_RGB1555(1,  8, 16, 16),
+        COLOR_RGB1555(1,  9, 16, 16),
+        COLOR_RGB1555(1, 10, 16, 16),
+        COLOR_RGB1555(1, 11, 16, 16),
+        COLOR_RGB1555(1, 12, 16, 16),
+        COLOR_RGB1555(1, 13, 16, 16),
+        COLOR_RGB1555(1, 14, 16, 16),
+        COLOR_RGB1555(1, 15, 16, 16),
+        COLOR_RGB1555(1, 16, 16, 16),
+        COLOR_RGB1555(1, 17, 16, 16),
+        COLOR_RGB1555(1, 18, 16, 16),
+        COLOR_RGB1555(1, 19, 16, 16),
+        COLOR_RGB1555(1, 20, 16, 16),
+        COLOR_RGB1555(1, 21, 16, 16),
+        COLOR_RGB1555(1, 22, 16, 16),
+        COLOR_RGB1555(1, 23, 16, 16),
+        COLOR_RGB1555(1, 24, 16, 16),
+        COLOR_RGB1555(1, 25, 16, 16),
+        COLOR_RGB1555(1, 26, 16, 16),
+        COLOR_RGB1555(1, 27, 16, 16),
+        COLOR_RGB1555(1, 28, 16, 16),
+        COLOR_RGB1555(1, 29, 16, 16),
+        COLOR_RGB1555(1, 30, 16, 16),
+        COLOR_RGB1555(1, 31, 16, 16)
+};
+
+static const uint8_t _depth_fog_z[DEPTH_FOG_COUNT] = {
+         0,  0,  0,  0,  0,  0,  1,  1,  2,  2,  3,  3,  4,  5,  5,  6, 
+         7,  8,  9, 10, 11, 11, 12, 13, 14, 15, 16, 17, 17, 18, 19, 20, 
+        21, 21, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 
+        28, 29, 29, 29, 29, 29, 30, 30, 30, 30, 30, 30, 30, 30, 30, 31 
+};
+
 static struct {
-        bool initialized;
+        flags_t flags;
 
         sega3d_info_t view;
+
+        sega3d_fog_t fog;
+        FIXED start_z;
+        FIXED end_z;
+        uint16_t fog_len;
 
         FIXED cached_inv_top;
         FIXED cached_inv_right;
@@ -62,11 +120,13 @@ static struct {
         sega3d_iterate_fn iterate_fn;
 
         /* Buffered for copying */
+        /* XXX: Change this */
         vdp1_cmdt_list_t *copy_cmdt_list;
 } _state;
 
 static void _sort_iterate(sort_single_t *single);
 
+static void _fog_calculate(const sega3d_object_t *object, const transform_t *trans, uint32_t index);
 static bool _view_cull_test(const sega3d_object_t *object, uint32_t index);
 static bool _screen_cull_test(const sega3d_object_t *object, const transform_t *trans);
 
@@ -104,14 +164,23 @@ _vertex_transform(const FIXED *p, const FIXED *matrix)
 void
 sega3d_init(void)
 {
+        const sega3d_fog_t default_fog = {
+                .depth_colors = _depth_fog_colors,
+                .depth_z = _depth_fog_z,
+                .pow = DEPTH_FOG_POW,
+                .gouraud_idx = 0
+        };
+
         /* Prevent re-initialization */
-        if (_state.initialized) {
+        if ((_state.flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
                 return;
         }
 
-        _state.initialized = true;
+        _state.flags = FLAGS_INITIALIZED;
 
         sega3d_perspective_set(DEGtoANG(90.0f));
+
+        sega3d_fog_set(&default_fog);
 
         _state.copy_cmdt_list = vdp1_cmdt_list_alloc(PACKET_SIZE);
         assert(_state.copy_cmdt_list != NULL);
@@ -233,49 +302,33 @@ sega3d_object_prepare(sega3d_object_t *object)
         }
 }
 
-static const color_rgb1555_t _depth_fog_colors[32] = {
-        COLOR_RGB1555(1, 31, 31, 31),
-        COLOR_RGB1555(1, 30, 30, 30),
-        COLOR_RGB1555(1, 29, 29, 29),
-        COLOR_RGB1555(1, 28, 28, 28),
-        COLOR_RGB1555(1, 27, 27, 27),
-        COLOR_RGB1555(1, 26, 26, 26),
-        COLOR_RGB1555(1, 25, 25, 25),
-        COLOR_RGB1555(1, 24, 24, 24),
-        COLOR_RGB1555(1, 23, 23, 23),
-        COLOR_RGB1555(1, 22, 22, 22),
-        COLOR_RGB1555(1, 21, 21, 21),
-        COLOR_RGB1555(1, 20, 20, 20),
-        COLOR_RGB1555(1, 19, 19, 19),
-        COLOR_RGB1555(1, 18, 18, 18),
-        COLOR_RGB1555(1, 17, 17, 17),
-        COLOR_RGB1555(1, 16, 16, 16),
-        COLOR_RGB1555(1, 15, 15, 15),
-        COLOR_RGB1555(1, 14, 14, 14),
-        COLOR_RGB1555(1, 13, 13, 13),
-        COLOR_RGB1555(1, 12, 12, 12),
-        COLOR_RGB1555(1, 11, 11, 11),
-        COLOR_RGB1555(1, 10, 10, 10),
-        COLOR_RGB1555(1,  9,  9,  9),
-        COLOR_RGB1555(1,  8,  8,  8),
-        COLOR_RGB1555(1,  7,  7,  7),
-        COLOR_RGB1555(1,  6,  6,  6),
-        COLOR_RGB1555(1,  5,  5,  5),
-        COLOR_RGB1555(1,  4,  4,  4),
-        COLOR_RGB1555(1,  3,  3,  3),
-        COLOR_RGB1555(1,  2,  2,  2),
-        COLOR_RGB1555(1,  1,  1,  1),
-        COLOR_RGB1555(1,  0,  0,  0)
-};
+void
+sega3d_fog_set(const sega3d_fog_t *fog)
+{
+        _state.flags &= ~FLAGS_FOG_ENABLED;
 
-#define DEPTH_COUNT (64)
+        if (fog == NULL) {
+                (void)memset(&_state.fog, 0, sizeof(sega3d_fog_t));
 
-static const uint8_t _depth_fog_z[DEPTH_COUNT] = {
-         0,  0,  0,  0,  0,  0,  1,  1,  2,  2,  3,  3,  4,  5,  5,  6, 
-         7,  8,  9, 10, 11, 11, 12, 13, 14, 15, 16, 17, 17, 18, 19, 20, 
-        21, 21, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 
-        28, 29, 29, 29, 29, 29, 30, 30, 30, 30, 30, 30, 30, 30, 30, 31 
-};
+                return;
+        }
+
+        assert(fog->depth_colors != NULL);
+        assert(fog->depth_z != NULL); 
+
+        _state.flags |= FLAGS_FOG_ENABLED;
+
+        (void)memcpy(&_state.fog, fog, sizeof(sega3d_fog_t));
+
+        _state.fog_len = 1 << fog->pow;
+}
+
+void
+sega3d_fog_limits_set(FIXED start_z, FIXED end_z)
+{
+        _state.start_z = start_z;
+        _state.end_z = end_z;
+}
 
 void
 sega3d_object_transform(const sega3d_object_t *object)
@@ -408,25 +461,13 @@ sega3d_object_transform(const sega3d_object_t *object)
                 }
 
                 /* Divide by 4 to get the average (bit shift) */
-                const FIXED z_center = trans.z_avg >> 2;
+                trans.z_center = trans.z_avg >> 2;
 
-                const FIXED z_depth = z_center;
-
-                int32_t int_z_depth;
-                int_z_depth = fix16_int32_to(z_depth);
-
-                if (int_z_depth < 0) {
-                        int_z_depth = 0;
-                }
-                if (int_z_depth >= DEPTH_COUNT) {
-                        int_z_depth = DEPTH_COUNT - 1;
+                if ((_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
+                        _fog_calculate(object, &trans, index);
                 }
 
-                const int32_t depth_index = _depth_fog_z[int_z_depth];
-
-                copy_cmdt->cmd_colr = _depth_fog_colors[depth_index].raw;
-
-                _internal_sort_add(copy_cmdt, fix16_int32_to(z_center));
+                _internal_sort_add(copy_cmdt, fix16_int32_to(trans.z_center));
         }
 }
 
@@ -466,6 +507,27 @@ _sort_iterate(sort_single_t *single)
         sort_cmdt = single->packet;
 
         _state.iterate_fn(_state.object, sort_cmdt);
+}
+
+static void
+_fog_calculate(const sega3d_object_t *object __unused, const transform_t *trans, uint32_t index)
+{
+        vdp1_cmdt_t *copy_cmdt;
+        copy_cmdt = &_state.copy_cmdt_list->cmdts[index];
+
+        int32_t int_z_depth;
+        int_z_depth = fix16_int32_to(trans->z_center);
+
+        if (int_z_depth < 0) {
+                int_z_depth = 0;
+        }
+        if (int_z_depth >= _state.fog_len) {
+                int_z_depth = _state.fog_len - 1;
+        }
+
+        const int32_t depth_index = _depth_fog_z[int_z_depth];
+
+        copy_cmdt->cmd_colr = _depth_fog_colors[depth_index].raw;
 }
 
 static bool
