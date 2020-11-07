@@ -110,6 +110,7 @@ SH_CFLAGS= \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
+	-Wno-format \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
 	-DFIXMATH_NO_OVERFLOW=1 \
 	-DFIXMATH_NO_ROUNDING=1
