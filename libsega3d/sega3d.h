@@ -45,6 +45,14 @@ typedef struct {
         VECTOR view;
 } sega3d_info_t;
 
+typedef struct {
+        const color_rgb1555_t * const depth_colors;
+        const uint8_t * const depth_z;
+        uint8_t pow;
+
+        uint16_t gouraud_idx;
+} sega3d_fog_t;
+
 struct sega3d_object {
         void *pdata;
         vdp1_cmdt_t *cmdts;
@@ -82,6 +90,9 @@ extern void sega3d_matrix_rotate_z(const ANGLE angle);
 
 extern void sega3d_perspective_set(ANGLE fov);
 extern void sega3d_info_get(sega3d_info_t *info);
+
+extern void sega3d_fog_set(const sega3d_fog_t *fog);
+extern void sega3d_fog_limits_set(FIXED start_z, FIXED end_z);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_prepare(sega3d_object_t *object);
