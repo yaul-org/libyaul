@@ -29,70 +29,27 @@
 
 #include <fix16.h> 
 
-#define P01 10
-#define P02 100
-#define P03 1000
-#define P04 1000 * 10
-#define P05 1000 * 100
-#define P06 1000 * 1000
-#define P07 1000 * 1000 * 10
-#define P08 1000 * 1000 * 100
-#define P09 1000 * 1000 * 1000
-#define P10 1000 * 1000 * 1000 * 10
+#define P01 (10)
+#define P02 (100)
+#define P03 (1000)
+#define P04 (1000 * 10)
+#define P05 (1000 * 100)
+#define P06 (1000 * 1000)
+#define P07 (1000 * 1000 * 10)
+#define P08 (1000 * 1000 * 100)
+#define P09 (1000 * 1000 * 1000)
+#define P10 (1000 * 1000 * 1000 * 10)
 
 static const char _uppercase_hexchars[] = "0123456789ABCDEF";
 static const char _lowercase_hexchars[] = "0123456789abcdef";
 static const char _digits[] __unused =
-        "0001020304050607080910111213141516171819"
-        "2021222324252627282930313233343536373839"
-        "4041424344454647484950515253545556575859"
-        "6061626364656667686970717273747576777879"
-        "8081828384858687888990919293949596979899";
+    "0001020304050607080910111213141516171819"
+    "2021222324252627282930313233343536373839"
+    "4041424344454647484950515253545556575859"
+    "6061626364656667686970717273747576777879"
+    "8081828384858687888990919293949596979899";
 
-static uint16_t _digits10(const uint32_t v);
 static uint16_t _skip_atoi(const char **s);
-
-static uint16_t __unused
-_digits10(const uint32_t v)
-{
-        if (v < P01) {
-                return 1;
-        }
-
-        if (v < P02) {
-                return 2;
-        }
-
-        if (v < P03) {
-                return 3;
-        }
-
-        if (v < P08) {
-                if (v < P06) {
-                        if (v < P04) {
-                                return 4;
-                        }
-
-                        return 5 + (v >= P05);
-                }
-
-                return 7 + (v >= P07);
-        }
-
-        return 9 + (v >= P09);
-}
-
-static uint16_t
-_skip_atoi(const char **s)
-{
-        uint16_t i = 0;
-
-        while (isdigit(**s)) {
-                i = (i * 10) + *((*s)++) - '0';
-        }
-
-        return i;
-}
 
 int
 vsprintf(char *buf, const char *fmt, va_list args)
@@ -147,7 +104,7 @@ repeat:
                         goto repeat;
                 }
 
-                // Process field width and precision
+                /* Process field width and precision */
 
                 field_width = precision = -1;
 
@@ -156,8 +113,7 @@ repeat:
                 } else if (*fmt == '*') {
                         ++fmt;
                         /* It's the next argument */
-                        /* field_width = va_arg(args, int16_t); */
-                        field_width = va_arg(args, int);
+                        field_width = va_arg(args, int32_t);
 
                         if (field_width < 0) {
                                 field_width = -field_width;
@@ -172,9 +128,8 @@ repeat:
                                 precision = _skip_atoi(&fmt);
                         } else if (*fmt == '*') {
                                 ++fmt;
-                                // it's the next argument
-                                /* precision = va_arg(args, int16_t); */
-                                precision = va_arg(args, int);
+                                /* it's the next argument */
+                                precision = va_arg(args, int32_t);
                         }
 
                         if (precision < 0) {
@@ -192,13 +147,13 @@ repeat:
 
                 switch (*fmt) {
                 case 'c':
-                        if (!left_align)
+                        if (!left_align) {
                                 while (--field_width > 0) {
                                         *str++ = ' ';
                                 }
+                        }
 
-                        /* *str++ = (unsigned char) va_arg(args, int16_t); */
-                        *str++ = (unsigned char) va_arg(args, int);
+                        *str++ = (uint8_t)va_arg(args, int32_t);
 
                         while (--field_width > 0) {
                                 *str++ = ' ';
@@ -248,9 +203,8 @@ repeat:
 
 hexa_conv:
                         s = &tmp_buffer[12];
-                        *--s = 0;
-                        /* num = va_arg(args, uint16_t); */
-                        num = va_arg(args, int);
+                        *--s = '\0';
+                        num = va_arg(args, uint32_t);
 
                         if (!num) {
                                 *--s = '0';
@@ -273,8 +227,7 @@ hexa_conv:
                 case 'u':
                         s = &tmp_buffer[12];
                         *--s = 0;
-                        /* num = va_arg(args, uint16_t); */
-                        num = va_arg(args, int);
+                        num = va_arg(args, uint32_t);
 
                         if (!num) {
                                 *--s = '0';
@@ -292,11 +245,10 @@ hexa_conv:
                 case 'd':
                 case 'i':
                         s = &tmp_buffer[12];
-                        *--s = 0;
-                        /* i = va_arg(args, int16_t); */
+                        *--s = '\0';
                         i = va_arg(args, int32_t);
 
-                        if (!i) {
+                        if (i == 0) {
                                 *--s = '0';
                         }
 
@@ -318,6 +270,13 @@ hexa_conv:
 
                         break;
 
+                case 'f':
+                        i = va_arg(args, int32_t);
+
+                        fix16_str((fix16_t)i, tmp_buffer, 7);
+                        s = tmp_buffer;
+
+                        break;
                 default:
                         continue;
                 }
@@ -383,6 +342,18 @@ snprintf(char *__restrict buffer, size_t n __unused, const char *__restrict fmt,
         va_start(args, fmt);
         i = vsprintf(buffer, fmt, args);
         va_end(args);
+
+        return i;
+}
+
+static uint16_t
+_skip_atoi(const char **s)
+{
+        uint16_t i = 0;
+
+        while (isdigit(**s)) {
+                i = ((i * 10) + *((*s)++) - '0');
+        }
 
         return i;
 }
