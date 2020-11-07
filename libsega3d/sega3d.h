@@ -23,13 +23,15 @@ typedef enum {
 } matrix_type_t;
 
 typedef enum {
-        SEGA3D_OBJECT_FLAGS_NONE      = 0,
+        SEGA3D_OBJECT_FLAGS_NONE          = 0,
         /// Display wireframe
-        SEGA3D_OBJECT_FLAGS_WIREFRAME = 1 << 0,
-        /// Disable culling
-        SEGA3D_OBJECT_FLAGS_NO_CULL   = 1 << 1,
+        SEGA3D_OBJECT_FLAGS_WIREFRAME     = 1 << 0,
+        /// Cull using view vector
+        SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 1,
         /// Cull taking into account rotation of polygons
-        SEGA3D_OBJECT_FLAGS_CULL_ROT  = 1 << 2
+        SEGA3D_OBJECT_FLAGS_CULL_VIEW_ROT = 1 << 2,
+        /// Cull in screen space
+        SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3
 } sega3d_flags_t;
 
 typedef struct {
@@ -83,7 +85,7 @@ extern void sega3d_info_get(sega3d_info_t *info);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_prepare(sega3d_object_t *object);
-extern void sega3d_object_transform(sega3d_object_t *object);
+extern void sega3d_object_transform(const sega3d_object_t *object);
 extern void sega3d_object_iterate(sega3d_object_t *object);
 
 /// Standard iteration functions

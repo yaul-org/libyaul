@@ -24,6 +24,13 @@
 
 __BEGIN_DECLS
 
+#define VDP1_CMDT_PMOD_MSB_ENABLE               (1 << 15)
+#define VDP1_CMDT_PMOD_HSS_ENABLE               (1 << 12)
+#define VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE     (1 << 11)
+#define VDP1_CMDT_PMOD_MESH_ENABLE              (1 << 8)
+#define VDP1_CMDT_PMOD_END_CODE_DISABLE         (1 << 7)
+#define VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE      (1 << 6)
+
 #define CMDT_ZOOM_POINT_NONE            (0x0)
 #define CMDT_ZOOM_POINT_UPPER_LEFT      (0x5)
 #define CMDT_ZOOM_POINT_UPPER_CENTER    (0x6)

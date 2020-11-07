@@ -29,10 +29,11 @@ typedef enum {
 } clip_flags_t;
 
 typedef struct {
-        FIXED p[XYZ];
-        FIXED proj[XY];
-        FIXED inverse_top;
-        FIXED inverse_right;
+        FIXED proj_xy[XY];
+        FIXED proj_z[4];
+        FIXED proj_screen[4 * XY];
+        FIXED scale_inv_top;
+        FIXED scale_inv_right;
         FIXED z_avg;
         clip_flags_t clip_flags[4];
         color_rgb1555_t color;
@@ -66,7 +67,8 @@ static struct {
 
 static void _sort_iterate(sort_single_t *single);
 
-static bool _transform_cull_test(const sega3d_object_t *object, uint32_t index);
+static bool _view_cull_test(const sega3d_object_t *object, uint32_t index);
+static bool _screen_cull_test(const sega3d_object_t *object, const transform_t *trans);
 
 static inline FIXED __always_inline __used
 _vertex_transform(const FIXED *p, const FIXED *matrix)
@@ -75,25 +77,26 @@ _vertex_transform(const FIXED *p, const FIXED *matrix)
         register int32_t tmp2;
         register int32_t pt;
 
-        __asm__ volatile ("\tclrmac\n"
-                          "\tmov %[p], %[pt]\n"
+        __asm__ volatile (
                           "\tmov %[matrix], %[tmp1]\n"
+                          "\tmov %[p], %[pt]\n"
+                          "\tclrmac\n"
                           "\tmac.l @%[pt]+, @%[tmp1]+\n"
                           "\tmac.l @%[pt]+, @%[tmp1]+\n"
                           "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmov.l @%[tmp1]+, %[pt]\n" 
+                          "\tmov.l @%[tmp1], %[pt]\n"
                           "\tsts mach, %[tmp1]\n"
                           "\tsts macl, %[tmp2]\n"
                           "\txtrct %[tmp1], %[tmp2]\n"
                           "add %[tmp2], %[pt]\n"
-            /* Output */ 
+            /* Output */
             : [tmp1] "=&r" (tmp1),
               [tmp2] "=&r" (tmp2),
               [pt]   "=&r" (pt)
             /* Input */
             : [p]      "r" (p),
               [matrix] "r" (matrix)
-            : "mach", "macl");
+            : "mach", "macl", "memory");
 
         return pt;
 }
@@ -123,7 +126,7 @@ sega3d_perspective_set(ANGLE fov)
 #define AW_2 FIX16(12.446f) /* ([film-aperature-width = 0.980] * inch->mm) / 2) */
 #define AH_2 FIX16(9.3345f) /* ([film-aperature-height = 0.735] * inch->mm) / 2) */
 
-        const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1; 
+        const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1;
 
         uint16_t i_width;
         uint16_t i_height;
@@ -150,7 +153,7 @@ sega3d_perspective_set(ANGLE fov)
         _state.view.view[X] = 0;
         _state.view.view[Y] = 0;
         _state.view.view[Z] = -_state.view.focal_length;
-        
+
         _state.view.near = _state.view.focal_length;
 
         cpu_divu_fix16_set(AH_2, _state.view.focal_length);
@@ -177,7 +180,7 @@ sega3d_object_polycount_get(const sega3d_object_t *object)
 {
         const PDATA *pdata;
         pdata = object->pdata;
-        
+
         return pdata->nbPolygon;
 }
 
@@ -188,7 +191,7 @@ sega3d_object_prepare(sega3d_object_t *object)
         pdata = object->pdata;
 
         assert(pdata != NULL);
-        
+
         for (uint32_t i = 0; i < pdata->nbPolygon; i++) {
                 vdp1_cmdt_t *cmdt;
                 cmdt = &_state.copy_cmdt_list->cmdts[i];
@@ -203,8 +206,8 @@ sega3d_object_prepare(sega3d_object_t *object)
 
                 /* For debugging */
                 if ((object->flags & SEGA3D_OBJECT_FLAGS_WIREFRAME) == SEGA3D_OBJECT_FLAGS_WIREFRAME) {
-                        cmdt->cmd_ctrl = 0x0005;
-                        cmdt->cmd_pmod = 0x00C0;
+                        cmdt->cmd_ctrl = 0x0004;
+                        cmdt->cmd_pmod = VDP1_CMDT_PMOD_END_CODE_DISABLE | VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE;
                         cmdt->cmd_colr = 0xFFFF;
                 }
 
@@ -230,15 +233,58 @@ sega3d_object_prepare(sega3d_object_t *object)
         }
 }
 
-void __section("copy-function")
-sega3d_object_transform(sega3d_object_t *object)
+static const color_rgb1555_t _depth_fog_colors[32] = {
+        COLOR_RGB1555(1, 31, 31, 31),
+        COLOR_RGB1555(1, 30, 30, 30),
+        COLOR_RGB1555(1, 29, 29, 29),
+        COLOR_RGB1555(1, 28, 28, 28),
+        COLOR_RGB1555(1, 27, 27, 27),
+        COLOR_RGB1555(1, 26, 26, 26),
+        COLOR_RGB1555(1, 25, 25, 25),
+        COLOR_RGB1555(1, 24, 24, 24),
+        COLOR_RGB1555(1, 23, 23, 23),
+        COLOR_RGB1555(1, 22, 22, 22),
+        COLOR_RGB1555(1, 21, 21, 21),
+        COLOR_RGB1555(1, 20, 20, 20),
+        COLOR_RGB1555(1, 19, 19, 19),
+        COLOR_RGB1555(1, 18, 18, 18),
+        COLOR_RGB1555(1, 17, 17, 17),
+        COLOR_RGB1555(1, 16, 16, 16),
+        COLOR_RGB1555(1, 15, 15, 15),
+        COLOR_RGB1555(1, 14, 14, 14),
+        COLOR_RGB1555(1, 13, 13, 13),
+        COLOR_RGB1555(1, 12, 12, 12),
+        COLOR_RGB1555(1, 11, 11, 11),
+        COLOR_RGB1555(1, 10, 10, 10),
+        COLOR_RGB1555(1,  9,  9,  9),
+        COLOR_RGB1555(1,  8,  8,  8),
+        COLOR_RGB1555(1,  7,  7,  7),
+        COLOR_RGB1555(1,  6,  6,  6),
+        COLOR_RGB1555(1,  5,  5,  5),
+        COLOR_RGB1555(1,  4,  4,  4),
+        COLOR_RGB1555(1,  3,  3,  3),
+        COLOR_RGB1555(1,  2,  2,  2),
+        COLOR_RGB1555(1,  1,  1,  1),
+        COLOR_RGB1555(1,  0,  0,  0)
+};
+
+#define DEPTH_COUNT (64)
+
+static const uint8_t _depth_fog_z[DEPTH_COUNT] = {
+         0,  0,  0,  0,  0,  0,  1,  1,  2,  2,  3,  3,  4,  5,  5,  6, 
+         7,  8,  9, 10, 11, 11, 12, 13, 14, 15, 16, 17, 17, 18, 19, 20, 
+        21, 21, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 
+        28, 29, 29, 29, 29, 29, 30, 30, 30, 30, 30, 30, 30, 30, 30, 31 
+};
+
+void
+sega3d_object_transform(const sega3d_object_t *object)
 {
         _internal_sort_clear();
 
-        const PDATA *pdata;
-        pdata = object->pdata;
+        const PDATA * const pdata = object->pdata;
 
-        const FIXED *src_matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const src_matrix = (const FIXED *)sega3d_matrix_top();
 
         FIXED dst_matrix[MTRX] __aligned(16);
 
@@ -257,12 +303,10 @@ sega3d_object_transform(sega3d_object_t *object)
         dst_matrix[10] = src_matrix[M22];
         dst_matrix[11] = src_matrix[M32];
 
-        const POINT *points;
-        points = pdata->pntbl;
+        const POINT * const points = pdata->pntbl;
 
         for (uint32_t index = 0; index < pdata->nbPolygon; index++) {
-                POLYGON *polygon;
-                polygon = &pdata->pltbl[index];
+                const POLYGON * const polygon = &pdata->pltbl[index];
 
                 vdp1_cmdt_t *copy_cmdt;
                 copy_cmdt = &_state.copy_cmdt_list->cmdts[index];
@@ -273,8 +317,8 @@ sega3d_object_transform(sega3d_object_t *object)
                 transform_t trans;
                 trans.z_avg = 0;
 
-                if ((object->flags & SEGA3D_OBJECT_FLAGS_NO_CULL) == SEGA3D_OBJECT_FLAGS_NONE) {
-                        bool cull = _transform_cull_test(object, index);
+                if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
+                        bool cull = _view_cull_test(object, index);
 
                         if (cull) {
                                 continue;
@@ -282,68 +326,105 @@ sega3d_object_transform(sega3d_object_t *object)
                 }
 
                 for (uint32_t v = 0; v < 4; v++) {
-                        int16_t vertex;
-                        vertex = polygon->Vertices[v];
+                        const int16_t vertex = polygon->Vertices[v];
+                        const FIXED * const point = (const FIXED *)&points[vertex];
 
-                        const FIXED *point = (const FIXED *)&points[vertex];
-
-                        trans.p[Z] = _vertex_transform(point, &dst_matrix[8]);
+                        trans.proj_z[v] = _vertex_transform(point, &dst_matrix[8]);
 
                         trans.clip_flags[v] = CLIP_FLAGS_NONE;
 
                         /* In case the projected Z value is on or behind the near plane */
-                        if (trans.p[Z] <= _state.view.near) {
+                        if (trans.proj_z[v] <= _state.view.near) {
                                 trans.clip_flags[v] |= CLIP_FLAGS_NEAR;
 
-                                trans.p[Z] = _state.view.near;
+                                trans.proj_z[v] = _state.view.near;
                         }
 
-                        cpu_divu_fix16_set(_state.cached_inv_right, trans.p[Z]);
+                        cpu_divu_fix16_set(_state.cached_inv_right, trans.proj_z[v]);
 
-                        trans.z_avg += trans.p[Z];
+                        trans.z_avg += trans.proj_z[v];
 
-                        trans.p[X] = _vertex_transform(point, &dst_matrix[0]);
-                        trans.inverse_right = cpu_divu_quotient_get();
-                        trans.p[X] = fix16_mul(trans.p[X], trans.inverse_right);
+                        trans.proj_xy[X] = _vertex_transform(point, &dst_matrix[0]);
+                        trans.scale_inv_right = cpu_divu_quotient_get();
+                        trans.proj_xy[X] = fix16_mul(trans.proj_xy[X], trans.scale_inv_right);
 
-                        cpu_divu_fix16_set(_state.cached_inv_top, trans.p[Z]);
+                        cpu_divu_fix16_set(_state.cached_inv_top, trans.proj_z[v]);
 
-                        trans.proj[X] = fix16_int32_to(trans.p[X]);
+                        FIXED *proj_ptr;
+                        proj_ptr = &trans.proj_screen[v * XY];
 
-                        if (trans.proj[X] < -_state.cached_sw_2) {
+                        proj_ptr[X] = fix16_int32_to(trans.proj_xy[X]);
+
+                        if (proj_ptr[X] < -_state.cached_sw_2) {
                                 trans.clip_flags[v] |= CLIP_FLAGS_LEFT;
                         }
-                        if (trans.proj[X] > _state.cached_sw_2) {
+                        if (proj_ptr[X] > _state.cached_sw_2) {
                                 trans.clip_flags[v] |= CLIP_FLAGS_RIGHT;
                         }
 
-                        trans.p[Y] = _vertex_transform(point, &dst_matrix[4]);
-                        trans.inverse_top = cpu_divu_quotient_get();
+                        trans.proj_xy[Y] = _vertex_transform(point, &dst_matrix[4]);
+                        trans.scale_inv_top = cpu_divu_quotient_get();
 
-                        trans.p[Y] = fix16_mul(trans.p[Y], trans.inverse_top);
-                        trans.proj[Y] = fix16_int32_to(trans.p[Y]);
+                        trans.proj_xy[Y] = fix16_mul(trans.proj_xy[Y], trans.scale_inv_top);
+                        proj_ptr[Y] = fix16_int32_to(trans.proj_xy[Y]);
 
-                        if (trans.proj[Y] > _state.cached_sh_2) {
+                        if (proj_ptr[Y] > _state.cached_sh_2) {
                                 trans.clip_flags[v] |= CLIP_FLAGS_TOP;
                         }
-                        if (trans.proj[Y] < -_state.cached_sh_2) {
+                        if (proj_ptr[Y] < -_state.cached_sh_2) {
                                 trans.clip_flags[v] |= CLIP_FLAGS_BOTTOM;
                         }
 
-                        cmd_vertex[v].x = trans.proj[X];
-                        cmd_vertex[v].y = trans.proj[Y];
+                        cmd_vertex[v].x = proj_ptr[X];
+                        cmd_vertex[v].y = proj_ptr[Y];
                 }
 
-                const clip_flags_t clip_flags = (trans.clip_flags[0] &
-                                                 trans.clip_flags[1] &
-                                                 trans.clip_flags[2] &
-                                                 trans.clip_flags[3]);
+                const clip_flags_t and_clip_flags = (trans.clip_flags[0] &
+                                                     trans.clip_flags[1] &
+                                                     trans.clip_flags[2] &
+                                                     trans.clip_flags[3]);
 
-                if (clip_flags != CLIP_FLAGS_NONE) {
+                if (and_clip_flags != CLIP_FLAGS_NONE) {
                         continue;
                 }
 
-                const FIXED z_center = trans.z_avg >> 2; /* Divide by 4 */
+                if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SCREEN) != SEGA3D_OBJECT_FLAGS_NONE) {
+                        bool cull = _screen_cull_test(object, &trans);
+
+                        if (cull) {
+                                continue;
+                        }
+                }
+
+                const clip_flags_t or_clip_flags = (trans.clip_flags[0] |
+                                                    trans.clip_flags[1] |
+                                                    trans.clip_flags[2] |
+                                                    trans.clip_flags[3]);
+
+                if (or_clip_flags == CLIP_FLAGS_NONE) {
+                        /* Since no clip flags are set, disable pre-clipping.
+                         * This should help with performance */
+                        copy_cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
+                }
+
+                /* Divide by 4 to get the average (bit shift) */
+                const FIXED z_center = trans.z_avg >> 2;
+
+                const FIXED z_depth = z_center;
+
+                int32_t int_z_depth;
+                int_z_depth = fix16_int32_to(z_depth);
+
+                if (int_z_depth < 0) {
+                        int_z_depth = 0;
+                }
+                if (int_z_depth >= DEPTH_COUNT) {
+                        int_z_depth = DEPTH_COUNT - 1;
+                }
+
+                const int32_t depth_index = _depth_fog_z[int_z_depth];
+
+                copy_cmdt->cmd_colr = _depth_fog_colors[depth_index].raw;
 
                 _internal_sort_add(copy_cmdt, fix16_int32_to(z_center));
         }
@@ -388,32 +469,37 @@ _sort_iterate(sort_single_t *single)
 }
 
 static bool
-_transform_cull_test(const sega3d_object_t *object, uint32_t index)
+_screen_cull_test(const sega3d_object_t *object __unused, const transform_t *trans)
 {
-        const PDATA *pdata;
-        pdata = object->pdata;
+        const FIXED * const proj_ptr = &trans->proj_screen[0];
+        const FIXED * const next_proj_ptr = &trans->proj_screen[(1 * XY)];
 
-        POLYGON *polygon;
-        polygon = &pdata->pltbl[index];
-        const POINT *points;
-        points = pdata->pntbl;
+        const FIXED cull_z = fix16_mul(proj_ptr[X], next_proj_ptr[Y]) -
+            fix16_mul(proj_ptr[Y], next_proj_ptr[X]);
 
-        const FIXED *src_matrix = (const FIXED *)sega3d_matrix_top();
-        
-        int16_t cull_vi;
-        cull_vi = polygon->Vertices[0];
+        return (cull_z < 0);
+}
 
-        const FIXED *cull_p = (const FIXED *)&points[cull_vi];
+static bool
+_view_cull_test(const sega3d_object_t *object, uint32_t index)
+{
+        const PDATA * const pdata = object->pdata;
+        const POLYGON * const polygon = &pdata->pltbl[index];
+        const POINT * const points = pdata->pntbl;
+
+        const FIXED * const src_matrix = (const FIXED *)sega3d_matrix_top();
+
+        const int16_t cull_vi = polygon->Vertices[0];
+
+        const FIXED * const cull_p = (const FIXED *)&points[cull_vi];
 
         FIXED view_p[XYZ];
 
-        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_ROT) == SEGA3D_OBJECT_FLAGS_CULL_ROT) {
-                view_p[X] = -src_matrix[M30];
-                view_p[Y] = -src_matrix[M31]; 
-                view_p[Z] = -src_matrix[M32];
+        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW_ROT) != SEGA3D_OBJECT_FLAGS_NONE) {
+                /* Invert 3x3 rotation matrix */
         } else {
                 view_p[X] = -src_matrix[M30];
-                view_p[Y] = -src_matrix[M31]; 
+                view_p[Y] = -src_matrix[M31];
                 view_p[Z] = -src_matrix[M32];
         }
 
