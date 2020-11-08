@@ -95,11 +95,6 @@ extern void sega3d_fog_set(const sega3d_fog_t *fog);
 extern void sega3d_fog_limits_set(FIXED start_z, FIXED end_z);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
-extern void sega3d_object_prepare(sega3d_object_t *object);
-extern void sega3d_object_transform(const sega3d_object_t *object);
-extern void sega3d_object_iterate(sega3d_object_t *object);
-
-/// Standard iteration functions
-extern void sega3d_standard_iterate(sega3d_object_t *object, const vdp1_cmdt_t *cmdt);
+extern void sega3d_object_transform(sega3d_object_t *object);
 
 #endif /* SEGA3D_H_ */
