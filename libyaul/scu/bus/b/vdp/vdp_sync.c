@@ -676,11 +676,37 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
 }
 
 static void
-_vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist __unused)
+_vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
 {
         /* Reset it. We don't have any control over where in VRAM command tables
          * are being sent */
         vdp1_sync_last_command_set(0);
+
+        static scu_dma_level_cfg_t dma_cfg = {
+                .mode = SCU_DMA_MODE_INDIRECT,
+                .xfer.direct.len = 0x00000000,
+                .xfer.direct.dst = 0x00000000,
+                .xfer.direct.src = 0x00000000,
+                .stride = SCU_DMA_STRIDE_2_BYTES,
+                .update = SCU_DMA_UPDATE_NONE
+        };
+
+        static scu_dma_handle_t handle;
+
+        scu_dma_xfer_t *xfer_table;
+        xfer_table = (scu_dma_xfer_t *)cmdt_orderlist;
+
+        dma_cfg.xfer.indirect = xfer_table;
+
+        scu_dma_config_buffer(&handle, &dma_cfg);
+
+        int8_t ret __unused;
+        ret = dma_queue_enqueue(&handle, DMA_QUEUE_TAG_IMMEDIATE,
+            _vdp1_dma_handler, NULL);
+        assert(ret == 0);
+
+        ret = dma_queue_flush(DMA_QUEUE_TAG_IMMEDIATE);
+        assert(ret >= 0);
 }
 
 static void

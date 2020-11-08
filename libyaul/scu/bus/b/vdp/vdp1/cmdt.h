@@ -221,14 +221,17 @@ typedef struct vdp1_cmdt_list {
 } __aligned(4) vdp1_cmdt_list_t;
 
 typedef struct vdp1_cmdt_orderlist {
-        struct {
-                unsigned int end:1;
-                unsigned int :30;
-        } control __aligned(4);
-
+        unsigned int :32;
         unsigned int :32;
 
-        vdp1_cmdt_t *cmdt;
+        union {
+                struct {
+                        unsigned int end:1;
+                        unsigned int :30;
+                } control __aligned(4);
+
+                vdp1_cmdt_t *cmdt;
+        };
 } __aligned(4) vdp1_cmdt_orderlist_t;
 
 static inline uint16_t __always_inline
