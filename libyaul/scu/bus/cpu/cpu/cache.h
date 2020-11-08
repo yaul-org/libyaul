@@ -50,6 +50,10 @@ __BEGIN_DECLS
 #define CPU_CACHE_MODE_4_WAY    0x00
 /// Not yet documented.
 #define CPU_CACHE_MODE_2_WAY    0x08
+/// Not yet documented.
+#define CPU_CACHE_MODE_OD_DIS   0x04
+/// Not yet documented.
+#define CPU_CACHE_MODE_ID_DIS   0x02
 
 /// @}
 
@@ -134,7 +138,7 @@ cpu_cache_way_mode_set(uint8_t mode)
         reg_ccr = (uint8_t *)CPU(CCR);
 
         uint8_t t0;
-        t0 = *reg_ccr & ~0x09;
+        t0 = *reg_ccr & ~0x0F;
 
         *reg_ccr = t0;
         *reg_ccr = t0 | mode;

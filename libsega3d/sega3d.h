@@ -55,13 +55,14 @@ typedef struct {
 
 struct sega3d_object {
         void *pdata;
+        vdp1_cmdt_orderlist_t *cmdt_orderlist;
         vdp1_cmdt_t *cmdts;
         uint16_t offset;
         uint16_t count;
 
         sega3d_flags_t flags;
-        sega3d_iterate_fn iterate_fn;
 
+        sega3d_iterate_fn iterate_fn;
         void *data;
 };
 

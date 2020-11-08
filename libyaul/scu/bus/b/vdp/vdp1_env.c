@@ -167,6 +167,8 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
 
         vdp1_cmdt_local_coord_set(&cmdts[1]);
         vdp1_cmdt_param_vertex_set(&cmdts[1], CMDT_VTX_LOCAL_COORD, local_coords);
+
+        vdp1_cmdt_end_set(&cmdts[2]);
 }
 
 static inline void __always_inline

@@ -14,7 +14,7 @@ memalign(size_t n __unused, size_t align __unused) /* Keep as __unused */
         pool = master_state()->tlsf_pools[TLSF_POOL_USER];
 
         void *ret;
-        ret = tlsf_memalign(pool, n, align);
+        ret = tlsf_memalign(pool, align, n);
 
         return ret;
 #else
