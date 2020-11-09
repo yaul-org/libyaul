@@ -220,19 +220,11 @@ typedef struct vdp1_cmdt_list {
         uint16_t count;
 } __aligned(4) vdp1_cmdt_list_t;
 
-typedef struct vdp1_cmdt_orderlist {
+typedef struct {
         unsigned int :32;
         unsigned int :32;
-
-        union {
-                struct {
-                        unsigned int end:1;
-                        unsigned int :30;
-                } control __aligned(4);
-
-                vdp1_cmdt_t *cmdt;
-        };
-} __aligned(4) vdp1_cmdt_orderlist_t;
+        vdp1_cmdt_t *cmdt;
+} __packed __aligned(4) vdp1_cmdt_orderlist_t;
 
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
@@ -244,6 +236,15 @@ static inline uint16_t __always_inline
 vdp1_cmdt_last_get(void)
 {
         return MEMORY_READ(16, VDP1(LOPR)) >> 2;
+}
+
+static inline void __always_inline
+vdp1_cmdt_orderlist_end(vdp1_cmdt_orderlist_t *cmdt_orderlist)
+{
+        scu_dma_xfer_t *dma_xfer;
+        dma_xfer = (scu_dma_xfer_t *)cmdt_orderlist;
+
+        dma_xfer->src |= SCU_DMA_INDIRECT_TABLE_END;
 }
 
 extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t);

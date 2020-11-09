@@ -68,11 +68,11 @@ __BEGIN_DECLS
 #define SCU_DMA_STRIDE_64_BYTES         0x06
 #define SCU_DMA_STRIDE_128_BYTES        0x07
 
-#define SCU_DMA_UPDATE_NONE     0x00000000
-#define SCU_DMA_UPDATE_RUP      0x00010000
-#define SCU_DMA_UPDATE_WUP      0x00000100
+#define SCU_DMA_UPDATE_NONE     (0x00000000UL)
+#define SCU_DMA_UPDATE_RUP      (0x00010000UL)
+#define SCU_DMA_UPDATE_WUP      (0x00000100UL)
 
-#define SCU_DMA_INDIRECT_TABLE_END      (0x80000000)
+#define SCU_DMA_INDIRECT_TABLE_END      (0x80000000UL)
 
 #define SCU_DMA_BUS_A   0x00
 #define SCU_DMA_BUS_B   0x01
@@ -102,7 +102,7 @@ typedef struct scu_dma_xfer {
         uint32_t len;
         uint32_t dst;
         uint32_t src;
-} __packed scu_dma_xfer_t;
+} __packed __aligned(4) scu_dma_xfer_t;
 
 typedef struct scu_dma_level_cfg {
         uint8_t mode;

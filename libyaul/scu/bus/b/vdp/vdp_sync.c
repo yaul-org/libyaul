@@ -693,10 +693,7 @@ _vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
 
         static scu_dma_handle_t handle;
 
-        scu_dma_xfer_t *xfer_table;
-        xfer_table = (scu_dma_xfer_t *)cmdt_orderlist;
-
-        dma_cfg.xfer.indirect = xfer_table;
+        dma_cfg.xfer.indirect = (scu_dma_xfer_t *)cmdt_orderlist;
 
         scu_dma_config_buffer(&handle, &dma_cfg);
 
