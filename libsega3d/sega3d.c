@@ -39,7 +39,7 @@ typedef enum {
         FLAGS_NONE        = 0,
         FLAGS_INITIALIZED = 1 << 0,
         FLAGS_FOG_ENABLED = 1 << 1,
-} __packed flags_t;
+} flags_t;
 
 typedef struct {
         FIXED point_z;
@@ -113,24 +113,24 @@ static const uint8_t _depth_fog_z[DEPTH_FOG_COUNT] = {
 static struct {
         flags_t flags;
 
-        sega3d_info_t view;
+        /* Current object */
+        sega3d_object_t *object;
+        /* Current sorting orderlist */
+        vdp1_cmdt_orderlist_t *sort_orderlist;
         FIXED cached_inv_top;
         FIXED cached_inv_right;
         int16_t cached_sw_2;
         int16_t cached_sh_2;
-
-        vdp1_cmdt_t cmdt_end;
 
         sega3d_fog_t fog;
         FIXED fog_start_z;
         FIXED fog_end_z;
         uint16_t fog_len;
 
-        /* Current object */
-        sega3d_object_t *object;
-        /* Set iteration function */
-        sega3d_iterate_fn iterate_fn;
-} _state;
+        sega3d_info_t view;
+
+        vdp1_cmdt_t cmdt_end;
+} _state __aligned(4);
 
 static void _sort_iterate(sort_single_t *single);
 
@@ -309,7 +309,7 @@ sega3d_object_transform(sega3d_object_t *object)
         trans = &_transform;
 
         vdp1_cmdt_t *transform_cmdts;
-        transform_cmdts = _state.object->cmdts;
+        transform_cmdts = object->cmdts;
 
         const FIXED * const src_matrix = (const FIXED *)sega3d_matrix_top();
 
@@ -411,42 +411,33 @@ sega3d_object_transform(sega3d_object_t *object)
                 trans->z_center = z_avg >> 2;
 
                 vdp1_cmdt_t *transform_cmdt;
-                transform_cmdt = &transform_cmdts[_state.object->offset + trans->index];
+                transform_cmdt = &transform_cmdts[object->offset + trans->index];
 
                 _cmdt_prepare(trans, transform_cmdt);
 
                 _internal_sort_add(transform_cmdt, fix16_int32_to(trans->z_center));
         }
 
-        _state.object->count = 0;
+        _state.sort_orderlist = &object->cmdt_orderlist[object->offset];
 
         _internal_sort_iterate(_sort_iterate);
 
-        /* Take the the last entry in the orderlist and terminate, as well as
-         * the command table */
-        vdp1_cmdt_orderlist_t *cmdt_orderlist;
-        cmdt_orderlist = &_state.object->cmdt_orderlist[_state.object->offset + _state.object->count];
-
-        vdp1_cmdt_end_set(&_state.cmdt_end);
+        /* Update count */
+        object->count = _state.sort_orderlist - object->cmdt_orderlist;
 
         /* Fetch the last command table pointer before setting the indirect mode
          * transfer end bit */
-        cmdt_orderlist->control.end = false;
-        cmdt_orderlist->cmdt = &_state.cmdt_end;
-
-        cmdt_orderlist->control.end = true;
+        _state.sort_orderlist->cmdt = &_state.cmdt_end;
+        _state.sort_orderlist->xfer.src |= SCU_DMA_INDIRECT_TABLE_END;
 }
 
 static void
 _sort_iterate(sort_single_t *single)
 {
-        vdp1_cmdt_orderlist_t *cmdt_orderlist;
-        cmdt_orderlist = &_state.object->cmdt_orderlist[_state.object->offset + _state.object->count];
+        /* No need to clear the end bit, as the above clobbers the bit */
+        _state.sort_orderlist->cmdt = single->packet;
 
-        cmdt_orderlist->cmdt = single->packet;
-        cmdt_orderlist->control.end = false;
-
-        _state.object->count++;
+        _state.sort_orderlist++;
 }
 
 static void
