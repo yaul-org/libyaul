@@ -77,6 +77,23 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
         return out;
 }
 
+static inline int16_t __always_inline
+fix16_int16_muls(const fix16_t a, const fix16_t b)
+{
+        register int16_t out;
+
+        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                          "\tsts mach, %[out]\n"
+            /* Output */
+            : [out] "=&r" (out)
+            /* Input */
+            : [a] "r" (a),
+              [b] "r" (b)
+            : "mach");
+
+        return out;
+}
+
 static inline fix16_t __always_inline
 fix16_mul(const fix16_t a, const fix16_t b)
 {
