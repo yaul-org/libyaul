@@ -17,10 +17,10 @@ typedef enum {
         TLIST_FLAGS_ALLOCATED      = 1 << 1
 } tlist_flags_t;
 
-#define MATRIX_STACK_MAX (20)
-
-#define Z_RANGE         2048
-#define PACKET_SIZE     4096
+#define MATRIX_STACK_MAX        (20)
+#define Z_RANGE                 (2048)
+#define PACKET_SIZE             (4096)
+#define VERTEX_POOL_SIZE        (1024)
 
 typedef struct sort_single {
         void *packet;
