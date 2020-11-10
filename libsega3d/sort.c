@@ -19,7 +19,7 @@ static struct {
 } _state;
 
 void
-_internal_sort_clear(void)
+_internal_sort_init(void)
 {
         _state.index = 0;
 
@@ -27,6 +27,12 @@ _internal_sort_clear(void)
         /* XXX: Maybe we can remove this? Is there really a need to reset the
          *      pool? */
         (void)memset(_state.single_pool, 0, sizeof(sort_single_t) * PACKET_SIZE);
+}
+
+void
+_internal_sort_clear(void)
+{
+        _internal_sort_init();
 }
 
 void

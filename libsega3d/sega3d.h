@@ -50,16 +50,17 @@ typedef struct {
         uint16_t gouraud_idx;
 } sega3d_fog_t;
 
+typedef struct {
+        uint16_t count;
+} sega3d_results_t;
+
 struct sega3d_object {
         void *pdata;
         vdp1_cmdt_orderlist_t *cmdt_orderlist;
         vdp1_cmdt_t *cmdts;
-        uint16_t offset;
-        uint16_t count;
 
         sega3d_flags_t flags;
 
-        sega3d_iterate_fn iterate_fn;
         void *data;
 };
 
@@ -91,7 +92,10 @@ extern void sega3d_info_get(sega3d_info_t *info);
 extern void sega3d_fog_set(const sega3d_fog_t *fog);
 extern void sega3d_fog_limits_set(FIXED start_z, FIXED end_z);
 
+extern void sega3d_start(vdp1_cmdt_orderlist_t *orderlist);
+extern void sega3d_finish(void);
+
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
-extern void sega3d_object_transform(sega3d_object_t *object);
+extern void sega3d_object_transform(const sega3d_object_t *object, sega3d_results_t *results);
 
 #endif /* SEGA3D_H_ */
