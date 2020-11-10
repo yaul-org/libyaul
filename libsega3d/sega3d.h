@@ -26,10 +26,8 @@ typedef enum {
         SEGA3D_OBJECT_FLAGS_NONE          = 0,
         /// Display wireframe
         SEGA3D_OBJECT_FLAGS_WIREFRAME     = 1 << 0,
-        /// Cull using view vector
+        /// Cull in world space
         SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 1,
-        /// Cull taking into account rotation of polygons
-        SEGA3D_OBJECT_FLAGS_CULL_VIEW_ROT = 1 << 2,
         /// Cull in screen space
         SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3
 } sega3d_flags_t;
@@ -42,7 +40,6 @@ typedef struct {
         FIXED ratio;
         FIXED near;
         FIXED focal_length;
-        VECTOR view;
 } sega3d_info_t;
 
 typedef struct {
@@ -82,9 +79,8 @@ extern void sega3d_matrix_pop(void);
 extern const MATRIX *sega3d_matrix_top(void);
 extern void sega3d_matrix_load(const MATRIX *matrix);
 extern void sega3d_matrix_copy(MATRIX *matrix);
-extern void sega3d_matrix_copy_push(void);
+extern void sega3d_matrix_inverse_push(void);
 extern void sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz);
-extern void sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz);
 extern void sega3d_matrix_rotate_x(const ANGLE angle);
 extern void sega3d_matrix_rotate_y(const ANGLE angle);
 extern void sega3d_matrix_rotate_z(const ANGLE angle);
