@@ -162,13 +162,30 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
         system_clip_coords.x = _state_vdp2()->tv.resolution.x;
         system_clip_coords.y = _state_vdp2()->tv.resolution.y;
 
-        vdp1_cmdt_system_clip_coord_set(&cmdts[0]);
-        vdp1_cmdt_param_vertex_set(&cmdts[0], CMDT_VTX_SYSTEM_CLIP, &system_clip_coords);
+        int16_vec2_t user_clip_ul;
+        int16_vec2_zero(&user_clip_ul);
 
-        vdp1_cmdt_local_coord_set(&cmdts[1]);
-        vdp1_cmdt_param_vertex_set(&cmdts[1], CMDT_VTX_LOCAL_COORD, local_coords);
+        int16_vec2_t user_clip_lr;
+        user_clip_lr.x = system_clip_coords.x - 1;
+        user_clip_lr.y = system_clip_coords.y - 1;
 
-        vdp1_cmdt_end_set(&cmdts[2]);
+        vdp1_cmdt_t *cmdt;
+        cmdt = &cmdts[0];
+
+        vdp1_cmdt_system_clip_coord_set(cmdt);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_SYSTEM_CLIP, &system_clip_coords);
+        cmdt++;
+
+        vdp1_cmdt_user_clip_coord_set(cmdt);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_UL, &user_clip_ul);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_LR, &user_clip_lr);
+        cmdt++;
+
+        vdp1_cmdt_local_coord_set(cmdt);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_LOCAL_COORD, local_coords);
+        cmdt++;
+
+        vdp1_cmdt_end_set(cmdt);
 }
 
 static inline void __always_inline
