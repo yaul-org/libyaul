@@ -137,6 +137,10 @@ vdp1_env_set(const vdp1_env_t *env)
 void
 vdp1_env_stop(void)
 {
+        (void)memset(&_state_vdp1()->regs->buffer[0],
+            0x00,
+            sizeof(vdp1_registers_t));
+
         MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
         MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
         MEMORY_WRITE(16, VDP1(FBCR), 0x0000);

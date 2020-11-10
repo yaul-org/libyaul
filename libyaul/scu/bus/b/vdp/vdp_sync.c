@@ -64,12 +64,27 @@
 #define TRANSFER_TYPE_BUFFER            (0)
 #define TRANSFER_TYPE_ORDERLIST         (1)
 
+#define VDP1_TVMR_VBE                   (0x0008)
+
+#define VDP1_FBCR_NONE                  (0x0000)
+#define VDP1_FBCR_FCT                   (0x0001)
+#define VDP1_FBCR_FCM                   (0x0002)
+#define VDP1_FBCR_FCM_FCT               (0x0003)
+#define VDP1_FBCR_DIL                   (0x0004)
+#define VDP1_FBCR_DIE                   (0x0008)
+#define VDP1_FBCR_EOS                   (0x0010)
+
+#define VDP1_PTMR_IDLE                  (0x0000)
+#define VDP1_PTMR_PLOT                  (0x0001)
+#define VDP1_PTMR_AUTO                  (0x0002)
+
 typedef void (*vdp1_func_ptr)(const void *);
 
 typedef struct {
         uint8_t transfer_type;
         const vdp1_cmdt_orderlist_t *cmdt_orderlist;
         const vdp1_cmdt_t *cmdts;
+        const uint16_t index;
         const uint16_t count;
         vdp1_sync_callback callback;
         void *work;
@@ -96,9 +111,6 @@ static volatile struct {
 static_assert(sizeof(struct vdp1_state) == 2);
 static_assert(sizeof(struct vdp2_state) == 1);
 static_assert(sizeof(_state) == 4);
-
-/* Keep track of the current command table operation */
-static volatile uint16_t _vdp1_last_command = 0x0000;
 
 static callback_t _user_vdp1_sync_callback;
 static callback_t _user_vblank_in_callback;
@@ -275,8 +287,6 @@ vdp_sync(void)
         _state.vdp1.flags &= ~VDP1_FLAG_MASK;
         _state.vdp2.flags &= ~VDP2_FLAG_MASK;
 
-        vdp1_sync_last_command_set(0);
-
         scu_ic_mask_set(scu_mask);
         cpu_intc_mask_set(intc_mask);
 }
@@ -287,7 +297,7 @@ vdp1_sync_rendering(void)
         const uint8_t flag_mask = VDP1_FLAG_REQUEST_COMMIT_LIST |
                                   VDP1_FLAG_LIST_COMMITTED;
 
-        return (_state.vdp1.flags & flag_mask) == VDP1_FLAG_REQUEST_COMMIT_LIST;
+        return ((_state.vdp1.flags & flag_mask) == VDP1_FLAG_REQUEST_COMMIT_LIST);
 }
 
 void
@@ -323,7 +333,7 @@ vdp1_sync_mode_set(const uint8_t mode)
 
 void
 vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
-    vdp1_sync_callback callback, void *work)
+    const uint16_t index, vdp1_sync_callback callback, void *work)
 {
         assert(cmdts != NULL);
 
@@ -331,9 +341,12 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
                 return;
         }
 
+        /* Check if index exceeds VRAM command table bounds */
+
         const vdp1_sync_put_args_t args = {
                 .transfer_type = TRANSFER_TYPE_BUFFER,
                 .cmdts = cmdts,
+                .index = index,
                 .count = count,
                 .callback = callback,
                 .work = work
@@ -344,12 +357,12 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
 
 void
 vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
-    vdp1_sync_callback callback, void *work)
+    const uint16_t index, vdp1_sync_callback callback, void *work)
 {
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
 
-        vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, callback, work);
+        vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, index, callback, work);
 }
 
 void
@@ -366,18 +379,6 @@ vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
         };
 
         _vdp1_sync_put_call(&args);
-}
-
-uint16_t
-vdp1_sync_last_command_get(void)
-{
-        return _vdp1_last_command;
-}
-
-void
-vdp1_sync_last_command_set(const uint16_t index)
-{
-        _vdp1_last_command = index;
 }
 
 void
@@ -446,8 +447,6 @@ _vdp1_init(void)
 
         vdp1_sync_mode_set(VDP1_SYNC_MODE_ERASE_CHANGE);
         vdp1_sync_interval_set(VDP1_SYNC_INTERVAL_60HZ);
-
-        vdp1_sync_last_command_set(0);
 }
 
 static inline void __always_inline
@@ -491,16 +490,16 @@ _vdp1_mode_auto_sync_put(const void *args_ptr)
                 }
         }
 
-        const uint32_t intc_mask = cpu_intc_mask_get();
-        cpu_intc_mask_set(15);
+        /* Mask interrupts to make sure this variable does not get modified at
+         * the same time */
+        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_MASK_OR);
 
         _state.vdp1.flags &= ~VDP1_FLAG_MASK;
         _state.vdp1.flags |= VDP1_FLAG_REQUEST_XFER_LIST;
 
-        cpu_intc_mask_set(intc_mask);
+        scu_ic_mask_chg(SCU_MASK_AND, SCU_IC_MASK_NONE);
 
-        const uint32_t vdp1_vram =
-            VDP1_VRAM(vdp1_sync_last_command_get() * sizeof(vdp1_cmdt_t));
+        const uint32_t vdp1_vram = VDP1_VRAM(args->index);
 
         switch (args->transfer_type) {
         case TRANSFER_TYPE_BUFFER:
@@ -555,9 +554,9 @@ _vdp1_mode_auto_vblank_in(const void *args_ptr __unused)
          * However, VDP1(FBCR) must not be entirely cleared. This caused
          * a lot of glitching when in double-density interlace mode */
 
-        MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0002);
+        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
 }
 
 static void
@@ -575,10 +574,10 @@ _vdp1_mode_auto_vblank_out(const void *args_ptr __unused)
 
         switch (_state.vdp1.fb_mode) {
         case VDP1_FB_MODE_ERASE_CHANGE:
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
+                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
                 break;
         case VDP1_FB_MODE_CHANGE_ONLY:
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
                 break;
         }
 }
@@ -609,28 +608,76 @@ _vdp1_mode_fixed_vblank_out(const void *args_ptr __unused)
 }
 
 static void
-_vdp1_mode_variable_sync_put(const void *args_ptr __unused)
+_vdp1_mode_variable_sync_put(const void *args_ptr)
 {
+        _vdp1_mode_auto_sync_put(args_ptr);
 }
 
 static void
 _vdp1_mode_variable_dma(const void *args_ptr __unused)
 {
+        /* Since the DMA transfer went through, the VDP1 is idling, so start drawing */
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_PLOT);
+
+        /* Set the flags as transfered and request to draw the list */
+        _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
 }
 
 static void
 _vdp1_mode_variable_sprite_end(const void *args_ptr __unused)
 {
+        _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
+
+        /* Move the plotter to idle, we are done drawing */
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
+
+        callback_call(&_user_vdp1_sync_callback);
 }
 
 static void
 _vdp1_mode_variable_vblank_in(const void *args_ptr __unused)
 {
+        /* Don't change frame buffers if we never sent a transfer list */
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_XFER_LIST) == 0x00) {
+                return;
+        }
+
+        if ((vdp1_sync_rendering())) {
+                return;
+        }
+
+        /* Don't call to change buffers unless we've requested to sync */
+        if ((_state.flags & SYNC_FLAG_SYNC) == 0x00) {
+                return;
+        }
+
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_CHANGE;
+
+        /* Change and erase on next field */
+        _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
+
+        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+
+        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
 }
 
 static void
 _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
 {
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_CHANGE) == 0x00) {
+                return;
+        }
+
+        _state.vdp1.flags &= ~VDP1_FLAG_REQUEST_COMMIT_LIST;
+        _state.vdp1.flags &= ~VDP1_FLAG_REQUEST_CHANGE;
+
+        _state.vdp1.flags |= VDP1_FLAG_CHANGED;
+
+        /* Clear VBE */
+        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+
+        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
 }
 
 static void
@@ -648,13 +695,6 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
         };
 
         static scu_dma_handle_t handle;
-
-        /* Keep track of how many commands are being sent.
-         *
-         * Remove the "draw end" command from the count as it needs to be
-         * overwritten on next request to sync VDP1 */
-        const uint16_t last_command = vdp1_sync_last_command_get();
-        vdp1_sync_last_command_set(last_command + (count - 1));
 
         const uint32_t xfer_len = count * sizeof(vdp1_cmdt_t);
         const uint32_t xfer_dst = vdp1_vram;
@@ -678,10 +718,6 @@ _vdp1_cmdt_transfer(const vdp1_cmdt_t *cmdts,
 static void
 _vdp1_cmdt_orderlist_transfer(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
 {
-        /* Reset it. We don't have any control over where in VRAM command tables
-         * are being sent */
-        vdp1_sync_last_command_set(0);
-
         static scu_dma_level_cfg_t dma_cfg = {
                 .mode = SCU_DMA_MODE_INDIRECT,
                 .xfer.direct.len = 0x00000000,
