@@ -105,15 +105,14 @@ fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
         return aux1;
 }
 
-
 extern fix16_t fix16_vec3_length(const fix16_vec3_t *);
 extern fix16_t fix16_vec3_sqr_length(const fix16_vec3_t *);
 extern void fix16_vec3_normalize(fix16_vec3_t *);
 extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict,
     fix16_vec3_t * __restrict);
 extern fix16_t fix16_vec3_dot(const fix16_vec3_t *, const fix16_vec3_t *);
-extern void fix16_vec3_cross(const fix16_vec3_t * __restrict,
-    const fix16_vec3_t * __restrict, fix16_vec3_t * __restrict);
+extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict,
+    const fix16_vec3_t * const __restrict, fix16_vec3_t * __restrict);
 
 extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict,
     const fix16_vec3_t * __restrict);

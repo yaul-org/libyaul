@@ -61,8 +61,8 @@ fix16_vec3_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
 }
 
 void
-fix16_vec3_cross(const fix16_vec3_t * __restrict v0,
-    const fix16_vec3_t * __restrict v1, fix16_vec3_t * __restrict result)
+fix16_vec3_cross(const fix16_vec3_t * const __restrict v0,
+    const fix16_vec3_t * const __restrict v1, fix16_vec3_t * __restrict result)
 {
         result->x = fix16_mul(v0->y, v1->z) - fix16_mul(v0->z, v1->y);
         result->y = fix16_mul(v0->z, v1->x) - fix16_mul(v0->x, v1->z);
