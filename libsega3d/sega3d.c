@@ -52,7 +52,6 @@ typedef struct {
 
         uint16_t index;
         FIXED z_center;
-        const VECTOR *polygon_normal;
         transform_proj_t *polygon[4] __aligned(16);
 
         transform_proj_t projs[VERTEX_POOL_SIZE] __aligned(16);
@@ -127,7 +126,7 @@ static struct {
         FIXED fog_end_z;
         uint16_t fog_len;
 
-        sega3d_info_t view;
+        sega3d_info_t info;
 } _state __aligned(4);
 
 static vdp1_cmdt_t _cmdt_end;
@@ -136,7 +135,7 @@ static void _sort_iterate(sort_single_t *single);
 
 static void _cmdt_prepare(const transform_t *trans, vdp1_cmdt_t *cmdt);
 static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt);
-static bool _view_cull_test(const transform_t * const trans);
+static bool _world_cull_test(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t *trans) __unused;
 
 static inline FIXED __always_inline __used
@@ -222,30 +221,30 @@ sega3d_perspective_set(ANGLE fov)
         _state.cached_sh_2 = i_height / 2;
 
         cpu_divu_fix16_set(screen_width, screen_height);
-        _state.view.ratio = cpu_divu_quotient_get();
+        _state.info.ratio = cpu_divu_quotient_get();
 
         cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
-        _state.view.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
+        _state.info.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
 
-        _state.view.near = _state.view.focal_length;
+        _state.info.near = _state.info.focal_length;
 
-        cpu_divu_fix16_set(AH_2, _state.view.focal_length);
-        _state.view.top = cpu_divu_quotient_get();
-        _state.view.right = -fix16_mul(-_state.view.top, _state.view.ratio);
-        _state.view.left = -_state.view.right;
-        _state.view.bottom = -_state.view.top;
+        cpu_divu_fix16_set(AH_2, _state.info.focal_length);
+        _state.info.top = cpu_divu_quotient_get();
+        _state.info.right = -fix16_mul(-_state.info.top, _state.info.ratio);
+        _state.info.left = -_state.info.right;
+        _state.info.bottom = -_state.info.top;
 
-        cpu_divu_fix16_set(screen_height, _state.view.top << 1);
+        cpu_divu_fix16_set(screen_height, _state.info.top << 1);
         _state.cached_inv_top = cpu_divu_quotient_get();
 
-        cpu_divu_fix16_set(screen_width, _state.view.right << 1);
+        cpu_divu_fix16_set(screen_width, _state.info.right << 1);
         _state.cached_inv_right = cpu_divu_quotient_get();
 }
 
 void
 sega3d_info_get(sega3d_info_t *info)
 {
-        (void)memcpy(info, &_state.view, sizeof(sega3d_info_t));
+        (void)memcpy(info, &_state.info, sizeof(sega3d_info_t));
 }
 
 Uint16
@@ -297,10 +296,10 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 /* In case the projected Z value is on or behind the near plane */
-                if (trans_proj->point[Z] <= _state.view.near) {
+                if (trans_proj->point[Z] <= _state.info.near) {
                         trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
 
-                        trans_proj->point[Z] = _state.view.near;
+                        trans_proj->point[Z] = FIX16(0.1f);
                 }
 
                 cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point[Z]);
@@ -340,15 +339,13 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
         for (trans->index = 0; trans->index < polygon_count; trans->index++,  polygons++) {
                 const uint16_t * vertices = &polygons->Vertices[0];
 
-                trans->polygon_normal = &polygons->norm;
-
                 trans->polygon[0] = &trans->projs[*(vertices++)];
                 trans->polygon[1] = &trans->projs[*(vertices++)];
                 trans->polygon[2] = &trans->projs[*(vertices++)];
                 trans->polygon[3] = &trans->projs[*vertices];
 
                 if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
-                        if ((_view_cull_test(trans))) {
+                        if ((_world_cull_test(trans))) {
                                 continue;
                         }
                 }
@@ -537,17 +534,10 @@ static bool
 _screen_cull_test(const transform_t *trans __unused)
 {
         return false;
-        /* const FIXED * const proj_ptr = &trans->proj_screen[0]; */
-        /* const FIXED * const next_proj_ptr = &trans->proj_screen[(1 * XY)]; */
-
-        /* const FIXED cull_z = fix16_mul(proj_ptr[X], next_proj_ptr[Y]) - */
-        /*     fix16_mul(proj_ptr[Y], next_proj_ptr[X]); */
-
-        /* return (cull_z < 0); */
 }
 
 static bool
-_view_cull_test(const transform_t * const trans)
+_world_cull_test(const transform_t * const trans)
 {
         const FIXED * const p0 = (const FIXED *)trans->polygon[0]->point;
         const FIXED * const p1 = (const FIXED *)trans->polygon[1]->point;
