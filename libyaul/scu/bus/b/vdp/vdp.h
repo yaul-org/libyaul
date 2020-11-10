@@ -39,16 +39,13 @@ extern uint8_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(const uint8_t);
 
 extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *, const uint16_t,
-    vdp1_sync_callback, void *);
+    const uint16_t, vdp1_sync_callback, void *);
 
 extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *,
-    vdp1_sync_callback, void *);
+    const uint16_t, vdp1_sync_callback, void *);
 
 extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *,
     vdp1_sync_callback, void *);
-
-extern uint16_t vdp1_sync_last_command_get(void);
-extern void vdp1_sync_last_command_set(const uint16_t);
 
 extern bool vdp1_sync_rendering(void);
 
