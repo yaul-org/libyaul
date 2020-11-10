@@ -16,24 +16,14 @@ void
 _internal_matrix_init(void)
 {
         for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
-                MATRIX *matrix;
-                matrix = &_matrix_stack.matrices[i];
+                FIXED *matrix;
+                matrix = (FIXED *)&_matrix_stack.matrices[i];
 
-                (*matrix)[0][0] = toFIXED(1.0f);
-                (*matrix)[0][1] = toFIXED(0.0f);
-                (*matrix)[0][2] = toFIXED(0.0f);
+                (void)memset(matrix, 0, sizeof(MATRIX));
 
-                (*matrix)[1][0] = toFIXED(0.0f);
-                (*matrix)[1][1] = toFIXED(1.0f);
-                (*matrix)[1][2] = toFIXED(0.0f);
-
-                (*matrix)[2][0] = toFIXED(0.0f);
-                (*matrix)[2][1] = toFIXED(0.0f);
-                (*matrix)[2][2] = toFIXED(1.0f);
-
-                (*matrix)[3][0] = toFIXED(0.0f);
-                (*matrix)[3][1] = toFIXED(0.0f);
-                (*matrix)[3][2] = toFIXED(1.0f);
+                matrix[M00] = toFIXED(1.0f);
+                matrix[M11] = toFIXED(1.0f);
+                matrix[M22] = toFIXED(1.0f);
         }
 }
 
@@ -103,23 +93,18 @@ sega3d_matrix_copy_push(void)
 void
 sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
 {
-        MATRIX *matrix;
-        matrix = &_matrix_stack.matrices[_matrix_stack.index];
+        FIXED *matrix;
+        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        (*matrix)[3][0] = tx;
-        (*matrix)[3][1] = ty;
-        (*matrix)[3][2] = tz;
+        matrix[M03] += tx;
+        matrix[M13] += ty;
+        matrix[M23] += tz;
 }
 
 void
-sega3d_matrix_scale(FIXED sx, FIXED sy, FIXED sz)
+sega3d_matrix_scale(FIXED sx __unused, FIXED sy __unused, FIXED sz __unused)
 {
-        MATRIX *matrix;
-        matrix = &_matrix_stack.matrices[_matrix_stack.index];
-
-        (*matrix)[0][0] = sx;
-        (*matrix)[1][1] = sy;
-        (*matrix)[2][2] = sz;
+        assert(false && "Not yet implemented");
 }
 
 void

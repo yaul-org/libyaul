@@ -42,14 +42,13 @@ typedef enum {
 } flags_t;
 
 typedef struct {
-        FIXED point_z;
+        FIXED point[XYZ];
         int16_t screen[XY];
-        /* Align to a 2-byte boundary since the enum is packed as 1-byte */
         clip_flags_t clip_flags;
 } transform_proj_t;
 
 typedef struct {
-        FIXED dst_matrix[MTRX] __aligned(16);
+        const FIXED *dst_matrix;
 
         uint16_t index;
         FIXED z_center;
@@ -59,7 +58,7 @@ typedef struct {
         transform_proj_t projs[VERTEX_POOL_SIZE] __aligned(16);
 } transform_t;
 
-static_assert(sizeof(transform_proj_t) == 12);
+static_assert(sizeof(transform_proj_t) == 20);
 
 extern void _internal_tlist_init(void);
 extern void _internal_matrix_init(void);
@@ -136,7 +135,7 @@ static void _sort_iterate(sort_single_t *single);
 
 static void _cmdt_prepare(const transform_t *trans, vdp1_cmdt_t *cmdt);
 static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt);
-static bool _view_cull_test(const transform_t *trans);
+static bool _view_cull_test(const transform_t * const trans, const transform_proj_t * const trans_proj);
 static bool _screen_cull_test(const transform_t *trans) __unused;
 
 static inline FIXED __always_inline __used
@@ -288,101 +287,71 @@ sega3d_fog_limits_set(FIXED start_z, FIXED end_z)
         _state.fog_end_z = end_z;
 }
 
-void
-sega3d_object_transform(sega3d_object_t *object)
+static void
+_vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
 {
-        static transform_t _transform __aligned(16) __unused;
+        const FIXED *current_point = (const FIXED *)points; 
 
-        _state.object = object;
-
-        _internal_sort_clear();
-
-        const PDATA * const pdata = object->pdata;
-        const POINT * const points = pdata->pntbl;
-
-        const uint32_t polygon_count =
-            (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
-        const uint32_t vertex_count =
-            (pdata->nbPoint < VERTEX_POOL_SIZE) ? pdata->nbPoint : VERTEX_POOL_SIZE;
-
-        transform_t *trans;
-        trans = &_transform;
-
-        vdp1_cmdt_t *transform_cmdts;
-        transform_cmdts = object->cmdts;
-
-        const FIXED * const src_matrix = (const FIXED *)sega3d_matrix_top();
-
-        trans->dst_matrix[ 0] = src_matrix[M00];
-        trans->dst_matrix[ 1] = src_matrix[M01];
-        trans->dst_matrix[ 2] = src_matrix[M02];
-        trans->dst_matrix[ 3] = src_matrix[M30];
-
-        trans->dst_matrix[ 4] = src_matrix[M10];
-        trans->dst_matrix[ 5] = src_matrix[M11];
-        trans->dst_matrix[ 6] = src_matrix[M12];
-        trans->dst_matrix[ 7] = src_matrix[M31];
-
-        trans->dst_matrix[ 8] = src_matrix[M20];
-        trans->dst_matrix[ 9] = src_matrix[M21];
-        trans->dst_matrix[10] = src_matrix[M22];
-        trans->dst_matrix[11] = src_matrix[M32];
+        transform_proj_t *trans_proj;
+        trans_proj = &trans->projs[0];
 
         for (uint32_t index = 0; index < vertex_count; index++) {
-                const FIXED * const point = (const FIXED *)&points[index];
-
-                transform_proj_t *proj;
-                proj = &trans->projs[index];
-
-                proj->point_z = _vertex_transform(point, &trans->dst_matrix[8]);
-                proj->clip_flags = CLIP_FLAGS_NONE;
+                trans_proj->point[Z] = _vertex_transform(current_point, &trans->dst_matrix[8]);
+                trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 /* In case the projected Z value is on or behind the near plane */
-                if (proj->point_z <= _state.view.near) {
-                        proj->clip_flags |= CLIP_FLAGS_NEAR;
+                if (trans_proj->point[Z] <= _state.view.near) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
 
-                        proj->point_z = _state.view.near;
+                        trans_proj->point[Z] = _state.view.near;
                 }
 
-                cpu_divu_fix16_set(_state.cached_inv_right, proj->point_z);
+                cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point[Z]);
         
-                const FIXED point_x = _vertex_transform(point, &trans->dst_matrix[0]);
+                trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[0]);
+                trans_proj->screen[X] = fix16_int16_muls(trans_proj->point[X], cpu_divu_quotient_get());
 
-                proj->screen[X] = fix16_int16_muls(point_x, cpu_divu_quotient_get());
+                cpu_divu_fix16_set(_state.cached_inv_top, trans_proj->point[Z]);
 
-                cpu_divu_fix16_set(_state.cached_inv_top, proj->point_z);
-
-                if (proj->screen[X] < -_state.cached_sw_2) {
-                        proj->clip_flags |= CLIP_FLAGS_LEFT;
-                } else if (proj->screen[X] > _state.cached_sw_2) {
-                        proj->clip_flags |= CLIP_FLAGS_RIGHT;
+                if (trans_proj->screen[X] < -_state.cached_sw_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
+                } else if (trans_proj->screen[X] > _state.cached_sw_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
                 }
 
-                const FIXED point_y = _vertex_transform(point, &trans->dst_matrix[4]);
+                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[4]);
+                trans_proj->screen[Y] = fix16_int16_muls(trans_proj->point[Y], cpu_divu_quotient_get());
 
-                proj->screen[Y] = fix16_int16_muls(point_y, cpu_divu_quotient_get());
-
-                if (proj->screen[Y] > _state.cached_sh_2) {
-                        proj->clip_flags |= CLIP_FLAGS_TOP;
-                } else if (proj->screen[Y] < -_state.cached_sh_2) {
-                        proj->clip_flags |= CLIP_FLAGS_BOTTOM;
+                if (trans_proj->screen[Y] > _state.cached_sh_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_TOP;
+                } else if (trans_proj->screen[Y] < -_state.cached_sh_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
                 }
+
+                trans_proj++;
+                current_point += 3;
         }
+}
 
-        for (trans->index = 0; trans->index < polygon_count; trans->index++) {
-                const POLYGON * const polygon = &pdata->pltbl[trans->index];
-                const uint16_t * vertices = &polygon->Vertices[0];
+static void
+_polygon_process(const sega3d_object_t *object, transform_t *trans,
+    POLYGON const *polygons, uint32_t polygon_count)
+{
+        vdp1_cmdt_t *transform_cmdt;
+        transform_cmdt = &object->cmdts[object->offset];
+        
+        for (trans->index = 0; trans->index < polygon_count; trans->index++,  polygons++) {
+                const uint16_t * vertices = &polygons->Vertices[0];
 
-
-                trans->polygon_normal = &polygon->norm;
+                trans->polygon_normal = &polygons->norm;
 
                 trans->polygon[0] = &trans->projs[*(vertices++)];
                 trans->polygon[1] = &trans->projs[*(vertices++)];
                 trans->polygon[2] = &trans->projs[*(vertices++)];
-                trans->polygon[3] = &trans->projs[*(vertices++)];
+                trans->polygon[3] = &trans->projs[*vertices];
 
                 if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
-                        if ((_view_cull_test(trans))) {
+                        if ((_view_cull_test(trans, trans->polygon[0]))) {
                                 continue;
                         }
                 }
@@ -402,21 +371,45 @@ sega3d_object_transform(sega3d_object_t *object)
                         }
                 }
 
-                const FIXED z_avg = trans->polygon[0]->point_z +
-                                    trans->polygon[1]->point_z +
-                                    trans->polygon[2]->point_z +
-                                    trans->polygon[3]->point_z;
+                const FIXED z_avg = trans->polygon[0]->point[Z] +
+                                    trans->polygon[1]->point[Z] +
+                                    trans->polygon[2]->point[Z] +
+                                    trans->polygon[3]->point[Z];
 
                 /* Divide by 4 to get the average (bit shift) */
                 trans->z_center = z_avg >> 2;
 
-                vdp1_cmdt_t *transform_cmdt;
-                transform_cmdt = &transform_cmdts[object->offset + trans->index];
-
                 _cmdt_prepare(trans, transform_cmdt);
 
                 _internal_sort_add(transform_cmdt, fix16_int32_to(trans->z_center));
+
+                transform_cmdt++;
         }
+}
+
+void
+sega3d_object_transform(sega3d_object_t *object)
+{
+        static transform_t _transform __aligned(16) __unused;
+
+        _state.object = object;
+
+        _internal_sort_clear();
+
+        const PDATA * const pdata = object->pdata;
+
+        const uint32_t polygon_count =
+            (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
+        const uint32_t vertex_count =
+            (pdata->nbPoint < VERTEX_POOL_SIZE) ? pdata->nbPoint : VERTEX_POOL_SIZE;
+
+        transform_t *trans;
+        trans = &_transform;
+
+        trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
+
+        _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
+        _polygon_process(object, trans, pdata->pltbl, polygon_count);
 
         _state.sort_orderlist = &object->cmdt_orderlist[object->offset];
 
@@ -428,13 +421,15 @@ sega3d_object_transform(sega3d_object_t *object)
         /* Fetch the last command table pointer before setting the indirect mode
          * transfer end bit */
         _state.sort_orderlist->cmdt = &_state.cmdt_end;
-        _state.sort_orderlist->xfer.src |= SCU_DMA_INDIRECT_TABLE_END;
+
+        vdp1_cmdt_orderlist_end(_state.sort_orderlist);
 }
 
 static void
 _sort_iterate(sort_single_t *single)
 {
-        /* No need to clear the end bit, as the above clobbers the bit */
+        /* No need to clear the end bit, as setting the "source" clobbers the
+         * bit */
         _state.sort_orderlist->cmdt = single->packet;
 
         _state.sort_orderlist++;
@@ -551,10 +546,10 @@ _screen_cull_test(const transform_t *trans __unused)
 }
 
 static bool
-_view_cull_test(const transform_t *trans)
+_view_cull_test(const transform_t * const trans, const transform_proj_t * const trans_proj)
 {
-        const FIXED * const cull_p = (const FIXED *)&trans->polygon[0];
-        
+        const FIXED * const cull_p = (const FIXED *)&trans_proj->point[0];
+
         FIXED view_p[XYZ];
 
         /* XXX: Compute this outside!!! */
@@ -566,10 +561,10 @@ _view_cull_test(const transform_t *trans)
                 view_p[Z] = -trans->dst_matrix[11];
         }
 
-        const fix16_t cull_point = fix16_vec3_dot((const fix16_vec3_t *)cull_p,
+        const fix16_t cull_point = fix16_vec3_inline_dot((const fix16_vec3_t *)cull_p,
             (const fix16_vec3_t *)trans->polygon_normal);
 
-        const fix16_t cull_view = fix16_vec3_dot((const fix16_vec3_t *)view_p,
+        const fix16_t cull_view = fix16_vec3_inline_dot((const fix16_vec3_t *)view_p,
             (const fix16_vec3_t *)trans->polygon_normal);
 
         return (cull_view < cull_point);
