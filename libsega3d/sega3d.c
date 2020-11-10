@@ -16,6 +16,7 @@
 
 #include <cpu/cache.h>
 #include <cpu/divu.h>
+#include <cpu/frt.h>
 
 #include "sega3d.h"
 #include "sega3d-internal.h"
@@ -44,7 +45,7 @@ typedef enum {
 
 typedef struct {
         FIXED point[XYZ];
-        int16_t screen[XY];
+        int16_vec2_t screen;
         clip_flags_t clip_flags;
 } transform_proj_t;
 
@@ -114,7 +115,6 @@ static struct {
         flags_t flags;
 
         /* Current processing orderlist */
-        vdp1_cmdt_orderlist_t *current_orderlist;
         VECTOR cached_view;
         FIXED cached_inv_top;
         FIXED cached_inv_right;
@@ -122,7 +122,9 @@ static struct {
         int16_t cached_sh_2;
 
         /* Start/finish state */
+        vdp1_cmdt_orderlist_t *current_orderlist;
         vdp1_cmdt_orderlist_t *orderlist;
+        vdp1_cmdt_t *current_cmdt;
 
         sega3d_fog_t fog;
         FIXED fog_start_z;
@@ -295,23 +297,37 @@ sega3d_object_polycount_get(const sega3d_object_t *object)
 }
 
 void
-sega3d_start(vdp1_cmdt_orderlist_t *orderlist)
+sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_cmdt_t *cmdts)
 {
         assert(orderlist != NULL);
 
         _internal_sort_clear();
 
         _state.orderlist = orderlist;
+        _state.current_orderlist = &orderlist[orderlist_offset];
+        _state.current_cmdt = cmdts;
 }
 
 void
-sega3d_finish(void)
+sega3d_finish(sega3d_results_t *results)
 {
+        _internal_sort_iterate(_sort_iterate);
+
+        /* Fetch the last command table pointer before setting the indirect mode
+         * transfer end bit */
+        _state.current_orderlist->cmdt = &_cmdt_end;
+
+        vdp1_cmdt_orderlist_end(_state.current_orderlist);
+
         vdp1_sync_cmdt_orderlist_put(_state.orderlist, NULL, NULL);
+
+        if (results != NULL) {
+                results->count = _state.current_orderlist - _state.orderlist;
+        }
 }
 
 void
-sega3d_object_transform(const sega3d_object_t *object, sega3d_results_t *results)
+sega3d_object_transform(const sega3d_object_t *object)
 {
         static transform_t _transform __aligned(16) __unused;
 
@@ -333,18 +349,6 @@ sega3d_object_transform(const sega3d_object_t *object, sega3d_results_t *results
 
         _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
         _polygon_process(object, trans, pdata->pltbl, polygon_count);
-
-        _state.current_orderlist = object->cmdt_orderlist;
-
-        _internal_sort_iterate(_sort_iterate);
-
-        /* Fetch the last command table pointer before setting the indirect mode
-         * transfer end bit */
-        _state.current_orderlist->cmdt = &_cmdt_end;
-
-        vdp1_cmdt_orderlist_end(_state.current_orderlist);
-
-        results->count = _state.current_orderlist - object->cmdt_orderlist;
 }
 
 static void
@@ -379,22 +383,22 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                 cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point[Z]);
 
                 trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[M00]);
-                trans_proj->screen[X] = fix16_int16_muls(trans_proj->point[X], cpu_divu_quotient_get());
+                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[M10]);
 
-                cpu_divu_fix16_set(_state.cached_inv_top, trans_proj->point[Z]);
+                const FIXED inv_z = cpu_divu_quotient_get();
 
-                if (trans_proj->screen[X] < -_state.cached_sw_2) {
+                trans_proj->screen.x = fix16_int16_muls(trans_proj->point[X], inv_z);
+                trans_proj->screen.y = fix16_int16_muls(trans_proj->point[Y], inv_z);
+
+                if (trans_proj->screen.x < -_state.cached_sw_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
-                } else if (trans_proj->screen[X] > _state.cached_sw_2) {
+                } else if (trans_proj->screen.x > _state.cached_sw_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
                 }
 
-                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[M10]);
-                trans_proj->screen[Y] = fix16_int16_muls(trans_proj->point[Y], cpu_divu_quotient_get());
-
-                if (trans_proj->screen[Y] > _state.cached_sh_2) {
+                if (trans_proj->screen.y > _state.cached_sh_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_TOP;
-                } else if (trans_proj->screen[Y] < -_state.cached_sh_2) {
+                } else if (trans_proj->screen.y < -_state.cached_sh_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
                 }
 
@@ -407,9 +411,6 @@ static void
 _polygon_process(const sega3d_object_t *object, transform_t *trans,
     POLYGON const *polygons, uint32_t polygon_count)
 {
-        vdp1_cmdt_t *transform_cmdt;
-        transform_cmdt = object->cmdts;
-
         for (trans->index = 0; trans->index < polygon_count; trans->index++, polygons++) {
                 const uint16_t * vertices = &polygons->Vertices[0];
 
@@ -447,11 +448,11 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
                 /* Divide by 4 to get the average (bit shift) */
                 trans->z_center = z_avg >> 2;
 
-                _cmdt_prepare(object, trans, transform_cmdt);
+                _cmdt_prepare(object, trans, _state.current_cmdt);
 
-                _internal_sort_add(transform_cmdt, fix16_int32_to(trans->z_center) >> 4);
+                _internal_sort_add(_state.current_cmdt, fix16_int32_to(trans->z_center) >> 4);
 
-                transform_cmdt++;
+                _state.current_cmdt++;
         }
 }
 
@@ -474,6 +475,7 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
                 cmdt->cmd_pmod = VDP1_CMDT_PMOD_END_CODE_DISABLE | VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE;
                 cmdt->cmd_colr = 0xFFFF;
         }
+
         const clip_flags_t or_clip_flags = (trans->polygon[0]->clip_flags |
                                             trans->polygon[1]->clip_flags |
                                             trans->polygon[2]->clip_flags |
@@ -487,46 +489,37 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
 
         /* Even when there is not texture list, there is the default
          * texture that zeroes out CMDSRCA and CMDSIZE */
-        const TEXTURE *texture;
-        texture = sega3d_tlist_tex_get(attr->texno);
+        if ((attr->sort & UseTexture) == UseTexture) { 
+                const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno);
 
-#ifdef DEBUG
-        const uint16_t tlist_count = sega3d_tlist_count_get();
-
-        /* If the texture number is zero, it could imply no texture.
-         * Even if the texture list is empty, it's considered valid */
-        if ((tlist_count > 0) && (attr->texno != 0)) {
-                assert(attr->texno < tlist_count);
+                cmdt->cmd_srca = texture->CGadr;
+                cmdt->cmd_size = texture->HVsize;
         }
-#endif /* DEBUG */
-
-        cmdt->cmd_srca = texture->CGadr;
-        cmdt->cmd_size = texture->HVsize;
 
         int16_vec2_t *cmd_vertex;
         cmd_vertex = (int16_vec2_t *)(&cmdt->cmd_xa);
 
-        cmd_vertex->x = trans->polygon[0]->screen[X];
-        cmd_vertex->y = trans->polygon[0]->screen[Y];
+        cmd_vertex->x = trans->polygon[0]->screen.x;
+        cmd_vertex->y = trans->polygon[0]->screen.y;
         cmd_vertex++;
 
-        cmd_vertex->x = trans->polygon[1]->screen[X];
-        cmd_vertex->y = trans->polygon[1]->screen[Y];
+        cmd_vertex->x = trans->polygon[1]->screen.x;
+        cmd_vertex->y = trans->polygon[1]->screen.y;
         cmd_vertex++;
 
-        cmd_vertex->x = trans->polygon[2]->screen[X];
-        cmd_vertex->y = trans->polygon[2]->screen[Y];
+        cmd_vertex->x = trans->polygon[2]->screen.x;
+        cmd_vertex->y = trans->polygon[2]->screen.y;
         cmd_vertex++;
 
-        cmd_vertex->x = trans->polygon[3]->screen[X];
-        cmd_vertex->y = trans->polygon[3]->screen[Y];
+        cmd_vertex->x = trans->polygon[3]->screen.x;
+        cmd_vertex->y = trans->polygon[3]->screen.y;
         cmd_vertex++;
 
         cmdt->cmd_grda = attr->gstb;
 
-        if ((_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
-                _fog_calculate(trans, cmdt);
-        }
+        /* if ((_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) { */
+        /*         _fog_calculate(trans, cmdt); */
+        /* } */
 }
 
 static void
@@ -555,7 +548,22 @@ _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
 static bool
 _screen_cull_test(const transform_t *trans __unused)
 {
-        return false;
+        const int16_vec2_t * const p0 = &trans->polygon[0]->screen;
+        const int16_vec2_t * const p1 = &trans->polygon[1]->screen;
+        const int16_vec2_t * const p2 = &trans->polygon[2]->screen;
+
+        int16_vec2_t u;
+        int16_vec2_t v;
+
+        u.x = p1->x - p0->x;
+        u.y = p1->y - p0->y;
+
+        v.x = p2->x - p0->x;
+        v.y = p2->y - p0->y;
+
+        const int16_t z = (u.x * v.y) - (u.y * v.x);
+
+        return (z >= 0);
 }
 
 static bool
