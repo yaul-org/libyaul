@@ -116,6 +116,7 @@ static struct {
         sega3d_object_t *object;
         /* Current sorting orderlist */
         vdp1_cmdt_orderlist_t *sort_orderlist;
+        VECTOR cached_view;
         FIXED cached_inv_top;
         FIXED cached_inv_right;
         int16_t cached_sw_2;
@@ -127,15 +128,15 @@ static struct {
         uint16_t fog_len;
 
         sega3d_info_t view;
-
-        vdp1_cmdt_t cmdt_end;
 } _state __aligned(4);
+
+static vdp1_cmdt_t _cmdt_end;
 
 static void _sort_iterate(sort_single_t *single);
 
 static void _cmdt_prepare(const transform_t *trans, vdp1_cmdt_t *cmdt);
 static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt);
-static bool _view_cull_test(const transform_t * const trans, const transform_proj_t * const trans_proj);
+static bool _view_cull_test(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t *trans) __unused;
 
 static inline FIXED __always_inline __used
@@ -190,7 +191,7 @@ sega3d_init(void)
         sega3d_fog_set(&default_fog);
         sega3d_fog_limits_set(DEPTH_FOG_START, DEPTH_FOG_END);
 
-        vdp1_cmdt_end_set(&_state.cmdt_end);
+        vdp1_cmdt_end_set(&_cmdt_end);
 
         _internal_tlist_init();
         _internal_matrix_init();
@@ -225,10 +226,6 @@ sega3d_perspective_set(ANGLE fov)
 
         cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
         _state.view.focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
-
-        _state.view.view[X] = 0;
-        _state.view.view[Y] = 0;
-        _state.view.view[Z] = -_state.view.focal_length;
 
         _state.view.near = _state.view.focal_length;
 
@@ -296,7 +293,7 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
         trans_proj = &trans->projs[0];
 
         for (uint32_t index = 0; index < vertex_count; index++) {
-                trans_proj->point[Z] = _vertex_transform(current_point, &trans->dst_matrix[8]);
+                trans_proj->point[Z] = _vertex_transform(current_point, &trans->dst_matrix[M20]);
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 /* In case the projected Z value is on or behind the near plane */
@@ -307,8 +304,8 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                 }
 
                 cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point[Z]);
-        
-                trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[0]);
+
+                trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[M00]);
                 trans_proj->screen[X] = fix16_int16_muls(trans_proj->point[X], cpu_divu_quotient_get());
 
                 cpu_divu_fix16_set(_state.cached_inv_top, trans_proj->point[Z]);
@@ -319,7 +316,7 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                         trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
                 }
 
-                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[4]);
+                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[M10]);
                 trans_proj->screen[Y] = fix16_int16_muls(trans_proj->point[Y], cpu_divu_quotient_get());
 
                 if (trans_proj->screen[Y] > _state.cached_sh_2) {
@@ -339,7 +336,7 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
 {
         vdp1_cmdt_t *transform_cmdt;
         transform_cmdt = &object->cmdts[object->offset];
-        
+
         for (trans->index = 0; trans->index < polygon_count; trans->index++,  polygons++) {
                 const uint16_t * vertices = &polygons->Vertices[0];
 
@@ -351,7 +348,7 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
                 trans->polygon[3] = &trans->projs[*vertices];
 
                 if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
-                        if ((_view_cull_test(trans, trans->polygon[0]))) {
+                        if ((_view_cull_test(trans))) {
                                 continue;
                         }
                 }
@@ -381,7 +378,7 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
 
                 _cmdt_prepare(trans, transform_cmdt);
 
-                _internal_sort_add(transform_cmdt, fix16_int32_to(trans->z_center));
+                _internal_sort_add(transform_cmdt, fix16_int32_to(trans->z_center) >> 8);
 
                 transform_cmdt++;
         }
@@ -408,6 +405,10 @@ sega3d_object_transform(sega3d_object_t *object)
 
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
+        _state.cached_view[X] = 0;
+        _state.cached_view[Y] = 0;
+        _state.cached_view[Z] = 0;
+
         _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
         _polygon_process(object, trans, pdata->pltbl, polygon_count);
 
@@ -420,7 +421,7 @@ sega3d_object_transform(sega3d_object_t *object)
 
         /* Fetch the last command table pointer before setting the indirect mode
          * transfer end bit */
-        _state.sort_orderlist->cmdt = &_state.cmdt_end;
+        _state.sort_orderlist->cmdt = &_cmdt_end;
 
         vdp1_cmdt_orderlist_end(_state.sort_orderlist);
 }
@@ -546,26 +547,49 @@ _screen_cull_test(const transform_t *trans __unused)
 }
 
 static bool
-_view_cull_test(const transform_t * const trans, const transform_proj_t * const trans_proj)
+_view_cull_test(const transform_t * const trans)
 {
-        const FIXED * const cull_p = (const FIXED *)&trans_proj->point[0];
+        const FIXED * const p0 = (const FIXED *)trans->polygon[0]->point;
+        const FIXED * const p1 = (const FIXED *)trans->polygon[1]->point;
+        const FIXED * const p2 = (const FIXED *)trans->polygon[2]->point;
 
-        FIXED view_p[XYZ];
+        fix16_vec3_t u;
+        fix16_vec3_t v;
 
-        /* XXX: Compute this outside!!! */
-        if ((_state.object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW_ROT) != SEGA3D_OBJECT_FLAGS_NONE) {
-                /* Invert 3x3 rotation matrix */
-        } else {
-                view_p[X] = -trans->dst_matrix[3];
-                view_p[Y] = -trans->dst_matrix[7];
-                view_p[Z] = -trans->dst_matrix[11];
-        }
+        u.x = p1[X] - p0[X];
+        u.y = p1[Y] - p0[Y];
+        u.z = p1[Z] - p0[Z];
 
-        const fix16_t cull_point = fix16_vec3_inline_dot((const fix16_vec3_t *)cull_p,
-            (const fix16_vec3_t *)trans->polygon_normal);
+        v.x = p2[X] - p0[X];
+        v.y = p2[Y] - p0[Y];
+        v.z = p2[Z] - p0[Z];
 
-        const fix16_t cull_view = fix16_vec3_inline_dot((const fix16_vec3_t *)view_p,
-            (const fix16_vec3_t *)trans->polygon_normal);
+        /* We need to drop enough of the fractional part in order to calculate
+         * the dot product between the view and the polygon's normal. Otherwise,
+         * we run into overflow issues */
+        u.x >>= 8;
+        u.y >>= 8;
+        u.z >>= 8;
 
-        return (cull_view < cull_point);
+        v.x >>= 8;
+        v.y >>= 8;
+        v.z >>= 8;
+
+        fix16_vec3_t normal;
+
+        fix16_vec3_cross(&u, &v, &normal);
+
+        fix16_vec3_t view;
+
+        view.x = _state.cached_view[X] - p0[X];
+        view.y = _state.cached_view[Y] - p0[Y];
+        view.z = _state.cached_view[Z] - p0[Z];
+
+        view.x >>= 8;
+        view.y >>= 8;
+        view.z >>= 8;
+
+        const fix16_t dp = fix16_vec3_inline_dot(&view, &normal);
+
+        return (dp <= 0);
 }

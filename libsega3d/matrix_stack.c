@@ -32,14 +32,14 @@ sega3d_matrix_push(matrix_type_t matrix_type)
 {
         assert(_matrix_stack.index < (MATRIX_STACK_MAX - 1));
 
-        MATRIX *src_matrix;
-        src_matrix = &_matrix_stack.matrices[_matrix_stack.index];
-
         _matrix_stack.index++;
 
         if (matrix_type == MATRIX_TYPE_PUSH) {
                 MATRIX *dst_matrix;
                 dst_matrix = &_matrix_stack.matrices[_matrix_stack.index];
+
+                MATRIX *src_matrix;
+                src_matrix = dst_matrix - 1;
 
                 (void)memcpy(dst_matrix, src_matrix, sizeof(MATRIX));
         }
@@ -48,9 +48,9 @@ sega3d_matrix_push(matrix_type_t matrix_type)
 void
 sega3d_matrix_pop(void)
 {
-        assert(_matrix_stack.index > 0);
-
-        _matrix_stack.index--;
+        if (_matrix_stack.index > 0) {
+                _matrix_stack.index--;
+        }
 }
 
 const MATRIX *
@@ -77,17 +77,37 @@ sega3d_matrix_copy(MATRIX *matrix)
 }
 
 void
-sega3d_matrix_copy_push(void)
+sega3d_matrix_inverse_push(void)
 {
-        assert(_matrix_stack.index >= 1);
+        int8_t index;
+        index = _matrix_stack.index - 1;
 
-        MATRIX *src_matrix;
-        src_matrix = &_matrix_stack.matrices[_matrix_stack.index - 1];
+        if (index < 0) {
+                index = 0;
+        }
 
-        MATRIX *dst_matrix;
-        dst_matrix = &_matrix_stack.matrices[_matrix_stack.index];
+        FIXED *src_matrix;
+        src_matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        (void)memcpy(dst_matrix, src_matrix, sizeof(MATRIX));
+        sega3d_matrix_push(MATRIX_TYPE_MOVE_PTR);
+
+        FIXED *dst_matrix;
+        dst_matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+
+        dst_matrix[M00] =  src_matrix[M00];
+        dst_matrix[M10] =  src_matrix[M01];
+        dst_matrix[M20] =  src_matrix[M02];
+        dst_matrix[M03] = -src_matrix[M03];
+
+        dst_matrix[M01] =  src_matrix[M10];
+        dst_matrix[M11] =  src_matrix[M11];
+        dst_matrix[M21] =  src_matrix[M12];
+        dst_matrix[M13] = -src_matrix[M13];
+
+        dst_matrix[M02] =  src_matrix[M20];
+        dst_matrix[M12] =  src_matrix[M21];
+        dst_matrix[M22] =  src_matrix[M22];
+        dst_matrix[M23] = -src_matrix[M23];
 }
 
 void
@@ -99,12 +119,6 @@ sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
         matrix[M03] += tx;
         matrix[M13] += ty;
         matrix[M23] += tz;
-}
-
-void
-sega3d_matrix_scale(FIXED sx __unused, FIXED sy __unused, FIXED sz __unused)
-{
-        assert(false && "Not yet implemented");
 }
 
 void
