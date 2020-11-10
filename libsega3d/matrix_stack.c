@@ -4,11 +4,10 @@
 
 #include "sega3d-internal.h"
 
-
 typedef struct {
         uint8_t index; 
         MATRIX matrices[MATRIX_STACK_MAX] __aligned(16);
-} matrix_stack_t;
+} __aligned(16) matrix_stack_t;
 
 static matrix_stack_t _matrix_stack;
 
@@ -116,9 +115,15 @@ sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        matrix[M03] += tx;
-        matrix[M13] += ty;
-        matrix[M23] += tz;
+        fix16_vec3_t t;
+
+        t.x = -tx;
+        t.y = -ty;
+        t.z = -tz;
+
+        matrix[M03] = fix16_vec3_dot(&t, (const fix16_vec3_t *)&matrix[M00]);
+        matrix[M13] = fix16_vec3_dot(&t, (const fix16_vec3_t *)&matrix[M10]);
+        matrix[M23] = fix16_vec3_dot(&t, (const fix16_vec3_t *)&matrix[M20]);
 }
 
 void
@@ -127,7 +132,7 @@ sega3d_matrix_rotate_x(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin = fix16_bradians_sin(bradians);
         const FIXED cos = fix16_bradians_cos(bradians);
 
@@ -152,7 +157,7 @@ sega3d_matrix_rotate_y(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin_value = fix16_bradians_sin(bradians);
         const FIXED cos_value = fix16_bradians_cos(bradians);
 
@@ -177,7 +182,7 @@ sega3d_matrix_rotate_z(const ANGLE angle)
         FIXED *matrix;
         matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
 
-        const int32_t bradians = fix16_int32_to(FIX16_LUT_SIN_TABLE_COUNT * angle);
+        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin_value = fix16_bradians_sin(bradians);
         const FIXED cos_value = fix16_bradians_cos(bradians);
 
