@@ -343,6 +343,8 @@ _queue_request_start(const struct dma_queue_request *request)
         scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
             &request->handle, NULL);
 
+        cpu_cache_purge();
+
         scu_dma_level_start(DMA_QUEUE_SCU_DMA_LEVEL);
 }
 
