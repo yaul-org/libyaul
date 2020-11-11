@@ -112,6 +112,8 @@
 #define __used                  __attribute__ ((__used__))
 #define __weak                  __attribute__ ((__weak__))
 #define __leaf                  __attribute__ ((leaf))
+#define __no_reorder            __attribute__ ((no_reorder))
+#define __hot                   __attribute__ ((hot))
 
 #if __has_attribute(__alloc_align__)
 #define __alloc_align(x)        __attribute__ ((__alloc_align__ (x)))
