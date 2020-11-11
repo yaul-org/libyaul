@@ -66,15 +66,21 @@ cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
 
 /// @brief Not yet documented.
 static inline void __always_inline
+cpu_divu_fix16_split(fix16_t dividend, uint32_t *dh, uint32_t *dl)
+{
+        *dh = cpu_instr_swapw(dividend);
+        *dh = cpu_instr_extsw(*dh);
+        *dl = dividend << 16;
+}
+
+/// @brief Not yet documented.
+static inline void __always_inline
 cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
 {
         uint32_t dh;
-        dh = cpu_instr_swapw(dividend);
-        dh = cpu_instr_extsw(dh);
-
         uint32_t dl;
-        dl = dividend << 16;
 
+        cpu_divu_fix16_split(dividend, &dh, &dl);
         cpu_divu_64_32_set(dh, dl, divisor);
 }
 

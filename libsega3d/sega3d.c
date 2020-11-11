@@ -340,6 +340,10 @@ sega3d_object_transform(const sega3d_object_t *object)
         const uint32_t vertex_count =
             (pdata->nbPoint < VERTEX_POOL_SIZE) ? pdata->nbPoint : VERTEX_POOL_SIZE;
 
+        if ((vertex_count == 0) || (polygon_count == 0)) {
+                return;
+        }
+
         transform_t *trans;
         trans = &_transform;
 
@@ -366,12 +370,13 @@ _sort_iterate(sort_single_t *single)
 static void
 _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
 {
-        const FIXED *current_point = (const FIXED *)points; 
+        const FIXED *current_point = (const FIXED *)points;
+        const FIXED *last_point = (const FIXED *)points[vertex_count];
 
         transform_proj_t *trans_proj;
         trans_proj = &trans->projs[0];
 
-        for (uint32_t index = 0; index < vertex_count; index++) {
+        do {
                 trans_proj->point[Z] = _vertex_transform(current_point, &trans->dst_matrix[M20]);
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
@@ -386,6 +391,8 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
 
                 trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[M00]);
                 trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[M10]);
+
+                current_point += 3;
 
                 const FIXED inv_z = cpu_divu_quotient_get();
 
@@ -405,8 +412,7 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                 }
 
                 trans_proj++;
-                current_point += 3;
-        }
+        } while (current_point <= last_point);
 }
 
 static void
