@@ -24,10 +24,12 @@ typedef enum {
 
 typedef enum {
         SEGA3D_OBJECT_FLAGS_NONE          = 0,
+        /// Display non-textured polygons
+        SEGA3D_OBJECT_FLAGS_NON_TEXTURED  = 1 << 0,
         /// Display wireframe
-        SEGA3D_OBJECT_FLAGS_WIREFRAME     = 1 << 0,
+        SEGA3D_OBJECT_FLAGS_WIREFRAME     = 1 << 1,
         /// Cull in world space
-        SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 1,
+        SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 2,
         /// Cull in screen space
         SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3
 } sega3d_flags_t;
@@ -46,6 +48,7 @@ typedef struct {
         const color_rgb1555_t * const depth_colors;
         const uint8_t * const depth_z;
         uint8_t pow;
+        FIXED step;
 
         uint16_t gouraud_idx;
 } sega3d_fog_t;

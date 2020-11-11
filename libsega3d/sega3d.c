@@ -21,9 +21,10 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
-#define DEPTH_FOG_START         FIX16(20.f)
-#define DEPTH_FOG_END           FIX16(108.0f)
+#define DEPTH_FOG_START         FIX16(1.f)
+#define DEPTH_FOG_END           FIX16(512.0f)
 #define DEPTH_FOG_POW           (6)
+#define DEPTH_FOG_STEP          FIX16(1 / 8.0f)
 #define DEPTH_FOG_COLOR_COUNT   (32)
 #define DEPTH_FOG_COUNT         (64)
 
@@ -186,6 +187,7 @@ sega3d_init(void)
                 .depth_colors = _depth_fog_colors,
                 .depth_z = _depth_fog_z,
                 .pow = DEPTH_FOG_POW,
+                .step = DEPTH_FOG_STEP,
                 .gouraud_idx = 0
         };
 
@@ -469,9 +471,12 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
         cmdt->cmd_pmod = attr->atrb;
         cmdt->cmd_colr = attr->colno;
 
+        const sega3d_flags_t debug_flags =
+            (SEGA3D_OBJECT_FLAGS_WIREFRAME | SEGA3D_OBJECT_FLAGS_NON_TEXTURED);
+
         /* For debugging */
-        if ((object->flags & SEGA3D_OBJECT_FLAGS_WIREFRAME) == SEGA3D_OBJECT_FLAGS_WIREFRAME) {
-                cmdt->cmd_ctrl = 0x0005;
+        if ((object->flags & debug_flags) != SEGA3D_OBJECT_FLAGS_NONE) {
+                cmdt->cmd_ctrl = 0x0004 | ((object->flags & debug_flags) >> 1);
                 cmdt->cmd_pmod = VDP1_CMDT_PMOD_END_CODE_DISABLE | VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE;
                 cmdt->cmd_colr = 0xFFFF;
         }
@@ -487,8 +492,8 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
                 cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
         }
 
-        /* Even when there is not texture list, there is the default
-         * texture that zeroes out CMDSRCA and CMDSIZE */
+        /* Even when there is not texture list, there is the default texture
+         * that zeroes out CMDSRCA and CMDSIZE */
         if ((attr->sort & UseTexture) == UseTexture) { 
                 const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno);
 
@@ -517,9 +522,9 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
 
         cmdt->cmd_grda = attr->gstb;
 
-        /* if ((_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) { */
-        /*         _fog_calculate(trans, cmdt); */
-        /* } */
+        if ((_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
+                _fog_calculate(trans, cmdt);
+        }
 }
 
 static void
@@ -531,7 +536,7 @@ _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int32_to(trans->z_center);
+        int_z_depth = fix16_int16_muls(trans->z_center, _state.fog.step); 
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;
