@@ -45,22 +45,20 @@ typedef enum {
 } flags_t;
 
 typedef struct {
-        FIXED point[XYZ];
+        FIXED point_z;
         int16_vec2_t screen;
         clip_flags_t clip_flags;
-} transform_proj_t;
+} __aligned(16) transform_proj_t;
 
 typedef struct {
-        const FIXED *dst_matrix;
-
-        uint16_t index;
         FIXED z_center;
-        transform_proj_t *polygon[4] __aligned(16);
+        transform_proj_t *polygon[4];
+        const FIXED *dst_matrix;
+        uint16_t index;
+        transform_proj_t proj_pool[VERTEX_POOL_SIZE] __aligned(16);
+} __aligned(16) transform_t;
 
-        transform_proj_t projs[VERTEX_POOL_SIZE] __aligned(16);
-} transform_t;
-
-static_assert(sizeof(transform_proj_t) == 20);
+static_assert(sizeof(transform_proj_t) == 16);
 
 extern void _internal_tlist_init(void);
 extern void _internal_matrix_init(void);
@@ -151,7 +149,7 @@ static bool _world_cull_test(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t *trans) __unused;
 
 static inline FIXED __always_inline __used
-_vertex_transform(const FIXED *p, const FIXED *matrix)
+_vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
 {
         register int32_t tmp1;
         register int32_t tmp2;
@@ -331,7 +329,7 @@ sega3d_finish(sega3d_results_t *results)
 void
 sega3d_object_transform(const sega3d_object_t *object)
 {
-        static transform_t _transform __aligned(16) __unused;
+        static transform_t transform __aligned(16);
 
         const PDATA * const pdata = object->pdata;
 
@@ -345,7 +343,7 @@ sega3d_object_transform(const sega3d_object_t *object)
         }
 
         transform_t *trans;
-        trans = &_transform;
+        trans = &transform;
 
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
@@ -374,30 +372,30 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
         const FIXED *last_point = (const FIXED *)points[vertex_count];
 
         transform_proj_t *trans_proj;
-        trans_proj = &trans->projs[0];
+        trans_proj = &trans->proj_pool[0];
 
         do {
-                trans_proj->point[Z] = _vertex_transform(current_point, &trans->dst_matrix[M20]);
+                trans_proj->point_z = _vertex_transform(current_point, &trans->dst_matrix[M20]);
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 /* In case the projected Z value is on or behind the near plane */
-                if (trans_proj->point[Z] <= _state.info.near) {
+                if (trans_proj->point_z <= _state.info.near) {
                         trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
 
-                        trans_proj->point[Z] = _state.info.near;
+                        trans_proj->point_z = _state.info.near;
                 }
 
-                cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point[Z]);
+                cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point_z);
 
-                trans_proj->point[X] = _vertex_transform(current_point, &trans->dst_matrix[M00]);
-                trans_proj->point[Y] = _vertex_transform(current_point, &trans->dst_matrix[M10]);
+                const FIXED point_x = _vertex_transform(current_point, &trans->dst_matrix[M00]);
+                const FIXED point_y = _vertex_transform(current_point, &trans->dst_matrix[M10]);
 
                 current_point += 3;
 
                 const FIXED inv_z = cpu_divu_quotient_get();
 
-                trans_proj->screen.x = fix16_int16_muls(trans_proj->point[X], inv_z);
-                trans_proj->screen.y = fix16_int16_muls(trans_proj->point[Y], inv_z);
+                trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
+                trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
 
                 if (trans_proj->screen.x < -_state.cached_sw_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
@@ -422,10 +420,10 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
         for (trans->index = 0; trans->index < polygon_count; trans->index++, polygons++) {
                 const uint16_t * vertices = &polygons->Vertices[0];
 
-                trans->polygon[0] = &trans->projs[*(vertices++)];
-                trans->polygon[1] = &trans->projs[*(vertices++)];
-                trans->polygon[2] = &trans->projs[*(vertices++)];
-                trans->polygon[3] = &trans->projs[*vertices];
+                trans->polygon[0] = &trans->proj_pool[*(vertices++)];
+                trans->polygon[1] = &trans->proj_pool[*(vertices++)];
+                trans->polygon[2] = &trans->proj_pool[*(vertices++)];
+                trans->polygon[3] = &trans->proj_pool[*vertices];
 
                 if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
                         if ((_world_cull_test(trans))) {
@@ -448,10 +446,10 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
                         }
                 }
 
-                const FIXED z_avg = trans->polygon[0]->point[Z] +
-                                    trans->polygon[1]->point[Z] +
-                                    trans->polygon[2]->point[Z] +
-                                    trans->polygon[3]->point[Z];
+                const FIXED z_avg = trans->polygon[0]->point_z +
+                                    trans->polygon[1]->point_z +
+                                    trans->polygon[2]->point_z +
+                                    trans->polygon[3]->point_z;
 
                 /* Divide by 4 to get the average (bit shift) */
                 trans->z_center = z_avg >> 2;
@@ -580,9 +578,9 @@ _screen_cull_test(const transform_t *trans __unused)
 static bool
 _world_cull_test(const transform_t * const trans)
 {
-        const FIXED * const p0 = (const FIXED *)trans->polygon[0]->point;
-        const FIXED * const p1 = (const FIXED *)trans->polygon[1]->point;
-        const FIXED * const p2 = (const FIXED *)trans->polygon[2]->point;
+        const FIXED * const p0 = (const FIXED *)trans->polygon[0]->point_z;
+        const FIXED * const p1 = (const FIXED *)trans->polygon[1]->point_z;
+        const FIXED * const p2 = (const FIXED *)trans->polygon[2]->point_z;
 
         fix16_vec3_t u;
         fix16_vec3_t v;
