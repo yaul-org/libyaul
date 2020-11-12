@@ -186,6 +186,8 @@ sega3d_init(void)
                 .depth_z = _depth_fog_z,
                 .pow = DEPTH_FOG_POW,
                 .step = DEPTH_FOG_STEP,
+                .near_ambient_color = _depth_fog_colors[0],
+                .far_ambient_color = _depth_fog_colors[31],
                 .gouraud_idx = 0
         };
 
@@ -534,8 +536,15 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
 static void
 _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
 {
-        if ((trans->z_center < _state.fog_start_z) ||
-            (trans->z_center >= _state.fog_end_z)) {
+        if (trans->z_center < _state.fog_start_z) {
+                cmdt->cmd_colr = _state.fog.near_ambient_color.raw;
+
+                return;
+        }
+
+        if (trans->z_center >= _state.fog_end_z) {
+                cmdt->cmd_colr = _state.fog.far_ambient_color.raw;
+
                 return;
         }
 

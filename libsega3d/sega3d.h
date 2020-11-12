@@ -49,6 +49,8 @@ typedef struct {
         const uint8_t * const depth_z;
         uint8_t pow;
         FIXED step;
+        color_rgb1555_t near_ambient_color;
+        color_rgb1555_t far_ambient_color;
 
         uint16_t gouraud_idx;
 } sega3d_fog_t;
