@@ -153,7 +153,7 @@ cpu_cache_way_mode_set(uint8_t mode)
 /// @brief Not yet documented.
 extern void cpu_cache_purge_line(void *) __section(".uncached");
 /// @brief Not yet documented.
-extern void cpu_cache_purge(void) __section(".uncached");
+extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
 
 /// @}
 

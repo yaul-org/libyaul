@@ -18,7 +18,7 @@ cpu_cache_purge_line(void *addr)
         *purge_addr = 0x00000000;
 }
 
-void __section(".uncached")
+void __no_reorder __section(".uncached")
 cpu_cache_purge(void)
 {
         volatile uint8_t * const reg_ccr = (volatile uint8_t * const)CPU(CCR);
@@ -27,11 +27,9 @@ cpu_cache_purge(void)
         t0 = *reg_ccr;
 
         t0 &= ~0x01;
-        *reg_ccr = t0;
-
+        *reg_ccr = t0; /* Disable cache */
         t0 |= 0x10;
-        *reg_ccr = t0;
-
+        *reg_ccr = t0; /* Purge cache */
         t0 |= 0x01;
-        *reg_ccr = t0;
+        *reg_ccr = t0; /* Enable cache */
 }

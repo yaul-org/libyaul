@@ -360,7 +360,7 @@ _sort_iterate(sort_single_t *single)
 {
         /* No need to clear the end bit, as setting the "source" clobbers the
          * bit */
-        _state.current_orderlist->cmdt = single->packet;
+        _state.current_orderlist->cmdt = (void *)(CPU_CACHE_THROUGH | (uint32_t)single->packet);
 
         _state.current_orderlist++;
 }
