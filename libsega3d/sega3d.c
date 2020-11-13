@@ -144,8 +144,6 @@ static vdp1_cmdt_t _cmdt_end;
 
 static void _sort_iterate(sort_single_t *single);
 static void _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count);
-static void _vertex_pool_transform(transform_t *trans, POINT const * points,
-    uint32_t vertex_count);
 static void _polygon_process(const sega3d_object_t *object, transform_t *trans,
     POLYGON const *polygons, uint32_t polygon_count);
 static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans,
@@ -155,36 +153,6 @@ static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *tran
 static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt) __hot;
 static bool _world_cull_test(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t *trans) __hot;
-
-static inline FIXED __always_inline __used
-_vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
-{
-        register int32_t tmp1;
-        register int32_t tmp2;
-        register int32_t pt;
-
-        __asm__ volatile ("\tmov %[matrix], %[tmp1]\n"
-                          "\tmov %[p], %[pt]\n"
-                          "\tclrmac\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmov.l @%[tmp1], %[pt]\n"
-                          "\tsts mach, %[tmp1]\n"
-                          "\tsts macl, %[tmp2]\n"
-                          "\txtrct %[tmp1], %[tmp2]\n"
-                          "add %[tmp2], %[pt]\n"
-            /* Output */
-            : [tmp1] "=&r" (tmp1),
-              [tmp2] "=&r" (tmp2),
-              [pt]   "=&r" (pt)
-            /* Input */
-            : [p]      "r" (p),
-              [matrix] "r" (matrix)
-            : "mach", "macl", "memory");
-
-        return pt;
-}
 
 void
 sega3d_init(void)
@@ -357,13 +325,8 @@ sega3d_object_transform(const sega3d_object_t *object)
 
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
-        _state.cached_view[X] = 0;
-        _state.cached_view[Y] = 0;
-        _state.cached_view[Z] = 0;
-
         _internal_asm_vertex_pool_transform(&_state, trans, pdata->pntbl, vertex_count);
         _vertex_pool_clipping(trans, vertex_count);
-        /* _vertex_pool_transform(trans, pdata->pntbl, vertex_count); */
         _polygon_process(object, trans, pdata->pltbl, polygon_count);
 }
 
@@ -383,88 +346,27 @@ _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count)
         transform_proj_t *trans_proj;
         trans_proj = &trans->proj_pool[0];
 
-        const transform_proj_t * const last_trans_proj =
-            (const transform_proj_t *)&trans->proj_pool[vertex_count];
+        const int16_t sw_2 = _state.cached_sw_2;
+        const int16_t sw_n2 = -_state.cached_sw_2;
+        const int16_t sh_2 = _state.cached_sh_2;
+        const int16_t sh_n2 = -_state.cached_sh_2;        
 
-        do {
-                /* Pre-cache next entry */
-                volatile transform_proj_t *next_trans_proj =
-                    (volatile transform_proj_t *)(&trans_proj[1]);
-                next_trans_proj->clip_flags; 
-
-                if (trans_proj->screen.x < -_state.cached_sw_2) {
+        do { 
+                if (trans_proj->screen.x < sw_n2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
-                } else if (trans_proj->screen.x > _state.cached_sw_2) {
+                } else if (trans_proj->screen.x > sw_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
                 }
 
-                if (trans_proj->screen.y > _state.cached_sh_2) {
+                if (trans_proj->screen.y > sh_2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_TOP;
-                } else if (trans_proj->screen.y < -_state.cached_sh_2) {
+                } else if (trans_proj->screen.y < sh_n2) {
                         trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
                 }
 
                 trans_proj++;
-        } while (trans_proj < last_trans_proj);
-}
-
-static __noinline __used void
-_vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
-{
-        const FIXED *current_point = (const FIXED *)points;
-        const FIXED *last_point = (const FIXED *)points[vertex_count];
-
-        transform_proj_t *trans_proj;
-        trans_proj = &trans->proj_pool[0];
-
-        trans_proj->clip_flags = CLIP_FLAGS_NONE;
-
-        do {
-                /* Pre-cache next entry */
-                volatile transform_proj_t *next_trans_proj =
-                    (volatile transform_proj_t *)(&trans_proj[1]);
-                next_trans_proj->clip_flags = CLIP_FLAGS_NONE; 
-
-                trans_proj->point_z = _vertex_transform(current_point, &trans->dst_matrix[M20]);
-
-                /* In case the projected Z value is on or behind the near plane */
-                if (trans_proj->point_z <= _state.info.near) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
-
-                        trans_proj->point_z = _state.info.near;
-                }
-
-                cpu_divu_fix16_set(_state.cached_inv_right, trans_proj->point_z);
-
-                const FIXED point_x = _vertex_transform(current_point, &trans->dst_matrix[M00]);
-                const FIXED point_y = _vertex_transform(current_point, &trans->dst_matrix[M10]);
-
-                current_point += 3;
-
-                /* Pre-cache next point */
-                const volatile FIXED *next_point =
-                    (const volatile FIXED *)current_point;
-                next_point[X];
-
-                const FIXED inv_z = cpu_divu_quotient_get();
-
-                trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
-                trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
-
-                if (trans_proj->screen.x < -_state.cached_sw_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
-                } else if (trans_proj->screen.x > _state.cached_sw_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
-                }
-
-                if (trans_proj->screen.y > _state.cached_sh_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_TOP;
-                } else if (trans_proj->screen.y < -_state.cached_sh_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
-                }
-
-                trans_proj++;
-        } while (current_point <= last_point);
+                vertex_count--;
+        } while (vertex_count != 0);
 }
 
 static void
