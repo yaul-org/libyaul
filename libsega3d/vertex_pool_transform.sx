@@ -46,13 +46,14 @@ __internal_asm_vertex_pool_transform:
         mov.l   r2,@(8,r1)              ! trans->proj_pool[0].clip_flags = CLIP_FLAGS_NONE;
         add     #-16,r15                ! Allocate 4 words on stack
         mov.l   @(20,r4),r7             ! state::cached_inv_right
+        mov.l   @(44,r4),r3             ! sega3d_info_t::near
 
 .L_LOOP:
         mov     r5,r12
         mov     #0,r2
         add     #32,r12                 ! trans->dst_matrix[M20]
                                         ! Prefetch next_trans_proj (below)
-        mov.l   r2,@(24,r1)             ! next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
+        mov.l   r2,@(24,r1)             ! (+16) (+8 offset) next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
         clrmac
         mov     r6,r0
 
@@ -62,18 +63,17 @@ __internal_asm_vertex_pool_transform:
         mac.l   @r0+,@r12+
         mov.l   @r12,r0
         sts     mach,r12
-        mov.l   @(44,r4),r2             ! sega3d_info_t::near
         sts     macl,r13
         xtrct   r12,r13
         add     r13,r0
         mov.l   r0,@r1                  ! trans_proj::point_z = ...
 
         ! Test: near clip
-        cmp/ge  r0,r2
+        cmp/ge  r0,r3
         bf      .L_NO_NEAR_CLIP
 
         mov.l   @(8,r1),r0
-        mov.l   r2,@r1                  ! trans_proj->point_z = _state.info.near;
+        mov.l   r3,@r1                  ! trans_proj->point_z = _state.info.near;
         or      #1,r0
         mov.l   r0,@(8,r1)              ! trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
 
