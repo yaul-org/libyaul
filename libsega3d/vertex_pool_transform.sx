@@ -108,16 +108,14 @@ __internal_asm_vertex_pool_transform:
         xtrct   r9,r13
         dmuls.l r12,r2                  ! point_x * inv_z
         add     r13,r9
-        sts     mach,r13
-        mov     r13,r0
+        sts     mach,r0
 
         dmuls.l r9,r2
         mov.w   r0,@(4,r1)              ! Write to transform_proj_t::screen::x
-        sts     mach,r13
-        mov     r13,r0
+        cmp/hs  r6,r14                  ! current_point <= last_point
+        sts     mach,r0
         mov.w   r0,@(6,r1)              ! Write to transform_proj_t::screen::y
 
-        cmp/hs  r6,r14                  ! current_point <= last_point
         bt.s    .L_LOOP                 !
         add     #16,r1                  ! Next transform_proj_t
 
@@ -130,7 +128,7 @@ __internal_asm_vertex_pool_transform:
         mov.l   @r15+,r9
         rts
         nop
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 .align 4
 
 REG_CPU_DSVR:   .word DVSR
