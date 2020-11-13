@@ -40,6 +40,8 @@ __internal_asm_vertex_pool_transform:
         mov     r6,r14                  ! points/current_point
         add     r1,r14                  ! last_point
         mov     r5,r1                   ! trans
+        mov.l   @(20,r5),r7             ! Offset into trans->dst_matrix
+        mov     r7,r5
         add     #32,r1
 
         mov.w   REG_CPU_DSVR,r10
@@ -54,9 +56,8 @@ __internal_asm_vertex_pool_transform:
         mov     #0,r2
         mov.l   r2,@(8,r7)              ! next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
-        mov.l   @(20,r5),r2             ! Offset into trans->dst_matrix
-        add     #32,r2                  ! trans->dst_matrix[M20]
-        mov     r2,r12                  ! trans->dst_matrix[M20]
+        mov     r5,r12
+        add     #32,r12                 ! trans->dst_matrix[M20]
         mov     r6,r0
 
         ! Z component
@@ -90,8 +91,7 @@ __internal_asm_vertex_pool_transform:
         mov.l   r12,@r10                ! CPU(DSVR)
         mov.l   r0,@r11                 ! CPU(DVDNTH)
         mov.l   r2,@r8                  ! CPU(DVDNTL)
-        mov.l   @(20,r5),r2             ! Offset into trans->dst_matrix
-        mov     r2,r0                   ! trans->dst_matrix[M00]
+        mov     r5,r0                   ! trans->dst_matrix[M00]
         mov     r6,r12                  ! XXX: We should be able to just keep updating r6 to avoid adding
 
         ! X component
@@ -105,10 +105,8 @@ __internal_asm_vertex_pool_transform:
         xtrct   r0,r13
         add     r13,r12
 
-        mov.l   @(20,r5),r2             ! Offset into trans->dst_matrix
-        add     #16,r2                  ! trans->dst_matrix[M10]
-        mov.l   r2,@r15
-        mov     r2,r9
+        mov     r5,r9                   ! Offset into trans->dst_matrix
+        add     #16,r9                  ! trans->dst_matrix[M10]
         mov     r6,r0
 
         ! Y component
@@ -120,12 +118,10 @@ __internal_asm_vertex_pool_transform:
         sts     mach,r9
         sts     macl,r13
         xtrct   r9,r13
-        add     r13,r0
+        add     r13,r9
 
         add     #12,r6                  ! Next point
         mov.l   @r6,r2                  ! Prefetch the next point
-
-        mov.l   r0,@(8,r15)             ! XXX: Write point_y to stack. We ran out of registers?!
 
         mov.l   @r8,r2                  ! Read quotient (1 / transform_proj_t::point_z)
 
@@ -135,7 +131,6 @@ __internal_asm_vertex_pool_transform:
         exts.w  r13,r12                 ! Sign extend (for clipping)
         mov.w   r0,@(4,r1)              ! Write to transform_proj_t::screen::x
 
-        mov.l   @(8,r15),r9             ! XXX: We need to read from stack? 
         dmuls.l r9,r2
         sts     mach,r13
         mov     r13,r0
