@@ -244,7 +244,10 @@ static void
 peripheral_free(smpc_peripheral_t *peripheral)
 {
         assert(peripheral != NULL);
-        assert((memb_free(&peripherals, peripheral)) == 0);
+
+        int ret __unused;
+        ret = memb_free(&peripherals, peripheral);
+        assert(ret == 0);
 }
 
 static int32_t

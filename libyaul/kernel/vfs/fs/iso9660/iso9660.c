@@ -105,7 +105,7 @@ _filelist_read_walker(const iso9660_filelist_entry_t *entry, void *args)
         filelist->entries_count++;
 }
 
-static bool
+static bool __unused
 _dirent_interleave(const iso9660_dirent_t *dirent)
 { 
         return ((isonum_711(dirent->interleave)) != 0x00);
@@ -208,7 +208,7 @@ _dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
 static void
 _bread(uint32_t sector, void *ptr)
 {
-        int ret;
+        int ret __unused;
         ret = cd_block_sector_read(LBA2FAD(sector), ptr);
         assert(ret == 0);
 }
