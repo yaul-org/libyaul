@@ -53,10 +53,10 @@ __internal_asm_vertex_pool_transform:
         add     #32,r12                 ! trans->dst_matrix[M20]
                                         ! Prefetch next_trans_proj (below)
         mov.l   r2,@(24,r1)             ! next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
+        clrmac
         mov     r6,r0
 
         ! Z component
-        clrmac
         mac.l   @r0+,@r12+
         mac.l   @r0+,@r12+
         mac.l   @r0+,@r12+
@@ -86,8 +86,8 @@ __internal_asm_vertex_pool_transform:
         mov.l   r12,@r10                ! CPU(DSVR)
         mov.l   r0,@r11                 ! CPU(DVDNTH)
         mov.l   r13,@r8                 ! CPU(DVDNTL)
+        mov     r6,r12
         mov     r5,r0                   ! trans->dst_matrix[M00]
-        mov     r6,r12                  ! XXX: We should be able to just keep updating r6 to avoid adding
 
         ! X component
         clrmac
@@ -99,17 +99,16 @@ __internal_asm_vertex_pool_transform:
         mov     r5,r9                   ! Offset into trans->dst_matrix
         sts     macl,r13
         add     #16,r9                  ! trans->dst_matrix[M10]
+        clrmac
         xtrct   r0,r13
         add     r13,r12
-        mov     r6,r0
 
         ! Y component
-        clrmac
-        mac.l   @r0+,@r9+
-        mac.l   @r0+,@r9+
-        mac.l   @r0+,@r9+
+        mac.l   @r6+,@r9+
+        mac.l   @r6+,@r9+
+        mac.l   @r6+,@r9+
         mov.l   @r9,r0
-        add     #12,r6                  ! Next point
+                                        ! Next point
         sts     mach,r9
         mov.l   @r6,r2                  ! Prefetch the next point
         sts     macl,r13
