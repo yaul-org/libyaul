@@ -4,15 +4,24 @@ SUB_BUILD:=$(YAUL_BUILD)/lib$(TARGET)
 
 LIB_FILE_base:= $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/lib$(TARGET).a
 
-LIB_OBJS:= $(LIB_SRCS:.c=.o)
-LIB_DEPS:= $(LIB_SRCS:.c=.d)
+LIB_SRCS_C:= $(filter %.c,$(LIB_SRCS))
+LIB_SRCS_S:= $(filter %.sx,$(LIB_SRCS))
+
+LIB_OBJS_C:= $(patsubst %.c,%.o,$(LIB_SRCS_C))
+LIB_OBJS_S:= $(patsubst %.sx,%.o,$(LIB_SRCS_S))
+
+LIB_OBJS_C_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS_C))
+LIB_OBJS_S_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS_S))
+
+LIB_OBJS:= $(LIB_OBJS_C) $(LIB_OBJS_S)
+LIB_DEPS:= $(LIB_OBJS:.o=.d)
 
 LIB_OBJS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_OBJS))
 LIB_DEPS_base:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/,$(LIB_DEPS))
 
 .PHONY: all $(TYPE) clean install-$(TYPE) generate-cdb
 
-.SUFFIXES:= .c .o
+.SUFFIXES:= .sx .c .o
 
 all: $(TYPE)
 
@@ -25,6 +34,9 @@ $(LIB_FILE_base): $(LIB_OBJS_base)
 	$(call macro-sh-build-library)
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
+	$(call macro-sh-build-object,$(TYPE))
+
+$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
 
 # Install header files
