@@ -51,10 +51,16 @@ typedef struct {
 } __aligned(16) transform_proj_t;
 
 typedef struct {
+        /* Z center of the polygon */
         FIXED z_center;
+        /* Pointers to the pool that make up the polygon */
         transform_proj_t *polygon[4];
+        /* Current matrix */
         const FIXED *dst_matrix;
+        /* Polygon index */
         uint16_t index;
+
+        /* Pool containing the projected data */
         transform_proj_t proj_pool[VERTEX_POOL_SIZE] __aligned(16);
 } __aligned(16) transform_t;
 
@@ -67,6 +73,8 @@ extern void _internal_sort_init(void);
 extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
 extern void _internal_sort_iterate(iterate_fn fn);
+
+extern void _internal_asm_vertex_pool_transform(void *state, transform_t *trans, POINT const * points, uint32_t vertex_count);
 
 static const color_rgb1555_t _depth_fog_colors[DEPTH_FOG_COLOR_COUNT] = {
         COLOR_RGB1555(1,  0, 16, 16),
@@ -117,6 +125,7 @@ static struct {
         VECTOR cached_view;
         FIXED cached_inv_top;
         FIXED cached_inv_right;
+        sega3d_info_t info;
         int16_t cached_sw_2;
         int16_t cached_sh_2;
 
@@ -129,13 +138,12 @@ static struct {
         FIXED fog_start_z;
         FIXED fog_end_z;
         uint16_t fog_len;
-
-        sega3d_info_t info;
 } _state __aligned(4);
 
 static vdp1_cmdt_t _cmdt_end;
 
 static void _sort_iterate(sort_single_t *single);
+static void _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count);
 static void _vertex_pool_transform(transform_t *trans, POINT const * points,
     uint32_t vertex_count);
 static void _polygon_process(const sega3d_object_t *object, transform_t *trans,
@@ -144,9 +152,9 @@ static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *tran
     vdp1_cmdt_t *cmdt);
 static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans,
     vdp1_cmdt_t *cmdt);
-static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt);
+static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt) __hot;
 static bool _world_cull_test(const transform_t * const trans);
-static bool _screen_cull_test(const transform_t *trans) __unused;
+static bool _screen_cull_test(const transform_t *trans) __hot;
 
 static inline FIXED __always_inline __used
 _vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
@@ -190,7 +198,7 @@ sega3d_init(void)
                 .far_ambient_color = _depth_fog_colors[31],
                 .gouraud_idx = 0
         };
-
+        
         /* Prevent re-initialization */
         if ((_state.flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
                 return;
@@ -353,7 +361,9 @@ sega3d_object_transform(const sega3d_object_t *object)
         _state.cached_view[Y] = 0;
         _state.cached_view[Z] = 0;
 
-        _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
+        _internal_asm_vertex_pool_transform(&_state, trans, pdata->pntbl, vertex_count);
+        _vertex_pool_clipping(trans, vertex_count);
+        /* _vertex_pool_transform(trans, pdata->pntbl, vertex_count); */
         _polygon_process(object, trans, pdata->pltbl, polygon_count);
 }
 
@@ -367,7 +377,38 @@ _sort_iterate(sort_single_t *single)
         _state.current_orderlist++;
 }
 
-static void
+static __noinline __used void
+_vertex_pool_clipping(transform_t *trans, uint32_t vertex_count)
+{
+        transform_proj_t *trans_proj;
+        trans_proj = &trans->proj_pool[0];
+
+        const transform_proj_t * const last_trans_proj =
+            (const transform_proj_t *)&trans->proj_pool[vertex_count];
+
+        do {
+                /* Pre-cache next entry */
+                volatile transform_proj_t *next_trans_proj =
+                    (volatile transform_proj_t *)(&trans_proj[1]);
+                next_trans_proj->clip_flags; 
+
+                if (trans_proj->screen.x < -_state.cached_sw_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
+                } else if (trans_proj->screen.x > _state.cached_sw_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
+                }
+
+                if (trans_proj->screen.y > _state.cached_sh_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_TOP;
+                } else if (trans_proj->screen.y < -_state.cached_sh_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
+                }
+
+                trans_proj++;
+        } while (trans_proj < last_trans_proj);
+}
+
+static __noinline __used void
 _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
 {
         const FIXED *current_point = (const FIXED *)points;
@@ -376,9 +417,15 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
         transform_proj_t *trans_proj;
         trans_proj = &trans->proj_pool[0];
 
+        trans_proj->clip_flags = CLIP_FLAGS_NONE;
+
         do {
+                /* Pre-cache next entry */
+                volatile transform_proj_t *next_trans_proj =
+                    (volatile transform_proj_t *)(&trans_proj[1]);
+                next_trans_proj->clip_flags = CLIP_FLAGS_NONE; 
+
                 trans_proj->point_z = _vertex_transform(current_point, &trans->dst_matrix[M20]);
-                trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 /* In case the projected Z value is on or behind the near plane */
                 if (trans_proj->point_z <= _state.info.near) {
@@ -393,6 +440,11 @@ _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex
                 const FIXED point_y = _vertex_transform(current_point, &trans->dst_matrix[M10]);
 
                 current_point += 3;
+
+                /* Pre-cache next point */
+                const volatile FIXED *next_point =
+                    (const volatile FIXED *)current_point;
+                next_point[X];
 
                 const FIXED inv_z = cpu_divu_quotient_get();
 
@@ -533,7 +585,7 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
         }
 }
 
-static void
+static __hot void
 _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
 {
         if (trans->z_center < _state.fog_start_z) {
@@ -563,7 +615,7 @@ _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
         cmdt->cmd_colr = _depth_fog_colors[depth_index].raw;
 }
 
-static bool
+static __hot bool
 _screen_cull_test(const transform_t *trans __unused)
 {
         const int16_vec2_t * const p0 = &trans->polygon[0]->screen;

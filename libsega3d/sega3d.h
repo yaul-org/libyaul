@@ -42,7 +42,7 @@ typedef struct {
         FIXED ratio;
         FIXED near;
         FIXED focal_length;
-} sega3d_info_t;
+} __aligned(4) sega3d_info_t;
 
 typedef struct {
         const color_rgb1555_t * const depth_colors;
