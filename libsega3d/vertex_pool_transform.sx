@@ -34,19 +34,19 @@ __internal_asm_vertex_pool_transform:
         mov.l   r13,@-r15
         mov.l   r14,@-r15
         mov     r6,r14                  ! points/current_point
-        add     r1,r14                  ! last_point
         mov.l   @(20,r5),r7             ! Offset into trans->dst_matrix
+        add     r1,r14                  ! last_point
         mov     r5,r1                   ! trans
         mov.l   @(44,r4),r3             ! sega3d_info_t::near
         mov     r7,r5
-        add     #32,r1
         mov.l   @(20,r4),r7             ! state::cached_inv_right
+        add     #32,r1
         mov.w   REG_CPU_DVDNTL,r4
 
 .L_LOOP:
         mov     r5,r12
         mov     #0,r2
-        mov.l   r2,@(8,r1)              ! (+16) (+8 offset) next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
+        mov.l   r2,@(8,r1)              ! next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
         clrmac
         mov     r6,r0
         add     #32,r12                 ! trans->dst_matrix[M20]
