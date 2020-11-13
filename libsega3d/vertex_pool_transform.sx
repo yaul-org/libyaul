@@ -29,7 +29,6 @@ __internal_asm_vertex_pool_transform:
         sts     macl,r1
         mov.w   REG_CPU_DSVR,r10
         mov.l   r11,@-r15
-        mov     #0,r2
         mov.w   REG_CPU_DVDNTH,r11
         mov.l   r12,@-r15
         mov.l   r13,@-r15
@@ -42,17 +41,15 @@ __internal_asm_vertex_pool_transform:
         mov     r7,r5
         add     #32,r1
         mov.l   @(20,r4),r7             ! state::cached_inv_right
-        mov.l   r2,@(8,r1)              ! trans->proj_pool[0].clip_flags = CLIP_FLAGS_NONE;
         mov.w   REG_CPU_DVDNTL,r4
 
 .L_LOOP:
         mov     r5,r12
         mov     #0,r2
-        add     #32,r12                 ! trans->dst_matrix[M20]
-                                        ! Prefetch next_trans_proj (below)
-        mov.l   r2,@(24,r1)             ! (+16) (+8 offset) next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
+        mov.l   r2,@(8,r1)              ! (+16) (+8 offset) next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
         clrmac
         mov     r6,r0
+        add     #32,r12                 ! trans->dst_matrix[M20]
 
         ! Z component
         mac.l   @r0+,@r12+
@@ -104,10 +101,8 @@ __internal_asm_vertex_pool_transform:
         mac.l   @r6+,@r9+
         mac.l   @r6+,@r9+
         mac.l   @r6+,@r9+
-        mov.l   @r9,r0
-                                        ! Next point
+        mov.l   @r9,r0                  ! Next point
         sts     mach,r9
-        mov.l   @r6,r2                  ! Prefetch the next point
         sts     macl,r13
         mov.l   @r4,r2                  ! Read quotient (1 / transform_proj_t::point_z)
         xtrct   r9,r13
