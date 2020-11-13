@@ -392,7 +392,7 @@ _scroll_screen_reset(void)
 }
 
 static inline void __always_inline
-_assert_shared_init(const dbgio_vdp2_t *params)
+_assert_shared_init(const dbgio_vdp2_t *params __unused)
 {
         assert(params != NULL);
 

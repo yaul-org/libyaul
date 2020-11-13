@@ -65,7 +65,7 @@ _async_flush(void)
 
         _scroll_screen_reset();
 
-        int8_t ret;
+        int8_t ret __unused;
         ret = dma_queue_enqueue(&_dma_handle, DMA_QUEUE_TAG_VBLANK_IN,
             _flush_dma_handler, NULL);
         assert(ret == 0);
