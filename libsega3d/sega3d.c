@@ -36,6 +36,7 @@ typedef enum {
         CLIP_FLAGS_RIGHT  = 1 << 3,
         CLIP_FLAGS_TOP    = 1 << 4,
         CLIP_FLAGS_BOTTOM = 1 << 5,
+        CLIP_FLAGS_SIDE   = 1 << 6,
 } clip_flags_t;
 
 typedef enum {
@@ -335,7 +336,7 @@ _sort_iterate(sort_single_t *single)
 {
         /* No need to clear the end bit, as setting the "source" clobbers the
          * bit */
-        _state.current_orderlist->cmdt = (void *)(CPU_CACHE_THROUGH | (uint32_t)single->packet);
+        _state.current_orderlist->cmdt = single->packet;
 
         _state.current_orderlist++;
 }
@@ -351,17 +352,15 @@ _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count)
         const int16_t sh_2 = _state.cached_sh_2;
         const int16_t sh_n2 = -_state.cached_sh_2;        
 
-        do { 
+        do {
                 if (trans_proj->screen.x < sw_n2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_LEFT;
+                        trans_proj->clip_flags |= CLIP_FLAGS_SIDE;
                 } else if (trans_proj->screen.x > sw_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_RIGHT;
-                }
-
-                if (trans_proj->screen.y > sh_2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_TOP;
+                        trans_proj->clip_flags |= CLIP_FLAGS_SIDE;
+                } else if (trans_proj->screen.y > sh_2) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_SIDE;
                 } else if (trans_proj->screen.y < sh_n2) {
-                        trans_proj->clip_flags |= CLIP_FLAGS_BOTTOM;
+                        trans_proj->clip_flags |= CLIP_FLAGS_SIDE;
                 }
 
                 trans_proj++;
