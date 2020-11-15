@@ -11,16 +11,54 @@
 
 #include <vdp1/cmdt.h>
 
+#define MATRIX_STACK_MAX        (20)
+#define Z_RANGE                 (1024)
+#define PACKET_SIZE             (4096)
+#define VERTEX_POOL_SIZE        (1024)
+
+typedef enum {
+        FLAGS_NONE        = 0,
+        FLAGS_INITIALIZED = 1 << 0,
+        FLAGS_FOG_ENABLED = 1 << 1,
+} flags_t;
+
 typedef enum {
         TLIST_FLAGS_NONE,
         TLIST_FLAGS_USER_ALLOCATED = 1 << 0,
         TLIST_FLAGS_ALLOCATED      = 1 << 1
 } tlist_flags_t;
 
-#define MATRIX_STACK_MAX        (20)
-#define Z_RANGE                 (1024)
-#define PACKET_SIZE             (4096)
-#define VERTEX_POOL_SIZE        (1024)
+typedef enum {
+        CLIP_FLAGS_NONE   = 0,
+        CLIP_FLAGS_NEAR   = 1 << 0,
+        CLIP_FLAGS_FAR    = 1 << 1,
+        CLIP_FLAGS_LEFT   = 1 << 2,
+        CLIP_FLAGS_RIGHT  = 1 << 3,
+        CLIP_FLAGS_TOP    = 1 << 4,
+        CLIP_FLAGS_BOTTOM = 1 << 5,
+        CLIP_FLAGS_SIDE   = 1 << 6,
+} clip_flags_t;
+
+typedef struct {
+        FIXED point_z;
+        int16_vec2_t screen;
+        clip_flags_t clip_flags;
+} __aligned(16) transform_proj_t;
+
+typedef struct {
+        /* Z center of the current polygon */
+        FIXED z_center;
+        /* Pointers to the pool that make up the current polygon */
+        transform_proj_t *polygon[4];
+        /* Current matrix */
+        const FIXED *dst_matrix;
+        /* Current polygon index */
+        uint16_t index;
+
+        vdp1_cmdt_orderlist_t *current_orderlist;
+        vdp1_cmdt_orderlist_t *orderlist;
+        vdp1_cmdt_t *current_cmdt;
+} __aligned(16) transform_t;
 
 typedef struct sort_single {
         void *packet;
@@ -32,5 +70,16 @@ typedef struct {
 } sort_list_t;
 
 typedef void (*iterate_fn)(sort_single_t *);
+
+typedef struct {
+        flags_t flags;
+
+        sega3d_fog_t * const fog;
+        transform_t * const transform;
+        transform_proj_t * const transform_proj_pool;
+        MATRIX * const matrices;
+} __aligned(16) state_t;
+
+extern state_t _internal_state;
 
 #endif /* SEGA3D_INTERNAL_H_ */
