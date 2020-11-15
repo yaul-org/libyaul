@@ -24,7 +24,9 @@
 #include <string.h>
 #include <stdint.h>
 
-void *
+/* Kludge: LTO returns an error: undefined reference to memset. The
+ * hack/solution is to simply mark it as used */
+void * __used
 memset(void *dest, int c, size_t n)
 {
         uint8_t *s = dest;
