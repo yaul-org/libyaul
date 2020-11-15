@@ -7,14 +7,14 @@ __BEGIN_DECLS
 
 #undef assert
 
-#ifdef DEBUG
+#if defined(DEBUG) || (HAVE_ASSERT_SUPPORT == 1)
 #define assert(e) ((e)                                                         \
         ? (void)0                                                              \
         : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                \
               __STRING(e)))
 #else
 #define assert(e)
-#endif /* DEBUG */
+#endif
 
 #ifndef __ASSERT_FUNC
 /* Use g++'s demangled names in C++ */
