@@ -77,6 +77,13 @@ ifneq ($(YAUL_OPTION_BUILD_GDB),$(filter $(YAUL_OPTION_BUILD_GDB),0 1))
   $(error Invalid value for YAUL_OPTION_BUILD_GDB (build GDB))
 endif
 
+ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),)
+  $(error Undefined YAUL_OPTION_BUILD_ASSERT (build ASSERT))
+endif
+ifneq ($(YAUL_OPTION_BUILD_ASSERT),$(filter $(YAUL_OPTION_BUILD_ASSERT),0 1))
+  $(error Invalid value for YAUL_OPTION_BUILD_ASSERT (build assert))
+endif
+
 ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
   $(error Undefined YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
 endif
@@ -130,7 +137,8 @@ SH_CFLAGS_shared:= \
 	-Wshadow \
 	-Wunused \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
-	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB)
+	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB) \
+	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 SH_CFLAGS_shared += \
