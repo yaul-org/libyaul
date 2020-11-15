@@ -5,18 +5,19 @@
 #include "sega3d-internal.h"
 
 typedef struct {
-        uint8_t index; 
-        MATRIX matrices[MATRIX_STACK_MAX] __aligned(16);
+        uint8_t index;
 } __aligned(16) matrix_stack_t;
 
-static matrix_stack_t _matrix_stack;
+static matrix_stack_t _matrix_stack = {
+        .index = 0
+};
 
 void
 _internal_matrix_init(void)
 {
         for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
                 FIXED *matrix;
-                matrix = (FIXED *)&_matrix_stack.matrices[i];
+                matrix = (FIXED *)&_internal_state.matrices[i];
 
                 (void)memset(matrix, 0, sizeof(MATRIX));
 
@@ -35,7 +36,7 @@ sega3d_matrix_push(matrix_type_t matrix_type)
 
         if (matrix_type == MATRIX_TYPE_PUSH) {
                 MATRIX *dst_matrix;
-                dst_matrix = &_matrix_stack.matrices[_matrix_stack.index];
+                dst_matrix = &_internal_state.matrices[_matrix_stack.index];
 
                 MATRIX *src_matrix;
                 src_matrix = dst_matrix - 1;
@@ -55,7 +56,7 @@ sega3d_matrix_pop(void)
 const MATRIX *
 sega3d_matrix_top(void)
 {
-        return &_matrix_stack.matrices[_matrix_stack.index];
+        return &_internal_state.matrices[_matrix_stack.index];
 }
 
 void
@@ -63,14 +64,14 @@ sega3d_matrix_load(const MATRIX *matrix)
 {
         assert(matrix != NULL);
 
-        (void)memcpy(&_matrix_stack.matrices[0], matrix, sizeof(MATRIX));
+        (void)memcpy(&_internal_state.matrices[0], matrix, sizeof(MATRIX));
 }
 
 void
 sega3d_matrix_copy(MATRIX *matrix)
 {
         MATRIX *src_matrix;
-        src_matrix = &_matrix_stack.matrices[_matrix_stack.index];
+        src_matrix = &_internal_state.matrices[_matrix_stack.index];
 
         (void)memcpy(matrix, src_matrix, sizeof(MATRIX));
 }
@@ -86,12 +87,12 @@ sega3d_matrix_inverse_push(void)
         }
 
         FIXED *src_matrix;
-        src_matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        src_matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         sega3d_matrix_push(MATRIX_TYPE_MOVE_PTR);
 
         FIXED *dst_matrix;
-        dst_matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        dst_matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         dst_matrix[M00] =  src_matrix[M00];
         dst_matrix[M10] =  src_matrix[M01];
@@ -113,7 +114,7 @@ void
 sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
 {
         FIXED *matrix;
-        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         fix16_vec3_t t;
 
@@ -130,7 +131,7 @@ void
 sega3d_matrix_rotate_x(const ANGLE angle)
 {
         FIXED *matrix;
-        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin = fix16_bradians_sin(bradians);
@@ -155,7 +156,7 @@ void
 sega3d_matrix_rotate_y(const ANGLE angle)
 {
         FIXED *matrix;
-        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin_value = fix16_bradians_sin(bradians);
@@ -180,7 +181,7 @@ void
 sega3d_matrix_rotate_z(const ANGLE angle)
 {
         FIXED *matrix;
-        matrix = (FIXED *)&_matrix_stack.matrices[_matrix_stack.index];
+        matrix = (FIXED *)&_internal_state.matrices[_matrix_stack.index];
 
         const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
         const FIXED sin_value = fix16_bradians_sin(bradians);
