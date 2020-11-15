@@ -144,6 +144,7 @@ static struct {
 static vdp1_cmdt_t _cmdt_end;
 
 static void _sort_iterate(sort_single_t *single);
+static void _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count);
 static void _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count);
 static void _polygon_process(const sega3d_object_t *object, transform_t *trans,
     POLYGON const *polygons, uint32_t polygon_count);
@@ -152,8 +153,37 @@ static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *tran
 static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans,
     vdp1_cmdt_t *cmdt);
 static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt) __hot;
-static bool _world_cull_test(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t *trans) __hot;
+
+static inline FIXED __always_inline __used
+_vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
+{
+        register int32_t tmp1;
+        register int32_t tmp2;
+        register int32_t pt;
+
+        __asm__ volatile ("\tmov %[matrix], %[tmp1]\n"
+                          "\tmov %[p], %[pt]\n"
+                          "\tclrmac\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
+                          "\tmov.l @%[tmp1], %[pt]\n"
+                          "\tsts mach, %[tmp1]\n"
+                          "\tsts macl, %[tmp2]\n"
+                          "\txtrct %[tmp1], %[tmp2]\n"
+                          "add %[tmp2], %[pt]\n"
+            /* Output */
+            : [tmp1] "=&r" (tmp1),
+              [tmp2] "=&r" (tmp2),
+              [pt]   "=&r" (pt)
+            /* Input */
+            : [p]      "r" (p),
+              [matrix] "r" (matrix)
+            : "mach", "macl", "memory");
+
+        return pt;
+}
 
 void
 sega3d_init(void)
@@ -326,9 +356,50 @@ sega3d_object_transform(const sega3d_object_t *object)
 
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
-        _internal_asm_vertex_pool_transform(&_state, trans, pdata->pntbl, vertex_count);
+        /* _internal_asm_vertex_pool_transform(&_state, trans, pdata->pntbl, vertex_count); */
+        _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
         _vertex_pool_clipping(trans, vertex_count);
         _polygon_process(object, trans, pdata->pltbl, polygon_count);
+}
+
+static __noinline __used void
+_vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
+{
+        const FIXED *current_point = (const FIXED *)points;
+        const FIXED *last_point = (const FIXED *)points[vertex_count];
+
+        transform_proj_t *trans_proj;
+        trans_proj = &trans->proj_pool[0];
+
+        const FIXED inv_right = _state.cached_inv_right;
+        const FIXED z_near = _state.info.near;
+
+        do {
+                trans_proj->clip_flags = CLIP_FLAGS_NONE; 
+
+                trans_proj->point_z = _vertex_transform(current_point, &trans->dst_matrix[M20]);
+
+                /* In case the projected Z value is on or behind the near plane */
+                if (trans_proj->point_z <= z_near) {
+                        trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
+
+                        trans_proj->point_z = z_near;
+                }
+
+                cpu_divu_fix16_set(inv_right, trans_proj->point_z);
+
+                const FIXED point_x = _vertex_transform(current_point, &trans->dst_matrix[M00]);
+                const FIXED point_y = _vertex_transform(current_point, &trans->dst_matrix[M10]);
+
+                current_point += 3;
+
+                const FIXED inv_z = cpu_divu_quotient_get();
+
+                trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
+                trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
+ 
+                trans_proj++;
+        } while (current_point <= last_point);
 }
 
 static void
@@ -379,12 +450,6 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
                 trans->polygon[1] = &trans->proj_pool[*(vertices++)];
                 trans->polygon[2] = &trans->proj_pool[*(vertices++)];
                 trans->polygon[3] = &trans->proj_pool[*vertices];
-
-                if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_VIEW) != SEGA3D_OBJECT_FLAGS_NONE) {
-                        if ((_world_cull_test(trans))) {
-                                continue;
-                        }
-                }
 
                 const clip_flags_t and_clip_flags = (trans->polygon[0]->clip_flags &
                                                      trans->polygon[1]->clip_flags &
@@ -453,12 +518,12 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
 
         /* Even when there is not texture list, there is the default texture
          * that zeroes out CMDSRCA and CMDSIZE */
-        if ((attr->sort & UseTexture) == UseTexture) { 
-                const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno);
+        /* if ((attr->sort & UseTexture) == UseTexture) {  */
+        /*         const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno); */
 
-                cmdt->cmd_srca = texture->CGadr;
-                cmdt->cmd_size = texture->HVsize;
-        }
+        /*         cmdt->cmd_srca = texture->CGadr; */
+        /*         cmdt->cmd_size = texture->HVsize; */
+        /* } */
 
         int16_vec2_t *cmd_vertex;
         cmd_vertex = (int16_vec2_t *)(&cmdt->cmd_xa);
@@ -535,52 +600,4 @@ _screen_cull_test(const transform_t *trans __unused)
         const int16_t z = (u.x * v.y) - (u.y * v.x);
 
         return (z >= 0);
-}
-
-static bool
-_world_cull_test(const transform_t * const trans)
-{
-        const FIXED * const p0 = (const FIXED *)trans->polygon[0]->point_z;
-        const FIXED * const p1 = (const FIXED *)trans->polygon[1]->point_z;
-        const FIXED * const p2 = (const FIXED *)trans->polygon[2]->point_z;
-
-        fix16_vec3_t u;
-        fix16_vec3_t v;
-
-        u.x = p1[X] - p0[X];
-        u.y = p1[Y] - p0[Y];
-        u.z = p1[Z] - p0[Z];
-
-        v.x = p2[X] - p0[X];
-        v.y = p2[Y] - p0[Y];
-        v.z = p2[Z] - p0[Z];
-
-        /* We need to drop enough of the fractional part in order to calculate
-         * the dot product between the view and the polygon's normal. Otherwise,
-         * we run into overflow issues */
-        u.x >>= 8;
-        u.y >>= 8;
-        u.z >>= 8;
-
-        v.x >>= 8;
-        v.y >>= 8;
-        v.z >>= 8;
-
-        fix16_vec3_t normal;
-
-        fix16_vec3_cross(&u, &v, &normal);
-
-        fix16_vec3_t view;
-
-        view.x = _state.cached_view[X] - p0[X];
-        view.y = _state.cached_view[Y] - p0[Y];
-        view.z = _state.cached_view[Z] - p0[Z];
-
-        view.x >>= 8;
-        view.y >>= 8;
-        view.z >>= 8;
-
-        const fix16_t dp = fix16_vec3_inline_dot(&view, &normal);
-
-        return (dp <= 0);
 }
