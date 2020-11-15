@@ -47,7 +47,9 @@
 /* Kernel */
 #include <common/ip.h>
 
+#if HAVE_GDB_SUPPORT == 1
 #include <common/gdb/gdb.h>
+#endif /* HAVE_GDB_SUPPORT */
 
 #include <dbgio/dbgio.h>
 
