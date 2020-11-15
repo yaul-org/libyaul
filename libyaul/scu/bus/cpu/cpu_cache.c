@@ -9,7 +9,7 @@
 
 #include <cpu/cache.h>
 
-void __section(".uncached")
+void __uncached_func
 cpu_cache_purge_line(void *addr)
 {
         volatile uint32_t *purge_addr;
@@ -18,7 +18,7 @@ cpu_cache_purge_line(void *addr)
         *purge_addr = 0x00000000;
 }
 
-void __no_reorder __section(".uncached")
+void __uncached_func
 cpu_cache_purge(void)
 {
         volatile uint8_t * const reg_ccr = (volatile uint8_t * const)CPU(CCR);

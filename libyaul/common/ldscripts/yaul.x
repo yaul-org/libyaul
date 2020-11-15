@@ -125,7 +125,10 @@ SECTIONS
   .uncached (0x20000000 | __bss_end) : AT (__bss_end)
   {
      PROVIDE_HIDDEN (__uncached_start = .);
-     *(.uncached)
+
+     *(.uncached_var.*)
+     *(.uncached_func.*)
+
      . = ALIGN (0x10);
      PROVIDE_HIDDEN (__uncached_end = .);
   }
