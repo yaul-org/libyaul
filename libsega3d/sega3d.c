@@ -21,8 +21,6 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
-static_assert(sizeof(transform_proj_t) == 16);
-
 extern void _internal_fog_init(void);
 extern void _internal_matrix_init(void);
 extern void _internal_sort_init(void);
@@ -32,10 +30,7 @@ extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
 extern void _internal_sort_iterate(iterate_fn fn);
 
-extern void _internal_asm_vertex_pool_transform(void *state, transform_t *trans, POINT const * points, uint32_t vertex_count);
-
 static struct {
-        /* Current processing orderlist */
         VECTOR cached_view;
         FIXED cached_inv_top;
         FIXED cached_inv_right;
@@ -47,16 +42,12 @@ static struct {
 static vdp1_cmdt_t _cmdt_end;
 
 static void _sort_iterate(sort_single_t *single);
-static void _vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count);
-static void _vertex_pool_clipping(transform_t *trans, uint32_t vertex_count);
-static void _polygon_process(const sega3d_object_t *object, transform_t *trans,
-    POLYGON const *polygons, uint32_t polygon_count);
-static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans,
-    vdp1_cmdt_t *cmdt);
-static void _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans,
-    vdp1_cmdt_t *cmdt);
-static void _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt) __hot;
-static bool _screen_cull_test(const transform_t *trans) __hot;
+static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
+static void _vertex_pool_clipping(const transform_t * const trans);
+static void _polygon_process(transform_t *trans, POLYGON const *polygons);
+static void _cmdt_prepare(const transform_t * const trans);
+static void _fog_calculate(const transform_t * const trans);
+static bool _screen_cull_test(const transform_t * const trans);
 
 static inline FIXED __always_inline __used
 _vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
@@ -206,9 +197,9 @@ sega3d_object_transform(const sega3d_object_t *object)
 {
         const PDATA * const pdata = object->pdata;
 
-        const uint32_t polygon_count =
+        const uint16_t polygon_count =
             (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
-        const uint32_t vertex_count =
+        const uint16_t vertex_count =
             (pdata->nbPoint < VERTEX_POOL_SIZE) ? pdata->nbPoint : VERTEX_POOL_SIZE;
 
         if ((vertex_count == 0) || (polygon_count == 0)) {
@@ -217,19 +208,21 @@ sega3d_object_transform(const sega3d_object_t *object)
 
         transform_t * const trans = _internal_state.transform;
 
+        trans->object = object;
+        trans->vertex_count = vertex_count;
+        trans->polygon_count = polygon_count;
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
-        /* _internal_asm_vertex_pool_transform(&_state, trans, pdata->pntbl, vertex_count); */
-        _vertex_pool_transform(trans, pdata->pntbl, vertex_count);
-        _vertex_pool_clipping(trans, vertex_count);
-        _polygon_process(object, trans, pdata->pltbl, polygon_count);
+        _vertex_pool_transform(trans, pdata->pntbl);
+        _vertex_pool_clipping(trans);
+        _polygon_process(trans, pdata->pltbl);
 }
 
 static __noinline __used void
-_vertex_pool_transform(transform_t *trans, POINT const * points, uint32_t vertex_count)
+_vertex_pool_transform(const transform_t * const trans, const POINT * const points)
 {
         const FIXED *current_point = (const FIXED *)points;
-        const FIXED *last_point = (const FIXED *)points[vertex_count];
+        const FIXED *last_point = (const FIXED *)points[trans->vertex_count];
 
         transform_proj_t *trans_proj;
         trans_proj = &_internal_state.transform_proj_pool[0];
@@ -273,12 +266,11 @@ _sort_iterate(sort_single_t *single)
         /* No need to clear the end bit, as setting the "source" clobbers the
          * bit */
         trans->current_orderlist->cmdt = single->packet;
-
         trans->current_orderlist++;
 }
 
-static __noinline __used void
-_vertex_pool_clipping(transform_t *trans __unused, uint32_t vertex_count)
+static void
+_vertex_pool_clipping(const transform_t * const trans)
 {
         transform_proj_t *trans_proj;
         trans_proj = &_internal_state.transform_proj_pool[0];
@@ -286,7 +278,10 @@ _vertex_pool_clipping(transform_t *trans __unused, uint32_t vertex_count)
         const int16_t sw_2 = _state.cached_sw_2;
         const int16_t sw_n2 = -_state.cached_sw_2;
         const int16_t sh_2 = _state.cached_sh_2;
-        const int16_t sh_n2 = -_state.cached_sh_2;        
+        const int16_t sh_n2 = -_state.cached_sh_2;
+
+        uint16_t vertex_count;
+        vertex_count = trans->vertex_count;
 
         do {
                 if (trans_proj->screen.x < sw_n2) {
@@ -305,11 +300,13 @@ _vertex_pool_clipping(transform_t *trans __unused, uint32_t vertex_count)
 }
 
 static void
-_polygon_process(const sega3d_object_t *object, transform_t *trans,
-    POLYGON const *polygons, uint32_t polygon_count)
+_polygon_process(transform_t *trans, POLYGON const *polygons)
 {
         transform_proj_t * const transform_proj_pool =            
             &_internal_state.transform_proj_pool[0];
+
+        const sega3d_object_t * const object = trans->object;
+        const uint16_t polygon_count = trans->polygon_count;
 
         for (trans->index = 0; trans->index < polygon_count; trans->index++, polygons++) {
                 const uint16_t * vertices = &polygons->Vertices[0];
@@ -342,7 +339,7 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
                 /* Divide by 4 to get the average (bit shift) */
                 trans->z_center = z_avg >> 2;
 
-                _cmdt_prepare(object, trans, trans->current_cmdt);
+                _cmdt_prepare(trans);
 
                 _internal_sort_add(trans->current_cmdt, fix16_int32_to(trans->z_center) >> 4);
 
@@ -351,9 +348,12 @@ _polygon_process(const sega3d_object_t *object, transform_t *trans,
 }
 
 static void
-_cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt_t *cmdt)
+_cmdt_prepare(const transform_t * const trans)
 {
+        const sega3d_object_t * const object = trans->object;
         const PDATA * const pdata = object->pdata;
+
+        vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 
         const ATTR *attr;
         attr = &pdata->attbl[trans->index];
@@ -415,13 +415,15 @@ _cmdt_prepare(const sega3d_object_t *object, const transform_t *trans, vdp1_cmdt
         cmdt->cmd_grda = attr->gstb;
 
         if ((_internal_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
-                _fog_calculate(trans, cmdt);
+                _fog_calculate(trans);
         }
 }
 
-static __hot void
-_fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
+static void
+_fog_calculate(const transform_t * const trans)
 {
+        vdp1_cmdt_t * const cmdt = trans->current_cmdt;
+
         if (trans->z_center < _internal_state.fog->start_z) {
                 cmdt->cmd_colr = _internal_state.fog->near_ambient_color.raw;
 
@@ -449,8 +451,8 @@ _fog_calculate(const transform_t *trans, vdp1_cmdt_t *cmdt)
         cmdt->cmd_colr = _internal_state.fog->depth_colors[depth_index].raw;
 }
 
-static __hot bool
-_screen_cull_test(const transform_t *trans __unused)
+static bool
+_screen_cull_test(const transform_t * const trans)
 {
         const int16_vec2_t * const p0 = &trans->polygon[0]->screen;
         const int16_vec2_t * const p1 = &trans->polygon[1]->screen;
