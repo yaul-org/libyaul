@@ -86,6 +86,8 @@ typedef struct {
         transform_t * const transform;
         transform_proj_t * const transform_proj_pool;
         MATRIX * const matrices;
+        sort_list_t * const sort_list;
+        sort_single_t * const sort_single_pool;
 } __aligned(16) state_t;
 
 extern state_t _internal_state;
