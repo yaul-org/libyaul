@@ -45,6 +45,8 @@ typedef struct {
         clip_flags_t clip_flags;
 } __aligned(16) transform_proj_t;
 
+static_assert(sizeof(transform_proj_t) == 16);
+
 typedef struct {
         /* Z center of the current polygon */
         FIXED z_center;
@@ -54,6 +56,10 @@ typedef struct {
         const FIXED *dst_matrix;
         /* Current polygon index */
         uint16_t index;
+
+        const sega3d_object_t *object;
+        uint16_t vertex_count;
+        uint16_t polygon_count;
 
         vdp1_cmdt_orderlist_t *current_orderlist;
         vdp1_cmdt_orderlist_t *orderlist;
