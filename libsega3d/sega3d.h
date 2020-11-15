@@ -35,10 +35,6 @@ typedef enum {
 } sega3d_flags_t;
 
 typedef struct {
-        FIXED top;
-        FIXED left;
-        FIXED right;
-        FIXED bottom;
         FIXED ratio;
         FIXED near;
         FIXED focal_length;

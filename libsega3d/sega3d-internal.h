@@ -48,32 +48,33 @@ typedef struct {
 static_assert(sizeof(transform_proj_t) == 16);
 
 typedef struct {
-        /* Z center of the current polygon */
-        FIXED z_center;
-        /* Pointers to the pool that make up the current polygon */
-        transform_proj_t *polygon[4];
-        /* Current matrix */
-        const FIXED *dst_matrix;
-        /* Current polygon index */
-        uint16_t index;
+        const FIXED *dst_matrix;       /* Current matrix */
+        FIXED cached_inv_right;        /* Cached value for projection */
+        int16_t cached_sw_2;           /* Cached half of screen width */
+        int16_t cached_sh_2;           /* Cached half of screen height */
+        uint16_t vertex_count;         /* Current vertex count */
+        uint16_t polygon_count;        /* Current polygon count */
+        uint16_t index;                /* Current polygon index */
+        FIXED z_center;                /* Z center of the current polygon */
+        const transform_proj_t *polygon[4]; /* Pointers to the pool that make up the current polygon */
 
-        const sega3d_object_t *object;
-        uint16_t vertex_count;
-        uint16_t polygon_count;
-
+        const sega3d_object_t *object; /* Current object */
+        
         vdp1_cmdt_orderlist_t *current_orderlist;
         vdp1_cmdt_orderlist_t *orderlist;
         vdp1_cmdt_t *current_cmdt;
 } __aligned(16) transform_t;
 
+static_assert(sizeof(transform_t) == 64);
+
 typedef struct sort_single {
         void *packet;
         struct sort_single *next_single;
-} sort_single_t;
+} __aligned(8) sort_single_t;
 
 typedef struct {
         sort_single_t *first_single;
-} sort_list_t;
+} __aligned(4) sort_list_t;
 
 typedef void (*iterate_fn)(sort_single_t *);
 
@@ -81,6 +82,7 @@ typedef struct {
         flags_t flags;
 
         sega3d_fog_t * const fog;
+        sega3d_info_t * const info;
         transform_t * const transform;
         transform_proj_t * const transform_proj_pool;
         MATRIX * const matrices;
