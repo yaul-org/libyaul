@@ -9,7 +9,7 @@ typedef struct {
         TEXTURE *textures;
         uint16_t count;
         uint16_t cursor;
-} tlist_t;
+} __aligned(16) tlist_t;
 
 static tlist_t _tlist;
 

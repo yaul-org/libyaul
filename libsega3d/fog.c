@@ -70,7 +70,7 @@ _internal_fog_init(void)
 void
 sega3d_fog_set(const sega3d_fog_t *fog)
 {
-        _internal_state.flags &= ~FLAGS_FOG_ENABLED;
+        _internal_state->flags &= ~FLAGS_FOG_ENABLED;
 
         if (fog == NULL) {
                 return;
@@ -80,14 +80,14 @@ sega3d_fog_set(const sega3d_fog_t *fog)
         assert(fog->depth_z != NULL);
         assert(fog->depth_count > 0);
 
-        (void)memcpy(_internal_state.fog, fog, sizeof(sega3d_fog_t));
+        (void)memcpy(_internal_state->fog, fog, sizeof(sega3d_fog_t));
 
-        _internal_state.flags |= FLAGS_FOG_ENABLED;
+        _internal_state->flags |= FLAGS_FOG_ENABLED;
 }
 
 void
 sega3d_fog_limits_set(FIXED start_z, FIXED end_z)
 {
-        _internal_state.fog->start_z = start_z;
-        _internal_state.fog->end_z = end_z;
+        _internal_state->fog->start_z = start_z;
+        _internal_state->fog->end_z = end_z;
 }

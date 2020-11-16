@@ -11,8 +11,8 @@
 
 #include <vdp1/cmdt.h>
 
-#define MATRIX_STACK_MAX        (20)
-#define Z_RANGE                 (1024)
+#define MATRIX_STACK_MAX        (32)
+#define SORT_Z_RANGE            (256)
 #define PACKET_SIZE             (4096)
 #define VERTEX_POOL_SIZE        (1024)
 
@@ -90,6 +90,6 @@ typedef struct {
         sort_single_t * const sort_single_pool;
 } __aligned(16) state_t;
 
-extern state_t _internal_state;
+extern state_t * const _internal_state;
 
 #endif /* SEGA3D_INTERNAL_H_ */
