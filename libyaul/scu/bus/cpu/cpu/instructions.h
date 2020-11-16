@@ -55,6 +55,45 @@ cpu_instr_clrmac(void)
             : "mach", "macl");
 }
 
+static inline void __always_inline
+cpu_instr_macl(void *a, void *b)
+{
+        register uint32_t **ap = a;
+        register uint32_t **bp = b;
+
+        __asm__ volatile ("mac.l @%[a]+, @%[b]+"
+            : [a] "+&r" (*ap),
+              [b] "+&r" (*bp)
+            : /* No inputs */
+            : "mach", "macl", "memory");
+}
+
+static inline uint32_t __always_inline
+cpu_instr_sts_mach(void)
+{
+        register uint32_t out;
+
+        __asm__ volatile ("sts mach, %[out]"
+            : [out] "=r" (out)
+            : /* No inputs */
+            : "0");
+
+        return out;
+}
+
+static inline uint32_t __always_inline
+cpu_instr_sts_macl(void)
+{
+        register uint32_t out;
+
+        __asm__ volatile ("sts macl, %[out]"
+            : [out] "=r" (out)
+            : /* No inputs */
+            : "0");
+
+        return out;
+}
+
 static inline uint32_t __always_inline
 cpu_instr_extsw(const uint32_t rm)
 {
