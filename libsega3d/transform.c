@@ -233,7 +233,7 @@ _vertex_pool_clipping(const transform_t * const trans)
 static void
 _polygon_process(transform_t *trans, POLYGON const *polygons)
 {
-        transform_proj_t * const transform_proj_pool =            
+        transform_proj_t * const transform_proj_pool =
             &_internal_state->transform_proj_pool[0];
 
         const sega3d_object_t * const object = trans->object;
@@ -368,7 +368,7 @@ _fog_calculate(const transform_t * const trans)
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step); 
+        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step);
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;
@@ -389,16 +389,24 @@ _screen_cull_test(const transform_t * const trans)
         const int16_vec2_t * const p1 = &trans->polygon[1]->screen;
         const int16_vec2_t * const p2 = &trans->polygon[2]->screen;
 
-        int16_vec2_t u;
-        int16_vec2_t v;
+        const int16_t a[XY] __aligned(4) = {
+                p1->x - p0->x, /* u.x */
+                p0->y - p1->y  /* u.y */
+        };
 
-        u.x = p1->x - p0->x;
-        u.y = p1->y - p0->y;
+        const int16_t b[XY] __aligned(4) = {
+                p2->y - p0->y, /* v.y */
+                p2->x - p0->x  /* v.x */
+        };
 
-        v.x = p2->x - p0->x;
-        v.y = p2->y - p0->y;
+        const int16_t *a_p = a;
+        const int16_t *b_p = b;
 
-        const int16_t z = (u.x * v.y) - (u.y * v.x);
+        cpu_instr_clrmac();
+        cpu_instr_macw(&a_p, &b_p);
+        cpu_instr_macw(&a_p, &b_p);
+
+        const int16_t z = cpu_instr_sts_macl();
 
         return (z >= 0);
 }
