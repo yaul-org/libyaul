@@ -9,6 +9,7 @@ extern void _internal_sort_iterate(iterate_fn fn);
 
 static void _sort_iterate(sort_single_t *single);
 static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
+
 static void _vertex_pool_clipping(const transform_t * const trans);
 static void _polygon_process(transform_t *trans, POLYGON const *polygons);
 static void _cmdt_prepare(const transform_t * const trans);
@@ -18,33 +19,18 @@ static bool _screen_cull_test(const transform_t * const trans);
 static vdp1_cmdt_t _cmdt_end;
 
 static inline FIXED __always_inline __used
-_vertex_transform(const FIXED * __restrict p, const FIXED * __restrict matrix)
+_vertex_transform2(const FIXED *p, const FIXED *matrix)
 {
-        register int32_t tmp1;
-        register int32_t tmp2;
-        register int32_t pt;
+        cpu_instr_clrmac();
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
 
-        __asm__ volatile ("\tmov %[matrix], %[tmp1]\n"
-                          "\tmov %[p], %[pt]\n"
-                          "\tclrmac\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmac.l @%[pt]+, @%[tmp1]+\n"
-                          "\tmov.l @%[tmp1], %[pt]\n"
-                          "\tsts mach, %[tmp1]\n"
-                          "\tsts macl, %[tmp2]\n"
-                          "\txtrct %[tmp1], %[tmp2]\n"
-                          "add %[tmp2], %[pt]\n"
-            /* Output */
-            : [tmp1] "=&r" (tmp1),
-              [tmp2] "=&r" (tmp2),
-              [pt]   "=&r" (pt)
-            /* Input */
-            : [p]      "r" (p),
-              [matrix] "r" (matrix)
-            : "mach", "macl", "memory");
+        register const uint32_t mach = cpu_instr_sts_mach();
+        register const uint32_t macl = cpu_instr_sts_macl();
+        register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
 
-        return pt;
+        return (xtrct + (*matrix));
 }
 
 void
@@ -117,7 +103,7 @@ static __noinline __used void
 _vertex_pool_transform(const transform_t * const trans, const POINT * const points)
 {
         const FIXED *current_point = (const FIXED *)points;
-        const FIXED *last_point = (const FIXED *)points[trans->vertex_count];
+        const FIXED * const last_point = (const FIXED * const)&points[trans->vertex_count];
 
         transform_proj_t *trans_proj;
         trans_proj = &_internal_state->transform_proj_pool[0];
@@ -125,10 +111,14 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         const FIXED inv_right = trans->cached_inv_right;
         const FIXED z_near = _internal_state->info->near;
 
+        const FIXED * const matrix_x = &trans->dst_matrix[M00];
+        const FIXED * const matrix_y = &trans->dst_matrix[M10];
+        const FIXED * const matrix_z = &trans->dst_matrix[M20];
+
         do {
                 trans_proj->clip_flags = CLIP_FLAGS_NONE; 
 
-                trans_proj->point_z = _vertex_transform(current_point, &trans->dst_matrix[M20]);
+                trans_proj->point_z = _vertex_transform2(current_point, matrix_z);
 
                 /* In case the projected Z value is on or behind the near plane */
                 if (trans_proj->point_z <= z_near) {
@@ -139,10 +129,8 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 
                 cpu_divu_fix16_set(inv_right, trans_proj->point_z);
 
-                const FIXED point_x = _vertex_transform(current_point, &trans->dst_matrix[M00]);
-                const FIXED point_y = _vertex_transform(current_point, &trans->dst_matrix[M10]);
-
-                current_point += 3;
+                const FIXED point_x = _vertex_transform2(current_point, matrix_x);
+                const FIXED point_y = _vertex_transform2(current_point, matrix_y);
 
                 const FIXED inv_z = cpu_divu_quotient_get();
 
@@ -150,6 +138,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                 trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
  
                 trans_proj++;
+                current_point += 3;
         } while (current_point <= last_point);
 }
 
