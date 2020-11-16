@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include <stdlib.h>
 
 #include "sega3d.h"

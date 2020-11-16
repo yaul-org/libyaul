@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include <cpu/divu.h>
 #include <vdp.h>
 
@@ -59,9 +66,10 @@ sega3d_finish(sega3d_results_t *results)
 }
 
 void
-sega3d_object_transform(const sega3d_object_t *object)
+sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
 {
-        const PDATA * const pdata = object->pdata;
+        const PDATA * const object_pdata = object->pdata;
+        const PDATA * const pdata = &object_pdata[pdata_count];
 
         const uint16_t polygon_count =
             (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
@@ -75,6 +83,7 @@ sega3d_object_transform(const sega3d_object_t *object)
         transform_t * const trans = _internal_state->transform;
 
         trans->object = object;
+        trans->pdata = pdata;
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
@@ -273,7 +282,7 @@ static void
 _cmdt_prepare(const transform_t * const trans)
 {
         const sega3d_object_t * const object = trans->object;
-        const PDATA * const pdata = object->pdata;
+        const PDATA * const pdata = trans->pdata;
 
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 

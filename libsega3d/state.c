@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include "sega3d-internal.h"
 
 static sega3d_fog_t _fog;
