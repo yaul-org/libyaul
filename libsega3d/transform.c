@@ -102,6 +102,10 @@ sega3d_object_transform(const sega3d_object_t *object)
 static __noinline __used void
 _vertex_pool_transform(const transform_t * const trans, const POINT * const points)
 {
+#define OFFSET_CPU_DVSR         (0x00)
+#define OFFSET_CPU_DVDNTH       (0x10 / 4)
+#define OFFSET_CPU_DVDNTL       (0x14 / 4)
+
         const FIXED *current_point = (const FIXED *)points;
         const FIXED * const last_point = (const FIXED * const)&points[trans->vertex_count];
 
@@ -109,16 +113,36 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         trans_proj = &_internal_state->transform_proj_pool[0];
 
         const FIXED inv_right = trans->cached_inv_right;
+        const FIXED inv_right_16 = inv_right << 16;
         const FIXED z_near = _internal_state->info->near;
 
-        const FIXED * const matrix_x = &trans->dst_matrix[M00];
-        const FIXED * const matrix_y = &trans->dst_matrix[M10];
         const FIXED * const matrix_z = &trans->dst_matrix[M20];
 
-        do {
-                trans_proj->clip_flags = CLIP_FLAGS_NONE; 
+        register uint32_t * const cpu_divu_regs = (uint32_t *)CPU(DVSR);
 
-                trans_proj->point_z = _vertex_transform2(current_point, matrix_z);
+        do {
+                cpu_instr_clrmac();
+
+                const FIXED *matrix_p = matrix_z;
+
+                trans_proj->clip_flags = CLIP_FLAGS_NONE;
+
+                cpu_instr_macl(&current_point, &matrix_p);
+                const uint32_t dh1 = cpu_instr_swapw(inv_right);
+                cpu_instr_macl(&current_point, &matrix_p);
+                const uint32_t dh2 = cpu_instr_extsw(dh1);
+                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_divu_regs[OFFSET_CPU_DVDNTH] = dh2;
+
+                register const uint32_t z_mach = cpu_instr_sts_mach();
+
+                const uint32_t tz = *matrix_p;
+
+                const uint32_t z_macl = cpu_instr_sts_macl();
+                current_point -= XYZ;
+                const uint32_t z_xtrct = cpu_instr_xtrct(z_mach, z_macl);
+
+                trans_proj->point_z = (z_xtrct + tz);
 
                 /* In case the projected Z value is on or behind the near plane */
                 if (trans_proj->point_z <= z_near) {
@@ -127,18 +151,47 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                         trans_proj->point_z = z_near;
                 }
 
-                cpu_divu_fix16_set(inv_right, trans_proj->point_z);
+                cpu_instr_clrmac();
 
-                const FIXED point_x = _vertex_transform2(current_point, matrix_x);
-                const FIXED point_y = _vertex_transform2(current_point, matrix_y);
+                matrix_p -= M23; /* Move back to start of matrix */
 
-                const FIXED inv_z = cpu_divu_quotient_get();
+                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_divu_regs[OFFSET_CPU_DVSR] = trans_proj->point_z;
+                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_divu_regs[OFFSET_CPU_DVDNTL] = inv_right_16;
+                cpu_instr_macl(&current_point, &matrix_p);
+
+                const uint32_t x_mach = cpu_instr_sts_mach();
+                const uint32_t tx = *matrix_p;
+                const uint32_t x_macl = cpu_instr_sts_macl();
+                matrix_p++;
+
+                const uint32_t x_xtrct = cpu_instr_xtrct(x_mach, x_macl);
+
+                cpu_instr_clrmac();
+
+                current_point -= XYZ;
+
+                const FIXED point_x = (x_xtrct + tx);
+
+                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_p);
+
+                const uint32_t y_mach = cpu_instr_sts_mach();
+                const uint32_t y_macl = cpu_instr_sts_macl();
+                const uint32_t ty = *matrix_p;
+                const uint32_t y_xtrct = cpu_instr_xtrct(y_mach, y_macl);
+
+                const FIXED point_y = (y_xtrct + ty);
+
+                const FIXED inv_z = cpu_divu_regs[0x14 / 4];
 
                 trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
+
                 trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
- 
+
                 trans_proj++;
-                current_point += 3;
         } while (current_point <= last_point);
 }
 
