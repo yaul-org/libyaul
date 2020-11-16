@@ -60,7 +60,7 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
 
         _internal_sort_clear();
 
-        transform_t * const trans = _internal_state.transform;
+        transform_t * const trans = _internal_state->transform;
 
         trans->orderlist = orderlist;
         trans->current_orderlist = &orderlist[orderlist_offset];
@@ -72,7 +72,7 @@ sega3d_finish(sega3d_results_t *results)
 {
         _internal_sort_iterate(_sort_iterate);
 
-        transform_t * const trans = _internal_state.transform;
+        transform_t * const trans = _internal_state->transform;
 
         /* Fetch the last command table pointer before setting the indirect mode
          * transfer end bit */
@@ -101,7 +101,7 @@ sega3d_object_transform(const sega3d_object_t *object)
                 return;
         }
 
-        transform_t * const trans = _internal_state.transform;
+        transform_t * const trans = _internal_state->transform;
 
         trans->object = object;
         trans->vertex_count = vertex_count;
@@ -120,10 +120,10 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         const FIXED *last_point = (const FIXED *)points[trans->vertex_count];
 
         transform_proj_t *trans_proj;
-        trans_proj = &_internal_state.transform_proj_pool[0];
+        trans_proj = &_internal_state->transform_proj_pool[0];
 
         const FIXED inv_right = trans->cached_inv_right;
-        const FIXED z_near = _internal_state.info->near;
+        const FIXED z_near = _internal_state->info->near;
 
         do {
                 trans_proj->clip_flags = CLIP_FLAGS_NONE; 
@@ -156,7 +156,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 static void
 _sort_iterate(sort_single_t *single)
 {
-        transform_t * const trans = _internal_state.transform;
+        transform_t * const trans = _internal_state->transform;
 
         /* No need to clear the end bit, as setting the "source" clobbers the
          * bit */
@@ -168,7 +168,7 @@ static void
 _vertex_pool_clipping(const transform_t * const trans)
 {
         transform_proj_t *trans_proj;
-        trans_proj = &_internal_state.transform_proj_pool[0];
+        trans_proj = &_internal_state->transform_proj_pool[0];
 
         const int16_t sw_2 = trans->cached_sw_2;
         const int16_t sw_n2 = -trans->cached_sw_2;
@@ -198,7 +198,7 @@ static void
 _polygon_process(transform_t *trans, POLYGON const *polygons)
 {
         transform_proj_t * const transform_proj_pool =            
-            &_internal_state.transform_proj_pool[0];
+            &_internal_state->transform_proj_pool[0];
 
         const sega3d_object_t * const object = trans->object;
         const uint16_t polygon_count = trans->polygon_count;
@@ -309,7 +309,7 @@ _cmdt_prepare(const transform_t * const trans)
 
         cmdt->cmd_grda = attr->gstb;
 
-        if ((_internal_state.flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
+        if ((_internal_state->flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
                 _fog_calculate(trans);
         }
 }
@@ -319,31 +319,31 @@ _fog_calculate(const transform_t * const trans)
 {
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 
-        if (trans->z_center < _internal_state.fog->start_z) {
-                cmdt->cmd_colr = _internal_state.fog->near_ambient_color.raw;
+        if (trans->z_center < _internal_state->fog->start_z) {
+                cmdt->cmd_colr = _internal_state->fog->near_ambient_color.raw;
 
                 return;
         }
 
-        if (trans->z_center >= _internal_state.fog->end_z) {
-                cmdt->cmd_colr = _internal_state.fog->far_ambient_color.raw;
+        if (trans->z_center >= _internal_state->fog->end_z) {
+                cmdt->cmd_colr = _internal_state->fog->far_ambient_color.raw;
 
                 return;
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state.fog->step); 
+        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step); 
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;
         }
-        if (int_z_depth >= _internal_state.fog->depth_count) {
-                int_z_depth = _internal_state.fog->depth_count - 1;
+        if (int_z_depth >= _internal_state->fog->depth_count) {
+                int_z_depth = _internal_state->fog->depth_count - 1;
         }
 
-        const int32_t depth_index = _internal_state.fog->depth_z[int_z_depth];
+        const int32_t depth_index = _internal_state->fog->depth_z[int_z_depth];
 
-        cmdt->cmd_colr = _internal_state.fog->depth_colors[depth_index].raw;
+        cmdt->cmd_colr = _internal_state->fog->depth_colors[depth_index].raw;
 }
 
 static bool

@@ -31,11 +31,11 @@ void
 sega3d_init(void)
 {        
         /* Prevent re-initialization */
-        if ((_internal_state.flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
+        if ((_internal_state->flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
                 return;
         }
 
-        _internal_state.flags = FLAGS_INITIALIZED;
+        _internal_state->flags = FLAGS_INITIALIZED;
 
         sega3d_perspective_set(DEGtoANG(90.0f));
 
@@ -52,7 +52,7 @@ sega3d_perspective_set(ANGLE fov)
 #define AW_2 FIX16(12.446f) /* ([film-aperature-width = 0.980] * inch->mm) / 2) */
 #define AH_2 FIX16(9.3345f) /* ([film-aperature-height = 0.735] * inch->mm) / 2) */
 
-        transform_t * const trans = _internal_state.transform;
+        transform_t * const trans = _internal_state->transform;
 
         const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1;
 
@@ -75,17 +75,17 @@ sega3d_perspective_set(ANGLE fov)
         
 
         cpu_divu_fix16_set(screen_width, screen_height);
-        _internal_state.info->ratio = cpu_divu_quotient_get();
+        _internal_state->info->ratio = cpu_divu_quotient_get();
 
         cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
-        _internal_state.info->focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
+        _internal_state->info->focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
 
-        _internal_state.info->near = _internal_state.info->focal_length;
+        _internal_state->info->near = _internal_state->info->focal_length;
 
-        cpu_divu_fix16_set(AH_2, _internal_state.info->focal_length);
+        cpu_divu_fix16_set(AH_2, _internal_state->info->focal_length);
 
         const FIXED top = cpu_divu_quotient_get();
-        const FIXED right = -fix16_mul(-top, _internal_state.info->ratio);
+        const FIXED right = -fix16_mul(-top, _internal_state->info->ratio);
 
         cpu_divu_fix16_set(screen_width, right << 1);
         trans->cached_inv_right = cpu_divu_quotient_get();
@@ -94,7 +94,7 @@ sega3d_perspective_set(ANGLE fov)
 void
 sega3d_info_get(sega3d_info_t *info)
 {
-        (void)memcpy(info, _internal_state.info, sizeof(sega3d_info_t));
+        (void)memcpy(info, _internal_state->info, sizeof(sega3d_info_t));
 }
 
 Uint16
