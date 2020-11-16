@@ -1,5 +1,8 @@
 /*
- * No copyright.
+ * Copyright (c) 2020
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
  */
 
 #ifndef SEGA3D_H_
@@ -12,6 +15,7 @@
 #include <vdp1/cmdt.h>
 
 #include "sgl.h"
+#include "ztp.h"
 
 typedef struct sega3d_object sega3d_object_t;
 
@@ -56,9 +60,15 @@ typedef struct {
 } sega3d_results_t;
 
 struct sega3d_object {
-        void *pdata;
         sega3d_flags_t flags;
-        void *data;
+
+        void *pdata;
+        uint16_t pdata_count;
+
+        FIXED origin[XYZ];
+        FIXED bb_length[XYZ];
+
+        void *user_data;
 };
 
 extern void sega3d_init(void);
@@ -93,6 +103,6 @@ extern void sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_of
 extern void sega3d_finish(sega3d_results_t *results);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
-extern void sega3d_object_transform(const sega3d_object_t *object);
+extern void sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata);
 
 #endif /* SEGA3D_H_ */
