@@ -68,7 +68,7 @@ sega3d_finish(sega3d_results_t *results)
 void
 sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
 {
-        const PDATA * const object_pdata = object->pdata;
+        const PDATA * const object_pdata = object->pdatas;
         const PDATA * const pdata = &object_pdata[pdata_count];
 
         const uint16_t polygon_count =

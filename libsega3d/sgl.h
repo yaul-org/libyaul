@@ -5,6 +5,8 @@
 #ifndef SEGA3D_SGL_H_
 #define SEGA3D_SGL_H_
 
+#include <sys/cdefs.h>
+
 /* XXX: Hack: There is a strange compilation warning with ATTRIBUTE */
 #pragma GCC diagnostic ignored "-Wpedantic"
 
@@ -211,7 +213,7 @@ typedef struct {
         POLYGON *pltbl;
         Uint32 nbPolygon;
         ATTR *attbl;
-} PDATA;
+} __packed __aligned(4) PDATA;
 
 typedef struct {
         POINT *pntbl;
@@ -220,7 +222,7 @@ typedef struct {
         Uint32 nbPolygon;
         ATTR *attbl;
         VECTOR *vntbl;
-} XPDATA;
+} __packed __aligned(4) XPDATA;
 
 typedef struct OBJECT {
         PDATA *pat;
