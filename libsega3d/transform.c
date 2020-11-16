@@ -18,21 +18,6 @@ static bool _screen_cull_test(const transform_t * const trans);
 
 static vdp1_cmdt_t _cmdt_end;
 
-static inline FIXED __always_inline __used
-_vertex_transform2(const FIXED *p, const FIXED *matrix)
-{
-        cpu_instr_clrmac();
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
-
-        register const uint32_t mach = cpu_instr_sts_mach();
-        register const uint32_t macl = cpu_instr_sts_macl();
-        register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
-
-        return (xtrct + (*matrix));
-}
-
 void
 _internal_transform_init(void)
 {
@@ -99,7 +84,7 @@ sega3d_object_transform(const sega3d_object_t *object)
         _polygon_process(trans, pdata->pltbl);
 }
 
-static __noinline __used void
+static void
 _vertex_pool_transform(const transform_t * const trans, const POINT * const points)
 {
 #define OFFSET_CPU_DVSR         (0x00)
