@@ -56,6 +56,19 @@ cpu_instr_clrmac(void)
 }
 
 static inline void __always_inline
+cpu_instr_macw(void *a, void *b)
+{
+        register uint16_t **ap = a;
+        register uint16_t **bp = b;
+
+        __asm__ volatile ("mac.w @%[a]+, @%[b]+"
+            : [a] "+&r" (*ap),
+              [b] "+&r" (*bp)
+            : /* No inputs */
+            : "mach", "macl", "memory");
+}
+
+static inline void __always_inline
 cpu_instr_macl(void *a, void *b)
 {
         register uint32_t **ap = a;
