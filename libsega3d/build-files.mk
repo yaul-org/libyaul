@@ -7,8 +7,7 @@ LIB_SRCS:= \
 	transform.c \
 	sort.c \
 	matrix_stack.c \
-	fog.c \
-	vertex_pool_transform.sx
+	fog.c
 
 INSTALL_HEADER_FILES:= \
 	./:sega3d.h:./sega3d/ \
