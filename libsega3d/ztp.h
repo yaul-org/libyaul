@@ -8,6 +8,7 @@
 #ifndef SEGA3D_ZTP_H_
 #define SEGA3D_ZTP_H_
 
+#include <stdint.h>
 #include <sys/cdefs.h>
 
 #include "sgl.h"
@@ -15,8 +16,8 @@
 typedef struct {
         uint16_t pdata_count; /* Total amount of PDATA */
         uint16_t tex_count;   /* Total amount of textures */
-        uint32_t tex_size;    /* To quickly load from disk, that's the size of the textures in bytes */
-        uint32_t pdata_size;  /* To quickly load from disk, total size of PDATA in bytes */
+        uint32_t tex_size;    /* Total size of the textures in bytes */
+        uint32_t pdata_size;  /* Total size of PDATA in bytes */
         /* Origin point used to "center" the culling/collision data and your
          * model's position. Should be 0,0,0 unless you have an offset */
         FIXED origin[XYZ];
@@ -28,6 +29,8 @@ typedef struct {
          * frames */
         uint16_t framerate;
         void *animation;
-} __packed sega3d_ztp_t;
+} __packed __aligned(4) sega3d_ztp_t;
+
+static_assert(sizeof(sega3d_ztp_t) == 44);
 
 #endif /* SEGA3D_ZTP_H_ */
