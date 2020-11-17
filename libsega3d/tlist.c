@@ -91,13 +91,12 @@ sega3d_tlist_tex_append(void)
         assert(_tlist.textures != NULL);
         assert(_tlist.count != 0);
 
-        uint32_t next_cursor;
-        next_cursor = (uint32_t)_tlist.cursor + 1;
+        const uint32_t next_cursor = (uint32_t)_tlist.cursor + 1;
 
         assert(next_cursor < _tlist.count);
 
-        TEXTURE *next_texture;
-        next_texture = sega3d_tlist_tex_get(next_cursor); 
+        TEXTURE * const next_texture =
+            sega3d_tlist_tex_get(next_cursor); 
 
         _tlist.count = next_cursor;
 
@@ -107,18 +106,11 @@ sega3d_tlist_tex_append(void)
 TEXTURE *
 sega3d_tlist_tex_get(uint16_t cursor)
 {
-        if (_tlist.count == 0) {
-                return NULL;
+        if ((_tlist.count <= cursor) || (_tlist.textures == NULL)) {
+                return &_default_texture[0];
         }
 
-        if (_tlist.textures == NULL) {
-                return NULL;
-        }
-
-        assert(cursor < _tlist.count);
-
-        TEXTURE *texture;
-        texture = &_tlist.textures[cursor];
+        TEXTURE * const texture = &_tlist.textures[cursor];
 
         return texture;
 }

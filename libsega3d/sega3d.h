@@ -105,6 +105,7 @@ extern void sega3d_finish(sega3d_results_t *results);
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata);
 
-extern void sega3d_ztp_pdata_patch(sega3d_object_t *object, sega3d_ztp_t *ztp);
+extern void sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp);
+extern void sega3d_ztp_texs_get(const sega3d_ztp_t *ztp, sega3d_ztp_tex_t *ztp_texs);
 
 #endif /* SEGA3D_H_ */
