@@ -390,17 +390,30 @@ _screen_cull_test(const transform_t * const trans)
         const int16_vec2_t * const p0 = &trans->polygon[0]->screen;
         const int16_vec2_t * const p1 = &trans->polygon[1]->screen;
         const int16_vec2_t * const p2 = &trans->polygon[2]->screen;
+        const int16_vec2_t * const p3 = &trans->polygon[3]->screen;
 
-        int16_vec2_t u;
-        int16_vec2_t v;
+        const int16_vec2_t u1 = {
+                .x = p1->x - p0->x,
+                .y = p1->y - p0->y
+        };
 
-        u.x = p1->x - p0->x;
-        u.y = p1->y - p0->y;
+        const int16_vec2_t v1 = {
+                .x = p2->x - p0->x,
+                .y = p2->y - p0->y
+        };
 
-        v.x = p2->x - p0->x;
-        v.y = p2->y - p0->y;
+        const int16_t z1 = (u1.x * v1.y) - (u1.y * v1.x);
 
-        const int16_t z = (u.x * v.y) - (u.y * v.x);
+        if (z1 < 0) {
+                return false;
+        }
 
-        return (z >= 0);
+        const int16_vec2_t v2 = {
+                .x = p3->x - p0->x,
+                .y = p3->y - p0->y
+        };
+        
+        const int16_t z2 = (v1.x * v2.y) - (v1.y * v2.x);
+
+        return (z2 >= 0);
 }
