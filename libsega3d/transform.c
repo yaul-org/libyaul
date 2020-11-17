@@ -317,12 +317,14 @@ _cmdt_prepare(const transform_t * const trans)
 
         /* Even when there is not texture list, there is the default texture
          * that zeroes out CMDSRCA and CMDSIZE */
-        /* if ((attr->sort & UseTexture) == UseTexture) {  */
-        /*         const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno); */
+        if ((attr->sort & UseTexture) == UseTexture) {
+                const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno);
 
-        /*         cmdt->cmd_srca = texture->CGadr; */
-        /*         cmdt->cmd_size = texture->HVsize; */
-        /* } */
+                cmdt->cmd_srca = texture->CGadr;
+                cmdt->cmd_size = texture->HVsize;
+
+                cmdt->cmd_pmod |= VDP1_CMDT_PMOD_HSS_ENABLE;
+        }
 
         int16_vec2_t *cmd_vertex;
         cmd_vertex = (int16_vec2_t *)(&cmdt->cmd_xa);

@@ -13,6 +13,13 @@
 
 #include "sgl.h"
 
+#define SEGA3D_ZTP_CMODE_CLUT           (0)
+#define SEGA3D_ZTP_CMODE_16             (1)
+#define SEGA3D_ZTP_CMODE_64             (2)
+#define SEGA3D_ZTP_CMODE_128            (3)
+#define SEGA3D_ZTP_CMODE_256            (4)
+#define SEGA3D_ZTP_CMODE_RGB1555        (5)
+
 typedef struct {
         uint16_t pdata_count; /* Total amount of PDATA */
         uint16_t tex_count;   /* Total amount of textures */
@@ -24,12 +31,20 @@ typedef struct {
         /* Length along the X,Y,Z axis. Together with the origin, that gives you
          * the bounding box for quick broad collision testing */
         FIXED length[XYZ];
-        uint16_t frame_count;
+        uint16_t frame_count; /* Number of animation frames */
         /* Interpolation factor of 2, means the number of frames between 2 key
          * frames */
         uint16_t framerate;
         void *animation;
 } __packed __aligned(4) sega3d_ztp_t;
+
+typedef struct {
+        uint16_t width;
+        uint16_t height;
+        uint16_t color_mode;
+        void *cg;
+        void *palette;
+} __packed __aligned(4) sega3d_ztp_tex_t;
 
 static_assert(sizeof(sega3d_ztp_t) == 44);
 

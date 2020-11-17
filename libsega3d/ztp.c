@@ -13,14 +13,31 @@
 
 #include "sega3d-internal.h"
 
+/* This is the internal representation. We want to not expose the current
+ * implementation */
+typedef struct {
+        uint16_t width;
+        uint16_t height;
+        uint16_t color_mode;  /* Color type: 16 or 256 */
+        uint16_t color_count;
+        uint16_t *data;       /* The palette index for the pixels */
+} __packed internal_tex_t;
+
 void
-sega3d_ztp_pdata_patch(sega3d_object_t *object, sega3d_ztp_t *ztp)
+sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp)
 {
         PDATA * const pdatas = malloc(ztp->pdata_count * sizeof(PDATA));
         assert(pdatas != NULL);
 
         object->pdatas = pdatas;
         object->pdata_count = ztp->pdata_count;
+        object->origin[X] = ztp->origin[X];
+        object->origin[Y] = ztp->origin[Y];
+        object->origin[Z] = ztp->origin[Z];
+
+        object->bb_length[X] = ztp->length[X];
+        object->bb_length[Y] = ztp->length[Y];
+        object->bb_length[Z] = ztp->length[Z];
 
         uintptr_t base_p = ((uintptr_t)ztp + sizeof(sega3d_ztp_t) + ztp->tex_size);
 
@@ -45,5 +62,69 @@ sega3d_ztp_pdata_patch(sega3d_object_t *object, sega3d_ztp_t *ztp)
 
                 pdata->nbPoint = base_pdata->nbPoint;
                 pdata->nbPolygon = base_pdata->nbPolygon;
+        }
+}
+
+void
+sega3d_ztp_texs_get(const sega3d_ztp_t *ztp, sega3d_ztp_tex_t *ztp_texs)
+{
+        assert(ztp_texs != NULL);
+
+        sega3d_ztp_tex_t *ztp_tex;
+        ztp_tex = ztp_texs;
+
+        uintptr_t base_p = ((uintptr_t)ztp + sizeof(sega3d_ztp_t));
+
+        for (uint16_t tex_num = 0; tex_num < ztp->tex_count; tex_num++) {
+                const internal_tex_t * const tex = (internal_tex_t *)base_p;
+
+                base_p += sizeof(internal_tex_t);
+
+                ztp_tex->width = tex->width;
+                ztp_tex->height = tex->height;
+                ztp_tex->cg = (void *)base_p;
+
+                uint32_t tex_size;
+                tex_size = (tex->width * tex->height);
+
+                /* Right now, only 16-color (CLUT? color bank?) is supported */
+                switch (tex->color_mode) {
+                default:
+                        ztp_tex->color_mode = SEGA3D_ZTP_CMODE_CLUT;
+                        tex_size /= 2;
+                        break;
+                }
+
+                base_p += tex_size;
+                ztp_tex++;
+        }
+
+        ztp_tex = ztp_texs;
+
+        for (uint16_t tex_num = 0; tex_num < ztp->tex_count; tex_num++) {
+                ztp_tex->palette = (void *)base_p;
+
+                uint32_t palette_size;
+                palette_size = 0;
+
+                switch (ztp_tex->color_mode) {
+                case SEGA3D_ZTP_CMODE_CLUT:
+                case SEGA3D_ZTP_CMODE_16:
+                        palette_size = 16 * sizeof(color_rgb1555_t);
+                        break;
+                case SEGA3D_ZTP_CMODE_64:
+                        palette_size = 64 * sizeof(color_rgb1555_t);
+                        break;
+                case SEGA3D_ZTP_CMODE_128:
+                        palette_size = 128 * sizeof(color_rgb1555_t);
+                        break;
+                case SEGA3D_ZTP_CMODE_256:
+                        palette_size = 256 * sizeof(color_rgb1555_t);
+                        break;
+                case SEGA3D_ZTP_CMODE_RGB1555:
+                        break;
+                }
+
+                base_p += palette_size;
         }
 }
