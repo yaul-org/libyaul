@@ -35,9 +35,16 @@ sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp)
         object->origin[Y] = ztp->origin[Y];
         object->origin[Z] = ztp->origin[Z];
 
-        object->bb_length[X] = ztp->length[X];
-        object->bb_length[Y] = ztp->length[Y];
-        object->bb_length[Z] = ztp->length[Z];
+        object->cull_type = SEGA3D_CULL_TYPE_BOX;
+
+        sega3d_box_t * const box = malloc(sizeof(sega3d_box_t));
+        assert(box != NULL);
+
+        box->length[X] = ztp->length[X];
+        box->length[Y] = ztp->length[Y];
+        box->length[Z] = ztp->length[Z];
+
+        object->cull_data = box;
 
         uintptr_t base_p = ((uintptr_t)ztp + sizeof(sega3d_ztp_t) + ztp->tex_size);
 

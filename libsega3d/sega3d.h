@@ -35,8 +35,16 @@ typedef enum {
         /// Cull in world space
         SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 2,
         /// Cull in screen space
-        SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3
+        SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3,
+        /// Cull object
+        SEGA3D_OBJECT_FLAGS_CULL_OBJECT   = 1 << 4,
 } sega3d_flags_t;
+
+typedef enum {
+        SEGA3D_CULL_TYPE_NONE   = 0,
+        SEGA3D_CULL_TYPE_SPHERE = 1 << 0,
+        SEGA3D_CULL_TYPE_BOX    = 1 << 1
+} sega3d_cull_type_t;
 
 typedef struct {
         FIXED ratio;         /* Screen ratio */
@@ -46,9 +54,13 @@ typedef struct {
          * is */
         uint16_t level;
         FIXED view_distance; /* Distance between view point (eye) and view plane */
+
+        /* XXX: This can be simplified down to using 8-bit vectors for the
+         *      normal */
+        fix16_plane_t clip_planes[6];
 } __aligned(4) sega3d_info_t;
 
-static_assert(sizeof(sega3d_info_t) == 20);
+static_assert(sizeof(sega3d_info_t) > 128);
 
 typedef struct {
         const color_rgb1555_t * const depth_colors;
@@ -65,6 +77,14 @@ typedef struct {
         uint16_t count;
 } sega3d_results_t;
 
+typedef struct {
+        FIXED radius;
+} sega3d_sphere_t;
+
+typedef struct {
+        FIXED length[XYZ];
+} sega3d_box_t;
+
 struct sega3d_object {
         sega3d_flags_t flags;
 
@@ -72,7 +92,8 @@ struct sega3d_object {
         uint16_t pdata_count;
 
         FIXED origin[XYZ];
-        FIXED bb_length[XYZ];
+        sega3d_cull_type_t cull_type;
+        void *cull_data;
 
         void *user_data;
 };

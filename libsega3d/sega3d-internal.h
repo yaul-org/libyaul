@@ -37,7 +37,7 @@ typedef enum {
         CLIP_FLAGS_RIGHT  = 1 << 3,
         CLIP_FLAGS_TOP    = 1 << 4,
         CLIP_FLAGS_BOTTOM = 1 << 5,
-        CLIP_FLAGS_SIDE   = 1 << 6,
+        CLIP_FLAGS_SIDE   = 1 << 6
 } clip_flags_t;
 
 typedef struct {

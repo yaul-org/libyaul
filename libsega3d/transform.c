@@ -22,6 +22,22 @@ static void _polygon_process(transform_t *trans, POLYGON const *polygons);
 static void _cmdt_prepare(const transform_t * const trans);
 static void _fog_calculate(const transform_t * const trans);
 static bool _screen_cull_test(const transform_t * const trans);
+static bool _object_cull_test(const transform_t * const trans);
+
+static inline FIXED __always_inline __unused
+_point_transform(const FIXED *p, const FIXED *matrix)
+{
+        cpu_instr_clrmac();
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
+
+        register const uint32_t mach = cpu_instr_sts_mach();
+        register const uint32_t macl = cpu_instr_sts_macl();
+        register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
+
+        return (xtrct + (*matrix));
+}
 
 static vdp1_cmdt_t _cmdt_end;
 
@@ -88,6 +104,12 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
         trans->polygon_count = polygon_count;
         trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
+        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_OBJECT) != SEGA3D_OBJECT_FLAGS_NONE) {
+                if ((_object_cull_test(trans))) {
+                        return;
+                }
+        }
+
         _vertex_pool_transform(trans, pdata->pntbl);
         _vertex_pool_clipping(trans);
         _polygon_process(trans, pdata->pltbl);
@@ -100,7 +122,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 #define OFFSET_CPU_DVDNTH       (0x10 / 4)
 #define OFFSET_CPU_DVDNTL       (0x14 / 4)
 
-        sega3d_info_t * const info = _internal_state->info;
+        const sega3d_info_t * const info = _internal_state->info;
 
         const FIXED *current_point = (const FIXED *)points;
         const FIXED * const last_point = (const FIXED * const)&points[trans->vertex_count];
@@ -418,4 +440,57 @@ _screen_cull_test(const transform_t * const trans)
         const int16_t z2 = (v1.x * v2.y) - (v1.y * v2.x);
 
         return (z2 >= 0);
+}
+
+static bool
+_object_cull_test(const transform_t * const trans)
+{
+        const sega3d_info_t * const info = _internal_state->info;
+        const sega3d_object_t * const object = trans->object;
+        const sega3d_sphere_t * const sphere = object->cull_data;
+
+        /* Transform the origin */
+        const FIXED view_distance = info->view_distance;
+        const FIXED ratio = info->ratio;
+
+        const FIXED * const matrix = trans->dst_matrix;
+
+        /* FIXED trans_point[XYZ]; */
+        fix16_vec3_t trans_point;
+
+        trans_point.z = _point_transform(&object->origin[Z], &matrix[M20]);
+        cpu_divu_fix16_set(view_distance, trans_point.z);
+        trans_point.x = _point_transform(&object->origin[X], &matrix[M00]);
+        trans_point.y = _point_transform(&object->origin[Y], &matrix[M10]);
+
+        const FIXED inverse_z = cpu_divu_quotient_get();
+
+        trans_point.x = fix16_mul(trans_point.x, inverse_z);
+        trans_point.y = fix16_mul(fix16_mul(trans_point.y, ratio), inverse_z);
+
+        clip_flags_t clip_flag;
+        clip_flag = CLIP_FLAGS_NONE;
+
+        for (uint32_t i = 0; i < 6; i++) {
+                const fix16_plane_t * const plane = &info->clip_planes[0];
+
+                fix16_vec3_t cp;
+                fix16_vec3_sub(&trans_point, &plane->d, &cp);
+
+                const fix16_t intersect_dot = fix16_vec3_dot(&cp, &cp);
+
+                if (intersect_dot < sphere->radius) {
+                        clip_flag |= CLIP_FLAGS_SIDE;
+
+                        continue;
+                }
+
+                const fix16_t side = fix16_vec3_dot(&cp, &plane->normal);
+
+                if (side > 0) {
+                        clip_flag |= CLIP_FLAGS_SIDE;
+                }
+        }
+
+        return (clip_flag != CLIP_FLAGS_SIDE);
 }
