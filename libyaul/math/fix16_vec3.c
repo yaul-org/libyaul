@@ -86,7 +86,7 @@ fix16_vec3_cross_mag(const fix16_vec3_t * __restrict v0,
         return result;
 }
 
-void
+uint32_t
 fix16_vec3_str(const fix16_vec3_t *v0, char *buf, int decimals)
 {
         char component_buf[13] __aligned(16);
@@ -115,4 +115,6 @@ fix16_vec3_str(const fix16_vec3_t *v0, char *buf, int decimals)
         *buf_ptr++ = ')';
 
         *buf_ptr = '\0';
+
+        return (buf_ptr - buf);
 }

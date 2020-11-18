@@ -159,12 +159,13 @@ endif
 LIB_SRCS+= \
 	math/color.c \
 	math/fix16.c \
+	math/fix16_mat3.c \
+	math/fix16_plane.c \
 	math/fix16_sqrt.c \
 	math/fix16_str.c \
 	math/fix16_trig.c \
 	math/fix16_vec2.c \
 	math/fix16_vec3.c \
-	math/fix16_mat3.c \
 	math/int16.c \
 	math/uint32.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
@@ -254,6 +255,7 @@ INSTALL_HEADER_FILES+= \
 	./math/:fix.h:yaul/math/ \
 	./math/:fix16.h:yaul/math/ \
 	./math/:fix16_mat3.h:yaul/math/ \
+	./math/:fix16_plane.h:yaul/math/ \
 	./math/:fix16_trig.h:yaul/math/ \
 	./math/:fix16_vec2.h:yaul/math/ \
 	./math/:fix16_vec3.h:yaul/math/ \
