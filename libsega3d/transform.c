@@ -100,15 +100,18 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 #define OFFSET_CPU_DVDNTH       (0x10 / 4)
 #define OFFSET_CPU_DVDNTL       (0x14 / 4)
 
+        sega3d_info_t * const info = _internal_state->info;
+
         const FIXED *current_point = (const FIXED *)points;
         const FIXED * const last_point = (const FIXED * const)&points[trans->vertex_count];
 
         transform_proj_t *trans_proj;
         trans_proj = &_internal_state->transform_proj_pool[0];
 
-        const FIXED inv_right = trans->cached_inv_right;
-        const FIXED inv_right_16 = inv_right << 16;
-        const FIXED z_near = _internal_state->info->near;
+        const FIXED view_distance = info->view_distance;
+        const FIXED view_distance_16 = view_distance << 16;
+        const FIXED z_near = info->near;
+        const FIXED ratio = info->ratio;
 
         const FIXED * const matrix_z = &trans->dst_matrix[M20];
 
@@ -122,7 +125,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
                 cpu_instr_macl(&current_point, &matrix_p);
-                const uint32_t dh1 = cpu_instr_swapw(inv_right);
+                const uint32_t dh1 = cpu_instr_swapw(view_distance);
                 cpu_instr_macl(&current_point, &matrix_p);
                 const uint32_t dh2 = cpu_instr_extsw(dh1);
                 cpu_instr_macl(&current_point, &matrix_p);
@@ -139,7 +142,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                 trans_proj->point_z = (z_xtrct + tz);
 
                 /* In case the projected Z value is on or behind the near plane */
-                if (trans_proj->point_z <= z_near) {
+                if (trans_proj->point_z < z_near) {
                         trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
 
                         trans_proj->point_z = z_near;
@@ -152,7 +155,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                 cpu_instr_macl(&current_point, &matrix_p);
                 cpu_divu_regs[OFFSET_CPU_DVSR] = trans_proj->point_z;
                 cpu_instr_macl(&current_point, &matrix_p);
-                cpu_divu_regs[OFFSET_CPU_DVDNTL] = inv_right_16;
+                cpu_divu_regs[OFFSET_CPU_DVDNTL] = view_distance_16;
                 cpu_instr_macl(&current_point, &matrix_p);
 
                 const uint32_t x_mach = cpu_instr_sts_mach();
@@ -182,8 +185,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
                 const FIXED inv_z = cpu_divu_regs[0x14 / 4];
 
                 trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
-
-                trans_proj->screen.y = fix16_int16_muls(point_y, inv_z);
+                trans_proj->screen.y = fix16_int16_muls(point_y, fix16_mul(ratio, inv_z));
 
                 trans_proj++;
         } while (current_point <= last_point);

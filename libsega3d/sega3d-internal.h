@@ -15,6 +15,7 @@
 #define SORT_Z_RANGE            (256)
 #define PACKET_SIZE             (4096)
 #define VERTEX_POOL_SIZE        (1024)
+#define DISPLAY_LEVEL_COUNT     (8)
 
 typedef enum {
         FLAGS_NONE        = 0,
@@ -49,7 +50,6 @@ static_assert(sizeof(transform_proj_t) == 16);
 
 typedef struct {
         const FIXED *dst_matrix;       /* Current matrix */
-        FIXED cached_inv_right;        /* Cached value for projection */
         int16_t cached_sw_2;           /* Cached half of screen width */
         int16_t cached_sh_2;           /* Cached half of screen height */
         uint16_t vertex_count;         /* Current vertex count */
