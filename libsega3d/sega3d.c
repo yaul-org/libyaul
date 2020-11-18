@@ -37,6 +37,9 @@ sega3d_init(void)
 
         _internal_state->flags = FLAGS_INITIALIZED;
 
+        (void)memset(_internal_state->info, 0, sizeof(sega3d_info_t));
+
+        sega3d_display_level_set(0);
         sega3d_perspective_set(DEGtoANG(90.0f));
 
         _internal_tlist_init();
@@ -47,12 +50,19 @@ sega3d_init(void)
 }
 
 void
+sega3d_display_level_set(uint16_t level)
+{
+        sega3d_info_t * const info = _internal_state->info;
+
+        info->level = level & (DISPLAY_LEVEL_COUNT - 1);
+        info->near = info->view_distance >> info->level;
+}
+
+void
 sega3d_perspective_set(ANGLE fov)
 {
-#define AW_2 FIX16(12.446f) /* ([film-aperature-width = 0.980] * inch->mm) / 2) */
-#define AH_2 FIX16(9.3345f) /* ([film-aperature-height = 0.735] * inch->mm) / 2) */
-
         transform_t * const trans = _internal_state->transform;
+        sega3d_info_t * const info = _internal_state->info;
 
         const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1;
 
@@ -72,23 +82,11 @@ sega3d_perspective_set(ANGLE fov)
         trans->cached_sw_2 = i_width / 2;
         trans->cached_sh_2 = i_height / 2;
 
-        
-
         cpu_divu_fix16_set(screen_width, screen_height);
-        _internal_state->info->ratio = cpu_divu_quotient_get();
+        info->ratio = cpu_divu_quotient_get();
 
-        cpu_divu_fix16_set(FIX16(1.0f), fix16_tan(fov_angle));
-        _internal_state->info->focal_length = fix16_mul(AW_2, cpu_divu_quotient_get());
-
-        _internal_state->info->near = _internal_state->info->focal_length;
-
-        cpu_divu_fix16_set(AH_2, _internal_state->info->focal_length);
-
-        const FIXED top = cpu_divu_quotient_get();
-        const FIXED right = -fix16_mul(-top, _internal_state->info->ratio);
-
-        cpu_divu_fix16_set(screen_width, right << 1);
-        trans->cached_inv_right = cpu_divu_quotient_get();
+        info->view_distance = fix16_mul(screen_width - FIX16(1.0f), fix16_tan(fov_angle)) >> 1;
+        info->near = info->view_distance >> info->level;
 }
 
 void

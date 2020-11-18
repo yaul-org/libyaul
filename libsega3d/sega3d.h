@@ -39,10 +39,16 @@ typedef enum {
 } sega3d_flags_t;
 
 typedef struct {
-        FIXED ratio;
-        FIXED near;
-        FIXED focal_length;
+        FIXED ratio;         /* Screen ratio */
+        FIXED near;          /* Distance between view point and near plane */
+        FIXED far;           /* Distance between view point and far plane */
+        /* View distance divided by level to determine where the near plane
+         * is */
+        uint16_t level;
+        FIXED view_distance; /* Distance between view point (eye) and view plane */
 } __aligned(4) sega3d_info_t;
+
+static_assert(sizeof(sega3d_info_t) == 20);
 
 typedef struct {
         const color_rgb1555_t * const depth_colors;
@@ -93,6 +99,7 @@ extern void sega3d_matrix_rotate_x(const ANGLE angle);
 extern void sega3d_matrix_rotate_y(const ANGLE angle);
 extern void sega3d_matrix_rotate_z(const ANGLE angle);
 
+extern void sega3d_display_level_set(uint16_t level);
 extern void sega3d_perspective_set(ANGLE fov);
 extern void sega3d_info_get(sega3d_info_t *info);
 
