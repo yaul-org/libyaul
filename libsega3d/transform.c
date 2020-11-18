@@ -446,6 +446,7 @@ static bool
 _object_cull_test(const transform_t * const trans)
 {
         const sega3d_info_t * const info = _internal_state->info;
+        const fix16_plane_t * const clip_planes = _internal_state->clip_planes;
         const sega3d_object_t * const object = trans->object;
         const sega3d_sphere_t * const sphere = object->cull_data;
 
@@ -455,7 +456,6 @@ _object_cull_test(const transform_t * const trans)
 
         const FIXED * const matrix = trans->dst_matrix;
 
-        /* FIXED trans_point[XYZ]; */
         fix16_vec3_t trans_point;
 
         trans_point.z = _point_transform(&object->origin[Z], &matrix[M20]);
@@ -472,7 +472,7 @@ _object_cull_test(const transform_t * const trans)
         clip_flag = CLIP_FLAGS_NONE;
 
         for (uint32_t i = 0; i < 6; i++) {
-                const fix16_plane_t * const plane = &info->clip_planes[0];
+                const fix16_plane_t * const plane = &clip_planes[0];
 
                 fix16_vec3_t cp;
                 fix16_vec3_sub(&trans_point, &plane->d, &cp);
