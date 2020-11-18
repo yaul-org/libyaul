@@ -448,7 +448,7 @@ _object_cull_test(const transform_t * const trans)
         const sega3d_info_t * const info = _internal_state->info;
         const fix16_plane_t * const clip_planes = _internal_state->clip_planes;
         const sega3d_object_t * const object = trans->object;
-        const sega3d_sphere_t * const sphere = object->cull_data;
+        const sega3d_cull_sphere_t * const sphere = object->cull_data;
 
         /* Transform the origin */
         const FIXED view_distance = info->view_distance;
