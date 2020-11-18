@@ -75,11 +75,11 @@ typedef struct {
 
 typedef struct {
         FIXED radius;
-} sega3d_sphere_t;
+} sega3d_cull_sphere_t;
 
 typedef struct {
         FIXED length[XYZ];
-} sega3d_box_t;
+} sega3d_cull_box_t;
 
 struct sega3d_object {
         sega3d_flags_t flags;

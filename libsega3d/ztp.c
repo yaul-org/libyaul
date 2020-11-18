@@ -37,7 +37,7 @@ sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp)
 
         object->cull_type = SEGA3D_CULL_TYPE_BOX;
 
-        sega3d_box_t * const box = malloc(sizeof(sega3d_box_t));
+        sega3d_cull_box_t * const box = malloc(sizeof(sega3d_cull_box_t));
         assert(box != NULL);
 
         box->length[X] = ztp->length[X];
