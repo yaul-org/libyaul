@@ -39,6 +39,9 @@ sega3d_init(void)
 
         (void)memset(_internal_state->info, 0, sizeof(sega3d_info_t));
 
+        /* XXX: Fix/set the far value */
+        _internal_state->info->far = FIX16(32768.0f);
+
         sega3d_display_level_set(0);
         sega3d_perspective_set(DEGtoANG(90.0f));
 

@@ -56,12 +56,12 @@ fix16_vec3_add(const fix16_vec3_t * __restrict v0,
 }
 
 static inline void __always_inline
-fix16_vec3_sub(const fix16_vec3_t * __restrict v0,
-    const fix16_vec3_t * __restrict v1, fix16_vec3_t * __restrict result)
+fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
+    const fix16_vec3_t * __restrict v0, fix16_vec3_t * __restrict result)
 {
-        result->x = v0->x - v1->x;
-        result->y = v0->y - v1->y;
-        result->z = v0->z - v1->z;
+        result->x = v1->x - v0->x;
+        result->y = v1->y - v0->y;
+        result->z = v1->z - v0->z;
 }
 
 static inline void __always_inline
