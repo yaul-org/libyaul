@@ -117,4 +117,4 @@ extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict,
 extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict,
     const fix16_vec3_t * __restrict);
 
-extern void fix16_vec3_str(const fix16_vec3_t *, char *, int);
+extern uint32_t fix16_vec3_str(const fix16_vec3_t *, char *, int);

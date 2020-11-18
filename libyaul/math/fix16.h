@@ -222,6 +222,8 @@ extern uint32_t fix16_str(fix16_t, char *, int);
 
 #include "fix16_mat3.h"
 
+#include "fix16_plane.h"
+
 #undef _FIX16_INCLUDE_ONCE
 
 #undef FIXMATH_FUNC_ATTRS
