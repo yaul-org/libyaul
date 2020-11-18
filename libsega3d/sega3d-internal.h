@@ -86,6 +86,7 @@ typedef struct {
         sega3d_info_t * const info;
         transform_t * const transform;
         transform_proj_t * const transform_proj_pool;
+        fix16_plane_t * const clip_planes;
         MATRIX * const matrices;
         sort_list_t * const sort_list;
         sort_single_t * const sort_single_pool;

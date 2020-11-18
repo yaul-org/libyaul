@@ -54,13 +54,9 @@ typedef struct {
          * is */
         uint16_t level;
         FIXED view_distance; /* Distance between view point (eye) and view plane */
-
-        /* XXX: This can be simplified down to using 8-bit vectors for the
-         *      normal */
-        fix16_plane_t clip_planes[6];
 } __aligned(4) sega3d_info_t;
 
-static_assert(sizeof(sega3d_info_t) > 128);
+static_assert(sizeof(sega3d_info_t) == 20);
 
 typedef struct {
         const color_rgb1555_t * const depth_colors;
