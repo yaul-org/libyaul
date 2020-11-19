@@ -21,25 +21,30 @@ _internal_matrix_init(void)
         _state.top_matrix = (FIXED *)&_internal_state->matrices[0];
 
         for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
-                FIXED *matrix;
-                matrix = (FIXED *)&_internal_state->matrices[i];
-
-                (void)memset(matrix, 0, sizeof(MATRIX));
-
-                matrix[M00] = toFIXED(1.0f);
-                matrix[M11] = toFIXED(1.0f);
-                matrix[M22] = toFIXED(1.0f);
+                sega3d_matrix_identity(&_internal_state->matrices[i]);
         }
 }
 
 void
-sega3d_matrix_push(matrix_type_t matrix_type)
+sega3d_matrix_identity(MATRIX *matrix)
+{
+        FIXED * const matrix_p = (FIXED *)matrix;
+
+        (void)memset(matrix, 0, sizeof(MATRIX));
+
+        matrix_p[M00] = toFIXED(1.0f);
+        matrix_p[M11] = toFIXED(1.0f);
+        matrix_p[M22] = toFIXED(1.0f);
+}
+
+void
+sega3d_matrix_push(sega3d_matrix_type_t matrix_type)
 {
         assert((MATRIX *)_state.top_matrix < &_internal_state->matrices[MATRIX_STACK_MAX - 1]);
 
         _state.top_matrix += MTRX;
 
-        if (matrix_type == MATRIX_TYPE_PUSH) {
+        if (matrix_type == SEGA3D_MATRIX_TYPE_PUSH) {
                 MATRIX * const dst_matrix = (MATRIX *)_state.top_matrix;
                 MATRIX * const src_matrix = dst_matrix - 1;
 
@@ -78,7 +83,7 @@ sega3d_matrix_copy(MATRIX *matrix)
 }
 
 void
-sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
+sega3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -103,7 +108,27 @@ sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz)
 }
 
 void
-sega3d_matrix_rotate_x(const ANGLE angle)
+sega3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz)
+{
+        FIXED * const top_matrix = _state.top_matrix;
+
+        top_matrix[M03] = tx;
+        top_matrix[M13] = ty;
+        top_matrix[M23] = tz;
+}
+
+void
+sega3d_matrix_trans_reset(void)
+{
+        FIXED * const top_matrix = _state.top_matrix;
+
+        top_matrix[M03] = 0;
+        top_matrix[M13] = 0;
+        top_matrix[M23] = 0;
+}
+
+void
+sega3d_matrix_rot_x(const ANGLE angle)
 {
         FIXED * const matrix = _state.top_matrix;
 
@@ -127,7 +152,7 @@ sega3d_matrix_rotate_x(const ANGLE angle)
 }
 
 void
-sega3d_matrix_rotate_y(const ANGLE angle)
+sega3d_matrix_rot_y(const ANGLE angle)
 {
         FIXED * const matrix = _state.top_matrix;
 
@@ -151,7 +176,7 @@ sega3d_matrix_rotate_y(const ANGLE angle)
 }
 
 void
-sega3d_matrix_rotate_z(const ANGLE angle)
+sega3d_matrix_rot_z(const ANGLE angle)
 {
         FIXED * const matrix = _state.top_matrix;
 
@@ -172,4 +197,25 @@ sega3d_matrix_rotate_z(const ANGLE angle)
         matrix[M11] = -fix16_mul(m10, sin_value) + fix16_mul(m11, cos_value);
         matrix[M20] =  fix16_mul(m20, cos_value) + fix16_mul(m21, sin_value);
         matrix[M21] = -fix16_mul(m20, sin_value) + fix16_mul(m21, cos_value);
+}
+
+void
+sega3d_matrix_transpose(void)
+{
+        /* FIXED * const dst_matrix = _state.top_matrix; */
+
+        /* dst_matrix[M00] =  src_matrix[M00]; */
+        /* dst_matrix[M10] =  src_matrix[M01]; */
+        /* dst_matrix[M20] =  src_matrix[M02]; */
+        /* dst_matrix[M03] = -src_matrix[M03]; */
+
+        /* dst_matrix[M01] =  src_matrix[M10]; */
+        /* dst_matrix[M11] =  src_matrix[M11]; */
+        /* dst_matrix[M21] =  src_matrix[M12]; */
+        /* dst_matrix[M13] = -src_matrix[M13]; */
+
+        /* dst_matrix[M02] =  src_matrix[M20]; */
+        /* dst_matrix[M12] =  src_matrix[M21]; */
+        /* dst_matrix[M22] =  src_matrix[M22]; */
+        /* dst_matrix[M23] = -src_matrix[M23]; */
 }

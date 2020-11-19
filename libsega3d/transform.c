@@ -8,6 +8,8 @@
 #include <cpu/divu.h>
 #include <vdp.h>
 
+#include <dbgio.h>
+
 #include "sega3d-internal.h"
 
 extern void _internal_sort_clear(void);
@@ -39,12 +41,30 @@ _point_transform(const FIXED *p, const FIXED *matrix)
         return (xtrct + (*matrix));
 }
 
+static inline FIXED __always_inline __unused
+_normal_rotate(const FIXED *p, const FIXED *matrix)
+{
+        cpu_instr_clrmac();
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
+        cpu_instr_macl(&p, &matrix);
+
+        register const uint32_t mach = cpu_instr_sts_mach();
+        register const uint32_t macl = cpu_instr_sts_macl();
+        register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
+
+        return xtrct;
+}
+
 static vdp1_cmdt_t _cmdt_end;
+
 
 void
 _internal_transform_init(void)
 {
         vdp1_cmdt_end_set(&_cmdt_end);
+
+        sega3d_matrix_identity(_internal_state->clip_camera);
 }
 
 void
@@ -82,10 +102,10 @@ sega3d_finish(sega3d_results_t *results)
 }
 
 void
-sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
+sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
 {
         const PDATA * const object_pdata = object->pdatas;
-        const PDATA * const pdata = &object_pdata[pdata_count];
+        const PDATA * const pdata = &object_pdata[pdata_index];
 
         const uint16_t polygon_count =
             (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
@@ -102,7 +122,6 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
         trans->pdata = pdata;
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
-        trans->dst_matrix = (const FIXED *)sega3d_matrix_top();
 
         if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_OBJECT) != SEGA3D_OBJECT_FLAGS_NONE) {
                 if ((_object_cull_test(trans))) {
@@ -110,9 +129,16 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_count)
                 }
         }
 
-        _vertex_pool_transform(trans, pdata->pntbl);
-        _vertex_pool_clipping(trans);
-        _polygon_process(trans, pdata->pltbl);
+        sega3d_matrix_push(SEGA3D_MATRIX_TYPE_PUSH); {
+                const FIXED * const camera_matrix =
+                    (const FIXED *)_internal_state->clip_camera;
+
+                sega3d_matrix_trans_load(-camera_matrix[M03], -camera_matrix[M13], -camera_matrix[M23]);
+
+                _vertex_pool_transform(trans, pdata->pntbl);
+                _vertex_pool_clipping(trans);
+                _polygon_process(trans, pdata->pltbl);
+        } sega3d_matrix_pop();
 }
 
 static void
@@ -135,14 +161,15 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         const FIXED z_near = info->near;
         const FIXED ratio = info->ratio;
 
-        const FIXED * const matrix_z = &trans->dst_matrix[M20];
+        const FIXED * const top_matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const matrix = &top_matrix[M20];
 
         register uint32_t * const cpu_divu_regs = (uint32_t *)CPU(DVSR);
 
         do {
                 cpu_instr_clrmac();
 
-                const FIXED *matrix_p = matrix_z;
+                const FIXED *matrix_p = matrix;
 
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
@@ -426,6 +453,12 @@ _screen_cull_test(const transform_t * const trans)
                 .y = p2->y - p0->y
         };
 
+        /* Ideally, we only need to do a cross product on one winding order, but
+         * in the case of triangles that combine two vertices, it's unknown
+         * which two vertices are joined. The easiest solution is to test one
+         * winding order, and if it fails, don't bother testing the other
+         * winding order */
+
         const int16_t z1 = (u1.x * v1.y) - (u1.y * v1.x);
 
         if (z1 < 0) {
@@ -445,52 +478,88 @@ _screen_cull_test(const transform_t * const trans)
 static bool
 _object_cull_test(const transform_t * const trans)
 {
-        const sega3d_info_t * const info = _internal_state->info;
-        const fix16_plane_t * const clip_planes = _internal_state->clip_planes;
+        const fix16_plane_t * const clip_planes =
+            (fix16_plane_t *)_internal_state->clip_planes;
         const sega3d_object_t * const object = trans->object;
         const sega3d_cull_sphere_t * const sphere = object->cull_data;
 
         /* Transform the origin */
-        const FIXED view_distance = info->view_distance;
-        const FIXED ratio = info->ratio;
+        const FIXED * const camera_matrix =
+            (const FIXED *)_internal_state->clip_camera;
+        /* We want the world matrix */
+        const FIXED * const matrix = (const FIXED *)sega3d_matrix_top();
 
-        const FIXED * const matrix = trans->dst_matrix;
+        fix16_vec3_t trans_origin;
+        trans_origin.x = _point_transform((const FIXED *)&object->origin, &matrix[M00]);
+        trans_origin.y = _point_transform((const FIXED *)&object->origin, &matrix[M10]);
+        trans_origin.z = _point_transform((const FIXED *)&object->origin, &matrix[M20]);
 
-        fix16_vec3_t trans_point;
+        fix16_vec3_t rot_normals[6];
+        fix16_vec3_t trans_d[6];
 
-        trans_point.z = _point_transform(&object->origin[Z], &matrix[M20]);
-        cpu_divu_fix16_set(view_distance, trans_point.z);
-        trans_point.x = _point_transform(&object->origin[X], &matrix[M00]);
-        trans_point.y = _point_transform(&object->origin[Y], &matrix[M10]);
+        uint16_t valid_count;
+        valid_count = 0;
 
-        const FIXED inverse_z = cpu_divu_quotient_get();
+        /* 0 near
+         * 1 far
+         * 2 left
+         * 3 right
+         * 4 top
+         * 5 bottom */
 
-        trans_point.x = fix16_mul(trans_point.x, inverse_z);
-        trans_point.y = fix16_mul(fix16_mul(trans_point.y, ratio), inverse_z);
+#define DEBUG_CLIP_PLANE_START  (0)
+#define DEBUG_CLIP_PLANE_END    (5)
 
-        clip_flags_t clip_flag;
-        clip_flag = CLIP_FLAGS_NONE;
+        for (uint32_t i = DEBUG_CLIP_PLANE_START; i < (DEBUG_CLIP_PLANE_END + 1); i++) {
+                const fix16_plane_t * const clip_plane = &clip_planes[i];
 
-        for (uint32_t i = 0; i < 6; i++) {
-                const fix16_plane_t * const plane = &clip_planes[0];
+                rot_normals[i].x = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M00]);
+                rot_normals[i].y = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M10]);
+                rot_normals[i].z = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M20]);
+
+                trans_d[i].x = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M00]);
+                trans_d[i].y = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M10]);
+                trans_d[i].z = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M20]);
 
                 fix16_vec3_t cp;
-                fix16_vec3_sub(&trans_point, &plane->d, &cp);
+                fix16_vec3_sub(&trans_origin, &trans_d[i], &cp);
 
-                const fix16_t intersect_dot = fix16_vec3_dot(&cp, &cp);
+                const fix16_t cp_length = fix16_vec3_length(&cp);
+                const fix16_t side = fix16_vec3_dot(&rot_normals[i], &cp);
 
-                if (intersect_dot < sphere->radius) {
-                        clip_flag |= CLIP_FLAGS_SIDE;
+                /* dbgio_printf("%2i. n:(%f,%f,%f), o:(%f,%f,%f), rn:(%f,%f,%f), td:(%f,%f,%f), cp:(%f,%f,%f), side:%f, |cp|:%f\n", */
+                /*     i, */
+                /*     clip_planes[i].normal.x, */
+                /*     clip_planes[i].normal.y, */
+                /*     clip_planes[i].normal.z, */
+                /*     trans_origin.x, */
+                /*     trans_origin.y, */
+                /*     trans_origin.z, */
+                /*     rot_normals[i].x, */
+                /*     rot_normals[i].y, */
+                /*     rot_normals[i].z, */
+                /*     trans_d[i].x, */
+                /*     trans_d[i].y, */
+                /*     trans_d[i].z, */
+                /*     cp.x, */
+                /*     cp.y, */
+                /*     cp.z, */
+                /*     side, */
+                /*     cp_length); dbgio_flush(); */
+
+                /* Test for intersection */
+                /* dbgio_printf("test #1: %i %f<%f\n", i, cp_length, sphere->radius); dbgio_flush(); */
+                if (cp_length < sphere->radius) {
+                        valid_count++;
 
                         continue;
                 }
 
-                const fix16_t side = fix16_vec3_dot(&cp, &plane->normal);
-
-                if (side > 0) {
-                        clip_flag |= CLIP_FLAGS_SIDE;
+                /* Test for intersection */
+                if (side >= FIX16(0.0f)) {
+                        valid_count++;
                 }
         }
 
-        return (clip_flag != CLIP_FLAGS_SIDE);
+        return (valid_count != (DEBUG_CLIP_PLANE_END - DEBUG_CLIP_PLANE_START + 1));
 }

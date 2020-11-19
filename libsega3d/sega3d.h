@@ -22,9 +22,9 @@ typedef struct sega3d_object sega3d_object_t;
 typedef void (*sega3d_iterate_fn)(sega3d_object_t *, const vdp1_cmdt_t *);
 
 typedef enum {
-        MATRIX_TYPE_PUSH     = 0,
-        MATRIX_TYPE_MOVE_PTR = 1
-} matrix_type_t;
+        SEGA3D_MATRIX_TYPE_PUSH     = 0,
+        SEGA3D_MATRIX_TYPE_MOVE_PTR = 1
+} sega3d_matrix_type_t;
 
 typedef enum {
         SEGA3D_OBJECT_FLAGS_NONE          = 0,
@@ -48,6 +48,7 @@ typedef enum {
 
 typedef struct {
         FIXED ratio;         /* Screen ratio */
+        ANGLE fov;           /* FOV */
         FIXED near;          /* Distance between view point and near plane */
         FIXED far;           /* Distance between view point and far plane */
         /* View distance divided by level to determine where the near plane
@@ -56,7 +57,7 @@ typedef struct {
         FIXED view_distance; /* Distance between view point (eye) and view plane */
 } __aligned(4) sega3d_info_t;
 
-static_assert(sizeof(sega3d_info_t) == 20);
+static_assert(sizeof(sega3d_info_t) == 24);
 
 typedef struct {
         const color_rgb1555_t * const depth_colors;
@@ -105,19 +106,24 @@ extern void sega3d_tlist_cursor_reset(void);
 extern TEXTURE *sega3d_tlist_tex_append(void);
 extern TEXTURE *sega3d_tlist_tex_get(Uint16 cursor);
 
-extern void sega3d_matrix_push(matrix_type_t matrix_type);
+extern void sega3d_matrix_identity(MATRIX *matrix);
+extern void sega3d_matrix_push(sega3d_matrix_type_t matrix_type);
 extern void sega3d_matrix_pop(void);
 extern const MATRIX *sega3d_matrix_top(void);
 extern void sega3d_matrix_load(const MATRIX *matrix);
 extern void sega3d_matrix_copy(MATRIX *matrix);
-extern void sega3d_matrix_inverse_push(void);
-extern void sega3d_matrix_translate(FIXED tx, FIXED ty, FIXED tz);
-extern void sega3d_matrix_rotate_x(const ANGLE angle);
-extern void sega3d_matrix_rotate_y(const ANGLE angle);
-extern void sega3d_matrix_rotate_z(const ANGLE angle);
+extern void sega3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz);
+extern void sega3d_matrix_trans_reset(void);
+extern void sega3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz);
+extern void sega3d_matrix_rot_x(const ANGLE angle);
+extern void sega3d_matrix_rot_y(const ANGLE angle);
+extern void sega3d_matrix_rot_z(const ANGLE angle);
+extern void sega3d_matrix_transpose(void);
 
 extern void sega3d_display_level_set(uint16_t level);
 extern void sega3d_perspective_set(ANGLE fov);
+extern void sega3d_frustum_camera_set(const POINT *position, const VECTOR *rx,
+    const VECTOR *ry, const VECTOR *rz);
 extern void sega3d_info_get(sega3d_info_t *info);
 
 extern void sega3d_fog_set(const sega3d_fog_t *fog);
@@ -127,7 +133,7 @@ extern void sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_of
 extern void sega3d_finish(sega3d_results_t *results);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
-extern void sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata);
+extern void sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index);
 
 extern void sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp);
 extern void sega3d_ztp_texs_get(const sega3d_ztp_t *ztp, sega3d_ztp_tex_t *ztp_texs);

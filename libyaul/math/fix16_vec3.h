@@ -38,6 +38,14 @@ fix16_vec3_zero(fix16_vec3_t *result)
 }
 
 static inline void __always_inline
+fix16_vec3_set(fix16_vec3_t *result, fix16_t x, fix16_t y, fix16_t z)
+{
+        result->x = x;
+        result->y = y;
+        result->z = z;
+}
+
+static inline void __always_inline
 fix16_vec3_dup(const fix16_vec3_t * __restrict v0,
     fix16_vec3_t * __restrict result)
 {
@@ -57,7 +65,7 @@ fix16_vec3_add(const fix16_vec3_t * __restrict v0,
 
 static inline void __always_inline
 fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
-    const fix16_vec3_t * __restrict v0, fix16_vec3_t * __restrict result)
+    const fix16_vec3_t * __restrict const v0, fix16_vec3_t * __restrict const result)
 {
         result->x = v1->x - v0->x;
         result->y = v1->y - v0->y;

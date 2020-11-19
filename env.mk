@@ -126,14 +126,15 @@ SH_CFLAGS_shared:= \
 	-fdelete-null-pointer-checks \
 	-fmerge-all-constants \
 	-flto \
-	-Wmissing-include-dirs \
-	-Wfatal-errors \
 	-Wall \
-	-Wextra \
 	-Wduplicated-branches \
 	-Wduplicated-cond \
-	-Wnull-dereference \
+	-Wextra \
+	-Wfatal-errors \
 	-Winit-self \
+	-Wmissing-include-dirs \
+	-Wno-format \
+	-Wnull-dereference \
 	-Wshadow \
 	-Wunused \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
