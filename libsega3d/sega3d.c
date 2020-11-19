@@ -27,6 +27,9 @@ extern void _internal_sort_init(void);
 extern void _internal_tlist_init(void);
 extern void _internal_transform_init(void);
 
+static void _perspective_calculate(FIXED fov_angle);
+static void _frustum_clip_planes_calculate(FIXED fov_angle);
+
 void
 sega3d_init(void)
 {        
@@ -38,9 +41,6 @@ sega3d_init(void)
         _internal_state->flags = FLAGS_INITIALIZED;
 
         (void)memset(_internal_state->info, 0, sizeof(sega3d_info_t));
-
-        /* XXX: Fix/set the far value */
-        _internal_state->info->far = FIX16(32768.0f);
 
         sega3d_display_level_set(0);
         sega3d_perspective_set(DEGtoANG(90.0f));
@@ -59,15 +59,70 @@ sega3d_display_level_set(uint16_t level)
 
         info->level = level & (DISPLAY_LEVEL_COUNT - 1);
         info->near = info->view_distance >> info->level;
+        info->far = FAR_Z;
 }
 
 void
 sega3d_perspective_set(ANGLE fov)
 {
-        transform_t * const trans = _internal_state->transform;
-        sega3d_info_t * const info = _internal_state->info;
+        if (fov < MIN_FOV_ANGLE) {
+                fov = MIN_FOV_ANGLE;
+        }
+
+        if (fov > MAX_FOV_ANGLE) {
+                fov = MAX_FOV_ANGLE;
+        }
 
         const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1;
+
+        sega3d_info_t * const info = _internal_state->info;
+        info->fov = fov;
+
+        _perspective_calculate(fov_angle);
+        _frustum_clip_planes_calculate(fov_angle);
+}
+
+void
+sega3d_frustum_camera_set(const POINT *position, const VECTOR *rx,
+    const VECTOR *ry, const VECTOR *rz)
+{
+        FIXED * const clip_camera = (FIXED *)_internal_state->clip_camera;
+
+        clip_camera[M00] = (*rx)[X];
+        clip_camera[M01] = (*rx)[Y];
+        clip_camera[M02] = (*rx)[Z];
+        clip_camera[M03] = (*position)[X];
+
+        clip_camera[M10] = (*ry)[X];
+        clip_camera[M11] = (*ry)[Y];
+        clip_camera[M12] = (*ry)[Z];
+        clip_camera[M13] = (*position)[Y];
+
+        clip_camera[M20] = (*rz)[X];
+        clip_camera[M21] = (*rz)[Y];
+        clip_camera[M22] = (*rz)[Z];
+        clip_camera[M23] = (*position)[Z];
+}
+
+void
+sega3d_info_get(sega3d_info_t *info)
+{
+        (void)memcpy(info, _internal_state->info, sizeof(sega3d_info_t));
+}
+
+Uint16
+sega3d_object_polycount_get(const sega3d_object_t *object)
+{
+        const PDATA * const pdata = object->pdatas;
+
+        return pdata->nbPolygon;
+}
+
+static void
+_perspective_calculate(FIXED fov_angle)
+{
+        transform_t * const trans = _internal_state->transform;
+        sega3d_info_t * const info = _internal_state->info;
 
         uint16_t i_width;
         uint16_t i_height;
@@ -92,16 +147,87 @@ sega3d_perspective_set(ANGLE fov)
         info->near = info->view_distance >> info->level;
 }
 
-void
-sega3d_info_get(sega3d_info_t *info)
+static void
+_frustum_clip_planes_calculate(FIXED fov_angle)
 {
-        (void)memcpy(info, _internal_state->info, sizeof(sega3d_info_t));
-}
+        static const fix16_vec3_t axis_up    = FIX16_VEC3_INITIALIZER(0.0f, -1.0f, 0.0f);
+        static const fix16_vec3_t axis_right = FIX16_VEC3_INITIALIZER(1.0f,  0.0f, 0.0f);
 
-Uint16
-sega3d_object_polycount_get(const sega3d_object_t *object)
-{
-        const PDATA * const pdata = object->pdatas;
+        const sega3d_info_t * const info = _internal_state->info;
+        clip_planes_t * const clip_planes = _internal_state->clip_planes;
 
-        return pdata->nbPolygon;
+        const FIXED aspect_ratio = info->ratio;
+
+        const FIXED sin = fix16_sin(fov_angle);
+        const FIXED cos = fix16_sin(fov_angle);
+        cpu_divu_fix16_set(FIX16(1.0f), cos);
+        const FIXED inv_cos = cpu_divu_quotient_get();
+
+        fix16_vec3_t right;
+        right.x = fix16_mul(inv_cos, sin);
+        right.y = FIX16(0.0f);
+        right.z = FIX16(1.0f);
+
+        fix16_vec3_t top;
+        top.x = FIX16(0.0f);
+        top.y = fix16_mul(aspect_ratio, right.x);
+        top.z = aspect_ratio;
+
+        fix16_vec3_t * const near_normal = &clip_planes->near_plane.normal;
+        near_normal->x = FIX16(0.0f);
+        near_normal->y = FIX16(0.0f);
+        near_normal->z = FIX16(1.0f);
+
+        fix16_vec3_t * const far_normal = &clip_planes->far_plane.normal;
+        far_normal->x = FIX16( 0.0f);
+        far_normal->y = FIX16( 0.0f);
+        far_normal->z = FIX16(-1.0f);
+
+        fix16_vec3_t * const right_normal = &clip_planes->right_plane.normal;
+        fix16_vec3_cross(&axis_up, &right, right_normal);
+        fix16_vec3_normalize(right_normal);
+
+        fix16_vec3_t * const left_normal = &clip_planes->left_plane.normal;
+        left_normal->x = -right_normal->x;
+        left_normal->y =  right_normal->y;
+        left_normal->z =  right_normal->z;
+
+        fix16_vec3_t * const top_normal = &clip_planes->top_plane.normal;
+        fix16_vec3_cross(&axis_right, &top, top_normal);
+        fix16_vec3_normalize(top_normal);
+
+        fix16_vec3_t * const bottom_normal = &clip_planes->bottom_plane.normal;
+        bottom_normal->x =  top_normal->x;
+        bottom_normal->y = -top_normal->y;
+        bottom_normal->z =  top_normal->z;
+
+        fix16_vec3_t * const near_d = &clip_planes->near_plane.d;
+        near_d->x = FIX16(0.0f);
+        near_d->y = FIX16(0.0f);
+        near_d->z = info->near;
+
+        fix16_vec3_t * const far_d = &clip_planes->far_plane.d;
+        far_d->x = FIX16(0.0f);
+        far_d->y = FIX16(0.0f);
+        far_d->z = info->far;
+
+        fix16_vec3_t * const right_d = &clip_planes->right_plane.d;
+        right_d->x = fix16_mul(info->view_distance, inv_cos);
+        right_d->y = FIX16(0.0f);
+        right_d->z = info->view_distance;
+
+        fix16_vec3_t * const left_d = &clip_planes->left_plane.d;
+        left_d->x = -right_d->x;
+        left_d->y =  right_d->y;
+        left_d->z =  right_d->z;
+
+        fix16_vec3_t * const top_d = &clip_planes->top_plane.d;
+        top_d->x = FIX16(0.0f);
+        top_d->y = right_d->x;
+        top_d->z = right_d->y;
+
+        fix16_vec3_t * const bottom_d = &clip_planes->bottom_plane.d;
+        bottom_d->x =  top_d->x;
+        bottom_d->y = -top_d->y;
+        bottom_d->z =  top_d->z;
 }

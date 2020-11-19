@@ -16,6 +16,9 @@
 #define PACKET_SIZE             (4096)
 #define VERTEX_POOL_SIZE        (1024)
 #define DISPLAY_LEVEL_COUNT     (8)
+#define FAR_Z                   toFIXED(1024.0f)
+#define MIN_FOV_ANGLE           (DEGtoANG(60.0f))
+#define MAX_FOV_ANGLE           (DEGtoANG(120.0f))
 
 typedef enum {
         FLAGS_NONE        = 0,
@@ -49,7 +52,6 @@ typedef struct {
 static_assert(sizeof(transform_proj_t) == 16);
 
 typedef struct {
-        const FIXED *dst_matrix;       /* Current matrix */
         int16_t cached_sw_2;           /* Cached half of screen width */
         int16_t cached_sh_2;           /* Cached half of screen height */
         uint16_t vertex_count;         /* Current vertex count */
@@ -67,6 +69,17 @@ typedef struct {
 } __aligned(16) transform_t;
 
 static_assert(sizeof(transform_t) == 64);
+
+typedef struct {
+        fix16_plane_t near_plane;
+        fix16_plane_t far_plane;
+        fix16_plane_t left_plane;
+        fix16_plane_t right_plane;
+        fix16_plane_t top_plane;
+        fix16_plane_t bottom_plane;
+} __packed __aligned(4) clip_planes_t;
+
+static_assert(sizeof(clip_planes_t) == (6 * sizeof(fix16_plane_t)));
 
 typedef struct sort_single {
         void *packet;
@@ -86,7 +99,8 @@ typedef struct {
         sega3d_info_t * const info;
         transform_t * const transform;
         transform_proj_t * const transform_proj_pool;
-        fix16_plane_t * const clip_planes;
+        MATRIX * const clip_camera;
+        clip_planes_t * const clip_planes;
         MATRIX * const matrices;
         sort_list_t * const sort_list;
         sort_single_t * const sort_single_pool;

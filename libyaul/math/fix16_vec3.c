@@ -40,18 +40,34 @@ fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
 fix16_t
 fix16_vec3_length(const fix16_vec3_t *v0)
 {
-        const fix16_t r = fix16_vec3_inline_dot(v0, v0);
-        const fix16_t sqrt = fix16_sqrt(r);
+        const fix16_t r = fix16_vec3_sqr_length(v0) >> 8;
+        const fix16_t length = fix16_sqrt(r) << 8;
 
-        return sqrt;
+        return length;
 }
 
 fix16_t
 fix16_vec3_sqr_length(const fix16_vec3_t *v0)
 {
-        const fix16_t r = fix16_vec3_inline_dot(v0, v0);
+        const fix16_vec3_t v0_shifted = {
+                .x = v0->x >> 8,
+                .y = v0->y >> 8,
+                .z = v0->z >> 8
+        };
 
-        return r;
+        const fix16_vec3_t *v0_p1 = &v0_shifted;
+        const fix16_vec3_t *v0_p2 = &v0_shifted;
+
+        cpu_instr_macl(&v0_p1, &v0_p2);
+        cpu_instr_macl(&v0_p1, &v0_p2);
+        cpu_instr_macl(&v0_p1, &v0_p2);
+
+        const fix16_t mach = cpu_instr_sts_mach();
+        const fix16_t macl = cpu_instr_sts_mach();
+
+        const fix16_t length = cpu_instr_xtrct(mach, macl) << 8;
+
+        return length;
 }
 
 fix16_t
