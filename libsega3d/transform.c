@@ -133,7 +133,7 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
                 const FIXED * const camera_matrix =
                     (const FIXED *)_internal_state->clip_camera;
 
-                sega3d_matrix_trans_load(-camera_matrix[M03], -camera_matrix[M13], -camera_matrix[M23]);
+                sega3d_matrix_trans(-camera_matrix[M03], -camera_matrix[M13], -camera_matrix[M23]);
 
                 _vertex_pool_transform(trans, pdata->pntbl);
                 _vertex_pool_clipping(trans);
