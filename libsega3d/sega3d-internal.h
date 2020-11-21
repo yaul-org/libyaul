@@ -9,6 +9,7 @@
 
 #include "sega3d.h"
 
+#include <math.h>
 #include <vdp1/cmdt.h>
 
 #define MATRIX_STACK_MAX        (32)
@@ -71,15 +72,25 @@ typedef struct {
 static_assert(sizeof(transform_t) == 64);
 
 typedef struct {
+        /* XXX: This group of planes are output */
         fix16_plane_t near_plane;
         fix16_plane_t far_plane;
         fix16_plane_t left_plane;
         fix16_plane_t right_plane;
         fix16_plane_t top_plane;
         fix16_plane_t bottom_plane;
-} __packed __aligned(4) clip_planes_t;
 
-static_assert(sizeof(clip_planes_t) == (6 * sizeof(fix16_plane_t)));
+        /* XXX: This group of normals & 2 vectors are input to the output planes
+         *      above */
+        fix16_vec3_t near_normal;
+        fix16_vec3_t far_normal;
+        fix16_vec3_t left_normal;
+        fix16_vec3_t right_normal;
+        fix16_vec3_t top_normal;
+        fix16_vec3_t bottom_normal;
+        fix16_vec3_t near_d;
+        fix16_vec3_t far_d;
+} __packed __aligned(4) clip_planes_t;
 
 typedef struct sort_single {
         void *packet;

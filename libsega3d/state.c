@@ -19,7 +19,6 @@ static transform_t _transform;
 static sort_list_t _sort_list[SORT_Z_RANGE] __aligned(16);
 static sort_single_t _sort_single_pool[PACKET_SIZE] __aligned(16);
 
-/* XXX: This can be simplified down to using 8-bit vectors for the normal */
 static MATRIX _clip_camera __aligned(16);
 static clip_planes_t _clip_planes __aligned(16);
 
