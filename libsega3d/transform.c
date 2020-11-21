@@ -112,6 +112,11 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
         trans->current_orderlist = &orderlist[orderlist_offset];
         trans->current_cmdt = cmdts;
 
+        sega3d_results_t * const results = _internal_state->results;
+
+        results->object_count = 0;
+        results->polygon_count = 0;
+
         const FIXED * const camera_matrix =
             (const FIXED *)_internal_state->clip_camera;
 
@@ -165,6 +170,9 @@ sega3d_finish(sega3d_results_t *results)
         vdp1_sync_cmdt_orderlist_put(trans->orderlist, NULL, NULL);
 
         if (results != NULL) {
+                sega3d_results_t * const internal_results = _internal_state->results;
+
+                results->object_count = internal_results->object_count;
                 results->polygon_count = trans->current_orderlist - trans->orderlist;
         }
 }
@@ -203,6 +211,10 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
                 _vertex_pool_clipping(trans);
                 _polygon_process(trans, pdata->pltbl);
         } sega3d_matrix_pop();
+
+        sega3d_results_t * const results = _internal_state->results;
+
+        results->object_count++;
 }
 
 static void
@@ -307,7 +319,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 
                 const FIXED point_y = (y_xtrct + ty);
 
-                const FIXED inv_z = cpu_divu_regs[0x14 / 4];
+                const FIXED inv_z = cpu_divu_regs[OFFSET_CPU_DVDNTL];
 
                 trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
                 trans_proj->screen.y = fix16_int16_muls(point_y, fix16_mul(ratio, inv_z));
