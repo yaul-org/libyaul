@@ -58,12 +58,13 @@ fix16_vec3_sqr_length(const fix16_vec3_t *v0)
         const fix16_vec3_t *v0_p1 = &v0_shifted;
         const fix16_vec3_t *v0_p2 = &v0_shifted;
 
+        cpu_instr_clrmac();
         cpu_instr_macl(&v0_p1, &v0_p2);
         cpu_instr_macl(&v0_p1, &v0_p2);
         cpu_instr_macl(&v0_p1, &v0_p2);
 
         const fix16_t mach = cpu_instr_sts_mach();
-        const fix16_t macl = cpu_instr_sts_mach();
+        const fix16_t macl = cpu_instr_sts_macl();
 
         const fix16_t length = cpu_instr_xtrct(mach, macl) << 8;
 

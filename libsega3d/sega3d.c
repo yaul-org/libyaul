@@ -28,6 +28,7 @@ extern void _internal_tlist_init(void);
 extern void _internal_transform_init(void);
 
 static void _perspective_calculate(FIXED fov_angle);
+static void _frustrum_nf_clip_planes_calculate(void);
 static void _frustum_clip_planes_calculate(FIXED fov_angle);
 
 void
@@ -60,6 +61,8 @@ sega3d_display_level_set(uint16_t level)
         info->level = level & (DISPLAY_LEVEL_COUNT - 1);
         info->near = info->view_distance >> info->level;
         info->far = FAR_Z;
+
+        _frustrum_nf_clip_planes_calculate();
 }
 
 void
@@ -148,6 +151,23 @@ _perspective_calculate(FIXED fov_angle)
 }
 
 static void
+_frustrum_nf_clip_planes_calculate(void)
+{
+        const sega3d_info_t * const info = _internal_state->info;
+        clip_planes_t * const clip_planes = _internal_state->clip_planes;
+
+        fix16_vec3_t * const near_d = &clip_planes->near_plane.d;
+        near_d->x = FIX16(0.0f);
+        near_d->y = FIX16(0.0f);
+        near_d->z = info->near;
+
+        fix16_vec3_t * const far_d = &clip_planes->far_plane.d;
+        far_d->x = FIX16(0.0f);
+        far_d->y = FIX16(0.0f);
+        far_d->z = info->far;
+}
+
+static void
 _frustum_clip_planes_calculate(FIXED fov_angle)
 {
         static const fix16_vec3_t axis_up    = FIX16_VEC3_INITIALIZER(0.0f, -1.0f, 0.0f);
@@ -201,16 +221,6 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
         bottom_normal->y = -top_normal->y;
         bottom_normal->z =  top_normal->z;
 
-        fix16_vec3_t * const near_d = &clip_planes->near_plane.d;
-        near_d->x = FIX16(0.0f);
-        near_d->y = FIX16(0.0f);
-        near_d->z = info->near;
-
-        fix16_vec3_t * const far_d = &clip_planes->far_plane.d;
-        far_d->x = FIX16(0.0f);
-        far_d->y = FIX16(0.0f);
-        far_d->z = info->far;
-
         fix16_vec3_t * const right_d = &clip_planes->right_plane.d;
         right_d->x = fix16_mul(info->view_distance, inv_cos);
         right_d->y = FIX16(0.0f);
@@ -230,4 +240,6 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
         bottom_d->x =  top_d->x;
         bottom_d->y = -top_d->y;
         bottom_d->z =  top_d->z;
+
+        _frustrum_nf_clip_planes_calculate();
 }

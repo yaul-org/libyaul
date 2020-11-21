@@ -19,6 +19,7 @@ extern void _internal_sort_iterate(iterate_fn fn);
 static void _sort_iterate(sort_single_t *single);
 static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
 
+static void _camera_world_transform(void);
 static void _vertex_pool_clipping(const transform_t * const trans);
 static void _polygon_process(transform_t *trans, POLYGON const *polygons);
 static void _cmdt_prepare(const transform_t * const trans);
@@ -30,24 +31,32 @@ static inline FIXED __always_inline __unused
 _point_transform(const FIXED *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
+
+        const FIXED *p_p = p;
+        const FIXED *matrix_p = matrix;
+
+        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_p, &matrix_p);
 
         register const uint32_t mach = cpu_instr_sts_mach();
         register const uint32_t macl = cpu_instr_sts_macl();
         register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
 
-        return (xtrct + (*matrix));
+        return (xtrct + (*matrix_p));
 }
 
 static inline FIXED __always_inline __unused
 _normal_rotate(const FIXED *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
-        cpu_instr_macl(&p, &matrix);
+
+        const FIXED *p_p = p;
+        const FIXED *matrix_p = matrix;
+
+        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_p, &matrix_p);
 
         register const uint32_t mach = cpu_instr_sts_mach();
         register const uint32_t macl = cpu_instr_sts_macl();
@@ -97,7 +106,7 @@ sega3d_finish(sega3d_results_t *results)
         vdp1_sync_cmdt_orderlist_put(trans->orderlist, NULL, NULL);
 
         if (results != NULL) {
-                results->count = trans->current_orderlist - trans->orderlist;
+                results->polygon_count = trans->current_orderlist - trans->orderlist;
         }
 }
 
@@ -130,15 +139,23 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
         }
 
         sega3d_matrix_push(SEGA3D_MATRIX_TYPE_PUSH); {
-                const FIXED * const camera_matrix =
-                    (const FIXED *)_internal_state->clip_camera;
-
-                sega3d_matrix_trans(-camera_matrix[M03], -camera_matrix[M13], -camera_matrix[M23]);
-
+                _camera_world_transform();
                 _vertex_pool_transform(trans, pdata->pntbl);
                 _vertex_pool_clipping(trans);
                 _polygon_process(trans, pdata->pltbl);
         } sega3d_matrix_pop();
+}
+
+static void
+_camera_world_transform(void)
+{
+        FIXED * const top_matrix = (FIXED *)sega3d_matrix_top();
+        const FIXED * const camera_matrix =
+            (const FIXED *)_internal_state->clip_camera;
+
+        top_matrix[M03] += -camera_matrix[M03];
+        top_matrix[M13] += -camera_matrix[M13];
+        top_matrix[M23] += -camera_matrix[M23];
 }
 
 static void
@@ -494,8 +511,8 @@ _object_cull_test(const transform_t * const trans)
         trans_origin.y = _point_transform((const FIXED *)&object->origin, &matrix[M10]);
         trans_origin.z = _point_transform((const FIXED *)&object->origin, &matrix[M20]);
 
-        fix16_vec3_t rot_normals[6];
-        fix16_vec3_t trans_d[6];
+        static fix16_vec3_t rot_normals[6];
+        static fix16_vec3_t trans_d[6];
 
         uint16_t valid_count;
         valid_count = 0;
@@ -517,47 +534,59 @@ _object_cull_test(const transform_t * const trans)
                 rot_normals[i].y = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M10]);
                 rot_normals[i].z = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M20]);
 
-                trans_d[i].x = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M00]);
-                trans_d[i].y = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M10]);
-                trans_d[i].z = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M20]);
+                if (i < 2) {
+                        /* trans_d[i].x = clip_plane->d.x + camera_matrix[M03]; */
+                        /* trans_d[i].y = clip_plane->d.y + camera_matrix[M13]; */
+                        /* trans_d[i].z = clip_plane->d.z + camera_matrix[M23]; */
+
+                        trans_d[i].x = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M00]);
+                        trans_d[i].y = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M10]);
+                        trans_d[i].z = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M20]);
+                } else {
+                        trans_d[i].x = camera_matrix[M03];
+                        trans_d[i].y = camera_matrix[M13];
+                        trans_d[i].z = camera_matrix[M23];
+                }
 
                 fix16_vec3_t cp;
                 fix16_vec3_sub(&trans_origin, &trans_d[i], &cp);
 
-                const fix16_t cp_length = fix16_vec3_length(&cp);
                 const fix16_t side = fix16_vec3_dot(&rot_normals[i], &cp);
 
-                /* dbgio_printf("%2i. n:(%f,%f,%f), o:(%f,%f,%f), rn:(%f,%f,%f), td:(%f,%f,%f), cp:(%f,%f,%f), side:%f, |cp|:%f\n", */
-                /*     i, */
-                /*     clip_planes[i].normal.x, */
-                /*     clip_planes[i].normal.y, */
-                /*     clip_planes[i].normal.z, */
-                /*     trans_origin.x, */
-                /*     trans_origin.y, */
-                /*     trans_origin.z, */
-                /*     rot_normals[i].x, */
-                /*     rot_normals[i].y, */
-                /*     rot_normals[i].z, */
-                /*     trans_d[i].x, */
-                /*     trans_d[i].y, */
-                /*     trans_d[i].z, */
-                /*     cp.x, */
-                /*     cp.y, */
-                /*     cp.z, */
-                /*     side, */
-                /*     cp_length); dbgio_flush(); */
+                bool intersect = false;
 
                 /* Test for intersection */
-                /* dbgio_printf("test #1: %i %f<%f\n", i, cp_length, sphere->radius); dbgio_flush(); */
-                if (cp_length < sphere->radius) {
+                if ((side > -sphere->radius) && (side < sphere->radius)) {
+                        valid_count++;
+                        intersect = true;
+
+                        /* continue; */
+                } else if (side >= FIX16(0.0f)) { /* Test for intersection */
                         valid_count++;
 
-                        continue;
+                        intersect = true;
                 }
 
-                /* Test for intersection */
-                if (side >= FIX16(0.0f)) {
-                        valid_count++;
+                if (!intersect) {
+                        /* dbgio_printf("    %i. to:(%f,%f,%f), rn:(%f,%f,%f), d:(%f,%f,%f), td:(%f,%f,%f), cp:(%f,%f,%f), side:%f, radius:%f\n", */
+                        /*     i, */
+                        /*     trans_origin.x, */
+                        /*     trans_origin.y, */
+                        /*     trans_origin.z, */
+                        /*     rot_normals[i].x, */
+                        /*     rot_normals[i].y, */
+                        /*     rot_normals[i].z, */
+                        /*     clip_plane->d.x, */
+                        /*     clip_plane->d.y, */
+                        /*     clip_plane->d.z, */
+                        /*     trans_d[i].x, */
+                        /*     trans_d[i].y, */
+                        /*     trans_d[i].z, */
+                        /*     cp.x, */
+                        /*     cp.y, */
+                        /*     cp.z, */
+                        /*     side, */
+                        /*     sphere->radius); dbgio_flush(); */
                 }
         }
 

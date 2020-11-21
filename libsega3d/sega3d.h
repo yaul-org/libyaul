@@ -71,7 +71,8 @@ typedef struct {
 } sega3d_fog_t;
 
 typedef struct {
-        uint16_t count;
+        uint16_t object_count;
+        uint16_t polygon_count;
 } sega3d_results_t;
 
 typedef struct {
@@ -115,10 +116,11 @@ extern void sega3d_matrix_copy(MATRIX *matrix);
 extern void sega3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz);
 extern void sega3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz);
 extern void sega3d_matrix_trans_reset(void);
-extern void sega3d_matrix_rotate(const ANGLE rx, const ANGLE ry, const ANGLE rz);
+extern void sega3d_matrix_rot_load(const ANGLE rx, const ANGLE ry, const ANGLE rz);
 extern void sega3d_matrix_rot_x(const ANGLE angle);
 extern void sega3d_matrix_rot_y(const ANGLE angle);
 extern void sega3d_matrix_rot_z(const ANGLE angle);
+extern void sega3d_matrix_transpose_in(MATRIX *matrix);
 extern void sega3d_matrix_transpose(void);
 
 extern void sega3d_display_level_set(uint16_t level);
