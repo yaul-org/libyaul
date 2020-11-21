@@ -28,11 +28,11 @@ static bool _screen_cull_test(const transform_t * const trans);
 static bool _object_cull_test(const transform_t * const trans);
 
 static inline FIXED __always_inline __unused
-_point_transform(const FIXED *p, const FIXED *matrix)
+_point_component_transform(const fix16_vec3_t *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
 
-        const FIXED *p_p = p;
+        const fix16_vec3_t *p_p = p;
         const FIXED *matrix_p = matrix;
 
         cpu_instr_macl(&p_p, &matrix_p);
@@ -46,12 +46,24 @@ _point_transform(const FIXED *p, const FIXED *matrix)
         return (xtrct + (*matrix_p));
 }
 
+static inline fix16_vec3_t __always_inline __unused
+_point_transform(const fix16_vec3_t *p, const FIXED *matrix)
+{
+        fix16_vec3_t out_p;
+
+        out_p.x = _point_component_transform(p, &matrix[M00]);
+        out_p.y = _point_component_transform(p, &matrix[M10]);
+        out_p.z = _point_component_transform(p, &matrix[M20]);
+
+        return out_p;
+}
+
 static inline FIXED __always_inline __unused
-_normal_rotate(const FIXED *p, const FIXED *matrix)
+_normal_component_rotate(const fix16_vec3_t *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
 
-        const FIXED *p_p = p;
+        const fix16_vec3_t *p_p = p;
         const FIXED *matrix_p = matrix;
 
         cpu_instr_macl(&p_p, &matrix_p);
@@ -65,8 +77,19 @@ _normal_rotate(const FIXED *p, const FIXED *matrix)
         return xtrct;
 }
 
-static vdp1_cmdt_t _cmdt_end;
+static inline fix16_vec3_t __always_inline __unused
+_normal_rotate(const fix16_vec3_t *p, const FIXED *matrix)
+{
+        fix16_vec3_t out_p;
 
+        out_p.x = _normal_component_rotate(p, &matrix[M00]);
+        out_p.y = _normal_component_rotate(p, &matrix[M10]);
+        out_p.z = _normal_component_rotate(p, &matrix[M20]);
+
+        return out_p;
+}
+
+static vdp1_cmdt_t _cmdt_end;
 
 void
 _internal_transform_init(void)
@@ -88,6 +111,42 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
         trans->orderlist = orderlist;
         trans->current_orderlist = &orderlist[orderlist_offset];
         trans->current_cmdt = cmdts;
+
+        const FIXED * const camera_matrix =
+            (const FIXED *)_internal_state->clip_camera;
+
+        clip_planes_t * const clip_planes = _internal_state->clip_planes;
+        fix16_plane_t * const out_clip_planes =
+            (fix16_plane_t *)_internal_state->clip_planes;
+        const fix16_vec3_t * const clip_normals =
+            (const fix16_vec3_t *)&_internal_state->clip_planes->near_normal;
+
+        for (uint32_t i = 0; i < 6; i++) {
+                fix16_plane_t * const clip_plane = &out_clip_planes[i]; 
+                const fix16_vec3_t * const clip_normal = &clip_normals[i];
+
+                clip_plane->normal = _normal_rotate(clip_normal, camera_matrix);
+        }
+
+        /* Both the near and far plane point needs to be rotated, whereas the
+         * other planes all can use the camera's position as the point on the
+         * plane since all the other planes intersect at that point.
+         *
+         * This however can have overflow issues when the objects are really far
+         * away from the frustum */
+
+        clip_planes->near_plane.d =
+            _point_transform(&clip_planes->near_d, camera_matrix);
+        clip_planes->far_plane.d =
+            _point_transform(&clip_planes->far_d, camera_matrix);
+
+        for (uint32_t i = 2; i < 6; i++) {
+                fix16_plane_t * const clip_plane = &out_clip_planes[i];
+
+                clip_plane->d.x = camera_matrix[M03];
+                clip_plane->d.y = camera_matrix[M13];
+                clip_plane->d.z = camera_matrix[M23];
+        }
 }
 
 void
@@ -500,19 +559,12 @@ _object_cull_test(const transform_t * const trans)
         const sega3d_object_t * const object = trans->object;
         const sega3d_cull_sphere_t * const sphere = object->cull_data;
 
-        /* Transform the origin */
-        const FIXED * const camera_matrix =
-            (const FIXED *)_internal_state->clip_camera;
         /* We want the world matrix */
         const FIXED * const matrix = (const FIXED *)sega3d_matrix_top();
 
-        fix16_vec3_t trans_origin;
-        trans_origin.x = _point_transform((const FIXED *)&object->origin, &matrix[M00]);
-        trans_origin.y = _point_transform((const FIXED *)&object->origin, &matrix[M10]);
-        trans_origin.z = _point_transform((const FIXED *)&object->origin, &matrix[M20]);
-
-        static fix16_vec3_t rot_normals[6];
-        static fix16_vec3_t trans_d[6];
+        /* Transform the shape's origin */
+        const fix16_vec3_t trans_origin =
+            _point_transform((const fix16_vec3_t *)&object->origin, matrix); 
 
         uint16_t valid_count;
         valid_count = 0;
@@ -530,27 +582,9 @@ _object_cull_test(const transform_t * const trans)
         for (uint32_t i = DEBUG_CLIP_PLANE_START; i < (DEBUG_CLIP_PLANE_END + 1); i++) {
                 const fix16_plane_t * const clip_plane = &clip_planes[i];
 
-                rot_normals[i].x = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M00]);
-                rot_normals[i].y = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M10]);
-                rot_normals[i].z = _normal_rotate((const FIXED *)&clip_plane->normal, &camera_matrix[M20]);
-
-                if (i < 2) {
-                        /* trans_d[i].x = clip_plane->d.x + camera_matrix[M03]; */
-                        /* trans_d[i].y = clip_plane->d.y + camera_matrix[M13]; */
-                        /* trans_d[i].z = clip_plane->d.z + camera_matrix[M23]; */
-
-                        trans_d[i].x = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M00]);
-                        trans_d[i].y = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M10]);
-                        trans_d[i].z = _point_transform((const FIXED *)&clip_plane->d, &camera_matrix[M20]);
-                } else {
-                        trans_d[i].x = camera_matrix[M03];
-                        trans_d[i].y = camera_matrix[M13];
-                        trans_d[i].z = camera_matrix[M23];
-                }
-
                 fix16_vec3_t cp;
-                fix16_vec3_sub(&trans_origin, &trans_d[i], &cp);
-                const fix16_t side = fix16_vec3_dot(&rot_normals[i], &cp);
+                fix16_vec3_sub(&trans_origin, &clip_plane->d, &cp);
+                const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp);
 
                 /* Test for intersection */
                 if ((side > -sphere->radius) && (side < sphere->radius)) {
