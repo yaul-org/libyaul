@@ -140,7 +140,7 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
         clip_planes->far_plane.d =
             _point_transform(&clip_planes->far_d, camera_matrix);
 
-        for (uint32_t i = 2; i < 6; i++) {
+        for (uint32_t i = 2; i < CLIP_PLANE_COUNT; i++) {
                 fix16_plane_t * const clip_plane = &out_clip_planes[i];
 
                 clip_plane->d.x = camera_matrix[M03];
@@ -566,20 +566,7 @@ _object_cull_test(const transform_t * const trans)
         const fix16_vec3_t trans_origin =
             _point_transform((const fix16_vec3_t *)&object->origin, matrix); 
 
-        uint16_t valid_count;
-        valid_count = 0;
-
-        /* 0 near
-         * 1 far
-         * 2 left
-         * 3 right
-         * 4 top
-         * 5 bottom */
-
-#define DEBUG_CLIP_PLANE_START  (0)
-#define DEBUG_CLIP_PLANE_END    (5)
-
-        for (uint32_t i = DEBUG_CLIP_PLANE_START; i < (DEBUG_CLIP_PLANE_END + 1); i++) {
+        for (uint32_t i = 0; i < CLIP_PLANE_COUNT; i++) {
                 const fix16_plane_t * const clip_plane = &clip_planes[i];
 
                 fix16_vec3_t cp;
@@ -587,12 +574,10 @@ _object_cull_test(const transform_t * const trans)
                 const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp);
 
                 /* Test for intersection */
-                if ((side > -sphere->radius) && (side < sphere->radius)) {
-                        valid_count++;
-                } else if (side >= FIX16(0.0f)) { /* Test for intersection */
-                        valid_count++;
+                if (((side <= -sphere->radius) || (side >= sphere->radius)) && (side < FIX16(0.0f))) {
+                        return true;
                 }
         }
 
-        return (valid_count != (DEBUG_CLIP_PLANE_END - DEBUG_CLIP_PLANE_START + 1));
+        return false;
 }

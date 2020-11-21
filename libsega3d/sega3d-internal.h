@@ -21,6 +21,8 @@
 #define MIN_FOV_ANGLE           (DEGtoANG(60.0f))
 #define MAX_FOV_ANGLE           (DEGtoANG(120.0f))
 
+#define CLIP_PLANE_COUNT        (6)
+
 typedef enum {
         FLAGS_NONE        = 0,
         FLAGS_INITIALIZED = 1 << 0,
