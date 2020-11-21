@@ -550,43 +550,13 @@ _object_cull_test(const transform_t * const trans)
 
                 fix16_vec3_t cp;
                 fix16_vec3_sub(&trans_origin, &trans_d[i], &cp);
-
                 const fix16_t side = fix16_vec3_dot(&rot_normals[i], &cp);
-
-                bool intersect = false;
 
                 /* Test for intersection */
                 if ((side > -sphere->radius) && (side < sphere->radius)) {
                         valid_count++;
-                        intersect = true;
-
-                        /* continue; */
                 } else if (side >= FIX16(0.0f)) { /* Test for intersection */
                         valid_count++;
-
-                        intersect = true;
-                }
-
-                if (!intersect) {
-                        /* dbgio_printf("    %i. to:(%f,%f,%f), rn:(%f,%f,%f), d:(%f,%f,%f), td:(%f,%f,%f), cp:(%f,%f,%f), side:%f, radius:%f\n", */
-                        /*     i, */
-                        /*     trans_origin.x, */
-                        /*     trans_origin.y, */
-                        /*     trans_origin.z, */
-                        /*     rot_normals[i].x, */
-                        /*     rot_normals[i].y, */
-                        /*     rot_normals[i].z, */
-                        /*     clip_plane->d.x, */
-                        /*     clip_plane->d.y, */
-                        /*     clip_plane->d.z, */
-                        /*     trans_d[i].x, */
-                        /*     trans_d[i].y, */
-                        /*     trans_d[i].z, */
-                        /*     cp.x, */
-                        /*     cp.y, */
-                        /*     cp.z, */
-                        /*     side, */
-                        /*     sphere->radius); dbgio_flush(); */
                 }
         }
 
