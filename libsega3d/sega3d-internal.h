@@ -107,6 +107,7 @@ typedef void (*iterate_fn)(sort_single_t *);
 
 typedef struct {
         flags_t flags;
+        sega3d_results_t * const results;
 
         sega3d_fog_t * const fog;
         sega3d_info_t * const info;

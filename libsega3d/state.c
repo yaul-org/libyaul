@@ -7,6 +7,8 @@
 
 #include "sega3d-internal.h"
 
+static sega3d_results_t _results;
+
 static sega3d_fog_t _fog;
 
 static sega3d_info_t _info;
@@ -24,6 +26,7 @@ static clip_planes_t _clip_planes __aligned(16);
 
 static state_t _state = {
         .flags = FLAGS_NONE,
+        .results = &_results,
         .fog = &_fog,
         .info = &_info,
         .transform = &_transform,
