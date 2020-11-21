@@ -24,6 +24,9 @@
 #define STATE_BUFFER_DIRTY      0x02
 #define STATE_BUFFER_FLUSHING   0x04
 
+#define BUFFER_FLUSH_POW        (5)
+#define BUFFER_FLUSH_REM_MASK   (0x1F)
+
 static void _init(const dbgio_usb_cart_t *);
 static void _deinit(void);
 static void _puts(const char *);
@@ -124,6 +127,21 @@ _puts(const char *buffer)
 }
 
 static void
+_buffer_partial_flush(const uint8_t *buffer, uint32_t len)
+{
+        if (len == 0) {
+                return;
+        }
+
+        usb_cart_byte_send(SSLOAD_API_CMD_LOG);
+        usb_cart_long_send(len);
+
+        for (uint32_t i = 0; i < len; i++) {
+                usb_cart_byte_send(buffer[i]);
+        }
+}
+
+static void
 _flush(void)
 {
         if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
@@ -132,20 +150,11 @@ _flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        uint32_t len;
-        len = _dev_state->buffer_p - _dev_state->buffer;
+        const uint32_t len = _dev_state->buffer_p - _dev_state->buffer;
 
-        if (len > 0) {
-                usb_cart_byte_send(SSLOAD_API_CMD_LOG);
+        _buffer_partial_flush(&_dev_state->buffer[0], len);
 
-                usb_cart_long_send(len);
-
-                for (uint32_t i = 0; i < len; i++) {
-                        usb_cart_byte_send(_dev_state->buffer[i]);
-                }
-
-                _dev_state->buffer_p = _dev_state->buffer;
-        }
+        _dev_state->buffer_p = _dev_state->buffer;
 
         _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
 }
