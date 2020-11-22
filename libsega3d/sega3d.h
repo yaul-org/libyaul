@@ -36,15 +36,11 @@ typedef enum {
         SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 2,
         /// Cull in screen space
         SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3,
-        /// Cull object
-        SEGA3D_OBJECT_FLAGS_CULL_OBJECT   = 1 << 4,
+        /// Cull object using a bounding sphere
+        SEGA3D_OBJECT_FLAGS_CULL_SPHERE   = 1 << 4,
+        /// Cull object using an AABB
+        SEGA3D_OBJECT_FLAGS_CULL_AABB     = 1 << 5,
 } sega3d_flags_t;
-
-typedef enum {
-        SEGA3D_CULL_TYPE_NONE   = 0,
-        SEGA3D_CULL_TYPE_SPHERE = 1 << 0,
-        SEGA3D_CULL_TYPE_BOX    = 1 << 1
-} sega3d_cull_type_t;
 
 typedef struct {
         FIXED ratio;         /* Screen ratio */
@@ -76,12 +72,14 @@ typedef struct {
 } sega3d_results_t;
 
 typedef struct {
+        FIXED origin[XYZ];
         FIXED radius;
 } sega3d_cull_sphere_t;
 
 typedef struct {
+        FIXED origin[XYZ];
         FIXED length[XYZ];
-} sega3d_cull_box_t;
+} sega3d_cull_aabb_t;
 
 struct sega3d_object {
         sega3d_flags_t flags;
@@ -89,9 +87,7 @@ struct sega3d_object {
         void *pdatas;
         uint16_t pdata_count;
 
-        FIXED origin[XYZ];
-        sega3d_cull_type_t cull_type;
-        void *cull_data;
+        void *cull_shape;
 
         void *user_data;
 };
@@ -125,20 +121,24 @@ extern void sega3d_matrix_transpose(void);
 
 extern void sega3d_display_level_set(uint16_t level);
 extern void sega3d_perspective_set(ANGLE fov);
-extern void sega3d_frustum_camera_set(const POINT *position, const VECTOR *rx,
-    const VECTOR *ry, const VECTOR *rz);
+extern void sega3d_frustum_camera_set(const POINT position, const VECTOR rx,
+    const VECTOR ry, const VECTOR rz);
 extern void sega3d_info_get(sega3d_info_t *info);
 
 extern void sega3d_fog_set(const sega3d_fog_t *fog);
 extern void sega3d_fog_limits_set(FIXED start_z, FIXED end_z);
 
-extern void sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_cmdt_t *cmdts);
+extern void sega3d_start(vdp1_cmdt_orderlist_t *orderlist,
+    uint16_t orderlist_offset, vdp1_cmdt_t *cmdts);
 extern void sega3d_finish(sega3d_results_t *results);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
-extern void sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index);
+extern void sega3d_object_transform(const sega3d_object_t *object,
+    uint16_t pdata_index);
 
-extern void sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp);
-extern void sega3d_ztp_texs_get(const sega3d_ztp_t *ztp, sega3d_ztp_tex_t *ztp_texs);
+extern void sega3d_ztp_pdata_patch(sega3d_object_t *object,
+    const sega3d_ztp_t *ztp, const sega3d_ztp_patch_t patch);
+extern void sega3d_ztp_texs_get(const sega3d_ztp_t *ztp,
+    sega3d_ztp_tex_t *ztp_texs);
 
 #endif /* SEGA3D_H_ */

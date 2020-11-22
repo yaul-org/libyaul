@@ -86,25 +86,25 @@ sega3d_perspective_set(ANGLE fov)
 }
 
 void
-sega3d_frustum_camera_set(const POINT *position, const VECTOR *rx,
-    const VECTOR *ry, const VECTOR *rz)
+sega3d_frustum_camera_set(const POINT position, const VECTOR rx,
+    const VECTOR ry, const VECTOR rz)
 {
         FIXED * const clip_camera = (FIXED *)_internal_state->clip_camera;
 
-        clip_camera[M00] = (*rx)[X];
-        clip_camera[M01] = (*rx)[Y];
-        clip_camera[M02] = (*rx)[Z];
-        clip_camera[M03] = (*position)[X];
+        clip_camera[M00] = rx[X];
+        clip_camera[M01] = rx[Y];
+        clip_camera[M02] = rx[Z];
+        clip_camera[M03] = position[X];
 
-        clip_camera[M10] = (*ry)[X];
-        clip_camera[M11] = (*ry)[Y];
-        clip_camera[M12] = (*ry)[Z];
-        clip_camera[M13] = (*position)[Y];
+        clip_camera[M10] = ry[X];
+        clip_camera[M11] = ry[Y];
+        clip_camera[M12] = ry[Z];
+        clip_camera[M13] = position[Y];
 
-        clip_camera[M20] = (*rz)[X];
-        clip_camera[M21] = (*rz)[Y];
-        clip_camera[M22] = (*rz)[Z];
-        clip_camera[M23] = (*position)[Z];
+        clip_camera[M20] = rz[X];
+        clip_camera[M21] = rz[Y];
+        clip_camera[M22] = rz[Z];
+        clip_camera[M23] = position[Z];
 }
 
 void

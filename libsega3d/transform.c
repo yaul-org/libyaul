@@ -16,16 +16,16 @@ extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
 extern void _internal_sort_iterate(iterate_fn fn);
 
-static void _sort_iterate(sort_single_t *single);
-static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
-
+static bool _object_aabb_cull_test(const transform_t * const trans) __unused;
+static bool _object_sphere_cull_test(const transform_t * const trans);
+static bool _screen_cull_test(const transform_t * const trans);
 static void _camera_world_transform(void);
-static void _vertex_pool_clipping(const transform_t * const trans);
-static void _polygon_process(transform_t *trans, POLYGON const *polygons);
 static void _cmdt_prepare(const transform_t * const trans);
 static void _fog_calculate(const transform_t * const trans);
-static bool _screen_cull_test(const transform_t * const trans);
-static bool _object_cull_test(const transform_t * const trans);
+static void _polygon_process(transform_t *trans, POLYGON const *polygons);
+static void _sort_iterate(sort_single_t *single);
+static void _vertex_pool_clipping(const transform_t * const trans);
+static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
 
 static inline FIXED __always_inline __unused
 _point_component_transform(const fix16_vec3_t *p, const FIXED *matrix)
@@ -199,8 +199,8 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
 
-        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_OBJECT) != SEGA3D_OBJECT_FLAGS_NONE) {
-                if ((_object_cull_test(trans))) {
+        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SPHERE) != SEGA3D_OBJECT_FLAGS_NONE) {
+                if ((_object_sphere_cull_test(trans))) {
                         return;
                 }
         }
@@ -564,31 +564,65 @@ _screen_cull_test(const transform_t * const trans)
 }
 
 static bool
-_object_cull_test(const transform_t * const trans)
+_object_sphere_cull_test(const transform_t * const trans)
 {
         const fix16_plane_t * const clip_planes =
             (fix16_plane_t *)_internal_state->clip_planes;
         const sega3d_object_t * const object = trans->object;
-        const sega3d_cull_sphere_t * const sphere = object->cull_data;
+        const sega3d_cull_sphere_t * const sphere = object->cull_shape;
 
-        /* We want the world matrix */
-        const FIXED * const matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const world_matrix = (const FIXED *)sega3d_matrix_top();
 
-        /* Transform the shape's origin */
-        const fix16_vec3_t trans_origin =
-            _point_transform((const fix16_vec3_t *)&object->origin, matrix); 
+        /* Transform the shape's origin
+         * Because we're working with spheres and AABBs, it's enough to just
+         * translate the center point. For AABBs, the user would be responsible
+         * for updating the AABB */
+        const fix16_vec3_t trans_origin = {
+                .x = sphere->origin[X] + world_matrix[M03],
+                .y = sphere->origin[Y] + world_matrix[M13],
+                .z = sphere->origin[Z] + world_matrix[M23]
+        };
 
         for (uint32_t i = 0; i < CLIP_PLANE_COUNT; i++) {
                 const fix16_plane_t * const clip_plane = &clip_planes[i];
 
                 fix16_vec3_t cp;
                 fix16_vec3_sub(&trans_origin, &clip_plane->d, &cp);
+
                 const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp);
 
                 /* Test for intersection */
                 if (((side <= -sphere->radius) || (side >= sphere->radius)) && (side < FIX16(0.0f))) {
                         return true;
                 }
+        }
+
+        return false;
+}
+
+static bool
+_object_aabb_cull_test(const transform_t * const trans)
+{
+        const fix16_plane_t * const clip_planes =
+            (fix16_plane_t *)_internal_state->clip_planes;
+        const sega3d_object_t * const object = trans->object;
+        const sega3d_cull_aabb_t * const aabb = object->cull_shape;
+
+        const FIXED * const world_matrix = (const FIXED *)sega3d_matrix_top();
+
+        const fix16_vec3_t trans_origin = {
+                .x = aabb->origin[X] + world_matrix[M03],
+                .y = aabb->origin[Y] + world_matrix[M13],
+                .z = aabb->origin[Z] + world_matrix[M23]
+        };
+
+        for (uint32_t i = 0; i < CLIP_PLANE_COUNT; i++) {
+                /* const fix16_plane_t * const clip_plane = &clip_planes[i]; */
+
+                /* fix16_vec3_t cp; */
+                /* fix16_vec3_sub(&trans_origin, &clip_plane->d, &cp); */
+
+                /* const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp); */
         }
 
         return false;
