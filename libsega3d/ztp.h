@@ -20,6 +20,11 @@
 #define SEGA3D_ZTP_CMODE_256            (4)
 #define SEGA3D_ZTP_CMODE_RGB1555        (5)
 
+typedef enum {
+        SEGA3D_ZTP_PATCH_NONE     = 0,
+        SEGA3D_ZTP_PATCH_USE_AABB = 1 << 0
+} sega3d_ztp_patch_t;
+
 typedef struct {
         uint16_t pdata_count; /* Total amount of PDATA */
         uint16_t tex_count;   /* Total amount of textures */

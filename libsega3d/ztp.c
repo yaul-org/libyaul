@@ -24,27 +24,29 @@ typedef struct {
 } __packed internal_tex_t;
 
 void
-sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp)
+sega3d_ztp_pdata_patch(sega3d_object_t *object, const sega3d_ztp_t *ztp,
+    const sega3d_ztp_patch_t patch)
 {
         PDATA * const pdatas = malloc(ztp->pdata_count * sizeof(PDATA));
         assert(pdatas != NULL);
 
         object->pdatas = pdatas;
         object->pdata_count = ztp->pdata_count;
-        object->origin[X] = ztp->origin[X];
-        object->origin[Y] = ztp->origin[Y];
-        object->origin[Z] = ztp->origin[Z];
 
-        object->cull_type = SEGA3D_CULL_TYPE_BOX;
+        if ((patch & SEGA3D_ZTP_PATCH_USE_AABB) != SEGA3D_ZTP_PATCH_NONE) {
+                sega3d_cull_aabb_t * const aabb = malloc(sizeof(sega3d_cull_aabb_t));
+                assert(aabb != NULL);
 
-        sega3d_cull_box_t * const box = malloc(sizeof(sega3d_cull_box_t));
-        assert(box != NULL);
+                aabb->origin[X] = ztp->origin[X];
+                aabb->origin[Y] = ztp->origin[Y];
+                aabb->origin[Z] = ztp->origin[Z];
 
-        box->length[X] = ztp->length[X];
-        box->length[Y] = ztp->length[Y];
-        box->length[Z] = ztp->length[Z];
+                aabb->length[X] = ztp->length[X];
+                aabb->length[Y] = ztp->length[Y];
+                aabb->length[Z] = ztp->length[Z];
 
-        object->cull_data = box;
+                object->cull_shape = aabb;
+        }
 
         uintptr_t base_p = ((uintptr_t)ztp + sizeof(sega3d_ztp_t) + ztp->tex_size);
 
