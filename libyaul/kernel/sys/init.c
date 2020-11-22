@@ -57,7 +57,7 @@ static void __used __section(".init")
 _init(void)
 {
         _internal_mm_init();
-        
+
         _call_global_ctors();
 
         _internal_cpu_init();

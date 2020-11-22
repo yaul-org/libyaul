@@ -24,14 +24,14 @@ __BEGIN_DECLS
 #define FAD2LBA(x)      ((x) - 150)
 #define LBA2FAD(x)      ((x) + 150)
 
-typedef uint32_t fad_t; 
+typedef uint32_t fad_t;
 
 typedef struct cd_block_hardware_info {
         uint8_t cd_status;
         uint8_t hw_flag;
-        uint8_t hw_version; 
-        uint8_t mpeg_version; 
-        uint8_t drive_version; 
+        uint8_t hw_version;
+        uint8_t mpeg_version;
+        uint8_t drive_version;
         uint8_t drive_revision;
 } cd_block_hardware_info_t;
 

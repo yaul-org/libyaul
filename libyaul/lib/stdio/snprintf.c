@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <fix16.h> 
+#include <fix16.h>
 
 #define P01 (10)
 #define P02 (100)

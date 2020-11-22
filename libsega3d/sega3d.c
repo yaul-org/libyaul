@@ -33,7 +33,7 @@ static void _frustum_clip_planes_calculate(FIXED fov_angle);
 
 void
 sega3d_init(void)
-{        
+{
         /* Prevent re-initialization */
         if ((_internal_state->flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
                 return;

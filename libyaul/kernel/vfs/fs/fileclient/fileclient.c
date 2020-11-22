@@ -21,7 +21,7 @@ fileclient_sector_request(const char *filename, const uint32_t sector_offset,
 
         usb_cart_long_send(sector_offset);
 
-        while (true) { 
+        while (true) {
                 uint8_t *byte_buffer;
                 byte_buffer = (uint8_t *)dst;
 

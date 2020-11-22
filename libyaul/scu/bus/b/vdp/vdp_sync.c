@@ -297,7 +297,7 @@ vdp_sync(void)
                 dma_queue_flush_wait();
 
                 const uint8_t vdp1_flag_mask =
-                    (VDP1_FLAG_REQUEST_XFER_LIST | VDP1_FLAG_CHANGED); 
+                    (VDP1_FLAG_REQUEST_XFER_LIST | VDP1_FLAG_CHANGED);
 
                 const bool vdp1_working =
                     ((_state.vdp1.flags & vdp1_flag_mask) == VDP1_FLAG_REQUEST_XFER_LIST);
@@ -330,9 +330,9 @@ vdp1_sync_rendering(void)
         }
 
         const uint8_t vdp1_flag_mask =
-            (VDP1_FLAG_REQUEST_COMMIT_LIST | VDP1_FLAG_LIST_COMMITTED); 
+            (VDP1_FLAG_REQUEST_COMMIT_LIST | VDP1_FLAG_LIST_COMMITTED);
 
-        return ((_state.vdp1.flags & vdp1_flag_mask) != VDP1_FLAG_LIST_COMMITTED);       
+        return ((_state.vdp1.flags & vdp1_flag_mask) != VDP1_FLAG_LIST_COMMITTED);
 }
 
 void
@@ -732,7 +732,7 @@ _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
             _state.vdp2.flags);
 
         if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_CHANGE) == 0x00) {
-                DEBUG_PRINTF("VBLANK-OUT,!VDP1_FLAG_REQUEST_CHANGE\n"); 
+                DEBUG_PRINTF("VBLANK-OUT,!VDP1_FLAG_REQUEST_CHANGE\n");
                 return;
         }
 

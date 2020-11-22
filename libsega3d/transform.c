@@ -127,7 +127,7 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
             (const fix16_vec3_t *)&_internal_state->clip_planes->near_normal;
 
         for (uint32_t i = 0; i < 6; i++) {
-                fix16_plane_t * const clip_plane = &out_clip_planes[i]; 
+                fix16_plane_t * const clip_plane = &out_clip_planes[i];
                 const fix16_vec3_t * const clip_normal = &clip_normals[i];
 
                 clip_plane->normal = _normal_rotate(clip_normal, camera_matrix);
@@ -372,7 +372,7 @@ _vertex_pool_clipping(const transform_t * const trans)
 static void
 _polygon_process(transform_t *trans, POLYGON const *polygons)
 {
-        transform_proj_t * const transform_proj_pool =            
+        transform_proj_t * const transform_proj_pool =
             &_internal_state->transform_proj_pool[0];
 
         const sega3d_object_t * const object = trans->object;
@@ -509,7 +509,7 @@ _fog_calculate(const transform_t * const trans)
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step); 
+        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step);
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;
@@ -557,7 +557,7 @@ _screen_cull_test(const transform_t * const trans)
                 .x = p3->x - p0->x,
                 .y = p3->y - p0->y
         };
-        
+
         const int16_t z2 = (v1.x * v2.y) - (v1.y * v2.x);
 
         return (z2 >= 0);
