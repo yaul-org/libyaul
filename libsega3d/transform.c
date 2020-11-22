@@ -646,18 +646,6 @@ _object_aabb_cull_test(const transform_t * const trans)
                 const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp);
 
                 if (side < FIX16(0.0f)) {
-                        dbgio_printf("    np:(%f,%f,%f), n:(%f,%f,%f), cp:(%f,%f,%f), side: %f\n",
-                            near_point.x,
-                            near_point.y,
-                            near_point.z,
-                            clip_plane->normal.x,
-                            clip_plane->normal.y,
-                            clip_plane->normal.z,
-                            cp.x,
-                            cp.y,
-                            cp.z,
-                            side);
-                        dbgio_flush();
                         return true;
                 }
         }
