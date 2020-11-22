@@ -187,11 +187,13 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
         right.x = fix16_mul(inv_cos, sin);
         right.y = FIX16(0.0f);
         right.z = FIX16(1.0f);
+        fix16_vec3_normalize(&right);
 
         fix16_vec3_t top;
         top.x = FIX16(0.0f);
         top.y = fix16_mul(aspect_ratio, right.x);
         top.z = aspect_ratio;
+        fix16_vec3_normalize(&top);
 
         fix16_vec3_t * const near_normal = &clip_planes->near_normal;
         near_normal->x = FIX16(0.0f);
@@ -205,7 +207,6 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
 
         fix16_vec3_t * const right_normal = &clip_planes->right_normal;
         fix16_vec3_cross(&axis_up, &right, right_normal);
-        fix16_vec3_normalize(right_normal);
 
         fix16_vec3_t * const left_normal = &clip_planes->left_normal;
         left_normal->x = -right_normal->x;
@@ -214,7 +215,6 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
 
         fix16_vec3_t * const top_normal = &clip_planes->top_normal;
         fix16_vec3_cross(&axis_right, &top, top_normal);
-        fix16_vec3_normalize(top_normal);
 
         _frustrum_nf_clip_planes_calculate();
 }
