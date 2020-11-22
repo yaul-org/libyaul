@@ -13,7 +13,7 @@
 #include "fix16.h"
 
 void
-fix16_vec3_normalize(fix16_vec3_t *result __unused)
+fix16_vec3_normalize(fix16_vec3_t *result)
 {
         const fix16_t length = fix16_vec3_length(result);
 
@@ -40,8 +40,8 @@ fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
 fix16_t
 fix16_vec3_length(const fix16_vec3_t *v0)
 {
-        const fix16_t r = fix16_vec3_sqr_length(v0) >> 8;
-        const fix16_t length = fix16_sqrt(r) << 8;
+        const fix16_t r = fix16_vec3_sqr_length(v0);
+        const fix16_t length = fix16_sqrt(r);
 
         return length;
 }
@@ -50,9 +50,9 @@ fix16_t
 fix16_vec3_sqr_length(const fix16_vec3_t *v0)
 {
         const fix16_vec3_t v0_shifted = {
-                .x = v0->x >> 8,
-                .y = v0->y >> 8,
-                .z = v0->z >> 8
+                .x = v0->x,
+                .y = v0->y,
+                .z = v0->z
         };
 
         const fix16_vec3_t *v0_p1 = &v0_shifted;
@@ -66,7 +66,7 @@ fix16_vec3_sqr_length(const fix16_vec3_t *v0)
         const fix16_t mach = cpu_instr_sts_mach();
         const fix16_t macl = cpu_instr_sts_macl();
 
-        const fix16_t length = cpu_instr_xtrct(mach, macl) << 8;
+        const fix16_t length = cpu_instr_xtrct(mach, macl);
 
         return length;
 }

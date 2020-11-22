@@ -199,7 +199,11 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
 
-        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SPHERE) != SEGA3D_OBJECT_FLAGS_NONE) {
+        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_AABB) != SEGA3D_OBJECT_FLAGS_NONE) {
+                if ((_object_aabb_cull_test(trans))) {
+                        return;
+                }
+        } else if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SPHERE) != SEGA3D_OBJECT_FLAGS_NONE) {
                 if ((_object_sphere_cull_test(trans))) {
                         return;
                 }
@@ -610,19 +614,52 @@ _object_aabb_cull_test(const transform_t * const trans)
 
         const FIXED * const world_matrix = (const FIXED *)sega3d_matrix_top();
 
-        const fix16_vec3_t trans_origin = {
-                .x = aabb->origin[X] + world_matrix[M03],
-                .y = aabb->origin[Y] + world_matrix[M13],
-                .z = aabb->origin[Z] + world_matrix[M23]
+        const fix16_vec3_t aabb_min = {
+                .x = world_matrix[M03] + aabb->origin[X] - aabb->length[X],
+                .y = world_matrix[M13] + aabb->origin[Y] - aabb->length[Y],
+                .z = world_matrix[M23] + aabb->origin[Z] - aabb->length[Z]
         };
 
+        const fix16_vec3_t aabb_max = {
+                .x = world_matrix[M03] + aabb->origin[X] + aabb->length[X],
+                .y = world_matrix[M13] + aabb->origin[Y] + aabb->length[Y],
+                .z = world_matrix[M23] + aabb->origin[Z] + aabb->length[Z]
+        };
+
+        /* Depending where the normal is pointing, find the point nearest to the
+         * plane. Taking the dot product of the normal and this near point of
+         * the AABB determines if the AABB is intersecting with the clip
+         * plane */
+
         for (uint32_t i = 0; i < CLIP_PLANE_COUNT; i++) {
-                /* const fix16_plane_t * const clip_plane = &clip_planes[i]; */
+                const fix16_plane_t * const clip_plane = &clip_planes[i];
 
-                /* fix16_vec3_t cp; */
-                /* fix16_vec3_sub(&trans_origin, &clip_plane->d, &cp); */
+                fix16_vec3_t near_point;
 
-                /* const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp); */
+                near_point.x = (clip_plane->normal.x < FIX16(0.0f)) ? aabb_min.x : aabb_max.x;
+                near_point.y = (clip_plane->normal.y < FIX16(0.0f)) ? aabb_min.y : aabb_max.y;
+                near_point.z = (clip_plane->normal.z < FIX16(0.0f)) ? aabb_min.z : aabb_max.z;
+
+                fix16_vec3_t cp;
+                fix16_vec3_sub(&near_point, &clip_plane->d, &cp);
+
+                const fix16_t side = fix16_vec3_dot(&clip_plane->normal, &cp);
+
+                if (side < FIX16(0.0f)) {
+                        dbgio_printf("    np:(%f,%f,%f), n:(%f,%f,%f), cp:(%f,%f,%f), side: %f\n",
+                            near_point.x,
+                            near_point.y,
+                            near_point.z,
+                            clip_plane->normal.x,
+                            clip_plane->normal.y,
+                            clip_plane->normal.z,
+                            cp.x,
+                            cp.y,
+                            cp.z,
+                            side);
+                        dbgio_flush();
+                        return true;
+                }
         }
 
         return false;
