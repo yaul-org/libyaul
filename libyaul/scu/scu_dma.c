@@ -77,7 +77,7 @@ _internal_scu_dma_init(void)
 
         for (uint32_t level = 0; level < 3; level++) {
                 struct level_state *level_state;
-                level_state = &_level_state[level]; 
+                level_state = &_level_state[level];
 
                 level_state->flags = LEVEL_STATE_IDLING;
 

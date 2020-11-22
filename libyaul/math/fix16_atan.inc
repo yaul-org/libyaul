@@ -264,5 +264,5 @@ static const fix16_t _lut_brads_atan[FIX16_LUT_ATAN_TABLE_COUNT + 2] __aligned(1
         /* 254. atan(0.99219f): 0.77926f  */ 0x0000C77D,
         /* 255. atan(0.99609f): 0.78233f  */ 0x0000C846,
         /* 256. atan(1.00000f): 0.78540f  */ 0x0000C90F,
-        /* 257. atan(1.00391f): 0.78847f  */ 0x0000C9D8 
+        /* 257. atan(1.00391f): 0.78847f  */ 0x0000C9D8
 };

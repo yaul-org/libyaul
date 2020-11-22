@@ -96,7 +96,7 @@ sega3d_tlist_tex_append(void)
         assert(next_cursor < _tlist.count);
 
         TEXTURE * const next_texture =
-            sega3d_tlist_tex_get(next_cursor); 
+            sega3d_tlist_tex_get(next_cursor);
 
         _tlist.count = next_cursor;
 

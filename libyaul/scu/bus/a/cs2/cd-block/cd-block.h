@@ -20,7 +20,7 @@ __BEGIN_DECLS
 /**
  * Initialize the cd block subsystem.
  *
- * @param standby Controls the time before the CD stops moving while idle 
+ * @param standby Controls the time before the CD stops moving while idle
  *                (default timer is 0x1000).
  */
 extern int cd_block_init(int16_t standby);
@@ -32,7 +32,7 @@ extern int cd_block_security_bypass();
 
 /**
  * Transfer data from CD-block buffer to memory.
- * 
+ *
  * @param offset        Offset from current FAD.
  * @param buffer_number Number of buffer to start reading.
  * @param output_buffer Buffer where data will be recorded.
@@ -42,7 +42,7 @@ extern int cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8
 /**
  * Read a sector to a memory location. This function initialize and spins the
  * disk to retrieve data.
- * 
+ *
  * @param fad           FAD to start reading from.
  * @param output_buffer Buffer where data will be recorded.
  */

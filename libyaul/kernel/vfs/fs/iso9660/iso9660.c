@@ -96,7 +96,7 @@ _filelist_read_walker(const iso9660_filelist_entry_t *entry, void *args)
         if (filelist->entries_count >= filelist->entries_pooled_count) {
                 return;
         }
-        
+
         iso9660_filelist_entry_t *this_entry;
         this_entry = &filelist->entries[filelist->entries_count];
 
@@ -107,7 +107,7 @@ _filelist_read_walker(const iso9660_filelist_entry_t *entry, void *args)
 
 static bool __unused
 _dirent_interleave(const iso9660_dirent_t *dirent)
-{ 
+{
         return ((isonum_711(dirent->interleave)) != 0x00);
 }
 

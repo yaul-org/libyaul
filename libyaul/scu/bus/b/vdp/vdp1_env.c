@@ -154,7 +154,7 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
         assert(cmdts != NULL);
 
         int16_vec2_t stack_local_coords;
-        
+
         if (local_coords == NULL) {
                 local_coords = &stack_local_coords;
 
