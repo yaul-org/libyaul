@@ -23,6 +23,7 @@
 
 extern void _internal_fog_init(void);
 extern void _internal_matrix_init(void);
+extern void _internal_plist_init(void);
 extern void _internal_sort_init(void);
 extern void _internal_tlist_init(void);
 extern void _internal_transform_init(void);
@@ -46,10 +47,11 @@ sega3d_init(void)
         sega3d_display_level_set(0);
         sega3d_perspective_set(DEGtoANG(90.0f));
 
-        _internal_tlist_init();
-        _internal_matrix_init();
         _internal_fog_init();
+        _internal_matrix_init();
+        _internal_plist_init();
         _internal_sort_init();
+        _internal_tlist_init();
         _internal_transform_init();
 }
 

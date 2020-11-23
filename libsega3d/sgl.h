@@ -56,7 +56,7 @@
         h,                                                                     \
         v,                                                                     \
         (cgaddress + (((presize) * 4) >> (pal))) / 8,                          \
-        ((((h) & 0x01F8) << 5) | (v))                                          \
+        TEXHVSIZE(h, v)                                                        \
 }
 #define PICDEF(texno, cmode, pcsrc)             { (Uint16)(texno), (Uint16)(cmode), (void *)(pcsrc) }
 
@@ -69,8 +69,10 @@
         hs,                                                                    \
         vs,                                                                    \
         (cga) >> 3,                                                            \
-        (((hs) & 0x01F8) << 5) | (vs)                                          \
+        TEXHVSIZE(hs, vs)                                                      \
 }
+
+#define TEXHVSIZE(hs, vs) ((((hs) & 0x01F8) << 5) | (vs))
 
 #define PICTBL(texno, cmode, pcsrc)             { (Uint16)(texno), (Uint16)(cmode), (void *)(pcsrc) }
 
@@ -239,6 +241,10 @@ typedef struct {
         Uint16 CGadr;
         Uint16 HVsize;
 } TEXTURE;
+
+typedef struct {
+        Uint16 Color;
+} PALETTE;
 
 typedef struct {
         Uint16 texno;

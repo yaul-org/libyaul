@@ -441,32 +441,45 @@ _cmdt_prepare(const transform_t * const trans)
             (SEGA3D_OBJECT_FLAGS_WIREFRAME | SEGA3D_OBJECT_FLAGS_NON_TEXTURED);
 
         /* For debugging */
-        if ((object->flags & debug_flags) != SEGA3D_OBJECT_FLAGS_NONE) {
+        if ((object->flags & debug_flags) == SEGA3D_OBJECT_FLAGS_NONE) {
+                const clip_flags_t or_clip_flags = (trans->polygon[0]->clip_flags |
+                                                    trans->polygon[1]->clip_flags |
+                                                    trans->polygon[2]->clip_flags |
+                                                    trans->polygon[3]->clip_flags);
+        
+                if (or_clip_flags == CLIP_FLAGS_NONE) {
+                        /* Since no clip flags are set, disable pre-clipping.
+                         * This should help with performance */
+                        cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
+                }
+        
+                /* Even when there is not texture list, there is the default
+                 * texture that zeroes out CMDSRCA and CMDSIZE */
+                const TEXTURE * const textures = _internal_state->tlist->list;
+
+                /* When there is no palette list, simply use the value directly */
+                const PALETTE * const palettes = _internal_state->plist->list;
+
+                if ((attr->dir == FUNC_Texture) && ((attr->sort & UseTexture) == UseTexture)) {
+                        const TEXTURE * const texture = &textures[attr->texno];
+
+                        if (palettes != NULL) {
+                                const PALETTE * const palette = &palettes[attr->colno];
+
+                                cmdt->cmd_colr = palette->Color;
+                        } else {
+                                cmdt->cmd_colr = attr->colno;
+                        }
+
+                        cmdt->cmd_srca = texture->CGadr;
+                        cmdt->cmd_size = texture->HVsize;
+
+                        cmdt->cmd_pmod |= VDP1_CMDT_PMOD_HSS_ENABLE;
+                }
+        } else {
                 cmdt->cmd_ctrl = 0x0004 | ((object->flags & debug_flags) >> 1);
                 cmdt->cmd_pmod = VDP1_CMDT_PMOD_END_CODE_DISABLE | VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE;
                 cmdt->cmd_colr = 0xFFFF;
-        }
-
-        const clip_flags_t or_clip_flags = (trans->polygon[0]->clip_flags |
-                                            trans->polygon[1]->clip_flags |
-                                            trans->polygon[2]->clip_flags |
-                                            trans->polygon[3]->clip_flags);
-
-        if (or_clip_flags == CLIP_FLAGS_NONE) {
-                /* Since no clip flags are set, disable pre-clipping. This
-                 * should help with performance */
-                cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
-        }
-
-        /* Even when there is not texture list, there is the default texture
-         * that zeroes out CMDSRCA and CMDSIZE */
-        if ((attr->sort & UseTexture) == UseTexture) {
-                const TEXTURE * const texture = sega3d_tlist_tex_get(attr->texno);
-
-                cmdt->cmd_srca = texture->CGadr;
-                cmdt->cmd_size = texture->HVsize;
-
-                cmdt->cmd_pmod |= VDP1_CMDT_PMOD_HSS_ENABLE;
         }
 
         int16_vec2_t *cmd_vertex;
@@ -491,7 +504,7 @@ _cmdt_prepare(const transform_t * const trans)
         cmdt->cmd_grda = attr->gstb;
 
         if ((_internal_state->flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
-                _fog_calculate(trans);
+                /* _fog_calculate(trans); */
         }
 }
 
@@ -522,7 +535,7 @@ _fog_calculate(const transform_t * const trans)
                 int_z_depth = _internal_state->fog->depth_count - 1;
         }
 
-        const int32_t depth_index = _internal_state->fog->depth_z[int_z_depth];
+        const int32_t depth_index __unused = _internal_state->fog->depth_z[int_z_depth];
 
         cmdt->cmd_colr = _internal_state->fog->depth_colors[depth_index].raw;
 }
