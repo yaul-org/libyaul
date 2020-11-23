@@ -30,10 +30,10 @@ typedef enum {
 } flags_t;
 
 typedef enum {
-        TLIST_FLAGS_NONE,
-        TLIST_FLAGS_USER_ALLOCATED = 1 << 0,
-        TLIST_FLAGS_ALLOCATED      = 1 << 1
-} tlist_flags_t;
+        LIST_FLAGS_NONE,
+        LIST_FLAGS_USER_ALLOCATED = 1 << 0,
+        LIST_FLAGS_ALLOCATED      = 1 << 1
+} list_flags_t;
 
 typedef enum {
         CLIP_FLAGS_NONE   = 0,
@@ -106,6 +106,14 @@ typedef struct {
 typedef void (*iterate_fn)(sort_single_t *);
 
 typedef struct {
+        list_flags_t flags;
+        void *list;
+        uint16_t count;
+        uint16_t size;
+        void *default_element;
+} __aligned(4) list_t;
+
+typedef struct {
         flags_t flags;
         sega3d_results_t * const results;
 
@@ -118,8 +126,14 @@ typedef struct {
         MATRIX * const matrices;
         sort_list_t * const sort_list;
         sort_single_t * const sort_single_pool;
+        list_t * const tlist;
+        list_t * const plist;
 } __aligned(16) state_t;
 
 extern state_t * const _internal_state;
+
+extern void internal_list_alloc(list_t *list, uint16_t count);
+extern void internal_list_free(list_t *list);
+extern void internal_list_set(list_t *list, void *list_p, uint16_t count);
 
 #endif /* SEGA3D_INTERNAL_H_ */

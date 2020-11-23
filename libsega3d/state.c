@@ -24,6 +24,9 @@ static sort_single_t _sort_single_pool[PACKET_SIZE] __aligned(16);
 static MATRIX _clip_camera __aligned(16);
 static clip_planes_t _clip_planes __aligned(16);
 
+static list_t _tlist __aligned(16);
+static list_t _plist __aligned(16);
+
 static state_t _state = {
         .flags = FLAGS_NONE,
         .results = &_results,
@@ -35,7 +38,9 @@ static state_t _state = {
         .clip_planes = &_clip_planes,
         .matrices = _matrices,
         .sort_list = _sort_list,
-        .sort_single_pool = _sort_single_pool
+        .sort_single_pool = _sort_single_pool,
+        .tlist = &_tlist,
+        .plist = &_plist
 };
 
 state_t * const _internal_state = &_state;
