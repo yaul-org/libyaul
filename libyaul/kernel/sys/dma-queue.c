@@ -24,13 +24,10 @@
 #define DMA_QUEUE_REQUESTS_MAX_COUNT    (32)
 #define DMA_QUEUE_REQUESTS_MASK         (DMA_QUEUE_REQUESTS_MAX_COUNT - 1)
 
-/* XXX: Move this! */
-typedef void (*dma_queue_request_handler)(const dma_queue_transfer_t *);
-
 struct dma_queue_request {
         scu_dma_handle_t handle;
 
-        dma_queue_request_handler handler;
+        dma_queue_request_hdl_t handler;
         dma_queue_transfer_t transfer;
 } __aligned(8);
 
@@ -188,7 +185,7 @@ _internal_dma_queue_init(void)
 
 int8_t
 dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
-    dma_queue_request_handler handler,
+    dma_queue_request_hdl_t handler,
     void *work)
 {
         assert(handle != NULL);
@@ -224,6 +221,21 @@ exit:
         cpu_intc_mask_set(intc_mask);
 
         return status;
+}
+
+int8_t
+dma_queue_simple_enqueue(uint8_t tag, void *dst, void *src, size_t len)
+{
+        static scu_dma_handle_t handle = {
+                .dnad = 0x00000101,
+                .dnmd = 0x00010100
+        };
+
+        handle.dnr = (uint32_t)src;
+        handle.dnw = (uint32_t)dst;
+        handle.dnc = len;
+
+        return dma_queue_enqueue(&handle, tag, NULL, NULL);
 }
 
 void
