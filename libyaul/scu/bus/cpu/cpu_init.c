@@ -21,6 +21,8 @@
 #include <cpu/registers.h>
 #include <cpu/wdt.h>
 
+#include <vdp.h>
+
 #include <dbgio.h>
 
 #include <internal.h>
@@ -106,15 +108,27 @@ _internal_cpu_init(void)
 static void
 _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
-        _internal_reset();
-
         const char *buffer;
         buffer = _exception_message_format(regs, exception_name);
 
+        _internal_reset();
+
+        dbgio_dev_deinit();
         dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
 
+        vdp2_tvmd_vblank_in_next_wait(1);
+
+        cpu_intc_mask_set(14);
+        dbgio_dev_font_load();
+        dbgio_dev_font_load_wait();
+        cpu_intc_mask_set(15);
+
+        dbgio_puts("[H[2J");
         dbgio_puts(buffer);
+
+        vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
+        vdp2_sync_commit();
 }
 
 static void __noreturn __used

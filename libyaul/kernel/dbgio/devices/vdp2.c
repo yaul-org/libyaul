@@ -529,11 +529,6 @@ _shared_font_load(font_load_callback_t callback)
 
         static struct dev_font_load_state font_load_state;
 
-        const uint8_t intc_mask __unused = cpu_intc_mask_get();
-
-        /* Be sure to have interrupts enabled */
-        assert(intc_mask < 15);
-
         if (_dev_state == NULL) {
                 return;
         }
@@ -541,6 +536,11 @@ _shared_font_load(font_load_callback_t callback)
         if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
                 return;
         }
+
+        const uint8_t intc_mask __unused = cpu_intc_mask_get();
+
+        /* Be sure to have interrupts enabled */
+        assert(intc_mask < 15);
 
         struct dev_font_state *font_state;
         font_state = _dev_state->font_state;
