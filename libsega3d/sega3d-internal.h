@@ -60,7 +60,7 @@ typedef struct {
         uint16_t vertex_count;         /* Current vertex count */
         uint16_t polygon_count;        /* Current polygon count */
         uint16_t index;                /* Current polygon index */
-        FIXED z_center;                /* Z center of the current polygon */
+        FIXED z_value;                 /* Z value of the current polygon */
         const transform_proj_t *polygon[4]; /* Pointers to the pool that make up the current polygon */
 
         const sega3d_object_t *object; /* Current object */

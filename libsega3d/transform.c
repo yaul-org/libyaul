@@ -22,10 +22,11 @@ static bool _screen_cull_test(const transform_t * const trans);
 static void _camera_world_transform(void);
 static void _cmdt_prepare(const transform_t * const trans);
 static void _fog_calculate(const transform_t * const trans);
-static void _polygon_process(transform_t *trans, POLYGON const *polygons);
+static void _polygon_process(transform_t * const trans, POLYGON const *polygons);
 static void _sort_iterate(sort_single_t *single);
 static void _vertex_pool_clipping(const transform_t * const trans);
 static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
+static void _z_calculate(transform_t * const trans);
 
 static inline FIXED __always_inline __unused
 _point_component_transform(const fix16_vec3_t *p, const FIXED *matrix)
@@ -374,7 +375,7 @@ _vertex_pool_clipping(const transform_t * const trans)
 }
 
 static void
-_polygon_process(transform_t *trans, POLYGON const *polygons)
+_polygon_process(transform_t * const trans, POLYGON const *polygons)
 {
         transform_proj_t * const transform_proj_pool =
             &_internal_state->transform_proj_pool[0];
@@ -405,19 +406,58 @@ _polygon_process(transform_t *trans, POLYGON const *polygons)
                         }
                 }
 
+                _z_calculate(trans);
+
+                _cmdt_prepare(trans);
+
+                _internal_sort_add(trans->current_cmdt, fix16_int32_to(trans->z_value));
+
+                trans->current_cmdt++;
+        }
+}
+
+static void
+_z_calculate(transform_t * const trans)
+{
+        const PDATA * const pdata = trans->pdata;
+        const ATTR * const attr = &pdata->attbl[trans->index];
+
+        const uint32_t sort = attr->sort & 0x03; 
+
+        if (sort == SORT_CEN) {
                 const FIXED z_avg = trans->polygon[0]->point_z +
                                     trans->polygon[1]->point_z +
                                     trans->polygon[2]->point_z +
                                     trans->polygon[3]->point_z;
 
                 /* Divide by 4 to get the average (bit shift) */
-                trans->z_center = z_avg >> 2;
+                trans->z_value = z_avg >> 2;
+        } else if (sort == SORT_MIN) {
+                trans->z_value = trans->polygon[0]->point_z; 
 
-                _cmdt_prepare(trans);
+                trans->z_value = (trans->polygon[1]->point_z < trans->z_value)
+                    ? trans->polygon[1]->point_z
+                    : trans->z_value;
+                trans->z_value = (trans->polygon[2]->point_z < trans->z_value)
+                    ? trans->polygon[2]->point_z
+                    : trans->z_value;
+                trans->z_value = (trans->polygon[3]->point_z < trans->z_value)
+                    ? trans->polygon[3]->point_z
+                    : trans->z_value;
+        } else if (sort == SORT_MAX) {
+                trans->z_value = trans->polygon[0]->point_z;
 
-                _internal_sort_add(trans->current_cmdt, fix16_int32_to(trans->z_center) >> 4);
-
-                trans->current_cmdt++;
+                trans->z_value = (trans->polygon[1]->point_z > trans->z_value)
+                    ? trans->polygon[1]->point_z
+                    : trans->z_value;
+                trans->z_value = (trans->polygon[2]->point_z > trans->z_value)
+                    ? trans->polygon[2]->point_z
+                    : trans->z_value;
+                trans->z_value = (trans->polygon[3]->point_z > trans->z_value)
+                    ? trans->polygon[3]->point_z
+                    : trans->z_value;
+        } else if (sort == SORT_BFR) {
+                assert(false && "Not yet implemented");
         }
 }
 
@@ -513,20 +553,20 @@ _fog_calculate(const transform_t * const trans)
 {
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 
-        if (trans->z_center < _internal_state->fog->start_z) {
+        if (trans->z_value < _internal_state->fog->start_z) {
                 cmdt->cmd_colr = _internal_state->fog->near_ambient_color.raw;
 
                 return;
         }
 
-        if (trans->z_center >= _internal_state->fog->end_z) {
+        if (trans->z_value >= _internal_state->fog->end_z) {
                 cmdt->cmd_colr = _internal_state->fog->far_ambient_color.raw;
 
                 return;
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int16_muls(trans->z_center, _internal_state->fog->step);
+        int_z_depth = fix16_int16_muls(trans->z_value, _internal_state->fog->step);
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;
@@ -548,14 +588,14 @@ _screen_cull_test(const transform_t * const trans)
         const int16_vec2_t * const p2 = &trans->polygon[2]->screen;
         const int16_vec2_t * const p3 = &trans->polygon[3]->screen;
 
-        const int16_vec2_t u1 = {
+        const int32_vec2_t u1 = {
                 .x = p1->x - p0->x,
                 .y = p1->y - p0->y
         };
 
-        const int16_vec2_t v1 = {
-                .x = p2->x - p0->x,
-                .y = p2->y - p0->y
+        const int32_vec2_t v1 = {
+                .x = p3->x - p0->x,
+                .y = p3->y - p0->y
         };
 
         /* Ideally, we only need to do a cross product on one winding order, but
@@ -564,18 +604,23 @@ _screen_cull_test(const transform_t * const trans)
          * winding order, and if it fails, don't bother testing the other
          * winding order */
 
-        const int16_t z1 = (u1.x * v1.y) - (u1.y * v1.x);
+        const int32_t z1 = (u1.x * v1.y) - (u1.y * v1.x);
 
         if (z1 < 0) {
                 return false;
         }
 
-        const int16_vec2_t v2 = {
-                .x = p3->x - p0->x,
-                .y = p3->y - p0->y
+        const int16_vec2_t u2 = {
+                .x = p3->x - p2->x,
+                .y = p3->y - p2->y
         };
 
-        const int16_t z2 = (v1.x * v2.y) - (v1.y * v2.x);
+        const int16_vec2_t v2 = {
+                .x = p1->x - p2->x,
+                .y = p1->y - p2->y
+        };
+
+        const int16_t z2 = (u2.x * v2.y) - (u2.y * v2.x);
 
         return (z2 >= 0);
 }
