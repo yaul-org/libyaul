@@ -118,6 +118,7 @@ SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
 SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
+	-ggdb3 \
 	-pedantic \
 	-s \
 	-ffreestanding \
@@ -169,7 +170,7 @@ SH_CXXFLAGS:= \
 	$(SH_CXXFLAGS_shared)
 
 SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
-SH_CFLAGS_shared_debug:= -Og -ggdb3 -DDEBUG
+SH_CFLAGS_shared_debug:= -Og -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)

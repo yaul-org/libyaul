@@ -8,6 +8,7 @@
 #include "fix16.h"
 #include "int8.h"
 #include "int16.h"
+#include "int32.h"
 #include "uint32.h"
 
 __BEGIN_DECLS
