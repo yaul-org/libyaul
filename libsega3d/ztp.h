@@ -73,7 +73,7 @@ static_assert(sizeof(sega3d_ztp_t) == 24);
 struct sega3d_ztp_handle {
         const sega3d_ztp_t *ztp;
 
-        uint16_t pdata_count;
+        uint16_t xpdata_count;
         uint16_t polygon_count;
         uint16_t tex_count;
 

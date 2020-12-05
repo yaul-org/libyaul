@@ -179,15 +179,15 @@ sega3d_finish(sega3d_results_t *results)
 }
 
 void
-sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
+sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
 {
-        const PDATA * const object_pdata = object->pdatas;
-        const PDATA * const pdata = &object_pdata[pdata_index];
+        const XPDATA * const object_xpdata = object->xpdatas;
+        const XPDATA * const xpdata = &object_xpdata[xpdata_index];
 
         const uint16_t polygon_count =
-            (pdata->nbPolygon < (PACKET_SIZE - 1)) ? pdata->nbPolygon : (PACKET_SIZE - 1);
+            (xpdata->nbPolygon < (PACKET_SIZE - 1)) ? xpdata->nbPolygon : (PACKET_SIZE - 1);
         const uint16_t vertex_count =
-            (pdata->nbPoint < VERTEX_POOL_SIZE) ? pdata->nbPoint : VERTEX_POOL_SIZE;
+            (xpdata->nbPoint < VERTEX_POOL_SIZE) ? xpdata->nbPoint : VERTEX_POOL_SIZE;
 
         if ((vertex_count == 0) || (polygon_count == 0)) {
                 return;
@@ -196,7 +196,7 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
         transform_t * const trans = _internal_state->transform;
 
         trans->object = object;
-        trans->pdata = pdata;
+        trans->xpdata = xpdata;
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
 
@@ -212,9 +212,9 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t pdata_index)
 
         sega3d_matrix_push(SEGA3D_MATRIX_TYPE_PUSH); {
                 _camera_world_transform();
-                _vertex_pool_transform(trans, pdata->pntbl);
+                _vertex_pool_transform(trans, xpdata->pntbl);
                 _vertex_pool_clipping(trans);
-                _polygon_process(trans, pdata->pltbl);
+                _polygon_process(trans, xpdata->pltbl);
         } sega3d_matrix_pop();
 
         sega3d_results_t * const results = _internal_state->results;
@@ -419,8 +419,8 @@ _polygon_process(transform_t * const trans, POLYGON const *polygons)
 static void
 _z_calculate(transform_t * const trans)
 {
-        const PDATA * const pdata = trans->pdata;
-        const ATTR * const attr = &pdata->attbl[trans->index];
+        const XPDATA * const xpdata = trans->xpdata;
+        const ATTR * const attr = &xpdata->attbl[trans->index];
 
         const uint32_t sort = attr->sort & 0x03; 
 
@@ -465,12 +465,12 @@ static void
 _cmdt_prepare(const transform_t * const trans)
 {
         const sega3d_object_t * const object = trans->object;
-        const PDATA * const pdata = trans->pdata;
+        const XPDATA * const xpdata = trans->xpdata;
 
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 
         const ATTR *attr;
-        attr = &pdata->attbl[trans->index];
+        attr = &xpdata->attbl[trans->index];
 
         cmdt->cmd_ctrl = attr->dir; /* We care about (Dir) and (Comm) bits */
         cmdt->cmd_link = 0x0000;
@@ -544,7 +544,9 @@ _cmdt_prepare(const transform_t * const trans)
         cmdt->cmd_grda = attr->gstb;
 
         if ((_internal_state->flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
-                /* _fog_calculate(trans); */
+                if ((object->flags & SEGA3D_OBJECT_FLAGS_FOG_EXCLUDE) == SEGA3D_OBJECT_FLAGS_NONE) {
+                        _fog_calculate(trans);
+                }
         }
 }
 

@@ -64,7 +64,7 @@ typedef struct {
         const transform_proj_t *polygon[4]; /* Pointers to the pool that make up the current polygon */
 
         const sega3d_object_t *object; /* Current object */
-        const void *pdata;             /* Current PDATA */
+        const void *xpdata;            /* Current XPDATA */
 
         vdp1_cmdt_orderlist_t *current_orderlist;
         vdp1_cmdt_orderlist_t *orderlist;
