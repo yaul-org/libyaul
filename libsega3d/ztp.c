@@ -25,17 +25,17 @@ typedef struct {
 } __packed _tex_v1_t;
 
 typedef struct {
-        uint16_t pdata_count; /* Total amount of PDATA */
-        uint16_t tex_count;   /* Total amount of textures */
-        uint32_t tex_size;    /* Total size of the textures in bytes */
-        uint32_t pdata_size;  /* Total size of PDATA in bytes */
+        uint16_t xpdata_count; /* Total amount of XPDATA */
+        uint16_t tex_count;    /* Total amount of textures */
+        uint32_t tex_size;     /* Total size of the textures in bytes */
+        uint32_t xpdata_size;  /* Total size of XPDATA in bytes */
         /* Origin point used to "center" the culling/collision data and your
          * model's position. Should be 0,0,0 unless you have an offset */
         FIXED origin[XYZ];
         /* Length along the X,Y,Z axis. Together with the origin, that gives you
          * the bounding box for quick broad collision testing */
         FIXED length[XYZ];
-        uint16_t frame_count; /* Number of animation frames */
+        uint16_t frame_count;  /* Number of animation frames */
         /* Interpolation factor of 2, means the number of frames between 2 key
          * frames */
         uint16_t framerate;
@@ -62,8 +62,8 @@ sega3d_ztp_parse(sega3d_object_t *object, const sega3d_ztp_t *ztp)
 
         ATTR * const attrs = ztp->attrs;
 
-        object->pdatas = xpdatas;
-        object->pdata_count = header->pdata_count;
+        object->xpdatas = xpdatas;
+        object->xpdata_count = header->xpdata_count;
 
         if ((ztp->flags & SEGA3D_ZTP_FLAG_USE_AABB) != SEGA3D_ZTP_PATCH_NONE) {
                 sega3d_cull_aabb_t * const aabb = ztp->cull_shape;
@@ -84,20 +84,20 @@ sega3d_ztp_parse(sega3d_object_t *object, const sega3d_ztp_t *ztp)
 
         uint16_t polygon_count = 0;
 
-        for (uint16_t i = 0; i < header->pdata_count; i++) {
+        for (uint16_t i = 0; i < header->xpdata_count; i++) {
                 XPDATA * const xpdata = &xpdatas[i];
 
-                const XPDATA * const base_pdata = (const XPDATA *)base_p;
+                const XPDATA * const base_xpdata = (const XPDATA *)base_p;
 
                 base_p += sizeof(XPDATA);
 
                 xpdata->pntbl = (POINT *)base_p;
-                base_p += (sizeof(POINT) * base_pdata->nbPoint);
+                base_p += (sizeof(POINT) * base_xpdata->nbPoint);
 
                 xpdata->pltbl = (POLYGON *)base_p;
-                base_p += (sizeof(POLYGON) * base_pdata->nbPolygon);
+                base_p += (sizeof(POLYGON) * base_xpdata->nbPolygon);
 
-                const uint32_t attbl_size = sizeof(ATTR) * base_pdata->nbPolygon;
+                const uint32_t attbl_size = sizeof(ATTR) * base_xpdata->nbPolygon;
 
                 if (attrs == NULL) {
                         xpdata->attbl = (ATTR *)base_p;
@@ -109,20 +109,20 @@ sega3d_ztp_parse(sega3d_object_t *object, const sega3d_ztp_t *ztp)
                 base_p += attbl_size;
 
                 /* Normals */
-                base_p += (sizeof(VECTOR) * base_pdata->nbPoint);
+                base_p += (sizeof(VECTOR) * base_xpdata->nbPoint);
 
-                xpdata->nbPoint = base_pdata->nbPoint;
-                xpdata->nbPolygon = base_pdata->nbPolygon;
+                xpdata->nbPoint = base_xpdata->nbPoint;
+                xpdata->nbPolygon = base_xpdata->nbPolygon;
 
-                polygon_count += base_pdata->nbPolygon;
+                polygon_count += base_xpdata->nbPolygon;
         }
 
         handle.ztp = ztp;
-        handle.pdata_count = header->pdata_count;
+        handle.xpdata_count = header->xpdata_count;
         handle.polygon_count = polygon_count;
         handle.tex_count = header->tex_count;
 
-        for (uint16_t i = 0; i < header->pdata_count; i++) { 
+        for (uint16_t i = 0; i < header->xpdata_count; i++) { 
                 _attr_texture_num_adjust(&handle, i, ztp->texture_num);
                 _attr_palette_num_adjust(&handle, i, ztp->palette_num);
         }
@@ -195,7 +195,7 @@ sega3d_ztp_textures_parse(sega3d_ztp_handle_t *handle, void *vram,
                         tex_fn(handle, &ztp_tex);
                 }
 
-                tex_vram_offset += tex_size;
+                tex_vram_offset += max(tex_size, 0x20UL);
                 tex_base_p += tex_size;
 
                 offset_palette += palette_size;
@@ -207,7 +207,7 @@ sega3d_ztp_textures_parse(sega3d_ztp_handle_t *handle, void *vram,
 void
 sega3d_ztp_update(sega3d_ztp_handle_t *handle, uint16_t texture_num)
 {
-        for (uint32_t i = 0; i < handle->pdata_count; i++) {
+        for (uint32_t i = 0; i < handle->xpdata_count; i++) {
                 _attr_texture_num_adjust(handle, i, texture_num);
         }
 }
@@ -251,10 +251,9 @@ _attr_palette_num_adjust(sega3d_ztp_handle_t *handle, uint16_t xpdata_index,
                 if ((attr->dir == FUNC_Texture) &&
                     ((attr->sort & UseTexture) == UseTexture) &&
                     ((attr->atrb & CL32KRGB) != CL32KRGB)) {
+                        const uint16_t rel_tex_number = attr->texno - base_texture_num;
                         /* We want the relative texture number */
-                        attr->colno = palette_num | ((attr->texno - base_texture_num) << 2);
-                        dbgio_printf("attr->atrb: 0x%04X, attr->colno: 0x%04X, attr->texno: 0x%04X, prev: 0x%04X\n",
-                            attr->atrb, attr->colno, attr->texno, base_texture_num);
+                        attr->colno = palette_num | (rel_tex_number << 2);
                 }
         }
 }

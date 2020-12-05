@@ -55,7 +55,7 @@ extern void sega3d_finish(sega3d_results_t *results);
 
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_transform(const sega3d_object_t *object,
-    uint16_t pdata_index);
+    uint16_t xpdata_index);
 
 extern sega3d_ztp_handle_t sega3d_ztp_parse(sega3d_object_t *object,
     const sega3d_ztp_t *ztp);

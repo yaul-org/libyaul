@@ -26,19 +26,21 @@ typedef enum sega3d_matrix_type {
 } sega3d_matrix_type_t;
 
 typedef enum sega3d_flags {
-        SEGA3D_OBJECT_FLAGS_NONE          = 0,
+        SEGA3D_OBJECT_FLAGS_NONE         = 0,
         /// Display non-textured polygons
-        SEGA3D_OBJECT_FLAGS_NON_TEXTURED  = 1 << 0,
+        SEGA3D_OBJECT_FLAGS_NON_TEXTURED = 1 << 0,
         /// Display wireframe
-        SEGA3D_OBJECT_FLAGS_WIREFRAME     = 1 << 1,
+        SEGA3D_OBJECT_FLAGS_WIREFRAME    = 1 << 1,
         /// Cull in world space
-        SEGA3D_OBJECT_FLAGS_CULL_VIEW     = 1 << 2,
+        SEGA3D_OBJECT_FLAGS_CULL_VIEW    = 1 << 2,
         /// Cull in screen space
-        SEGA3D_OBJECT_FLAGS_CULL_SCREEN   = 1 << 3,
+        SEGA3D_OBJECT_FLAGS_CULL_SCREEN  = 1 << 3,
         /// Cull object using a bounding sphere
-        SEGA3D_OBJECT_FLAGS_CULL_SPHERE   = 1 << 4,
+        SEGA3D_OBJECT_FLAGS_CULL_SPHERE  = 1 << 4,
         /// Cull object using an AABB
-        SEGA3D_OBJECT_FLAGS_CULL_AABB     = 1 << 5,
+        SEGA3D_OBJECT_FLAGS_CULL_AABB    = 1 << 5,
+        /// Exclude from fog calculation
+        SEGA3D_OBJECT_FLAGS_FOG_EXCLUDE  = 1 << 6
 } sega3d_flags_t;
 
 typedef struct sega3d_info {
@@ -83,8 +85,8 @@ typedef struct sega3d_cull_aabb {
 struct sega3d_object {
         sega3d_flags_t flags;
 
-        void *pdatas;
-        uint16_t pdata_count;
+        void *xpdatas;
+        uint16_t xpdata_count;
 
         void *cull_shape;
 

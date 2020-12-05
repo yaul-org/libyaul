@@ -118,9 +118,9 @@ sega3d_info_get(sega3d_info_t *info)
 Uint16
 sega3d_object_polycount_get(const sega3d_object_t *object)
 {
-        const PDATA * const pdata = object->pdatas;
+        const XPDATA * const xpdata = object->xpdatas;
 
-        return pdata->nbPolygon;
+        return xpdata->nbPolygon;
 }
 
 static void
