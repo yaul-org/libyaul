@@ -114,8 +114,6 @@
 #define __leaf                  __attribute__ ((leaf))
 #define __no_reorder            __attribute__ ((no_reorder))
 #define __hot                   __attribute__ ((hot))
-#define __uncached_var          __attribute__ ((section (__XSTRING(__CONCAT(.uncached_var.,__COUNTER__)))))
-#define __uncached_func         __attribute__ ((section (__XSTRING(__CONCAT(.uncached_func.,__COUNTER__)))))
 
 #if __has_attribute(__alloc_align__)
 #define __alloc_align(x)        __attribute__ ((__alloc_align__ (x)))
