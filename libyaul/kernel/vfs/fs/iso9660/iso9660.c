@@ -45,11 +45,12 @@ iso9660_filelist_read(iso9660_filelist_t *filelist, int32_t count)
 
         if (clamped_count <= 0) {
                 clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
+
+                filelist->entries = malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
         } else if (clamped_count > ISO9660_FILELIST_ENTRIES_COUNT) {
                 clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
         }
 
-        filelist->entries = malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
         assert(filelist->entries != NULL);
 
         filelist->entries_pooled_count = (uint32_t)clamped_count;
