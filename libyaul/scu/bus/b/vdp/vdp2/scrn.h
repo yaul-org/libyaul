@@ -449,14 +449,28 @@ typedef struct vdp2_scrn_rotation_table {
 typedef struct vdp2_scrn_ls_format {
         uint8_t scroll_screen; /* Normal background */
         uint32_t line_scroll_table; /* Line scroll table (lead addr.) */
-        uint8_t interlace_mode; /* Dependent on the interlace setting */
+        uint8_t interval; /* Dependent on the interlace setting */
 
-#define VDP2_SCRN_LS_N0SCX      0x0002
-#define VDP2_SCRN_LS_N1SCX      0x0200
-#define VDP2_SCRN_LS_N0SCY      0x0004
-#define VDP2_SCRN_LS_N1SCY      0x0400
-        uint16_t enable; /* Enable line scroll */
+#define VDP2_SCRN_LS_HORZ       0x0001 /* Scrolls horizontally per line units */
+#define VDP2_SCRN_LS_VERT       0x0002 /* Scrolls vertically per line units */
+#define VDP2_SCRN_LS_ZOOM_HORZ  0x0004 /* Scales horizontally per line units */
+        uint8_t enable; /* Enable line scroll */
 } vdp2_scrn_ls_format_t;
+
+typedef struct vdp2_scrn_ls_h {
+        fix16_t horz;
+} __packed vdp2_scrn_ls_h_t;
+
+typedef struct vdp2_scrn_ls_hv {
+        fix16_t horz;
+        fix16_t vert;
+} __packed vdp2_scrn_ls_hv_t;
+
+typedef struct vdp2_scrn_ls_hvz {
+        fix16_t horz;
+        fix16_t vert;
+        fix16_t horz_incr;
+} __packed vdp2_scrn_ls_hvz_t;
 
 typedef struct vdp2_scrn_vcs_format {
         uint8_t scroll_screen; /* Normal background */
