@@ -23,12 +23,18 @@ __BEGIN_DECLS
 
 #define VDP2_CRAM_ADDR(x)       (0x25F00000UL + ((x) << 1))
 
-#define VDP2_CRAM_MODE_0_OFFSET(x, y, z)                                       \
-        (0x25F00000UL + ((x) << 9) + ((y) << 5) + ((z) << 1))
-#define VDP2_CRAM_MODE_1_OFFSET(x, y, z)                                       \
-        VDP2_CRAM_MODE_0_OFFSET(x, y, z)
-#define VDP2_CRAM_MODE_2_OFFSET(x, y, z)                                       \
-        (0x25F00000UL + ((x) << 10) + ((y) << 6) + ((z) << 2))
+#define VDP2_CRAM_MODE_0_OFFSET(_256_bank, _16_bank, color_index)              \
+        (0x25F00000UL +                                                        \
+         ((_256_bank) << 9) +                                                  \
+         ((_16_bank) << 5) +                                                   \
+         ((color_index) << 1))
+#define VDP2_CRAM_MODE_1_OFFSET(_256_bank, _16_bank, color_index)              \
+        VDP2_CRAM_MODE_0_OFFSET(_256_bank, _16_bank, color_index)
+#define VDP2_CRAM_MODE_2_OFFSET(_256_bank, _16_bank, color_index)              \
+        (0x25F00000UL +                                                        \
+         ((_256_bank) << 10) +                                                 \
+         ((_16_bank) << 6) +                                                   \
+         ((color_index) << 2))
 
 /*-
  * CRAM Modes
@@ -51,6 +57,7 @@ __BEGIN_DECLS
 #define COLOR_RGB888_TO_RGB555(r, g, b)                                        \
         ((((b) >> 3) << 10) | (((g) >> 3) << 5) | ((r) >> 3))
 
+extern uint8_t vdp2_cram_mode_get(void);
 extern void vdp2_cram_mode_set(uint8_t);
 extern void vdp2_cram_offset_set(uint8_t, uint32_t);
 

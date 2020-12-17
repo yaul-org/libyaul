@@ -9,6 +9,12 @@
 
 #include "vdp-internal.h"
 
+uint8_t
+vdp2_cram_mode_get(void)
+{
+        return ((_state_vdp2()->regs->ramctl >> 12) & 0x03);
+}
+
 void
 vdp2_cram_mode_set(uint8_t mode)
 {
@@ -38,11 +44,9 @@ vdp2_cram_offset_set(uint8_t scrn, uint32_t cram_addr)
                (cram_addr < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
 #endif /* DEBUG */
 
-        /* Fetch CRAM mode */
-        uint8_t mode;
-        mode = (_state_vdp2()->regs->ramctl >> 12) & 0x03;
-
-        cram_addr = ((mode == 1) ? (cram_addr >> 10) : (cram_addr >> 9)) & 0x07;
+        cram_addr = (((vdp2_cram_mode_get()) == 2)
+            ? (cram_addr >> 10)
+            : (cram_addr >> 9)) & 0x07;
 
         switch (scrn) {
         case VDP2_SCRN_RBG1:

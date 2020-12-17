@@ -53,10 +53,12 @@ struct dev_state {
         /* Base page VRAM address */
         uint32_t page_base;
         uint16_t *page_pnd;
-        /* Size of splt page */
+        /* Size of split page */
         uint16_t page_size;
         uint16_t page_width;
         uint16_t page_height;
+
+        uint8_t cram_mode;
 
         /* PND value */
         uint16_t pnd_value;
@@ -150,6 +152,48 @@ static inline void __always_inline
 _pnd_clear(int16_t col, int16_t row)
 {
         _pnd_write(col, row, _dev_state->pnd_value_clear);
+}
+
+static void
+_pnd_values_update(bool force)
+{
+        const uint8_t cram_mode = vdp2_cram_mode_get();
+
+        if (!force && (_dev_state->cram_mode != cram_mode)) {
+                return;
+        }
+
+        _dev_state->cram_mode = cram_mode;
+
+        uint16_t pnd_value;
+
+        switch (cram_mode) {
+        case 0:
+        case 1:
+        default:
+                pnd_value = VDP2_SCRN_PND_CONFIG_0(0,
+                    _dev_state->cp_table,
+                    _dev_state->color_palette,
+                    /* vf = */ 0,
+                    /* hf = */ 0);
+                break;
+        case 2:
+                pnd_value = VDP2_SCRN_PND_CONFIG_0(2,
+                    _dev_state->cp_table,
+                    _dev_state->color_palette,
+                    /* vf = */ 0,
+                    /* hf = */ 0);
+                break;
+        }
+
+        _dev_state->pnd_value = pnd_value;
+        /* PND value used to clear pages */
+        _dev_state->pnd_value_clear = pnd_value;
+
+        for (uint32_t i = 0; i < _dev_state->page_size; i++) {
+                _dev_state->page_pnd[i] &= ~0xF000;
+                _dev_state->page_pnd[i] |= pnd_value; 
+        }
 }
 
 static void
@@ -321,18 +365,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
         /* Restricting the page to 64x32 avoids wasting space */
         _dev_state->page_size >>= 1;
 
-        _dev_state->pnd_value = VDP2_SCRN_PND_CONFIG_0(
-                _dev_state->cp_table,
-                _dev_state->color_palette,
-                /* vf = */ 0,
-                /* hf = */ 0);
-
-        /* PND value used to clear pages */
-        _dev_state->pnd_value_clear = VDP2_SCRN_PND_CONFIG_0(
-                _dev_state->cp_table,
-                _dev_state->color_palette,
-                /* vf = */ 0,
-                /* hf = */ 0);
+        _pnd_values_update(/* force = */ true);
 
         if (_dev_state->page_pnd == NULL) {
                 _dev_state->page_pnd = _internal_malloc(_dev_state->page_size);
@@ -382,6 +415,8 @@ static void
 _scroll_screen_reset(void)
 {
         /* Force reset */
+        _pnd_values_update(/* force = */ false);
+
         vdp2_scrn_priority_set(_params.scrn, 7);
         vdp2_scrn_scroll_x_set(_params.scrn, FIX16(0.0f));
         vdp2_scrn_scroll_y_set(_params.scrn, FIX16(0.0f));
@@ -501,7 +536,7 @@ _shared_puts(const char *buffer)
         cons_buffer(buffer);
 }
 
-void
+static void
 _shared_font_load_cpd_callback(void *work)
 {
         const struct dev_font_load_state *font_load_state = work;
