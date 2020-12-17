@@ -150,56 +150,61 @@ __BEGIN_DECLS
  * +-----+--------+------+-----------+------------+------------+-------------+
  */
 
-#define VDP2_SCRN_PND_CHARACTER_NUM(x)   ((x) >> 5)
-#define VDP2_SCRN_PND_PALETTE_NUM(x)     ((x) >> 5)
+#define VDP2_SCRN_PND_CP_NUM(x)         (((uint32_t)(x)) >> 5)
+#define VDP2_SCRN_PND_MODE_0_PAL_NUM(x) ((((uint32_t)(x)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_1_PAL_NUM(x) ((((uint32_t)(x)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_2_PAL_NUM(x) ((((uint32_t)(x)) >> 6) & 0x007F)
 
-#define VDP2_SCRN_PND_CONFIG_0(character_addr, palette_addr, vf, hf)           \
-        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
+#define VDP2_SCRN_PND_PAL_NUM(cram_mode, x)                                    \
+        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(x)
+
+#define VDP2_SCRN_PND_CONFIG_0(cram_mode, cpd_addr, pal_addr, vf, hf)          \
+        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFF))
+         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFF))
 
-#define VDP2_SCRN_PND_CONFIG_1(character_addr, palette_addr)                   \
-        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
-         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x03FF))
+#define VDP2_SCRN_PND_CONFIG_1(cram_mode, cpd_addr, pal_addr)                  \
+        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
+         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x03FF))
 
-#define VDP2_SCRN_PND_CONFIG_2(character_addr, palette_addr, vf, hf)           \
-        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
+#define VDP2_SCRN_PND_CONFIG_2(cram_mode, cpd_addr, pal_addr, vf, hf)          \
+        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
 
-#define VDP2_SCRN_PND_CONFIG_3(character_addr, palette_addr)                   \
-        (((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x000F) << 12) |          \
-         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
+#define VDP2_SCRN_PND_CONFIG_3(cram_mode, cpd_addr, pal_addr)                  \
+        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
 
-#define VDP2_SCRN_PND_CONFIG_4(character_addr, palette_addr, vf, hf)           \
-        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
+#define VDP2_SCRN_PND_CONFIG_4(cram_mode, cpd_addr, pal_addr, vf, hf)          \
+        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFF))
+         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFF))
 
-#define VDP2_SCRN_PND_CONFIG_5(character_addr, palette_addr)                   \
-        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
-         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x03FF))
+#define VDP2_SCRN_PND_CONFIG_5(cram_mode, cpd_addr, pal_addr)                  \
+        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
+         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x03FF))
 
-#define VDP2_SCRN_PND_CONFIG_6(character_addr, palette_addr, vf, hf)           \
-        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
+#define VDP2_SCRN_PND_CONFIG_6(cram_mode, cpd_addr, pal_addr, vf, hf)          \
+        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
 
-#define VDP2_SCRN_PND_CONFIG_7(character_addr, palette_addr, vf, hf)           \
-        ((((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) >> 4) & 0x0007) << 12) |   \
-         ((VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x0FFC) >> 2))
+#define VDP2_SCRN_PND_CONFIG_7(cram_mode, cpd_addr, pal_addr, vf, hf)          \
+        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
 
-#define VDP2_SCRN_PND_CONFIG_8(character_addr, palette_addr, vf, hf, pr, cc)   \
+#define VDP2_SCRN_PND_CONFIG_8(cram_mode, cpd_addr, pal_addr, vf, hf, pr, cc)  \
         ((((vf) & 0x01) << 31) |                                               \
          (((hf) & 0x01) << 30) |                                               \
          (((pr) & 0x01) << 29) |                                               \
          (((cc) & 0x01) << 28) |                                               \
-         ((VDP2_SCRN_PND_PALETTE_NUM(palette_addr) & 0x007F) << 16) |          \
-         (VDP2_SCRN_PND_CHARACTER_NUM(character_addr) & 0x7FFF))
+         ((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x007F) << 16) |       \
+         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x7FFF))
 
 #define VDP2_VRAM_USAGE_TYPE_NONE       0x00
 #define VDP2_VRAM_USAGE_TYPE_COEFF_TBL  0x01

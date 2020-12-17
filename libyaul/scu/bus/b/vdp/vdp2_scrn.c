@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include <vdp2/cram.h>
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
@@ -126,8 +127,9 @@ _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         uint16_t bank;
         bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
-        uint16_t palette_number;
-        palette_number = (format->color_palette >> 9) & 0x07;
+        const uint16_t palette_number = (((vdp2_cram_mode_get()) == 2) ?
+            (format->color_palette >> 10) :
+            (format->color_palette >> 9)) & 0x07;
 
         uint16_t width;
         width = format->bitmap_size.width >> 10;
@@ -185,8 +187,9 @@ _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         uint16_t bank;
         bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
-        uint16_t palette_number;
-        palette_number = (format->color_palette >> 9) & 0x07;
+        const uint16_t palette_number = (((vdp2_cram_mode_get()) == 2) ?
+            (format->color_palette >> 10) :
+            (format->color_palette >> 9)) & 0x07;
 
         uint16_t width;
         width = format->bitmap_size.width >> 10;
@@ -250,8 +253,9 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         uint16_t bank;
         bank = VDP2_VRAM_BANK(format->bitmap_pattern);
 
-        uint16_t palette_number;
-        palette_number = (format->color_palette >> 9) & 0x07;
+        const uint16_t palette_number = (((vdp2_cram_mode_get()) == 2) ?
+            (format->color_palette >> 10) :
+            (format->color_palette >> 9)) & 0x07;
 
         uint16_t width;
         width = format->bitmap_size.width >> 10;
@@ -440,10 +444,22 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
         sp_number = 0;
 
         uint16_t character_number;
-        character_number = VDP2_SCRN_PND_CHARACTER_NUM(format->cp_table);
+        character_number = VDP2_SCRN_PND_CP_NUM(format->cp_table);
 
         uint16_t palette_number;
-        palette_number = VDP2_SCRN_PND_PALETTE_NUM(format->color_palette);
+
+        switch ((vdp2_cram_mode_get())) {
+        case 0:
+        default:
+                palette_number = VDP2_SCRN_PND_MODE_0_PAL_NUM(format->color_palette);
+                break;
+        case 1:
+                palette_number = VDP2_SCRN_PND_MODE_1_PAL_NUM(format->color_palette);
+                break;
+        case 2:
+                palette_number = VDP2_SCRN_PND_MODE_2_PAL_NUM(format->color_palette);
+                break;
+        }
 
         switch (format->pnd_size) {
         case 1:
@@ -459,10 +475,12 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
 
                 switch (format->cc_count) {
                 case VDP2_SCRN_CCC_PALETTE_16:
-                        sp_number = ((palette_number & 0x0070) >> 4) << 5;
+                        sp_number = ((palette_number >> 4) & 0x07) << 5;
                         break;
                 case VDP2_SCRN_CCC_PALETTE_256:
                 case VDP2_SCRN_CCC_PALETTE_2048:
+                case VDP2_SCRN_CCC_RGB_32768:
+                case VDP2_SCRN_CCC_RGB_16770000:
                 default:
                         sp_number = 0x0000;
                         break;

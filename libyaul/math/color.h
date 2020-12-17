@@ -12,7 +12,7 @@ typedef union {
         } __packed;
 
         uint16_t raw;
-} __aligned (2) color_rgb1555_t;
+} __aligned(2) color_rgb1555_t;
 
 #define COLOR_RGB1555(msb, r, g, b)                                            \
     ((color_rgb1555_t)COLOR_RGB1555_INITIALIZER(msb, r, g, b))
@@ -42,15 +42,16 @@ static inline uint8_t color_rgb_max(const color_rgb1555_t *color __unused) {
 
 typedef union {
         struct {
-                unsigned int :8;
+                unsigned int cc:1;
+                unsigned int :7;
                 unsigned int b:8;
                 unsigned int g:8;
                 unsigned int r:8;
         } __packed;
 
-        uint8_t comp[4];
+        uint8_t comp[3];
         uint32_t raw;
-} __aligned (4) color_rgb888_t;
+} __aligned(4) color_rgb888_t;
 
 #define COLOR_RGB888_INITIALIZER(r, g, b)                                      \
     {                                                                          \
