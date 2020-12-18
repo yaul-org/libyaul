@@ -79,6 +79,7 @@ __BEGIN_DECLS
 #define VDP2_SPRITE_TYPE_F_DC_MASK      ((1 << 6) - 1)
 
 typedef uint32_t vdp2_sprite_register_t;
+typedef uint32_t vdp2_sprite_type_t;
 
 typedef struct vdp2_sprite_type_0 {
         unsigned int pr:2; /* Bit 15 */ /* Priority bit(s) */
