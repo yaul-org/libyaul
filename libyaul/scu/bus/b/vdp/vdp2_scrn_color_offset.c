@@ -135,13 +135,10 @@ vdp2_scrn_color_offset_clear(void)
 }
 
 void
-vdp2_scrn_color_offset_rgb_set(uint8_t select, int16_t r, int16_t g, int16_t b)
+vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select, int16_t r,
+    int16_t g, int16_t b)
 {
 #ifdef DEBUG
-        /* Check if the color offset is A or B */
-        assert((select == VDP2_SCRN_COLOR_OFFSET_A) ||
-               (select == VDP2_SCRN_COLOR_OFFSET_B));
-
         /* Check range: [-256,256] */
         assert(((r >= -256) && (r <= 255)) &&
                ((g >= -256) && (g <= 255)) &&
