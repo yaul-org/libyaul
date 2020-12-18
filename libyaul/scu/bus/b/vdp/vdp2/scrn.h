@@ -20,9 +20,9 @@ __BEGIN_DECLS
 
 typedef enum vdp2_scrn {
         /// Normal background.
-        VDP2_SCRN_NBG0   = 0 , 
+        VDP2_SCRN_NBG0   = 0 ,
         /// Rotational background.
-        VDP2_SCRN_RBG1   = 5, 
+        VDP2_SCRN_RBG1   = 5,
         /// Normal background.
         VDP2_SCRN_NBG1   = 1,
         /// Normal background.
@@ -67,7 +67,7 @@ typedef enum vdp2_scrn_reduction {
         /// 1/2 reduction
         VDP2_SCRN_REDUCTION_HALF    = 1,
         /// 1/4 reduction
-        VDP2_SCRN_REDUCTION_QUARTER = 2  
+        VDP2_SCRN_REDUCTION_QUARTER = 2
 } vdp2_scrn_reduction_t;
 
 typedef enum vdp2_scrn_sf_type {

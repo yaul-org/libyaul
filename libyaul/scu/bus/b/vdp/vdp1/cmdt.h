@@ -33,7 +33,7 @@ __BEGIN_DECLS
 
 typedef uint16_t vdp1_link_t;
 
-typedef enum vdp1_cmdt_zoom_point { 
+typedef enum vdp1_cmdt_zoom_point {
         VDP1_CMDT_ZOOM_POINT_NONE         = 0x00,
         VDP1_CMDT_ZOOM_POINT_UPPER_LEFT   = 0x05,
         VDP1_CMDT_ZOOM_POINT_UPPER_CENTER = 0x06,
