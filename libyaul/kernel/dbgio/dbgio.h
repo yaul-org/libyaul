@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
 __BEGIN_DECLS
@@ -31,7 +32,7 @@ typedef struct dbgio_vdp2 {
         uint8_t font_fg;
         uint8_t font_bg;
 
-        uint8_t scrn;
+        vdp2_scrn_t scroll_screen;
 
         uint8_t cpd_bank;
         uint32_t cpd_offset;

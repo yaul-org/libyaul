@@ -29,16 +29,16 @@ vdp2_cram_mode_set(uint8_t mode)
 }
 
 void
-vdp2_cram_offset_set(uint8_t scrn, uint32_t cram_addr)
+vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, uint32_t cram_addr)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_RBG1) ||
-               (scrn == VDP2_SCRN_SPRITE));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1) ||
+               (scroll_screen == VDP2_SCRN_SPRITE));
 
         assert((cram_addr >= VDP2_CRAM_ADDR(0x000)) &&
                (cram_addr < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
@@ -48,7 +48,7 @@ vdp2_cram_offset_set(uint8_t scrn, uint32_t cram_addr)
             ? (cram_addr >> 10)
             : (cram_addr >> 9)) & 0x07;
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->craofa &= 0xFFF8;

@@ -12,21 +12,21 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_priority_set(uint8_t scrn, uint8_t priority)
+vdp2_scrn_priority_set(vdp2_scrn_t scroll_screen, uint8_t priority)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_RBG1));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
         /* When priority is zero, scroll screen is transparent. */
         priority &= 0x07;
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->prina &= 0xFFF8;
@@ -54,18 +54,18 @@ vdp2_scrn_priority_set(uint8_t scrn, uint8_t priority)
 }
 
 uint8_t
-vdp2_scrn_priority_get(uint8_t scrn)
+vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_RBG1));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 return _state_vdp2()->regs->prina & 0x0007;

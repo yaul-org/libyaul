@@ -38,14 +38,14 @@ vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs)
 }
 
 void
-vdp2_scrn_vcs_unset(uint8_t scrn)
+vdp2_scrn_vcs_unset(vdp2_scrn_t scroll_screen)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->scrctl &= 0xFFFE;
                 break;

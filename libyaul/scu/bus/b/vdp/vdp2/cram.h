@@ -8,9 +8,11 @@
 #ifndef _VDP2_CRAM_H_
 #define _VDP2_CRAM_H_
 
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 
-#include <sys/cdefs.h>
+#include <vdp2/scrn.h>
 
 __BEGIN_DECLS
 
@@ -59,7 +61,7 @@ __BEGIN_DECLS
 
 extern uint8_t vdp2_cram_mode_get(void);
 extern void vdp2_cram_mode_set(uint8_t);
-extern void vdp2_cram_offset_set(uint8_t, uint32_t);
+extern void vdp2_cram_offset_set(vdp2_scrn_t, uint32_t);
 
 __END_DECLS
 

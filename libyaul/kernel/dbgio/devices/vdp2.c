@@ -91,7 +91,7 @@ static const dbgio_vdp2_t _default_params = {
         .font_pal = &_font_pal[0],
         .font_fg = 7,
         .font_bg = 0,
-        .scrn = VDP2_SCRN_NBG3,
+        .scroll_screen = VDP2_SCRN_NBG3,
         .cpd_bank = 3,
         .cpd_offset = 0x00000,
         .pnd_bank = 3,
@@ -394,7 +394,7 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         assert(_dev_state != NULL);
 
         const vdp2_scrn_cell_format_t cell_format = {
-                .scroll_screen = params->scrn,
+                .scroll_screen = params->scroll_screen,
                 .cc_count = VDP2_SCRN_CCC_PALETTE_16,
                 .character_size = 1 * 1,
                 .pnd_size = 1, /* 1-word */
@@ -417,10 +417,10 @@ _scroll_screen_reset(void)
         /* Force reset */
         _pnd_values_update(/* force = */ false);
 
-        vdp2_scrn_priority_set(_params.scrn, 7);
-        vdp2_scrn_scroll_x_set(_params.scrn, FIX16(0.0f));
-        vdp2_scrn_scroll_y_set(_params.scrn, FIX16(0.0f));
-        vdp2_scrn_display_set(_params.scrn, /* transparent = */ true);
+        vdp2_scrn_priority_set(_params.scroll_screen, 7);
+        vdp2_scrn_scroll_x_set(_params.scroll_screen, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(_params.scroll_screen, FIX16(0.0f));
+        vdp2_scrn_display_set(_params.scroll_screen, /* transparent = */ true);
 
         vdp2_vram_cycp_bank_set(_params.cpd_bank, &_params.cpd_cycp);
         vdp2_vram_cycp_bank_set(_params.pnd_bank, &_params.pnd_cycp);
@@ -437,13 +437,13 @@ _assert_shared_init(const dbgio_vdp2_t *params __unused)
         assert(params->font_bg <= 15);
         assert(params->font_bg <= 15);
 
-        assert((params->scrn == VDP2_SCRN_NBG0) ||
-               (params->scrn == VDP2_SCRN_NBG1) ||
-               (params->scrn == VDP2_SCRN_NBG2) ||
-               (params->scrn == VDP2_SCRN_NBG3));
+        assert((params->scroll_screen == VDP2_SCRN_NBG0) ||
+               (params->scroll_screen == VDP2_SCRN_NBG1) ||
+               (params->scroll_screen == VDP2_SCRN_NBG2) ||
+               (params->scroll_screen == VDP2_SCRN_NBG3));
 
-        assert((params->scrn != VDP2_SCRN_RBG0) &&
-               (params->scrn != VDP2_SCRN_RBG1));
+        assert((params->scroll_screen != VDP2_SCRN_RBG0) &&
+               (params->scroll_screen != VDP2_SCRN_RBG1));
 
         assert(params->cpd_bank <= 3);
         /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
