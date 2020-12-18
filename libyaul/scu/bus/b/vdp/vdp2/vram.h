@@ -61,7 +61,7 @@ typedef enum vdp2_vram_mode {
 
 typedef enum vdp2_vram_ctl_coeff_table {
         /// Store coefficient table in VRAM.
-        VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM = 0x00, 
+        VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM = 0x00,
         /// Store coefficient table in CRAM.
         VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM = 0x01,
 } vdp2_vram_ctl_coeff_table_t;

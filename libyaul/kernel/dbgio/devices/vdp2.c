@@ -192,7 +192,7 @@ _pnd_values_update(bool force)
 
         for (uint32_t i = 0; i < _dev_state->page_size; i++) {
                 _dev_state->page_pnd[i] &= ~0xF000;
-                _dev_state->page_pnd[i] |= pnd_value; 
+                _dev_state->page_pnd[i] |= pnd_value;
         }
 }
 
