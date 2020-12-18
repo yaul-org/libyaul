@@ -12,26 +12,26 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, uint16_t reduction_amt)
+vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reduction)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
                (scroll_screen == VDP2_SCRN_NBG1));
 
-        assert((reduction_amt == VDP2_SCRN_REDUCTION_NONE) ||
-               (reduction_amt == VDP2_SCRN_REDUCTION_HALF) ||
-               (reduction_amt == VDP2_SCRN_REDUCTION_QUARTER));
+        assert((reduction == VDP2_SCRN_REDUCTION_NONE) ||
+               (reduction == VDP2_SCRN_REDUCTION_HALF) ||
+               (reduction == VDP2_SCRN_REDUCTION_QUARTER));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->zmctl &= 0xFFFC;
-                _state_vdp2()->regs->zmctl |= reduction_amt;
+                _state_vdp2()->regs->zmctl |= reduction;
                 break;
         case VDP2_SCRN_NBG1:
                 _state_vdp2()->regs->zmctl &= 0xFCFF;
-                _state_vdp2()->regs->zmctl |= reduction_amt << 8;
+                _state_vdp2()->regs->zmctl |= reduction << 8;
                 break;
         default:
                 break;

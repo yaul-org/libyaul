@@ -15,27 +15,90 @@
 __BEGIN_DECLS
 
 typedef enum vdp2_scrn {
-        /// Normal background (NBG0)
+        /// Normal background.
         VDP2_SCRN_NBG0   = 0 , 
-        /// Rotational background (RBG1)
+        /// Rotational background.
         VDP2_SCRN_RBG1   = 5, 
-        /// Normal background (NBG1)
+        /// Normal background.
         VDP2_SCRN_NBG1   = 1,
-        /// Normal background (NBG2)
+        /// Normal background.
         VDP2_SCRN_NBG2   = 2,
-        /// Normal background (NBG3)
+        /// Normal background.
         VDP2_SCRN_NBG3   = 3,
-        /// Rotational background (RBG0)
+        /// Rotational background.
         VDP2_SCRN_RBG0   = 4,
+        /// Back screen.
         VDP2_SCRN_BACK   = 5,
+        /// Sprite layer.
         VDP2_SCRN_SPRITE = 6
 } vdp2_scrn_t;
 
-#define VDP2_SCRN_CCC_PALETTE_16        0
-#define VDP2_SCRN_CCC_PALETTE_256       1
-#define VDP2_SCRN_CCC_PALETTE_2048      2
-#define VDP2_SCRN_CCC_RGB_32768         3
-#define VDP2_SCRN_CCC_RGB_16770000      4
+typedef enum vdp2_scrn_ccc {
+        VDP2_SCRN_CCC_PALETTE_16   = 0,
+        VDP2_SCRN_CCC_PALETTE_256  = 1,
+        VDP2_SCRN_CCC_PALETTE_2048 = 2,
+        VDP2_SCRN_CCC_RGB_32768    = 3,
+        VDP2_SCRN_CCC_RGB_16770000 = 4
+} vdp2_scrn_ccc_t;
+
+typedef enum vdp2_scrn_ls_enable {
+        /// Scrolls horizontally per line units.
+        VDP2_SCRN_LS_HORZ      = 0x01,
+        /// Scrolls vertically per line units.
+        VDP2_SCRN_LS_VERT      = 0x02,
+        /// Scales horizontally per line units.
+        VDP2_SCRN_LS_ZOOM_HORZ = 0x04
+} vdp2_scrn_ls_enable_t;
+
+typedef enum vdp2_scrn_color_offset {
+        /// Not yet documented.
+        VDP2_SCRN_COLOR_OFFSET_A = 0,
+        /// Not yet documented.
+        VDP2_SCRN_COLOR_OFFSET_B = 1
+} vdp2_scrn_color_offset_t;
+
+typedef enum vdp2_scrn_reduction {
+        /// No reduction
+        VDP2_SCRN_REDUCTION_NONE    = 0,
+        /// 1/2 reduction
+        VDP2_SCRN_REDUCTION_HALF    = 1,
+        /// 1/4 reduction
+        VDP2_SCRN_REDUCTION_QUARTER = 2  
+} vdp2_scrn_reduction_t;
+
+typedef enum vdp2_scrn_sf_type {
+        /// Not yet documented.
+        VDP2_SCRN_SF_TYPE_NONE              = 0,
+        /// Not yet documented.
+        VDP2_SCRN_SF_TYPE_COLOR_CALCULATION = 1,
+        /// Not yet documented.
+        VDP2_SCRN_SF_TYPE_PRIORITY          = 2
+} vdp2_scrn_sf_type_t;
+
+typedef enum vdp2_scrn_sf_code {
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_A = 0,
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_B = 1
+} vdp2_scrn_sf_code_t;
+
+typedef enum vdp2_scrn_sf_code_range {
+        VDP2_SCRN_SF_CODE_0x00_0x01 = (1 << 0),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x02_0x03 = (1 << 1),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x04_0x05 = (1 << 2),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x06_0x07 = (1 << 3),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x08_0x09 = (1 << 4),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x0A_0x0B = (1 << 5),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x0C_0x0D = (1 << 6),
+        /// Not yet documented.
+        VDP2_SCRN_SF_CODE_0x0E_0x0F = (1 << 7)
+} vdp2_scrn_sf_code_range_t;
 
 #define VDP2_SCRN_CALCULATE_PAGE_COUNT(format)                                 \
         ((format)->plane_size)
@@ -228,23 +291,23 @@ typedef struct vdp2_scrn_bitmap_format {
                 uint16_t width;
                 uint16_t height;
         } bitmap_size; /* Bitmap sizes: 512x256, 512x512, 1024x256,
-                            * 1024x512 */
+                        * 1024x512 */
         uint32_t color_palette; /* Color palette lead address (if
                                      * applicable) */
         uint32_t bitmap_pattern; /* Bitmap pattern lead address */
-        uint32_t sf_type; /* Special function type priority
-                               * Special function type color calculation */
-        uint32_t sf_code; /* Special function code A
-                               * Special function code B */
+        vdp2_scrn_sf_type_t sf_type; /* Special function type priority
+                                      * Special function type color calculation */
+        vdp2_scrn_sf_code_t sf_code; /* Special function code A
+                                      * Special function code B */
         uint32_t sf_mode; /* Mode 0 (per screen)
-                               * Mode 1 (per cell)
-                               * Mode 2 (per pixel) */
+                           * Mode 1 (per cell)
+                           * Mode 2 (per pixel) */
         uint8_t rp_mode; /* RBG0 and RBG1 only
-                              * Rotation parameter mode
-                              *   Mode 0: Rotation Parameter A
-                              *   Mode 1: Rotation Parameter B
-                              *   Mode 2: Swap Coefficient Data Read
-                              *   Mode 3: Swap via Rotation Parameter Window */
+                          * Rotation parameter mode
+                          *   Mode 0: Rotation Parameter A
+                          *   Mode 1: Rotation Parameter B
+                          *   Mode 2: Swap Coefficient Data Read
+                          *   Mode 3: Swap via Rotation Parameter Window */
         uint32_t rotation_table_base; /* RBG0 and RBG1 only */
 
         struct {
@@ -266,7 +329,7 @@ typedef struct vdp2_scrn_bitmap_format {
 
 typedef struct vdp2_scrn_cell_format {
         vdp2_scrn_t scroll_screen; /* Normal/rotational background */
-        uint32_t cc_count; /* Character color count */
+        vdp2_scrn_ccc_t cc_count; /* Character color count */
         uint32_t character_size; /* Character size: (1 * 1) or (2 * 2) cells */
         uint32_t pnd_size; /* Pattern name data size: (1)-word or (2)-words */
         uint32_t auxiliary_mode; /* Auxiliary mode #0 (flip function) or
@@ -274,13 +337,13 @@ typedef struct vdp2_scrn_cell_format {
         uint32_t cp_table; /* Character pattern table lead address*/
         uint32_t color_palette; /* Color palette lead address */
         uint32_t plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
-        uint32_t sf_type; /* Special function type priority
-                               * Special function type color calculation */
-        uint32_t sf_code; /* Special function code A
-                               * Special function code B */
+        vdp2_scrn_sf_type_t sf_type; /* Special function type priority
+                                      * Special function type color calculation */
+        vdp2_scrn_sf_code_t sf_code; /* Special function code A
+                                      * Special function code B */
         uint32_t sf_mode; /* Mode 0 (per screen)
-                               * Mode 1 (per cell)
-                               * Mode 2 (per pixel) */
+                           * Mode 1 (per cell)
+                           * Mode 2 (per pixel) */
 
         union {
                 uint32_t planes[16];
@@ -394,22 +457,6 @@ typedef struct vdp2_scrn_rotation_table {
         uint32_t delta_kax;  /* Addr. increment coeff. table (per dot) */
 } __packed vdp2_scrn_rotation_table_t;
 
-#define VDP2_SCRN_SF_TYPE_NONE                  0
-#define VDP2_SCRN_SF_TYPE_COLOR_CALCULATION     1
-#define VDP2_SCRN_SF_TYPE_PRIORITY              2
-
-#define VDP2_SCRN_SF_CODE_A     0
-#define VDP2_SCRN_SF_CODE_B     1
-
-#define VDP2_SCRN_SF_CODE_0x00_0x01     (1 << 0)
-#define VDP2_SCRN_SF_CODE_0x02_0x03     (1 << 1)
-#define VDP2_SCRN_SF_CODE_0x04_0x05     (1 << 2)
-#define VDP2_SCRN_SF_CODE_0x06_0x07     (1 << 3)
-#define VDP2_SCRN_SF_CODE_0x08_0x09     (1 << 4)
-#define VDP2_SCRN_SF_CODE_0x0A_0x0B     (1 << 5)
-#define VDP2_SCRN_SF_CODE_0x0C_0x0D     (1 << 6)
-#define VDP2_SCRN_SF_CODE_0x0E_0x0F     (1 << 7)
-
 /*-
  * Limitations for NBG0/NBG1 reduction:
  * +--------+-----+-----------+------------+
@@ -446,10 +493,6 @@ typedef struct vdp2_scrn_rotation_table {
  * | (1,7]          | Reduc. out (1/7)  | 16  |
  * +----------------+-------------------+-----+ */
 
-#define VDP2_SCRN_REDUCTION_NONE        0 /* No reduction */
-#define VDP2_SCRN_REDUCTION_HALF        1 /* 1/2 reduction */
-#define VDP2_SCRN_REDUCTION_QUARTER     2 /* 1/4 reduction */
-
 #define VDP2_SCRN_REDUCTION_STEP        Q0_3_8(1.0f / 256.0f)
 #define VDP2_SCRN_REDUCTION_MIN         VDP2_SCRN_REDUCTION_STEP
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
@@ -458,11 +501,7 @@ typedef struct vdp2_scrn_ls_format {
         vdp2_scrn_t scroll_screen; /* Normal background */
         uint32_t line_scroll_table; /* Line scroll table (lead addr.) */
         uint8_t interval; /* Dependent on the interlace setting */
-
-#define VDP2_SCRN_LS_HORZ       0x0001 /* Scrolls horizontally per line units */
-#define VDP2_SCRN_LS_VERT       0x0002 /* Scrolls vertically per line units */
-#define VDP2_SCRN_LS_ZOOM_HORZ  0x0004 /* Scales horizontally per line units */
-        uint8_t enable; /* Enable line scroll */
+        vdp2_scrn_ls_enable_t enable; /* Enable line scroll */
 } vdp2_scrn_ls_format_t;
 
 typedef struct vdp2_scrn_ls_h {
@@ -485,9 +524,6 @@ typedef struct vdp2_scrn_vcs_format {
         uint32_t vcs_table; /* Vertical cell scroll table (lead addr.) */
 } vdp2_scrn_vcs_format_t;
 
-#define VDP2_SCRN_COLOR_OFFSET_A        0
-#define VDP2_SCRN_COLOR_OFFSET_B        1
-
 extern void vdp2_scrn_back_screen_color_set(uint32_t, const color_rgb1555_t);
 extern void vdp2_scrn_back_screen_buffer_set(uint32_t, const color_rgb1555_t *,
     const uint16_t);
@@ -497,7 +533,7 @@ extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t, int16_t, int16_t);
+extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t, int16_t, int16_t, int16_t);
 extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, uint8_t);
 extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
 
@@ -520,7 +556,7 @@ extern void vdp2_scrn_mosaic_vertical_set(uint8_t);
 extern void vdp2_scrn_priority_set(vdp2_scrn_t, uint8_t);
 extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t);
 
-extern void vdp2_scrn_reduction_set(vdp2_scrn_t, uint16_t);
+extern void vdp2_scrn_reduction_set(vdp2_scrn_t, vdp2_scrn_reduction_t);
 extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t, q0_3_8_t);
 extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t, q0_3_8_t);
 
@@ -529,7 +565,8 @@ extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t, fix16_t);
 extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t, fix16_t);
 extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t, fix16_t);
 
-extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
+extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t,
+    vdp2_scrn_sf_code_range_t);
 
 __END_DECLS
 

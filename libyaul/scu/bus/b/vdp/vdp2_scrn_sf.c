@@ -12,22 +12,16 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_sf_codes_set(uint8_t code, uint8_t codes)
+vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t code, vdp2_scrn_sf_code_range_t code_range)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((code == VDP2_SCRN_SF_CODE_A) ||
-               (code == VDP2_SCRN_SF_CODE_B));
-#endif /* DEBUG */
-
         switch (code) {
         case VDP2_SCRN_SF_CODE_A:
                 _state_vdp2()->regs->sfcode &= 0xFF00;
-                _state_vdp2()->regs->sfcode |= (uint16_t)codes;
+                _state_vdp2()->regs->sfcode |= (uint16_t)code_range;
                 break;
         case VDP2_SCRN_SF_CODE_B:
                 _state_vdp2()->regs->sfcode &= 0x00FF;
-                _state_vdp2()->regs->sfcode |= (uint16_t)codes << 8;
+                _state_vdp2()->regs->sfcode |= (uint16_t)code_range << 8;
                 break;
         default:
                 break;
