@@ -216,15 +216,15 @@ vdp1_cmdt_param_size_set(vdp1_cmdt_t *cmdt, uint16_t width, uint16_t height)
 void
 vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *cmdt, bool flip)
 {
-        cmdt->cmd_ctrl &= 0xFFBF;
-        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x1)  << 6;
+        cmdt->cmd_ctrl &= 0xFFEF;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x0001) << 4;
 }
 
 void
 vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *cmdt, bool flip)
 {
         cmdt->cmd_ctrl &= 0xFFDF;
-        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x1) << 5;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x0001) << 5;
 }
 
 void
@@ -256,61 +256,70 @@ vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 void
 vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0000;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0000;
 }
 
 void
 vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0001;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0001;
 }
 
 void
 vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0002;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0002;
 }
 
 void
 vdp1_cmdt_polygon_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0004;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0004;
 }
 
 void
 vdp1_cmdt_polyline_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0005;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0005;
 }
 
 void
 vdp1_cmdt_line_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0006;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0006;
 }
 
 void
 vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0008;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0008;
 }
 
 void
 vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x0009;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0009;
 }
 
 void
 vdp1_cmdt_local_coord_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x000A;
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x000A;
 }
 
 void
 vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl = 0x8000;
+        cmdt->cmd_ctrl |= 0x8000;
 }
 
 void
