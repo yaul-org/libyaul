@@ -263,6 +263,8 @@ clean:
 	    root.romdisk \
 	    IP.BIN \
 	    IP.BIN.map \
+		CART-IP.BIN \
+		CART-IP.BIN.map \
 	    $(CDB_FILE)
 ifneq ($(strip $(M68K_PROGRAM)),)
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
