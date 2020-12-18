@@ -138,7 +138,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CC),\
+		/usr/bin/gcc,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -149,7 +149,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -160,7 +160,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -171,7 +171,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -182,7 +182,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		$(SH_CXX),\
+		/usr/bin/g++,\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
