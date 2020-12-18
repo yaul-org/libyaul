@@ -9,14 +9,14 @@
 
 #include "vdp-internal.h"
 
-uint8_t
+vdp2_cram_mode_t
 vdp2_cram_mode_get(void)
 {
         return ((_state_vdp2()->regs->ramctl >> 12) & 0x03);
 }
 
 void
-vdp2_cram_mode_set(uint8_t mode)
+vdp2_cram_mode_set(vdp2_cram_mode_t mode)
 {
 #ifdef DEBUG
         assert(mode <= 2);

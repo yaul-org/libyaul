@@ -13,7 +13,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_sprite_priority_set(uint8_t sprite_register, uint8_t priority)
+vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priority)
 {
 #ifdef DEBUG
         assert(sprite_register <= 7);

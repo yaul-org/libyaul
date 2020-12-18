@@ -125,7 +125,7 @@ vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist, const uint
 
 void
 vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
-    const vdp1_cmdt_draw_mode_t draw_mode)
+    vdp1_cmdt_draw_mode_t draw_mode)
 {
         /* Values 0x4, 0x5, 0x6 for comm indicate a non-textured command table,
          * and we want to set the bits 7 and 6 without branching */
@@ -139,14 +139,14 @@ vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
 }
 
 void
-vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *cmdt, const uint8_t zoom_point)
+vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_zoom_point_t zoom_point)
 {
         cmdt->cmd_ctrl &= 0xF0F0;
         cmdt->cmd_ctrl |= (zoom_point << 8) | 0x0001;
 }
 
 void
-vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *cmdt, uint32_t base)
+vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 {
         cmdt->cmd_srca = (base >> 3) & 0xFFFF;
 }
@@ -173,7 +173,7 @@ vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *cmdt,
 }
 
 void
-vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, uint32_t base)
+vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 {
         cmdt->cmd_pmod &= 0xFFC7;
         cmdt->cmd_pmod |= 0x0008;
@@ -182,7 +182,7 @@ vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, uint32_t base)
 
 void
 vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *cmdt,
-    const vdp1_cmdt_color_bank_t color_bank)
+    vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
         cmdt->cmd_pmod |= 0x0010;
@@ -191,7 +191,7 @@ vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *cmdt,
 
 void
 vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
-    const vdp1_cmdt_color_bank_t color_bank)
+    vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
        cmdt->cmd_pmod |= 0x0018;
@@ -200,7 +200,7 @@ vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
 
 void
 vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *cmdt,
-    const vdp1_cmdt_color_bank_t color_bank)
+    vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
         cmdt->cmd_pmod |= 0x0020;
@@ -246,7 +246,7 @@ vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vec2_t *p)
 }
 
 void
-vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *cmdt, uint32_t base)
+vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 {
         /* Gouraud shading processing is valid when a color calculation mode is
          * specified */
@@ -320,35 +320,35 @@ vdp1_cmdt_jump_clear(vdp1_cmdt_t *cmdt)
 }
 
 void
-vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, uint16_t link_index)
+vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x1000;
-        cmdt->cmd_link = link_index & 0xFFFC;
+        cmdt->cmd_link = index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, uint16_t link_index)
+vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x2000;
-        cmdt->cmd_link = link_index & 0xFFFC;
+        cmdt->cmd_link = index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, uint16_t link_index)
+vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x5000;
-        cmdt->cmd_link = link_index & 0xFFFC;
+        cmdt->cmd_link = index & 0xFFFC;
 }
 
 void
-vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, uint16_t link_index)
+vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x6000;
-        cmdt->cmd_link = link_index & 0xFFFC;
+        cmdt->cmd_link = index & 0xFFFC;
 }
 
 void

@@ -6,6 +6,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <string.h>
+
 #include <gdb.h>
 
 #include <cpu/cache.h>
@@ -17,9 +19,6 @@
 #include <vdp.h>
 
 #include <sys/dma-queue.h>
-#include <sys/callback-list.h>
-
-#include <string.h>
 
 #include "vdp-internal.h"
 
@@ -99,7 +98,7 @@ typedef struct {
         const vdp1_cmdt_t *cmdts;
         const uint16_t index;
         const uint16_t count;
-        vdp1_sync_callback callback;
+        vdp1_sync_callback_t callback;
         void *work;
 } __aligned(4) vdp1_sync_put_args_t;
 
@@ -363,21 +362,21 @@ vdp1_sync_interval_set(const int8_t interval)
         _current_vdp1_mode = &_vdp1_mode_table[mode];
 }
 
-uint8_t
+vdp_sync_mode_t
 vdp1_sync_mode_get(void)
 {
         return _state.vdp1.fb_mode;
 }
 
 void
-vdp1_sync_mode_set(const uint8_t mode)
+vdp1_sync_mode_set(vdp_sync_mode_t mode)
 {
-        _state.vdp1.fb_mode = mode & VDP1_SYNC_MODE_MASK;
+        _state.vdp1.fb_mode = mode;
 }
 
 void
 vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
-    const uint16_t index, vdp1_sync_callback callback, void *work)
+    const uint16_t index, vdp1_sync_callback_t callback, void *work)
 {
         assert(cmdts != NULL);
 
@@ -401,7 +400,7 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
 
 void
 vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
-    const uint16_t index, vdp1_sync_callback callback, void *work)
+    const uint16_t index, vdp1_sync_callback_t callback, void *work)
 {
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
@@ -411,7 +410,7 @@ vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
 
 void
 vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
-    vdp1_sync_callback callback, void *work)
+    vdp1_sync_callback_t callback, void *work)
 {
         assert(cmdt_orderlist != NULL);
 
@@ -455,25 +454,25 @@ vdp2_sync_commit(void)
 }
 
 void
-vdp_sync_vblank_in_set(vdp_sync_callback callback)
+vdp_sync_vblank_in_set(vdp_sync_callback_t callback)
 {
         callback_set(&_user_vblank_in_callback, callback, NULL);
 }
 
 void
-vdp_sync_vblank_out_set(vdp_sync_callback callback)
+vdp_sync_vblank_out_set(vdp_sync_callback_t callback)
 {
         callback_set(&_user_vblank_out_callback, callback, NULL);
 }
 
-int8_t
-vdp_sync_user_callback_add(vdp_sync_callback callback, void *work)
+callback_id_t
+vdp_sync_user_callback_add(vdp_sync_callback_t callback, void *work)
 {
         return callback_list_callback_add(_user_callback_list, callback, work);
 }
 
 void
-vdp_sync_user_callback_remove(const uint8_t id)
+vdp_sync_user_callback_remove(callback_id_t id)
 {
         callback_list_callback_remove(_user_callback_list, id);
 }

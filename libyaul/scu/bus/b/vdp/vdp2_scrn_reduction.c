@@ -18,10 +18,6 @@ vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reducti
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
                (scroll_screen == VDP2_SCRN_NBG1));
-
-        assert((reduction == VDP2_SCRN_REDUCTION_NONE) ||
-               (reduction == VDP2_SCRN_REDUCTION_HALF) ||
-               (reduction == VDP2_SCRN_REDUCTION_QUARTER));
 #endif /* DEBUG */
 
         switch (scroll_screen) {

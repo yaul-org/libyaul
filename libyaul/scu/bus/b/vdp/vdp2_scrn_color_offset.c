@@ -131,28 +131,28 @@ vdp2_scrn_color_offset_clear(void)
 }
 
 void
-vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select, vdp2_color8_t r,
-    vdp2_color8_t g, vdp2_color8_t b)
+vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
+        const vdp2_scrn_color_offset_rgb_t * const rgb)
 {
 #ifdef DEBUG
         /* Check range: [-256,256] */
-        assert(((r >= -256) && (r <= 255)) &&
-               ((g >= -256) && (g <= 255)) &&
-               ((b >= -256) && (b <= 255)));
+        assert(((rgb->r >= -256) && (rgb->r <= 255)) &&
+               ((rgb->g >= -256) && (rgb->g <= 255)) &&
+               ((rgb->b >= -256) && (rgb->b <= 255)));
 #endif /* DEBUG */
 
         /* Each color component in the color offset has a range [-256,255] Lower
          * bound: -(2**(9-1)) & upper bound: (2**9)-1 */
         switch (select) {
         case VDP2_SCRN_COLOR_OFFSET_A:
-                _state_vdp2()->regs->coar = r & 0x01FF;
-                _state_vdp2()->regs->coag = g & 0x01FF;
-                _state_vdp2()->regs->coab = b & 0x01FF;
+                _state_vdp2()->regs->coar = rgb->r & 0x01FF;
+                _state_vdp2()->regs->coag = rgb->g & 0x01FF;
+                _state_vdp2()->regs->coab = rgb->b & 0x01FF;
                 break;
         case VDP2_SCRN_COLOR_OFFSET_B:
-                _state_vdp2()->regs->cobr = r & 0x01FF;
-                _state_vdp2()->regs->cobg = g & 0x01FF;
-                _state_vdp2()->regs->cobb = b & 0x01FF;
+                _state_vdp2()->regs->cobr = rgb->r & 0x01FF;
+                _state_vdp2()->regs->cobg = rgb->g & 0x01FF;
+                _state_vdp2()->regs->cobb = rgb->b & 0x01FF;
                 break;
         default:
                 break;

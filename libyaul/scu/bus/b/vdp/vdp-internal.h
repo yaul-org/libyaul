@@ -62,7 +62,7 @@ struct state_vdp2 {
         } nbg3;
 
         struct {
-                void *vram;
+                vdp2_vram_t *vram;
                 void *buffer;
                 uint32_t count;
         } back;
