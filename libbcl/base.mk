@@ -38,7 +38,7 @@ $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
 generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_base),c,$(SH_CC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_base),c,/usr/bin/gcc,$(SH_CFLAGS_release),release,$(CDB_FILE))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
