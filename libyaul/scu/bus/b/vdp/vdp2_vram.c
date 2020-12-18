@@ -40,9 +40,8 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 
         /* If the coefficient table is set to be stored in CRAM, the
          * color mode must be 1 */
-        if (vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM) {
-                _state_vdp2()->regs->ramctl |= 0x1000;
-        }
+        _state_vdp2()->regs->ramctl &= 0xEFFF;
+        _state_vdp2()->regs->ramctl |= 1 << vram_ctl->coefficient_table;
 
         /* Coefficient table storage */
         _state_vdp2()->regs->ramctl &= 0x7FFF;
