@@ -62,7 +62,7 @@ typedef struct vdp1_vram_partitions {
         vdp1_cmdt_t *cmdt_base;
         uint32_t cmdt_size;
 
-        vdp1_vram_t *texture_base;
+        void *texture_base;
         uint32_t texture_size;
 
         vdp1_gouraud_table_t *gouraud_base;

@@ -55,7 +55,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         vram_partitions->cmdt_size = cmdt_size;
         vram_base += cmdt_size;
 
-        vram_partitions->texture_base = (vdp1_vram_t *)vram_base;
+        vram_partitions->texture_base = (void *)vram_base;
         vram_partitions->texture_size = texture_size;
         vram_base += texture_size;
 
