@@ -119,9 +119,9 @@ _debug_check_bitmap(const vdp2_scrn_bitmap_format_t *format)
 static void
 _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
-        _state_vdp2()->regs->chctla &= 0xFF80;      /* Bits 0,1,2,3,4,5,6 */
-        _state_vdp2()->regs->mpofn &= 0xFFF8;       /* Bits 0,1,2 */
-        _state_vdp2()->regs->bmpna &= 0xFFC8;       /* Bits 0,1,2,4,5 */
+        _state_vdp2()->regs->chctla &= 0xFF80; /* Bits 0, 1, 2, 3, 4, 5, 6 */
+        _state_vdp2()->regs->mpofn &= 0xFFF8;  /* Bits 0, 1, 2 */
+        _state_vdp2()->regs->bmpna &= 0xFFC8;  /* Bits 0, 1, 2, 4, 5 */
         _state_vdp2()->regs->sfsel &= 0xFFFE;
         _state_vdp2()->regs->sfprmd &= 0xFFFC;
 
@@ -181,9 +181,9 @@ _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 static void
 _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
-        _state_vdp2()->regs->chctla &= 0xC0FF;      /* Bits 8,9,10,11,12,13 */
-        _state_vdp2()->regs->mpofn &= 0xFF8F;       /* Bits 4,5,6 */
-        _state_vdp2()->regs->bmpna &= 0xC8FF;       /* Bits 8,9,10,12,13 */
+        _state_vdp2()->regs->chctla &= 0xC0FF; /* Bits 8,9,10,11,12,13 */
+        _state_vdp2()->regs->mpofn &= 0xFF8F;  /* Bits 4,5,6 */
+        _state_vdp2()->regs->bmpna &= 0xC8FF;  /* Bits 8,9,10,12,13 */
         _state_vdp2()->regs->sfsel &= 0xFFFD;
         _state_vdp2()->regs->sfprmd &= 0xFFF3;
 
@@ -249,7 +249,7 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 #endif /* DEBUG */
 
         _state_vdp2()->regs->chctlb &= 0xC0FF; /* Bits 8, 9, 10, 12, 13, 14 */
-        _state_vdp2()->regs->bmpnb &= 0xFFC8;  /* Bits 0, 1, 2, 4, 5 */
+        _state_vdp2()->regs->bmpnb &= 0xFFC8;  /* Bits 0, 1,  2,  4,  5 */
         _state_vdp2()->regs->rpmd &= 0xFFFC;   /* Bits 0, 1 */
         _state_vdp2()->regs->sfsel &= 0xFFEF;
         _state_vdp2()->regs->sfprmd &= 0xFCFF;
