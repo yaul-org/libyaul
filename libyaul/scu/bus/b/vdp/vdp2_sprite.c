@@ -22,32 +22,38 @@ vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priorit
         /* When priority is zero, scroll screen is transparent. */
         priority &= 0x07;
 
-        uint16_t shift;
-        shift = (sprite_register & 0x01) << 3;
-
-        uint16_t reg_mask;
-        reg_mask = 0xFFFF & ~(0x07 << shift);
-
         switch (sprite_register) {
         case 0:
+                _state_vdp2()->regs->prisa &= 0xFFF8;
+                _state_vdp2()->regs->prisa |= priority;
+                break;
         case 1:
-                _state_vdp2()->regs->prisa &= reg_mask;
-                _state_vdp2()->regs->prisa |= priority << shift;
+                _state_vdp2()->regs->prisa &= 0xF8FF;
+                _state_vdp2()->regs->prisa |= priority << 8;
                 break;
         case 2:
+                _state_vdp2()->regs->prisb &= 0xFFF8;
+                _state_vdp2()->regs->prisb |= priority;
+                break;
         case 3:
-                _state_vdp2()->regs->prisb &= reg_mask;
-                _state_vdp2()->regs->prisb |= priority << shift;
+                _state_vdp2()->regs->prisb &= 0xF8FF;
+                _state_vdp2()->regs->prisb |= priority << 8;
                 break;
         case 4:
+                _state_vdp2()->regs->prisc &= 0xFFF8;
+                _state_vdp2()->regs->prisc |= priority;
+                break;
         case 5:
-                _state_vdp2()->regs->prisc &= reg_mask;
-                _state_vdp2()->regs->prisc |= priority << shift;
+                _state_vdp2()->regs->prisc &= 0xF8FF;
+                _state_vdp2()->regs->prisc |= priority << 8;
                 break;
         case 6:
+                _state_vdp2()->regs->prisd &= 0xFFF8;
+                _state_vdp2()->regs->prisd |= priority;
+                break;
         case 7:
-                _state_vdp2()->regs->prisd &= reg_mask;
-                _state_vdp2()->regs->prisd |= priority << shift;
+                _state_vdp2()->regs->prisd &= 0xF8FF;
+                _state_vdp2()->regs->prisd |= priority << 8;
                 break;
         default:
                 break;
