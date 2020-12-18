@@ -39,6 +39,8 @@ __BEGIN_DECLS
 #define VDP1_ENV_COLOR_MODE_PALETTE     0
 /// Not yet documented.
 #define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
+/// Not yet documented.
+#define VDP1_ENV_CMDT_PREAMBLE_COUNT (4)
 
 /// @}
 
