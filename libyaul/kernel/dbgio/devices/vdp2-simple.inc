@@ -4,13 +4,13 @@ static void _simple_init(const dbgio_vdp2_t *);
 static void _simple_flush(void);
 
 const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple = {
-        .dev = DBGIO_DEV_VDP2_SIMPLE,
+        .dev            = DBGIO_DEV_VDP2_SIMPLE,
         .default_params = &_default_params,
-        .init = (dev_ops_init_t)_simple_init,
-        .deinit = _shared_deinit,
-        .font_load = _shared_font_load,
-        .puts = _shared_puts,
-        .flush = _simple_flush
+        .init           = (dev_ops_init_t)_simple_init,
+        .deinit         = _shared_deinit,
+        .font_load      = _shared_font_load,
+        .puts           = _shared_puts,
+        .flush          = _simple_flush
 };
 
 static void
