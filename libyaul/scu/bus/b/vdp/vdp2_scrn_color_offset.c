@@ -12,25 +12,25 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_color_offset_set(uint8_t scrn, uint8_t select)
+vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, uint8_t select)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_RBG1) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_BACK) ||
-               (scrn == VDP2_SCRN_SPRITE));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_BACK) ||
+               (scroll_screen == VDP2_SCRN_SPRITE));
 
         /* Check if the color offset is A or B */
         assert((select == VDP2_SCRN_COLOR_OFFSET_A) ||
                (select == VDP2_SCRN_COLOR_OFFSET_B));
 #endif /* DEBUG */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->clofen &= 0xFFFE;
                 _state_vdp2()->regs->clofen |= 0x0001;
@@ -86,21 +86,21 @@ vdp2_scrn_color_offset_set(uint8_t scrn, uint8_t select)
 }
 
 void
-vdp2_scrn_color_offset_unset(uint8_t scrn)
+vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_RBG1) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_BACK) ||
-               (scrn == VDP2_SCRN_SPRITE));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_BACK) ||
+               (scroll_screen == VDP2_SCRN_SPRITE));
 #endif /* DEBUG */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->clofen &= 0xFFFE;
                 break;

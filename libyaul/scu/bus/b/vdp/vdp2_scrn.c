@@ -60,6 +60,8 @@ vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         case VDP2_SCRN_RBG0:
                 _rbg0_scrn_cell_format_set(format);
                 break;
+        default:
+                return;
         }
 }
 
@@ -80,6 +82,8 @@ vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         case VDP2_SCRN_RBG0:
                 _rbg0_scrn_bitmap_format_set(format);
                 break;
+        default:
+                return;
         }
 }
 

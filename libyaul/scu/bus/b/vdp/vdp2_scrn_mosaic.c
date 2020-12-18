@@ -10,15 +10,15 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_mosaic_set(uint8_t scrn)
+vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_RBG1));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
         /* If performing mosaic processing in NBG0 or NBG1, the vertical
@@ -26,7 +26,7 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
          *
          * Mosaic processing is then ignored for NBG0 or NBG1. */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
 #ifdef DEBUG
@@ -66,18 +66,18 @@ vdp2_scrn_mosaic_set(uint8_t scrn)
 }
 
 void
-vdp2_scrn_mosaic_unset(uint8_t scrn)
+vdp2_scrn_mosaic_unset(vdp2_scrn_t scroll_screen)
 {
 #ifdef DEBUG
-        assert((scrn == VDP2_SCRN_NBG0) ||
-               (scrn == VDP2_SCRN_NBG1) ||
-               (scrn == VDP2_SCRN_NBG2) ||
-               (scrn == VDP2_SCRN_NBG3) ||
-               (scrn == VDP2_SCRN_RBG0) ||
-               (scrn == VDP2_SCRN_RBG1));
+        assert((scroll_screen == VDP2_SCRN_NBG0) ||
+               (scroll_screen == VDP2_SCRN_NBG1) ||
+               (scroll_screen == VDP2_SCRN_NBG2) ||
+               (scroll_screen == VDP2_SCRN_NBG3) ||
+               (scroll_screen == VDP2_SCRN_RBG0) ||
+               (scroll_screen == VDP2_SCRN_RBG1));
 #endif /* DEBUG */
 
-        switch (scrn) {
+        switch (scroll_screen) {
         case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->mzctl &= 0xFFFE;

@@ -14,14 +14,22 @@
 
 __BEGIN_DECLS
 
-#define VDP2_SCRN_NBG0          0 /* Normal background (NBG0) */
-#define VDP2_SCRN_RBG1          5 /* Rotational background (RBG1) */
-#define VDP2_SCRN_NBG1          1 /* Normal background (NBG1) */
-#define VDP2_SCRN_NBG2          2 /* Normal background (NBG2) */
-#define VDP2_SCRN_NBG3          3 /* Normal background (NBG3) */
-#define VDP2_SCRN_RBG0          4 /* Rotational background (RBG0) */
-#define VDP2_SCRN_BACK          5
-#define VDP2_SCRN_SPRITE        6
+typedef enum vdp2_scrn {
+        /// Normal background (NBG0)
+        VDP2_SCRN_NBG0   = 0 , 
+        /// Rotational background (RBG1)
+        VDP2_SCRN_RBG1   = 5, 
+        /// Normal background (NBG1)
+        VDP2_SCRN_NBG1   = 1,
+        /// Normal background (NBG2)
+        VDP2_SCRN_NBG2   = 2,
+        /// Normal background (NBG3)
+        VDP2_SCRN_NBG3   = 3,
+        /// Rotational background (RBG0)
+        VDP2_SCRN_RBG0   = 4,
+        VDP2_SCRN_BACK   = 5,
+        VDP2_SCRN_SPRITE = 6
+} vdp2_scrn_t;
 
 #define VDP2_SCRN_CCC_PALETTE_16        0
 #define VDP2_SCRN_CCC_PALETTE_256       1
@@ -213,7 +221,7 @@ __BEGIN_DECLS
 #define VDP2_VRAM_USAGE_TYPE_BPD        0x03
 
 typedef struct vdp2_scrn_bitmap_format {
-        uint8_t scroll_screen; /* Normal/rotational background */
+        vdp2_scrn_t scroll_screen; /* Normal/rotational background */
         uint32_t cc_count; /* Character color count */
 
         struct {
@@ -257,7 +265,7 @@ typedef struct vdp2_scrn_bitmap_format {
 } vdp2_scrn_bitmap_format_t;
 
 typedef struct vdp2_scrn_cell_format {
-        uint32_t scroll_screen; /* Normal/rotational background */
+        vdp2_scrn_t scroll_screen; /* Normal/rotational background */
         uint32_t cc_count; /* Character color count */
         uint32_t character_size; /* Character size: (1 * 1) or (2 * 2) cells */
         uint32_t pnd_size; /* Pattern name data size: (1)-word or (2)-words */
@@ -447,7 +455,7 @@ typedef struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
 typedef struct vdp2_scrn_ls_format {
-        uint8_t scroll_screen; /* Normal background */
+        vdp2_scrn_t scroll_screen; /* Normal background */
         uint32_t line_scroll_table; /* Line scroll table (lead addr.) */
         uint8_t interval; /* Dependent on the interlace setting */
 
@@ -473,7 +481,7 @@ typedef struct vdp2_scrn_ls_hvz {
 } __packed vdp2_scrn_ls_hvz_t;
 
 typedef struct vdp2_scrn_vcs_format {
-        uint8_t scroll_screen; /* Normal background */
+        vdp2_scrn_t scroll_screen; /* Normal background */
         uint32_t vcs_table; /* Vertical cell scroll table (lead addr.) */
 } vdp2_scrn_vcs_format_t;
 
@@ -490,36 +498,36 @@ extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
 extern void vdp2_scrn_color_offset_clear(void);
 extern void vdp2_scrn_color_offset_rgb_set(uint8_t, int16_t, int16_t, int16_t);
-extern void vdp2_scrn_color_offset_set(uint8_t, uint8_t);
-extern void vdp2_scrn_color_offset_unset(uint8_t);
+extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, uint8_t);
+extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
 
-extern void vdp2_scrn_display_set(uint8_t, bool);
-extern void vdp2_scrn_display_unset(uint8_t);
+extern void vdp2_scrn_display_set(vdp2_scrn_t, bool);
+extern void vdp2_scrn_display_unset(vdp2_scrn_t);
 extern void vdp2_scrn_display_clear(void);
 
 extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *);
 
 extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *);
-extern void vdp2_scrn_vcs_unset(uint8_t);
+extern void vdp2_scrn_vcs_unset(vdp2_scrn_t);
 extern void vdp2_scrn_vcs_clear(void);
 
-extern void vdp2_scrn_mosaic_set(uint8_t);
-extern void vdp2_scrn_mosaic_unset(uint8_t);
+extern void vdp2_scrn_mosaic_set(vdp2_scrn_t);
+extern void vdp2_scrn_mosaic_unset(vdp2_scrn_t);
 extern void vdp2_scrn_mosaic_clear(void);
 extern void vdp2_scrn_mosaic_horizontal_set(uint8_t);
 extern void vdp2_scrn_mosaic_vertical_set(uint8_t);
 
-extern void vdp2_scrn_priority_set(uint8_t, uint8_t);
-extern uint8_t vdp2_scrn_priority_get(uint8_t);
+extern void vdp2_scrn_priority_set(vdp2_scrn_t, uint8_t);
+extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t);
 
-extern void vdp2_scrn_reduction_set(uint8_t, uint16_t);
-extern void vdp2_scrn_reduction_x_set(uint8_t, q0_3_8_t);
-extern void vdp2_scrn_reduction_y_set(uint8_t, q0_3_8_t);
+extern void vdp2_scrn_reduction_set(vdp2_scrn_t, uint16_t);
+extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t, q0_3_8_t);
+extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t, q0_3_8_t);
 
-extern void vdp2_scrn_scroll_x_set(uint8_t, fix16_t);
-extern void vdp2_scrn_scroll_x_update(uint8_t, fix16_t);
-extern void vdp2_scrn_scroll_y_set(uint8_t, fix16_t);
-extern void vdp2_scrn_scroll_y_update(uint8_t, fix16_t);
+extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t, fix16_t);
+extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t, fix16_t);
+extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t, fix16_t);
+extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t, fix16_t);
 
 extern void vdp2_scrn_sf_codes_set(uint8_t, uint8_t);
 
