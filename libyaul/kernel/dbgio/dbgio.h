@@ -35,7 +35,7 @@ typedef struct dbgio_vdp2 {
         vdp2_scrn_t scroll_screen;
 
         vdp2_vram_bank_t cpd_bank;
-        uint32_t cpd_offset;
+        vdp2_vram_t cpd_offset;
 
         vdp2_vram_bank_t pnd_bank;
         uint8_t map_index;
