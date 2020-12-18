@@ -55,7 +55,7 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
         MEMORY_WRITE(16, VDP2(VRSIZE), 0x0000);
         MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs->ramctl);
 
-        (void)memcpy(&_state_vdp2()->vram_ctl, &vram_ctl,
+        (void)memcpy(_state_vdp2()->vram_ctl, &vram_ctl,
             sizeof(vdp2_vram_ctl_t));
 }
 
