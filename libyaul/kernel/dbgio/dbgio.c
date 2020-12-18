@@ -56,16 +56,9 @@ _internal_dbgio_init(void)
 }
 
 void
-dbgio_dev_init(uint8_t dev, const void *params)
+dbgio_dev_init(dbgio_dev_t dev, const void *params)
 {
-        assert((dev == DBGIO_DEV_NULL) ||
-               (dev == DBGIO_DEV_VDP1) ||
-               (dev == DBGIO_DEV_VDP2_SIMPLE) ||
-               (dev == DBGIO_DEV_VDP2_ASYNC) ||
-               (dev == DBGIO_DEV_USB_CART));
-
         assert(params != NULL);
-
         assert(_dev_ops_table[dev]->init != NULL);
 
         if (_dbgio_state.dev_ops != _dev_ops_table[dev]) {
@@ -78,7 +71,7 @@ dbgio_dev_init(uint8_t dev, const void *params)
 }
 
 void
-dbgio_dev_default_init(uint8_t dev)
+dbgio_dev_default_init(dbgio_dev_t dev)
 {
         dbgio_dev_init(dev, _dev_ops_table[dev]->default_params);
 }

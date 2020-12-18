@@ -18,13 +18,15 @@
 
 __BEGIN_DECLS
 
-#define DBGIO_DEV_NULL          0
-#define DBGIO_DEV_VDP1          1
-#define DBGIO_DEV_VDP2_SIMPLE   2
-#define DBGIO_DEV_VDP2_ASYNC    3
-#define DBGIO_DEV_USB_CART      4
+typedef enum dbgio_dev {
+        DBGIO_DEV_NULL        = 0,
+        DBGIO_DEV_VDP1        = 1,
+        DBGIO_DEV_VDP2_SIMPLE = 2,
+        DBGIO_DEV_VDP2_ASYNC  = 3,
+        DBGIO_DEV_USB_CART    = 4
+} dbgio_dev_t;
 
-#define DBGIO_DEV_COUNT         5
+#define DBGIO_DEV_COUNT 5
 
 typedef struct dbgio_vdp2 {
         const uint8_t *font_cpd;
@@ -50,8 +52,8 @@ typedef struct dbgio_usb_cart {
         uint16_t buffer_size;
 } dbgio_usb_cart_t;
 
-extern void dbgio_dev_init(uint8_t, const void *);
-extern void dbgio_dev_default_init(uint8_t);
+extern void dbgio_dev_init(dbgio_dev_t, const void *);
+extern void dbgio_dev_default_init(dbgio_dev_t);
 extern void dbgio_dev_deinit(void);
 
 extern void dbgio_dev_font_load(void);

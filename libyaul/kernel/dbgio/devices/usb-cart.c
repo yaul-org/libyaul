@@ -48,13 +48,13 @@ static const dbgio_usb_cart_t _default_params = {
 static dev_state_t *_dev_state;
 
 const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
-        .dev = DBGIO_DEV_USB_CART,
+        .dev            = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
-        .init = (dev_ops_init_t)_init,
-        .deinit = _deinit,
-        .font_load = _font_load,
-        .puts = _puts,
-        .flush = _flush
+        .init           = (dev_ops_init_t)_init,
+        .deinit         = _deinit,
+        .font_load      = _font_load,
+        .puts           = _puts,
+        .flush          = _flush
 };
 
 static void

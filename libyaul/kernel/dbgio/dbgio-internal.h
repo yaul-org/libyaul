@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <dbgio.h>
+
 __BEGIN_DECLS
 
 typedef void (*font_load_callback_t)(void);
@@ -22,7 +24,7 @@ typedef void (*dev_ops_puts_t)(const char *);
 typedef void (*dev_ops_flush_t)(void);
 
 struct dbgio_dev_ops {
-        uint8_t dev;
+        dbgio_dev_t dev;
         const void *default_params;
         dev_ops_init_t init;
         dev_ops_deinit_t deinit;
