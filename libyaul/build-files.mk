@@ -343,6 +343,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/b/vdp/vdp2/:cram.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:map.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:scrn.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_macros.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:sprite.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:tvmd.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:vram.h:yaul/scu/bus/b/vdp/vdp2/ \
