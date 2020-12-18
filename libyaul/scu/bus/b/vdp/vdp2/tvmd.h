@@ -31,39 +31,49 @@ __BEGIN_DECLS
  * VBLANK=1 | Vertical sync   |
  *          +-----------------+ */
 
-#define VDP2_TVMD_TV_STANDARD_NTSC      0
-#define VDP2_TVMD_TV_STANDARD_PAL       1
+typedef enum vdp2_tvmd_tv_field {
+        VDP2_TVMD_TV_FIELD_SCAN_EVEN = 0,
+        VDP2_TVMD_TV_FIELD_SCAN_ODD  = 1
+} vdp2_tvmd_tv_field_t;
 
-#define VDP2_TVMD_TV_FIELD_SCAN_EVEN    0
-#define VDP2_TVMD_TV_FIELD_SCAN_ODD     1
+typedef enum vdp2_tvmd_tv_standard {
+        VDP2_TVMD_TV_STANDARD_NTSC = 0,
+        VDP2_TVMD_TV_STANDARD_PAL  = 1
+} vdp2_tvmd_tv_standard_t;
 
-#define VDP2_TVMD_INTERLACE_NONE        0
-#define VDP2_TVMD_INTERLACE_SINGLE      1
-#define VDP2_TVMD_INTERLACE_DOUBLE      2
+typedef enum vdp2_tvmd_interlace {
+        VDP2_TVMD_INTERLACE_NONE   = 0,
+        VDP2_TVMD_INTERLACE_SINGLE = 1,
+        VDP2_TVMD_INTERLACE_DOUBLE = 2
+} vdp2_tvmd_interlace_t;
 
-#define VDP2_TVMD_VERT_224      0
-#define VDP2_TVMD_VERT_240      1
-#define VDP2_TVMD_VERT_256      2
+typedef enum vdp2_tvmd_vert {
+        VDP2_TVMD_VERT_224 = 0,
+        VDP2_TVMD_VERT_240 = 1,
+        VDP2_TVMD_VERT_256 = 2
+} vdp2_tvmd_vert_t;
 
-#define VDP2_TVMD_HORZ_NORMAL_A         0 /* 320x */
-#define VDP2_TVMD_HORZ_NORMAL_B         1 /* 352x */
-#define VDP2_TVMD_HORZ_HIRESO_A         2 /* 640x */
-#define VDP2_TVMD_HORZ_HIRESO_B         3 /* 704x */
-#define VDP2_TVMD_HORZ_NORMAL_AE        4 /* 320x480 */
-#define VDP2_TVMD_HORZ_NORMAL_BE        5 /* 352x480 */
-#define VDP2_TVMD_HORZ_HIRESO_AE        6 /* 640x480 */
-#define VDP2_TVMD_HORZ_HIRESO_BE        7 /* 704x480 */
+typedef enum vdp2_tvmd_horz {
+        VDP2_TVMD_HORZ_NORMAL_A  = 0, /* 320x */
+        VDP2_TVMD_HORZ_NORMAL_B  = 1, /* 352x */
+        VDP2_TVMD_HORZ_HIRESO_A  = 2, /* 640x */
+        VDP2_TVMD_HORZ_HIRESO_B  = 3, /* 704x */
+        VDP2_TVMD_HORZ_NORMAL_AE = 4, /* 320x480 */
+        VDP2_TVMD_HORZ_NORMAL_BE = 5, /* 352x480 */
+        VDP2_TVMD_HORZ_HIRESO_AE = 6, /* 640x480 */
+        VDP2_TVMD_HORZ_HIRESO_BE = 7  /* 704x480 */
+} vdp2_tvmd_horz_t;
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_in(void)
 {
-        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008;
+        return ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008);
 }
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_out(void)
 {
-        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000;
+        return ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000);
 }
 
 static inline void __always_inline
@@ -99,22 +109,22 @@ vdp2_tvmd_extern_latch(void)
 static inline uint16_t __always_inline
 vdp2_tvmd_hcount_get(void)
 {
-        return MEMORY_READ(16, VDP2(HCNT)) & 0x03FF;
+        return (MEMORY_READ(16, VDP2(HCNT)) & 0x03FF);
 }
 
 static inline uint16_t __always_inline
 vdp2_tvmd_vcount_get(void)
 {
-        return MEMORY_READ(16, VDP2(VCNT)) & 0x03FF;
+        return (MEMORY_READ(16, VDP2(VCNT)) & 0x03FF);
 }
 
-static inline uint16_t __always_inline
+static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
-        return MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001;
+        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001);
 }
 
-static inline uint8_t __always_inline
+static inline vdp2_tvmd_tv_field_t __always_inline
 vdp2_tvmd_field_scan_get(void)
 {
         return (MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001;
@@ -129,7 +139,7 @@ vdp2_tvmd_display(void)
 extern void vdp2_tvmd_display_clear(void);
 extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
-extern void vdp2_tvmd_display_res_set(uint8_t, uint8_t, uint8_t);
+extern void vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t, vdp2_tvmd_horz_t, vdp2_tvmd_vert_t);
 
 extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
 

@@ -166,6 +166,8 @@ _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs->bmpna |= palette_number;
                 break;
+        default:
+                break;
         }
 
         /* Special function type */
@@ -217,6 +219,8 @@ _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         case VDP2_SCRN_CCC_PALETTE_16:
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs->bmpna |= palette_number << 8;
+                break;
+        default:
                 break;
         }
 
@@ -280,6 +284,8 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         case VDP2_SCRN_CCC_PALETTE_16:
         case VDP2_SCRN_CCC_PALETTE_256:
                 _state_vdp2()->regs->bmpnb |= palette_number;
+                break;
+        default:
                 break;
         }
 

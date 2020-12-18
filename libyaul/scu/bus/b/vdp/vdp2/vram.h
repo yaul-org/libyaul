@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <vdp2/map.h>
+
 __BEGIN_DECLS
 
 /*-
@@ -40,17 +42,34 @@ __BEGIN_DECLS
 /* 4 Mbit 4-split VRAM bank size */
 #define VDP2_VRAM_BSIZE_4       (VDP2_VRAM_SIZE / 4)
 
-typedef struct vdp2_vram_ctl {
-#define VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM    0x0000 /* Store coefficient table in VRAM */
-#define VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM    0x0001 /* Store coefficient table in CRAM */
-        uint8_t coefficient_table;
+typedef enum vdp2_vram_bank {
+        VDP2_VRAM_BANK_A0 = 0,
+        VDP2_VRAM_BANK_A1 = 1,
+        VDP2_VRAM_BANK_B0 = 2,
+        VDP2_VRAM_BANK_B1 = 3
+} vdp2_vram_bank_t;
 
-#define VDP2_VRAM_CTL_MODE_NO_PART_BANK_A       0x0000
-#define VDP2_VRAM_CTL_MODE_NO_PART_BANK_B       0x0000
-#define VDP2_VRAM_CTL_MODE_PART_BANK_A          0x0001 /* Partition VRAM-A into two banks */
-#define VDP2_VRAM_CTL_MODE_PART_BANK_B          0x0002 /* Partition VRAM-B into two banks */
-#define VDP2_VRAM_CTL_MODE_PART_BANK_BOTH       0x0003
-        uint8_t vram_mode; /* VRAM mode bank partitions */
+typedef enum vdp2_vram_mode {
+        VDP2_VRAM_CTL_MODE_NO_PART_BANK_A = 0x00,
+        VDP2_VRAM_CTL_MODE_NO_PART_BANK_B = 0x00,
+        /// Partition VRAM-A into two banks
+        VDP2_VRAM_CTL_MODE_PART_BANK_A    = 0x01,
+        /// Partition VRAM-B into two banks
+        VDP2_VRAM_CTL_MODE_PART_BANK_B    = 0x02,
+        VDP2_VRAM_CTL_MODE_PART_BANK_BOTH = 0x03
+} vdp2_vram_ctl_mode_t;
+
+typedef enum vdp2_vram_ctl_coeff_table {
+        /// Store coefficient table in VRAM.
+        VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM = 0x00, 
+        /// Store coefficient table in CRAM.
+        VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM = 0x01,
+} vdp2_vram_ctl_coeff_table_t;
+
+typedef struct vdp2_vram_ctl {
+        vdp2_vram_ctl_coeff_table_t coefficient_table;
+        /// VRAM mode bank partitions.
+        vdp2_vram_ctl_mode_t vram_mode;
 } __aligned(4) vdp2_vram_ctl_t;
 
 #define VDP2_VRAM_CYCP_PNDR_NBG0        0x0 /* NBG0 pattern name data read */
@@ -113,9 +132,9 @@ extern void vdp2_vram_control_set(const vdp2_vram_ctl_t *);
 extern void vdp2_vram_cycp_set(const vdp2_vram_cycp_t *);
 extern void vdp2_vram_cycp_clear(void);
 
-extern vdp2_vram_cycp_bank_t vdp2_vram_cycp_bank_get(uint8_t);
-extern void vdp2_vram_cycp_bank_set(uint8_t, const vdp2_vram_cycp_bank_t *);
-extern void vdp2_vram_cycp_bank_clear(uint8_t);
+extern vdp2_vram_cycp_bank_t vdp2_vram_cycp_bank_get(vdp2_vram_bank_t);
+extern void vdp2_vram_cycp_bank_set(vdp2_vram_bank_t, const vdp2_vram_cycp_bank_t *);
+extern void vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t);
 
 __END_DECLS
 
