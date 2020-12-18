@@ -31,16 +31,20 @@ __BEGIN_DECLS
 #define VDP1_CMDT_PMOD_END_CODE_DISABLE         (1 << 7)
 #define VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE      (1 << 6)
 
-#define CMDT_ZOOM_POINT_NONE            (0x0)
-#define CMDT_ZOOM_POINT_UPPER_LEFT      (0x5)
-#define CMDT_ZOOM_POINT_UPPER_CENTER    (0x6)
-#define CMDT_ZOOM_POINT_UPPER_RIGHT     (0x7)
-#define CMDT_ZOOM_POINT_CENTER_LEFT     (0x9)
-#define CMDT_ZOOM_POINT_CENTER          (0xA)
-#define CMDT_ZOOM_POINT_CENTER_RIGHT    (0xB)
-#define CMDT_ZOOM_POINT_LOWER_LEFT      (0xD)
-#define CMDT_ZOOM_POINT_LOWER_CENTER    (0xE)
-#define CMDT_ZOOM_POINT_LOWER_RIGHT     (0xF)
+typedef uint16_t vdp1_link_t;
+
+typedef enum vdp1_cmdt_zoom_point { 
+        VDP1_CMDT_ZOOM_POINT_NONE         = 0x00,
+        VDP1_CMDT_ZOOM_POINT_UPPER_LEFT   = 0x05,
+        VDP1_CMDT_ZOOM_POINT_UPPER_CENTER = 0x06,
+        VDP1_CMDT_ZOOM_POINT_UPPER_RIGHT  = 0x07,
+        VDP1_CMDT_ZOOM_POINT_CENTER_LEFT  = 0x09,
+        VDP1_CMDT_ZOOM_POINT_CENTER       = 0x0A,
+        VDP1_CMDT_ZOOM_POINT_CENTER_RIGHT = 0x0B,
+        VDP1_CMDT_ZOOM_POINT_LOWER_LEFT   = 0x0D,
+        VDP1_CMDT_ZOOM_POINT_LOWER_CENTER = 0x0E,
+        VDP1_CMDT_ZOOM_POINT_LOWER_RIGHT  = 0x0F
+} vdp1_cmdt_zoom_point_t;
 
 #define CMDT_VTX_NORMAL_SPRITE          (0)
 #define CMDT_VTX_NORMAL_SPRITE_COUNT    (1)
@@ -178,16 +182,16 @@ typedef struct vdp1_cmdt {
 
 typedef union vdp1_cmdt_draw_mode {
         struct {
-                unsigned int msb_enable:1;              /* Bit 15 */
+                unsigned int msb_enable:1;           /* Bit 15 */
                 unsigned int :2;
-                unsigned int hss_enable:1;              /* Bit 12 */
-                unsigned int pre_clipping_disable:1;    /* Bit 11 */
+                unsigned int hss_enable:1;           /* Bit 12 */
+                unsigned int pre_clipping_disable:1; /* Bit 11 */
                 unsigned int user_clipping_mode:2;   /* Bits 10-9 */
-                unsigned int mesh_enable:1;              /* Bit 8 */
-                unsigned int end_code_disable:1;         /* Bit 7 */
-                unsigned int trans_pixel_disable:1;      /* Bit 6 */
-                unsigned int color_mode:3;            /* Bits 5-3 */
-                unsigned int cc_mode:3;               /* Bits 2-0 */
+                unsigned int mesh_enable:1;          /* Bit 8 */
+                unsigned int end_code_disable:1;     /* Bit 7 */
+                unsigned int trans_pixel_disable:1;  /* Bit 6 */
+                unsigned int color_mode:3;           /* Bits 5-3 */
+                unsigned int cc_mode:3;              /* Bits 2-0 */
         } bits __aligned(2);
 
         uint16_t raw;
@@ -229,13 +233,13 @@ typedef struct {
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
 {
-        return MEMORY_READ(16, VDP1(COPR)) >> 2;
+        return (MEMORY_READ(16, VDP1(COPR)) >> 2);
 }
 
 static inline uint16_t __always_inline
 vdp1_cmdt_last_get(void)
 {
-        return MEMORY_READ(16, VDP1(LOPR)) >> 2;
+        return (MEMORY_READ(16, VDP1(LOPR)) >> 2);
 }
 
 static inline void __always_inline
@@ -267,29 +271,29 @@ extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *);
 extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *);
 extern void vdp1_cmdt_end_set(vdp1_cmdt_t *);
 
-extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, const vdp1_cmdt_draw_mode_t);
-extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, const uint8_t);
-extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, vdp1_cmdt_draw_mode_t);
+extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, vdp1_cmdt_zoom_point_t);
+extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, vdp1_vram_t);
 extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb1555_t);
-extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, uint32_t);
-extern void vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, const vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, vdp1_vram_t);
+extern void vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
+extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
 extern void vdp1_cmdt_param_size_set(vdp1_cmdt_t *, uint16_t, uint16_t);
 extern void vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *, bool);
 extern void vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *, bool);
 extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vec2_t *);
 extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vec2_t *);
-extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, uint32_t);
+extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, vdp1_vram_t);
 
 extern void vdp1_cmdt_jump_clear(vdp1_cmdt_t *);
 
-extern void vdp1_cmdt_jump_assign(vdp1_cmdt_t *, uint16_t);
-extern void vdp1_cmdt_jump_call(vdp1_cmdt_t *, uint16_t);
-extern void vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *, uint16_t);
-extern void vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *, uint16_t);
+extern void vdp1_cmdt_jump_assign(vdp1_cmdt_t *, vdp1_link_t);
+extern void vdp1_cmdt_jump_call(vdp1_cmdt_t *, vdp1_link_t);
+extern void vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *, vdp1_link_t);
+extern void vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *, vdp1_link_t);
 
 extern void vdp1_cmdt_jump_next(vdp1_cmdt_t *);
 extern void vdp1_cmdt_jump_return(vdp1_cmdt_t *);

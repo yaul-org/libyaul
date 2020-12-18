@@ -17,8 +17,6 @@
 
 __BEGIN_DECLS
 
-typedef int16_t vdp2_color8_t;
-
 typedef enum vdp2_scrn {
         /// Normal background.
         VDP2_SCRN_NBG0   = 0 , 
@@ -338,7 +336,7 @@ typedef struct vdp2_scrn_cell_format {
         uint32_t character_size; /* Character size: (1 * 1) or (2 * 2) cells */
         uint32_t pnd_size; /* Pattern name data size: (1)-word or (2)-words */
         uint32_t auxiliary_mode; /* Auxiliary mode #0 (flip function) or
-                                      * auxiliary mode #1 (no flip function) */
+                                  * auxiliary mode #1 (no flip function) */
         vdp2_vram_t cp_table; /* Character pattern table lead address*/
         vdp2_cram_t color_palette; /* Color palette lead address */
         uint32_t plane_size; /* Plane size: (1 * 1) or (2 * 1) or (2 * 2) */
@@ -529,6 +527,12 @@ typedef struct vdp2_scrn_vcs_format {
         vdp2_vram_t vcs_table; /* Vertical cell scroll table (lead addr.) */
 } vdp2_scrn_vcs_format_t;
 
+typedef struct vdp2_scrn_color_offset_rgb {
+        int16_t r;
+        int16_t g;
+        int16_t b;
+} vdp2_scrn_color_offset_rgb_t;
+
 extern void vdp2_scrn_back_screen_color_set(vdp2_vram_t, const color_rgb1555_t);
 extern void vdp2_scrn_back_screen_buffer_set(vdp2_vram_t, const color_rgb1555_t *,
     const uint16_t);
@@ -538,7 +542,8 @@ extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t, vdp2_color8_t, vdp2_color8_t, vdp2_color8_t);
+extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t,
+    const vdp2_scrn_color_offset_rgb_t * const);
 extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, vdp2_scrn_color_offset_t);
 extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
 

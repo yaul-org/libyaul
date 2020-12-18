@@ -13,6 +13,8 @@
 
 __BEGIN_DECLS
 
+typedef uint8_t callback_id_t;
+
 typedef void (*callback_handler)(void *);
 
 typedef struct callback {
@@ -34,14 +36,14 @@ callback_call(callback_t *callback)
         callback->handler(callback->work);
 }
 
-extern callback_list_t *callback_list_alloc(const uint8_t);
+extern callback_list_t *callback_list_alloc(uint8_t);
 extern void callback_list_free(callback_list_t *);
-extern void callback_list_init(callback_list_t *, callback_t *, const uint8_t);
+extern void callback_list_init(callback_list_t *, callback_t *, uint8_t);
 
 extern void callback_list_process(callback_list_t *, bool);
 
-extern uint8_t callback_list_callback_add(callback_list_t *, callback_handler, void *);
-extern void callback_list_callback_remove(callback_list_t *, const uint8_t);
+extern callback_id_t callback_list_callback_add(callback_list_t *, callback_handler, void *);
+extern void callback_list_callback_remove(callback_list_t *, callback_id_t);
 extern void callback_list_clear(callback_list_t *);
 
 extern void callback_init(callback_t *);

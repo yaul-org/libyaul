@@ -45,7 +45,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
 
         assert(remaining_size >= 0);
 
-        uint32_t vram_base;
+        vdp1_vram_t vram_base;
         vram_base = VDP1_VRAM(sizeof(vdp1_cmdt_t));
 
         vdp1_vram_partitions_t *vram_partitions;
@@ -55,7 +55,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         vram_partitions->cmdt_size = cmdt_size;
         vram_base += cmdt_size;
 
-        vram_partitions->texture_base = (void *)vram_base;
+        vram_partitions->texture_base = (vdp1_vram_t *)vram_base;
         vram_partitions->texture_size = texture_size;
         vram_base += texture_size;
 
@@ -70,7 +70,7 @@ vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
         if (remaining_size == 0) {
                 vram_partitions->remaining_base = NULL;
         } else {
-                vram_partitions->remaining_base = (void *)vram_base;
+                vram_partitions->remaining_base = (vdp1_vram_t *)vram_base;
         }
 
         vram_partitions->remaining_size = remaining_size;

@@ -25,6 +25,8 @@
 #define COPR            0x0014UL
 #define MODR            0x0016UL
 
+typedef uint32_t vdp1_vram_t;
+
 typedef union vdp1_registers {
         uint16_t buffer[11];
 

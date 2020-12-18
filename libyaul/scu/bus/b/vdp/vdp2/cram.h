@@ -60,8 +60,10 @@ __BEGIN_DECLS
 #define COLOR_RGB888_TO_RGB555(r, g, b)                                        \
         ((((b) >> 3) << 10) | (((g) >> 3) << 5) | ((r) >> 3))
 
-extern uint8_t vdp2_cram_mode_get(void);
-extern void vdp2_cram_mode_set(uint8_t);
+typedef uint32_t vdp2_cram_mode_t;
+
+extern vdp2_cram_mode_t vdp2_cram_mode_get(void);
+extern void vdp2_cram_mode_set(vdp2_cram_mode_t);
 extern void vdp2_cram_offset_set(vdp2_scrn_t, vdp2_cram_t);
 
 __END_DECLS

@@ -18,7 +18,7 @@
 static void _default_handler(void *);
 
 callback_list_t *
-callback_list_alloc(const uint8_t count)
+callback_list_alloc(uint8_t count)
 {
         assert(count > 0);
 
@@ -49,7 +49,7 @@ callback_list_free(callback_list_t *callback_list)
 }
 
 void
-callback_list_init(callback_list_t *callback_list, callback_t *callbacks, const uint8_t count)
+callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint8_t count)
 {
         assert(callback_list != NULL);
         assert(callbacks != NULL);
@@ -82,7 +82,7 @@ callback_list_process(callback_list_t *callback_list, bool clear)
         }
 }
 
-uint8_t
+callback_id_t
 callback_list_callback_add(callback_list_t *callback_list, callback_handler handler, void *work)
 {
 #ifdef DEBUG
@@ -91,7 +91,7 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler hand
         assert(callback_list->count > 0);
 #endif /* DEBUG */
 
-        uint8_t id;
+        callback_id_t id;
         for (id = 0; id < callback_list->count; id++) {
                 if (callback_list->callbacks[id].handler != _default_handler) {
                         continue;
@@ -110,7 +110,7 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler hand
 }
 
 void
-callback_list_callback_remove(callback_list_t *callback_list, const uint8_t id)
+callback_list_callback_remove(callback_list_t *callback_list, callback_id_t id)
 {
 #ifdef DEBUG
         assert(callback_list != NULL);
