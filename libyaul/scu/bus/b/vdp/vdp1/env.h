@@ -26,23 +26,30 @@ __BEGIN_DECLS
 /// @{
 
 /// Not yet documented.
-#define VDP1_ENV_ROTATION_0  0
-/// Not yet documented.
-#define VDP1_ENV_ROTATION_90 1
-
-/// Not yet documented.
-#define VDP1_ENV_BPP_16      0
-/// Not yet documented.
-#define VDP1_ENV_BPP_8       1
-
-/// Not yet documented.
-#define VDP1_ENV_COLOR_MODE_PALETTE     0
-/// Not yet documented.
-#define VDP1_ENV_COLOR_MODE_RGB_PALETTE 1
-/// Not yet documented.
 #define VDP1_ENV_CMDT_PREAMBLE_COUNT (4)
 
 /// @}
+
+typedef enum vdp1_env_rotation {
+        /// Not yet documented.
+        VDP1_ENV_ROTATION_0  = 0,
+        /// Not yet documented.
+        VDP1_ENV_ROTATION_90 = 1
+} vdp1_env_rotation_t;
+
+typedef enum vdp1_env_bpp {
+        /// Not yet documented.
+        VDP1_ENV_BPP_16 = 0,
+        /// Not yet documented.
+        VDP1_ENV_BPP_8  = 1
+} vdp1_env_bpp_t;
+
+typedef enum vdp1_env_color_mode {
+        /// Not yet documented.
+        VDP1_ENV_COLOR_MODE_PALETTE     = 0,
+        /// Not yet documented.
+        VDP1_ENV_COLOR_MODE_RGB_PALETTE = 1
+} vdp1_env_color_mode_t;
 
 /// @addtogroup VDP1_ENV_STRUCTURES
 /// @{
@@ -54,10 +61,10 @@ typedef struct vdp1_env {
 
         struct {
                 unsigned int :1;
-                unsigned int bpp:1;
-                unsigned int rotation:1;
-                unsigned int color_mode:1;
-                unsigned int sprite_type:4;
+                vdp1_env_bpp_t bpp:1;
+                vdp1_env_rotation_t rotation:1;
+                vdp1_env_color_mode_t color_mode:1;
+                vdp2_sprite_type_t sprite_type:4;
         } __packed;
 
         color_rgb1555_t erase_color;
