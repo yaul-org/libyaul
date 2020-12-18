@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 
+#include <vdp2/map.h>
 #include <vdp2/scrn.h>
 
 __BEGIN_DECLS
@@ -61,7 +62,7 @@ __BEGIN_DECLS
 
 extern uint8_t vdp2_cram_mode_get(void);
 extern void vdp2_cram_mode_set(uint8_t);
-extern void vdp2_cram_offset_set(vdp2_scrn_t, uint32_t);
+extern void vdp2_cram_offset_set(vdp2_scrn_t, vdp2_cram_t);
 
 __END_DECLS
 

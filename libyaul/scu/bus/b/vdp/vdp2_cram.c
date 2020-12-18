@@ -29,7 +29,7 @@ vdp2_cram_mode_set(uint8_t mode)
 }
 
 void
-vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, uint32_t cram_addr)
+vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram_addr)
 {
 #ifdef DEBUG
         assert((scroll_screen == VDP2_SCRN_NBG0) ||

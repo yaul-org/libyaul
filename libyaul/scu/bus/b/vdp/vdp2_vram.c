@@ -66,23 +66,23 @@ vdp2_vram_cycp_set(const vdp2_vram_cycp_t *vram_cycp)
         assert(vram_cycp != NULL);
 #endif /* DEBUG */
 
-        vdp2_vram_cycp_bank_set(0, &vram_cycp->pt[0]);
-        vdp2_vram_cycp_bank_set(1, &vram_cycp->pt[1]);
-        vdp2_vram_cycp_bank_set(2, &vram_cycp->pt[2]);
-        vdp2_vram_cycp_bank_set(3, &vram_cycp->pt[3]);
+        vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_A0, &vram_cycp->pt[0]);
+        vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_A1, &vram_cycp->pt[1]);
+        vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_B0, &vram_cycp->pt[2]);
+        vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_B1, &vram_cycp->pt[3]);
 }
 
 void
 vdp2_vram_cycp_clear(void)
 {
-        vdp2_vram_cycp_bank_clear(0);
-        vdp2_vram_cycp_bank_clear(1);
-        vdp2_vram_cycp_bank_clear(2);
-        vdp2_vram_cycp_bank_clear(3);
+        vdp2_vram_cycp_bank_clear(VDP2_VRAM_BANK_A0);
+        vdp2_vram_cycp_bank_clear(VDP2_VRAM_BANK_A1);
+        vdp2_vram_cycp_bank_clear(VDP2_VRAM_BANK_B0);
+        vdp2_vram_cycp_bank_clear(VDP2_VRAM_BANK_B1);
 }
 
 vdp2_vram_cycp_bank_t
-vdp2_vram_cycp_bank_get(uint8_t bank)
+vdp2_vram_cycp_bank_get(vdp2_vram_bank_t bank)
 {
 #ifdef DEBUG
         assert(bank <= 3);
@@ -92,12 +92,10 @@ vdp2_vram_cycp_bank_get(uint8_t bank)
 }
 
 void
-vdp2_vram_cycp_bank_set(uint8_t bank,
+vdp2_vram_cycp_bank_set(vdp2_vram_bank_t bank,
     const vdp2_vram_cycp_bank_t *cycp_bank)
 {
 #ifdef DEBUG
-        assert(bank <= 3);
-
         assert(cycp_bank != NULL);
 #endif /* DEBUG */
 
@@ -105,11 +103,7 @@ vdp2_vram_cycp_bank_set(uint8_t bank,
 }
 
 void
-vdp2_vram_cycp_bank_clear(uint8_t bank)
+vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t bank)
 {
-#ifdef DEBUG
-        assert(bank <= 3);
-#endif /* DEBUG */
-
         _state_vdp2()->regs->cyc[bank] = 0xFFFFFFFF;
 }

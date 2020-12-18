@@ -38,31 +38,9 @@ vdp2_tvmd_display_res_get(uint16_t *width, uint16_t *height)
 }
 
 void
-vdp2_tvmd_display_res_set(uint8_t interlace, uint8_t horizontal,
-    uint8_t vertical)
+vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t horizontal,
+    vdp2_tvmd_vert_t vertical)
 {
-#ifdef DEBUG
-        /* Check interlace values */
-        assert((interlace == VDP2_TVMD_INTERLACE_NONE) ||
-               (interlace == VDP2_TVMD_INTERLACE_SINGLE) ||
-               (interlace == VDP2_TVMD_INTERLACE_DOUBLE));
-
-        /* Check vertical resolution */
-        assert((vertical == VDP2_TVMD_VERT_224) ||
-               (vertical == VDP2_TVMD_VERT_240) ||
-               (vertical == VDP2_TVMD_VERT_256));
-
-        /* Check horizontal resolution */
-        assert((horizontal == VDP2_TVMD_HORZ_NORMAL_A) ||
-               (horizontal == VDP2_TVMD_HORZ_NORMAL_B) ||
-               (horizontal == VDP2_TVMD_HORZ_HIRESO_A) ||
-               (horizontal == VDP2_TVMD_HORZ_HIRESO_B) ||
-               (horizontal == VDP2_TVMD_HORZ_NORMAL_AE) ||
-               (horizontal == VDP2_TVMD_HORZ_NORMAL_BE) ||
-               (horizontal == VDP2_TVMD_HORZ_HIRESO_AE) ||
-               (horizontal == VDP2_TVMD_HORZ_HIRESO_BE));
-#endif /* DEBUG */
-
         uint32_t sys_clock;
         sys_clock = bios_clock_speed_get();
 

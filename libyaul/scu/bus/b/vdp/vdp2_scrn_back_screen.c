@@ -14,10 +14,10 @@
 
 #include "vdp-internal.h"
 
-static inline void _back_screen_set(uint32_t vram, const color_rgb1555_t *buffer, const uint16_t count);
+static inline void _back_screen_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t count);
 
 void
-vdp2_scrn_back_screen_color_set(uint32_t vram, const color_rgb1555_t color)
+vdp2_scrn_back_screen_color_set(vdp2_vram_t vram, const color_rgb1555_t color)
 {
         static color_rgb1555_t buffer = COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
 
@@ -31,7 +31,7 @@ vdp2_scrn_back_screen_color_set(uint32_t vram, const color_rgb1555_t color)
 }
 
 void
-vdp2_scrn_back_screen_buffer_set(uint32_t vram, const color_rgb1555_t *buffer,
+vdp2_scrn_back_screen_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer,
     const uint16_t count)
 {
 #ifdef DEBUG

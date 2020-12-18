@@ -155,6 +155,9 @@
 #define COBG    0x011CUL
 #define COBB    0x011EUL
 
+typedef uint32_t vdp2_cram_t;
+typedef uint32_t vdp2_vram_t;
+
 typedef union vdp2_registers {
         uint16_t buffer[144];
 

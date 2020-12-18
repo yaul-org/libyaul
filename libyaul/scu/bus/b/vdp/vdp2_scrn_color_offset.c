@@ -12,7 +12,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, uint8_t select)
+vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t select)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
@@ -24,10 +24,6 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, uint8_t select)
                (scroll_screen == VDP2_SCRN_RBG0) ||
                (scroll_screen == VDP2_SCRN_BACK) ||
                (scroll_screen == VDP2_SCRN_SPRITE));
-
-        /* Check if the color offset is A or B */
-        assert((select == VDP2_SCRN_COLOR_OFFSET_A) ||
-               (select == VDP2_SCRN_COLOR_OFFSET_B));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
@@ -135,8 +131,8 @@ vdp2_scrn_color_offset_clear(void)
 }
 
 void
-vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select, int16_t r,
-    int16_t g, int16_t b)
+vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select, vdp2_color8_t r,
+    vdp2_color8_t g, vdp2_color8_t b)
 {
 #ifdef DEBUG
         /* Check range: [-256,256] */
@@ -145,8 +141,8 @@ vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select, int16_t r,
                ((b >= -256) && (b <= 255)));
 #endif /* DEBUG */
 
-        /* Each color component in the color offset has a range [-256,255]
-         * Lower bound: -(2**(9-1)) & upper bound: (2**9)-1 */
+        /* Each color component in the color offset has a range [-256,255] Lower
+         * bound: -(2**(9-1)) & upper bound: (2**9)-1 */
         switch (select) {
         case VDP2_SCRN_COLOR_OFFSET_A:
                 _state_vdp2()->regs->coar = r & 0x01FF;
