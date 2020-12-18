@@ -27,6 +27,13 @@ ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
   $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
 endif
 
+ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),)
+  $(error Undefined YAUL_OPTION_BUILD_ASSERT (build ASSERT))
+endif
+ifneq ($(YAUL_OPTION_BUILD_ASSERT),$(filter $(YAUL_OPTION_BUILD_ASSERT),0 1))
+  $(error Invalid value for YAUL_OPTION_BUILD_ASSERT (build assert))
+endif
+
 ifeq ($(strip $(SILENT)),)
   ECHO=
 else
@@ -112,7 +119,8 @@ SH_CFLAGS= \
 	-Wno-main \
 	-Wno-format \
 	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
-	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB)
+	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB) \
+	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
 
 SH_LDFLAGS= \
 	-Wl,-Map,$(SH_PROGRAM).map
