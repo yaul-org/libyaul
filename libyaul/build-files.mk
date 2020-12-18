@@ -293,6 +293,9 @@ INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
+	./kernel/sys/:callback-list.h:yaul/sys/
+
+INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
 
 INSTALL_HEADER_FILES+= \
