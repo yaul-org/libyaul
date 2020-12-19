@@ -118,35 +118,35 @@ fix16_mul(const fix16_t a, const fix16_t b)
 static inline fix16_t __always_inline
 fix16_int32_from(int32_t value)
 {
-        return value * FIX16_ONE;
+        return (value * FIX16_ONE);
 }
 
 static inline int32_t __always_inline
 fix16_int32_to(const fix16_t value)
 {
-        return value >> 16;
+        return (value >> 16);
 }
 
 static inline int32_t __always_inline
 fix16_round_int32_to(const fix16_t value)
 {
         if (value >= 0) {
-                return (value + (FIX16_ONE >> 1)) / FIX16_ONE;
+                return ((value + (FIX16_ONE >> 1)) / FIX16_ONE);
         }
 
-        return (value - (FIX16_ONE >> 1)) / FIX16_ONE;
+        return ((value - (FIX16_ONE >> 1)) / FIX16_ONE);
 }
 
 static inline fix16_t __always_inline
 fix16_integral(const fix16_t value)
 {
-        return value & 0xFFFF0000;
+        return (value & 0xFFFF0000);
 }
 
 static inline fix16_t __always_inline
 fix16_fractional(const fix16_t value)
 {
-        return value & 0x0000FFFF;
+        return (value & 0x0000FFFF);
 }
 
 static inline fix16_t __always_inline
