@@ -48,7 +48,20 @@ fileclient_sector_request(const char *filename, const uint32_t sector_offset,
 uint32_t
 fileclient_sector_count_request(const char *filename)
 {
-        usb_cart_byte_send(SSLOAD_API_CMD_SIZE);
+        usb_cart_byte_send(SSLOAD_API_CMD_SECTOR_COUNT);
+
+        _filename_send(filename);
+
+        uint32_t sector_count;
+        sector_count = usb_cart_long_read();
+
+        return sector_count;
+}
+
+uint32_t
+fileclient_byte_size_request(const char *filename)
+{
+        usb_cart_byte_send(SSLOAD_API_CMD_BYTE_SIZE);
 
         _filename_send(filename);
 
