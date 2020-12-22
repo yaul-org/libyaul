@@ -26,20 +26,21 @@
 #include "crc.h"
 #include "api.h"
 
-/* Maximum length of a path per path entry */
-#define PATH_ENTRY_PATH_LENGTH  (256)
+/* Maximum filename length */
+#define PATH_ENTRY_FILENAME_LENGTH      (32)
 /* Maximum number of path entries */
-#define PATH_ENTRY_COUNT        (4096)
+#define PATH_ENTRY_COUNT                (4096)
 
-#define FILESERVER_SECTOR_SIZE  (2048)
+#define FILESERVER_SECTOR_SIZE (2048)
 
 static uint8_t _sector_buffer[FILESERVER_SECTOR_SIZE];
 
 typedef struct path_entry path_entry_t;
 
 struct path_entry {
-        char path[PATH_ENTRY_PATH_LENGTH];
+        char filename[PATH_ENTRY_FILENAME_LENGTH];
 
+        size_t sector_count;
         size_t size;
         uint8_t *buffer;
 
@@ -48,6 +49,7 @@ struct path_entry {
 };
 
 static path_entry_t _path_entries[PATH_ENTRY_COUNT];
+static char *_server_cwd;
 
 typedef enum {
         READ_STATUS_OK,
@@ -58,8 +60,18 @@ typedef enum {
         READ_STATUS_READ_ERROR
 } read_status_t;
 
+static const char *_read_status_strs[] = {
+        "READ_STATUS_OK",
+        "READ_STATUS_STAT_ERROR",
+        "READ_STATUS_FILETYPE_CHANGE",
+        "READ_STATUS_OPEN_ERROR",
+        "READ_STATUS_OOM",
+        "READ_STATUS_READ_ERROR"
+};
+
 static void _fileserver_cmd_file(const struct device_driver *);
-static void _fileserver_cmd_size(const struct device_driver *);
+static void _fileserver_cmd_byte_size(const struct device_driver *);
+static void _fileserver_cmd_sector_count(const struct device_driver *);
 static void _fileserver_cmd_quit(const struct device_driver *);
 
 static int _validate_dirpath(const char *dirpath);
@@ -84,7 +96,7 @@ fileserver_init(const char *dirpath)
                 return;
         }
 
-        /* Install necessary signal handlers */
+        /* XXX: Install necessary signal handlers */
 
         /* Build the path entries (OS specific) */
         _build_path_entries(dirpath);
@@ -99,8 +111,11 @@ fileserver_exec(const struct device_driver *device, uint8_t command)
         case API_CMD_FILE:
                 _fileserver_cmd_file(device);
                 break;
-        case API_CMD_SIZE:
-                _fileserver_cmd_size(device);
+        case API_CMD_BYTE_SIZE:
+                _fileserver_cmd_byte_size(device);
+                break;
+        case API_CMD_SECTOR_COUNT:
+                _fileserver_cmd_sector_count(device);
                 break;
         }
 }
@@ -120,11 +135,11 @@ _fileserver_cmd_file(const struct device_driver *device)
          * Host send    - sector        - 2048B
          * Host send    - checksum      - 1B */
 
-        static char filename[32];
+        static char filename[PATH_ENTRY_FILENAME_LENGTH];
 
         int ret;
 
-        if (!(api_variable_read(device, filename, sizeof(filename)))) {
+        if (!(api_variable_read(device, filename, PATH_ENTRY_FILENAME_LENGTH))) {
                 /* Error */
                 return;
         }
@@ -150,7 +165,7 @@ _fileserver_cmd_file(const struct device_driver *device)
 
         verbose_printf("Requested sector offset: %lu\n", sector_offset);
 
-        if (sector_offset >= path_entry->size) {
+        if (sector_offset >= path_entry->sector_count) {
                 /* Error */
                 return;
         }
@@ -206,17 +221,57 @@ _fileserver_cmd_file(const struct device_driver *device)
 }
 
 static void
-_fileserver_cmd_size(const struct device_driver *device)
+_fileserver_cmd_byte_size(const struct device_driver *device)
 {
-        /* Host receive - command       - 1B
-         * Host receive - filename      - 32B
-         * Host send    - file size     - 4B */
+        /* Host receive - command        - 1B
+         * Host receive - filename       - 32B
+         * Host send    - file byte size - 4B */
 
-        static char filename[32];
+        static char filename[PATH_ENTRY_FILENAME_LENGTH];
 
         int ret;
 
-        if (!(api_variable_read(device, filename, sizeof(filename)))) {
+        if (!(api_variable_read(device, filename, PATH_ENTRY_FILENAME_LENGTH))) {
+                /* Error */
+                return;
+        }
+
+        verbose_printf("Requesting sector count for file \"%s\"\n", filename);
+
+        const path_entry_t *path_entry;
+        path_entry = _path_entry_find(filename);
+
+        uint32_t byte_size;
+
+        if (path_entry != NULL) {
+                byte_size = TO_BE(path_entry->size);
+
+                verbose_printf("Sending (LE: 0x%08X) (BE: 0x%08X)\n", path_entry->size, byte_size);
+        } else {
+                verbose_printf("Error: File not found\n");
+                /* Error */
+                byte_size = -1;
+        }
+
+        if ((ret = device->send(&byte_size, sizeof(byte_size))) < 0) {
+                verbose_printf("Error: Timed out sending sector size\n");
+                /* Error */
+                return;
+        }
+}
+
+static void
+_fileserver_cmd_sector_count(const struct device_driver *device)
+{
+        /* Host receive - command      - 1B
+         * Host receive - filename     - 32B
+         * Host send    - sector count - 4B */
+
+        static char filename[PATH_ENTRY_FILENAME_LENGTH];
+
+        int ret;
+
+        if (!(api_variable_read(device, filename, PATH_ENTRY_FILENAME_LENGTH))) {
                 /* Error */
                 return;
         }
@@ -229,7 +284,7 @@ _fileserver_cmd_size(const struct device_driver *device)
         uint32_t sector_count;
 
         if (path_entry != NULL) {
-                sector_count = TO_BE(path_entry->size);
+                sector_count = TO_BE(path_entry->sector_count);
 
                 verbose_printf("Sending (LE: 0x%08X) (BE: 0x%08X)\n", path_entry->size, sector_count);
         } else {
@@ -264,7 +319,7 @@ _path_entry_file_read(path_entry_t *path_entry)
 
         /* Attempt to get the modification time */
         int ret;
-        if ((ret = stat(path_entry->path, &statbuf)) < 0) {
+        if ((ret = stat(path_entry->filename, &statbuf)) < 0) {
                 return READ_STATUS_STAT_ERROR;
         }
 
@@ -278,26 +333,28 @@ _path_entry_file_read(path_entry_t *path_entry)
                 return  READ_STATUS_OK;
         }
 
-        path_entry->size = (size_t)(ceilf((float)statbuf.st_size / (float)FILESERVER_SECTOR_SIZE));
+        path_entry->size = statbuf.st_size;
+        path_entry->sector_count =
+            (size_t)(ceilf((float)path_entry->size / (float)FILESERVER_SECTOR_SIZE));
         path_entry->time = statbuf.st_mtime;
 
         read_status_t read_status = READ_STATUS_OK;
 
         FILE *fp;
-        if ((fp = fopen(path_entry->path, "rb")) == NULL) {
+        if ((fp = fopen(path_entry->filename, "rb")) == NULL) {
                 read_status = READ_STATUS_OPEN_ERROR;
                 goto error;
         }
 
         void *buffer;
-        if ((buffer = malloc(path_entry->size * FILESERVER_SECTOR_SIZE)) == NULL) {
+        if ((buffer = malloc(path_entry->sector_count * FILESERVER_SECTOR_SIZE)) == NULL) {
                 fclose(fp);
 
                 read_status = READ_STATUS_OOM;
                 goto error;
         }
 
-        (void)memset(buffer, 0x00, path_entry->size * FILESERVER_SECTOR_SIZE);
+        (void)memset(buffer, 0x00, path_entry->sector_count * FILESERVER_SECTOR_SIZE);
 
         path_entry->buffer = buffer;
 
@@ -311,7 +368,7 @@ _path_entry_file_read(path_entry_t *path_entry)
                 goto error;
         }
 
-        crc_calculate(buffer, path_entry->size * FILESERVER_SECTOR_SIZE);
+        crc_calculate(buffer, path_entry->sector_count * FILESERVER_SECTOR_SIZE);
 
         return read_status;
 
@@ -329,6 +386,7 @@ _path_entry_cache_purge(path_entry_t *path_entry)
         }
 
         path_entry->size = 0;
+        path_entry->sector_count = 0;
         path_entry->checksum = 0;
 
         path_entry->buffer = NULL;
@@ -342,14 +400,14 @@ _path_entry_find(const char *filename)
                 path_entry_t *path_entry;
                 path_entry = &_path_entries[i];
 
-                if (*path_entry->path == '\0') {
+                if (*path_entry->filename == '\0') {
                         DEBUG_PRINTF("i: %i\n", i);
                         continue;
                 }
 
-                DEBUG_PRINTF("i: %i, filename: \"%s\" <?> \"%s\"\n", i, path_entry->path, filename);
+                DEBUG_PRINTF("i: %i, filename: \"%s\" <?> \"%s\"\n", i, path_entry->filename, filename);
 
-                if ((strstr(path_entry->path, filename)) != NULL) {
+                if ((strstr(path_entry->filename, filename)) != NULL) {
                         return path_entry;
                 }
         }
@@ -372,45 +430,59 @@ _build_path_entries(const char *dirpath)
 
         struct dirent *dirent;
 
-        for (int i = 0; (dirent = readdir(dir)) != NULL; ) {
+        for (int file_count = 0; (dirent = readdir(dir)) != NULL; ) {
                 struct stat statbuf;
 
                 (void)sprintf(path, "%s/%s", dirpath, dirent->d_name); 
 
+                if ((strlen(dirent->d_name)) >= PATH_ENTRY_FILENAME_LENGTH) {
+                        verbose_printf("Warning: Exceeded filename length: \"%s\"\n", dirent->d_name);
+
+                        continue;
+                }
+
                 int ret;
                 if ((ret = stat(path, &statbuf)) < 0) {
                         /* Error */
+                        verbose_printf("Error: Stat error\n");
+
                         return;
                 }
 
+                /* Ignore anything but a regular file */
                 if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
                         continue;
                 }
 
-                if (i >= PATH_ENTRY_COUNT) {
-                        /* Warning/note */
+                if (file_count >= PATH_ENTRY_COUNT) {
+                        verbose_printf("Warning: Exceeded file count: %i/%i\n", file_count, PATH_ENTRY_COUNT);
+
                         continue;
                 }
 
                 path_entry_t *path_entry;
-                path_entry = &_path_entries[i];
+                path_entry = &_path_entries[file_count];
 
-                (void)strncpy(path_entry->path, path, PATH_ENTRY_PATH_LENGTH);
-                path_entry->path[PATH_ENTRY_PATH_LENGTH - 1] = '\0';
+                (void)strncpy(path_entry->filename, path, PATH_ENTRY_FILENAME_LENGTH);
+                path_entry->filename[PATH_ENTRY_FILENAME_LENGTH - 1] = '\0';
 
                 _path_entry_cache_purge(path_entry);
 
                 read_status_t read_status;
                 read_status = _path_entry_file_read(path_entry);
 
-                verbose_printf("Serving file: \"%s\", sector count: %lu\n", path_entry->path, path_entry->size);
+                verbose_printf("Serving file: \"%s\", byte size: %lu, sector count: %lu\n",
+                    path_entry->filename,
+                    path_entry->size,
+                    path_entry->sector_count);
 
                 if (read_status != READ_STATUS_OK) {
-                        /* Error */
+                        verbose_printf("Error: Read status is invalid: %s\n", _read_status_strs[read_status]);
+
                         goto error;
                 }
 
-                i++;
+                file_count++;
         }
 
 error:

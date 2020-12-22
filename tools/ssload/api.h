@@ -8,11 +8,12 @@
 #ifndef API_H_
 #define API_H_
 
-#define API_CMD_FILE    (0xFB)
-#define API_CMD_SIZE    (0xFC)
-#define API_CMD_LOG     (0xFD)
-#define API_CMD_QUIT    (0xFE)
-#define API_CMD_INVALID (0xFF)
+#define API_CMD_FILE         (0xFA)
+#define API_CMD_SECTOR_COUNT (0xFB)
+#define API_CMD_BYTE_SIZE    (0xFC)
+#define API_CMD_LOG          (0xFD)
+#define API_CMD_QUIT         (0xFE)
+#define API_CMD_INVALID      (0xFF)
 
 #define API_RET_ERROR   (0xFF)
 

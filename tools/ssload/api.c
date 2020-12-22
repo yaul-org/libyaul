@@ -38,7 +38,8 @@ api_handle(const struct device_driver *device)
 
                         switch (command) {
                         case API_CMD_FILE:
-                        case API_CMD_SIZE:
+                        case API_CMD_BYTE_SIZE:
+                        case API_CMD_SECTOR_COUNT:
                                 fileserver_exec(device, command);
                                 break;
                         case API_CMD_LOG:
