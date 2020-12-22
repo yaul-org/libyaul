@@ -59,7 +59,7 @@ vdp2_scrn_scroll_x_set(vdp2_scrn_t scroll_screen, fix16_t scroll)
                 _fixed_point_scroll_set(&_state_vdp2()->regs->scxin0, scroll);
                 break;
         case VDP2_SCRN_NBG1:
-                _fixed_point_scroll_set(&_state_vdp2()->regs->scxin0, scroll);
+                _fixed_point_scroll_set(&_state_vdp2()->regs->scxin1, scroll);
                 break;
         case VDP2_SCRN_NBG2:
                 _integer_scroll_set(&_state_vdp2()->regs->scxn2, scroll);
@@ -123,7 +123,7 @@ vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta)
                 _fixed_point_scroll_update(&_state_vdp2()->regs->scxin0, delta);
                 break;
         case VDP2_SCRN_NBG1:
-                _fixed_point_scroll_update(&_state_vdp2()->regs->scxin0, delta);
+                _fixed_point_scroll_update(&_state_vdp2()->regs->scxin1, delta);
                 break;
         case VDP2_SCRN_NBG2:
                 _integer_scroll_update(&_state_vdp2()->regs->scxn2, delta);
@@ -155,7 +155,7 @@ vdp2_scrn_scroll_y_update(vdp2_scrn_t scroll_screen, fix16_t delta)
                 _fixed_point_scroll_update(&_state_vdp2()->regs->scyin0, delta);
                 break;
         case VDP2_SCRN_NBG1:
-                _fixed_point_scroll_update(&_state_vdp2()->regs->scyin0, delta);
+                _fixed_point_scroll_update(&_state_vdp2()->regs->scyin1, delta);
                 break;
         case VDP2_SCRN_NBG2:
                 _integer_scroll_update(&_state_vdp2()->regs->scyn2, delta);
