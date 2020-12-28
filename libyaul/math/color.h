@@ -28,7 +28,7 @@ typedef union {
     }
 
 #define COLOR_RGB1888_RGB1555(msb, r, g, b)                                    \
-    ((color_rgb1555_t)COLOR_RGB1888_1555(msb, r, g, b))
+    ((color_rgb1555_t)COLOR_RGB1555(msb, (r) >> 3, (g) >> 3, (b) >> 3))
 #define COLOR_RGB1888_RGB1555_INITIALIZER(msb, r, g, b)                        \
     COLOR_RGB1555_INITIALIZER(msb, (r) >> 3, (g) >> 3, (b) >> 3)
 
