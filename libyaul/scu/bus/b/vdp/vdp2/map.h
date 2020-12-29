@@ -317,4 +317,6 @@ typedef union vdp2_registers {
         };
 } vdp2_registers_t;
 
+extern vdp2_registers_t vdp2_regs_get(void);
+
 #endif /* !_VDP2_MAP_H_ */
