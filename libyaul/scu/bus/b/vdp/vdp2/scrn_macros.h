@@ -160,11 +160,11 @@ __BEGIN_DECLS
         (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_3(cram_mode, cpd_addr, pal_addr)                  \
         (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_4(cram_mode, cpd_addr, pal_addr, vf, hf)          \
         ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
@@ -180,11 +180,11 @@ __BEGIN_DECLS
         ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
          (((vf) & 0x01) << 11) |                                               \
          (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_7(cram_mode, cpd_addr, pal_addr, vf, hf)          \
         ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFC) >> 2))
+         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_8(cram_mode, cpd_addr, pal_addr, vf, hf, pr, cc)  \
         ((((vf) & 0x01) << 31) |                                               \

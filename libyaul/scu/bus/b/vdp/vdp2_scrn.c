@@ -14,20 +14,19 @@
 
 #include "vdp-internal.h"
 
-static void _cell_plane_calc(const vdp2_scrn_cell_format_t *, uint16_t *,
-    uint16_t *);
-static uint16_t _cell_pattern_name_control_calc(
-    const vdp2_scrn_cell_format_t *);
+static void _cell_plane_calc(const vdp2_scrn_cell_format_t *format,
+    uint16_t plane_count, uint16_t *planes, uint16_t *map_offset);
+static uint16_t _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format);
 
-static void _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
-static void _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
-static void _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
-static void _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
-static void _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+static void _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format);
+static void _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format);
+static void _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format);
+static void _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format);
+static void _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format);
 
-static void _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
-static void _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
-static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
+static void _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format);
+static void _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format);
+static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format);
 
 void
 vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
@@ -291,35 +290,25 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 }
 
 static void
-_cell_plane_calc(
-        const vdp2_scrn_cell_format_t *format,
-        uint16_t *planes,
-        uint16_t *map_offset)
+_cell_plane_calc(const vdp2_scrn_cell_format_t *format, uint16_t plane_count,
+    uint16_t *planes, uint16_t *map_offset)
 {
-        uint16_t plane_count;
-        plane_count = ((format->scroll_screen == VDP2_SCRN_RBG0) ||
-                       (format->scroll_screen == VDP2_SCRN_RBG1)) ? 16 : 4;
+        const uint32_t page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
 
-        uint16_t page_size;
-        page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
+        for (uint32_t plane = 0; plane < plane_count; plane++) {
+                const uint16_t map_bits = (format->map_bases.planes[plane] / page_size) & 0x03FF;
 
-        uint32_t i;
-        for (i = 0; i < plane_count; i++) {
-                /* XXX: There should be a way to mask out the top mask bits */
-                uint32_t offset;
-                offset = format->map_bases.planes[i] - VDP2_VRAM_ADDR(0, 0);
+                planes[plane] = map_bits & 0x003F;
 
-                planes[i] = (offset / page_size) & 0x003F;
+                /* Calculate the upper 3-bits of the 9-bits "map register", but
+                 * only for the first plane.
+                 *
+                 * Does this then imply that the all pattern name data for all
+                 * planes must be stored on the same VRAM bank? */
+                if (plane == 0) {
+                        *map_offset = (map_bits >> 6) & 0x07;
+                }
         }
-
-        /* Calculate the upper 3-bits of the 9-bits "map register" */
-        uint32_t offset;
-        offset = format->map_bases.planes[0] - VDP2_VRAM_ADDR(0, 0);
-
-        uint16_t map_bits;
-        map_bits = offset / page_size;
-
-        *map_offset = (map_bits & 0x01C0) >> 6;
 }
 
 static uint16_t
@@ -390,14 +379,14 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
                         switch (format->character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 9~0
-                                 * Character number in supplemental data: bits 14 13 12 11 10 */
+                                 * Character number in supplemental data:  bits 14 13 12 11 10 */
                                 sc_number = (character_number & 0x7C00) >> 10;
                                 break;
                         case (2 * 2):
                                 /* Character number in pattern name table: bits 11~2
-                                 * Character number in supplemental data: bits 14 13 12  1  0 */
-                                sc_number = ((character_number & 0x7000) >> 10) |
-                                             (character_number & 0x03);
+                                 * Character number in supplemental data:  bits 14 13 12  1  0 */
+                                sc_number = ((((character_number >> 12) & 0x7) << 2) |
+                                             (character_number & 0x03));
                                 break;
                         }
                         break;
@@ -407,14 +396,14 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
                         switch (format->character_size) {
                         case (1 * 1):
                                 /* Character number in pattern name table: bits 11~0
-                                 * Character number in supplemental data: bits 14 13 12 __ __ */
+                                 * Character number in supplemental data:  bits 14 13 12 __ __ */
                                 sc_number = (character_number & 0x7000) >> 10;
                                 break;
                         case (2 * 2):
                                 /* Character number in pattern name table: bits 13~2
-                                 * Character number in supplemental data: bits 14 __ __  1  0 */
-                                sc_number = ((character_number & 0x4000) >> 10) |
-                                             (character_number & 0x03);
+                                 * Character number in supplemental data:  bits 14 __ __  1  0 */
+                                sc_number = ((((character_number >> 12) & 0x7) << 2) |
+                                             (character_number & 0x03));
                                 break;
                         }
 
@@ -442,19 +431,13 @@ _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->chctla &= 0xFFFE;
         _state_vdp2()->regs->plsz &= 0xFFFC;
         _state_vdp2()->regs->mpofn &= 0xFFF8;
-        _state_vdp2()->regs->mpabn0 = 0x0000;
-        _state_vdp2()->regs->mpcdn0 = 0x0000;
-        _state_vdp2()->regs->pncn0 = 0x0000;
         _state_vdp2()->regs->sfsel &= 0xFFFE;
         _state_vdp2()->regs->sfprmd &= 0xFFFC;
-
-        uint16_t pncn0;
-        pncn0 = _cell_pattern_name_control_calc(format);
 
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, planes, &map_offset);
+        _cell_plane_calc(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctla |= format->cc_count << 4;
@@ -469,7 +452,7 @@ _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->mpofn |= map_offset;
         _state_vdp2()->regs->mpabn0 = (planes[1] << 8) | planes[0];
         _state_vdp2()->regs->mpcdn0 = (planes[3] << 8) | planes[2];
-        _state_vdp2()->regs->pncn0 = pncn0;
+        _state_vdp2()->regs->pncn0 = _cell_pattern_name_control_calc(format);
 
         /* Special function */
         _state_vdp2()->regs->sfsel |= (format->sf_code & 0x01) << 0;
@@ -483,19 +466,13 @@ _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->chctla &= 0xFEFF;
         _state_vdp2()->regs->plsz &= 0xFFF3;
         _state_vdp2()->regs->mpofn &= 0xFF8F;
-        _state_vdp2()->regs->mpabn1 = 0x0000;
-        _state_vdp2()->regs->mpcdn1 = 0x0000;
-        _state_vdp2()->regs->pncn1 = 0x0000;
         _state_vdp2()->regs->sfsel &= 0xFFFD;
         _state_vdp2()->regs->sfprmd &= 0xFFF3;
-
-        uint16_t pncn1;
-        pncn1 = _cell_pattern_name_control_calc(format);
 
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, planes, &map_offset);
+        _cell_plane_calc(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctla |= format->cc_count << 12;
@@ -510,7 +487,7 @@ _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->mpofn |= map_offset << 4;
         _state_vdp2()->regs->mpabn1 = (planes[1] << 8) | planes[0];
         _state_vdp2()->regs->mpcdn1 = (planes[3] << 8) | planes[2];
-        _state_vdp2()->regs->pncn1 = pncn1;
+        _state_vdp2()->regs->pncn1 = _cell_pattern_name_control_calc(format);
 
         /* Special function */
         _state_vdp2()->regs->sfsel |= (format->sf_code & 0x01) << 1;
@@ -524,34 +501,28 @@ _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->chctlb &= 0xFFFE;
         _state_vdp2()->regs->plsz &= 0xFFCF;
         _state_vdp2()->regs->mpofn &= 0xF8FF;
-        _state_vdp2()->regs->mpabn2 = 0x0000;
-        _state_vdp2()->regs->mpcdn2 = 0x0000;
-        _state_vdp2()->regs->pncn2 = 0x0000;
         _state_vdp2()->regs->sfsel &= 0xFFFB;
         _state_vdp2()->regs->sfprmd &= 0xFFCF;
-
-        uint16_t pncn2;
-        pncn2 = _cell_pattern_name_control_calc(format);
 
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, planes, &map_offset);
+        _cell_plane_calc(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 1;
 
-        /* Character Size */
+        /* Character size */
         _state_vdp2()->regs->chctlb |= format->character_size >> 2;
 
-        /* Plane Size */
+        /* Plane size */
         _state_vdp2()->regs->plsz |= (format->plane_size - 1) << 4;
 
         /* Map */
         _state_vdp2()->regs->mpofn |= map_offset << 8;
         _state_vdp2()->regs->mpabn2 = (planes[1] << 8) | planes[0];
         _state_vdp2()->regs->mpcdn2 = (planes[3] << 8) | planes[2];
-        _state_vdp2()->regs->pncn2 = pncn2;
+        _state_vdp2()->regs->pncn2 = _cell_pattern_name_control_calc(format);
 
         /* Special function */
         _state_vdp2()->regs->sfsel |= (format->sf_code & 0x01) << 2;
@@ -565,19 +536,13 @@ _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->chctlb &= 0xFFEF;
         _state_vdp2()->regs->plsz &= 0xFF3F;
         _state_vdp2()->regs->mpofn &= 0x8FFF;
-        _state_vdp2()->regs->mpabn3 = 0x0000;
-        _state_vdp2()->regs->mpcdn3 = 0x0000;
-        _state_vdp2()->regs->pncn3 = 0x0000;
         _state_vdp2()->regs->sfsel &= 0xFFF7;
         _state_vdp2()->regs->sfprmd &= 0xFF3F;
-
-        uint16_t pncn3;
-        pncn3 = _cell_pattern_name_control_calc(format);
 
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, planes, &map_offset);
+        _cell_plane_calc(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 5;
@@ -592,7 +557,7 @@ _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->mpofn |= map_offset << 12;
         _state_vdp2()->regs->mpabn3 = (planes[1] << 8) | planes[0];
         _state_vdp2()->regs->mpcdn3 = (planes[3] << 8) | planes[2];
-        _state_vdp2()->regs->pncn3 = pncn3;
+        _state_vdp2()->regs->pncn3 = _cell_pattern_name_control_calc(format);
 
         /* Special function */
         _state_vdp2()->regs->sfsel |= (format->sf_code & 0x01) << 3;
@@ -625,17 +590,13 @@ _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         _state_vdp2()->regs->mpklrb = 0x0000;
         _state_vdp2()->regs->mpmnrb = 0x0000;
         _state_vdp2()->regs->mpoprb = 0x0000;
-        _state_vdp2()->regs->pncr = 0x0000;
         _state_vdp2()->regs->sfsel &= 0xFFEF;
         _state_vdp2()->regs->sfprmd &= 0xFCFF;
-
-        uint16_t pncr;
-        pncr = _cell_pattern_name_control_calc(format);
 
         uint16_t planes[16];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, planes, &map_offset);
+        _cell_plane_calc(format, 16, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 12;
@@ -694,7 +655,7 @@ _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
                 break;
         }
 
-        _state_vdp2()->regs->pncr = pncr;
+        _state_vdp2()->regs->pncr = _cell_pattern_name_control_calc(format);
 
         /* VRAM data bank select */
         _state_vdp2()->regs->ramctl |= format->usage_banks.a0;
