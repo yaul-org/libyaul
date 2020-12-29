@@ -46,22 +46,6 @@ struct state_vdp2 {
         } tv;
 
         struct {
-                fix16_vec2_t scroll;
-        } nbg0;
-
-        struct {
-                fix16_vec2_t scroll;
-        } nbg1;
-
-        struct {
-                int16_vec2_t scroll;
-        } nbg2;
-
-        struct {
-                int16_vec2_t scroll;
-        } nbg3;
-
-        struct {
                 vdp2_vram_t *vram;
                 void *buffer;
                 uint32_t count;
