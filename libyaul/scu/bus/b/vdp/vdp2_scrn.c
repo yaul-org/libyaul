@@ -14,10 +14,6 @@
 
 #include "vdp-internal.h"
 
-#ifdef DEBUG
-static void _debug_check_cell(const vdp2_scrn_cell_format_t *);
-#endif /* DEBUG */
-
 static void _cell_plane_calc(const vdp2_scrn_cell_format_t *, uint16_t *,
     uint16_t *);
 static uint16_t _cell_pattern_name_control_calc(
@@ -29,10 +25,6 @@ static void _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 static void _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 static void _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
 
-#ifdef DEBUG
-static void _debug_check_bitmap(const vdp2_scrn_bitmap_format_t *);
-#endif /* DEBUG */
-
 static void _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 static void _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
@@ -40,10 +32,6 @@ static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 void
 vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
-#ifdef DEBUG
-        _debug_check_cell(format);
-#endif /* DEBUG */
-
         switch (format->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _nbg0_scrn_cell_format_set(format);
@@ -68,10 +56,6 @@ vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 void
 vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
-#ifdef DEBUG
-        _debug_check_bitmap(format);
-#endif /* DEBUG */
-
         switch (format->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _nbg0_scrn_bitmap_format_set(format);
@@ -86,35 +70,6 @@ vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
                 return;
         }
 }
-
-#ifdef DEBUG
-static void
-_debug_check_bitmap(const vdp2_scrn_bitmap_format_t *format)
-{
-        assert(format != NULL);
-
-        /* Check if the background passed is valid */
-        assert((format->scroll_screen == VDP2_SCRN_NBG0) ||
-               (format->scroll_screen == VDP2_SCRN_NBG1) ||
-               (format->scroll_screen == VDP2_SCRN_RBG0));
-
-        /* assert that the lead address to the color palette in CRAM is
-         * on a 20-byte boundary */
-        assert((format->color_palette & 0x1F) == 0x00);
-
-        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_2048) ||
-               (format->cc_count == VDP2_SCRN_CCC_RGB_32768) ||
-               (format->cc_count == VDP2_SCRN_CCC_RGB_16770000));
-
-        assert((format->bitmap_size.width == 512) ||
-               (format->bitmap_size.width == 1024));
-
-        assert((format->bitmap_size.height == 256) ||
-               (format->bitmap_size.height == 512));
-}
-#endif /* DEBUG */
 
 static void
 _nbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
@@ -235,19 +190,6 @@ _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 static void
 _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 {
-#ifdef DEBUG
-        assert((format->bitmap_size.width > 0) &&
-               ((format->bitmap_size.width & 0x1FF) == 0x0000));
-
-        assert((format->bitmap_size.height > 0) &&
-               ((format->bitmap_size.height & 0x00FF) == 0x0000));
-
-        assert((format->rp_mode == 0) ||
-               (format->rp_mode == 1) ||
-               (format->rp_mode == 2) ||
-               (format->rp_mode == 3));
-#endif /* DEBUG */
-
         _state_vdp2()->regs->chctlb &= 0xC0FF; /* Bits 8, 9, 10, 12, 13, 14 */
         _state_vdp2()->regs->bmpnb &= 0xFFC8;  /* Bits 0, 1,  2,  4,  5 */
         _state_vdp2()->regs->rpmd &= 0xFFFC;   /* Bits 0, 1 */
@@ -348,61 +290,6 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
         _state_vdp2()->regs->sfprmd |= (format->sf_mode & 0x03) << 8;
 }
 
-#ifdef DEBUG
-static void
-_debug_check_cell(const vdp2_scrn_cell_format_t *format)
-{
-        assert(format != NULL);
-
-        /* Check if the background passed is valid */
-        assert((format->scroll_screen == VDP2_SCRN_NBG0) ||
-               (format->scroll_screen == VDP2_SCRN_RBG1) ||
-               (format->scroll_screen == VDP2_SCRN_NBG1) ||
-               (format->scroll_screen == VDP2_SCRN_NBG2) ||
-               (format->scroll_screen == VDP2_SCRN_NBG3) ||
-               (format->scroll_screen == VDP2_SCRN_RBG0));
-
-        /* Assert that the lead address to character pattern table in
-         * VRAM is on a 20-byte boundary */
-        assert((format->cp_table & 0x1F) == 0x00);
-
-        /* Assert that the lead address to the color palette in CRAM is
-         * on a 20-byte boundary */
-        assert((format->color_palette & 0x1F) == 0x00);
-
-        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_2048));
-
-        /* Check the character number supplement mode */
-        assert((format->auxiliary_mode == 0) ||
-               (format->auxiliary_mode == 1));
-
-        /* Check the character size */
-        assert((format->character_size == (1 * 1)) ||
-               (format->character_size == (2 * 2)));
-
-        /* Check the plane size */
-        assert((format->plane_size == (1 * 1)) ||
-               (format->plane_size == (2 * 1)) ||
-               (format->plane_size == (2 * 2)));
-
-        /* Check the pattern name data size */
-        assert((format->pnd_size == 1) ||
-               (format->pnd_size == 2));
-
-        /* Check the lead address for each plane */
-        /* The lead address must be on a boundary dependent on the size
-         * of the plane. For example, if NBG0 is configured to use 2x2
-         * cells, the dimensions of its page(s) will be 32x32 cells
-         * (0x800 bytes). */
-        assert((format->map_bases.plane_a & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->map_bases.plane_b & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->map_bases.plane_c & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-        assert((format->map_bases.plane_d & (VDP2_SCRN_CALCULATE_PLANE_SIZE(format) - 1)) == 0x0000);
-}
-#endif /* DEBUG */
-
 static void
 _cell_plane_calc(
         const vdp2_scrn_cell_format_t *format,
@@ -474,14 +361,13 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
         switch (format->pnd_size) {
         case 1:
                 /* Pattern name data size: 1-word */
-#ifdef DEBUG
+
                 /* Depending on the Color RAM mode, there are "invalid"
                  * CRAM banks.
                  *
                  * Mode 0 (1024 colors, mirrored, 64 banks)
                  * Mode 1 (2048 colors, 128 banks)
                  * Mode 2 (1024 colors) */
-#endif /* DEBUG */
 
                 switch (format->cc_count) {
                 case VDP2_SCRN_CCC_PALETTE_16:
@@ -634,11 +520,6 @@ _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 static void
 _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
-#ifdef DEBUG
-        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256));
-#endif /* DEBUG */
-
         _state_vdp2()->regs->chctlb &= 0xFFFD;
         _state_vdp2()->regs->chctlb &= 0xFFFE;
         _state_vdp2()->regs->plsz &= 0xFFCF;
@@ -680,11 +561,6 @@ _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 static void
 _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
-#ifdef DEBUG
-        assert((format->cc_count == VDP2_SCRN_CCC_PALETTE_16) ||
-               (format->cc_count == VDP2_SCRN_CCC_PALETTE_256));
-#endif /* DEBUG */
-
         _state_vdp2()->regs->chctlb &= 0xFFDF;
         _state_vdp2()->regs->chctlb &= 0xFFEF;
         _state_vdp2()->regs->plsz &= 0xFF3F;
@@ -726,13 +602,6 @@ _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 static void
 _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 {
-#ifdef DEBUG
-        assert((format->rp_mode == 0) ||
-               (format->rp_mode == 1) ||
-               (format->rp_mode == 2) ||
-               (format->rp_mode == 3));
-#endif /* DEBUG */
-
         _state_vdp2()->regs->chctlb &= 0x8FFF;
         _state_vdp2()->regs->chctlb &= 0xFEFF;
         _state_vdp2()->regs->rpmd &= 0xFFFE;
