@@ -138,13 +138,13 @@ __BEGIN_DECLS
  * +-----+--------+------+-----------+------------+------------+-------------+
  */
 
-#define VDP2_SCRN_PND_CP_NUM(x)         (((uint32_t)(x)) >> 5)
-#define VDP2_SCRN_PND_MODE_0_PAL_NUM(x) ((((uint32_t)(x)) >> 5) & 0x007F)
-#define VDP2_SCRN_PND_MODE_1_PAL_NUM(x) ((((uint32_t)(x)) >> 5) & 0x007F)
-#define VDP2_SCRN_PND_MODE_2_PAL_NUM(x) ((((uint32_t)(x)) >> 6) & 0x007F)
+#define VDP2_SCRN_PND_CP_NUM(address)                   (((uint32_t)(address)) >> 5)
+#define VDP2_SCRN_PND_MODE_0_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_1_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_2_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 6) & 0x007F)
 
-#define VDP2_SCRN_PND_PAL_NUM(cram_mode, x)                                    \
-        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(x)
+#define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_address)                         \
+        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(cram_address)
 
 #define VDP2_SCRN_PND_CONFIG_0(cram_mode, cpd_addr, pal_addr, vf, hf)          \
         (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
