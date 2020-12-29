@@ -187,6 +187,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp1_env.c \
 	scu/bus/b/vdp/vdp1_vram.c \
 	scu/bus/b/vdp/vdp2_cram.c \
+	scu/bus/b/vdp/vdp2_regs.c \
 	scu/bus/b/vdp/vdp2_scrn.c \
 	scu/bus/b/vdp/vdp2_scrn_back_screen.c \
 	scu/bus/b/vdp/vdp2_scrn_color_offset.c \
