@@ -24,7 +24,7 @@ __BEGIN_DECLS
  * possible only in word units and long word units. Access in bytes is not
  * allowed */
 
-#define VDP2_CRAM_ADDR(x)       (0x25F00000UL + ((x) << 1))
+#define VDP2_CRAM_ADDR(address) (0x25F00000UL + ((address) << 1))
 
 #define VDP2_CRAM_MODE_0_OFFSET(_256_bank, _16_bank, color_index)              \
         (0x25F00000UL +                                                        \

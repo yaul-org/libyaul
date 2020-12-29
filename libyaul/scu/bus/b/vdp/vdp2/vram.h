@@ -30,9 +30,9 @@ __BEGIN_DECLS
  * 0x080000 +----------+
  */
 
-#define VDP2_VRAM_ADDR(x, y)    (0x25E00000UL + ((x) << 17) + (y))
+#define VDP2_VRAM_ADDR(bank, offset) (0x25E00000UL + ((bank) << 17) + (offset))
 
-#define VDP2_VRAM_BANK(x)       (((x) >> 17) & 0x0007)
+#define VDP2_VRAM_BANK(addr) (((addr) >> 17) & 0x0007)
 
 #define VDP2_VRAM_SIZE          (0x00080000UL)
 
