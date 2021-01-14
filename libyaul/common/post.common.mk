@@ -73,6 +73,8 @@ SH_SYSTEM_INCLUDE_DIRS=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,"-isystem "); print }')
 
 CDB_FILE:= compile_commands.json
+CDB_GCC?= /usr/bin/gcc
+CDB_REDIRECT:= >/dev/null 2>&1
 
 ifeq ($(strip $(YAUL_CDB)),1)
 # $1 -> Absolute path to compiler executable
@@ -82,11 +84,11 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $5 -> Absolute path to output compile DB file
 define macro-update-cdb
 	set -e; \
-	    input_file=$$(printf -- "$2" | sed -E 's/^\s*//g;s/\s*$$//g'); \
-	    output_file=$$(printf -- "$3" | sed -E 's/^\s*//g;s/\s*$$//g'); \
+	    input_file=$$(printf -- "$2" | sed -E 's/^[[:space:]]*//g;s/[[:space:]]*$$//g'); \
+	    output_file=$$(printf -- "$3" | sed -E 's/^[[:space:]]*//g;s/[[:space:]]*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 >/dev/null 2>&1
+	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 $(CDB_REDIRECT)
 endef
 else
 define macro-update-cdb
@@ -138,7 +140,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CC) -MF $(abspath $*.d) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/gcc,\
+		$(CDB_GCC),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
