@@ -10,10 +10,10 @@ endif
 ifneq (1,$(words [$(strip $(YAUL_INSTALL_ROOT))]))
 	$(error YAUL_INSTALL_ROOT (install root directory) contains spaces)
 endif
-ifneq ($(shell test -e $(YAUL_INSTALL_ROOT) && echo -n $${?}),0)
+ifneq ($(shell test -e "$(YAUL_INSTALL_ROOT)"; printf "$${?}"),0)
   $(error Path YAUL_INSTALL_ROOT (install root directory) does not exist)
 endif
-ifneq ($(shell test -d $(YAUL_INSTALL_ROOT) && echo -n $${?}),0)
+ifneq ($(shell test -d "$(YAUL_INSTALL_ROOT)" && printf "$${?}"),0)
   $(error Path YAUL_INSTALL_ROOT (install root directory) is not a directory)
 endif
 
@@ -34,10 +34,10 @@ endif
 ifneq (1,$(words [$(strip $(YAUL_BUILD_ROOT))]))
   $(error YAUL_BUILD_ROOT (build root directory) contains spaces)
 endif
-ifneq ($(shell test -e $(YAUL_BUILD_ROOT) && echo -n $${?}),0)
+ifneq ($(shell test -e "$(YAUL_BUILD_ROOT)"; printf "$${?}"),0)
   $(error Path YAUL_BUILD_ROOT (build root directory) does not exist)
 endif
-ifneq ($(shell test -d $(YAUL_BUILD_ROOT) && echo -n $${?}),0)
+ifneq ($(shell test -d "$(YAUL_BUILD_ROOT)"; printf "$${?}"),0)
   $(error Path YAUL_BUILD_ROOT (build root directory) is not a directory)
 endif
 
