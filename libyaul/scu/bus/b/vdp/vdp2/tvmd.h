@@ -121,13 +121,13 @@ vdp2_tvmd_vcount_get(void)
 static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
-        return (MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001);
+        return (vdp2_tvmd_tv_standard_t)(MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001);
 }
 
 static inline vdp2_tvmd_tv_field_t __always_inline
 vdp2_tvmd_field_scan_get(void)
 {
-        return (MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001;
+        return (vdp2_tvmd_tv_field_t)((MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001);
 }
 
 static inline bool __always_inline
