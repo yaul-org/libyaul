@@ -58,8 +58,8 @@ cpu_instr_clrmac(void)
 static inline void __always_inline
 cpu_instr_macw(void *a, void *b)
 {
-        register uint16_t **ap = a;
-        register uint16_t **bp = b;
+        register uint16_t **ap = (uint16_t **)a;
+        register uint16_t **bp = (uint16_t **)b;
 
         __asm__ volatile ("mac.w @%[a]+, @%[b]+"
             : [a] "+&r" (*ap),
@@ -71,8 +71,8 @@ cpu_instr_macw(void *a, void *b)
 static inline void __always_inline
 cpu_instr_macl(void *a, void *b)
 {
-        register uint32_t **ap = a;
-        register uint32_t **bp = b;
+        register uint32_t **ap = (uint32_t **)a;
+        register uint32_t **bp = (uint32_t **)b;
 
         __asm__ volatile ("mac.l @%[a]+, @%[b]+"
             : [a] "+&r" (*ap),
