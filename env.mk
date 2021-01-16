@@ -201,7 +201,7 @@ SHARED_INCLUDE_DIRS:= \
 
 CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
 CDB_GCC?= /usr/bin/gcc
-CDB_REDIRECT:= >/dev/null 2>&1
+CDB_CPP?= /usr/bin/g++
 
 ifeq ($(strip $(YAUL_CDB)),1)
 # $1 -> Absolute path to compiler executable
@@ -215,7 +215,7 @@ define macro-update-cdb
 	    output_file=$$(printf -- "$3" | sed -E 's/^[[:space:]]*//g;s/[[:space:]]*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 $(CDB_REDIRECT)
+	    $(THIS_ROOT)/libyaul/common/wrap-error $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 
 # $1 -> Space delimited list of object files
@@ -274,7 +274,7 @@ define macro-sh-build-c++-object
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/g++,\
+		$(GDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\

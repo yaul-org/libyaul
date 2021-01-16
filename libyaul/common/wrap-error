@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+PROGNAME="${0##*/}"
+TMPDIR="${TMPDIR:-/tmp}"
+
+if [ ${#} -eq 0 ]; then
+    exit 0
+fi
+
+clean_up () {
+    rm -f "${TMP_FILE}"
+}
+
+panic () {
+    printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
+    exit "${2}"
+}
+
+trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
+trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
+
+TMP_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
+
+COMMAND="${@}"
+
+(eval "${COMMAND}") >"${TMP_FILE}" 2>&1 || {
+    exit_code=${?}
+
+    printf -- "Executing \"%s\" failed\\n" "${COMMAND}"
+    if [ -s "${TMP_FILE}" ]; then
+        printf -- "%s\\n" "$(cat "${TMP_FILE}")"
+    fi
+    exit ${exit_code}
+}

@@ -141,13 +141,7 @@ IP_SLAVE_STACK_ADDR?= 0x06002000
 IP_1ST_READ_ADDR?= 0x06004000
 IP_1ST_READ_SIZE?= 0
 
-ROMDISK_FLAGS:= -a 16 -V "ROOT"
-MAKE_ISO_REDIRECT:= >/dev/null 2>&1
-
-ifeq ($(strip $(SILENT)),)
-  ROMDISK_FLAGS:= -v $(ROMDISK_FLAGS)
-  MAKE_ISO_REDIRECT:=
-endif
+ROMDISK_FLAGS:= -v -a 16 -V "ROOT"
 
 SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk.o
 

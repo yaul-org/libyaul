@@ -74,7 +74,7 @@ SH_SYSTEM_INCLUDE_DIRS=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
 
 CDB_FILE:= compile_commands.json
 CDB_GCC?= /usr/bin/gcc
-CDB_REDIRECT:= >/dev/null 2>&1
+CDB_CPP?= /usr/bin/g++
 
 ifeq ($(strip $(YAUL_CDB)),1)
 # $1 -> Absolute path to compiler executable
@@ -88,7 +88,7 @@ define macro-update-cdb
 	    output_file=$$(printf -- "$3" | sed -E 's/^[[:space:]]*//g;s/[[:space:]]*$$//g'); \
 	    [ -e "$${input_file}" ] || (printf -- "generate-cdb: $${input_file} doesn't exist\n"; exit 1); \
 	    [ -e "$${output_file}" ] || (printf -- "generate-cdb: $${output_file} doesn't exist\n"; exit 1); \
-	    $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6 $(CDB_REDIRECT)
+	    $(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i $2 -o $3 -d $4 -O $5 -- $6
 endef
 else
 define macro-update-cdb
@@ -128,7 +128,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 
 %.romdisk: ./romdisk $(ROMDISK_DEPS)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS) -d ./romdisk/ -f $@
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS) -d ./romdisk/ -f $@
 
 %.romdisk.o: %.romdisk
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -151,7 +151,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/g++,\
+		$(GDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -162,7 +162,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/g++,\
+		$(GDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -173,7 +173,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/g++,\
+		$(GDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -184,7 +184,7 @@ $(M68K_PROGRAM).m68k.elf: $(M68K_OBJECTS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(SH_CXX) -MF $(abspath $*.d) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $@ $<
 	$(ECHO)$(call macro-update-cdb,\
-		/usr/bin/g++,\
+		$(GDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
@@ -208,7 +208,7 @@ $(SH_PROGRAM).iso: $(SH_PROGRAM).bin IP.BIN $(shell find $(IMAGE_DIRECTORY)/ -ty
 		printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
 	    fi \
 	done
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM) $(MAKE_ISO_REDIRECT)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_PROGRAM)
 
 $(SH_PROGRAM).ss: $(SH_PROGRAM).bin CART-IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -216,29 +216,29 @@ $(SH_PROGRAM).ss: $(SH_PROGRAM).bin CART-IP.BIN
 
 $(SH_PROGRAM).cue: $(SH_PROGRAM).iso
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso" $(MAKE_ISO_REDIRECT)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso"
 
 IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-ip \
 	    "$(SH_PROGRAM).bin" \
 		"$(IP_VERSION)" \
 		$(IP_RELEASE_DATE) \
 		"$(IP_AREAS)" \
 		"$(IP_PERIPHERALS)" \
-		"$(IP_TITLE)" \
+		'"$(IP_TITLE)"' \
 		$(IP_MASTER_STACK_ADDR) \
 		$(IP_SLAVE_STACK_ADDR) \
 		$(IP_1ST_READ_ADDR) \
 	    $(IP_1ST_READ_SIZE)
 
 CART-IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/bootstrap/ip.sx $(SH_PROGRAM).bin
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/make-ip	\
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-ip \
 	    "$(SH_PROGRAM).bin" \
 		"$(IP_VERSION)" \
 		$(IP_RELEASE_DATE) \
 		"$(IP_AREAS)" \
 		"$(IP_PERIPHERALS)" \
-		"$(IP_TITLE)" \
+		'"$(IP_TITLE)"' \
 		$(IP_MASTER_STACK_ADDR) \
 		$(IP_SLAVE_STACK_ADDR) \
 		$(IP_1ST_READ_ADDR) \

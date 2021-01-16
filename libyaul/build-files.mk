@@ -18,7 +18,8 @@ USER_FILES:= \
 	common/post.common.mk
 
 HELPER_FILES:= \
-	common/update-cdb
+	common/update-cdb \
+	common/wrap-error
 
 LDSCRIPTS:= \
 	common/ldscripts/yaul.x \
