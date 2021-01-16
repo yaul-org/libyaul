@@ -121,9 +121,9 @@ $(cat "${TMP3_FILE}")
  }
 
 ("${SH_AS}" ${SH_AS_ARGS} -o "${TMP1_FILE}" "${TMP2_FILE}") >"${TMP3_FILE}" 2>&1 || {
-    panic "Can't build IP.BIN (${SH_AS})\
->>>\
-$(cat "${TMP3_FILE}")\
+    panic "Can't build IP.BIN (${SH_AS})
+>>>
+$(cat "${TMP3_FILE}")
 <<<" 1
 }
 

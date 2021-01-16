@@ -7,8 +7,6 @@
 
 PROGNAME="${0##*/}"
 
-XORRISO="/usr/bin/xorriso"
-
 XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
 
 panic () {
@@ -37,7 +35,8 @@ fi
 
 [ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
 [ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
-[ -x "${XORRISO}" ] || panic "Invalid executable \`${XORRISO}'" 1
+[ -n "${MAKE_ISO_XORRISO}" ] || panic "Undefined MAKE_ISO_XORRISO (make-iso xorriso executable path)" 1
+[ -x "${MAKE_ISO_XORRISO}" ] || panic "Invalid executable \`${MAKE_ISO_XORRISO}'" 1
 
 directory=$(my_readlink "${1}")
 image="${2}"
@@ -79,24 +78,24 @@ for file in "IP.BIN" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}
 done
 unset realpath
 
-# Check if ${XORRISO} is installed
-iso_tool_realpath=$(my_readlink "${XORRISO}")
+# Check if ${MAKE_ISO_XORRISO} is installed
+iso_tool_realpath=$(my_readlink "${MAKE_ISO_XORRISO}")
 if ! [ -f "${iso_tool_realpath}" ] && ! [ -L "${iso_tool_realpath}" ]; then
-    panic "${XORRISO}: Does not exist" 1
+    panic "${MAKE_ISO_XORRISO}: Does not exist" 1
 fi
 
 if ! [ -x "${iso_tool_realpath}" ]; then
-    panic "${XORRISO}: Not an executable" 1
+    panic "${MAKE_ISO_XORRISO}: Not an executable" 1
 fi
 unset iso_tool_realpath
 
 # Echo options used
-printf -- "%s %s" "${XORRISO}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
+printf -- "%s %s" "${MAKE_ISO_XORRISO}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
 
 # Force delete the existing ISO
-rm -r "${image}.iso"
+rm -f "${image}.iso"
 
-if ! (eval "${XORRISO}" "${XORRISO_OPTIONS}" -- -outdev "${image}.iso" -cd / -map "${directory}" /) >>"${TMP1_FILE}" 2>&1; then
+if ! (eval "${MAKE_ISO_XORRISO}" "${XORRISO_OPTIONS}" -- -outdev "${image}.iso" -cd / -map "${directory}" /) >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
 $(sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}")
