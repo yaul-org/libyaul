@@ -122,9 +122,9 @@ $(foreach HELPER_FILE,$(HELPER_FILES_all), \
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
 generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,/usr/bin/gcc,$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,/usr/bin/gcc,$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,/usr/bin/g++,$(SH_CXXFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(CDB_CPP),$(SH_CXXFLAGS_release),release,$(CDB_FILE))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
