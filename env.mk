@@ -274,7 +274,7 @@ define macro-sh-build-c++-object
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
-		$(GDB_CPP),\
+		$(CDB_CPP),\
 		$(abspath $(<)),\
 		$(abspath $(@)),\
 		$(abspath $(<D)),\
