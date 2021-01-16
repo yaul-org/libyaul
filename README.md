@@ -39,11 +39,13 @@ Verify that the following packages are installed.
        apt-get install \
        git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
-### OS X
+### MacOS X
 
 Verify that the following packages are installed (via _Brew_):
 
-    brew install make gcc wget unzip zip p7zip diffutils dos2unix gpatch
+    brew install make gcc wget unzip zip p7zip diffutils dos2unix gpatch xorriso bash
+
+Please note that a **case-sensitive** file system is required.
 
 ## Installing the tool-chain
 
