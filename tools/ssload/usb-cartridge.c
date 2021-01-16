@@ -137,8 +137,8 @@ _dev_init(void)
                 DEBUG_PRINTF("ftdi_usb_open()\n");
                 goto error;
         }
-        if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
-                DEBUG_PRINTF("ftdi_usb_purge_buffers()\n");
+        if ((ftdi_error = ftdi_tcioflush(&ftdi_ctx)) < 0) {
+                DEBUG_PRINTF("ftdi_tcioflush()\n");
                 goto error;
         }
         if ((ftdi_error = ftdi_read_data_set_chunksize(&ftdi_ctx,
@@ -172,7 +172,7 @@ _dev_shutdown(void)
 {
         DEBUG_PRINTF("Enter\n");
 
-        if ((ftdi_error = ftdi_usb_purge_buffers(&ftdi_ctx)) < 0) {
+        if ((ftdi_error = ftdi_tcioflush(&ftdi_ctx)) < 0) {
                 return -1;
         }
 
