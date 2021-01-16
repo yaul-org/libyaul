@@ -301,13 +301,13 @@ _fileserver_cmd_sector_count(const struct device_driver *device)
 }
 
 static void
-_fileserver_cmd_quit(const struct device_driver *device)
+_fileserver_cmd_quit(const struct device_driver *device __unused)
 {
         _purge_path_entries();
 }
 
 static int
-_validate_dirpath(const char *dirpath)
+_validate_dirpath(const char *dirpath __unused)
 {
         return 0;
 }
