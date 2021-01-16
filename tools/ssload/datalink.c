@@ -236,7 +236,7 @@ error_stringify(void)
  *
  */
 static int
-device_read(uint8_t *read_buffer, uint32_t len)
+device_read(uint8_t *read_buffer __unused, uint32_t len __unused)
 {
         DEBUG_PRINTF("Enter\n");
 
@@ -334,7 +334,7 @@ device_read(uint8_t *read_buffer, uint32_t len)
  *
  */
 static int
-device_write(uint8_t *write_buffer, uint32_t len)
+device_write(uint8_t *write_buffer __unused, uint32_t len __unused)
 {
         DEBUG_PRINTF("Enter\n");
         DEBUG_PRINTF("Writing %iB\n", len);

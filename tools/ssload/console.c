@@ -69,6 +69,6 @@ error:
 }
 
 void
-console_quit(const struct device_driver *device)
+console_quit(const struct device_driver *device __unused)
 {
 }
