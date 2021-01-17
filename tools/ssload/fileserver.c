@@ -463,7 +463,8 @@ _build_path_entries(const char *dirpath)
                 path_entry_t *path_entry;
                 path_entry = &_path_entries[file_count];
 
-                (void)strncpy(path_entry->filename, path, PATH_ENTRY_FILENAME_LENGTH);
+                path[PATH_ENTRY_FILENAME_LENGTH - 1] = '\0';
+                (void)strcpy(path_entry->filename, path);
                 path_entry->filename[PATH_ENTRY_FILENAME_LENGTH - 1] = '\0';
 
                 _path_entry_cache_purge(path_entry);
