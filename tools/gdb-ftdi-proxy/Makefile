@@ -56,7 +56,7 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OB
 		$(foreach DIR,$(LIB_DIRS),-L$(DIR)) \
 		$(foreach LIB,$(LIBS),-l$(LIB)) \
 		$(LDFLAGS)
-	if [ -z "${DEBUG}" ]; then \
+	$(ECHO)if [ -z "${DEBUG}" ]; then \
 	    $(STRIP) -s $@; \
 	fi
 
