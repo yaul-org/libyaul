@@ -16,6 +16,16 @@
 #include <ftdi.h>
 #endif /* HAVE_LIBFTD2XX */
 
+/* Compatibility with Linux and FreeBSD */
+#ifndef __unused
+#define __unused __attribute__ ((unused))
+#endif /* !__unused */
+
+/* XXX: Remove manual check until upgrading from libftdi1-1.4 to libftdi1-1.5 */
+#ifndef ftdi_tcioflush
+#define ftdi_tcioflush(ctx) ftdi_usb_purge_buffers((ctx))
+#endif /* !ftdi_tcioflush */
+
 #define ADDRESS_MSB(x)  ((uint8_t)((x) >> 24) & 0xFF)
 #define ADDRESS_02(x)   ((uint8_t)((x) >> 16) & 0xFF)
 #define ADDRESS_01(x)   ((uint8_t)((x) >> 8) & 0xFF)
