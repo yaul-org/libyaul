@@ -258,7 +258,8 @@ extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *, vdp1_cmdt_t *);
 extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t);
 extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *);
 extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
-extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *, const uint32_t, const uint16_t);
+extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *,
+    const vdp1_cmdt_t *, const uint16_t);
 
 extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *);
 extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *);

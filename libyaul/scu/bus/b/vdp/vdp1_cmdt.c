@@ -108,16 +108,18 @@ vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *cmdt_orderlist, uint16_t count)
 }
 
 void
-vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist, const uint32_t base, const uint16_t count)
+vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist,
+    const vdp1_cmdt_t *cmdt_base,
+    const uint16_t count)
 {
         assert(cmdt_orderlist != NULL);
         assert(count > 0);
 
-        scu_dma_xfer_t *xfer_table;
-        xfer_table = (scu_dma_xfer_t *)cmdt_orderlist;
+        scu_dma_xfer_t * const xfer_table =
+            (scu_dma_xfer_t *)cmdt_orderlist;
 
         for (uint32_t i = 0; i < count; i++) {
-                xfer_table[i].dst = base + (i * sizeof(vdp1_cmdt_t));
+                xfer_table[i].dst = (uintptr_t)cmdt_base + (i * sizeof(vdp1_cmdt_t));
         }
 
         xfer_table[count - 1].len |= SCU_DMA_INDIRECT_TABLE_END;
@@ -333,7 +335,7 @@ vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x1000;
-        cmdt->cmd_link = index & 0xFFFC;
+        cmdt->cmd_link = index;
 }
 
 void
@@ -341,7 +343,7 @@ vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x2000;
-        cmdt->cmd_link = index & 0xFFFC;
+        cmdt->cmd_link = index;
 }
 
 void
@@ -349,7 +351,7 @@ vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x5000;
-        cmdt->cmd_link = index & 0xFFFC;
+        cmdt->cmd_link = index;
 }
 
 void
@@ -357,7 +359,7 @@ vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x6000;
-        cmdt->cmd_link = index & 0xFFFC;
+        cmdt->cmd_link = index;
 }
 
 void
