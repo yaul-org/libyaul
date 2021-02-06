@@ -23,7 +23,7 @@ static void _camera_world_transform(void);
 static void _cmdt_prepare(const transform_t * const trans);
 static void _fog_calculate(const transform_t * const trans);
 static void _polygon_process(transform_t * const trans, POLYGON const *polygons);
-static void _sort_iterate(sort_single_t *single);
+static void _sort_iterate(const sort_single_t *single);
 static void _vertex_pool_clipping(const transform_t * const trans);
 static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
 static void _z_calculate(transform_t * const trans);
@@ -334,7 +334,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 }
 
 static void
-_sort_iterate(sort_single_t *single)
+_sort_iterate(const sort_single_t *single)
 {
         transform_t * const trans = _internal_state->transform;
 

@@ -100,10 +100,10 @@ typedef struct sort_single {
 } __aligned(8) sort_single_t;
 
 typedef struct {
-        sort_single_t *first_single;
+        sort_single_t *last_single;
 } __aligned(4) sort_list_t;
 
-typedef void (*iterate_fn)(sort_single_t *);
+typedef void (*iterate_fn)(const sort_single_t *);
 
 typedef struct {
         list_flags_t flags;

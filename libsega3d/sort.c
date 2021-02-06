@@ -13,13 +13,18 @@
 #include "sega3d-internal.h"
 
 static struct {
-        uint32_t index;
+        sort_single_t *current; 
 } _state;
+
+static const sort_single_t _single_empty = {
+        .packet      = NULL,
+        .next_single = NULL
+};
 
 void
 _internal_sort_init(void)
 {
-        _state.index = 0;
+        _state.current = &_internal_state->sort_single_pool[0];
 
         (void)memset(_internal_state->sort_list, 0, sizeof(sort_list_t) * SORT_Z_RANGE);
         (void)memset(_internal_state->sort_single_pool, 0, sizeof(sort_single_t) * PACKET_SIZE);
@@ -43,39 +48,25 @@ _internal_sort_add(void *packet, int32_t pz)
         }
 
         /* Get the node */
-        sort_single_t *free_link;
-        free_link = _internal_state->sort_list[pz].first_single;
+        sort_single_t **free_link;
+        free_link = &_internal_state->sort_list[pz].last_single;
+
+        sort_single_t *next_available;
+        next_available = _state.current; 
+
+        /* Assign the value to this new node */
+        next_available->packet = packet;
 
         /* There was a package here already in this Z */
-        if (free_link != NULL) {
-                /* Loop until we get a free node */
-                while (free_link->next_single != NULL) {
-                        free_link = free_link->next_single;
-                }
-
-                /* We pick the new link that is going to hold our value */
-                sort_single_t *next_avail_single =
-                    &_internal_state->sort_single_pool[_state.index];
-
-                /* Increase the packet counter */
-                _state.index++;
-
-                /* Assign the value to this new node */
-                next_avail_single->packet = packet;
-
-                /* Link the package with the available link */
-                free_link->next_single = next_avail_single;
+        if (*free_link != NULL) {
+                /* Update the following z link */
+                next_available->next_single = *free_link;
         } else {
-                sort_single_t **first_single =
-                    (sort_single_t **)&_internal_state->sort_list[pz].first_single;
-
-                *first_single = &_internal_state->sort_single_pool[_state.index];
-
-                (*first_single)->packet = packet;
-                (*first_single)->next_single = NULL;
-
-                _state.index++;
+                /* Fill in the first z with the blank node */
+                next_available->next_single = (sort_single_t *)&_single_empty;
         }
+
+        *free_link = _state.current++;
 }
 
 void
@@ -83,8 +74,8 @@ _internal_sort_iterate(iterate_fn fn)
 {
         assert(fn != NULL);
 
-        sort_single_t **first_single =
-            &_internal_state->sort_list[SORT_Z_RANGE - 1].first_single;
+        const sort_single_t **first_single =
+            (const sort_single_t **)&_internal_state->sort_list[SORT_Z_RANGE - 1].last_single;
 
         for (int32_t i = 0; i < SORT_Z_RANGE; i++, first_single--) {
                 /* There is something in this Z */
@@ -95,22 +86,16 @@ _internal_sort_iterate(iterate_fn fn)
                 /* Send commmand here */
                 fn(*first_single);
 
-                if ((*first_single)->next_single == NULL) {
-                        continue;
-                }
+                if ((*first_single)->next_single != NULL) {
+                        const sort_single_t *single_next;
+                        single_next = (*first_single)->next_single;
 
-                sort_single_t *single_next = (*first_single)->next_single;
-
-                if (single_next->next_single != NULL) {
                         while (single_next->next_single != NULL) {
                                 /* Send commmand here */
-                                fn(single_next);
+                                fn(*first_single);
 
                                 single_next = single_next->next_single;
                         }
                 }
-
-                /* Send commmand here */
-                fn(single_next);
         }
 }
