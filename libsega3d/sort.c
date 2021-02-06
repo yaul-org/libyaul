@@ -78,7 +78,7 @@ _internal_sort_iterate(iterate_fn fn)
             (const sort_single_t **)&_internal_state->sort_list[SORT_Z_RANGE - 1].last_single;
 
         for (int32_t i = 0; i < SORT_Z_RANGE; i++, first_single--) {
-                /* There is something in this Z */
+                /* There isn't something in this Z */
                 if (*first_single == NULL) {
                         continue;
                 }
