@@ -158,3 +158,16 @@ vdp2_tvmd_vblank_in_next_wait(uint32_t count)
                 vdp2_tvmd_vblank_in_wait();
         }
 }
+
+void
+vdp2_tvmd_border_set(bool enable)
+{
+        /* If BDCLMD (0x0100 is set and DISP has never been set, the back screen
+         * will not display properly */
+        _state_vdp2()->regs->tvmd &= 0xFEFF;
+        _state_vdp2()->regs->tvmd |= 0x8000;
+
+        if (enable) {
+                _state_vdp2()->regs->tvmd |= 0x0100;
+        }
+}
