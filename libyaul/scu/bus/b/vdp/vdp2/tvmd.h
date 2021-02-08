@@ -140,6 +140,7 @@ extern void vdp2_tvmd_display_clear(void);
 extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
 extern void vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t, vdp2_tvmd_horz_t, vdp2_tvmd_vert_t);
+extern void vdp2_tvmd_border_set(bool);
 
 extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
 

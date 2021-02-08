@@ -98,6 +98,8 @@ _vdp2_init(void)
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x000000),
             COLOR_RGB1555(1, 0, 0, 0));
 
+        vdp2_tvmd_border_set(false);
+
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
 }
