@@ -14,6 +14,14 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_INSTRUCTIONS_INLINE_FUNCTIONS
+
+/// @addtogroup CPU_INSTRUCTIONS_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Emit a `trap` instruction.
+///
+/// @param vector Interrupt vector number (`rn`).
 static inline void __always_inline
 cpu_instr_trapa(const uint8_t vector)
 {
@@ -22,6 +30,13 @@ cpu_instr_trapa(const uint8_t vector)
             : [n] "n" (vector));
 }
 
+/// @brief Emit a `swap.b` instruction.
+///
+/// @details Swap the upper and lower bytes of a 2-byte value.
+/// 
+/// @param x Value to be swapped.
+///
+/// @see cpu_bswap16
 static inline uint32_t __always_inline
 cpu_instr_swapb(uint32_t x)
 {
@@ -34,6 +49,11 @@ cpu_instr_swapb(uint32_t x)
         return out;
 }
 
+/// @brief Emit a `swap.w` instruction.
+///
+/// @details Swap the upper and lower 2-bytes of a 4-byte value.
+/// 
+/// @param x Value to be swapped.
 static inline uint32_t __always_inline
 cpu_instr_swapw(uint32_t x)
 {
@@ -46,6 +66,7 @@ cpu_instr_swapw(uint32_t x)
         return out;
 }
 
+/// @brief Emit a `clrmac` instruction.
 static inline void __always_inline
 cpu_instr_clrmac(void)
 {
@@ -55,6 +76,10 @@ cpu_instr_clrmac(void)
             : "mach", "macl");
 }
 
+/// @brief Emit a `mac.w` instruction.
+///
+/// @param a The `rm` register.
+/// @param b The `rn` register.
 static inline void __always_inline
 cpu_instr_macw(void *a, void *b)
 {
@@ -68,6 +93,10 @@ cpu_instr_macw(void *a, void *b)
             : "mach", "macl", "memory");
 }
 
+/// @brief Emit a `mac.l` instruction.
+///
+/// @param a The `rm` register.
+/// @param b The `rn` register.
 static inline void __always_inline
 cpu_instr_macl(void *a, void *b)
 {
@@ -81,6 +110,8 @@ cpu_instr_macl(void *a, void *b)
             : "mach", "macl", "memory");
 }
 
+/// @brief Emit a `sts` instruction to fetch `mach`.
+/// @returns The value of the `mach` register.
 static inline uint32_t __always_inline
 cpu_instr_sts_mach(void)
 {
@@ -94,6 +125,8 @@ cpu_instr_sts_mach(void)
         return out;
 }
 
+/// @brief Emit a `sts` instruction to fetch `macl`.
+/// @returns The value of the `macl` register.
 static inline uint32_t __always_inline
 cpu_instr_sts_macl(void)
 {
@@ -107,6 +140,11 @@ cpu_instr_sts_macl(void)
         return out;
 }
 
+/// @brief Emit a `exts.w` instruction.
+///
+/// @param rm The `rm` register.
+///
+/// @returns The sign-extended 32-bit value.
 static inline uint32_t __always_inline
 cpu_instr_extsw(const uint32_t rm)
 {
@@ -119,6 +157,11 @@ cpu_instr_extsw(const uint32_t rm)
         return rn;
 }
 
+/// @brief Emit a `neg` instruction.
+///
+/// @param rm The `rm` register.
+///
+/// @returns The negated 32-bit value.
 static inline uint32_t __always_inline
 cpu_instr_neg(uint32_t rm)
 {
@@ -131,6 +174,11 @@ cpu_instr_neg(uint32_t rm)
         return rn;
 }
 
+/// @brief Emit a `rotl` instruction.
+///
+/// @param rn The `rn` register.
+///
+/// @returns The rotated to the left 32-bit value.
 static inline uint32_t __always_inline
 cpu_instr_rotl(uint32_t rn)
 {
@@ -141,6 +189,11 @@ cpu_instr_rotl(uint32_t rn)
         return rn;
 }
 
+/// @brief Emit a `rotr` instruction.
+///
+/// @param rn The `rn` register.
+///
+/// @returns The rotated to the right 32-bit value.
 static inline uint32_t __always_inline
 cpu_instr_rotr(uint32_t rn)
 {
@@ -151,6 +204,14 @@ cpu_instr_rotr(uint32_t rn)
         return rn;
 }
 
+
+/// @brief Emit a `xtrct` instruction.
+///
+/// @param rm The `rm` register.
+/// @param rn The `rn` register.
+///
+/// @returns The 32-bit extracted value between the 64-bits of coupled `rm` and
+/// `rn` registers.
 static inline uint32_t __always_inline
 cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 {
@@ -161,6 +222,7 @@ cpu_instr_xtrct(uint32_t rm, uint32_t rn)
         return rn;
 }
 
+/// @brief Emit a `nop` instruction.
 static inline void __always_inline
 cpu_instr_nop(void)
 {
@@ -169,6 +231,8 @@ cpu_instr_nop(void)
             : /* No inputs */
         );
 }
+
+/// @}
 
 __END_DECLS
 
