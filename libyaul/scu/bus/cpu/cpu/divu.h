@@ -15,9 +15,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_DIVU_INLINE_FUNCTIONS
-/// @defgroup CPU_DIVU_HELPERS
-/// @defgroup CPU_DIVU_FUNCTIONS
+/// @defgroup CPU_DIVU_INLINE_FUNCTIONS CPU DIVU inline functions
+/// @defgroup CPU_DIVU_HELPERS  CPU DIVU helpers
+/// @defgroup CPU_DIVU_FUNCTIONS  CPU DIVU functions
 
 /// @addtogroup CPU_DIVU_INLINE_FUNCTIONS
 /// @{
@@ -149,7 +149,7 @@ do {                                                                           \
 
 /// @brief Set the interrupt handler for the CPU-DIVU OVFI interrupt.
 ///
-/// @detail There is no need to explicitly return via `rte`.
+/// @details There is no need to explicitly return via `rte`.
 ///
 /// @param ihr The interrupt handler
 ///
