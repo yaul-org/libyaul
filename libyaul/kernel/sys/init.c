@@ -25,7 +25,7 @@ user_init(void)
 }
 
 static void __used
-_call_global_ctors(void)
+_global_ctors_call(void)
 {
         extern void (*__CTOR_LIST__[])(void);
 
@@ -38,9 +38,8 @@ _call_global_ctors(void)
         }
 }
 
-/* Do all destructors */
 static void __used
-_call_global_dtors(void)
+_global_dtors_call(void)
 {
         extern void (*__DTOR_LIST__[])(void);
 
@@ -58,7 +57,7 @@ _init(void)
 {
         _internal_mm_init();
 
-        _call_global_ctors();
+        _global_ctors_call();
 
         _internal_cpu_init();
         _internal_scu_init();
@@ -93,7 +92,7 @@ _init(void)
 static void __section(".fini") __used __noreturn
 _fini(void)
 {
-        _call_global_dtors();
+        _global_dtors_call();
 
         while (true) {
         }
