@@ -21,60 +21,60 @@ __BEGIN_DECLS
 /// @addtogroup CPU_CACHE_DEFINES
 /// @{
 
-/// Not yet documented.
+/// Partition designated for using the cache.
 #define CPU_CACHE               0x00000000UL
-/// Not yet documented.
+/// Partition designated for bypassing the cache. 
 #define CPU_CACHE_THROUGH       0x20000000UL
-/// Not yet documented.
+/// Partition designated for purging a specific line.
 #define CPU_CACHE_PURGE         0x40000000UL
-/// Not yet documented.
+/// Partition designated for accessing the address cache array directly.
 #define CPU_CACHE_ADDRESS_RW    0x60000000UL
-/// Not yet documented.
+/// Partition designated for accessing the cache data directly.
 #define CPU_CACHE_DATA_RW       0xC0000000UL
-/// Not yet documented.
+/// Partition designated for bypassing the cache (I/O area).
 #define CPU_CACHE_IO            0xF0000000UL
 
-/// Not yet documented.
+/// Address for when accessing cache data directly.
 #define CPU_CACHE_WAY_0_ADDR    0xC0000000UL
-/// Not yet documented.
+/// Address for when accessing cache data directly.
 #define CPU_CACHE_WAY_1_ADDR    0xC0000400UL
-/// Not yet documented.
+/// Address for when accessing cache data directly.
 #define CPU_CACHE_WAY_2_ADDR    0xC0000800UL
-/// Not yet documented.
+/// Address for when accessing cache data directly.
 #define CPU_CACHE_WAY_3_ADDR    0xC0000C00UL
 
-/// Not yet documented.
+/// @brief The size in bytes of the 2KiB RAM.
+/// @see cpu_cache_way_mode_set
 #define CPU_CACHE_2_WAY_SIZE    (CPU_CACHE_WAY_2_ADDR - CPU_CACHE_WAY_0_ADDR)
 
-/// Not yet documented.
+/// @deprecated To be removed and replaced as an `enum`.
 #define CPU_CACHE_MODE_4_WAY    0x00
-/// Not yet documented.
+/// @deprecated To be removed and replaced as an `enum`.
 #define CPU_CACHE_MODE_2_WAY    0x08
-/// Not yet documented.
-#define CPU_CACHE_MODE_OD_DIS   0x04
-/// Not yet documented.
-#define CPU_CACHE_MODE_ID_DIS   0x02
 
 /// @}
 
 /// @addtogroup CPU_CACHE_INLINE_FUNCTIONS
 /// @{
 
-/// @brief Not yet documented.
+/// @brief Enable cache.
 static inline void __always_inline
 cpu_cache_enable(void)
 {
         MEMORY_WRITE_OR(8, CPU(CCR), 0x01);
 }
 
-/// @brief Not yet documented.
+/// @brief Disable cache.
 static inline void __always_inline
 cpu_cache_disable(void)
 {
         MEMORY_WRITE_AND(8, CPU(CCR), ~0x01);
 }
 
-/// @brief Not yet documented.
+/// @brief Disable data replacement in the cache.
+///
+/// @details When data is fetched from memory, cache data is not
+/// written to the cache even if there is a cache miss.
 static inline void __always_inline
 cpu_cache_data_repl_disable(void)
 {
@@ -88,7 +88,9 @@ cpu_cache_data_repl_disable(void)
         *reg_ccr = t0 | 0x05;
 }
 
-/// @brief Not yet documented.
+/// @brief Enable data replacement in the cache.
+///
+/// @details When data is fetched from memory, cache data is written.
 static inline void __always_inline
 cpu_cache_data_repl_enable(void)
 {
@@ -102,7 +104,10 @@ cpu_cache_data_repl_enable(void)
         *reg_ccr = t0 | 0x01;
 }
 
-/// @brief Not yet documented.
+/// @brief Disable instruction replacement in the cache.
+///
+/// @details When an instruction is fetched from memory, cache data is not
+/// written to the cache even if there is a cache miss.
 static inline void __always_inline
 cpu_cache_instr_repl_disable(void)
 {
@@ -116,7 +121,9 @@ cpu_cache_instr_repl_disable(void)
         *reg_ccr = t0 | 0x03;
 }
 
-/// @brief Not yet documented.
+/// @brief Enable instruction replacement in the cache.
+///
+/// @details When an instruction is fetched from memory, cache data is written.
 static inline void __always_inline
 cpu_cache_instr_repl_enable(void)
 {
@@ -130,7 +137,17 @@ cpu_cache_instr_repl_enable(void)
         *reg_ccr = t0 | 0x01;
 }
 
-/// @brief Not yet documented.
+/// @brief Change the mode the cache operates.
+///
+/// @details The cache can be set to operate as a four-way set associative
+/// cache, or as a two-way associative cache and 2KiB RAM.
+///
+/// In the two-way mode, ways `0` and `1` are RAM.
+///
+/// @param mode Way mode.
+///
+/// @see CPU_CACHE_MODE_4_WAY
+/// @see CPU_CACHE_MODE_2_WAY
 static inline void __always_inline
 cpu_cache_way_mode_set(uint8_t mode)
 {
@@ -150,9 +167,17 @@ cpu_cache_way_mode_set(uint8_t mode)
 /// @addtogroup CPU_CACHE_FUNCTIONS
 /// @{
 
-/// @brief Not yet documented.
-extern void cpu_cache_purge_line(void *) __section(".uncached");
-/// @brief Not yet documented.
+/// @brief Cache line of the specified address is purged.
+///
+/// @details Calling this function will not pollute the cache.
+/// 
+/// @param addr Address associated with cache line.
+extern void cpu_cache_purge_line(void *addr) __section(".uncached");
+
+/// @brief Purge the entire cache.
+///
+/// @details All cache entries and all valid bits and LRU bits of all ways are
+/// initialized to `0`. Calling this function will not pollute the cache.
 extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
 
 /// @}
