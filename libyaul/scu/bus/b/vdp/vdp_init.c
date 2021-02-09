@@ -74,8 +74,6 @@ _vdp2_init(void)
         _state_vdp2()->tv.resolution.x = 0;
         _state_vdp2()->tv.resolution.y = 0;
 
-        vdp2_tvmd_display_clear();
-
         vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG2, 1);
@@ -94,14 +92,6 @@ _vdp2_init(void)
         _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
 
         vdp2_cram_mode_set(1);
-
-        vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(0, 0x000000),
-            COLOR_RGB1555(1, 0, 0, 0));
-
-        vdp2_tvmd_border_set(false);
-
-        vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
-            VDP2_TVMD_VERT_224);
 }
 
 static void

@@ -49,9 +49,6 @@ _back_screen_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t
         _state_vdp2()->regs->bktau = bkclmd | VDP2_VRAM_BANK(vram);
         _state_vdp2()->regs->bktal = (vram >> 1) & 0xFFFF;
 
-        _state_vdp2()->regs->tvmd &= 0x7FFF;
-        _state_vdp2()->regs->tvmd |= 0x8000;
-
         _state_vdp2()->back.vram = (vdp2_vram_t *)vram;
         _state_vdp2()->back.buffer = (void *)buffer;
         _state_vdp2()->back.count = count;
