@@ -14,9 +14,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_CACHE_DEFINES
-/// @defgroup CPU_CACHE_INLINE_FUNCTIONS
-/// @defgroup CPU_CACHE_FUNCTIONS
+/// @defgroup CPU_CACHE_DEFINES CPU cache defines
+/// @defgroup CPU_CACHE_INLINE_FUNCTIONS CPU cache inline functions
+/// @defgroup CPU_CACHE_FUNCTIONS CPU cache functions
 
 /// @addtogroup CPU_CACHE_DEFINES
 /// @{

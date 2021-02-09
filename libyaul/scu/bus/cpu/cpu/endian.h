@@ -9,10 +9,10 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_ENDIAN_DEFINES
-/// @defgroup CPU_ENDIAN_INLINE_FUNCTIONS
+/// @defgroup CPU_ENDIAN_HELPERS CPU endianness helpers
+/// @defgroup CPU_ENDIAN_INLINE_FUNCTIONS CPU endianness inline functions
 
-/// @addtogroup CPU_ENDIAN_DEFINES
+/// @addtogroup CPU_ENDIAN_HELPERS
 /// @{
 
 /// @brief Convert from host byte order to big-endian order.
