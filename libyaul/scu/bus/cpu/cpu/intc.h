@@ -15,9 +15,20 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_INTC_INTERRUPT_DEFINES
-/// @defgroup CPU_INTC_PRIORITY_DEFINES
-/// @defgroup CPU_INTC_INLINE_FUNCTIONS
+/// @defgroup CPU_INTC_DEFINES CPU INTC defines
+/// @defgroup CPU_INTC_INTERRUPT_DEFINES CPU INTC interrupt defines
+/// @defgroup CPU_INTC_PRIORITY_DEFINES CPU INTC priority defines
+/// @defgroup CPU_INTC_INLINE_FUNCTIONS CPU INTC inline functions
+
+/// @addtogroup CPU_INTC_DEFINES
+/// @{
+
+/// Not yet documented.
+#define CPU_INTC_INTERRUPT_MASTER_BASE  0x0000
+/// Not yet documented.
+#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x0100
+
+/// @}
 
 /// @addtogroup CPU_INTC_INTERRUPT_DEFINES
 /// @{
@@ -84,11 +95,6 @@ __BEGIN_DECLS
 #define CPU_INTC_INTERRUPT_FREE_6F      0x6F
 /// Not yet documented.
 #define CPU_INTC_INTERRUPT_SLAVE_ENTRY  0x94
-
-/// Not yet documented.
-#define CPU_INTC_INTERRUPT_MASTER_BASE  0x0000
-/// Not yet documented.
-#define CPU_INTC_INTERRUPT_SLAVE_BASE   0x0100
 
 /// @}
 
@@ -184,31 +190,35 @@ cpu_intc_mask_set(uint8_t mask)
         cpu_reg_sr_set(reg_sr);
 }
 
-/// @}
-
+/// @brief Not yet documented.
 static inline uint16_t __always_inline
 cpu_intc_priority_a_get(void)
 {
         return MEMORY_READ(16, CPU(IPRA));
 }
 
+/// @brief Not yet documented.
 static inline uint16_t __always_inline
 cpu_intc_priority_b_get(void)
 {
         return MEMORY_READ(16, CPU(IPRB));
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_intc_priority_a_set(uint16_t ipra)
 {
         MEMORY_WRITE(16, CPU(IPRA), ipra);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_intc_priority_b_set(uint16_t iprb)
 {
         MEMORY_WRITE(16, CPU(IPRA), iprb);
 }
+
+/// @}
 
 __END_DECLS
 
