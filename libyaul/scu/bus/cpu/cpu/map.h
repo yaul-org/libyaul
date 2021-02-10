@@ -57,6 +57,11 @@ do {                                                                           \
         (*(volatile uint16_t *)(CPU(RSTCSRW)) = (0x5A3F | ((x) & 0x00FF)));    \
 } while (false)
 
+/// @}
+
+/// @addtogroup CPU_IO_REGISTERS
+/// @{
+
 /// @brief Access the CPU I/O registers.
 ///
 /// @param x The byte offset.
@@ -65,166 +70,389 @@ do {                                                                           \
 /// @see MEMORY_WRITE
 #define CPU(x) (0xFFFFF000UL + (x))
 
-/// @}
-
-/// @addtogroup CPU_IO_REGISTERS
-/// @{
-
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SMR             0x0E00UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BRR             0x0E01UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SCR             0x0E02UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TDR             0x0E03UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SSR             0x0E04UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RDR             0x0E05UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TIER            0x0E10UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FTCSR           0x0E11UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FRCH            0x0E12UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FRCL            0x0E13UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define OCRAH           0x0E14UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define OCRAL           0x0E15UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define OCRBH           0x0E14UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define OCRBL           0x0E15UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TCR             0x0E16UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TOCR            0x0E17UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FICRH           0x0E18UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FICRL           0x0E19UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define IPRB            0x0E60UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRA            0x0E62UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRB            0x0E64UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRC            0x0E66UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRD            0x0E68UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DRCR0           0x0E71UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DRCR1           0x0E72UL
 
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define WTCSRW          0x0E80UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define WTCSRR          0x0E80UL
 
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define WTCNTW          0x0E80UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define WTCNTR          0x0E81UL
 
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RSTCSRW         0x0E82UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RSTCSRR         0x0E83UL
 
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FMR             0x0E90UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SBYCR           0x0E91UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define CCR             0x0E92UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define ICR             0x0EE0UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define IPRA            0x0EE2UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRWDT          0x0EE4UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DVSR            0x0F00UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DVDNT           0x0F04UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DVCR            0x0F08UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRDIV          0x0F0CUL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DVDNTH          0x0F10UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DVDNTL          0x0F14UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BARAH           0x0F40UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BARAL           0x0F42UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BAMRAH          0x0F44UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BAMRAL          0x0F46UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BBRA            0x0F48UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BARBH           0x0F60UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BARBL           0x0F62UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BAMRBH          0x0F64UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BAMRBL          0x0F66UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BBRB            0x0F68UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BDRBH           0x0F70UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BDRBL           0x0F72UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BDMRBH          0x0F74UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BDMRBL          0x0F76UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BRCR            0x0F78UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SAR0            0x0F80UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DAR0            0x0F84UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TCR0            0x0F88UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define CHCR0           0x0F8CUL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define SAR1            0x0F90UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DAR1            0x0F94UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define TCR1            0x0F98UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define CHCR1           0x0F9CUL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRDMA0         0x0FA0UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define VCRDMA1         0x0FA8UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define DMAOR           0x0FB0UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BCR1            0x0FE0UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define BCR2            0x0FE4UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define WCR             0x0FE8UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define MCR             0x0FECUL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RTCSR           0x0FF0UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RTCNT           0x0FF4UL
-/// CPU I/O register.
+/// @brief CPU I/O register.
+/// @see CPU
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define RTCOR           0x0FF8UL
 
 /// @}
