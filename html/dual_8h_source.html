@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -114,7 +121,7 @@ $(function() {
 <div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#ga6584ef1da1e28ba9152867b89881da01">   56</a></span>&#160;<a class="code" href="group__CPU__DUAL.html#ga6584ef1da1e28ba9152867b89881da01">cpu_dual_notification_wait</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;{</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keyword">volatile</span> uint8_t *reg_ftcsr;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        reg_ftcsr = (<span class="keyword">volatile</span> uint8_t *)<a class="code" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370">FTCSR</a>);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        reg_ftcsr = (<span class="keyword">volatile</span> uint8_t *)<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370">FTCSR</a>);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">while</span> ((*reg_ftcsr &amp; 0x80) == 0x00);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
@@ -171,12 +178,12 @@ $(function() {
 <div class="ttc" id="agroup__CPU__DUAL_html_ga2cf34cf330da637046ecb20dfdeb768e"><div class="ttname"><a href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">cpu_dual_slave_stack_get</a></div><div class="ttdeci">static void * cpu_dual_slave_stack_get(void)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> dual.h:77</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga9bfe9f291fcba65c2d2bde11f20a1fd0"><div class="ttname"><a href="group__CPU__DUAL.html#ga9bfe9f291fcba65c2d2bde11f20a1fd0">cpu_dual_master_set</a></div><div class="ttdeci">void cpu_dual_master_set(cpu_dual_master_entry)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> cpu_dual.c:93</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_gaf46365da53f8180a4366ad93f16c3703"><div class="ttname"><a href="group__CPU__DUAL.html#gaf46365da53f8180a4366ad93f16c3703">cpu_dual_init</a></div><div class="ttdeci">void cpu_dual_init(uint8_t)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> cpu_dual.c:67</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_gadd4faf455ed1393f052e4b9d219d5370"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370">FTCSR</a></div><div class="ttdeci">#define FTCSR</div><div class="ttdoc">CPU register.</div><div class="ttdef"><b>Definition:</b> map.h:88</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_gadd4faf455ed1393f052e4b9d219d5370"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370">FTCSR</a></div><div class="ttdeci">#define FTCSR</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:112</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:71</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga036242d182f6395926199da18f718c55"><div class="ttname"><a href="group__CPU__DUAL.html#ga036242d182f6395926199da18f718c55">cpu_dual_slave_notify</a></div><div class="ttdeci">static void cpu_dual_slave_notify(void)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> dual.h:49</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_gaf2153696a3211f801525876a544b9584"><div class="ttname"><a href="group__CPU__DUAL.html#gaf2153696a3211f801525876a544b9584">cpu_dual_master_notify</a></div><div class="ttdeci">static void cpu_dual_master_notify(void)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> dual.h:42</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga69f13daed2fca2ba5abbc44c5627faa7"><div class="ttname"><a href="group__CPU__DUAL.html#ga69f13daed2fca2ba5abbc44c5627faa7">cpu_dual_slave_entry</a></div><div class="ttdeci">void(* cpu_dual_slave_entry)(void)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> dual.h:38</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga6584ef1da1e28ba9152867b89881da01"><div class="ttname"><a href="group__CPU__DUAL.html#ga6584ef1da1e28ba9152867b89881da01">cpu_dual_notification_wait</a></div><div class="ttdeci">static void cpu_dual_notification_wait(void)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> dual.h:56</div></div>
-<div class="ttc" id="agroup__CPU__WDT_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:66</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

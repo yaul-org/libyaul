@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -85,72 +92,75 @@ $(function() {
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;__BEGIN_DECLS</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">bool</span> __always_inline</div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#gaadbd1131956bca5d55ceaada17573d39">   25</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#gaadbd1131956bca5d55ceaada17573d39">cpu_sync_mutex</a>(uint8_t b)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">register</span> uint8_t *bios_address;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keyword">register</span> uint32_t result;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        result = 0;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="comment">/* Currently using cpu_sync_mutex() to compare the value results in</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">         * extra instructions being emitted. Because TAS.B sets the T bit in SR,</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">         * there shouldn&#39;t be a need for the MOVT instruction */</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;\tadd %[b], %[bios_address]\n&quot;</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                          <span class="stringliteral">&quot;\ttas.b @%[out]\n&quot;</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                          <span class="stringliteral">&quot;\tmovt %[result]&quot;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            <span class="comment">/* Output */</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            : [out] <span class="stringliteral">&quot;=r&quot;</span> (bios_address),</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;              [result] <span class="stringliteral">&quot;=r&quot;</span> (result)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;            <span class="comment">/* Input */</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;            : [bios_address] <span class="stringliteral">&quot;r&quot;</span> (bios_address),</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;              [b] <span class="stringliteral">&quot;r&quot;</span> (b));</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">   27</a></span>&#160;<span class="keyword">typedef</span> uint8_t <a class="code" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">bool</span> __always_inline</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga4f8c84d991e45de992b8950b9599aa22">   38</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga4f8c84d991e45de992b8950b9599aa22">cpu_sync_mutex</a>(<a class="code" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">register</span> uint8_t *bios_address;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keyword">register</span> uint32_t result;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        result = 0;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="comment">/* Currently using cpu_sync_mutex() to compare the value results in</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">         * extra instructions being emitted. Because TAS.B sets the T bit in SR,</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">         * there shouldn&#39;t be a need for the MOVT instruction */</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga6056f1aff5ac4250c7ee091db97fdeb0">   52</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga6056f1aff5ac4250c7ee091db97fdeb0">cpu_sync_mutex_clear</a>(uint8_t b)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        MEMORY_WRITE(8, HWRAM_UNCACHED(0x00000B00 + b), 0x00);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga88f423ce317e40c166d524c4ab2c8e77">   59</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga88f423ce317e40c166d524c4ab2c8e77">cpu_sync_spinlock</a>(uint8_t b)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;{</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keyword">register</span> uint8_t *bios_address;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;\tadd %[b], %[bios_address]\n&quot;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                          <span class="stringliteral">&quot;1:\n&quot;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                          <span class="stringliteral">&quot;\ttas.b @%[out]\n&quot;</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                          <span class="stringliteral">&quot;\tbf 1b&quot;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            <span class="comment">/* Output */</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            : [out] <span class="stringliteral">&quot;=r&quot;</span> (bios_address)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            <span class="comment">/* Input */</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            : [bios_address] <span class="stringliteral">&quot;0&quot;</span> (bios_address),</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;              [b] <span class="stringliteral">&quot;r&quot;</span> (b));</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#gaa5ad5bd13fa9399414f3dadb6c72e72b">   77</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#gaa5ad5bd13fa9399414f3dadb6c72e72b">cpu_sync_spinlock_clear</a>(uint8_t b)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <a class="code" href="group__CPU__SYNC.html#ga6056f1aff5ac4250c7ee091db97fdeb0">cpu_sync_mutex_clear</a>(b);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;\tadd %[b], %[bios_address]\n&quot;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                          <span class="stringliteral">&quot;\ttas.b @%[out]\n&quot;</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                          <span class="stringliteral">&quot;\tmovt %[result]&quot;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            <span class="comment">/* Output */</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            : [out] <span class="stringliteral">&quot;=r&quot;</span> (bios_address),</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;              [result] <span class="stringliteral">&quot;=r&quot;</span> (result)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <span class="comment">/* Input */</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            : [bios_address] <span class="stringliteral">&quot;r&quot;</span> (bios_address),</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;              [b] <span class="stringliteral">&quot;r&quot;</span> (b));</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">   69</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">cpu_sync_mutex_clear</a>(<a class="code" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        MEMORY_WRITE(8, HWRAM_UNCACHED(0x00000B00 + b), 0x00);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga2c2ecc568fa1da8339c4f2f321b26bbf">   81</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga2c2ecc568fa1da8339c4f2f321b26bbf">cpu_sync_spinlock</a>(<a class="code" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;{</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">register</span> uint8_t *bios_address;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_SYNC_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;\tadd %[b], %[bios_address]\n&quot;</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                          <span class="stringliteral">&quot;1:\n&quot;</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                          <span class="stringliteral">&quot;\ttas.b @%[out]\n&quot;</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                          <span class="stringliteral">&quot;\tbf 1b&quot;</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="comment">/* Output */</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            : [out] <span class="stringliteral">&quot;=r&quot;</span> (bios_address)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="comment">/* Input */</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            : [bios_address] <span class="stringliteral">&quot;0&quot;</span> (bios_address),</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;              [b] <span class="stringliteral">&quot;r&quot;</span> (b));</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="group__CPU__SYNC.html#ga76fcd58e7c321f82f0701eb5205ea1ef">  103</a></span>&#160;<a class="code" href="group__CPU__SYNC.html#ga76fcd58e7c321f82f0701eb5205ea1ef">cpu_sync_spinlock_clear</a>(<a class="code" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <a class="code" href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">cpu_sync_mutex_clear</a>(b);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_SYNC_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="agroup__CPU__SYNC_html_gaa5ad5bd13fa9399414f3dadb6c72e72b"><div class="ttname"><a href="group__CPU__SYNC.html#gaa5ad5bd13fa9399414f3dadb6c72e72b">cpu_sync_spinlock_clear</a></div><div class="ttdeci">static void cpu_sync_spinlock_clear(uint8_t b)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> sync.h:77</div></div>
-<div class="ttc" id="agroup__CPU__SYNC_html_ga88f423ce317e40c166d524c4ab2c8e77"><div class="ttname"><a href="group__CPU__SYNC.html#ga88f423ce317e40c166d524c4ab2c8e77">cpu_sync_spinlock</a></div><div class="ttdeci">static void cpu_sync_spinlock(uint8_t b)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> sync.h:59</div></div>
-<div class="ttc" id="agroup__CPU__SYNC_html_ga6056f1aff5ac4250c7ee091db97fdeb0"><div class="ttname"><a href="group__CPU__SYNC.html#ga6056f1aff5ac4250c7ee091db97fdeb0">cpu_sync_mutex_clear</a></div><div class="ttdeci">static void cpu_sync_mutex_clear(uint8_t b)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> sync.h:52</div></div>
-<div class="ttc" id="agroup__CPU__SYNC_html_gaadbd1131956bca5d55ceaada17573d39"><div class="ttname"><a href="group__CPU__SYNC.html#gaadbd1131956bca5d55ceaada17573d39">cpu_sync_mutex</a></div><div class="ttdeci">static bool cpu_sync_mutex(uint8_t b)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> sync.h:25</div></div>
+<div class="ttc" id="agroup__CPU__SYNC_html_ga76fcd58e7c321f82f0701eb5205ea1ef"><div class="ttname"><a href="group__CPU__SYNC.html#ga76fcd58e7c321f82f0701eb5205ea1ef">cpu_sync_spinlock_clear</a></div><div class="ttdeci">static void cpu_sync_spinlock_clear(cpu_sync_lock_t b)</div><div class="ttdoc">Clear the lock.</div><div class="ttdef"><b>Definition:</b> sync.h:103</div></div>
+<div class="ttc" id="agroup__CPU__SYNC_html_ga4f8c84d991e45de992b8950b9599aa22"><div class="ttname"><a href="group__CPU__SYNC.html#ga4f8c84d991e45de992b8950b9599aa22">cpu_sync_mutex</a></div><div class="ttdeci">static bool cpu_sync_mutex(cpu_sync_lock_t b)</div><div class="ttdoc">Provide functionality of mutual exclusion.</div><div class="ttdef"><b>Definition:</b> sync.h:38</div></div>
+<div class="ttc" id="agroup__CPU__SYNC_html_ga2c2ecc568fa1da8339c4f2f321b26bbf"><div class="ttname"><a href="group__CPU__SYNC.html#ga2c2ecc568fa1da8339c4f2f321b26bbf">cpu_sync_spinlock</a></div><div class="ttdeci">static void cpu_sync_spinlock(cpu_sync_lock_t b)</div><div class="ttdoc">Provide functionality of a spinlock.</div><div class="ttdef"><b>Definition:</b> sync.h:81</div></div>
+<div class="ttc" id="agroup__CPU__SYNC_html_ga8521db265f6cd838914304f1b1e69124"><div class="ttname"><a href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">cpu_sync_mutex_clear</a></div><div class="ttdeci">static void cpu_sync_mutex_clear(cpu_sync_lock_t b)</div><div class="ttdoc">Clear the lock.</div><div class="ttdef"><b>Definition:</b> sync.h:69</div></div>
+<div class="ttc" id="agroup__CPU__SYNC_html_gad677885e1469d6fab6374542954946a7"><div class="ttname"><a href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a></div><div class="ttdeci">uint8_t cpu_sync_lock_t</div><div class="ttdoc">Represent a lock in the BIOS lock array.</div><div class="ttdef"><b>Definition:</b> sync.h:27</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

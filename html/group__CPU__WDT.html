@@ -5,13 +5,20 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Yaul: CPU Watch-Dog Timer (WDT)</title>
+<title>Yaul: CPU Watchdog Timer (WDT)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -62,17 +69,26 @@ $(function() {
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
-<div class="title">CPU Watch-Dog Timer (WDT)</div>  </div>
+<div class="title">CPU Watchdog Timer (WDT)</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>Not yet documented.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcpu__wdt__mode.html">cpu_wdt_mode</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-WDT modes.  <a href="structcpu__wdt__mode.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:gad07c9d0b9e27a5902fc2693b6a39ba94"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gad07c9d0b9e27a5902fc2693b6a39ba94">MEMORY_WRITE_WTCNT</a>(x)</td></tr>
@@ -87,124 +103,71 @@ Macros</h2></td></tr>
 <tr class="memitem:ga748275f13cc36803697d09a7697cc7f7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga748275f13cc36803697d09a7697cc7f7">MEMORY_CLEAR_RSTCSR</a>(x)</td></tr>
 <tr class="memdesc:ga748275f13cc36803697d09a7697cc7f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register.  <a href="group__CPU__WDT.html#ga748275f13cc36803697d09a7697cc7f7">More...</a><br /></td></tr>
 <tr class="separator:ga748275f13cc36803697d09a7697cc7f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga298694f5a284a9481357c09aab7aa7e3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(x)&#160;&#160;&#160;(0xFFFFF000UL + (x))</td></tr>
-<tr class="memdesc:ga298694f5a284a9481357c09aab7aa7e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the CPU I/O registers.  <a href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">More...</a><br /></td></tr>
-<tr class="separator:ga298694f5a284a9481357c09aab7aa7e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga65e4f5df0167c5a0f93e95e0ec5e5ca8"><td class="memItemLeft" align="right" valign="top"><a id="ga65e4f5df0167c5a0f93e95e0ec5e5ca8"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga65e4f5df0167c5a0f93e95e0ec5e5ca8">CPU_WDT_CLOCK_DIV_2</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:ga65e4f5df0167c5a0f93e95e0ec5e5ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga65e4f5df0167c5a0f93e95e0ec5e5ca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeb95810f2cfe6311d72ffe7cb59f9455"><td class="memItemLeft" align="right" valign="top"><a id="gaeb95810f2cfe6311d72ffe7cb59f9455"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaeb95810f2cfe6311d72ffe7cb59f9455">CPU_WDT_CLOCK_DIV_64</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:gaeb95810f2cfe6311d72ffe7cb59f9455"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gaeb95810f2cfe6311d72ffe7cb59f9455"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae816bb99b44dda5d1e33f95229347148"><td class="memItemLeft" align="right" valign="top"><a id="gae816bb99b44dda5d1e33f95229347148"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gae816bb99b44dda5d1e33f95229347148">CPU_WDT_CLOCK_DIV_128</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:gae816bb99b44dda5d1e33f95229347148"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gae816bb99b44dda5d1e33f95229347148"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaada013ed75665f4369f88f4a8c9a5e1f"><td class="memItemLeft" align="right" valign="top"><a id="gaada013ed75665f4369f88f4a8c9a5e1f"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaada013ed75665f4369f88f4a8c9a5e1f">CPU_WDT_CLOCK_DIV_256</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memdesc:gaada013ed75665f4369f88f4a8c9a5e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gaada013ed75665f4369f88f4a8c9a5e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga29dd55ad1f651e120064cf968bdbcf69"><td class="memItemLeft" align="right" valign="top"><a id="ga29dd55ad1f651e120064cf968bdbcf69"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga29dd55ad1f651e120064cf968bdbcf69">CPU_WDT_CLOCK_DIV_512</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memdesc:ga29dd55ad1f651e120064cf968bdbcf69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga29dd55ad1f651e120064cf968bdbcf69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga270d71f53fd393dbe00cbc838e728aa3"><td class="memItemLeft" align="right" valign="top"><a id="ga270d71f53fd393dbe00cbc838e728aa3"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga270d71f53fd393dbe00cbc838e728aa3">CPU_WDT_CLOCK_DIV_1024</a>&#160;&#160;&#160;5</td></tr>
-<tr class="memdesc:ga270d71f53fd393dbe00cbc838e728aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga270d71f53fd393dbe00cbc838e728aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga63e25ecedc4b17cefc7ad5a83c26500e"><td class="memItemLeft" align="right" valign="top"><a id="ga63e25ecedc4b17cefc7ad5a83c26500e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga63e25ecedc4b17cefc7ad5a83c26500e">CPU_WDT_CLOCK_DIV_4096</a>&#160;&#160;&#160;6</td></tr>
-<tr class="memdesc:ga63e25ecedc4b17cefc7ad5a83c26500e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga63e25ecedc4b17cefc7ad5a83c26500e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5faee21dd64a750d6056035cfa3e7e1a"><td class="memItemLeft" align="right" valign="top"><a id="ga5faee21dd64a750d6056035cfa3e7e1a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga5faee21dd64a750d6056035cfa3e7e1a">CPU_WDT_CLOCK_DIV_8192</a>&#160;&#160;&#160;7</td></tr>
-<tr class="memdesc:ga5faee21dd64a750d6056035cfa3e7e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga5faee21dd64a750d6056035cfa3e7e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac72aca45a6c47c5be5f5da7d9b154ff5"><td class="memItemLeft" align="right" valign="top"><a id="gac72aca45a6c47c5be5f5da7d9b154ff5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gac72aca45a6c47c5be5f5da7d9b154ff5">CPU_WDT_TIMER_MODE_INTERVAL</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:gac72aca45a6c47c5be5f5da7d9b154ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gac72aca45a6c47c5be5f5da7d9b154ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacc148abb8c0863f28a2f6900295414ad"><td class="memItemLeft" align="right" valign="top"><a id="gacc148abb8c0863f28a2f6900295414ad"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gacc148abb8c0863f28a2f6900295414ad">CPU_WDT_TIMER_MODE_WATCHDOG</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:gacc148abb8c0863f28a2f6900295414ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gacc148abb8c0863f28a2f6900295414ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ga2f60d098014cdc4d65381defe2a2744e"><td class="memItemLeft" align="right" valign="top"><a id="ga2f60d098014cdc4d65381defe2a2744e"></a>
-typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a>) (void)</td></tr>
-<tr class="memdesc:ga2f60d098014cdc4d65381defe2a2744e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga871e6ca3976c0552c9dd1cb1c612446d"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">cpu_wdt_clock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a></td></tr>
+<tr class="memdesc:ga871e6ca3976c0552c9dd1cb1c612446d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-WDT clock divisors.  <a href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">More...</a><br /></td></tr>
+<tr class="separator:ga871e6ca3976c0552c9dd1cb1c612446d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2f60d098014cdc4d65381defe2a2744e"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a>) (void)</td></tr>
+<tr class="memdesc:ga2f60d098014cdc4d65381defe2a2744e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type.  <a href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">More...</a><br /></td></tr>
 <tr class="separator:ga2f60d098014cdc4d65381defe2a2744e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gaef061bbf38b3b9e76d37092a36fa4bc4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">cpu_wdt_clock</a> { <br />
+&#160;&#160;<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4a2371a937dc4c5a0bc6b603208cb0bffa">CPU_WDT_CLOCK_DIV_2</a> = 0, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4a529f8a7476ab0f317cdce672ff29fa1d">CPU_WDT_CLOCK_DIV_64</a> = 1, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4a974b71b48969aeb3f901796219fb9954">CPU_WDT_CLOCK_DIV_128</a> = 2, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4a98da3232034c478fbcc4352e93cb2bbc">CPU_WDT_CLOCK_DIV_256</a> = 3, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4aa5a06752f424e0460c9ee069de04ccc1">CPU_WDT_CLOCK_DIV_512</a> = 4, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4ae59a1d656a845d8e279600e53f90e852">CPU_WDT_CLOCK_DIV_1024</a> = 5, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4ab7649fbeefafcea0ad99f0afde063eca">CPU_WDT_CLOCK_DIV_4096</a> = 6, 
+<a class="el" href="group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4afa5c1dd7f0f4b38a45ee2ae0e996705f">CPU_WDT_CLOCK_DIV_8192</a> = 7
+<br />
+ }</td></tr>
+<tr class="memdesc:gaef061bbf38b3b9e76d37092a36fa4bc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-WDT clock divisors.  <a href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">More...</a><br /></td></tr>
+<tr class="separator:gaef061bbf38b3b9e76d37092a36fa4bc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga9871efbf0d783f682b754af0a8329354"><td class="memItemLeft" align="right" valign="top"><a id="ga9871efbf0d783f682b754af0a8329354"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga9871efbf0d783f682b754af0a8329354">cpu_wdt_count_set</a> (uint8_t count)</td></tr>
-<tr class="memdesc:ga9871efbf0d783f682b754af0a8329354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga9871efbf0d783f682b754af0a8329354"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga9871efbf0d783f682b754af0a8329354">cpu_wdt_count_set</a> (uint8_t count)</td></tr>
+<tr class="memdesc:ga9871efbf0d783f682b754af0a8329354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the 1-byte WDT tick count.  <a href="group__CPU__WDT.html#ga9871efbf0d783f682b754af0a8329354">More...</a><br /></td></tr>
 <tr class="separator:ga9871efbf0d783f682b754af0a8329354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa284872731b8b7e0c6b345f3a373db12"><td class="memItemLeft" align="right" valign="top"><a id="gaa284872731b8b7e0c6b345f3a373db12"></a>
-static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaa284872731b8b7e0c6b345f3a373db12">cpu_wdt_count_get</a> (void)</td></tr>
-<tr class="memdesc:gaa284872731b8b7e0c6b345f3a373db12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:gaa284872731b8b7e0c6b345f3a373db12"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaa284872731b8b7e0c6b345f3a373db12">cpu_wdt_count_get</a> (void)</td></tr>
+<tr class="memdesc:gaa284872731b8b7e0c6b345f3a373db12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the current 1-byte WDT tick count.  <a href="group__CPU__WDT.html#gaa284872731b8b7e0c6b345f3a373db12">More...</a><br /></td></tr>
 <tr class="separator:gaa284872731b8b7e0c6b345f3a373db12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8163b44f9dd197ecc300c10329fde544"><td class="memItemLeft" align="right" valign="top"><a id="ga8163b44f9dd197ecc300c10329fde544"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga8163b44f9dd197ecc300c10329fde544">cpu_wdt_enable</a> (void)</td></tr>
-<tr class="memdesc:ga8163b44f9dd197ecc300c10329fde544"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga8163b44f9dd197ecc300c10329fde544"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the CPU-WDT. <br /></td></tr>
 <tr class="separator:ga8163b44f9dd197ecc300c10329fde544"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaeea9dfc61d92ef077ec94a46b99f8b5e"><td class="memItemLeft" align="right" valign="top"><a id="gaeea9dfc61d92ef077ec94a46b99f8b5e"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaeea9dfc61d92ef077ec94a46b99f8b5e">cpu_wdt_disable</a> (void)</td></tr>
-<tr class="memdesc:gaeea9dfc61d92ef077ec94a46b99f8b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gaeea9dfc61d92ef077ec94a46b99f8b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the CPU-WDT. <br /></td></tr>
 <tr class="separator:gaeea9dfc61d92ef077ec94a46b99f8b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga92a635ecd54be5758067bcca793a0028"><td class="memItemLeft" align="right" valign="top"><a id="ga92a635ecd54be5758067bcca793a0028"></a>
-static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028">cpu_wdt_interrupt_priority_get</a> (void)</td></tr>
-<tr class="memdesc:ga92a635ecd54be5758067bcca793a0028"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga92a635ecd54be5758067bcca793a0028"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028">cpu_wdt_interrupt_priority_get</a> (void)</td></tr>
+<tr class="memdesc:ga92a635ecd54be5758067bcca793a0028"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the interrupt priority level for CPU-WDT.  <a href="group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028">More...</a><br /></td></tr>
 <tr class="separator:ga92a635ecd54be5758067bcca793a0028"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga67a0ff40a9f1504a7a458edb0b6ac69b"><td class="memItemLeft" align="right" valign="top"><a id="ga67a0ff40a9f1504a7a458edb0b6ac69b"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b">cpu_wdt_interrupt_priority_set</a> (uint8_t priority)</td></tr>
-<tr class="memdesc:ga67a0ff40a9f1504a7a458edb0b6ac69b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga67a0ff40a9f1504a7a458edb0b6ac69b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b">cpu_wdt_interrupt_priority_set</a> (uint8_t priority)</td></tr>
+<tr class="memdesc:ga67a0ff40a9f1504a7a458edb0b6ac69b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt priority level for CPU-WDT.  <a href="group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b">More...</a><br /></td></tr>
 <tr class="separator:ga67a0ff40a9f1504a7a458edb0b6ac69b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaca15c2ef7b573c4b44a7b4fcf119ca34"><td class="memItemLeft" align="right" valign="top"><a id="gaca15c2ef7b573c4b44a7b4fcf119ca34"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gaca15c2ef7b573c4b44a7b4fcf119ca34">cpu_wdt_init</a> (uint8_t)</td></tr>
-<tr class="memdesc:gaca15c2ef7b573c4b44a7b4fcf119ca34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gaca15c2ef7b573c4b44a7b4fcf119ca34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga60ba86bc35abbfcf2fe41fd09bb64f20"><td class="memItemLeft" align="right" valign="top"><a id="ga60ba86bc35abbfcf2fe41fd09bb64f20"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga60ba86bc35abbfcf2fe41fd09bb64f20">cpu_wdt_timer_mode_set</a> (uint8_t, <a class="el" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a>)</td></tr>
-<tr class="memdesc:ga60ba86bc35abbfcf2fe41fd09bb64f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga60ba86bc35abbfcf2fe41fd09bb64f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5880fa2dd120c2e0be696752d8e063a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2">cpu_wdt_init</a> (<a class="el" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a> clock_div)</td></tr>
+<tr class="memdesc:ga5880fa2dd120c2e0be696752d8e063a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fully initialize the CPU-WDT depending with a specific clock divisor.  <a href="group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2">More...</a><br /></td></tr>
+<tr class="separator:ga5880fa2dd120c2e0be696752d8e063a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafcccaa58106e9ba25e474ebdb595158e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e">cpu_wdt_timer_mode_set</a> (cpu_wdt_mode_t mode, <a class="el" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a> ihr)</td></tr>
+<tr class="memdesc:gafcccaa58106e9ba25e474ebdb595158e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the CPU-WDT mode.  <a href="group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e">More...</a><br /></td></tr>
+<tr class="separator:gafcccaa58106e9ba25e474ebdb595158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ga47bc5dcb5a98e5a41cadc5aea2fcf9a9"><td class="memItemLeft" align="right" valign="top"><a id="ga47bc5dcb5a98e5a41cadc5aea2fcf9a9"></a>
+typdef struct <a class="el" href="structcpu__wdt__mode.html">cpu_wdt_mode</a>&#160;</td><td class="memItemRight" valign="bottom"><b>cpu_wdt_mode_t</b></td></tr>
+<tr class="separator:ga47bc5dcb5a98e5a41cadc5aea2fcf9a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Not yet documented. </p>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ga298694f5a284a9481357c09aab7aa7e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga298694f5a284a9481357c09aab7aa7e3">&#9670;&nbsp;</a></span>CPU</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">x</td><td>)</td>
-          <td>&#160;&#160;&#160;(0xFFFFF000UL + (x))</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Access the CPU I/O registers. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>The byte offset.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd>MEMORY_READ </dd>
-<dd>
-MEMORY_WRITE </dd></dl>
-
-</div>
-</div>
 <a id="ga748275f13cc36803697d09a7697cc7f7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga748275f13cc36803697d09a7697cc7f7">&#9670;&nbsp;</a></span>MEMORY_CLEAR_RSTCSR</h2>
 
@@ -221,7 +184,7 @@ MEMORY_WRITE </dd></dl>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = (0x5A3F | ((x) &amp; 0x00FF)));    \</div>
+<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = (0x5A3F | ((x) &amp; 0x00FF)));    \</div>
 <div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
 </div><!-- fragment -->
 <p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register. </p>
@@ -249,7 +212,7 @@ MEMORY_WRITE </dd></dl>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = 0xA500);                       \</div>
+<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = 0xA500);                       \</div>
 <div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
 </div><!-- fragment -->
 <p>Write <code>0xA500</code> to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register. </p>
@@ -275,7 +238,7 @@ MEMORY_WRITE </dd></dl>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a>)) = (0x5A00 | ((x) &amp; 0x00FF)));     \</div>
+<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a>)) = (0x5A00 | ((x) &amp; 0x00FF)));     \</div>
 <div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
 </div><!-- fragment -->
 <p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a> register. </p>
@@ -304,7 +267,7 @@ MEMORY_WRITE </dd></dl>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a>)) = (0xA500 | ((x) &amp; 0x00FF)));     \</div>
+<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a>)) = (0xA500 | ((x) &amp; 0x00FF)));     \</div>
 <div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
 </div><!-- fragment -->
 <p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a> register. </p>
@@ -318,11 +281,272 @@ MEMORY_WRITE </dd></dl>
 
 </div>
 </div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga871e6ca3976c0552c9dd1cb1c612446d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga871e6ca3976c0552c9dd1cb1c612446d">&#9670;&nbsp;</a></span>cpu_wdt_clock_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum <a class="el" href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">cpu_wdt_clock</a> <a class="el" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CPU-WDT clock divisors. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2" title="Fully initialize the CPU-WDT depending with a specific clock divisor.">cpu_wdt_init</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga2f60d098014cdc4d65381defe2a2744e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2f60d098014cdc4d65381defe2a2744e">&#9670;&nbsp;</a></span>cpu_wdt_ihr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* cpu_wdt_ihr) (void)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Callback type. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e" title="Set the CPU-WDT mode.">cpu_wdt_timer_mode_set</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="gaef061bbf38b3b9e76d37092a36fa4bc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaef061bbf38b3b9e76d37092a36fa4bc4">&#9670;&nbsp;</a></span>cpu_wdt_clock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">cpu_wdt_clock</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CPU-WDT clock divisors. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2" title="Fully initialize the CPU-WDT depending with a specific clock divisor.">cpu_wdt_init</a> </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4a2371a937dc4c5a0bc6b603208cb0bffa"></a>CPU_WDT_CLOCK_DIV_2&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{2}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4a529f8a7476ab0f317cdce672ff29fa1d"></a>CPU_WDT_CLOCK_DIV_64&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{64}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4a974b71b48969aeb3f901796219fb9954"></a>CPU_WDT_CLOCK_DIV_128&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{128}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4a98da3232034c478fbcc4352e93cb2bbc"></a>CPU_WDT_CLOCK_DIV_256&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{256}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4aa5a06752f424e0460c9ee069de04ccc1"></a>CPU_WDT_CLOCK_DIV_512&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{512}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4ae59a1d656a845d8e279600e53f90e852"></a>CPU_WDT_CLOCK_DIV_1024&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{1024}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4ab7649fbeefafcea0ad99f0afde063eca"></a>CPU_WDT_CLOCK_DIV_4096&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{4096}\). </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaef061bbf38b3b9e76d37092a36fa4bc4afa5c1dd7f0f4b38a45ee2ae0e996705f"></a>CPU_WDT_CLOCK_DIV_8192&#160;</td><td class="fielddoc"><p>WDT clock divisor of \(\frac{\phi}{8192}\). </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gaa284872731b8b7e0c6b345f3a373db12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa284872731b8b7e0c6b345f3a373db12">&#9670;&nbsp;</a></span>cpu_wdt_count_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint8_t cpu_wdt_count_get </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the current 1-byte WDT tick count. </p>
+<dl class="section return"><dt>Returns</dt><dd>Return the 1-byte WDT tick count. </dd></dl>
+
+</div>
+</div>
+<a id="ga9871efbf0d783f682b754af0a8329354"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9871efbf0d783f682b754af0a8329354">&#9670;&nbsp;</a></span>cpu_wdt_count_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_wdt_count_set </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the 1-byte WDT tick count. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>The 1-byte tick value to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5880fa2dd120c2e0be696752d8e063a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5880fa2dd120c2e0be696752d8e063a2">&#9670;&nbsp;</a></span>cpu_wdt_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_wdt_init </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a>&#160;</td>
+          <td class="paramname"><em>clock_div</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fully initialize the CPU-WDT depending with a specific clock divisor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">clock_div</td><td>The clock divisor. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga92a635ecd54be5758067bcca793a0028"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga92a635ecd54be5758067bcca793a0028">&#9670;&nbsp;</a></span>cpu_wdt_interrupt_priority_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint8_t cpu_wdt_interrupt_priority_get </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the interrupt priority level for CPU-WDT. </p>
+<dl class="section return"><dt>Returns</dt><dd>The interrupt priority level ranging from <code>0</code> to <code>15</code>. </dd></dl>
+
+</div>
+</div>
+<a id="ga67a0ff40a9f1504a7a458edb0b6ac69b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga67a0ff40a9f1504a7a458edb0b6ac69b">&#9670;&nbsp;</a></span>cpu_wdt_interrupt_priority_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_wdt_interrupt_priority_set </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>priority</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the interrupt priority level for CPU-WDT. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">priority</td><td>The priority ranging from <code>0</code> to <code>15</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gafcccaa58106e9ba25e474ebdb595158e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafcccaa58106e9ba25e474ebdb595158e">&#9670;&nbsp;</a></span>cpu_wdt_timer_mode_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_wdt_timer_mode_set </td>
+          <td>(</td>
+          <td class="paramtype">cpu_wdt_mode_t&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a>&#160;</td>
+          <td class="paramname"><em>ihr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the CPU-WDT mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td>The mode. </td></tr>
+    <tr><td class="paramname">ihr</td><td>The interrupt handler. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga2ed0a436ae1aae03c36e33ad5a391dca"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a></div><div class="ttdeci">#define WTCSRW</div><div class="ttdoc">CPU register.</div><div class="ttdef"><b>Definition:</b> map.h:125</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga0613723c5d4a3cad1b342e1d1f026dcf"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a></div><div class="ttdeci">#define WTCNTW</div><div class="ttdoc">CPU register.</div><div class="ttdef"><b>Definition:</b> map.h:130</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga53171005a614694007fedf30f1c0d768"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a></div><div class="ttdeci">#define RSTCSRW</div><div class="ttdoc">CPU register.</div><div class="ttdef"><b>Definition:</b> map.h:135</div></div>
-<div class="ttc" id="agroup__CPU__WDT_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__CPU__WDT.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:66</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:71</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga2ed0a436ae1aae03c36e33ad5a391dca"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a></div><div class="ttdeci">#define WTCSRW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:203</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga0613723c5d4a3cad1b342e1d1f026dcf"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a></div><div class="ttdeci">#define WTCNTW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:214</div></div>
+<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga53171005a614694007fedf30f1c0d768"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a></div><div class="ttdeci">#define RSTCSRW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:225</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

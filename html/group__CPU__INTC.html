@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -64,155 +71,143 @@ $(function() {
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CPU Interrupt Controller (INTC)</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Not yet documented.  
-<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ga182da6e00dc06a727a013a7f45222167"><td class="memItemLeft" align="right" valign="top"><a id="ga182da6e00dc06a727a013a7f45222167"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga182da6e00dc06a727a013a7f45222167">CPU_INTC_INTERRUPT_MASTER_BASE</a>&#160;&#160;&#160;0x0000</td></tr>
-<tr class="memdesc:ga182da6e00dc06a727a013a7f45222167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga182da6e00dc06a727a013a7f45222167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt vector offset for master CPU. <br /></td></tr>
 <tr class="separator:ga182da6e00dc06a727a013a7f45222167"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaba344807301589cb06ba6405b4ce063f"><td class="memItemLeft" align="right" valign="top"><a id="gaba344807301589cb06ba6405b4ce063f"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaba344807301589cb06ba6405b4ce063f">CPU_INTC_INTERRUPT_SLAVE_BASE</a>&#160;&#160;&#160;0x0100</td></tr>
-<tr class="memdesc:gaba344807301589cb06ba6405b4ce063f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gaba344807301589cb06ba6405b4ce063f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt vector offset for slave CPU. <br /></td></tr>
 <tr class="separator:gaba344807301589cb06ba6405b4ce063f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga778e9e3867507fe0fb921b32ccf8161e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga778e9e3867507fe0fb921b32ccf8161e">CPU_INTC_INTERRUPT_POWER_ON_RESET_PC</a>&#160;&#160;&#160;0x00</td></tr>
-<tr class="separator:ga778e9e3867507fe0fb921b32ccf8161e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2453913377b89f86d194bb94bfbe7aba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga2453913377b89f86d194bb94bfbe7aba">CPU_INTC_INTERRUPT_POWER_ON_RESET_SP</a>&#160;&#160;&#160;0x01</td></tr>
-<tr class="separator:ga2453913377b89f86d194bb94bfbe7aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeec7c3e22ced71ec0bd0bdaf66543ca2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaeec7c3e22ced71ec0bd0bdaf66543ca2">CPU_INTC_INTERRUPT_MANUAL_RESET_PC</a>&#160;&#160;&#160;0x02</td></tr>
-<tr class="separator:gaeec7c3e22ced71ec0bd0bdaf66543ca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7582a455652f048c5a09c93b66a0e58c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga7582a455652f048c5a09c93b66a0e58c">CPU_INTC_INTERRUPT_MANUAL_RESET_SP</a>&#160;&#160;&#160;0x03</td></tr>
-<tr class="separator:ga7582a455652f048c5a09c93b66a0e58c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga94682e421031c2bc5463c6726d7962f8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga94682e421031c2bc5463c6726d7962f8">CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION</a>&#160;&#160;&#160;0x04</td></tr>
-<tr class="separator:ga94682e421031c2bc5463c6726d7962f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga56b976786503221b566c5fe9b0853a80"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga56b976786503221b566c5fe9b0853a80">CPU_INTC_INTERRUPT_ILLEGAL_SLOT</a>&#160;&#160;&#160;0x06</td></tr>
-<tr class="separator:ga56b976786503221b566c5fe9b0853a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5c99a02b87464f00d793559d28245961"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga5c99a02b87464f00d793559d28245961">CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR</a>&#160;&#160;&#160;0x09</td></tr>
-<tr class="separator:ga5c99a02b87464f00d793559d28245961"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga24629ea7b2368de2b4a5bb7eecb9e7b2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga24629ea7b2368de2b4a5bb7eecb9e7b2">CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR</a>&#160;&#160;&#160;0x0A</td></tr>
-<tr class="separator:ga24629ea7b2368de2b4a5bb7eecb9e7b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacb0ce449424f1133ebbcec3cb7d8b65f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gacb0ce449424f1133ebbcec3cb7d8b65f">CPU_INTC_INTERRUPT_NMI</a>&#160;&#160;&#160;0x0B</td></tr>
-<tr class="separator:gacb0ce449424f1133ebbcec3cb7d8b65f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9afb0558a0e1e4d279a04f56a9a80fb3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga9afb0558a0e1e4d279a04f56a9a80fb3">CPU_INTC_INTERRUPT_UBC</a>&#160;&#160;&#160;0x0C</td></tr>
-<tr class="separator:ga9afb0558a0e1e4d279a04f56a9a80fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafc3934aa4ae1870a89d4c859a8ec6409"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gafc3934aa4ae1870a89d4c859a8ec6409">CPU_INTC_INTERRUPT_BREAK</a>&#160;&#160;&#160;0x20</td></tr>
-<tr class="separator:gafc3934aa4ae1870a89d4c859a8ec6409"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac99e2b23c9f31bb182c5fa3f9393d033"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gac99e2b23c9f31bb182c5fa3f9393d033">CPU_INTC_INTERRUPT_SCI_ERI</a>&#160;&#160;&#160;0x60</td></tr>
-<tr class="separator:gac99e2b23c9f31bb182c5fa3f9393d033"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga31eeeaf9c5b188ebabb57b70745a1b88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga31eeeaf9c5b188ebabb57b70745a1b88">CPU_INTC_INTERRUPT_SCI_RXI</a>&#160;&#160;&#160;0x61</td></tr>
-<tr class="separator:ga31eeeaf9c5b188ebabb57b70745a1b88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad48a8b35d7aaccbb60fb555e81a72e2c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gad48a8b35d7aaccbb60fb555e81a72e2c">CPU_INTC_INTERRUPT_SCI_TXI</a>&#160;&#160;&#160;0x62</td></tr>
-<tr class="separator:gad48a8b35d7aaccbb60fb555e81a72e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5583d66657f631bbc3abdf10e15431a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga5583d66657f631bbc3abdf10e15431a1">CPU_INTC_INTERRUPT_SCI_TEI</a>&#160;&#160;&#160;0x63</td></tr>
-<tr class="separator:ga5583d66657f631bbc3abdf10e15431a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga64aaca97e6d0036eb507890590f77dae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga64aaca97e6d0036eb507890590f77dae">CPU_INTC_INTERRUPT_FRT_ICI</a>&#160;&#160;&#160;0x64</td></tr>
-<tr class="separator:ga64aaca97e6d0036eb507890590f77dae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8d9caf7355bd3ad24cc8d8b04159b9f8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga8d9caf7355bd3ad24cc8d8b04159b9f8">CPU_INTC_INTERRUPT_FRT_OCI</a>&#160;&#160;&#160;0x65</td></tr>
-<tr class="separator:ga8d9caf7355bd3ad24cc8d8b04159b9f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaffe029bf906f4634cc708e44a2f0054e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaffe029bf906f4634cc708e44a2f0054e">CPU_INTC_INTERRUPT_FRT_OVI</a>&#160;&#160;&#160;0x66</td></tr>
-<tr class="separator:gaffe029bf906f4634cc708e44a2f0054e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab5a3eddd7e858dd0a7fdc3569a99b1c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gab5a3eddd7e858dd0a7fdc3569a99b1c4">CPU_INTC_INTERRUPT_FREE_67</a>&#160;&#160;&#160;0x67</td></tr>
-<tr class="separator:gab5a3eddd7e858dd0a7fdc3569a99b1c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae7af72c6e062322a7f58b0262b0b3dde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gae7af72c6e062322a7f58b0262b0b3dde">CPU_INTC_INTERRUPT_WDT_ITI</a>&#160;&#160;&#160;0x68</td></tr>
-<tr class="separator:gae7af72c6e062322a7f58b0262b0b3dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5600f20cfd54aaa6c12e31e1b6c52e6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga5600f20cfd54aaa6c12e31e1b6c52e6f">CPU_INTC_INTERRUPT_BSC</a>&#160;&#160;&#160;0x69</td></tr>
-<tr class="separator:ga5600f20cfd54aaa6c12e31e1b6c52e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4d6eed46aee3c02bf53c754249b2e013"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga4d6eed46aee3c02bf53c754249b2e013">CPU_INTC_INTERRUPT_FREE_6A</a>&#160;&#160;&#160;0x6A</td></tr>
-<tr class="separator:ga4d6eed46aee3c02bf53c754249b2e013"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafa1a250361f30652767a153fa1815d77"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gafa1a250361f30652767a153fa1815d77">CPU_INTC_INTERRUPT_FREE_6B</a>&#160;&#160;&#160;0x6B</td></tr>
-<tr class="separator:gafa1a250361f30652767a153fa1815d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6fcdd01321f863556c418bac62e36a4d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga6fcdd01321f863556c418bac62e36a4d">CPU_INTC_INTERRUPT_DMAC0</a>&#160;&#160;&#160;0x6C</td></tr>
-<tr class="separator:ga6fcdd01321f863556c418bac62e36a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5aafa15f5469054143b7529de0c004fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga5aafa15f5469054143b7529de0c004fc">CPU_INTC_INTERRUPT_DMAC1</a>&#160;&#160;&#160;0x6D</td></tr>
-<tr class="separator:ga5aafa15f5469054143b7529de0c004fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaac8928e7f415d04a582fae8f5b665085"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaac8928e7f415d04a582fae8f5b665085">CPU_INTC_INTERRUPT_DIVU_OVFI</a>&#160;&#160;&#160;0x6E</td></tr>
-<tr class="separator:gaac8928e7f415d04a582fae8f5b665085"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga906fe66bd43f073c2bfa1ca5cd3260ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga906fe66bd43f073c2bfa1ca5cd3260ec">CPU_INTC_INTERRUPT_FREE_6F</a>&#160;&#160;&#160;0x6F</td></tr>
-<tr class="separator:ga906fe66bd43f073c2bfa1ca5cd3260ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga69da3e1879ba80ed85cf576cf5aecbe5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga69da3e1879ba80ed85cf576cf5aecbe5">CPU_INTC_INTERRUPT_SLAVE_ENTRY</a>&#160;&#160;&#160;0x94</td></tr>
-<tr class="separator:ga69da3e1879ba80ed85cf576cf5aecbe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa206ea0422cb66f0c4ff4d072f3a9789"><td class="memItemLeft" align="right" valign="top"><a id="gaa206ea0422cb66f0c4ff4d072f3a9789"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaa206ea0422cb66f0c4ff4d072f3a9789">CPU_INTC_PRIORITY_VBLANK_IN</a>&#160;&#160;&#160;15</td></tr>
-<tr class="memdesc:gaa206ea0422cb66f0c4ff4d072f3a9789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gaa206ea0422cb66f0c4ff4d072f3a9789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gaa206ea0422cb66f0c4ff4d072f3a9789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga427a66cb2f1a80dc72ba20c62c153553"><td class="memItemLeft" align="right" valign="top"><a id="ga427a66cb2f1a80dc72ba20c62c153553"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga427a66cb2f1a80dc72ba20c62c153553">CPU_INTC_PRIORITY_VBLANK_OUT</a>&#160;&#160;&#160;14</td></tr>
-<tr class="memdesc:ga427a66cb2f1a80dc72ba20c62c153553"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga427a66cb2f1a80dc72ba20c62c153553"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga427a66cb2f1a80dc72ba20c62c153553"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad1cebd290b50f5b5413d0309d7a2e96a"><td class="memItemLeft" align="right" valign="top"><a id="gad1cebd290b50f5b5413d0309d7a2e96a"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gad1cebd290b50f5b5413d0309d7a2e96a">CPU_INTC_PRIORITY_HBLANK_IN</a>&#160;&#160;&#160;13</td></tr>
-<tr class="memdesc:gad1cebd290b50f5b5413d0309d7a2e96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gad1cebd290b50f5b5413d0309d7a2e96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gad1cebd290b50f5b5413d0309d7a2e96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga20f664430c58463c264bed3418ca8fca"><td class="memItemLeft" align="right" valign="top"><a id="ga20f664430c58463c264bed3418ca8fca"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga20f664430c58463c264bed3418ca8fca">CPU_INTC_PRIORITY_TIMER_0</a>&#160;&#160;&#160;12</td></tr>
-<tr class="memdesc:ga20f664430c58463c264bed3418ca8fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga20f664430c58463c264bed3418ca8fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga20f664430c58463c264bed3418ca8fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae37d79da46f39ee4989d35d8a83663c6"><td class="memItemLeft" align="right" valign="top"><a id="gae37d79da46f39ee4989d35d8a83663c6"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gae37d79da46f39ee4989d35d8a83663c6">CPU_INTC_PRIORITY_TIMER_1</a>&#160;&#160;&#160;11</td></tr>
-<tr class="memdesc:gae37d79da46f39ee4989d35d8a83663c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gae37d79da46f39ee4989d35d8a83663c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gae37d79da46f39ee4989d35d8a83663c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf43b4bbb9067581d8fc55d798e87971a"><td class="memItemLeft" align="right" valign="top"><a id="gaf43b4bbb9067581d8fc55d798e87971a"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaf43b4bbb9067581d8fc55d798e87971a">CPU_INTC_PRIORITY_DSP_END</a>&#160;&#160;&#160;10</td></tr>
-<tr class="memdesc:gaf43b4bbb9067581d8fc55d798e87971a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gaf43b4bbb9067581d8fc55d798e87971a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gaf43b4bbb9067581d8fc55d798e87971a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga833f975129f9f27cec537e585e7a6fc4"><td class="memItemLeft" align="right" valign="top"><a id="ga833f975129f9f27cec537e585e7a6fc4"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga833f975129f9f27cec537e585e7a6fc4">CPU_INTC_PRIORITY_SOUND_REQUEST</a>&#160;&#160;&#160;9</td></tr>
-<tr class="memdesc:ga833f975129f9f27cec537e585e7a6fc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga833f975129f9f27cec537e585e7a6fc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga833f975129f9f27cec537e585e7a6fc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga972599f22800f749cfc7a38b66abe4a0"><td class="memItemLeft" align="right" valign="top"><a id="ga972599f22800f749cfc7a38b66abe4a0"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga972599f22800f749cfc7a38b66abe4a0">CPU_INTC_PRIORITY_SYSTEM_MANAGER</a>&#160;&#160;&#160;8</td></tr>
-<tr class="memdesc:ga972599f22800f749cfc7a38b66abe4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga972599f22800f749cfc7a38b66abe4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga972599f22800f749cfc7a38b66abe4a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae4840faaafe151ffd4742294bc928f27"><td class="memItemLeft" align="right" valign="top"><a id="gae4840faaafe151ffd4742294bc928f27"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gae4840faaafe151ffd4742294bc928f27">CPU_INTC_PRIORITY_PAD_INTERRUPT</a>&#160;&#160;&#160;8</td></tr>
-<tr class="memdesc:gae4840faaafe151ffd4742294bc928f27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gae4840faaafe151ffd4742294bc928f27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gae4840faaafe151ffd4742294bc928f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3e73105dd948b47c84d74e3b3195549d"><td class="memItemLeft" align="right" valign="top"><a id="ga3e73105dd948b47c84d74e3b3195549d"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga3e73105dd948b47c84d74e3b3195549d">CPU_INTC_PRIORITY_LEVEL_2_DMA</a>&#160;&#160;&#160;6</td></tr>
-<tr class="memdesc:ga3e73105dd948b47c84d74e3b3195549d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga3e73105dd948b47c84d74e3b3195549d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga3e73105dd948b47c84d74e3b3195549d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae3386d4714de63ad243b08cdf1745fc1"><td class="memItemLeft" align="right" valign="top"><a id="gae3386d4714de63ad243b08cdf1745fc1"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gae3386d4714de63ad243b08cdf1745fc1">CPU_INTC_PRIORITY_LEVEL_1_DMA</a>&#160;&#160;&#160;6</td></tr>
-<tr class="memdesc:gae3386d4714de63ad243b08cdf1745fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gae3386d4714de63ad243b08cdf1745fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gae3386d4714de63ad243b08cdf1745fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae64d60cad807744495dc95081e8fdcdc"><td class="memItemLeft" align="right" valign="top"><a id="gae64d60cad807744495dc95081e8fdcdc"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gae64d60cad807744495dc95081e8fdcdc">CPU_INTC_PRIORITY_LEVEL_0_DMA</a>&#160;&#160;&#160;5</td></tr>
-<tr class="memdesc:gae64d60cad807744495dc95081e8fdcdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gae64d60cad807744495dc95081e8fdcdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:gae64d60cad807744495dc95081e8fdcdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga274e6f183c69b4717f856363e45ccd0d"><td class="memItemLeft" align="right" valign="top"><a id="ga274e6f183c69b4717f856363e45ccd0d"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga274e6f183c69b4717f856363e45ccd0d">CPU_INTC_PRIORITY_DMA_ILLEGAL</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memdesc:ga274e6f183c69b4717f856363e45ccd0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga274e6f183c69b4717f856363e45ccd0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga274e6f183c69b4717f856363e45ccd0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga89faf06be1a02c1bf9163dded9d693ad"><td class="memItemLeft" align="right" valign="top"><a id="ga89faf06be1a02c1bf9163dded9d693ad"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga89faf06be1a02c1bf9163dded9d693ad">CPU_INTC_PRIORITY_SPRITE_END</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:ga89faf06be1a02c1bf9163dded9d693ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga89faf06be1a02c1bf9163dded9d693ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupts belonging to this priority. <br /></td></tr>
 <tr class="separator:ga89faf06be1a02c1bf9163dded9d693ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:ga7f9cda3c9f657fc6017e4a5a0fd98443"><td class="memItemLeft" align="right" valign="top"><a id="ga7f9cda3c9f657fc6017e4a5a0fd98443"></a>
+typedef enum <a class="el" href="group__CPU__INTC.html#gaac41bcdeba2bd9e84b2c04f6780e9ed2">cpu_intc_interrupt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a></td></tr>
+<tr class="memdesc:ga7f9cda3c9f657fc6017e4a5a0fd98443"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt vectors. <br /></td></tr>
+<tr class="separator:ga7f9cda3c9f657fc6017e4a5a0fd98443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga050b13884769da2ebeee50e6aa8b967a"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a>) (void)</td></tr>
 <tr class="memdesc:ga050b13884769da2ebeee50e6aa8b967a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type.  <a href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">More...</a><br /></td></tr>
 <tr class="separator:ga050b13884769da2ebeee50e6aa8b967a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gaac41bcdeba2bd9e84b2c04f6780e9ed2"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaac41bcdeba2bd9e84b2c04f6780e9ed2">cpu_intc_interrupt</a> { <br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abf475cdbb5a50aeb790338759c9d2554">CPU_INTC_INTERRUPT_POWER_ON_RESET_PC</a> = 0x00, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2afe70cb63047e12b5a98e2eaf6a3703a0">CPU_INTC_INTERRUPT_POWER_ON_RESET_SP</a> = 0x01, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ad5fe6f3ef79648283cba53a5b13f9c4e">CPU_INTC_INTERRUPT_MANUAL_RESET_PC</a> = 0x02, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2aff40e3383f87016f76853bea32261a32">CPU_INTC_INTERRUPT_MANUAL_RESET_SP</a> = 0x03, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ad66eb6e5766372c8a13721e2058a3c62">CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION</a> = 0x04, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a7850eae5985481091da1a212b7764704">CPU_INTC_INTERRUPT_ILLEGAL_SLOT</a> = 0x06, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a1abc2fa83e1690a95f576c7657e04cf5">CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR</a> = 0x09, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac4f198a49b704296e797724ccfe9b9a3">CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR</a> = 0x0A, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2acf5b83003de723d2ad16be138412f4e2">CPU_INTC_INTERRUPT_NMI</a> = 0x0B, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac77d05a22c84f47a7ae630e7ef4ca534">CPU_INTC_INTERRUPT_UBC</a> = 0x0C, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a0b07e46cde2b38a826cc52883c88a5bb">CPU_INTC_INTERRUPT_BREAK</a> = 0x20, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abd691c26f6d926c4f9d32bad91265113">CPU_INTC_INTERRUPT_SCI_ERI</a> = 0x60, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abeab69d42b8e22213da10c39a1f167b1">CPU_INTC_INTERRUPT_SCI_RXI</a> = 0x61, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a689205615bdbb579ca748922d0b98114">CPU_INTC_INTERRUPT_SCI_TXI</a> = 0x62, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2af07ed08fdc5604ff08649228640b567a">CPU_INTC_INTERRUPT_SCI_TEI</a> = 0x63, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a511b7cb4e52cf1d034d0027bf099138b">CPU_INTC_INTERRUPT_FRT_ICI</a> = 0x64, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a2b62501fada2b17543493dd851bd68d1">CPU_INTC_INTERRUPT_FRT_OCI</a> = 0x65, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2aefe38eaee1c95879e3d57dca45086099">CPU_INTC_INTERRUPT_FRT_OVI</a> = 0x66, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a706f716de08a6db23d26f059dfd16a2f">CPU_INTC_INTERRUPT_FREE_67</a> = 0x67, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a914cac7152324dccdbd69b3d0ba4b885">CPU_INTC_INTERRUPT_WDT_ITI</a> = 0x68, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ab0929951193179aa3b67133f1cc4d5f3">CPU_INTC_INTERRUPT_BSC</a> = 0x69, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac97ffe04f22d3aa53feaf5054b2e8a57">CPU_INTC_INTERRUPT_FREE_6A</a> = 0x6A, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a4f603eea502f6ff94d62e086a2a6a708">CPU_INTC_INTERRUPT_FREE_6B</a> = 0x6B, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a5c4d4d49edbf87a075b9ad36b5c538a5">CPU_INTC_INTERRUPT_DMAC0</a> = 0x6C, 
+<br />
+&#160;&#160;<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a26f2a59640e39636075347b071dfec0d">CPU_INTC_INTERRUPT_DMAC1</a> = 0x6D, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ae1bb28d5d849e7165601ae4115218117">CPU_INTC_INTERRUPT_DIVU_OVFI</a> = 0x6E, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a27c31d78bc3c33571ec3ae88e8ac972d">CPU_INTC_INTERRUPT_FREE_6F</a> = 0x6F, 
+<a class="el" href="group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a22c2ac20c68f31b8abb638497062ae55">CPU_INTC_INTERRUPT_SLAVE_ENTRY</a> = 0x94
+<br />
+ }</td></tr>
+<tr class="memdesc:gaac41bcdeba2bd9e84b2c04f6780e9ed2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt vectors.  <a href="group__CPU__INTC.html#gaac41bcdeba2bd9e84b2c04f6780e9ed2">More...</a><br /></td></tr>
+<tr class="separator:gaac41bcdeba2bd9e84b2c04f6780e9ed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga7135a436480778f07281a19353961297"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga7135a436480778f07281a19353961297">cpu_intc_ihr_set</a> (uint32_t vector, <a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a> ihr)</td></tr>
-<tr class="memdesc:ga7135a436480778f07281a19353961297"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the specified interrupt.  <a href="group__CPU__INTC.html#ga7135a436480778f07281a19353961297">More...</a><br /></td></tr>
-<tr class="separator:ga7135a436480778f07281a19353961297"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaabb7c0d37e6219947497f5ef212e6d12"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaabb7c0d37e6219947497f5ef212e6d12">cpu_intc_ihr_clear</a> (uint32_t vector)</td></tr>
-<tr class="memdesc:gaabb7c0d37e6219947497f5ef212e6d12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the interrupt handler for the specified interrupt.  <a href="group__CPU__INTC.html#gaabb7c0d37e6219947497f5ef212e6d12">More...</a><br /></td></tr>
-<tr class="separator:gaabb7c0d37e6219947497f5ef212e6d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa6e7f9e5c6687239de93f711f34ece27"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaa6e7f9e5c6687239de93f711f34ece27">cpu_intc_ihr_get</a> (uint32_t vector)</td></tr>
-<tr class="memdesc:gaa6e7f9e5c6687239de93f711f34ece27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the interrupt handler for the specified interrupt.  <a href="group__CPU__INTC.html#gaa6e7f9e5c6687239de93f711f34ece27">More...</a><br /></td></tr>
-<tr class="separator:gaa6e7f9e5c6687239de93f711f34ece27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf39f1dd0daef4e52978564887b9ed585"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#gaf39f1dd0daef4e52978564887b9ed585">cpu_intc_ihr_set</a> (<a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a> vector, <a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a> ihr)</td></tr>
+<tr class="memdesc:gaf39f1dd0daef4e52978564887b9ed585"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the specified CPU related interrupt.  <a href="group__CPU__INTC.html#gaf39f1dd0daef4e52978564887b9ed585">More...</a><br /></td></tr>
+<tr class="separator:gaf39f1dd0daef4e52978564887b9ed585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0a1842c994bf6fab1882e1757f6a5904"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga0a1842c994bf6fab1882e1757f6a5904">cpu_intc_ihr_clear</a> (<a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a> vector)</td></tr>
+<tr class="memdesc:ga0a1842c994bf6fab1882e1757f6a5904"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the interrupt handler for the specified CPU related interrupt.  <a href="group__CPU__INTC.html#ga0a1842c994bf6fab1882e1757f6a5904">More...</a><br /></td></tr>
+<tr class="separator:ga0a1842c994bf6fab1882e1757f6a5904"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8c65917945b331636320e5a1da71babf"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga8c65917945b331636320e5a1da71babf">cpu_intc_ihr_get</a> (<a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a> vector)</td></tr>
+<tr class="memdesc:ga8c65917945b331636320e5a1da71babf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the interrupt handler for the specified CPU related interrupt.  <a href="group__CPU__INTC.html#ga8c65917945b331636320e5a1da71babf">More...</a><br /></td></tr>
+<tr class="separator:ga8c65917945b331636320e5a1da71babf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0db90f7486707a423fcd4baf894d3f67"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC.html#ga0db90f7486707a423fcd4baf894d3f67">cpu_intc_mask_get</a> (void)</td></tr>
 <tr class="memdesc:ga0db90f7486707a423fcd4baf894d3f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the interrupt priority level <code>I</code> mask bits from the <code>sr</code> register.  <a href="group__CPU__INTC.html#ga0db90f7486707a423fcd4baf894d3f67">More...</a><br /></td></tr>
 <tr class="separator:ga0db90f7486707a423fcd4baf894d3f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,428 +228,6 @@ Functions</h2></td></tr>
 <tr class="separator:ga66fc65e006c520b1c0f94f0d834d1760"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Not yet documented. </p>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="gafc3934aa4ae1870a89d4c859a8ec6409"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafc3934aa4ae1870a89d4c859a8ec6409">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_BREAK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_BREAK&#160;&#160;&#160;0x20</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000016">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga5600f20cfd54aaa6c12e31e1b6c52e6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5600f20cfd54aaa6c12e31e1b6c52e6f">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_BSC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_BSC&#160;&#160;&#160;0x69</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000026">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga5c99a02b87464f00d793559d28245961"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5c99a02b87464f00d793559d28245961">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR&#160;&#160;&#160;0x09</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000012">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gaac8928e7f415d04a582fae8f5b665085"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaac8928e7f415d04a582fae8f5b665085">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_DIVU_OVFI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_DIVU_OVFI&#160;&#160;&#160;0x6E</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000031">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga24629ea7b2368de2b4a5bb7eecb9e7b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga24629ea7b2368de2b4a5bb7eecb9e7b2">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR&#160;&#160;&#160;0x0A</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000013">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga6fcdd01321f863556c418bac62e36a4d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6fcdd01321f863556c418bac62e36a4d">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_DMAC0</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_DMAC0&#160;&#160;&#160;0x6C</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000029">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga5aafa15f5469054143b7529de0c004fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5aafa15f5469054143b7529de0c004fc">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_DMAC1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_DMAC1&#160;&#160;&#160;0x6D</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000030">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gab5a3eddd7e858dd0a7fdc3569a99b1c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab5a3eddd7e858dd0a7fdc3569a99b1c4">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FREE_67</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FREE_67&#160;&#160;&#160;0x67</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000024">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga4d6eed46aee3c02bf53c754249b2e013"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4d6eed46aee3c02bf53c754249b2e013">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FREE_6A</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FREE_6A&#160;&#160;&#160;0x6A</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000027">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gafa1a250361f30652767a153fa1815d77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafa1a250361f30652767a153fa1815d77">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FREE_6B</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FREE_6B&#160;&#160;&#160;0x6B</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000028">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga906fe66bd43f073c2bfa1ca5cd3260ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga906fe66bd43f073c2bfa1ca5cd3260ec">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FREE_6F</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FREE_6F&#160;&#160;&#160;0x6F</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000032">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga64aaca97e6d0036eb507890590f77dae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga64aaca97e6d0036eb507890590f77dae">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FRT_ICI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FRT_ICI&#160;&#160;&#160;0x64</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga8d9caf7355bd3ad24cc8d8b04159b9f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8d9caf7355bd3ad24cc8d8b04159b9f8">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FRT_OCI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FRT_OCI&#160;&#160;&#160;0x65</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gaffe029bf906f4634cc708e44a2f0054e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaffe029bf906f4634cc708e44a2f0054e">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_FRT_OVI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_FRT_OVI&#160;&#160;&#160;0x66</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000023">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga94682e421031c2bc5463c6726d7962f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga94682e421031c2bc5463c6726d7962f8">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION&#160;&#160;&#160;0x04</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000010">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga56b976786503221b566c5fe9b0853a80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga56b976786503221b566c5fe9b0853a80">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_ILLEGAL_SLOT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_ILLEGAL_SLOT&#160;&#160;&#160;0x06</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000011">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gaeec7c3e22ced71ec0bd0bdaf66543ca2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaeec7c3e22ced71ec0bd0bdaf66543ca2">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_MANUAL_RESET_PC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_MANUAL_RESET_PC&#160;&#160;&#160;0x02</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga7582a455652f048c5a09c93b66a0e58c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7582a455652f048c5a09c93b66a0e58c">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_MANUAL_RESET_SP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_MANUAL_RESET_SP&#160;&#160;&#160;0x03</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gacb0ce449424f1133ebbcec3cb7d8b65f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacb0ce449424f1133ebbcec3cb7d8b65f">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_NMI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_NMI&#160;&#160;&#160;0x0B</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000014">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga778e9e3867507fe0fb921b32ccf8161e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga778e9e3867507fe0fb921b32ccf8161e">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_POWER_ON_RESET_PC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_POWER_ON_RESET_PC&#160;&#160;&#160;0x00</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga2453913377b89f86d194bb94bfbe7aba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2453913377b89f86d194bb94bfbe7aba">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_POWER_ON_RESET_SP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_POWER_ON_RESET_SP&#160;&#160;&#160;0x01</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gac99e2b23c9f31bb182c5fa3f9393d033"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac99e2b23c9f31bb182c5fa3f9393d033">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_SCI_ERI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_SCI_ERI&#160;&#160;&#160;0x60</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000017">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga31eeeaf9c5b188ebabb57b70745a1b88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga31eeeaf9c5b188ebabb57b70745a1b88">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_SCI_RXI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_SCI_RXI&#160;&#160;&#160;0x61</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000018">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga5583d66657f631bbc3abdf10e15431a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5583d66657f631bbc3abdf10e15431a1">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_SCI_TEI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_SCI_TEI&#160;&#160;&#160;0x63</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gad48a8b35d7aaccbb60fb555e81a72e2c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad48a8b35d7aaccbb60fb555e81a72e2c">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_SCI_TXI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_SCI_TXI&#160;&#160;&#160;0x62</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000019">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga69da3e1879ba80ed85cf576cf5aecbe5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga69da3e1879ba80ed85cf576cf5aecbe5">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_SLAVE_ENTRY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_SLAVE_ENTRY&#160;&#160;&#160;0x94</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000033">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga9afb0558a0e1e4d279a04f56a9a80fb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga9afb0558a0e1e4d279a04f56a9a80fb3">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_UBC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_UBC&#160;&#160;&#160;0x0C</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000015">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="gae7af72c6e062322a7f58b0262b0b3dde"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae7af72c6e062322a7f58b0262b0b3dde">&#9670;&nbsp;</a></span>CPU_INTC_INTERRUPT_WDT_ITI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_INTC_INTERRUPT_WDT_ITI&#160;&#160;&#160;0x68</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000025">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ga050b13884769da2ebeee50e6aa8b967a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga050b13884769da2ebeee50e6aa8b967a">&#9670;&nbsp;</a></span>cpu_intc_ihr</h2>
@@ -669,13 +242,88 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Callback type. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__INTC.html#ga7135a436480778f07281a19353961297" title="Set the interrupt handler for the specified interrupt.">cpu_intc_ihr_set</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__INTC.html#gaf39f1dd0daef4e52978564887b9ed585" title="Set the interrupt handler for the specified CPU related interrupt.">cpu_intc_ihr_set</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="gaac41bcdeba2bd9e84b2c04f6780e9ed2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaac41bcdeba2bd9e84b2c04f6780e9ed2">&#9670;&nbsp;</a></span>cpu_intc_interrupt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__CPU__INTC.html#gaac41bcdeba2bd9e84b2c04f6780e9ed2">cpu_intc_interrupt</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Interrupt vectors. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2abf475cdbb5a50aeb790338759c9d2554"></a>CPU_INTC_INTERRUPT_POWER_ON_RESET_PC&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2afe70cb63047e12b5a98e2eaf6a3703a0"></a>CPU_INTC_INTERRUPT_POWER_ON_RESET_SP&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ad5fe6f3ef79648283cba53a5b13f9c4e"></a>CPU_INTC_INTERRUPT_MANUAL_RESET_PC&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2aff40e3383f87016f76853bea32261a32"></a>CPU_INTC_INTERRUPT_MANUAL_RESET_SP&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ad66eb6e5766372c8a13721e2058a3c62"></a>CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a7850eae5985481091da1a212b7764704"></a>CPU_INTC_INTERRUPT_ILLEGAL_SLOT&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a1abc2fa83e1690a95f576c7657e04cf5"></a>CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac4f198a49b704296e797724ccfe9b9a3"></a>CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2acf5b83003de723d2ad16be138412f4e2"></a>CPU_INTC_INTERRUPT_NMI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac77d05a22c84f47a7ae630e7ef4ca534"></a>CPU_INTC_INTERRUPT_UBC&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a0b07e46cde2b38a826cc52883c88a5bb"></a>CPU_INTC_INTERRUPT_BREAK&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2abd691c26f6d926c4f9d32bad91265113"></a>CPU_INTC_INTERRUPT_SCI_ERI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2abeab69d42b8e22213da10c39a1f167b1"></a>CPU_INTC_INTERRUPT_SCI_RXI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a689205615bdbb579ca748922d0b98114"></a>CPU_INTC_INTERRUPT_SCI_TXI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2af07ed08fdc5604ff08649228640b567a"></a>CPU_INTC_INTERRUPT_SCI_TEI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a511b7cb4e52cf1d034d0027bf099138b"></a>CPU_INTC_INTERRUPT_FRT_ICI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a2b62501fada2b17543493dd851bd68d1"></a>CPU_INTC_INTERRUPT_FRT_OCI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2aefe38eaee1c95879e3d57dca45086099"></a>CPU_INTC_INTERRUPT_FRT_OVI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a706f716de08a6db23d26f059dfd16a2f"></a>CPU_INTC_INTERRUPT_FREE_67&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a914cac7152324dccdbd69b3d0ba4b885"></a>CPU_INTC_INTERRUPT_WDT_ITI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ab0929951193179aa3b67133f1cc4d5f3"></a>CPU_INTC_INTERRUPT_BSC&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac97ffe04f22d3aa53feaf5054b2e8a57"></a>CPU_INTC_INTERRUPT_FREE_6A&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a4f603eea502f6ff94d62e086a2a6a708"></a>CPU_INTC_INTERRUPT_FREE_6B&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a5c4d4d49edbf87a075b9ad36b5c538a5"></a>CPU_INTC_INTERRUPT_DMAC0&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a26f2a59640e39636075347b071dfec0d"></a>CPU_INTC_INTERRUPT_DMAC1&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2ae1bb28d5d849e7165601ae4115218117"></a>CPU_INTC_INTERRUPT_DIVU_OVFI&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a27c31d78bc3c33571ec3ae88e8ac972d"></a>CPU_INTC_INTERRUPT_FREE_6F&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaac41bcdeba2bd9e84b2c04f6780e9ed2a22c2ac20c68f31b8abb638497062ae55"></a>CPU_INTC_INTERRUPT_SLAVE_ENTRY&#160;</td><td class="fielddoc"><p>Interrupt vector. </p>
+</td></tr>
+</table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gaabb7c0d37e6219947497f5ef212e6d12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaabb7c0d37e6219947497f5ef212e6d12">&#9670;&nbsp;</a></span>cpu_intc_ihr_clear()</h2>
+<a id="ga0a1842c994bf6fab1882e1757f6a5904"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0a1842c994bf6fab1882e1757f6a5904">&#9670;&nbsp;</a></span>cpu_intc_ihr_clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -686,7 +334,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void cpu_intc_ihr_clear </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype"><a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a>&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td></td>
         </tr>
@@ -698,8 +346,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Clear the interrupt handler for the specified interrupt. </p>
+<p>Clear the interrupt handler for the specified CPU related interrupt. </p>
 <p>This is a BIOS call.</p>
+<p>To clear a handler in the slave CPU vector table, add the offset <a class="el" href="group__CPU__INTC.html#gaba344807301589cb06ba6405b4ce063f">CPU_INTC_INTERRUPT_SLAVE_BASE</a> to <code>vector</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>The vector number. </td></tr>
@@ -709,8 +358,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gaa6e7f9e5c6687239de93f711f34ece27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa6e7f9e5c6687239de93f711f34ece27">&#9670;&nbsp;</a></span>cpu_intc_ihr_get()</h2>
+<a id="ga8c65917945b331636320e5a1da71babf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8c65917945b331636320e5a1da71babf">&#9670;&nbsp;</a></span>cpu_intc_ihr_get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -721,7 +370,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static <a class="el" href="group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a">cpu_intc_ihr</a> cpu_intc_ihr_get </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype"><a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a>&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td></td>
         </tr>
@@ -733,8 +382,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Obtain the interrupt handler for the specified interrupt. </p>
+<p>Obtain the interrupt handler for the specified CPU related interrupt. </p>
 <p>This is a BIOS call.</p>
+<p>To get a handler in the slave CPU vector table, add the offset <a class="el" href="group__CPU__INTC.html#gaba344807301589cb06ba6405b4ce063f">CPU_INTC_INTERRUPT_SLAVE_BASE</a> to <code>vector</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>The vector number. </td></tr>
@@ -744,8 +394,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga7135a436480778f07281a19353961297"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7135a436480778f07281a19353961297">&#9670;&nbsp;</a></span>cpu_intc_ihr_set()</h2>
+<a id="gaf39f1dd0daef4e52978564887b9ed585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf39f1dd0daef4e52978564887b9ed585">&#9670;&nbsp;</a></span>cpu_intc_ihr_set()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -756,7 +406,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void cpu_intc_ihr_set </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype"><a class="el" href="group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443">cpu_intc_interrupt_t</a>&#160;</td>
           <td class="paramname"><em>vector</em>, </td>
         </tr>
         <tr>
@@ -778,9 +428,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Set the interrupt handler for the specified interrupt. </p>
-<p>This is a BIOS call.</p>
-<p>There is no need to explicitly return via <code>rte</code> for <code>ihr</code>.</p>
+<p>Set the interrupt handler for the specified CPU related interrupt. </p>
+<p>This is a BIOS call. The function must use <code>rte</code> to return. Use the <code>__interrupt_handler</code> GCC attribute.</p>
+<p>To set a handler in the slave CPU vector table, add the offset <a class="el" href="group__CPU__INTC.html#gaba344807301589cb06ba6405b4ce063f">CPU_INTC_INTERRUPT_SLAVE_BASE</a> to <code>vector</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>The vector number. </td></tr>

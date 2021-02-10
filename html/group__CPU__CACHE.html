@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -63,6 +70,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CPU Cache</div>  </div>
@@ -114,10 +123,30 @@ Macros</h2></td></tr>
 <tr class="memitem:ga305e02a50983e44b80817a55586b94ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">CPU_CACHE_2_WAY_SIZE</a>&#160;&#160;&#160;(<a class="el" href="group__CPU__CACHE.html#gab8c1fa0e47ab64ca48e363a0f4024ae3">CPU_CACHE_WAY_2_ADDR</a> - <a class="el" href="group__CPU__CACHE.html#gacc74b410744bd58c554d51ea8be7ea6a">CPU_CACHE_WAY_0_ADDR</a>)</td></tr>
 <tr class="memdesc:ga305e02a50983e44b80817a55586b94ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size in bytes of the 2KiB RAM.  <a href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">More...</a><br /></td></tr>
 <tr class="separator:ga305e02a50983e44b80817a55586b94ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4f0552a711bfa7c4cda5a830dbb97c1e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga4f0552a711bfa7c4cda5a830dbb97c1e">CPU_CACHE_MODE_4_WAY</a>&#160;&#160;&#160;0x00</td></tr>
-<tr class="separator:ga4f0552a711bfa7c4cda5a830dbb97c1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga42c5e2d3a8d620a6bb7ce949cca3f410"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga42c5e2d3a8d620a6bb7ce949cca3f410">CPU_CACHE_MODE_2_WAY</a>&#160;&#160;&#160;0x08</td></tr>
-<tr class="separator:ga42c5e2d3a8d620a6bb7ce949cca3f410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga425790888be5a412c303fcf59beb190d"><td class="memItemLeft" align="right" valign="top"><a id="ga425790888be5a412c303fcf59beb190d"></a>
+typedef enum <a class="el" href="group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc0d15887e2a">cpu_cache_mode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga425790888be5a412c303fcf59beb190d">cpu_cache_mode_t</a></td></tr>
+<tr class="memdesc:ga425790888be5a412c303fcf59beb190d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache mode. <br /></td></tr>
+<tr class="separator:ga425790888be5a412c303fcf59beb190d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafd9cc331e952f55eb6a3ded73f0ec852"><td class="memItemLeft" align="right" valign="top"><a id="gafd9cc331e952f55eb6a3ded73f0ec852"></a>
+typedef enum <a class="el" href="group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037">cpu_cache_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a></td></tr>
+<tr class="memdesc:gafd9cc331e952f55eb6a3ded73f0ec852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache type. <br /></td></tr>
+<tr class="separator:gafd9cc331e952f55eb6a3ded73f0ec852"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gac2ab1a6f63685fd7dc4bbc0d15887e2a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc0d15887e2a">cpu_cache_mode</a> { <a class="el" href="group__CPU__CACHE.html#ggac2ab1a6f63685fd7dc4bbc0d15887e2aa9e38df73685fe9ad8e6638cc0a14ed0d">CPU_CACHE_MODE_4_WAY</a> = 0x00, 
+<a class="el" href="group__CPU__CACHE.html#ggac2ab1a6f63685fd7dc4bbc0d15887e2aafc2031a1da4b7dd6507e9c898088ab73">CPU_CACHE_MODE_2_WAY</a> = 0x08
+ }</td></tr>
+<tr class="memdesc:gac2ab1a6f63685fd7dc4bbc0d15887e2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache mode.  <a href="group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc0d15887e2a">More...</a><br /></td></tr>
+<tr class="separator:gac2ab1a6f63685fd7dc4bbc0d15887e2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0c4b9e3f8d6d8c4ce274da1b88010037"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037">cpu_cache_type</a> { <a class="el" href="group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037a0cf3fb6de48fafbe16cb74b4c9536f1b">CPU_CACHE_TYPE_I</a> = 0x02, 
+<a class="el" href="group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037aae5be6e2c73c3970b37b7a24fd990890">CPU_CACHE_TYPE_D</a> = 0x04
+ }</td></tr>
+<tr class="memdesc:ga0c4b9e3f8d6d8c4ce274da1b88010037"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache type.  <a href="group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037">More...</a><br /></td></tr>
+<tr class="separator:ga0c4b9e3f8d6d8c4ce274da1b88010037"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -129,21 +158,15 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga60d16b61d90570032b2b0e6e72385ba7">cpu_cache_disable</a> (void)</td></tr>
 <tr class="memdesc:ga60d16b61d90570032b2b0e6e72385ba7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable cache. <br /></td></tr>
 <tr class="separator:ga60d16b61d90570032b2b0e6e72385ba7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1972313ec419bdadac7897d0d0872869"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga1972313ec419bdadac7897d0d0872869">cpu_cache_data_repl_disable</a> (void)</td></tr>
-<tr class="memdesc:ga1972313ec419bdadac7897d0d0872869"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable data replacement in the cache.  <a href="group__CPU__CACHE.html#ga1972313ec419bdadac7897d0d0872869">More...</a><br /></td></tr>
-<tr class="separator:ga1972313ec419bdadac7897d0d0872869"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga196ec8b4a104d8713d3e3658e22b5ae1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga196ec8b4a104d8713d3e3658e22b5ae1">cpu_cache_data_repl_enable</a> (void)</td></tr>
-<tr class="memdesc:ga196ec8b4a104d8713d3e3658e22b5ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable data replacement in the cache.  <a href="group__CPU__CACHE.html#ga196ec8b4a104d8713d3e3658e22b5ae1">More...</a><br /></td></tr>
-<tr class="separator:ga196ec8b4a104d8713d3e3658e22b5ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga126cb8c0cd82098045ab9392165222b1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga126cb8c0cd82098045ab9392165222b1">cpu_cache_instr_repl_disable</a> (void)</td></tr>
-<tr class="memdesc:ga126cb8c0cd82098045ab9392165222b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable instruction replacement in the cache.  <a href="group__CPU__CACHE.html#ga126cb8c0cd82098045ab9392165222b1">More...</a><br /></td></tr>
-<tr class="separator:ga126cb8c0cd82098045ab9392165222b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1f1583481284ee7118d481277f028354"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga1f1583481284ee7118d481277f028354">cpu_cache_instr_repl_enable</a> (void)</td></tr>
-<tr class="memdesc:ga1f1583481284ee7118d481277f028354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable instruction replacement in the cache.  <a href="group__CPU__CACHE.html#ga1f1583481284ee7118d481277f028354">More...</a><br /></td></tr>
-<tr class="separator:ga1f1583481284ee7118d481277f028354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4b616687c36cbc008b8cd90d22bac0a6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga4b616687c36cbc008b8cd90d22bac0a6">cpu_cache_way_mode_set</a> (uint8_t mode)</td></tr>
-<tr class="memdesc:ga4b616687c36cbc008b8cd90d22bac0a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the mode the cache operates.  <a href="group__CPU__CACHE.html#ga4b616687c36cbc008b8cd90d22bac0a6">More...</a><br /></td></tr>
-<tr class="separator:ga4b616687c36cbc008b8cd90d22bac0a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4a4daad707ca16d39d150200c9b5b806"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga4a4daad707ca16d39d150200c9b5b806">cpu_cache_repl_enable</a> (<a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a> type)</td></tr>
+<tr class="memdesc:ga4a4daad707ca16d39d150200c9b5b806"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable type replacement.  <a href="group__CPU__CACHE.html#ga4a4daad707ca16d39d150200c9b5b806">More...</a><br /></td></tr>
+<tr class="separator:ga4a4daad707ca16d39d150200c9b5b806"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaea671d76e1e96d0a8be49ad1c10b5a8e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gaea671d76e1e96d0a8be49ad1c10b5a8e">cpu_cache_repl_disable</a> (<a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a> type)</td></tr>
+<tr class="memdesc:gaea671d76e1e96d0a8be49ad1c10b5a8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable type replacement in the cache.  <a href="group__CPU__CACHE.html#gaea671d76e1e96d0a8be49ad1c10b5a8e">More...</a><br /></td></tr>
+<tr class="separator:gaea671d76e1e96d0a8be49ad1c10b5a8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae38d00811f197d982543190a807ee890"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gae38d00811f197d982543190a807ee890">cpu_cache_way_mode_set</a> (<a class="el" href="group__CPU__CACHE.html#ga425790888be5a412c303fcf59beb190d">cpu_cache_mode_t</a> mode)</td></tr>
+<tr class="memdesc:gae38d00811f197d982543190a807ee890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the mode the cache operates.  <a href="group__CPU__CACHE.html#gae38d00811f197d982543190a807ee890">More...</a><br /></td></tr>
+<tr class="separator:gae38d00811f197d982543190a807ee890"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1bb1a9f9d783321ebbb2a3b8d6bc3b96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga1bb1a9f9d783321ebbb2a3b8d6bc3b96">cpu_cache_purge_line</a> (void *addr)</td></tr>
 <tr class="memdesc:ga1bb1a9f9d783321ebbb2a3b8d6bc3b96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache line of the specified address is purged.  <a href="group__CPU__CACHE.html#ga1bb1a9f9d783321ebbb2a3b8d6bc3b96">More...</a><br /></td></tr>
 <tr class="separator:ga1bb1a9f9d783321ebbb2a3b8d6bc3b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,157 +189,56 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div><div class="memdoc">
 
 <p>The size in bytes of the 2KiB RAM. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#ga4b616687c36cbc008b8cd90d22bac0a6" title="Change the mode the cache operates.">cpu_cache_way_mode_set</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#gae38d00811f197d982543190a807ee890" title="Change the mode the cache operates.">cpu_cache_way_mode_set</a> </dd></dl>
 
 </div>
 </div>
-<a id="ga42c5e2d3a8d620a6bb7ce949cca3f410"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga42c5e2d3a8d620a6bb7ce949cca3f410">&#9670;&nbsp;</a></span>CPU_CACHE_MODE_2_WAY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CPU_CACHE_MODE_2_WAY&#160;&#160;&#160;0x08</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga4f0552a711bfa7c4cda5a830dbb97c1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4f0552a711bfa7c4cda5a830dbb97c1e">&#9670;&nbsp;</a></span>CPU_CACHE_MODE_4_WAY</h2>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="gac2ab1a6f63685fd7dc4bbc0d15887e2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac2ab1a6f63685fd7dc4bbc0d15887e2a">&#9670;&nbsp;</a></span>cpu_cache_mode</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CPU_CACHE_MODE_4_WAY&#160;&#160;&#160;0x00</td>
+          <td class="memname">enum <a class="el" href="group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc0d15887e2a">cpu_cache_mode</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>To be removed and replaced as an <code>enum</code>. </dd></dl>
+
+<p>Cache mode. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggac2ab1a6f63685fd7dc4bbc0d15887e2aa9e38df73685fe9ad8e6638cc0a14ed0d"></a>CPU_CACHE_MODE_4_WAY&#160;</td><td class="fielddoc"><p>Four-way set associative. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac2ab1a6f63685fd7dc4bbc0d15887e2aafc2031a1da4b7dd6507e9c898088ab73"></a>CPU_CACHE_MODE_2_WAY&#160;</td><td class="fielddoc"><p>Two-way set associate and 2KiB RAM. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ga0c4b9e3f8d6d8c4ce274da1b88010037"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0c4b9e3f8d6d8c4ce274da1b88010037">&#9670;&nbsp;</a></span>cpu_cache_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037">cpu_cache_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cache type. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga0c4b9e3f8d6d8c4ce274da1b88010037a0cf3fb6de48fafbe16cb74b4c9536f1b"></a>CPU_CACHE_TYPE_I&#160;</td><td class="fielddoc"><p>Instruction cache type. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga0c4b9e3f8d6d8c4ce274da1b88010037aae5be6e2c73c3970b37b7a24fd990890"></a>CPU_CACHE_TYPE_D&#160;</td><td class="fielddoc"><p>Data cache type. </p>
+</td></tr>
+</table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga1972313ec419bdadac7897d0d0872869"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1972313ec419bdadac7897d0d0872869">&#9670;&nbsp;</a></span>cpu_cache_data_repl_disable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cpu_cache_data_repl_disable </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Disable data replacement in the cache. </p>
-<p>When data is fetched from memory, cache data is not written to the cache even if there is a cache miss. </p>
-
-</div>
-</div>
-<a id="ga196ec8b4a104d8713d3e3658e22b5ae1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga196ec8b4a104d8713d3e3658e22b5ae1">&#9670;&nbsp;</a></span>cpu_cache_data_repl_enable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cpu_cache_data_repl_enable </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Enable data replacement in the cache. </p>
-<p>When data is fetched from memory, cache data is written. </p>
-
-</div>
-</div>
-<a id="ga126cb8c0cd82098045ab9392165222b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga126cb8c0cd82098045ab9392165222b1">&#9670;&nbsp;</a></span>cpu_cache_instr_repl_disable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cpu_cache_instr_repl_disable </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Disable instruction replacement in the cache. </p>
-<p>When an instruction is fetched from memory, cache data is not written to the cache even if there is a cache miss. </p>
-
-</div>
-</div>
-<a id="ga1f1583481284ee7118d481277f028354"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1f1583481284ee7118d481277f028354">&#9670;&nbsp;</a></span>cpu_cache_instr_repl_enable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cpu_cache_instr_repl_enable </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Enable instruction replacement in the cache. </p>
-<p>When an instruction is fetched from memory, cache data is written. </p>
-
-</div>
-</div>
 <a id="ga25279430a80d3b57960af39c8ddc7bee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga25279430a80d3b57960af39c8ddc7bee">&#9670;&nbsp;</a></span>cpu_cache_purge()</h2>
 
@@ -365,8 +287,78 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 </div>
 </div>
-<a id="ga4b616687c36cbc008b8cd90d22bac0a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4b616687c36cbc008b8cd90d22bac0a6">&#9670;&nbsp;</a></span>cpu_cache_way_mode_set()</h2>
+<a id="gaea671d76e1e96d0a8be49ad1c10b5a8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaea671d76e1e96d0a8be49ad1c10b5a8e">&#9670;&nbsp;</a></span>cpu_cache_repl_disable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_cache_repl_disable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a>&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Disable type replacement in the cache. </p>
+<p>When either an instruction or data is fetched from memory, cache data is not written to the cache even if there is a cache miss.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The cache type(s) to disable. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4a4daad707ca16d39d150200c9b5b806"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4a4daad707ca16d39d150200c9b5b806">&#9670;&nbsp;</a></span>cpu_cache_repl_enable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_cache_repl_enable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a>&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Enable type replacement. </p>
+<p>When either instruction and/or data is fetched from memory, the cache data is written.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The cache type(s) to enable. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae38d00811f197d982543190a807ee890"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae38d00811f197d982543190a807ee890">&#9670;&nbsp;</a></span>cpu_cache_way_mode_set()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -377,7 +369,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
         <tr>
           <td class="memname">static void cpu_cache_way_mode_set </td>
           <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype"><a class="el" href="group__CPU__CACHE.html#ga425790888be5a412c303fcf59beb190d">cpu_cache_mode_t</a>&#160;</td>
           <td class="paramname"><em>mode</em></td><td>)</td>
           <td></td>
         </tr>
@@ -394,13 +386,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <p>In the two-way mode, ways <code>0</code> and <code>1</code> are RAM.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mode</td><td>Way mode.</td></tr>
+    <tr><td class="paramname">mode</td><td>Mode. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#ga4f0552a711bfa7c4cda5a830dbb97c1e">CPU_CACHE_MODE_4_WAY</a> </dd>
-<dd>
-<a class="el" href="group__CPU__CACHE.html#ga42c5e2d3a8d620a6bb7ce949cca3f410">CPU_CACHE_MODE_2_WAY</a> </dd></dl>
 
 </div>
 </div>

@@ -12,6 +12,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -62,36 +69,179 @@ $(function() {
 
 <div class="header">
   <div class="summary">
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CPU Synchronization</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Not yet documented.  
-<a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:gad677885e1469d6fab6374542954946a7"><td class="memItemLeft" align="right" valign="top"><a id="gad677885e1469d6fab6374542954946a7"></a>
+typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a></td></tr>
+<tr class="memdesc:gad677885e1469d6fab6374542954946a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represent a lock in the BIOS lock array. <br /></td></tr>
+<tr class="separator:gad677885e1469d6fab6374542954946a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaadbd1131956bca5d55ceaada17573d39"><td class="memItemLeft" align="right" valign="top"><a id="gaadbd1131956bca5d55ceaada17573d39"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#gaadbd1131956bca5d55ceaada17573d39">cpu_sync_mutex</a> (uint8_t b)</td></tr>
-<tr class="memdesc:gaadbd1131956bca5d55ceaada17573d39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gaadbd1131956bca5d55ceaada17573d39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6056f1aff5ac4250c7ee091db97fdeb0"><td class="memItemLeft" align="right" valign="top"><a id="ga6056f1aff5ac4250c7ee091db97fdeb0"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga6056f1aff5ac4250c7ee091db97fdeb0">cpu_sync_mutex_clear</a> (uint8_t b)</td></tr>
-<tr class="memdesc:ga6056f1aff5ac4250c7ee091db97fdeb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga6056f1aff5ac4250c7ee091db97fdeb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga88f423ce317e40c166d524c4ab2c8e77"><td class="memItemLeft" align="right" valign="top"><a id="ga88f423ce317e40c166d524c4ab2c8e77"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga88f423ce317e40c166d524c4ab2c8e77">cpu_sync_spinlock</a> (uint8_t b)</td></tr>
-<tr class="memdesc:ga88f423ce317e40c166d524c4ab2c8e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga88f423ce317e40c166d524c4ab2c8e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa5ad5bd13fa9399414f3dadb6c72e72b"><td class="memItemLeft" align="right" valign="top"><a id="gaa5ad5bd13fa9399414f3dadb6c72e72b"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#gaa5ad5bd13fa9399414f3dadb6c72e72b">cpu_sync_spinlock_clear</a> (uint8_t b)</td></tr>
-<tr class="memdesc:gaa5ad5bd13fa9399414f3dadb6c72e72b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:gaa5ad5bd13fa9399414f3dadb6c72e72b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4f8c84d991e45de992b8950b9599aa22"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga4f8c84d991e45de992b8950b9599aa22">cpu_sync_mutex</a> (<a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</td></tr>
+<tr class="memdesc:ga4f8c84d991e45de992b8950b9599aa22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provide functionality of mutual exclusion.  <a href="group__CPU__SYNC.html#ga4f8c84d991e45de992b8950b9599aa22">More...</a><br /></td></tr>
+<tr class="separator:ga4f8c84d991e45de992b8950b9599aa22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8521db265f6cd838914304f1b1e69124"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">cpu_sync_mutex_clear</a> (<a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</td></tr>
+<tr class="memdesc:ga8521db265f6cd838914304f1b1e69124"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the lock.  <a href="group__CPU__SYNC.html#ga8521db265f6cd838914304f1b1e69124">More...</a><br /></td></tr>
+<tr class="separator:ga8521db265f6cd838914304f1b1e69124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2c2ecc568fa1da8339c4f2f321b26bbf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga2c2ecc568fa1da8339c4f2f321b26bbf">cpu_sync_spinlock</a> (<a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</td></tr>
+<tr class="memdesc:ga2c2ecc568fa1da8339c4f2f321b26bbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provide functionality of a spinlock.  <a href="group__CPU__SYNC.html#ga2c2ecc568fa1da8339c4f2f321b26bbf">More...</a><br /></td></tr>
+<tr class="separator:ga2c2ecc568fa1da8339c4f2f321b26bbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga76fcd58e7c321f82f0701eb5205ea1ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#ga76fcd58e7c321f82f0701eb5205ea1ef">cpu_sync_spinlock_clear</a> (<a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a> b)</td></tr>
+<tr class="memdesc:ga76fcd58e7c321f82f0701eb5205ea1ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the lock.  <a href="group__CPU__SYNC.html#ga76fcd58e7c321f82f0701eb5205ea1ef">More...</a><br /></td></tr>
+<tr class="separator:ga76fcd58e7c321f82f0701eb5205ea1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Not yet documented. </p>
+<p>All functions, otherwise noted make use of an exclusive area in HWRAM for all the lock variables. The size of the "lock array" is 256 bytes, and each lock variable is 1-byte. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga4f8c84d991e45de992b8950b9599aa22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4f8c84d991e45de992b8950b9599aa22">&#9670;&nbsp;</a></span>cpu_sync_mutex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool cpu_sync_mutex </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Provide functionality of mutual exclusion. </p>
+<p>Implementation of the mutex is using test-and-set CPU instruction <code>tas.b</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>The lock number in the lock array.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if locking was previously unlocked, otherwise <code>false</code>. </dd></dl>
+
+</div>
+</div>
+<a id="ga8521db265f6cd838914304f1b1e69124"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8521db265f6cd838914304f1b1e69124">&#9670;&nbsp;</a></span>cpu_sync_mutex_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_sync_mutex_clear </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear the lock. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The clearing of <code>b</code> is not atomic.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga2c2ecc568fa1da8339c4f2f321b26bbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2c2ecc568fa1da8339c4f2f321b26bbf">&#9670;&nbsp;</a></span>cpu_sync_spinlock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_sync_spinlock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Provide functionality of a spinlock. </p>
+<p>Busy wait in a loop while repeatedly checking if the <code>b</code> is available.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga76fcd58e7c321f82f0701eb5205ea1ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga76fcd58e7c321f82f0701eb5205ea1ef">&#9670;&nbsp;</a></span>cpu_sync_spinlock_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_sync_spinlock_clear </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear the lock. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The clearing of <code>b</code> is not atomic.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
