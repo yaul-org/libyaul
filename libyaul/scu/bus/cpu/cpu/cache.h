@@ -45,10 +45,21 @@ __BEGIN_DECLS
 /// @see cpu_cache_way_mode_set
 #define CPU_CACHE_2_WAY_SIZE    (CPU_CACHE_WAY_2_ADDR - CPU_CACHE_WAY_0_ADDR)
 
-/// @deprecated To be removed and replaced as an `enum`.
-#define CPU_CACHE_MODE_4_WAY    0x00
-/// @deprecated To be removed and replaced as an `enum`.
-#define CPU_CACHE_MODE_2_WAY    0x08
+/// @brief Cache mode.
+typedef enum cpu_cache_mode {
+        /// Four-way set associative.
+        CPU_CACHE_MODE_4_WAY = 0x00,
+        /// Two-way set associate and 2KiB RAM.
+        CPU_CACHE_MODE_2_WAY = 0x08
+} cpu_cache_mode_t;
+
+/// @brief Cache type.
+typedef enum cpu_cache_type {
+        /// Instruction cache type.
+        CPU_CACHE_TYPE_I = 0x02,
+        /// Data cache type.
+        CPU_CACHE_TYPE_D = 0x04
+} cpu_cache_type_t;
 
 /// @brief Enable cache.
 static inline void __always_inline
@@ -64,70 +75,42 @@ cpu_cache_disable(void)
         MEMORY_WRITE_AND(8, CPU(CCR), ~0x01);
 }
 
-/// @brief Disable data replacement in the cache.
+/// @brief Enable type replacement.
 ///
-/// @details When data is fetched from memory, cache data is not
-/// written to the cache even if there is a cache miss.
-static inline void __always_inline
-cpu_cache_data_repl_disable(void)
-{
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
-
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x01;
-
-        *reg_ccr = t0 | 0x04;
-        *reg_ccr = t0 | 0x05;
-}
-
-/// @brief Enable data replacement in the cache.
+/// @details When either instruction and/or data is fetched from memory, the
+/// cache data is written.
 ///
-/// @details When data is fetched from memory, cache data is written.
+/// @param type The cache type(s) to enable.
 static inline void __always_inline
-cpu_cache_data_repl_enable(void)
+cpu_cache_repl_enable(cpu_cache_type_t type)
 {
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
+        volatile uint8_t * const reg_ccr =
+            (volatile uint8_t *)CPU(CCR);
 
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x05;
+        const uint8_t t0 = *reg_ccr & ~((uint8_t)type | 0x01);
 
         *reg_ccr = t0;
         *reg_ccr = t0 | 0x01;
 }
 
-/// @brief Disable instruction replacement in the cache.
+/// @brief Disable type replacement in the cache.
 ///
-/// @details When an instruction is fetched from memory, cache data is not
-/// written to the cache even if there is a cache miss.
-static inline void __always_inline
-cpu_cache_instr_repl_disable(void)
-{
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
-
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x01;
-
-        *reg_ccr = t0 | 0x02;
-        *reg_ccr = t0 | 0x03;
-}
-
-/// @brief Enable instruction replacement in the cache.
+/// @details When either an instruction or data is fetched from memory, cache
+/// data is not written to the cache even if there is a cache miss.
 ///
-/// @details When an instruction is fetched from memory, cache data is written.
+/// @param type The cache type(s) to disable.
 static inline void __always_inline
-cpu_cache_instr_repl_enable(void)
+cpu_cache_repl_disable(cpu_cache_type_t type)
 {
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
+        volatile uint8_t * const reg_ccr =
+            (volatile uint8_t *)CPU(CCR);
 
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x03;
+        const uint8_t t0 = *reg_ccr & ~0x01;
 
-        *reg_ccr = t0;
-        *reg_ccr = t0 | 0x01;
+        /* Set bit with cache disabled */
+        *reg_ccr = t0 | (uint8_t)type;
+        /* Enable cache and set bit(s) */
+        *reg_ccr = t0 | (uint8_t)type | 0x01;
 }
 
 /// @brief Change the mode the cache operates.
@@ -137,22 +120,18 @@ cpu_cache_instr_repl_enable(void)
 ///
 /// In the two-way mode, ways `0` and `1` are RAM.
 ///
-/// @param mode Way mode.
-///
-/// @see CPU_CACHE_MODE_4_WAY
-/// @see CPU_CACHE_MODE_2_WAY
+/// @param mode Mode.
 static inline void __always_inline
-cpu_cache_way_mode_set(uint8_t mode)
+cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 {
-        volatile uint8_t *reg_ccr;
-        reg_ccr = (uint8_t *)CPU(CCR);
+        volatile uint8_t * const reg_ccr =
+            (volatile uint8_t *)CPU(CCR);
 
-        uint8_t t0;
-        t0 = *reg_ccr & ~0x0F;
+        const uint8_t t0 = *reg_ccr & ~0x0F;
 
         *reg_ccr = t0;
-        *reg_ccr = t0 | mode;
-        *reg_ccr = t0 | mode | 0x01;
+        *reg_ccr = t0 | (uint8_t)mode;
+        *reg_ccr = t0 | (uint8_t)mode | 0x01;
 }
 
 /// @brief Cache line of the specified address is purged.
