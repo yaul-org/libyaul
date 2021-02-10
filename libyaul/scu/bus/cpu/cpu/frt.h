@@ -30,43 +30,43 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define CPU_FRT_CLOCK_DIV_RISING_EDGE   0x03
 
-/// Tick count value representing 1ms for a NTSC machine in 320-mode with a ɸ/8
+/// Tick count value representing 1ms for a NTSC machine in 320-mode with a @f$\frac{\phi}{8}@f$
 /// clock divisor.
 #define CPU_FRT_NTSC_320_8_COUNT_1MS    0x0D1F
-/// Tick count value representing 1ms for a NTSC machine in 320-mode with a ɸ/32
+/// Tick count value representing 1ms for a NTSC machine in 320-mode with a @f$\frac{\phi}{32}@f$
 /// clock divisor.
 #define CPU_FRT_NTSC_320_32_COUNT_1MS   0x0348
 /// Tick count value representing 1ms for a NTSC machine in 320-mode with a
-/// ɸ/128 clock divisor.
+/// @f$\frac{\phi}{128}@f$ clock divisor.
 #define CPU_FRT_NTSC_320_128_COUNT_1MS  0x00D2
 
-/// Tick count value representing 1ms for a NTSC machine in 352-mode with a ɸ/8
+/// Tick count value representing 1ms for a NTSC machine in 352-mode with a @f$\frac{\phi}{8}@f$
 /// clock divisor.
 #define CPU_FRT_NTSC_352_8_COUNT_1MS    0x0DFC
-/// Tick count value representing 1ms for a NTSC machine in 352-mode with a ɸ/32
+/// Tick count value representing 1ms for a NTSC machine in 352-mode with a @f$\frac{\phi}{32}@f$
 /// clock divisor.
 #define CPU_FRT_NTSC_352_32_COUNT_1MS   0x037F
 /// Tick count value representing 1ms for a NTSC machine in 352-mode with a
-/// ɸ/128 clock divisor.
+/// @f$\frac{\phi}{128}@f$ clock divisor.
 #define CPU_FRT_NTSC_352_128_COUNT_1MS  0x00E0
 
-/// Tick count value representing 1ms for a PAL machine in 320-mode with a ɸ/8
+/// Tick count value representing 1ms for a PAL machine in 320-mode with a @f$\frac{\phi}{8}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_320_8_COUNT_1MS     0x0D08
-/// Tick count value representing 1ms for a PAL machine in 320-mode with a ɸ/32
+/// Tick count value representing 1ms for a PAL machine in 320-mode with a @f$\frac{\phi}{32}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_320_32_COUNT_1MS    0x0342
-/// Tick count value representing 1ms for a PAL machine in 320-mode with a ɸ/128
+/// Tick count value representing 1ms for a PAL machine in 320-mode with a @f$\frac{\phi}{128}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_320_128_COUNT_1MS   0x00D0
 
-/// Tick count value representing 1ms for a PAL machine in 352-mode with a ɸ/8
+/// Tick count value representing 1ms for a PAL machine in 352-mode with a @f$\frac{\phi}{8}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_352_8_COUNT_1MS     0x0DFC
-/// Tick count value representing 1ms for a PAL machine in 352-mode with a ɸ/32
+/// Tick count value representing 1ms for a PAL machine in 352-mode with a @f$\frac{\phi}{32}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_352_32_COUNT_1MS    0x037F
-/// Tick count value representing 1ms for a PAL machine in 352-mode with a ɸ/128
+/// Tick count value representing 1ms for a PAL machine in 352-mode with a @f$\frac{\phi}{128}@f$
 /// clock divisor.
 #define CPU_FRT_PAL_352_128_COUNT_1MS   0x00E0
 
