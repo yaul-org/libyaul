@@ -1,6 +1,0 @@
-Structures
-**********
-
-.. doxygenstruct:: smpc_time
-   :project: yaul
-   :members:
