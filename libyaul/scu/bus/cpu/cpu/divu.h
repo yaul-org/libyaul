@@ -149,7 +149,7 @@ do {                                                                           \
 
 /// @brief Set the interrupt handler for the CPU-DIVU OVFI interrupt.
 ///
-/// @details There is no need to explicitly return via `rte`.
+/// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
 /// @param ihr The interrupt handler
 ///
