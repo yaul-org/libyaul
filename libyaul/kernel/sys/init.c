@@ -30,10 +30,9 @@ _global_ctors_call(void)
         extern void (*__CTOR_LIST__[])(void);
 
         /* Constructors are called in reverse order of the list */
-        int32_t i;
-        for (i = (int32_t)__CTOR_LIST__[0]; i >= 1; i--) {
-                /* Each function handles one or more destructor (within
-                 * file scope) */
+        for (int32_t i = (int32_t)__CTOR_LIST__[0]; i >= 1; i--) {
+                /* Each function handles one or more destructor (within file
+                 * scope) */
                 __CTOR_LIST__[i]();
         }
 }
@@ -44,10 +43,9 @@ _global_dtors_call(void)
         extern void (*__DTOR_LIST__[])(void);
 
         /* Destructors in forward order */
-        int32_t i;
-        for (i = 0; i < (int32_t)__DTOR_LIST__[0]; i++) {
-                /* Each function handles one or more destructor (within
-                 * file scope) */
+        for (int32_t i = 0; i < (int32_t)__DTOR_LIST__[0]; i++) {
+                /* Each function handles one or more destructor (within file
+                 * scope) */
                 __DTOR_LIST__[i + 1]();
         }
 }
