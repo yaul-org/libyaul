@@ -139,7 +139,7 @@ do {                                                                           \
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr The interrupt handler
+/// @param ihr The interrupt handler.
 ///
 /// @see cpu_divu_ovfi_clear
 extern void cpu_divu_ovfi_set(cpu_divu_ihr ihr);
