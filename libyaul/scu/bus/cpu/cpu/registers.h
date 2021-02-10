@@ -14,24 +14,64 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_REGISTERS_DEFINES  CPU register defines
+/// @defgroup CPU_REGISTERS_STRUCTURES  CPU register structures
+/// @defgroup CPU_REGISTERS_INLINE_FUNCTIONS CPU register inline functions
+
+/// @addtogroup CPU_REGISTERS_DEFINES
+/// @{
+
+/// @brief CPU `sr` register `T` bit that indicates carry/borrow or overflow/underflow.
 #define CPU_SR_T_BIT_MASK       0x00000001
+/// @brief CPU `sr` register `S` bit is used by the multiply/accumulate instructions.
 #define CPU_SR_S_BIT_MASK       0x00000002
-#define CPU_SR_I_BIT_MASK       0x000000F0
+/// @brief CPU `sr` register `I` bits are used for the interrupt mask bits.
+#define CPU_SR_I_BITS_MASK      0x000000F0
+/// @brief CPU `sr` register `Q` bit used by `div0u`, `divu0s`, and `div1` instructions.
 #define CPU_SR_Q_BIT_MASK       0x00000100
+/// @brief CPU `sr` register `M` bit used by `divu0`, `divu0s`, and `div1` instructions.
 #define CPU_SR_M_BIT_MASK       0x00000200
 
+/// @}
+
+/// @addtogroup CPU_REGISTERS_STRUCTURES
+/// @{
+
+/// @brief Represent the register configuration.
 typedef struct cpu_registers {
+        /// `sp` register (or `r15`).
         uint32_t sp;
-        uint32_t r[15]; /* Registers r0..r14 */
+        /// Registers `r0`..`r14`.
+        uint32_t r[15];
+        /// `macl` register.
         uint32_t macl;
+        /// `mach` register.
         uint32_t mach;
+        /// `vbr` register.
         uint32_t vbr;
+        /// `gbr` register.
         uint32_t gbr;
+        /// `pr` register.
         uint32_t pr;
+        /// `pc` register.
         uint32_t pc;
+        /// `sr` register.
         uint32_t sr;
 } __packed cpu_registers_t;
 
+/// @}
+
+/// @addtogroup CPU_REGISTERS_INLINE_FUNCTIONS
+/// @{
+
+/// @brief Set the `gbr` register.
+///
+/// The appropriate `gbr` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @warning Yaul may use this register at some point in the future.
+///
+/// @param reg_gbr The 32-bit value.
 static inline void __always_inline
 cpu_reg_gbr_set(uint32_t reg_gbr)
 {
@@ -40,6 +80,12 @@ cpu_reg_gbr_set(uint32_t reg_gbr)
             : "r" (reg_gbr));
 }
 
+/// @brief Obtain the 32-bit value of the `gbr` register.
+///
+/// @details The appropriate `gbr` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `gbr` register.
 static inline uint32_t __always_inline
 cpu_reg_gbr_get(void)
 {
@@ -53,6 +99,15 @@ cpu_reg_gbr_get(void)
         return reg_gbr;
 }
 
+/// @brief Set the `vbr` register.
+///
+/// @details The `vbr` register defaults to `0x0600000` for the master CPU, and
+/// `0x06000400` for the slave CPU.
+///
+/// The appropriate `vbr` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @param reg_vbr The 32-bit value.
 static inline void __always_inline
 cpu_reg_vbr_set(uint32_t reg_vbr)
 {
@@ -61,6 +116,12 @@ cpu_reg_vbr_set(uint32_t reg_vbr)
             : "r" (reg_vbr));
 }
 
+/// @brief Obtain the 32-bit value of the `vbr` register.
+///
+/// @details The appropriate `vbr` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `vbr` register.
 static inline uint32_t __always_inline
 cpu_reg_vbr_get(void)
 {
@@ -74,6 +135,12 @@ cpu_reg_vbr_get(void)
         return reg_vbr;
 }
 
+/// @brief Set the `mach` register.
+///
+/// The appropriate `mach` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @param reg_mach The 32-bit value.
 static inline void __always_inline
 cpu_reg_mach_set(uint32_t reg_mach)
 {
@@ -82,6 +149,12 @@ cpu_reg_mach_set(uint32_t reg_mach)
             : "r" (reg_mach));
 }
 
+/// @brief Obtain the 32-bit value of the `mach` register.
+///
+/// @details The appropriate `mach` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `mach` register.
 static inline uint32_t __always_inline
 cpu_reg_mach_get(void)
 {
@@ -95,6 +168,12 @@ cpu_reg_mach_get(void)
         return reg_mach;
 }
 
+/// @brief Set the `macl` register.
+///
+/// The appropriate `macl` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @param reg_macl The 32-bit value.
 static inline void __always_inline
 cpu_reg_macl_set(uint32_t reg_macl)
 {
@@ -103,6 +182,12 @@ cpu_reg_macl_set(uint32_t reg_macl)
             : "r" (reg_macl));
 }
 
+/// @brief Obtain the 32-bit value of the `macl` register.
+///
+/// @details The appropriate `macl` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `macl` register.
 static inline uint32_t __always_inline
 cpu_reg_macl_get(void)
 {
@@ -116,6 +201,12 @@ cpu_reg_macl_get(void)
         return reg_macl;
 }
 
+/// @brief Set the `pr` register
+///
+/// The appropriate `pr` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @param reg_pr The 32-bit value.
 static inline void __always_inline
 cpu_reg_pr_set(uint32_t reg_pr)
 {
@@ -124,6 +215,12 @@ cpu_reg_pr_set(uint32_t reg_pr)
             : "r" (reg_pr));
 }
 
+/// @brief Obtain the 32-bit value of the `pr` register.
+///
+/// @details The appropriate `pr` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `pr` register.
 static inline uint32_t __always_inline
 cpu_reg_pr_get(void)
 {
@@ -137,6 +234,12 @@ cpu_reg_pr_get(void)
         return reg_pr;
 }
 
+/// @brief Set the `sr` register
+///
+/// The appropriate `sr` value will be set depending on which CPU you're
+/// executing this inlined function on.
+///
+/// @param reg_sr The 32-bit value.
 static inline void __always_inline
 cpu_reg_sr_set(uint32_t reg_sr)
 {
@@ -145,6 +248,12 @@ cpu_reg_sr_set(uint32_t reg_sr)
             : "r" (reg_sr));
 }
 
+/// @brief Obtain the 32-bit value of the `sr` register.
+///
+/// @details The appropriate `sr` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `sr` register.
 static inline uint32_t __always_inline
 cpu_reg_sr_get(void)
 {
@@ -158,6 +267,15 @@ cpu_reg_sr_get(void)
         return reg_sr;
 }
 
+/// @brief Obtain the 32-bit value of the `fp` (or `r14`) register.
+///
+/// @details The appropriate `fp` (or `r14`) value will be returned depending on
+/// which CPU you're executing this inlined function on.
+///
+/// @note Yaul passes `-fomit-frame-pointer` to GCC, so the the frame pointer is
+/// not being tracked.
+///
+/// @returns The 32-bit value of the `fp` (or `r14`) register.
 static inline uint32_t __always_inline
 cpu_reg_fp_get(void)
 {
@@ -171,6 +289,12 @@ cpu_reg_fp_get(void)
         return reg_r14;
 }
 
+/// @brief Obtain the 32-bit value of the `sp` register.
+///
+/// @details The appropriate `sp` value will be returned depending on which CPU
+/// you're executing this inlined function on.
+///
+/// @returns The 32-bit value of the `sp` register.
 static inline uint32_t __always_inline
 cpu_reg_sp_get(void)
 {
@@ -183,6 +307,8 @@ cpu_reg_sp_get(void)
 
         return reg_r15;
 }
+
+/// @}
 
 __END_DECLS
 
