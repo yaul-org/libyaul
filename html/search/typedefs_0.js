@@ -14,5 +14,6 @@ var searchData=
   ['cpu_5fregisters_5ft_524',['cpu_registers_t',['../group__CPU__REGISTERS.html#gaf1d459c6962a5eae2393f9853095fcdf',1,'registers.h']]],
   ['cpu_5fsync_5flock_5ft_525',['cpu_sync_lock_t',['../group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7',1,'sync.h']]],
   ['cpu_5fwdt_5fclock_5ft_526',['cpu_wdt_clock_t',['../group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d',1,'wdt.h']]],
-  ['cpu_5fwdt_5fihr_527',['cpu_wdt_ihr',['../group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e',1,'wdt.h']]]
+  ['cpu_5fwdt_5fihr_527',['cpu_wdt_ihr',['../group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e',1,'wdt.h']]],
+  ['cpu_5fwdt_5fmode_5ft_528',['cpu_wdt_mode_t',['../group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98',1,'wdt.h']]]
 ];

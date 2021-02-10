@@ -259,7 +259,9 @@ var searchData=
   ['cpu_5fwdt_5finit_276',['cpu_wdt_init',['../group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2',1,'cpu_wdt_init(cpu_wdt_clock_t clock_div):&#160;cpu_wdt.c'],['../group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2',1,'cpu_wdt_init(cpu_wdt_clock_t clock_div):&#160;cpu_wdt.c']]],
   ['cpu_5fwdt_5finterrupt_5fpriority_5fget_277',['cpu_wdt_interrupt_priority_get',['../group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028',1,'wdt.h']]],
   ['cpu_5fwdt_5finterrupt_5fpriority_5fset_278',['cpu_wdt_interrupt_priority_set',['../group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b',1,'wdt.h']]],
-  ['cpu_5fwdt_5fmode_279',['cpu_wdt_mode',['../structcpu__wdt__mode.html',1,'']]],
-  ['cpu_5fwdt_5fmode_5finterval_280',['CPU_WDT_MODE_INTERVAL',['../structcpu__wdt__mode.html#a694d2e32ed0219a29dfed4b51254654c',1,'cpu_wdt_mode']]],
-  ['cpu_5fwdt_5ftimer_5fmode_5fset_281',['cpu_wdt_timer_mode_set',['../group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e',1,'cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr):&#160;cpu_wdt.c'],['../group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e',1,'cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr):&#160;cpu_wdt.c']]]
+  ['cpu_5fwdt_5fmode_279',['cpu_wdt_mode',['../group__CPU__WDT.html#gac50337e47648ff1ce4fffab70fd008e3',1,'wdt.h']]],
+  ['cpu_5fwdt_5fmode_5finterval_280',['CPU_WDT_MODE_INTERVAL',['../group__CPU__WDT.html#ggac50337e47648ff1ce4fffab70fd008e3aa50026a0b0fc5eaafbaa7f8bbdcee7d7',1,'wdt.h']]],
+  ['cpu_5fwdt_5fmode_5ft_281',['cpu_wdt_mode_t',['../group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98',1,'wdt.h']]],
+  ['cpu_5fwdt_5fmode_5fwatchdog_282',['CPU_WDT_MODE_WATCHDOG',['../group__CPU__WDT.html#ggac50337e47648ff1ce4fffab70fd008e3a68ed4c5f5d85685a4b8d2aecc3b26875',1,'wdt.h']]],
+  ['cpu_5fwdt_5ftimer_5fmode_5fset_283',['cpu_wdt_timer_mode_set',['../group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e',1,'cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr):&#160;cpu_wdt.c'],['../group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e',1,'cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr):&#160;cpu_wdt.c']]]
 ];
