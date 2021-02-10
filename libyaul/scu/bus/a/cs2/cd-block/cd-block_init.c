@@ -112,13 +112,13 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
 }
 
 int
-cd_block_security_bypass()
+cd_block_security_bypass(void)
 {
         int i;
         int j;
         int ret;
-        struct cd_block_regs regs __unused;
-        struct cd_block_regs status __unused;
+        cd_block_regs_t regs __unused;
+        cd_block_regs_t status __unused;
 
         if ((ret = cd_block_cmd_set_sector_length(SECTOR_LENGTH_2352)) != 0) {
                 return ret;
@@ -271,8 +271,8 @@ static int __used
 _cd_block_auth(void)
 {
         volatile int i;
-        struct cd_block_regs regs;
-        struct cd_block_regs status;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
         uint8_t flags;
 
         MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));

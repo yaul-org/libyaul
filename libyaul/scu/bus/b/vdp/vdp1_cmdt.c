@@ -131,11 +131,8 @@ vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
 {
         /* Values 0x4, 0x5, 0x6 for comm indicate a non-textured command table,
          * and we want to set the bits 7 and 6 without branching */
-        uint16_t comm;
-        comm = (cmdt->cmd_ctrl & 0x0004);
-
-        uint32_t pmod_bits;
-        pmod_bits = (comm << 5) | (comm << 4);
+        const uint16_t comm = (cmdt->cmd_ctrl & 0x0004);
+        const uint16_t pmod_bits = (comm << 5) | (comm << 4);
 
         cmdt->cmd_pmod = pmod_bits | draw_mode.raw;
 }
