@@ -70,161 +70,161 @@ do {                                                                           \
 /// @addtogroup CPU_IO_REGISTERS
 /// @{
 
-/// CPU register.
+/// CPU I/O register.
 #define SMR             0x0E00UL
-/// CPU register.
+/// CPU I/O register.
 #define BRR             0x0E01UL
-/// CPU register.
+/// CPU I/O register.
 #define SCR             0x0E02UL
-/// CPU register.
+/// CPU I/O register.
 #define TDR             0x0E03UL
-/// CPU register.
+/// CPU I/O register.
 #define SSR             0x0E04UL
-/// CPU register.
+/// CPU I/O register.
 #define RDR             0x0E05UL
-/// CPU register.
+/// CPU I/O register.
 #define TIER            0x0E10UL
-/// CPU register.
+/// CPU I/O register.
 #define FTCSR           0x0E11UL
-/// CPU register.
+/// CPU I/O register.
 #define FRCH            0x0E12UL
-/// CPU register.
+/// CPU I/O register.
 #define FRCL            0x0E13UL
-/// CPU register.
+/// CPU I/O register.
 #define OCRAH           0x0E14UL
-/// CPU register.
+/// CPU I/O register.
 #define OCRAL           0x0E15UL
-/// CPU register.
+/// CPU I/O register.
 #define OCRBH           0x0E14UL
-/// CPU register.
+/// CPU I/O register.
 #define OCRBL           0x0E15UL
-/// CPU register.
+/// CPU I/O register.
 #define TCR             0x0E16UL
-/// CPU register.
+/// CPU I/O register.
 #define TOCR            0x0E17UL
-/// CPU register.
+/// CPU I/O register.
 #define FICRH           0x0E18UL
-/// CPU register.
+/// CPU I/O register.
 #define FICRL           0x0E19UL
-/// CPU register.
+/// CPU I/O register.
 #define IPRB            0x0E60UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRA            0x0E62UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRB            0x0E64UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRC            0x0E66UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRD            0x0E68UL
-/// CPU register.
+/// CPU I/O register.
 #define DRCR0           0x0E71UL
-/// CPU register.
+/// CPU I/O register.
 #define DRCR1           0x0E72UL
 
-/// CPU register.
+/// CPU I/O register.
 #define WTCSRW          0x0E80UL
-/// CPU register.
+/// CPU I/O register.
 #define WTCSRR          0x0E80UL
 
-/// CPU register.
+/// CPU I/O register.
 #define WTCNTW          0x0E80UL
-/// CPU register.
+/// CPU I/O register.
 #define WTCNTR          0x0E81UL
 
-/// CPU register.
+/// CPU I/O register.
 #define RSTCSRW         0x0E82UL
-/// CPU register.
+/// CPU I/O register.
 #define RSTCSRR         0x0E83UL
 
-/// CPU register.
+/// CPU I/O register.
 #define FMR             0x0E90UL
-/// CPU register.
+/// CPU I/O register.
 #define SBYCR           0x0E91UL
-/// CPU register.
+/// CPU I/O register.
 #define CCR             0x0E92UL
-/// CPU register.
+/// CPU I/O register.
 #define ICR             0x0EE0UL
-/// CPU register.
+/// CPU I/O register.
 #define IPRA            0x0EE2UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRWDT          0x0EE4UL
-/// CPU register.
+/// CPU I/O register.
 #define DVSR            0x0F00UL
-/// CPU register.
+/// CPU I/O register.
 #define DVDNT           0x0F04UL
-/// CPU register.
+/// CPU I/O register.
 #define DVCR            0x0F08UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRDIV          0x0F0CUL
-/// CPU register.
+/// CPU I/O register.
 #define DVDNTH          0x0F10UL
-/// CPU register.
+/// CPU I/O register.
 #define DVDNTL          0x0F14UL
-/// CPU register.
+/// CPU I/O register.
 #define BARAH           0x0F40UL
-/// CPU register.
+/// CPU I/O register.
 #define BARAL           0x0F42UL
-/// CPU register.
+/// CPU I/O register.
 #define BAMRAH          0x0F44UL
-/// CPU register.
+/// CPU I/O register.
 #define BAMRAL          0x0F46UL
-/// CPU register.
+/// CPU I/O register.
 #define BBRA            0x0F48UL
-/// CPU register.
+/// CPU I/O register.
 #define BARBH           0x0F60UL
-/// CPU register.
+/// CPU I/O register.
 #define BARBL           0x0F62UL
-/// CPU register.
+/// CPU I/O register.
 #define BAMRBH          0x0F64UL
-/// CPU register.
+/// CPU I/O register.
 #define BAMRBL          0x0F66UL
-/// CPU register.
+/// CPU I/O register.
 #define BBRB            0x0F68UL
-/// CPU register.
+/// CPU I/O register.
 #define BDRBH           0x0F70UL
-/// CPU register.
+/// CPU I/O register.
 #define BDRBL           0x0F72UL
-/// CPU register.
+/// CPU I/O register.
 #define BDMRBH          0x0F74UL
-/// CPU register.
+/// CPU I/O register.
 #define BDMRBL          0x0F76UL
-/// CPU register.
+/// CPU I/O register.
 #define BRCR            0x0F78UL
-/// CPU register.
+/// CPU I/O register.
 #define SAR0            0x0F80UL
-/// CPU register.
+/// CPU I/O register.
 #define DAR0            0x0F84UL
-/// CPU register.
+/// CPU I/O register.
 #define TCR0            0x0F88UL
-/// CPU register.
+/// CPU I/O register.
 #define CHCR0           0x0F8CUL
-/// CPU register.
+/// CPU I/O register.
 #define SAR1            0x0F90UL
-/// CPU register.
+/// CPU I/O register.
 #define DAR1            0x0F94UL
-/// CPU register.
+/// CPU I/O register.
 #define TCR1            0x0F98UL
-/// CPU register.
+/// CPU I/O register.
 #define CHCR1           0x0F9CUL
-/// CPU register.
+/// CPU I/O register.
 #define VCRDMA0         0x0FA0UL
-/// CPU register.
+/// CPU I/O register.
 #define VCRDMA1         0x0FA8UL
-/// CPU register.
+/// CPU I/O register.
 #define DMAOR           0x0FB0UL
-/// CPU register.
+/// CPU I/O register.
 #define BCR1            0x0FE0UL
-/// CPU register.
+/// CPU I/O register.
 #define BCR2            0x0FE4UL
-/// CPU register.
+/// CPU I/O register.
 #define WCR             0x0FE8UL
-/// CPU register.
+/// CPU I/O register.
 #define MCR             0x0FECUL
-/// CPU register.
+/// CPU I/O register.
 #define RTCSR           0x0FF0UL
-/// CPU register.
+/// CPU I/O register.
 #define RTCNT           0x0FF4UL
-/// CPU register.
+/// CPU I/O register.
 #define RTCOR           0x0FF8UL
 
 /// @}
