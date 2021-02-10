@@ -18,6 +18,7 @@
 __BEGIN_DECLS
 
 /// @defgroup CPU_DMAC CPU Direct Memory Access Controller (DMAC)
+/// Not yet documented.
 
 /// @addtogroup CPU_DMAC
 /// @{

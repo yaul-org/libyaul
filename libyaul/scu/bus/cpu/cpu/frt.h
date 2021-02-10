@@ -178,8 +178,8 @@ extern void cpu_frt_init(uint8_t clock_div);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler
-/// @param count The tick count to trigger OCA on
+/// @param ihr   The interrupt handler.
+/// @param count The tick count to trigger OCA on.
 ///
 /// @see cpu_frt_oca_clear
 extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr);
@@ -188,8 +188,8 @@ extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler
-/// @param count The tick count to trigger OCB on
+/// @param ihr   The interrupt handler.
+/// @param count The tick count to trigger OCB on.
 ///
 /// @see cpu_frt_ocb_clear
 extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr);
@@ -198,7 +198,7 @@ extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr The interrupt handler
+/// @param ihr The interrupt handler.
 ///
 /// @see cpu_frt_ovi_clear
 extern void cpu_frt_ovi_set(cpu_frt_ihr ihr);
