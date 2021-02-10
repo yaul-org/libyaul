@@ -71,8 +71,7 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
                 return;
         }
 
-        uint32_t reg_dmaor;
-        reg_dmaor = MEMORY_READ(32, CPU(DMAOR));
+        const uint32_t reg_dmaor = MEMORY_READ(32, CPU(DMAOR));
 
         status->enabled = reg_dmaor & 0x00000001;
         status->priority_mode = (reg_dmaor >> 3) & 0x00000001;
@@ -173,10 +172,9 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 }
 
 void
-cpu_dmac_channel_wait(uint8_t ch)
+cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
 {
-        uint32_t n;
-        n = (ch & 0x01) << 4;
+        const uint32_t n = (ch & 0x01) << 4;
 
         /* Don't wait if DMAC is disabled */
         if ((MEMORY_READ(32, CPU(DMAOR)) & 0x00000001) == 0x00000000) {

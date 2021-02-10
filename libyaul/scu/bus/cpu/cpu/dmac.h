@@ -18,15 +18,19 @@
 __BEGIN_DECLS
 
 /// @defgroup CPU_DMAC CPU Direct Memory Access Controller (DMAC)
-/// Not yet documented.
+/// Documentation is incomplete.
 
 /// @addtogroup CPU_DMAC
 /// @{
 
-/// @brief Not yet documented.
-#define CPU_DMAC_PRIORITY_MODE_FIXED            0x00
-/// @brief Not yet documented.
-#define CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN      0x01
+/// @brief CPU-DMAC priority mode.
+/// @see cpu_dmac_priority_mode_set
+typedef enum cpu_dmac_priority_mode {
+        /// @brief Fixed mode.
+        CPU_DMAC_PRIORITY_MODE_FIXED       = 0x00,
+        /// @brief Round-robin mode.
+        CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN = 0x01
+} cpu_dmac_priority_mode_t;
 
 /// @brief Not yet documented.
 #define CPU_DMAC_DESTINATION_FIXED      0x00
@@ -54,36 +58,55 @@ __BEGIN_DECLS
 /// @brief Not yet documented.
 #define CPU_DMAC_BUS_MODE_CYCLE_STEAL   0x00
 /// @brief Not yet documented.
-#define CPU_DMAC_BUS_MODE_BURST         0x01 
+#define CPU_DMAC_BUS_MODE_BURST         0x01
 
-/// @brief Not yet documented.
+/// @brief Callback type.
+/// @see cpu_dmac_cfg_t.ihr
+/// @see cpu_dmac_cfg_t.ihr_work
 typedef void (*cpu_dmac_ihr)(void *);
 
-/// @brief Not yet documented.
+/// CPU-DMAC channel.
+typedef uint8_t cpu_dmac_channel_t;
+
+/// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
-        /// Not yet documented.
-        uint8_t channel;
-        /// Not yet documented.
+        /// Channel
+        cpu_dmac_channel_t channel;
+
+        /// Source mode
         uint8_t src_mode;
-        /// Not yet documented.
+
+        /// Destination mode.
         uint8_t dst_mode;
-        /// Not yet documented.
+
+        /// Stride.
         uint8_t stride;
-        /// Not yet documented.
+
+        /// Bus mode.
         uint8_t bus_mode;
-        /// Not yet documented.
+
+        /// Memory transfer source address.
         uint32_t src;
-        /// Not yet documented.
+
+        /// Memory transfer destination address.
         uint32_t dst;
-        /// Not yet documented.
+
+        /// Transfer length.
         uint32_t len;
-        /// Not yet documented.
+
+        /// @brief Callback when transfer is completed.
+        ///
+        /// @details Set to `NULL` if no callback is desired.
         cpu_dmac_ihr ihr;
-        /// Not yet documented.
+
+        /// @brief Pointer to any work passed onto @ref cpu_dmac_cfg_t.ihr.
+        ///
+        /// @details If @ref cpu_dmac_cfg_t.ihr is `NULL`, @ref
+        /// cpu_dmac_cfg_t.ihr_work is ignored.
         void *ihr_work;
 } cpu_dmac_cfg_t;
 
-/// @brief Not yet documented.
+/// @brief CPU-DMAC status.
 typedef struct cpu_dmac_status {
         /// Not yet documented.
         unsigned int enabled:1;
@@ -99,17 +122,32 @@ typedef struct cpu_dmac_status {
         unsigned int nmi_interrupt:1;
 } __packed cpu_dmac_status_t;
 
-/// @brief Not yet documented.
+/// @brief Write directly to the CPU-DMAC I/O @ref TCR0 or @ref TCR1 register.
+///
+/// @details This function is not enough to set up a proper transfer. Use @ref
+/// cpu_dmac_channel_config_set to configure a transfer. The purpose of this
+/// function is to quickly reset a transfer by just setting the transfer length.
+///
+/// There is no waiting if the CPU-DMAC or the specific channel @p ch is
+/// operating.
+/// 
+/// While this function resets the transfer length, it does not start the
+/// transfer again. For that, use @ref cpu_dmac_channel_start.
+/// 
+/// @param ch       The channel.
+/// @param tcr_bits The 4-byte I/O register value.
+///
+/// @see cpu_dmac_channel_config_set
+/// @see cpu_dmac_channel_start
 static inline void __always_inline
-cpu_dmac_channel_transfer_set(uint8_t ch, uint32_t tcr_bits)
+cpu_dmac_channel_transfer_set(cpu_dmac_channel_t ch, uint32_t tcr_bits)
 {
-        uint32_t n;
-        n = (ch & 0x01) << 4;
+        const uint32_t n = (ch & 0x01) << 4;
 
         MEMORY_WRITE(32, CPU(TCR0 | n), tcr_bits);
 }
 
-/// @brief Not yet documented.
+/// @brief Enable CPU-DMAC.
 static inline void __always_inline
 cpu_dmac_enable(void)
 {
@@ -117,24 +155,26 @@ cpu_dmac_enable(void)
         MEMORY_WRITE_OR(32, CPU(DMAOR), 0x00000001);
 }
 
-/// @brief Not yet documented.
+/// @brief Disable CPU-DMAC.
 static inline void __always_inline
 cpu_dmac_disable(void)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the interrupt priority level for CPU-DMAC.
+/// @returns The interrupt priority level ranging from `0` to `15`.
 static inline uint8_t __always_inline
 cpu_dmac_interrupt_priority_get(void)
 {
-        uint16_t ipra;
-        ipra = MEMORY_READ(16, CPU(IPRA));
+        const uint16_t ipra = MEMORY_READ(16, CPU(IPRA));
 
         return ((ipra >> 8) & 0x0F);
 }
 
-/// @brief Not yet documented.
+/// @brief Set the interrupt priority level for CPU-DMAC.
+///
+/// @param priority The priority ranging from `0` to `15`.
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
@@ -142,37 +182,44 @@ cpu_dmac_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 
-/// @brief Not yet documented.
+/// @brief Set the priority mode.
+///
+/// @param mode The priority mode.
 static inline void __always_inline
-cpu_dmac_priority_mode_set(uint8_t mode)
+cpu_dmac_priority_mode_set(cpu_dmac_priority_mode_t mode)
 {
         MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
         MEMORY_WRITE_OR(32, CPU(DMAOR), (mode & 0x01) << 3);
 }
 
-/// @brief Not yet documented.
+/// @brief Start the CPU-DMAC channel transfer.
+///
+/// @details There is no check if the CPU-DMAC channel @p ch is currently
+/// operating.
+///
+/// There is no check if the CPU-DMAC channel @p ch has been configured.
 static inline void __always_inline
-cpu_dmac_channel_start(uint8_t ch)
+cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 {
-        uint32_t n;
-        n = (ch & 0x01) << 4;
+        const uint32_t n = (ch & 0x01) << 4;
 
         MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000003);
         MEMORY_WRITE_OR(32, CPU(CHCR0 | n), 0x00000001);
 }
 
-/// @brief Not yet documented.
+/// @brief Stop specific CPU-DMAC channel transfer.
+///
+/// @param ch The channel.
 static inline void __always_inline
-cpu_dmac_channel_stop(uint8_t ch)
+cpu_dmac_channel_stop(cpu_dmac_channel_t ch)
 {
-        uint32_t n;
-        n = (ch & 0x01) << 4;
+        const uint32_t n = (ch & 0x01) << 4;
 
         /* Don't clear the status bits */
         MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000001);
 }
 
-/// @brief Not yet documented.
+/// @brief Stop all CPU-DMAC channel transfers (if any).
 static inline void __always_inline
 cpu_dmac_stop(void)
 {
@@ -180,14 +227,37 @@ cpu_dmac_stop(void)
         cpu_dmac_channel_stop(1);
 }
 
-/// @brief Not yet documented.
-extern void cpu_dmac_status_get(cpu_dmac_status_t *);
+/// @brief Obtain CPU-DMAC operation status.
+///
+/// @details If @p status is `NULL`, the status will not be updated.
+///
+/// @param[out] status The pointer to @ref cpu_dmac_status_t
+extern void cpu_dmac_status_get(cpu_dmac_status_t *status);
 
-/// @brief Not yet documented.
-extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *);
+/// @brief Configure a CPU-DMAC channel for transfer.
+///
+/// @details Configuring the CPU-DMAC channel in @p cfg does start the transfer.
+/// To start the transfer, use @ref cpu_dmac_channel_start.
+///
+/// The CPU-DMAC channel is forcefully stopped upon starting the configuration.
+/// If the channel is currently operating, use @ref cpu_dmac_channel_wait to
+/// wait until the transfer is complete.
+/// 
+/// @param[in] cfg The CPU-DMAC transfer configuration.
+///
+/// @see cpu_dmac_channel_start
+/// @see cpu_dmac_channel_stop
+/// @see cpu_dmac_channel_wait
+/// @see cpu_dmac_channel_transfer_set
+extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg);
 
-/// @brief Not yet documented.
-extern void cpu_dmac_channel_wait(uint8_t);
+/// @brief Busy wait for transfer completion of CPU-DMAC channel.
+///
+/// @details There is no waiting if the CPU-DMAC or the specific channel @p ch
+/// is disabled.
+///
+/// @param ch The channel.
+extern void cpu_dmac_channel_wait(cpu_dmac_channel_t ch);
 
 /// @}
 

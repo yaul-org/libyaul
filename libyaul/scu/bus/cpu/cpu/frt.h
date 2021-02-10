@@ -123,8 +123,7 @@ cpu_frt_input_capture_get(void)
 static inline uint8_t __always_inline
 cpu_frt_interrupt_priority_get(void)
 {
-        uint16_t iprb;
-        iprb = MEMORY_READ(16, CPU(IPRB));
+        const uint16_t iprb = MEMORY_READ(16, CPU(IPRB));
 
         return ((iprb >> 8) & 0x0F);
 }
