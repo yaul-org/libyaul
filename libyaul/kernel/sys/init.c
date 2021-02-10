@@ -78,10 +78,6 @@ _init(void)
         /* XXX: Fix hard coded value */
         cd_block_init(0x0002);
 
-        if ((cd_block_cmd_is_auth(NULL)) == 0) {
-                cd_block_security_bypass();
-        }
-
         cpu_cache_purge();
 
         user_init();
