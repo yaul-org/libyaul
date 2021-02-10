@@ -14,11 +14,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_REGISTERS_DEFINES  CPU register defines
-/// @defgroup CPU_REGISTERS_STRUCTURES  CPU register structures
-/// @defgroup CPU_REGISTERS_INLINE_FUNCTIONS CPU register inline functions
+/// @defgroup CPU_REGISTERS  CPU Registers
 
-/// @addtogroup CPU_REGISTERS_DEFINES
+/// @addtogroup CPU_REGISTERS
 /// @{
 
 /// @brief CPU `sr` register `T` bit that indicates carry/borrow or overflow/underflow.
@@ -31,11 +29,6 @@ __BEGIN_DECLS
 #define CPU_SR_Q_BIT_MASK       0x00000100
 /// @brief CPU `sr` register `M` bit used by `divu0`, `divu0s`, and `div1` instructions.
 #define CPU_SR_M_BIT_MASK       0x00000200
-
-/// @}
-
-/// @addtogroup CPU_REGISTERS_STRUCTURES
-/// @{
 
 /// @brief Represent the register configuration.
 typedef struct cpu_registers {
@@ -58,11 +51,6 @@ typedef struct cpu_registers {
         /// `sr` register.
         uint32_t sr;
 } __packed cpu_registers_t;
-
-/// @}
-
-/// @addtogroup CPU_REGISTERS_INLINE_FUNCTIONS
-/// @{
 
 /// @brief Set the `gbr` register.
 ///

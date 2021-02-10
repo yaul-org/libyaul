@@ -15,11 +15,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_DIVU_INLINE_FUNCTIONS CPU DIVU inline functions
-/// @defgroup CPU_DIVU_HELPERS  CPU DIVU helpers
-/// @defgroup CPU_DIVU_FUNCTIONS  CPU DIVU functions
+/// @defgroup CPU_DIVU CPU Division Unit (DIVU)
 
-/// @addtogroup CPU_DIVU_INLINE_FUNCTIONS
+/// @addtogroup CPU_DIVU
 /// @{
 
 /// @brief Callback type.
@@ -130,22 +128,12 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
-/// @}
-
-/// @addtogroup CPU_DIVU_HELPERS
-/// @{
-
 /// @brief Clear the interrupt handler for the CPU-DIVU OVFI interrupt.
 /// @see cpu_divu_ovfi_set
 #define cpu_divu_ovfi_clear()                                                  \
 do {                                                                           \
         cpu_divu_ovfi_set(NULL);                                               \
 } while (false)
-
-/// @}
-
-/// @addtogroup CPU_DIVU_FUNCTIONS
-/// @{
 
 /// @brief Set the interrupt handler for the CPU-DIVU OVFI interrupt.
 ///

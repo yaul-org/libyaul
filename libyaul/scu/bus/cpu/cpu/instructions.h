@@ -14,9 +14,7 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_INSTRUCTIONS_INLINE_FUNCTIONS CPU instruction emitters
-
-/// @addtogroup CPU_INSTRUCTIONS_INLINE_FUNCTIONS
+/// @addtogroup CPU
 /// @{
 
 /// @brief Emit a `trap` instruction.
