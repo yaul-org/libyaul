@@ -23,7 +23,7 @@ static cpu_wdt_ihr _slave_wdt_iti_ihr = _default_ihr;
 static cpu_wdt_ihr *_wdt_executor_iti_ihr_get(void);
 
 void
-cpu_wdt_init(uint8_t clock_div)
+cpu_wdt_init(cpu_wdt_clock_t clock_div)
 {
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x7F00);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_WDT_ITI << 8);
@@ -44,7 +44,7 @@ cpu_wdt_init(uint8_t clock_div)
 }
 
 void
-cpu_wdt_timer_mode_set(uint8_t mode, cpu_wdt_ihr ihr)
+cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr)
 {
         uint8_t wtcr_bits;
         wtcr_bits = MEMORY_READ(8, CPU(WTCSRR));
