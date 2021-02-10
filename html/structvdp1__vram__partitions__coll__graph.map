@@ -1,0 +1,23 @@
+<map id="vdp1_vram_partitions" name="vdp1_vram_partitions">
+<area shape="rect" id="node1" title=" " alt="" coords="584,181,748,208"/>
+<area shape="rect" id="node2" href="$structvdp1__cmdt.html" title=" " alt="" coords="315,131,410,157"/>
+<area shape="rect" id="node3" href="$structvdp1__gouraud__table.html" title=" " alt="" coords="285,181,440,208"/>
+<area shape="rect" id="node4" href="$unioncolor__rgb1555__t.html" title=" " alt="" coords="33,15,160,41"/>
+<area shape="rect" id="node5" href="$structvdp1__clut.html" title=" " alt="" coords="320,411,405,437"/>
+<area shape="rect" id="node6" href="$structvdp1__color__bank__type__c.html" title=" " alt="" coords="5,81,188,108"/>
+<area shape="rect" id="node7" href="$structvdp1__color__bank__type__4.html" title=" " alt="" coords="5,132,188,159"/>
+<area shape="rect" id="node8" href="$structvdp1__color__bank__type__d.html" title=" " alt="" coords="5,183,188,209"/>
+<area shape="rect" id="node9" href="$structvdp1__color__bank__type__5.html" title=" " alt="" coords="5,233,188,260"/>
+<area shape="rect" id="node10" href="$structvdp1__color__bank__type__e.html" title=" " alt="" coords="5,284,188,311"/>
+<area shape="rect" id="node11" href="$structvdp1__color__bank__type__6.html" title=" " alt="" coords="5,335,188,361"/>
+<area shape="rect" id="node12" href="$structvdp1__color__bank__type__f.html" title=" " alt="" coords="7,385,187,412"/>
+<area shape="rect" id="node13" href="$structvdp1__color__bank__type__7.html" title=" " alt="" coords="5,436,188,463"/>
+<area shape="rect" id="node14" href="$structvdp1__color__bank__type__8.html" title=" " alt="" coords="5,487,188,513"/>
+<area shape="rect" id="node15" href="$structvdp1__color__bank__type__9.html" title=" " alt="" coords="5,537,188,564"/>
+<area shape="rect" id="node16" href="$structvdp1__color__bank__type__0.html" title=" " alt="" coords="5,588,188,615"/>
+<area shape="rect" id="node17" href="$structvdp1__color__bank__type__1.html" title=" " alt="" coords="5,639,188,665"/>
+<area shape="rect" id="node18" href="$structvdp1__color__bank__type__a.html" title=" " alt="" coords="5,689,188,716"/>
+<area shape="rect" id="node19" href="$structvdp1__color__bank__type__2.html" title=" " alt="" coords="5,740,188,767"/>
+<area shape="rect" id="node20" href="$structvdp1__color__bank__type__b.html" title=" " alt="" coords="5,791,188,817"/>
+<area shape="rect" id="node21" href="$structvdp1__color__bank__type__3.html" title=" " alt="" coords="5,841,188,868"/>
+</map>
