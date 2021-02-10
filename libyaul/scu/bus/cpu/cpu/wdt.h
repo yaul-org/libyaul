@@ -10,11 +10,10 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_WDT_DEFINES
-/// @defgroup CPU_WDT_INLINE_FUNCTIONS
-/// @defgroup CPU_WDT_FUNCTIONS
+/// @defgroup CPU_WDT CPU Watch-Dog Timer (WDT)
+/// Not yet documented.
 
-/// @addtogroup CPU_WDT_DEFINES
+/// @addtogroup CPU_WDT
 /// @{
 
 /// Not yet documented.
@@ -39,12 +38,8 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define CPU_WDT_TIMER_MODE_WATCHDOG 1
 
-/// @}
-
+/// Not yet documented.
 typedef void (*cpu_wdt_ihr)(void);
-
-/// @addtogroup CPU_WDT_INLINE_FUNCTIONS
-/// @{
 
 /// @brief Not yet documented.
 static inline void __always_inline
@@ -95,17 +90,13 @@ cpu_wdt_interrupt_priority_get(void)
         return ((ipra >> 4) & 0x0F);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
         MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF7F);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
-
-/// @}
-
-/// @addtogroup CPU_WDT_FUNCTIONS
-/// @{
 
 /// @brief Not yet documented.
 extern void cpu_wdt_init(uint8_t);

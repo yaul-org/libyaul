@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+/// @defgroup CPU CPU
+
 #ifndef _CPU_H_
 #define _CPU_H_
 
@@ -19,9 +21,5 @@
 #include <cpu/registers.h>
 #include <cpu/sync.h>
 #include <cpu/wdt.h>
-
-__BEGIN_DECLS
-
-__END_DECLS
 
 #endif /* !_CPU_H_ */

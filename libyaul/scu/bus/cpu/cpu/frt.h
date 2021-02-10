@@ -16,12 +16,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_FRT_DEFINES CPU FRT defines
-/// @defgroup CPU_FRT_HELPERS CPU FRT helpers
-/// @defgroup CPU_FRT_INLINE_FUNCTIONS CPU FRT inline functions
-/// @defgroup CPU_FRT_FUNCTIONS CPU FRT functions
+/// @defgroup CPU_FRT CPU Free-Running Timer (FRT)
 
-/// @addtogroup CPU_FRT_DEFINES
+/// @addtogroup CPU_FRT
 /// @{
 
 /// @deprecated To be removed and replaced as an `enum`.
@@ -73,16 +70,11 @@ __BEGIN_DECLS
 /// clock divisor.
 #define CPU_FRT_PAL_352_128_COUNT_1MS   0x00E0
 
-/// @}
-
 /// @brief Callback type.
 /// @see cpu_frt_oca_set
 /// @see cpu_frt_ocb_set
 /// @see cpu_frt_ovi_set
 typedef void (*cpu_frt_ihr)(void);
-
-/// @addtogroup CPU_FRT_INLINE_FUNCTIONS
-/// @{
 
 /// @brief Set the 2-byte FRT tick count.
 ///
@@ -149,11 +141,6 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
-/// @}
-
-/// @addtogroup CPU_FRT_HELPERS
-/// @{
-
 /// @brief Clear the interrupt handler for the CPU-FRT OCA interrupt.
 /// @see cpu_frt_oca_set
 #define cpu_frt_oca_clear()                                                    \
@@ -174,11 +161,6 @@ do {                                                                           \
 do {                                                                           \
         cpu_frt_ovi_set(NULL);                                                 \
 } while (false)
-
-/// @}
-
-/// @addtogroup CPU_FRT_FUNCTIONS
-/// @{
 
 /// @brief Fully initialize the CPU-FRT depending with a specific clock divisor.
 ///

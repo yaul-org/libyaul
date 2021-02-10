@@ -10,10 +10,9 @@
 
 #include <scu/map.h>
 
-/// @defgroup CPU_MAP_HELPERS CPU memory map helpers
-/// @defgroup CPU_MAP_REGISTERS CPU memory map registers
+/// @defgroup CPU_IO_REGISTERS CPU I/O Registers
 
-/// @addtogroup CPU_MAP_HELPERS
+/// @addtogroup CPU_WDT
 /// @{
 
 /// @brief Write to the CPU-WDT @ref WTCNTW register.
@@ -68,7 +67,7 @@ do {                                                                           \
 
 /// @}
 
-/// @addtogroup CPU_MAP_REGISTERS
+/// @addtogroup CPU_IO_REGISTERS
 /// @{
 
 /// CPU register.

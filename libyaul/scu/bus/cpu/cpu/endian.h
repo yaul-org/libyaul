@@ -9,10 +9,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_ENDIAN_HELPERS CPU endianness helpers
-/// @defgroup CPU_ENDIAN_INLINE_FUNCTIONS CPU endianness inline functions
+/// @defgroup CPU_ENDIANNESS CPU Endianness
 
-/// @addtogroup CPU_ENDIAN_HELPERS
+/// @addtogroup CPU_ENDIANNESS
 /// @{
 
 /// @brief Convert from host byte order to big-endian order.
@@ -33,11 +32,6 @@ __BEGIN_DECLS
 
 /// @brief Convert from little-endian order to host byte order.
 #define cpu_le32toh(x)  cpu_bswap32((x))
-
-/// @}
-
-/// @addtogroup CPU_ENDIAN_INLINE_FUNCTIONS
-/// @{
 
 /// @brief Swap the upper and lower bytes of a 2-byte value.
 ///

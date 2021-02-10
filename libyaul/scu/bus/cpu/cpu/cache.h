@@ -14,11 +14,9 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_CACHE_DEFINES CPU cache defines
-/// @defgroup CPU_CACHE_INLINE_FUNCTIONS CPU cache inline functions
-/// @defgroup CPU_CACHE_FUNCTIONS CPU cache functions
+/// @defgroup CPU_CACHE CPU Cache
 
-/// @addtogroup CPU_CACHE_DEFINES
+/// @addtogroup CPU_CACHE
 /// @{
 
 /// Partition designated for using the cache.
@@ -51,11 +49,6 @@ __BEGIN_DECLS
 #define CPU_CACHE_MODE_4_WAY    0x00
 /// @deprecated To be removed and replaced as an `enum`.
 #define CPU_CACHE_MODE_2_WAY    0x08
-
-/// @}
-
-/// @addtogroup CPU_CACHE_INLINE_FUNCTIONS
-/// @{
 
 /// @brief Enable cache.
 static inline void __always_inline
@@ -161,11 +154,6 @@ cpu_cache_way_mode_set(uint8_t mode)
         *reg_ccr = t0 | mode;
         *reg_ccr = t0 | mode | 0x01;
 }
-
-/// @}
-
-/// @addtogroup CPU_CACHE_FUNCTIONS
-/// @{
 
 /// @brief Cache line of the specified address is purged.
 ///

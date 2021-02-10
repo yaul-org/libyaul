@@ -16,13 +16,12 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_DUAL_DEFINES
-/// @defgroup CPU_DUAL_INLINE_FUNCTIONS
-/// @defgroup CPU_DUAL_HELPERS
-/// @defgroup CPU_DUAL_FUNCTIONS
+/// @defgroup CPU_DUAL CPU Dual
+/// Not yet documented.
 
-/// @addtogroup CPU_DUAL_DEFINES
+/// @addtogroup CPU_DUAL
 /// @{
+
 
 /// Not yet documented.
 #define CPU_MASTER      0
@@ -33,11 +32,6 @@ __BEGIN_DECLS
 #define CPU_DUAL_ENTRY_POLLING 0
 /// Not yet documented.
 #define CPU_DUAL_ENTRY_ICI     1
-
-/// @}
-
-/// @addtogroup CPU_DUAL_INLINE_FUNCTIONS
-/// @{
 
 typedef void (*cpu_dual_master_entry)(void);
 typedef void (*cpu_dual_slave_entry)(void);
@@ -97,8 +91,6 @@ extern void cpu_dual_master_set(cpu_dual_master_entry);
 /// @brief Not yet documented.
 extern void cpu_dual_slave_set(cpu_dual_master_entry);
 
-/// @addtogroup CPU_DUAL_HELPERS
-
 /// @brief Not yet documented.
 #define cpu_dual_master_clear() do {                                           \
         cpu_dual_master_set(NULL);                                             \
@@ -108,11 +100,6 @@ extern void cpu_dual_slave_set(cpu_dual_master_entry);
 #define cpu_dual_slave_clear() do {                                            \
         cpu_dual_slave_set(NULL);                                              \
 } while (false)
-
-/// @}
-
-/// @addtogroup CPU_DUAL_FUNCTIONS
-/// @{
 
 /// @brief Not yet documented.
 extern void cpu_dual_init(uint8_t);
