@@ -30,6 +30,9 @@
 
 __BEGIN_DECLS
 
+/// @addtogroup MATH
+/// @{
+
 #define FIXMATH_FUNC_ATTRS __attribute__ ((leaf, nothrow, const))
 
 /* Macro for defining fix16_t constant values. The functions above can't be used
@@ -58,6 +61,7 @@ __BEGIN_DECLS
 #define FIX16_RAD2DEG   (0x00394BB8)
 #define FIX16_DEG2RAD   (0x00000478)
 
+/// Not yet documented.
 typedef int32_t fix16_t;
 
 static inline fix16_t __always_inline
@@ -227,6 +231,8 @@ extern uint32_t fix16_str(fix16_t, char *, int);
 #undef _FIX16_INCLUDE_ONCE
 
 #undef FIXMATH_FUNC_ATTRS
+
+/// @}
 
 __END_DECLS
 

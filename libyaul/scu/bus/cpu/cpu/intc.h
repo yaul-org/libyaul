@@ -128,7 +128,7 @@ typedef void (*cpu_intc_ihr)(void);
 ///
 /// There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param vecter The vector number.
+/// @param vector The vector number.
 /// @param ihr    The interrupt handler.
 static inline void __always_inline
 cpu_intc_ihr_set(uint32_t vector, cpu_intc_ihr ihr)

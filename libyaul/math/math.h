@@ -1,3 +1,6 @@
+/// @defgroup MATH Math
+/// Not yet documented.
+
 #ifndef _MATH_H_
 #define _MATH_H_
 

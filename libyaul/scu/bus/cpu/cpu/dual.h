@@ -22,7 +22,6 @@ __BEGIN_DECLS
 /// @addtogroup CPU_DUAL
 /// @{
 
-
 /// Not yet documented.
 #define CPU_MASTER      0
 /// Not yet documented.
@@ -33,7 +32,9 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define CPU_DUAL_ENTRY_ICI     1
 
+/// Not yet documented.
 typedef void (*cpu_dual_master_entry)(void);
+/// Not yet documented.
 typedef void (*cpu_dual_slave_entry)(void);
 
 /// @brief Not yet documented.
@@ -79,8 +80,6 @@ cpu_dual_slave_stack_get(void)
 
         return (void *)&_slave_stack;
 }
-
-/// @}
 
 /// @brief Not yet documented.
 extern void cpu_dual_init(uint8_t);

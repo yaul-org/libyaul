@@ -14,6 +14,13 @@
 
 __BEGIN_DECLS
 
+/// @defgroup CPU_SYNC CPU Synchronization
+/// Not yet documented.
+
+/// @addtogroup CPU_SYNC
+/// @{
+
+/// @brief Not yet documented.
 static inline bool __always_inline
 cpu_sync_mutex(uint8_t b)
 {
@@ -40,12 +47,14 @@ cpu_sync_mutex(uint8_t b)
         return result;
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_sync_mutex_clear(uint8_t b)
 {
         MEMORY_WRITE(8, HWRAM_UNCACHED(0x00000B00 + b), 0x00);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_sync_spinlock(uint8_t b)
 {
@@ -63,11 +72,14 @@ cpu_sync_spinlock(uint8_t b)
               [b] "r" (b));
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 cpu_sync_spinlock_clear(uint8_t b)
 {
         cpu_sync_mutex_clear(b);
 }
+
+/// @}
 
 __END_DECLS
 
