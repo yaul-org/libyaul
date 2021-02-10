@@ -72,6 +72,7 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CPU Direct Memory Access Controller (DMAC)</div>  </div>
@@ -84,7 +85,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcpu__dmac__cfg.html">cpu_dmac_cfg</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="structcpu__dmac__cfg.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC configuration.  <a href="structcpu__dmac__cfg.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcpu__dmac__status.html">cpu_dmac_status</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="structcpu__dmac__status.html#details">More...</a><br /></td></tr>
@@ -92,14 +93,6 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga394a2c3c71f99eb6c73d5560e68199e5"><td class="memItemLeft" align="right" valign="top"><a id="ga394a2c3c71f99eb6c73d5560e68199e5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga394a2c3c71f99eb6c73d5560e68199e5">CPU_DMAC_PRIORITY_MODE_FIXED</a>&#160;&#160;&#160;0x00</td></tr>
-<tr class="memdesc:ga394a2c3c71f99eb6c73d5560e68199e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga394a2c3c71f99eb6c73d5560e68199e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga02fa55aed4dc6d0a21349f0dc0553654"><td class="memItemLeft" align="right" valign="top"><a id="ga02fa55aed4dc6d0a21349f0dc0553654"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga02fa55aed4dc6d0a21349f0dc0553654">CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN</a>&#160;&#160;&#160;0x01</td></tr>
-<tr class="memdesc:ga02fa55aed4dc6d0a21349f0dc0553654"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga02fa55aed4dc6d0a21349f0dc0553654"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa260d2c6ccce4cc4d64607d313335602"><td class="memItemLeft" align="right" valign="top"><a id="gaa260d2c6ccce4cc4d64607d313335602"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaa260d2c6ccce4cc4d64607d313335602">CPU_DMAC_DESTINATION_FIXED</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memdesc:gaa260d2c6ccce4cc4d64607d313335602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
@@ -151,72 +144,438 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ga358061a56a92311e6711f85508e75bbd"><td class="memItemLeft" align="right" valign="top"><a id="ga358061a56a92311e6711f85508e75bbd"></a>
-typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga358061a56a92311e6711f85508e75bbd">cpu_dmac_ihr</a>) (void *)</td></tr>
-<tr class="memdesc:ga358061a56a92311e6711f85508e75bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga99ce968384f4cb454426c5fe409b83ae"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="group__CPU__DMAC.html#gaf4c328e811d0f3e242f36353e28a78a8">cpu_dmac_priority_mode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga99ce968384f4cb454426c5fe409b83ae">cpu_dmac_priority_mode_t</a></td></tr>
+<tr class="memdesc:ga99ce968384f4cb454426c5fe409b83ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC priority mode.  <a href="group__CPU__DMAC.html#ga99ce968384f4cb454426c5fe409b83ae">More...</a><br /></td></tr>
+<tr class="separator:ga99ce968384f4cb454426c5fe409b83ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga358061a56a92311e6711f85508e75bbd"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga358061a56a92311e6711f85508e75bbd">cpu_dmac_ihr</a>) (void *)</td></tr>
+<tr class="memdesc:ga358061a56a92311e6711f85508e75bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type.  <a href="group__CPU__DMAC.html#ga358061a56a92311e6711f85508e75bbd">More...</a><br /></td></tr>
 <tr class="separator:ga358061a56a92311e6711f85508e75bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga90c58703cb0b7d3892e6bf70e24325e1"><td class="memItemLeft" align="right" valign="top"><a id="ga90c58703cb0b7d3892e6bf70e24325e1"></a>
+typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a></td></tr>
+<tr class="memdesc:ga90c58703cb0b7d3892e6bf70e24325e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC channel. <br /></td></tr>
+<tr class="separator:ga90c58703cb0b7d3892e6bf70e24325e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="memItemLeft" align="right" valign="top"><a id="ga73a52ed09ab57d9df2a1514e15f8c6d4"></a>
 typedef struct <a class="el" href="structcpu__dmac__cfg.html">cpu_dmac_cfg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a></td></tr>
-<tr class="memdesc:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC configuration. <br /></td></tr>
 <tr class="separator:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1381a65ff30ef4f738e3d3ab486c3c15"><td class="memItemLeft" align="right" valign="top"><a id="ga1381a65ff30ef4f738e3d3ab486c3c15"></a>
 typedef struct <a class="el" href="structcpu__dmac__status.html">cpu_dmac_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a></td></tr>
 <tr class="memdesc:ga1381a65ff30ef4f738e3d3ab486c3c15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
 <tr class="separator:ga1381a65ff30ef4f738e3d3ab486c3c15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gaf4c328e811d0f3e242f36353e28a78a8"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaf4c328e811d0f3e242f36353e28a78a8">cpu_dmac_priority_mode</a> { <a class="el" href="group__CPU__DMAC.html#ggaf4c328e811d0f3e242f36353e28a78a8ae0d2f2e9838a50533085471b86e40938">CPU_DMAC_PRIORITY_MODE_FIXED</a> = 0x00, 
+<a class="el" href="group__CPU__DMAC.html#ggaf4c328e811d0f3e242f36353e28a78a8af191067b2efe27ea8a8c7fabd991a390">CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN</a> = 0x01
+ }</td></tr>
+<tr class="memdesc:gaf4c328e811d0f3e242f36353e28a78a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC priority mode.  <a href="group__CPU__DMAC.html#gaf4c328e811d0f3e242f36353e28a78a8">More...</a><br /></td></tr>
+<tr class="separator:gaf4c328e811d0f3e242f36353e28a78a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga519f88e4dcee359184c6166820266053"><td class="memItemLeft" align="right" valign="top"><a id="ga519f88e4dcee359184c6166820266053"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga519f88e4dcee359184c6166820266053">cpu_dmac_channel_transfer_set</a> (uint8_t ch, uint32_t tcr_bits)</td></tr>
-<tr class="memdesc:ga519f88e4dcee359184c6166820266053"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga519f88e4dcee359184c6166820266053"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa36f0e459d7735660fd361b4270dca1a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a">cpu_dmac_channel_transfer_set</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch, uint32_t tcr_bits)</td></tr>
+<tr class="memdesc:gaa36f0e459d7735660fd361b4270dca1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write directly to the CPU-DMAC I/O <a class="el" href="group__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register.  <a href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a">More...</a><br /></td></tr>
+<tr class="separator:gaa36f0e459d7735660fd361b4270dca1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5b03cac0c45a74d471de1e84b86cb7ab"><td class="memItemLeft" align="right" valign="top"><a id="ga5b03cac0c45a74d471de1e84b86cb7ab"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga5b03cac0c45a74d471de1e84b86cb7ab">cpu_dmac_enable</a> (void)</td></tr>
-<tr class="memdesc:ga5b03cac0c45a74d471de1e84b86cb7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga5b03cac0c45a74d471de1e84b86cb7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable CPU-DMAC. <br /></td></tr>
 <tr class="separator:ga5b03cac0c45a74d471de1e84b86cb7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac6628f7617376e4f36c9d8aaf6d32745"><td class="memItemLeft" align="right" valign="top"><a id="gac6628f7617376e4f36c9d8aaf6d32745"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gac6628f7617376e4f36c9d8aaf6d32745">cpu_dmac_disable</a> (void)</td></tr>
-<tr class="memdesc:gac6628f7617376e4f36c9d8aaf6d32745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gac6628f7617376e4f36c9d8aaf6d32745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable CPU-DMAC. <br /></td></tr>
 <tr class="separator:gac6628f7617376e4f36c9d8aaf6d32745"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0eea9265323a34a9908b34fa025f819d"><td class="memItemLeft" align="right" valign="top"><a id="ga0eea9265323a34a9908b34fa025f819d"></a>
-static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga0eea9265323a34a9908b34fa025f819d">cpu_dmac_interrupt_priority_get</a> (void)</td></tr>
-<tr class="memdesc:ga0eea9265323a34a9908b34fa025f819d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga0eea9265323a34a9908b34fa025f819d"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga0eea9265323a34a9908b34fa025f819d">cpu_dmac_interrupt_priority_get</a> (void)</td></tr>
+<tr class="memdesc:ga0eea9265323a34a9908b34fa025f819d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the interrupt priority level for CPU-DMAC.  <a href="group__CPU__DMAC.html#ga0eea9265323a34a9908b34fa025f819d">More...</a><br /></td></tr>
 <tr class="separator:ga0eea9265323a34a9908b34fa025f819d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5c1432937ccb202ed2202eed993e0bcc"><td class="memItemLeft" align="right" valign="top"><a id="ga5c1432937ccb202ed2202eed993e0bcc"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga5c1432937ccb202ed2202eed993e0bcc">cpu_dmac_interrupt_priority_set</a> (uint8_t priority)</td></tr>
-<tr class="memdesc:ga5c1432937ccb202ed2202eed993e0bcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga5c1432937ccb202ed2202eed993e0bcc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga5c1432937ccb202ed2202eed993e0bcc">cpu_dmac_interrupt_priority_set</a> (uint8_t priority)</td></tr>
+<tr class="memdesc:ga5c1432937ccb202ed2202eed993e0bcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt priority level for CPU-DMAC.  <a href="group__CPU__DMAC.html#ga5c1432937ccb202ed2202eed993e0bcc">More...</a><br /></td></tr>
 <tr class="separator:ga5c1432937ccb202ed2202eed993e0bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga71d543c4f5dcc48c18ae7ec3d7f091af"><td class="memItemLeft" align="right" valign="top"><a id="ga71d543c4f5dcc48c18ae7ec3d7f091af"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga71d543c4f5dcc48c18ae7ec3d7f091af">cpu_dmac_priority_mode_set</a> (uint8_t mode)</td></tr>
-<tr class="memdesc:ga71d543c4f5dcc48c18ae7ec3d7f091af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga71d543c4f5dcc48c18ae7ec3d7f091af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7642467dde2e2bf0a7754f0a6e0d05ea"><td class="memItemLeft" align="right" valign="top"><a id="ga7642467dde2e2bf0a7754f0a6e0d05ea"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga7642467dde2e2bf0a7754f0a6e0d05ea">cpu_dmac_channel_start</a> (uint8_t ch)</td></tr>
-<tr class="memdesc:ga7642467dde2e2bf0a7754f0a6e0d05ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga7642467dde2e2bf0a7754f0a6e0d05ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0f8baf42c70dae9f11c6be411b219bc8"><td class="memItemLeft" align="right" valign="top"><a id="ga0f8baf42c70dae9f11c6be411b219bc8"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga0f8baf42c70dae9f11c6be411b219bc8">cpu_dmac_channel_stop</a> (uint8_t ch)</td></tr>
-<tr class="memdesc:ga0f8baf42c70dae9f11c6be411b219bc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga0f8baf42c70dae9f11c6be411b219bc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8457a4d07fba36dc7af82c38caf88d57"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga8457a4d07fba36dc7af82c38caf88d57">cpu_dmac_priority_mode_set</a> (<a class="el" href="group__CPU__DMAC.html#ga99ce968384f4cb454426c5fe409b83ae">cpu_dmac_priority_mode_t</a> mode)</td></tr>
+<tr class="memdesc:ga8457a4d07fba36dc7af82c38caf88d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the priority mode.  <a href="group__CPU__DMAC.html#ga8457a4d07fba36dc7af82c38caf88d57">More...</a><br /></td></tr>
+<tr class="separator:ga8457a4d07fba36dc7af82c38caf88d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2b26ef48721710c7c902a5b7c22120f1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1">cpu_dmac_channel_start</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch)</td></tr>
+<tr class="memdesc:ga2b26ef48721710c7c902a5b7c22120f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the CPU-DMAC channel.  <a href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1">More...</a><br /></td></tr>
+<tr class="separator:ga2b26ef48721710c7c902a5b7c22120f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6b1abd56274f3e913f538f2cc76b42e3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga6b1abd56274f3e913f538f2cc76b42e3">cpu_dmac_channel_stop</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch)</td></tr>
+<tr class="memdesc:ga6b1abd56274f3e913f538f2cc76b42e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop specific CPU-DMAC channel.  <a href="group__CPU__DMAC.html#ga6b1abd56274f3e913f538f2cc76b42e3">More...</a><br /></td></tr>
+<tr class="separator:ga6b1abd56274f3e913f538f2cc76b42e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae2d968ef07dc8430c1609d42527aa7d3"><td class="memItemLeft" align="right" valign="top"><a id="gae2d968ef07dc8430c1609d42527aa7d3"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gae2d968ef07dc8430c1609d42527aa7d3">cpu_dmac_stop</a> (void)</td></tr>
-<tr class="memdesc:gae2d968ef07dc8430c1609d42527aa7d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:gae2d968ef07dc8430c1609d42527aa7d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop all CPU-DMAC channels. <br /></td></tr>
 <tr class="separator:gae2d968ef07dc8430c1609d42527aa7d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9e8635d7032edc6163dd171e0f447b92"><td class="memItemLeft" align="right" valign="top"><a id="ga9e8635d7032edc6163dd171e0f447b92"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga9e8635d7032edc6163dd171e0f447b92">cpu_dmac_status_get</a> (<a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a> *)</td></tr>
-<tr class="memdesc:ga9e8635d7032edc6163dd171e0f447b92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga9e8635d7032edc6163dd171e0f447b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga417efe61b30874edbda8b42f9de47cb8"><td class="memItemLeft" align="right" valign="top"><a id="ga417efe61b30874edbda8b42f9de47cb8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga417efe61b30874edbda8b42f9de47cb8">cpu_dmac_channel_config_set</a> (const <a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a> *)</td></tr>
-<tr class="memdesc:ga417efe61b30874edbda8b42f9de47cb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga417efe61b30874edbda8b42f9de47cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga438bb92b78919865df1c94a518c4af26"><td class="memItemLeft" align="right" valign="top"><a id="ga438bb92b78919865df1c94a518c4af26"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga438bb92b78919865df1c94a518c4af26">cpu_dmac_channel_wait</a> (uint8_t)</td></tr>
-<tr class="memdesc:ga438bb92b78919865df1c94a518c4af26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga438bb92b78919865df1c94a518c4af26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga54e0bf92350dba22a62f571b68a522c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga54e0bf92350dba22a62f571b68a522c8">cpu_dmac_status_get</a> (<a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a> *status)</td></tr>
+<tr class="memdesc:ga54e0bf92350dba22a62f571b68a522c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain CPU-DMAC operation status.  <a href="group__CPU__DMAC.html#ga54e0bf92350dba22a62f571b68a522c8">More...</a><br /></td></tr>
+<tr class="separator:ga54e0bf92350dba22a62f571b68a522c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga52a95c82897c107ac282fcf69ad588de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">cpu_dmac_channel_config_set</a> (const <a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a> *cfg)</td></tr>
+<tr class="memdesc:ga52a95c82897c107ac282fcf69ad588de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure a CPU-DMAC channel for transfer.  <a href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">More...</a><br /></td></tr>
+<tr class="separator:ga52a95c82897c107ac282fcf69ad588de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa25f9dd1ea61b12deaefec4f77d64131"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131">cpu_dmac_channel_wait</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch)</td></tr>
+<tr class="memdesc:gaa25f9dd1ea61b12deaefec4f77d64131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy wait for completion of CPU-DMAC channel.  <a href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131">More...</a><br /></td></tr>
+<tr class="separator:gaa25f9dd1ea61b12deaefec4f77d64131"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Not yet documented. </p>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga358061a56a92311e6711f85508e75bbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga358061a56a92311e6711f85508e75bbd">&#9670;&nbsp;</a></span>cpu_dmac_ihr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* cpu_dmac_ihr) (void *)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Callback type. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structcpu__dmac__cfg.html#a6b32c81edacbca2a7eee1da9e696212e" title="Callback when transfer is completed.">cpu_dmac_cfg_t.ihr</a> </dd>
+<dd>
+<a class="el" href="structcpu__dmac__cfg.html#adb8bb377ffdb53781aee3ba952508fce" title="Pointer to any work passed onto cpu_dmac_cfg_t::ihr.">cpu_dmac_cfg_t.ihr_work</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga99ce968384f4cb454426c5fe409b83ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga99ce968384f4cb454426c5fe409b83ae">&#9670;&nbsp;</a></span>cpu_dmac_priority_mode_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum <a class="el" href="group__CPU__DMAC.html#gaf4c328e811d0f3e242f36353e28a78a8">cpu_dmac_priority_mode</a> <a class="el" href="group__CPU__DMAC.html#ga99ce968384f4cb454426c5fe409b83ae">cpu_dmac_priority_mode_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CPU-DMAC priority mode. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga8457a4d07fba36dc7af82c38caf88d57" title="Set the priority mode.">cpu_dmac_priority_mode_set</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="gaf4c328e811d0f3e242f36353e28a78a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf4c328e811d0f3e242f36353e28a78a8">&#9670;&nbsp;</a></span>cpu_dmac_priority_mode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__CPU__DMAC.html#gaf4c328e811d0f3e242f36353e28a78a8">cpu_dmac_priority_mode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CPU-DMAC priority mode. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga8457a4d07fba36dc7af82c38caf88d57" title="Set the priority mode.">cpu_dmac_priority_mode_set</a> </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggaf4c328e811d0f3e242f36353e28a78a8ae0d2f2e9838a50533085471b86e40938"></a>CPU_DMAC_PRIORITY_MODE_FIXED&#160;</td><td class="fielddoc"><p>Fixed mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaf4c328e811d0f3e242f36353e28a78a8af191067b2efe27ea8a8c7fabd991a390"></a>CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN&#160;</td><td class="fielddoc"><p>Round-robin mode. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga52a95c82897c107ac282fcf69ad588de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga52a95c82897c107ac282fcf69ad588de">&#9670;&nbsp;</a></span>cpu_dmac_channel_config_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_dmac_channel_config_set </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a> *&#160;</td>
+          <td class="paramname"><em>cfg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Configure a CPU-DMAC channel for transfer. </p>
+<p>Configuring the CPU-DMAC channel in <code>cfg</code> does start the transfer. To start the transfer, use <a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1">cpu_dmac_channel_start</a>.</p>
+<p>The CPU-DMAC channel is forcefully stopped upon starting the configuration. If the channel is currently operating, use <a class="el" href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131">cpu_dmac_channel_wait</a> to wait until the transfer is complete.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cfg</td><td>The CPU-DMAC transfer configuration.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1" title="Start the CPU-DMAC channel.">cpu_dmac_channel_start</a> </dd>
+<dd>
+<a class="el" href="group__CPU__DMAC.html#ga6b1abd56274f3e913f538f2cc76b42e3" title="Stop specific CPU-DMAC channel.">cpu_dmac_channel_stop</a> </dd>
+<dd>
+<a class="el" href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131" title="Busy wait for completion of CPU-DMAC channel.">cpu_dmac_channel_wait</a> </dd>
+<dd>
+<a class="el" href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a" title="Write directly to the CPU-DMAC I/O TCR0 or TCR1 register.">cpu_dmac_channel_transfer_set</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga2b26ef48721710c7c902a5b7c22120f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2b26ef48721710c7c902a5b7c22120f1">&#9670;&nbsp;</a></span>cpu_dmac_channel_start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_dmac_channel_start </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a>&#160;</td>
+          <td class="paramname"><em>ch</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start the CPU-DMAC channel. </p>
+<p>There is no check if the CPU-DMAC channel <code>ch</code> is currently operating. </p>
+
+</div>
+</div>
+<a id="ga6b1abd56274f3e913f538f2cc76b42e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6b1abd56274f3e913f538f2cc76b42e3">&#9670;&nbsp;</a></span>cpu_dmac_channel_stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_dmac_channel_stop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a>&#160;</td>
+          <td class="paramname"><em>ch</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Stop specific CPU-DMAC channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ch</td><td>The channel. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa36f0e459d7735660fd361b4270dca1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa36f0e459d7735660fd361b4270dca1a">&#9670;&nbsp;</a></span>cpu_dmac_channel_transfer_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_dmac_channel_transfer_set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a>&#160;</td>
+          <td class="paramname"><em>ch</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>tcr_bits</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write directly to the CPU-DMAC I/O <a class="el" href="group__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register. </p>
+<p>This function is not enough to set up a proper transfer. Use <a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">cpu_dmac_channel_config_set</a> to configure a transfer. The purpose of this function is to quickly reset a transfer by just setting the transfer length.</p>
+<p>While this function resets the transfer length, it does not start the transfer again. For that, use </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1" title="Start the CPU-DMAC channel.">cpu_dmac_channel_start</a>.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ch</td><td>The channel. </td></tr>
+    <tr><td class="paramname">tcr_bits</td><td>The 4-byte I/O register value.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de" title="Configure a CPU-DMAC channel for transfer.">cpu_dmac_channel_config_set</a> </dd>
+<dd>
+<a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1" title="Start the CPU-DMAC channel.">cpu_dmac_channel_start</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaa25f9dd1ea61b12deaefec4f77d64131"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa25f9dd1ea61b12deaefec4f77d64131">&#9670;&nbsp;</a></span>cpu_dmac_channel_wait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_dmac_channel_wait </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a>&#160;</td>
+          <td class="paramname"><em>ch</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Busy wait for completion of CPU-DMAC channel. </p>
+<p>There is no waiting if the CPU-DMAC or the specific channel <code>ch</code> is disabled.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ch</td><td>The channel. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0eea9265323a34a9908b34fa025f819d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0eea9265323a34a9908b34fa025f819d">&#9670;&nbsp;</a></span>cpu_dmac_interrupt_priority_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint8_t cpu_dmac_interrupt_priority_get </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the interrupt priority level for CPU-DMAC. </p>
+<dl class="section return"><dt>Returns</dt><dd>The interrupt priority level ranging from <code>0</code> to <code>15</code>. </dd></dl>
+
+</div>
+</div>
+<a id="ga5c1432937ccb202ed2202eed993e0bcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5c1432937ccb202ed2202eed993e0bcc">&#9670;&nbsp;</a></span>cpu_dmac_interrupt_priority_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_dmac_interrupt_priority_set </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>priority</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the interrupt priority level for CPU-DMAC. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">priority</td><td>The priority ranging from <code>0</code> to <code>15</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8457a4d07fba36dc7af82c38caf88d57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8457a4d07fba36dc7af82c38caf88d57">&#9670;&nbsp;</a></span>cpu_dmac_priority_mode_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void cpu_dmac_priority_mode_set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga99ce968384f4cb454426c5fe409b83ae">cpu_dmac_priority_mode_t</a>&#160;</td>
+          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the priority mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td>The priority mode. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga54e0bf92350dba22a62f571b68a522c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga54e0bf92350dba22a62f571b68a522c8">&#9670;&nbsp;</a></span>cpu_dmac_status_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_dmac_status_get </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a> *&#160;</td>
+          <td class="paramname"><em>status</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain CPU-DMAC operation status. </p>
+<p>If <code>status</code> is <code>NULL</code>, the status will not be updated.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">status</td><td>The pointer to <a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
