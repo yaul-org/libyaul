@@ -102,7 +102,7 @@ _internal_cpu_init(void)
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         _internal_cpu_dmac_init();
-        cpu_dual_init(CPU_DUAL_ENTRY_POLLING);
+        cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
 }
 
 static void
