@@ -109,44 +109,44 @@ $(function() {
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        *reg_ftcsr &amp;= ~0x80;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> * __always_inline</div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">  105</a></span>&#160;<a class="code" href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">cpu_dual_master_stack_get</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;{</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keyword">extern</span> uint32_t _master_stack;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">void</span> *)&amp;_master_stack;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;}</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> * __always_inline</div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">  115</a></span>&#160;<a class="code" href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">cpu_dual_slave_stack_get</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keyword">extern</span> uint32_t _slave_stack;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> * __always_inline</div>
+<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">  112</a></span>&#160;<a class="code" href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">cpu_dual_master_stack_get</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <span class="keyword">extern</span> uint32_t _master_stack;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">void</span> *)&amp;_master_stack;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">void</span> *)&amp;_slave_stack;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;}</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#ga483b150a8710d2156d9253f6cd16599b">  123</a></span>&#160;<span class="preprocessor">#define cpu_dual_master_clear()                                                \</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor">        cpu_dual_master_set(NULL);                                             \</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">} while (false)</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#gaef1c0285fb7ee1cde3a90fe2543f79c2">  129</a></span>&#160;<span class="preprocessor">#define cpu_dual_slave_clear()                                                 \</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">        cpu_dual_slave_set(NULL);                                              \</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="preprocessor">} while (false)</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#ga15c329e78ac6000940ca3627d944a25f">cpu_dual_comm_mode_set</a>(<a class="code" href="group__CPU__DUAL.html#gaf87bfe76c43a15a774840925e6b52941">cpu_dual_comm_mode_t</a> mode);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> * __always_inline</div>
+<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">  129</a></span>&#160;<a class="code" href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">cpu_dual_slave_stack_get</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;{</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keyword">extern</span> uint32_t _slave_stack;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">void</span> *)&amp;_slave_stack;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#ga483b150a8710d2156d9253f6cd16599b">  137</a></span>&#160;<span class="preprocessor">#define cpu_dual_master_clear()                                                \</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">        cpu_dual_master_set(NULL);                                             \</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">} while (false)</span></div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#ga474ae0e0c5473364241de9485471ec27">cpu_dual_master_set</a>(<a class="code" href="group__CPU__DUAL.html#ga46b88f103361dd6bfd02cfbb05e793f5">cpu_dual_master_entry</a> entry);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#gaa6bb6fb7e34a366f02f56960d6fd2d62">cpu_dual_slave_set</a>(<a class="code" href="group__CPU__DUAL.html#ga69f13daed2fca2ba5abbc44c5627faa7">cpu_dual_slave_entry</a> entry);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__CPU__DUAL.html#ga9c8dbada59d05ccef93fb03457e52e23">cpu_which_t</a> <a class="code" href="group__CPU__DUAL.html#ga922e6d291710fb4fab69c9c62aed50fa">cpu_dual_executor_get</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;__END_DECLS</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_DUAL_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="group__CPU__DUAL.html#gaef1c0285fb7ee1cde3a90fe2543f79c2">  143</a></span>&#160;<span class="preprocessor">#define cpu_dual_slave_clear()                                                 \</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="preprocessor">        cpu_dual_slave_set(NULL);                                              \</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="preprocessor">} while (false)</span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#ga15c329e78ac6000940ca3627d944a25f">cpu_dual_comm_mode_set</a>(<a class="code" href="group__CPU__DUAL.html#gaf87bfe76c43a15a774840925e6b52941">cpu_dual_comm_mode_t</a> mode);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#ga474ae0e0c5473364241de9485471ec27">cpu_dual_master_set</a>(<a class="code" href="group__CPU__DUAL.html#ga46b88f103361dd6bfd02cfbb05e793f5">cpu_dual_master_entry</a> entry);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DUAL.html#gaa6bb6fb7e34a366f02f56960d6fd2d62">cpu_dual_slave_set</a>(<a class="code" href="group__CPU__DUAL.html#ga69f13daed2fca2ba5abbc44c5627faa7">cpu_dual_slave_entry</a> entry);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__CPU__DUAL.html#ga9c8dbada59d05ccef93fb03457e52e23">cpu_which_t</a> <a class="code" href="group__CPU__DUAL.html#ga922e6d291710fb4fab69c9c62aed50fa">cpu_dual_executor_get</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_DUAL_H */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__CPU__DUAL_html_ggacae9b18808e5889cee3f06f9822dcf7dab70c3c1c43be27b9dc410c8cecc820aa"><div class="ttname"><a href="group__CPU__DUAL.html#ggacae9b18808e5889cee3f06f9822dcf7dab70c3c1c43be27b9dc410c8cecc820aa">CPU_DUAL_ENTRY_ICI</a></div><div class="ttdeci">@ CPU_DUAL_ENTRY_ICI</div><div class="ttdoc">Use the CPU-FRT ICI interrupt for master/slave CPU communication.</div><div class="ttdef"><b>Definition:</b> dual.h:41</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga15c329e78ac6000940ca3627d944a25f"><div class="ttname"><a href="group__CPU__DUAL.html#ga15c329e78ac6000940ca3627d944a25f">cpu_dual_comm_mode_set</a></div><div class="ttdeci">void cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)</div><div class="ttdoc">Select or change the master-slave CPU communication mode.</div><div class="ttdef"><b>Definition:</b> cpu_dual.c:67</div></div>
@@ -155,8 +155,8 @@ $(function() {
 <div class="ttc" id="agroup__CPU__DUAL_html_gaf87bfe76c43a15a774840925e6b52941"><div class="ttname"><a href="group__CPU__DUAL.html#gaf87bfe76c43a15a774840925e6b52941">cpu_dual_comm_mode_t</a></div><div class="ttdeci">enum cpu_comm_mode cpu_dual_comm_mode_t</div><div class="ttdoc">The communication mode used for the slave CPU.</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_gacae9b18808e5889cee3f06f9822dcf7d"><div class="ttname"><a href="group__CPU__DUAL.html#gacae9b18808e5889cee3f06f9822dcf7d">cpu_comm_mode</a></div><div class="ttdeci">cpu_comm_mode</div><div class="ttdoc">The communication mode used for the slave CPU.</div><div class="ttdef"><b>Definition:</b> dual.h:33</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_gaa6bb6fb7e34a366f02f56960d6fd2d62"><div class="ttname"><a href="group__CPU__DUAL.html#gaa6bb6fb7e34a366f02f56960d6fd2d62">cpu_dual_slave_set</a></div><div class="ttdeci">void cpu_dual_slave_set(cpu_dual_slave_entry entry)</div><div class="ttdoc">Set the entry handler for the slave CPU.</div><div class="ttdef"><b>Definition:</b> cpu_dual.c:112</div></div>
-<div class="ttc" id="agroup__CPU__DUAL_html_gac7ec0f19f5388b375079c164514e30b8"><div class="ttname"><a href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">cpu_dual_master_stack_get</a></div><div class="ttdeci">static void * cpu_dual_master_stack_get(void)</div><div class="ttdoc">Obtain the top of the master CPU stack.</div><div class="ttdef"><b>Definition:</b> dual.h:105</div></div>
-<div class="ttc" id="agroup__CPU__DUAL_html_ga2cf34cf330da637046ecb20dfdeb768e"><div class="ttname"><a href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">cpu_dual_slave_stack_get</a></div><div class="ttdeci">static void * cpu_dual_slave_stack_get(void)</div><div class="ttdoc">Obtain the top of the slave CPU stack.</div><div class="ttdef"><b>Definition:</b> dual.h:115</div></div>
+<div class="ttc" id="agroup__CPU__DUAL_html_gac7ec0f19f5388b375079c164514e30b8"><div class="ttname"><a href="group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8">cpu_dual_master_stack_get</a></div><div class="ttdeci">static void * cpu_dual_master_stack_get(void)</div><div class="ttdoc">Obtain the top of the master CPU stack.</div><div class="ttdef"><b>Definition:</b> dual.h:112</div></div>
+<div class="ttc" id="agroup__CPU__DUAL_html_ga2cf34cf330da637046ecb20dfdeb768e"><div class="ttname"><a href="group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e">cpu_dual_slave_stack_get</a></div><div class="ttdeci">static void * cpu_dual_slave_stack_get(void)</div><div class="ttdoc">Obtain the top of the slave CPU stack.</div><div class="ttdef"><b>Definition:</b> dual.h:129</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_ga922e6d291710fb4fab69c9c62aed50fa"><div class="ttname"><a href="group__CPU__DUAL.html#ga922e6d291710fb4fab69c9c62aed50fa">cpu_dual_executor_get</a></div><div class="ttdeci">cpu_which_t cpu_dual_executor_get(void)</div><div class="ttdoc">Obtain which of the two CPUs this function was called on.</div><div class="ttdef"><b>Definition:</b> cpu_dual.c:122</div></div>
 <div class="ttc" id="agroup__CPU__IO__REGISTERS_html_gadd4faf455ed1393f052e4b9d219d5370"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370">FTCSR</a></div><div class="ttdeci">#define FTCSR</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:112</div></div>
 <div class="ttc" id="agroup__CPU__DUAL_html_gga680207c415c4ac4a00d54af2c60525ffa215029e7eea75cd8cefccda2843b443c"><div class="ttname"><a href="group__CPU__DUAL.html#gga680207c415c4ac4a00d54af2c60525ffa215029e7eea75cd8cefccda2843b443c">CPU_SLAVE</a></div><div class="ttdeci">@ CPU_SLAVE</div><div class="ttdoc">ID for slave CPU.</div><div class="ttdef"><b>Definition:</b> dual.h:29</div></div>

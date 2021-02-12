@@ -358,6 +358,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Obtain the top of the master CPU stack. </p>
+<p>The pointer the master CPU can be changed per application via changing the <code>IP_MASTER_STACK_ADDR</code> variable in the application <code>Makefile</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The stack grows downward toward zero. Be sure to also specify an address on a 4-byte boundary.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer. </dd></dl>
 
 </div>
@@ -480,6 +482,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Obtain the top of the slave CPU stack. </p>
+<p>The pointer the slave CPU can be changed per application via changing the <code>IP_SLAVE_STACK_ADDR</code> variable in the application <code>Makefile</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The stack grows downward toward zero. Be sure to also specify an address on a 4-byte boundary.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer. </dd></dl>
 
 </div>
