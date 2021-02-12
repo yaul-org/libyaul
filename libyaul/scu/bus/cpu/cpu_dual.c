@@ -64,7 +64,7 @@ static slave_entry _slave_entry_table[] = {
 };
 
 void
-cpu_dual_init(uint8_t entry_type)
+cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 {
         uint8_t sr_mask;
         sr_mask = cpu_intc_mask_get();
@@ -82,7 +82,7 @@ cpu_dual_init(uint8_t entry_type)
             _slave_ici_handler);
 
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_SLAVE_ENTRY,
-            _slave_entry_table[entry_type & 0x01]);
+            _slave_entry_table[mode & 0x01]);
 
         smpc_smc_sshon_call();
 
@@ -118,7 +118,7 @@ cpu_dual_slave_set(cpu_dual_slave_entry entry)
         }
 }
 
-int8_t
+cpu_which_t
 cpu_dual_executor_get(void)
 {
         extern uint32_t _master_stack;
