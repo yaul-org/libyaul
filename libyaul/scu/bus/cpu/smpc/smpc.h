@@ -14,8 +14,6 @@
 
 __BEGIN_DECLS
 
-extern void smpc_init(void);
-
 __END_DECLS
 
 #endif /* !_SMPC_H_ */
