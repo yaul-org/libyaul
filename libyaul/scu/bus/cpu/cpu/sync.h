@@ -16,14 +16,18 @@ __BEGIN_DECLS
 
 /// @defgroup CPU_SYNC CPU Synchronization
 ///
-/// @details All functions, otherwise noted make use of an exclusive area in
-/// HWRAM for all the lock variables. The size of the "lock array" is 256 bytes,
-/// and each lock variable is 1-byte.
+/// @details All functions, otherwise noted make use of an exclusive area in the
+/// first `0x4000` bytes of HWRAM for all the lock variables. The size of the
+/// "lock array" is 256 bytes, and each lock variable is 1-byte.
+///
+/// For the lock array, the user is responsible for keeping track of usage.
+/// There is no way to determine which locks are being used.
 
 /// @addtogroup CPU_SYNC
 /// @{
 
-/// @brief Represent a lock in the BIOS lock array.
+/// @brief An 8-bit integer value representing the lock index in the BIOS lock
+/// array.
 typedef uint8_t cpu_sync_lock_t;
 
 /// @brief Provide functionality of mutual exclusion.
@@ -31,7 +35,7 @@ typedef uint8_t cpu_sync_lock_t;
 /// @details Implementation of the mutex is using test-and-set CPU instruction
 /// `tas.b`.
 /// 
-/// @param b The lock number in the lock array.
+/// @param b The lock index in the lock array.
 ///
 /// @returns `true` if locking was previously unlocked, otherwise `false`.
 static inline bool __always_inline
@@ -64,7 +68,7 @@ cpu_sync_mutex(cpu_sync_lock_t b)
 ///
 /// @warning The clearing of @p b is not atomic.
 ///
-/// @param b The lock number in the lock array.
+/// @param b The lock index in the lock array.
 static inline void __always_inline
 cpu_sync_mutex_clear(cpu_sync_lock_t b)
 {
@@ -76,7 +80,7 @@ cpu_sync_mutex_clear(cpu_sync_lock_t b)
 /// @details Busy wait in a loop while repeatedly checking if the @p b is
 /// available.
 ///
-/// @param b The lock number in the lock array.
+/// @param b The lock index in the lock array.
 static inline void __always_inline
 cpu_sync_spinlock(cpu_sync_lock_t b)
 {
@@ -98,7 +102,7 @@ cpu_sync_spinlock(cpu_sync_lock_t b)
 ///
 /// @warning The clearing of @p b is not atomic.
 ///
-/// @param b The lock number in the lock array.
+/// @param b The lock index in the lock array.
 static inline void __always_inline
 cpu_sync_spinlock_clear(cpu_sync_lock_t b)
 {
