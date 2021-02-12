@@ -14,12 +14,12 @@
 
 __BEGIN_DECLS
 
-/// @defgroup SCU_DMA_STRUCTURES
+/// @defgroup SMPC_RTC SMPC RTC
+/// Not yet documented.
 
-/// @addtogroup SCU_DMA_STRUCTURES
+/// @addtogroup SMPC_RTC
 /// @{
 
-/// @struct
 /// @brief Not yet documented.
 typedef struct cpu_smpc_time {
         /// Not yet documented.
