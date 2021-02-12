@@ -10,7 +10,6 @@
 #include <cpu/intc.h>
 #include <scu/ic.h>
 
-#include <assert.h>
 #include <sys/callback-list.h>
 
 #include "cpu-internal.h"
@@ -18,13 +17,13 @@
 static void _dmac_ch0_ihr_handler(void);
 static void _dmac_ch1_ihr_handler(void);
 
-#define CPU_DMAC_IHR_INDEX_CH0  0
-#define CPU_DMAC_IHR_INDEX_CH1  1
+#define CPU_DMAC_IHR_INDEX_CH0 0
+#define CPU_DMAC_IHR_INDEX_CH1 1
 
 static callback_t _master_ihr_callbacks[2];
 static callback_t _slave_ihr_callbacks[2];
 
-static callback_t* _dmac_executor_ihr_callbacks_get(void);
+static callback_t *_dmac_executor_ihr_callbacks_get(void);
 
 void
 _internal_cpu_dmac_init(void)
@@ -78,15 +77,11 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
         status->address_error = (reg_dmaor >> 2) & 0x00000001;
         status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
 
-        uint32_t reg_chcr0;
-        reg_chcr0 = MEMORY_READ(32, CPU(CHCR0));
-        uint32_t reg_chcr1;
-        reg_chcr1 = MEMORY_READ(32, CPU(CHCR1));
+        const uint32_t reg_chcr0 = MEMORY_READ(32, CPU(CHCR0));
+        const uint32_t reg_chcr1 = MEMORY_READ(32, CPU(CHCR1));
 
-        uint8_t ch0_enabled;
-        ch0_enabled = reg_chcr0 & 0x00000001;
-        uint8_t ch1_enabled;
-        ch1_enabled = reg_chcr1 & 0x00000001;
+        const uint8_t ch0_enabled = reg_chcr0 & 0x00000001;
+        const uint8_t ch1_enabled = reg_chcr1 & 0x00000001;
 
         status->channel_enabled = (ch1_enabled << 1) | ch0_enabled;
 
@@ -94,10 +89,10 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
          * Truth table to determine if a specific channel is enabled or not
          *
          * TE DE Busy
-         *  0  0 0
-         *  0  1 1    Could be a false positive
-         *  1  0 0
-         *  1  1 0
+         *  0 0  0
+         *  0 1  1    Could be a false positive
+         *  1 0  0
+         *  1 1  0
          */
         uint8_t de;
         uint8_t te;
@@ -118,8 +113,7 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
 void
 cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 {
-        uint32_t n;
-        n = (cfg->channel & 0x01) << 4;
+        const uint32_t n = (cfg->channel & 0x01) << 4;
 
         cpu_dmac_channel_stop(cfg->channel);
 
@@ -138,22 +132,28 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
         uint8_t stride;
         stride = cfg->stride & 0x03;
 
-        /* Check that the source and destination addresses are
-         * stride-byte aligned */
+        /* Check that the source and destination addresses are stride-byte
+         * aligned */
 
-        if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
-                reg_tcr >>= 2;
-        } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
-                reg_tcr >>= 1;
+        if ((stride == CPU_DMAC_STRIDE_16_BYTES) || (reg_tcr > 0x00FFFFFF)) {
+                stride = CPU_DMAC_STRIDE_16_BYTES;
+
+                /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
+                reg_tcr = 0x00000000;
+
+                /* During 16-byte transfers, the transfer address mode bit for
+                 * dual address mode */
+                reg_chcr &= ~0x00000008;
+        } else {
+                if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
+                        reg_tcr >>= 2;
+                } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
+                        reg_tcr >>= 1;
+                }
         }
 
-        /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
-        reg_tcr = (reg_tcr > 0x00FFFFFF) ? 0x00000000 : reg_tcr;
-
-        callback_t *ihr_callbacks;
-        ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t *ihr_callback;
-        ihr_callback = &ihr_callbacks[cfg->channel];
+        callback_t * const ihr_callbacks = _dmac_executor_ihr_callbacks_get();
+        callback_t * const ihr_callback = &ihr_callbacks[cfg->channel];
 
         callback_init(ihr_callback);
 
