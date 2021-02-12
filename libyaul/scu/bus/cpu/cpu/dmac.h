@@ -10,6 +10,7 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -26,39 +27,56 @@ __BEGIN_DECLS
 /// @brief CPU-DMAC priority mode.
 /// @see cpu_dmac_priority_mode_set
 typedef enum cpu_dmac_priority_mode {
-        /// @brief Fixed mode.
+        /// @brief Fixed priority mode.
+        /// @details Channel #0 has higher priority over channel #1.
         CPU_DMAC_PRIORITY_MODE_FIXED       = 0x00,
         /// @brief Round-robin mode.
         CPU_DMAC_PRIORITY_MODE_ROUND_ROBIN = 0x01
 } cpu_dmac_priority_mode_t;
 
-/// @brief Not yet documented.
-#define CPU_DMAC_DESTINATION_FIXED      0x00
-/// @brief Not yet documented.
-#define CPU_DMAC_DESTINATION_INCREMENT  0x01
-/// @brief Not yet documented.
-#define CPU_DMAC_DESTINATION_DECREMENT  0x02
+/// @brief Transfer source address modes.
+/// @see cpu_dmac_cfg_t
+typedef enum cpu_dmac_src {
+        /// @brief Fixed source address.
+        CPU_DMAC_SOURCE_FIXED     = 0x00,
+        /// @brief Source address is incremented.
+        CPU_DMAC_SOURCE_INCREMENT = 0x01,
+        /// @brief Source address is decremented.
+        CPU_DMAC_SOURCE_DECREMENT = 0x02
+} cpu_dmac_src_t;
 
-/// @brief Not yet documented.
-#define CPU_DMAC_SOURCE_FIXED           0x00
-/// @brief Not yet documented.
-#define CPU_DMAC_SOURCE_INCREMENT       0x01
-/// @brief Not yet documented.
-#define CPU_DMAC_SOURCE_DECREMENT       0x02
+/// @brief Transfer destination type.
+/// @see cpu_dmac_cfg_t
+typedef enum cpu_dmac_dst {
+        /// @brief Fixed destination address.
+        CPU_DMAC_DESTINATION_FIXED     = 0x00,
+        /// @brief Destination address is incremented.
+        CPU_DMAC_DESTINATION_INCREMENT = 0x01,
+        /// @brief Destination address is decremented.
+        CPU_DMAC_DESTINATION_DECREMENT = 0x02
+} cpu_dmac_dst_t;
 
-/// @brief Not yet documented.
-#define CPU_DMAC_STRIDE_1_BYTE          0x00
-/// @brief Not yet documented.
-#define CPU_DMAC_STRIDE_2_BYTES         0x01
-/// @brief Not yet documented.
-#define CPU_DMAC_STRIDE_4_BYTES         0x02
-/// @brief Not yet documented.
-#define CPU_DMAC_STRIDE_16_BYTES        0x03
+/// @brief Transfer stride bytes.
+/// @see cpu_dmac_cfg_t
+typedef enum cpu_dmac_stride {
+        /// @brief 1-byte stride.
+        CPU_DMAC_STRIDE_1_BYTE   = 0x00,
+        /// @brief 2-byte stride.
+        CPU_DMAC_STRIDE_2_BYTES  = 0x01,
+        /// @brief 4-byte stride.
+        CPU_DMAC_STRIDE_4_BYTES  = 0x02,
+        /// @brief 16-byte stride.
+        CPU_DMAC_STRIDE_16_BYTES = 0x03
+} cpu_dmac_stride_t;
 
-/// @brief Not yet documented.
-#define CPU_DMAC_BUS_MODE_CYCLE_STEAL   0x00
-/// @brief Not yet documented.
-#define CPU_DMAC_BUS_MODE_BURST         0x01
+/// @brief Transfer bus mode.
+/// @see cpu_dmac_cfg_t
+typedef enum cpu_dmac_bus_mode {
+        /// @brief Select bus mode to cycle-steal mode.
+        CPU_DMAC_BUS_MODE_CYCLE_STEAL = 0x00,
+        /// @brief Select bus mode to burst mode.
+        CPU_DMAC_BUS_MODE_BURST       = 0x01
+} cpu_dmac_bus_mode_t;
 
 /// @brief Callback type.
 /// @see cpu_dmac_cfg_t.ihr
@@ -71,19 +89,19 @@ typedef uint8_t cpu_dmac_channel_t;
 /// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
         /// Channel
-        cpu_dmac_channel_t channel;
+        cpu_dmac_channel_t channel:2;
 
         /// Source mode
-        uint8_t src_mode;
+        cpu_dmac_src_t src_mode:2;
 
         /// Destination mode.
-        uint8_t dst_mode;
+        cpu_dmac_dst_t dst_mode:2;
 
         /// Stride.
-        uint8_t stride;
+        cpu_dmac_stride_t stride:3;
 
         /// Bus mode.
-        uint8_t bus_mode;
+        cpu_dmac_bus_mode_t bus_mode:1;
 
         /// Memory transfer source address.
         uint32_t src;
@@ -104,22 +122,24 @@ typedef struct cpu_dmac_cfg {
         /// @details If @ref cpu_dmac_cfg_t.ihr is `NULL`, @ref
         /// cpu_dmac_cfg_t.ihr_work is ignored.
         void *ihr_work;
-} cpu_dmac_cfg_t;
+} __aligned(4) cpu_dmac_cfg_t;
+
+static_assert(sizeof(cpu_dmac_cfg_t) == 24);
 
 /// @brief CPU-DMAC status.
 typedef struct cpu_dmac_status {
-        /// Not yet documented.
-        unsigned int enabled:1;
-        /// Not yet documented.
-        unsigned int priority_mode:1;
-        /// Not yet documented.
+        /// Flag to determine if CPU-DMAC transfers are enabled on all channels.
+        bool enabled:1;
+        /// Priority mode.
+        cpu_dmac_priority_mode_t priority_mode:1;
+        /// Bit field to determine which channel(s) are enabled.
         unsigned int channel_enabled:2;
-        /// Not yet documented.
+        /// Bit field to determine which channel(s) are busy.
         unsigned int channel_busy:2;
-        /// Not yet documented.
-        unsigned int address_error:1;
-        /// Not yet documented.
-        unsigned int nmi_interrupt:1;
+        /// Flag to determine if an address error has occurred.
+        bool address_error:1;
+        /// Flag to determine if NMI interrupt has occurred.
+        bool nmi_interrupt:1;
 } __packed cpu_dmac_status_t;
 
 /// @brief Write directly to the CPU-DMAC I/O @ref TCR0 or @ref TCR1 register.
