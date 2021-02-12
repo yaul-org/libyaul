@@ -57,7 +57,7 @@ $(function() {
 Typedefs</h2></td></tr>
 <tr class="memitem:gad677885e1469d6fab6374542954946a7"><td class="memItemLeft" align="right" valign="top"><a id="gad677885e1469d6fab6374542954946a7"></a>
 typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__SYNC.html#gad677885e1469d6fab6374542954946a7">cpu_sync_lock_t</a></td></tr>
-<tr class="memdesc:gad677885e1469d6fab6374542954946a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represent a lock in the BIOS lock array. <br /></td></tr>
+<tr class="memdesc:gad677885e1469d6fab6374542954946a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">An 8-bit integer value representing the lock index in the BIOS lock array. <br /></td></tr>
 <tr class="separator:gad677885e1469d6fab6374542954946a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -76,7 +76,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga76fcd58e7c321f82f0701eb5205ea1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>All functions, otherwise noted make use of an exclusive area in HWRAM for all the lock variables. The size of the "lock array" is 256 bytes, and each lock variable is 1-byte. </p>
+<p>All functions, otherwise noted make use of an exclusive area in the first <code>0x4000</code> bytes of HWRAM for all the lock variables. The size of the "lock array" is 256 bytes, and each lock variable is 1-byte.</p>
+<p>For the lock array, the user is responsible for keeping track of usage. There is no way to determine which locks are being used. </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga4f8c84d991e45de992b8950b9599aa22"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga4f8c84d991e45de992b8950b9599aa22">&#9670;&nbsp;</a></span>cpu_sync_mutex()</h2>
@@ -106,7 +107,7 @@ Functions</h2></td></tr>
 <p>Implementation of the mutex is using test-and-set CPU instruction <code>tas.b</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">b</td><td>The lock number in the lock array.</td></tr>
+    <tr><td class="paramname">b</td><td>The lock index in the lock array.</td></tr>
   </table>
   </dd>
 </dl>
@@ -142,7 +143,7 @@ Functions</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>The clearing of <code>b</code> is not atomic.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+    <tr><td class="paramname">b</td><td>The lock index in the lock array. </td></tr>
   </table>
   </dd>
 </dl>
@@ -177,7 +178,7 @@ Functions</h2></td></tr>
 <p>Busy wait in a loop while repeatedly checking if the <code>b</code> is available.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+    <tr><td class="paramname">b</td><td>The lock index in the lock array. </td></tr>
   </table>
   </dd>
 </dl>
@@ -212,7 +213,7 @@ Functions</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>The clearing of <code>b</code> is not atomic.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">b</td><td>The lock number in the lock array. </td></tr>
+    <tr><td class="paramname">b</td><td>The lock index in the lock array. </td></tr>
   </table>
   </dd>
 </dl>
