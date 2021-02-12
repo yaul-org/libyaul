@@ -174,11 +174,8 @@ cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 static inline uint8_t __always_inline
 cpu_intc_mask_get(void)
 {
-        register uint32_t reg_sr;
-        reg_sr = cpu_reg_sr_get();
-
-        register uint32_t mask;
-        mask = (reg_sr >> 4) & CPU_SR_I_BITS_MASK;
+        register const uint32_t reg_sr = cpu_reg_sr_get();
+        register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
 
         return mask;
 }
@@ -193,7 +190,7 @@ cpu_intc_mask_set(uint8_t mask)
         reg_sr = cpu_reg_sr_get();
 
         reg_sr &= ~CPU_SR_I_BITS_MASK;
-        reg_sr |= (mask & CPU_SR_I_BITS_MASK) << 4;
+        reg_sr |= (mask << 4) & CPU_SR_I_BITS_MASK;
 
         cpu_reg_sr_set(reg_sr);
 }
