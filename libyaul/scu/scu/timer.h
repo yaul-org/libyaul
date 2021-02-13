@@ -5,8 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-/// @defgroup SCU_TIMER
-
 #ifndef _SCU_TIMER_H_
 #define _SCU_TIMER_H_
 
@@ -19,13 +17,14 @@
 
 __BEGIN_DECLS
 
-/// @defgroup SCU_TIMER_INLINE_FUNCTIONS
-/// @defgroup SCU_TIMER_FUNCTIONS
+/// @defgroup SCU_TIMER SCU Timer
+/// Not yet documented.
 
-typedef void (*scu_timer_ihr)(void);
-
-/// @addtogroup SCU_TIMER_INLINE_FUNCTIONS
+/// @addtogroup SCU_TIMER
 /// @{
+
+/// Not yet documented.
+typedef void (*scu_timer_ihr)(void);
 
 /// @brief Not yet documented.
 static inline void __always_inline
@@ -63,19 +62,16 @@ scu_timer_line_enable(void)
 }
 
 /// @brief Not yet documented.
-#define scu_timer_t0_clear() do {                                              \
+#define scu_timer_t0_clear()                                                   \
+do {                                                                           \
         scu_timer_t0_set(NULL);                                                \
 } while (false)
 
 /// @brief Not yet documented.
-#define scu_timer_t1_clear() do {                                              \
+#define scu_timer_t1_clear()                                                   \
+do {                                                                           \
         scu_timer_t1_set(NULL);                                                \
 } while (false)
-
-/// @}
-
-/// @addtogroup SCU_TIMER_FUNCTIONS
-/// @{
 
 /// @brief Not yet documented.
 extern void scu_timer_t0_set(scu_timer_ihr);

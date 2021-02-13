@@ -5,8 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-/// @defgroup SCU_IC
-
 #ifndef _SCU_IC_H_
 #define _SCU_IC_H_
 
@@ -18,12 +16,10 @@
 
 __BEGIN_DECLS
 
-/// @defgroup SCU_IC_INTERRUPT_DEFINES
-/// @defgroup SCU_IC_MASK_DEFINES
-/// @defgroup SCU_IC_IST_DEFINES
-/// @defgroup SCU_IC_INLINE_FUNCTIONS
+/// @defgroup SCU_IC SCU IC
+/// Not yet documented.
 
-/// @addtogroup SCU_IC_INTERRUPT_DEFINES
+/// @addtogroup SCU_IC
 /// @{
 
 /// Not yet documented.
@@ -55,75 +51,106 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define SCU_IC_INTERRUPT_SPRITE_END             0x4D
 
-/// @}
-
-/// @addtogroup SCU_IC_MASK_DEFINES
-/// @{
-
 /// Value of 0 (zero).
 #define SCU_IC_MASK_NONE                0x00000000
+/// Not yet documented.
 #define SCU_IC_MASK_VBLANK_IN           0x00000001
+/// Not yet documented.
 #define SCU_IC_MASK_VBLANK_OUT          0x00000002
+/// Not yet documented.
 #define SCU_IC_MASK_HBLANK_IN           0x00000004
+/// Not yet documented.
 #define SCU_IC_MASK_TIMER_0             0x00000008
+/// Not yet documented.
 #define SCU_IC_MASK_TIMER_1             0x00000010
+/// Not yet documented.
 #define SCU_IC_MASK_DSP_END             0x00000020
+/// Not yet documented.
 #define SCU_IC_MASK_SOUND_REQUEST       0x00000040
+/// Not yet documented.
 #define SCU_IC_MASK_SYSTEM_MANAGER      0x00000080
+/// Not yet documented.
 #define SCU_IC_MASK_PAD_INTERRUPT       0x00000100
+/// Not yet documented.
 #define SCU_IC_MASK_LEVEL_2_DMA_END     0x00000200
+/// Not yet documented.
 #define SCU_IC_MASK_LEVEL_1_DMA_END     0x00000400
+/// Not yet documented.
 #define SCU_IC_MASK_LEVEL_0_DMA_END     0x00000800
+/// Not yet documented.
 #define SCU_IC_MASK_DMA_ILLEGAL         0x00001000
+/// Not yet documented.
 #define SCU_IC_MASK_SPRITE_END          0x00002000
+/// Not yet documented.
 #define SCU_IC_MASK_A_BUS               0x00008000
 /// Defines all mask values.
 #define SCU_IC_MASK_ALL                 0x0000BFFF
 
-/// @}
-
-/// @addtogroup SCU_IC_IST_DEFINES
-/// @{
-
 /// Value of 0 (zero).
 #define SCU_IC_IST_NONE                 0x00000000
+/// Not yet documented.
 #define SCU_IC_IST_VBLANK_IN            0x00000001
+/// Not yet documented.
 #define SCU_IC_IST_VBLANK_OUT           0x00000002
+/// Not yet documented.
 #define SCU_IC_IST_HBLANK_IN            0x00000004
+/// Not yet documented.
 #define SCU_IC_IST_TIMER_0              0x00000008
+/// Not yet documented.
 #define SCU_IC_IST_TIMER_1              0x00000010
+/// Not yet documented.
 #define SCU_IC_IST_DSP_END              0x00000020
+/// Not yet documented.
 #define SCU_IC_IST_SOUND_REQUEST        0x00000040
+/// Not yet documented.
 #define SCU_IC_IST_SYSTEM_MANAGER       0x00000080
+/// Not yet documented.
 #define SCU_IC_IST_PAD_INTERRUPT        0x00000100
+/// Not yet documented.
 #define SCU_IC_IST_LEVEL_2_DMA_END      0x00000200
+/// Not yet documented.
 #define SCU_IC_IST_LEVEL_1_DMA_END      0x00000400
+/// Not yet documented.
 #define SCU_IC_IST_LEVEL_0_DMA_END      0x00000800
+/// Not yet documented.
 #define SCU_IC_IST_DMA_ILLEGAL          0x00001000
+/// Not yet documented.
 #define SCU_IC_IST_SPRITE_END           0x00002000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_16          0x00010000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_15          0x00020000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_14          0x00040000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_13          0x00080000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_12          0x00100000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_11          0x00200000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_10          0x00400000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_09          0x00800000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_08          0x01000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_07          0x02000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_06          0x04000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_05          0x08000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_04          0x10000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_03          0x20000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_02          0x40000000
+/// Not yet documented.
 #define SCU_IC_IST_EXTERNAL_01          0x80000000
 
-/// @}
-
+/// Not yet documented.
 typedef void (*scu_ic_ihr)(void);
-
-/// @addtogroup SCU_IC_INLINE_FUNCTIONS
-/// @{
 
 /// Not yet documented.
 /// @note This is a BIOS call.
