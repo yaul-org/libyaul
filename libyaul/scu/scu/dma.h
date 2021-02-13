@@ -20,6 +20,12 @@
 
 __BEGIN_DECLS
 
+/// @defgroup SCU_DMA SCU DMA
+/// Not yet documented.
+
+/// @addtogroup SCU_DMA
+/// @{
+
 /*-
  * SCU DMA should be activated by the Master CPU
  *
@@ -45,109 +51,182 @@ __BEGIN_DECLS
  *   4. VDP1, VDP2, SCSP                 -> all values can be set
  */
 
+/// @brief Not yet documented.
 #define SCU_DMA_LEVEL_COUNT     3
 
+/// @brief Not yet documented.
 #define SCU_DMA_MODE_DIRECT     0x00
+/// @brief Not yet documented.
 #define SCU_DMA_MODE_INDIRECT   0x01
 
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_VBLANK_IN          0x00
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_VBLANK_OUT         0x01
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_HBLANK_IN          0x02
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_TIMER_0            0x03
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_TIMER_1            0x04
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_SOUND_REQ          0x05
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_SPRITE_DRAW_END    0x06
+/// @brief Not yet documented.
 #define SCU_DMA_START_FACTOR_ENABLE             0x07
 
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_0_BYTES          0x00
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_2_BYTES          0x01
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_4_BYTES          0x02
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_8_BYTES          0x03
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_16_BYTES         0x04
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_32_BYTES         0x05
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_64_BYTES         0x06
+/// @brief Not yet documented.
 #define SCU_DMA_STRIDE_128_BYTES        0x07
 
+/// @brief Not yet documented.
 #define SCU_DMA_UPDATE_NONE     (0x00000000UL)
+/// @brief Not yet documented.
 #define SCU_DMA_UPDATE_RUP      (0x00010000UL)
+/// @brief Not yet documented.
 #define SCU_DMA_UPDATE_WUP      (0x00000100UL)
 
-#define SCU_DMA_INDIRECT_TABLE_END      (0x80000000UL)
+/// @brief Not yet documented.
+#define SCU_DMA_INDIRECT_TABLE_END (0x80000000UL)
 
+/// @brief Not yet documented.
 #define SCU_DMA_BUS_A   0x00
+/// @brief Not yet documented.
 #define SCU_DMA_BUS_B   0x01
+/// @brief Not yet documented.
 #define SCU_DMA_BUS_DSP 0x02
 
+/// @brief Not yet documented.
 #define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                      \
         .len = (_len),                                                         \
         .dst = (uint32_t)(_dst),                                               \
         .src = (uint32_t)(_src)                                                \
 }
 
+/// @brief Not yet documented.
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
         .len = _len,                                                           \
         .dst = (uint32_t)(_dst),                                               \
         .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
 }
 
+/// @brief Not yet documented.
 typedef struct scu_dma_handle {
+        /// Not yet documented.
         uint32_t dnr;
+        /// Not yet documented.
         uint32_t dnw;
+        /// Not yet documented.
         uint32_t dnc;
+        /// Not yet documented.
         uint32_t dnad;
+        /// Not yet documented.
         uint32_t dnmd;
 } __packed __aligned(4) scu_dma_handle_t;
 
+/// @brief Not yet documented.
 typedef struct scu_dma_xfer {
+        /// Not yet documented.
         uint32_t len;
+        /// Not yet documented.
         uint32_t dst;
+        /// Not yet documented.
         uint32_t src;
 } __packed __aligned(4) scu_dma_xfer_t;
 
+/// @brief Not yet documented.
 typedef struct scu_dma_level_cfg {
+        /// Not yet documented.
         uint8_t mode;
 
+        /// Not yet documented.
         union {
-                /* Indirect mode */
+                /// Indirect mode
                 scu_dma_xfer_t *indirect;
 
-                /* Direct mode */
+                /// Direct mode
                 scu_dma_xfer_t direct;
         } xfer;
 
+        /// Not yet documented.
         uint8_t stride;
+        /// Not yet documented.
         uint32_t update;
 } scu_dma_level_cfg_t;
 
+/// @brief Not yet documented.
 typedef void (*scu_dma_ihr)(void);
+
+/// @brief Not yet documented.
 typedef void (*scu_dma_callback)(void *);
 
+/// @brief Not yet documented.
 void scu_dma_level0_fast_start(void);
+
+/// @brief Not yet documented.
 void scu_dma_level1_fast_start(void);
+
+/// @brief Not yet documented.
 void scu_dma_level2_fast_start(void);
 
+/// @brief Not yet documented.
 void scu_dma_level0_start(void);
+
+/// @brief Not yet documented.
 void scu_dma_level1_start(void);
+
+/// @brief Not yet documented.
 void scu_dma_level2_start(void);
 
+/// @brief Not yet documented.
 void scu_dma_level0_stop(void);
+
+/// @brief Not yet documented.
 void scu_dma_level1_stop(void);
+
+/// @brief Not yet documented.
 void scu_dma_level2_stop(void);
 
+/// @brief Not yet documented.
 extern void scu_dma_level0_wait(void);
+
+/// @brief Not yet documented.
 extern void scu_dma_level1_wait(void);
+
+/// @brief Not yet documented.
 extern void scu_dma_level2_wait(void);
 
+/// @brief Not yet documented.
 extern void scu_dma_level0_end_set(scu_dma_callback, void *);
+
+/// @brief Not yet documented.
 extern void scu_dma_level1_end_set(scu_dma_callback, void *);
+
+/// @brief Not yet documented.
 extern void scu_dma_level2_end_set(scu_dma_callback, void *);
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_status_get(void)
 {
         return MEMORY_READ(32, SCU(DSTA));
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
@@ -155,24 +234,28 @@ scu_dma_dsp_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_dsp_wait(void)
 {
         while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
+/// @brief Not yet documented.
 static inline uint8_t __always_inline
 scu_dma_bus_access_busy(void)
 {
         return (MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03;
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_bus_access_wait(const uint8_t bus_mask)
 {
         while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
@@ -180,6 +263,7 @@ scu_dma_level0_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
@@ -187,6 +271,7 @@ scu_dma_level1_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
@@ -194,6 +279,7 @@ scu_dma_level2_busy(void)
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
 }
 
+/// @brief Not yet documented.
 static inline uint32_t __always_inline
 scu_dma_level_busy(const uint8_t level)
 {
@@ -208,6 +294,7 @@ scu_dma_level_busy(const uint8_t level)
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_wait(const uint8_t level)
 {
@@ -224,6 +311,7 @@ scu_dma_level_wait(const uint8_t level)
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_fast_start(const uint8_t level)
 {
@@ -240,6 +328,7 @@ scu_dma_level_fast_start(const uint8_t level)
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_start(const uint8_t level)
 {
@@ -256,6 +345,7 @@ scu_dma_level_start(const uint8_t level)
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_stop(const uint8_t level)
 {
@@ -272,6 +362,7 @@ scu_dma_level_stop(const uint8_t level)
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_stop(void)
 {
@@ -280,6 +371,7 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_end_set(const uint8_t level, scu_dma_callback callback, void *work)
 {
@@ -297,17 +389,25 @@ scu_dma_level_end_set(const uint8_t level, scu_dma_callback callback, void *work
         }
 }
 
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_illegal_set(scu_dma_ihr ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
+/// @brief Not yet documented.
 extern void scu_dma_config_buffer(scu_dma_handle_t *,
     const scu_dma_level_cfg_t *);
+
+/// @brief Not yet documented.
 extern void scu_dma_config_set(uint8_t, uint8_t,
     const scu_dma_handle_t *, scu_dma_callback);
+
+/// @brief Not yet documented.
 extern int8_t scu_dma_level_unused_get(void);
+
+/// @}
 
 __END_DECLS
 

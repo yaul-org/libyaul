@@ -16,13 +16,10 @@
 
 __BEGIN_DECLS
 
-/// @defgroup SCU_DSP_DEFINES
-/// @defgroup SCU_DSP_STRUCTURES
-/// @defgroup SCU_DSP_INLINE_FUNCTIONS
-/// @defgroup SCU_DSP_HELPERS
-/// @defgroup SCU_DSP_FUNCTIONS
+/// @defgroup SCU_DSP SCU DSP
+/// Not yet documented.
 
-/// @addtogroup SCU_DSP_DEFINES
+/// @addtogroup SCU_DSP
 /// @{
 
 /// Not yet documented.
@@ -44,14 +41,9 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define DSP_RAM_PAGE_WORD_COUNT (DSP_RAM_PAGE_SIZE / 4)
 
-/// @}
-
+/// Not yet documented.
 typedef void (*scu_dsp_ihr)(void);
 
-/// @addtogroup SCU_DSP_STRUCTURES
-/// @{
-
-/// @compound
 /// @brief Not yet documented.
 typedef struct scu_dsp_status {
         unsigned int :5;
@@ -79,11 +71,7 @@ typedef struct scu_dsp_status {
         unsigned int pc:8;
 } __packed scu_dsp_status_t;
 
-/// @}
-
-/// @addtogroup SCU_DSP_INLINE_FUNCTIONS
-/// @{
-
+/// @brief Not yet documented.
 static inline void __always_inline
 scu_dsp_program_pause(bool pause)
 {
@@ -94,25 +82,16 @@ scu_dsp_program_pause(bool pause)
         }
 }
 
-/// @}
-
-/// @addtogroup SCU_DSP_HELPERS
-/// @{
-
 /// @brief Not yet documented.
-#define scu_dsp_end_clear() do {                                               \
+#define scu_dsp_end_clear()                                                    \
+do {                                                                           \
         scu_dsp_end_set(NULL);                                                 \
 } while (false)
-
-/// @}
-
-/// @addtogroup SCU_DSP_FUNCTIONS
-/// @{
 
 /// @brief Not yet documented.
 extern void scu_dsp_end_set(scu_dsp_ihr);
 
-/// Not yet documented.
+/// @brief Not yet documented.
 extern void scu_dsp_program_load(const void *, uint32_t);
 
 /// @brief Not yet documented.
@@ -147,6 +126,7 @@ extern void scu_dsp_data_read(uint8_t, uint8_t, void *, uint32_t);
 
 /// @brief Not yet documented.
 extern void scu_dsp_data_write(uint8_t, uint8_t, void *, uint32_t);
+
 /// @brief Not yet documented.
 extern void scu_dsp_status_get(scu_dsp_status_t *);
 
