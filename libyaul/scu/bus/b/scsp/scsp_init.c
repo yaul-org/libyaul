@@ -8,6 +8,6 @@
 #include "scsp-internal.h"
 
 void
-scsp_init(void)
+_internal_scsp_init(void)
 {
 }
