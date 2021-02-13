@@ -23,6 +23,7 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "Yaul", "index.html", [
+    [ "Yaul documentation", "index.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "Modules", "modules.html", "modules" ],
     [ "Data Structures", "annotated.html", [
@@ -44,7 +45,7 @@ var NAVTREEINDEX =
 "annotated.html",
 "group__CPU__IO__REGISTERS.html",
 "group__SCU__IC.html#ga51267b394bb5c46191a869c34fa85924",
-"structscu__dma__handle.html#a25eb6346ff16e40533341b7e0dd8b2fe"
+"structscu__dma__handle.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
