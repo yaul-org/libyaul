@@ -10,8 +10,6 @@
 
 __BEGIN_DECLS
 
-extern void scsp_init(void);
-
 __END_DECLS
 
 #endif /* !_SCSP_H_ */
