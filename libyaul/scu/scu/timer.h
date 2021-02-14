@@ -23,62 +23,97 @@ __BEGIN_DECLS
 /// @addtogroup SCU_TIMER
 /// @{
 
-/// Not yet documented.
-typedef void (*scu_timer_ihr)(void);
+/// @brief Callback type.
+/// @see scu_timer_t0_set
+/// @see scu_timer_t1_set
+typedef void (*scu_timer_ihr_t)(void);
 
-/// @brief Not yet documented.
+/// @brief Set the compare value for SCU timer #0.
+///
+/// @param value The 2-byte compare value.
 static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
 {
         MEMORY_WRITE(32, SCU(T0C), value & 0x03FF);
 }
 
-/// @brief Not yet documented.
+/// @brief Set the compare value for SCU timer #1.
+///
+/// @param value The 2-byte compare value.
 static inline void __always_inline
 scu_timer_t1_value_set(uint16_t value)
 {
         MEMORY_WRITE(32, SCU(T1S), value & 0x01FF);
 }
 
-/// @brief Not yet documented.
+/// @brief Disable SCU timers.
 static inline void __always_inline
 scu_timer_disable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
 }
 
-/// @brief Not yet documented.
+/// @brief Enable SCU timers.
 static inline void __always_inline
 scu_timer_enable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
 }
 
-/// @brief Not yet documented.
+/// @brief Set behavior of the SCU timer #1 interrupt to occur at lines indicated by SCU timer #0
+///
+/// This function also enables the SCU timers.
+///
+/// @see scu_timer_line_disable
 static inline void __always_inline
 scu_timer_line_enable(void)
 {
         MEMORY_WRITE(32, SCU(T1MD), 0x00000101);
 }
 
-/// @brief Not yet documented.
+/// @brief Set behavior of the SCU timer #1 interrupt to occur at every line.
+///
+/// This function also enables the SCU timers.
+///
+/// @see scu_timer_line_enable
+static inline void __always_inline
+scu_timer_line_disable(void)
+{
+        MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
+}
+
+/// @brief Clear the interrupt handler for the SCU timer #0 interrupt.
+/// @see scu_timer_t0_set
 #define scu_timer_t0_clear()                                                   \
 do {                                                                           \
         scu_timer_t0_set(NULL);                                                \
 } while (false)
 
-/// @brief Not yet documented.
+
+/// @brief Clear the interrupt handler for the SCU timer #1 interrupt.
+/// @see scu_timer_t1_set
 #define scu_timer_t1_clear()                                                   \
 do {                                                                           \
         scu_timer_t1_set(NULL);                                                \
 } while (false)
 
-/// @brief Not yet documented.
-extern void scu_timer_t0_set(scu_timer_ihr);
-/// @brief Not yet documented.
-extern void scu_timer_t1_set(scu_timer_ihr);
-/// @brief Not yet documented.
-extern void scu_timer_t1_line_set(int16_t);
+/// @brief Set the interrupt handler for the SCU timer #0 interrupt.
+///
+/// @details There is no need to explicitly return via `rte` for @p ihr.
+///
+/// @param ihr The interrupt handler.
+///
+/// @see scu_timer_t0_clear
+extern void scu_timer_t0_set(scu_timer_ihr_t ihr);
+
+/// @brief Set the interrupt handler for the SCU timer #1 interrupt.
+///
+/// @details There is no need to explicitly return via `rte` for @p ihr.
+///
+/// @param ihr The interrupt handler.
+///
+/// @see scu_timer_t1_clear
+extern void scu_timer_t1_set(scu_timer_ihr_t ihr);
 
 /// @}
 
