@@ -58,7 +58,6 @@ $(document).ready(function(){initNavTree('group__CPU__WDT.html',''); initResizab
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
@@ -67,21 +66,6 @@ $(document).ready(function(){initNavTree('group__CPU__WDT.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:gad07c9d0b9e27a5902fc2693b6a39ba94"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#gad07c9d0b9e27a5902fc2693b6a39ba94">MEMORY_WRITE_WTCNT</a>(x)</td></tr>
-<tr class="memdesc:gad07c9d0b9e27a5902fc2693b6a39ba94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a> register.  <a href="group__CPU__WDT.html#gad07c9d0b9e27a5902fc2693b6a39ba94">More...</a><br /></td></tr>
-<tr class="separator:gad07c9d0b9e27a5902fc2693b6a39ba94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6b1aa64a4276a980fcb16559b5421cdb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga6b1aa64a4276a980fcb16559b5421cdb">MEMORY_WRITE_WTCSR</a>(x)</td></tr>
-<tr class="memdesc:ga6b1aa64a4276a980fcb16559b5421cdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a> register.  <a href="group__CPU__WDT.html#ga6b1aa64a4276a980fcb16559b5421cdb">More...</a><br /></td></tr>
-<tr class="separator:ga6b1aa64a4276a980fcb16559b5421cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6b0f160c7d82ed45185f298fe146a979"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga6b0f160c7d82ed45185f298fe146a979">MEMORY_CLEAR_WOVF_RSTCSR</a>()</td></tr>
-<tr class="memdesc:ga6b0f160c7d82ed45185f298fe146a979"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write <code>0xA500</code> to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register.  <a href="group__CPU__WDT.html#ga6b0f160c7d82ed45185f298fe146a979">More...</a><br /></td></tr>
-<tr class="separator:ga6b0f160c7d82ed45185f298fe146a979"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga748275f13cc36803697d09a7697cc7f7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga748275f13cc36803697d09a7697cc7f7">MEMORY_CLEAR_RSTCSR</a>(x)</td></tr>
-<tr class="memdesc:ga748275f13cc36803697d09a7697cc7f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register.  <a href="group__CPU__WDT.html#ga748275f13cc36803697d09a7697cc7f7">More...</a><br /></td></tr>
-<tr class="separator:ga748275f13cc36803697d09a7697cc7f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ga871e6ca3976c0552c9dd1cb1c612446d"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4">cpu_wdt_clock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a></td></tr>
@@ -146,120 +130,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:gafcccaa58106e9ba25e474ebdb595158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ga748275f13cc36803697d09a7697cc7f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga748275f13cc36803697d09a7697cc7f7">&#9670;&nbsp;</a></span>MEMORY_CLEAR_RSTCSR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEMORY_CLEAR_RSTCSR</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">x</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = (0x5A3F | ((x) &amp; 0x00FF)));    \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>The 2-byte value. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ga6b0f160c7d82ed45185f298fe146a979"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6b0f160c7d82ed45185f298fe146a979">&#9670;&nbsp;</a></span>MEMORY_CLEAR_WOVF_RSTCSR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEMORY_CLEAR_WOVF_RSTCSR</td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a>)) = 0xA500);                       \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Write <code>0xA500</code> to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> register. </p>
-<p>For writing to <a class="el" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a> and <a class="el" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a>, use 16-bit writes only:</p>
-<div class="fragment"><div class="line">*(<span class="keyword">volatile</span> uint16_t *)<a class="code" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a> = 0xA518 | (value &amp; 0xFF);</div>
-<div class="line">*(<span class="keyword">volatile</span> uint16_t *)<a class="code" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a> = 0x5A00 | (value &amp; 0xFF);</div>
-</div><!-- fragment --> 
-</div>
-</div>
-<a id="gad07c9d0b9e27a5902fc2693b6a39ba94"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad07c9d0b9e27a5902fc2693b6a39ba94">&#9670;&nbsp;</a></span>MEMORY_WRITE_WTCNT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEMORY_WRITE_WTCNT</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">x</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a>)) = (0x5A00 | ((x) &amp; 0x00FF)));     \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a> register. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>The 2-byte value. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ga6b1aa64a4276a980fcb16559b5421cdb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6b1aa64a4276a980fcb16559b5421cdb">&#9670;&nbsp;</a></span>MEMORY_WRITE_WTCSR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEMORY_WRITE_WTCSR</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">x</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        (*(<span class="keyword">volatile</span> uint16_t *)(<a class="code" href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a>)) = (0xA500 | ((x) &amp; 0x00FF)));     \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Write to the CPU-WDT <a class="el" href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a> register. </p>
-<p>When clearing the <code>WOVF</code> bit: </p><div class="fragment"><div class="line">*(<span class="keyword">volatile</span> uint16_t *)<a class="code" href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a> = 0xA500 | 0x00;</div>
-</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>The 2-byte value. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ga871e6ca3976c0552c9dd1cb1c612446d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga871e6ca3976c0552c9dd1cb1c612446d">&#9670;&nbsp;</a></span>cpu_wdt_clock_t</h2>
@@ -563,10 +433,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:71</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga2ed0a436ae1aae03c36e33ad5a391dca"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga2ed0a436ae1aae03c36e33ad5a391dca">WTCSRW</a></div><div class="ttdeci">#define WTCSRW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:203</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga0613723c5d4a3cad1b342e1d1f026dcf"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga0613723c5d4a3cad1b342e1d1f026dcf">WTCNTW</a></div><div class="ttdeci">#define WTCNTW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:214</div></div>
-<div class="ttc" id="agroup__CPU__IO__REGISTERS_html_ga53171005a614694007fedf30f1c0d768"><div class="ttname"><a href="group__CPU__IO__REGISTERS.html#ga53171005a614694007fedf30f1c0d768">RSTCSRW</a></div><div class="ttdeci">#define RSTCSRW</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:225</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

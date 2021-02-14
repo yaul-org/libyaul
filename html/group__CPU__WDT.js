@@ -1,9 +1,5 @@
 var group__CPU__WDT =
 [
-    [ "MEMORY_CLEAR_RSTCSR", "group__CPU__WDT.html#ga748275f13cc36803697d09a7697cc7f7", null ],
-    [ "MEMORY_CLEAR_WOVF_RSTCSR", "group__CPU__WDT.html#ga6b0f160c7d82ed45185f298fe146a979", null ],
-    [ "MEMORY_WRITE_WTCNT", "group__CPU__WDT.html#gad07c9d0b9e27a5902fc2693b6a39ba94", null ],
-    [ "MEMORY_WRITE_WTCSR", "group__CPU__WDT.html#ga6b1aa64a4276a980fcb16559b5421cdb", null ],
     [ "cpu_wdt_clock_t", "group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d", null ],
     [ "cpu_wdt_ihr", "group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e", null ],
     [ "cpu_wdt_mode_t", "group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98", null ],

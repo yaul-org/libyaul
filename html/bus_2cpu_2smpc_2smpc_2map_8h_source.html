@@ -73,42 +73,43 @@ $(document).ready(function(){initNavTree('bus_2cpu_2smpc_2smpc_2map_8h_source.ht
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;scu/map.h&gt;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define SMPC_IREGS      7</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#define SMPC_OREGS      32</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga54dcb69c90fcbdfa9b4c1bda4c0ba860">   31</a></span>&#160;<span class="preprocessor">#define IREG(x)         (0x20100001UL + ((x) &lt;&lt; 1))</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#gafb6e640cae4663b0aa6e2ef55426e76b">   40</a></span>&#160;<span class="preprocessor">#define OREG(x)         (0x20100021UL + ((x) &lt;&lt; 1))</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#gadcdf6654942d055f66f72da44a62e314">   48</a></span>&#160;<span class="preprocessor">#define SMPC(x)         (0x20100000UL + (x))</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define SMPC_IREGS      7</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#define SMPC_OREGS      32</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__AREAS.html#ga54dcb69c90fcbdfa9b4c1bda4c0ba860">   29</a></span>&#160;<span class="preprocessor">#define IREG(x)         (0x20100001UL + ((x) &lt;&lt; 1))</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__AREAS.html#gafb6e640cae4663b0aa6e2ef55426e76b">   38</a></span>&#160;<span class="preprocessor">#define OREG(x)         (0x20100021UL + ((x) &lt;&lt; 1))</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__AREAS.html#gadcdf6654942d055f66f72da44a62e314">   46</a></span>&#160;<span class="preprocessor">#define SMPC(x)         (0x20100000UL + (x))</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga17860ca5b160ca96af6c5bf5b3198a7e">   54</a></span>&#160;<span class="preprocessor">#define COMREG          0x01FUL</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#gabaed93a16a0cde13f32bc4dc48b96804">   60</a></span>&#160;<span class="preprocessor">#define SR              0x061UL</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga1022bf161d0791b616eb885b56a04934">   66</a></span>&#160;<span class="preprocessor">#define SF              0x063UL</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga9dba01360ec7e7e8115c05231ebbb68a">   72</a></span>&#160;<span class="preprocessor">#define PDR1            0x075UL</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga5a20a76234588d55c944a3d59e8f0c4d">   78</a></span>&#160;<span class="preprocessor">#define PDR2            0x077UL</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga17860ca5b160ca96af6c5bf5b3198a7e">   58</a></span>&#160;<span class="preprocessor">#define COMREG          0x01FUL</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#gabaed93a16a0cde13f32bc4dc48b96804">   63</a></span>&#160;<span class="preprocessor">#define SR              0x061UL</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga1022bf161d0791b616eb885b56a04934">   68</a></span>&#160;<span class="preprocessor">#define SF              0x063UL</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga9dba01360ec7e7e8115c05231ebbb68a">   73</a></span>&#160;<span class="preprocessor">#define PDR1            0x075UL</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga5a20a76234588d55c944a3d59e8f0c4d">   78</a></span>&#160;<span class="preprocessor">#define PDR2            0x077UL</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga463e760bc0012ae9f9e997a620a4fb0a">   84</a></span>&#160;<span class="preprocessor">#define DDR1            0x079UL</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#gafa199a228bf69225ca8bc7e1773c54d7">   90</a></span>&#160;<span class="preprocessor">#define DDR2            0x07BUL</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga23ea04a27f31826f7efe8a960f3542fb">   96</a></span>&#160;<span class="preprocessor">#define IOSEL1          0x07DUL</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga2d2f51c0572402906c344c99ed6d84e2">  102</a></span>&#160;<span class="preprocessor">#define IOSEL2          0x07DUL</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#ga0408e6e207c3c9e9b5ad459875e78ca5">  108</a></span>&#160;<span class="preprocessor">#define EXLE1           0x07FUL</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga463e760bc0012ae9f9e997a620a4fb0a">   83</a></span>&#160;<span class="preprocessor">#define DDR1            0x079UL</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#gafa199a228bf69225ca8bc7e1773c54d7">   88</a></span>&#160;<span class="preprocessor">#define DDR2            0x07BUL</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00093"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga23ea04a27f31826f7efe8a960f3542fb">   93</a></span>&#160;<span class="preprocessor">#define IOSEL1          0x07DUL</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga2d2f51c0572402906c344c99ed6d84e2">   98</a></span>&#160;<span class="preprocessor">#define IOSEL2          0x07DUL</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga0408e6e207c3c9e9b5ad459875e78ca5">  103</a></span>&#160;<span class="preprocessor">#define EXLE1           0x07FUL</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="group__MEMORY__MAP__SMPC__IO__REGISTERS.html#gafc139f1f71fa8f101f180850450d236d">  108</a></span>&#160;<span class="preprocessor">#define EXLE2           0x07FUL</span></div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="group__SMPC__IO__REGISTERS.html#gafc139f1f71fa8f101f180850450d236d">  114</a></span>&#160;<span class="preprocessor">#define EXLE2           0x07FUL</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_SMPC_MAP_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_SMPC_MAP_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

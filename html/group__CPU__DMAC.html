@@ -144,7 +144,7 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:gaa36f0e459d7735660fd361b4270dca1a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a">cpu_dmac_channel_transfer_set</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch, uint32_t tcr_bits)</td></tr>
-<tr class="memdesc:gaa36f0e459d7735660fd361b4270dca1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write directly to the CPU-DMAC I/O <a class="el" href="group__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register.  <a href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a">More...</a><br /></td></tr>
+<tr class="memdesc:gaa36f0e459d7735660fd361b4270dca1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write directly to the CPU-DMAC I/O <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register.  <a href="group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a">More...</a><br /></td></tr>
 <tr class="separator:gaa36f0e459d7735660fd361b4270dca1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5b03cac0c45a74d471de1e84b86cb7ab"><td class="memItemLeft" align="right" valign="top"><a id="ga5b03cac0c45a74d471de1e84b86cb7ab"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga5b03cac0c45a74d471de1e84b86cb7ab">cpu_dmac_enable</a> (void)</td></tr>
@@ -548,7 +548,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </table>
 </div><div class="memdoc">
 
-<p>Write directly to the CPU-DMAC I/O <a class="el" href="group__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register. </p>
+<p>Write directly to the CPU-DMAC I/O <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register. </p>
 <p>This function is not enough to set up a proper transfer. Use <a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">cpu_dmac_channel_config_set</a> to configure a transfer. The purpose of this function is to quickly reset a transfer by just setting the transfer length.</p>
 <p>There is no waiting if the CPU-DMAC or the specific channel <code>ch</code> is operating.</p>
 <p>While this function resets the transfer length, it does not start the transfer again. For that, use <a class="el" href="group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1">cpu_dmac_channel_start</a>.</p>
