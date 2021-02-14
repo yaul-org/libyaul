@@ -24,21 +24,21 @@ static void _default_ihr(void);
 #define FRT_IHR_INDEX_OCAI      2
 #define FRT_IHR_INDEX_OVI       3
 
-static cpu_frt_ihr _master_frt_ihr_table[] = {
+static cpu_frt_ihr_t _master_frt_ihr_table[] = {
         _default_ihr,
         _default_ihr,
         _default_ihr,
         _default_ihr
 };
 
-static cpu_frt_ihr _slave_frt_ihr_table[] = {
+static cpu_frt_ihr_t _slave_frt_ihr_table[] = {
         _default_ihr,
         _default_ihr,
         _default_ihr,
         _default_ihr
 };
 
-static cpu_frt_ihr* _frt_ihr_table_get(void);
+static cpu_frt_ihr_t* _frt_ihr_table_get(void);
 
 void
 cpu_frt_init(uint8_t clock_div)
@@ -75,7 +75,7 @@ cpu_frt_init(uint8_t clock_div)
 }
 
 void
-cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr)
+cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr)
 {
         /* Disable interrupt */
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x08);
@@ -86,7 +86,7 @@ cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr)
         MEMORY_WRITE(8, CPU(OCRAH), 0);
         MEMORY_WRITE(8, CPU(OCRAL), 0);
 
-        cpu_frt_ihr *frt_ihr_table;
+        cpu_frt_ihr_t *frt_ihr_table;
         frt_ihr_table = _frt_ihr_table_get();
 
         frt_ihr_table[FRT_IHR_INDEX_OCAI] = _default_ihr;
@@ -105,7 +105,7 @@ cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr)
 }
 
 void
-cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr)
+cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr)
 {
         /* Disable interrupt */
         MEMORY_WRITE_AND(8, CPU(TIER), ~0x04);
@@ -119,7 +119,7 @@ cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr)
         MEMORY_WRITE(8, CPU(OCRBH), 0);
         MEMORY_WRITE(8, CPU(OCRBL), 0);
 
-        cpu_frt_ihr *frt_ihr_table;
+        cpu_frt_ihr_t *frt_ihr_table;
         frt_ihr_table = _frt_ihr_table_get();
 
         frt_ihr_table[FRT_IHR_INDEX_OCBI] = _default_ihr;
@@ -136,7 +136,7 @@ cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr)
 }
 
 void
-cpu_frt_ovi_set(cpu_frt_ihr ihr)
+cpu_frt_ovi_set(cpu_frt_ihr_t ihr)
 {
         volatile uint8_t *reg_tier;
         reg_tier = (volatile uint8_t *)CPU(TIER);
@@ -145,7 +145,7 @@ cpu_frt_ovi_set(cpu_frt_ihr ihr)
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        cpu_frt_ihr *frt_ihr_table;
+        cpu_frt_ihr_t *frt_ihr_table;
         frt_ihr_table = _frt_ihr_table_get();
 
         frt_ihr_table[FRT_IHR_INDEX_OVI] = _default_ihr;
@@ -157,7 +157,7 @@ cpu_frt_ovi_set(cpu_frt_ihr ihr)
         }
 }
 
-static cpu_frt_ihr *
+static cpu_frt_ihr_t *
 _frt_ihr_table_get(void)
 {
         const uint8_t which_cpu = cpu_dual_executor_get();
@@ -193,7 +193,7 @@ _frt_oci_handler(void)
         *reg_tier &= ~ocf_bits;
         *reg_ftcsr = ftcsr_bits & ~0x0C;
 
-        cpu_frt_ihr *frt_ihr_table;
+        cpu_frt_ihr_t *frt_ihr_table;
         frt_ihr_table = _frt_ihr_table_get();
 
         frt_ihr_table[(ocf_bits & 0x08) >> 2]();
@@ -212,7 +212,7 @@ _frt_ovi_handler(void)
 
         MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
 
-        cpu_frt_ihr *frt_ihr_table;
+        cpu_frt_ihr_t *frt_ihr_table;
         frt_ihr_table = _frt_ihr_table_get();
 
         frt_ihr_table[FRT_IHR_INDEX_OVI]();

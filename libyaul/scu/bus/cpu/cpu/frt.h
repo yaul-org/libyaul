@@ -74,7 +74,7 @@ __BEGIN_DECLS
 /// @see cpu_frt_oca_set
 /// @see cpu_frt_ocb_set
 /// @see cpu_frt_ovi_set
-typedef void (*cpu_frt_ihr)(void);
+typedef void (*cpu_frt_ihr_t)(void);
 
 /// @brief Set the 2-byte FRT tick count.
 ///
@@ -181,7 +181,7 @@ extern void cpu_frt_init(uint8_t clock_div);
 /// @param count The tick count to trigger OCA on.
 ///
 /// @see cpu_frt_oca_clear
-extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr);
+extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
 
 /// @brief Set the interrupt handler for the CPU-FRT OCB interrupt.
 ///
@@ -191,7 +191,7 @@ extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr ihr);
 /// @param count The tick count to trigger OCB on.
 ///
 /// @see cpu_frt_ocb_clear
-extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr);
+extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr);
 
 /// @brief Set the interrupt handler for the CPU-FRT OVI interrupt.
 ///
@@ -200,7 +200,7 @@ extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr ihr);
 /// @param ihr The interrupt handler.
 ///
 /// @see cpu_frt_ovi_clear
-extern void cpu_frt_ovi_set(cpu_frt_ihr ihr);
+extern void cpu_frt_ovi_set(cpu_frt_ihr_t ihr);
 
 /// @}
 
