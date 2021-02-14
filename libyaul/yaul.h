@@ -5,6 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+/// @defgroup MEMORY_MAP Memory map
+/// @defgroup MEMORY_MAP_MACROS Accessors
+/// @ingroup MEMORY_MAP
+/// @defgroup MEMORY_MAP_AREAS Offset Accessors
+/// @ingroup MEMORY_MAP
+
 #ifndef _YAUL_H_
 #define _YAUL_H_
 

@@ -12,9 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/// @defgroup SCU_IO_REGISTERS SCU I/O Registers
-
-/// @addtogroup SCU_IO_REGISTERS
+/// @addtogroup MEMORY_MAP_MACROS
 /// @{
 
 /// Read value of size @p t from address @p x.
@@ -29,7 +27,6 @@
 /// @param t The bit count: 8, 16, or 32.
 /// @param x The byte offset.
 /// @param y The value to write.
-
 #define MEMORY_WRITE(t, x, y)                                                  \
 do {                                                                           \
         (*(volatile uint ## t ## _t *)(x) = (y));                              \
@@ -54,6 +51,11 @@ do {                                                                           \
 do {                                                                           \
         (*(volatile uint ## t ## _t *)(x) |= (y));                             \
 } while (false)
+
+/// @}
+
+/// @addtogroup MEMORY_MAP_AREAS
+/// @{
 
 /// @brief Specify offset @p x for address space.
 ///
@@ -156,10 +158,17 @@ do {                                                                           \
 /// Total size of L-WRAM in bytes.
 #define LWRAM_SIZE              0x00100000UL
 
-/// Master address
-#define MINIT                   (0x21000000UL)
-/// Slave address
-#define SINIT                   (0x21800000UL)
+/// Master CPU address for slave CPU notification
+#define MINIT (0x21000000UL)
+/// Save CPU address for master CPU notification
+#define SINIT (0x21800000UL)
+
+/// @}
+
+/// @addtogroup MEMORY_MAP
+/// @defgroup MEMORY_MAP_SCU_IO_REGISTERS SCU I/O
+/// @ingroup MEMORY_MAP
+/// @{
 
 /// @brief SCU I/O register.
 /// @see MEMORY_WRITE
