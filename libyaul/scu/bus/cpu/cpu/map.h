@@ -10,9 +10,7 @@
 
 #include <scu/map.h>
 
-/// @defgroup CPU_IO_REGISTERS CPU I/O Registers
-
-/// @addtogroup CPU_WDT
+/// @addtogroup MEMORY_MAP_MACROS
 /// @{
 
 /// @brief Write to the CPU-WDT @ref WTCNTW register.
@@ -59,16 +57,20 @@ do {                                                                           \
 
 /// @}
 
-/// @addtogroup CPU_IO_REGISTERS
+/// @addtogroup MEMORY_MAP_AREAS
 /// @{
 
 /// @brief Access the CPU I/O registers.
 ///
 /// @param x The byte offset.
-///
-/// @see MEMORY_READ
-/// @see MEMORY_WRITE
 #define CPU(x) (0xFFFFF000UL + (x))
+
+/// @}
+
+/// @addtogroup MEMORY_MAP
+/// @defgroup MEMORY_MAP_CPU_IO_REGISTERS CPU I/O
+/// @ingroup MEMORY_MAP
+/// @{
 
 /// @brief CPU I/O register.
 /// @see CPU

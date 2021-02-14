@@ -10,15 +10,13 @@
 
 #include <scu/map.h>
 
-/// @defgroup SMPC_IO_REGISTERS SMPC I/O Registers
-
 /// The number of IREG I/O registers available.
 #define SMPC_IREGS      7
 
 /// The number of OREG I/O registers available.
 #define SMPC_OREGS      32
 
-/// @addtogroup SMPC_IO_REGISTERS
+/// @addtogroup MEMORY_MAP_AREAS
 /// @{
 
 /// @brief Access the SMPC 7 IREG I/O registers.
@@ -47,68 +45,64 @@
 /// @see MEMORY_WRITE
 #define SMPC(x)         (0x20100000UL + (x))
 
+/// @}
+
+/// @addtogroup MEMORY_MAP
+/// @defgroup MEMORY_MAP_SMPC_IO_REGISTERS SMPC I/O
+/// @ingroup MEMORY_MAP
+/// @{
+
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define COMREG          0x01FUL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define SR              0x061UL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define SF              0x063UL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define PDR1            0x075UL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define PDR2            0x077UL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define DDR1            0x079UL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define DDR2            0x07BUL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define IOSEL1          0x07DUL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define IOSEL2          0x07DUL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EXLE1           0x07FUL
 
 /// @brief SMPC I/O register.
-/// @see SMPC
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EXLE2           0x07FUL
