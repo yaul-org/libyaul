@@ -19,14 +19,14 @@ var group__CPU__FRT =
     [ "CPU_FRT_PAL_352_128_COUNT_1MS", "group__CPU__FRT.html#ga8a4e8a7009dcded7bcad5cc135a1dcb1", null ],
     [ "CPU_FRT_PAL_352_32_COUNT_1MS", "group__CPU__FRT.html#gacc191fd5cf3a122812b2daf1392d4957", null ],
     [ "CPU_FRT_PAL_352_8_COUNT_1MS", "group__CPU__FRT.html#gaa4c24fbf9e576f97322c3f865f5f7da9", null ],
-    [ "cpu_frt_ihr", "group__CPU__FRT.html#ga3fbc7edf14937eed335549bc256da270", null ],
+    [ "cpu_frt_ihr_t", "group__CPU__FRT.html#ga0d937d749aacbbe03a9827dadf1f8890", null ],
     [ "cpu_frt_count_get", "group__CPU__FRT.html#ga46d93f737eb171df458cab924da3e9a9", null ],
     [ "cpu_frt_count_set", "group__CPU__FRT.html#gadf01d6278fce65a134f67d149ede7b57", null ],
     [ "cpu_frt_init", "group__CPU__FRT.html#gac60b2f4331a501e4e4489479e7c9449f", null ],
     [ "cpu_frt_input_capture_get", "group__CPU__FRT.html#ga1b610ba664854ed0957aca2eb4203889", null ],
     [ "cpu_frt_interrupt_priority_get", "group__CPU__FRT.html#gaea3a6b236f233d10d1c0a295ba7a37b6", null ],
     [ "cpu_frt_interrupt_priority_set", "group__CPU__FRT.html#ga8e1a4fbebdb89e776c8b4d89f20feebc", null ],
-    [ "cpu_frt_oca_set", "group__CPU__FRT.html#ga90371ce22ebf824e6de935f2a09151e5", null ],
-    [ "cpu_frt_ocb_set", "group__CPU__FRT.html#ga8a36eaef75eef5982e14c4035739249b", null ],
-    [ "cpu_frt_ovi_set", "group__CPU__FRT.html#gaebf91a7dc06942f4f6c538f91a41505e", null ]
+    [ "cpu_frt_oca_set", "group__CPU__FRT.html#gaf9f4ba810bf072d54af608e1d8fd19c0", null ],
+    [ "cpu_frt_ocb_set", "group__CPU__FRT.html#ga76a7b36ddb1773db523daa09383b979c", null ],
+    [ "cpu_frt_ovi_set", "group__CPU__FRT.html#gacfebd31e06994eeed04538eff518315d", null ]
 ];
