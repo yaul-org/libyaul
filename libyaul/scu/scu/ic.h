@@ -21,7 +21,8 @@ __BEGIN_DECLS
 /// Not yet documented.
 
 /// @defgroup SCU_IC_HELPERS SCU IC Setters
-/// These functions set the interrupt handler for their respective SCU IC interrupt.
+/// These functions set the interrupt handler for their respective SCU IC
+/// interrupt.
 
 /// @addtogroup SCU_IC
 /// @{
