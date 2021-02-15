@@ -18,7 +18,8 @@ __BEGIN_DECLS
 /// @defgroup CPU_INTC CPU Interrupt Controller (INTC)
 
 /// @defgroup CPU_INTC_HELPERS CPU INTC Setters
-/// These functions set the interrupt handler for their respective CPU INTC interrupt.
+/// These functions set the interrupt handler for their respective CPU INTC
+/// interrupt.
 
 /// @addtogroup CPU_INTC
 /// @{
@@ -138,8 +139,7 @@ typedef void (*cpu_intc_ihr)(void);
 static inline void __always_inline
 cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr ihr)
 {
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000310;
+        register uint32_t * const bios_address = (uint32_t *)0x06000310;
 
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
@@ -173,8 +173,7 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 static inline cpu_intc_ihr __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 {
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000314;
+        register uint32_t * const bios_address = (uint32_t *)0x06000314;
 
         return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
