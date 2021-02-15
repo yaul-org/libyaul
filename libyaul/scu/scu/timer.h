@@ -82,6 +82,7 @@ scu_timer_line_disable(void)
         MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
 }
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU timer #0 interrupt.
 /// @see scu_timer_t0_set
 #define scu_timer_t0_clear()                                                   \
@@ -89,7 +90,7 @@ do {                                                                           \
         scu_timer_t0_set(NULL);                                                \
 } while (false)
 
-
+/// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU timer #1 interrupt.
 /// @see scu_timer_t1_set
 #define scu_timer_t1_clear()                                                   \
@@ -97,6 +98,7 @@ do {                                                                           \
         scu_timer_t1_set(NULL);                                                \
 } while (false)
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Set the interrupt handler for the SCU timer #0 interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
@@ -106,6 +108,7 @@ do {                                                                           \
 /// @see scu_timer_t0_clear
 extern void scu_timer_t0_set(scu_timer_ihr_t ihr);
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Set the interrupt handler for the SCU timer #1 interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.

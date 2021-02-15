@@ -371,6 +371,7 @@ scu_dma_stop(void)
         scu_dma_level2_stop();
 }
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Not yet documented.
 static inline void __always_inline
 scu_dma_level_end_set(const uint8_t level, scu_dma_callback callback, void *work)

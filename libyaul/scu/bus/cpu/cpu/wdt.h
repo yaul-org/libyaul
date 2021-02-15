@@ -117,6 +117,7 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
 /// @param clock_div The clock divisor.
 extern void cpu_wdt_init(cpu_wdt_clock_t clock_div);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the CPU-WDT mode.
 ///
 /// @param mode The mode.

@@ -20,6 +20,9 @@ __BEGIN_DECLS
 /// @defgroup SCU_IC SCU IC
 /// Not yet documented.
 
+/// @defgroup SCU_IC_HELPERS SCU IC Setters
+/// These functions set the interrupt handler for their respective SCU IC interrupt.
+
 /// @addtogroup SCU_IC
 /// @{
 
@@ -178,7 +181,7 @@ static_assert(sizeof(scu_ic_priority_t) == 4);
 /// @see scu_ic_ihr_set
 typedef void (*scu_ic_ihr_t)(void);
 
-/// @brief Set the interrupt handler for the specified CPU related interrupt.
+/// @brief Set the interrupt handler for the specified SCU related interrupt.
 ///
 /// @details This is a BIOS call. The function should @em not use `rte` to
 /// return, unlike @ref cpu_intc_ihr_set.
@@ -256,8 +259,13 @@ typedef void (*scu_ic_ihr_t)(void);
 /// 0x0600094C: nop
 /// @endcode
 ///
+/// @warning Avoid setting interrupts directly via this function, unless there
+/// is an explicit need to do so. To see which functions and macros to use for
+/// each interrupt, see @ref SCU_IC_HELPERS.
+///
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
+///
 static inline void __always_inline
 scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 {
@@ -270,6 +278,10 @@ scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 ///
 /// @details This is a BIOS call.
 ///
+/// @warning Avoid clearing interrupts directly via this function, unless there
+/// is an explicit need to do so. To see which functions and macros to use for
+/// each interrupt, see @ref SCU_IC_HELPERS.
+///
 /// @param vector The vector number.
 static inline void __always_inline
 scu_ic_ihr_clear(scu_ic_interrupt_t vector)
@@ -277,7 +289,7 @@ scu_ic_ihr_clear(scu_ic_interrupt_t vector)
         scu_ic_ihr_set(vector, NULL);
 }
 
-/// @brief Obtain the interrupt handler for the specified CPU related interrupt.
+/// @brief Obtain the interrupt handler for the specified SCU related interrupt.
 ///
 /// @details This is a BIOS call.
 ///

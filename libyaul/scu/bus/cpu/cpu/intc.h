@@ -17,6 +17,9 @@ __BEGIN_DECLS
 
 /// @defgroup CPU_INTC CPU Interrupt Controller (INTC)
 
+/// @defgroup CPU_INTC_HELPERS CPU INTC Setters
+/// These functions set the interrupt handler for their respective CPU INTC interrupt.
+
 /// @addtogroup CPU_INTC
 /// @{
 
@@ -125,7 +128,11 @@ typedef void (*cpu_intc_ihr)(void);
 ///
 /// To set a handler in the slave CPU vector table, add the offset @ref
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
-/// 
+///
+/// @warning Do not use this function to set your interrupt handler, unless
+/// there is an explicit need to do so. To see which functions and macros to use
+/// for each interrupt, see @ref CPU_INTC_HELPERS.
+///
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
 static inline void __always_inline
@@ -144,6 +151,10 @@ cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr ihr)
 /// To clear a handler in the slave CPU vector table, add the offset @ref
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
 ///
+/// @warning Do not use this function to clear your interrupt handler, unless
+/// there is an explicit need to do so. To see which functions and macros to use
+/// for each interrupt, see @ref CPU_INTC_HELPERS.
+///
 /// @param vector The vector number.
 static inline void __always_inline
 cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
@@ -157,7 +168,7 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 ///
 /// To get a handler in the slave CPU vector table, add the offset @ref
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
-/// 
+///
 /// @param vector The vector number.
 static inline cpu_intc_ihr __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)

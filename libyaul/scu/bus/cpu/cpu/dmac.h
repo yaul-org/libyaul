@@ -111,11 +111,13 @@ typedef struct cpu_dmac_cfg {
         /// Transfer length.
         uint32_t len;
 
+        /// @ingroup CPU_INTC_HELPERS
         /// @brief Callback when transfer is completed.
         ///
         /// @details Set to `NULL` if no callback is desired.
         cpu_dmac_ihr ihr;
 
+        /// @ingroup CPU_INTC_HELPERS
         /// @brief Pointer to any work passed onto @ref cpu_dmac_cfg_t.ihr.
         ///
         /// @details If @ref cpu_dmac_cfg_t.ihr is `NULL`, @ref

@@ -133,12 +133,14 @@ cpu_dual_slave_stack_get(void)
         return (void *)&_slave_stack;
 }
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the master CPU entry handler.
 #define cpu_dual_master_clear()                                                \
 do {                                                                           \
         cpu_dual_master_set(NULL);                                             \
 } while (false)
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the slave CPU entry handler.
 #define cpu_dual_slave_clear()                                                 \
 do {                                                                           \
@@ -153,6 +155,7 @@ do {                                                                           \
 /// @param mode The communication mode.
 extern void cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the entry handler for the master CPU.
 ///
 /// @details When the master CPU calls @ref cpu_dual_master_notify, @p entry will
@@ -164,6 +167,7 @@ extern void cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode);
 /// @see cpu_dual_master_clear
 extern void cpu_dual_master_set(cpu_dual_master_entry entry);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the entry handler for the slave CPU.
 ///
 /// @details When the master CPU calls @ref cpu_dual_slave_notify, @p entry will

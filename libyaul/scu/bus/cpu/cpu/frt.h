@@ -140,6 +140,7 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCA interrupt.
 /// @see cpu_frt_oca_set
 #define cpu_frt_oca_clear()                                                    \
@@ -147,6 +148,7 @@ do {                                                                           \
         cpu_frt_oca_set(0, NULL);                                              \
 } while (false)
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCB interrupt.
 /// @see cpu_frt_ocb_set
 #define cpu_frt_ocb_clear()                                                    \
@@ -154,6 +156,7 @@ do {                                                                           \
         cpu_frt_ocb_set(0, NULL);                                              \
 } while (false)
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OVI interrupt.
 /// @see cpu_frt_ovi_set
 #define cpu_frt_ovi_clear()                                                    \
@@ -173,6 +176,7 @@ do {                                                                           \
 /// @param clock_div The clock divisor.
 extern void cpu_frt_init(uint8_t clock_div);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the interrupt handler for the CPU-FRT OCA interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
@@ -183,6 +187,7 @@ extern void cpu_frt_init(uint8_t clock_div);
 /// @see cpu_frt_oca_clear
 extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the interrupt handler for the CPU-FRT OCB interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
@@ -193,6 +198,7 @@ extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
 /// @see cpu_frt_ocb_clear
 extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr);
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the interrupt handler for the CPU-FRT OVI interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
