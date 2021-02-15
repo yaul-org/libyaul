@@ -20,5 +20,6 @@ var annotated_dup =
     [ "scu_dma_handle", "structscu__dma__handle.html", "structscu__dma__handle" ],
     [ "scu_dma_level_cfg", "structscu__dma__level__cfg.html", "structscu__dma__level__cfg" ],
     [ "scu_dma_xfer", "structscu__dma__xfer.html", "structscu__dma__xfer" ],
-    [ "scu_dsp_status", "structscu__dsp__status.html", "structscu__dsp__status" ]
+    [ "scu_dsp_status", "structscu__dsp__status.html", "structscu__dsp__status" ],
+    [ "scu_ic_priority", "structscu__ic__priority.html", "structscu__ic__priority" ]
 ];

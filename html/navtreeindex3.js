@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"structint16__vec2__t.html":[3,0,13],
 "structint16__vec2__t.html#aeb6b52c6fa60bb760c09ba39c7356fb7":[3,0,13,1],
 "structint16__vec2__t.html#af24166cff0fedb6a6d085b707f7a05e9":[3,0,13,0],
 "structint32__vec2__t.html":[3,0,14],
@@ -38,6 +39,9 @@ var NAVTREEINDEX3 =
 "structscu__dsp__status.html#ac3cb92fd3a2c03653188269bd8205d98":[2,2,0,2],
 "structscu__dsp__status.html#acdb4be1ffecabb20efaea2baa50530e8":[2,2,0,3],
 "structscu__dsp__status.html#ae06172e7bc2836f36ded49694a262456":[2,2,0,6],
+"structscu__ic__priority.html":[2,3,0],
+"structscu__ic__priority.html#a2c83b254f82bf22b77418e8d85956c21":[2,3,0,0],
+"structscu__ic__priority.html#a3c07957e7e2f4b9d6414781174babf53":[2,3,0,1],
 "sync_8h_source.html":[4,0,0,1,0,0,0,10],
 "timer_8h_source.html":[4,0,0,1,1,4],
 "ubc_8h_source.html":[4,0,0,1,0,0,0,11],

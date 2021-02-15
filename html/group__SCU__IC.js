@@ -1,8 +1,13 @@
 var group__SCU__IC =
 [
+    [ "scu_ic_priority", "structscu__ic__priority.html", [
+      [ "scu_mask", "structscu__ic__priority.html#a2c83b254f82bf22b77418e8d85956c21", null ],
+      [ "sr_mask", "structscu__ic__priority.html#a3c07957e7e2f4b9d6414781174babf53", null ]
+    ] ],
     [ "scu_ic_ihr_t", "group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172", null ],
     [ "scu_ic_interrupt_t", "group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87", null ],
     [ "scu_ic_mask_t", "group__SCU__IC.html#ga855d46e631f80e31cc154fada83342c9", null ],
+    [ "scu_ic_priority_t", "group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2", null ],
     [ "scu_ic_status_reg_t", "group__SCU__IC.html#gaba50f52ac504271a1fe4ddb3bcffa277", null ],
     [ "scu_ic_interrupt", "group__SCU__IC.html#ga3efa4b5e182a2252797ca01d24dcac57", [
       [ "SCU_IC_INTERRUPT_VBLANK_IN", "group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57a3d5eaf0fc28a7f55a9f0240f36a2ad98", null ],
@@ -77,10 +82,10 @@ var group__SCU__IC =
     [ "scu_ic_ihr_set", "group__SCU__IC.html#ga486e21d1b255047890e4cfefb22d8d9d", null ],
     [ "scu_ic_mask_chg", "group__SCU__IC.html#gaad8e506393ee34348d073af6c4178381", null ],
     [ "scu_ic_mask_get", "group__SCU__IC.html#ga2c37f042e896d8f6904610055650d683", null ],
-    [ "scu_ic_mask_set", "group__SCU__IC.html#gacaee1d482089f499638ef7ede66378c4", null ],
-    [ "scu_ic_priority_table_get", "group__SCU__IC.html#ga22a3465fd41992da1ceead15936719e9", null ],
-    [ "scu_ic_priority_table_set", "group__SCU__IC.html#ga68a7e72c81bdea5a1cd4936821956ce1", null ],
-    [ "scu_ic_status_chg", "group__SCU__IC.html#gace1fed29a3f1b1f733ceaf3ff20f62e3", null ],
-    [ "scu_ic_status_get", "group__SCU__IC.html#gab1dbef91570000158065b2a2fa735186", null ],
-    [ "scu_ic_status_set", "group__SCU__IC.html#ga16368ae9aa18f63d36756e712578b0e4", null ]
+    [ "scu_ic_mask_set", "group__SCU__IC.html#ga69c3394920957da209d09ab18b6040f0", null ],
+    [ "scu_ic_priority_table_get", "group__SCU__IC.html#gafe100222c1ad129cf0d7927f4e3e2836", null ],
+    [ "scu_ic_priority_table_set", "group__SCU__IC.html#gad777920c5cb9edb483f5698a9ad70b6c", null ],
+    [ "scu_ic_status_chg", "group__SCU__IC.html#gafa372713bb72cfa2a84cffb7c64e6ec1", null ],
+    [ "scu_ic_status_get", "group__SCU__IC.html#gacb983b1eab49e8be17af55a2f8a591a5", null ],
+    [ "scu_ic_status_set", "group__SCU__IC.html#ga84257d38bbed172056f93ad345fb61a7", null ]
 ];
