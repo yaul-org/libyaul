@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1cb186d</span>
+   &#160;<span id="projectnumber">Git hash 6d2cede</span>
    </div>
   </td>
  </tr>
@@ -454,7 +454,7 @@ Functions</h2></td></tr>
 
 <p>Clear the interrupt handler for the specified SCU related interrupt. </p>
 <p>This is a BIOS call.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Avoid clearing interrupts directly via this function, unless there is an explicit need to do so. To see which functions and macros to use for each interrupt, see <a class="el" href="group__SCU__IC__HELPERS.html">SCU IC Setters</a>.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Do not use this function to clear your interrupt handler, unless there is an explicit need to do so. To see which functions and macros to use for each interrupt, see <a class="el" href="group__SCU__IC__HELPERS.html">SCU IC Setters</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>The vector number. </td></tr>
@@ -597,7 +597,7 @@ Functions</h2></td></tr>
 <div class="line"> </div>
 <div class="line">0x0600094A: rte                    ! Default handler</div>
 <div class="line">0x0600094C: nop</div>
-</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Avoid setting interrupts directly via this function, unless there is an explicit need to do so. To see which functions and macros to use for each interrupt, see <a class="el" href="group__SCU__IC__HELPERS.html">SCU IC Setters</a>.</dd></dl>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Do not use this function to set your interrupt handler, unless there is an explicit need to do so. To see which functions and macros to use for each interrupt, see <a class="el" href="group__SCU__IC__HELPERS.html">SCU IC Setters</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>The vector number. </td></tr>
