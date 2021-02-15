@@ -10,6 +10,7 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 
 #include <scu/map.h>
@@ -163,6 +164,16 @@ typedef enum scu_ic_status_reg_t {
 } scu_ic_status_reg_t;
 #pragma GCC diagnostic pop
 
+/// @brief SCU IC priority entry.
+typedef struct scu_ic_priority {
+        /// CPU `sr` register priority level mask.
+        uint16_t sr_mask;
+        /// SCU @ref IMS mask.
+        scu_ic_interrupt_t scu_mask:16;
+} __packed __aligned(4) scu_ic_priority_t;
+
+static_assert(sizeof(scu_ic_priority_t) == 4);
+
 /// @brief Callback type.
 /// @see scu_ic_ihr_set
 typedef void (*scu_ic_ihr_t)(void);
@@ -250,8 +261,7 @@ typedef void (*scu_ic_ihr_t)(void);
 static inline void __always_inline
 scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 {
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000300;
+        register uint32_t * const bios_address = (uint32_t *)0x06000300;
 
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
@@ -286,7 +296,7 @@ scu_ic_ihr_get(scu_ic_interrupt_t vector)
 ///
 /// @param mask The 32-bit mask.
 static inline void __always_inline
-scu_ic_mask_set(uint32_t mask)
+scu_ic_mask_set(scu_ic_mask_t mask)
 {
         register uint32_t * const bios_address = (uint32_t *)0x06000340;
 
@@ -326,8 +336,7 @@ scu_ic_mask_set(uint32_t mask)
 static inline void __always_inline
 scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 {
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000344;
+        register uint32_t * const bios_address = (uint32_t *)0x06000344;
 
         ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
@@ -340,28 +349,24 @@ scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 static inline scu_ic_mask_t __always_inline
 scu_ic_mask_get(void)
 {
-        register uint32_t *bios_address;
-        bios_address = (uint32_t *)0x06000348;
+        register uint32_t * const bios_address = (uint32_t *)0x06000348;
 
         return *bios_address;
 }
 
 /// @brief Obtain the 32-bit SCU @ref IST value.
 /// @returns The 32-bit SCU @ref IST value.
-static inline uint32_t __always_inline
+static inline scu_ic_status_reg_t __always_inline
 scu_ic_status_get(void)
 {
-        uint32_t ist;
-        ist = MEMORY_READ(32, SCU(IST));
-
-        return ist;
+        return MEMORY_READ(32, SCU(IST));
 }
 
 /// @brief Write to the SCU @ref IST register.
 ///
 /// @param value The 32-bit-value.
 static inline void __always_inline
-scu_ic_status_set(uint32_t value)
+scu_ic_status_set(scu_ic_status_reg_t value)
 {
         MEMORY_WRITE(32, SCU(IST), value);
 }
@@ -374,7 +379,7 @@ scu_ic_status_set(uint32_t value)
 /// @param and_mask The bitwise AND mask.
 /// @param or_mask  The bitwise OR mask.
 static inline void __always_inline
-scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
+scu_ic_status_chg(scu_ic_status_reg_t and_mask, scu_ic_status_reg_t or_mask)
 {
         volatile uint32_t * const reg_ist = (volatile uint32_t *)SCU(IST);
 
@@ -397,10 +402,12 @@ scu_ic_status_chg(uint32_t and_mask, uint32_t or_mask)
 /// This is a BIOS call.
 ///
 /// @returns A read-only pointer to the priority table.
-static inline const uint32_t * __always_inline
+
+static inline const scu_ic_priority_t * __always_inline
 scu_ic_priority_table_get(void)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000A80;
+        register scu_ic_priority_t * const bios_address =
+            (scu_ic_priority_t *)0x06000A80;
 
         return bios_address;
 }
@@ -414,11 +421,11 @@ scu_ic_priority_table_get(void)
 ///
 /// @param table Pointer to the priority table.
 static inline void __always_inline
-scu_ic_priority_table_set(const uint32_t *table)
+scu_ic_priority_table_set(const scu_ic_priority_t *table)
 {
         register uint32_t * const bios_address = (uint32_t *)0x06000280;
 
-        ((void (*)(const uint32_t *))*bios_address)(table);
+        ((void (*)(const scu_ic_priority_t *))*bios_address)(table);
 }
 
 /// @}
