@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0b6ffaa</span>
+   &#160;<span id="projectnumber">Git hash 1cb186d</span>
    </div>
   </td>
  </tr>
@@ -92,9 +92,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gadde9e48902b70c88b539b3411215f871">DSP_RAM_PAGE_WORD_COUNT</a>&#160;&#160;&#160;(<a class="el" href="group__SCU__DSP.html#ga50874023d854f85bd2146711a1fa49f8">DSP_RAM_PAGE_SIZE</a> / 4)</td></tr>
 <tr class="memdesc:gadde9e48902b70c88b539b3411215f871"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP RAM page word count. <br /></td></tr>
 <tr class="separator:gadde9e48902b70c88b539b3411215f871"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf0247c32ff53eac09854ee31c72261ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gaf0247c32ff53eac09854ee31c72261ad">scu_dsp_end_clear</a>()</td></tr>
-<tr class="memdesc:gaf0247c32ff53eac09854ee31c72261ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the interrupt handler for the SCU-DSP end interrupt.  <a href="group__SCU__DSP.html#gaf0247c32ff53eac09854ee31c72261ad">More...</a><br /></td></tr>
-<tr class="separator:gaf0247c32ff53eac09854ee31c72261ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -130,9 +127,6 @@ Functions</h2></td></tr>
 <tr class="memitem:gaa6d45762c4b53549dc8f48f0d20e9034"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gaa6d45762c4b53549dc8f48f0d20e9034">scu_dsp_program_pause</a> (bool pause)</td></tr>
 <tr class="memdesc:gaa6d45762c4b53549dc8f48f0d20e9034"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pause SCU-DSP execution.  <a href="group__SCU__DSP.html#gaa6d45762c4b53549dc8f48f0d20e9034">More...</a><br /></td></tr>
 <tr class="separator:gaa6d45762c4b53549dc8f48f0d20e9034"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga78dcbe3ab89089f7eb7cd41dea7e337e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">scu_dsp_end_set</a> (<a class="el" href="group__SCU__DSP.html#ga3ff9018a3065ab6d7319e51d16cbc738">scu_dsp_ihr_t</a> ihr)</td></tr>
-<tr class="memdesc:ga78dcbe3ab89089f7eb7cd41dea7e337e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the SCU-DSP end interrupt.  <a href="group__SCU__DSP.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">More...</a><br /></td></tr>
-<tr class="separator:ga78dcbe3ab89089f7eb7cd41dea7e337e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf50c5249e40e743178793e989f6465c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0">scu_dsp_program_load</a> (const void *program, uint32_t count)</td></tr>
 <tr class="memdesc:gaf50c5249e40e743178793e989f6465c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load program onto SCU-DSP.  <a href="group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0">More...</a><br /></td></tr>
 <tr class="separator:gaf50c5249e40e743178793e989f6465c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,30 +172,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <tr class="separator:ga2edf70b8678416394ea17f582a426278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="gaf0247c32ff53eac09854ee31c72261ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf0247c32ff53eac09854ee31c72261ad">&#9670;&nbsp;</a></span>scu_dsp_end_clear</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define scu_dsp_end_clear</td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        scu_dsp_end_set(NULL);                                                 \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Clear the interrupt handler for the SCU-DSP end interrupt. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__SCU__DSP.html#gaf0247c32ff53eac09854ee31c72261ad" title="Clear the interrupt handler for the SCU-DSP end interrupt.">scu_dsp_end_clear</a> </dd></dl>
-
-</div>
-</div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="gac5316f84cc8999256f18f23738e7ecd7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac5316f84cc8999256f18f23738e7ecd7">&#9670;&nbsp;</a></span>scu_dsp_ram</h2>
@@ -352,34 +322,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 
 <p>Determine if the SCU-DSP DMA transfer is occurring. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if SCU-DSP DMA transfer is occurring. Otherwise, <code>false</code>. </dd></dl>
-
-</div>
-</div>
-<a id="ga78dcbe3ab89089f7eb7cd41dea7e337e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga78dcbe3ab89089f7eb7cd41dea7e337e">&#9670;&nbsp;</a></span>scu_dsp_end_set()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void scu_dsp_end_set </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#ga3ff9018a3065ab6d7319e51d16cbc738">scu_dsp_ihr_t</a>&#160;</td>
-          <td class="paramname"><em>ihr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the interrupt handler for the SCU-DSP end interrupt. </p>
-<p>There is no need to explicitly return via <code>rte</code> for <code>ihr</code>.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">ihr</td><td>The interrupt handler.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__SCU__DSP.html#gaf0247c32ff53eac09854ee31c72261ad" title="Clear the interrupt handler for the SCU-DSP end interrupt.">scu_dsp_end_clear</a> </dd></dl>
 
 </div>
 </div>

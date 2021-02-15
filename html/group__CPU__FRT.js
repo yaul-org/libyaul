@@ -10,9 +10,6 @@ var group__CPU__FRT =
     [ "CPU_FRT_NTSC_352_128_COUNT_1MS", "group__CPU__FRT.html#gaa4420e57037b82c58d88d380905a1313", null ],
     [ "CPU_FRT_NTSC_352_32_COUNT_1MS", "group__CPU__FRT.html#ga1a9d1f6c37352725f0b09a5b4439ffeb", null ],
     [ "CPU_FRT_NTSC_352_8_COUNT_1MS", "group__CPU__FRT.html#ga4cd6414042fb4a5d581d38988d1352f4", null ],
-    [ "cpu_frt_oca_clear", "group__CPU__FRT.html#gafedfca4dff9856a79c0e81ded25fd00d", null ],
-    [ "cpu_frt_ocb_clear", "group__CPU__FRT.html#ga341ef99e55b0bae6c16103f1b3363da3", null ],
-    [ "cpu_frt_ovi_clear", "group__CPU__FRT.html#gab6ba0f4fb4e460c62936702c2fc97b3b", null ],
     [ "CPU_FRT_PAL_320_128_COUNT_1MS", "group__CPU__FRT.html#ga47f2aea583dcb8407975abf138ba34ad", null ],
     [ "CPU_FRT_PAL_320_32_COUNT_1MS", "group__CPU__FRT.html#ga6f76c4c2e7ec76aa5f5961cc0fe8ea10", null ],
     [ "CPU_FRT_PAL_320_8_COUNT_1MS", "group__CPU__FRT.html#ga5bad75e31f001b6568c63243c03d41f0", null ],
@@ -25,8 +22,5 @@ var group__CPU__FRT =
     [ "cpu_frt_init", "group__CPU__FRT.html#gac60b2f4331a501e4e4489479e7c9449f", null ],
     [ "cpu_frt_input_capture_get", "group__CPU__FRT.html#ga1b610ba664854ed0957aca2eb4203889", null ],
     [ "cpu_frt_interrupt_priority_get", "group__CPU__FRT.html#gaea3a6b236f233d10d1c0a295ba7a37b6", null ],
-    [ "cpu_frt_interrupt_priority_set", "group__CPU__FRT.html#ga8e1a4fbebdb89e776c8b4d89f20feebc", null ],
-    [ "cpu_frt_oca_set", "group__CPU__FRT.html#gaf9f4ba810bf072d54af608e1d8fd19c0", null ],
-    [ "cpu_frt_ocb_set", "group__CPU__FRT.html#ga76a7b36ddb1773db523daa09383b979c", null ],
-    [ "cpu_frt_ovi_set", "group__CPU__FRT.html#gacfebd31e06994eeed04538eff518315d", null ]
+    [ "cpu_frt_interrupt_priority_set", "group__CPU__FRT.html#ga8e1a4fbebdb89e776c8b4d89f20feebc", null ]
 ];

@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0b6ffaa</span>
+   &#160;<span id="projectnumber">Git hash 1cb186d</span>
    </div>
   </td>
  </tr>
@@ -58,7 +58,6 @@ $(document).ready(function(){initNavTree('group__CPU__DIVU.html',''); initResiza
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -66,12 +65,6 @@ $(document).ready(function(){initNavTree('group__CPU__DIVU.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:gafe009e0d441fd3e89cd6255d3a0ec9b6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DIVU.html#gafe009e0d441fd3e89cd6255d3a0ec9b6">cpu_divu_ovfi_clear</a>()</td></tr>
-<tr class="memdesc:gafe009e0d441fd3e89cd6255d3a0ec9b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the interrupt handler for the CPU-DIVU OVFI interrupt.  <a href="group__CPU__DIVU.html#gafe009e0d441fd3e89cd6255d3a0ec9b6">More...</a><br /></td></tr>
-<tr class="separator:gafe009e0d441fd3e89cd6255d3a0ec9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ga1e2ae959a0d610a573a480172fb8203f"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a>) (void)</td></tr>
@@ -107,35 +100,8 @@ Functions</h2></td></tr>
 <tr class="memitem:ga534450add69d199aa549f6028242121e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DIVU.html#ga534450add69d199aa549f6028242121e">cpu_divu_interrupt_priority_set</a> (uint8_t priority)</td></tr>
 <tr class="memdesc:ga534450add69d199aa549f6028242121e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt priority level for CPU-DIVU.  <a href="group__CPU__DIVU.html#ga534450add69d199aa549f6028242121e">More...</a><br /></td></tr>
 <tr class="separator:ga534450add69d199aa549f6028242121e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a> (<a class="el" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a> ihr)</td></tr>
-<tr class="memdesc:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the CPU-DIVU OVFI interrupt.  <a href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17">More...</a><br /></td></tr>
-<tr class="separator:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="gafe009e0d441fd3e89cd6255d3a0ec9b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafe009e0d441fd3e89cd6255d3a0ec9b6">&#9670;&nbsp;</a></span>cpu_divu_ovfi_clear</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define cpu_divu_ovfi_clear</td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                           \</div>
-<div class="line">        cpu_divu_ovfi_set(NULL);                                               \</div>
-<div class="line">} <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
-</div><!-- fragment -->
-<p>Clear the interrupt handler for the CPU-DIVU OVFI interrupt. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17" title="Set the interrupt handler for the CPU-DIVU OVFI interrupt.">cpu_divu_ovfi_set</a> </dd></dl>
-
-</div>
-</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ga1e2ae959a0d610a573a480172fb8203f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga1e2ae959a0d610a573a480172fb8203f">&#9670;&nbsp;</a></span>cpu_divu_ihr</h2>
@@ -150,7 +116,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Callback type. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17" title="Set the interrupt handler for the CPU-DIVU OVFI interrupt.">cpu_divu_ovfi_set</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__INTC__HELPERS.html#ga4512d66c93ed495dfc70d8e759bcaa17" title="Set the interrupt handler for the CPU-DIVU OVFI interrupt.">cpu_divu_ovfi_set</a> </dd></dl>
 
 </div>
 </div>
@@ -411,34 +377,6 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="ga4512d66c93ed495dfc70d8e759bcaa17"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4512d66c93ed495dfc70d8e759bcaa17">&#9670;&nbsp;</a></span>cpu_divu_ovfi_set()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cpu_divu_ovfi_set </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a>&#160;</td>
-          <td class="paramname"><em>ihr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the interrupt handler for the CPU-DIVU OVFI interrupt. </p>
-<p>There is no need to explicitly return via <code>rte</code> for <code>ihr</code>.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">ihr</td><td>The interrupt handler.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DIVU.html#gafe009e0d441fd3e89cd6255d3a0ec9b6" title="Clear the interrupt handler for the CPU-DIVU OVFI interrupt.">cpu_divu_ovfi_clear</a> </dd></dl>
 
 </div>
 </div>

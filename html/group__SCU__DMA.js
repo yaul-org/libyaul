@@ -79,7 +79,6 @@ var group__SCU__DMA =
     [ "scu_dma_level2_stop", "group__SCU__DMA.html#ga45c5bf4afb1993a9c988924a633f487b", null ],
     [ "scu_dma_level2_wait", "group__SCU__DMA.html#ga00d504646218426591dbd25ddebd1295", null ],
     [ "scu_dma_level_busy", "group__SCU__DMA.html#ga9562352ecaef5cae12f373a85e6012fa", null ],
-    [ "scu_dma_level_end_set", "group__SCU__DMA.html#gacb611830de4631ba1738204e118a6a0f", null ],
     [ "scu_dma_level_fast_start", "group__SCU__DMA.html#ga28c926a108735580826b7f65ca09d72f", null ],
     [ "scu_dma_level_start", "group__SCU__DMA.html#gaa30f5af2e5e2190784690a693edd5bf4", null ],
     [ "scu_dma_level_stop", "group__SCU__DMA.html#ga30fea641c8168e91b94d9033584939fe", null ],

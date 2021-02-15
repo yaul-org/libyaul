@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0b6ffaa</span>
+   &#160;<span id="projectnumber">Git hash 1cb186d</span>
    </div>
   </td>
  </tr>
@@ -121,50 +121,50 @@ $(document).ready(function(){initNavTree('dsp_8h_source.html',''); initResizable
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">if</span> (pause) {</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                <a class="code" href="group__MEMORY__MAP__MACROS.html#ga945642431974707252514869a35ab184">MEMORY_WRITE</a>(32, <a class="code" href="group__MEMORY__MAP__AREAS.html#ga209b899cd14aba32d246050e4cf003d3">SCU</a>(<a class="code" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gaa8b5d92d26b4906fdab2a4b19ec41e2b">PPAF</a>), 0x02010000);</div>
-<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="group__SCU__DSP.html#gaf0247c32ff53eac09854ee31c72261ad">   87</a></span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                <a class="code" href="group__MEMORY__MAP__MACROS.html#ga945642431974707252514869a35ab184">MEMORY_WRITE</a>(32, <a class="code" href="group__MEMORY__MAP__AREAS.html#ga209b899cd14aba32d246050e4cf003d3">SCU</a>(<a class="code" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gaa8b5d92d26b4906fdab2a4b19ec41e2b">PPAF</a>), 0x04010000);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="group__SCU__IC__HELPERS.html#gaf0247c32ff53eac09854ee31c72261ad">   88</a></span>&#160;                <a class="code" href="group__MEMORY__MAP__MACROS.html#ga945642431974707252514869a35ab184">MEMORY_WRITE</a>(32, <a class="code" href="group__MEMORY__MAP__AREAS.html#ga209b899cd14aba32d246050e4cf003d3">SCU</a>(<a class="code" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gaa8b5d92d26b4906fdab2a4b19ec41e2b">PPAF</a>), 0x04010000);</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        }</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;}</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#define scu_dsp_end_clear()                                                    \</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">        scu_dsp_end_set(NULL);                                                 \</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">} while (false)</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">scu_dsp_end_set</a>(<a class="code" href="group__SCU__DSP.html#ga3ff9018a3065ab6d7319e51d16cbc738">scu_dsp_ihr_t</a> ihr);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0">scu_dsp_program_load</a>(<span class="keyword">const</span> <span class="keywordtype">void</span> *program, uint32_t count);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga84955edd888d0dbec5708e602916b042">scu_dsp_program_clear</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gaa80d92c99937e023bde1ce7d1ccbf387">scu_dsp_program_pc_set</a>(<a class="code" href="group__SCU__DSP.html#ga860709ce7fcc39a26d929d85cdc6e69a">scu_dsp_pc_t</a> pc);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gac70845e00842506bc6347cf9dd34a9e2">scu_dsp_program_start</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga79a9206b9b261923bd7336e86b6ffb22">scu_dsp_program_stop</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__SCU__DSP.html#ga860709ce7fcc39a26d929d85cdc6e69a">scu_dsp_pc_t</a> <a class="code" href="group__SCU__DSP.html#ga7241c4da2fae028e0fbd658a235a9385">scu_dsp_program_step</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="group__SCU__DSP.html#ga91d43ca0a5d42d1fedeaef9974335973">scu_dsp_dma_busy</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gadb31df3b73018d342638903102e81c0c">scu_dsp_dma_wait</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="group__SCU__DSP.html#gaef37bd16d488e3fdb31655e8b91ea0cd">scu_dsp_program_end</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga11fc8661b312c59893ada229c37e073f">scu_dsp_program_end_wait</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga35377ec1b29e4654f37194eb77e8dba4">scu_dsp_data_read</a>(<a class="code" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset,</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordtype">void</span> *data, uint32_t count);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gab7edff6efe6f5aeef377d2071f2e83b7">scu_dsp_data_write</a>(<a class="code" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset,</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">void</span> *data, uint32_t count);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">scu_dsp_status_get</a>(<a class="code" href="structscu__dsp__status.html">scu_dsp_status_t</a> *status);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#define scu_dsp_end_clear()                                                    \</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">        scu_dsp_end_set(NULL);                                                 \</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">} while (false)</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__IC__HELPERS.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">scu_dsp_end_set</a>(<a class="code" href="group__SCU__DSP.html#ga3ff9018a3065ab6d7319e51d16cbc738">scu_dsp_ihr_t</a> ihr);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0">scu_dsp_program_load</a>(<span class="keyword">const</span> <span class="keywordtype">void</span> *program, uint32_t count);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga84955edd888d0dbec5708e602916b042">scu_dsp_program_clear</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gaa80d92c99937e023bde1ce7d1ccbf387">scu_dsp_program_pc_set</a>(<a class="code" href="group__SCU__DSP.html#ga860709ce7fcc39a26d929d85cdc6e69a">scu_dsp_pc_t</a> pc);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gac70845e00842506bc6347cf9dd34a9e2">scu_dsp_program_start</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga79a9206b9b261923bd7336e86b6ffb22">scu_dsp_program_stop</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__SCU__DSP.html#ga860709ce7fcc39a26d929d85cdc6e69a">scu_dsp_pc_t</a> <a class="code" href="group__SCU__DSP.html#ga7241c4da2fae028e0fbd658a235a9385">scu_dsp_program_step</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="group__SCU__DSP.html#ga91d43ca0a5d42d1fedeaef9974335973">scu_dsp_dma_busy</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gadb31df3b73018d342638903102e81c0c">scu_dsp_dma_wait</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="group__SCU__DSP.html#gaef37bd16d488e3fdb31655e8b91ea0cd">scu_dsp_program_end</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga11fc8661b312c59893ada229c37e073f">scu_dsp_program_end_wait</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga35377ec1b29e4654f37194eb77e8dba4">scu_dsp_data_read</a>(<a class="code" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset,</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordtype">void</span> *data, uint32_t count);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#gab7edff6efe6f5aeef377d2071f2e83b7">scu_dsp_data_write</a>(<a class="code" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset,</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordtype">void</span> *data, uint32_t count);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">scu_dsp_status_get</a>(<a class="code" href="structscu__dsp__status.html">scu_dsp_status_t</a> *status);</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;__END_DECLS</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_SCU_DSP_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_SCU_DSP_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="astructscu__dsp__status_html_a475567743264c45de38ceceb55245ed2"><div class="ttname"><a href="structscu__dsp__status.html#a475567743264c45de38ceceb55245ed2">scu_dsp_status::c</a></div><div class="ttdeci">bool c</div><div class="ttdoc">SCU-DSP C (carry) flag.</div><div class="ttdef"><b>Definition:</b> dsp.h:61</div></div>
@@ -172,7 +172,6 @@ $(document).ready(function(){initNavTree('dsp_8h_source.html',''); initResizable
 <div class="ttc" id="agroup__SCU__DSP_html_ga91d43ca0a5d42d1fedeaef9974335973"><div class="ttname"><a href="group__SCU__DSP.html#ga91d43ca0a5d42d1fedeaef9974335973">scu_dsp_dma_busy</a></div><div class="ttdeci">bool scu_dsp_dma_busy(void)</div><div class="ttdoc">Determine if the SCU-DSP DMA transfer is occurring.</div></div>
 <div class="ttc" id="astructscu__dsp__status_html_a4907f390fbdd14483afd53a05ff9efbd"><div class="ttname"><a href="structscu__dsp__status.html#a4907f390fbdd14483afd53a05ff9efbd">scu_dsp_status::z</a></div><div class="ttdeci">bool z</div><div class="ttdoc">SCU-DSP Z (zero) flag.</div><div class="ttdef"><b>Definition:</b> dsp.h:59</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_ga79a9206b9b261923bd7336e86b6ffb22"><div class="ttname"><a href="group__SCU__DSP.html#ga79a9206b9b261923bd7336e86b6ffb22">scu_dsp_program_stop</a></div><div class="ttdeci">void scu_dsp_program_stop(void)</div><div class="ttdoc">Stop SCU-DSP execution.</div></div>
-<div class="ttc" id="agroup__SCU__DSP_html_ga78dcbe3ab89089f7eb7cd41dea7e337e"><div class="ttname"><a href="group__SCU__DSP.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">scu_dsp_end_set</a></div><div class="ttdeci">void scu_dsp_end_set(scu_dsp_ihr_t ihr)</div><div class="ttdoc">Set the interrupt handler for the SCU-DSP end interrupt.</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_ggac5316f84cc8999256f18f23738e7ecd7a449eee862b33a201118922877509d910"><div class="ttname"><a href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7a449eee862b33a201118922877509d910">DSP_RAM_PAGE_0</a></div><div class="ttdeci">@ DSP_RAM_PAGE_0</div><div class="ttdoc">SCU-DSP RAM page #0.</div><div class="ttdef"><b>Definition:</b> dsp.h:27</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_gafc0907392c5bad64936e9e6533219275"><div class="ttname"><a href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a></div><div class="ttdeci">enum scu_dsp_ram scu_dsp_ram_t</div><div class="ttdoc">SCU-DSP RAM pages.</div></div>
 <div class="ttc" id="astructscu__dsp__status_html_a1634e1929c62360d680a8078cbbc6176"><div class="ttname"><a href="structscu__dsp__status.html#a1634e1929c62360d680a8078cbbc6176">scu_dsp_status::e</a></div><div class="ttdeci">bool e</div><div class="ttdoc">SCU-DSP E (program end interrupt) flag.</div><div class="ttdef"><b>Definition:</b> dsp.h:65</div></div>
@@ -200,6 +199,7 @@ $(document).ready(function(){initNavTree('dsp_8h_source.html',''); initResizable
 <div class="ttc" id="agroup__SCU__DSP_html_ggac5316f84cc8999256f18f23738e7ecd7ac327f53983e8a1f8d60d453057167411"><div class="ttname"><a href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7ac327f53983e8a1f8d60d453057167411">DSP_RAM_PAGE_3</a></div><div class="ttdeci">@ DSP_RAM_PAGE_3</div><div class="ttdoc">SCU-DSP RAM page #3.</div><div class="ttdef"><b>Definition:</b> dsp.h:33</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_ga2edf70b8678416394ea17f582a426278"><div class="ttname"><a href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">scu_dsp_status_get</a></div><div class="ttdeci">void scu_dsp_status_get(scu_dsp_status_t *status)</div><div class="ttdoc">Obtain SCU-DSP operation status.</div></div>
 <div class="ttc" id="astructscu__dsp__status_html_a44db36a4b9684458bdc860924893d5d5"><div class="ttname"><a href="structscu__dsp__status.html#a44db36a4b9684458bdc860924893d5d5">scu_dsp_status::t0</a></div><div class="ttdeci">bool t0</div><div class="ttdoc">D0-Bus DMA execution flag.</div><div class="ttdef"><b>Definition:</b> dsp.h:55</div></div>
+<div class="ttc" id="agroup__SCU__IC__HELPERS_html_ga78dcbe3ab89089f7eb7cd41dea7e337e"><div class="ttname"><a href="group__SCU__IC__HELPERS.html#ga78dcbe3ab89089f7eb7cd41dea7e337e">scu_dsp_end_set</a></div><div class="ttdeci">void scu_dsp_end_set(scu_dsp_ihr_t ihr)</div><div class="ttdoc">Set the interrupt handler for the SCU-DSP end interrupt.</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_gac70845e00842506bc6347cf9dd34a9e2"><div class="ttname"><a href="group__SCU__DSP.html#gac70845e00842506bc6347cf9dd34a9e2">scu_dsp_program_start</a></div><div class="ttdeci">void scu_dsp_program_start(void)</div><div class="ttdoc">Start SCU-DSP execution.</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_gaf50c5249e40e743178793e989f6465c0"><div class="ttname"><a href="group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0">scu_dsp_program_load</a></div><div class="ttdeci">void scu_dsp_program_load(const void *program, uint32_t count)</div><div class="ttdoc">Load program onto SCU-DSP.</div></div>
 <div class="ttc" id="agroup__SCU__DSP_html_gaa6d45762c4b53549dc8f48f0d20e9034"><div class="ttname"><a href="group__SCU__DSP.html#gaa6d45762c4b53549dc8f48f0d20e9034">scu_dsp_program_pause</a></div><div class="ttdeci">static void scu_dsp_program_pause(bool pause)</div><div class="ttdoc">Pause SCU-DSP execution.</div><div class="ttdef"><b>Definition:</b> dsp.h:76</div></div>

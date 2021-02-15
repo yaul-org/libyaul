@@ -23,6 +23,5 @@ var group__CPU__WDT =
     [ "cpu_wdt_enable", "group__CPU__WDT.html#ga8163b44f9dd197ecc300c10329fde544", null ],
     [ "cpu_wdt_init", "group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2", null ],
     [ "cpu_wdt_interrupt_priority_get", "group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028", null ],
-    [ "cpu_wdt_interrupt_priority_set", "group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b", null ],
-    [ "cpu_wdt_timer_mode_set", "group__CPU__WDT.html#gafcccaa58106e9ba25e474ebdb595158e", null ]
+    [ "cpu_wdt_interrupt_priority_set", "group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b", null ]
 ];

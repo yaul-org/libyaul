@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0b6ffaa</span>
+   &#160;<span id="projectnumber">Git hash 1cb186d</span>
    </div>
   </td>
  </tr>
@@ -150,17 +150,17 @@ $(document).ready(function(){initNavTree('divu_8h_source.html',''); initResizabl
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <a class="code" href="group__MEMORY__MAP__MACROS.html#ga9c6cc7716bab701615bc418a3e2d1264">MEMORY_WRITE_OR</a>(16, <a class="code" href="group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(<a class="code" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga9a77f5a4ee16445b1e9f1ebfe8bdd1db">IPRA</a>), (priority &amp; 0x0F) &lt;&lt; 12);</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;}</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno"><a class="line" href="group__CPU__DIVU.html#gafe009e0d441fd3e89cd6255d3a0ec9b6">  133</a></span>&#160;<span class="preprocessor">#define cpu_divu_ovfi_clear()                                                  \</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">        cpu_divu_ovfi_set(NULL);                                               \</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">} while (false)</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a>(<a class="code" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a> ihr);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="group__CPU__INTC__HELPERS.html#gafe009e0d441fd3e89cd6255d3a0ec9b6">  134</a></span>&#160;<span class="preprocessor">#define cpu_divu_ovfi_clear()                                                  \</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">do {                                                                           \</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">        cpu_divu_ovfi_set(NULL);                                               \</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">} while (false)</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__INTC__HELPERS.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a>(<a class="code" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a> ihr);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;__END_DECLS</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_DIVU_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_DIVU_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="agroup__CPU__DIVU_html_ga46b1ace51589ad0d96e98f2934e63391"><div class="ttname"><a href="group__CPU__DIVU.html#ga46b1ace51589ad0d96e98f2934e63391">cpu_divu_fix16_set</a></div><div class="ttdeci">static void cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)</div><div class="ttdoc">Perform a fixed-point bit division operation.</div><div class="ttdef"><b>Definition:</b> divu.h:102</div></div>
@@ -175,8 +175,8 @@ $(document).ready(function(){initNavTree('divu_8h_source.html',''); initResizabl
 <div class="ttc" id="agroup__CPU__DIVU_html_ga1117e673b03a934e28f4c289d02df4e6"><div class="ttname"><a href="group__CPU__DIVU.html#ga1117e673b03a934e28f4c289d02df4e6">cpu_divu_64_32_set</a></div><div class="ttdeci">static void cpu_divu_64_32_set(uint32_t dividendh, uint32_t dividendl, uint32_t divisor)</div><div class="ttdoc">Perform a 64÷32 bit division operation.</div><div class="ttdef"><b>Definition:</b> divu.h:58</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__CPU__IO__REGISTERS_html_ga9832c4683c481e714f3ccde055d04ee8"><div class="ttname"><a href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga9832c4683c481e714f3ccde055d04ee8">DVDNT</a></div><div class="ttdeci">#define DVDNT</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:273</div></div>
 <div class="ttc" id="agroup__CPU__DIVU_html_ga6ccd3668b021698772ab240c23e0bee4"><div class="ttname"><a href="group__CPU__DIVU.html#ga6ccd3668b021698772ab240c23e0bee4">cpu_divu_fix16_split</a></div><div class="ttdeci">static void cpu_divu_fix16_split(fix16_t dividend, uint32_t *dh, uint32_t *dl)</div><div class="ttdoc">Split a fix16_t value into two 32-bit parts of the dividend.</div><div class="ttdef"><b>Definition:</b> divu.h:87</div></div>
+<div class="ttc" id="agroup__CPU__INTC__HELPERS_html_ga4512d66c93ed495dfc70d8e759bcaa17"><div class="ttname"><a href="group__CPU__INTC__HELPERS.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a></div><div class="ttdeci">void cpu_divu_ovfi_set(cpu_divu_ihr ihr)</div><div class="ttdoc">Set the interrupt handler for the CPU-DIVU OVFI interrupt.</div><div class="ttdef"><b>Definition:</b> cpu_divu.c:44</div></div>
 <div class="ttc" id="agroup__CPU__DIVU_html_ga534450add69d199aa549f6028242121e"><div class="ttname"><a href="group__CPU__DIVU.html#ga534450add69d199aa549f6028242121e">cpu_divu_interrupt_priority_set</a></div><div class="ttdeci">static void cpu_divu_interrupt_priority_set(uint8_t priority)</div><div class="ttdoc">Set the interrupt priority level for CPU-DIVU.</div><div class="ttdef"><b>Definition:</b> divu.h:125</div></div>
-<div class="ttc" id="agroup__CPU__DIVU_html_ga4512d66c93ed495dfc70d8e759bcaa17"><div class="ttname"><a href="group__CPU__DIVU.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a></div><div class="ttdeci">void cpu_divu_ovfi_set(cpu_divu_ihr ihr)</div><div class="ttdoc">Set the interrupt handler for the CPU-DIVU OVFI interrupt.</div><div class="ttdef"><b>Definition:</b> cpu_divu.c:44</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__AREAS_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:66</div></div>
 <div class="ttc" id="agroup__MATH_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> fix16.h:65</div></div>
 <div class="ttc" id="agroup__CPU__DIVU_html_ga0e668afa8e1d613cdd90dc8c0d29fcd5"><div class="ttname"><a href="group__CPU__DIVU.html#ga0e668afa8e1d613cdd90dc8c0d29fcd5">cpu_divu_quotient_get</a></div><div class="ttdeci">static uint32_t cpu_divu_quotient_get(void)</div><div class="ttdoc">Obtain the quotient part at the end of a division operation.</div><div class="ttdef"><b>Definition:</b> divu.h:38</div></div>
