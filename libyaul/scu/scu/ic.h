@@ -259,9 +259,9 @@ typedef void (*scu_ic_ihr_t)(void);
 /// 0x0600094C: nop
 /// @endcode
 ///
-/// @warning Avoid setting interrupts directly via this function, unless there
-/// is an explicit need to do so. To see which functions and macros to use for
-/// each interrupt, see @ref SCU_IC_HELPERS.
+/// @warning Do not use this function to set your interrupt handler, unless
+/// there is an explicit need to do so. To see which functions and macros to use
+/// for each interrupt, see @ref SCU_IC_HELPERS.
 ///
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
@@ -278,9 +278,9 @@ scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 ///
 /// @details This is a BIOS call.
 ///
-/// @warning Avoid clearing interrupts directly via this function, unless there
-/// is an explicit need to do so. To see which functions and macros to use for
-/// each interrupt, see @ref SCU_IC_HELPERS.
+/// @warning Do not use this function to clear your interrupt handler, unless
+/// there is an explicit need to do so. To see which functions and macros to use
+/// for each interrupt, see @ref SCU_IC_HELPERS.
 ///
 /// @param vector The vector number.
 static inline void __always_inline
