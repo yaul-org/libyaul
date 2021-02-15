@@ -128,6 +128,7 @@ cpu_divu_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-DIVU OVFI interrupt.
 /// @see cpu_divu_ovfi_set
 #define cpu_divu_ovfi_clear()                                                  \
@@ -135,6 +136,7 @@ do {                                                                           \
         cpu_divu_ovfi_set(NULL);                                               \
 } while (false)
 
+/// @ingroup CPU_INTC_HELPERS
 /// @brief Set the interrupt handler for the CPU-DIVU OVFI interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.

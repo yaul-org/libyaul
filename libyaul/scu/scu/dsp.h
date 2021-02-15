@@ -89,6 +89,7 @@ scu_dsp_program_pause(bool pause)
         }
 }
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU-DSP end interrupt.
 /// @see scu_dsp_end_clear
 #define scu_dsp_end_clear()                                                    \
@@ -96,6 +97,7 @@ do {                                                                           \
         scu_dsp_end_set(NULL);                                                 \
 } while (false)
 
+/// @ingroup SCU_IC_HELPERS
 /// @brief Set the interrupt handler for the SCU-DSP end interrupt.
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
