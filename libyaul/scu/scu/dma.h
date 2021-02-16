@@ -181,49 +181,7 @@ typedef void (*scu_dma_ihr_t)(void);
 typedef void (*scu_dma_callback_t)(void *);
 
 /// @brief Not yet documented.
-void scu_dma_level0_fast_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level1_fast_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level2_fast_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level0_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level1_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level2_start(void);
-
-/// @brief Not yet documented.
-void scu_dma_level0_stop(void);
-
-/// @brief Not yet documented.
-void scu_dma_level1_stop(void);
-
-/// @brief Not yet documented.
-void scu_dma_level2_stop(void);
-
-/// @brief Not yet documented.
-extern void scu_dma_level0_wait(void);
-
-/// @brief Not yet documented.
-extern void scu_dma_level1_wait(void);
-
-/// @brief Not yet documented.
-extern void scu_dma_level2_wait(void);
-
-/// @brief Not yet documented.
-extern void scu_dma_level0_end_set(scu_dma_callback_t callback, void *work);
-
-/// @brief Not yet documented.
-extern void scu_dma_level1_end_set(scu_dma_callback_t callback, void *work);
-
-/// @brief Not yet documented.
-extern void scu_dma_level2_end_set(scu_dma_callback_t callback, void *work);
+extern void scu_dma_level_stop(scu_dma_level_t level);
 
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
@@ -302,99 +260,11 @@ scu_dma_level_busy(const scu_dma_level_t level)
 
 /// @brief Not yet documented.
 static inline void __always_inline
-scu_dma_level_wait(const scu_dma_level_t level)
-{
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 0:
-                scu_dma_level0_wait();
-                break;
-        case 1:
-                scu_dma_level1_wait();
-                break;
-        case 2:
-                scu_dma_level2_wait();
-                break;
-        }
-}
-
-/// @brief Not yet documented.
-static inline void __always_inline
-scu_dma_level_fast_start(const scu_dma_level_t level)
-{
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 0:
-                scu_dma_level0_fast_start();
-                break;
-        case 1:
-                scu_dma_level1_fast_start();
-                break;
-        case 2:
-                scu_dma_level2_fast_start();
-                break;
-        }
-}
-
-/// @brief Not yet documented.
-static inline void __always_inline
-scu_dma_level_start(const scu_dma_level_t level)
-{
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 0:
-                scu_dma_level0_start();
-                break;
-        case 1:
-                scu_dma_level1_start();
-                break;
-        case 2:
-                scu_dma_level2_start();
-                break;
-        }
-}
-
-/// @brief Not yet documented.
-static inline void __always_inline
-scu_dma_level_stop(const scu_dma_level_t level)
-{
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 0:
-                scu_dma_level0_stop();
-                break;
-        case 1:
-                scu_dma_level1_stop();
-                break;
-        case 2:
-                scu_dma_level2_stop();
-                break;
-        }
-}
-
-/// @brief Not yet documented.
-static inline void __always_inline
 scu_dma_stop(void)
 {
-        scu_dma_level0_stop();
-        scu_dma_level1_stop();
-        scu_dma_level2_stop();
-}
-
-/// @ingroup SCU_IC_HELPERS
-/// @brief Not yet documented.
-static inline void __always_inline
-scu_dma_level_end_set(const scu_dma_level_t level, scu_dma_callback_t callback,
-    void *work)
-{
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 2:
-                scu_dma_level2_end_set(callback, work);
-                break;
-        case 1:
-                scu_dma_level1_end_set(callback, work);
-                break;
-        case 0:
-        default:
-                scu_dma_level0_end_set(callback, work);
-                break;
-        }
+        scu_dma_level_stop(0);
+        scu_dma_level_stop(1);
+        scu_dma_level_stop(2);
 }
 
 /// @brief Not yet documented.
@@ -412,6 +282,20 @@ extern void scu_dma_config_buffer(scu_dma_handle_t *handle,
 extern void scu_dma_config_set(scu_dma_level_t level,
     scu_dma_start_factor_t start_factor, const scu_dma_handle_t *handle,
     scu_dma_callback_t callback);
+
+/// @ingroup SCU_IC_HELPERS
+/// @brief Not yet documented.
+extern void scu_dma_level_end_set(scu_dma_level_t level,
+    scu_dma_callback_t callback, void *work);
+
+/// @brief Not yet documented.
+extern void scu_dma_level_fast_start(scu_dma_level_t level);
+
+/// @brief Not yet documented.
+extern void scu_dma_level_start(scu_dma_level_t level);
+
+/// @brief Not yet documented.
+extern void scu_dma_level_wait(scu_dma_level_t level);
 
 /// @brief Not yet documented.
 extern scu_dma_level_t scu_dma_level_unused_get(void);
