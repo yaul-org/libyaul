@@ -32,15 +32,14 @@ static struct level_state {
 } _level_state[3];
 
 static inline void __always_inline
-_scu_dma_level_wait(const uint8_t level)
+_scu_dma_level_wait(const scu_dma_level_t level)
 {
         while (true) {
                 if (_level_state[0].flags != LEVEL_STATE_WORKING) {
                         return;
                 }
 
-                uint32_t busy;
-                busy = scu_dma_level_busy(level);
+                const uint32_t busy = scu_dma_level_busy(level);
 
                 if (busy == 0x00000000) {
                         return;
@@ -310,7 +309,7 @@ scu_dma_level2_end_set(scu_dma_callback_t callback, void *work)
         callback_set(&_level_state[2].callback, callback, work);
 }
 
-int8_t
+scu_dma_level_t
 scu_dma_level_unused_get(void)
 {
         if ((scu_dma_level_busy(0)) != 0x00) {
