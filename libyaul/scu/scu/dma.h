@@ -414,7 +414,7 @@ extern void scu_dma_config_set(scu_dma_level_t level,
     scu_dma_callback_t callback);
 
 /// @brief Not yet documented.
-extern int8_t scu_dma_level_unused_get(void);
+extern scu_dma_level_t scu_dma_level_unused_get(void);
 
 /// @}
 
