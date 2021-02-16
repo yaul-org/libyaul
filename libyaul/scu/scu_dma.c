@@ -19,6 +19,10 @@
 /* Debug: Keep a copy of the SCU-DMA registers for each level */
 #define DEBUG_COPY_DMA_HANDLES_ENABLE 0
 
+/* Each block of SCU-DMA registers is 0x20 bytes, and luckily, each block is
+ * contiguous */
+#define REGISTER_BLOCK_OFFSET(level) (((level) & SCU_DMA_LEVEL_COUNT) << 5)
+
 #if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
 static scu_dma_handle_t _dma_handles[SCU_DMA_LEVEL_COUNT];
 #endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
@@ -31,26 +35,6 @@ static struct level_state {
         callback_t callback;
 } _level_state[3];
 
-static inline void __always_inline
-_scu_dma_level_wait(const scu_dma_level_t level)
-{
-        while (true) {
-                if (_level_state[0].flags != LEVEL_STATE_WORKING) {
-                        return;
-                }
-
-                const uint32_t busy = scu_dma_level_busy(level);
-
-                if (busy == 0x00000000) {
-                        return;
-                }
-
-                for (register uint32_t i = 0; i < 0x30; i++) {
-                        cpu_instr_nop();
-                }
-        }
-}
-
 static void _scu_dma_level0_handler(void);
 static void _scu_dma_level1_handler(void);
 static void _scu_dma_level2_handler(void);
@@ -60,11 +44,10 @@ _internal_scu_dma_init(void)
 {
         scu_dma_stop();
 
-        uint32_t scu_mask;
-        scu_mask = SCU_IC_MASK_LEVEL_0_DMA_END |
-                   SCU_IC_MASK_LEVEL_1_DMA_END |
-                   SCU_IC_MASK_LEVEL_2_DMA_END |
-                   SCU_IC_MASK_DMA_ILLEGAL;
+        const uint32_t scu_mask = SCU_IC_MASK_LEVEL_0_DMA_END |
+                                  SCU_IC_MASK_LEVEL_1_DMA_END |
+                                  SCU_IC_MASK_LEVEL_2_DMA_END |
+                                  SCU_IC_MASK_DMA_ILLEGAL;
 
         scu_ic_mask_chg(SCU_IC_MASK_ALL, scu_mask);
 
@@ -74,9 +57,8 @@ _internal_scu_dma_init(void)
 
         scu_dma_illegal_set(NULL);
 
-        for (uint32_t level = 0; level < 3; level++) {
-                struct level_state *level_state;
-                level_state = &_level_state[level];
+        for (scu_dma_level_t level = 0; level <= 2; level++) {
+                struct level_state * const level_state = &_level_state[level];
 
                 level_state->flags = LEVEL_STATE_IDLING;
 
@@ -93,88 +75,51 @@ _internal_scu_dma_init(void)
 }
 
 void
-scu_dma_level0_fast_start(void)
+scu_dma_level_fast_start(scu_dma_level_t level)
 {
-        MEMORY_WRITE(32, SCU(D0EN), 0x00000101);
+        MEMORY_WRITE(32, SCU(D0EN | REGISTER_BLOCK_OFFSET(level)), 0x00000101);
 }
 
 void
-scu_dma_level1_fast_start(void)
+scu_dma_level_start(scu_dma_level_t level)
 {
-        MEMORY_WRITE(32, SCU(D1EN), 0x00000101);
+        if (level == 2) {
+                /* To prevent operation errors, do not activate DMA level 2
+                 * during DMA level 1 operation. */
+
+                scu_dma_level_wait(1);
+        }
+
+        scu_dma_level_wait(level);
+        scu_dma_level_fast_start(level);
 }
 
 void
-scu_dma_level2_fast_start(void)
+scu_dma_level_stop(scu_dma_level_t level)
 {
-        MEMORY_WRITE(32, SCU(D2EN), 0x00000101);
+        MEMORY_WRITE(32, SCU(D0EN | REGISTER_BLOCK_OFFSET(level)), 0x00000000);
+
+        _level_state[level].flags = LEVEL_STATE_IDLING;
 }
 
 void
-scu_dma_level0_start(void)
+scu_dma_level_wait(scu_dma_level_t level)
 {
-        scu_dma_level0_wait();
-        scu_dma_level0_fast_start();
-}
+        while (true) {
+                if (_level_state[level].flags != LEVEL_STATE_WORKING) {
+                        return;
+                }
 
-void
-scu_dma_level1_start(void)
-{
-        scu_dma_level1_wait();
-        scu_dma_level1_fast_start();
-}
+                const uint32_t busy = scu_dma_level_busy(level);
 
-void
-scu_dma_level2_start(void)
-{
-        /* To prevent operation errors, do not activate DMA
-         * level 2 during DMA level 1 operation. */
+                if (busy == 0x00000000) {
+                        return;
+                }
 
-        scu_dma_level1_wait();
-        scu_dma_level2_wait();
-        scu_dma_level2_fast_start();
-}
-
-void
-scu_dma_level0_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D0EN), 0x00000000);
-
-        _level_state[0].flags = LEVEL_STATE_IDLING;
-}
-
-void
-scu_dma_level1_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D1EN), 0x00000000);
-
-        _level_state[1].flags = LEVEL_STATE_IDLING;
-}
-
-void
-scu_dma_level2_stop(void)
-{
-        MEMORY_WRITE(32, SCU(D2EN), 0x00000000);
-
-        _level_state[2].flags = LEVEL_STATE_IDLING;
-}
-
-void
-scu_dma_level0_wait(void)
-{
-        _scu_dma_level_wait(0);
-}
-
-void
-scu_dma_level1_wait(void)
-{
-        _scu_dma_level_wait(1);
-}
-
-void
-scu_dma_level2_wait(void)
-{
-        _scu_dma_level_wait(2);
+                for (register uint32_t i = 0; i < 0x30; i++) {
+                        cpu_instr_nop();
+                }
+        }
 }
 
 void
@@ -236,77 +181,39 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
         (void)memcpy(&_dma_handles[level], handle, sizeof(scu_dma_handle_t));
 #endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
-        switch (level) {
-        case 0:
-                scu_dma_level0_wait();
-                scu_dma_level0_stop();
+        /* To prevent operation errors, do not activate DMA level 2 during DMA
+         * level 1 operation. */
+        if (level == 2) {
+                scu_dma_level_wait(1);
+        }
 
-                _level_state[0].flags = LEVEL_STATE_WORKING;
+        scu_dma_level_wait(level);
+        scu_dma_level_stop(level);
 
-                MEMORY_WRITE(32, SCU(D0R), handle->dnr);
-                MEMORY_WRITE(32, SCU(D0W), handle->dnw);
-                MEMORY_WRITE(32, SCU(D0C), handle->dnc);
-                MEMORY_WRITE(32, SCU(D0AD), handle->dnad);
-                MEMORY_WRITE(32, SCU(D0MD), handle->dnmd | start_factor);
+        _level_state[level].flags = LEVEL_STATE_WORKING;
 
-                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
-                        MEMORY_WRITE(32, SCU(D0EN), 0x00000100);
-                }
-                break;
-        case 1:
-                scu_dma_level1_wait();
-                scu_dma_level1_stop();
+        volatile uint32_t *reg_ptr =
+            (volatile uint32_t *)SCU(REGISTER_BLOCK_OFFSET(level));
 
-                _level_state[1].flags = LEVEL_STATE_WORKING;
+        *reg_ptr++ = handle->dnr;
+        *reg_ptr++ = handle->dnw;
+        *reg_ptr++ = handle->dnc;
+        *reg_ptr++ = handle->dnad;
 
-                MEMORY_WRITE(32, SCU(D1R), handle->dnr);
-                MEMORY_WRITE(32, SCU(D1W), handle->dnw);
-                MEMORY_WRITE(32, SCU(D1C), handle->dnc);
-                MEMORY_WRITE(32, SCU(D1AD), handle->dnad);
-                MEMORY_WRITE(32, SCU(D1MD), handle->dnmd | start_factor);
+        volatile uint32_t * const reg_dxen = (volatile uint32_t *)reg_ptr++;
 
-                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
-                        MEMORY_WRITE(32, SCU(D1EN), 0x00000100);
-                }
-                break;
-        case 2:
-                /* To prevent operation errors, do not activate DMA level 2
-                 * during DMA level 1 operation. */
+        *reg_ptr = handle->dnmd | start_factor;
 
-                scu_dma_level2_wait();
-                scu_dma_level2_stop();
-
-                _level_state[2].flags = LEVEL_STATE_WORKING;
-
-                MEMORY_WRITE(32, SCU(D2R), handle->dnr);
-                MEMORY_WRITE(32, SCU(D2W), handle->dnw);
-                MEMORY_WRITE(32, SCU(D2C), handle->dnc);
-                MEMORY_WRITE(32, SCU(D2AD), handle->dnad);
-                MEMORY_WRITE(32, SCU(D2MD), handle->dnmd | start_factor);
-
-                if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
-                        MEMORY_WRITE(32, SCU(D2EN), 0x00000100);
-                }
-                break;
+        if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
+                *reg_dxen = 0x00000100;
         }
 }
 
 void
-scu_dma_level0_end_set(scu_dma_callback_t callback, void *work)
+scu_dma_level_end_set(scu_dma_level_t level, scu_dma_callback_t callback,
+    void *work)
 {
-        callback_set(&_level_state[0].callback, callback, work);
-}
-
-void
-scu_dma_level1_end_set(scu_dma_callback_t callback, void *work)
-{
-        callback_set(&_level_state[1].callback, callback, work);
-}
-
-void
-scu_dma_level2_end_set(scu_dma_callback_t callback, void *work)
-{
-        callback_set(&_level_state[2].callback, callback, work);
+        callback_set(&_level_state[level].callback, callback, work);
 }
 
 scu_dma_level_t

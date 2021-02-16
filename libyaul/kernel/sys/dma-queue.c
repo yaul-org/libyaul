@@ -170,7 +170,7 @@ _internal_dma_queue_init(void)
 
         scu_dma_illegal_set(_dma_illegal_handler);
 
-        scu_dma_level0_end_set(NULL, NULL);
+        scu_dma_level_end_set(0, NULL, NULL);
 
         _state.current_tag = DMA_QUEUE_TAG_INVALID;
         _state.dma_queues = &_dma_queues[0];
