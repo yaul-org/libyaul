@@ -224,8 +224,8 @@ scu_dma_config_buffer(scu_dma_handle_t *handle,
 }
 
 void
-scu_dma_config_set(uint8_t level, uint8_t start_factor,
-    const scu_dma_handle_t *handle, scu_dma_callback callback __unused)
+scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
+    const scu_dma_handle_t *handle, scu_dma_callback_t callback __unused)
 {
         assert(handle != NULL);
 
@@ -293,19 +293,19 @@ scu_dma_config_set(uint8_t level, uint8_t start_factor,
 }
 
 void
-scu_dma_level0_end_set(scu_dma_callback callback, void *work)
+scu_dma_level0_end_set(scu_dma_callback_t callback, void *work)
 {
         callback_set(&_level_state[0].callback, callback, work);
 }
 
 void
-scu_dma_level1_end_set(scu_dma_callback callback, void *work)
+scu_dma_level1_end_set(scu_dma_callback_t callback, void *work)
 {
         callback_set(&_level_state[1].callback, callback, work);
 }
 
 void
-scu_dma_level2_end_set(scu_dma_callback callback, void *work)
+scu_dma_level2_end_set(scu_dma_callback_t callback, void *work)
 {
         callback_set(&_level_state[2].callback, callback, work);
 }
