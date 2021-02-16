@@ -107,63 +107,63 @@ typedef enum scu_ic_status_reg_t {
         SCU_IC_IST_NONE            = 0x00000000UL,
         /// HBLANK-IN status bit.
         SCU_IC_IST_VBLANK_IN       = 0x00000001UL,
-        /// Not yet documented.
+        /// VBLANK-OUT status bit.
         SCU_IC_IST_VBLANK_OUT      = 0x00000002UL,
-        /// Not yet documented.
+        /// HBLANK-IN status bit.
         SCU_IC_IST_HBLANK_IN       = 0x00000004UL,
-        /// Not yet documented.
+        /// SCU timer #0 status bit.
         SCU_IC_IST_TIMER_0         = 0x00000008UL,
-        /// Not yet documented.
+        /// SCU timer #1 status bit.
         SCU_IC_IST_TIMER_1         = 0x00000010UL,
-        /// Not yet documented.
+        /// SCU-DSP Program end status bit.
         SCU_IC_IST_DSP_END         = 0x00000020UL,
-        /// Not yet documented.
+        /// Sound request status bit.
         SCU_IC_IST_SOUND_REQUEST   = 0x00000040UL,
-        /// Not yet documented.
+        /// SMPC System manager status bit.
         SCU_IC_IST_SYSTEM_MANAGER  = 0x00000080UL,
-        /// Not yet documented.
+        /// SMPC Pad status bit.
         SCU_IC_IST_PAD_INTERRUPT   = 0x00000100UL,
-        /// Not yet documented.
+        /// SCU-DMA level 2 end status bit.
         SCU_IC_IST_LEVEL_2_DMA_END = 0x00000200UL,
-        /// Not yet documented.
+        /// SCU-DMA level 1 end status bit.
         SCU_IC_IST_LEVEL_1_DMA_END = 0x00000400UL,
-        /// Not yet documented.
+        /// SCU-DMA level 0 end status bit.
         SCU_IC_IST_LEVEL_0_DMA_END = 0x00000800UL,
-        /// Not yet documented.
+        /// SCU-DMA illegal status bit.
         SCU_IC_IST_DMA_ILLEGAL     = 0x00001000UL,
-        /// Not yet documented.
+        /// VDP1 sprite end status bit.
         SCU_IC_IST_SPRITE_END      = 0x00002000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_16     = 0x00010000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_15     = 0x00020000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_14     = 0x00040000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_13     = 0x00080000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_12     = 0x00100000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_11     = 0x00200000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_10     = 0x00400000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_09     = 0x00800000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_08     = 0x01000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_07     = 0x02000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_06     = 0x04000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_05     = 0x08000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_04     = 0x10000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_03     = 0x20000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_02     = 0x40000000UL,
-        /// Not yet documented.
+        /// External interrupt status bit.
         SCU_IC_IST_EXTERNAL_01     = 0x80000000UL
 } scu_ic_status_reg_t;
 #pragma GCC diagnostic pop
@@ -266,7 +266,6 @@ typedef void (*scu_ic_ihr_t)(void);
 ///
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
-///
 static inline void __always_inline
 scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 {
@@ -377,6 +376,10 @@ scu_ic_status_get(void)
 
 /// @brief Write to the SCU @ref IST register.
 ///
+/// @details Below describes what happens when reading and writing to the @ref
+/// IST register:
+/// @htmlinclude scu_ic_status_table.html
+/// 
 /// @param value The 32-bit-value.
 static inline void __always_inline
 scu_ic_status_set(scu_ic_status_reg_t value)
@@ -410,12 +413,11 @@ scu_ic_status_chg(scu_ic_status_reg_t and_mask, scu_ic_status_reg_t or_mask)
 /// VBLANK-IN and @em VBLANK-OUT.
 ///
 /// Below is the decoded table,
-/// @htmlinclude priority.html
+/// @htmlinclude scu_ic_priority_table.html
 ///
 /// This is a BIOS call.
 ///
 /// @returns A read-only pointer to the priority table.
-
 static inline const scu_ic_priority_t * __always_inline
 scu_ic_priority_table_get(void)
 {
