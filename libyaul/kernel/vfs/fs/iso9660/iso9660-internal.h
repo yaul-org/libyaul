@@ -8,13 +8,6 @@
 #include <sys/types.h>
 #include <sys/cdefs.h>
 
-/* XXX: Remove */
-#ifdef __linux__
-#define __packed __attribute__ ((packed))
-#define __unused __attribute__ ((unused))
-#define __aligned(n) __attribute__ ((aligned(n)))
-#endif
-
 #include <stdint.h>
 
 /* Volume descriptor types */
