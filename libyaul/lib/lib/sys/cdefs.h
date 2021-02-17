@@ -35,6 +35,10 @@
 
 #include <stddef.h>
 
+/// @defgroup GCC GCC
+/// @defgroup GCC_ATTRIBUTES Attributes
+/// @ingroup GCC
+
 /* Testing against Clang-specific extensions */
 #ifndef __has_attribute
 #define __has_attribute(x)      0
@@ -89,35 +93,91 @@
  * given compiler, let the compile fail if it is told to use a feature that we
  * cannot live without. */
 
+/// @addtogroup GCC_ATTRIBUTES
+/// @{
+
+/// @def __aligned(x)
+/// @brief Not yet documented.
 #define __aligned(x)            __attribute__ ((__aligned__ (x)))
+/// @def __alloc_size(x)
+/// @brief Not yet documented.
 #define __alloc_size(x)         __attribute__ ((__alloc_size__ (x)))
+/// @def __always_inline
+/// @brief Not yet documented.
 #define __always_inline         __attribute__ ((__always_inline__))
+/// @def __const
+/// @brief Not yet documented.
 #define __const                 __attribute__ ((__const__))
+/// @def __dead2
+/// @brief Not yet documented.
 #define __dead2                 __attribute__ ((__noreturn__))
+/// @def __fastcall
+/// @brief Not yet documented.
 #define __fastcall              __attribute__ ((__fastcall__))
+/// @def __interrupt_handler
+/// @brief Not yet documented.
 #define __interrupt_handler     __attribute__ ((interrupt_handler))
+/// @def __malloc_like
+/// @brief Not yet documented.
 #define __malloc_like           __attribute__ ((__malloc__))
+/// @def __may_alias
+/// @brief Not yet documented.
 #define __may_alias             __attribute__ ((__may_alias__))
+/// @def __noinline
+/// @brief Not yet documented.
 #define __noinline              __attribute__ ((__noinline__))
+/// @def __nonnull(x)
+/// @brief Not yet documented.
 #define __nonnull(x)            __attribute__ ((__nonnull__ (x)))
+/// @def __nonnull_all
+/// @brief Not yet documented.
 #define __nonnull_all           __attribute__ ((__nonnull__))
+/// @def __noreturn
+/// @brief Not yet documented.
 #define __noreturn              __attribute__ ((noreturn))
+/// @def __packed
+/// @brief Not yet documented.
 #define __packed                __attribute__ ((__packed__))
+/// @def __pure
+/// @brief Not yet documented.
 #define __pure                  __attribute__ ((__pure__))
+/// @def __pure2
+/// @brief Not yet documented.
 #define __pure2                 __attribute__ ((__const__))
+/// @def __result_use_check
+/// @brief Not yet documented.
 #define __result_use_check      __attribute__ ((__warn_unused_result__))
+/// @def __returns_twice
+/// @brief Not yet documented.
 #define __returns_twice         __attribute__ ((__returns_twice__))
+/// @def __section(x)
+/// @brief Not yet documented.
 #define __section(x)            __attribute__ ((__section__ (x)))
+/// @def __unused
+/// @brief Not yet documented.
 #define __unused                __attribute__ ((__unused__))
+/// @def __used
+/// @brief Not yet documented.
 #define __used                  __attribute__ ((__used__))
+/// @def __weak
+/// @brief Not yet documented.
 #define __weak                  __attribute__ ((__weak__))
+/// @def __leaf
+/// @brief Not yet documented.
 #define __leaf                  __attribute__ ((leaf))
+/// @def __no_reorder
+/// @brief Not yet documented.
 #define __no_reorder            __attribute__ ((no_reorder))
+/// @def __hot
+/// @brief Not yet documented.
 #define __hot                   __attribute__ ((hot))
 
+/// @def __alloc_align(yyy)
+/// @brief Not yet documented.
 #if __has_attribute(__alloc_align__)
 #define __alloc_align(x)        __attribute__ ((__alloc_align__ (x)))
 #else
+/// @def __always_inline
 #define __alloc_align(x)
 #endif /* __has_attribute(__alloc_align__) */
 
@@ -125,7 +185,11 @@
  * is expected to be an explicit NULL.
  *
  * The attribute is only valid on variadic functions. */
+/// @def __null_sentinel
+/// @brief Not yet documented.
 #define __null_sentinel         __attribute__ ((__sentinel__))
+
+/// @}
 
 /* C99 Static array indices in function parameter declarations. Syntax such as:
  *
@@ -137,6 +201,7 @@
  * headers using it can be compiled in either language. Use like this:
  *
  *   void bar(int myArray[__min_size(10)]); */
+/// @private
 #if !defined(__cplusplus) &&                                                   \
     (defined(__clang__)) &&                                                    \
     (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
@@ -155,12 +220,14 @@
  * function. This name is the unadorned name of the function. As an extension,
  * at file (or, in C++, namespace scope), __func__ evaluates to the empty
  * string. */
+/// @private
 #define __func__ NULL
 
 /* GCC 2.95 provides `__restrict' as an extension to C90 to support the
  * C99-specific `restrict' type qualifier. We happen to use `__restrict' as a
  * way to define the `restrict' type qualifier without disturbing older software
  * that is unaware of C99 keywords. */
+/// @private
 #if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901) || defined(lint)
 #define __restrict
 #else
@@ -192,14 +259,19 @@
  *     seldomly (e.g. at subsystem initialization time) as the
  *     basic block reordering that this affects can often generate
  *     larger code. */
+/// @private
 #define __predict_true(exp)     __builtin_expect((exp), 1)
+/// @private
 #define __predict_false(exp)    __builtin_expect((exp), 0)
 
-#define __alignof(x)                                                           \
+/// @private
+#define __alignof(x)                                                            \
         __offsetof(struct { char __a; x __b; }, __b)
-#define __offsetof(type, field)                                                \
+/// @private
+#define __offsetof(type, field)                                                 \
         offsetof(type, field)
-#define __rangeof(type, start, end)                                            \
+/// @private
+#define __rangeof(type, start, end)                                             \
         (__offsetof(type, end) - __offsetof(type, start))
 
 /* Compiler-dependent macros to declare that functions take printf-like or
@@ -208,11 +280,14 @@
  * They are null except for versions of GCC that are known to support the
  * features properly (old versions of GCC-2 didn't permit keeping the keywords
  * out of the application namespace). */
-#define __printflike(fmt_arg, first_vararg)                                    \
+/// @private
+#define __printflike(fmt_arg, first_vararg)                                     \
         __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
-#define __format_arg(fmt_arg)                                                  \
+/// @private
+#define __format_arg(fmt_arg)                                                   \
         __attribute__ ((__format_arg__ (fmt_arg)))
 
+/// @private
 #define __weak_alias(name, aliasname)                                          \
         extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
 
