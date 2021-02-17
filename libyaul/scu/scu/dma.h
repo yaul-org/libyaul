@@ -133,7 +133,7 @@ typedef enum scu_dma_bus {
 }
 
 /// @brief SCU-DMA level representing one of the 3 levels.
-typedef int8_t scu_dma_level_t;
+typedef int32_t scu_dma_level_t;
 
 /// @brief A SCU-DMA handle representing a copy of the level's SCU-DMA
 /// registers.
@@ -180,12 +180,14 @@ typedef struct scu_dma_xfer {
  * together */
 } __packed __aligned(4) scu_dma_xfer_t;
 
-/// Not yet documented.
+/// The transfer type.
 typedef union scu_dma_xfer_type {
-        /// Indirect mode
+        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+        /// this to point to the transfer table.
         scu_dma_xfer_t *indirect;
 
-        /// Direct mode
+        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+        /// this to set the 3-tuple.
         scu_dma_xfer_t direct;
 } scu_dma_xfer_type_t;
 
@@ -217,14 +219,14 @@ typedef union scu_dma_xfer_type {
 ///     When allocating dynamically, use @ref memalign. Otherwise, when
 ///     statically allocating, use the @ref __aligned GCC attribute.
 typedef struct scu_dma_level_cfg {
-        /// Not yet documented.
+        /// Transfer mode.
         scu_dma_mode_t mode:8;
-        /// Not yet documented.
+        /// Transfer stride.
         scu_dma_stride_t stride:8;
-        /// Not yet documented.
-        scu_dma_xfer_type_t xfer;
-        /// Not yet documented.
+        /// Transfer update.
         scu_dma_update_t update;
+        /// Transfer 3-tuple.
+        scu_dma_xfer_type_t xfer;
 } __packed __aligned(4) scu_dma_level_cfg_t;
 
 static_assert(sizeof(scu_dma_level_cfg_t) == 20);
@@ -353,7 +355,7 @@ scu_dma_illegal_set(scu_dma_ihr_t ihr)
 static inline void __always_inline
 scu_dma_illegal_clear(void)
 {
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, NULL);
+        scu_dma_illegal_set(NULL);
 }
 
 /// @brief Not yet documented.
@@ -366,20 +368,44 @@ extern void scu_dma_config_set(scu_dma_level_t level,
     scu_dma_callback_t callback);
 
 /// @ingroup SCU_IC_HELPERS
-/// @brief Not yet documented.
+/// @brief Set the interrupt handler for the SCU-DMA level end interrupt.
+///
+/// @details There is no need to explicitly return via `rte` for @p ihr.
+///
+/// @param level    The SCU-DMA level.
+/// @param callback The interrupt handler.
+/// @param work     The pointer to the work passed to @p callback.
 extern void scu_dma_level_end_set(scu_dma_level_t level,
     scu_dma_callback_t callback, void *work);
 
-/// @brief Not yet documented.
+/// @brief Start a SCU-DMA transfer.
+///
+/// @details There is no check if the SCU-DMA level @p level is currently
+/// operating.
+///
+/// There is no check if the SCU-DMA level @p level has been configured.
 extern void scu_dma_level_fast_start(scu_dma_level_t level);
 
-/// @brief Not yet documented.
+/// @brief Start a SCU-DMA transfer.
+///
+/// @details The function waits until the SCU-DMA level @p level is not in
+/// operation or standby. There is also a check if @p level is 2, then it also
+/// waits until SCU-DMA level 1 is not in operation or standby.
+///
+/// There is no check if the SCU-DMA level @p level has been configured.
 extern void scu_dma_level_start(scu_dma_level_t level);
 
-/// @brief Not yet documented.
+/// @brief Wait until the SCU-DMA level is not in operation or standby.
+///
+/// @details Waits indefinitely until the SCU-DMA level @p level is not in
+/// operation or standby.
+///
+/// @param level The SCU-DMA level.
 extern void scu_dma_level_wait(scu_dma_level_t level);
 
-/// @brief Not yet documented.
+/// @brief Obtain the first unused SCU-DMA level.
+///
+/// @returns SCU-DMA level 0, then 1, then 2. Otherwise, -1 is returned.
 extern scu_dma_level_t scu_dma_level_unused_get(void);
 
 /// @}
