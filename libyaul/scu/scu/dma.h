@@ -157,12 +157,11 @@ typedef struct scu_dma_handle {
 /// transfer.
 ///
 /// @details When a SCU-DMA level is configured to operate in direct mode (@ref
-/// scu_dma_level_cfg_t.mode), then this structure represents one transfer, and
-/// is set in @ref scu_dma_level_cfg_t.xfer.direct.
+/// scu_dma_level_cfg_t.mode), then this structure represents one transfer.
 ///
-/// However, when the mode is @ref SCU_DMA_MODE_INDIRECT, then @ref
-/// scu_dma_level_cfg_t.xfer.indirect is a pointer to a contiguous @em table of
-/// transfers.
+/// However, when the mode is @ref SCU_DMA_MODE_INDIRECT, then this structure
+/// represents possibly one of many transfers contiguously laid out in memory as
+/// a @em table of transfers.
 typedef struct scu_dma_xfer {
         /// Transfer length.
         uint32_t len;
@@ -177,7 +176,18 @@ typedef struct scu_dma_xfer {
         /// scu_dma_xfer.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
         /// the machine @em will lock up.
         uint32_t src;
+/* The alignment must be 4 bytes as the entries in the table are packed
+ * together */
 } __packed __aligned(4) scu_dma_xfer_t;
+
+/// Not yet documented.
+typedef union scu_dma_xfer_type {
+        /// Indirect mode
+        scu_dma_xfer_t *indirect;
+
+        /// Direct mode
+        scu_dma_xfer_t direct;
+} scu_dma_xfer_type_t;
 
 /// @brief Not yet documented.
 ///
@@ -185,15 +195,14 @@ typedef struct scu_dma_xfer {
 ///
 /// @warning
 /// + When in indirect mode,
-///   - The last entry in @ref scu_dma_level_cfg_t.xfer.indirect @em must be
-///     bitwise OR'd with the memory transfer source address and @ref
-///     scu_dma_xfer.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise, the
-///     machine @em will lock up.
+///   - The last entry in the transfer table @em must be bitwise OR'd with the
+///     memory transfer source address and @ref scu_dma_xfer.src with @ref
+///     SCU_DMA_INDIRECT_TABLE_END. Otherwise, the machine @em will lock up.
 ///
 ///   - The base pointer to the table of transfers (@ref
-///     scu_dma_level_cfg_t.xfer.indirect) must be byte aligned proportional to
-///     the number of transfers in the table. Ignoring this condition @em will
-///     cause the machine to lock up.
+///     scu_dma_xfer_type_t.indirect) must be byte aligned proportional to the
+///     number of transfers in the table. Ignoring this condition @em will cause
+///     the machine to lock up.
 ///
 ///     For example, if the transfer count in the table is 1, and because this
 ///     structure is 12 bytes, first round to the nearest power of 2, the
@@ -210,21 +219,15 @@ typedef struct scu_dma_xfer {
 typedef struct scu_dma_level_cfg {
         /// Not yet documented.
         scu_dma_mode_t mode:8;
-
-        /// Not yet documented.
-        union {
-                /// Indirect mode
-                scu_dma_xfer_t *indirect;
-
-                /// Direct mode
-                scu_dma_xfer_t direct;
-        } xfer;
-
         /// Not yet documented.
         scu_dma_stride_t stride:8;
         /// Not yet documented.
+        scu_dma_xfer_type_t xfer;
+        /// Not yet documented.
         scu_dma_update_t update;
-} scu_dma_level_cfg_t;
+} __packed __aligned(4) scu_dma_level_cfg_t;
+
+static_assert(sizeof(scu_dma_level_cfg_t) == 20);
 
 /// @brief Not yet documented.
 typedef void (*scu_dma_ihr_t)(void);
@@ -235,67 +238,80 @@ typedef void (*scu_dma_callback_t)(void *);
 /// @brief Not yet documented.
 extern void scu_dma_level_stop(scu_dma_level_t level);
 
-/// @brief Not yet documented.
+/// @brief Obtain the 32-bit SCU @ref DSTA value.
+/// @returns The 32-bit SCU @ref DSTA value.
 static inline uint32_t __always_inline
 scu_dma_status_get(void)
 {
         return MEMORY_READ(32, SCU(DSTA));
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the status of SCU-DSP DMA.
+/// @returns Whether SCU-DSP DMA is in operation, on standby, or interrupted to
+/// background.
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
-        /* In operation, on standby, or interrupted to background */
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
 }
 
-/// @brief Not yet documented.
+/// @brief Wait until SCU-DSP DMA is no longer in operation/standby.
 static inline void __always_inline
 scu_dma_dsp_wait(void)
 {
         while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain which bus(es) are being accessed during DMA.
+/// @returns The mask of bus(es) that are being accessed during DMA.
 static inline scu_dma_bus_t __always_inline
 scu_dma_bus_access_busy(void)
 {
         return ((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x07);
 }
 
-/// @brief Not yet documented.
+/// @brief Wait until the mask of bus(es) are no longer being accessed during
+/// DMA.
+///
+/// @param mask The mask of bus(es).
 static inline void __always_inline
 scu_dma_bus_access_wait(scu_dma_bus_t mask)
 {
         while (((scu_dma_bus_access_busy()) & mask) != 0x00);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the status of SCU-DMA level 0.
+/// @returns Whether SCU-DMA level 0 is in operation, on standby, or
+/// interrupted.
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
-        /* In operation, on standby, or interrupted */
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the status of SCU-DMA level 1.
+/// @returns Whether SCU-DMA level 1 is in operation, on standby, or
+/// interrupted.
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
-        /* In operation, on standby, or interrupted */
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the status of SCU-DMA level 2.
+/// @returns Whether SCU-DMA level 2 is in operation, on standby, or
+/// interrupted.
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
-        /* In operation, on standby, or interrupted */
         return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
 }
 
-/// @brief Not yet documented.
+/// @brief Obtain the status of SCU-DMA level.
+///
+/// @param level The SCU-DMA level.
+///
+/// @returns Whether SCU-DMA level is in operation, on standby, or interrupted.
 static inline uint32_t __always_inline
 scu_dma_level_busy(scu_dma_level_t level)
 {
@@ -310,7 +326,7 @@ scu_dma_level_busy(scu_dma_level_t level)
         }
 }
 
-/// @brief Not yet documented.
+/// @brief Stop all SCU-DMA levels unconditionally.
 static inline void __always_inline
 scu_dma_stop(void)
 {
@@ -319,11 +335,25 @@ scu_dma_stop(void)
         scu_dma_level_stop(2);
 }
 
-/// @brief Not yet documented.
+/// @ingroup CPU_INTC_HELPERS
+/// @brief Set the interrupt handler for the SCU-DMA illegal interrupt.
+///
+/// @details There is no need to explicitly return via `rte` for @p ihr.
+///
+/// @param ihr The interrupt handler.
 static inline void __always_inline
 scu_dma_illegal_set(scu_dma_ihr_t ihr)
 {
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
+}
+
+/// @ingroup CPU_INTC_HELPERS
+/// @brief Clear the interrupt handler for the SCU-DMA illegal interrupt.
+/// @see scu_dma_illegal_set
+static inline void __always_inline
+scu_dma_illegal_clear(void)
+{
+        scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, NULL);
 }
 
 /// @brief Not yet documented.
