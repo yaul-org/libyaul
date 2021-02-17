@@ -45,49 +45,49 @@ __BEGIN_DECLS
 
 /// @brief SCU-DMA transfer mode.
 typedef enum scu_dma_mode {
-        /// @brief Not yet documented.
+        /// @brief SCU-DMA direct mode.
         SCU_DMA_MODE_DIRECT   = 0x00,
-        /// @brief Not yet documented.
+        /// @brief SCU-DMA indirect mode.
         SCU_DMA_MODE_INDIRECT = 0x01
 } scu_dma_mode_t;
 
 /// @brief SCU-DMA starting factors.
 typedef enum scu_dma_start_factor {
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at VBLANK-IN.
         SCU_DMA_START_FACTOR_VBLANK_IN       = 0x00,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at VBLANK-OUT.
         SCU_DMA_START_FACTOR_VBLANK_OUT      = 0x01,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at HBLANK-IN.
         SCU_DMA_START_FACTOR_HBLANK_IN       = 0x02,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at SCU timer #0.
         SCU_DMA_START_FACTOR_TIMER_0         = 0x03,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at SCU timer #1.
         SCU_DMA_START_FACTOR_TIMER_1         = 0x04,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at sound request.
         SCU_DMA_START_FACTOR_SOUND_REQ       = 0x05,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer at VDP1 sprite end.
         SCU_DMA_START_FACTOR_SPRITE_DRAW_END = 0x06,
-        /// @brief Not yet documented.
+        /// @brief Start DMA transfer immediately.
         SCU_DMA_START_FACTOR_ENABLE          = 0x07
 } scu_dma_start_factor_t;
 
 /// @brief SCU-DMA transfer stride.
 typedef enum scu_dma_stride {
-        /// @brief Not yet documented.
+        /// @brief Do not add to read/write addresses.
         SCU_DMA_STRIDE_0_BYTES   = 0x00,
-        /// @brief Not yet documented.
+        /// @brief 2-byte stride.
         SCU_DMA_STRIDE_2_BYTES   = 0x01,
-        /// @brief Not yet documented.
+        /// @brief 4-byte stride.
         SCU_DMA_STRIDE_4_BYTES   = 0x02,
-        /// @brief Not yet documented.
+        /// @brief 8-byte stride.
         SCU_DMA_STRIDE_8_BYTES   = 0x03,
-        /// @brief Not yet documented.
+        /// @brief 16-byte stride.
         SCU_DMA_STRIDE_16_BYTES  = 0x04,
-        /// @brief Not yet documented.
+        /// @brief 32-byte stride.
         SCU_DMA_STRIDE_32_BYTES  = 0x05,
-        /// @brief Not yet documented.
+        /// @brief 64-byte stride.
         SCU_DMA_STRIDE_64_BYTES  = 0x06,
-        /// @brief Not yet documented.
+        /// @brief 128-byte stride.
         SCU_DMA_STRIDE_128_BYTES = 0x07
 } scu_dma_stride_t;
 
@@ -104,6 +104,7 @@ typedef enum scu_dma_update {
 /// @brief Not yet documented.
 #define SCU_DMA_INDIRECT_TABLE_END (0x80000000UL)
 
+/// @brief Not yet documented.
 typedef enum scu_dma_bus {
         /// @brief Not yet documented.
         SCU_DMA_BUS_NONE = 0x00,
@@ -112,7 +113,7 @@ typedef enum scu_dma_bus {
         /// @brief Not yet documented.
         SCU_DMA_BUS_B    = 0x02,
         /// @brief Not yet documented.
-        SCU_DMA_BUS_DSP  = 0x04        
+        SCU_DMA_BUS_DSP  = 0x04
 } scu_dma_bus_t;
 
 /// @brief Not yet documented.
@@ -131,10 +132,14 @@ typedef enum scu_dma_bus {
         .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
 }
 
-/// Not yet documented.
-typedef uint8_t scu_dma_level_t;
+/// @brief SCU-DMA level representing one of the 3 levels.
+typedef int8_t scu_dma_level_t;
 
-/// @brief Not yet documented.
+/// @brief A SCU-DMA handle representing a copy of the level's SCU-DMA
+/// registers.
+///
+/// @see scu_dma_config_buffer
+/// @see scu_dma_config_set
 typedef struct scu_dma_handle {
         /// Not yet documented.
         uint32_t dnr;
@@ -148,17 +153,60 @@ typedef struct scu_dma_handle {
         uint32_t dnmd;
 } __packed __aligned(4) scu_dma_handle_t;
 
-/// @brief Not yet documented.
+/// @brief The 3-tuple represents a single transfer in direct or indirect
+/// transfer.
+///
+/// @details When a SCU-DMA level is configured to operate in direct mode (@ref
+/// scu_dma_level_cfg_t.mode), then this structure represents one transfer, and
+/// is set in @ref scu_dma_level_cfg_t.xfer.direct.
+///
+/// However, when the mode is @ref SCU_DMA_MODE_INDIRECT, then @ref
+/// scu_dma_level_cfg_t.xfer.indirect is a pointer to a contiguous @em table of
+/// transfers.
 typedef struct scu_dma_xfer {
-        /// Not yet documented.
+        /// Transfer length.
         uint32_t len;
-        /// Not yet documented.
+
+        /// Memory transfer destination address.
         uint32_t dst;
-        /// Not yet documented.
+
+        /// @brief Memory transfer source address.
+        ///
+        /// @details When in indirect mode, the last entry @em must be bitwise
+        /// OR'd with the memory transfer source address and @ref
+        /// scu_dma_xfer.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
+        /// the machine @em will lock up.
         uint32_t src;
 } __packed __aligned(4) scu_dma_xfer_t;
 
 /// @brief Not yet documented.
+///
+/// @details ...
+///
+/// @warning
+/// + When in indirect mode,
+///   - The last entry in @ref scu_dma_level_cfg_t.xfer.indirect @em must be
+///     bitwise OR'd with the memory transfer source address and @ref
+///     scu_dma_xfer.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise, the
+///     machine @em will lock up.
+///
+///   - The base pointer to the table of transfers (@ref
+///     scu_dma_level_cfg_t.xfer.indirect) must be byte aligned proportional to
+///     the number of transfers in the table. Ignoring this condition @em will
+///     cause the machine to lock up.
+///
+///     For example, if the transfer count in the table is 1, and because this
+///     structure is 12 bytes, first round to the nearest power of 2, the
+///     alignment of the table must be on a 16-byte boundary. If the the
+///     transfer count is 3 (36 bytes rounded to 64), then the table must be on
+///     a 64-byte boundary.
+///
+///     Effectively, the formula to determine the byte alignment is
+///     @f$2^{\lceil\log_2 N\rceil}@f$-bytes where @f$N@f$ is the size of the
+///     transfer table in bytes.
+///
+///     When allocating dynamically, use @ref memalign. Otherwise, when
+///     statically allocating, use the @ref __aligned GCC attribute.
 typedef struct scu_dma_level_cfg {
         /// Not yet documented.
         scu_dma_mode_t mode:8;
