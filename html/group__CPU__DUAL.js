@@ -14,9 +14,9 @@ var group__CPU__DUAL =
     ] ],
     [ "cpu_dual_comm_mode_set", "group__CPU__DUAL.html#ga15c329e78ac6000940ca3627d944a25f", null ],
     [ "cpu_dual_executor_get", "group__CPU__DUAL.html#ga922e6d291710fb4fab69c9c62aed50fa", null ],
-    [ "cpu_dual_master_notify", "group__CPU__DUAL.html#gaf2153696a3211f801525876a544b9584", null ],
-    [ "cpu_dual_master_stack_get", "group__CPU__DUAL.html#gac7ec0f19f5388b375079c164514e30b8", null ],
-    [ "cpu_dual_notification_wait", "group__CPU__DUAL.html#ga6584ef1da1e28ba9152867b89881da01", null ],
-    [ "cpu_dual_slave_notify", "group__CPU__DUAL.html#ga036242d182f6395926199da18f718c55", null ],
-    [ "cpu_dual_slave_stack_get", "group__CPU__DUAL.html#ga2cf34cf330da637046ecb20dfdeb768e", null ]
+    [ "cpu_dual_master_notify", "group__CPU__DUAL.html#ga662293aa2a9cab5942b57f48804dacaa", null ],
+    [ "cpu_dual_master_stack_get", "group__CPU__DUAL.html#gaecb79ccf8bec43fd8fe5ccfa7e474bfa", null ],
+    [ "cpu_dual_notification_wait", "group__CPU__DUAL.html#ga9840197c5bd28cc2a72f70bd2258cab2", null ],
+    [ "cpu_dual_slave_notify", "group__CPU__DUAL.html#gaa74784407ed5f85e4b2f22f306e68b59", null ],
+    [ "cpu_dual_slave_stack_get", "group__CPU__DUAL.html#gaf031a9e668fba745290bf5ab404aee8d", null ]
 ];

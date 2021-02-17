@@ -43,9 +43,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"group__CPU__INTC__HELPERS.html#gacfebd31e06994eeed04538eff518315d",
-"group__SCU__DMA.html#gac6f30d9c30c74091f60969514a968ae3",
-"structfix16__plane.html"
+"group__CPU__INTC__HELPERS.html#ga76a7b36ddb1773db523daa09383b979c",
+"group__MEMORY__MAP__SMPC__IO__REGISTERS.html#ga23ea04a27f31826f7efe8a960f3542fb",
+"structcpu__dmac__cfg.html#a0343b8547d469b9a2714615bc89870d5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

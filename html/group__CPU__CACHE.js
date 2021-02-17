@@ -21,11 +21,11 @@ var group__CPU__CACHE =
       [ "CPU_CACHE_TYPE_I", "group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037a0cf3fb6de48fafbe16cb74b4c9536f1b", null ],
       [ "CPU_CACHE_TYPE_D", "group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037aae5be6e2c73c3970b37b7a24fd990890", null ]
     ] ],
-    [ "cpu_cache_disable", "group__CPU__CACHE.html#ga60d16b61d90570032b2b0e6e72385ba7", null ],
-    [ "cpu_cache_enable", "group__CPU__CACHE.html#gad762e595b6e8bb6b812c1ccc1ebcd8bd", null ],
-    [ "cpu_cache_purge", "group__CPU__CACHE.html#ga25279430a80d3b57960af39c8ddc7bee", null ],
-    [ "cpu_cache_purge_line", "group__CPU__CACHE.html#ga1bb1a9f9d783321ebbb2a3b8d6bc3b96", null ],
-    [ "cpu_cache_repl_disable", "group__CPU__CACHE.html#gaea671d76e1e96d0a8be49ad1c10b5a8e", null ],
-    [ "cpu_cache_repl_enable", "group__CPU__CACHE.html#ga4a4daad707ca16d39d150200c9b5b806", null ],
-    [ "cpu_cache_way_mode_set", "group__CPU__CACHE.html#gae38d00811f197d982543190a807ee890", null ]
+    [ "cpu_cache_disable", "group__CPU__CACHE.html#gaef6f9bd128cd36bc3bf0f084401c0b06", null ],
+    [ "cpu_cache_enable", "group__CPU__CACHE.html#ga857d5442d14cbf45e0296d159d24faed", null ],
+    [ "cpu_cache_purge", "group__CPU__CACHE.html#gacd31f9c6aad6d5e315dae3794c0652c7", null ],
+    [ "cpu_cache_purge_line", "group__CPU__CACHE.html#ga93095a87134cdec86275d36b22523902", null ],
+    [ "cpu_cache_repl_disable", "group__CPU__CACHE.html#gadd8c0e17683f976dc148974e87ceb81f", null ],
+    [ "cpu_cache_repl_enable", "group__CPU__CACHE.html#gafdc3159e80989e12086149dadf6dd22f", null ],
+    [ "cpu_cache_way_mode_set", "group__CPU__CACHE.html#ga48557c885d1318a326d2554580e50990", null ]
 ];

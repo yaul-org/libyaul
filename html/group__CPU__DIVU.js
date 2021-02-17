@@ -1,13 +1,13 @@
 var group__CPU__DIVU =
 [
     [ "cpu_divu_ihr", "group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f", null ],
-    [ "cpu_divu_32_32_set", "group__CPU__DIVU.html#ga0410bd2ebc2554b8dbe997fd2e1e5378", null ],
-    [ "cpu_divu_64_32_set", "group__CPU__DIVU.html#ga1117e673b03a934e28f4c289d02df4e6", null ],
-    [ "cpu_divu_fix16_set", "group__CPU__DIVU.html#ga46b1ace51589ad0d96e98f2934e63391", null ],
-    [ "cpu_divu_fix16_split", "group__CPU__DIVU.html#ga6ccd3668b021698772ab240c23e0bee4", null ],
-    [ "cpu_divu_interrupt_priority_get", "group__CPU__DIVU.html#gab7312b1cd3478f46865bd5ccb7bbeee8", null ],
-    [ "cpu_divu_interrupt_priority_set", "group__CPU__DIVU.html#ga534450add69d199aa549f6028242121e", null ],
-    [ "cpu_divu_quotient_get", "group__CPU__DIVU.html#ga0e668afa8e1d613cdd90dc8c0d29fcd5", null ],
-    [ "cpu_divu_remainder_get", "group__CPU__DIVU.html#gaf6b5cb8546b373711641f0dc1e137f5f", null ],
-    [ "cpu_divu_status_get", "group__CPU__DIVU.html#gac1de99e0806a1107a0e73c3a1473af2a", null ]
+    [ "cpu_divu_32_32_set", "group__CPU__DIVU.html#ga3833bc435bf2bd47268a66a77ac8f9f2", null ],
+    [ "cpu_divu_64_32_set", "group__CPU__DIVU.html#ga826a1e3215bf545fcbc80b4002486e5b", null ],
+    [ "cpu_divu_fix16_set", "group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b", null ],
+    [ "cpu_divu_fix16_split", "group__CPU__DIVU.html#ga4277d6b23ccbba1e8455cbacc2a6bc6f", null ],
+    [ "cpu_divu_interrupt_priority_get", "group__CPU__DIVU.html#ga6f355ce2d3d564ed423c57255cbc5bb5", null ],
+    [ "cpu_divu_interrupt_priority_set", "group__CPU__DIVU.html#gaa5b4966cb085f55322e34a682307985e", null ],
+    [ "cpu_divu_quotient_get", "group__CPU__DIVU.html#gab40c98cbb789445c2e08e867cc39f1b2", null ],
+    [ "cpu_divu_remainder_get", "group__CPU__DIVU.html#ga7bc279b20a45d78096a506251bd0b21d", null ],
+    [ "cpu_divu_status_get", "group__CPU__DIVU.html#gaa8cea507d581c285f4cf3876af1ea9bb", null ]
 ];

@@ -17,11 +17,11 @@ var group__CPU__WDT =
       [ "CPU_WDT_MODE_INTERVAL", "group__CPU__WDT.html#ggac50337e47648ff1ce4fffab70fd008e3aa50026a0b0fc5eaafbaa7f8bbdcee7d7", null ],
       [ "CPU_WDT_MODE_WATCHDOG", "group__CPU__WDT.html#ggac50337e47648ff1ce4fffab70fd008e3a68ed4c5f5d85685a4b8d2aecc3b26875", null ]
     ] ],
-    [ "cpu_wdt_count_get", "group__CPU__WDT.html#gaa284872731b8b7e0c6b345f3a373db12", null ],
-    [ "cpu_wdt_count_set", "group__CPU__WDT.html#ga9871efbf0d783f682b754af0a8329354", null ],
-    [ "cpu_wdt_disable", "group__CPU__WDT.html#gaeea9dfc61d92ef077ec94a46b99f8b5e", null ],
-    [ "cpu_wdt_enable", "group__CPU__WDT.html#ga8163b44f9dd197ecc300c10329fde544", null ],
+    [ "cpu_wdt_count_get", "group__CPU__WDT.html#ga996f23855c8e43639128b976f8240b61", null ],
+    [ "cpu_wdt_count_set", "group__CPU__WDT.html#ga65c81c0b483f5ba108e8461b26055f7f", null ],
+    [ "cpu_wdt_disable", "group__CPU__WDT.html#ga34942b20b3bd6a6465496b8bc7ed64eb", null ],
+    [ "cpu_wdt_enable", "group__CPU__WDT.html#ga12c515442dd2feb6ae47ff7644a5ffe5", null ],
     [ "cpu_wdt_init", "group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2", null ],
-    [ "cpu_wdt_interrupt_priority_get", "group__CPU__WDT.html#ga92a635ecd54be5758067bcca793a0028", null ],
-    [ "cpu_wdt_interrupt_priority_set", "group__CPU__WDT.html#ga67a0ff40a9f1504a7a458edb0b6ac69b", null ]
+    [ "cpu_wdt_interrupt_priority_get", "group__CPU__WDT.html#gae22e2789951c47ebe2b3bf54afdf53b5", null ],
+    [ "cpu_wdt_interrupt_priority_set", "group__CPU__WDT.html#gac97dbfca711ad66e24d7d40cc881c322", null ]
 ];

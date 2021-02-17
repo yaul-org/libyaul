@@ -1,5 +1,6 @@
 var unionfix16__vec3 =
 [
+    [ "__aligned", "unionfix16__vec3.html#a94d6994f9550ee7ff088c7954883a52e", null ],
     [ "comp", "unionfix16__vec3.html#afcfdd7fcbd0e445848190eada59d1824", null ],
     [ "x", "unionfix16__vec3.html#a0afc1392e541c22076ef6642122b240c", null ],
     [ "y", "unionfix16__vec3.html#ac06aee4d03e559293c688744382527ac", null ],

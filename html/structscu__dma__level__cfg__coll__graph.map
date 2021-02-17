@@ -1,5 +1,4 @@
 <map id="scu_dma_level_cfg" name="scu_dma_level_cfg">
-<area shape="rect" id="node1" title="Not yet documented." alt="" coords="7,199,153,225"/>
-<area shape="rect" id="node2" href="$unionscu__dma__xfer__type.html" title="Not yet documented." alt="" coords="5,109,155,136"/>
-<area shape="rect" id="node3" href="$structscu__dma__xfer.html" title="The 3&#45;tuple represents a single transfer in direct or indirect transfer." alt="" coords="23,5,137,32"/>
+<area shape="rect" id="node1" title="Not yet documented." alt="" coords="7,95,153,121"/>
+<area shape="rect" id="node2" href="$unionscu__dma__xfer__type.html" title="The transfer type." alt="" coords="5,5,155,32"/>
 </map>

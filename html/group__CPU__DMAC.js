@@ -21,7 +21,6 @@ var group__CPU__DMAC =
       [ "priority_mode", "structcpu__dmac__status.html#a977c3ceb75f7dd339fc1284b6799deae", null ]
     ] ],
     [ "cpu_dmac_bus_mode_t", "group__CPU__DMAC.html#ga8bc6bfc97122bf9f6b57669fa2c36425", null ],
-    [ "cpu_dmac_cfg_t", "group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4", null ],
     [ "cpu_dmac_channel_t", "group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1", null ],
     [ "cpu_dmac_dst_t", "group__CPU__DMAC.html#ga2cd59afe9a28a83c8d88a3f6a46840e5", null ],
     [ "cpu_dmac_ihr", "group__CPU__DMAC.html#ga358061a56a92311e6711f85508e75bbd", null ],
@@ -53,16 +52,17 @@ var group__CPU__DMAC =
       [ "CPU_DMAC_STRIDE_4_BYTES", "group__CPU__DMAC.html#ggadba88414e2eb0392834e70b87d47def5adbc0cabc6e71124db1c05a305e5e2f9c", null ],
       [ "CPU_DMAC_STRIDE_16_BYTES", "group__CPU__DMAC.html#ggadba88414e2eb0392834e70b87d47def5aafd9716f55c20388df772d12bc85ca9a", null ]
     ] ],
+    [ "__aligned", "group__CPU__DMAC.html#ga925dc315094d86d13aa48c359cefed59", null ],
     [ "cpu_dmac_channel_config_set", "group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de", null ],
-    [ "cpu_dmac_channel_start", "group__CPU__DMAC.html#ga2b26ef48721710c7c902a5b7c22120f1", null ],
-    [ "cpu_dmac_channel_stop", "group__CPU__DMAC.html#ga6b1abd56274f3e913f538f2cc76b42e3", null ],
-    [ "cpu_dmac_channel_transfer_set", "group__CPU__DMAC.html#gaa36f0e459d7735660fd361b4270dca1a", null ],
+    [ "cpu_dmac_channel_start", "group__CPU__DMAC.html#ga7bcafe8e2d8ac13e2ee4d3e7ebe23e4d", null ],
+    [ "cpu_dmac_channel_stop", "group__CPU__DMAC.html#ga7baac7ecba01979b44a7c24598ac9d5d", null ],
+    [ "cpu_dmac_channel_transfer_set", "group__CPU__DMAC.html#ga1abfe1297fd6b31e67e74a2d04f524d1", null ],
     [ "cpu_dmac_channel_wait", "group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131", null ],
-    [ "cpu_dmac_disable", "group__CPU__DMAC.html#gac6628f7617376e4f36c9d8aaf6d32745", null ],
-    [ "cpu_dmac_enable", "group__CPU__DMAC.html#ga5b03cac0c45a74d471de1e84b86cb7ab", null ],
-    [ "cpu_dmac_interrupt_priority_get", "group__CPU__DMAC.html#ga0eea9265323a34a9908b34fa025f819d", null ],
-    [ "cpu_dmac_interrupt_priority_set", "group__CPU__DMAC.html#ga5c1432937ccb202ed2202eed993e0bcc", null ],
-    [ "cpu_dmac_priority_mode_set", "group__CPU__DMAC.html#ga8457a4d07fba36dc7af82c38caf88d57", null ],
+    [ "cpu_dmac_disable", "group__CPU__DMAC.html#ga2b9e63fefa5b8d420230f024cf28f6c8", null ],
+    [ "cpu_dmac_enable", "group__CPU__DMAC.html#gac0e59cb343e7c761f9452da2544f4394", null ],
+    [ "cpu_dmac_interrupt_priority_get", "group__CPU__DMAC.html#ga126f941b59f9ba894fa4a287d5ae2d34", null ],
+    [ "cpu_dmac_interrupt_priority_set", "group__CPU__DMAC.html#ga5cb508c3c6a802f1dad9a79ebb5b434a", null ],
+    [ "cpu_dmac_priority_mode_set", "group__CPU__DMAC.html#ga0b5e3bdec1c19cfb3398a24b911d9dab", null ],
     [ "cpu_dmac_status_get", "group__CPU__DMAC.html#ga54e0bf92350dba22a62f571b68a522c8", null ],
-    [ "cpu_dmac_stop", "group__CPU__DMAC.html#gae2d968ef07dc8430c1609d42527aa7d3", null ]
+    [ "cpu_dmac_stop", "group__CPU__DMAC.html#ga628a876a95c4637129f3a75a20fed39d", null ]
 ];

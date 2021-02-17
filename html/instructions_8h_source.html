@@ -78,16 +78,16 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;__BEGIN_DECLS</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="group__CPU.html#gadad56e6d3d6cc92ff32a6c003e7937a2">   24</a></span>&#160;<a class="code" href="group__CPU.html#gadad56e6d3d6cc92ff32a6c003e7937a2">cpu_instr_trapa</a>(<span class="keyword">const</span> uint8_t vector)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="group__CPU.html#ga42cd246ca0c50e1d93d2e9a48d7c0eb3">   24</a></span>&#160;<a class="code" href="group__CPU.html#ga42cd246ca0c50e1d93d2e9a48d7c0eb3">cpu_instr_trapa</a>(<span class="keyword">const</span> uint8_t vector)</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;trapa %[n]&quot;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            : <span class="comment">/* No outputs */</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            : [n] <span class="stringliteral">&quot;n&quot;</span> (vector));</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="group__CPU.html#ga70975990f55daf2a339fd40b65c00b1b">   39</a></span>&#160;<a class="code" href="group__CPU.html#ga70975990f55daf2a339fd40b65c00b1b">cpu_instr_swapb</a>(uint32_t x)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="group__CPU.html#ga40a347baed727ca949ee9b04d3308d1f">   39</a></span>&#160;<a class="code" href="group__CPU.html#ga40a347baed727ca949ee9b04d3308d1f">cpu_instr_swapb</a>(uint32_t x)</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">register</span> uint32_t out;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
@@ -98,8 +98,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keywordflow">return</span> out;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="group__CPU.html#ga11a33f4fdbec58a3e2a475e29106e945">   56</a></span>&#160;<a class="code" href="group__CPU.html#ga11a33f4fdbec58a3e2a475e29106e945">cpu_instr_swapw</a>(uint32_t x)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="group__CPU.html#gad2f9f90a86ea4a02100524ccd912d630">   56</a></span>&#160;<a class="code" href="group__CPU.html#gad2f9f90a86ea4a02100524ccd912d630">cpu_instr_swapw</a>(uint32_t x)</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;{</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keyword">register</span> uint32_t out;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
@@ -110,8 +110,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> out;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="group__CPU.html#gac3579b1acece8abbc898e21e38dd753c">   69</a></span>&#160;<a class="code" href="group__CPU.html#gac3579b1acece8abbc898e21e38dd753c">cpu_instr_clrmac</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="group__CPU.html#ga781bfec92d4850d009ab3ff7bababc60">   69</a></span>&#160;<a class="code" href="group__CPU.html#ga781bfec92d4850d009ab3ff7bababc60">cpu_instr_clrmac</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;clrmac&quot;</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            : <span class="comment">/* No outputs */</span></div>
@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            : <span class="stringliteral">&quot;mach&quot;</span>, <span class="stringliteral">&quot;macl&quot;</span>);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="group__CPU.html#ga4bb0f08153a598b307e10471b359a499">   82</a></span>&#160;<a class="code" href="group__CPU.html#ga4bb0f08153a598b307e10471b359a499">cpu_instr_macw</a>(<span class="keywordtype">void</span> *a, <span class="keywordtype">void</span> *b)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="group__CPU.html#gad993a8b7c764b80062b5e57c962775b8">   82</a></span>&#160;<a class="code" href="group__CPU.html#gad993a8b7c764b80062b5e57c962775b8">cpu_instr_macw</a>(<span class="keywordtype">void</span> *a, <span class="keywordtype">void</span> *b)</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;{</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keyword">register</span> uint16_t **ap = (uint16_t **)a;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keyword">register</span> uint16_t **bp = (uint16_t **)b;</div>
@@ -132,8 +132,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            : <span class="stringliteral">&quot;mach&quot;</span>, <span class="stringliteral">&quot;macl&quot;</span>, <span class="stringliteral">&quot;memory&quot;</span>);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="group__CPU.html#ga762b093157501cd8458163022a1bd834">   99</a></span>&#160;<a class="code" href="group__CPU.html#ga762b093157501cd8458163022a1bd834">cpu_instr_macl</a>(<span class="keywordtype">void</span> *a, <span class="keywordtype">void</span> *b)</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="group__CPU.html#ga42ef8b03f09cbcbce5b9f3248ac307de">   99</a></span>&#160;<a class="code" href="group__CPU.html#ga42ef8b03f09cbcbce5b9f3248ac307de">cpu_instr_macl</a>(<span class="keywordtype">void</span> *a, <span class="keywordtype">void</span> *b)</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;{</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keyword">register</span> uint32_t **ap = (uint32_t **)a;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keyword">register</span> uint32_t **bp = (uint32_t **)b;</div>
@@ -145,8 +145,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            : <span class="stringliteral">&quot;mach&quot;</span>, <span class="stringliteral">&quot;macl&quot;</span>, <span class="stringliteral">&quot;memory&quot;</span>);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="group__CPU.html#gafdc4cf93b33233477cf9060892fc7b60">  114</a></span>&#160;<a class="code" href="group__CPU.html#gafdc4cf93b33233477cf9060892fc7b60">cpu_instr_sts_mach</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="group__CPU.html#gac6c343fee8cdec8d47bf55a79933fe7f">  114</a></span>&#160;<a class="code" href="group__CPU.html#gac6c343fee8cdec8d47bf55a79933fe7f">cpu_instr_sts_mach</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;{</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keyword">register</span> uint32_t out;</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
@@ -158,8 +158,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordflow">return</span> out;</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="group__CPU.html#ga8791512bbd45bd1c6d8479bec2b0aeda">  129</a></span>&#160;<a class="code" href="group__CPU.html#ga8791512bbd45bd1c6d8479bec2b0aeda">cpu_instr_sts_macl</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="group__CPU.html#gae0126d75656975e83200af106ffa322f">  129</a></span>&#160;<a class="code" href="group__CPU.html#gae0126d75656975e83200af106ffa322f">cpu_instr_sts_macl</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;{</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keyword">register</span> uint32_t out;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
@@ -171,8 +171,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <span class="keywordflow">return</span> out;</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00147"></a><span class="lineno"><a class="line" href="group__CPU.html#gacb81ead2c901e8a72f267b47390c2998">  147</a></span>&#160;<a class="code" href="group__CPU.html#gacb81ead2c901e8a72f267b47390c2998">cpu_instr_extsw</a>(<span class="keyword">const</span> uint32_t rm)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00147"></a><span class="lineno"><a class="line" href="group__CPU.html#ga5cb88f68db4c01e2b5207fc260e9b205">  147</a></span>&#160;<a class="code" href="group__CPU.html#ga5cb88f68db4c01e2b5207fc260e9b205">cpu_instr_extsw</a>(<span class="keyword">const</span> uint32_t rm)</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;{</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keyword">register</span> uint32_t rn;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
@@ -183,8 +183,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordflow">return</span> rn;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="group__CPU.html#ga465c92688247e95e250d0477b2b2d857">  164</a></span>&#160;<a class="code" href="group__CPU.html#ga465c92688247e95e250d0477b2b2d857">cpu_instr_neg</a>(uint32_t rm)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="group__CPU.html#gac767eb0dc90b69adcb647b95ec01f792">  164</a></span>&#160;<a class="code" href="group__CPU.html#gac767eb0dc90b69adcb647b95ec01f792">cpu_instr_neg</a>(uint32_t rm)</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;{</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keyword">register</span> uint32_t rn;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
@@ -195,8 +195,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keywordflow">return</span> rn;</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00181"></a><span class="lineno"><a class="line" href="group__CPU.html#gaeae1d389792dfea558c0cfcd4ca239b4">  181</a></span>&#160;<a class="code" href="group__CPU.html#gaeae1d389792dfea558c0cfcd4ca239b4">cpu_instr_rotl</a>(uint32_t rn)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00181"></a><span class="lineno"><a class="line" href="group__CPU.html#gab65c8d8f478c44a83596ef0bd4535804">  181</a></span>&#160;<a class="code" href="group__CPU.html#gab65c8d8f478c44a83596ef0bd4535804">cpu_instr_rotl</a>(uint32_t rn)</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;{</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;rotl %[rn]&quot;</span></div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            : [rn] <span class="stringliteral">&quot;=&amp;r&quot;</span> (rn)</div>
@@ -205,8 +205,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keywordflow">return</span> rn;</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;}</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="group__CPU.html#ga4699a9247e521daa87e8690d550d6a1e">  196</a></span>&#160;<a class="code" href="group__CPU.html#ga4699a9247e521daa87e8690d550d6a1e">cpu_instr_rotr</a>(uint32_t rn)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="group__CPU.html#gad27ac2177f7691ffa73237eb87e7d633">  196</a></span>&#160;<a class="code" href="group__CPU.html#gad27ac2177f7691ffa73237eb87e7d633">cpu_instr_rotr</a>(uint32_t rn)</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;{</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;rotr %[rn]&quot;</span></div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            : [rn] <span class="stringliteral">&quot;=&amp;r&quot;</span> (rn)</div>
@@ -216,8 +216,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;}</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t __always_inline</div>
-<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="group__CPU.html#ga9af4d7fb3fcd8fdbf10a021d06b2a809">  214</a></span>&#160;<a class="code" href="group__CPU.html#ga9af4d7fb3fcd8fdbf10a021d06b2a809">cpu_instr_xtrct</a>(uint32_t rm, uint32_t rn)</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="group__CPU.html#gac06adbff6ed0d1286b6ab4fc8d69baec">  214</a></span>&#160;<a class="code" href="group__CPU.html#gac06adbff6ed0d1286b6ab4fc8d69baec">cpu_instr_xtrct</a>(uint32_t rm, uint32_t rn)</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;{</div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;xtrct %[rm], %[rn]&quot;</span></div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            : [rn] <span class="stringliteral">&quot;=&amp;r&quot;</span> (rn)</div>
@@ -226,8 +226,8 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">return</span> rn;</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="group__CPU.html#ga14d9d87f1e15f67124958c5b2b947577">  225</a></span>&#160;<a class="code" href="group__CPU.html#ga14d9d87f1e15f67124958c5b2b947577">cpu_instr_nop</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="group__CPU.html#ga15351d16768263d5e897818674e0c34c">  225</a></span>&#160;<a class="code" href="group__CPU.html#ga15351d16768263d5e897818674e0c34c">cpu_instr_nop</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;{</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        __asm__ <span class="keyword">volatile</span> (<span class="stringliteral">&quot;nop&quot;</span></div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            : <span class="comment">/* No outputs */</span></div>
@@ -241,20 +241,21 @@ $(document).ready(function(){initNavTree('instructions_8h_source.html',''); init
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_CPU_INSTRUCTIONS_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__CPU_html_gaeae1d389792dfea558c0cfcd4ca239b4"><div class="ttname"><a href="group__CPU.html#gaeae1d389792dfea558c0cfcd4ca239b4">cpu_instr_rotl</a></div><div class="ttdeci">static uint32_t cpu_instr_rotl(uint32_t rn)</div><div class="ttdoc">Emit a rotl instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:181</div></div>
-<div class="ttc" id="agroup__CPU_html_ga4699a9247e521daa87e8690d550d6a1e"><div class="ttname"><a href="group__CPU.html#ga4699a9247e521daa87e8690d550d6a1e">cpu_instr_rotr</a></div><div class="ttdeci">static uint32_t cpu_instr_rotr(uint32_t rn)</div><div class="ttdoc">Emit a rotr instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:196</div></div>
-<div class="ttc" id="agroup__CPU_html_gadad56e6d3d6cc92ff32a6c003e7937a2"><div class="ttname"><a href="group__CPU.html#gadad56e6d3d6cc92ff32a6c003e7937a2">cpu_instr_trapa</a></div><div class="ttdeci">static void cpu_instr_trapa(const uint8_t vector)</div><div class="ttdoc">Emit a trap instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:24</div></div>
-<div class="ttc" id="agroup__CPU_html_ga70975990f55daf2a339fd40b65c00b1b"><div class="ttname"><a href="group__CPU.html#ga70975990f55daf2a339fd40b65c00b1b">cpu_instr_swapb</a></div><div class="ttdeci">static uint32_t cpu_instr_swapb(uint32_t x)</div><div class="ttdoc">Emit a swap.b instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:39</div></div>
-<div class="ttc" id="agroup__CPU_html_ga11a33f4fdbec58a3e2a475e29106e945"><div class="ttname"><a href="group__CPU.html#ga11a33f4fdbec58a3e2a475e29106e945">cpu_instr_swapw</a></div><div class="ttdeci">static uint32_t cpu_instr_swapw(uint32_t x)</div><div class="ttdoc">Emit a swap.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:56</div></div>
-<div class="ttc" id="agroup__CPU_html_gacb81ead2c901e8a72f267b47390c2998"><div class="ttname"><a href="group__CPU.html#gacb81ead2c901e8a72f267b47390c2998">cpu_instr_extsw</a></div><div class="ttdeci">static uint32_t cpu_instr_extsw(const uint32_t rm)</div><div class="ttdoc">Emit a exts.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:147</div></div>
-<div class="ttc" id="agroup__CPU_html_ga4bb0f08153a598b307e10471b359a499"><div class="ttname"><a href="group__CPU.html#ga4bb0f08153a598b307e10471b359a499">cpu_instr_macw</a></div><div class="ttdeci">static void cpu_instr_macw(void *a, void *b)</div><div class="ttdoc">Emit a mac.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:82</div></div>
-<div class="ttc" id="agroup__CPU_html_ga14d9d87f1e15f67124958c5b2b947577"><div class="ttname"><a href="group__CPU.html#ga14d9d87f1e15f67124958c5b2b947577">cpu_instr_nop</a></div><div class="ttdeci">static void cpu_instr_nop(void)</div><div class="ttdoc">Emit a nop instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:225</div></div>
-<div class="ttc" id="agroup__CPU_html_ga8791512bbd45bd1c6d8479bec2b0aeda"><div class="ttname"><a href="group__CPU.html#ga8791512bbd45bd1c6d8479bec2b0aeda">cpu_instr_sts_macl</a></div><div class="ttdeci">static uint32_t cpu_instr_sts_macl(void)</div><div class="ttdoc">Emit a sts instruction to fetch macl.</div><div class="ttdef"><b>Definition:</b> instructions.h:129</div></div>
-<div class="ttc" id="agroup__CPU_html_gafdc4cf93b33233477cf9060892fc7b60"><div class="ttname"><a href="group__CPU.html#gafdc4cf93b33233477cf9060892fc7b60">cpu_instr_sts_mach</a></div><div class="ttdeci">static uint32_t cpu_instr_sts_mach(void)</div><div class="ttdoc">Emit a sts instruction to fetch mach.</div><div class="ttdef"><b>Definition:</b> instructions.h:114</div></div>
-<div class="ttc" id="agroup__CPU_html_gac3579b1acece8abbc898e21e38dd753c"><div class="ttname"><a href="group__CPU.html#gac3579b1acece8abbc898e21e38dd753c">cpu_instr_clrmac</a></div><div class="ttdeci">static void cpu_instr_clrmac(void)</div><div class="ttdoc">Emit a clrmac instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:69</div></div>
-<div class="ttc" id="agroup__CPU_html_ga9af4d7fb3fcd8fdbf10a021d06b2a809"><div class="ttname"><a href="group__CPU.html#ga9af4d7fb3fcd8fdbf10a021d06b2a809">cpu_instr_xtrct</a></div><div class="ttdeci">static uint32_t cpu_instr_xtrct(uint32_t rm, uint32_t rn)</div><div class="ttdoc">Emit a xtrct instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:214</div></div>
-<div class="ttc" id="agroup__CPU_html_ga465c92688247e95e250d0477b2b2d857"><div class="ttname"><a href="group__CPU.html#ga465c92688247e95e250d0477b2b2d857">cpu_instr_neg</a></div><div class="ttdeci">static uint32_t cpu_instr_neg(uint32_t rm)</div><div class="ttdoc">Emit a neg instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:164</div></div>
-<div class="ttc" id="agroup__CPU_html_ga762b093157501cd8458163022a1bd834"><div class="ttname"><a href="group__CPU.html#ga762b093157501cd8458163022a1bd834">cpu_instr_macl</a></div><div class="ttdeci">static void cpu_instr_macl(void *a, void *b)</div><div class="ttdoc">Emit a mac.l instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:99</div></div>
+<div class="ttc" id="agroup__CPU_html_ga40a347baed727ca949ee9b04d3308d1f"><div class="ttname"><a href="group__CPU.html#ga40a347baed727ca949ee9b04d3308d1f">cpu_instr_swapb</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_swapb(uint32_t x)</div><div class="ttdoc">Emit a swap.b instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:39</div></div>
+<div class="ttc" id="agroup__CPU_html_ga42ef8b03f09cbcbce5b9f3248ac307de"><div class="ttname"><a href="group__CPU.html#ga42ef8b03f09cbcbce5b9f3248ac307de">cpu_instr_macl</a></div><div class="ttdeci">static void __always_inline cpu_instr_macl(void *a, void *b)</div><div class="ttdoc">Emit a mac.l instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:99</div></div>
+<div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
+<div class="ttc" id="agroup__CPU_html_ga15351d16768263d5e897818674e0c34c"><div class="ttname"><a href="group__CPU.html#ga15351d16768263d5e897818674e0c34c">cpu_instr_nop</a></div><div class="ttdeci">static void __always_inline cpu_instr_nop(void)</div><div class="ttdoc">Emit a nop instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:225</div></div>
+<div class="ttc" id="agroup__CPU_html_gae0126d75656975e83200af106ffa322f"><div class="ttname"><a href="group__CPU.html#gae0126d75656975e83200af106ffa322f">cpu_instr_sts_macl</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_sts_macl(void)</div><div class="ttdoc">Emit a sts instruction to fetch macl.</div><div class="ttdef"><b>Definition:</b> instructions.h:129</div></div>
+<div class="ttc" id="agroup__CPU_html_gac6c343fee8cdec8d47bf55a79933fe7f"><div class="ttname"><a href="group__CPU.html#gac6c343fee8cdec8d47bf55a79933fe7f">cpu_instr_sts_mach</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_sts_mach(void)</div><div class="ttdoc">Emit a sts instruction to fetch mach.</div><div class="ttdef"><b>Definition:</b> instructions.h:114</div></div>
+<div class="ttc" id="agroup__CPU_html_gac767eb0dc90b69adcb647b95ec01f792"><div class="ttname"><a href="group__CPU.html#gac767eb0dc90b69adcb647b95ec01f792">cpu_instr_neg</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_neg(uint32_t rm)</div><div class="ttdoc">Emit a neg instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:164</div></div>
+<div class="ttc" id="agroup__CPU_html_gab65c8d8f478c44a83596ef0bd4535804"><div class="ttname"><a href="group__CPU.html#gab65c8d8f478c44a83596ef0bd4535804">cpu_instr_rotl</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_rotl(uint32_t rn)</div><div class="ttdoc">Emit a rotl instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:181</div></div>
+<div class="ttc" id="agroup__CPU_html_gad2f9f90a86ea4a02100524ccd912d630"><div class="ttname"><a href="group__CPU.html#gad2f9f90a86ea4a02100524ccd912d630">cpu_instr_swapw</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_swapw(uint32_t x)</div><div class="ttdoc">Emit a swap.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:56</div></div>
+<div class="ttc" id="agroup__CPU_html_gac06adbff6ed0d1286b6ab4fc8d69baec"><div class="ttname"><a href="group__CPU.html#gac06adbff6ed0d1286b6ab4fc8d69baec">cpu_instr_xtrct</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_xtrct(uint32_t rm, uint32_t rn)</div><div class="ttdoc">Emit a xtrct instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:214</div></div>
+<div class="ttc" id="agroup__CPU_html_ga42cd246ca0c50e1d93d2e9a48d7c0eb3"><div class="ttname"><a href="group__CPU.html#ga42cd246ca0c50e1d93d2e9a48d7c0eb3">cpu_instr_trapa</a></div><div class="ttdeci">static void __always_inline cpu_instr_trapa(const uint8_t vector)</div><div class="ttdoc">Emit a trap instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:24</div></div>
+<div class="ttc" id="agroup__CPU_html_ga5cb88f68db4c01e2b5207fc260e9b205"><div class="ttname"><a href="group__CPU.html#ga5cb88f68db4c01e2b5207fc260e9b205">cpu_instr_extsw</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_extsw(const uint32_t rm)</div><div class="ttdoc">Emit a exts.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:147</div></div>
+<div class="ttc" id="agroup__CPU_html_gad27ac2177f7691ffa73237eb87e7d633"><div class="ttname"><a href="group__CPU.html#gad27ac2177f7691ffa73237eb87e7d633">cpu_instr_rotr</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_rotr(uint32_t rn)</div><div class="ttdoc">Emit a rotr instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:196</div></div>
+<div class="ttc" id="agroup__CPU_html_ga781bfec92d4850d009ab3ff7bababc60"><div class="ttname"><a href="group__CPU.html#ga781bfec92d4850d009ab3ff7bababc60">cpu_instr_clrmac</a></div><div class="ttdeci">static void __always_inline cpu_instr_clrmac(void)</div><div class="ttdoc">Emit a clrmac instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:69</div></div>
+<div class="ttc" id="agroup__CPU_html_gad993a8b7c764b80062b5e57c962775b8"><div class="ttname"><a href="group__CPU.html#gad993a8b7c764b80062b5e57c962775b8">cpu_instr_macw</a></div><div class="ttdeci">static void __always_inline cpu_instr_macw(void *a, void *b)</div><div class="ttdoc">Emit a mac.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:82</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

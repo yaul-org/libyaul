@@ -7,7 +7,6 @@ var group__SCU__IC =
     [ "scu_ic_ihr_t", "group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172", null ],
     [ "scu_ic_interrupt_t", "group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87", null ],
     [ "scu_ic_mask_t", "group__SCU__IC.html#ga855d46e631f80e31cc154fada83342c9", null ],
-    [ "scu_ic_priority_t", "group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2", null ],
     [ "scu_ic_status_reg_t", "group__SCU__IC.html#gaba50f52ac504271a1fe4ddb3bcffa277", null ],
     [ "scu_ic_interrupt", "group__SCU__IC.html#ga3efa4b5e182a2252797ca01d24dcac57", [
       [ "SCU_IC_INTERRUPT_VBLANK_IN", "group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57a3d5eaf0fc28a7f55a9f0240f36a2ad98", null ],
@@ -77,15 +76,16 @@ var group__SCU__IC =
       [ "SCU_IC_IST_EXTERNAL_02", "group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaaebee6e6c191e9bf45640438ca8c281b8", null ],
       [ "SCU_IC_IST_EXTERNAL_01", "group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaac693714ce8e1bef811f8d8e4cc0bd42e", null ]
     ] ],
-    [ "scu_ic_ihr_clear", "group__SCU__IC.html#gae2a03aa493b3033a6a7e07b47387e3e9", null ],
+    [ "__aligned", "group__SCU__IC.html#ga39ca2a85576b5f84b682eb4ab026d8d5", null ],
+    [ "scu_ic_ihr_clear", "group__SCU__IC.html#gaa55eec9fc53750219182bf884d9620bd", null ],
     [ "scu_ic_ihr_get", "group__SCU__IC.html#ga16c69f9277adc957aac15bfdd73806c7", null ],
-    [ "scu_ic_ihr_set", "group__SCU__IC.html#ga486e21d1b255047890e4cfefb22d8d9d", null ],
-    [ "scu_ic_mask_chg", "group__SCU__IC.html#gaad8e506393ee34348d073af6c4178381", null ],
-    [ "scu_ic_mask_get", "group__SCU__IC.html#ga2c37f042e896d8f6904610055650d683", null ],
-    [ "scu_ic_mask_set", "group__SCU__IC.html#ga69c3394920957da209d09ab18b6040f0", null ],
-    [ "scu_ic_priority_table_get", "group__SCU__IC.html#gafe100222c1ad129cf0d7927f4e3e2836", null ],
-    [ "scu_ic_priority_table_set", "group__SCU__IC.html#gad777920c5cb9edb483f5698a9ad70b6c", null ],
-    [ "scu_ic_status_chg", "group__SCU__IC.html#gafa372713bb72cfa2a84cffb7c64e6ec1", null ],
-    [ "scu_ic_status_get", "group__SCU__IC.html#gacb983b1eab49e8be17af55a2f8a591a5", null ],
-    [ "scu_ic_status_set", "group__SCU__IC.html#ga84257d38bbed172056f93ad345fb61a7", null ]
+    [ "scu_ic_ihr_set", "group__SCU__IC.html#ga2916d10d4eb7d3f1596c69b8680a569f", null ],
+    [ "scu_ic_mask_chg", "group__SCU__IC.html#ga5031b9bf30ac4139a80ec1fb78fce787", null ],
+    [ "scu_ic_mask_get", "group__SCU__IC.html#gaf8e65f3ca87120bdc903325a17772b13", null ],
+    [ "scu_ic_mask_set", "group__SCU__IC.html#gacdc555d2ba9e2f5130834efd6add42c9", null ],
+    [ "scu_ic_priority_table_get", "group__SCU__IC.html#ga12f6ed3888323151f7711a8082f4a81b", null ],
+    [ "scu_ic_priority_table_set", "group__SCU__IC.html#gaffdfee3683acd1fd57518c6739794840", null ],
+    [ "scu_ic_status_chg", "group__SCU__IC.html#gac70ad9ec5e86f4f063478f6aba8b84c1", null ],
+    [ "scu_ic_status_get", "group__SCU__IC.html#ga44b8d65498f42fd3cea951c9e0528f99", null ],
+    [ "scu_ic_status_set", "group__SCU__IC.html#gac5fa2897c1c6f6f9d285676b8529a7b8", null ]
 ];

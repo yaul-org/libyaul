@@ -48,13 +48,13 @@ var group__CPU__INTC =
       [ "CPU_INTC_INTERRUPT_FREE_6F", "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a27c31d78bc3c33571ec3ae88e8ac972d", null ],
       [ "CPU_INTC_INTERRUPT_SLAVE_ENTRY", "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a22c2ac20c68f31b8abb638497062ae55", null ]
     ] ],
-    [ "cpu_intc_ihr_clear", "group__CPU__INTC.html#ga0a1842c994bf6fab1882e1757f6a5904", null ],
-    [ "cpu_intc_ihr_get", "group__CPU__INTC.html#ga8c65917945b331636320e5a1da71babf", null ],
-    [ "cpu_intc_ihr_set", "group__CPU__INTC.html#gaf39f1dd0daef4e52978564887b9ed585", null ],
-    [ "cpu_intc_mask_get", "group__CPU__INTC.html#ga0db90f7486707a423fcd4baf894d3f67", null ],
-    [ "cpu_intc_mask_set", "group__CPU__INTC.html#ga11501e22716ca9e43485dfe7907d49df", null ],
-    [ "cpu_intc_priority_a_get", "group__CPU__INTC.html#ga1572927e6d2ff09e2e4f9339e92833c9", null ],
-    [ "cpu_intc_priority_a_set", "group__CPU__INTC.html#ga18e6521d0a6d685510383279ada2211f", null ],
-    [ "cpu_intc_priority_b_get", "group__CPU__INTC.html#gaef6925625a65b7400a428b75f5c27a8f", null ],
-    [ "cpu_intc_priority_b_set", "group__CPU__INTC.html#ga66fc65e006c520b1c0f94f0d834d1760", null ]
+    [ "cpu_intc_ihr_clear", "group__CPU__INTC.html#gafa002f9116625d45d73091517ce3abc0", null ],
+    [ "cpu_intc_ihr_get", "group__CPU__INTC.html#gaf86b4b3e9ab79bb592c6b1f193c462cf", null ],
+    [ "cpu_intc_ihr_set", "group__CPU__INTC.html#ga46fc6a96ca11dfbcb79ef71b2dc02d2e", null ],
+    [ "cpu_intc_mask_get", "group__CPU__INTC.html#ga9453b932948bf1425c2d292b63403ac3", null ],
+    [ "cpu_intc_mask_set", "group__CPU__INTC.html#ga7d3d019782fd356e35dc35cf32739b78", null ],
+    [ "cpu_intc_priority_a_get", "group__CPU__INTC.html#ga879023ad25de6bb4bcbf3a994f0e40ab", null ],
+    [ "cpu_intc_priority_a_set", "group__CPU__INTC.html#gac8edb051bdeecdd8dfc39516e07bfc67", null ],
+    [ "cpu_intc_priority_b_get", "group__CPU__INTC.html#ga028450d01105f310fd8ecaf95a0722f8", null ],
+    [ "cpu_intc_priority_b_set", "group__CPU__INTC.html#gab9234531bc36d6fa0c634c0e111d161a", null ]
 ];

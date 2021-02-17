@@ -88,56 +88,56 @@ $(document).ready(function(){initNavTree('fix16__vec2_8h_source.html',''); initR
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        };</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> comp[2];</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;} __packed __aligned(4) <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;} <a class="code" href="union____packed.html">__packed</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a>(4) fix16_vec2_t;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;static inline <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;fix16_vec2_zero(<a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *result)</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;static inline <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;fix16_vec2_zero(fix16_vec2_t *result)</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        result-&gt;x = FIX16(0.0f);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        result-&gt;y = FIX16(0.0f);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;fix16_vec2_dup(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v0,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict result)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;fix16_vec2_dup(<span class="keyword">const</span> fix16_vec2_t * __restrict v0,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    fix16_vec2_t * __restrict result)</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        result-&gt;x = v0-&gt;x;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        result-&gt;y = v0-&gt;y;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;fix16_vec2_add(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v0,</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v1, <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict result)</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;fix16_vec2_add(<span class="keyword">const</span> fix16_vec2_t * __restrict v0,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">const</span> fix16_vec2_t * __restrict v1, fix16_vec2_t * __restrict result)</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        result-&gt;x = v0-&gt;x + v1-&gt;x;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        result-&gt;y = v0-&gt;y + v1-&gt;y;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;fix16_vec2_sub(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v0,</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v1, <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict result)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;fix16_vec2_sub(<span class="keyword">const</span> fix16_vec2_t * __restrict v0,</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">const</span> fix16_vec2_t * __restrict v1, fix16_vec2_t * __restrict result)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;{</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        result-&gt;x = v0-&gt;x - v1-&gt;x;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        result-&gt;y = v0-&gt;y - v1-&gt;y;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;fix16_vec2_scale(<span class="keyword">const</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> scalar, <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *result)</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;fix16_vec2_scale(<span class="keyword">const</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> scalar, fix16_vec2_t *result)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        result-&gt;x = fix16_mul(scalar, result-&gt;x);</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        result-&gt;y = fix16_mul(scalar, result-&gt;y);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> __always_inline</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;fix16_vec2_scaled(<span class="keyword">const</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> scalar, <span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict v0,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict result)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;fix16_vec2_scaled(<span class="keyword">const</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> scalar, <span class="keyword">const</span> fix16_vec2_t * __restrict v0,</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    fix16_vec2_t * __restrict result)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        result-&gt;x = fix16_mul(scalar, v0-&gt;x);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        result-&gt;y = fix16_mul(scalar, v0-&gt;y);</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> __always_inline</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;fix16_vec2_inline_dot(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *a, <span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *b)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;fix16_vec2_inline_dot(<span class="keyword">const</span> fix16_vec2_t *a, <span class="keyword">const</span> fix16_vec2_t *b)</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keyword">register</span> uint32_t aux0;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keyword">register</span> uint32_t aux1;</div>
@@ -159,15 +159,18 @@ $(document).ready(function(){initNavTree('fix16__vec2_8h_source.html',''); initR
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">return</span> aux1;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;}</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_length(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_sqr_length(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_normalize(<a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_normalized(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict, <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> * __restrict);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_dot(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *, <span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_str(<span class="keyword">const</span> <a class="code" href="unionfix16__vec2.html">fix16_vec2_t</a> *, <span class="keywordtype">char</span> *, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_length(<span class="keyword">const</span> fix16_vec2_t *);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_sqr_length(<span class="keyword">const</span> fix16_vec2_t *);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_normalize(fix16_vec2_t *);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_normalized(<span class="keyword">const</span> fix16_vec2_t * __restrict, fix16_vec2_t * __restrict);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keyword">extern</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> fix16_vec2_dot(<span class="keyword">const</span> fix16_vec2_t *, <span class="keyword">const</span> fix16_vec2_t *);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> fix16_vec2_str(<span class="keyword">const</span> fix16_vec2_t *, <span class="keywordtype">char</span> *, <span class="keywordtype">int</span>);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aunionfix16__vec2_html"><div class="ttname"><a href="unionfix16__vec2.html">fix16_vec2</a></div><div class="ttdef"><b>Definition:</b> fix16_vec2.h:21</div></div>
+<div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
+<div class="ttc" id="aunion____packed_html"><div class="ttname"><a href="union____packed.html">__packed</a></div><div class="ttdef"><b>Definition:</b> color.h:103</div></div>
+<div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga5ec304e7577e6c1a8a36c3096fc466af"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a></div><div class="ttdeci">#define __aligned(x)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> cdefs.h:101</div></div>
 <div class="ttc" id="agroup__MATH_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> fix16.h:65</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

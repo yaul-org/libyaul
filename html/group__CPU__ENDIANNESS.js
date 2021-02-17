@@ -8,6 +8,6 @@ var group__CPU__ENDIANNESS =
     [ "cpu_htole32", "group__CPU__ENDIANNESS.html#ga2e9a0e4e1dda2c6a4bf9f0ac291c845d", null ],
     [ "cpu_le16toh", "group__CPU__ENDIANNESS.html#ga8b627625d8e6047e485e7f92991e8901", null ],
     [ "cpu_le32toh", "group__CPU__ENDIANNESS.html#ga7945763db387328e71e002470440b1ac", null ],
-    [ "cpu_bswap16", "group__CPU__ENDIANNESS.html#ga43c80d17aa7718fd2096f0e10f45cf84", null ],
-    [ "cpu_bswap32", "group__CPU__ENDIANNESS.html#ga63581a62c9b4a61f4e54713526fb1adc", null ]
+    [ "cpu_bswap16", "group__CPU__ENDIANNESS.html#gaa086a085c5685eb282e50bf634d45325", null ],
+    [ "cpu_bswap32", "group__CPU__ENDIANNESS.html#ga16bc44e4a048ea88388b5b4eb43b50d8", null ]
 ];

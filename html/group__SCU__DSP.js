@@ -32,7 +32,7 @@ var group__SCU__DSP =
     [ "scu_dsp_program_end", "group__SCU__DSP.html#gaef37bd16d488e3fdb31655e8b91ea0cd", null ],
     [ "scu_dsp_program_end_wait", "group__SCU__DSP.html#ga11fc8661b312c59893ada229c37e073f", null ],
     [ "scu_dsp_program_load", "group__SCU__DSP.html#gaf50c5249e40e743178793e989f6465c0", null ],
-    [ "scu_dsp_program_pause", "group__SCU__DSP.html#gaa6d45762c4b53549dc8f48f0d20e9034", null ],
+    [ "scu_dsp_program_pause", "group__SCU__DSP.html#gae57003fe75b471c60601506ceadf3210", null ],
     [ "scu_dsp_program_pc_set", "group__SCU__DSP.html#gaa80d92c99937e023bde1ce7d1ccbf387", null ],
     [ "scu_dsp_program_start", "group__SCU__DSP.html#gac70845e00842506bc6347cf9dd34a9e2", null ],
     [ "scu_dsp_program_step", "group__SCU__DSP.html#ga7241c4da2fae028e0fbd658a235a9385", null ],
