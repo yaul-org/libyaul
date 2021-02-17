@@ -1,17 +1,5 @@
 var NAVTREEINDEX3 =
 {
-"structcpu__registers.html#a9f8860e10ff3b3e67490a7fd3c42f3ce":[2,15,0,2],
-"structcpu__registers.html#acffad4fb777cd737865c4a5c5b88bee8":[2,15,0,4],
-"structcpu__smpc__time.html":[2,18,0],
-"structcpu__smpc__time.html#a290bb295493a58de5257b9f5a21ff70e":[2,18,0,2],
-"structcpu__smpc__time.html#a490c97b2bf8e8b3b983821a8eabe1512":[2,18,0,5],
-"structcpu__smpc__time.html#a832e1514cc76318ec347f16fc1c9f9a5":[2,18,0,1],
-"structcpu__smpc__time.html#a88b7d3bfbd909ea50f16777a70891415":[2,18,0,4],
-"structcpu__smpc__time.html#a97cd9d7299fd9e28f8e9d25e6a56c2a1":[2,18,0,6],
-"structcpu__smpc__time.html#abd503c51315da827a05416938ae56084":[2,18,0,0],
-"structcpu__smpc__time.html#abe16bae85515d0c6efbccdd1b0461a98":[2,18,0,3],
-"structfix16__plane.html":[3,0,10],
-"structfix16__plane.html#a013651652ae5bfacc0f5ab7d775d3c2c":[3,0,10,0],
 "structfix16__plane.html#aae2bcc53399f5e248e40169b691e4438":[3,0,10,1],
 "structint16__vec2__t.html":[3,0,13],
 "structint16__vec2__t.html#aeb6b52c6fa60bb760c09ba39c7356fb7":[3,0,13,1],

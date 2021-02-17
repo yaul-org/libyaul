@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash c50d591</span>
+   &#160;<span id="projectnumber">Git hash 0965749</span>
    </div>
   </td>
  </tr>
@@ -64,7 +64,7 @@ $(document).ready(function(){initNavTree('structscu__dma__xfer.html',''); initRe
 </div><!--header-->
 <div class="contents">
 
-<p>Not yet documented.  
+<p>The 3-tuple represents a single transfer in direct or indirect transfer.  
  <a href="structscu__dma__xfer.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="dma_8h_source.html">dma.h</a>&gt;</code></p>
@@ -73,20 +73,39 @@ $(document).ready(function(){initNavTree('structscu__dma__xfer.html',''); initRe
 Data Fields</h2></td></tr>
 <tr class="memitem:a20e90be6f822238d60768b8c3b8f083f"><td class="memItemLeft" align="right" valign="top"><a id="a20e90be6f822238d60768b8c3b8f083f"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__xfer.html#a20e90be6f822238d60768b8c3b8f083f">len</a></td></tr>
-<tr class="memdesc:a20e90be6f822238d60768b8c3b8f083f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:a20e90be6f822238d60768b8c3b8f083f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transfer length. <br /></td></tr>
 <tr class="separator:a20e90be6f822238d60768b8c3b8f083f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30f5d85af3fbe5e384c70381e765d966"><td class="memItemLeft" align="right" valign="top"><a id="a30f5d85af3fbe5e384c70381e765d966"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__xfer.html#a30f5d85af3fbe5e384c70381e765d966">dst</a></td></tr>
-<tr class="memdesc:a30f5d85af3fbe5e384c70381e765d966"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:a30f5d85af3fbe5e384c70381e765d966"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory transfer destination address. <br /></td></tr>
 <tr class="separator:a30f5d85af3fbe5e384c70381e765d966"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6a041c073ce5b9428414af19f845054"><td class="memItemLeft" align="right" valign="top"><a id="ae6a041c073ce5b9428414af19f845054"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">src</a></td></tr>
-<tr class="memdesc:ae6a041c073ce5b9428414af19f845054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ae6a041c073ce5b9428414af19f845054"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">src</a></td></tr>
+<tr class="memdesc:ae6a041c073ce5b9428414af19f845054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory transfer source address.  <a href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">More...</a><br /></td></tr>
 <tr class="separator:ae6a041c073ce5b9428414af19f845054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Not yet documented. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<div class="textblock"><p>The 3-tuple represents a single transfer in direct or indirect transfer. </p>
+<p>When a SCU-DMA level is configured to operate in direct mode (<a class="el" href="structscu__dma__level__cfg.html#a348e1a4ad08021512d95eff0ba6e065b">scu_dma_level_cfg_t::mode</a>), then this structure represents one transfer, and is set in scu_dma_level_cfg_t.xfer.direct.</p>
+<p>However, when the mode is <a class="el" href="group__SCU__DMA.html#gga646cf5f03cabed68f52c4db84c3fa9d9a4b166ce7fb023724a21308e2a5f485cc">SCU_DMA_MODE_INDIRECT</a>, then scu_dma_level_cfg_t.xfer.indirect is a pointer to a contiguous <em>table</em> of transfers. </p>
+</div><h2 class="groupheader">Field Documentation</h2>
+<a id="ae6a041c073ce5b9428414af19f845054"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6a041c073ce5b9428414af19f845054">&#9670;&nbsp;</a></span>src</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t scu_dma_xfer::src</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Memory transfer source address. </p>
+<p>When in indirect mode, the last entry <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">scu_dma_xfer::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up. </p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>libyaul/scu/scu/<a class="el" href="dma_8h_source.html">dma.h</a></li>
 </ul>
 </div><!-- contents -->

@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash c50d591</span>
+   &#160;<span id="projectnumber">Git hash 0965749</span>
    </div>
   </td>
  </tr>
@@ -419,7 +419,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the interrupt handler for the specified CPU related interrupt. </p>
-<p>This is a BIOS call. The function must use <code>rte</code> to return. Use the <code>__interrupt_handler</code> GCC attribute.</p>
+<p>This is a BIOS call. The function must use <code>rte</code> to return. Use the __interrupt_handler GCC attribute.</p>
 <p>To set a handler in the slave CPU vector table, add the offset <a class="el" href="group__CPU__INTC.html#gaba344807301589cb06ba6405b4ce063f">CPU_INTC_INTERRUPT_SLAVE_BASE</a> to <code>vector</code>.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Do not use this function to set your interrupt handler, unless there is an explicit need to do so. To see which functions and macros to use for each interrupt, see <a class="el" href="group__CPU__INTC__HELPERS.html">CPU INTC Setters</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>

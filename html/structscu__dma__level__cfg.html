@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash c50d591</span>
+   &#160;<span id="projectnumber">Git hash 0965749</span>
    </div>
   </td>
  </tr>
@@ -74,7 +74,7 @@ Collaboration diagram for scu_dma_level_cfg:</div>
 <div class="center"><img src="structscu__dma__level__cfg__coll__graph.png" border="0" usemap="#scu__dma__level__cfg_coll__map" alt="Collaboration graph"/></div>
 <map name="scu__dma__level__cfg_coll__map" id="scu__dma__level__cfg_coll__map">
 <area shape="rect" title="Not yet documented." alt="" coords="5,109,152,136"/>
-<area shape="rect" href="structscu__dma__xfer.html" title="Not yet documented." alt="" coords="22,5,135,32"/>
+<area shape="rect" href="structscu__dma__xfer.html" title="The 3&#45;tuple represents a single transfer in direct or indirect transfer." alt="" coords="22,5,135,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -108,6 +108,19 @@ union {</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Not yet documented. </p>
+<p>...</p>
+<dl class="section warning"><dt>Warning</dt><dd><ul>
+<li>When in indirect mode,<ul>
+<li>The last entry in scu_dma_level_cfg_t.xfer.indirect <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">scu_dma_xfer::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up.</li>
+<li><p class="startli">The base pointer to the table of transfers (scu_dma_level_cfg_t.xfer.indirect) must be byte aligned proportional to the number of transfers in the table. Ignoring this condition <em>will</em> cause the machine to lock up.</p>
+<p class="startli">For example, if the transfer count in the table is 1, and because this structure is 12 bytes, first round to the nearest power of 2, the alignment of the table must be on a 16-byte boundary. If the the transfer count is 3 (36 bytes rounded to 64), then the table must be on a 64-byte boundary.</p>
+<p class="startli">Effectively, the formula to determine the byte alignment is \(2^{\lceil\log_2 N\rceil}\)-bytes where \(N\) is the size of the transfer table in bytes.</p>
+<p class="startli">When allocating dynamically, use memalign. Otherwise, when statically allocating, use the __aligned GCC attribute. </p>
+</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>libyaul/scu/scu/<a class="el" href="dma_8h_source.html">dma.h</a></li>
 </ul>
