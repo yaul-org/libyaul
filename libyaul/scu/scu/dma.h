@@ -104,12 +104,16 @@ typedef enum scu_dma_update {
 /// @brief Not yet documented.
 #define SCU_DMA_INDIRECT_TABLE_END (0x80000000UL)
 
-/// @brief Not yet documented.
-#define SCU_DMA_BUS_A   0x00
-/// @brief Not yet documented.
-#define SCU_DMA_BUS_B   0x01
-/// @brief Not yet documented.
-#define SCU_DMA_BUS_DSP 0x02
+typedef enum scu_dma_bus {
+        /// @brief Not yet documented.
+        SCU_DMA_BUS_NONE = 0x00,
+        /// @brief Not yet documented.
+        SCU_DMA_BUS_A    = 0x01,
+        /// @brief Not yet documented.
+        SCU_DMA_BUS_B    = 0x02,
+        /// @brief Not yet documented.
+        SCU_DMA_BUS_DSP  = 0x04        
+} scu_dma_bus_t;
 
 /// @brief Not yet documented.
 #define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src)                        \
@@ -206,17 +210,17 @@ scu_dma_dsp_wait(void)
 }
 
 /// @brief Not yet documented.
-static inline uint8_t __always_inline
+static inline scu_dma_bus_t __always_inline
 scu_dma_bus_access_busy(void)
 {
-        return ((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x03);
+        return ((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x07);
 }
 
 /// @brief Not yet documented.
 static inline void __always_inline
-scu_dma_bus_access_wait(const uint8_t bus_mask)
+scu_dma_bus_access_wait(scu_dma_bus_t mask)
 {
-        while (((scu_dma_bus_access_busy()) & bus_mask) != 0x00);
+        while (((scu_dma_bus_access_busy()) & mask) != 0x00);
 }
 
 /// @brief Not yet documented.
@@ -245,7 +249,7 @@ scu_dma_level2_busy(void)
 
 /// @brief Not yet documented.
 static inline uint32_t __always_inline
-scu_dma_level_busy(const scu_dma_level_t level)
+scu_dma_level_busy(scu_dma_level_t level)
 {
         switch (level & SCU_DMA_LEVEL_COUNT) {
         case 1:
