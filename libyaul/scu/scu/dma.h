@@ -157,7 +157,7 @@ typedef struct scu_dma_handle {
 /// transfer.
 ///
 /// @details When a SCU-DMA level is configured to operate in direct mode (@ref
-/// scu_dma_level_cfg_t.mode), then this structure represents one transfer.
+/// scu_dma_level_cfg.mode), then this structure represents one transfer.
 ///
 /// However, when the mode is @ref SCU_DMA_MODE_INDIRECT, then this structure
 /// represents possibly one of many transfers contiguously laid out in memory as
@@ -182,11 +182,11 @@ typedef struct scu_dma_xfer {
 
 /// The transfer type.
 typedef union scu_dma_xfer_type {
-        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+        /// When indirect mode is used via @ref scu_dma_level_cfg.mode, use
         /// this to point to the transfer table.
         scu_dma_xfer_t *indirect;
 
-        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+        /// When indirect mode is used via @ref scu_dma_level_cfg.mode, use
         /// this to set the 3-tuple.
         scu_dma_xfer_t direct;
 } scu_dma_xfer_type_t;
@@ -202,7 +202,7 @@ typedef union scu_dma_xfer_type {
 ///     SCU_DMA_INDIRECT_TABLE_END. Otherwise, the machine @em will lock up.
 ///
 ///   - The base pointer to the table of transfers (@ref
-///     scu_dma_xfer_type_t.indirect) must be byte aligned proportional to the
+///     scu_dma_xfer_type.indirect) must be byte aligned proportional to the
 ///     number of transfers in the table. Ignoring this condition @em will cause
 ///     the machine to lock up.
 ///
