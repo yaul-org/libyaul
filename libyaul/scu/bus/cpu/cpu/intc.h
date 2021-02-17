@@ -125,7 +125,7 @@ typedef void (*cpu_intc_ihr)(void);
 /// @brief Set the interrupt handler for the specified CPU related interrupt.
 ///
 /// @details This is a BIOS call. The function must use `rte` to return. Use the
-/// @p __interrupt_handler GCC attribute.
+/// @ref __interrupt_handler GCC attribute.
 ///
 /// To set a handler in the slave CPU vector table, add the offset @ref
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
