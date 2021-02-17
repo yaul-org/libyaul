@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0965749</span>
+   &#160;<span id="projectnumber">Git hash 92fd7cf</span>
    </div>
   </td>
  </tr>
@@ -92,6 +92,12 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC__HELPERS.html#ga1a28cf0f54f72089ca0306cb366fb09f">scu_dma_illegal_set</a> (<a class="el" href="group__SCU__DMA.html#gaf108227cc266af498d768d6e5c09ff3e">scu_dma_ihr_t</a> ihr)</td></tr>
+<tr class="memdesc:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the SCU-DMA illegal interrupt.  <a href="group__CPU__INTC__HELPERS.html#ga1a28cf0f54f72089ca0306cb366fb09f">More...</a><br /></td></tr>
+<tr class="separator:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga94c183cdb58b6e064e1e4914b7d2a174"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC__HELPERS.html#ga94c183cdb58b6e064e1e4914b7d2a174">scu_dma_illegal_clear</a> (void)</td></tr>
+<tr class="memdesc:ga94c183cdb58b6e064e1e4914b7d2a174"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the interrupt handler for the SCU-DMA illegal interrupt.  <a href="group__CPU__INTC__HELPERS.html#ga94c183cdb58b6e064e1e4914b7d2a174">More...</a><br /></td></tr>
+<tr class="separator:ga94c183cdb58b6e064e1e4914b7d2a174"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__INTC__HELPERS.html#ga4512d66c93ed495dfc70d8e759bcaa17">cpu_divu_ovfi_set</a> (<a class="el" href="group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f">cpu_divu_ihr</a> ihr)</td></tr>
 <tr class="memdesc:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the CPU-DIVU OVFI interrupt.  <a href="group__CPU__INTC__HELPERS.html#ga4512d66c93ed495dfc70d8e759bcaa17">More...</a><br /></td></tr>
 <tr class="separator:ga4512d66c93ed495dfc70d8e759bcaa17"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -487,6 +493,70 @@ Variables</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">mode</td><td>The mode. </td></tr>
+    <tr><td class="paramname">ihr</td><td>The interrupt handler. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga94c183cdb58b6e064e1e4914b7d2a174"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga94c183cdb58b6e064e1e4914b7d2a174">&#9670;&nbsp;</a></span>scu_dma_illegal_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void scu_dma_illegal_clear </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear the interrupt handler for the SCU-DMA illegal interrupt. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__INTC__HELPERS.html#ga1a28cf0f54f72089ca0306cb366fb09f" title="Set the interrupt handler for the SCU-DMA illegal interrupt.">scu_dma_illegal_set</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga1a28cf0f54f72089ca0306cb366fb09f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1a28cf0f54f72089ca0306cb366fb09f">&#9670;&nbsp;</a></span>scu_dma_illegal_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void scu_dma_illegal_set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DMA.html#gaf108227cc266af498d768d6e5c09ff3e">scu_dma_ihr_t</a>&#160;</td>
+          <td class="paramname"><em>ihr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the interrupt handler for the SCU-DMA illegal interrupt. </p>
+<p>There is no need to explicitly return via <code>rte</code> for <code>ihr</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
     <tr><td class="paramname">ihr</td><td>The interrupt handler. </td></tr>
   </table>
   </dd>

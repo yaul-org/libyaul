@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 0965749</span>
+   &#160;<span id="projectnumber">Git hash 92fd7cf</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,9 @@ Data Structures</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__xfer.html">scu_dma_xfer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The 3-tuple represents a single transfer in direct or indirect transfer.  <a href="structscu__dma__xfer.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionscu__dma__xfer__type.html">scu_dma_xfer_type</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="unionscu__dma__xfer__type.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__level__cfg.html">scu_dma_level_cfg</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="structscu__dma__level__cfg.html#details">More...</a><br /></td></tr>
@@ -132,6 +135,10 @@ typedef int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:gaf70ea70888625293f7a86e446774e107"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structscu__dma__xfer.html">scu_dma_xfer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107">scu_dma_xfer_t</a></td></tr>
 <tr class="memdesc:gaf70ea70888625293f7a86e446774e107"><td class="mdescLeft">&#160;</td><td class="mdescRight">The 3-tuple represents a single transfer in direct or indirect transfer.  <a href="group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107">More...</a><br /></td></tr>
 <tr class="separator:gaf70ea70888625293f7a86e446774e107"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabeda6302677941c485ab9fb4a5640f05"><td class="memItemLeft" align="right" valign="top"><a id="gabeda6302677941c485ab9fb4a5640f05"></a>
+typedef union <a class="el" href="unionscu__dma__xfer__type.html">scu_dma_xfer_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gabeda6302677941c485ab9fb4a5640f05">scu_dma_xfer_type_t</a></td></tr>
+<tr class="memdesc:gabeda6302677941c485ab9fb4a5640f05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="separator:gabeda6302677941c485ab9fb4a5640f05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac6eb443eda81e601afa8a34a76200cb7"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structscu__dma__level__cfg.html">scu_dma_level_cfg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gac6eb443eda81e601afa8a34a76200cb7">scu_dma_level_cfg_t</a></td></tr>
 <tr class="memdesc:gac6eb443eda81e601afa8a34a76200cb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="group__SCU__DMA.html#gac6eb443eda81e601afa8a34a76200cb7">More...</a><br /></td></tr>
 <tr class="separator:gac6eb443eda81e601afa8a34a76200cb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,50 +206,38 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gac1bb891c91d16b14a04f41e95109dfff">scu_dma_level_stop</a> (<a class="el" href="group__SCU__DMA.html#gac6f30d9c30c74091f60969514a968ae3">scu_dma_level_t</a> level)</td></tr>
 <tr class="memdesc:gac1bb891c91d16b14a04f41e95109dfff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
 <tr class="separator:gac1bb891c91d16b14a04f41e95109dfff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga937ab48102337e70516622a641a4da4b"><td class="memItemLeft" align="right" valign="top"><a id="ga937ab48102337e70516622a641a4da4b"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga937ab48102337e70516622a641a4da4b">scu_dma_status_get</a> (void)</td></tr>
-<tr class="memdesc:ga937ab48102337e70516622a641a4da4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga937ab48102337e70516622a641a4da4b"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga937ab48102337e70516622a641a4da4b">scu_dma_status_get</a> (void)</td></tr>
+<tr class="memdesc:ga937ab48102337e70516622a641a4da4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the 32-bit SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gadc3b4d1b508d859691b762cf558144be">DSTA</a> value.  <a href="group__SCU__DMA.html#ga937ab48102337e70516622a641a4da4b">More...</a><br /></td></tr>
 <tr class="separator:ga937ab48102337e70516622a641a4da4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad5756fd6cf4b1571efee83d9acbda9b9"><td class="memItemLeft" align="right" valign="top"><a id="gad5756fd6cf4b1571efee83d9acbda9b9"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gad5756fd6cf4b1571efee83d9acbda9b9">scu_dma_dsp_busy</a> (void)</td></tr>
-<tr class="memdesc:gad5756fd6cf4b1571efee83d9acbda9b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:gad5756fd6cf4b1571efee83d9acbda9b9"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gad5756fd6cf4b1571efee83d9acbda9b9">scu_dma_dsp_busy</a> (void)</td></tr>
+<tr class="memdesc:gad5756fd6cf4b1571efee83d9acbda9b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the status of SCU-DSP DMA.  <a href="group__SCU__DMA.html#gad5756fd6cf4b1571efee83d9acbda9b9">More...</a><br /></td></tr>
 <tr class="separator:gad5756fd6cf4b1571efee83d9acbda9b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga64ce65b964bcfbae37e8aae95927bdc4"><td class="memItemLeft" align="right" valign="top"><a id="ga64ce65b964bcfbae37e8aae95927bdc4"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga64ce65b964bcfbae37e8aae95927bdc4">scu_dma_dsp_wait</a> (void)</td></tr>
-<tr class="memdesc:ga64ce65b964bcfbae37e8aae95927bdc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga64ce65b964bcfbae37e8aae95927bdc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until SCU-DSP DMA is no longer in operation/standby. <br /></td></tr>
 <tr class="separator:ga64ce65b964bcfbae37e8aae95927bdc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2dfc011f772e4727bd96bacf3f27ebd8"><td class="memItemLeft" align="right" valign="top"><a id="ga2dfc011f772e4727bd96bacf3f27ebd8"></a>
-static <a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga2dfc011f772e4727bd96bacf3f27ebd8">scu_dma_bus_access_busy</a> (void)</td></tr>
-<tr class="memdesc:ga2dfc011f772e4727bd96bacf3f27ebd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga2dfc011f772e4727bd96bacf3f27ebd8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga2dfc011f772e4727bd96bacf3f27ebd8">scu_dma_bus_access_busy</a> (void)</td></tr>
+<tr class="memdesc:ga2dfc011f772e4727bd96bacf3f27ebd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain which bus(es) are being accessed during DMA.  <a href="group__SCU__DMA.html#ga2dfc011f772e4727bd96bacf3f27ebd8">More...</a><br /></td></tr>
 <tr class="separator:ga2dfc011f772e4727bd96bacf3f27ebd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf75bc13c250546cc195671c98206159b"><td class="memItemLeft" align="right" valign="top"><a id="gaf75bc13c250546cc195671c98206159b"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf75bc13c250546cc195671c98206159b">scu_dma_bus_access_wait</a> (<a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a> mask)</td></tr>
-<tr class="memdesc:gaf75bc13c250546cc195671c98206159b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:gaf75bc13c250546cc195671c98206159b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf75bc13c250546cc195671c98206159b">scu_dma_bus_access_wait</a> (<a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a> mask)</td></tr>
+<tr class="memdesc:gaf75bc13c250546cc195671c98206159b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until the mask of bus(es) are no longer being accessed during DMA.  <a href="group__SCU__DMA.html#gaf75bc13c250546cc195671c98206159b">More...</a><br /></td></tr>
 <tr class="separator:gaf75bc13c250546cc195671c98206159b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3f48197fda85df613323cadb8065b29b"><td class="memItemLeft" align="right" valign="top"><a id="ga3f48197fda85df613323cadb8065b29b"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga3f48197fda85df613323cadb8065b29b">scu_dma_level0_busy</a> (void)</td></tr>
-<tr class="memdesc:ga3f48197fda85df613323cadb8065b29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga3f48197fda85df613323cadb8065b29b"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga3f48197fda85df613323cadb8065b29b">scu_dma_level0_busy</a> (void)</td></tr>
+<tr class="memdesc:ga3f48197fda85df613323cadb8065b29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the status of SCU-DMA level 0.  <a href="group__SCU__DMA.html#ga3f48197fda85df613323cadb8065b29b">More...</a><br /></td></tr>
 <tr class="separator:ga3f48197fda85df613323cadb8065b29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8273e5bbecf45f9bfdb8b23c27062d2d"><td class="memItemLeft" align="right" valign="top"><a id="ga8273e5bbecf45f9bfdb8b23c27062d2d"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga8273e5bbecf45f9bfdb8b23c27062d2d">scu_dma_level1_busy</a> (void)</td></tr>
-<tr class="memdesc:ga8273e5bbecf45f9bfdb8b23c27062d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:ga8273e5bbecf45f9bfdb8b23c27062d2d"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga8273e5bbecf45f9bfdb8b23c27062d2d">scu_dma_level1_busy</a> (void)</td></tr>
+<tr class="memdesc:ga8273e5bbecf45f9bfdb8b23c27062d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the status of SCU-DMA level 1.  <a href="group__SCU__DMA.html#ga8273e5bbecf45f9bfdb8b23c27062d2d">More...</a><br /></td></tr>
 <tr class="separator:ga8273e5bbecf45f9bfdb8b23c27062d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf479ec064163f758026c6280443730db"><td class="memItemLeft" align="right" valign="top"><a id="gaf479ec064163f758026c6280443730db"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf479ec064163f758026c6280443730db">scu_dma_level2_busy</a> (void)</td></tr>
-<tr class="memdesc:gaf479ec064163f758026c6280443730db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:gaf479ec064163f758026c6280443730db"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf479ec064163f758026c6280443730db">scu_dma_level2_busy</a> (void)</td></tr>
+<tr class="memdesc:gaf479ec064163f758026c6280443730db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the status of SCU-DMA level 2.  <a href="group__SCU__DMA.html#gaf479ec064163f758026c6280443730db">More...</a><br /></td></tr>
 <tr class="separator:gaf479ec064163f758026c6280443730db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae015bc1cd0858165e491f6e3436b3bd4"><td class="memItemLeft" align="right" valign="top"><a id="gae015bc1cd0858165e491f6e3436b3bd4"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gae015bc1cd0858165e491f6e3436b3bd4">scu_dma_level_busy</a> (<a class="el" href="group__SCU__DMA.html#gac6f30d9c30c74091f60969514a968ae3">scu_dma_level_t</a> level)</td></tr>
-<tr class="memdesc:gae015bc1cd0858165e491f6e3436b3bd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memitem:gae015bc1cd0858165e491f6e3436b3bd4"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gae015bc1cd0858165e491f6e3436b3bd4">scu_dma_level_busy</a> (<a class="el" href="group__SCU__DMA.html#gac6f30d9c30c74091f60969514a968ae3">scu_dma_level_t</a> level)</td></tr>
+<tr class="memdesc:gae015bc1cd0858165e491f6e3436b3bd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the status of SCU-DMA level.  <a href="group__SCU__DMA.html#gae015bc1cd0858165e491f6e3436b3bd4">More...</a><br /></td></tr>
 <tr class="separator:gae015bc1cd0858165e491f6e3436b3bd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5de0845401d2a89c4d379b9f246a5fcf"><td class="memItemLeft" align="right" valign="top"><a id="ga5de0845401d2a89c4d379b9f246a5fcf"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga5de0845401d2a89c4d379b9f246a5fcf">scu_dma_stop</a> (void)</td></tr>
-<tr class="memdesc:ga5de0845401d2a89c4d379b9f246a5fcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
+<tr class="memdesc:ga5de0845401d2a89c4d379b9f246a5fcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop all SCU-DMA levels unconditionally. <br /></td></tr>
 <tr class="separator:ga5de0845401d2a89c4d379b9f246a5fcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="memItemLeft" align="right" valign="top"><a id="ga1a28cf0f54f72089ca0306cb366fb09f"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga1a28cf0f54f72089ca0306cb366fb09f">scu_dma_illegal_set</a> (<a class="el" href="group__SCU__DMA.html#gaf108227cc266af498d768d6e5c09ff3e">scu_dma_ihr_t</a> ihr)</td></tr>
-<tr class="memdesc:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
-<tr class="separator:ga1a28cf0f54f72089ca0306cb366fb09f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad45c92289c2918e1db756a4fda6392c1"><td class="memItemLeft" align="right" valign="top"><a id="gad45c92289c2918e1db756a4fda6392c1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gad45c92289c2918e1db756a4fda6392c1">scu_dma_config_buffer</a> (<a class="el" href="group__SCU__DMA.html#ga8dff5e447ac8c7d93f868e1e228d4135">scu_dma_handle_t</a> *handle, const <a class="el" href="group__SCU__DMA.html#gac6eb443eda81e601afa8a34a76200cb7">scu_dma_level_cfg_t</a> *cfg)</td></tr>
 <tr class="memdesc:gad45c92289c2918e1db756a4fda6392c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented. <br /></td></tr>
@@ -407,8 +402,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <p>...</p>
 <dl class="section warning"><dt>Warning</dt><dd><ul>
 <li>When in indirect mode,<ul>
-<li>The last entry in scu_dma_level_cfg_t.xfer.indirect <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">scu_dma_xfer::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up.</li>
-<li><p class="startli">The base pointer to the table of transfers (scu_dma_level_cfg_t.xfer.indirect) must be byte aligned proportional to the number of transfers in the table. Ignoring this condition <em>will</em> cause the machine to lock up.</p>
+<li>The last entry in the transfer table <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054">scu_dma_xfer::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up.</li>
+<li><p class="startli">The base pointer to the table of transfers (<a class="el" href="unionscu__dma__xfer__type.html#a5210c1d6766636cb986e45ebd8bcc75c">scu_dma_xfer_type_t::indirect</a>) must be byte aligned proportional to the number of transfers in the table. Ignoring this condition <em>will</em> cause the machine to lock up.</p>
 <p class="startli">For example, if the transfer count in the table is 1, and because this structure is 12 bytes, first round to the nearest power of 2, the alignment of the table must be on a 16-byte boundary. If the the transfer count is 3 (36 bytes rounded to 64), then the table must be on a 64-byte boundary.</p>
 <p class="startli">Effectively, the formula to determine the byte alignment is \(2^{\lceil\log_2 N\rceil}\)-bytes where \(N\) is the size of the transfer table in bytes.</p>
 <p class="startli">When allocating dynamically, use memalign. Otherwise, when statically allocating, use the __aligned GCC attribute. </p>
@@ -433,8 +428,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 </div><div class="memdoc">
 
 <p>The 3-tuple represents a single transfer in direct or indirect transfer. </p>
-<p>When a SCU-DMA level is configured to operate in direct mode (<a class="el" href="structscu__dma__level__cfg.html#a348e1a4ad08021512d95eff0ba6e065b">scu_dma_level_cfg_t::mode</a>), then this structure represents one transfer, and is set in scu_dma_level_cfg_t.xfer.direct.</p>
-<p>However, when the mode is <a class="el" href="group__SCU__DMA.html#gga646cf5f03cabed68f52c4db84c3fa9d9a4b166ce7fb023724a21308e2a5f485cc">SCU_DMA_MODE_INDIRECT</a>, then scu_dma_level_cfg_t.xfer.indirect is a pointer to a contiguous <em>table</em> of transfers. </p>
+<p>When a SCU-DMA level is configured to operate in direct mode (<a class="el" href="structscu__dma__level__cfg.html#a348e1a4ad08021512d95eff0ba6e065b">scu_dma_level_cfg_t::mode</a>), then this structure represents one transfer.</p>
+<p>However, when the mode is <a class="el" href="group__SCU__DMA.html#gga646cf5f03cabed68f52c4db84c3fa9d9a4b166ce7fb023724a21308e2a5f485cc">SCU_DMA_MODE_INDIRECT</a>, then this structure represents possibly one of many transfers contiguously laid out in memory as a <em>table</em> of transfers. </p>
 
 </div>
 </div>
@@ -576,6 +571,250 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <tr><td class="fieldname"><a id="ggabfee742a4a6ff1ae48d81d384eae5201a5624235b5af76c96025d66136551c256"></a>SCU_DMA_UPDATE_WUP&#160;</td><td class="fielddoc"><p>Not yet documented. </p>
 </td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga2dfc011f772e4727bd96bacf3f27ebd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2dfc011f772e4727bd96bacf3f27ebd8">&#9670;&nbsp;</a></span>scu_dma_bus_access_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a> scu_dma_bus_access_busy </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain which bus(es) are being accessed during DMA. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mask of bus(es) that are being accessed during DMA. </dd></dl>
+
+</div>
+</div>
+<a id="gaf75bc13c250546cc195671c98206159b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf75bc13c250546cc195671c98206159b">&#9670;&nbsp;</a></span>scu_dma_bus_access_wait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void scu_dma_bus_access_wait </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712">scu_dma_bus_t</a>&#160;</td>
+          <td class="paramname"><em>mask</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait until the mask of bus(es) are no longer being accessed during DMA. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mask</td><td>The mask of bus(es). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad5756fd6cf4b1571efee83d9acbda9b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad5756fd6cf4b1571efee83d9acbda9b9">&#9670;&nbsp;</a></span>scu_dma_dsp_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_dsp_busy </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the status of SCU-DSP DMA. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether SCU-DSP DMA is in operation, on standby, or interrupted to background. </dd></dl>
+
+</div>
+</div>
+<a id="ga3f48197fda85df613323cadb8065b29b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3f48197fda85df613323cadb8065b29b">&#9670;&nbsp;</a></span>scu_dma_level0_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_level0_busy </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the status of SCU-DMA level 0. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether SCU-DMA level 0 is in operation, on standby, or interrupted. </dd></dl>
+
+</div>
+</div>
+<a id="ga8273e5bbecf45f9bfdb8b23c27062d2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8273e5bbecf45f9bfdb8b23c27062d2d">&#9670;&nbsp;</a></span>scu_dma_level1_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_level1_busy </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the status of SCU-DMA level 1. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether SCU-DMA level 1 is in operation, on standby, or interrupted. </dd></dl>
+
+</div>
+</div>
+<a id="gaf479ec064163f758026c6280443730db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf479ec064163f758026c6280443730db">&#9670;&nbsp;</a></span>scu_dma_level2_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_level2_busy </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the status of SCU-DMA level 2. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether SCU-DMA level 2 is in operation, on standby, or interrupted. </dd></dl>
+
+</div>
+</div>
+<a id="gae015bc1cd0858165e491f6e3436b3bd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae015bc1cd0858165e491f6e3436b3bd4">&#9670;&nbsp;</a></span>scu_dma_level_busy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_level_busy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DMA.html#gac6f30d9c30c74091f60969514a968ae3">scu_dma_level_t</a>&#160;</td>
+          <td class="paramname"><em>level</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the status of SCU-DMA level. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>The SCU-DMA level.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether SCU-DMA level is in operation, on standby, or interrupted. </dd></dl>
+
+</div>
+</div>
+<a id="ga937ab48102337e70516622a641a4da4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga937ab48102337e70516622a641a4da4b">&#9670;&nbsp;</a></span>scu_dma_status_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t scu_dma_status_get </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain the 32-bit SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gadc3b4d1b508d859691b762cf558144be">DSTA</a> value. </p>
+<dl class="section return"><dt>Returns</dt><dd>The 32-bit SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#gadc3b4d1b508d859691b762cf558144be">DSTA</a> value. </dd></dl>
 
 </div>
 </div>

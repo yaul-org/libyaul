@@ -12,13 +12,15 @@ var group__SCU__DMA =
       [ "len", "structscu__dma__xfer.html#a20e90be6f822238d60768b8c3b8f083f", null ],
       [ "src", "structscu__dma__xfer.html#ae6a041c073ce5b9428414af19f845054", null ]
     ] ],
+    [ "scu_dma_xfer_type", "unionscu__dma__xfer__type.html", [
+      [ "direct", "unionscu__dma__xfer__type.html#aceb30b34cfdcbe7214cc48cb1b818984", null ],
+      [ "indirect", "unionscu__dma__xfer__type.html#a5210c1d6766636cb986e45ebd8bcc75c", null ]
+    ] ],
     [ "scu_dma_level_cfg", "structscu__dma__level__cfg.html", [
-      [ "direct", "structscu__dma__level__cfg.html#afd55b85af86e54a6475236ecb9674c49", null ],
-      [ "indirect", "structscu__dma__level__cfg.html#a368ab8941c794be12ab47697283a437a", null ],
       [ "mode", "structscu__dma__level__cfg.html#a348e1a4ad08021512d95eff0ba6e065b", null ],
       [ "stride", "structscu__dma__level__cfg.html#ab6316461b8aacce1e5c4866197c33fdb", null ],
       [ "update", "structscu__dma__level__cfg.html#afcc36eabbd3b2552d1803db8099b6e26", null ],
-      [ "xfer", "structscu__dma__level__cfg.html#a6f7a816eb2ce7a7d6352462992efa059", null ]
+      [ "xfer", "structscu__dma__level__cfg.html#ab6865f06ca4e7556f009291372928dba", null ]
     ] ],
     [ "SCU_DMA_INDIRECT_TABLE_END", "group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1", null ],
     [ "SCU_DMA_LEVEL_COUNT", "group__SCU__DMA.html#ga5575c1252e0a025def433aaf6c66b177", null ],
@@ -35,6 +37,7 @@ var group__SCU__DMA =
     [ "scu_dma_stride_t", "group__SCU__DMA.html#gae14b607b52bc9ad6f33f39498e86bf6b", null ],
     [ "scu_dma_update_t", "group__SCU__DMA.html#gafef467055dc78e0fd25a48a8c2a522b5", null ],
     [ "scu_dma_xfer_t", "group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107", null ],
+    [ "scu_dma_xfer_type_t", "group__SCU__DMA.html#gabeda6302677941c485ab9fb4a5640f05", null ],
     [ "scu_dma_bus", "group__SCU__DMA.html#ga8d2cfba2e52470f20e54db926cf5aa57", [
       [ "SCU_DMA_BUS_NONE", "group__SCU__DMA.html#gga8d2cfba2e52470f20e54db926cf5aa57a2124ce2b672d61a60ea885a9613aae26", null ],
       [ "SCU_DMA_BUS_A", "group__SCU__DMA.html#gga8d2cfba2e52470f20e54db926cf5aa57ab4ed11a130d6bfa203eafe9e33390721", null ],
@@ -76,7 +79,6 @@ var group__SCU__DMA =
     [ "scu_dma_config_set", "group__SCU__DMA.html#ga719debf3a27cfa61db802f230db4d7a0", null ],
     [ "scu_dma_dsp_busy", "group__SCU__DMA.html#gad5756fd6cf4b1571efee83d9acbda9b9", null ],
     [ "scu_dma_dsp_wait", "group__SCU__DMA.html#ga64ce65b964bcfbae37e8aae95927bdc4", null ],
-    [ "scu_dma_illegal_set", "group__SCU__DMA.html#ga1a28cf0f54f72089ca0306cb366fb09f", null ],
     [ "scu_dma_level0_busy", "group__SCU__DMA.html#ga3f48197fda85df613323cadb8065b29b", null ],
     [ "scu_dma_level1_busy", "group__SCU__DMA.html#ga8273e5bbecf45f9bfdb8b23c27062d2d", null ],
     [ "scu_dma_level2_busy", "group__SCU__DMA.html#gaf479ec064163f758026c6280443730db", null ],

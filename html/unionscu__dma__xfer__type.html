@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Yaul: scu_ic_priority Struct Reference</title>
+<title>Yaul: scu_dma_xfer_type Union Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -52,7 +52,7 @@
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('structscu__ic__priority.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('unionscu__dma__xfer__type.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -60,37 +60,46 @@ $(document).ready(function(){initNavTree('structscu__ic__priority.html',''); ini
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">scu_ic_priority Struct Reference<div class="ingroups"><a class="el" href="group__SCU__IC.html">SCU IC</a></div></div>  </div>
+<div class="title">scu_dma_xfer_type Union Reference<div class="ingroups"><a class="el" href="group__SCU__DMA.html">SCU DMA</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>SCU IC priority entry.  
- <a href="structscu__ic__priority.html#details">More...</a></p>
+<p>Not yet documented.  
+ <a href="unionscu__dma__xfer__type.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="ic_8h_source.html">ic.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="dma_8h_source.html">dma.h</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for scu_dma_xfer_type:</div>
+<div class="dyncontent">
+<div class="center"><img src="unionscu__dma__xfer__type__coll__graph.png" border="0" usemap="#scu__dma__xfer__type_coll__map" alt="Collaboration graph"/></div>
+<map name="scu__dma__xfer__type_coll__map" id="scu__dma__xfer__type_coll__map">
+<area shape="rect" title="Not yet documented." alt="" coords="5,109,155,136"/>
+<area shape="rect" href="structscu__dma__xfer.html" title="The 3&#45;tuple represents a single transfer in direct or indirect transfer." alt="" coords="23,5,137,32"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a3c07957e7e2f4b9d6414781174babf53"><td class="memItemLeft" align="right" valign="top"><a id="a3c07957e7e2f4b9d6414781174babf53"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__ic__priority.html#a3c07957e7e2f4b9d6414781174babf53">sr_mask</a></td></tr>
-<tr class="memdesc:a3c07957e7e2f4b9d6414781174babf53"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU <code>sr</code> register priority level mask. <br /></td></tr>
-<tr class="separator:a3c07957e7e2f4b9d6414781174babf53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c83b254f82bf22b77418e8d85956c21"><td class="memItemLeft" align="right" valign="top"><a id="a2c83b254f82bf22b77418e8d85956c21"></a>
-<a class="el" href="group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87">scu_ic_interrupt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__ic__priority.html#a2c83b254f82bf22b77418e8d85956c21">scu_mask</a>:16</td></tr>
-<tr class="memdesc:a2c83b254f82bf22b77418e8d85956c21"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa842098a8e332ea17074de890be">IMS</a> mask. <br /></td></tr>
-<tr class="separator:a2c83b254f82bf22b77418e8d85956c21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5210c1d6766636cb986e45ebd8bcc75c"><td class="memItemLeft" align="right" valign="top"><a id="a5210c1d6766636cb986e45ebd8bcc75c"></a>
+<a class="el" href="group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107">scu_dma_xfer_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionscu__dma__xfer__type.html#a5210c1d6766636cb986e45ebd8bcc75c">indirect</a></td></tr>
+<tr class="memdesc:a5210c1d6766636cb986e45ebd8bcc75c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indirect mode. <br /></td></tr>
+<tr class="separator:a5210c1d6766636cb986e45ebd8bcc75c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceb30b34cfdcbe7214cc48cb1b818984"><td class="memItemLeft" align="right" valign="top"><a id="aceb30b34cfdcbe7214cc48cb1b818984"></a>
+<a class="el" href="group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107">scu_dma_xfer_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionscu__dma__xfer__type.html#aceb30b34cfdcbe7214cc48cb1b818984">direct</a></td></tr>
+<tr class="memdesc:aceb30b34cfdcbe7214cc48cb1b818984"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct mode. <br /></td></tr>
+<tr class="separator:aceb30b34cfdcbe7214cc48cb1b818984"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>SCU IC priority entry. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>libyaul/scu/scu/<a class="el" href="ic_8h_source.html">ic.h</a></li>
+<div class="textblock"><p>Not yet documented. </p>
+</div><hr/>The documentation for this union was generated from the following file:<ul>
+<li>libyaul/scu/scu/<a class="el" href="dma_8h_source.html">dma.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="structscu__ic__priority.html">scu_ic_priority</a></li>
+    <li class="navelem"><a class="el" href="unionscu__dma__xfer__type.html">scu_dma_xfer_type</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
