@@ -30,7 +30,7 @@ typedef enum cpu_which {
 } cpu_which_t;
 
 /// The communication mode used for the slave CPU.
-typedef enum cpu_comm_mode {
+typedef enum cpu_dual_comm_mode {
         /// @brief Use polling for master/slave CPU communication.
         /// @details The slave CPU directly polls for a notification from the
         /// master CPU.
