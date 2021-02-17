@@ -1,12 +1,12 @@
 var group__CPU__DUAL =
 [
-    [ "cpu_dual_comm_mode_t", "group__CPU__DUAL.html#gaf87bfe76c43a15a774840925e6b52941", null ],
+    [ "cpu_dual_comm_mode_t", "group__CPU__DUAL.html#ga556ad06de8fc4c8fba2df3be5947bdc7", null ],
     [ "cpu_dual_master_entry", "group__CPU__DUAL.html#ga46b88f103361dd6bfd02cfbb05e793f5", null ],
     [ "cpu_dual_slave_entry", "group__CPU__DUAL.html#ga69f13daed2fca2ba5abbc44c5627faa7", null ],
     [ "cpu_which_t", "group__CPU__DUAL.html#ga9c8dbada59d05ccef93fb03457e52e23", null ],
-    [ "cpu_comm_mode", "group__CPU__DUAL.html#gacae9b18808e5889cee3f06f9822dcf7d", [
-      [ "CPU_DUAL_ENTRY_POLLING", "group__CPU__DUAL.html#ggacae9b18808e5889cee3f06f9822dcf7da7ccec2f404ab4b4796dd4f848babb67e", null ],
-      [ "CPU_DUAL_ENTRY_ICI", "group__CPU__DUAL.html#ggacae9b18808e5889cee3f06f9822dcf7dab70c3c1c43be27b9dc410c8cecc820aa", null ]
+    [ "cpu_dual_comm_mode", "group__CPU__DUAL.html#ga19e2cdb40455e9696cf840775ddff04b", [
+      [ "CPU_DUAL_ENTRY_POLLING", "group__CPU__DUAL.html#gga19e2cdb40455e9696cf840775ddff04ba7ccec2f404ab4b4796dd4f848babb67e", null ],
+      [ "CPU_DUAL_ENTRY_ICI", "group__CPU__DUAL.html#gga19e2cdb40455e9696cf840775ddff04bab70c3c1c43be27b9dc410c8cecc820aa", null ]
     ] ],
     [ "cpu_which", "group__CPU__DUAL.html#ga680207c415c4ac4a00d54af2c60525ff", [
       [ "CPU_MASTER", "group__CPU__DUAL.html#gga680207c415c4ac4a00d54af2c60525ffafdee45acba038c9e3ffbab049d3f9172", null ],
