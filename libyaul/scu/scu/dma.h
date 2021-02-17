@@ -40,7 +40,7 @@ __BEGIN_DECLS
 /// @addtogroup SCU_DMA
 /// @{
 
-/// @brief Not yet documented.
+/// @brief The number of SCU-DMA levels.
 #define SCU_DMA_LEVEL_COUNT 3
 
 /// @brief SCU-DMA transfer mode.
@@ -93,30 +93,41 @@ typedef enum scu_dma_stride {
 
 /// @brief SCU-DMA transfer update type.
 typedef enum scu_dma_update {
-        /// @brief Not yet documented.
+        /// @brief Do not update read or write address.
         SCU_DMA_UPDATE_NONE = 0x00000000UL,
-        /// @brief Not yet documented.
+        /// @brief Read address update.
         SCU_DMA_UPDATE_RUP  = 0x00010000UL,
-        /// @brief Not yet documented.
+        /// @brief Write address update.
         SCU_DMA_UPDATE_WUP  = 0x00000100UL
 } scu_dma_update_t;
 
-/// @brief Not yet documented.
+/// @brief The bit that signifies the end of the transfer table.
+///
+/// @details This bit must be set in @ref scu_dma_xfer.src.
+///
+/// @warning Forgetting to bitwise OR this value to the last @ref
+/// scu_dma_xfer.src in the table @em will result in the machine locking up.
 #define SCU_DMA_INDIRECT_TABLE_END (0x80000000UL)
 
-/// @brief Not yet documented.
+/// @brief Different busses.
 typedef enum scu_dma_bus {
-        /// @brief Not yet documented.
+        /// @brief None.
         SCU_DMA_BUS_NONE = 0x00,
-        /// @brief Not yet documented.
+        /// @brief A-Bus.
         SCU_DMA_BUS_A    = 0x01,
-        /// @brief Not yet documented.
+        /// @brief B-Bus.
         SCU_DMA_BUS_B    = 0x02,
-        /// @brief Not yet documented.
+        /// @brief SCU-DSP Bus.
         SCU_DMA_BUS_DSP  = 0x04
 } scu_dma_bus_t;
 
-/// @brief Not yet documented.
+/// @brief Initializer for @ref scu_dma_xfer_t.
+///
+/// @details This macro can be used in direct or indirect mode.
+///
+/// @param _len The length.
+/// @param _dst The memory transfer destination address.
+/// @param _src The memory transfer source address.
 #define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src)                        \
 {                                                                              \
         .len = (_len),                                                         \
@@ -124,7 +135,14 @@ typedef enum scu_dma_bus {
         .src = (uint32_t)(_src)                                                \
 }
 
-/// @brief Not yet documented.
+/// @brief End Initializer for @ref scu_dma_xfer_t.
+///
+/// @details Terminates the transfer table for when the level is in indirect
+/// mode.
+///
+/// @param _len The length.
+/// @param _dst The memory transfer destination address.
+/// @param _src The memory transfer source address.
 #define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src)                    \
 {                                                                              \
         .len = _len,                                                           \
@@ -138,18 +156,21 @@ typedef int32_t scu_dma_level_t;
 /// @brief A SCU-DMA handle representing a copy of the level's SCU-DMA
 /// registers.
 ///
+/// @details After configuring with @ref scu_dma_config_buffer using @ref
+/// scu_dma_level_cfg, the end result is a handle.
+///
 /// @see scu_dma_config_buffer
 /// @see scu_dma_config_set
 typedef struct scu_dma_handle {
-        /// Not yet documented.
+        /// Value for @ref D0R, @ref D1R, @ref D2R.
         uint32_t dnr;
-        /// Not yet documented.
+        /// Value for @ref D0W, @ref D1W, @ref D2W.
         uint32_t dnw;
-        /// Not yet documented.
+        /// Value for @ref D0C, @ref D1C, @ref D2C.
         uint32_t dnc;
-        /// Not yet documented.
+        /// Value for @ref D0C, @ref D1C, @ref D2C.
         uint32_t dnad;
-        /// Not yet documented.
+        /// Value for @ref D0MD, @ref D1MD, @ref D2MD.
         uint32_t dnmd;
 } __packed __aligned(4) scu_dma_handle_t;
 
@@ -191,9 +212,9 @@ typedef union scu_dma_xfer_type {
         scu_dma_xfer_t direct;
 } scu_dma_xfer_type_t;
 
-/// @brief Not yet documented.
+/// @brief Defines a SCU-DMA level configuration.
 ///
-/// @details ...
+/// @details Details goes here.
 ///
 /// @warning
 /// + When in indirect mode,
@@ -231,13 +252,18 @@ typedef struct scu_dma_level_cfg {
 
 static_assert(sizeof(scu_dma_level_cfg_t) == 20);
 
-/// @brief Not yet documented.
+/// @brief Callback type.
+/// @see scu_dma_illegal_set
 typedef void (*scu_dma_ihr_t)(void);
 
-/// @brief Not yet documented.
+/// @brief Callback type.
+/// @see scu_dma_config_set
+/// @see scu_dma_level_end_set
 typedef void (*scu_dma_callback_t)(void *);
 
-/// @brief Not yet documented.
+/// @brief Stop a specific SCU-DMA level.
+///
+/// @param level The SCU-DMA level.
 extern void scu_dma_level_stop(scu_dma_level_t level);
 
 /// @brief Obtain the 32-bit SCU @ref DSTA value.
