@@ -384,11 +384,19 @@ scu_dma_illegal_clear(void)
         scu_dma_illegal_set(NULL);
 }
 
-/// @brief Not yet documented.
+/// @brief Generates a handle from the SCU-DMA level configuration.
+///
+/// @param[out] handle The handle.
+/// @param[in]  cfg    The configuration.
 extern void scu_dma_config_buffer(scu_dma_handle_t *handle,
     const scu_dma_level_cfg_t *cfg);
 
-/// @brief Not yet documented.
+/// @brief Commits handle to SCU-DMA level I/O registers.
+///
+/// @param     level        The SCU-DMA level.
+/// @param     start_factor The starting factor.
+/// @param[in] handle       The handle.
+/// @param     callback     The callback when transfer is complete.
 extern void scu_dma_config_set(scu_dma_level_t level,
     scu_dma_start_factor_t start_factor, const scu_dma_handle_t *handle,
     scu_dma_callback_t callback);
