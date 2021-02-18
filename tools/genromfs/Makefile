@@ -16,8 +16,14 @@ CFLAGS:= -O2 \
 	-Wno-unused \
 	-Wno-parentheses
 
+LDFLAGS:=
+
+ifeq ($(OS), Windows_NT)
+	LDFLAGS+= -lshlwapi -lws2_32
+endif
+
 SRCS:= genromfs.c
-INCLUDES:= /usr/include
+INCLUDES:=
 
 OBJS:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.o))
 DEPS:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(SRCS:.c=.d))
@@ -28,7 +34,7 @@ all: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)$(CC) -o $@ $(OBJS)
+	$(ECHO)$(CC) -o $@ $(OBJS) $(LDFLAGS)
 	$(ECHO)$(STRIP) -s $@
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD):
