@@ -20,7 +20,7 @@ CFLAGS:= -O2 \
 LDFLAGS:=
 
 ifeq ($(OS), Windows_NT)
-	LDFLAGS+= -lshlwapi -lws2_32
+LDFLAGS+= -lshlwapi -lws2_32
 endif
 
 SRCS:= genromfs.c
