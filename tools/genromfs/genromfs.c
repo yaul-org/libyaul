@@ -620,15 +620,15 @@ int spaceneeded(struct filenode *node)
 
 int alignnode(struct filenode *node, int curroffset, int extraspace)
 {
-    int align = findalign(node), d;
+    int found_align = findalign(node), d;
 
-    d = ((curroffset + extraspace) & (align - 1));
+    d = ((curroffset + extraspace) & (found_align - 1));
 
     if (d) {
-        align -= d;
-        curroffset += align;
-        node->offset += align;
-        node->pad = align;
+        found_align -= d;
+        curroffset += found_align;
+        node->offset += found_align;
+        node->pad = found_align;
     }
 
     return curroffset;

@@ -14,7 +14,8 @@ CFLAGS:= -O2 \
 	-Wuninitialized \
 	-Wshadow \
 	-Wno-unused \
-	-Wno-parentheses
+	-Wno-parentheses \
+	-Wno-sign-compare
 
 LDFLAGS:=
 
