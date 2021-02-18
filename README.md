@@ -14,12 +14,6 @@ providing lightweight abstractions between your program and the hardware.
 
 ### Windows
 
-<p align="center">
-  <a href="https://github.com/ijacquez/libyaul-installer/releases">
-    <img width="64" height="64" src=".images/yaul-installer.png">
-  </a>
-</p>
-
 Download the _Yaul MSYS2 64-bit_ installer from the release [page][2].
 
 Once _Yaul MSYS2 64-bit_ is installed, your entire environment is set up!
@@ -34,7 +28,7 @@ Verify that the following packages are installed.
        pacman -S \
        git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
 
- - Via _APT_ (Debian, Ubuntu, and related Linux distributions):
+ - Via _APT_ (Debian based Linux distributions):
 
        apt-get install \
        git make gcc wget unzip zip p7zip diffutils dos2unix patch xorriso
@@ -60,14 +54,11 @@ A prebuilt tool-chain can be downloaded from the table below. Create a directory
 If you're on Windows, and you've downloaded _Yaul MSYS2 64-bit_, the tool-chain
 is already installed in `/opt/x-tools`.
 
-| Platform         | Architecture | Tool-chain Link |
+| Platform         | Architecture | Tool-chain link |
 |------------------|--------------|-----------------|
 | Linux            | i686         | [Available][3]  |
 | Linux            | x86_64       | [Available][4]  |
-| Windows (MinGW)  | i686         | [Available][5]  |
-| Windows (MinGW)  | x86_64       | [Available][6]  |
-| Windows (Cygwin) | x86          | Not available   |
-| Windows (Cygwin) | x86_64       | Not available   |
+| Windows (MinGW)  | x86_64       | [Available][5]  |
 | Mac OS X         | x86_64       | Not available   |
 
 ### M68k
@@ -139,6 +130,10 @@ directory. Take note of the absolute path to the tool-chain.
 You can now build any of the given examples in the [`libyaul-examples`][1]
 submodule.
 
+## Documentation
+
+Visit [yaul.org][6].
+
 ## Contact
 
 You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
@@ -147,5 +142,5 @@ You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 [2]: https://github.com/ijacquez/libyaul-installer/releases
 [3]: https://drive.google.com/open?id=1Cg73hDwp_EuQCEol5praZa33QrEvdY5_
 [4]: https://drive.google.com/open?id=1YVcXcZLlcYezajkNUksylSxtLwx9zrl-
-[5]: https://drive.google.com/open?id=1eEIvAVY0tmmkldRSF5d557W831Qh15d2
-[6]: https://drive.google.com/open?id=1hkQ6PKWDM29Xv0ZhJzUBRg0Xvz09UFMI
+[5]: https://drive.google.com/open?id=1hkQ6PKWDM29Xv0ZhJzUBRg0Xvz09UFMI
+[6]: https://yaul.org/
