@@ -29,6 +29,11 @@ INCLUDES:=
 LIB_DIRS:=
 LIBS:= m
 
+# Force use libusb and local ftdi.c/ftdi.h
+ifeq ($(OS), Windows_NT)
+HAVE_LIBUSB_WIN32:= 1
+endif
+
 ifneq ($(strip $(HAVE_LIBFTD2XX)),)
 CFLAGS+= -DHAVE_LIBFTD2XX=1
 INCLUDES+= ./libftd2xx/release
