@@ -54,12 +54,12 @@ A prebuilt tool-chain can be downloaded from the table below. Create a directory
 If you're on Windows, and you've downloaded _Yaul MSYS2 64-bit_, the tool-chain
 is already installed in `/opt/x-tools`.
 
-| Platform         | Architecture | Tool-chain link |
-|------------------|--------------|-----------------|
-| Linux            | i686         | [Available][3]  |
-| Linux            | x86_64       | [Available][4]  |
-| Windows (MinGW)  | x86_64       | [Available][5]  |
-| Mac OS X         | x86_64       | Not available   |
+| Platform        | Architecture | Tool-chain link |
+|-----------------|--------------|-----------------|
+| Linux           | x86          | [Available][3]  |
+| Linux           | x86_64       | [Available][3]  |
+| Windows (MinGW) | x86_64       | [Available][3]  |
+| MacOS X         | x86_64       | Not available   |
 
 ### M68k
 
@@ -132,7 +132,7 @@ submodule.
 
 ## Documentation
 
-Visit [yaul.org][6].
+Visit [yaul.org][4].
 
 ## Contact
 
@@ -140,7 +140,5 @@ You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 
 [1]: https://github.com/ijacquez/libyaul-examples
 [2]: https://github.com/ijacquez/libyaul-installer/releases
-[3]: https://drive.google.com/open?id=1Cg73hDwp_EuQCEol5praZa33QrEvdY5_
-[4]: https://drive.google.com/open?id=1YVcXcZLlcYezajkNUksylSxtLwx9zrl-
-[5]: https://drive.google.com/open?id=1hkQ6PKWDM29Xv0ZhJzUBRg0Xvz09UFMI
-[6]: https://yaul.org/
+[3]: github.com/ijacquez/libyaul-packages/releases/latest
+[4]: https://yaul.org/
