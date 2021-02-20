@@ -78,7 +78,7 @@ distclean: clean
 
 install: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 	@printf -- "$(V_BEGIN_BLUE)$(SUB_BUILD)/$(PROGRAM)$(V_END)\n"
-	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/bin
-	$(ECHO)$(INSTALL) -m 755 $< $(YAUL_INSTALL_ROOT)/bin/
+	$(ECHO)mkdir -p $(YAUL_PREFIX)/bin
+	$(ECHO)$(INSTALL) -m 755 $< $(YAUL_PREFIX)/bin/
 
 -include $(DEPS)
