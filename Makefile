@@ -26,8 +26,8 @@ define macro-generate-install-rule
 .PHONY: $1-install-$2
 
 $1-install-$2:
-	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
-	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
+	$(ECHO)mkdir -p $(YAUL_PREFIX)/lib
+	$(ECHO)mkdir -p $(YAUL_PREFIX)/include
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)install-$2$(V_END)\n"
 	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
@@ -53,8 +53,8 @@ endef
 
 # No arguments
 define macro-install
-	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/lib
-	$(ECHO)mkdir -p $(YAUL_INSTALL_ROOT)/include
+	$(ECHO)mkdir -p $(YAUL_PREFIX)/lib
+	$(ECHO)mkdir -p $(YAUL_PREFIX)/include
 	$(ECHO)for project in $(PROJECTS); do \
 	    printf -- "$(V_BEGIN_CYAN)$${project}$(V_END) $(V_BEGIN_GREEN)$@$(V_END)\n"; \
 	    ($(MAKE) -C $${project} -f $<.mk $@) || exit $${?}; \
