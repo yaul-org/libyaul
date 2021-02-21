@@ -1,7 +1,7 @@
 Yet Another Useless [Saturn] Library
 ===
 <div align="center">
-  <img src=".images/logo.png" width="50%" height="50%"/>
+  <img src=".images/logo.png" width="66%" height="66%"/>
 </div>
 <div align="center">
   <a href="https://travis-ci.org/ijacquez/libyaul">
