@@ -71,11 +71,11 @@ still need to [build](#building-yaul) Yaul.
 |-----------------|--------------|-----------------|
 | Linux           | x86          | [Available][3]  |
 | Linux           | x86_64       | [Available][3]  |
+| Windows (MinGW) | x86_64       | [Available][3]  |
 
 ## Building tool-chain from source
 
 Follow the instructions found in the [`build-scripts/`][5] submodule directory.
-Take note of the absolute path to the tool-chain.
 
 ## Building Yaul
 
@@ -83,7 +83,7 @@ Take note of the absolute path to the tool-chain.
 
 Clone the repository
 
-      git clone --recursive "https://github.com/ijacquez/libyaul.git"
+    git clone --recursive "https://github.com/ijacquez/libyaul.git"
 
 ### Setting up environment file
 
