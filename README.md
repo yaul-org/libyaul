@@ -14,7 +14,7 @@ Yet Another Useless [Saturn] Library
     <img src="https://img.shields.io/github/last-commit/ijacquez/libyaul.svg" alt="Last commit"/>
   </a>
   <a href="https://discord.gg/S434dWA">
-    <img src="https://discord.gg/S434dWA" alt="Join us on Discord"/>
+    <img src="https://img.shields.io/discord/531844227655532554.svg" alt="Join us on Discord"/>
   </a>
 </div>
 
