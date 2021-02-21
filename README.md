@@ -1,11 +1,21 @@
 Yet Another Useless [Saturn] Library
 ===
 <div align="center">
-  <img src=".images/logo.png" width="33%" height="33%"/>
+  <img src=".images/logo.png" width="50%" height="50%"/>
 </div>
-
 <div align="center">
-[![Build status](https://img.shields.io/travis/ijacquez/libyaul.svg)](https://travis-ci.org/ijacquez/libyaul) [![Issues](https://img.shields.io/github/issues/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/issues) [![Last commit](https://img.shields.io/github/last-commit/ijacquez/libyaul.svg)](https://github.com/ijacquez/libyaul/commits/develop) ![Size](https://img.shields.io/github/repo-size/ijacquez/libyaul.svg) [![Join us on Discord](https://img.shields.io/discord/531844227655532554.svg)]( https://discord.gg/S434dWA)
+  <a href="https://travis-ci.org/ijacquez/libyaul">
+    <img src="https://img.shields.io/travis/ijacquez/libyaul.svg" alt="Build status"/>
+  </a>
+  <a href="https://github.com/ijacquez/libyaul/issues">
+    <img src="https://img.shields.io/github/issues/ijacquez/libyaul.svg" alt="Issues"/>
+  </a>
+  <a href="https://github.com/ijacquez/libyaul/commits/develop">
+    <img src="https://img.shields.io/github/last-commit/ijacquez/libyaul.svg" alt="Last commit"/>
+  </a>
+  <a href="https://discord.gg/S434dWA">
+    <img src="https://discord.gg/S434dWA" alt="Join us on Discord"/>
+  </a>
 </div>
 
 Yaul is an open source development kit for the SEGA Saturn. The SDK as a whole
