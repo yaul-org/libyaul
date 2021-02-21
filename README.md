@@ -18,6 +18,8 @@ Yet Another Useless [Saturn] Library
   </a>
 </div>
 
+## About
+
 Yaul is an open source development kit for the SEGA Saturn. The SDK as a whole
 aims to minimize the _painful_ experience that is developing for the Saturn by
 providing lightweight abstractions between your program and the hardware.
@@ -26,7 +28,7 @@ providing lightweight abstractions between your program and the hardware.
 
 Visit [yaul.org][1].
 
-## Pre-built Installation
+## Pre-built environment
 
 ### Windows
 
@@ -55,19 +57,20 @@ _Instructions coming soon!_
 
 There are currently no `.deb` packages available.
 
-#### Other
+### MacOS X
 
-A pre-built tool-chain can be downloaded from the table below. Create a
-directory `tool-chains` and extract the contents of the archive into it.
+There are currently no packages available.
+
+## Pre-built tool-chain
+
+A pre-built tool-chain can be downloaded. Be sure to create a directory
+`tool-chains` and extract the contents of the archive into it. Please note, you
+still need to [build](#building-yaul) Yaul.
 
 | Platform        | Architecture | Tool-chain link |
 |-----------------|--------------|-----------------|
 | Linux           | x86          | [Available][3]  |
 | Linux           | x86_64       | [Available][3]  |
-
-### MacOS X
-
-There are currently no packages available.
 
 ## Building tool-chain from source
 
