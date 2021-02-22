@@ -143,7 +143,7 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
 
 1. Clone the repository.
 
-    git clone --recursive "https://github.com/ijacquez/libyaul.git"
+       git clone --recursive "https://github.com/ijacquez/libyaul.git"
 
 ### Building
 
