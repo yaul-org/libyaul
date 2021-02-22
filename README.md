@@ -42,16 +42,74 @@ installer from the release [page][2].
 If you already have MSYS2 installed, follow the directions below to setup access
 to the package repository.
 
-_Instructions coming soon!_
+1. Open `/etc/pacman.conf` and at the end of the file, add:
+
+       [yaul-packages]
+       SigLevel = Optional TrustAll
+       Server = http://packages.yaul.org/mingw64-repo/x86_64
+
+2. Sync and refresh the databases:
+
+       pacman -Sy
+
+3. To list the packages for the `yaul-packages` repository, use:
+
+       pacman -Sl yaul-packages
+
+4. Install everything:
+
+       pacman -S \
+         mingw-w64-x86_64-yaul-tool-chain \
+         mingw-w64-x86_64-yaul-git \
+         mingw-w64-x86_64-yaul-emulator-yabause \
+         mingw-w64-x86_64-yaul-emulator-mednafen \
+         yaul-examples-git
+
+5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
+   environment file.
+
+6. Once copied, follow the steps in setting up your [environment
+   file](#setting-up-environment-file).
+
+7. Test your environment by building an
+   [example](#building-and-running-an-example).
 
 ### Linux
 
 #### Arch
 
 Follow the directions below to setup access to the Arch Linux package
-repository, or build the [packages][ yourself.
+repository, or build the [packages][6] yourself.
 
-_Instructions coming soon!_
+1. As `root`, open `/etc/pacman.conf` and at the end of the file, add:
+
+       [yaul-packages]
+       SigLevel = Optional TrustAll
+       Server = http://packages.yaul.org/repo/x86_64
+
+2. Sync and refresh the databases:
+
+       pacman -Sy
+
+3. To list the packages for the `yaul-packages` repository, use:
+
+       pacman -Sl yaul-packages
+
+4. Install everything:
+
+       pacman -S \
+         yaul-tool-chain \
+         yaul-git \
+         yaul-examples-git
+
+5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
+   environment file.
+
+6. Once copied, follow the steps in setting up your [environment
+   file](#setting-up-environment-file).
+
+7. Test your environment by building an
+   [example](#building-and-running-an-example).
 
 #### Debian based
 
@@ -65,7 +123,7 @@ There are currently no packages available.
 
 A pre-built tool-chain can be downloaded. Be sure to create a directory
 `tool-chains` and extract the contents of the archive into it. Please note, you
-still need to [build](#building-yaul) Yaul.
+still need to [build Yaul](#building-yaul-manually).
 
 | Platform        | Architecture | Tool-chain link |
 |-----------------|--------------|-----------------|
@@ -77,7 +135,7 @@ still need to [build](#building-yaul) Yaul.
 
 Follow the instructions found in the [`build-scripts/`][5] submodule directory.
 
-## Building Yaul
+## Building Yaul manually
 
 ### Cloning the repository
 
@@ -85,7 +143,29 @@ Clone the repository
 
     git clone --recursive "https://github.com/ijacquez/libyaul.git"
 
-### Setting up environment file
+### Building
+
+1. Follow the steps in setting up your
+   [environment file](#setting-up-environment-file).
+
+2. Build and install the supported libraries.
+
+       SILENT=1 make install-release
+
+   If any given library in Yaul is being debugged, use the `install-debug`
+   target instead. Either _release_ or _debug_ can currently be installed at one
+   time. It's possible to switch between the two in the same installation.
+
+   To find more about other targets, call `make list-targets`.
+
+3. Build and install the tools.
+
+       SILENT=1 make install-tools
+
+4. Test your environment by building an
+   [example](#building-and-running-an-example).
+
+## Setting up environment file
 
 1. Copy the template `yaul.env.in` to your home directory as `.yaul.env`. This
    is your environment file.
@@ -118,26 +198,30 @@ Clone the repository
    If `.bash_profile` is not used, use `.profile` instead. This is dependent on
    your set up.
 
-### Building
+## Building and running an example
 
-2. Build and install the supported libraries.
+1. If you've built Yaul manually, check out any example in the [`examples`][4]
+   submodule. Otherwise, go to `/opt/yaul-examples/`.
 
-       SILENT=1 make install-release
+2. Copy the `vdp1-balls` example to your home directory
 
-   If any given library in Yaul is being debugged, use the `install-debug`
-   target instead. Either _release_ or _debug_ can currently be installed at one
-   time. It's possible to switch between the two in the same installation.
+       cp -r vdp1-balls ~
 
-   To find more about other targets, call `make list-targets`.
+3. Build `vdp1-balls`
 
-3. Build and install the tools.
+       cd ~/vdp1-balls
+       SILENT=1 make clean
+       SILENT=1 make
 
-       SILENT=1 make install-tools
+4. If you have Mednafen or Yabause correctly configured:
 
-### Building and running an example
+       mednafen vdp1-balls.cue
 
-You can now build any of the given examples in the [`examples`][4] submodule
-directory.
+5. Success! :tada:
+
+<p align="center">
+  <img src=".images/results.png" alt="Balls!">
+</p>
 
 ## Contact
 
@@ -148,3 +232,4 @@ You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 [3]: https://github.com/ijacquez/libyaul-packages/releases/latest
 [4]: https://github.com/ijacquez/libyaul-examples
 [5]: https://github.com/ijacquez/libyaul-build-scripts
+[6]: https://github.com/ijacquez/libyaul-packages
