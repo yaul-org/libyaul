@@ -211,7 +211,7 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $5 -> Absolute path to output compile DB file
 # $6 -> Compiler flags
 define macro-update-cdb
-  $(THIS_ROOT)/libyaul/common/wrap-error $(THIS_ROOT)/libyaul/common/update-cdb -c $1 -i "$2" -o "$3" -d $4 -O $5 -- $6
+  $(THIS_ROOT)/libyaul/common/wrap-error $(THIS_ROOT)/libyaul/common/update-cdb $1 "$2" "$3" $4 $5 $6
 endef
 
 # $1 -> Space delimited list of object files
@@ -235,7 +235,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir)))) >/dev/null 2>&1; \
+	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir)))); \
 	done
 endef
 else

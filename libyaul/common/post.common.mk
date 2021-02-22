@@ -84,7 +84,7 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $5 -> Absolute path to output compile DB file
 # $6 -> Compiler flags
 define macro-update-cdb
-  $(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/share/update-cdb -c $1 -i "$2" -o "$3" -d $4 -O $5 -- $6
+  $(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/share/update-cdb $1 "$2" "$3" $4 $5 $6
 endef
 else
 define macro-update-cdb
