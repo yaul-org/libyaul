@@ -42,13 +42,13 @@ installer from the release [page][2].
 If you already have MSYS2 installed, follow the directions below to setup access
 to the package repository.
 
-1. Open `/etc/pacman.conf` and at the end of the file, add:
+1. Open `/etc/pacman.conf` and at the end of the file, add the following:
 
        [yaul-packages]
        SigLevel = Optional TrustAll
        Server = http://packages.yaul.org/mingw64-repo/x86_64
 
-2. Sync and refresh the databases:
+2. Sync and refresh the databases.
 
        pacman -Sy
 
@@ -56,7 +56,7 @@ to the package repository.
 
        pacman -Sl yaul-packages
 
-4. Install everything:
+4. Install everything.
 
        pacman -S \
          mingw-w64-x86_64-yaul-tool-chain \
@@ -81,13 +81,14 @@ to the package repository.
 Follow the directions below to setup access to the Arch Linux package
 repository, or build the [packages][6] yourself.
 
-1. As `root`, open `/etc/pacman.conf` and at the end of the file, add:
+1. As `root`, open `/etc/pacman.conf` and at the end of the file, add the
+   following:
 
        [yaul-packages]
        SigLevel = Optional TrustAll
        Server = http://packages.yaul.org/repo/x86_64
 
-2. Sync and refresh the databases:
+2. Sync and refresh the databases.
 
        pacman -Sy
 
@@ -95,7 +96,7 @@ repository, or build the [packages][6] yourself.
 
        pacman -Sl yaul-packages
 
-4. Install everything:
+4. Install everything.
 
        pacman -S \
          yaul-tool-chain \
@@ -134,19 +135,20 @@ still need to [build Yaul](#building-yaul-manually).
 ## Building tool-chain from source
 
 Follow the instructions found in the [`build-scripts/`][5] submodule directory.
+Please note, you still need to [build Yaul](#building-yaul-manually).
 
 ## Building Yaul manually
 
 ### Cloning the repository
 
-Clone the repository
+1. Clone the repository.
 
     git clone --recursive "https://github.com/ijacquez/libyaul.git"
 
 ### Building
 
-1. Follow the steps in setting up your
-   [environment file](#setting-up-environment-file).
+1. Follow the steps in setting up your [environment
+   file](#setting-up-environment-file).
 
 2. Build and install the supported libraries.
 
@@ -213,7 +215,8 @@ Clone the repository
        SILENT=1 make clean
        SILENT=1 make
 
-4. If you have Mednafen or Yabause correctly configured:
+4. If you have Mednafen or Yabause correctly configured, you can test the
+   example.
 
        mednafen vdp1-balls.cue
 
