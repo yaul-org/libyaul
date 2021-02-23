@@ -363,7 +363,7 @@ scu_ic_mask_get(void)
 {
         register uint32_t * const bios_address = (uint32_t *)0x06000348;
 
-        return *bios_address;
+        return (scu_ic_mask_t)*bios_address;
 }
 
 /// @brief Obtain the 32-bit SCU @ref IST value.
@@ -371,7 +371,7 @@ scu_ic_mask_get(void)
 static inline scu_ic_status_reg_t __always_inline
 scu_ic_status_get(void)
 {
-        return MEMORY_READ(32, SCU(IST));
+        return (scu_ic_status_reg_t)MEMORY_READ(32, SCU(IST));
 }
 
 /// @brief Write to the SCU @ref IST register.
