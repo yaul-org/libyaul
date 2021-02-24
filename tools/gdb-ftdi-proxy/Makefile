@@ -3,6 +3,15 @@ include ../../env.mk
 TARGET:= gdb-ftdi-proxy
 PROGRAM:= $(TARGET)$(EXE_EXT)
 
+# This is a special flag for cross compiling Pacman packages
+ifneq ($(strip $(BUILD_CROSS)),)
+CC:= x86_64-w64-mingw32-gcc
+STRIP:= x86_64-w64-mingw32-strip
+HAVE_LIBUSB_WIN32:= 1
+
+PROGRAM:= $(TARGET).exe
+endif
+
 SUB_BUILD:=$(YAUL_BUILD)/tools/$(TARGET)
 
 CFLAGS:= -s \
@@ -27,13 +36,17 @@ INCLUDES+= ./libftd2xx/release
 LIB_DIRS+= ./libftd2xx/release/build/$(shell uname -m)
 LIBS+= ftd2xx dl pthread rt
 else
-ifneq ($(strip $(HAVE_LIBFTDI1_32BIT)),)
-INCLUDES+= libftdi1-1.4/include/libftdi1 libusb-1.0/include/libusb-1.0
-LIB_DIRS+= libftdi1-1.4/lib libusb-1.0/lib
-LIBS+= ftdi1 usb-1.0
+ifneq ($(strip $(HAVE_LIBUSB_WIN32)),)
+SRCS+= ../ssload/support/windows/ftdi.c
+INCLUDES+= ../ssload/support/windows/
+INCLUDES+= ../ssload/support/windows/libusb-win32-1.2.6.0/include
+LIB_DIRS+= ../ssload/support/windows/libusb-win32-1.2.6.0/lib
+LIBS+= usb
+LDFLAGS+= -static
 else
-CFLAGS+= $(shell pkg-config --cflags libftdi1)
-LDFLAGS+= $(shell pkg-config --libs libftdi1)
+LIB_DIRS+= /usr/lib
+CFLAGS+= $(shell pkg-config --cflags libftdi1 2>/dev/null)
+LDFLAGS+= $(shell pkg-config --static --libs libftdi1 2>/dev/null)
 endif
 endif
 
