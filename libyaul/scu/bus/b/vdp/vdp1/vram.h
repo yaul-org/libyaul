@@ -79,17 +79,6 @@ extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
 
 extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *);
 
-extern void *vdp1_vram_texture_base_get(void);
-extern uint32_t vdp1_vram_texture_size_get(void);
-
-extern vdp1_gouraud_table_t *vdp1_vram_gouraud_base_get(void);
-extern uint32_t vdp1_vram_gouraud_size_get(void);
-
-extern vdp1_clut_t *vdp1_vram_clut_base_get(void);
-extern uint32_t vdp1_vram_clut_size_get(void);
-
-extern void *vdp1_vram_remaining_get(void);
-
 __END_DECLS
 
 #endif /* !_VDP1_VRAM_H_ */
