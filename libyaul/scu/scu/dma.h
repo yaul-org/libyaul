@@ -295,7 +295,7 @@ scu_dma_dsp_wait(void)
 static inline scu_dma_bus_t __always_inline
 scu_dma_bus_access_busy(void)
 {
-        return ((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x07);
+        return (scu_dma_bus_t)((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x07);
 }
 
 /// @brief Wait until the mask of bus(es) are no longer being accessed during
