@@ -3,6 +3,15 @@ include ../../env.mk
 TARGET:= genromfs
 PROGRAM:= $(TARGET)$(EXE_EXT)
 
+# This is a special flag for cross compiling Pacman packages
+ifneq ($(strip $(BUILD_CROSS)),)
+CC:= x86_64-w64-mingw32-gcc
+STRIP:= x86_64-w64-mingw32-strip
+LDFLAGS:= -lshlwapi -lws2_32
+
+PROGRAM:= $(TARGET).exe
+endif
+
 SUB_BUILD:=$(YAUL_BUILD)/tools/$(TARGET)
 
 CFLAGS:= -O2 \
@@ -17,7 +26,7 @@ CFLAGS:= -O2 \
 	-Wno-parentheses \
 	-Wno-sign-compare
 
-LDFLAGS:=
+LDFLAGS?=
 
 ifeq ($(OS), Windows_NT)
 LDFLAGS+= -lshlwapi -lws2_32

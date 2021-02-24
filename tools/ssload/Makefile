@@ -3,6 +3,15 @@ include ../../env.mk
 TARGET:= ssload
 PROGRAM:= $(TARGET)$(EXE_EXT)
 
+# This is a special flag for cross compiling Pacman packages
+ifneq ($(strip $(BUILD_CROSS)),)
+CC:= x86_64-w64-mingw32-gcc
+STRIP:= x86_64-w64-mingw32-strip
+HAVE_LIBUSB_WIN32:= 1
+
+PROGRAM:= $(TARGET).exe
+endif
+
 SUB_BUILD:=$(YAUL_BUILD)/tools/$(TARGET)
 
 CFLAGS:= -s \
@@ -14,7 +23,8 @@ CFLAGS:= -s \
 	-Wshadow \
 	-Wno-unused \
 	-Wno-parentheses
-LDFLAGS:=
+
+LDFLAGS?=
 
 SRCS:= ssload.c \
 	api.c \

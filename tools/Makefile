@@ -13,10 +13,12 @@ ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 PROJECTS+= \
 	ssload
 
-# Currently, gdb-ftdi-proxy is broken under Windows
+# XXX: Currently, gdb-ftdi-proxy is broken under Windows
 ifneq ($(OS), Windows_NT)
+ifeq ($(strip $(BUILD_CROSS)),)
 PROJECTS+= \
 	gdb-ftdi-proxy
+endif
 endif
 endif
 

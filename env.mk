@@ -325,7 +325,7 @@ M68K_OBJDUMP:= $(YAUL_INSTALL_ROOT)/$(M68K_ARCH)/bin/$(M68K_ARCH)-objdump$(EXE_E
 FIND:= find$(EXE_EXT)
 INSTALL:= install$(EXE_EXT)
 SED:= sed$(EXE_EXT)
-STRIP:= strip$(EXE_EXT)
+STRIP?= strip$(EXE_EXT)
 
 V_BEGIN_BLACK= [1;30m
 V_BEGIN_RED= [1;31m
