@@ -44,25 +44,25 @@ to the package repository.
 
 1. Open `/etc/pacman.conf` and at the end of the file, add the following:
 
-       [yaul-packages]
+       [yaul-mingw-w64]
        SigLevel = Optional TrustAll
-       Server = http://packages.yaul.org/mingw64-repo/x86_64
+       Server = http://packages.yaul.org/mingw-w64/x86_64
 
 2. Sync and refresh the databases.
 
-       pacman -Sy
+       pacman -Syy
 
-3. To list the packages for the `yaul-packages` repository, use:
+3. To list the packages for the `yaul-mingw-w64` repository, use:
 
-       pacman -Sl yaul-packages
+       pacman -Sl yaul-mingw-w64
 
 4. Install everything.
 
        pacman -S \
-         mingw-w64-x86_64-yaul-tool-chain \
-         mingw-w64-x86_64-yaul-git \
-         mingw-w64-x86_64-yaul-emulator-yabause \
-         mingw-w64-x86_64-yaul-emulator-mednafen \
+         yaul-tool-chain-git \
+         yaul-git \
+         yaul-emulator-yabause \
+         yaul-emulator-mednafen \
          yaul-examples-git
 
 5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
@@ -84,23 +84,25 @@ repository, or build the [packages][6] yourself.
 1. As `root`, open `/etc/pacman.conf` and at the end of the file, add the
    following:
 
-       [yaul-packages]
+       [yaul-linux]
        SigLevel = Optional TrustAll
-       Server = http://packages.yaul.org/repo/x86_64
+       Server = http://packages.yaul.org/linux/x86_64
 
 2. Sync and refresh the databases.
 
-       pacman -Sy
+       pacman -Syy
 
-3. To list the packages for the `yaul-packages` repository, use:
+3. To list the packages for the `yaul-linux` repository, use:
 
-       pacman -Sl yaul-packages
+       pacman -Sl yaul-linux
 
 4. Install everything.
 
        pacman -S \
-         yaul-tool-chain \
+         yaul-tool-chain-git \
          yaul-git \
+         yaul-emulator-mednafen \
+         yaul-emulator-kronos \
          yaul-examples-git
 
 5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
@@ -119,18 +121,6 @@ There are currently no `.deb` packages available.
 ### MacOS X
 
 There are currently no packages available.
-
-## Pre-built tool-chain
-
-A pre-built tool-chain can be downloaded. Be sure to create a directory
-`tool-chains` and extract the contents of the archive into it. Please note, you
-still need to [build Yaul](#building-yaul-manually).
-
-| Platform        | Architecture | Tool-chain link |
-|-----------------|--------------|-----------------|
-| Linux           | x86          | [Available][3]  |
-| Linux           | x86_64       | [Available][3]  |
-| Windows (MinGW) | x86_64       | [Available][3]  |
 
 ## Building tool-chain from source
 
