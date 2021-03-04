@@ -20,10 +20,6 @@
 #define ISO_STANDARD_ID         "CD001"
 #define ISO_ECMA_ID             "CDW01"
 
-/* ISO9660 limitations */
-#define ISO_DIR_LEVEL_MAX       8
-#define ISO_FILENAME_MAX_LENGTH 11
-
 #define DIRENT_FILE_FLAGS_FILE                  0x00
 #define DIRENT_FILE_FLAGS_HIDDEN                0x01
 #define DIRENT_FILE_FLAGS_DIRECTORY             0x02
@@ -31,9 +27,6 @@
 #define DIRENT_FILE_FLAGS_RECORD                0x08
 #define DIRENT_FILE_FLAGS_PROTECTION            0x10
 #define DIRENT_FILE_FLAGS_MULTI_EXTENT          0x80
-
-#define DIRENT_FILE_ID_FILE             0x00
-#define DIRENT_FILE_ID_DIRECTORY        0x01
 
 #define ISODCL(from, to) ((to) - (from) + 1)
 
