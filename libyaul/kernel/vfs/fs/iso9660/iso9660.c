@@ -147,7 +147,7 @@ _dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
         dirent_offset = 0;
 
         while (true) {
-                const uint8_t dirent_length =
+                uint8_t dirent_length =
                     (dirent != NULL) ? isonum_711(dirent->length) : 0;
 
                 if ((dirent == NULL) ||
@@ -164,6 +164,7 @@ _dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
                         _bread(sector, _sector_buffer);
 
                         dirent = (const iso9660_dirent_t *)&_sector_buffer[0];
+                        dirent_length = isonum_711(dirent->length);
 
                         if (dirent->name[0] == '\0') {
                                 uint32_t data_length;
@@ -249,6 +250,10 @@ _filelist_entry_populate(const iso9660_dirent_t *dirent, iso9660_entry_type_t ty
         if (type == ISO9660_ENTRY_TYPE_FILE) {
                 /* Minus the ';1' */
                 name_len -= 2;
+
+                /* Empty extension */
+                if (dirent->name[name_len - 1] == '.')
+                        name_len--;
         }
 
         (void)memcpy(filelist_entry->name, dirent->name, name_len);
