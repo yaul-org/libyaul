@@ -143,6 +143,10 @@ IP_1ST_READ_SIZE?= 0
 
 ROMDISK_FLAGS:= -v -a 16 -V "ROOT"
 
+CDB_FILE:= compile_commands.json
+CDB_GCC?= /usr/bin/gcc
+CDB_CPP?= /usr/bin/g++
+
 SUFFIXES:= .c .cc .C .cpp .cxx .m68k.sx .sx .o .m68k .bin .elf .romdisk .romdisk.o
 
 .PHONY: all clean example list-targets
