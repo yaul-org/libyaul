@@ -72,10 +72,6 @@ SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v -nostdinc $(foreach specs,$(S
 SH_SYSTEM_INCLUDE_DIRS=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,"-isystem "); print }')
 
-CDB_FILE:= compile_commands.json
-CDB_GCC?= /usr/bin/gcc
-CDB_CPP?= /usr/bin/g++
-
 ifeq ($(strip $(YAUL_CDB)),1)
 # $1 -> Absolute path to compiler executable
 # $2 -> Absolute path to input file
