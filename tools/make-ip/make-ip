@@ -16,9 +16,9 @@ fi
 SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
 SH_AS_ARGS="--fatal-warnings -I"${YAUL_INSTALL_ROOT}/share/yaul/bootstrap""
 SH_CC="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-gcc"
-SH_CC_ARGS="-Wl,-Map,IP.BIN.map -nostdlib -m2 -mb -nostartfiles -specs=ip.specs"
+SH_CC_ARGS="-nostdlib -m2 -mb -nostartfiles -specs=ip.specs"
 
-panic () {
+panic() {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
     exit "${2}"
 }
@@ -38,7 +38,7 @@ TMP1_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 TMP2_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 TMP3_FILE="$(mktemp "${TMPDIR}/XXXX")" || panic "Couldn't create file" 1
 
-clean_up () {
+clean_up() {
     rm -f "${TMP1_FILE}"
     rm -f "${TMP2_FILE}"
     rm -f "${TMP3_FILE}"
@@ -66,7 +66,11 @@ IP_SLAVE_STACK_ADDR=${8}
 # Sanitize for integer value
 IP_1ST_READ_ADDR=${9}
 # Sanitize for integer value
-IP_1ST_READ_SIZE="${10}"  
+IP_1ST_READ_SIZE="${10}"
+
+OUTPUT_PATH=$(dirname "${1}")
+
+SH_CC_ARGS="-Wl,-Map,${OUTPUT_PATH}/IP.BIN.map ${SH_CC_ARGS}"
 
 IP_1ST_READ_BINARY_SIZE="$(stat -c "%s" "${IP_1ST_READ_BINARY}")"
 
@@ -127,7 +131,7 @@ $(cat "${TMP3_FILE}")
 <<<" 1
 }
 
-("${SH_CC}" ${SH_CC_ARGS} "${TMP1_FILE}" -o IP.BIN) >"${TMP3_FILE}" 2>&1 || {
+("${SH_CC}" ${SH_CC_ARGS} "${TMP1_FILE}" -o "${OUTPUT_PATH}/IP.BIN") >"${TMP3_FILE}" 2>&1 || {
     panic "Can't build IP.BIN (${SH_CC})
 >>>
 $(cat "${TMP3_FILE}")
