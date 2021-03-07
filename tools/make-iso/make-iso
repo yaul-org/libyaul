@@ -7,9 +7,9 @@
 
 PROGNAME="${0##*/}"
 
-XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"IP.BIN\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
+XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"${ip_bin_path}\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
 
-panic () {
+panic() {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
     exit "${2}"
 }
@@ -21,15 +21,15 @@ my_readlink() {
     printf -- "%s" $(cd $(dirname "${1}") 2>/dev/null && pwd -P && echo "/$(basename ${1})")
 }
 
-clean_up () {
+clean_up() {
     rm -f "${TMP1_FILE}"
 }
 
 trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
 trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
 
-if ! [ ${#} -eq 2 ]; then
-    printf -- "Usage: %s cd-directory image-output-name\n" "${PROGNAME}" >&2
+if ! [ ${#} -eq 3 ]; then
+    printf -- "Usage: %s cd-directory IP.BIN-path image-output-name\n" "${PROGNAME}" >&2
     exit 2
 fi
 
@@ -39,42 +39,26 @@ fi
 [ -x "${MAKE_ISO_XORRISO}" ] || panic "Invalid executable \`${MAKE_ISO_XORRISO}'" 1
 
 directory=$(my_readlink "${1}")
-image="${2}"
+ip_bin_path=$(my_readlink "${2}")
+image="${3}"
 
 # Check if the CD directory exists and is a directory
-if [ -L "${directory}" ]; then
-    panic "${directory}: Directory must not be a symbolic link" 1
-fi
-if ! [ -d "${directory}" ]; then
-    panic "${directory}: Directory does not exist" 1
-fi
-if ! [ -r "${directory}" ]; then
-    panic "${directory}: Directory is not readable" 1
-fi
-if ! [ -x "${directory}" ]; then
-    panic "${directory}: Directory is inaccessible" 1
-fi
+[ -L "${directory}" ] && { panic "${directory}: Directory must not be a symbolic link" 1; }
+[ -d "${directory}" ] || { panic "${directory}: Directory does not exist" 1; }
+[ -r "${directory}" ] || { panic "${directory}: Directory is not readable" 1; }
+[ -x "${directory}" ] || { panic "${directory}: Directory is inaccessible" 1; }
+
+[ -f "${ip_bin_path}" ] || { panic "${ip_bin_path}: File does not exist" 1; }
 
 # Check if all the files are present
-for file in "IP.BIN" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}/CPY.TXT"; do
+for file in "${ip_bin_path}" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}/CPY.TXT"; do
     # Needs to be portable (alternative to readlink)
     realpath=$(my_readlink "${file}")
 
-    if [ -z "${realpath}" ]; then
-        panic "$(basename "${file}"): Unable to dereference symbolic link" 1
-    fi
-
-    if [ -d "${realpath}" ]; then
-        panic "$(basename "${realpath}"): Not a file" 1
-    fi
-
-    if ! [ -f "${realpath}" ]; then
-        panic "$(basename "${realpath}"): Does not exist in $(dirname "${realpath}")" 1
-    fi
-
-    if ! [ -r "${realpath}" ]; then
-        panic "$(basename "${realpath}"): File is not readable" 1
-    fi
+    [ -z "${realpath}" ] && { panic "$(basename "${file}"): Unable to dereference symbolic link" 1; }
+    [ -d "${realpath}" ] && { panic "$(basename "${realpath}"): Not a file" 1; }
+    [ -f "${realpath}" ] || { panic "$(basename "${realpath}"): Does not exist in $(dirname "${realpath}")" 1; }
+    [ -r "${realpath}" ] || { panic "$(basename "${realpath}"): File is not readable" 1; }
 done
 unset realpath
 
