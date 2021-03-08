@@ -41,17 +41,6 @@ ifeq ($(strip $(SH_OBJS_UNIQ)),)
   endif
 endif
 
-# Check that M68K_OBJS doesn't include duplicates
-M68K_OBJS_UNIQ= $(sort $(M68K_OBJS))
-
-ifneq ($(strip $(M68K_PROGRAM)),)
-  ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
-    ifeq ($(strip $(M68K_OBJS_UNIQ)),)
-      $(error Empty M68K_OBJS (M68K source list))
-    endif
-  endif
-endif
-
 SH_DEFSYMS=
 
 ifneq ($(strip $(IP_MASTER_STACK_ADDR)),)
@@ -71,18 +60,6 @@ ifeq ($(strip $(SH_CUSTOM_SPECS)),)
   SH_SPECS+= yaul-main.specs
 else
   SH_SPECS+= $(SH_CUSTOM_SPECS)
-endif
-
-ifneq ($(strip $(M68K_PROGRAM)),)
-  ifneq ($(strip $(M68K_PROGRAM)),undefined-program)
-    # Check if there is a romdisk.o and append the object file to the end of the
-    # list of SH objects
-	# XXX: Change this... check SH_SRCS_ROMDISK and do a foreach on each romdisk
-	ifeq ($(strip $(filter %.romdisk,$(SH_SRCS_UNIQ))),)
-      SH_OBJS_NO_LINK_UNIQ+= root.romdisk.o
-    endif
-    # ROMDISK_DEPS+= ./romdisk/$(M68K_PROGRAM).m68k
-  endif
 endif
 
 SH_DEPS:= $(SH_OBJS_UNIQ:.o=.d)
@@ -183,17 +160,6 @@ $(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ) $(SH_OBJS_NO_LINK_UNIQ)
 	$(ECHO)$(SH_NM) $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).sym
 	$(ECHO)$(SH_OBJDUMP) -S $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).asm
 
-./romdisk/$(M68K_PROGRAM).m68k: $(M68K_PROGRAM).m68k.elf
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(M68K_OBJCOPY) -O binary $< $@
-	$(ECHO)chmod -x $@
-	@du -hs $@ | awk '{ print $$1 " ""'"($@)"'" }'
-
-$(M68K_PROGRAM).m68k.elf: $(M68K_OBJS_UNIQ)
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(M68K_LD) $(M68K_OBJS_UNIQ) $(M68K_LDFLAGS) -o $@
-	$(ECHO)$(M68K_NM) $(M68K_PROGRAM).m68k.elf > $(M68K_PROGRAM).m68k.sym
-
 $(foreach SRC,$(SH_SRCS_C), \
 	$(eval $(call macro-generate-sh-build-object,$(SRC),\
 		$(call macro-convert-build-path,$(addsuffix .o,$(basename $(SRC)))))))
@@ -211,10 +177,6 @@ $(foreach SRC,$(SH_SRCS_ROMDISK), \
 		$(SRC),\
 		$(call macro-convert-build-path,$(SRC)),\
 		./romdisk/)))
-
-%.m68k.o: %.m68k.sx
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(M68K_AS) $(M68K_AFLAGS) -o $@ $<
 
 $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -283,14 +245,6 @@ clean:
 		$(SH_BUILD_PATH)/CART-IP.BIN \
 		$(SH_BUILD_PATH)/CART-IP.BIN.map \
 	    $(CDB_FILE)
-ifneq ($(strip $(M68K_PROGRAM)),)
-	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(M68K_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
-	$(ECHO)-rm -f \
-	    romdisk/$(M68K_PROGRAM).m68k \
-	    $(M68K_PROGRAM).m68k.elf \
-	    $(M68K_PROGRAM).m68k.sym \
-	    $(M68K_OBJS)
-endif
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
