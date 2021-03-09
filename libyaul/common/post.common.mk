@@ -1,13 +1,18 @@
 .PHONY: $(SH_PROGRAM)
 
+$(shell mkdir -p $(SH_BUILD_DIR))
+
 ifeq ($(strip $(SH_PROGRAM)),)
   $(error Empty SH_PROGRAM (SH program name))
 endif
 
 # Each relative or absolute path will be converted to using '@' instead of '/'
-# or '\\' (for Windows)
 define macro-convert-build-path
-  $(SH_BUILD_PATH)/$(subst /,@,$(abspath $1))
+$(SH_BUILD_PATH)/$(subst /,@,$(abspath $1))
+endef
+
+define macro-word-split
+$(word $2,$(subst ;, ,$1))
 endef
 
 # Check that SH_SRCS and SH_SRCS_NO_LINK don't include duplicates. Be
@@ -21,23 +26,33 @@ SH_SRCS_CXX:= $(filter %.cxx,$(SH_SRCS_UNIQ)) \
 	$(filter %.cc,$(SH_SRCS_UNIQ)) \
 	$(filter %.C,$(SH_SRCS_UNIQ))
 SH_SRCS_S:= $(filter %.sx,$(SH_SRCS_UNIQ))
-SH_SRCS_ROMDISK:= $(filter %.romdisk,$(SH_SRCS_UNIQ))
+SH_SRCS_ROMDISK:= $(addsuffix .romdisk,$(ROMDISK_DIRS))
 
 SH_SRCS_NO_LINK_C:= $(filter %.c,$(SH_SRCS_NO_LINK_UNIQ))
-SH_SRCS_NO_LINK_ROMDISK:= $(filter %.romdisk,$(SH_SRCS_NO_LINK_UNIQ))
 
 SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRCS_S),$(basename $(SRC)))) \
 	$(addsuffix .o,$(SH_SRCS_ROMDISK))
 SH_OBJS_UNIQ:= $(foreach OBJ,$(SH_OBJS_UNIQ),$(call macro-convert-build-path,$(OBJ)))
 
-SH_OBJS_NO_LINK_UNIQ:= $(addsuffix .o,$(foreach dir,$(SH_SRCS_NO_LINK_C),$(basename $(dir)))) \
-	$(addsuffix .o,$(SH_SRCS_NO_LINK_ROMDISK))
+SH_OBJS_NO_LINK_UNIQ:= $(addsuffix .o,$(foreach dir,$(SH_SRCS_NO_LINK_C),$(basename $(dir))))
 SH_OBJS_NO_LINK_UNIQ:= $(foreach OBJ,$(SH_OBJS_NO_LINK_UNIQ),$(call macro-convert-build-path,$(OBJ)))
 
 ifeq ($(strip $(SH_OBJS_UNIQ)),)
   # If both SH_OBJS_UNIQ and SH_OBJS_NO_LINK_UNIQ is empty
   ifeq ($(strip $(SH_OBJS_NO_LINK_UNIQ)),)
     $(error Empty SH_OBJS (SH source list))
+  endif
+endif
+
+ifneq ($(strip $(ROMDISK_DIRS)),)
+  ifeq ($(strip $(ROMDISK_SYMBOLS)),)
+    $(error Empty ROMDISK_SYMBOLS (symbols for ROMDISK))
+  endif
+endif
+
+ifneq ($(strip $(ROMDISK_SYMBOLS)),)
+  ifeq ($(strip $(ROMDISK_SYMBOLS)),)
+    $(error Empty ROMDISK_DIRS (paths for ROMDISK))
   endif
 endif
 
@@ -93,7 +108,6 @@ endif
 define macro-generate-sh-build-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)mkdir -p $(SH_BUILD_PATH)
 	$(ECHO)$(SH_CC) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
 	$(ECHO)$(call macro-update-cdb,\
 		$(CDB_GCC),\
@@ -109,7 +123,6 @@ endef
 define macro-generate-sh-build-asm-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)mkdir -p $(SH_BUILD_PATH)
 	$(ECHO)$(SH_AS) $(SH_AFLAGS) -o $2 $1
 endef
 
@@ -118,7 +131,6 @@ endef
 define macro-generate-sh-build-c++-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)mkdir -p $(SH_BUILD_PATH)
 	$(ECHO)$(SH_CXX) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
 	$(ECHO)$(call macro-update-cdb,\
 		$(CDB_CPP),\
@@ -129,18 +141,25 @@ $2: $1
 		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 endef
 
-# $1 -> Source filename
+# $1 -> Symbol
 # $2 -> Absolute filename build path
 # $3 -> Directory
 define macro-generate-romdisk-rule
-$2:
-	@printf -- "$(V_BEGIN_YELLOW)$(strip $1)$(V_END)\n"
-	$(ECHO)mkdir -p $(SH_BUILD_PATH)
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/genromfs $(ROMDISK_FLAGS) -d $3 -f - > $2
+$2.d:
+	$(ECHO)find $3 -type f,d -print 2>/dev/null | \
+		awk 'BEGIN { print "$2: \\"; } \
+		     { print "\t" $$$$0 " \\"; } \
+		     END { print "\t" $$$$0; }' > $$@
+
+$2: $2.d
+	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).romdisk$(V_END)\n"
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/genromfs$(EXE_EXT) $(ROMDISK_FLAGS) -d $3 -f - > $2
 
 $2.o: $2
-	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).o$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/bin2o $$< `echo "$(strip $1)" | sed -E 's/[\. ]/_/g'` $$@
+	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).romdisk.o$(V_END)\n"
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/bin2o $$< "$(strip $1)_romdisk" $$@
+
+-include "$2.d"
 endef
 
 $(SH_PROGRAM): $(SH_PROGRAM).cue
@@ -152,7 +171,7 @@ example: all
 $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
 	$(ECHO)$(SH_OBJCOPY) -O binary $< $@
-	@[ -z "${SILENT}" ] && du -hs $@ | awk '{ print $$1 }' || true
+	@[ -z "${SILENT}" ] && du -hs $@ | awk '{ print $$1; }' || true
 
 $(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ) $(SH_OBJS_NO_LINK_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
@@ -172,11 +191,12 @@ $(foreach SRC,$(SH_SRCS_S), \
 	$(eval $(call macro-generate-sh-build-asm-object,$(SRC),\
 		$(call macro-convert-build-path,$(addsuffix .o,$(basename $(SRC)))))))
 
-$(foreach SRC,$(SH_SRCS_ROMDISK), \
+# Each entry is <symbol>;<directory>
+$(foreach SYMBOL_DIR,$(join $(ROMDISK_SYMBOLS),$(addprefix ;,$(SH_SRCS_ROMDISK))), \
 	$(eval $(call macro-generate-romdisk-rule,\
-		$(SRC),\
-		$(call macro-convert-build-path,$(SRC)),\
-		./romdisk/)))
+		$(call macro-word-split,$(SYMBOL_DIR),1),\
+		$(call macro-convert-build-path,$(call macro-word-split,$(SYMBOL_DIR),2)),\
+		$(basename $(call macro-word-split,$(SYMBOL_DIR),2)))))
 
 $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -242,9 +262,10 @@ clean:
 	    $(SH_DEPS_NO_LINK) \
 	    $(SH_BUILD_PATH)/IP.BIN \
 	    $(SH_BUILD_PATH)/IP.BIN.map \
-		$(SH_BUILD_PATH)/CART-IP.BIN \
-		$(SH_BUILD_PATH)/CART-IP.BIN.map \
-	    $(CDB_FILE)
+	    $(SH_BUILD_PATH)/CART-IP.BIN \
+	    $(SH_BUILD_PATH)/CART-IP.BIN.map \
+	    $(CDB_FILE) \
+	    $(foreach DIR,$(SH_SRCS_ROMDISK),$(call macro-convert-build-path,$(DIR)))
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
