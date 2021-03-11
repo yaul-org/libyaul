@@ -7,7 +7,7 @@
 
 PROGNAME="${0##*/}"
 
-XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"${ip_bin_path}\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
+XORRISO_OPTIONS="-as mkisofs -quiet -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -generic-boot \"\${ip_bin_path}\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose"
 
 panic() {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
@@ -47,8 +47,6 @@ image="${3}"
 [ -d "${directory}" ] || { panic "${directory}: Directory does not exist" 1; }
 [ -r "${directory}" ] || { panic "${directory}: Directory is not readable" 1; }
 [ -x "${directory}" ] || { panic "${directory}: Directory is inaccessible" 1; }
-
-[ -f "${ip_bin_path}" ] || { panic "${ip_bin_path}: File does not exist" 1; }
 
 # Check if all the files are present
 for file in "${ip_bin_path}" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}/CPY.TXT"; do
