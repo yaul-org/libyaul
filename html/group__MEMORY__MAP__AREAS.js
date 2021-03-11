@@ -1,5 +1,6 @@
 var group__MEMORY__MAP__AREAS =
 [
+    [ "ARP", "group__MEMORY__MAP__AREAS.html#ga49d8c911d97bdd5d54c04e714878a3d2", null ],
     [ "CD_BLOCK", "group__MEMORY__MAP__AREAS.html#gaa0e1d3dbea5e6ccbb8abbe594334ba06", null ],
     [ "CPU", "group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3", null ],
     [ "CS0", "group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597", null ],

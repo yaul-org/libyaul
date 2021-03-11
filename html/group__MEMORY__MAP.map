@@ -1,8 +1,9 @@
 <map id="Memory map" name="Memory map">
 <area shape="rect" id="node1" href="$group__MEMORY__MAP__SCU__IO__REGISTERS.html" title=" " alt="" coords="193,5,263,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,104,115,129"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,129,115,155"/>
 <area shape="rect" id="node3" href="$group__MEMORY__MAP__AREAS.html" title=" " alt="" coords="163,55,293,80"/>
 <area shape="rect" id="node4" href="$group__MEMORY__MAP__SMPC__IO__REGISTERS.html" title=" " alt="" coords="187,104,269,129"/>
 <area shape="rect" id="node5" href="$group__MEMORY__MAP__MACROS.html" title=" " alt="" coords="185,153,271,179"/>
 <area shape="rect" id="node6" href="$group__MEMORY__MAP__CPU__IO__REGISTERS.html" title=" " alt="" coords="193,203,263,228"/>
+<area shape="rect" id="node7" href="$group__MEMORY__MAP__ARP__IO__REGISTERS.html" title=" " alt="" coords="193,252,263,277"/>
 </map>

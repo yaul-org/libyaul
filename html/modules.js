@@ -7,6 +7,7 @@ var modules =
     [ "SCU IC", "group__SCU__IC.html", "group__SCU__IC" ],
     [ "SCU IC Setters", "group__SCU__IC__HELPERS.html", "group__SCU__IC__HELPERS" ],
     [ "SCU Timer", "group__SCU__TIMER.html", "group__SCU__TIMER" ],
+    [ "Cartridge ARP", "group__ARP.html", "group__ARP" ],
     [ "CPU", "group__CPU.html", "group__CPU" ],
     [ "CPU Cache", "group__CPU__CACHE.html", "group__CPU__CACHE" ],
     [ "CPU Division Unit (DIVU)", "group__CPU__DIVU.html", "group__CPU__DIVU" ],

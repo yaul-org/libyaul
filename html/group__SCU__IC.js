@@ -7,6 +7,7 @@ var group__SCU__IC =
     [ "scu_ic_ihr_t", "group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172", null ],
     [ "scu_ic_interrupt_t", "group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87", null ],
     [ "scu_ic_mask_t", "group__SCU__IC.html#ga855d46e631f80e31cc154fada83342c9", null ],
+    [ "scu_ic_priority_t", "group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2", null ],
     [ "scu_ic_status_reg_t", "group__SCU__IC.html#gaba50f52ac504271a1fe4ddb3bcffa277", null ],
     [ "scu_ic_interrupt", "group__SCU__IC.html#ga3efa4b5e182a2252797ca01d24dcac57", [
       [ "SCU_IC_INTERRUPT_VBLANK_IN", "group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57a3d5eaf0fc28a7f55a9f0240f36a2ad98", null ],
@@ -76,7 +77,6 @@ var group__SCU__IC =
       [ "SCU_IC_IST_EXTERNAL_02", "group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaaebee6e6c191e9bf45640438ca8c281b8", null ],
       [ "SCU_IC_IST_EXTERNAL_01", "group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaac693714ce8e1bef811f8d8e4cc0bd42e", null ]
     ] ],
-    [ "__aligned", "group__SCU__IC.html#ga39ca2a85576b5f84b682eb4ab026d8d5", null ],
     [ "scu_ic_ihr_clear", "group__SCU__IC.html#gaa55eec9fc53750219182bf884d9620bd", null ],
     [ "scu_ic_ihr_get", "group__SCU__IC.html#ga16c69f9277adc957aac15bfdd73806c7", null ],
     [ "scu_ic_ihr_set", "group__SCU__IC.html#ga2916d10d4eb7d3f1596c69b8680a569f", null ],

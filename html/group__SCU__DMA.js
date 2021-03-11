@@ -28,12 +28,15 @@ var group__SCU__DMA =
     [ "SCU_DMA_MODE_XFER_INITIALIZER", "group__SCU__DMA.html#ga2efed0911c05939a1499cac850bb76b8", null ],
     [ "scu_dma_bus_t", "group__SCU__DMA.html#gaa60797576bc34f21a21514994e6f7712", null ],
     [ "scu_dma_callback_t", "group__SCU__DMA.html#ga948d02a56ca70e89bf0235599c85fbe2", null ],
+    [ "scu_dma_handle_t", "group__SCU__DMA.html#ga8dff5e447ac8c7d93f868e1e228d4135", null ],
     [ "scu_dma_ihr_t", "group__SCU__DMA.html#gaf108227cc266af498d768d6e5c09ff3e", null ],
+    [ "scu_dma_level_cfg_t", "group__SCU__DMA.html#gac6eb443eda81e601afa8a34a76200cb7", null ],
     [ "scu_dma_level_t", "group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203", null ],
     [ "scu_dma_mode_t", "group__SCU__DMA.html#gaf085d41bde4a9eceb299372747b7b9ef", null ],
     [ "scu_dma_start_factor_t", "group__SCU__DMA.html#ga1a1032eaf8b4eab284a17015f1fcb63b", null ],
     [ "scu_dma_stride_t", "group__SCU__DMA.html#gae14b607b52bc9ad6f33f39498e86bf6b", null ],
     [ "scu_dma_update_t", "group__SCU__DMA.html#gafef467055dc78e0fd25a48a8c2a522b5", null ],
+    [ "scu_dma_xfer_t", "group__SCU__DMA.html#gaf70ea70888625293f7a86e446774e107", null ],
     [ "scu_dma_xfer_type_t", "group__SCU__DMA.html#gabeda6302677941c485ab9fb4a5640f05", null ],
     [ "scu_dma_bus", "group__SCU__DMA.html#ga8d2cfba2e52470f20e54db926cf5aa57", [
       [ "SCU_DMA_BUS_NONE", "group__SCU__DMA.html#gga8d2cfba2e52470f20e54db926cf5aa57a2124ce2b672d61a60ea885a9613aae26", null ],
@@ -70,7 +73,6 @@ var group__SCU__DMA =
       [ "SCU_DMA_UPDATE_RUP", "group__SCU__DMA.html#ggabfee742a4a6ff1ae48d81d384eae5201ac3b6b389dc925d12832823455df3ea75", null ],
       [ "SCU_DMA_UPDATE_WUP", "group__SCU__DMA.html#ggabfee742a4a6ff1ae48d81d384eae5201a5624235b5af76c96025d66136551c256", null ]
     ] ],
-    [ "__aligned", "group__SCU__DMA.html#ga169d9c1ef502244ec6e690cb7ac08853", null ],
     [ "scu_dma_bus_access_busy", "group__SCU__DMA.html#ga62eb3869b86a3a2828b11da17d0ca095", null ],
     [ "scu_dma_bus_access_wait", "group__SCU__DMA.html#gab90bd0a044250e2ec0f70ccc374fe41f", null ],
     [ "scu_dma_config_buffer", "group__SCU__DMA.html#gad45c92289c2918e1db756a4fda6392c1", null ],

@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash dda07fc</span>
+   &#160;<span id="projectnumber">Git hash 7dc4e80</span>
    </div>
   </td>
  </tr>
@@ -90,6 +90,10 @@ typedef enum <a class="el" href="group__SCU__IC.html#gafda662d6e8c822f24c6314d7a
 typedef enum <a class="el" href="group__SCU__IC.html#ga4352d84e68d077870ad833de0154aaaa">scu_ic_status_reg_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gaba50f52ac504271a1fe4ddb3bcffa277">scu_ic_status_reg_t</a></td></tr>
 <tr class="memdesc:gaba50f52ac504271a1fe4ddb3bcffa277"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt status bits. <br /></td></tr>
 <tr class="separator:gaba50f52ac504271a1fe4ddb3bcffa277"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga84d5378f3833339df812583efb2db9e2"><td class="memItemLeft" align="right" valign="top"><a id="ga84d5378f3833339df812583efb2db9e2"></a>
+typedef struct <a class="el" href="structscu__ic__priority.html">scu_ic_priority</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2">scu_ic_priority_t</a></td></tr>
+<tr class="memdesc:ga84d5378f3833339df812583efb2db9e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU IC priority entry. <br /></td></tr>
+<tr class="separator:ga84d5378f3833339df812583efb2db9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab7eb1bdacf074ba10bc78cf153141172"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172">scu_ic_ihr_t</a>) (void)</td></tr>
 <tr class="memdesc:gab7eb1bdacf074ba10bc78cf153141172"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type.  <a href="group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172">More...</a><br /></td></tr>
 <tr class="separator:gab7eb1bdacf074ba10bc78cf153141172"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,11 +194,7 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga39ca2a85576b5f84b682eb4ab026d8d5"><td class="memItemLeft" align="right" valign="top"><a id="ga39ca2a85576b5f84b682eb4ab026d8d5"></a>
-struct <a class="el" href="structscu__ic__priority.html">scu_ic_priority</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga39ca2a85576b5f84b682eb4ab026d8d5">__aligned</a> (4) scu_ic_priority_t</td></tr>
-<tr class="memdesc:ga39ca2a85576b5f84b682eb4ab026d8d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU IC priority entry. <br /></td></tr>
-<tr class="separator:ga39ca2a85576b5f84b682eb4ab026d8d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2916d10d4eb7d3f1596c69b8680a569f"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga2916d10d4eb7d3f1596c69b8680a569f">scu_ic_ihr_set</a> (<a class="el" href="group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87">scu_ic_interrupt_t</a> vector, <a class="el" href="group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172">scu_ic_ihr_t</a> <a class="el" href="group__CPU__INTC__HELPERS.html#ga79b65017d3bd974e8a0cc006c53190dc">ihr</a>)</td></tr>
+<tr class="memitem:ga2916d10d4eb7d3f1596c69b8680a569f"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga2916d10d4eb7d3f1596c69b8680a569f">scu_ic_ihr_set</a> (<a class="el" href="group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87">scu_ic_interrupt_t</a> vector, <a class="el" href="group__SCU__IC.html#gab7eb1bdacf074ba10bc78cf153141172">scu_ic_ihr_t</a> ihr)</td></tr>
 <tr class="memdesc:ga2916d10d4eb7d3f1596c69b8680a569f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interrupt handler for the specified SCU related interrupt.  <a href="group__SCU__IC.html#ga2916d10d4eb7d3f1596c69b8680a569f">More...</a><br /></td></tr>
 <tr class="separator:ga2916d10d4eb7d3f1596c69b8680a569f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa55eec9fc53750219182bf884d9620bd"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gaa55eec9fc53750219182bf884d9620bd">scu_ic_ihr_clear</a> (<a class="el" href="group__SCU__IC.html#ga988f0058b151c7a7b02bcff316df3b87">scu_ic_interrupt_t</a> vector)</td></tr>
@@ -221,10 +221,10 @@ struct <a class="el" href="structscu__ic__priority.html">scu_ic_priority</a>&#16
 <tr class="memitem:gac70ad9ec5e86f4f063478f6aba8b84c1"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gac70ad9ec5e86f4f063478f6aba8b84c1">scu_ic_status_chg</a> (<a class="el" href="group__SCU__IC.html#ga4352d84e68d077870ad833de0154aaaa">scu_ic_status_reg_t</a> and_mask, <a class="el" href="group__SCU__IC.html#ga4352d84e68d077870ad833de0154aaaa">scu_ic_status_reg_t</a> or_mask)</td></tr>
 <tr class="memdesc:gac70ad9ec5e86f4f063478f6aba8b84c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change value in the SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a> register.  <a href="group__SCU__IC.html#gac70ad9ec5e86f4f063478f6aba8b84c1">More...</a><br /></td></tr>
 <tr class="separator:gac70ad9ec5e86f4f063478f6aba8b84c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga12f6ed3888323151f7711a8082f4a81b"><td class="memItemLeft" align="right" valign="top">static const scu_ic_priority_t *<a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga12f6ed3888323151f7711a8082f4a81b">scu_ic_priority_table_get</a> (void)</td></tr>
+<tr class="memitem:ga12f6ed3888323151f7711a8082f4a81b"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2">scu_ic_priority_t</a> *<a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#ga12f6ed3888323151f7711a8082f4a81b">scu_ic_priority_table_get</a> (void)</td></tr>
 <tr class="memdesc:ga12f6ed3888323151f7711a8082f4a81b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a read-only pointer to the priority table.  <a href="group__SCU__IC.html#ga12f6ed3888323151f7711a8082f4a81b">More...</a><br /></td></tr>
 <tr class="separator:ga12f6ed3888323151f7711a8082f4a81b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaffdfee3683acd1fd57518c6739794840"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gaffdfee3683acd1fd57518c6739794840">scu_ic_priority_table_set</a> (const scu_ic_priority_t *table)</td></tr>
+<tr class="memitem:gaffdfee3683acd1fd57518c6739794840"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__IC.html#gaffdfee3683acd1fd57518c6739794840">scu_ic_priority_table_set</a> (const <a class="el" href="group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2">scu_ic_priority_t</a> *table)</td></tr>
 <tr class="memdesc:gaffdfee3683acd1fd57518c6739794840"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the priority table.  <a href="group__SCU__IC.html#gaffdfee3683acd1fd57518c6739794840">More...</a><br /></td></tr>
 <tr class="separator:gaffdfee3683acd1fd57518c6739794840"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -734,7 +734,7 @@ struct <a class="el" href="structscu__ic__priority.html">scu_ic_priority</a>&#16
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const scu_ic_priority_t* <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a> scu_ic_priority_table_get </td>
+          <td class="memname">static const <a class="el" href="group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2">scu_ic_priority_t</a>* <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a> scu_ic_priority_table_get </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -1177,7 +1177,7 @@ struct <a class="el" href="structscu__ic__priority.html">scu_ic_priority</a>&#16
         <tr>
           <td class="memname">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a> scu_ic_priority_table_set </td>
           <td>(</td>
-          <td class="paramtype">const scu_ic_priority_t *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__SCU__IC.html#ga84d5378f3833339df812583efb2db9e2">scu_ic_priority_t</a> *&#160;</td>
           <td class="paramname"><em>table</em></td><td>)</td>
           <td></td>
         </tr>

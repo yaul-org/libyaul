@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash dda07fc</span>
+   &#160;<span id="projectnumber">Git hash 7dc4e80</span>
    </div>
   </td>
  </tr>
@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('wdt_8h_source.html',''); initResizable
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__WDT.html#ga5880fa2dd120c2e0be696752d8e063a2">cpu_wdt_init</a>(<a class="code" href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a> clock_div);</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__INTC__HELPERS.html#gafcccaa58106e9ba25e474ebdb595158e">cpu_wdt_timer_mode_set</a>(<a class="code" href="group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98">cpu_wdt_mode_t</a> mode, <a class="code" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a> <a class="code" href="group__CPU__INTC__HELPERS.html#ga79b65017d3bd974e8a0cc006c53190dc">ihr</a>);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group__CPU__INTC__HELPERS.html#gafcccaa58106e9ba25e474ebdb595158e">cpu_wdt_timer_mode_set</a>(<a class="code" href="group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98">cpu_wdt_mode_t</a> mode, <a class="code" href="group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e">cpu_wdt_ihr</a> ihr);</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;__END_DECLS</div>
@@ -170,7 +170,6 @@ $(document).ready(function(){initNavTree('wdt_8h_source.html',''); initResizable
 <div class="ttc" id="agroup__CPU__WDT_html_gac50337e47648ff1ce4fffab70fd008e3"><div class="ttname"><a href="group__CPU__WDT.html#gac50337e47648ff1ce4fffab70fd008e3">cpu_wdt_mode</a></div><div class="ttdeci">cpu_wdt_mode</div><div class="ttdoc">CPU-WDT modes.</div><div class="ttdef"><b>Definition:</b> wdt.h:41</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__MACROS_html_gad07c9d0b9e27a5902fc2693b6a39ba94"><div class="ttname"><a href="group__MEMORY__MAP__MACROS.html#gad07c9d0b9e27a5902fc2693b6a39ba94">MEMORY_WRITE_WTCNT</a></div><div class="ttdeci">#define MEMORY_WRITE_WTCNT(x)</div><div class="ttdoc">Write to the CPU-WDT WTCNTW register.</div><div class="ttdef"><b>Definition:</b> map.h:19</div></div>
 <div class="ttc" id="agroup__CPU__WDT_html_ga34942b20b3bd6a6465496b8bc7ed64eb"><div class="ttname"><a href="group__CPU__WDT.html#ga34942b20b3bd6a6465496b8bc7ed64eb">cpu_wdt_disable</a></div><div class="ttdeci">static void __always_inline cpu_wdt_disable(void)</div><div class="ttdoc">Disable the CPU-WDT.</div><div class="ttdef"><b>Definition:</b> wdt.h:84</div></div>
-<div class="ttc" id="agroup__CPU__INTC__HELPERS_html_ga79b65017d3bd974e8a0cc006c53190dc"><div class="ttname"><a href="group__CPU__INTC__HELPERS.html#ga79b65017d3bd974e8a0cc006c53190dc">ihr</a></div><div class="ttdeci">cpu_dmac_ihr ihr</div><div class="ttdoc">Callback when transfer is completed.</div><div class="ttdef"><b>Definition:</b> dmac.h:115</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__CPU__IO__REGISTERS_html_ga3982b323af047850098961641f6b6454"><div class="ttname"><a href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga3982b323af047850098961641f6b6454">WTCNTR</a></div><div class="ttdeci">#define WTCNTR</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:221</div></div>
 <div class="ttc" id="agroup__CPU__WDT_html_ga871e6ca3976c0552c9dd1cb1c612446d"><div class="ttname"><a href="group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d">cpu_wdt_clock_t</a></div><div class="ttdeci">enum cpu_wdt_clock cpu_wdt_clock_t</div><div class="ttdoc">CPU-WDT clock divisors.</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__AREAS_html_ga298694f5a284a9481357c09aab7aa7e3"><div class="ttname"><a href="group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a></div><div class="ttdeci">#define CPU(x)</div><div class="ttdoc">Access the CPU I/O registers.</div><div class="ttdef"><b>Definition:</b> map.h:66</div></div>

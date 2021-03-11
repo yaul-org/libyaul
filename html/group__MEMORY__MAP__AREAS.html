@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash dda07fc</span>
+   &#160;<span id="projectnumber">Git hash 7dc4e80</span>
    </div>
   </td>
  </tr>
@@ -148,6 +148,9 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#ga8a4b69b3e292e50954947d8d74fa4308">SINIT</a>&#160;&#160;&#160;(0x21800000UL)</td></tr>
 <tr class="memdesc:ga8a4b69b3e292e50954947d8d74fa4308"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save CPU address for master CPU notification. <br /></td></tr>
 <tr class="separator:ga8a4b69b3e292e50954947d8d74fa4308"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#ga49d8c911d97bdd5d54c04e714878a3d2">ARP</a>(x)&#160;&#160;&#160;(0x22000000UL + (x))</td></tr>
+<tr class="memdesc:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify offset <code>x</code> for address space.  <a href="group__MEMORY__MAP__AREAS.html#ga49d8c911d97bdd5d54c04e714878a3d2">More...</a><br /></td></tr>
+<tr class="separator:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga298694f5a284a9481357c09aab7aa7e3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3">CPU</a>(x)&#160;&#160;&#160;(0xFFFFF000UL + (x))</td></tr>
 <tr class="memdesc:ga298694f5a284a9481357c09aab7aa7e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the CPU I/O registers.  <a href="group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3">More...</a><br /></td></tr>
 <tr class="separator:ga298694f5a284a9481357c09aab7aa7e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,6 +166,32 @@ Macros</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ga49d8c911d97bdd5d54c04e714878a3d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga49d8c911d97bdd5d54c04e714878a3d2">&#9670;&nbsp;</a></span>ARP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ARP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;(0x22000000UL + (x))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Specify offset <code>x</code> for address space. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>The byte offset. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="gaa0e1d3dbea5e6ccbb8abbe594334ba06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaa0e1d3dbea5e6ccbb8abbe594334ba06">&#9670;&nbsp;</a></span>CD_BLOCK</h2>
 

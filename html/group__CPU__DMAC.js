@@ -21,6 +21,7 @@ var group__CPU__DMAC =
       [ "priority_mode", "structcpu__dmac__status.html#a977c3ceb75f7dd339fc1284b6799deae", null ]
     ] ],
     [ "cpu_dmac_bus_mode_t", "group__CPU__DMAC.html#ga8bc6bfc97122bf9f6b57669fa2c36425", null ],
+    [ "cpu_dmac_cfg_t", "group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4", null ],
     [ "cpu_dmac_channel_t", "group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1", null ],
     [ "cpu_dmac_dst_t", "group__CPU__DMAC.html#ga2cd59afe9a28a83c8d88a3f6a46840e5", null ],
     [ "cpu_dmac_ihr", "group__CPU__DMAC.html#ga358061a56a92311e6711f85508e75bbd", null ],
@@ -52,7 +53,6 @@ var group__CPU__DMAC =
       [ "CPU_DMAC_STRIDE_4_BYTES", "group__CPU__DMAC.html#ggadba88414e2eb0392834e70b87d47def5adbc0cabc6e71124db1c05a305e5e2f9c", null ],
       [ "CPU_DMAC_STRIDE_16_BYTES", "group__CPU__DMAC.html#ggadba88414e2eb0392834e70b87d47def5aafd9716f55c20388df772d12bc85ca9a", null ]
     ] ],
-    [ "__aligned", "group__CPU__DMAC.html#ga925dc315094d86d13aa48c359cefed59", null ],
     [ "cpu_dmac_channel_config_set", "group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de", null ],
     [ "cpu_dmac_channel_start", "group__CPU__DMAC.html#ga7bcafe8e2d8ac13e2ee4d3e7ebe23e4d", null ],
     [ "cpu_dmac_channel_stop", "group__CPU__DMAC.html#ga7baac7ecba01979b44a7c24598ac9d5d", null ],

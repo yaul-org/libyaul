@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash dda07fc</span>
+   &#160;<span id="projectnumber">Git hash 7dc4e80</span>
    </div>
   </td>
  </tr>
@@ -100,6 +100,10 @@ Typedefs</h2></td></tr>
 typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a></td></tr>
 <tr class="memdesc:ga90c58703cb0b7d3892e6bf70e24325e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC channel. <br /></td></tr>
 <tr class="separator:ga90c58703cb0b7d3892e6bf70e24325e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="memItemLeft" align="right" valign="top"><a id="ga73a52ed09ab57d9df2a1514e15f8c6d4"></a>
+typedef struct <a class="el" href="structcpu__dmac__cfg.html">cpu_dmac_cfg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a></td></tr>
+<tr class="memdesc:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC configuration. <br /></td></tr>
+<tr class="separator:ga73a52ed09ab57d9df2a1514e15f8c6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1381a65ff30ef4f738e3d3ab486c3c15"><td class="memItemLeft" align="right" valign="top"><a id="ga1381a65ff30ef4f738e3d3ab486c3c15"></a>
 typedef struct <a class="el" href="structcpu__dmac__status.html">cpu_dmac_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a></td></tr>
 <tr class="memdesc:ga1381a65ff30ef4f738e3d3ab486c3c15"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC status. <br /></td></tr>
@@ -139,10 +143,6 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga925dc315094d86d13aa48c359cefed59"><td class="memItemLeft" align="right" valign="top"><a id="ga925dc315094d86d13aa48c359cefed59"></a>
-struct <a class="el" href="structcpu__dmac__cfg.html">cpu_dmac_cfg</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga925dc315094d86d13aa48c359cefed59">__aligned</a> (4) cpu_dmac_cfg_t</td></tr>
-<tr class="memdesc:ga925dc315094d86d13aa48c359cefed59"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU-DMAC configuration. <br /></td></tr>
-<tr class="separator:ga925dc315094d86d13aa48c359cefed59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1abfe1297fd6b31e67e74a2d04f524d1"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga1abfe1297fd6b31e67e74a2d04f524d1">cpu_dmac_channel_transfer_set</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch, uint32_t tcr_bits)</td></tr>
 <tr class="memdesc:ga1abfe1297fd6b31e67e74a2d04f524d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write directly to the CPU-DMAC I/O <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga694a5587bfbecb1bb8d738c7f31d4a39">TCR0</a> or <a class="el" href="group__MEMORY__MAP__CPU__IO__REGISTERS.html#ga22ed687f6c89414bf4688318d0afa63d">TCR1</a> register.  <a href="group__CPU__DMAC.html#ga1abfe1297fd6b31e67e74a2d04f524d1">More...</a><br /></td></tr>
 <tr class="separator:ga1abfe1297fd6b31e67e74a2d04f524d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -176,7 +176,7 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 <tr class="memitem:ga54e0bf92350dba22a62f571b68a522c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga54e0bf92350dba22a62f571b68a522c8">cpu_dmac_status_get</a> (<a class="el" href="group__CPU__DMAC.html#ga1381a65ff30ef4f738e3d3ab486c3c15">cpu_dmac_status_t</a> *status)</td></tr>
 <tr class="memdesc:ga54e0bf92350dba22a62f571b68a522c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain CPU-DMAC operation status.  <a href="group__CPU__DMAC.html#ga54e0bf92350dba22a62f571b68a522c8">More...</a><br /></td></tr>
 <tr class="separator:ga54e0bf92350dba22a62f571b68a522c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga52a95c82897c107ac282fcf69ad588de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">cpu_dmac_channel_config_set</a> (const cpu_dmac_cfg_t *cfg)</td></tr>
+<tr class="memitem:ga52a95c82897c107ac282fcf69ad588de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">cpu_dmac_channel_config_set</a> (const <a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a> *cfg)</td></tr>
 <tr class="memdesc:ga52a95c82897c107ac282fcf69ad588de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure a CPU-DMAC channel for transfer.  <a href="group__CPU__DMAC.html#ga52a95c82897c107ac282fcf69ad588de">More...</a><br /></td></tr>
 <tr class="separator:ga52a95c82897c107ac282fcf69ad588de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa25f9dd1ea61b12deaefec4f77d64131"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131">cpu_dmac_channel_wait</a> (<a class="el" href="group__CPU__DMAC.html#ga90c58703cb0b7d3892e6bf70e24325e1">cpu_dmac_channel_t</a> ch)</td></tr>
@@ -198,7 +198,7 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 </div><div class="memdoc">
 
 <p>Transfer bus mode. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 
 </div>
 </div>
@@ -215,7 +215,7 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 </div><div class="memdoc">
 
 <p>Transfer destination type. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 
 </div>
 </div>
@@ -232,9 +232,9 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 </div><div class="memdoc">
 
 <p>Callback type. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t.ihr </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__INTC__HELPERS.html#ga6b32c81edacbca2a7eee1da9e696212e" title="Callback when transfer is completed.">cpu_dmac_cfg_t.ihr</a> </dd>
 <dd>
-cpu_dmac_cfg_t.ihr_work </dd></dl>
+<a class="el" href="group__CPU__INTC__HELPERS.html#gadb8bb377ffdb53781aee3ba952508fce" title="Pointer to any work passed onto cpu_dmac_cfg_t::ihr.">cpu_dmac_cfg_t.ihr_work</a> </dd></dl>
 
 </div>
 </div>
@@ -268,7 +268,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer source address modes. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 
 </div>
 </div>
@@ -285,7 +285,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer stride bytes. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 
 </div>
 </div>
@@ -303,7 +303,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer bus mode. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggafd2aa9f9a8a740c128ccf8cfa4cc5b0aadd60bb424e32af1fc8acef63a5884273"></a>CPU_DMAC_BUS_MODE_CYCLE_STEAL&#160;</td><td class="fielddoc"><p>Select bus mode to cycle-steal mode. </p>
 </td></tr>
@@ -326,7 +326,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer destination type. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga12d1096d5482168480f42128a8e4209ea90f298a4da06ab72437ff63138ef709a"></a>CPU_DMAC_DESTINATION_FIXED&#160;</td><td class="fielddoc"><p>Fixed destination address. </p>
 </td></tr>
@@ -375,7 +375,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer source address modes. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga543d9d09b32a5b6273de156242891e22a57ac3be9ef92720502e55453007655db"></a>CPU_DMAC_SOURCE_FIXED&#160;</td><td class="fielddoc"><p>Fixed source address. </p>
 </td></tr>
@@ -400,7 +400,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Transfer stride bytes. </p>
-<dl class="section see"><dt>See also</dt><dd>cpu_dmac_cfg_t </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4" title="CPU-DMAC configuration.">cpu_dmac_cfg_t</a> </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggadba88414e2eb0392834e70b87d47def5a3e9ba2045fa48b536c144690c94d3750"></a>CPU_DMAC_STRIDE_1_BYTE&#160;</td><td class="fielddoc"><p>1-byte stride. </p>
 </td></tr>
@@ -424,7 +424,7 @@ cpu_dmac_cfg_t.ihr_work </dd></dl>
         <tr>
           <td class="memname">void cpu_dmac_channel_config_set </td>
           <td>(</td>
-          <td class="paramtype">const cpu_dmac_cfg_t *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__CPU__DMAC.html#ga73a52ed09ab57d9df2a1514e15f8c6d4">cpu_dmac_cfg_t</a> *&#160;</td>
           <td class="paramname"><em>cfg</em></td><td>)</td>
           <td></td>
         </tr>

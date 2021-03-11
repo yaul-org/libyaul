@@ -15,8 +15,6 @@ var group__CPU__INTC__HELPERS =
     [ "cpu_wdt_timer_mode_set", "group__CPU__INTC__HELPERS.html#gafcccaa58106e9ba25e474ebdb595158e", null ],
     [ "scu_dma_illegal_clear", "group__CPU__INTC__HELPERS.html#ga013ffcfcb17626c9f3d3b9472328f778", null ],
     [ "scu_dma_illegal_set", "group__CPU__INTC__HELPERS.html#gad435a35953b1604dd4b9c6d2ca3ca0ed", null ],
-    [ "ihr", "group__CPU__INTC__HELPERS.html#ga79b65017d3bd974e8a0cc006c53190dc", null ],
     [ "ihr", "group__CPU__INTC__HELPERS.html#ga6b32c81edacbca2a7eee1da9e696212e", null ],
-    [ "ihr_work", "group__CPU__INTC__HELPERS.html#gad0d5bdb786923b6766e5301630fe81d2", null ],
     [ "ihr_work", "group__CPU__INTC__HELPERS.html#gadb8bb377ffdb53781aee3ba952508fce", null ]
 ];
