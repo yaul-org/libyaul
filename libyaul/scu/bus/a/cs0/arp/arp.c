@@ -63,12 +63,8 @@ _invoke_callback(void)
 bool
 arp_busy_status(void)
 {
-        uint8_t status;
-        status = MEMORY_READ(8, ARP(STATUS));
-        status &= 0x01;
-
-        bool busy;
-        busy = (status == 0x00);
+        const uint8_t status = MEMORY_READ_AND(8, ARP(STATUS), 0x01);
+        const bool busy = (status == 0x00);
 
         if (!busy) {
                 MEMORY_WRITE(8, ARP(status), 0x00);
@@ -108,13 +104,12 @@ void
 arp_function_callback_set(arp_callback_handler_t handler)
 {
         /* Disable interrupts */
-        uint32_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
+        const uint32_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
 
         /* Clear ARP callback */
-        memset(&_callback.ptr, 0x00, sizeof(_callback));
+        (void)memset(&_callback.ptr, 0x00, sizeof(_callback));
 
         _handler = handler;
 
@@ -129,8 +124,7 @@ arp_function_nonblock(void)
                 return;
         }
 
-        uint32_t command;
-        command = arp_byte_xchg(0x00) & 0x0F;
+        const uint32_t command = arp_byte_xchg(0x00) & 0x0F;
 
         _arp_function_table[command]();
 }
@@ -139,7 +133,7 @@ uint32_t
 arp_long_read(void)
 {
         uint32_t b;
-        b = 0;
+        b = 0x00000000;
 
         b |= (arp_byte_xchg(0x00)) << 24;
         b |= (arp_byte_xchg(0x00)) << 16;
@@ -172,14 +166,14 @@ arp_return(void)
 void
 arp_sync(void)
 {
-        while (!(arp_sync_nonblock()));
+        while (!(arp_sync_nonblock())) {
+        }
 }
 
 bool
 arp_sync_nonblock(void)
 {
         uint32_t b;
-
         b = MEMORY_READ(8, ARP(INPUT));
 
         if (b != 'I') {
@@ -223,24 +217,18 @@ _arp_function_nop(void)
 {
 }
 
-/* Read byte from memory and send to client (download from client's
- * perspective) */
 static void
 _arp_function_01(void)
 {
-        uint32_t b;
-        uint32_t address;
-        uint32_t len;
-        uint8_t checksum;
-
         /* Send some bogus value? */
         arp_long_send(0x00000000);
 
-        len = 0;
         while (true) {
+                uint32_t address;
                 /* Read address */
                 address = arp_long_read();
                 /* Read length */
+                uint32_t len;
                 len = arp_long_read();
                 /* Check if we're done with transfer */
                 if (len == 0) {
@@ -260,9 +248,11 @@ _arp_function_01(void)
                 _callback.exec = false;
                 _callback.len += len;
 
+                uint8_t checksum;
                 checksum = 0;
                 for (; len > 0; len--, address++) {
-                        b = MEMORY_READ(8, address);
+                        const uint32_t b = MEMORY_READ(8, address);
+
                         arp_byte_xchg(b);
 
                         /* Checksum allow overflow */
@@ -273,29 +263,28 @@ _arp_function_01(void)
         }
 }
 
-/* Upload memory and jump (if requested) */
 static void
 _arp_function_09(void)
 {
-        uint32_t b;
-        uint32_t addr;
-        uint32_t this_addr;
-        uint32_t len;
-        bool exec;
-
         /* Read addr */
+        uint32_t addr;
         addr = arp_long_read();
+
+        uint32_t this_addr;
         this_addr = addr;
+
         /* Read length */
+        uint32_t len;
         len = arp_long_read();
+
         /* Execute? */
-        b = arp_byte_xchg(0x00);
-        exec = (b == 0x01);
+        const bool exec = ((arp_byte_xchg(0x00)) == 0x01);
 
         /* Set for ARP callback */
         if (_callback.ptr == NULL) {
                 _callback.ptr = (void *)(addr - len);
         }
+
         _callback.function = 0x09;
         _callback.exec = exec;
         _callback.len += len;
@@ -307,8 +296,8 @@ _arp_function_09(void)
                 MEMORY_WRITE(8, addr, b);
         }
 
-        /* Only call the ARP user callback for when we get the last
-         * chunk of data which just happens to be the start address */
+        /* Only call the ARP user callback for when we get the last chunk of
+         * data which just happens to be the start address */
         if ((uint32_t)_callback.ptr == this_addr) {
                 _invoke_callback();
         }
