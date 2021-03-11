@@ -153,7 +153,7 @@ $2.d:
 
 $2: $2.d
 	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).romdisk$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/genromfs$(EXE_EXT) $(ROMDISK_FLAGS) -d $3 -f - > $2
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/genromfs$(EXE_EXT) $(ROMDISK_FLAGS) -d $3 -f $2
 
 $2.o: $2
 	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).romdisk.o$(V_END)\n"
