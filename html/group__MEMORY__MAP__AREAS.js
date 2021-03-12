@@ -6,6 +6,7 @@ var group__MEMORY__MAP__AREAS =
     [ "CS0", "group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597", null ],
     [ "CS1", "group__MEMORY__MAP__AREAS.html#ga0a0f757204ff3bf22f63c85fa950373b", null ],
     [ "CS2", "group__MEMORY__MAP__AREAS.html#ga4cd18c6974a71029b424c2abc322c122", null ],
+    [ "DRAM", "group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f", null ],
     [ "DUMMY", "group__MEMORY__MAP__AREAS.html#ga463463ac4a3d3b641f63e961cb26ffe6", null ],
     [ "HWRAM", "group__MEMORY__MAP__AREAS.html#ga98991c68e347e8dd06bbf1a53541c10b", null ],
     [ "HWRAM_PURGE_CACHE", "group__MEMORY__MAP__AREAS.html#ga7ce57345dd6d637b8f36415f9326f73a", null ],
