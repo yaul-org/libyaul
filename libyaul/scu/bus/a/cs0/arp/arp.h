@@ -21,6 +21,18 @@ __BEGIN_DECLS
 /// @addtogroup ARP
 /// @{
 
+/// @brief ARP Function types.
+typedef enum arp_function_type {
+        /// Invalid function.
+        ARP_FUNCTION_TYPE_NONE     = 0,
+        /// Download function.
+        ARP_FUNCTION_TYPE_DOWNLOAD = 1,
+        /// Upload function.
+        ARP_FUNCTION_TYPE_UPLOAD   = 2,
+        /// Upload and execute function.
+        ARP_FUNCTION_TYPE_EXEC     = 3
+} arp_function_type_t;
+
 /// @brief Callback type.
 typedef struct arp_callback arp_callback_t;
 
@@ -30,11 +42,9 @@ typedef void (*arp_callback_handler_t)(const arp_callback_t *);
 /// @brief Not yet documented.
 struct arp_callback {
         /// Function recently executed.
-        uint8_t function;
+        arp_function_type_t function_type;
         /// Address.
         void *ptr;
-        /// Determine whether or not it's executable.
-        bool exec;
         /// Length of transfer.
         size_t len;
 } __aligned(4);
@@ -95,8 +105,8 @@ extern void arp_function_callback_set(arp_callback_handler_t handler);
 /// @brief Perform ARP functions.
 ///
 /// @details This function performs the following ARP functions:
-///  - Download memory from Saturn to host
-///  - Upload binary to Saturn from host and jump (if requested)
+///  - Download memory from Saturn to host.
+///  - Upload binary to Saturn from host and jump (if requested).
 ///
 /// @warning The function still currently blocks.
 extern void arp_function_nonblock(void);
