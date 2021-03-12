@@ -9,7 +9,7 @@
 
 #include "dram-cart-internal.h"
 
-static uint8_t _id = 0x00;
+static dram_cart_id_t _id = DRAM_CART_ID_INVALID;
 static void *_base = NULL;
 
 static bool _detect_dram_cart(void);
@@ -46,7 +46,7 @@ dram_cart_area_get(void)
         return _base;
 }
 
-uint8_t
+dram_cart_id_t
 dram_cart_id_get(void)
 {
         return _id;
@@ -68,33 +68,12 @@ dram_cart_size_get(void)
 static bool
 _detect_dram_cart(void)
 {
-        /*
-         *              8-Mbit DRAM            32-Mbit DRAM
-         *             +--------------------+ +--------------------+
-         * 0x2240'0000 | DRAM #0            | | DRAM #0            |
-         *             +--------------------+ |                    |
-         * 0x2248'0000 | DRAM #0 (mirrored) | |                    |
-         *             +--------------------+ |                    |
-         * 0x2250'0000 | DRAM #0 (mirrored) | |                    |
-         *             +--------------------+ |                    |
-         * 0x2258'0000 | DRAM #0 (mirrored) | |                    |
-         *             +--------------------+ +--------------------+
-         * 0x2260'0000 | DRAM #1            | | DRAM #1            |
-         *             +--------------------+ |                    |
-         * 0x2268'0000 | DRAM #1 (mirrored) | |                    |
-         *             +--------------------+ |                    |
-         * 0x2270'0000 | DRAM #1 (mirrored) | |                    |
-         *             +--------------------+ |                    |
-         * 0x2278'0000 | DRAM #1 (mirrored) | |                    |
-         * 0x227F'FFFF +--------------------+ +--------------------+
-         */
-
         /* Check the ID */
         _id = MEMORY_READ(8, CS1(ID));
         _id &= 0xFF;
 
         if ((_id != DRAM_CART_ID_1MIB) && (_id != DRAM_CART_ID_4MIB)) {
-                _id = 0x00;
+                _id = DRAM_CART_ID_INVALID;
                 _base = NULL;
 
                 return false;
