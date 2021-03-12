@@ -1,5 +1,11 @@
 var NAVTREEINDEX1 =
 {
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a706f716de08a6db23d26f059dfd16a2f":[2,15,18,18],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a7850eae5985481091da1a212b7764704":[2,15,18,5],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a914cac7152324dccdbd69b3d0ba4b885":[2,15,18,19],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ab0929951193179aa3b67133f1cc4d5f3":[2,15,18,20],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abd691c26f6d926c4f9d32bad91265113":[2,15,18,11],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abeab69d42b8e22213da10c39a1f167b1":[2,15,18,12],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abf475cdbb5a50aeb790338759c9d2554":[2,15,18,0],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac4f198a49b704296e797724ccfe9b9a3":[2,15,18,7],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2ac77d05a22c84f47a7ae630e7ef4ca534":[2,15,18,9],
@@ -243,11 +249,5 @@ var NAVTREEINDEX1 =
 "group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga269b1701004459ceb9b82168143f2f97":[2,0,2,9],
 "group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga292f6e27f5bcb4861c1dc3ecc5f81044":[2,0,2,18],
 "group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952":[2,0,2,25],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga342711b66770a39aaac3bd08248c16ae":[2,0,2,13],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga350936cb7a9e71e91a7658529956fd69":[2,0,2,19],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga45c15d2ffdbee5e1dadd1198aaa3daad":[2,0,2,16],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b50738b8633408ba38a402b70443d0a":[2,0,2,8],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa842098a8e332ea17074de890be":[2,0,2,24],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga6be0ff87eac68c5e6ad394b4cdce1d51":[2,0,2,6],
-"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga74e0f1bd9384fd5c9be773e920b089c3":[2,0,2,0]
+"group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga342711b66770a39aaac3bd08248c16ae":[2,0,2,13]
 };
