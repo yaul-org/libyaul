@@ -53,17 +53,15 @@ _invoke_callback(void)
                 _handler(&_callback);
         }
 
-        /* Clear ARP user callback */
-        _callback.function = 0x00;
+        _callback.function_type = ARP_FUNCTION_TYPE_NONE;
         _callback.ptr = NULL;
-        _callback.exec = false;
         _callback.len = 0;
 }
 
 bool
 arp_busy_status(void)
 {
-        const uint8_t status = MEMORY_READ_AND(8, ARP(STATUS), 0x01);
+        const uint8_t status = MEMORY_READ(8, ARP(STATUS)) & 0x01;
         const bool busy = (status == 0x00);
 
         if (!busy) {
@@ -244,8 +242,7 @@ _arp_function_01(void)
                 if (_callback.ptr == NULL) {
                         _callback.ptr = (void *)address;
                 }
-                _callback.function = 0x01;
-                _callback.exec = false;
+                _callback.function_type = ARP_FUNCTION_TYPE_DOWNLOAD;
                 _callback.len += len;
 
                 uint8_t checksum;
@@ -278,20 +275,20 @@ _arp_function_09(void)
         len = arp_long_read();
 
         /* Execute? */
-        const bool exec = ((arp_byte_xchg(0x00)) == 0x01);
+        const uint8_t exec_byte = arp_byte_xchg(0x00);
+        const bool exec = (exec_byte == 0x01);
 
         /* Set for ARP callback */
         if (_callback.ptr == NULL) {
                 _callback.ptr = (void *)(addr - len);
         }
 
-        _callback.function = 0x09;
-        _callback.exec = exec;
+        _callback.function_type = (exec) ? ARP_FUNCTION_TYPE_EXEC : ARP_FUNCTION_TYPE_UPLOAD;
         _callback.len += len;
 
         /* XXX: Blocking */
         for (; len > 0; len--, addr++) {
-                b = arp_byte_xchg(b);
+                const uint8_t b = arp_byte_xchg(exec_byte);
 
                 MEMORY_WRITE(8, addr, b);
         }
