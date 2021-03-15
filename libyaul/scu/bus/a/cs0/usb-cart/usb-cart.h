@@ -144,6 +144,8 @@ extern void usb_cart_dma_read(void *buffer, uint32_t len);
 /// @param len    The size of @p buffer in bytes.
 extern void usb_cart_dma_send(const void *buffer, uint32_t len);
 
+/// @}
+
 __END_DECLS
 
 #endif /* !_USB_CART_H_ */
