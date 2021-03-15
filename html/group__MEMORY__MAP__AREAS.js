@@ -23,6 +23,7 @@ var group__MEMORY__MAP__AREAS =
     [ "SCU", "group__MEMORY__MAP__AREAS.html#ga209b899cd14aba32d246050e4cf003d3", null ],
     [ "SINIT", "group__MEMORY__MAP__AREAS.html#ga8a4b69b3e292e50954947d8d74fa4308", null ],
     [ "SMPC", "group__MEMORY__MAP__AREAS.html#gadcdf6654942d055f66f72da44a62e314", null ],
+    [ "USB_CART", "group__MEMORY__MAP__AREAS.html#gae5094a0a946547d5e2446693f3c626bb", null ],
     [ "VDP1", "group__MEMORY__MAP__AREAS.html#ga8b466742d8556d15248e0ec553ce6af4", null ],
     [ "VDP1_FB", "group__MEMORY__MAP__AREAS.html#gac662cb1e8b3deaf7684b03a00d7ad2aa", null ],
     [ "VDP1_VRAM", "group__MEMORY__MAP__AREAS.html#ga58b0ffabcb4e115c0dd38bb5fd0ccf0d", null ],
