@@ -10,10 +10,31 @@
 
 #include <scu/map.h>
 
-/* Macros specific for processor */
+/// @addtogroup MEMORY_MAP_AREAS
+/// @{
+
+/// @brief Access the CPU I/O registers.
+///
+/// @param x The byte offset.
 #define USB_CART(x) (CS0(0x01) + ((x) << 20))
 
+/// @}
+
+/// @addtogroup MEMORY_MAP
+/// @defgroup MEMORY_MAP_USB_CART_IO_REGISTERS USB Cart I/O
+/// @ingroup MEMORY_MAP
+/// @{
+
+/// @brief USB Cart I/O register.
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FIFO    0x01
+
+/// @brief USB Cart I/O register.
+/// @see MEMORY_WRITE
+/// @see MEMORY_READ
 #define FLAGS   0x02
+
+/// @}
 
 #endif /* !_USB_CART_MAP_H_ */
