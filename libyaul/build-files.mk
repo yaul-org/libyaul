@@ -210,6 +210,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/cpu_dual.c \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
+	scu/bus/cpu/cpu_sci.c \
 	scu/bus/cpu/cpu_ubc.c \
 	scu/bus/cpu/cpu_wdt.c \
 	\
