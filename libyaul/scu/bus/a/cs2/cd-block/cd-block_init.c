@@ -212,12 +212,10 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
 }
 
 int
-cd_block_sector_read(uint32_t fad, uint8_t *output_buffer)
+cd_block_sector_read(uint32_t fad, void *output_buffer)
 {
-        const int32_t num_sectors = 1;
-
-        assert(output_buffer != NULL);
         assert(fad >= 150);
+        assert(output_buffer != NULL);
 
         int ret;
 
@@ -234,7 +232,7 @@ cd_block_sector_read(uint32_t fad, uint8_t *output_buffer)
         }
 
         /* Start reading */
-        if ((ret = cd_block_cmd_play_disk(0, fad, num_sectors)) != 0) {
+        if ((ret = cd_block_cmd_play_disk(0, fad, /* num_sectors */ 1)) != 0) {
                 return ret;
         }
 
@@ -252,11 +250,9 @@ cd_block_sector_read(uint32_t fad, uint8_t *output_buffer)
 void
 cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
 {
+        assert(fad >= 150);
         assert(output_buffer != NULL);
-
-        if (length == 0) {
-                return;
-        }
+        assert(length > 0);
 
         uint8_t *buffer_ptr = (uint8_t *)output_buffer;
 
