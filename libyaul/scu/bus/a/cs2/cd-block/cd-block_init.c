@@ -186,8 +186,9 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         read_buffer = (uint16_t *)output_buffer;
 
         uint32_t bytes_to_read = ISO9660_SECTOR_SIZE;
-        if (bytes_to_read > buffer_length)
+        if (bytes_to_read > buffer_length) {
                 bytes_to_read = buffer_length;
+        }
 
         uint32_t read_bytes = 0;
         for (uint32_t i = 0; i < bytes_to_read; i += 2) {
@@ -196,9 +197,10 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
                 read_bytes += 2;
         }
 
-        // If odd number of bytes, read the last one separated
+        /* If odd number of bytes, read the last one separated */
         if (read_bytes < buffer_length) {
-                uint16_t tmp = MEMORY_READ(16, CD_BLOCK(DTR));
+                const uint16_t tmp = MEMORY_READ(16, CD_BLOCK(DTR));
+
                 output_buffer[buffer_length - 1] = tmp >> 8;
         }
 
