@@ -242,11 +242,56 @@ cd_block_sector_read(uint32_t fad, uint8_t *output_buffer)
         while ((cd_block_cmd_get_sector_number(0)) == 0) {
         }
 
-        if ((ret = cd_block_transfer_data(0, 0, output_buffer, 2048)) != 0) {
+        if ((ret = cd_block_transfer_data(0, 0, output_buffer, ISO9660_SECTOR_SIZE)) != 0) {
                 return ret;
         }
 
         return 0;
+}
+
+void
+cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
+{
+        assert(output_buffer != NULL);
+
+        if (length == 0) {
+                return;
+        }
+
+        uint8_t *buffer_ptr = (uint8_t *)output_buffer;
+
+        /* Get the sector count from length */
+        const uint32_t sector_count = (length + (ISO9660_SECTOR_SIZE - 1)) / ISO9660_SECTOR_SIZE;
+
+        cd_block_cmd_reset_selector(0, 0);
+        cd_block_cmd_set_cd_device_connection(0);
+        cd_block_cmd_play_disk(0, fad, sector_count);
+
+        uint32_t bytes_missing = length;
+
+        while (bytes_missing > 0) {
+                /* Wait until there's data ready */
+                uint32_t sectors_ready;
+
+                do {
+                        sectors_ready = cd_block_cmd_get_sector_number(0);
+                } while (sectors_ready == 0);
+
+                uint32_t bytes_to_read;
+
+                if ((sectors_ready * ISO9660_SECTOR_SIZE) > bytes_missing) {
+                        bytes_to_read = bytes_missing;
+                } else {
+                        bytes_to_read = sectors_ready * ISO9660_SECTOR_SIZE;
+                }
+
+                /* Setup a transfer from CD buffer to buffer, then delete data
+                 * from CD buffer */
+                cd_block_transfer_data(0, 0, buffer_ptr, bytes_to_read);
+
+                buffer_ptr += bytes_to_read;
+                bytes_missing -= bytes_to_read;
+        }
 }
 
 static int
