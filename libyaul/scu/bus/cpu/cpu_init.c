@@ -19,6 +19,7 @@
 #include <cpu/intc.h>
 #include <cpu/map.h>
 #include <cpu/registers.h>
+#include <cpu/sci.h>
 #include <cpu/wdt.h>
 
 #include <vdp.h>
@@ -101,6 +102,7 @@ _internal_cpu_init(void)
         _internal_cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
+        cpu_sci_init();
         _internal_cpu_dmac_init();
         cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
 }
