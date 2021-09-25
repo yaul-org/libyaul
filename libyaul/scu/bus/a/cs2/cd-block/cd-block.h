@@ -49,6 +49,16 @@ extern int cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8
  */
 extern int cd_block_sector_read(uint32_t fad, uint8_t *output_buffer);
 
+/**
+ * Read multiple sectors to a memory location. This function initialize and
+ * spins the disk to retrieve data.
+ *
+ * @param output_buffer Buffer where data will be recorded.
+ * @param length        Length of buffer in bytes.
+ * @param fad           FAD to start reading from.
+ */
+extern void cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length);
+
 __END_DECLS
 
 #endif /* !_CD_BLOCK_H_ */
