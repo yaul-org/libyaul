@@ -358,13 +358,14 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:cache.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:divu.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:dmac.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:dual.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:endian.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:frt.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:instructions.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:map.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:registers.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:dual.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:sci.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:wdt.h:yaul/scu/bus/cpu/cpu/ \
