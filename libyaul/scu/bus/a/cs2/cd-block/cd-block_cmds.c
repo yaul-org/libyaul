@@ -424,12 +424,78 @@ cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range)
 
 /* TODO:
  * Get Filter Range                0x41
- * Set Filter Subheader Conditions 0x42
  * Get Filter Subheader Conditions 0x43
- * Set Filter Mode                 0x44
  * Get Filter Mode                 0x45
  * Set Filter Connection           0x46
  * Get Filter Connection           0x47 */
+
+int
+cd_block_cmd_set_filter_subheader_conditions(uint8_t channel, uint8_t submode_mask,
+    uint8_t code_info_mask, uint8_t filter_num, uint8_t file_id, uint8_t sub_mode_val,
+    uint8_t code_info_val)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4200 | channel;
+        regs.cr2 = (submode_mask << 8) | code_info_mask;
+        regs.cr3 = (filter_num << 8) | file_id;
+        regs.cr4 = (sub_mode_val << 8) | code_info_val;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
+
+int
+cd_block_cmd_set_filter_mode(uint8_t mode, uint16_t filter_num)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4400 | mode;
+        regs.cr2 = 0x0000;
+        regs.cr3 = filter_num;
+        regs.cr4 = 0x0000;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
+
+int
+cd_block_cmd_set_filter_connection(uint8_t conn_num, uint8_t true_conn, uint8_t false_conn, uint16_t filter_num)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4600 | conn_num;
+        regs.cr2 = (true_conn << 8) | false_conn;
+        regs.cr3 = filter_num;
+        regs.cr4 = 0x0000;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
 
 int
 cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
@@ -520,7 +586,7 @@ cd_block_cmd_get_sector_number(uint8_t buffer_number)
  * Get FAD Search Results 0x56 */
 
 int
-cd_block_cmd_set_sector_length(uint16_t size)
+cd_block_cmd_set_sector_length(uint8_t size)
 {
         cd_block_regs_t regs;
 

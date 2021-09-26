@@ -199,6 +199,9 @@ $(foreach SYMBOL_DIR,$(join $(ROMDISK_SYMBOLS),$(addprefix ;,$(SH_SRCS_ROMDISK))
 		$(basename $(call macro-word-split,$(SYMBOL_DIR),2)))))
 
 $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
+ifneq "$(ISO_PREBUILD_STEP)" ""
+		$(ISO_PREBUILD_STEP)
+endif
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)mkdir -p $(IMAGE_DIRECTORY)
 	$(ECHO)cp $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
@@ -208,6 +211,9 @@ $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
 	    fi \
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_BUILD_PATH)/IP.BIN $(SH_PROGRAM)
+ifneq "$(ISO_POSTBUILD_STEP)" ""
+		$(ISO_POSTBUILD_STEP)
+endif
 
 $(SH_PROGRAM).ss: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/CART-IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
