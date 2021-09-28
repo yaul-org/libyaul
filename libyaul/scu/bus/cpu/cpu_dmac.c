@@ -122,12 +122,26 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
         reg_chcr = ((cfg->src_mode & 0x03) << 12) |
                    ((cfg->dst_mode & 0x03) << 14) |
                    ((cfg->stride & 0x03) << 10) |
-                   ((cfg->bus_mode & 0x01) << 4) |
-                   /* Always enable AR (auto-request mode) */
-                   0x00000200;
+                   ((cfg->bus_mode & 0x01) << 4);
+        
+        if (true == cfg->nondefault)
+        {
+                /* Non-default DMAC settings */
+                reg_chcr |= ((cfg->request_mode & 0x01) << 9) |
+                        ((cfg->dack_mode & 0x01) << 8) |
+                        ((cfg->dack_level & 0x01) << 7) |
+                        ((cfg->detect_mode & 0x01) << 6) |
+                        ((cfg->dreq_level & 0x01) << 5);
+        } else {
+                /* Default DMAC settings, enable AR (auto-request mode) */
+                reg_chcr |= 0x00000200;
+        }
 
         uint32_t reg_tcr;
         reg_tcr = cfg->len;
+
+        uint8_t reg_drcr;
+        reg_drcr = (cfg->resource_select & 0x03);
 
         uint8_t stride;
         stride = cfg->stride & 0x03;
@@ -169,6 +183,7 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
         MEMORY_WRITE(32, CPU(SAR0 | n), (uint32_t)cfg->src);
         MEMORY_WRITE(32, CPU(TCR0 | n), reg_tcr);
         MEMORY_WRITE(32, CPU(CHCR0 | n), reg_chcr);
+        MEMORY_WRITE(8, CPU(DRCR0 + cfg->channel), reg_drcr);
 }
 
 void
