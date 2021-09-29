@@ -1,4 +1,4 @@
-.PHONY: $(SH_PROGRAM)
+THIS_FILE:=$(firstword $(MAKEFILE_LIST))
 
 $(shell mkdir -p $(SH_BUILD_DIR))
 
@@ -162,11 +162,7 @@ $2.o: $2
 -include "$2.d"
 endef
 
-$(SH_PROGRAM): $(SH_PROGRAM).cue
-
-all: $(SH_PROGRAM).cue
-
-example: all
+build: $(SH_PROGRAM).cue
 
 $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
@@ -199,6 +195,7 @@ $(foreach SYMBOL_DIR,$(join $(ROMDISK_SYMBOLS),$(addprefix ;,$(SH_SRCS_ROMDISK))
 		$(basename $(call macro-word-split,$(SYMBOL_DIR),2)))))
 
 $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
+	$(ECHO)$(MAKE) --no-print-directory -f $(THIS_FILE) pre-build-iso
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)mkdir -p $(IMAGE_DIRECTORY)
 	$(ECHO)cp $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
@@ -208,6 +205,7 @@ $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
 	    fi \
 	done
 	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_BUILD_PATH)/IP.BIN $(SH_PROGRAM)
+	$(ECHO)$(MAKE) --no-print-directory -f $(THIS_FILE) post-build-iso
 
 $(SH_PROGRAM).ss: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/CART-IP.BIN
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
@@ -268,7 +266,7 @@ clean:
 	    $(foreach DIR,$(SH_SRCS_ROMDISK),$(call macro-convert-build-path,$(DIR)))
 
 list-targets:
-	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \
+	@$(MAKE) -pRrq -f $(THIS_FILE) : 2>/dev/null | \
 	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
 	sort | \
 	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'

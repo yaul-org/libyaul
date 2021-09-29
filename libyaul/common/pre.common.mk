@@ -145,9 +145,19 @@ ROMDISK_FLAGS:= -v -a 16 -V "ROOT"
 
 SUFFIXES:= .c .cc .C .cpp .cxx .sx .o .bin .elf .romdisk .romdisk.o
 
-.PHONY: all clean example list-targets
+.PHONY: all clean list-targets
+
+# The targets which .SECONDARY depends on are treated as intermediate files,
+# except that they are never automatically deleted
+.SECONDARY: pre-build-iso post-build-iso build
 
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
 
 .PRECIOUS: %.elf %.c %.o
+
+all: build
+
+pre-build-iso:
+
+post-build-iso:
