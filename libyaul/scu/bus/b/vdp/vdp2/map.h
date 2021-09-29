@@ -319,8 +319,8 @@ typedef union vdp2_registers {
 
 __BEGIN_DECLS
 
-extern vdp2_registers_t* vdp2_regs_get(void);
-extern vdp2_registers_t vdp2_regs_get_copy(void);
+extern vdp2_registers_t *vdp2_regs_get(void);
+extern vdp2_registers_t vdp2_regs_copy_get(void);
 
 __END_DECLS
 

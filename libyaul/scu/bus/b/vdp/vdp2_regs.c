@@ -7,14 +7,14 @@
 
 #include "vdp-internal.h"
 
-vdp2_registers_t* 
+vdp2_registers_t *
 vdp2_regs_get(void)
 {
         return _state_vdp2()->regs;
 }
 
 vdp2_registers_t
-vdp2_regs_get_copy(void)
+vdp2_regs_copy_get(void)
 {
         return *_state_vdp2()->regs;
 }
