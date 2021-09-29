@@ -36,7 +36,7 @@
 /// @param b The four DRAM banks within two larger DRAM banks, 8-MBit each.
 /// @param x The byte offset.
 #define DRAM(t, b, x)                                                          \
-    (CS0((x) + ((((b) & 0x03) + (((t) & 0x01) << 2)) << 19)))
+    (CS0(x) | ((((t) & 0x01) + 2) << 21) | (((b) & 0x03) << 19))
 
 /// @}
 
