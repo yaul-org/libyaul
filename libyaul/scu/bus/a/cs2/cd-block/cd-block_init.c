@@ -247,7 +247,7 @@ cd_block_sector_read(uint32_t fad, void *output_buffer)
         return 0;
 }
 
-void
+int
 cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
 {
         assert(fad >= 150);
@@ -259,9 +259,19 @@ cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
         /* Get the sector count from length */
         const uint32_t sector_count = (length + (ISO9660_SECTOR_SIZE - 1)) / ISO9660_SECTOR_SIZE;
 
-        cd_block_cmd_reset_selector(0, 0);
-        cd_block_cmd_set_cd_device_connection(0);
-        cd_block_cmd_play_disk(0, fad, sector_count);
+        int ret;
+
+        if ((ret = cd_block_cmd_reset_selector(0, 0)) != 0) {
+                return ret;
+        }
+
+        if ((ret = cd_block_cmd_set_cd_device_connection(0)) != 0) {
+                return ret;
+        }
+
+        if ((ret = cd_block_cmd_play_disk(0, fad, sector_count)) != 0) {
+                return ret;
+        }
 
         uint32_t bytes_missing = length;
 
@@ -283,11 +293,15 @@ cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
 
                 /* Setup a transfer from CD buffer to buffer, then delete data
                  * from CD buffer */
-                cd_block_transfer_data(0, 0, buffer_ptr, bytes_to_read);
+                if ((ret = cd_block_transfer_data(0, 0, buffer_ptr, bytes_to_read)) != 0) {
+                        return ret;
+                }
 
                 buffer_ptr += bytes_to_read;
                 bytes_missing -= bytes_to_read;
         }
+
+        return 0;
 }
 
 static int
