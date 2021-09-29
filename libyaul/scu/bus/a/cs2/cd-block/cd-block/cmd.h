@@ -76,11 +76,16 @@ extern int cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *fi
 extern int cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num);
 extern int cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range);
 
+extern int cd_block_cmd_set_filter_subheader_conditions(uint8_t channel, uint8_t submode_mask,
+    uint8_t code_info_mask, uint8_t filter_num, uint8_t file_id, uint8_t sub_mode_val,
+    uint8_t code_info_val);
+extern int cd_block_cmd_set_filter_mode(uint8_t mode, uint16_t filter_num);
+extern int cd_block_cmd_set_filter_connection(uint8_t conn_num, uint8_t true_conn, uint8_t false_conn, uint16_t filter_num);
 extern int cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num);
 extern int cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space, uint8_t *max_selectors, uint16_t *max_blocks);
 extern int cd_block_cmd_get_sector_number(uint8_t buff_num);
 
-extern int cd_block_cmd_set_sector_length(uint16_t size);
+extern int cd_block_cmd_set_sector_length(uint8_t size);
 extern int cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num, uint16_t sec_num);
 extern int cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num, uint16_t sec_num);
 extern int cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num, uint16_t sec_num);
