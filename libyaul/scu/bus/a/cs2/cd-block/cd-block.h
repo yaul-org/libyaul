@@ -57,7 +57,7 @@ extern int cd_block_sector_read(uint32_t fad, void *output_buffer);
  * @param length        Length of buffer in bytes.
  * @param fad           FAD to start reading from.
  */
-extern void cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length);
+extern int cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length);
 
 __END_DECLS
 
