@@ -327,7 +327,7 @@ cd_block_cmd_subcode_get(uint8_t type, uint8_t *cd_status,
 }
 
 int
-cd_block_cmd_cd_dev_connection_get(uint8_t filter)
+cd_block_cmd_cd_dev_connection_set(uint8_t filter)
 {
         int ret;
         cd_block_regs_t regs;
@@ -347,7 +347,7 @@ cd_block_cmd_cd_dev_connection_get(uint8_t filter)
 }
 
 int
-cd_block_cmd_cd_device_connection_get(uint8_t *cd_status, uint8_t *filter_num)
+cd_block_cmd_cd_dev_connection_get(uint8_t *cd_status, uint8_t *filter_num)
 {
         int ret;
         cd_block_regs_t regs;

@@ -222,7 +222,7 @@ cd_block_sector_read(fad_t fad, void *output_buffer)
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_cd_dev_connection_get(0)) != 0) {
+        if ((ret = cd_block_cmd_cd_dev_connection_set(0)) != 0) {
                 return ret;
         }
 
@@ -260,7 +260,7 @@ cd_block_sectors_read(fad_t fad, void *output_buffer, uint32_t length)
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_cd_dev_connection_get(0)) != 0) {
+        if ((ret = cd_block_cmd_cd_dev_connection_set(0)) != 0) {
                 return ret;
         }
 

@@ -71,8 +71,8 @@ extern int cd_block_cmd_disk_play(int32_t mode, fad_t start_fad, int32_t num_sec
 extern int cd_block_cmd_disk_seek(uint32_t start_play_pos);
 extern int cd_block_cmd_disk_scan(uint8_t scan_direction, uint8_t *cd_status);
 extern int cd_block_cmd_subcode_get(uint8_t type, uint8_t *cd_status, uint16_t *size_in_words, uint16_t *flags);
-extern int cd_block_cmd_cd_dev_connection_get(uint8_t filter);
-extern int cd_block_cmd_cd_device_connection_get(uint8_t *cd_status, uint8_t *filter_num);
+extern int cd_block_cmd_cd_dev_connection_set(uint8_t filter);
+extern int cd_block_cmd_cd_dev_connection_get(uint8_t *cd_status, uint8_t *filter_num);
 extern int cd_block_cmd_last_buffer_destination_get(uint8_t *cd_status, uint8_t *buff_num);
 extern int cd_block_cmd_filter_range_set(uint8_t filter, fad_t fad, uint32_t range);
 
