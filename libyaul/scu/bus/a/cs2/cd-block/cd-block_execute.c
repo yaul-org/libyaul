@@ -75,7 +75,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         cd_status >>= 8;
 
         /* Checking if waiting or if command was rejected */
-        if (cd_status == 0xFF || cd_status & 0x80) {
+        if ((cd_status == 0xFF) || ((cd_status & 0x80) != 0x00)) {
                 goto busy;
         }
 
