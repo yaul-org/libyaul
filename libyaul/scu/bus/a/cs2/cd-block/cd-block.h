@@ -28,7 +28,7 @@ extern int cd_block_init(int16_t standby);
 /**
  * Bypass copy protection (by using JHL and CyberWarriorX exploit).
  */
-extern int cd_block_security_bypass();
+extern int cd_block_security_bypass(void);
 
 /**
  * Transfer data from CD-block buffer to memory.
@@ -47,7 +47,7 @@ extern int cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8
  * @param fad           FAD to start reading from.
  * @param output_buffer Buffer where data will be recorded.
  */
-extern int cd_block_sector_read(uint32_t fad, void *output_buffer);
+extern int cd_block_sector_read(fad_t fad, void *output_buffer);
 
 /**
  * Read multiple sectors to a memory location. This function initialize and
@@ -57,7 +57,7 @@ extern int cd_block_sector_read(uint32_t fad, void *output_buffer);
  * @param length        Length of buffer in bytes.
  * @param fad           FAD to start reading from.
  */
-extern int cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length);
+extern int cd_block_sectors_read(fad_t fad, void *output_buffer, uint32_t length);
 
 __END_DECLS
 
