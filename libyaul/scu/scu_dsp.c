@@ -6,6 +6,7 @@
  */
 
 #include <cpu/instructions.h>
+
 #include <scu/dsp.h>
 #include <scu/ic.h>
 
@@ -15,12 +16,12 @@ static void _dsp_end_handler(void);
 
 static void _default_ihr(void);
 
-#define LOAD_ENABLE_BIT ((uint32_t)(1 << 15))
-#define          EX_BIT ((uint32_t)(1 << 16))
-#define        STEP_BIT ((uint32_t)(1 << 17))
-#define         END_BIT ((uint32_t)(1 << 18))
-#define    OVERFLOW_BIT ((uint32_t)(1 << 19))
-#define    DMA_BUSY_BIT ((uint32_t)(1 << 23))
+#define PPAF_LOAD_ENABLE        (1 << 15UL)
+#define PPAF_EX                 (1 << 16UL)
+#define PPAF_STEP               (1 << 17UL)
+#define PPAF_END                (1 << 18UL)
+#define PPAF_OVERFLOW           (1 << 19UL)
+#define PPAF_DMA_BUSY           (1 << 23UL)
 
 /* XXX: State that should be moved (eventually) */
 static bool _overflow = false;
@@ -70,12 +71,12 @@ scu_dsp_program_load(const void *program, uint32_t count)
 
         const uint32_t clamped_count =
             (count < DSP_PROGRAM_WORD_COUNT) ? count : DSP_PROGRAM_WORD_COUNT;
-        
+
         // Stop execution
         MEMORY_WRITE(32, SCU(PPAF), 0x00000000UL);
 
         // Make the control port recognize the transfer
-        MEMORY_WRITE(32, SCU(PPAF), LOAD_ENABLE_BIT);
+        MEMORY_WRITE(32, SCU(PPAF), PPAF_LOAD_ENABLE);
 
         // Transfer
         uint32_t * const program_p = (uint32_t *)program;
@@ -97,7 +98,7 @@ scu_dsp_program_clear(void)
                 0xF0000000, /* END */
                 0x00000000  /* NOP */
         };
-        
+
         scu_dsp_program_end_wait();
 
         scu_dsp_program_load(&program[0], sizeof(program) / sizeof(*program));
@@ -117,7 +118,7 @@ scu_dsp_program_clear(void)
 void
 scu_dsp_program_pc_set(scu_dsp_pc_t pc)
 {
-        MEMORY_WRITE(32, SCU(PPAF), LOAD_ENABLE_BIT | pc);
+        MEMORY_WRITE(32, SCU(PPAF), PPAF_LOAD_ENABLE | pc);
 
         _overflow = false;
         _end = true;
@@ -128,7 +129,7 @@ scu_dsp_program_start(void)
 {
         _overflow = false;
         _end = false;
-        MEMORY_WRITE(32, SCU(PPAF), EX_BIT);
+        MEMORY_WRITE(32, SCU(PPAF), PPAF_EX);
 }
 
 void
@@ -148,7 +149,7 @@ scu_dsp_program_step(void)
         uint8_t pc;
         pc = ppaf_bits & 0xFF;
 
-        *reg_ppaf = STEP_BIT;
+        *reg_ppaf = PPAF_STEP;
 
         _overflow = false;
         _end = false;
@@ -188,7 +189,7 @@ scu_dsp_dma_busy(void)
         uint32_t ppaf_bits;
         ppaf_bits = _ppaf_read();
 
-        return ((ppaf_bits & DMA_BUSY_BIT) != 0x00000000UL);
+        return ((ppaf_bits & PPAF_DMA_BUSY) != 0x00000000UL);
 }
 
 void
@@ -212,7 +213,7 @@ scu_dsp_data_read(scu_dsp_ram_t ram_page, uint8_t offset, void *data, uint32_t c
         if (((uint16_t)count + offset) > DSP_RAM_PAGE_WORD_COUNT) {
                 return;
         }
-        
+
         scu_dsp_program_end_wait();
         scu_dsp_program_pc_set(0);
 
@@ -241,7 +242,7 @@ scu_dsp_data_write(scu_dsp_ram_t ram_page, uint8_t offset, void *data, uint32_t 
         if (((uint16_t)count + offset) > DSP_RAM_PAGE_WORD_COUNT) {
                 return;
         }
-        
+
         scu_dsp_program_end_wait();
         scu_dsp_program_pc_set(0);
 
@@ -309,7 +310,7 @@ _ppaf_read(void)
 static inline void __always_inline
 _flags_update(uint32_t ppaf_bits)
 {
-        _overflow = _overflow || ((ppaf_bits & OVERFLOW_BIT) != 0x00000000UL);
-        _end = _end || ((ppaf_bits & EX_BIT) == 0x00000000UL) ||
-               ((ppaf_bits & END_BIT) != 0x00000000UL);
+        _overflow = _overflow || ((ppaf_bits & PPAF_OVERFLOW) != 0x00000000UL);
+        _end = _end || ((ppaf_bits & PPAF_EX) == 0x00000000UL) ||
+                       ((ppaf_bits & PPAF_END) != 0x00000000UL);
 }
