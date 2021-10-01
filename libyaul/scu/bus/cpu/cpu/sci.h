@@ -6,8 +6,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_SCI_H_
-#define _CPU_SCI_H_
+#ifndef _YAUL_CPU_SCI_H_
+#define _YAUL_CPU_SCI_H_
 
 #include <sys/cdefs.h>
 
@@ -55,4 +55,4 @@ extern void cpu_sci_init(void);
 
 __END_DECLS
 
-#endif /* !_CPU_SCI_H_ */
+#endif /* !_YAUL_CPU_SCI_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_CRAM_H_
-#define _VDP2_CRAM_H_
+#ifndef _YAUL_VDP2_CRAM_H_
+#define _YAUL_VDP2_CRAM_H_
 
 #include <sys/cdefs.h>
 
@@ -68,4 +68,4 @@ extern void vdp2_cram_offset_set(vdp2_scrn_t, vdp2_cram_t);
 
 __END_DECLS
 
-#endif /* !_VDP2_CRAM_H_ */
+#endif /* !_YAUL_VDP2_CRAM_H_ */

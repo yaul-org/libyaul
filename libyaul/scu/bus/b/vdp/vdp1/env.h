@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_ENV_H_
-#define _VDP1_ENV_H_
+#ifndef _YAUL_VDP1_ENV_H_
+#define _YAUL_VDP1_ENV_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -95,4 +95,4 @@ extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
 
 __END_DECLS
 
-#endif /* !_VDP1_ENV_H_ */
+#endif /* !_YAUL_VDP1_ENV_H_ */

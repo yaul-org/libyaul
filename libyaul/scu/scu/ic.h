@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_IC_H_
-#define _SCU_IC_H_
+#ifndef _YAUL_SCU_IC_H_
+#define _YAUL_SCU_IC_H_
 
 #include <sys/cdefs.h>
 
@@ -447,4 +447,4 @@ scu_ic_priority_table_set(const scu_ic_priority_t *table)
 
 __END_DECLS
 
-#endif /* !_SCU_IC_H_ */
+#endif /* !_YAUL_SCU_IC_H_ */

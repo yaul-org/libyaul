@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_SMC_H_
-#define _SMPC_SMC_H_
+#ifndef _YAUL_SMPC_SMC_H_
+#define _YAUL_SMPC_SMC_H_
 
 #include <sys/cdefs.h>
 
@@ -251,4 +251,4 @@ smpc_smc_sysres_call(void)
 
 __END_DECLS
 
-#endif /* !_SMPC_SMC_H_ */
+#endif /* !_YAUL_SMPC_SMC_H_ */

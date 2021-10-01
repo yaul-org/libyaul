@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _MATH_INT8_H_
-#define _MATH_INT8_H_
+#ifndef _YAUL_MATH_INT8_H_
+#define _YAUL_MATH_INT8_H_
 
 #include <sys/cdefs.h>
 
@@ -36,4 +36,4 @@ typedef struct {
             (z)                                                                \
     }
 
-#endif /* !_MATH_INT8_H_ */
+#endif /* !_YAUL_MATH_INT8_H_ */

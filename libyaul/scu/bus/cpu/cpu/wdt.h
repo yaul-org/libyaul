@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_WDT_H_
-#define _CPU_WDT_H_
+#ifndef _YAUL_CPU_WDT_H_
+#define _YAUL_CPU_WDT_H_
 
 __BEGIN_DECLS
 
@@ -128,4 +128,4 @@ extern void cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr);
 
 __END_DECLS
 
-#endif /* !_CPU_WDT_H_ */
+#endif /* !_YAUL_CPU_WDT_H_ */

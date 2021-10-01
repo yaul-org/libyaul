@@ -2,8 +2,8 @@
  * See LICENSE for details.
  */
 
-#ifndef _ISO9660_INTERNAL_H_
-#define _ISO9660_INTERNAL_H_
+#ifndef _KERNEL_FS_ISO9660_INTERNAL_H_
+#define _KERNEL_FS_ISO9660_INTERNAL_H_
 
 #include <sys/types.h>
 #include <sys/cdefs.h>
@@ -154,4 +154,4 @@ isonum_733(const uint8_t *p)
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 }
 
-#endif /* !_ISO9660_INTERNAL_H_ */
+#endif /* !_KERNEL_FS_ISO9660_INTERNAL_H_ */

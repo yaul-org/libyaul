@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_DSP_H_
-#define _SCU_DSP_H_
+#ifndef _YAUL_SCU_DSP_H_
+#define _YAUL_SCU_DSP_H_
 
 #include <sys/cdefs.h>
 
@@ -197,4 +197,4 @@ extern void scu_dsp_status_get(scu_dsp_status_t *status);
 
 __END_DECLS
 
-#endif /* !_SCU_DSP_H_ */
+#endif /* !_YAUL_SCU_DSP_H_ */

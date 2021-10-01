@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _ARP_H_
-#define _ARP_H_
+#ifndef _YAUL_ARP_H_
+#define _YAUL_ARP_H_
 
 #include <sys/cdefs.h>
 
@@ -132,4 +132,4 @@ extern void arp_sync(void);
 
 __END_DECLS
 
-#endif /* !_ARP_H_ */
+#endif /* !_YAUL_ARP_H_ */

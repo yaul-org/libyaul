@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_SYNC_H_
-#define _CPU_SYNC_H_
+#ifndef _YAUL_CPU_SYNC_H_
+#define _YAUL_CPU_SYNC_H_
 
 #include <sys/cdefs.h>
 
@@ -113,4 +113,4 @@ cpu_sync_spinlock_clear(cpu_sync_lock_t b)
 
 __END_DECLS
 
-#endif /* !_CPU_SYNC_H_ */
+#endif /* !_YAUL_CPU_SYNC_H_ */

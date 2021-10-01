@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DBGIO_H_
-#define _DBGIO_H_
+#ifndef _YAUL_KERNEL_DBGIO_H_
+#define _YAUL_KERNEL_DBGIO_H_
 
 #include <sys/cdefs.h>
 
@@ -65,4 +65,4 @@ extern void dbgio_flush(void);
 
 __END_DECLS
 
-#endif /* !_DBGIO_H_ */
+#endif /* !_YAUL_KERNEL_DBGIO_H_ */

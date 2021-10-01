@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DRAM_CART_MAP_H_
-#define _DRAM_CART_MAP_H_
+#ifndef _YAUL_DRAM_CART_MAP_H_
+#define _YAUL_DRAM_CART_MAP_H_
 
 #include <scu/map.h>
 
@@ -40,4 +40,4 @@
 
 /// @}
 
-#endif /* _DRAM_CART_MAP_H_ */
+#endif /* _YAUL_DRAM_CART_MAP_H_ */

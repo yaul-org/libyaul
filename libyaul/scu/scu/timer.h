@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_TIMER_H_
-#define _SCU_TIMER_H_
+#ifndef _YAUL_SCU_TIMER_H_
+#define _YAUL_SCU_TIMER_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -122,4 +122,4 @@ extern void scu_timer_t1_set(scu_timer_ihr_t ihr);
 
 __END_DECLS
 
-#endif /* !_SCU_TIMER_H_ */
+#endif /* !_YAUL_SCU_TIMER_H_ */

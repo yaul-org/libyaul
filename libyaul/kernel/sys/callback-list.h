@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CALLBACK_LIST_H_
-#define _CALLBACK_LIST_H_
+#ifndef _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
+#define _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -51,4 +51,4 @@ extern void callback_set(callback_t *, callback_handler, void *);
 
 __END_DECLS
 
-#endif /* !_CALLBACK_LIST_H_ */
+#endif /* !_YAUL_KERNEL_SYS_CALLBACK_LIST_H_ */

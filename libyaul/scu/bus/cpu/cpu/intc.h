@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_INTC_H_
-#define _CPU_INTC_H_
+#ifndef _YAUL_CPU_INTC_H_
+#define _YAUL_CPU_INTC_H_
 
 #include <stdint.h>
 
@@ -243,4 +243,4 @@ cpu_intc_priority_b_set(uint16_t iprb)
 
 __END_DECLS
 
-#endif /* !_CPU_INTC_H */
+#endif /* !_YAUL_CPU_INTC_H_ */

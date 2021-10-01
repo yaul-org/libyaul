@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_DUAL_H_
-#define _CPU_DUAL_H_
+#ifndef _YAUL_CPU_DUAL_H_
+#define _YAUL_CPU_DUAL_H_
 
 #include <stdint.h>
 
@@ -191,4 +191,4 @@ extern cpu_which_t cpu_dual_executor_get(void);
 
 __END_DECLS
 
-#endif /* !_CPU_DUAL_H */
+#endif /* !_YAUL_CPU_DUAL_H_ */

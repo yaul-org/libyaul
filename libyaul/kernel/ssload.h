@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _KERNEL_SSLOAD_H_
-#define _KERNEL_SSLOAD_H_
+#ifndef _YAUL_KERNEL_SSLOAD_H_
+#define _YAUL_KERNEL_SSLOAD_H_
 
 #define SSLOAD_API_CMD_FILE         (0xFA)
 #define SSLOAD_API_CMD_SECTOR_COUNT (0xFB)
@@ -15,4 +15,4 @@
 #define SSLOAD_API_CMD_QUIT         (0xFE)
 #define SSLOAD_API_CMD_INVALID      (0xFF)
 
-#endif /* !_KERNEL_SSLOAD_H_ */
+#endif /* !_YAUL_KERNEL_SSLOAD_H_ */

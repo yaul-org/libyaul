@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_DMAC_H_
-#define _CPU_DMAC_H_
+#ifndef _YAUL_CPU_DMAC_H_
+#define _YAUL_CPU_DMAC_H_
 
 #include <sys/cdefs.h>
 
@@ -284,4 +284,4 @@ extern void cpu_dmac_channel_wait(cpu_dmac_channel_t ch);
 
 __END_DECLS
 
-#endif /* !_CPU_DMAC_H */
+#endif /* !_YAUL_CPU_DMAC_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_VRAM_H_
-#define _VDP1_VRAM_H_
+#ifndef _YAUL_VDP1_VRAM_H_
+#define _YAUL_VDP1_VRAM_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -81,4 +81,4 @@ extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *);
 
 __END_DECLS
 
-#endif /* !_VDP1_VRAM_H_ */
+#endif /* !_YAUL_VDP1_VRAM_H_ */

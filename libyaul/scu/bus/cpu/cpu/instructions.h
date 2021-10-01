@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_INSTRUCTIONS_H_
-#define _CPU_INSTRUCTIONS_H_
+#ifndef _YAUL_CPU_INSTRUCTIONS_H_
+#define _YAUL_CPU_INSTRUCTIONS_H_
 
 #include <sys/cdefs.h>
 
@@ -234,4 +234,4 @@ cpu_instr_nop(void)
 
 __END_DECLS
 
-#endif /* !_CPU_INSTRUCTIONS_H_ */
+#endif /* !_YAUL_CPU_INSTRUCTIONS_H_ */

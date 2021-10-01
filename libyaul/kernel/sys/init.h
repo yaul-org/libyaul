@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SYS_INIT_H_
-#define _SYS_INIT_H_
+#ifndef _YAUL_KERNEL_SYS_INIT_H_
+#define _YAUL_KERNEL_SYS_INIT_H_
 
 __BEGIN_DECLS
 
@@ -14,4 +14,4 @@ extern void user_init(void);
 
 __END_DECLS
 
-#endif /* !_SYS_INIT_H_ */
+#endif /* !_YAUL_KERNEL_SYS_INIT_H_ */

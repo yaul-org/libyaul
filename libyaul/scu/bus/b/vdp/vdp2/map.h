@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_MAP_H_
-#define _VDP2_MAP_H_
+#ifndef _YAUL_VDP2_MAP_H_
+#define _YAUL_VDP2_MAP_H_
 
 #include <sys/cdefs.h>
 
@@ -324,4 +324,4 @@ extern vdp2_registers_t vdp2_regs_copy_get(void);
 
 __END_DECLS
 
-#endif /* !_VDP2_MAP_H_ */
+#endif /* !_YAUL_VDP2_MAP_H_ */

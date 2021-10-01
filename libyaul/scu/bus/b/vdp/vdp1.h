@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_H_
-#define _VDP1_H_
+#ifndef _YAUL_VDP1_H_
+#define _YAUL_VDP1_H_
 
 #include <vdp1/cmdt.h>
 #include <vdp1/env.h>
@@ -63,4 +63,4 @@ vdp1_transfer_status_get(vdp1_transfer_status_t *status)
 
 __END_DECLS
 
-#endif /* !_VDP1_H_ */
+#endif /* !_YAUL_VDP1_H_ */

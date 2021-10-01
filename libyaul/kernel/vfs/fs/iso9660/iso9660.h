@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _ISO9660_H_
-#define _ISO9660_H_
+#ifndef _YAUL_KERNEL_FS_ISO9660_H_
+#define _YAUL_KERNEL_FS_ISO9660_H_
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -62,4 +62,4 @@ extern void iso9660_filelist_walk(const iso9660_filelist_entry_t *filelist_entry
 
 __END_DECLS
 
-#endif /* _ISO9660_H_ */
+#endif /* _YAUL_KERNEL_FS_ISO9660_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_TVMD_H_
-#define _VDP2_TVMD_H_
+#ifndef _YAUL_VDP2_TVMD_H_
+#define _YAUL_VDP2_TVMD_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -146,4 +146,4 @@ extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
 
 __END_DECLS
 
-#endif /* !_VDP2_TVMD_H_ */
+#endif /* !_YAUL_VDP2_TVMD_H_ */

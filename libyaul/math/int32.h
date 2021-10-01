@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _MATH_INT32_H_
-#define _MATH_INT32_H_
+#ifndef _YAUL_MATH_INT32_H_
+#define _YAUL_MATH_INT32_H_
 
 #include <sys/cdefs.h>
 
@@ -73,4 +73,4 @@ int32_vec2_scaled(const int8_t scalar, int32_vec2_t *in_out)
 
 extern void int32_vec2_str(const int32_vec2_t *, char *);
 
-#endif /* !_MATH_INT32_H_ */
+#endif /* !_YAUL_MATH_INT32_H_ */

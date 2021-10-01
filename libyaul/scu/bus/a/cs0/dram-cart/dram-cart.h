@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DRAM_CART_H_
-#define _DRAM_CART_H_
+#ifndef _YAUL_DRAM_CART_H_
+#define _YAUL_DRAM_CART_H_
 
 #include <sys/cdefs.h>
 
@@ -69,4 +69,4 @@ extern size_t dram_cart_size_get(void);
 
 __END_DECLS
 
-#endif /* !_DRAM_CART_H_ */
+#endif /* !_YAUL_DRAM_CART_H_ */
