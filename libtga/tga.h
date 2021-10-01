@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef TGA_H_
-#define TGA_H_
+#ifndef _TGA_H_
+#define _TGA_H_
 
 #include <stdint.h>
 
@@ -59,4 +59,5 @@ const char *tga_error_stringify(int);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* TGA_H_ */
+
+#endif /* !_TGA_H_ */
