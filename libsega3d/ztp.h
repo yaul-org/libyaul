@@ -5,8 +5,8 @@
  * XL2
  */
 
-#ifndef SEGA3D_ZTP_H_
-#define SEGA3D_ZTP_H_
+#ifndef _SEGA3D_ZTP_H_
+#define _SEGA3D_ZTP_H_
 
 #include <stdint.h>
 #include <sys/cdefs.h>
@@ -83,4 +83,4 @@ struct sega3d_ztp_handle {
         /* uint16_t _palette_num; */
 } __packed __aligned(4);
 
-#endif /* SEGA3D_ZTP_H_ */
+#endif /* !_SEGA3D_ZTP_H_ */

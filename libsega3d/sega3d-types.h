@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef SEGA3D_TYPES_H_
-#define SEGA3D_TYPES_H_
+#ifndef _SEGA3D_TYPES_H_
+#define _SEGA3D_TYPES_H_
 
 #include <stdint.h>
 
@@ -93,4 +93,4 @@ struct sega3d_object {
         void *user_data;
 };
 
-#endif /* SEGA3D_TYPES_H_ */
+#endif /* !_SEGA3D_TYPES_H_ */
