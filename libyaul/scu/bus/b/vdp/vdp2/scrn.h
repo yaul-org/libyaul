@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_SCRN_H_
-#define _VDP2_SCRN_H_
+#ifndef _YAUL_VDP2_SCRN_H_
+#define _YAUL_VDP2_SCRN_H_
 
 #include <math.h>
 #include <stdbool.h>
@@ -404,4 +404,4 @@ extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t,
 
 __END_DECLS
 
-#endif /* !_VDP2_SCRN_H_ */
+#endif /* !_YAUL_VDP2_SCRN_H_ */

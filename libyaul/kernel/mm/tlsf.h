@@ -1,5 +1,5 @@
-#ifndef _TLSF_H_
-#define _TLSF_H_
+#ifndef _YAUL_KERNEL_MM_TLSF_H_
+#define _YAUL_KERNEL_MM_TLSF_H_
 
 /* Two Level Segregated Fit memory allocator, version 3.1.
  *
@@ -87,4 +87,4 @@ int tlsf_check_pool(pool_t pool);
 };
 #endif
 
-#endif /* !_TLSF_H_ */
+#endif /* !_YAUL_KERNEL_MM_TLSF_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_FRT_H_
-#define _CPU_FRT_H_
+#ifndef _YAUL_CPU_FRT_H_
+#define _YAUL_CPU_FRT_H_
 
 #include <stdbool.h>
 
@@ -212,4 +212,4 @@ extern void cpu_frt_ovi_set(cpu_frt_ihr_t ihr);
 
 __END_DECLS
 
-#endif /* !_CPU_FRT_H_ */
+#endif /* !_YAUL_CPU_FRT_H_ */

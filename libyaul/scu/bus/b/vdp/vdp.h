@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP_H_
-#define _VDP_H_
+#ifndef _YAUL_VDP_H_
+#define _YAUL_VDP_H_
 
 #include <vdp1.h>
 #include <vdp2.h>
@@ -65,4 +65,4 @@ extern void vdp_sync_user_callback_clear(void);
 
 __END_DECLS
 
-#endif /* !_VDP_H_ */
+#endif /* !_YAUL_VDP_H_ */

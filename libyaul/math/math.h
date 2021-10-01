@@ -1,8 +1,8 @@
 /// @defgroup MATH Math
 /// Not yet documented.
 
-#ifndef _MATH_H_
-#define _MATH_H_
+#ifndef _YAUL_MATH_H_
+#define _YAUL_MATH_H_
 
 #include <sys/cdefs.h>
 
@@ -54,4 +54,4 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-#endif /* !_MATH_H_ */
+#endif /* !_YAUL_MATH_H_ */

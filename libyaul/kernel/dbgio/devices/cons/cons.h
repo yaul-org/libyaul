@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CONS_H_
-#define _CONS_H_
+#ifndef _KERNEL_DBGIO_CONS_H_
+#define _KERNEL_DBGIO_CONS_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -40,4 +40,4 @@ extern void cons_buffer(const char *);
 
 __END_DECLS
 
-#endif /* !_CONS_H_ */
+#endif /* !_KERNEL_DBGIO_CONS_H_ */

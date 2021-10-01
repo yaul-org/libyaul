@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _GDB_H_
-#define _GDB_H_
+#ifndef _YAUL_GDB_H_
+#define _YAUL_GDB_H_
 
 #include <cpu/instructions.h>
 
@@ -24,4 +24,4 @@ extern void gdb_init(void);
 
 __END_DECLS
 
-#endif /* !_GDB_H_ */
+#endif /* !_YAUL_GDB_H_ */

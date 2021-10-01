@@ -6,8 +6,8 @@
  * Lawrence Sebald
  */
 
-#ifndef _ROMDISK_H_
-#define _ROMDISK_H_
+#ifndef _YAUL_KERNEL_FS_ROMDISK_H_
+#define _YAUL_KERNEL_FS_ROMDISK_H_
 
 #include <errno.h>
 #include <stdint.h>
@@ -32,4 +32,4 @@ size_t romdisk_total(void *);
 
 __END_DECLS
 
-#endif /* _ROMDISK_H_ */
+#endif /* _YAUL_KERNEL_FS_ROMDISK_H_ */

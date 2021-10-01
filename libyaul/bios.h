@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _BIOS_H_
-#define _BIOS_H_
+#ifndef _YAUL_BIOS_H_
+#define _YAUL_BIOS_H_
 
 #include <sys/cdefs.h>
 
@@ -65,4 +65,4 @@ bios_execute(void)
 
 __END_DECLS
 
-#endif /* !_BIOS_H_ */
+#endif /* !_YAUL_BIOS_H_ */

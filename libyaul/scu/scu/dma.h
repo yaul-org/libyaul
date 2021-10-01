@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_DMA_H_
-#define _SCU_DMA_H_
+#ifndef _YAUL_SCU_DMA_H_
+#define _YAUL_SCU_DMA_H_
 
 #include <sys/cdefs.h>
 
@@ -446,4 +446,4 @@ extern scu_dma_level_t scu_dma_level_unused_get(void);
 
 __END_DECLS
 
-#endif /* !_SCU_DMA_H_ */
+#endif /* !_YAUL_SCU_DMA_H_ */

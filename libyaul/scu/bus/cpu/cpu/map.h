@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_MAP_H_
-#define _CPU_MAP_H_
+#ifndef _YAUL_CPU_MAP_H_
+#define _YAUL_CPU_MAP_H_
 
 #include <scu/map.h>
 
@@ -459,4 +459,4 @@ do {                                                                           \
 
 /// @}
 
-#endif /* !_CPU_MAP_H_ */
+#endif /* !_YAUL_CPU_MAP_H_ */

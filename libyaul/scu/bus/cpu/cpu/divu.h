@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_DIVU_H_
-#define _CPU_DIVU_H_
+#ifndef _YAUL_CPU_DIVU_H_
+#define _YAUL_CPU_DIVU_H_
 
 #include <cpu/instructions.h>
 #include <cpu/map.h>
@@ -150,4 +150,4 @@ extern void cpu_divu_ovfi_set(cpu_divu_ihr ihr);
 
 __END_DECLS
 
-#endif /* !_CPU_DIVU_H_ */
+#endif /* !_YAUL_CPU_DIVU_H_ */

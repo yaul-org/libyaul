@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DMA_QUEUE_H_
-#define _DMA_QUEUE_H_
+#ifndef _YAUL_KERNEL_SYS_DMA_QUEUE_H_
+#define _YAUL_KERNEL_SYS_DMA_QUEUE_H_
 
 #include <stdint.h>
 
@@ -49,4 +49,4 @@ extern uint32_t dma_queue_capacity_get(void);
 
 __END_DECLS
 
-#endif /* !_DMA_QUEUE_H_ */
+#endif /* !_YAUL_KERNEL_SYS_DMA_QUEUE_H_ */

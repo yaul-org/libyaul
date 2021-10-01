@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _USB_CART_MAP_H_
-#define _USB_CART_MAP_H_
+#ifndef _YAUL_USB_CART_MAP_H_
+#define _YAUL_USB_CART_MAP_H_
 
 #include <scu/map.h>
 
@@ -37,4 +37,4 @@
 
 /// @}
 
-#endif /* !_USB_CART_MAP_H_ */
+#endif /* !_YAUL_USB_CART_MAP_H_ */

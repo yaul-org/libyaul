@@ -21,8 +21,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _MATH_UINT32_H_
-#define _MATH_UINT32_H_
+#ifndef _YAUL_MATH_UINT32_H_
+#define _YAUL_MATH_UINT32_H_
 
 #include <sys/cdefs.h>
 
@@ -34,4 +34,4 @@ extern uint32_t uint32_log2(uint32_t);
 
 __END_DECLS
 
-#endif /* !_MATH_UINT32_H_ */
+#endif /* !_YAUL_MATH_UINT32_H_ */

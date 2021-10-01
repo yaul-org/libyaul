@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_PERIPHERAL_H_
-#define _SMPC_PERIPHERAL_H_
+#ifndef _YAUL_SMPC_PERIPHERAL_H_
+#define _YAUL_SMPC_PERIPHERAL_H_
 
 #include <sys/queue.h>
 #include <sys/cdefs.h>
@@ -440,4 +440,4 @@ extern void smpc_peripheral_process(void);
 
 __END_DECLS
 
-#endif /* !_SMPC_PERIPHERAL_H_ */
+#endif /* !_YAUL_SMPC_PERIPHERAL_H_ */

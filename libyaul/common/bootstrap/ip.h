@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _IP_H_
-#define _IP_H_
+#ifndef _YAUL_IP_H_
+#define _YAUL_IP_H_
 
 #include <sys/cdefs.h>
 
@@ -16,7 +16,7 @@
 #define IP_HEADER_DATA_SIGNATURE "SEGASATURN DATA "
 #define IP_HEADER_BOOT_SIGNATURE "SEGA SEGASATURN "
 
-/* Device Info */
+/* Device info */
 #define IP_HEADER_DEVICE_INFO_ROM       "R"
 #define IP_HEADER_DEVICE_INFO_SRAM      "S"
 #define IP_HEADER_DEVICE_INFO_DRAM      "D"
@@ -31,7 +31,7 @@
 /* European PAL, Southeast Asian PAL, Central and South American PAL */
 #define IP_HEADER_AREA_CODE_EUROPE_PAL          "E"
 
-/* Back-up RAM Info */
+/* Back-up RAM info */
 #define IP_HEADER_BUP_INFO_BRAM_ODD_BYTES       "O"
 #define IP_HEADER_BUP_INFO_BRAM_EVEN_BYTES      "E"
 #define IP_HEADER_BUP_INFO_BRAM_WORDS           "W"
@@ -109,4 +109,4 @@ typedef struct ip_header_boot {
         unsigned int :32;
 } __packed ip_header_boot_t;
 
-#endif /* !_IP_H_ */
+#endif /* !_YAUL_IP_H_ */

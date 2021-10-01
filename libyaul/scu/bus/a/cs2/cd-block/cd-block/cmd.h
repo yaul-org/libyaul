@@ -6,8 +6,8 @@
  * Romulo Fernandes Machado <abra185@gmail.com>
  */
 
-#ifndef _CD_BLOCK_CMD_H_
-#define _CD_BLOCK_CMD_H_
+#ifndef _YAUL_CD_BLOCK_CMD_H_
+#define _YAUL_CD_BLOCK_CMD_H_
 
 #include <stdint.h>
 
@@ -99,4 +99,4 @@ extern int cd_block_cmd_auth_check(uint16_t *disk_type_auth);
 
 __END_DECLS
 
-#endif /* !_CD_BLOCK_CMD_H_ */
+#endif /* !_YAUL_CD_BLOCK_CMD_H_ */

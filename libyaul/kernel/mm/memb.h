@@ -28,8 +28,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _MEMB_H_
-#define _MEMB_H_
+#ifndef _YAUL_KERNEL_MM_MEMB_H_
+#define _YAUL_KERNEL_MM_MEMB_H_
 
 #include <sys/cdefs.h>
 
@@ -78,4 +78,4 @@ bool memb_bounds(memb_t *, void *);
 
 __END_DECLS
 
-#endif /* _MEMB_H_ */
+#endif /* _YAUL_KERNEL_MM_MEMB_H_ */

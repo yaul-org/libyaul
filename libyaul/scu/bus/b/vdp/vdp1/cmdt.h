@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_CMDT_H_
-#define _VDP1_CMDT_H_
+#ifndef _YAUL_VDP1_CMDT_H_
+#define _YAUL_VDP1_CMDT_H_
 
 #include <sys/cdefs.h>
 
@@ -303,4 +303,4 @@ extern void vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *);
 
 __END_DECLS
 
-#endif /* !_VDP1_CMDT_H_ */
+#endif /* !_YAUL_VDP1_CMDT_H_ */

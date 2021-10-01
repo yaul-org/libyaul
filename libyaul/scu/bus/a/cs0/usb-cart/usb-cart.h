@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _USB_CART_H_
-#define _USB_CART_H_
+#ifndef _YAUL_USB_CART_H_
+#define _YAUL_USB_CART_H_
 
 #include <sys/cdefs.h>
 
@@ -148,4 +148,4 @@ extern void usb_cart_dma_send(const void *buffer, uint32_t len);
 
 __END_DECLS
 
-#endif /* !_USB_CART_H_ */
+#endif /* !_YAUL_USB_CART_H_ */

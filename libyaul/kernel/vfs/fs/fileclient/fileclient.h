@@ -3,8 +3,8 @@
  * See LICENSE for details.
  */
 
-#ifndef _FILECLIENT_H_
-#define _FILECLIENT_H_
+#ifndef _YAUL_KERNEL_FS_FILECLIENT_H_
+#define _YAUL_KERNEL_FS_FILECLIENT_H_
 
 #include <usb-cart.h>
 
@@ -20,4 +20,4 @@ extern uint32_t fileclient_byte_size_request(const char *filename);
 
 __END_DECLS
 
-#endif /* _FILECLIENT_H_ */
+#endif /* _YAUL_KERNEL_FS_FILECLIENT_H_ */

@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _ARP_MAP_H_
-#define _ARP_MAP_H_
+#ifndef _YAUL_ARP_MAP_H_
+#define _YAUL_ARP_MAP_H_
 
 /// @addtogroup MEMORY_MAP_AREAS
 /// @{
@@ -45,4 +45,4 @@
 
 /// @}
 
-#endif /* !_ARP_MAP_H_ */
+#endif /* !_YAUL_ARP_MAP_H_ */

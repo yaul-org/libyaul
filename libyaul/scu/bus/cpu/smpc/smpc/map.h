@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_MAP_H_
-#define _SMPC_MAP_H_
+#ifndef _YAUL_SMPC_MAP_H_
+#define _YAUL_SMPC_MAP_H_
 
 #include <scu/map.h>
 
@@ -109,4 +109,4 @@
 
 /// @}
 
-#endif /* !_SMPC_MAP_H_ */
+#endif /* !_YAUL_SMPC_MAP_H_ */

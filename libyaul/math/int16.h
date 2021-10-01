@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _MATH_INT16_H_
-#define _MATH_INT16_H_
+#ifndef _YAUL_MATH_INT16_H_
+#define _YAUL_MATH_INT16_H_
 
 #include <sys/cdefs.h>
 
@@ -73,4 +73,4 @@ int16_vec2_scaled(const int8_t scalar, int16_vec2_t *in_out)
 
 extern void int16_vec2_str(const int16_vec2_t *, char *);
 
-#endif /* !_MATH_INT16_H_ */
+#endif /* !_YAUL_MATH_INT16_H_ */

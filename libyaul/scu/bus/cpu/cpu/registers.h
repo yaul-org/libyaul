@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_REGISTERS_H_
-#define _CPU_REGISTERS_H_
+#ifndef _YAUL_CPU_REGISTERS_H_
+#define _YAUL_CPU_REGISTERS_H_
 
 #include <sys/cdefs.h>
 
@@ -300,4 +300,4 @@ cpu_reg_sp_get(void)
 
 __END_DECLS
 
-#endif /* !_CPU_REGISTERS_H_ */
+#endif /* !_YAUL_CPU_REGISTERS_H_ */

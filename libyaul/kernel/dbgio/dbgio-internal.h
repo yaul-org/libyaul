@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DBGIO_INTERNAL_H_
-#define _DBGIO_INTERNAL_H_
+#ifndef _KERNEL_DBGIO_INTERNAL_H_
+#define _KERNEL_DBGIO_INTERNAL_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -43,4 +43,4 @@ extern void _internal_dbgio_init(void);
 
 __END_DECLS
 
-#endif /* !_DBGIO_INTERNAL_H_ */
+#endif /* !_KERNEL_DBGIO_INTERNAL_H_ */

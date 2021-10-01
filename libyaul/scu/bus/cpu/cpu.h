@@ -7,8 +7,8 @@
 
 /// @defgroup CPU CPU
 
-#ifndef _CPU_H_
-#define _CPU_H_
+#ifndef _YAUL_CPU_H_
+#define _YAUL_CPU_H_
 
 #include <cpu/cache.h>
 #include <cpu/divu.h>
@@ -23,4 +23,4 @@
 #include <cpu/sync.h>
 #include <cpu/wdt.h>
 
-#endif /* !_CPU_H_ */
+#endif /* !_YAUL_CPU_H_ */

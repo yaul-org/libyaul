@@ -2,8 +2,8 @@
  * See LICENSE for details.
  */
 
-#ifndef _CPU_ENDIAN_H_
-#define _CPU_ENDIAN_H_
+#ifndef _YAUL_CPU_ENDIAN_H_
+#define _YAUL_CPU_ENDIAN_H_
 
 #include <stdint.h>
 
@@ -88,4 +88,4 @@ cpu_bswap32(uint32_t x)
 
 __END_DECLS
 
-#endif /* !_CPU_ENDIAN_H_ */
+#endif /* !_YAUL_CPU_ENDIAN_H_ */

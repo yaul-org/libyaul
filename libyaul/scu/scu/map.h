@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SCU_MAP_H_
-#define _SCU_MAP_H_
+#ifndef _YAUL_SCU_MAP_H_
+#define _YAUL_SCU_MAP_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -20,7 +20,7 @@
 /// @param t The bit count: 8, 16, or 32.
 /// @param x The byte offset.
 #define MEMORY_READ(t, x)                                                      \
-(*(volatile uint ## t ## _t *)(x))
+    (*(volatile uint ## t ## _t *)(x))
 
 /// Write value @p y to address @p x of size @p t.
 ///
@@ -347,4 +347,4 @@ do {                                                                           \
 
 /// @}
 
-#endif /* !_SCU_MAP_H_ */
+#endif /* !_YAUL_SCU_MAP_H_ */

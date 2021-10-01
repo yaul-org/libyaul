@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_VRAM_H_
-#define _VDP2_VRAM_H_
+#ifndef _YAUL_VDP2_VRAM_H_
+#define _YAUL_VDP2_VRAM_H_
 
 #include <sys/cdefs.h>
 
@@ -138,4 +138,4 @@ extern void vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t);
 
 __END_DECLS
 
-#endif /* !_VDP2_VRAM_H_ */
+#endif /* !_YAUL_VDP2_VRAM_H_ */

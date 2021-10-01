@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_UBC_H_
-#define _CPU_UBC_H_
+#ifndef _YAUL_CPU_UBC_H_
+#define _YAUL_CPU_UBC_H_
 
-#endif /* !_CPU_UBC_H_ */
+#endif /* !_YAUL_CPU_UBC_H_ */

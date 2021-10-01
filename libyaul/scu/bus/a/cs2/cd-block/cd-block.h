@@ -6,8 +6,8 @@
  * Romulo Fernandes Machado <abra185@gmail.com>
  */
 
-#ifndef _CD_BLOCK_H_
-#define _CD_BLOCK_H_
+#ifndef _YAUL_CD_BLOCK_H_
+#define _YAUL_CD_BLOCK_H_
 
 #include <stdint.h>
 
@@ -61,4 +61,4 @@ extern int cd_block_sectors_read(fad_t fad, void *output_buffer, uint32_t length
 
 __END_DECLS
 
-#endif /* !_CD_BLOCK_H_ */
+#endif /* !_YAUL_CD_BLOCK_H_ */

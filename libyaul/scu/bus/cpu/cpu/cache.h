@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_CACHE_H_
-#define _CPU_CACHE_H_
+#ifndef _YAUL_CPU_CACHE_H_
+#define _YAUL_CPU_CACHE_H_
 
 #include <sys/cdefs.h>
 
@@ -151,4 +151,4 @@ extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
 
 __END_DECLS
 
-#endif /* !_CPU_CACHE_H */
+#endif /* !_YAUL_CPU_CACHE_H_ */

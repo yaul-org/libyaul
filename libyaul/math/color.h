@@ -1,5 +1,5 @@
-#ifndef _MATH_COLOR_H_
-#define _MATH_COLOR_H_
+#ifndef _YAUL_MATH_COLOR_H_
+#define _YAUL_MATH_COLOR_H_
 
 #include "fix16.h"
 
@@ -149,4 +149,4 @@ extern void color_fix16_hsv_lerp(const color_fix16_hsv_t *,
     const color_fix16_hsv_t *, fix16_t, color_fix16_hsv_t *);
 extern void color_fix16_hsv_str(const color_fix16_hsv_t *, char *, int32_t);
 
-#endif /* !_MATH_COLOR_H_ */
+#endif /* !_YAUL_MATH_COLOR_H_ */
