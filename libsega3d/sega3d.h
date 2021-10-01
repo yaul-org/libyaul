@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef SEGA3D_H_
-#define SEGA3D_H_
+#ifndef _SEGA3D_H_
+#define _SEGA3D_H_
 
 #include <stdint.h>
 
@@ -64,4 +64,4 @@ extern void sega3d_ztp_textures_parse(sega3d_ztp_handle_t *handle, void *vram,
 extern void sega3d_ztp_update(sega3d_ztp_handle_t *handle,
     uint16_t texture_num);
 
-#endif /* SEGA3D_H_ */
+#endif /* !_SEGA3D_H_ */

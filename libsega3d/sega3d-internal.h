@@ -2,8 +2,8 @@
  * No copyright.
  */
 
-#ifndef SEGA3D_INTERNAL_H_
-#define SEGA3D_INTERNAL_H_
+#ifndef _SEGA3D_INTERNAL_H_
+#define _SEGA3D_INTERNAL_H_
 
 #include <stdint.h>
 
@@ -136,4 +136,4 @@ extern void internal_list_alloc(list_t *list, uint16_t count);
 extern void internal_list_free(list_t *list);
 extern void internal_list_set(list_t *list, void *list_p, uint16_t count);
 
-#endif /* SEGA3D_INTERNAL_H_ */
+#endif /* !_SEGA3D_INTERNAL_H_ */
