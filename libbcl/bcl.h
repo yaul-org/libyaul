@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef BCL_H_
-#define BCL_H_
+#ifndef _BCL_H_
+#define _BCL_H_
 
 #include <inttypes.h>
 
@@ -24,4 +24,5 @@ void SF_Uncompress(uint8_t *, uint8_t *, uint32_t, uint32_t);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* BCL_H_ */
+
+#endif /* _BCL_H_ */
