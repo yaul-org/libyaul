@@ -1,58 +1,4 @@
-/*************************************************************************
- * Name:        lz.c
- * Author:      Marcus Geelnard
- * Description: LZ77 coder/decoder implementation.
- * Reentrant:   Yes
- *
- * The LZ77 compression scheme is a substitutional compression scheme
- * proposed by Abraham Lempel and Jakob Ziv in 1977. It is very simple in
- * its design, and uses no fancy bit level compression.
- *
- * This is my first attempt at an implementation of a LZ77 code/decoder.
- *
- * The principle of the LZ77 compression algorithm is to store repeated
- * occurrences of strings as references to previous occurrences of the same
- * string. The point is that the reference consumes less space than the
- * string itself, provided that the string is long enough (in this
- * implementation, the string has to be at least 4 bytes long, since the
- * minimum coded reference is 3 bytes long). Also note that the term
- * "string" refers to any kind of byte sequence (it does not have to be
- * an ASCII string, for instance).
- *
- * The coder uses a brute force approach to finding string matches in the
- * history buffer (or "sliding window", if you wish), which is very, very
- * slow. I recon the complexity is somewhere between O(n^2) and O(n^3),
- * depending on the input data.
- *
- * There is also a faster implementation that uses a large working buffer
- * in which a "jump table" is stored, which is used to quickly find
- * possible string matches (see the source code for LZ_CompressFast() for
- * more information). The faster method is an order of magnitude faster,
- * but still quite slow compared to other compression methods.
- *
- * The upside is that decompression is very fast, and the compression ratio
- * is often very good.
- *
- * The reference to a string is coded as a (length,offset) pair, where the
- * length indicates the length of the string, and the offset gives the
- * offset from the current data position. To distinguish between string
- * references and literal strings (uncompressed bytes), a string reference
- * is preceded by a marker byte, which is chosen as the least common byte
- * symbol in the input data stream (this marker byte is stored in the
- * output stream as the first byte).
- *
- * Occurrences of the marker byte in the stream are encoded as the marker
- * byte followed by a zero byte, which means that occurrences of the marker
- * byte have to be coded with two bytes.
- *
- * The lengths and offsets are coded in a variable length fashion, allowing
- * values of any magnitude (up to 4294967295 in this implementation).
- *
- * With this compression scheme, the worst case compression result is
- * (257/256)*insize + 1.
- *
- *-------------------------------------------------------------------------
- * Copyright (c) 2003-2006 Marcus Geelnard
+/* Copyright (c) 2003-2006 Marcus Geelnard
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -62,112 +8,150 @@
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would
- *    be appreciated but is not required.
+ * 1. The origin of this software must not be misrepresented; you must not claim
+ *    that you wrote the original software. If you use this software in a
+ *    product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  *
- * 2. Altered source versions must be plainly marked as such, and must not
- *    be misrepresented as being the original software.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
  *
- * 3. This notice may not be removed or altered from any source
- *    distribution.
- *
- * Marcus Geelnard
- * marcus.geelnard at home.se
- *************************************************************************/
+ * 3. This notice may not be removed or altered from any source distribution. */
 
-
-/*************************************************************************
- * Constants used for LZ77 coding
- *************************************************************************/
+#define PROGNAME "bcl_lz"
 
 /* Maximum offset (can be any size < 2^31). Lower values give faster
-   compression, while higher values gives better compression. The default
-   value of 100000 is quite high. Experiment to see what works best for
-   you. */
+ * compression, while higher values gives better compression. The default value
+ * of 100000 is quite high. Experiment to see what works best for you. */
 #define LZ_MAX_OFFSET 2147483648
 
-/*************************************************************************
- * _LZ_StringCompare() - Return maximum length string match.
- *************************************************************************/
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
-static unsigned int _LZ_StringCompare(unsigned char * str1,
-                                      unsigned char * str2, unsigned int minlen, unsigned int maxlen)
+#include "shared.h"
+
+static int _lz_compress(uint8_t *in, uint8_t *out, uint32_t insize, uint32_t max_offset);
+
+int
+main(int argc, char *argv[])
 {
-        unsigned int len;
+        if (argc != 3) {
+                print_usage(PROGNAME);
+
+                return 0;
+        }
+
+        const char * const in_filename = argv[1];
+        const char * const out_filename = argv[2];
+
+        input_file_t input_file;
+
+        if ((input_file_open(in_filename, &input_file)) != 0) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        /* Allocate a buffer of equal to twice the size since we don't know how
+         * big the out file size will be */
+        void *out_buffer;
+
+        /* According to the original sources, the output buffer must be 0.4%
+         * larger plus 1 byte */
+        size_t out_size = (size_t)floor(1.004f * (float)input_file.buffer_len) + 1;
+
+        if ((out_buffer = malloc(out_size)) == NULL) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        const uint32_t out_file_size =
+            _lz_compress(input_file.buffer, out_buffer, input_file.buffer_len, LZ_MAX_OFFSET);
+
+        (void)printf("%zu -> %"PRIu32"\n", input_file.buffer_len, out_file_size);
+
+        if (out_file_size == 0) {
+                fprintf(stderr, "Error: %s: RLE compression failed\n", PROGNAME);
+
+                return 1;
+        }
+
+        if ((output_file_write(out_filename, out_buffer, out_file_size)) != 0) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        input_file_close(&input_file);
+
+        free(out_buffer);
+
+        return 0;
+}
+
+/* Return maximum length string match */
+static uint32_t
+_lz_string_compare(uint8_t *str1, uint8_t *str2, uint32_t minlen, uint32_t maxlen)
+{
+        uint32_t len;
 
         for (len = minlen; (len < maxlen) && (str1[len] == str2[len]); ++len);
 
         return len;
 }
 
-
-/*************************************************************************
- * _LZ_WriteVarSize() - Write unsigned integer with variable number of
- * bytes depending on value.
- *************************************************************************/
-
-static int _LZ_WriteVarSize(unsigned int x, unsigned char * buf)
+/* Write integer with variable number of bytes depending on value */
+static int _lz_var_size_write(uint32_t x, uint8_t *buf)
 {
-        unsigned int y;
+        uint32_t y;
         int num_bytes, i, b;
 
         /* Determine number of bytes needed to store the number x */
         y = x >> 3;
-        for (num_bytes = 5; num_bytes >= 2; -- num_bytes) {
+
+        for (num_bytes = 5; num_bytes >= 2; --num_bytes) {
                 if (y & 0xfe000000) {
                         break;
                 }
+
                 y <<= 7;
         }
 
         /* Write all bytes, seven bits in each, with 8:th bit set for all */
         /* but the last byte. */
-        for (i = num_bytes-1; i >= 0; -- i) {
-                b = (x >> (i*7)) & 0x0000007f;
+        for (i = num_bytes - 1; i >= 0; --i) {
+                b = (x >> (i * 7)) & 0x0000007f;
+
                 if (i > 0) {
                         b |= 0x00000080;
                 }
-                *buf++ = (unsigned char) b;
+
+                *buf++ = (uint8_t) b;
         }
 
         /* Return number of bytes written */
         return num_bytes;
 }
 
-
-
-/*************************************************************************
- *                            PUBLIC FUNCTIONS                            *
- *************************************************************************/
-
-
-/*************************************************************************
- * LZ_Compress() - Compress a block of data using an LZ77 coder.
- *  in     - Input (uncompressed) buffer.
- *  out    - Output (compressed) buffer. This buffer must be 0.4% larger
- *           than the input buffer, plus one byte.
- *  insize - Number of input bytes.
- * The function returns the size of the compressed data.
- *************************************************************************/
-
-int LZ_Compress(unsigned char *in, unsigned char *out,
-                unsigned int insize, unsigned long max_offset)
+static int
+_lz_compress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t max_offset)
 {
-        unsigned char marker, symbol;
-        unsigned int inpos, outpos, bytesleft, i;
-        unsigned int maxoffset, offset, bestoffset;
-        unsigned int maxlength, length, bestlength;
-        unsigned int histogram[256];
-        unsigned char *ptr1, *ptr2;
+        uint8_t marker, symbol;
+        uint32_t inpos, outpos, bytesleft, i;
+        uint32_t maxoffset, offset, bestoffset;
+        uint32_t maxlength, length, bestlength;
+        uint32_t histogram[256];
+        uint8_t *ptr1, *ptr2;
 
         if (max_offset >= LZ_MAX_OFFSET) {
                 max_offset = LZ_MAX_OFFSET;
         }
 
         /* Do we have anything to compress? */
-        if (insize < 1) {
+        if (in_size < 1) {
                 return 0;
         }
 
@@ -175,12 +159,14 @@ int LZ_Compress(unsigned char *in, unsigned char *out,
         for (i = 0; i < 256; ++i) {
                 histogram[i] = 0;
         }
-        for (i = 0; i < insize; ++i) {
+
+        for (i = 0; i < in_size; ++i) {
                 ++histogram[in[i]];
         }
 
         /* Find the least common byte, and use it as the marker symbol */
         marker = 0;
+
         for (i = 1; i < 256; ++i) {
                 if (histogram[i ] < histogram[marker]) {
                         marker = i;
@@ -195,7 +181,8 @@ int LZ_Compress(unsigned char *in, unsigned char *out,
         outpos = 1;
 
         /* Main compression loop */
-        bytesleft = insize;
+        bytesleft = in_size;
+
         do {
                 /* Determine most distant position */
                 if (inpos > max_offset) {
@@ -210,6 +197,7 @@ int LZ_Compress(unsigned char *in, unsigned char *out,
                 /* Search history window for maximum length string match */
                 bestlength = 3;
                 bestoffset = 0;
+
                 for (offset = 3; offset <= maxoffset; ++offset) {
                         /* Get pointer to candidate string */
                         ptr2 = &ptr1[- (int) offset];
@@ -221,7 +209,7 @@ int LZ_Compress(unsigned char *in, unsigned char *out,
                                 maxlength = (bytesleft < offset ? bytesleft : offset);
 
                                 /* Count maximum length match at this offset */
-                                length = _LZ_StringCompare(ptr1, ptr2, 0, maxlength);
+                                length = _lz_string_compare(ptr1, ptr2, 0, maxlength);
 
                                 /* Better match than any previous match? */
                                 if (length > bestlength) {
@@ -233,34 +221,37 @@ int LZ_Compress(unsigned char *in, unsigned char *out,
 
                 /* Was there a good enough match? */
                 if ((bestlength >= 8) ||
-                                ((bestlength == 4) && (bestoffset <= 0x0000007f)) ||
-                                ((bestlength == 5) && (bestoffset <= 0x00003fff)) ||
-                                ((bestlength == 6) && (bestoffset <= 0x001fffff)) ||
-                                ((bestlength == 7) && (bestoffset <= 0x0fffffff))) {
-                        out[outpos++] = (unsigned char) marker;
-                        outpos += _LZ_WriteVarSize(bestlength, &out[outpos]);
-                        outpos += _LZ_WriteVarSize(bestoffset, &out[outpos]);
+                    ((bestlength == 4) && (bestoffset <= 0x0000007f)) ||
+                    ((bestlength == 5) && (bestoffset <= 0x00003fff)) ||
+                    ((bestlength == 6) && (bestoffset <= 0x001fffff)) ||
+                    ((bestlength == 7) && (bestoffset <= 0x0fffffff))) {
+                        out[outpos++] = (uint8_t) marker;
+                        outpos += _lz_var_size_write(bestlength, &out[outpos]);
+                        outpos += _lz_var_size_write(bestoffset, &out[outpos]);
                         inpos += bestlength;
                         bytesleft -= bestlength;
                 } else {
                         /* Output single byte (or two bytes if marker byte) */
                         symbol = in[inpos++];
                         out[outpos++] = symbol;
+
                         if (symbol == marker) {
                                 out[outpos++] = 0;
                         }
-                        -- bytesleft;
+
+                        --bytesleft;
                 }
         } while (bytesleft > 3);
 
         /* Dump remaining bytes, if any */
-        while (inpos < insize) {
+        while (inpos < in_size) {
                 if (in[inpos] == marker) {
                         out[outpos++] = marker;
                         out[outpos++] = 0;
                 } else {
-                        out[outpos++ ] = in[inpos];
+                        out[outpos++] = in[inpos];
                 }
+
                 ++inpos;
         }
 
