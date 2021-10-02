@@ -31,6 +31,7 @@ all: $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM)
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(PROGRAM): $(YAUL_BUILD_ROOT)/$(SUB_BUILD) $(OBJS)
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	$(ECHO)$(STRIP) -s $@
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD):
 	$(ECHO)mkdir -p $@
