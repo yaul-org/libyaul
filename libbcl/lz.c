@@ -40,8 +40,10 @@ bcl_lz_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 
         /* Main decompression loop */
         outpos = 0;
+
         do {
                 symbol = in[ inpos ++ ];
+
                 if (symbol == marker) {
                         /* We had a marker byte */
                         if (in[ inpos ] == 0) {

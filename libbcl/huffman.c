@@ -26,33 +26,26 @@
 #define MAX_TREE_NODES 511
 
 typedef struct {
-        uint8_t *BytePtr;
-        uint32_t BitPos;
+        uint8_t *byte_ptr;
+        uint32_t bit_pos;
 } huff_bitstream_t;
 
-typedef struct {
-        int32_t Symbol;
-        uint32_t Count;
-        uint32_t Code;
-        uint32_t Bits;
-} huff_sym_t;
+typedef struct huff_encodenode huff_encodenode_t;
 
-typedef struct huff_encodenode_struct huff_encodenode_t;
-
-struct huff_encodenode_struct {
-        huff_encodenode_t *ChildA, *ChildB;
-        int32_t Count;
-        int32_t Symbol;
+struct huff_encodenode {
+        huff_encodenode_t *child_a, *child_b;
+        int32_t count;
+        int32_t symbol;
 };
 
-typedef struct huff_decodenode_struct huff_decodenode_t;
+typedef struct huff_decodenode huff_decodenode_t;
 
-struct huff_decodenode_struct {
-        huff_decodenode_t *ChildA, *ChildB;
-        int32_t Symbol;
+struct huff_decodenode {
+        huff_decodenode_t *child_a, *child_b;
+        int32_t symbol;
 };
 
-static void _bitstream_init(huff_bitstream_t *stream, uint8_t *buf);
+static void _bitstream_init(huff_bitstream_t *stream, uint8_t *buffer);
 static uint32_t _bit_read(huff_bitstream_t *stream);
 static uint32_t _8bits_read(huff_bitstream_t *stream);
 static huff_decodenode_t *_tree_recover(huff_decodenode_t *nodes, huff_bitstream_t *stream, uint32_t *nodenum);
@@ -63,7 +56,7 @@ bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out
         huff_decodenode_t nodes[MAX_TREE_NODES], *root, *node;
         huff_bitstream_t  stream;
         uint32_t k, node_count;
-        uint8_t *buf;
+        uint8_t *buffer;
 
         /* Do we have anything to decompress? */
         if (in_size < 1) {
@@ -78,30 +71,32 @@ bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out
         root = _tree_recover(nodes, &stream, &node_count);
 
         /* Decode input stream */
-        buf = out;
-        for (k = 0; k < out_size; ++ k) {
+        buffer = out;
+
+        for (k = 0; k < out_size; ++k) {
                 /* Traverse tree until we find a matching leaf node */
                 node = root;
-                while (node->Symbol < 0) {
+
+                while (node->symbol < 0) {
                         /* Get next node */
                         if (_bit_read(&stream)) {
-                                node = node->ChildB;
+                                node = node->child_b;
                         } else {
-                                node = node->ChildA;
+                                node = node->child_a;
                         }
                 }
 
                 /* We found the matching leaf node and have the symbol */
-                *buf ++ = (uint8_t) node->Symbol;
+                *buffer++ = (uint8_t)node->symbol;
         }
 }
 
 /* Initialize a bitstream */
 static void
-_bitstream_init(huff_bitstream_t *stream, uint8_t *buf)
+_bitstream_init(huff_bitstream_t *stream, uint8_t *buffer)
 {
-        stream->BytePtr  = buf;
-        stream->BitPos   = 0;
+        stream->byte_ptr  = buffer;
+        stream->bit_pos   = 0;
 }
 
 /* Read one bit from a bitstream */
@@ -109,22 +104,23 @@ static uint32_t
 _bit_read(huff_bitstream_t *stream)
 {
         uint32_t  x, bit;
-        uint8_t *buf;
+        uint8_t *buffer;
 
         /* Get current stream state */
-        buf = stream->BytePtr;
-        bit = stream->BitPos;
+        buffer = stream->byte_ptr;
+        bit = stream->bit_pos;
 
         /* Extract bit */
-        x = (*buf & (1<< (7-bit))) ? 1 : 0;
-        bit = (bit+1) & 7;
+        x = (*buffer & (1 << (7 - bit))) ? 1 : 0;
+        bit = (bit + 1) & 7;
+
         if (!bit) {
-                ++ buf;
+                ++buffer;
         }
 
         /* Store new stream state */
-        stream->BitPos = bit;
-        stream->BytePtr = buf;
+        stream->bit_pos = bit;
+        stream->byte_ptr = buffer;
 
         return x;
 }
@@ -134,18 +130,18 @@ static uint32_t
 _8bits_read(huff_bitstream_t *stream)
 {
         uint32_t  x, bit;
-        uint8_t *buf;
+        uint8_t *buffer;
 
         /* Get current stream state */
-        buf = stream->BytePtr;
-        bit = stream->BitPos;
+        buffer = stream->byte_ptr;
+        bit = stream->bit_pos;
 
         /* Extract byte */
-        x = (*buf << bit) | (buf[1] >> (8-bit));
-        ++ buf;
+        x = (*buffer << bit) | (buffer[1] >> (8 - bit));
+        ++buffer;
 
         /* Store new stream state */
-        stream->BytePtr = buf;
+        stream->byte_ptr = buffer;
 
         return x;
 }
@@ -154,30 +150,30 @@ _8bits_read(huff_bitstream_t *stream)
 static huff_decodenode_t *
 _tree_recover(huff_decodenode_t *nodes, huff_bitstream_t *stream, uint32_t *nodenum)
 {
-        huff_decodenode_t * this_node;
+        huff_decodenode_t *this_node;
 
         /* Pick a node from the node array */
         this_node = &nodes[*nodenum];
         *nodenum = *nodenum + 1;
 
         /* Clear the node */
-        this_node->Symbol = -1;
-        this_node->ChildA = NULL;
-        this_node->ChildB = NULL;
+        this_node->symbol = -1;
+        this_node->child_a = NULL;
+        this_node->child_b = NULL;
 
         /* Is this a leaf node? */
         if (_bit_read(stream)) {
                 /* Get symbol from tree description and store in lead node */
-                this_node->Symbol = _8bits_read(stream);
+                this_node->symbol = _8bits_read(stream);
 
                 return this_node;
         }
 
         /* Get branch A */
-        this_node->ChildA = _tree_recover(nodes, stream, nodenum);
+        this_node->child_a = _tree_recover(nodes, stream, nodenum);
 
         /* Get branch B */
-        this_node->ChildB = _tree_recover(nodes, stream, nodenum);
+        this_node->child_b = _tree_recover(nodes, stream, nodenum);
 
         return this_node;
 }
