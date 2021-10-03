@@ -44,11 +44,14 @@ bcl_rle_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 
         /* Main decompression loop */
         outpos = 0;
+
         do {
                 symbol = in[ inpos ++ ];
+
                 if (symbol == marker) {
                         /* We had a marker byte */
                         count = in[ inpos ++ ];
+
                         if (count <= 2) {
                                 /* Counts 0, 1 and 2 are used for marker byte repetition
                                    only */
@@ -59,7 +62,9 @@ bcl_rle_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
                                 if (count & 0x80) {
                                         count = ((count & 0x7f) << 8) + in[ inpos ++ ];
                                 }
+
                                 symbol = in[ inpos ++ ];
+
                                 for (i = 0; i <= count; ++ i) {
                                         out[ outpos ++ ] = symbol;
                                 }
