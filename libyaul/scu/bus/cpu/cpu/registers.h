@@ -14,7 +14,7 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_REGISTERS  CPU Registers
+/// @defgroup CPU_REGISTERS CPU Registers
 
 /// @addtogroup CPU_REGISTERS
 /// @{
