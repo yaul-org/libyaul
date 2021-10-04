@@ -15,7 +15,7 @@
 
 __BEGIN_DECLS
 
-/// @defgroup CPU_SCI CPU Free-Running Timer (SCI)
+/// @defgroup CPU_SCI CPU Serial Communication Interface (SCI)
 
 /// @addtogroup CPU_SCI
 /// @{

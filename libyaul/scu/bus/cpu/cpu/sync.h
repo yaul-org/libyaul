@@ -34,7 +34,7 @@ typedef uint8_t cpu_sync_lock_t;
 ///
 /// @details Implementation of the mutex is using test-and-set CPU instruction
 /// `tas.b`.
-/// 
+///
 /// @param b The lock index in the lock array.
 ///
 /// @returns `true` if locking was previously unlocked, otherwise `false`.
