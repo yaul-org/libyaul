@@ -15,8 +15,8 @@ define macro-word-split
 $(word $2,$(subst ;, ,$1))
 endef
 
-# Check that SH_SRCS and SH_SRCS_NO_LINK don't include duplicates. Be
-# mindful that sort remove duplicates
+# Check that SH_SRCS and SH_SRCS_NO_LINK don't include duplicates. Be mindful
+# that sort remove duplicates
 SH_SRCS_UNIQ= $(sort $(SH_SRCS))
 SH_SRCS_NO_LINK_UNIQ= $(sort $(SH_SRCS_NO_LINK))
 
@@ -146,7 +146,12 @@ endef
 # $3 -> Directory
 define macro-generate-romdisk-rule
 $2.d:
-	$(ECHO)find $3 -type f,d -print 2>/dev/null | \
+# When generating the dependency list file, use absolute paths to avoid conflict
+# between existing targets. For example, if the ROMDISK directory is named
+# "romdisk", find(1) will print out "romdisk" in its output. If any of the C
+# source files is also named romdisk.c, or the target is "romdisk", then it will
+# cause a conflict
+	$(ECHO)find $(abspath $3) -type f,d -print 2>/dev/null | \
 		awk 'BEGIN { print "$2: \\"; } \
 		     { print "\t" $$$$0 " \\"; } \
 		     END { print "\t" $$$$0; }' > $$@
