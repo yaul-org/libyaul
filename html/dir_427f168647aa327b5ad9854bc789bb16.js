@@ -10,6 +10,7 @@ var dir_427f168647aa327b5ad9854bc789bb16 =
     [ "intc.h", "intc_8h_source.html", null ],
     [ "map.h", "bus_2cpu_2cpu_2map_8h_source.html", null ],
     [ "registers.h", "registers_8h_source.html", null ],
+    [ "sci.h", "sci_8h_source.html", null ],
     [ "sync.h", "sync_8h_source.html", null ],
     [ "ubc.h", "ubc_8h_source.html", null ],
     [ "wdt.h", "wdt_8h_source.html", null ]

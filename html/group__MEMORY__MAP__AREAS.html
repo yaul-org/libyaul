@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 3e0a6b7</span>
+   &#160;<span id="projectnumber">Git hash 65cf755</span>
    </div>
   </td>
  </tr>
@@ -151,7 +151,7 @@ Macros</h2></td></tr>
 <tr class="memitem:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#ga49d8c911d97bdd5d54c04e714878a3d2">ARP</a>(x)&#160;&#160;&#160;(0x22000000UL + (x))</td></tr>
 <tr class="memdesc:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify offset <code>x</code> for address space.  <a href="group__MEMORY__MAP__AREAS.html#ga49d8c911d97bdd5d54c04e714878a3d2">More...</a><br /></td></tr>
 <tr class="separator:ga49d8c911d97bdd5d54c04e714878a3d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac774abf00f414b7ff6cc691f351b344f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f">DRAM</a>(t,  b,  x)&#160;&#160;&#160;(<a class="el" href="group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597">CS0</a>((x) + ((((b) &amp; 0x03) + (((t) &amp; 0x01) &lt;&lt; 2)) &lt;&lt; 19)))</td></tr>
+<tr class="memitem:gac774abf00f414b7ff6cc691f351b344f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f">DRAM</a>(t,  b,  x)&#160;&#160;&#160;(<a class="el" href="group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597">CS0</a>(x) | ((((t) &amp; 0x01) + 2) &lt;&lt; 21) | (((b) &amp; 0x03) &lt;&lt; 19))</td></tr>
 <tr class="memdesc:gac774abf00f414b7ff6cc691f351b344f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify triple for DRAM address space.  <a href="group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f">More...</a><br /></td></tr>
 <tr class="separator:gac774abf00f414b7ff6cc691f351b344f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5094a0a946547d5e2446693f3c626bb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MEMORY__MAP__AREAS.html#gae5094a0a946547d5e2446693f3c626bb">USB_CART</a>(x)&#160;&#160;&#160;(<a class="el" href="group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597">CS0</a>(0x01) + ((x) &lt;&lt; 20))</td></tr>
@@ -355,7 +355,7 @@ Macros</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(<a class="el" href="group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597">CS0</a>((x) + ((((b) &amp; 0x03) + (((t) &amp; 0x01) &lt;&lt; 2)) &lt;&lt; 19)))</td>
+          <td></td><td>&#160;&#160;&#160;(<a class="el" href="group__MEMORY__MAP__AREAS.html#ga421ec51c26cd54fac70e299543ff9597">CS0</a>(x) | ((((t) &amp; 0x01) + 2) &lt;&lt; 21) | (((b) &amp; 0x03) &lt;&lt; 19))</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -1,5 +1,11 @@
 var NAVTREEINDEX2 =
 {
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaf5e8ddda39a2a73227218e1229fb86d3":[2,0,6,23],
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaf5f83f2e99346066741a6f116176be84":[2,0,6,64],
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaf6483a40fc96b047f1609aa8c713c9b0":[2,0,6,60],
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaf7ed891f47333a017c47de4ed79ee8d4":[2,0,6,32],
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gafcf966ea3b3c937d162a532a8f273cae":[2,0,6,33],
+"group__MEMORY__MAP__DRAM__CART__IO__REGISTERS.html":[2,0,4],
 "group__MEMORY__MAP__DRAM__CART__IO__REGISTERS.html#ga77ceac8d6af195fe72f95f6afd87c45e":[2,0,4,0],
 "group__MEMORY__MAP__DRAM__CART__IO__REGISTERS.html#gac1ae4add974b9cfc6b5aaf8a578f01ab":[2,0,4,1],
 "group__MEMORY__MAP__MACROS.html":[2,0,0],
@@ -243,11 +249,5 @@ var NAVTREEINDEX2 =
 "group__SCU__IC__HELPERS.html#ga876b8cd790359ca892fbef6327bbabe9":[2,5,3],
 "group__SCU__IC__HELPERS.html#gabd71fd6e20d8119788dbbd96d3ddba32":[2,5,6],
 "group__SCU__IC__HELPERS.html#gabdb656783fee9b24d9eda1207acd425a":[2,5,1],
-"group__SCU__IC__HELPERS.html#gaf0247c32ff53eac09854ee31c72261ad":[2,5,0],
-"group__SCU__TIMER.html":[2,6],
-"group__SCU__TIMER.html#ga16da252a75851ef4bc8597ad35b1b23c":[2,6,6],
-"group__SCU__TIMER.html#ga6a3b77ba5eb9b5f737e11b251148bf32":[2,6,0],
-"group__SCU__TIMER.html#ga73ec800dc023017587e02c785fd0b0ff":[2,6,2],
-"group__SCU__TIMER.html#gac76df85e559ee354540a08a49779aa74":[2,6,5],
-"group__SCU__TIMER.html#gad020e987d78698c8e79da87be4d7f684":[2,6,4]
+"group__SCU__IC__HELPERS.html#gaf0247c32ff53eac09854ee31c72261ad":[2,5,0]
 };
