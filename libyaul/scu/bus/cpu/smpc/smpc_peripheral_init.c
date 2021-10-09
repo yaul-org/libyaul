@@ -293,6 +293,7 @@ peripheral_update(smpc_peripheral_port_t *parent,
 
         uint8_t type;
         uint8_t size;
+        uint8_t id;
 
         if (connected > 1) {
                 peripheral->connected = connected;
@@ -321,10 +322,11 @@ peripheral_update(smpc_peripheral_port_t *parent,
         }
 
         size = PC_GET_SIZE(_oreg_offset);
+        id = PC_GET_ID(_oreg_offset);
         if (size > 0) {
                 /* Peripheral data collection #1 */
                 /* Check if the ID is valid */
-                switch (PC_GET_ID(_oreg_offset)) {
+                switch (id) {
                 case ID_MD3B:
                 case ID_MD6B:
                 case ID_MDMOUSE:
@@ -361,6 +363,17 @@ peripheral_update(smpc_peripheral_port_t *parent,
                 peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
                 peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
                 break;
+        case 0x04:
+                peripheral->previous_data[0] = peripheral->data[0];
+                peripheral->previous_data[1] = peripheral->data[1];
+                peripheral->previous_data[2] = peripheral->data[2];
+                peripheral->previous_data[3] = peripheral->data[3];
+
+                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
+                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
+                peripheral->data[2] = PC_GET_DATA_BYTE(_oreg_offset, 2) ^ 0xFF;
+                peripheral->data[3] = PC_GET_DATA_BYTE(_oreg_offset, 3) ^ 0xFF;
+                break;
         case 0x06:
                 peripheral->previous_data[0] = peripheral->data[0];
                 peripheral->previous_data[1] = peripheral->data[1];
@@ -371,6 +384,10 @@ peripheral_update(smpc_peripheral_port_t *parent,
 
                 peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
                 peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
+                peripheral->data[2] = PC_GET_DATA_BYTE(_oreg_offset, 2) ^ 0xFF;
+                peripheral->data[3] = PC_GET_DATA_BYTE(_oreg_offset, 3) ^ 0xFF;
+                peripheral->data[4] = PC_GET_DATA_BYTE(_oreg_offset, 4) ^ 0xFF;
+                peripheral->data[5] = PC_GET_DATA_BYTE(_oreg_offset, 5) ^ 0xFF;
                 break;
         default:
                 /* XXX
@@ -380,8 +397,8 @@ peripheral_update(smpc_peripheral_port_t *parent,
 
         peripheral->connected = 1;
         peripheral->port = port;
-        peripheral->type = multitap_id;
-        peripheral->size = 0x00;
+        peripheral->type = id;//multitap_id;
+        peripheral->size = size;//0x00;
         peripheral->parent = parent;
 
         /* Move onto the next peripheral */
