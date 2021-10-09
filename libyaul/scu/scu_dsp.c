@@ -5,8 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <cpu/instructions.h>
-
 #include <scu/dsp.h>
 #include <scu/ic.h>
 
@@ -23,14 +21,20 @@ static void _default_ihr(void);
 #define PPAF_OVERFLOW           (1 << 19UL)
 #define PPAF_DMA_BUSY           (1 << 23UL)
 
-/* XXX: State that should be moved (eventually) */
-static bool _overflow = false;
-static bool _end = true;
+static volatile struct {
+        /* Keep track of the overflow bit in SCU(PPAF) */
+        bool overflow_bit;
+        /* Keep track of the end bit in SCU(PPAF) */
+        bool end_bit;
+} _ppaf_state = {
+        .overflow_bit = false,
+        .end_bit = true
+};
 
 static scu_dsp_ihr_t _dsp_end_ihr = _default_ihr;
 
 static inline uint32_t _ppaf_read(void);
-static inline void _flags_update(uint32_t);
+static inline void _flags_update(uint32_t ppaf_bits);
 
 void
 _internal_scu_dsp_init(void)
@@ -44,8 +48,8 @@ _internal_scu_dsp_init(void)
 
         scu_ic_ihr_set(SCU_IC_INTERRUPT_DSP_END, _dsp_end_handler);
 
-        _overflow = false;
-        _end = true;
+        _ppaf_state.overflow_bit = false;
+        _ppaf_state.end_bit = true;
 }
 
 void
@@ -107,9 +111,10 @@ scu_dsp_program_clear(void)
 
         scu_dsp_program_pc_set(0);
 
-        /* Clear program RAM */
+        /* After we've cleared the Z, S, and C flags, clear program RAM with END
+         * instructions */
         for (uint32_t i = 0; i < DSP_PROGRAM_WORD_COUNT; i++) {
-                MEMORY_WRITE(32, SCU(PPD), 0xF8000000);
+                MEMORY_WRITE(32, SCU(PPD), 0xF0000000); /* END */
         }
 
         scu_dsp_program_pc_set(0);
@@ -120,15 +125,16 @@ scu_dsp_program_pc_set(scu_dsp_pc_t pc)
 {
         MEMORY_WRITE(32, SCU(PPAF), PPAF_LOAD_ENABLE | pc);
 
-        _overflow = false;
-        _end = true;
+        _ppaf_state.overflow_bit = false;
+        _ppaf_state.end_bit = true;
 }
 
 void
 scu_dsp_program_start(void)
 {
-        _overflow = false;
-        _end = false;
+        _ppaf_state.overflow_bit = false;
+        _ppaf_state.end_bit = false;
+
         MEMORY_WRITE(32, SCU(PPAF), PPAF_EX);
 }
 
@@ -141,28 +147,25 @@ scu_dsp_program_stop(void)
 scu_dsp_pc_t
 scu_dsp_program_step(void)
 {
-        volatile uint32_t * const reg_ppaf = (volatile uint32_t *)SCU(PPAF);
-
         uint32_t ppaf_bits;
-        ppaf_bits = *reg_ppaf;
+        ppaf_bits = MEMORY_READ(32, SCU(PPAF));
 
-        uint8_t pc;
-        pc = ppaf_bits & 0xFF;
+        const uint8_t pc = ppaf_bits & 0xFF;
 
-        *reg_ppaf = PPAF_STEP;
+        MEMORY_WRITE(32, SCU(PPAF), PPAF_STEP);
 
-        _overflow = false;
-        _end = false;
+        _ppaf_state.overflow_bit = false;
+        _ppaf_state.end_bit = false;
 
         while (true) {
-                _flags_update (ppaf_bits);
+                _flags_update(ppaf_bits);
 
                 /* Wait until DSP is done executing one instruction */
-                if (_end || ((ppaf_bits & 0x00030000) == 0x00000000)) {
+                if (_ppaf_state.end_bit || ((ppaf_bits & (PPAF_EX | PPAF_STEP)) == 0x00000000)) {
                         break;
                 }
 
-                ppaf_bits = *reg_ppaf;
+                ppaf_bits = MEMORY_READ(32, SCU(PPAF));
         }
 
         return pc;
@@ -173,21 +176,20 @@ scu_dsp_program_end(void)
 {
         _ppaf_read();
 
-        return _end;
+        return _ppaf_state.end_bit;
 }
 
 void
 scu_dsp_program_end_wait(void)
 {
-        while (!scu_dsp_program_end())
-                cpu_instr_nop();
+        while (!scu_dsp_program_end()) {
+        }
 }
 
 bool
 scu_dsp_dma_busy(void)
 {
-        uint32_t ppaf_bits;
-        ppaf_bits = _ppaf_read();
+        const uint32_t ppaf_bits = _ppaf_read();
 
         return ((ppaf_bits & PPAF_DMA_BUSY) != 0x00000000UL);
 }
@@ -195,8 +197,8 @@ scu_dsp_dma_busy(void)
 void
 scu_dsp_dma_wait(void)
 {
-        while ((scu_dsp_dma_busy()))
-                cpu_instr_nop();
+        while ((scu_dsp_dma_busy())) {
+        }
 }
 
 void
@@ -274,8 +276,8 @@ scu_dsp_status_get(scu_dsp_status_t *status)
 
         *status_p = ppaf_bits;
 
-        status->v = status->v || _overflow;
-        status->e = status->e || _end;
+        status->v = status->v || _ppaf_state.overflow_bit;
+        status->e = status->e || _ppaf_state.end_bit;
 }
 
 static void
@@ -294,13 +296,10 @@ _default_ihr(void)
 static inline uint32_t
 _ppaf_read(void)
 {
-        volatile uint32_t * const reg_ppaf = (volatile uint32_t *)SCU(PPAF);
-
         /* Read SCU(PPAF) as the program end interrupt flag is reset when
          * read */
 
-        uint32_t ppaf_bits;
-        ppaf_bits = *reg_ppaf;
+        const uint32_t ppaf_bits = MEMORY_READ(32, SCU(PPAF));
 
         _flags_update(ppaf_bits);
 
@@ -310,7 +309,8 @@ _ppaf_read(void)
 static inline void __always_inline
 _flags_update(uint32_t ppaf_bits)
 {
-        _overflow = _overflow || ((ppaf_bits & PPAF_OVERFLOW) != 0x00000000UL);
-        _end = _end || ((ppaf_bits & PPAF_EX) == 0x00000000UL) ||
-                       ((ppaf_bits & PPAF_END) != 0x00000000UL);
+        _ppaf_state.overflow_bit = _ppaf_state.overflow_bit || ((ppaf_bits & PPAF_OVERFLOW) != 0x00000000UL);
+
+        _ppaf_state.end_bit = _ppaf_state.end_bit || ((ppaf_bits & PPAF_EX) == 0x00000000UL) ||
+                                                     ((ppaf_bits & PPAF_END) != 0x00000000UL);
 }
