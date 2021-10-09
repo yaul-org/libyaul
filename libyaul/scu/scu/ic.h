@@ -317,9 +317,14 @@ scu_ic_mask_set(scu_ic_mask_t mask)
 
 /// @brief Change the mask value in the SCU I/O register @ref IMS.
 ///
-/// @details This function is rather confusing. Effectively, the @p and_mask is
-/// the 32-bit mask value that enables/disables (masks) interrupts, while @p
-/// or_mask is the 32-bit mask value that enables interrupts.
+/// @details The @p and_mask is the 32-bit mask value that enables/disables
+/// (masks) interrupts, while @p or_mask is the 32-bit mask value that enables
+/// interrupts.
+///
+/// Effectively, the function does the following,
+/// @code{.c}
+/// SCU(IMS) = (SCU(IMS) & and_mask) | or_mask;
+/// @endcode
 ///
 /// To disable (mask) the @ref SCU_IC_MASK_VBLANK_IN interrupt,
 /// @code{.c}
