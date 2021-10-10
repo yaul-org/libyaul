@@ -193,7 +193,7 @@ vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
-       cmdt->cmd_pmod |= 0x0018;
+        cmdt->cmd_pmod |= 0x0018;
         cmdt->cmd_colr = color_bank.raw & 0xFF80;
 }
 
