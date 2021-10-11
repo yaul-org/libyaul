@@ -58,8 +58,11 @@ _vdp1_init(void)
                                  VDP1_VRAM_DEFAULT_GOURAUD_COUNT,
                                  VDP1_VRAM_DEFAULT_CLUT_COUNT);
 
-        _memory_area_clear(VDP1_VRAM(0x0000), 0x8000, VDP1_VRAM_SIZE);
+        _memory_area_clear(VDP1_VRAM(0x0000), 0x0000, VDP1_VRAM_SIZE);
         _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+
+        /* Force draw end */
+        MEMORY_WRITE(16, VDP1_VRAM(0x0000), 0x8000);
 }
 
 static void
