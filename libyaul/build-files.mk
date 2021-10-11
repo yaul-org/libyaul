@@ -268,11 +268,12 @@ INSTALL_HEADER_FILES+= \
 	./math/:fix16_trig.h:yaul/math/ \
 	./math/:fix16_vec2.h:yaul/math/ \
 	./math/:fix16_vec3.h:yaul/math/ \
-	./math/:int8.h:yaul/math/ \
 	./math/:int16.h:yaul/math/ \
 	./math/:int32.h:yaul/math/ \
+	./math/:int8.h:yaul/math/ \
 	./math/:math.h:yaul/math/ \
-	./math/:uint32.h:yaul/math/
+	./math/:uint32.h:yaul/math/ \
+	./math/:uint8.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
 	./common/bootstrap/:ip.h:yaul/common/
