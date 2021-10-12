@@ -118,7 +118,7 @@ vdp1_env_set(const vdp1_env_t *env)
 
         _state_vdp2()->regs->spctl &= 0xFFC0;
 
-        if ((env->sprite_type < 0x8) && (env->bpp == VDP1_ENV_BPP_16)) {        
+        if ((env->sprite_type < 0x8) && (env->bpp == VDP1_ENV_BPP_16)) {
                 /* Disable sprite window (SPWINEN) when SPCLMD bit is set */
                 _state_vdp2()->regs->spctl &= ~(spclmd >> 1);
                 _state_vdp2()->regs->spctl |= spclmd;
