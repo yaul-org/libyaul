@@ -5,12 +5,13 @@ import os
 import sys
 import locale
 
-PRUNED_FILE_EXTS = [".sx", ".cxx"]
+PRUNED_FILE_EXTS = [".sx"]
 
 PRUNE_COMPILER_FLAGS = [
     # This flag causes major issues with Clang. Having this flag present in the
     # JSON compilation database results in fatal errors
-    "-save-temps"
+    "-save-temps",
+    "-save-temps=obj"
 ]
 
 
