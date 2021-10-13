@@ -45,20 +45,28 @@ typedef struct vdp1_mode_status {
         };
 } __packed __aligned(2) vdp1_mode_status_t;
 
-static inline void __always_inline
-vdp1_mode_status_get(vdp1_mode_status_t *status)
+static inline __always_inline vdp1_mode_status_t
+vdp1_mode_status_get(void)
 {
-        /* If the structure isn't aligned on a 2-byte boundary, GCC will
-         * attempt to invoke memcpy() */
-        status->raw = MEMORY_READ(16, VDP1(MODR));
+        /* If the structure isn't aligned on a 2-byte boundary, GCC will attempt
+         * to invoke memcpy() */
+        vdp1_mode_status_t status;
+
+        status.raw = MEMORY_READ(16, VDP1(MODR));
+
+        return status;
 }
 
-static inline void __always_inline
-vdp1_transfer_status_get(vdp1_transfer_status_t *status)
+static inline __always_inline vdp1_transfer_status_t
+vdp1_transfer_status_get(void)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        status->raw = MEMORY_READ(16, VDP1(EDSR));
+        vdp1_transfer_status_t status;
+
+        status.raw = MEMORY_READ(16, VDP1(EDSR));
+
+        return status;
 }
 
 __END_DECLS
