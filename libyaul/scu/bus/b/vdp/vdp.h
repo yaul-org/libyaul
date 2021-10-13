@@ -37,7 +37,11 @@ typedef void (*vdp1_sync_callback_t)(void *);
 
 typedef void (*vdp_sync_callback_t)(void *);
 
-extern void vdp_sync(void);
+extern void vdp1_sync(void);
+extern void vdp1_sync_wait(void);
+
+extern void vdp2_sync(void);
+extern void vdp2_sync_wait(void);
 
 extern void vdp1_sync_interval_set(const int8_t);
 extern vdp_sync_mode_t vdp1_sync_mode_get(void);
