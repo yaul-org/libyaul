@@ -802,13 +802,14 @@ _vdp1_mode_variable_vblank_in(void)
                 return;
         }
 
-        /* HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK */
-        volatile uint32_t *dnc =  &_vdp1_dma_handle.dnc;
-        const uint16_t cmdt_count = *dnc / sizeof(vdp1_cmdt_t);
-        if ((vdp1_cmdt_current_get()) < (cmdt_count - 1)) {
+        const vdp1_mode_status_t mode_status = vdp1_mode_status_get();
+
+        /* Check if VDP1 is plotting. Previously, checking VDP1(COPR) was done.
+         * But this proves to be problematic for when orderlists are sent (SCU
+         * indirect table DMA transfers). */
+        if (mode_status.ptm1 == 0x00) {
                 return;
         }
-        *dnc = 0;
 
         _vdp1_sprite_end_call();
 
