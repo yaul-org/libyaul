@@ -227,6 +227,7 @@ static void _vdp2_init(void);
 static void _vdp2_registers_transfer(cpu_dmac_cfg_t *dmac_cfg);
 static void _vdp2_back_screen_transfer(cpu_dmac_cfg_t *dmac_cfg);
 
+static void _scu_dma_level_end_handler(void *work);
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 static void _vdp2_dma_handler(const dma_queue_transfer_t *transfer);
@@ -539,6 +540,7 @@ _vdp1_init(void)
 {
         const scu_dma_level_cfg_t dma_cfg = {
                 .mode = SCU_DMA_MODE_DIRECT,
+                /* Prevent assertion */
                 .xfer.direct.len = 0xFFFFFFFF,
                 .xfer.direct.dst = 0xFFFFFFFF,
                 .xfer.direct.src = 0xFFFFFFFF,
@@ -548,6 +550,7 @@ _vdp1_init(void)
 
         const scu_dma_level_cfg_t orderlist_dma_cfg = {
                 .mode = SCU_DMA_MODE_INDIRECT,
+                /* Avoid assertion if pointer to indirect table is NULL */
                 .xfer.indirect = (void *)0xFFFFFFFF,
                 .stride = SCU_DMA_STRIDE_2_BYTES,
                 .update = SCU_DMA_UPDATE_NONE
@@ -761,10 +764,6 @@ _vdp1_mode_variable_sprite_end(const void *args_ptr __unused)
 static void
 _vdp1_mode_variable_vblank_in(const void *args_ptr __unused)
 {
-        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) != SYNC_FLAG_VDP1_SYNC) {
-                return;
-        }
-
         /* Cache the state to avoid multiple loads */
         uint8_t state_vdp1_flags = _state.vdp1.flags;
 
@@ -783,11 +782,9 @@ _vdp1_mode_variable_vblank_in(const void *args_ptr __unused)
         /* HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK */
         volatile uint32_t *dnc =  &_vdp1_dma_handle.dnc;
         const uint16_t cmdt_count = *dnc / sizeof(vdp1_cmdt_t);
-
         if ((vdp1_cmdt_current_get()) < (cmdt_count - 1)) {
                 return;
         }
-
         *dnc = 0;
 
         _vdp1_sprite_end_call(NULL);
@@ -808,10 +805,6 @@ _vdp1_mode_variable_vblank_in(const void *args_ptr __unused)
 static void
 _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
 {
-        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) != SYNC_FLAG_VDP1_SYNC) {
-                return;
-        }
-
         uint8_t state_vdp1_flags = _state.vdp1.flags;
 
         DEBUG_PRINTF("VBLANK-OUT,vdp1: RX%i RL%i RC%i  X%i L%i C%i, vdp2: 0x%02X\n",
@@ -863,21 +856,14 @@ _vdp1_mode_variable_vblank_out(const void *args_ptr __unused)
 static void
 _vdp1_dma(scu_dma_handle_t *dma_handle)
 {
-        const uint32_t intc_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(15);
-
         scu_dma_level_wait(0);
         scu_dma_config_set(0, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
 
         cpu_cache_purge();
 
+        scu_dma_level_end_set(0, _scu_dma_level_end_handler, NULL);
+
         scu_dma_level_fast_start(0);
-        scu_dma_level_wait(0);
-
-        _vdp1_dma_call(NULL);
-
-        cpu_intc_mask_set(intc_mask);
 }
 
 static void
@@ -962,17 +948,25 @@ _vdp2_dma_handler(const dma_queue_transfer_t *transfer)
 }
 
 static void
+_scu_dma_level_end_handler(void *work __unused)
+{
+        scu_dma_level_end_set(0, NULL, NULL);
+
+        _vdp1_dma_call(NULL);
+}
+
+static void
 _vblank_in_handler(void)
 {
         /* VBLANK-IN interrupt runs at scanline #224 */
 
-        if ((_state.flags & (SYNC_FLAG_VDP1_SYNC)) == SYNC_FLAG_VDP1_SYNC) {
+        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 DEBUG_PRINTF("VBLANK-IN, SYNC_FLAG_VDP1_SYNC\n");
 
                 _vdp1_vblank_in_call(NULL);
         }
 
-        if ((_state.flags & (SYNC_FLAG_VDP2_SYNC)) == SYNC_FLAG_VDP2_SYNC) {
+        if ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
                 /* Because SYNC_FLAG_SYNC is set, we request to commit */
                 if (_state.vdp2.flags == VDP2_FLAG_IDLE) {
                         _state.vdp2.flags |= VDP2_FLAG_REQUEST_COMMIT;
@@ -987,7 +981,7 @@ _vblank_out_handler(void)
 {
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
-        if ((_state.flags & (SYNC_FLAG_VDP1_SYNC)) == SYNC_FLAG_VDP1_SYNC) {
+        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 DEBUG_PRINTF("VBLANK-OUT, SYNC_FLAG_SYNC\n");
 
                 _vdp1_vblank_out_call(NULL);
