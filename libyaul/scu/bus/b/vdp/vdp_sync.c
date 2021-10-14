@@ -278,7 +278,7 @@ _internal_vdp_sync_init(void)
 void
 vdp1_sync(void)
 {
-        DEBUG_PRINTF("vdp1_sync: Enter\n");
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 return;
@@ -295,6 +295,8 @@ vdp1_sync(void)
         _state.flags |= SYNC_FLAG_VDP1_SYNC;
 
         cpu_intc_mask_set(intc_mask);
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 void
@@ -421,7 +423,7 @@ vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
 void
 vdp2_sync(void)
 {
-        DEBUG_PRINTF("vdp2_sync: Enter\n");
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
 
         if ((_state.flags & (SYNC_FLAG_VDP2_SYNC)) == SYNC_FLAG_VDP2_SYNC) {
                 return;
@@ -458,6 +460,8 @@ vdp2_sync(void)
         _state.flags |= SYNC_FLAG_VDP2_SYNC;
 
         cpu_intc_mask_set(intc_mask);
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 void
@@ -467,14 +471,13 @@ vdp2_sync_wait(void)
                 return;
         }
 
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+
         const uint32_t intc_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(0);
 
-        /* Wait until VDP1 changed frame buffers and wait until VDP2 state has
-         * been committed */
-        DEBUG_PRINTF("Starting loop\n");
-
+        /* Wait until VDP2 state has been committed */
         while (true) {
                 if ((_state.vdp2.flags & VDP2_FLAG_REQUEST_COMMIT) != 0x00) {
                         DEBUG_PRINTF("Flushing VBLANK-IN\n");
@@ -506,6 +509,8 @@ vdp2_sync_wait(void)
         _state.vdp2.flags &= ~VDP2_FLAG_MASK;
 
         cpu_intc_mask_set(intc_mask);
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 void
@@ -609,25 +614,41 @@ _vdp1_init(void)
 static inline void __always_inline
 _vdp1_sync_put_call(void)
 {
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+
         _state.vdp1.current_mode->sync_put();
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 static inline void __always_inline
 _vdp1_dma_call(void)
 {
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+
         _state.vdp1.current_mode->dma();
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 static inline void __always_inline
 _vdp1_sprite_end_call(void)
 {
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+
         _state.vdp1.current_mode->sprite_end();
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": exit\n"));
 }
 
 static inline void __always_inline
 _vdp1_vblank_in_call(void)
 {
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+
         _state.vdp1.current_mode->vblank_in();
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 static inline void __always_inline
@@ -639,8 +660,6 @@ _vdp1_vblank_out_call(void)
 static void
 _vdp1_mode_auto_sync_put(void)
 {
-        DEBUG_PRINTF("sync_put: Enter\n");
-
         /* Mask interrupts to make sure this variable does not get modified at
          * the same time */
         const uint32_t intc_mask = cpu_intc_mask_get();
@@ -777,8 +796,6 @@ _vdp1_mode_variable_sync_put(void)
 static void
 _vdp1_mode_variable_dma(void)
 {
-        DEBUG_PRINTF("vdp1_dma_handler: Enter\n");
-
         /* Since the DMA transfer went through, the VDP1 is idling, so start
          * drawing */
         MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_PLOT);
@@ -795,8 +812,6 @@ _vdp1_mode_variable_dma(void)
 static void
 _vdp1_mode_variable_sprite_end(void)
 {
-        DEBUG_PRINTF("sprite_end_handler: Enter\n");
-
         _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
 
         callback_call(&_user_vdp1_sync_callback);
@@ -846,8 +861,6 @@ _vdp1_mode_variable_vblank_in(void)
 
         MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
 
-        DEBUG_PRINTF("VBLANK-IN,TVMR=$8,FBCR=$3\n");
-
         _state.vdp1.flags = state_vdp1_flags;
 }
 
@@ -870,7 +883,6 @@ _vdp1_mode_variable_vblank_out(void)
         }
 
         if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) != VDP1_FLAG_REQUEST_CHANGE) {
-                DEBUG_PRINTF("VBLANK-OUT,!VDP1_FLAG_REQUEST_CHANGE\n");;
                 return;
         }
 
@@ -892,8 +904,6 @@ _vdp1_mode_variable_vblank_out(void)
         state_vdp1_flags &= ~VDP1_FLAG_MASK;
 
         _state.vdp1.flags = state_vdp1_flags;
-
-        DEBUG_PRINTF("VBLANK-OUT,TVMR=$0\n");
 }
 
 static void
@@ -992,10 +1002,12 @@ _vdp2_dma_handler(const dma_queue_transfer_t *transfer)
                 return;
         }
 
-        DEBUG_PRINTF("vdp2_dma_handler: Enter\n");
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
 
         _state.vdp2.flags |= VDP2_FLAG_COMMITTED;
         _state.vdp2.flags &= ~VDP2_FLAG_COMITTING;
+
+        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 static void
@@ -1017,8 +1029,6 @@ _vblank_in_handler(void)
         /* VBLANK-IN interrupt runs at scanline #224 */
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
-                DEBUG_PRINTF("VBLANK-IN, SYNC_FLAG_VDP1_SYNC\n");
-
                 _vdp1_vblank_in_call();
         }
 
@@ -1038,8 +1048,6 @@ _vblank_out_handler(void)
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
-                DEBUG_PRINTF("VBLANK-OUT, SYNC_FLAG_SYNC\n");
-
                 _vdp1_vblank_out_call();
         }
 
