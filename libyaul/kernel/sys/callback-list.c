@@ -68,7 +68,7 @@ callback_list_process(callback_list_t *callback_list, bool clear)
 
         uint8_t id;
         for (id = 0; id < callback_list->count; id++) {
-                callback_handler handler;
+                callback_handler_t handler;
                 handler = callback_list->callbacks[id].handler;
 
                 void *work;
@@ -83,7 +83,7 @@ callback_list_process(callback_list_t *callback_list, bool clear)
 }
 
 callback_id_t
-callback_list_callback_add(callback_list_t *callback_list, callback_handler handler, void *work)
+callback_list_callback_add(callback_list_t *callback_list, callback_handler_t handler, void *work)
 {
 #ifdef DEBUG
         assert(callback_list != NULL);
@@ -146,7 +146,7 @@ callback_init(callback_t *callback)
 }
 
 void
-callback_set(callback_t *callback, callback_handler handler, void *work)
+callback_set(callback_t *callback, callback_handler_t handler, void *work)
 {
         assert(callback != NULL);
 

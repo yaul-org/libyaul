@@ -26,16 +26,12 @@ typedef enum vdp_sync_mode {
 } vdp_sync_mode_t;
 
 #define vdp_sync_vblank_in_clear() do {                                        \
-        vdp_sync_vblank_in_set(NULL);                                          \
+        vdp_sync_vblank_in_set(NULL, NULL);                                    \
 } while (false)
 
 #define vdp_sync_vblank_out_clear() do {                                       \
-        vdp_sync_vblank_out_set(NULL);                                         \
+        vdp_sync_vblank_out_set(NULL, NULL);                                   \
 } while (false)
-
-typedef void (*vdp1_sync_callback_t)(void *);
-
-typedef void (*vdp_sync_callback_t)(void *);
 
 extern void vdp1_sync(void);
 extern void vdp1_sync_wait(void);
@@ -48,20 +44,20 @@ extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
 
 extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
-    const uint16_t index, vdp1_sync_callback_t callback, void *work);
+    const uint16_t index, callback_handler_t callback, void *work);
 
 extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
-    const uint16_t index, vdp1_sync_callback_t callback, void *work);
+    const uint16_t index, callback_handler_t callback, void *work);
 
 extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
-    vdp1_sync_callback_t callback, void *work);
+    callback_handler_t callback, void *work);
 
 extern void vdp2_sync_commit(void);
 
-extern void vdp_sync_vblank_in_set(vdp_sync_callback_t callback);
-extern void vdp_sync_vblank_out_set(vdp_sync_callback_t callback);
+extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler, void *work);
+extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work);
 
-extern callback_id_t vdp_sync_user_callback_add(vdp_sync_callback_t callback, void *work);
+extern callback_id_t vdp_sync_user_callback_add(callback_handler_t callback, void *work);
 extern void vdp_sync_user_callback_remove(callback_id_t id);
 extern void vdp_sync_user_callback_clear(void);
 

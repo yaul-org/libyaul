@@ -15,10 +15,10 @@ __BEGIN_DECLS
 
 typedef uint8_t callback_id_t;
 
-typedef void (*callback_handler)(void *);
+typedef void (*callback_handler_t)(void *);
 
 typedef struct callback {
-        callback_handler handler;
+        callback_handler_t handler;
         void *work;
 } __packed callback_t;
 
@@ -28,7 +28,7 @@ typedef struct callback_list {
 } callback_list_t;
 
 static inline void __always_inline
-callback_call(callback_t *callback)
+callback_call(const callback_t *callback)
 {
         assert(callback != NULL);
         assert(callback->handler != NULL);
@@ -42,12 +42,12 @@ extern void callback_list_init(callback_list_t *, callback_t *, uint8_t);
 
 extern void callback_list_process(callback_list_t *, bool);
 
-extern callback_id_t callback_list_callback_add(callback_list_t *, callback_handler, void *);
+extern callback_id_t callback_list_callback_add(callback_list_t *, callback_handler_t, void *);
 extern void callback_list_callback_remove(callback_list_t *, callback_id_t);
 extern void callback_list_clear(callback_list_t *);
 
 extern void callback_init(callback_t *);
-extern void callback_set(callback_t *, callback_handler, void *);
+extern void callback_set(callback_t *, callback_handler_t, void *);
 
 __END_DECLS
 
