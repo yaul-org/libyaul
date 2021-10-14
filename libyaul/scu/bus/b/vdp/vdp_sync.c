@@ -175,13 +175,11 @@ static void _vdp1_mode_fixed_vblank_out(void);
  *
  * 2. When vdp_sync() is called, SYNC_FLAG_VDP1_SYNC is set.
  *
- * 3. At VBLANK-IN, a comparison of VDP1(COPR) and the number of command tables
- *    transferred is performed. If not equal, the VBLANK-IN interrupt handler
- *    returns until the next time it's fired.
+ * 3. At VBLANK-IN, a check is performed if the VDP1 is still plotting. If so,
+ *    the VBLANK-IN interrupt handler returns until the next time it's fired.
  *
- * 4. When VDP1(COPR) is equal to the number of command tables transferred, then
- *    VDP1_FLAG_REQUEST_CHANGE is set. VDP1(TVMR) sets VBE, and sets FCM|FCT to
- *    VDP1(FBCR).
+ * 4. When the VDP1 is done plotting, VDP1_FLAG_REQUEST_CHANGE is set.
+ *    VDP1(TVMR) sets VBE, and sets FCM|FCT to VDP1(FBCR).
  *
  * 5. In VBLANK-OUT, if the request to change framebuffers is set
  *    (VDP1_FLAG_REQUEST_CHANGE), then clear VBE from VDP1(TVMR), and wait until
@@ -311,7 +309,6 @@ vdp1_sync_interval_set(const int8_t interval)
 {
         uint8_t mode;
 
-        /* Clear VBE */
         _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
 
         MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
@@ -357,8 +354,9 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
         }
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) != SYNC_FLAG_VDP1_SYNC) {
-                /* Test if a transfer has been requested. If so, wait until it
-                 * has been committed */
+                /* When vdp1_sync() hasn't yet been called. Wait until the
+                 * previous (if any) put is complete. If there is no request to
+                 * transfer the command table list, continue */
                 while (true) {
                         const uint8_t state_vdp1_flags = _state.vdp1.flags;
 
@@ -366,7 +364,7 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
                                 break;
                         }
 
-                        if ((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) == VDP1_FLAG_LIST_COMMITTED) {
+                        if ((state_vdp1_flags & VDP1_FLAG_LIST_XFERRED) == VDP1_FLAG_LIST_XFERRED) {
                                 break;
                         }
                 }
@@ -687,12 +685,14 @@ _vdp1_mode_auto_sync_put(void)
 static void
 _vdp1_mode_auto_dma(void)
 {
-        /* Don't clear VDP1_FLAG_REQUEST_XFER_LIST as we want to know that we've
-         * requested to transfer a command list.
-         *
-         * This is important as there are cases where we don't transfer anything
-         * to the VDP1, but still expect to sync */
-        _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
+
+        uint8_t state_vdp1_flags = _state.vdp1.flags;
+
+        state_vdp1_flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
+        state_vdp1_flags |= VDP1_FLAG_LIST_XFERRED;
+
+        _state.vdp1.flags = state_vdp1_flags;
 }
 
 static void
@@ -706,51 +706,19 @@ _vdp1_mode_auto_sprite_end(void)
 static void
 _vdp1_mode_auto_vblank_in(void)
 {
-        uint8_t state_vdp1_flags = _state.vdp1.flags;
-
-        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_XFER_LIST) != VDP1_FLAG_REQUEST_XFER_LIST) {
-                return;
-        }
-
-        /* If we're still transferring, then abort */
-        if ((state_vdp1_flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
-                assert(false && "Exceeded transfer time");
-
-                return;
-        }
-
-        state_vdp1_flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
-        state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
-
-        _state.vdp1.flags = state_vdp1_flags;
-
-        /* Going from manual to 1-cycle mode requires the FCM and FCT
-         * bits to be cleared. Otherwise, we get weird behavior from the
-         * VDP1.
-         *
-         * However, VDP1(FBCR) must not be entirely cleared. This caused
-         * a lot of glitching when in double-density interlace mode */
-
-        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
-        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
-        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
 }
 
 static void
 _vdp1_mode_auto_vblank_out(void)
 {
-        uint8_t state_vdp1_flags = _state.vdp1.flags;
+        _vdp1_sprite_end_call();
 
-        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) == 0x00) {
-                return;
-        }
-
-        state_vdp1_flags &= ~VDP1_FLAG_REQUEST_CHANGE;
-
-        state_vdp1_flags |= VDP1_FLAG_LIST_COMMITTED;
-        state_vdp1_flags |= VDP1_FLAG_CHANGED;
-
-        _state.vdp1.flags = state_vdp1_flags;
+        /* Going from manual to 1-cycle mode requires the FCM and FCT bits to be
+         * cleared. Otherwise, we get weird behavior from the VDP1.
+         *
+         * However, VDP1(FBCR) must not be entirely cleared. This caused a lot
+         * of glitching when in double-density interlace mode */
+        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
 
         switch (_state.vdp1.fb_mode) {
         case VDP1_FB_MODE_ERASE_CHANGE:
@@ -760,6 +728,17 @@ _vdp1_mode_auto_vblank_out(void)
                 MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
                 break;
         }
+
+        /* This could be a hack, but wait until scanline #0 is reached to avoid
+         * the frame buffer change from aborting plotting, resulting in a soft
+         * lock */
+        do {
+                vdp2_tvmd_extern_latch();
+        } while ((vdp2_tvmd_vcount_get()) != 0);
+
+        _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
+
+        _state.vdp1.flags &= ~VDP1_FLAG_MASK;
 }
 
 static void
@@ -802,7 +781,6 @@ _vdp1_mode_variable_dma(void)
 
         uint8_t state_vdp1_flags = _state.vdp1.flags;
 
-        /* Set the flags as transfered and request to draw the list */
         state_vdp1_flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
         state_vdp1_flags |= VDP1_FLAG_LIST_XFERRED;
 
@@ -848,15 +826,11 @@ _vdp1_mode_variable_vblank_in(void)
 
         state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
 
-        switch (_state.vdp1.fb_mode) {
-        case VDP1_FB_MODE_ERASE_CHANGE:
+        if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
                 /* Change and erase on next field */
                 _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
 
                 MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-                break;
-        case VDP1_FB_MODE_CHANGE_ONLY:
-                break;
         }
 
         MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
@@ -869,15 +843,6 @@ _vdp1_mode_variable_vblank_out(void)
 {
         uint8_t state_vdp1_flags = _state.vdp1.flags;
 
-        DEBUG_PRINTF("VBLANK-OUT,vdp1: RX%i RL%i RC%i  X%i L%i C%i, vdp2: 0x%02X\n",
-            (state_vdp1_flags >> 0) & 1,
-            (state_vdp1_flags >> 1) & 1,
-            (state_vdp1_flags >> 2) & 1,
-            (state_vdp1_flags >> 3) & 1,
-            (state_vdp1_flags >> 4) & 1,
-            (state_vdp1_flags >> 5) & 1,
-            _state.vdp2.flags);
-
         if ((state_vdp1_flags & VDP1_FLAG_CHANGED) == VDP1_FLAG_CHANGED) {
                 return;
         }
@@ -886,9 +851,6 @@ _vdp1_mode_variable_vblank_out(void)
                 return;
         }
 
-        state_vdp1_flags &= ~VDP1_FLAG_REQUEST_CHANGE;
-
-        /* Clear VBE */
         _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
 
         MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
@@ -901,6 +863,7 @@ _vdp1_mode_variable_vblank_out(void)
         } while ((vdp2_tvmd_vcount_get()) != 0);
 
         _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
+
         state_vdp1_flags &= ~VDP1_FLAG_MASK;
 
         _state.vdp1.flags = state_vdp1_flags;
@@ -926,7 +889,7 @@ _vdp1_cmdt_transfer(void)
             _state.vdp1.put_context;
 
         put_ctx->dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)put_ctx->cmdts;
-        put_ctx->dma_handle->dnw = VDP1_VRAM(put_ctx->index);
+        put_ctx->dma_handle->dnw = VDP1_VRAM(put_ctx->index * sizeof(vdp1_cmdt_t));
         put_ctx->dma_handle->dnc = put_ctx->count * sizeof(vdp1_cmdt_t);
 
         _vdp1_dma(put_ctx->dma_handle);
