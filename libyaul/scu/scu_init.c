@@ -20,4 +20,6 @@ _internal_scu_init(void)
         _internal_scu_dma_init();
         _internal_scu_dsp_init();
         _internal_scu_timer_init();
+
+        scu_ic_mask_set(SCU_IC_MASK_HBLANK_IN);
 }
