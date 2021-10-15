@@ -1,20 +1,20 @@
 /* -*- mode: c -*- */
 
-static void _simple_init(const dbgio_vdp2_t *);
-static void _simple_flush(void);
+static void _init(const dbgio_vdp2_t *);
+static void _flush(void);
 
-const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple = {
-        .dev            = DBGIO_DEV_VDP2_SIMPLE,
+const struct dbgio_dev_ops _internal_dev_ops_vdp2 = {
+        .dev            = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
-        .init           = (dev_ops_init_t)_simple_init,
+        .init           = (dev_ops_init_t)_init,
         .deinit         = _shared_deinit,
         .font_load      = _shared_font_load,
         .puts           = _shared_puts,
-        .flush          = _simple_flush
+        .flush          = _flush
 };
 
 static void
-_simple_init(const dbgio_vdp2_t *params)
+_init(const dbgio_vdp2_t *params)
 {
         _shared_init(params);
 
@@ -27,7 +27,7 @@ _simple_init(const dbgio_vdp2_t *params)
 }
 
 static void
-_simple_flush(void)
+_flush(void)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
                 .channel = DEV_DMAC_CHANNEL,

@@ -115,7 +115,7 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
         _internal_reset();
 
         dbgio_dev_deinit();
-        dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
+        dbgio_dev_default_init(DBGIO_DEV_VDP2);
 
         vdp2_tvmd_vblank_in_next_wait(1);
 
