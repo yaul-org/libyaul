@@ -25,7 +25,9 @@ __BEGIN_DECLS
 
 #define VDP1_VRAM_SIZE  0x00080000UL /* In bytes */
 
-#define VDP1_FB_SIZE    0x00040000UL
+#define VDP1_FB_COUNT   2UL
+
+#define VDP1_FB_SIZE    0x00040000UL /* In bytes */
 
 typedef struct vdp1_gouraud_table {
         color_rgb1555_t colors[4];

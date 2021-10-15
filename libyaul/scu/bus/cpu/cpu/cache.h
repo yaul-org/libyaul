@@ -45,6 +45,9 @@ __BEGIN_DECLS
 /// @see cpu_cache_way_mode_set
 #define CPU_CACHE_2_WAY_SIZE    (CPU_CACHE_WAY_2_ADDR - CPU_CACHE_WAY_0_ADDR)
 
+/// @brief The size of a cache line in bytes.
+#define CPU_CACHE_LINE_SIZE     16UL
+
 /// @brief Cache mode.
 typedef enum cpu_cache_mode {
         /// Four-way set associative.

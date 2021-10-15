@@ -110,8 +110,7 @@ _internal_cpu_init(void)
 static void
 _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
-        const char *buffer;
-        buffer = _exception_message_format(regs, exception_name);
+        const char * const buffer = _exception_message_format(regs, exception_name);
 
         _internal_reset();
 

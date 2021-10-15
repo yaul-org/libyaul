@@ -60,10 +60,7 @@
 #define VDP1_FLAG_MASK                  (0x3F)
 
 #define VDP2_FLAG_IDLE                  (0x00)
-#define VDP2_FLAG_REQUEST_COMMIT        (1 << 0) /* VDP2 request to commit state */
-#define VDP2_FLAG_COMITTING             (1 << 1) /* VDP2 is committing state via SCU-DMA */
-#define VDP2_FLAG_COMMITTED             (1 << 2) /* VDP2 finished committing state */
-#define VDP2_FLAG_MASK                  (0x07)
+#define VDP2_FLAG_MASK                  (0x00)
 
 #define TRANSFER_TYPE_BUFFER            (0)
 #define TRANSFER_TYPE_ORDERLIST         (1)
@@ -146,8 +143,6 @@ static callback_t _user_vdp1_sync_callback;
 static callback_t _user_vblank_in_callback;
 static callback_t _user_vblank_out_callback;
 
-static callback_list_t *_user_callback_list;
-
 static const uint16_t _fbcr_bits[] __unused = {
         /* Render even-numbered lines */
         0x0008,
@@ -181,10 +176,10 @@ static void _vdp1_mode_fixed_vblank_out(void);
  * 4. When the VDP1 is done plotting, VDP1_FLAG_REQUEST_CHANGE is set.
  *    VDP1(TVMR) sets VBE, and sets FCM|FCT to VDP1(FBCR).
  *
- * 5. In VBLANK-OUT, if the request to change framebuffers is set
+ * 5. In VBLANK-OUT, if the request to change frame buffers is set
  *    (VDP1_FLAG_REQUEST_CHANGE), then clear VBE from VDP1(TVMR), and wait until
  *    scanline #0 is reached. Waiting until scanline #0 is reached should ensure
- *    that the VDP1 has enough time to fully change framebuffers. If plotting
+ *    that the VDP1 has enough time to fully change frame buffers. If plotting
  *    occurs (for another transfer), then the VDP1 will abort the plot,
  *    resulting in a soft lock. All state is reset at this point.
  *
@@ -237,13 +232,10 @@ static void _vdp1_cmdt_transfer(void);
 static void _vdp1_cmdt_orderlist_transfer(void);
 
 static void _vdp2_init(void);
-static void _vdp2_registers_transfer(cpu_dmac_cfg_t *dmac_cfg);
-static void _vdp2_back_screen_transfer(cpu_dmac_cfg_t *dmac_cfg);
 
 static void _scu_dma_level_end_handler(void *work);
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
-static void _vdp2_dma_handler(const dma_queue_transfer_t *transfer);
 
 void
 _internal_vdp_sync_init(void)
@@ -251,8 +243,6 @@ _internal_vdp_sync_init(void)
         const uint32_t intc_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
-
-        _user_callback_list = callback_list_alloc(USER_CALLBACK_COUNT);
 
         callback_init(&_user_vblank_in_callback);
         callback_init(&_user_vblank_out_callback);
@@ -429,19 +419,7 @@ vdp2_sync(void)
 
         const uint32_t intc_mask = cpu_intc_mask_get();
 
-        /* Wait for DMA queue to finish flushing, prior to syncing */
-        DEBUG_PRINTF("Flush #1\n");
-        dma_queue_flush_wait();
-
         cpu_intc_mask_set(15);
-
-        scu_dma_handle_t *handle;
-        handle = _state_vdp2()->commit.handle;
-
-        int8_t ret __unused;
-        ret = dma_queue_enqueue(handle, DMA_QUEUE_TAG_VBLANK_IN,
-            _vdp2_dma_handler, NULL);
-        assert(ret == 0);
 
         _state.flags &= ~SYNC_FLAG_INTERLACE_SINGLE;
         _state.flags &= ~SYNC_FLAG_INTERLACE_DOUBLE;
@@ -465,79 +443,45 @@ vdp2_sync(void)
 void
 vdp2_sync_wait(void)
 {
-        if ((_state.flags & SYNC_FLAG_VDP2_SYNC) != SYNC_FLAG_VDP2_SYNC) {
-                return;
+        while ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
         }
-
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
-
-        const uint32_t intc_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(0);
-
-        /* Wait until VDP2 state has been committed */
-        while (true) {
-                if ((_state.vdp2.flags & VDP2_FLAG_REQUEST_COMMIT) != 0x00) {
-                        DEBUG_PRINTF("Flushing VBLANK-IN\n");
-
-                        _state.vdp2.flags &= ~VDP2_FLAG_REQUEST_COMMIT;
-                        _state.vdp2.flags |= VDP2_FLAG_COMITTING;
-
-                        int ret __unused;
-                        ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
-                        assert(ret >= 0);
-                }
-
-                dma_queue_flush_wait();
-
-                const bool vdp2_working =
-                    (_state.vdp2.flags != VDP2_FLAG_COMMITTED);
-
-                if (!vdp2_working) {
-                        DEBUG_PRINTF("Next frame\n\n\n\n\n");
-                        break;
-                }
-        }
-
-        cpu_intc_mask_set(15);
-
-        callback_list_process(_user_callback_list, /* clear = */ true);
-
-        _state.flags &= ~SYNC_FLAG_VDP2_SYNC;
-        _state.vdp2.flags &= ~VDP2_FLAG_MASK;
-
-        cpu_intc_mask_set(intc_mask);
-
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
 }
 
 void
 vdp2_sync_commit(void)
 {
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .channel= SYNC_DMAC_CHANNEL,
-                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-                .src = 0x00000000,
-                .dst = 0x00000000,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len = 0x00000000,
-                .stride = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr = NULL
-        };
+        const scu_dma_handle_t * const dma_handle =
+            _state_vdp2()->commit.dma_handle;
 
-        _state.vdp2.flags &= ~VDP2_FLAG_COMMITTED;
-        _state.vdp2.flags |= VDP2_FLAG_COMITTING;
+        scu_dma_level_t level;
+        level = 0;
 
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-        cpu_dmac_enable();
+        /* Find an available SCU-DMA level */
+        if ((scu_dma_level_busy(level))) {
+                level = scu_dma_level_unused_get();
 
-        cpu_cache_purge();
+                if (level < 0) {
+                        level = 0;
 
-        _vdp2_back_screen_transfer(&dmac_cfg);
-        _vdp2_registers_transfer(&dmac_cfg);
+                        scu_dma_level_wait(level);
+                }
+        }
 
-        _state.vdp2.flags |= VDP2_FLAG_COMMITTED;
+        scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
+        scu_dma_level_end_set(level, NULL, NULL);
+
+        uintptr_t vdp2_regs_buffer = (uintptr_t)_state_vdp2()->regs->buffer;
+        const uint32_t cache_line_count =
+            sizeof(_state_vdp2()->regs->buffer) / CPU_CACHE_LINE_SIZE;
+
+        for (uint32_t i = 0; i < cache_line_count; i++) {
+                cpu_cache_purge_line((void *)vdp2_regs_buffer);
+
+                vdp2_regs_buffer += CPU_CACHE_LINE_SIZE / sizeof(uintptr_t);
+        }
+
+        scu_dma_level_fast_start(level);
+        scu_dma_level_wait(level);
 }
 
 void
@@ -550,24 +494,6 @@ void
 vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work)
 {
         callback_set(&_user_vblank_out_callback, callback_handler, work);
-}
-
-callback_id_t
-vdp_sync_user_callback_add(callback_handler_t callback_handler, void *work)
-{
-        return callback_list_callback_add(_user_callback_list, callback_handler, work);
-}
-
-void
-vdp_sync_user_callback_remove(callback_id_t id)
-{
-        callback_list_callback_remove(_user_callback_list, id);
-}
-
-void
-vdp_sync_user_callback_clear(void)
-{
-        callback_list_clear(_user_callback_list);
 }
 
 static void
@@ -813,12 +739,9 @@ _vdp1_mode_variable_vblank_in(void)
                 return;
         }
 
-        const vdp1_mode_status_t mode_status = vdp1_mode_status_get();
+        const vdp1_transfer_status_t transfer_status = vdp1_transfer_status_get();
 
-        /* Check if VDP1 is plotting. Previously, checking VDP1(COPR) was done.
-         * But this proves to be problematic for when orderlists are sent (SCU
-         * indirect table DMA transfers). */
-        if (mode_status.ptm1 != 0x00) {
+        if (!transfer_status.cef) {
                 return;
         }
 
@@ -917,63 +840,6 @@ _vdp2_init(void)
 }
 
 static void
-_vdp2_registers_transfer(cpu_dmac_cfg_t *dmac_cfg)
-{
-        /* Skip committing the first 7 VDP2 registers:
-         * 0x0000 TVMD
-         * 0x0002 EXTEN
-         * 0x0004 TVSTAT R/O
-         * 0x0006 VRSIZE R/W
-         * 0x0008 HCNT   R/O
-         * 0x000A VCNT   R/O
-         * 0x000C Reserved
-         * 0x000E RAMCTL */
-
-        dmac_cfg->len = sizeof(vdp2_registers_t) - 14;
-        dmac_cfg->dst = VDP2(0x000E);
-        dmac_cfg->src = (uint32_t)&_state_vdp2()->regs->buffer[7];
-
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-        cpu_dmac_channel_config_set(dmac_cfg);
-
-        MEMORY_WRITE(16, VDP2(0x0000), _state_vdp2()->regs->tvmd);
-
-        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
-
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-}
-
-static void
-_vdp2_back_screen_transfer(cpu_dmac_cfg_t *dmac_cfg)
-{
-        dmac_cfg->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t);
-        dmac_cfg->dst = (uint32_t)_state_vdp2()->back.vram;
-        dmac_cfg->src = (uint32_t)_state_vdp2()->back.buffer;
-
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-        cpu_dmac_channel_config_set(dmac_cfg);
-
-        cpu_dmac_channel_start(SYNC_DMAC_CHANNEL);
-
-        cpu_dmac_channel_wait(SYNC_DMAC_CHANNEL);
-}
-
-static void
-_vdp2_dma_handler(const dma_queue_transfer_t *transfer)
-{
-        if ((transfer->status & DMA_QUEUE_STATUS_COMPLETE) != DMA_QUEUE_STATUS_COMPLETE) {
-                return;
-        }
-
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
-
-        _state.vdp2.flags |= VDP2_FLAG_COMMITTED;
-        _state.vdp2.flags &= ~VDP2_FLAG_COMITTING;
-
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
-}
-
-static void
 _scu_dma_level_end_handler(void *work __unused)
 {
         scu_dma_level_end_set(0, NULL, NULL);
@@ -989,20 +855,25 @@ _scu_dma_level_end_handler(void *work __unused)
 static void
 _vblank_in_handler(void)
 {
+        callback_call(&_user_vblank_in_callback);
+
         /* VBLANK-IN interrupt runs at scanline #224 */
+        if ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
+                vdp2_sync_commit();
+
+                _state.flags &= ~SYNC_FLAG_VDP2_SYNC;
+                _state.vdp2.flags &= ~VDP2_FLAG_MASK;
+        }
+
+        int ret __unused;
+        ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
+        assert(ret >= 0);
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 _vdp1_vblank_in_call();
         }
 
-        if ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
-                /* Because SYNC_FLAG_SYNC is set, we request to commit */
-                if (_state.vdp2.flags == VDP2_FLAG_IDLE) {
-                        _state.vdp2.flags |= VDP2_FLAG_REQUEST_COMMIT;
-                }
-        }
-
-        callback_call(&_user_vblank_in_callback);
+        dma_queue_flush_wait();
 }
 
 static void

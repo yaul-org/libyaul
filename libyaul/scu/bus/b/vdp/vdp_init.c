@@ -20,12 +20,12 @@
 static void _vdp1_init(void);
 static void _vdp2_init(void);
 
-static void _memory_area_clear(const uint32_t, const uint16_t, const uint32_t);
+static void _memory_area_clear(uint32_t address, uint16_t value, uint32_t len);
 
-static vdp1_registers_t _vdp1_registers;
+static vdp1_registers_t _vdp1_registers __aligned(16);
 static vdp1_vram_partitions_t _vdp1_vram_partitions;
 
-static vdp2_registers_t _vdp2_registers;
+static vdp2_registers_t _vdp2_registers __aligned(16);
 
 void
 _internal_vdp_init(void)
@@ -59,7 +59,19 @@ _vdp1_init(void)
                                  VDP1_VRAM_DEFAULT_CLUT_COUNT);
 
         _memory_area_clear(VDP1_VRAM(0x0000), 0x0000, VDP1_VRAM_SIZE);
-        _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+
+        for (uint32_t fb = 0; fb < VDP1_FB_COUNT; fb++) {
+                /* Wait until the at the start of VBLANK-IN */
+                vdp2_tvmd_vblank_in_next_wait(1);
+
+                /* Change frame buffer */
+                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+
+                /* Wait until the change of frame buffer takes effect */
+                vdp2_tvmd_vcount_wait(0);
+
+                _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+        }
 
         /* Force draw end */
         MEMORY_WRITE(16, VDP1_VRAM(0x0000), 0x8000);
@@ -98,8 +110,7 @@ _vdp2_init(void)
 }
 
 static void
-_memory_area_clear(const uint32_t address, const uint16_t value,
-    const uint32_t len)
+_memory_area_clear(uint32_t address, uint16_t value, uint32_t len)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
                 .channel = 0,

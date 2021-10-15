@@ -50,9 +50,6 @@ _internal_reset(void)
         vdp2_sprite_priority_set(6, 0);
         vdp2_sprite_priority_set(7, 0);
 
-        /* Clear any pending VDP sync user callbacks */
-        vdp_sync_user_callback_clear();
-
         vdp_sync_vblank_in_clear();
         vdp_sync_vblank_out_clear();
 

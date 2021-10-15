@@ -67,10 +67,9 @@ _simple_flush(void)
         cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
         cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
 
-        uint8_t state_mask;
-        state_mask = STATE_BUFFER_DIRTY |
-                     STATE_BUFFER_FLUSHING |
-                     STATE_BUFFER_FORCE_FLUSHING;
+        const uint8_t state_mask = STATE_BUFFER_DIRTY |
+                                   STATE_BUFFER_FLUSHING |
+                                   STATE_BUFFER_FORCE_FLUSHING;
 
         _dev_state->state &= ~state_mask;
 
