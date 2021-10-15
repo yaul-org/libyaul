@@ -18,7 +18,7 @@ static scu_dma_xfer_t _commit_xfer_table[COMMIT_XFER_COUNT] __aligned(COMMIT_XFE
 void
 _internal_vdp2_xfer_table_init(void)
 {
-        _state_vdp2()->commit.handle = &_commit_handle;
+        _state_vdp2()->commit.dma_handle = &_commit_handle;
         _state_vdp2()->commit.xfer_table = &_commit_xfer_table[0];
 
         _internal_vdp2_xfer_table_update(COMMIT_XFER_VDP2_REG_TVMD);
@@ -35,10 +35,10 @@ _internal_vdp2_xfer_table_init(void)
                 .update = SCU_DMA_UPDATE_NONE
         };
 
-        scu_dma_handle_t *handle;
-        handle = _state_vdp2()->commit.handle;
+        scu_dma_handle_t * const dma_handle =
+            _state_vdp2()->commit.dma_handle;
 
-        scu_dma_config_buffer(handle, &dma_cfg);
+        scu_dma_config_buffer(dma_handle, &dma_cfg);
 }
 
 void

@@ -297,7 +297,7 @@ dma_queue_flush(uint8_t tag)
         dma_queue = &_state.dma_queues[tag];
 
         if (_queue_empty(dma_queue)) {
-                status = -1;
+                status = 0;
 
                 goto exit;
         }
@@ -357,8 +357,8 @@ dma_queue_flush_wait(void)
                         return;
                 }
 
-                const struct dma_queue_request *next_request;
-                next_request = _queue_dequeue(dma_queue);
+                const struct dma_queue_request * const next_request =
+                    _queue_dequeue(dma_queue);
 
                 uint32_t intc_mask;
                 intc_mask = cpu_intc_mask_get();

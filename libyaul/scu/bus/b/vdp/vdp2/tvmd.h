@@ -118,6 +118,21 @@ vdp2_tvmd_vcount_get(void)
         return (MEMORY_READ(16, VDP2(VCNT)) & 0x03FF);
 }
 
+static inline void __always_inline
+vdp2_tvmd_vcount_wait(uint16_t scanline)
+{
+        /* There are 1024 maximum counter values */
+        scanline &= 0x03FF;
+
+        while (true) {
+                vdp2_tvmd_extern_latch();
+
+                if ((vdp2_tvmd_vcount_get()) == scanline) {
+                        break;
+                }
+        }
+}
+
 static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {

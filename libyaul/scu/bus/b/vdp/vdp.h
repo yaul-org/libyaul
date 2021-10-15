@@ -57,10 +57,6 @@ extern void vdp2_sync_commit(void);
 extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler, void *work);
 extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work);
 
-extern callback_id_t vdp_sync_user_callback_add(callback_handler_t callback, void *work);
-extern void vdp_sync_user_callback_remove(callback_id_t id);
-extern void vdp_sync_user_callback_clear(void);
-
 __END_DECLS
 
 #endif /* !_YAUL_VDP_H_ */

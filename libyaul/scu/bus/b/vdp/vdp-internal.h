@@ -37,7 +37,7 @@ struct state_vdp2 {
         vdp2_vram_ctl_t *vram_ctl;
 
         struct {
-                scu_dma_handle_t *handle;
+                scu_dma_handle_t *dma_handle;
                 scu_dma_xfer_t *xfer_table;
         } commit;
 
