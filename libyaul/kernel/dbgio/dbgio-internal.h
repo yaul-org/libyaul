@@ -35,7 +35,7 @@ struct dbgio_dev_ops {
 
 extern const struct dbgio_dev_ops _internal_dev_ops_null;
 extern const struct dbgio_dev_ops _internal_dev_ops_vdp1;
-extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_simple;
+extern const struct dbgio_dev_ops _internal_dev_ops_vdp2;
 extern const struct dbgio_dev_ops _internal_dev_ops_vdp2_async;
 extern const struct dbgio_dev_ops _internal_dev_ops_usb_cart;
 

@@ -19,11 +19,11 @@
 __BEGIN_DECLS
 
 typedef enum dbgio_dev {
-        DBGIO_DEV_NULL        = 0,
-        DBGIO_DEV_VDP1        = 1,
-        DBGIO_DEV_VDP2_SIMPLE = 2,
-        DBGIO_DEV_VDP2_ASYNC  = 3,
-        DBGIO_DEV_USB_CART    = 4
+        DBGIO_DEV_NULL,
+        DBGIO_DEV_VDP1,
+        DBGIO_DEV_VDP2,
+        DBGIO_DEV_VDP2_ASYNC,
+        DBGIO_DEV_USB_CART
 } dbgio_dev_t;
 
 #define DBGIO_DEV_COUNT 5

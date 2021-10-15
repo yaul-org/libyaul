@@ -33,7 +33,7 @@ _assert(const char * restrict file, const char * restrict line,
                 _internal_reset();
 
                 dbgio_dev_deinit();
-                dbgio_dev_default_init(DBGIO_DEV_VDP2_SIMPLE);
+                dbgio_dev_default_init(DBGIO_DEV_VDP2);
 
                 vdp2_tvmd_vblank_in_next_wait(1);
 

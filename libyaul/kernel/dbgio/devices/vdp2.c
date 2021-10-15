@@ -35,7 +35,7 @@
 #define STATE_BUFFER_FLUSHING           (0x08)
 #define STATE_BUFFER_FORCE_FLUSHING     (0x10)
 
-/* CPU-DMAC channel used for _simple_flush() and _buffer_clear() */
+/* CPU-DMAC channel used for _flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
 
 struct dev_font_state;
@@ -478,8 +478,8 @@ _shared_init(const dbgio_vdp2_t *params)
 
         _scroll_screen_init(params);
 
-        struct dev_font_state *font_state;
-        font_state = _dev_state->font_state;
+        struct dev_font_state * const font_state =
+            _dev_state->font_state;
 
         _font_1bpp_4bpp_decompress(font_state->cpd_buffer,
             params->font_cpd,
@@ -577,8 +577,8 @@ _shared_font_load(font_load_callback_t callback)
         /* Be sure to have interrupts enabled */
         assert(intc_mask < 15);
 
-        struct dev_font_state *font_state;
-        font_state = _dev_state->font_state;
+        struct dev_font_state * const font_state =
+            _dev_state->font_state;
 
         /* Font palette (32 bytes) is small enough that we'd spend more time
          * setting up a CPU-DMAC transfer, than by just transferring the palette
@@ -612,5 +612,5 @@ _shared_font_load(font_load_callback_t callback)
         cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
 }
 
+#include "vdp2.inc"
 #include "vdp2-async.inc"
-#include "vdp2-simple.inc"

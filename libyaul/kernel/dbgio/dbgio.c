@@ -16,8 +16,8 @@
 #include "dbgio-internal.h"
 
 #define STATE_IDLE                      (0x00)
-#define STATE_FONT_LOAD_REQUESTED       (0x01)
-#define STATE_FONT_LOAD_COMPLETED       (0x02)
+#define STATE_FONT_LOAD_REQUESTED       (1 << 0)
+#define STATE_FONT_LOAD_COMPLETED       (1 << 1)
 
 /* This is enough for a 320x256 character resolution */
 #define SPRINTF_BUFFER_SIZE             (1280)
@@ -32,7 +32,7 @@ static struct {
 static const struct dbgio_dev_ops *_dev_ops_table[] = {
         &_internal_dev_ops_null,
         NULL,
-        &_internal_dev_ops_vdp2_simple,
+        &_internal_dev_ops_vdp2,
         &_internal_dev_ops_vdp2_async,
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
         &_internal_dev_ops_usb_cart,
