@@ -77,8 +77,9 @@ size_t tlsf_pool_overhead(void);
 size_t tlsf_alloc_overhead(void);
 
 /* Debugging. */
-typedef void (*tlsf_walker)(void* ptr, size_t size, int used, void* user);
-void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user);
+typedef void (*tlsf_walker_t)(void* ptr, size_t size, int used, void* user);
+
+void tlsf_walk_pool(pool_t pool, tlsf_walker_t walker, void* user);
 /* Returns nonzero if any internal consistency check fails. */
 int tlsf_check(tlsf_t tlsf);
 int tlsf_check_pool(pool_t pool);

@@ -18,10 +18,10 @@ static void _divu_ovfi_handler(void);
 
 static void _default_ihr(void);
 
-static cpu_divu_ihr _master_divu_ovfi_ihr = _default_ihr;
-static cpu_divu_ihr _slave_divu_ovfi_ihr = _default_ihr;
+static cpu_divu_ihr_t _master_divu_ovfi_ihr = _default_ihr;
+static cpu_divu_ihr_t _slave_divu_ovfi_ihr = _default_ihr;
 
-static cpu_divu_ihr *_divu_ovfi_ihr_get(void);
+static cpu_divu_ihr_t *_divu_ovfi_ihr_get(void);
 
 void
 _internal_cpu_divu_init(void)
@@ -41,14 +41,14 @@ _internal_cpu_divu_init(void)
 }
 
 void
-cpu_divu_ovfi_set(cpu_divu_ihr ihr)
+cpu_divu_ovfi_set(cpu_divu_ihr_t ihr)
 {
         volatile uint32_t *reg_dvcr;
         reg_dvcr = (volatile uint32_t *)CPU(DVCR);
 
         *reg_dvcr &= ~0x00000003;
 
-        cpu_divu_ihr *divu_ovfi_ihr;
+        cpu_divu_ihr_t *divu_ovfi_ihr;
         divu_ovfi_ihr = _divu_ovfi_ihr_get();
 
         *divu_ovfi_ihr = _default_ihr;
@@ -65,13 +65,13 @@ _divu_ovfi_handler(void)
 {
         MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);
 
-        cpu_divu_ihr *divu_ovfi_ihr;
+        cpu_divu_ihr_t *divu_ovfi_ihr;
         divu_ovfi_ihr = _divu_ovfi_ihr_get();
 
         (*divu_ovfi_ihr)();
 }
 
-static cpu_divu_ihr *
+static cpu_divu_ihr_t *
 _divu_ovfi_ihr_get(void)
 {
         const uint8_t which_cpu = cpu_dual_executor_get();

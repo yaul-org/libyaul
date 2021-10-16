@@ -42,9 +42,9 @@ typedef enum cpu_dual_comm_mode {
 } cpu_dual_comm_mode_t;
 
 /// Callback for master CPU entry point.
-typedef void (*cpu_dual_master_entry)(void);
+typedef void (*cpu_dual_master_entry_t)(void);
 /// Callback for slave CPU entry point.
-typedef void (*cpu_dual_slave_entry)(void);
+typedef void (*cpu_dual_slave_entry_t)(void);
 
 /// @brief From the slave CPU, notify the master CPU.
 ///
@@ -165,7 +165,7 @@ extern void cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode);
 ///
 /// @see cpu_dual_master_notify
 /// @see cpu_dual_master_clear
-extern void cpu_dual_master_set(cpu_dual_master_entry entry);
+extern void cpu_dual_master_set(cpu_dual_master_entry_t entry);
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Set the entry handler for the slave CPU.
@@ -177,7 +177,7 @@ extern void cpu_dual_master_set(cpu_dual_master_entry entry);
 ///
 /// @see cpu_dual_slave_notify
 /// @see cpu_dual_slave_clear
-extern void cpu_dual_slave_set(cpu_dual_slave_entry entry);
+extern void cpu_dual_slave_set(cpu_dual_slave_entry_t entry);
 
 /// @brief Obtain which of the two CPUs this function was called on.
 ///

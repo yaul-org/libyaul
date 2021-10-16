@@ -900,9 +900,9 @@ static void default_walker(void* ptr __unused, size_t size __unused, int used __
         /* printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr)); */
 }
 
-void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
+void tlsf_walk_pool(pool_t pool, tlsf_walker_t walker, void* user)
 {
-        tlsf_walker pool_walker = walker ? walker : default_walker;
+        tlsf_walker_t pool_walker = walker ? walker : default_walker;
         block_header_t* block =
                 offset_to_block(pool, -(int)block_header_overhead);
 

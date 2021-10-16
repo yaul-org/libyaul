@@ -47,7 +47,7 @@ typedef enum cpu_wdt_mode {
 
 /// @brief Callback type.
 /// @see cpu_wdt_timer_mode_set
-typedef void (*cpu_wdt_ihr)(void);
+typedef void (*cpu_wdt_ihr_t)(void);
 
 /// @brief Set the 1-byte WDT tick count.
 ///
@@ -122,7 +122,7 @@ extern void cpu_wdt_init(cpu_wdt_clock_t clock_div);
 ///
 /// @param mode The mode.
 /// @param ihr  The interrupt handler.
-extern void cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr);
+extern void cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr_t ihr);
 
 /// @}
 

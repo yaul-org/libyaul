@@ -40,7 +40,7 @@ __asm__ (".align 1\n"                                                          \
          "2:\n"                                                                \
          ".long __slave_" __STRING(type) "_entry\n")
 
-typedef void (*slave_entry)(void);
+typedef void (*slave_entry_t)(void);
 
 static void _slave_init(void);
 
@@ -55,10 +55,10 @@ static void _slave_ici_handler(void);
 
 static void _default_entry(void);
 
-static cpu_dual_master_entry _master_entry = _default_entry;
-static cpu_dual_slave_entry _slave_entry __section(".uncached") = _default_entry;
+static cpu_dual_master_entry_t _master_entry = _default_entry;
+static cpu_dual_slave_entry_t _slave_entry __section(".uncached") = _default_entry;
 
-static slave_entry _slave_entry_table[] = {
+static slave_entry_t _slave_entry_table[] = {
         &_slave_polling_entry_trampoline,
         &_slave_ici_entry_trampoline
 };
@@ -90,7 +90,7 @@ cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 }
 
 void
-cpu_dual_master_set(cpu_dual_master_entry entry)
+cpu_dual_master_set(cpu_dual_master_entry_t entry)
 {
         volatile uint8_t *reg_tier;
         reg_tier = (volatile uint8_t *)CPU(TIER);
@@ -109,7 +109,7 @@ cpu_dual_master_set(cpu_dual_master_entry entry)
 }
 
 void
-cpu_dual_slave_set(cpu_dual_slave_entry entry)
+cpu_dual_slave_set(cpu_dual_slave_entry_t entry)
 {
         _slave_entry = _default_entry;
 

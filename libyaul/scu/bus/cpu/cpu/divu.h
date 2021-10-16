@@ -22,7 +22,7 @@ __BEGIN_DECLS
 
 /// @brief Callback type.
 /// @see cpu_divu_ovfi_set
-typedef void (*cpu_divu_ihr)(void);
+typedef void (*cpu_divu_ihr_t)(void);
 
 /// @brief Determine if an overflow has occurred.
 /// @returns `true` if an overflow has occurred. Otherwise, `false`.
@@ -144,7 +144,7 @@ do {                                                                           \
 /// @param ihr The interrupt handler.
 ///
 /// @see cpu_divu_ovfi_clear
-extern void cpu_divu_ovfi_set(cpu_divu_ihr ihr);
+extern void cpu_divu_ovfi_set(cpu_divu_ihr_t ihr);
 
 /// @}
 
