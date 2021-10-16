@@ -120,7 +120,7 @@ typedef enum cpu_intc_interrupt {
 
 /// @brief Callback type.
 /// @see cpu_intc_ihr_set
-typedef void (*cpu_intc_ihr)(void);
+typedef void (*cpu_intc_ihr_t)(void);
 
 /// @brief Set the interrupt handler for the specified CPU related interrupt.
 ///
@@ -137,7 +137,7 @@ typedef void (*cpu_intc_ihr)(void);
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
 static inline void __always_inline
-cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr ihr)
+cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr_t ihr)
 {
         register uint32_t * const bios_address = (uint32_t *)0x06000310;
 
@@ -170,7 +170,7 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
 ///
 /// @param vector The vector number.
-static inline cpu_intc_ihr __always_inline
+static inline cpu_intc_ihr_t __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 {
         register uint32_t * const bios_address = (uint32_t *)0x06000314;

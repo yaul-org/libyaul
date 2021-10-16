@@ -80,7 +80,7 @@ typedef enum cpu_dmac_bus_mode {
 /// @brief Callback type.
 /// @see cpu_dmac_cfg_t.ihr
 /// @see cpu_dmac_cfg_t.ihr_work
-typedef void (*cpu_dmac_ihr)(void *);
+typedef void (*cpu_dmac_ihr_t)(void *);
 
 /// CPU-DMAC channel.
 typedef uint8_t cpu_dmac_channel_t;
@@ -115,7 +115,7 @@ typedef struct cpu_dmac_cfg {
         /// @brief Callback when transfer is completed.
         ///
         /// @details Set to `NULL` if no callback is desired.
-        cpu_dmac_ihr ihr;
+        cpu_dmac_ihr_t ihr;
 
         /// @ingroup CPU_INTC_HELPERS
         /// @brief Pointer to any work passed onto @ref cpu_dmac_cfg_t.ihr.
