@@ -23,12 +23,6 @@
 
 /* #define VDP_SYNC_DEBUG */
 
-/* CPU-DMAC channel used for vdp2_sync() */
-#define SYNC_DMAC_CHANNEL       0
-
-/* Maximum number of user callbacks */
-#define USER_CALLBACK_COUNT     4
-
 #define SCU_MASK_MASK   (SCU_IC_MASK_VBLANK_IN |                               \
                          SCU_IC_MASK_VBLANK_OUT |                              \
                          SCU_IC_MASK_LEVEL_0_DMA_END)
@@ -123,17 +117,17 @@ static_assert(sizeof(struct vdp1_state) == 12);
 
 struct vdp2_state {
         uint8_t flags;
-} __packed __aligned(4);
+} __packed;
 
-static_assert(sizeof(struct vdp2_state) == 4);
+static_assert(sizeof(struct vdp2_state) == 1);
 
 static volatile struct {
         struct vdp1_state vdp1;
         struct vdp2_state vdp2;
         uint8_t flags;
-} _state __aligned(4);
+} _state __aligned(16);
 
-static_assert(sizeof(_state) == 20);
+static_assert(sizeof(_state) == 16);
 
 static scu_dma_handle_t _vdp1_dma_handle;
 static scu_dma_handle_t _vdp1_orderlist_dma_handle;
@@ -246,8 +240,6 @@ _internal_vdp_sync_init(void)
 
         callback_init(&_user_vblank_in_callback);
         callback_init(&_user_vblank_out_callback);
-
-        _state.flags = SYNC_FLAG_NONE;
 
         _vdp1_init();
         _vdp2_init();
@@ -835,8 +827,6 @@ _vdp2_init(void)
         extern void _internal_vdp2_xfer_table_init(void);
 
         _internal_vdp2_xfer_table_init();
-
-        _state.vdp2.flags = VDP2_FLAG_IDLE;
 }
 
 static void
@@ -862,7 +852,6 @@ _vblank_in_handler(void)
                 vdp2_sync_commit();
 
                 _state.flags &= ~SYNC_FLAG_VDP2_SYNC;
-                _state.vdp2.flags &= ~VDP2_FLAG_MASK;
         }
 
         int ret __unused;
