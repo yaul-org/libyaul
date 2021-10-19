@@ -74,6 +74,8 @@
 #define VDP1_PTMR_AUTO                  (0x0002)
 
 #ifdef VDP_SYNC_DEBUG
+#include <sys/cdefs.h>
+
 #include <dbgio.h>
 
 #define DEBUG_PRINTF(...) do {                                                 \
@@ -162,7 +164,7 @@ static void _vdp1_mode_fixed_vblank_out(void);
  *    vdp1_sync_cmdt_list_put(), a transfer is initiated. The function blocks
  *    until the transfer is complete. VDP1 plotting starts.
  *
- * 2. When vdp_sync() is called, SYNC_FLAG_VDP1_SYNC is set.
+ * 2. When vdp1_sync() is called, SYNC_FLAG_VDP1_SYNC is set.
  *
  * 3. At VBLANK-IN, a check is performed if the VDP1 is still plotting. If so,
  *    the VBLANK-IN interrupt handler returns until the next time it's fired.
@@ -241,6 +243,8 @@ _internal_vdp_sync_init(void)
         callback_init(&_user_vblank_in_callback);
         callback_init(&_user_vblank_out_callback);
 
+        _state.flags = SYNC_FLAG_NONE;
+
         _vdp1_init();
         _vdp2_init();
 
@@ -258,7 +262,7 @@ _internal_vdp_sync_init(void)
 void
 vdp1_sync(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 return;
@@ -276,14 +280,24 @@ vdp1_sync(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 void
 vdp1_sync_wait(void)
 {
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
+        const uint32_t intc_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
         while ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
         }
+
+        cpu_intc_mask_set(intc_mask);
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 void
@@ -403,7 +417,7 @@ vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
 void
 vdp2_sync(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         if ((_state.flags & (SYNC_FLAG_VDP2_SYNC)) == SYNC_FLAG_VDP2_SYNC) {
                 return;
@@ -429,14 +443,24 @@ vdp2_sync(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 void
 vdp2_sync_wait(void)
 {
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
+        const uint32_t intc_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
         while ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
         }
+
+        cpu_intc_mask_set(intc_mask);
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 void
@@ -492,21 +516,21 @@ static void
 _vdp1_init(void)
 {
         const scu_dma_level_cfg_t dma_cfg = {
-                .mode = SCU_DMA_MODE_DIRECT,
+                .mode            = SCU_DMA_MODE_DIRECT,
                 /* Prevent assertion */
                 .xfer.direct.len = 0xFFFFFFFF,
                 .xfer.direct.dst = 0xFFFFFFFF,
                 .xfer.direct.src = 0xFFFFFFFF,
-                .stride = SCU_DMA_STRIDE_2_BYTES,
-                .update = SCU_DMA_UPDATE_NONE
+                .stride          = SCU_DMA_STRIDE_2_BYTES,
+                .update          = SCU_DMA_UPDATE_NONE
         };
 
         const scu_dma_level_cfg_t orderlist_dma_cfg = {
-                .mode = SCU_DMA_MODE_INDIRECT,
+                .mode          = SCU_DMA_MODE_INDIRECT,
                 /* Avoid assertion if pointer to indirect table is NULL */
                 .xfer.indirect = (void *)0xFFFFFFFF,
-                .stride = SCU_DMA_STRIDE_2_BYTES,
-                .update = SCU_DMA_UPDATE_NONE
+                .stride        = SCU_DMA_STRIDE_2_BYTES,
+                .update        = SCU_DMA_UPDATE_NONE
         };
 
         callback_init(&_user_vdp1_sync_callback);
@@ -530,41 +554,41 @@ _vdp1_init(void)
 static inline void __always_inline
 _vdp1_sync_put_call(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         _state.vdp1.current_mode->sync_put();
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 static inline void __always_inline
 _vdp1_dma_call(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         _state.vdp1.current_mode->dma();
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 static inline void __always_inline
 _vdp1_sprite_end_call(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         _state.vdp1.current_mode->sprite_end();
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 static inline void __always_inline
 _vdp1_vblank_in_call(void)
 {
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Enter\n"));
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
         _state.vdp1.current_mode->vblank_in();
 
-        DEBUG_PRINTF(CONCAT(__FUNCTION__, ": Exit\n"));
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 static inline void __always_inline
