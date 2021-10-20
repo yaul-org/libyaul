@@ -110,14 +110,8 @@ scu_dma_level_wait(scu_dma_level_t level)
                         return;
                 }
 
-                const uint32_t busy = scu_dma_level_busy(level);
-
-                if (busy == 0x00000000) {
+                if ((scu_dma_level_busy(level)) == 0x00000000) {
                         return;
-                }
-
-                for (register uint32_t i = 0; i < 0x30; i++) {
-                        cpu_instr_nop();
                 }
         }
 }
