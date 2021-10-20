@@ -130,6 +130,7 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
         vdp2_sync_commit();
+        vdp2_sync_commit_wait();
 }
 
 static void __noreturn __used
