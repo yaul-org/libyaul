@@ -82,6 +82,8 @@ _vdp2_init(void)
 {
         extern void _internal_vdp2_vram_init(void);
 
+        MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
+
         _state_vdp2()->regs = &_vdp2_registers;
 
         (void)memset(_state_vdp2()->regs, 0x00, sizeof(vdp2_registers_t));
