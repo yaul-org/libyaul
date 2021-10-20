@@ -433,7 +433,7 @@ _build_path_entries(const char *dirpath)
         for (int file_count = 0; (dirent = readdir(dir)) != NULL; ) {
                 struct stat statbuf;
 
-                (void)sprintf(path, "%s/%s", dirpath, dirent->d_name); 
+                (void)sprintf(path, "%s/%s", dirpath, dirent->d_name);
 
                 if ((strlen(dirent->d_name)) >= PATH_ENTRY_FILENAME_LENGTH) {
                         verbose_printf("Warning: Exceeded filename length: \"%s\"\n", dirent->d_name);
