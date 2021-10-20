@@ -18,10 +18,9 @@
 
 /* Default SCU DMA level */
 #define DMA_QUEUE_SCU_DMA_LEVEL         (0)
-#define DMA_QUEUE_SCU_DMA_MASK          (SCU_IC_MASK_LEVEL_0_DMA_END)
 
 /* Maximum count of requests in ring buffer to take in */
-#define DMA_QUEUE_REQUESTS_MAX_COUNT    (32)
+#define DMA_QUEUE_REQUESTS_MAX_COUNT    (16)
 #define DMA_QUEUE_REQUESTS_MASK         (DMA_QUEUE_REQUESTS_MAX_COUNT - 1)
 
 struct dma_queue_request {
@@ -31,6 +30,8 @@ struct dma_queue_request {
         dma_queue_transfer_t transfer;
 } __aligned(8);
 
+static_assert(sizeof(struct dma_queue_request) == 32);
+
 struct dma_queue {
         struct dma_queue_request *requests;
 
@@ -39,7 +40,6 @@ struct dma_queue {
         volatile int8_t flush_tail;
 } __aligned(16);
 
-static_assert(sizeof(struct dma_queue_request) == 32);
 static_assert(sizeof(struct dma_queue) == 16);
 
 static inline void _queue_init(const uint8_t, struct dma_queue *) __always_inline;
@@ -49,9 +49,7 @@ static inline bool _queue_empty(const struct dma_queue *) __always_inline;
 static inline struct dma_queue_request *_queue_top(struct dma_queue *) __always_inline;
 static inline struct dma_queue_request *_queue_enqueue(struct dma_queue *) __always_inline;
 static inline struct dma_queue_request *_queue_dequeue(struct dma_queue *) __always_inline;
-static inline void _queue_request_start(const struct dma_queue_request *) __always_inline;
-
-static void _dma_illegal_handler(void);
+static void _queue_request_start(const struct dma_queue_request *request);
 
 static void _default_handler(const dma_queue_transfer_t *);
 
@@ -60,6 +58,7 @@ static struct dma_queue _dma_queues[DMA_QUEUE_TAG_COUNT];
 
 static struct {
         volatile uint8_t current_tag;
+        volatile scu_dma_level_t current_level;
         struct dma_queue *dma_queues;
 } _state __aligned(4);
 
@@ -151,27 +150,30 @@ _queue_dequeue(struct dma_queue *dma_queue)
         return request;
 }
 
-static inline void __always_inline
+static void
 _queue_request_start(const struct dma_queue_request *request)
 {
-        scu_dma_config_set(DMA_QUEUE_SCU_DMA_LEVEL, SCU_DMA_START_FACTOR_ENABLE,
-            &request->handle, NULL);
+        scu_dma_level_t level;
+        level = DMA_QUEUE_SCU_DMA_LEVEL;
+
+        if ((scu_dma_level_busy(level))) {
+                if ((level = scu_dma_level_unused_get()) < 0) {
+                        level = 0;
+                }
+        }
+
+        _state.current_level = level;
+
+        scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, &request->handle, NULL);
 
         cpu_cache_purge();
 
-        scu_dma_level_start(DMA_QUEUE_SCU_DMA_LEVEL);
+        scu_dma_level_fast_start(level);
 }
 
 void
 _internal_dma_queue_init(void)
 {
-        scu_dma_level_wait(DMA_QUEUE_SCU_DMA_LEVEL);
-        scu_dma_level_stop(DMA_QUEUE_SCU_DMA_LEVEL);
-
-        scu_dma_illegal_set(_dma_illegal_handler);
-
-        scu_dma_level_end_set(0, NULL, NULL);
-
         _state.current_tag = DMA_QUEUE_TAG_INVALID;
         _state.dma_queues = &_dma_queues[0];
 
@@ -290,11 +292,8 @@ dma_queue_flush(uint8_t tag)
         intc_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
-        uint32_t scu_mask;
-        scu_mask = scu_ic_mask_get();
-
-        struct dma_queue *dma_queue;
-        dma_queue = &_state.dma_queues[tag];
+        struct dma_queue * const dma_queue =
+            &_state.dma_queues[tag];
 
         if (_queue_empty(dma_queue)) {
                 status = 0;
@@ -307,14 +306,12 @@ dma_queue_flush(uint8_t tag)
 
         _state.current_tag = tag;
 
-        struct dma_queue_request *request;
-        request = _queue_dequeue(dma_queue);
+        struct dma_queue_request * const request =
+            _queue_dequeue(dma_queue);
 
         request->handler(&request->transfer);
 
         _queue_request_start(request);
-
-        scu_mask &= ~DMA_QUEUE_SCU_DMA_MASK;
 
         if (intc_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
                 intc_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
@@ -322,7 +319,6 @@ dma_queue_flush(uint8_t tag)
 
 exit:
         cpu_intc_mask_set(intc_mask);
-        scu_ic_mask_set(scu_mask);
 
         return status;
 }
@@ -335,7 +331,7 @@ dma_queue_flush_wait(void)
                         return;
                 }
 
-                scu_dma_level_wait(0);
+                scu_dma_level_wait(_state.current_level);
 
                 struct dma_queue *dma_queue;
                 dma_queue = &_state.dma_queues[_state.current_tag];
@@ -367,13 +363,7 @@ dma_queue_flush_wait(void)
                         intc_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
                 }
 
-                uint32_t scu_mask;
-                scu_mask = scu_ic_mask_get();
-
-                scu_mask &= ~DMA_QUEUE_SCU_DMA_MASK;
-
                 cpu_intc_mask_set(intc_mask);
-                scu_ic_mask_set(scu_mask);
 
                 _queue_request_start(next_request);
         }
@@ -402,12 +392,6 @@ uint32_t
 dma_queue_capacity_get(void)
 {
         return DMA_QUEUE_REQUESTS_MAX_COUNT;
-}
-
-static void
-_dma_illegal_handler(void)
-{
-        assert(false);
 }
 
 static void
