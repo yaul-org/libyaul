@@ -280,7 +280,7 @@ _download_file(const char *output_file, uint32_t base_address,
         buffer = NULL;
         if ((buffer = (uint8_t *)malloc(len)) == NULL) {
                 usb_cartridge_error = USB_CARTRIDGE_INSUFFICIENT_MEMORY;
-                return -1;
+                goto error;
         }
         memset(buffer, 0x00, len);
 

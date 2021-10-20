@@ -13,13 +13,13 @@ input_file_open(const char *file_name, input_file_t *input_file)
         FILE *fp;
 
         if ((fp = fopen(file_name, "rb")) == NULL) {
-                return errno;
+                goto exit;
         }
 
         struct stat in_stat;
 
         if ((stat(file_name, &in_stat)) != 0) {
-                return errno;
+                goto exit;
         }
 
         input_file->buffer_len = in_stat.st_size;
@@ -27,16 +27,19 @@ input_file_open(const char *file_name, input_file_t *input_file)
         void **buffer_p = (void **)&input_file->buffer;
 
         if ((*buffer_p = malloc(input_file->buffer_len)) == NULL) {
-                return errno;
+                goto exit;
         }
 
         if ((fread(input_file->buffer, 1, input_file->buffer_len, fp)) != input_file->buffer_len) {
-                return errno;
+                goto exit;
         }
 
-        fclose(fp);
+exit:
+        if (fp != NULL) {
+                fclose(fp);
+        }
 
-        return 0;
+        return errno;
 }
 
 void
