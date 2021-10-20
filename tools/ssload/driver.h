@@ -17,14 +17,14 @@ struct device_driver {
         int (*shutdown)(void);
         const char *(*error_stringify)(void);
 
-        int (*read)(void *, uint32_t);
-        int (*send)(void *, uint32_t);
-        int (*download_buffer)(void *, uint32_t, uint32_t);
-        int (*download_file)(const char *, uint32_t, uint32_t);
-        int (*upload_buffer)(void *, uint32_t, uint32_t);
-        int (*upload_file)(const char *, uint32_t);
-        int (*execute_buffer)(void *, uint32_t, uint32_t);
-        int (*execute_file)(const char *, uint32_t);
+        int (*read)(void *buffer, uint32_t len);
+        int (*send)(void *buffer, uint32_t len);
+        int (*download_buffer)(void *buffer, uint32_t base_address, uint32_t len);
+        int (*download_file)(const char *output_file, uint32_t base_address, uint32_t len);
+        int (*upload_buffer)(void *buffer, uint32_t base_address, uint32_t len);
+        int (*upload_file)(const char *input_file, uint32_t base_address);
+        int (*execute_buffer)(void *buffer, uint32_t base_address, uint32_t len);
+        int (*execute_file)(const char *input_file, uint32_t base_address);
 };
 
 #endif /* !DRIVER_H_ */
