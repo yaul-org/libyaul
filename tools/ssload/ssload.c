@@ -372,6 +372,7 @@ exit:
         if (_global_options.xud_filepath != NULL) {
                 free(_global_options.xud_filepath);
         }
+
         if (_global_options.fileserver_dirpath != NULL) {
                 free(_global_options.fileserver_dirpath);
         }
