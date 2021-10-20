@@ -72,6 +72,7 @@ _assert(const char * restrict file, const char * restrict line,
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
         vdp2_sync_commit();
+        vdp2_sync_commit_wait();
 
         abort();
 }

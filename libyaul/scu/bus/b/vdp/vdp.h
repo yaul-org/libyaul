@@ -53,6 +53,7 @@ extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_order
     callback_handler_t callback, void *work);
 
 extern void vdp2_sync_commit(void);
+extern void vdp2_sync_commit_wait(void);
 
 extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler, void *work);
 extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work);

@@ -54,7 +54,9 @@
 #define VDP1_FLAG_MASK                  (0x3F)
 
 #define VDP2_FLAG_IDLE                  (0x00)
-#define VDP2_FLAG_MASK                  (0x00)
+#define VDP2_FLAG_REQUEST_COMMIT_REGS   (1 << 0) /* VDP2 request to commit registers */
+#define VDP2_FLAG_REGS_COMMITTED        (1 << 1) /* VDP2 finished committing registers */
+#define VDP2_FLAG_MASK                  (0x03)
 
 #define TRANSFER_TYPE_BUFFER            (0)
 #define TRANSFER_TYPE_ORDERLIST         (1)
@@ -113,15 +115,16 @@ struct vdp1_state {
         unsigned int frame_rate:6; /* XXX: Not yet used -- used to keep a locked frame rate */
         const struct vdp1_mode_table *current_mode;
         struct vdp1_sync_put_context *put_context;
-} __packed __aligned(4);
+} __aligned(4);
 
 static_assert(sizeof(struct vdp1_state) == 12);
 
 struct vdp2_state {
         uint8_t flags;
-} __packed;
+        scu_dma_level_t commit_level;
+} __aligned(4);
 
-static_assert(sizeof(struct vdp2_state) == 1);
+static_assert(sizeof(struct vdp2_state) == 8);
 
 static volatile struct {
         struct vdp1_state vdp1;
@@ -129,7 +132,7 @@ static volatile struct {
         uint8_t flags;
 } _state __aligned(16);
 
-static_assert(sizeof(_state) == 16);
+static_assert(sizeof(_state) == 24);
 
 static scu_dma_handle_t _vdp1_dma_handle;
 static scu_dma_handle_t _vdp1_orderlist_dma_handle;
@@ -466,6 +469,16 @@ vdp2_sync_wait(void)
 void
 vdp2_sync_commit(void)
 {
+        uint8_t state_vdp2_flags;
+        state_vdp2_flags = _state.vdp2.flags;
+
+        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) == VDP2_FLAG_REQUEST_COMMIT_REGS) {
+                return;
+        }
+
+        state_vdp2_flags &= ~VDP2_FLAG_REGS_COMMITTED;
+        state_vdp2_flags |= VDP2_FLAG_REQUEST_COMMIT_REGS;
+
         const scu_dma_handle_t * const dma_handle =
             _state_vdp2()->commit.dma_handle;
 
@@ -474,19 +487,15 @@ vdp2_sync_commit(void)
 
         /* Find an available SCU-DMA level */
         if ((scu_dma_level_busy(level))) {
-                level = scu_dma_level_unused_get();
-
-                if (level < 0) {
+                if ((level = scu_dma_level_unused_get()) < 0) {
                         level = 0;
-
-                        scu_dma_level_wait(level);
                 }
         }
 
-        scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
-        scu_dma_level_end_set(level, NULL, NULL);
+        _state.vdp2.commit_level = level;
 
-        uintptr_t vdp2_regs_buffer = (uintptr_t)_state_vdp2()->regs->buffer;
+        uintptr_t vdp2_regs_buffer;
+        vdp2_regs_buffer = (uintptr_t)_state_vdp2()->regs->buffer;
         const uint32_t cache_line_count =
             sizeof(_state_vdp2()->regs->buffer) / CPU_CACHE_LINE_SIZE;
 
@@ -496,8 +505,30 @@ vdp2_sync_commit(void)
                 vdp2_regs_buffer += CPU_CACHE_LINE_SIZE / sizeof(uintptr_t);
         }
 
+        scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
+        scu_dma_level_end_set(level, NULL, NULL);
+
         scu_dma_level_fast_start(level);
-        scu_dma_level_wait(level);
+
+        _state.vdp2.flags = state_vdp2_flags;
+}
+
+void
+vdp2_sync_commit_wait(void)
+{
+        uint8_t state_vdp2_flags;
+        state_vdp2_flags = _state.vdp2.flags;
+
+        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) != VDP2_FLAG_REQUEST_COMMIT_REGS) {
+                return;
+        }
+
+        scu_dma_level_wait(_state.vdp2.commit_level);
+
+        state_vdp2_flags &= ~VDP2_FLAG_REQUEST_COMMIT_REGS;
+        state_vdp2_flags |= VDP2_FLAG_REGS_COMMITTED;
+
+        _state.vdp2.flags = state_vdp2_flags;
 }
 
 void
@@ -852,6 +883,8 @@ _vdp2_init(void)
         extern void _internal_vdp2_xfer_table_init(void);
 
         _internal_vdp2_xfer_table_init();
+
+        _state.vdp2.flags = VDP2_FLAG_IDLE;
 }
 
 static void
@@ -882,8 +915,6 @@ _vblank_in_handler(void)
         /* VBLANK-IN interrupt runs at scanline #224 */
         if ((state_flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
                 vdp2_sync_commit();
-
-                state_flags &= ~SYNC_FLAG_VDP2_SYNC;
         }
 
         int ret __unused;
@@ -891,6 +922,10 @@ _vblank_in_handler(void)
         assert(ret >= 0);
 
         dma_queue_flush_wait();
+
+        vdp2_sync_commit_wait();
+
+        state_flags &= ~SYNC_FLAG_VDP2_SYNC;
 
         _state.flags = state_flags;
 }
