@@ -765,13 +765,14 @@ _vdp1_mode_variable_vblank_in(void)
 
         state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
 
+        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+
         if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
                 /* Change and erase on next field */
                 _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
-
-                MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
         }
 
+        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
         MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
 
         _state.vdp1.flags = state_vdp1_flags;
@@ -869,24 +870,29 @@ _scu_dma_level_end_handler(void *work __unused)
 static void
 _vblank_in_handler(void)
 {
+        uint8_t state_flags;
+        state_flags = _state.flags;
+
+        if ((state_flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
+                _vdp1_vblank_in_call();
+        }
+
         callback_call(&_user_vblank_in_callback);
 
         /* VBLANK-IN interrupt runs at scanline #224 */
-        if ((_state.flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
+        if ((state_flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
                 vdp2_sync_commit();
 
-                _state.flags &= ~SYNC_FLAG_VDP2_SYNC;
+                state_flags &= ~SYNC_FLAG_VDP2_SYNC;
         }
 
         int ret __unused;
         ret = dma_queue_flush(DMA_QUEUE_TAG_VBLANK_IN);
         assert(ret >= 0);
 
-        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
-                _vdp1_vblank_in_call();
-        }
-
         dma_queue_flush_wait();
+
+        _state.flags = state_flags;
 }
 
 static void
