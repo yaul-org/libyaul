@@ -13,7 +13,14 @@
 #include <vdp1/map.h>
 #include <vdp1/vram.h>
 
+#include <sys/callback-list.h>
+
 __BEGIN_DECLS
+
+/// Not yet documented.
+#define VDP1_SYNC_INTERVAL_60HZ         (0)
+/// Not yet documented.
+#define VDP1_SYNC_INTERVAL_VARIABLE     (-1)
 
 typedef struct vdp1_transfer_status {
         union {
@@ -45,6 +52,11 @@ typedef struct vdp1_mode_status {
         };
 } __packed __aligned(2) vdp1_mode_status_t;
 
+typedef enum vdp_sync_mode {
+        VDP1_SYNC_MODE_ERASE_CHANGE = 0x00,
+        VDP1_SYNC_MODE_CHANGE_ONLY  = 0x01
+} vdp_sync_mode_t;
+
 static inline __always_inline vdp1_mode_status_t
 vdp1_mode_status_get(void)
 {
@@ -68,6 +80,21 @@ vdp1_transfer_status_get(void)
 
         return status;
 }
+
+extern void vdp1_sync(void);
+extern void vdp1_sync_wait(void);
+
+extern void vdp1_sync_interval_set(const int8_t interval);
+extern vdp_sync_mode_t vdp1_sync_mode_get(void);
+extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
+
+extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
+    const uint16_t index, callback_handler_t callback, void *work);
+extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
+    const uint16_t index, callback_handler_t callback, void *work);
+extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
+    callback_handler_t callback, void *work);
+extern void vdp1_sync_put_wait(void);
 
 __END_DECLS
 
