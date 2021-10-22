@@ -77,7 +77,8 @@ typedef struct vdp1_vram_partitions {
         uint32_t remaining_size;
 } vdp1_vram_partitions_t;
 
-extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
+extern void vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
+    uint32_t gouraud_count, uint32_t clut_count);
 
 extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *);
 
