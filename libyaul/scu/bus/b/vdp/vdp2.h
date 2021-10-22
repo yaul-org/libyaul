@@ -16,6 +16,12 @@
 
 __BEGIN_DECLS
 
+extern void vdp2_sync_commit(void);
+extern void vdp2_sync_commit_wait(void);
+
+extern void vdp2_sync(void);
+extern void vdp2_sync_wait(void);
+
 __END_DECLS
 
 #endif /* !_YAUL_VDP2_H_ */
