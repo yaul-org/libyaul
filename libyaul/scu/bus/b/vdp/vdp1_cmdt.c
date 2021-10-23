@@ -315,6 +315,12 @@ vdp1_cmdt_local_coord_set(vdp1_cmdt_t *cmdt)
 }
 
 void
+vdp1_cmdt_end_clear(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= ~0x8000;
+}
+
+void
 vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt)
 {
         cmdt->cmd_ctrl |= 0x8000;
