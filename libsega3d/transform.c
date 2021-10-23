@@ -168,7 +168,7 @@ sega3d_finish(sega3d_results_t *results)
 
         vdp1_cmdt_orderlist_end(trans->current_orderlist);
 
-        vdp1_sync_cmdt_orderlist_put(trans->orderlist, NULL, NULL);
+        vdp1_sync_cmdt_orderlist_put(trans->orderlist);
 
         if (results != NULL) {
                 sega3d_results_t * const internal_results = _internal_state->results;

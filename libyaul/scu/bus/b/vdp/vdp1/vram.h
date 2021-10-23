@@ -20,8 +20,8 @@ __BEGIN_DECLS
 #define VDP1_VRAM_DEFAULT_GOURAUD_COUNT (1024)
 #define VDP1_VRAM_DEFAULT_CLUT_COUNT    (256)
 
-#define VDP1_FB_POINT(x, y)     (0x25C80000UL + (((x) & 0x1) << 18) + (y))
-#define VDP1_CMD_TABLE(x, y)    (0x25C00000UL + ((x) << 5) + (((y) << 1) & 0x1F))
+#define VDP1_FB_POINT(x, y)     VDP1_FB((((x) & 0x1) << 18) + (y)))
+#define VDP1_CMD_TABLE(x, y)    VDP1_VRAM(((x) << 5) + (((y) << 1) & 0x1F))
 
 #define VDP1_VRAM_SIZE  0x00080000UL /* In bytes */
 

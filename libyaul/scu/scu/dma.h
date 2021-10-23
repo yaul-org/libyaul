@@ -51,6 +51,16 @@ typedef enum scu_dma_mode {
         SCU_DMA_MODE_INDIRECT = 0x01
 } scu_dma_mode_t;
 
+/// @brief SCU-DMA transfer space.
+typedef enum scu_dma_space {
+        /// @brief SCU-DMA transfer space to CS2 (Chip Select), A-Bus.
+        SCU_DMA_SPACE_BUS_A,
+        /// @brief SCU-DMA transfer space to B-Bus.
+        SCU_DMA_SPACE_BUS_B,
+        /// @brief SCU-DMA transfer space to CPU-Bus.
+        SCU_DMA_SPACE_BUS_CPU
+} scu_dma_space_t;
+
 /// @brief SCU-DMA starting factors.
 typedef enum scu_dma_start_factor {
         /// @brief Start DMA transfer at VBLANK-IN.
@@ -240,6 +250,7 @@ typedef union scu_dma_xfer_type {
 ///     When allocating dynamically, use @ref memalign. Otherwise, when
 ///     statically allocating, use the @ref __aligned GCC attribute.
 typedef struct scu_dma_level_cfg {
+        scu_dma_space_t space:3;
         /// Transfer mode.
         scu_dma_mode_t mode:8;
         /// Transfer stride.

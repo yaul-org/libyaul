@@ -82,18 +82,19 @@ vdp1_transfer_status_get(void)
 }
 
 extern void vdp1_sync(void);
+extern bool vdp1_sync_busy(void);
 extern void vdp1_sync_wait(void);
 
 extern void vdp1_sync_interval_set(const int8_t interval);
 extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
 
-extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
-    const uint16_t index, callback_handler_t callback, void *work);
-extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
-    const uint16_t index, callback_handler_t callback, void *work);
-extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
-    callback_handler_t callback, void *work);
+extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count, uint16_t index);
+extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list, uint16_t index);
+extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist);
+extern void vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
+    uint16_t cmdt_index, uint16_t index);
+
 extern void vdp1_sync_put_wait(void);
 
 __END_DECLS
