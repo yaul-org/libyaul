@@ -57,7 +57,6 @@ extern void dbgio_dev_default_init(dbgio_dev_t);
 extern void dbgio_dev_deinit(void);
 
 extern void dbgio_dev_font_load(void);
-extern void dbgio_dev_font_load_wait(void);
 
 extern void dbgio_puts(const char *);
 extern void dbgio_printf(const char *, ...) __printflike(1, 2);

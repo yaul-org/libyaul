@@ -31,7 +31,7 @@ static void _init(const dbgio_usb_cart_t *);
 static void _deinit(void);
 static void _puts(const char *);
 static void _flush(void);
-static void _font_load(font_load_callback_t);
+static void _font_load(void);
 
 typedef struct {
         uint8_t *buffer;
@@ -160,9 +160,6 @@ _flush(void)
 }
 
 static void
-_font_load(font_load_callback_t callback)
+_font_load(void)
 {
-        if (callback != NULL) {
-                callback();
-        }
 }
