@@ -119,10 +119,7 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
 
         vdp2_tvmd_vblank_in_next_wait(1);
 
-        cpu_intc_mask_set(14);
         dbgio_dev_font_load();
-        dbgio_dev_font_load_wait();
-        cpu_intc_mask_set(15);
 
         dbgio_puts("[H[2J");
         dbgio_puts(buffer);

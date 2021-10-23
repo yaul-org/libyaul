@@ -19,7 +19,7 @@ typedef void (*font_load_callback_t)(void);
 
 typedef void (*dev_ops_init_t)(const void *);
 typedef void (*dev_ops_deinit_t)(void);
-typedef void (*dev_ops_font_load_t)(font_load_callback_t);
+typedef void (*dev_ops_font_load_t)(void);
 typedef void (*dev_ops_puts_t)(const char *);
 typedef void (*dev_ops_flush_t)(void);
 

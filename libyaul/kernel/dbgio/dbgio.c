@@ -22,8 +22,6 @@
 /* This is enough for a 320x256 character resolution */
 #define SPRINTF_BUFFER_SIZE             (1280)
 
-static void _font_load_callback(void);
-
 static struct {
         volatile uint32_t state;
         const struct dbgio_dev_ops *dev_ops;
@@ -96,28 +94,16 @@ dbgio_dev_font_load(void)
 {
         assert(_dbgio_state.dev_ops != NULL);
 
-        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) != 0x00) {
+        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) == STATE_FONT_LOAD_REQUESTED) {
                 return;
         }
 
         _dbgio_state.state &= ~STATE_FONT_LOAD_COMPLETED;
         _dbgio_state.state |= STATE_FONT_LOAD_REQUESTED;
 
-        _dbgio_state.dev_ops->font_load(_font_load_callback);
-}
+        _dbgio_state.dev_ops->font_load();
 
-void
-dbgio_dev_font_load_wait(void)
-{
-        assert(_dbgio_state.dev_ops != NULL);
-
-        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) == 0x00) {
-                return;
-        }
-
-        while ((_dbgio_state.state & STATE_FONT_LOAD_COMPLETED) == 0x00) {
-        }
-
+        _dbgio_state.state |= STATE_FONT_LOAD_COMPLETED;
         _dbgio_state.state &= ~STATE_FONT_LOAD_REQUESTED;
 }
 
@@ -159,10 +145,4 @@ dbgio_flush(void)
         assert(_dbgio_state.dev_ops != NULL);
 
         _dbgio_state.dev_ops->flush();
-}
-
-static void
-_font_load_callback(void)
-{
-        _dbgio_state.state |= STATE_FONT_LOAD_COMPLETED;
 }

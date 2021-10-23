@@ -72,12 +72,6 @@ struct dev_font_state {
         color_rgb1555_t *pal_buffer;
 };
 
-struct dev_font_load_state {
-        uint8_t intc_priority_a;
-
-        font_load_callback_t callback;
-};
-
 /* Restrictions:
  * 1. Screen will always be displayed
  * 2. Rotational backgrounds are not supported
@@ -372,8 +366,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
                 assert(_dev_state->page_pnd != NULL);
         }
 
-        struct dev_font_state *font_state;
-        font_state = _dev_state->font_state;
+        struct dev_font_state * const font_state = _dev_state->font_state;
 
         if (font_state->cpd_buffer == NULL) {
                 font_state->cpd_buffer = _internal_malloc(FONT_4BPP_CPD_SIZE);
@@ -537,71 +530,15 @@ _shared_puts(const char *buffer)
 }
 
 static void
-_shared_font_load_cpd_callback(void *work)
+_shared_font_load(void)
 {
-        const struct dev_font_load_state *font_load_state = work;
-
-        if (font_load_state->callback != NULL) {
-                font_load_state->callback();
-        }
-
-        cpu_intc_priority_a_set(font_load_state->intc_priority_a);
-}
-
-static void
-_shared_font_load(font_load_callback_t callback)
-{
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .channel = DEV_DMAC_CHANNEL,
-                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-                .src = 0x00000000,
-                .dst = 0x00000000,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len = 0x00000000,
-                .stride = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL
-        };
-
-        static struct dev_font_load_state font_load_state;
-
         if (_dev_state == NULL) {
                 return;
         }
 
-        if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
                 return;
         }
-
-        const uint8_t intc_mask __unused = cpu_intc_mask_get();
-
-        /* Be sure to have interrupts enabled */
-        assert(intc_mask < 15);
-
-        struct dev_font_state * const font_state =
-            _dev_state->font_state;
-
-        /* Font palette (32 bytes) is small enough that we'd spend more time
-         * setting up a CPU-DMAC transfer, than by just transferring the palette
-         * directly */
-        (void)memcpy((void *)_dev_state->color_palette,
-            font_state->pal_buffer,
-            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
-
-        dmac_cfg.len = FONT_4BPP_CPD_SIZE;
-        dmac_cfg.dst = (uint32_t)_dev_state->cp_table;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)font_state->cpd_buffer;
-        dmac_cfg.ihr = _shared_font_load_cpd_callback;
-        dmac_cfg.ihr_work = &font_load_state;
-
-        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-
-        cpu_dmac_enable();
-
-        font_load_state.callback = callback;
-        font_load_state.intc_priority_a = cpu_intc_priority_a_get();
-
-        cpu_dmac_interrupt_priority_set(15);
 
         /* Due to the 1BPP font being decompressed in cached H-WRAM, we need to
          * flush the cache as the DMA transfer accesses the uncached mirror
@@ -609,7 +546,12 @@ _shared_font_load(font_load_callback_t callback)
          * stale values not yet written back to H-WRAM */
         cpu_cache_purge();
 
-        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
+        struct dev_font_state * const font_state = _dev_state->font_state;
+
+        scu_dma_transfer(0, (void *)_dev_state->cp_table, font_state->cpd_buffer, FONT_4BPP_CPD_SIZE);
+        scu_dma_transfer(1, (void *)_dev_state->color_palette, font_state->pal_buffer, FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
+        scu_dma_transfer_wait(0);
+        scu_dma_transfer_wait(1);
 }
 
 #include "vdp2.inc"
