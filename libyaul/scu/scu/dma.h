@@ -412,6 +412,20 @@ extern void scu_dma_config_set(scu_dma_level_t level,
     scu_dma_start_factor_t start_factor, const scu_dma_handle_t *handle,
     scu_dma_callback_t callback);
 
+/// @brief Perform a transfer.
+///
+/// @param     level The SCU-DMA level.
+/// @param[in] dst   The pointer to write to.
+/// @param[in] src   The pointer to read from.
+/// @param     len   The amount to transfer in bytes.
+extern void scu_dma_transfer(scu_dma_level_t level, void *dst, void *src,
+    size_t len);
+
+/// @brief Wait for a transfer to complete.
+///
+/// @param level The SCU-DMA level.
+extern void scu_dma_transfer_wait(scu_dma_level_t level);
+
 /// @ingroup SCU_IC_HELPERS
 /// @brief Set the interrupt handler for the SCU-DMA level end interrupt.
 ///
