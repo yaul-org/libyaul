@@ -261,16 +261,17 @@ extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
 extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *,
     const vdp1_cmdt_t *, const uint16_t);
 
-extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_polygon_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_polyline_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_line_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *);
-extern void vdp1_cmdt_end_set(vdp1_cmdt_t *);
+extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_polygon_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_polyline_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_line_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_end_clear(vdp1_cmdt_t *cmdt);
+extern void vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt);
 
 extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, vdp1_cmdt_draw_mode_t);
 extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, vdp1_cmdt_zoom_point_t);
