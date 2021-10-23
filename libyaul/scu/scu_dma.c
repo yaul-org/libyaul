@@ -154,9 +154,11 @@ scu_dma_config_buffer(scu_dma_handle_t *handle,
                 break;
         }
 
-        /* Since bit 8 being unset is effective only for the CS2 space
-         * of the A bus, everything else should set it */
-        handle->dnad = 0x00000100 | (cfg->stride & 0x07);
+        handle->dnad = cfg->stride & 0x07;
+
+        if (cfg->space != SCU_DMA_SPACE_BUS_A) {
+                handle->dnad |= 0x00000100;
+        }
 
         handle->dnmd |= cfg->update & 0x00010100;
 }

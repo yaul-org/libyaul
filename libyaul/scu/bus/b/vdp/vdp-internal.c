@@ -12,27 +12,28 @@
 struct state_vdp1 _internal_state_vdp1;
 struct state_vdp2 _internal_state_vdp2;
 
-static scu_dma_handle_t _commit_handle;
-static scu_dma_xfer_t _commit_xfer_table[COMMIT_XFER_COUNT] __aligned(COMMIT_XFER_TABLE_ALIGNMENT);
+static scu_dma_handle_t _commit_dma_handle;
+static scu_dma_xfer_t _commit_dma_xfer_table[COMMIT_XFER_COUNT] __aligned(COMMIT_XFER_TABLE_ALIGNMENT);
 
 void
 _internal_vdp2_xfer_table_init(void)
 {
-        _state_vdp2()->commit.dma_handle = &_commit_handle;
-        _state_vdp2()->commit.xfer_table = &_commit_xfer_table[0];
+        _state_vdp2()->commit.dma_handle = &_commit_dma_handle;
+        _state_vdp2()->commit.xfer_table = &_commit_dma_xfer_table[0];
 
         _internal_vdp2_xfer_table_update(COMMIT_XFER_VDP2_REG_TVMD);
         _internal_vdp2_xfer_table_update(COMMIT_XFER_VDP2_REGS);
         _internal_vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);
 
-        scu_dma_xfer_t *xfer_table;
-        xfer_table = &_state_vdp2()->commit.xfer_table[0];
+        scu_dma_xfer_t * const xfer_table =
+            &_state_vdp2()->commit.xfer_table[0];
 
-        scu_dma_level_cfg_t dma_cfg = {
-                .mode = SCU_DMA_MODE_INDIRECT,
+        const scu_dma_level_cfg_t dma_cfg = {
+                .mode          = SCU_DMA_MODE_INDIRECT,
                 .xfer.indirect = xfer_table,
-                .stride = SCU_DMA_STRIDE_2_BYTES,
-                .update = SCU_DMA_UPDATE_NONE
+                .space         = SCU_DMA_SPACE_BUS_B,
+                .stride        = SCU_DMA_STRIDE_2_BYTES,
+                .update        = SCU_DMA_UPDATE_NONE
         };
 
         scu_dma_handle_t * const dma_handle =

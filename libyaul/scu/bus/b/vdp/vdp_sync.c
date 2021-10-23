@@ -92,20 +92,6 @@ struct vdp1_mode_table;
 
 typedef void (*vdp1_mode_func_ptr)(void);
 
-struct vdp1_sync_put_context {
-        uint32_t transfer_type;
-        scu_dma_handle_t *dma_handle;
-        union {
-            const vdp1_cmdt_orderlist_t *cmdt_orderlist;
-            const vdp1_cmdt_t *cmdts;
-        };
-        uint16_t index;
-        uint16_t count;
-        callback_t callback;
-} __aligned(4);
-
-static_assert(sizeof(struct vdp1_sync_put_context) == 24);
-
 struct vdp1_state {
         unsigned int flags:6;
         unsigned int field_count:1;
@@ -114,10 +100,9 @@ struct vdp1_state {
         unsigned int fb_mode:1;
         unsigned int frame_rate:6; /* XXX: Not yet used -- used to keep a locked frame rate */
         const struct vdp1_mode_table *current_mode;
-        struct vdp1_sync_put_context *put_context;
 } __aligned(4);
 
-static_assert(sizeof(struct vdp1_state) == 12);
+static_assert(sizeof(struct vdp1_state) == 8);
 
 struct vdp2_state {
         uint8_t flags;
@@ -132,11 +117,11 @@ static volatile struct {
         uint8_t flags;
 } _state __aligned(16);
 
-static_assert(sizeof(_state) == 24);
+static_assert(sizeof(_state) == 20);
 
 static scu_dma_handle_t _vdp1_dma_handle;
 static scu_dma_handle_t _vdp1_orderlist_dma_handle;
-static struct vdp1_sync_put_context _vdp1_put_context;
+static scu_dma_handle_t _vdp1_stride_dma_handle;
 
 static callback_t _user_vdp1_sync_callback;
 static callback_t _user_vblank_in_callback;
@@ -149,13 +134,11 @@ static const uint16_t _fbcr_bits[] __unused = {
         0x000C
 };
 
-static void _vdp1_mode_auto_sync_put(void);
 static void _vdp1_mode_auto_dma(void);
 static void _vdp1_mode_auto_sprite_end(void);
 static void _vdp1_mode_auto_vblank_in(void);
 static void _vdp1_mode_auto_vblank_out(void);
 
-static void _vdp1_mode_fixed_sync_put(void);
 static void _vdp1_mode_fixed_dma(void);
 static void _vdp1_mode_fixed_sprite_end(void);
 static void _vdp1_mode_fixed_vblank_in(void);
@@ -183,7 +166,6 @@ static void _vdp1_mode_fixed_vblank_out(void);
  *    resulting in a soft lock. All state is reset at this point.
  *
  * 6. vdp1_sync_wait() blocks until SYNC_FLAG_VDP1_SYNC is cleared. */
-static void _vdp1_mode_variable_sync_put(void);
 static void _vdp1_mode_variable_dma(void);
 static void _vdp1_mode_variable_sprite_end(void);
 static void _vdp1_mode_variable_vblank_in(void);
@@ -191,26 +173,22 @@ static void _vdp1_mode_variable_vblank_out(void);
 
 /* Interface to either of the three modes */
 static const struct vdp1_mode_table {
-        vdp1_mode_func_ptr sync_put;
         vdp1_mode_func_ptr dma;
         vdp1_mode_func_ptr sprite_end;
         vdp1_mode_func_ptr vblank_in;
         vdp1_mode_func_ptr vblank_out;
 } _vdp1_mode_table[] = {
         {
-                .sync_put   = _vdp1_mode_auto_sync_put,
                 .dma        = _vdp1_mode_auto_dma,
                 .sprite_end = _vdp1_mode_auto_sprite_end,
                 .vblank_in  = _vdp1_mode_auto_vblank_in,
                 .vblank_out = _vdp1_mode_auto_vblank_out
         }, {
-                .sync_put   = _vdp1_mode_fixed_sync_put,
                 .dma        = _vdp1_mode_fixed_dma,
                 .sprite_end = _vdp1_mode_fixed_sprite_end,
                 .vblank_in  = _vdp1_mode_fixed_vblank_in,
                 .vblank_out = _vdp1_mode_fixed_vblank_out
         }, {
-                .sync_put   = _vdp1_mode_variable_sync_put,
                 .dma        = _vdp1_mode_variable_dma,
                 .sprite_end = _vdp1_mode_variable_sprite_end,
                 .vblank_in  = _vdp1_mode_variable_vblank_in,
@@ -227,8 +205,6 @@ static inline __always_inline void _vdp1_vblank_in_call(void);
 static inline __always_inline void _vdp1_vblank_out_call(void);
 
 static void _vdp1_dma(scu_dma_handle_t *dma_handle);
-static void _vdp1_cmdt_transfer(void);
-static void _vdp1_cmdt_orderlist_transfer(void);
 
 static void _vdp2_init(void);
 
@@ -284,6 +260,20 @@ vdp1_sync(void)
         cpu_intc_mask_set(intc_mask);
 
         DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+}
+
+bool
+vdp1_sync_busy(void)
+{
+        const uint32_t intc_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
+        bool busy = ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC);
+
+        cpu_intc_mask_set(intc_mask);
+
+        return busy;
 }
 
 void
@@ -343,8 +333,7 @@ vdp1_sync_mode_set(vdp_sync_mode_t mode)
 }
 
 void
-vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
-    const uint16_t index, callback_handler_t callback_handler, void *work)
+vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count, uint16_t index)
 {
         assert(cmdts != NULL);
 
@@ -352,69 +341,73 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, const uint16_t count,
                 return;
         }
 
-        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) != SYNC_FLAG_VDP1_SYNC) {
-                /* When vdp1_sync() hasn't yet been called. Wait until the
-                 * previous (if any) put is complete. If there is no request to
-                 * transfer the command table list, continue */
-                while (true) {
-                        const uint8_t state_vdp1_flags = _state.vdp1.flags;
-
-                        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_XFER_LIST) != VDP1_FLAG_REQUEST_XFER_LIST) {
-                                break;
-                        }
-
-                        if ((state_vdp1_flags & VDP1_FLAG_LIST_XFERRED) == VDP1_FLAG_LIST_XFERRED) {
-                                break;
-                        }
-                }
-        } else {
-                /* If vdp1_sync() has been called prior to this put, then we
-                 * must wait until frame change */
-                vdp1_sync_wait();
-        }
-
-        struct vdp1_sync_put_context * const put_ctx =
-            _state.vdp1.put_context;
-
-        put_ctx->transfer_type = TRANSFER_TYPE_BUFFER;
-        put_ctx->dma_handle = &_vdp1_dma_handle;
-        put_ctx->cmdts = cmdts;
-        put_ctx->index = index;
-        put_ctx->count = count;
-
-        callback_set(&put_ctx->callback, callback_handler, work);
-
         _vdp1_sync_put_call();
+
+        scu_dma_handle_t * const dma_handle =
+            &_vdp1_dma_handle;
+
+        dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)cmdts;
+        dma_handle->dnw = VDP1_VRAM(index * sizeof(vdp1_cmdt_t));
+        dma_handle->dnc = count * sizeof(vdp1_cmdt_t);
+
+        _vdp1_dma(dma_handle);
 }
 
 void
-vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
-    const uint16_t index, callback_handler_t callback_handler, void *work)
+vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list, uint16_t index)
 {
         assert(cmdt_list != NULL);
         assert(cmdt_list->cmdts != NULL);
 
-        vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, index, callback_handler, work);
+        vdp1_sync_cmdt_put(cmdt_list->cmdts, cmdt_list->count, index);
 }
 
 void
-vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist,
-    callback_handler_t callback_handler, void *work)
+vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
 {
-        /* XXX: We have no way of checking if we're in the middle of syncing/transferring */
-
         assert(cmdt_orderlist != NULL);
 
-        struct vdp1_sync_put_context * const put_ctx =
-            _state.vdp1.put_context;
+        _vdp1_sync_put_call();
 
-        put_ctx->transfer_type = TRANSFER_TYPE_ORDERLIST;
-        put_ctx->dma_handle = &_vdp1_orderlist_dma_handle;
-        put_ctx->cmdt_orderlist = cmdt_orderlist;
+        scu_dma_handle_t * const dma_handle =
+            &_vdp1_orderlist_dma_handle;
 
-        callback_set(&put_ctx->callback, callback_handler, work);
+        dma_handle->dnw = CPU_CACHE_THROUGH | (uint32_t)cmdt_orderlist;
+
+        _vdp1_dma(dma_handle);
+}
+
+void
+vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
+    uint16_t cmdt_index, uint16_t index)
+{
+        assert(buffer != NULL);
+
+        if (count == 0) {
+                return;
+        }
 
         _vdp1_sync_put_call();
+
+        scu_dma_handle_t * const dma_handle =
+            &_vdp1_stride_dma_handle;
+
+        dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)buffer;
+        dma_handle->dnw = VDP1_CMD_TABLE(index, cmdt_index);
+        dma_handle->dnc = count * sizeof(uint16_t);
+
+        _vdp1_dma(dma_handle);
+}
+
+void
+vdp1_sync_put_wait(void)
+{
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_COMMIT_LIST) != VDP1_FLAG_REQUEST_COMMIT_LIST) {
+                return;
+        }
+
+        while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
+        }
 }
 
 void
@@ -552,6 +545,7 @@ _vdp1_init(void)
                 .xfer.direct.len = 0xFFFFFFFF,
                 .xfer.direct.dst = 0xFFFFFFFF,
                 .xfer.direct.src = 0xFFFFFFFF,
+                .space           = SCU_DMA_SPACE_BUS_B,
                 .stride          = SCU_DMA_STRIDE_2_BYTES,
                 .update          = SCU_DMA_UPDATE_NONE
         };
@@ -560,15 +554,26 @@ _vdp1_init(void)
                 .mode          = SCU_DMA_MODE_INDIRECT,
                 /* Avoid assertion if pointer to indirect table is NULL */
                 .xfer.indirect = (void *)0xFFFFFFFF,
+                .space         = SCU_DMA_SPACE_BUS_B,
                 .stride        = SCU_DMA_STRIDE_2_BYTES,
                 .update        = SCU_DMA_UPDATE_NONE
+        };
+
+        const scu_dma_level_cfg_t stride_dma_cfg = {
+                .mode            = SCU_DMA_MODE_DIRECT,
+                /* Prevent assertion */
+                .xfer.direct.len = 0xFFFFFFFF,
+                .xfer.direct.dst = 0xFFFFFFFF,
+                .xfer.direct.src = 0xFFFFFFFF,
+                .space           = SCU_DMA_SPACE_BUS_B,
+                .stride          = SCU_DMA_STRIDE_32_BYTES,
+                .update          = SCU_DMA_UPDATE_WUP
         };
 
         callback_init(&_user_vdp1_sync_callback);
 
         _state.vdp1.flags = VDP1_FLAG_IDLE;
         _state.vdp1.current_mode = NULL;
-        _state.vdp1.put_context = &_vdp1_put_context;
         _state.vdp1.field_count = 0;
         _state.vdp1.previous_fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
         _state.vdp1.fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
@@ -580,6 +585,7 @@ _vdp1_init(void)
 
         scu_dma_config_buffer(&_vdp1_dma_handle, &dma_cfg);
         scu_dma_config_buffer(&_vdp1_orderlist_dma_handle, &orderlist_dma_cfg);
+        scu_dma_config_buffer(&_vdp1_stride_dma_handle, &stride_dma_cfg);
 }
 
 static inline void __always_inline
@@ -587,7 +593,37 @@ _vdp1_sync_put_call(void)
 {
         DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
-        _state.vdp1.current_mode->sync_put();
+        if ((_state.flags & SYNC_FLAG_VDP1_SYNC) != SYNC_FLAG_VDP1_SYNC) {
+                /* When vdp1_sync() hasn't yet been called. Wait until the
+                 * previous (if any) put is complete. If there is no request to
+                 * transfer the command table list, continue */
+                while (true) {
+                        const uint8_t state_vdp1_flags = _state.vdp1.flags;
+
+                        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_XFER_LIST) != VDP1_FLAG_REQUEST_XFER_LIST) {
+                                break;
+                        }
+
+                        if ((state_vdp1_flags & VDP1_FLAG_LIST_XFERRED) == VDP1_FLAG_LIST_XFERRED) {
+                                break;
+                        }
+                }
+        } else {
+                /* If vdp1_sync() has been called prior to this put, then we
+                 * must wait until frame change */
+                vdp1_sync_wait();
+        }
+
+        /* Mask interrupts to make sure this variable does not get modified at
+         * the same time */
+        const uint32_t intc_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(15);
+
+        _state.vdp1.flags &= ~VDP1_FLAG_MASK;
+        _state.vdp1.flags |= VDP1_FLAG_REQUEST_XFER_LIST;
+
+        cpu_intc_mask_set(intc_mask);
 
         DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
@@ -626,33 +662,6 @@ static inline void __always_inline
 _vdp1_vblank_out_call(void)
 {
         _state.vdp1.current_mode->vblank_out();
-}
-
-static void
-_vdp1_mode_auto_sync_put(void)
-{
-        /* Mask interrupts to make sure this variable does not get modified at
-         * the same time */
-        const uint32_t intc_mask = cpu_intc_mask_get();
-
-        cpu_intc_mask_set(15);
-
-        _state.vdp1.flags &= ~VDP1_FLAG_MASK;
-        _state.vdp1.flags |= VDP1_FLAG_REQUEST_XFER_LIST;
-
-        cpu_intc_mask_set(intc_mask);
-
-        const struct vdp1_sync_put_context * const put_ctx =
-            _state.vdp1.put_context;
-
-        switch (put_ctx->transfer_type) {
-        case TRANSFER_TYPE_BUFFER:
-                _vdp1_cmdt_transfer();
-                break;
-        case TRANSFER_TYPE_ORDERLIST:
-                _vdp1_cmdt_orderlist_transfer();
-                break;
-        }
 }
 
 static void
@@ -715,11 +724,6 @@ _vdp1_mode_auto_vblank_out(void)
 }
 
 static void
-_vdp1_mode_fixed_sync_put(void)
-{
-}
-
-static void
 _vdp1_mode_fixed_dma(void)
 {
 }
@@ -737,12 +741,6 @@ _vdp1_mode_fixed_vblank_in(void)
 static void
 _vdp1_mode_fixed_vblank_out(void)
 {
-}
-
-static void
-_vdp1_mode_variable_sync_put(void)
-{
-        _vdp1_mode_auto_sync_put();
 }
 
 static void
@@ -828,7 +826,10 @@ _vdp1_mode_variable_vblank_out(void)
 
         /* This could be a hack, but wait until scanline #0 is reached to avoid
          * the frame buffer change from aborting plotting, resulting in a soft
-         * lock */
+         * lock.
+         *
+         * This is for the case when a request to plot is started immediately
+         * following the VBLANK-OUT interrupt */
         do {
                 vdp2_tvmd_extern_latch();
         } while ((vdp2_tvmd_vcount_get()) != 0);
@@ -843,7 +844,6 @@ _vdp1_mode_variable_vblank_out(void)
 static void
 _vdp1_dma(scu_dma_handle_t *dma_handle)
 {
-        scu_dma_level_wait(0);
         scu_dma_config_set(0, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
 
         scu_dma_level_end_set(0, _scu_dma_level_end_handler, NULL);
@@ -851,30 +851,6 @@ _vdp1_dma(scu_dma_handle_t *dma_handle)
         cpu_cache_purge();
 
         scu_dma_level_fast_start(0);
-}
-
-static void
-_vdp1_cmdt_transfer(void)
-{
-        const struct vdp1_sync_put_context * const put_ctx =
-            _state.vdp1.put_context;
-
-        put_ctx->dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)put_ctx->cmdts;
-        put_ctx->dma_handle->dnw = VDP1_VRAM(put_ctx->index * sizeof(vdp1_cmdt_t));
-        put_ctx->dma_handle->dnc = put_ctx->count * sizeof(vdp1_cmdt_t);
-
-        _vdp1_dma(put_ctx->dma_handle);
-}
-
-static void
-_vdp1_cmdt_orderlist_transfer(void)
-{
-        const struct vdp1_sync_put_context * const put_ctx =
-            _state.vdp1.put_context;
-
-        put_ctx->dma_handle->dnw = CPU_CACHE_THROUGH | (uint32_t)put_ctx->cmdt_orderlist;
-
-        _vdp1_dma(put_ctx->dma_handle);
 }
 
 static void
@@ -893,11 +869,6 @@ _scu_dma_level_end_handler(void *work __unused)
         scu_dma_level_end_set(0, NULL, NULL);
 
         _vdp1_dma_call();
-
-        const struct vdp1_sync_put_context * const put_context =
-            _state.vdp1.put_context;
-
-        callback_call(&put_context->callback);
 }
 
 static void
