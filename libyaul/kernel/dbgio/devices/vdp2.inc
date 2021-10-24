@@ -29,18 +29,6 @@ _init(const dbgio_vdp2_t *params)
 static void
 _flush(void)
 {
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .channel  = DEV_DMAC_CHANNEL,
-                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-                .src      = 0x00000000,
-                .dst      = 0x00000000,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len      = 0x00000000,
-                .stride   = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr      = NULL
-        };
-
         if (_dev_state == NULL) {
                 return;
         }
@@ -57,15 +45,7 @@ _flush(void)
 
         _scroll_screen_reset();
 
-        dmac_cfg.len = _dev_state->page_size;
-        dmac_cfg.dst = (uint32_t)_dev_state->page_base;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&_dev_state->page_pnd[0];
-
-        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-
-        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
-        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
+        scu_dma_transfer(2, (void *)_dev_state->page_base, _dev_state->page_pnd, _dev_state->page_size);
 
         const uint8_t state_mask = STATE_BUFFER_DIRTY |
                                    STATE_BUFFER_FLUSHING |

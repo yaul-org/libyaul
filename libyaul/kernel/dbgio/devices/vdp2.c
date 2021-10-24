@@ -81,16 +81,16 @@ struct dev_font_state {
  * 6. Resets scroll position to (0, 0) */
 
 static const dbgio_vdp2_t _default_params = {
-        .font_cpd = &_font_cpd[0],
-        .font_pal = &_font_pal[0],
-        .font_fg = 7,
-        .font_bg = 0,
+        .font_cpd      = &_font_cpd[0],
+        .font_pal      = &_font_pal[0],
+        .font_fg       = 7,
+        .font_bg       = 0,
         .scroll_screen = VDP2_SCRN_NBG3,
-        .cpd_bank = VDP2_VRAM_BANK_B1,
-        .cpd_offset = 0x00000,
-        .pnd_bank = VDP2_VRAM_BANK_B1,
-        .map_index = 2,
-        .cpd_cycp = {
+        .cpd_bank      = VDP2_VRAM_BANK_B1,
+        .cpd_offset    = 0x00000,
+        .pnd_bank      = VDP2_VRAM_BANK_B1,
+        .map_index     = 2,
+        .cpd_cycp      = {
                 .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
                 .t1 = VDP2_VRAM_CYCP_CPU_RW,
                 .t2 = VDP2_VRAM_CYCP_CPU_RW,
@@ -100,7 +100,7 @@ static const dbgio_vdp2_t _default_params = {
                 .t6 = VDP2_VRAM_CYCP_CPU_RW,
                 .t7 = VDP2_VRAM_CYCP_CPU_RW
         },
-        .pnd_cycp = {
+        .pnd_cycp      = {
                 .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
                 .t1 = VDP2_VRAM_CYCP_CPU_RW,
                 .t2 = VDP2_VRAM_CYCP_CPU_RW,
@@ -110,7 +110,7 @@ static const dbgio_vdp2_t _default_params = {
                 .t6 = VDP2_VRAM_CYCP_CPU_RW,
                 .t7 = VDP2_VRAM_CYCP_CPU_RW
         },
-        .cram_index = 0
+        .cram_index    = 0
 };
 
 /* Parameters set by the user */
@@ -126,11 +126,11 @@ static void _buffer_line_partial_clear(int16_t, int16_t, int16_t);
 static void _buffer_write(int16_t, int16_t, uint8_t);
 
 static const cons_ops_t _cons_ops = {
-        .clear = _buffer_clear,
-        .area_clear = _buffer_area_clear,
-        .line_clear = _buffer_line_clear,
+        .clear              = _buffer_clear,
+        .area_clear         = _buffer_area_clear,
+        .line_clear         = _buffer_line_clear,
         .line_partial_clear = _buffer_line_partial_clear,
-        .write = _buffer_write
+        .write              = _buffer_write
 };
 
 static inline void __always_inline
@@ -341,7 +341,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
         }
 
         /* Return if we're already initialized */
-        if ((_dev_state->state & STATE_INITIALIZED) != 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
                 return;
         }
 
@@ -387,14 +387,14 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         assert(_dev_state != NULL);
 
         const vdp2_scrn_cell_format_t cell_format = {
-                .scroll_screen = params->scroll_screen,
-                .cc_count = VDP2_SCRN_CCC_PALETTE_16,
-                .character_size = 1 * 1,
-                .pnd_size = 1, /* 1-word */
-                .auxiliary_mode = 0,
-                .cp_table = _dev_state->cp_table,
-                .color_palette = _dev_state->color_palette,
-                .plane_size = 1 * 1,
+                .scroll_screen     = params->scroll_screen,
+                .cc_count          = VDP2_SCRN_CCC_PALETTE_16,
+                .character_size    = 1 * 1,
+                .pnd_size          = 1, /* 1-word */
+                .auxiliary_mode    = 0,
+                .cp_table          = _dev_state->cp_table,
+                .color_palette     = _dev_state->color_palette,
+                .plane_size        = 1 * 1,
                 .map_bases.plane_a = _dev_state->page_base,
                 .map_bases.plane_b = _dev_state->page_base,
                 .map_bases.plane_c = _dev_state->page_base,
@@ -460,7 +460,7 @@ _shared_init(const dbgio_vdp2_t *params)
         _dev_state_init(params);
 
         /* Return if we're already initialized */
-        if ((_dev_state->state & STATE_INITIALIZED) != 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
                 return;
         }
 
@@ -512,7 +512,7 @@ _shared_puts(const char *buffer)
                 return;
         }
 
-        if ((_dev_state->state & STATE_INITIALIZED) == 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
                 return;
         }
 

@@ -85,7 +85,7 @@ _flush_dma_handler(const dma_queue_transfer_t *transfer)
                 return;
         }
 
-        /* If the DMA request was canceled, then we should allow force
-         * flush while blocking any more writes to the buffer */
+        /* If the DMA request was canceled, then we should allow force flush
+         * while blocking any more writes to the buffer */
         _dev_state->state |= STATE_BUFFER_FORCE_FLUSHING;
 }
