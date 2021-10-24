@@ -16,8 +16,6 @@
 #include "dbgio-internal.h"
 
 #define STATE_IDLE                      (0x00)
-#define STATE_FONT_LOAD_REQUESTED       (1 << 0)
-#define STATE_FONT_LOAD_COMPLETED       (1 << 1)
 
 /* This is enough for a 320x256 character resolution */
 #define SPRINTF_BUFFER_SIZE             (1280)
@@ -94,17 +92,7 @@ dbgio_dev_font_load(void)
 {
         assert(_dbgio_state.dev_ops != NULL);
 
-        if ((_dbgio_state.state & STATE_FONT_LOAD_REQUESTED) == STATE_FONT_LOAD_REQUESTED) {
-                return;
-        }
-
-        _dbgio_state.state &= ~STATE_FONT_LOAD_COMPLETED;
-        _dbgio_state.state |= STATE_FONT_LOAD_REQUESTED;
-
         _dbgio_state.dev_ops->font_load();
-
-        _dbgio_state.state |= STATE_FONT_LOAD_COMPLETED;
-        _dbgio_state.state &= ~STATE_FONT_LOAD_REQUESTED;
 }
 
 void
