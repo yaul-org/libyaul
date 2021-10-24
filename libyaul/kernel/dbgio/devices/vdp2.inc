@@ -19,7 +19,7 @@ _init(const dbgio_vdp2_t *params)
         _shared_init(params);
 
         /* Return if we're already initialized */
-        if ((_dev_state->state & STATE_INITIALIZED) != 0x00) {
+        if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
                 return;
         }
 
@@ -30,15 +30,15 @@ static void
 _flush(void)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
-                .channel = DEV_DMAC_CHANNEL,
+                .channel  = DEV_DMAC_CHANNEL,
                 .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-                .src = 0x00000000,
-                .dst = 0x00000000,
+                .src      = 0x00000000,
+                .dst      = 0x00000000,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len = 0x00000000,
-                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .len      = 0x00000000,
+                .stride   = CPU_DMAC_STRIDE_2_BYTES,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr = NULL
+                .ihr      = NULL
         };
 
         if (_dev_state == NULL) {

@@ -84,7 +84,7 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
         cutlim = cutoff % (unsigned long)base;
         cutoff /= (unsigned long)base;
 
-        for (acc = 0, any = 0;; c = *s++) {
+        for (acc = 0, any = 0; ; c = *s++) {
                 if (isdigit(c)) {
                         c -= '0';
                 } else if (isalpha(c)) {

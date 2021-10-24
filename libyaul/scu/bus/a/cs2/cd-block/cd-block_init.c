@@ -80,7 +80,7 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
                 ;
 
         /* Wait until drive has finished seeking */
-        for (;;) {
+        while (true) {
                 /* Wait a bit */
                 for (i = 0; i < 100000; i++) {
                 }
