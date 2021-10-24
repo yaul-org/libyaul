@@ -26,7 +26,7 @@
 struct dma_queue_request {
         scu_dma_handle_t handle;
 
-        dma_queue_request_hdl_t handler;
+        dma_queue_request_handler_t handler;
         dma_queue_transfer_t transfer;
 } __aligned(8);
 
@@ -187,7 +187,7 @@ _internal_dma_queue_init(void)
 
 int8_t
 dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
-    dma_queue_request_hdl_t handler,
+    dma_queue_request_handler_t handler,
     void *work)
 {
         assert(handle != NULL);
