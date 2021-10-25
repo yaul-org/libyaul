@@ -249,7 +249,7 @@ _internal_vdp_sync_init(void)
 void
 vdp1_sync(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
                 return;
@@ -267,7 +267,7 @@ vdp1_sync(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 bool
@@ -287,7 +287,7 @@ vdp1_sync_busy(void)
 void
 vdp1_sync_wait(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         const uint32_t intc_mask = cpu_intc_mask_get();
 
@@ -298,7 +298,7 @@ vdp1_sync_wait(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 void
@@ -452,7 +452,7 @@ vdp1_sync_commit_set(callback_handler_t callback_handler, void *work)
 void
 vdp2_sync(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         if ((_state.flags & (SYNC_FLAG_VDP2_SYNC)) == SYNC_FLAG_VDP2_SYNC) {
                 return;
@@ -478,13 +478,13 @@ vdp2_sync(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 void
 vdp2_sync_wait(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         const uint32_t intc_mask = cpu_intc_mask_get();
 
@@ -495,7 +495,7 @@ vdp2_sync_wait(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 void
@@ -613,7 +613,7 @@ _vdp1_init(void)
 static inline void __always_inline
 _vdp1_sync_put(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         /* Wait when a previous list is still transferring, or when the VDP1 is
          * rendering. We don't have to wait for request for frame buffer change
@@ -643,47 +643,47 @@ _vdp1_sync_put(void)
 
         cpu_intc_mask_set(intc_mask);
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 static inline void __always_inline
 _vdp1_dma_call(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         _state.vdp1.current_mode->dma();
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 static inline void __always_inline
 _vdp1_sync_commit_call(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         _state.vdp1.current_mode->sync_commit();
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 static inline void __always_inline
 _vdp1_sprite_end_call(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         _state.vdp1.current_mode->sprite_end();
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 static inline void __always_inline
 _vdp1_vblank_in_call(void)
 {
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Enter\n", __func__);
 
         _state.vdp1.current_mode->vblank_in();
 
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+        DEBUG_PRINTF("%s: Exit\n", __func__);
 }
 
 static inline void __always_inline
@@ -697,12 +697,7 @@ _vdp1_mode_auto_dma(void)
 {
         MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
 
-        uint8_t state_vdp1_flags = _state.vdp1.flags;
-
-        state_vdp1_flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
-        state_vdp1_flags |= VDP1_FLAG_LIST_XFERRED;
-
-        _state.vdp1.flags = state_vdp1_flags;
+        _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
 }
 
 static void
@@ -805,7 +800,8 @@ static void
 _vdp1_mode_variable_vblank_in(void)
 {
         /* Cache the state to avoid multiple loads */
-        uint8_t state_vdp1_flags = _state.vdp1.flags;
+        uint8_t state_vdp1_flags;
+        state_vdp1_flags = _state.vdp1.flags;
 
         if ((state_vdp1_flags & VDP1_FLAG_REQUEST_COMMIT_LIST) != VDP1_FLAG_REQUEST_COMMIT_LIST) {
                 return;
@@ -845,7 +841,8 @@ _vdp1_mode_variable_vblank_in(void)
 static void
 _vdp1_mode_variable_vblank_out(void)
 {
-        uint8_t state_vdp1_flags = _state.vdp1.flags;
+        uint8_t state_vdp1_flags;
+        state_vdp1_flags = _state.vdp1.flags;
 
         if ((state_vdp1_flags & VDP1_FLAG_CHANGED) == VDP1_FLAG_CHANGED) {
                 return;
