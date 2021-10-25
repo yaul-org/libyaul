@@ -21,8 +21,8 @@ __BEGIN_DECLS
  * VBLANK=1 | Top blanking    |
  *          +-----------------+
  * VBLANK=1 | Top border      | <--- scanline #262 (top border)
- *          +-----------------+ <--- scanline #0 (active display,
- * VBLANK=0 | Active display  |                   start of V-BLANK-OUT (scan))
+ *          +-----------------+ <--- scanline #0   (active display,
+ * VBLANK=0 | Active display  |                     start of V-BLANK-OUT (scan))
  *          +-----------------+ <--- scanline #223
  * VBLANK=1 | Bottom border   | <--- scanline #224 (bottom border,
  *          +-----------------+                     start of V-BLANK-IN (retrace))
