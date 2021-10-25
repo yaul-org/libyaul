@@ -70,6 +70,9 @@ _state_vdp2(void)
 
 extern void _internal_vdp_init(void);
 
-extern void _internal_vdp2_xfer_table_update(uint32_t);
+extern void _internal_vdp2_xfer_table_update(uint32_t xfer_index);
+
+extern void _internal_vdp2_commit(scu_dma_level_t level);
+extern void _internal_vdp2_commit_wait(scu_dma_level_t level);
 
 #endif /* !_VDP_INTERNAL_H_ */
