@@ -68,8 +68,11 @@ _assert(const char * restrict file, const char * restrict line,
 
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
-        vdp2_sync_commit();
-        vdp2_sync_commit_wait();
+
+        /* Use the internal calls to commit VDP2 to avoid dealing with VDP2 sync
+         * state */
+        _internal_vdp2_commit(0);
+        _internal_vdp2_commit_wait(0);
 
         abort();
 }

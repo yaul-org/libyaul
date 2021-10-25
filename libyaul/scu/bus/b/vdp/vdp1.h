@@ -22,6 +22,10 @@ __BEGIN_DECLS
 /// Not yet documented.
 #define VDP1_SYNC_INTERVAL_VARIABLE     (-1)
 
+#define vdp1_sync_commit_clear() do {                                          \
+        vdp1_sync_commit_set(NULL, NULL);                                      \
+} while (false)
+
 typedef struct vdp1_transfer_status {
         union {
                 struct {
@@ -85,7 +89,7 @@ extern void vdp1_sync(void);
 extern bool vdp1_sync_busy(void);
 extern void vdp1_sync_wait(void);
 
-extern void vdp1_sync_interval_set(const int8_t interval);
+extern void vdp1_sync_interval_set(int8_t interval);
 extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
 
@@ -96,6 +100,8 @@ extern void vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
     uint16_t cmdt_index, uint16_t index);
 
 extern void vdp1_sync_put_wait(void);
+extern void vdp1_sync_commit(void);
+extern void vdp1_sync_commit_set(callback_handler_t callback_handler, void *work);
 
 __END_DECLS
 
