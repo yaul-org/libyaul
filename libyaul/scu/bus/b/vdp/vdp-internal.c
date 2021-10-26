@@ -45,8 +45,8 @@ _internal_vdp2_xfer_table_init(void)
 void
 _internal_vdp2_xfer_table_update(uint32_t xfer_index)
 {
-        scu_dma_xfer_t *xfer;
-        xfer = &_state_vdp2()->commit.xfer_table[xfer_index];
+        scu_dma_xfer_t * const xfer =
+            &_state_vdp2()->commit.xfer_table[xfer_index];
 
         switch (xfer_index) {
         case COMMIT_XFER_VDP2_REG_TVMD:

@@ -197,7 +197,7 @@ dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
         int8_t status;
         status = 0;
 
-        const uint32_t intc_mask = cpu_intc_mask_get();
+        const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         struct dma_queue *dma_queue;
@@ -220,7 +220,7 @@ dma_queue_enqueue(const scu_dma_handle_t *handle, uint8_t tag,
         request->transfer.work = work;
 
 exit:
-        cpu_intc_mask_set(intc_mask);
+        cpu_intc_mask_set(sr_mask);
 
         return status;
 }
@@ -247,7 +247,7 @@ dma_queue_tag_clear(uint8_t tag)
 
         dma_queue_flush_wait();
 
-        const uint32_t intc_mask = cpu_intc_mask_get();
+        const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         struct dma_queue *dma_queue;
@@ -262,20 +262,20 @@ dma_queue_tag_clear(uint8_t tag)
                 request->handler(&request->transfer);
         }
 
-        cpu_intc_mask_set(intc_mask);
+        cpu_intc_mask_set(sr_mask);
 }
 
 void
 dma_queue_clear(void)
 {
-        const uint32_t intc_mask = cpu_intc_mask_get();
+        const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         for (uint32_t tag = 0; tag < DMA_QUEUE_TAG_COUNT; tag++) {
                 dma_queue_tag_clear(tag);
         }
 
-        cpu_intc_mask_set(intc_mask);
+        cpu_intc_mask_set(sr_mask);
 }
 
 uint32_t
@@ -288,8 +288,8 @@ dma_queue_flush(uint8_t tag)
         int8_t status;
         status = 0;
 
-        uint32_t intc_mask;
-        intc_mask = cpu_intc_mask_get();
+        uint32_t sr_mask;
+        sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         struct dma_queue * const dma_queue =
@@ -313,12 +313,12 @@ dma_queue_flush(uint8_t tag)
 
         _queue_request_start(request);
 
-        if (intc_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
-                intc_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
+        if (sr_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
+                sr_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
         }
 
 exit:
-        cpu_intc_mask_set(intc_mask);
+        cpu_intc_mask_set(sr_mask);
 
         return status;
 }
@@ -356,14 +356,14 @@ dma_queue_flush_wait(void)
                 const struct dma_queue_request * const next_request =
                     _queue_dequeue(dma_queue);
 
-                uint32_t intc_mask;
-                intc_mask = cpu_intc_mask_get();
+                uint32_t sr_mask;
+                sr_mask = cpu_intc_mask_get();
 
-                if (intc_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
-                        intc_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
+                if (sr_mask >= CPU_INTC_PRIORITY_LEVEL_2_DMA) {
+                        sr_mask = CPU_INTC_PRIORITY_SPRITE_END - 1;
                 }
 
-                cpu_intc_mask_set(intc_mask);
+                cpu_intc_mask_set(sr_mask);
 
                 _queue_request_start(next_request);
         }
@@ -374,7 +374,7 @@ dma_queue_count_get(uint8_t tag)
 {
         assert(tag < DMA_QUEUE_TAG_COUNT);
 
-        const uint32_t intc_mask = cpu_intc_mask_get();
+        const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         struct dma_queue *dma_queue;
@@ -383,7 +383,7 @@ dma_queue_count_get(uint8_t tag)
         uint32_t size;
         size = _queue_size(dma_queue);
 
-        cpu_intc_mask_set(intc_mask);
+        cpu_intc_mask_set(sr_mask);
 
         return size;
 }
