@@ -20,11 +20,12 @@ static inline void _back_screen_set(vdp2_vram_t vram,
 void
 vdp2_scrn_back_screen_color_set(vdp2_vram_t vram, const color_rgb1555_t color)
 {
-        static color_rgb1555_t buffer = COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
+        static color_rgb1555_t buffered_color =
+            COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
 
-        buffer = color;
+        buffered_color = color;
 
-        _back_screen_set(vram, &buffer, 1);
+        _back_screen_set(vram, &buffered_color, 1);
 }
 
 void
@@ -49,8 +50,8 @@ _back_screen_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t
         _state_vdp2()->regs->bktau = bkclmd | VDP2_VRAM_BANK(vram);
         _state_vdp2()->regs->bktal = (vram >> 1) & 0xFFFF;
 
-        _state_vdp2()->back.vram = (vdp2_vram_t *)vram;
-        _state_vdp2()->back.buffer = (void *)buffer;
+        _state_vdp2()->back.vram = vram;
+        _state_vdp2()->back.buffer = buffer;
         _state_vdp2()->back.count = count;
 
         _internal_vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);

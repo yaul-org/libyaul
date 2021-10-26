@@ -103,6 +103,8 @@ _vdp2_init(void)
         vdp2_scrn_reduction_x_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
         vdp2_scrn_reduction_y_set(VDP2_SCRN_NBG1, Q0_3_8(1.0f));
 
+        vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(3, 0x0001FFFE), COLOR_RGB1555(0, 0, 0, 0));
+
         _internal_vdp2_vram_init();
 
         _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
