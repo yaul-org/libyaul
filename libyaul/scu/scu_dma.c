@@ -111,6 +111,8 @@ scu_dma_level_wait(scu_dma_level_t level)
                 }
 
                 if ((scu_dma_level_busy(level)) == 0x00000000) {
+                        _level_state[level].flags = LEVEL_STATE_IDLING;
+
                         return;
                 }
         }
