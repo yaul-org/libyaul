@@ -462,7 +462,7 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev) {
   }
 #endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(__CYGWIN__)
   // set configuration (needed especially for windows)
   // tolerate EBUSY: one device with one configuration, but two interfaces
   //    and libftdi sessions to both interfaces (e.g. FT2232)

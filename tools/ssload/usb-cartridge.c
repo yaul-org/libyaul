@@ -133,7 +133,7 @@ _dev_init(void)
                 goto error;
         }
         ftdi_error = ftdi_usb_open(&ftdi_ctx, I_VENDOR, I_PRODUCT);
-        if ((ftdi_error < 0) && (ftdi_error != -5)) {
+        if (ftdi_error < 0) {
                 DEBUG_PRINTF("ftdi_usb_open()\n");
                 goto error;
         }
@@ -589,7 +589,7 @@ _upload_execute_buffer(void *buffer, uint32_t base_address,
 
         if ((_send_command(command, base_address, len)) < 0) {
                 goto error;
-        } 
+        }
 
         if ((_device_write(buffer, len)) < 0) {
                 goto error;
@@ -617,7 +617,7 @@ _send_command(uint32_t command, uint32_t address, size_t len)
 {
         static char *command2str[] = {
                 NULL,
-                "CMD_DOWNLOAD",     
+                "CMD_DOWNLOAD",
                 "CMD_UPLOAD",
                 "CMD_EXECUTE",
                 "CMD_GET_BUFF_ADDR",
