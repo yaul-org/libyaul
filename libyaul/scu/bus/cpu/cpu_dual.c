@@ -66,8 +66,7 @@ static slave_entry_t _slave_entry_table[] = {
 void
 cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 {
-        uint8_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
+        const uint8_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
 
@@ -92,8 +91,8 @@ cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 void
 cpu_dual_master_set(cpu_dual_master_entry_t entry)
 {
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile uint8_t * const reg_tier =
+            (volatile uint8_t *)CPU(TIER);
 
         *reg_tier &= ~0x80;
 
@@ -201,8 +200,8 @@ _master_ici_handler(void)
 static void __interrupt_handler
 _slave_ici_handler(void)
 {
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile uint8_t * const reg_tier =
+            (volatile uint8_t *)CPU(TIER);
 
         *reg_tier &= ~0x80;
 
