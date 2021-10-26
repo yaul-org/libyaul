@@ -171,7 +171,7 @@ static const char *
 _exception_message_format(const cpu_registers_t * restrict regs,
     const char *restrict exception_name)
 {
-        static char buffer[1024];
+        static char buffer[512];
 
         (void)sprintf(buffer,
             "[H[2J[1;44mException occurred: %s[m\n\n"
