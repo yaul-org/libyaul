@@ -153,8 +153,7 @@ $2.d:
 # cause a conflict
 	$(ECHO)find $(abspath $3) -type f,d -print 2>/dev/null | \
 		awk 'BEGIN { print "$2: \\"; } \
-		     { print "\t" $$$$0 " \\"; } \
-		     END { print "\t" $$$$0; }' > $$@
+             { while (getline == 1) { print "\t" $$$$0 " \\"; } print "\t" $$$$0; }' > $$@
 
 $2: $2.d
 	@printf -- "$(V_BEGIN_YELLOW)$(strip $1).romdisk$(V_END)\n"
