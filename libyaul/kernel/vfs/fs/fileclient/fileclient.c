@@ -25,19 +25,15 @@ fileclient_sector_request(const char *filename, const uint32_t sector_offset,
                 uint8_t *byte_buffer;
                 byte_buffer = (uint8_t *)dst;
 
-                uint32_t i;
-
-                for (i = 0; i < FILECLIENT_SECTOR_SIZE; i++) {
+                for (uint32_t i = 0; i < FILECLIENT_SECTOR_SIZE; i++) {
                         byte_buffer[i] = usb_cart_byte_read();
                 }
 
-                crc_t crc;
-                crc = crc_calculate(dst, FILECLIENT_SECTOR_SIZE);
+                const crc_t crc = crc_calculate(dst, FILECLIENT_SECTOR_SIZE);
 
                 usb_cart_byte_send(crc);
 
-                crc_t read_crc;
-                read_crc = usb_cart_byte_read();
+                const crc_t read_crc = usb_cart_byte_read();
 
                 if (read_crc == crc) {
                         break;
@@ -65,8 +61,7 @@ fileclient_byte_size_request(const char *filename)
 
         _filename_send(filename);
 
-        uint32_t sector_count;
-        sector_count = usb_cart_long_read();
+        const uint32_t sector_count = usb_cart_long_read();
 
         return sector_count;
 }
