@@ -706,12 +706,9 @@ _vdp1_mode_auto_vblank_out(void)
                 break;
         }
 
-        /* This could be a hack, but wait until scanline #0 is reached to avoid
-         * the frame buffer change from aborting plotting, resulting in a soft
-         * lock */
-        do {
-                vdp2_tvmd_extern_latch();
-        } while ((vdp2_tvmd_vcount_get()) != 0);
+        /* Wait until scanline #0 is reached to avoid the frame buffer change
+         * from aborting plotting, resulting in a soft lock */
+        vdp2_tvmd_vcount_wait(0);
 
         _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
 
@@ -823,15 +820,12 @@ _vdp1_mode_variable_vblank_out(void)
 
         MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
 
-        /* This could be a hack, but wait until scanline #0 is reached to avoid
-         * the frame buffer change from aborting plotting, resulting in a soft
-         * lock.
+        /* Wait until scanline #0 is reached to avoid the frame buffer change
+         * from aborting plotting, resulting in a soft lock.
          *
          * This is for the case when a request to plot is started immediately
          * following the VBLANK-OUT interrupt */
-        do {
-                vdp2_tvmd_extern_latch();
-        } while ((vdp2_tvmd_vcount_get()) != 0);
+        vdp2_tvmd_vcount_wait(0);
 
         _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
 
