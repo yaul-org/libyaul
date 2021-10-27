@@ -81,8 +81,12 @@
 #include <dbgio.h>
 
 #define DEBUG_PRINTF(...) do {                                                 \
+        const uint32_t sr_mask = cpu_intc_mask_get();                          \
+                                                                               \
+        cpu_intc_mask_set(15);                                                 \
         dbgio_printf(__VA_ARGS__);                                             \
         dbgio_flush();                                                         \
+        cpu_intc_mask_set(sr_mask);                                            \
 } while(false)
 #else
 #define DEBUG_PRINTF(...)
@@ -414,13 +418,21 @@ vdp1_sync_put_wait(void)
                 return;
         }
 
+        const uint32_t sr_mask = cpu_intc_mask_get();
+
+        cpu_intc_mask_set(0);
+
         while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
         }
+
+        cpu_intc_mask_set(sr_mask);
 }
 
 void
 vdp1_sync_commit(void)
 {
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
         if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_COMMIT_LIST) == VDP1_FLAG_REQUEST_COMMIT_LIST) {
                 return;
         }
@@ -441,6 +453,8 @@ vdp1_sync_commit(void)
         _state.vdp1.flags |= VDP1_FLAG_REQUEST_COMMIT_LIST;
 
         cpu_intc_mask_set(sr_mask);
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 void
@@ -494,62 +508,6 @@ vdp2_sync_wait(void)
         }
 
         cpu_intc_mask_set(sr_mask);
-
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
-}
-
-void
-vdp2_sync_commit(void)
-{
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
-
-        uint8_t state_vdp2_flags;
-        state_vdp2_flags = _state.vdp2.flags;
-
-        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) == VDP2_FLAG_REQUEST_COMMIT_REGS) {
-                return;
-        }
-
-        state_vdp2_flags &= ~VDP2_FLAG_REGS_COMMITTED;
-        state_vdp2_flags |= VDP2_FLAG_REQUEST_COMMIT_REGS;
-
-        scu_dma_level_t level;
-        level = 0;
-
-        /* Find an available SCU-DMA level */
-        if ((scu_dma_level_busy(level))) {
-                if ((level = scu_dma_level_unused_get()) < 0) {
-                        level = 0;
-                }
-        }
-
-        _state.vdp2.commit_level = level;
-
-        _internal_vdp2_commit(level);
-
-        _state.vdp2.flags = state_vdp2_flags;
-
-        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
-}
-
-void
-vdp2_sync_commit_wait(void)
-{
-        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
-
-        uint8_t state_vdp2_flags;
-        state_vdp2_flags = _state.vdp2.flags;
-
-        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) != VDP2_FLAG_REQUEST_COMMIT_REGS) {
-                return;
-        }
-
-        _internal_vdp2_commit_wait(_state.vdp2.commit_level);
-
-        state_vdp2_flags &= ~VDP2_FLAG_REQUEST_COMMIT_REGS;
-        state_vdp2_flags |= VDP2_FLAG_REGS_COMMITTED;
-
-        _state.vdp2.flags = state_vdp2_flags;
 
         DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
@@ -634,8 +592,6 @@ _vdp1_sync_put(void)
                 }
         }
 
-        /* Mask interrupts to make sure this variable does not get modified at
-         * the same time */
         const uint32_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
@@ -724,13 +680,16 @@ _vdp1_mode_auto_sprite_end(void)
 static void
 _vdp1_mode_auto_vblank_in(void)
 {
+        if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_COMMIT_LIST) != VDP1_FLAG_REQUEST_COMMIT_LIST) {
+                return;
+        }
+
+        _vdp1_sprite_end_call();
 }
 
 static void
 _vdp1_mode_auto_vblank_out(void)
 {
-        _vdp1_sprite_end_call();
-
         /* Going from manual to 1-cycle mode requires the FCM and FCT bits to be
          * cleared. Otherwise, we get weird behavior from the VDP1.
          *
@@ -904,6 +863,62 @@ _vdp2_init(void)
 }
 
 static void
+_vdp2_sync_commit(void)
+{
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
+        uint8_t state_vdp2_flags;
+        state_vdp2_flags = _state.vdp2.flags;
+
+        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) == VDP2_FLAG_REQUEST_COMMIT_REGS) {
+                return;
+        }
+
+        state_vdp2_flags &= ~VDP2_FLAG_REGS_COMMITTED;
+        state_vdp2_flags |= VDP2_FLAG_REQUEST_COMMIT_REGS;
+
+        scu_dma_level_t level;
+        level = 0;
+
+        /* Find an available SCU-DMA level */
+        if ((scu_dma_level_busy(level))) {
+                if ((level = scu_dma_level_unused_get()) < 0) {
+                        level = 0;
+                }
+        }
+
+        _state.vdp2.commit_level = level;
+
+        _internal_vdp2_commit(level);
+
+        _state.vdp2.flags = state_vdp2_flags;
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+}
+
+void
+_vdp2_sync_commit_wait(void)
+{
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
+        uint8_t state_vdp2_flags;
+        state_vdp2_flags = _state.vdp2.flags;
+
+        if ((state_vdp2_flags & VDP2_FLAG_REQUEST_COMMIT_REGS) != VDP2_FLAG_REQUEST_COMMIT_REGS) {
+                return;
+        }
+
+        _internal_vdp2_commit_wait(_state.vdp2.commit_level);
+
+        state_vdp2_flags &= ~VDP2_FLAG_REQUEST_COMMIT_REGS;
+        state_vdp2_flags |= VDP2_FLAG_REGS_COMMITTED;
+
+        _state.vdp2.flags = state_vdp2_flags;
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
+}
+
+static void
 _scu_dma_level_end_handler(void *work __unused)
 {
         scu_dma_level_end_set(0, NULL, NULL);
@@ -914,6 +929,9 @@ _scu_dma_level_end_handler(void *work __unused)
 static void
 _vblank_in_handler(void)
 {
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+        DEBUG_PRINTF("_state.vdp1.flags: 0x%02X\n", _state.vdp1.flags);
+
         uint8_t state_flags;
         state_flags = _state.flags;
 
@@ -925,7 +943,7 @@ _vblank_in_handler(void)
 
         /* VBLANK-IN interrupt runs at scanline #224 */
         if ((state_flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
-                vdp2_sync_commit();
+                _vdp2_sync_commit();
         }
 
         int ret __unused;
@@ -934,16 +952,20 @@ _vblank_in_handler(void)
 
         dma_queue_flush_wait();
 
-        vdp2_sync_commit_wait();
+        _vdp2_sync_commit_wait();
 
         state_flags &= ~SYNC_FLAG_VDP2_SYNC;
 
         _state.flags = state_flags;
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
 
 static void
 _vblank_out_handler(void)
 {
+        DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
         /* VBLANK-OUT interrupt runs at scanline #511 */
 
         if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
@@ -951,4 +973,6 @@ _vblank_out_handler(void)
         }
 
         callback_call(&_user_vblank_out_callback);
+
+        DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
