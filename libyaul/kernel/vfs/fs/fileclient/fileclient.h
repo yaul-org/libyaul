@@ -14,7 +14,8 @@
 
 __BEGIN_DECLS
 
-extern void fileclient_sector_request(const char *filename, const uint32_t sector_offset, void *dst);
+extern void fileclient_sector_request(const char *filename,
+    const uint32_t sector_offset, void *dst);
 extern uint32_t fileclient_sector_count_request(const char *filename);
 extern uint32_t fileclient_byte_size_request(const char *filename);
 

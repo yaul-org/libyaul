@@ -21,14 +21,14 @@
 __BEGIN_DECLS
 
 void romdisk_init(void);
-void *romdisk_mount(const char *, const uint8_t *);
-void *romdisk_open(void *, const char *);
-void romdisk_close(void *);
-ssize_t romdisk_read(void *, void *, size_t);
-void *romdisk_direct(void *);
-off_t romdisk_seek(void *, off_t, int);
-off_t romdisk_tell(void *);
-size_t romdisk_total(void *);
+void *romdisk_mount(const uint8_t *image);
+void *romdisk_open(void *fh, const char *filename);
+void romdisk_close(void *fh);
+ssize_t romdisk_read(void *fh, void *buffer, size_t len);
+void *romdisk_direct(void *fh);
+off_t romdisk_seek(void *fh, off_t offset, int whence);
+off_t romdisk_tell(void *fh);
+size_t romdisk_total(void *fh);
 
 __END_DECLS
 
