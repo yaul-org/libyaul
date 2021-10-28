@@ -878,7 +878,7 @@ static void default_walker(void *ptr __unused, size_t size __unused, int used __
         /* printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr)); */
 }
 
-void tlsf_walk_pool(pool_t pool, tlsf_walker_t walker, void *user)
+void tlsf_pool_walk(pool_t pool, tlsf_walker_t walker, void *user)
 {
         tlsf_walker_t pool_walker = walker ? walker : default_walker;
         block_header_t *block =
@@ -905,11 +905,11 @@ size_t tlsf_block_size(void *ptr)
         return size;
 }
 
-int tlsf_check_pool(pool_t pool)
+int tlsf_pool_check(pool_t pool)
 {
         /* Check that the blocks are physically correct. */
         integrity_t integ = { 0, 0 };
-        tlsf_walk_pool(pool, integrity_walker, &integ);
+        tlsf_pool_walk(pool, integrity_walker, &integ);
 
         return integ.status;
 }
@@ -951,7 +951,7 @@ size_t tlsf_alloc_overhead(void)
         return block_header_overhead;
 }
 
-pool_t tlsf_add_pool(tlsf_t tlsf, void *mem, size_t bytes)
+pool_t tlsf_pool_add(tlsf_t tlsf, void *mem, size_t bytes)
 {
         block_header_t *block;
         block_header_t *next;
@@ -996,7 +996,7 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void *mem, size_t bytes)
         return mem;
 }
 
-void tlsf_remove_pool(tlsf_t tlsf, pool_t pool)
+void tlsf_pool_remove(tlsf_t tlsf, pool_t pool)
 {
         control_t *control = tlsf_cast(control_t *, tlsf);
         block_header_t *block = offset_to_block(pool, -(int)block_header_overhead);
@@ -1064,10 +1064,10 @@ tlsf_t tlsf_create(void *mem)
         return tlsf_cast(tlsf_t, mem);
 }
 
-tlsf_t tlsf_create_with_pool(void *mem, size_t bytes)
+tlsf_t tlsf_pool_create(void *mem, size_t bytes)
 {
         tlsf_t tlsf = tlsf_create(mem);
-        tlsf_add_pool(tlsf, (char *)mem + tlsf_size(), bytes - tlsf_size());
+        tlsf_pool_add(tlsf, (char *)mem + tlsf_size(), bytes - tlsf_size());
         return tlsf;
 }
 
@@ -1077,7 +1077,7 @@ void tlsf_destroy(tlsf_t tlsf)
         (void)tlsf;
 }
 
-pool_t tlsf_get_pool(tlsf_t tlsf)
+pool_t tlsf_pool_get(tlsf_t tlsf)
 {
         return tlsf_cast(pool_t, (char *)tlsf + tlsf_size());
 }

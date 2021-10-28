@@ -51,13 +51,13 @@ typedef void *pool_t;
 
 /* Create/destroy a memory pool. */
 extern tlsf_t tlsf_create(void *mem);
-extern tlsf_t tlsf_create_with_pool(void *mem, size_t bytes);
+extern tlsf_t tlsf_pool_create(void *mem, size_t bytes);
 extern void tlsf_destroy(tlsf_t tlsf);
-extern pool_t tlsf_get_pool(tlsf_t tlsf);
+extern pool_t tlsf_pool_get(tlsf_t tlsf);
 
 /* Add/remove memory pools. */
-extern pool_t tlsf_add_pool(tlsf_t tlsf, void *mem, size_t bytes);
-extern void tlsf_remove_pool(tlsf_t tlsf, pool_t pool);
+extern pool_t tlsf_pool_add(tlsf_t tlsf, void *mem, size_t bytes);
+extern void tlsf_pool_remove(tlsf_t tlsf, pool_t pool);
 
 /* malloc/memalign/realloc/free replacements. */
 extern void *tlsf_malloc(tlsf_t tlsf, size_t bytes);
@@ -79,10 +79,10 @@ extern size_t tlsf_alloc_overhead(void);
 /* Debugging. */
 typedef void (*tlsf_walker_t)(void *ptr, size_t size, int used, void *user);
 
-extern void tlsf_walk_pool(pool_t pool, tlsf_walker_t walker, void *user);
+extern void tlsf_pool_walk(pool_t pool, tlsf_walker_t walker, void *user);
 /* Returns nonzero if any internal consistency check fails. */
 extern int tlsf_check(tlsf_t tlsf);
-extern int tlsf_check_pool(pool_t pool);
+extern int tlsf_pool_check(pool_t pool);
 
 __END_DECLS
 
