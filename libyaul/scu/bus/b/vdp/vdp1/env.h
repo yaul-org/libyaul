@@ -88,8 +88,8 @@ extern void vdp1_env_set(const vdp1_env_t *);
 extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
-extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
-    const int16_vec2_t *);
+extern void vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
+    const int16_vec2_t *local_coords);
 
 /// @}
 
