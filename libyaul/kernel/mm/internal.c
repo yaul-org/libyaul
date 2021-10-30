@@ -12,7 +12,7 @@
 #include <internal.h>
 
 #define TLSF_POOL_PRIVATE_START ((uint32_t)&_private_pool[0])
-#define TLSF_POOL_PRIVATE_SIZE  (0x4000)
+#define TLSF_POOL_PRIVATE_SIZE  (0x8000)
 
 #define TLSF_POOL_USER_START    ((uint32_t)&_end)
 #define TLSF_POOL_USER_END      (HWRAM(HWRAM_SIZE))
