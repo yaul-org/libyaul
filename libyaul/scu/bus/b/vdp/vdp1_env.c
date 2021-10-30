@@ -17,21 +17,13 @@
 #include "vdp-internal.h"
 
 static vdp1_env_t _default_env = {
-        .erase_color = COLOR_RGB1555_INITIALIZER(0, 0, 0, 0),
-        .erase_points[0] = {
-                0,
-                0
-        },
-        .erase_points[1] = {
-                /* Updated during runtime */
-                0,
-                /* Updated during runtime */
-                0
-        },
-        .bpp = VDP1_ENV_BPP_16,
-        .rotation = VDP1_ENV_ROTATION_0,
-        .color_mode = VDP1_ENV_COLOR_MODE_RGB_PALETTE,
-        .sprite_type = 0x0
+        .erase_color     = COLOR_RGB1555_INITIALIZER(0, 0, 0, 0),
+        .erase_points[0] = INT16_VEC2_INITIALIZER(0, 0),
+        .erase_points[1] = INT16_VEC2_INITIALIZER(0, 0),
+        .bpp             = VDP1_ENV_BPP_16,
+        .rotation        = VDP1_ENV_ROTATION_0,
+        .color_mode      = VDP1_ENV_COLOR_MODE_RGB_PALETTE,
+        .sprite_type     = 0
 };
 
 static vdp1_env_t _current_env;
@@ -44,7 +36,7 @@ static inline void __always_inline _env_erase_assert(const vdp1_env_t *);
 #define _env_erase_assert(x)
 #endif /* DEBUG */
 
-static inline void __always_inline _env_current_update(const vdp1_env_t *);
+static inline void __always_inline _env_current_update(const vdp1_env_t *env);
 
 static void _env_default_erase_update(void);
 
@@ -162,40 +154,41 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
 {
         assert(cmdts != NULL);
 
-        int16_vec2_t stack_local_coords;
+        const int16_vec2_t system_clip_coords =
+            _state_vdp2()->tv.resolution;
 
         if (local_coords == NULL) {
-                local_coords = &stack_local_coords;
+                int16_vec2_t center_local_coords;
+                local_coords = &center_local_coords;
 
-                stack_local_coords.x = _state_vdp2()->tv.resolution.x / 2;
-                stack_local_coords.y = _state_vdp2()->tv.resolution.y / 2;
+                center_local_coords.x = _state_vdp2()->tv.resolution.x / 2;
+                center_local_coords.y = _state_vdp2()->tv.resolution.y / 2;
         }
 
-        int16_vec2_t system_clip_coords;
-        system_clip_coords.x = _state_vdp2()->tv.resolution.x;
-        system_clip_coords.y = _state_vdp2()->tv.resolution.y;
-
-        int16_vec2_t user_clip_ul;
-        int16_vec2_zero(&user_clip_ul);
-
-        int16_vec2_t user_clip_lr;
-        user_clip_lr.x = system_clip_coords.x - 1;
-        user_clip_lr.y = system_clip_coords.y - 1;
+        const int16_vec2_t user_clip_ul =
+            INT16_VEC2_INITIALIZER(0, 0);
+        const int16_vec2_t user_clip_lr =
+            INT16_VEC2_INITIALIZER(system_clip_coords.x - 1,
+                                   system_clip_coords.y - 1);
 
         vdp1_cmdt_t *cmdt;
         cmdt = &cmdts[0];
 
         vdp1_cmdt_system_clip_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_SYSTEM_CLIP, &system_clip_coords);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_SYSTEM_CLIP,
+            &system_clip_coords);
         cmdt++;
 
         vdp1_cmdt_user_clip_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_UL, &user_clip_ul);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_LR, &user_clip_lr);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_UL,
+            &user_clip_ul);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_LR,
+            &user_clip_lr);
         cmdt++;
 
         vdp1_cmdt_local_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_LOCAL_COORD, local_coords);
+        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_LOCAL_COORD,
+            local_coords);
         cmdt++;
 
         vdp1_cmdt_end_set(cmdt);
@@ -212,11 +205,8 @@ _env_default_erase_update(void)
         /* If the system is PAL, or if there is a resolution change, update the
          * resolution */
 
-        uint16_t width;
-        width = _state_vdp2()->tv.resolution.x;
-
-        uint16_t height;
-        height = _state_vdp2()->tv.resolution.y;
+        const uint16_t width = _state_vdp2()->tv.resolution.x;
+        const uint16_t height = _state_vdp2()->tv.resolution.y;
 
         _default_env.erase_points[1].x = width;
         _default_env.erase_points[1].y = height;
