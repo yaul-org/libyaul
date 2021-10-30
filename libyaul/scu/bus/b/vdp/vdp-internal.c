@@ -81,16 +81,7 @@ _internal_vdp2_xfer_table_update(uint32_t xfer_index)
 void
 _internal_vdp2_commit(scu_dma_level_t level)
 {
-        uintptr_t vdp2_regs_buffer;
-        vdp2_regs_buffer = (uintptr_t)_state_vdp2()->regs->buffer;
-        const uint32_t cache_line_count =
-            sizeof(_state_vdp2()->regs->buffer) / CPU_CACHE_LINE_SIZE;
-
-        for (uint32_t i = 0; i < cache_line_count; i++) {
-                cpu_cache_purge_line((void *)vdp2_regs_buffer);
-
-                vdp2_regs_buffer += CPU_CACHE_LINE_SIZE / sizeof(uintptr_t);
-        }
+        cpu_cache_area_purge(_state_vdp2()->regs->buffer, sizeof(vdp2_registers_t));
 
         const scu_dma_handle_t * const dma_handle =
             _state_vdp2()->commit.dma_handle;
