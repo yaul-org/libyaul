@@ -21,7 +21,7 @@ __BEGIN_DECLS
 
 /// Partition designated for using the cache.
 #define CPU_CACHE               0x00000000UL
-/// Partition designated for bypassing the cache. 
+/// Partition designated for bypassing the cache.
 #define CPU_CACHE_THROUGH       0x20000000UL
 /// Partition designated for purging a specific line.
 #define CPU_CACHE_PURGE         0x40000000UL
@@ -140,7 +140,7 @@ cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 /// @brief Cache line of the specified address is purged.
 ///
 /// @details Calling this function will not pollute the cache.
-/// 
+///
 /// @param addr Address associated with cache line.
 extern void cpu_cache_purge_line(void *addr) __section(".uncached");
 
