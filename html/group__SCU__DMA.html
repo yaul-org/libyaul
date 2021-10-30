@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 958eaa9</span>
+   &#160;<span id="projectnumber">Git hash 7177dd8</span>
    </div>
   </td>
  </tr>
@@ -108,6 +108,10 @@ Typedefs</h2></td></tr>
 typedef enum <a class="el" href="group__SCU__DMA.html#ga646cf5f03cabed68f52c4db84c3fa9d9">scu_dma_mode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaf085d41bde4a9eceb299372747b7b9ef">scu_dma_mode_t</a></td></tr>
 <tr class="memdesc:gaf085d41bde4a9eceb299372747b7b9ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DMA transfer mode. <br /></td></tr>
 <tr class="separator:gaf085d41bde4a9eceb299372747b7b9ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaad73ac62f20dc40d38bb82a27ee7c2a7"><td class="memItemLeft" align="right" valign="top"><a id="gaad73ac62f20dc40d38bb82a27ee7c2a7"></a>
+typedef enum <a class="el" href="group__SCU__DMA.html#gae431ded6d78ef9d2f4c483b4c488e0e3">scu_dma_space</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaad73ac62f20dc40d38bb82a27ee7c2a7">scu_dma_space_t</a></td></tr>
+<tr class="memdesc:gaad73ac62f20dc40d38bb82a27ee7c2a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DMA transfer space. <br /></td></tr>
+<tr class="separator:gaad73ac62f20dc40d38bb82a27ee7c2a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1a1032eaf8b4eab284a17015f1fcb63b"><td class="memItemLeft" align="right" valign="top"><a id="ga1a1032eaf8b4eab284a17015f1fcb63b"></a>
 typedef enum <a class="el" href="group__SCU__DMA.html#ga4febb0015abc02fe8c8d437e6fe54ed3">scu_dma_start_factor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga1a1032eaf8b4eab284a17015f1fcb63b">scu_dma_start_factor_t</a></td></tr>
 <tr class="memdesc:ga1a1032eaf8b4eab284a17015f1fcb63b"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DMA starting factors. <br /></td></tr>
@@ -155,6 +159,12 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ga646cf5f03cabed68f52c4db84c3fa9d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DMA transfer mode.  <a href="group__SCU__DMA.html#ga646cf5f03cabed68f52c4db84c3fa9d9">More...</a><br /></td></tr>
 <tr class="separator:ga646cf5f03cabed68f52c4db84c3fa9d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae431ded6d78ef9d2f4c483b4c488e0e3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gae431ded6d78ef9d2f4c483b4c488e0e3">scu_dma_space</a> { <a class="el" href="group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3aaf286a7b35bed1a1adf9e22f6968d639">SCU_DMA_SPACE_BUS_A</a>, 
+<a class="el" href="group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3a7777005e86b3fc90ce637cf99d9b4498">SCU_DMA_SPACE_BUS_B</a>, 
+<a class="el" href="group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3ae1d5b4667e32820e60dcb0a4c8389e6f">SCU_DMA_SPACE_BUS_CPU</a>
+ }</td></tr>
+<tr class="memdesc:gae431ded6d78ef9d2f4c483b4c488e0e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DMA transfer space.  <a href="group__SCU__DMA.html#gae431ded6d78ef9d2f4c483b4c488e0e3">More...</a><br /></td></tr>
+<tr class="separator:gae431ded6d78ef9d2f4c483b4c488e0e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4febb0015abc02fe8c8d437e6fe54ed3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga4febb0015abc02fe8c8d437e6fe54ed3">scu_dma_start_factor</a> { <br />
 &#160;&#160;<a class="el" href="group__SCU__DMA.html#gga4febb0015abc02fe8c8d437e6fe54ed3a76dbd5462b139d36f04474d6aef95485">SCU_DMA_START_FACTOR_VBLANK_IN</a> = 0x00, 
 <a class="el" href="group__SCU__DMA.html#gga4febb0015abc02fe8c8d437e6fe54ed3aa30a470afd3c8c82ff18527ce9fb79b0">SCU_DMA_START_FACTOR_VBLANK_OUT</a> = 0x01, 
@@ -240,6 +250,12 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 <tr class="memitem:ga719debf3a27cfa61db802f230db4d7a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga719debf3a27cfa61db802f230db4d7a0">scu_dma_config_set</a> (<a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a> level, <a class="el" href="group__SCU__DMA.html#ga1a1032eaf8b4eab284a17015f1fcb63b">scu_dma_start_factor_t</a> start_factor, const <a class="el" href="group__SCU__DMA.html#ga8dff5e447ac8c7d93f868e1e228d4135">scu_dma_handle_t</a> *handle, <a class="el" href="group__SCU__DMA.html#ga948d02a56ca70e89bf0235599c85fbe2">scu_dma_callback_t</a> callback)</td></tr>
 <tr class="memdesc:ga719debf3a27cfa61db802f230db4d7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commits handle to SCU-DMA level I/O registers.  <a href="group__SCU__DMA.html#ga719debf3a27cfa61db802f230db4d7a0">More...</a><br /></td></tr>
 <tr class="separator:ga719debf3a27cfa61db802f230db4d7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4905fc353e326e36e183171b7e9f56d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga4905fc353e326e36e183171b7e9f56d8">scu_dma_transfer</a> (<a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a> level, void *dst, void *src, size_t len)</td></tr>
+<tr class="memdesc:ga4905fc353e326e36e183171b7e9f56d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a transfer.  <a href="group__SCU__DMA.html#ga4905fc353e326e36e183171b7e9f56d8">More...</a><br /></td></tr>
+<tr class="separator:ga4905fc353e326e36e183171b7e9f56d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8bd616f77daa39b719140d5cf6f3a38e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#ga8bd616f77daa39b719140d5cf6f3a38e">scu_dma_transfer_wait</a> (<a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a> level)</td></tr>
+<tr class="memdesc:ga8bd616f77daa39b719140d5cf6f3a38e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for a transfer to complete.  <a href="group__SCU__DMA.html#ga8bd616f77daa39b719140d5cf6f3a38e">More...</a><br /></td></tr>
+<tr class="separator:ga8bd616f77daa39b719140d5cf6f3a38e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaca548219b381950a1bde3da64324ffe0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DMA.html#gaca548219b381950a1bde3da64324ffe0">scu_dma_level_fast_start</a> (<a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a> level)</td></tr>
 <tr class="memdesc:gaca548219b381950a1bde3da64324ffe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a SCU-DMA transfer.  <a href="group__SCU__DMA.html#gaca548219b381950a1bde3da64324ffe0">More...</a><br /></td></tr>
 <tr class="separator:gaca548219b381950a1bde3da64324ffe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -540,6 +556,30 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga646cf5f03cabed68f52c4db84c3fa9d9a047360d4c79cb4132777c0e4a8b77b66"></a>SCU_DMA_MODE_DIRECT&#160;</td><td class="fielddoc"><p>SCU-DMA direct mode. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga646cf5f03cabed68f52c4db84c3fa9d9a4b166ce7fb023724a21308e2a5f485cc"></a>SCU_DMA_MODE_INDIRECT&#160;</td><td class="fielddoc"><p>SCU-DMA indirect mode. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="gae431ded6d78ef9d2f4c483b4c488e0e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae431ded6d78ef9d2f4c483b4c488e0e3">&#9670;&nbsp;</a></span>scu_dma_space</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__SCU__DMA.html#gae431ded6d78ef9d2f4c483b4c488e0e3">scu_dma_space</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>SCU-DMA transfer space. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggae431ded6d78ef9d2f4c483b4c488e0e3aaf286a7b35bed1a1adf9e22f6968d639"></a>SCU_DMA_SPACE_BUS_A&#160;</td><td class="fielddoc"><p>SCU-DMA transfer space to CS2 (Chip Select), A-Bus. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggae431ded6d78ef9d2f4c483b4c488e0e3a7777005e86b3fc90ce637cf99d9b4498"></a>SCU_DMA_SPACE_BUS_B&#160;</td><td class="fielddoc"><p>SCU-DMA transfer space to B-Bus. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggae431ded6d78ef9d2f4c483b4c488e0e3ae1d5b4667e32820e60dcb0a4c8389e6f"></a>SCU_DMA_SPACE_BUS_CPU&#160;</td><td class="fielddoc"><p>SCU-DMA transfer space to CPU-Bus. </p>
 </td></tr>
 </table>
 
@@ -1087,9 +1127,86 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 
 </div>
 </div>
+<a id="ga4905fc353e326e36e183171b7e9f56d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4905fc353e326e36e183171b7e9f56d8">&#9670;&nbsp;</a></span>scu_dma_transfer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void scu_dma_transfer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a>&#160;</td>
+          <td class="paramname"><em>level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Perform a transfer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">level</td><td>The SCU-DMA level. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>The pointer to write to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>The pointer to read from. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">len</td><td>The amount to transfer in bytes. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga8bd616f77daa39b719140d5cf6f3a38e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8bd616f77daa39b719140d5cf6f3a38e">&#9670;&nbsp;</a></span>scu_dma_transfer_wait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void scu_dma_transfer_wait </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203">scu_dma_level_t</a>&#160;</td>
+          <td class="paramname"><em>level</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wait for a transfer to complete. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>The SCU-DMA level. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__SCU__DMA_html_gabc4a50cba419b468c31d1aee6ab52dd1"><div class="ttname"><a href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a></div><div class="ttdeci">#define SCU_DMA_INDIRECT_TABLE_END</div><div class="ttdoc">The bit that signifies the end of the transfer table.</div><div class="ttdef"><b>Definition:</b> dma.h:110</div></div>
+<div class="ttc" id="agroup__SCU__DMA_html_gabc4a50cba419b468c31d1aee6ab52dd1"><div class="ttname"><a href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a></div><div class="ttdeci">#define SCU_DMA_INDIRECT_TABLE_END</div><div class="ttdoc">The bit that signifies the end of the transfer table.</div><div class="ttdef"><b>Definition:</b> dma.h:120</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

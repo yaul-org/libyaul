@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 958eaa9</span>
+   &#160;<span id="projectnumber">Git hash 7177dd8</span>
    </div>
   </td>
  </tr>
@@ -93,13 +93,22 @@ $(document).ready(function(){initNavTree('uint32_8h_source.html',''); initResiza
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;__BEGIN_DECLS</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">extern</span> uint32_t uint32_log2(uint32_t);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">extern</span> uint32_t uint32_log2(uint32_t value);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">extern</span> uint32_t uint32_loop_log2(uint32_t value);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">extern</span> uint32_t uint32_pow2_round_next(uint32_t value);</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_UINT32_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;uint32_pow2_round(uint32_t value, uint32_t pow)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">return</span> (((value + ((1 &lt;&lt; pow) - 1)) &gt;&gt; pow) &lt;&lt; pow);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_UINT32_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

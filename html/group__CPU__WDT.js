@@ -1,7 +1,7 @@
 var group__CPU__WDT =
 [
     [ "cpu_wdt_clock_t", "group__CPU__WDT.html#ga871e6ca3976c0552c9dd1cb1c612446d", null ],
-    [ "cpu_wdt_ihr", "group__CPU__WDT.html#ga2f60d098014cdc4d65381defe2a2744e", null ],
+    [ "cpu_wdt_ihr_t", "group__CPU__WDT.html#ga7d3b67d11fcbdd4a18c5972efad967f5", null ],
     [ "cpu_wdt_mode_t", "group__CPU__WDT.html#ga99ce47c27588d861551e37fecbc71a98", null ],
     [ "cpu_wdt_clock", "group__CPU__WDT.html#gaef061bbf38b3b9e76d37092a36fa4bc4", [
       [ "CPU_WDT_CLOCK_DIV_2", "group__CPU__WDT.html#ggaef061bbf38b3b9e76d37092a36fa4bc4a2371a937dc4c5a0bc6b603208cb0bffa", null ],

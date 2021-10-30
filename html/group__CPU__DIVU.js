@@ -1,6 +1,6 @@
 var group__CPU__DIVU =
 [
-    [ "cpu_divu_ihr", "group__CPU__DIVU.html#ga1e2ae959a0d610a573a480172fb8203f", null ],
+    [ "cpu_divu_ihr_t", "group__CPU__DIVU.html#ga68875fbe5569688570b1b780e084ab27", null ],
     [ "cpu_divu_32_32_set", "group__CPU__DIVU.html#ga3833bc435bf2bd47268a66a77ac8f9f2", null ],
     [ "cpu_divu_64_32_set", "group__CPU__DIVU.html#ga826a1e3215bf545fcbc80b4002486e5b", null ],
     [ "cpu_divu_fix16_set", "group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b", null ],

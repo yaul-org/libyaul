@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 958eaa9</span>
+   &#160;<span id="projectnumber">Git hash 7177dd8</span>
    </div>
   </td>
  </tr>
@@ -112,6 +112,10 @@ Macros</h2></td></tr>
 <tr class="memitem:ga305e02a50983e44b80817a55586b94ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">CPU_CACHE_2_WAY_SIZE</a>&#160;&#160;&#160;(<a class="el" href="group__CPU__CACHE.html#gab8c1fa0e47ab64ca48e363a0f4024ae3">CPU_CACHE_WAY_2_ADDR</a> - <a class="el" href="group__CPU__CACHE.html#gacc74b410744bd58c554d51ea8be7ea6a">CPU_CACHE_WAY_0_ADDR</a>)</td></tr>
 <tr class="memdesc:ga305e02a50983e44b80817a55586b94ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size in bytes of the 2KiB RAM.  <a href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">More...</a><br /></td></tr>
 <tr class="separator:ga305e02a50983e44b80817a55586b94ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6e6f8872956bea56a103cade85015f2f"><td class="memItemLeft" align="right" valign="top"><a id="ga6e6f8872956bea56a103cade85015f2f"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga6e6f8872956bea56a103cade85015f2f">CPU_CACHE_LINE_SIZE</a>&#160;&#160;&#160;16UL</td></tr>
+<tr class="memdesc:ga6e6f8872956bea56a103cade85015f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of a cache line in bytes. <br /></td></tr>
+<tr class="separator:ga6e6f8872956bea56a103cade85015f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -156,9 +160,12 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 <tr class="memitem:ga48557c885d1318a326d2554580e50990"><td class="memItemLeft" align="right" valign="top">static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga48557c885d1318a326d2554580e50990">cpu_cache_way_mode_set</a> (<a class="el" href="group__CPU__CACHE.html#ga425790888be5a412c303fcf59beb190d">cpu_cache_mode_t</a> mode)</td></tr>
 <tr class="memdesc:ga48557c885d1318a326d2554580e50990"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the mode the cache operates.  <a href="group__CPU__CACHE.html#ga48557c885d1318a326d2554580e50990">More...</a><br /></td></tr>
 <tr class="separator:ga48557c885d1318a326d2554580e50990"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga93095a87134cdec86275d36b22523902"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga93095a87134cdec86275d36b22523902">cpu_cache_purge_line</a> (void *addr) <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
-<tr class="memdesc:ga93095a87134cdec86275d36b22523902"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache line of the specified address is purged.  <a href="group__CPU__CACHE.html#ga93095a87134cdec86275d36b22523902">More...</a><br /></td></tr>
-<tr class="separator:ga93095a87134cdec86275d36b22523902"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga78fe7810cd00b94ac3c336cfc18d6a52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga78fe7810cd00b94ac3c336cfc18d6a52">cpu_cache_line_purge</a> (void *address) <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
+<tr class="memdesc:ga78fe7810cd00b94ac3c336cfc18d6a52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache line of the specified address is purged.  <a href="group__CPU__CACHE.html#ga78fe7810cd00b94ac3c336cfc18d6a52">More...</a><br /></td></tr>
+<tr class="separator:ga78fe7810cd00b94ac3c336cfc18d6a52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga149fb6c8492dd8adf6aa017eba6843cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga149fb6c8492dd8adf6aa017eba6843cc">cpu_cache_area_purge</a> (void *address, uint32_t len) <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
+<tr class="memdesc:ga149fb6c8492dd8adf6aa017eba6843cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache lines of the specified address are purged.  <a href="group__CPU__CACHE.html#ga149fb6c8492dd8adf6aa017eba6843cc">More...</a><br /></td></tr>
+<tr class="separator:ga149fb6c8492dd8adf6aa017eba6843cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gacd31f9c6aad6d5e315dae3794c0652c7">cpu_cache_purge</a> (void) <a class="el" href="group__GCC__ATTRIBUTES.html#ga19d4dd67e3a51d6dd20b6ab3f3507bbd">__no_reorder</a> <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
 <tr class="memdesc:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purge the entire cache.  <a href="group__CPU__CACHE.html#gacd31f9c6aad6d5e315dae3794c0652c7">More...</a><br /></td></tr>
 <tr class="separator:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,6 +235,71 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ga149fb6c8492dd8adf6aa017eba6843cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga149fb6c8492dd8adf6aa017eba6843cc">&#9670;&nbsp;</a></span>cpu_cache_area_purge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_cache_area_purge </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cache lines of the specified address are purged. </p>
+<p>The starting address to purge does not to be cache-line aligned. The area to cache purge does not have to be in multiples of the cache line size. Calling this function will not pollute the cache.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>The starting address. </td></tr>
+    <tr><td class="paramname">len</td><td>The area in bytes. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga78fe7810cd00b94ac3c336cfc18d6a52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga78fe7810cd00b94ac3c336cfc18d6a52">&#9670;&nbsp;</a></span>cpu_cache_line_purge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_cache_line_purge </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>address</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cache line of the specified address is purged. </p>
+<p>The starting address to purge does not to be cache-line aligned. Calling this function will not pollute the cache.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>The address associated with cache line. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="gacd31f9c6aad6d5e315dae3794c0652c7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gacd31f9c6aad6d5e315dae3794c0652c7">&#9670;&nbsp;</a></span>cpu_cache_purge()</h2>
 
@@ -246,33 +318,6 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 
 <p>Purge the entire cache. </p>
 <p>All cache entries and all valid bits and LRU bits of all ways are initialized to <code>0</code>. Calling this function will not pollute the cache. </p>
-
-</div>
-</div>
-<a id="ga93095a87134cdec86275d36b22523902"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga93095a87134cdec86275d36b22523902">&#9670;&nbsp;</a></span>cpu_cache_purge_line()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cpu_cache_purge_line </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>addr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Cache line of the specified address is purged. </p>
-<p>Calling this function will not pollute the cache.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">addr</td><td>Address associated with cache line. </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

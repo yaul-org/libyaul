@@ -16,7 +16,7 @@ var group__CPU__INTC =
     [ "CPU_INTC_PRIORITY_TIMER_1", "group__CPU__INTC.html#gae37d79da46f39ee4989d35d8a83663c6", null ],
     [ "CPU_INTC_PRIORITY_VBLANK_IN", "group__CPU__INTC.html#gaa206ea0422cb66f0c4ff4d072f3a9789", null ],
     [ "CPU_INTC_PRIORITY_VBLANK_OUT", "group__CPU__INTC.html#ga427a66cb2f1a80dc72ba20c62c153553", null ],
-    [ "cpu_intc_ihr", "group__CPU__INTC.html#ga050b13884769da2ebeee50e6aa8b967a", null ],
+    [ "cpu_intc_ihr_t", "group__CPU__INTC.html#ga7a5d1b68c5087e346eba805ff9f368c7", null ],
     [ "cpu_intc_interrupt_t", "group__CPU__INTC.html#ga7f9cda3c9f657fc6017e4a5a0fd98443", null ],
     [ "cpu_intc_interrupt", "group__CPU__INTC.html#gaac41bcdeba2bd9e84b2c04f6780e9ed2", [
       [ "CPU_INTC_INTERRUPT_POWER_ON_RESET_PC", "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2abf475cdbb5a50aeb790338759c9d2554", null ],
@@ -49,8 +49,8 @@ var group__CPU__INTC =
       [ "CPU_INTC_INTERRUPT_SLAVE_ENTRY", "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a22c2ac20c68f31b8abb638497062ae55", null ]
     ] ],
     [ "cpu_intc_ihr_clear", "group__CPU__INTC.html#gafa002f9116625d45d73091517ce3abc0", null ],
-    [ "cpu_intc_ihr_get", "group__CPU__INTC.html#gaf86b4b3e9ab79bb592c6b1f193c462cf", null ],
-    [ "cpu_intc_ihr_set", "group__CPU__INTC.html#ga46fc6a96ca11dfbcb79ef71b2dc02d2e", null ],
+    [ "cpu_intc_ihr_get", "group__CPU__INTC.html#ga6fe44ddce7c854c5467e09196452a1ca", null ],
+    [ "cpu_intc_ihr_set", "group__CPU__INTC.html#ga6cc5f6ba5070e086b460b8645cdd1fbd", null ],
     [ "cpu_intc_mask_get", "group__CPU__INTC.html#ga9453b932948bf1425c2d292b63403ac3", null ],
     [ "cpu_intc_mask_set", "group__CPU__INTC.html#ga7d3d019782fd356e35dc35cf32739b78", null ],
     [ "cpu_intc_priority_a_get", "group__CPU__INTC.html#ga879023ad25de6bb4bcbf3a994f0e40ab", null ],

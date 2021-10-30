@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 958eaa9</span>
+   &#160;<span id="projectnumber">Git hash 7177dd8</span>
    </div>
   </td>
  </tr>
@@ -534,8 +534,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the interrupt handler for the specified SCU related interrupt. </p>
-<p>This is a BIOS call. The function should <em>not</em> use <code>rte</code> to return, unlike <a class="el" href="group__CPU__INTC.html#ga46fc6a96ca11dfbcb79ef71b2dc02d2e">cpu_intc_ihr_set</a>.</p>
-<p>It's possible to use <a class="el" href="group__CPU__INTC.html#ga46fc6a96ca11dfbcb79ef71b2dc02d2e">cpu_intc_ihr_set</a> to set an SCU related interrupt. However, the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a>, as well as the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa842098a8e332ea17074de890be">IMS</a> I/O registers need to be updated.</p>
+<p>This is a BIOS call. The function should <em>not</em> use <code>rte</code> to return, unlike <a class="el" href="group__CPU__INTC.html#ga6cc5f6ba5070e086b460b8645cdd1fbd">cpu_intc_ihr_set</a>.</p>
+<p>It's possible to use <a class="el" href="group__CPU__INTC.html#ga6cc5f6ba5070e086b460b8645cdd1fbd">cpu_intc_ihr_set</a> to set an SCU related interrupt. However, the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a>, as well as the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa842098a8e332ea17074de890be">IMS</a> I/O registers need to be updated.</p>
 <p>Below is the disassembly of the BIOS function.</p>
 <div class="fragment"><div class="line">0x06000794: shll2 r4</div>
 <div class="line">0x06000796: tst r5, r5</div>

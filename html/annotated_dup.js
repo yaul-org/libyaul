@@ -22,5 +22,7 @@ var annotated_dup =
     [ "scu_dma_xfer", "structscu__dma__xfer.html", "structscu__dma__xfer" ],
     [ "scu_dma_xfer_type", "unionscu__dma__xfer__type.html", "unionscu__dma__xfer__type" ],
     [ "scu_dsp_status", "structscu__dsp__status.html", "structscu__dsp__status" ],
-    [ "scu_ic_priority", "structscu__ic__priority.html", "structscu__ic__priority" ]
+    [ "scu_ic_priority", "structscu__ic__priority.html", "structscu__ic__priority" ],
+    [ "uint8_vec2_t", "structuint8__vec2__t.html", "structuint8__vec2__t" ],
+    [ "uint8_vec3_t", "structuint8__vec3__t.html", "structuint8__vec3__t" ]
 ];

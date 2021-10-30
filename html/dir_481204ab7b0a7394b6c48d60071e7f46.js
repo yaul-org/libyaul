@@ -12,5 +12,6 @@ var dir_481204ab7b0a7394b6c48d60071e7f46 =
     [ "int32.h", "int32_8h_source.html", null ],
     [ "int8.h", "int8_8h_source.html", null ],
     [ "math.h", "math_8h_source.html", null ],
-    [ "uint32.h", "uint32_8h_source.html", null ]
+    [ "uint32.h", "uint32_8h_source.html", null ],
+    [ "uint8.h", "uint8_8h_source.html", null ]
 ];

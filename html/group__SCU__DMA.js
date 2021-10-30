@@ -18,6 +18,7 @@ var group__SCU__DMA =
     ] ],
     [ "scu_dma_level_cfg", "structscu__dma__level__cfg.html", [
       [ "mode", "structscu__dma__level__cfg.html#a348e1a4ad08021512d95eff0ba6e065b", null ],
+      [ "space", "structscu__dma__level__cfg.html#a23954b229fde05733ef666228ca0f891", null ],
       [ "stride", "structscu__dma__level__cfg.html#ab6316461b8aacce1e5c4866197c33fdb", null ],
       [ "update", "structscu__dma__level__cfg.html#afcc36eabbd3b2552d1803db8099b6e26", null ],
       [ "xfer", "structscu__dma__level__cfg.html#ab6865f06ca4e7556f009291372928dba", null ]
@@ -33,6 +34,7 @@ var group__SCU__DMA =
     [ "scu_dma_level_cfg_t", "group__SCU__DMA.html#gac6eb443eda81e601afa8a34a76200cb7", null ],
     [ "scu_dma_level_t", "group__SCU__DMA.html#ga6635b04f9cf22c7438e31d6bfbf78203", null ],
     [ "scu_dma_mode_t", "group__SCU__DMA.html#gaf085d41bde4a9eceb299372747b7b9ef", null ],
+    [ "scu_dma_space_t", "group__SCU__DMA.html#gaad73ac62f20dc40d38bb82a27ee7c2a7", null ],
     [ "scu_dma_start_factor_t", "group__SCU__DMA.html#ga1a1032eaf8b4eab284a17015f1fcb63b", null ],
     [ "scu_dma_stride_t", "group__SCU__DMA.html#gae14b607b52bc9ad6f33f39498e86bf6b", null ],
     [ "scu_dma_update_t", "group__SCU__DMA.html#gafef467055dc78e0fd25a48a8c2a522b5", null ],
@@ -47,6 +49,11 @@ var group__SCU__DMA =
     [ "scu_dma_mode", "group__SCU__DMA.html#ga646cf5f03cabed68f52c4db84c3fa9d9", [
       [ "SCU_DMA_MODE_DIRECT", "group__SCU__DMA.html#gga646cf5f03cabed68f52c4db84c3fa9d9a047360d4c79cb4132777c0e4a8b77b66", null ],
       [ "SCU_DMA_MODE_INDIRECT", "group__SCU__DMA.html#gga646cf5f03cabed68f52c4db84c3fa9d9a4b166ce7fb023724a21308e2a5f485cc", null ]
+    ] ],
+    [ "scu_dma_space", "group__SCU__DMA.html#gae431ded6d78ef9d2f4c483b4c488e0e3", [
+      [ "SCU_DMA_SPACE_BUS_A", "group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3aaf286a7b35bed1a1adf9e22f6968d639", null ],
+      [ "SCU_DMA_SPACE_BUS_B", "group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3a7777005e86b3fc90ce637cf99d9b4498", null ],
+      [ "SCU_DMA_SPACE_BUS_CPU", "group__SCU__DMA.html#ggae431ded6d78ef9d2f4c483b4c488e0e3ae1d5b4667e32820e60dcb0a4c8389e6f", null ]
     ] ],
     [ "scu_dma_start_factor", "group__SCU__DMA.html#ga4febb0015abc02fe8c8d437e6fe54ed3", [
       [ "SCU_DMA_START_FACTOR_VBLANK_IN", "group__SCU__DMA.html#gga4febb0015abc02fe8c8d437e6fe54ed3a76dbd5462b139d36f04474d6aef95485", null ],
@@ -89,5 +96,7 @@ var group__SCU__DMA =
     [ "scu_dma_level_unused_get", "group__SCU__DMA.html#gaa1bd8521a7f89294e3d80773fd15241f", null ],
     [ "scu_dma_level_wait", "group__SCU__DMA.html#ga7aee9c9fc4a46ca9162f26e25d20068a", null ],
     [ "scu_dma_status_get", "group__SCU__DMA.html#ga602d7482bd129a706bcfe8b140e47036", null ],
-    [ "scu_dma_stop", "group__SCU__DMA.html#gad8f88dfe133c9dc4b6f301d6f01cf094", null ]
+    [ "scu_dma_stop", "group__SCU__DMA.html#gad8f88dfe133c9dc4b6f301d6f01cf094", null ],
+    [ "scu_dma_transfer", "group__SCU__DMA.html#ga4905fc353e326e36e183171b7e9f56d8", null ],
+    [ "scu_dma_transfer_wait", "group__SCU__DMA.html#ga8bd616f77daa39b719140d5cf6f3a38e", null ]
 ];
