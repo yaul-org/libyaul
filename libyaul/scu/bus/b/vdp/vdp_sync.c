@@ -320,6 +320,16 @@ vdp1_sync_interval_set(int8_t interval)
         } else if (interval < 0) {
                 mode = VDP1_INTERVAL_MODE_VARIABLE;
 
+                /* Normalize the frame rate:
+                 *  0: no frame rate cap
+                 *  1: cap at 30Hz
+                 *  2: cap at 20Hz
+                 *  3: cap at 15Hz
+                 *  4: cap at 12Hz
+                 *  6: cap at 10Hz */
+                _state.vdp1.frame_rate = -interval - 1;
+                _state.vdp1.frame_count = 0;
+
                 MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
         } else {
                 mode = VDP1_INTERVAL_MODE_FIXED;
