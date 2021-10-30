@@ -11,6 +11,7 @@
 #include <sys/cdefs.h>
 
 #include <stdint.h>
+#include <string.h>
 
 #include <int16.h>
 
@@ -259,48 +260,274 @@ extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t);
 extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *);
 extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
 extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *,
-    const vdp1_cmdt_t *, const uint16_t);
+    const vdp1_cmdt_t *, uint16_t);
 
-extern void vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_polygon_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_polyline_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_line_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_local_coord_set(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_end_clear(vdp1_cmdt_t *cmdt);
-extern void vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt);
+static inline void __always_inline
+vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
+    vdp1_cmdt_draw_mode_t draw_mode)
+{
+        /* Values 0x4, 0x5, 0x6 for comm indicate a non-textured command table,
+         * and we want to set the bits 7 and 6 without branching */
+        const uint16_t comm = (cmdt->cmd_ctrl & 0x0004);
+        const uint16_t pmod_bits = (comm << 5) | (comm << 4);
 
-extern void vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *, vdp1_cmdt_draw_mode_t);
-extern void vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *, vdp1_cmdt_zoom_point_t);
-extern void vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *, vdp1_vram_t);
-extern void vdp1_cmdt_param_color_set(vdp1_cmdt_t *, color_rgb1555_t);
-extern void vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *, vdp1_vram_t);
-extern void vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *, vdp1_cmdt_color_bank_t);
-extern void vdp1_cmdt_param_size_set(vdp1_cmdt_t *, uint16_t, uint16_t);
-extern void vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *, bool);
-extern void vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *, bool);
-extern void vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *, uint16_t, const int16_vec2_t *);
-extern void vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *, const int16_vec2_t *);
-extern void vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *, vdp1_vram_t);
+        cmdt->cmd_pmod = pmod_bits | draw_mode.raw;
+}
 
-extern void vdp1_cmdt_jump_clear(vdp1_cmdt_t *);
+static inline void __always_inline
+vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_zoom_point_t zoom_point)
+{
+        cmdt->cmd_ctrl &= 0xF0F0;
+        cmdt->cmd_ctrl |= (zoom_point << 8) | 0x0001;
+}
 
-extern void vdp1_cmdt_jump_assign(vdp1_cmdt_t *, vdp1_link_t);
-extern void vdp1_cmdt_jump_call(vdp1_cmdt_t *, vdp1_link_t);
-extern void vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *, vdp1_link_t);
-extern void vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *, vdp1_link_t);
+static inline void __always_inline
+vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+{
+        cmdt->cmd_srca = (base >> 3) & 0xFFFF;
+}
 
-extern void vdp1_cmdt_jump_next(vdp1_cmdt_t *);
-extern void vdp1_cmdt_jump_return(vdp1_cmdt_t *);
-extern void vdp1_cmdt_jump_skip_next(vdp1_cmdt_t *);
-extern void vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *);
+static inline void __always_inline
+vdp1_cmdt_param_color_set(vdp1_cmdt_t *cmdt, color_rgb1555_t color)
+{
+        cmdt->cmd_colr = color.raw;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *cmdt,
+    const vdp1_cmdt_color_bank_t color_bank)
+{
+        cmdt->cmd_colr = color_bank.raw;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *cmdt,
+    const vdp1_cmdt_color_bank_t color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_colr = color_bank.raw & 0xFFF0;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0008;
+        cmdt->cmd_colr = (uint16_t)((base >> 3) & 0xFFFF);
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *cmdt,
+    vdp1_cmdt_color_bank_t color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0010;
+        cmdt->cmd_colr = color_bank.raw & 0xFFF0;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
+    vdp1_cmdt_color_bank_t color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0018;
+        cmdt->cmd_colr = color_bank.raw & 0xFF80;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *cmdt,
+    vdp1_cmdt_color_bank_t color_bank)
+{
+        cmdt->cmd_pmod &= 0xFFC7;
+        cmdt->cmd_pmod |= 0x0020;
+        cmdt->cmd_colr = color_bank.raw & 0xFF00;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_size_set(vdp1_cmdt_t *cmdt, uint16_t width, uint16_t height)
+{
+        cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_horizontal_flip_set(vdp1_cmdt_t *cmdt, bool flip)
+{
+        cmdt->cmd_ctrl &= 0xFFEF;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x0001) << 4;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_vertical_flip_set(vdp1_cmdt_t *cmdt, bool flip)
+{
+        cmdt->cmd_ctrl &= 0xFFDF;
+        cmdt->cmd_ctrl |= ((uint16_t)flip & 0x0001) << 5;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *cmdt,
+    uint16_t vertex_index,
+    const int16_vec2_t *p)
+{
+        int16_vec2_t * const vertex =
+            (int16_vec2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
+
+        vertex->x = p->x;
+        vertex->y = p->y;
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vec2_t *p)
+{
+        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vec2_t) * 4);
+}
+
+static inline void __always_inline
+vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+{
+        /* Gouraud shading processing is valid when a color calculation mode is
+         * specified */
+        cmdt->cmd_grda = (base >> 3) & 0xFFFF;
+}
+
+static inline void __always_inline
+vdp1_cmdt_normal_sprite_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0000;
+}
+
+static inline void __always_inline
+vdp1_cmdt_scaled_sprite_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0001;
+}
+
+static inline void __always_inline
+vdp1_cmdt_distorted_sprite_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0002;
+}
+
+static inline void __always_inline
+vdp1_cmdt_polygon_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0004;
+}
+
+static inline void __always_inline
+vdp1_cmdt_polyline_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0005;
+}
+
+static inline void __always_inline
+vdp1_cmdt_line_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0006;
+}
+
+static inline void __always_inline
+vdp1_cmdt_user_clip_coord_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0008;
+}
+
+static inline void __always_inline
+vdp1_cmdt_system_clip_coord_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x0009;
+}
+
+static inline void __always_inline
+vdp1_cmdt_local_coord_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x7FF0;
+        cmdt->cmd_ctrl |= 0x000A;
+}
+
+static inline void __always_inline
+vdp1_cmdt_end_clear(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= ~0x8000;
+}
+
+static inline void __always_inline
+vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl |= 0x8000;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_clear(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x1000;
+        cmdt->cmd_link = index << 2;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x2000;
+        cmdt->cmd_link = index << 2;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x5000;
+        cmdt->cmd_link = index << 2;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x6000;
+        cmdt->cmd_link = index << 2;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_next(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_return(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x3000;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_next(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x4000;
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *cmdt)
+{
+        cmdt->cmd_ctrl &= 0x8FFF;
+        cmdt->cmd_ctrl |= 0x7000;
+}
 
 __END_DECLS
 
