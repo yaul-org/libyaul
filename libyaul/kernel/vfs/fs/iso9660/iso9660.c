@@ -10,6 +10,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <math.h>
+
 #include <cd-block.h>
 
 #include <scu/map.h>
@@ -25,7 +27,7 @@ static struct {
 static inline uint32_t __always_inline
 _length_sector_round(uint32_t length)
 {
-        return ((length + 0x07FF) >> 11);
+        return (uint32_pow2_round(length, 11) / ISO9660_SECTOR_SIZE);
 }
 
 static void _dirent_root_walk(iso9660_filelist_walk_t, void *);
