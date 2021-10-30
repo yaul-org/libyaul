@@ -69,14 +69,14 @@ uint32_loop_log2(uint32_t value)
         l = 0;
 
         while ((value >> l) > 1) {
-                ++l;
+                l++;
         }
 
         return l;
 }
 
 uint32_t
-uint32_pow2(uint32_t value)
+uint32_pow2_round_next(uint32_t value)
 {
         value--;
         value |= value >> 1;
