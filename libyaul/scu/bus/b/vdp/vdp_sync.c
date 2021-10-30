@@ -35,14 +35,12 @@
 #define SYNC_FLAG_INTERLACE_DOUBLE      (1 << 3)
 #define SYNC_FLAG_MASK                  (0x0F)
 
-#define VDP1_INTERVAL_MODE_AUTO         (0x00)
-#define VDP1_INTERVAL_MODE_FIXED        (1 << 0)
-#define VDP1_INTERVAL_MODE_VARIABLE     (1 << 1)
-#define VDP1_INTERVAL_MODE_MASK         (0x03)
+#define VDP1_INTERVAL_MODE_AUTO         (0)
+#define VDP1_INTERVAL_MODE_FIXED        (1)
+#define VDP1_INTERVAL_MODE_VARIABLE     (2)
 
-#define VDP1_FB_MODE_ERASE_CHANGE       (0x00)
-#define VDP1_FB_MODE_CHANGE_ONLY        (1 << 0)
-#define VDP1_FB_MODE_MASK               (0x01)
+#define VDP1_FB_MODE_ERASE_CHANGE       (0)
+#define VDP1_FB_MODE_CHANGE_ONLY        (1)
 
 #define VDP1_FLAG_IDLE                  (0x00)
 #define VDP1_FLAG_REQUEST_XFER_LIST     (1 << 0) /* VDP1 request to transfer list */
@@ -102,7 +100,8 @@ struct vdp1_state {
         unsigned int interval_mode:2;
         unsigned int previous_fb_mode:1;
         unsigned int fb_mode:1;
-        unsigned int frame_rate:6; /* XXX: Not yet used -- used to keep a locked frame rate */
+        unsigned int frame_rate:5;
+        int8_t frame_count;
         const struct vdp1_mode_table *current_mode;
 } __aligned(4);
 
@@ -314,17 +313,21 @@ vdp1_sync_interval_set(int8_t interval)
 
         MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
 
-        /* XXX: This should take into account PAL systems */
-        if ((interval == VDP1_SYNC_INTERVAL_60HZ) || (interval > 60)) {
+        if (interval == 0) {
                 mode = VDP1_INTERVAL_MODE_AUTO;
 
                 MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
-        } else if (interval <= VDP1_SYNC_INTERVAL_VARIABLE) {
+        } else if (interval < 0) {
                 mode = VDP1_INTERVAL_MODE_VARIABLE;
 
                 MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
         } else {
                 mode = VDP1_INTERVAL_MODE_FIXED;
+
+                _state.vdp1.frame_rate = interval;
+                _state.vdp1.frame_count = 0;
+
+                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
         }
 
         _state.vdp1.interval_mode = mode;
@@ -565,11 +568,13 @@ _vdp1_init(void)
         _state.vdp1.field_count = 0;
         _state.vdp1.previous_fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
         _state.vdp1.fb_mode = VDP1_FB_MODE_ERASE_CHANGE;
+        _state.vdp1.frame_rate = 0;
+        _state.vdp1.frame_count = 0;
 
         _state.vdp1.interval_mode = VDP1_INTERVAL_MODE_AUTO;
 
         vdp1_sync_mode_set(VDP1_SYNC_MODE_ERASE_CHANGE);
-        vdp1_sync_interval_set(VDP1_SYNC_INTERVAL_60HZ);
+        vdp1_sync_interval_set(0);
 
         scu_dma_config_buffer(&_vdp1_dma_handle, &dma_cfg);
         scu_dma_config_buffer(&_vdp1_orderlist_dma_handle, &orderlist_dma_cfg);
@@ -718,26 +723,99 @@ _vdp1_mode_auto_vblank_out(void)
 static void
 _vdp1_mode_fixed_dma(void)
 {
+        _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
 }
 
 static void
 _vdp1_mode_fixed_sync_commit(void)
 {
+        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_PLOT);
 }
 
 static void
 _vdp1_mode_fixed_sprite_end(void)
 {
+        if ((_state.vdp1.flags & VDP1_FLAG_LIST_COMMITTED) != VDP1_FLAG_LIST_COMMITTED) {
+                _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
+
+                callback_call(&_user_vdp1_sync_callback);
+        }
 }
 
 static void
 _vdp1_mode_fixed_vblank_in(void)
 {
+        /* Cache the state to avoid multiple loads */
+        uint8_t state_vdp1_flags;
+        state_vdp1_flags = _state.vdp1.flags;
+
+        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_COMMIT_LIST) != VDP1_FLAG_REQUEST_COMMIT_LIST) {
+                return;
+        }
+
+        const vdp1_transfer_status_t transfer_status =
+            vdp1_transfer_status_get();
+
+        if (transfer_status.cef) {
+                _vdp1_sprite_end_call();
+        }
+
+        if ((_state.vdp1.frame_count + 1) == _state.vdp1.frame_rate) {
+                /* One frame before matching the frame rate, call to erase the
+                 * display frame buffer so that by the next frame we can call to
+                 * change frame buffers */
+                if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
+                        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+
+                        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+                        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM);
+                }
+        } else if (_state.vdp1.frame_count == _state.vdp1.frame_rate) {
+                /* Undo the increment at the end of function */
+                _state.vdp1.frame_count = -1;
+
+                /* Force stop plotting */
+                if (((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) != VDP1_FLAG_LIST_COMMITTED) &&
+                    !transfer_status.cef) {
+                        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
+
+                        _vdp1_sprite_end_call();
+                }
+
+                state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
+
+                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+        }
+
+        _state.vdp1.flags = state_vdp1_flags;
+
+        _state.vdp1.frame_count++;
 }
 
 static void
 _vdp1_mode_fixed_vblank_out(void)
 {
+        uint8_t state_vdp1_flags;
+        state_vdp1_flags = _state.vdp1.flags;
+
+        if ((state_vdp1_flags & VDP1_FLAG_CHANGED) == VDP1_FLAG_CHANGED) {
+                return;
+        }
+
+        /* Wait until scanline #0 is reached to avoid the frame buffer change
+         * from aborting plotting, resulting in a soft lock.
+         *
+         * This is for the case when a request to plot is started immediately
+         * following the VBLANK-OUT interrupt */
+        vdp2_tvmd_vcount_wait(0);
+
+        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) == VDP1_FLAG_REQUEST_CHANGE) {
+                _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
+
+                state_vdp1_flags &= ~VDP1_FLAG_MASK;
+        }
+
+        _state.vdp1.flags = state_vdp1_flags;
 }
 
 static void
@@ -882,10 +960,9 @@ _vdp2_sync_commit(void)
         }
 
         _state.vdp2.commit_level = level;
+        _state.vdp2.flags = state_vdp2_flags;
 
         _internal_vdp2_commit(level);
-
-        _state.vdp2.flags = state_vdp2_flags;
 
         DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
@@ -924,6 +1001,7 @@ static void
 _vblank_in_handler(void)
 {
         DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
+
         DEBUG_PRINTF("_state.vdp1.flags: 0x%02X\n", _state.vdp1.flags);
 
         uint8_t state_flags;

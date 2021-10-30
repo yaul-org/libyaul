@@ -17,11 +17,6 @@
 
 __BEGIN_DECLS
 
-/// Not yet documented.
-#define VDP1_SYNC_INTERVAL_60HZ         (0)
-/// Not yet documented.
-#define VDP1_SYNC_INTERVAL_VARIABLE     (-1)
-
 #define vdp1_sync_commit_clear() do {                                          \
         vdp1_sync_commit_set(NULL, NULL);                                      \
 } while (false)
@@ -89,6 +84,7 @@ extern void vdp1_sync(void);
 extern bool vdp1_sync_busy(void);
 extern void vdp1_sync_wait(void);
 
+/// @htmlinclude vdp1_sync_interval_table.html
 extern void vdp1_sync_interval_set(int8_t interval);
 extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
