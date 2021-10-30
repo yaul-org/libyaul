@@ -23,8 +23,10 @@ __BEGIN_DECLS
         vdp_sync_vblank_out_set(NULL, NULL);                                   \
 } while (false)
 
-extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler, void *work);
-extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work);
+extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler,
+    void *work);
+extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler,
+    void *work);
 
 __END_DECLS
 
