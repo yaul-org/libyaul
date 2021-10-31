@@ -41,8 +41,7 @@ void
 vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t horizontal,
     vdp2_tvmd_vert_t vertical)
 {
-        uint32_t sys_clock;
-        sys_clock = bios_clock_speed_get();
+        const uint32_t sys_clock = bios_clock_speed_get();
 
         uint16_t width;
         uint16_t height;
@@ -82,53 +81,49 @@ vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t hori
                 break;
         }
 
-        uint16_t clock_freq;
-        clock_freq = CPU_CLOCK_SPEED_26MHZ;
+        uint16_t clock_speed;
+        clock_speed = CPU_CLOCK_SPEED_26MHZ;
 
         _state_vdp2()->regs->tvmd &= 0xFFF0;
 
         switch (horizontal) {
         case VDP2_TVMD_HORZ_NORMAL_A:
                 width = 320;
-                clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 break;
         case VDP2_TVMD_HORZ_NORMAL_B:
                 width = 352;
-                clock_freq = CPU_CLOCK_SPEED_28MHZ;
+                clock_speed = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0001;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_A:
                 width = 640;
-                clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0002;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_B:
                 width = 704;
-                clock_freq = CPU_CLOCK_SPEED_28MHZ;
+                clock_speed = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0003;
                 break;
         case VDP2_TVMD_HORZ_NORMAL_AE:
                 width = 320;
                 height = 480;
-                clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0004;
                 break;
         case VDP2_TVMD_HORZ_NORMAL_BE:
                 width = 352;
                 height = 480;
-                clock_freq = CPU_CLOCK_SPEED_28MHZ;
+                clock_speed = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0005;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_AE:
                 width = 640;
                 height = 480;
-                clock_freq = CPU_CLOCK_SPEED_26MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0006;
                 break;
         case VDP2_TVMD_HORZ_HIRESO_BE:
                 width = 704;
                 height = 480;
-                clock_freq = CPU_CLOCK_SPEED_28MHZ;
+                clock_speed = CPU_CLOCK_SPEED_28MHZ;
                 _state_vdp2()->regs->tvmd |= 0x0007;
                 break;
         default:
@@ -136,14 +131,13 @@ vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t hori
                 break;
         }
 
-        /* Update state */
         _state_vdp2()->tv.resolution.x = width;
         _state_vdp2()->tv.resolution.y = height;
 
         /* If clock frequency is not set, change to the correct
          * frequency */
-        if (sys_clock != clock_freq) {
-                bios_clock_speed_chg(clock_freq);
+        if (sys_clock != clock_speed) {
+                bios_clock_speed_chg(clock_speed);
         }
 }
 
