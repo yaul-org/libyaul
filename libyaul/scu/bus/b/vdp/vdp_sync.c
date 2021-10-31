@@ -745,8 +745,13 @@ _vdp1_mode_fixed_sync_commit(void)
 static void
 _vdp1_mode_fixed_sprite_end(void)
 {
-        if ((_state.vdp1.flags & VDP1_FLAG_LIST_COMMITTED) != VDP1_FLAG_LIST_COMMITTED) {
-                _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
+        uint8_t state_vdp1_flags;
+        state_vdp1_flags = _state.vdp1.flags;
+
+        if ((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) != VDP1_FLAG_LIST_COMMITTED) {
+                state_vdp1_flags |= VDP1_FLAG_LIST_COMMITTED;
+
+                _state.vdp1.flags = state_vdp1_flags;
 
                 callback_call(&_user_vdp1_sync_callback);
         }
@@ -766,7 +771,10 @@ _vdp1_mode_fixed_vblank_in(void)
         const vdp1_transfer_status_t transfer_status =
             vdp1_transfer_status_get();
 
-        if (transfer_status.cef) {
+        const bool list_committed =
+            ((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) == VDP1_FLAG_LIST_COMMITTED);
+
+        if (transfer_status.cef && !list_committed) {
                 _vdp1_sprite_end_call();
         }
 
@@ -785,8 +793,7 @@ _vdp1_mode_fixed_vblank_in(void)
                 _state.vdp1.frame_count = -1;
 
                 /* Force stop plotting */
-                if (((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) != VDP1_FLAG_LIST_COMMITTED) &&
-                    !transfer_status.cef) {
+                if (!list_committed && !transfer_status.cef) {
                         MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
 
                         _vdp1_sprite_end_call();
@@ -812,6 +819,10 @@ _vdp1_mode_fixed_vblank_out(void)
                 return;
         }
 
+        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) != VDP1_FLAG_REQUEST_CHANGE) {
+                return;
+        }
+
         /* Wait until scanline #0 is reached to avoid the frame buffer change
          * from aborting plotting, resulting in a soft lock.
          *
@@ -819,11 +830,9 @@ _vdp1_mode_fixed_vblank_out(void)
          * following the VBLANK-OUT interrupt */
         vdp2_tvmd_vcount_wait(0);
 
-        if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) == VDP1_FLAG_REQUEST_CHANGE) {
-                _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
+        _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
 
-                state_vdp1_flags &= ~VDP1_FLAG_MASK;
-        }
+        state_vdp1_flags &= ~VDP1_FLAG_MASK;
 
         _state.vdp1.flags = state_vdp1_flags;
 }
@@ -859,35 +868,57 @@ _vdp1_mode_variable_vblank_in(void)
                 return;
         }
 
-        if ((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) == VDP1_FLAG_LIST_COMMITTED) {
-                return;
-        }
-
         if ((state_vdp1_flags & VDP1_FLAG_REQUEST_CHANGE) == VDP1_FLAG_REQUEST_CHANGE) {
                 return;
         }
 
-        const vdp1_transfer_status_t transfer_status = vdp1_transfer_status_get();
+        const int8_t frame_rate = _state.vdp1.frame_rate;
+        int8_t frame_count;
+        frame_count = _state.vdp1.frame_count;
 
-        if (!transfer_status.cef) {
-                return;
+        const vdp1_transfer_status_t transfer_status =
+            vdp1_transfer_status_get();
+
+        const bool list_committed =
+            ((state_vdp1_flags & VDP1_FLAG_LIST_COMMITTED) == VDP1_FLAG_LIST_COMMITTED);
+
+        if (transfer_status.cef || list_committed) {
+                if (!list_committed) {
+                        _vdp1_sprite_end_call();
+                }
+
+                if ((frame_count + 1) == frame_rate) {
+                        if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
+                                _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+
+                                MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+                                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM);
+                        }
+                /* Resetting (-1 for undoing the increment at the end of
+                 * function) the frame count only when the list has been
+                 * committed is important because on the next VBLANK-IN, we need
+                 * to request to change frame buffers */
+                } else if ((frame_rate == 0) || (frame_count >= frame_rate)) {
+                        frame_count = -1;
+
+                        state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
+
+                        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+
+                        if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
+                                _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
+                        }
+
+                        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+
+                        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                }
         }
 
-        _vdp1_sprite_end_call();
-
-        state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
-
-        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
-
-        if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
-                /* Change and erase on next field */
-                _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
-        }
-
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+        frame_count++;
 
         _state.vdp1.flags = state_vdp1_flags;
+        _state.vdp1.frame_count = frame_count;
 }
 
 static void
