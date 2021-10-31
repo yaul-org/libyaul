@@ -15,10 +15,8 @@
 
 #include "dbgio-internal.h"
 
-#define STATE_IDLE                      (0x00)
-
-/* This is enough for a 320x256 character resolution */
-#define SPRINTF_BUFFER_SIZE             (1280)
+/* This is enough for a 352x256 character resolution */
+#define SPRINTF_BUFFER_SIZE (1408)
 
 static struct {
         volatile uint32_t state;
@@ -42,8 +40,6 @@ static char *_sprintf_buffer;
 void
 _internal_dbgio_init(void)
 {
-        _dbgio_state.state = STATE_IDLE;
-
         dbgio_dev_default_init(DBGIO_DEV_NULL);
 
         if (_sprintf_buffer == NULL) {
@@ -83,7 +79,6 @@ dbgio_dev_deinit(void)
 
         _dbgio_state.dev_ops->deinit();
 
-        _dbgio_state.state = STATE_IDLE;
         _dbgio_state.dev_ops = NULL;
 }
 
