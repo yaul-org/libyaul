@@ -8,6 +8,7 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,26 +18,24 @@
 
 #include "vt_parse.inc"
 
-static void _action_character_print(int);
-static void _action_escape_character_print(int);
-static void _action_csi_dispatch_print(const int8_t, const uint8_t *, const uint8_t);
+static void _action_character_print(int ch);
+static void _action_escape_character_print(int ch);
+static void _action_csi_dispatch_print(int8_t ch, const uint8_t *params,
+    uint32_t num_params);
+static inline bool _cursor_column_exceeded(int16_t x) __always_inline;
+static inline bool _cursor_row_exceeded(uint16_t y) __always_inline;
+static inline void _cursor_column_advance(int16_t x) __always_inline;
+static inline void _cursor_column_set(int16_t x) __always_inline;
+static inline void _cursor_row_advance(uint16_t y) __always_inline;
+static inline bool _cursor_row_cond_set(int16_t row) __always_inline;
+static inline void _cursor_row_set(int16_t y) __always_inline;
 
-static inline bool _cursor_column_exceeded(int16_t) __always_inline;
-static inline bool _cursor_row_exceeded(uint16_t) __always_inline;
-static inline void _cursor_column_advance(int16_t) __always_inline;
-static inline bool _cursor_column_cond_set(int16_t) __always_inline;
-static inline void _cursor_column_set(int16_t) __always_inline;
-static inline void _cursor_row_advance(uint16_t) __always_inline;
-static inline bool _cursor_row_cond_set(int16_t) __always_inline;
-static inline void _cursor_row_set(int16_t) __always_inline;
-static inline bool _cursor_cond_set(int16_t, int16_t) __always_inline;
-
-static void _vt_parser_callback(vt_parse_t *, vt_parse_action_t, int);
+static void _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action,
+    int ch);
 
 typedef struct {
         uint16_t cols;
         uint16_t rows;
-        uint16_t cell_count;
 
         struct {
                 int16_t col;
@@ -55,9 +54,6 @@ cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
 {
         assert(ops != NULL);
 
-        assert((cols >= CONS_COLS_MIN) && (cols <= CONS_COLS_MAX));
-        assert((rows >= CONS_ROWS_MIN) && (rows <= CONS_ROWS_MAX));
-
         _cons.ops.clear = ops->clear;
         _cons.ops.area_clear = ops->area_clear;
         _cons.ops.line_clear = ops->line_clear;
@@ -68,16 +64,30 @@ cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
         assert(_cons.ops.line_clear != NULL);
         assert(_cons.ops.write != NULL);
 
-        _cons.cols = cols;
-        _cons.rows = rows;
-        _cons.cell_count = cols * rows;
+        _cons.cols = 0;
+        _cons.rows = 0;
 
         _cons.cursor.col = 0;
         _cons.cursor.row = 0;
 
+        cons_resize(cols, rows);
+
         ops->clear();
 
         _vt_parse_init(&_cons.vt_parser, _vt_parser_callback);
+}
+
+void
+cons_resize(uint16_t cols, uint16_t rows)
+{
+        assert((cols >= CONS_COLS_MIN) && (cols <= CONS_COLS_MAX));
+        assert((rows >= CONS_ROWS_MIN) && (rows <= CONS_ROWS_MAX));
+
+        _cons.cols = cols;
+        _cons.rows = rows;
+
+        _cons.cursor.col = clamp(_cons.cursor.col, 0, cols - 1);
+        _cons.cursor.row = clamp(_cons.cursor.row, 0, rows - 1);
 }
 
 void
@@ -126,9 +136,8 @@ _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
 static inline bool __always_inline
 _cursor_column_exceeded(int16_t x)
 {
-        int16_t col;
+        const int16_t col = _cons.cursor.col + x;
 
-        col = _cons.cursor.col + x;
         return (col < 0) || (col >= _cons.cols);
 }
 
@@ -139,9 +148,8 @@ _cursor_column_exceeded(int16_t x)
 static inline bool __always_inline
 _cursor_row_exceeded(uint16_t y)
 {
-        int16_t row;
+        const int16_t row = _cons.cursor.row + y;
 
-        row = _cons.cursor.row + y;
         return (row < 0) || (row >= _cons.rows);
 }
 
@@ -193,38 +201,6 @@ static inline void __always_inline
 _cursor_column_set(int16_t x)
 {
         _cons.cursor.col = x;
-}
-
-/*
- * Set the cursor to COL and return TRUE iff the COL has not been exceeded.
- */
-static inline bool __always_inline
-_cursor_column_cond_set(int16_t col)
-{
-        if ((col >= 0) && (col <= _cons.cols)) {
-                _cons.cursor.col = col;
-                return true;
-        }
-
-        return false;
-}
-
-/*
- * Set both the COL and ROW of the cursor and return TRUE iff the COL and ROW
- * both have not been exceeded.
- */
-static inline bool __always_inline
-_cursor_cond_set(int16_t col, int16_t row)
-{
-        if (((col >= 0) && (col <= _cons.cols)) &&
-            ((row >= 0) && (row <= _cons.rows))) {
-                _cons.cursor.col = col;
-                _cons.cursor.row = row;
-
-                return true;
-        }
-
-        return false;
 }
 
 static void
@@ -507,7 +483,7 @@ _action_csi_k(const uint8_t *params, const uint8_t num_params)
 }
 
 static void
-_action_csi_dispatch_print(const int8_t ch, const uint8_t *params, const uint8_t num_params)
+_action_csi_dispatch_print(int8_t ch, const uint8_t *params, uint32_t num_params)
 {
         switch (ch) {
         case 'A':
