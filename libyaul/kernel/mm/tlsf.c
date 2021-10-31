@@ -739,7 +739,7 @@ static block_header_t *block_trim_free_leading(control_t *control, block_header_
 static block_header_t *block_locate_free(control_t *control, size_t size)
 {
         int fl = 0, sl = 0;
-        block_header_t *block = 0;
+        block_header_t *block = NULL;
 
         if (size) {
                 mapping_search(size, &fl, &sl);
@@ -1046,11 +1046,9 @@ int test_ffs_fls()
 tlsf_t tlsf_create(void *mem)
 {
 #if _DEBUG
-
         if (test_ffs_fls()) {
                 return 0;
         }
-
 #endif
 
         if (((tlsfptr_t)mem % ALIGN_SIZE) != 0) {
