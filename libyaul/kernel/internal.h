@@ -24,15 +24,11 @@
 
 #include <mm/tlsf.h>
 
-#define TLSF_POOL_PRIVATE       (0)
-#define TLSF_POOL_USER          (1)
-#define TLSF_POOL_COUNT         (2)
-
 struct state {
         uint8_t which;
 
-        /* Both master and slave contain their own pools */
-        tlsf_t *tlsf_pools;
+        /* Both master and slave contain their own set of handles */
+        tlsf_t *tlsf_handles;
 };
 
 static inline struct state * __always_inline
@@ -61,6 +57,11 @@ void *_internal_malloc(size_t);
 void *_internal_realloc(void *, size_t);
 void *_internal_memalign(size_t, size_t);
 void _internal_free(void *);
+
+void *_internal_user_malloc(size_t);
+void *_internal_user_realloc(void *, size_t);
+void *_internal_user_memalign(size_t, size_t);
+void _internal_user_free(void *);
 
 extern void _internal_dma_queue_init(void);
 
