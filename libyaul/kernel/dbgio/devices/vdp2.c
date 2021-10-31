@@ -41,10 +41,7 @@
 struct dev_state {
         uint8_t state;
 
-        struct dev_font_state {
-                uint8_t *cpd_buffer;
-                color_rgb1555_t *pal_buffer;
-        } font_state;
+        dbgio_vdp2_t params;
 
         /* Base CPD VRAM address */
         vdp2_vram_t cp_table;
@@ -111,9 +108,6 @@ static const dbgio_vdp2_t _default_params = {
         .cram_index    = 0
 };
 
-/* Parameters set by the user */
-static dbgio_vdp2_t _params;
-
 /* Device state for both async and direct VDP2 devices */
 static struct dev_state *_dev_state;
 
@@ -134,8 +128,7 @@ static const cons_ops_t _cons_ops = {
 static inline void __always_inline
 _pnd_write(int16_t col, int16_t row, uint16_t value)
 {
-        int16_t offset;
-        offset = col + (row * _dev_state->page_width);
+        const uint32_t offset = col + (row * _dev_state->page_width);
 
         _dev_state->page_pnd[offset] = value;
 }
@@ -228,10 +221,8 @@ _buffer_area_clear(int16_t col_start, int16_t col_end, int16_t row_start,
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        int16_t row;
-        for (row = row_start; row < row_end; row++) {
-                int16_t col;
-                for (col = col_start; col < col_end; col++) {
+        for (int16_t row = row_start; row < row_end; row++) {
+                for (int16_t col = col_start; col < col_end; col++) {
                         _pnd_clear(col, row);
                 }
         }
@@ -242,8 +233,7 @@ _buffer_line_clear(int16_t row)
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        int16_t col;
-        for (col = 0; col < _dev_state->page_width; col++) {
+        for (int16_t col = 0; col < _dev_state->page_width; col++) {
                 _pnd_clear(col, row);
         }
 }
@@ -253,8 +243,7 @@ _buffer_line_partial_clear(int16_t col_start, int16_t col_end, int16_t row)
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        int16_t col;
-        for (col = col_start; col < col_end; col++) {
+        for (int16_t col = col_start; col < col_end; col++) {
                 _pnd_clear(col, row);
         }
 }
@@ -298,11 +287,8 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
                 fg & 0x0F
         };
 
-        uint8_t cpd;
-
-        uint32_t i;
-        uint32_t j;
-        for (i = 0, j = 0; i < FONT_1BPP_CPD_SIZE; i++) {
+        for (uint32_t i = 0, j = 0; i < FONT_1BPP_CPD_SIZE; i++) {
+                uint8_t cpd;
                 cpd = cmp_cpd[i];
 
                 dec_cpd[j + 0] = _1bpp_4bpp_convert(cpd, fgbg);
@@ -320,14 +306,13 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
 static void
 _dev_state_init(const dbgio_vdp2_t *params)
 {
-        assert(params != NULL);
-
         _dev_state = _internal_malloc(sizeof(struct dev_state));
         assert(_dev_state != NULL);
 
         (void)memset(_dev_state, 0x00, sizeof(struct dev_state));
 
         _dev_state->state = STATE_IDLE;
+        _dev_state->params = *params;
 
         /* Return if we're already initialized */
         if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
@@ -352,15 +337,6 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
         _dev_state->page_pnd = _internal_malloc(_dev_state->page_size);
         assert(_dev_state->page_pnd != NULL);
-
-        struct dev_font_state * const font_state = &_dev_state->font_state;
-
-        font_state->cpd_buffer = _internal_malloc(FONT_4BPP_CPD_SIZE);
-        assert(font_state->cpd_buffer != NULL);
-
-        font_state->pal_buffer =
-            _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
-        assert(font_state->pal_buffer != NULL);
 
         _dev_state->tv_resolution = _state_vdp2()->tv.resolution;
 }
@@ -395,13 +371,15 @@ _scroll_screen_reset(void)
         /* Force reset */
         _pnd_values_update(/* force = */ false);
 
-        vdp2_scrn_priority_set(_params.scroll_screen, 7);
-        vdp2_scrn_scroll_x_set(_params.scroll_screen, FIX16(0.0f));
-        vdp2_scrn_scroll_y_set(_params.scroll_screen, FIX16(0.0f));
-        vdp2_scrn_display_set(_params.scroll_screen, /* transparent = */ true);
+        const dbgio_vdp2_t * const params = &_dev_state->params;
 
-        vdp2_vram_cycp_bank_set(_params.cpd_bank, &_params.cpd_cycp);
-        vdp2_vram_cycp_bank_set(_params.pnd_bank, &_params.pnd_cycp);
+        vdp2_scrn_priority_set(params->scroll_screen, 7);
+        vdp2_scrn_scroll_x_set(params->scroll_screen, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(params->scroll_screen, FIX16(0.0f));
+        vdp2_scrn_display_set(params->scroll_screen, /* transparent = */ true);
+
+        vdp2_vram_cycp_bank_set(params->cpd_bank, &params->cpd_cycp);
+        vdp2_vram_cycp_bank_set(params->pnd_bank, &params->pnd_cycp);
 }
 
 static inline void __always_inline
@@ -454,20 +432,7 @@ _shared_init(const dbgio_vdp2_t *params)
 
         cons_init(&_cons_ops, cols, rows);
 
-        /* Copy user's set device parameters */
-        (void)memcpy(&_params, params, sizeof(dbgio_vdp2_t));
-
         _scroll_screen_init(params);
-
-        struct dev_font_state * const font_state = &_dev_state->font_state;
-
-        _font_1bpp_4bpp_decompress(font_state->cpd_buffer,
-            params->font_cpd,
-            params->font_fg,
-            params->font_bg);
-
-        (void)memcpy(font_state->pal_buffer, params->font_pal,
-            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
 }
 
 static void
@@ -482,9 +447,6 @@ _shared_deinit(void)
         }
 
         _internal_free(_dev_state->page_pnd);
-
-        _internal_free(_dev_state->font_state.cpd_buffer);
-        _internal_free(_dev_state->font_state.pal_buffer);
 
         _internal_free(_dev_state);
 
@@ -541,18 +503,16 @@ _shared_font_load(void)
                 return;
         }
 
-        struct dev_font_state * const font_state = &_dev_state->font_state;
+        const dbgio_vdp2_t * const params = &_dev_state->params;
 
-        const uint32_t cpd_size = FONT_4BPP_CPD_SIZE;
-        const uint32_t pal_size = FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t);
+        _font_1bpp_4bpp_decompress((void *)_dev_state->cp_table,
+            params->font_cpd,
+            params->font_fg,
+            params->font_bg);
 
-        cpu_cache_area_purge(font_state->cpd_buffer, cpd_size);
-        cpu_cache_area_purge(font_state->pal_buffer, pal_size);
-
-        scu_dma_transfer(0, (void *)_dev_state->cp_table, font_state->cpd_buffer, cpd_size);
-        scu_dma_transfer(1, (void *)_dev_state->color_palette, font_state->pal_buffer, pal_size);
-        scu_dma_transfer_wait(0);
-        scu_dma_transfer_wait(1);
+        (void)memcpy((void *)_dev_state->color_palette,
+            params->font_pal,
+            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
 }
 
 #include "vdp2.inc"
