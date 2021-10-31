@@ -47,9 +47,9 @@ struct dev_state {
         } font_state;
 
         /* Base CPD VRAM address */
-        uint32_t cp_table;
+        vdp2_vram_t cp_table;
         /* Base palette CRAM address */
-        uint32_t color_palette;
+        vdp2_cram_t color_palette;
 
         /* Base page VRAM address */
         uint32_t page_base;
@@ -59,13 +59,15 @@ struct dev_state {
         uint16_t page_width;
         uint16_t page_height;
 
-        uint8_t cram_mode;
+        vdp2_cram_mode_t cram_mode;
 
         /* PND value */
         uint16_t pnd_value;
 
         /* PND value for clearing a page */
         uint16_t pnd_value_clear;
+
+        int16_vec2_t tv_resolution;
 };
 
 /* Restrictions:
@@ -147,7 +149,7 @@ _pnd_clear(int16_t col, int16_t row)
 static void
 _pnd_values_update(bool force)
 {
-        const uint8_t cram_mode = vdp2_cram_mode_get();
+        const vdp2_cram_mode_t cram_mode = vdp2_cram_mode_get();
 
         if (!force && (_dev_state->cram_mode != cram_mode)) {
                 return;
@@ -359,6 +361,8 @@ _dev_state_init(const dbgio_vdp2_t *params)
         font_state->pal_buffer =
             _internal_malloc(FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
         assert(font_state->pal_buffer != NULL);
+
+        _dev_state->tv_resolution = _state_vdp2()->tv.resolution;
 }
 
 static inline void __always_inline
@@ -445,7 +449,10 @@ _shared_init(const dbgio_vdp2_t *params)
                 return;
         }
 
-        cons_init(&_cons_ops, CONS_COLS_MIN, CONS_ROWS_MIN);
+        const uint16_t cols = _dev_state->tv_resolution.x / FONT_CHAR_WIDTH;
+        const uint16_t rows = _dev_state->tv_resolution.y / FONT_CHAR_HEIGHT;
+
+        cons_init(&_cons_ops, cols, rows);
 
         /* Copy user's set device parameters */
         (void)memcpy(&_params, params, sizeof(dbgio_vdp2_t));
@@ -498,11 +505,26 @@ _shared_puts(const char *buffer)
         /* It's the best we can do for now. If the current buffer is marked for
          * flushing, we have to silently drop any calls to write to the
          * buffer */
-        uint8_t state_mask;
-        state_mask = STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
+        const uint8_t state_mask =
+            STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
 
         if ((_dev_state->state & state_mask) == STATE_BUFFER_FLUSHING) {
                 return;
+        }
+
+        int16_vec2_t * const tv_resolution =
+            &_dev_state->tv_resolution;
+        const int16_vec2_t * const vdp2_tv_resolution =
+            &_state_vdp2()->tv.resolution;
+
+        if ((tv_resolution->x != vdp2_tv_resolution->x) ||
+            (tv_resolution->y != vdp2_tv_resolution->y)) {
+                *tv_resolution = *vdp2_tv_resolution;
+
+                const uint16_t cols = tv_resolution->x / FONT_CHAR_WIDTH;
+                const uint16_t rows = tv_resolution->y / FONT_CHAR_HEIGHT;
+
+                cons_resize(cols, rows);
         }
 
         cons_buffer(buffer);
