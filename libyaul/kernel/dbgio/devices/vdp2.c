@@ -207,6 +207,8 @@ _buffer_clear(void)
         dmac_cfg.src = _dev_state->pnd_value_clear;
         dmac_cfg.len = _dev_state->page_size;
 
+        /* Force enable DMAC, in case cpu_dmac_stop() is called */
+        cpu_dmac_enable();
         cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
         cpu_dmac_channel_config_set(&dmac_cfg);
         cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
@@ -314,11 +316,6 @@ _dev_state_init(const dbgio_vdp2_t *params)
         _dev_state->state = STATE_IDLE;
         _dev_state->params = *params;
 
-        /* Return if we're already initialized */
-        if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
-                return;
-        }
-
         _dev_state->page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
         _dev_state->page_width = VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
         _dev_state->page_height = VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
@@ -421,11 +418,6 @@ _shared_init(const dbgio_vdp2_t *params)
         _assert_shared_init(params);
 
         _dev_state_init(params);
-
-        /* Return if we're already initialized */
-        if ((_dev_state->state & STATE_INITIALIZED) == STATE_INITIALIZED) {
-                return;
-        }
 
         const uint16_t cols = _dev_state->tv_resolution.x / FONT_CHAR_WIDTH;
         const uint16_t rows = _dev_state->tv_resolution.y / FONT_CHAR_HEIGHT;

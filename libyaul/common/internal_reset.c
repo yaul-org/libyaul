@@ -18,12 +18,21 @@
 
 #include <vdp.h>
 
+#include <sys/dma-queue.h>
+
 void
 _internal_reset(void)
 {
         cpu_intc_mask_set(15);
 
+        scu_ic_mask_set(SCU_IC_MASK_ALL);
+
         scu_dma_stop();
+
+        dma_queue_tag_clear(DMA_QUEUE_TAG_IMMEDIATE);
+        dma_queue_tag_clear(DMA_QUEUE_TAG_VBLANK_IN);
+        dma_queue_tag_clear(DMA_QUEUE_TAG_VBLANK_OUT);
+
         scu_dsp_program_stop();
 
         cpu_dmac_stop();
