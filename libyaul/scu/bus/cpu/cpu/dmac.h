@@ -151,10 +151,10 @@ typedef struct cpu_dmac_status {
 ///
 /// There is no waiting if the CPU-DMAC or the specific channel @p ch is
 /// operating.
-/// 
+///
 /// While this function resets the transfer length, it does not start the
 /// transfer again. For that, use @ref cpu_dmac_channel_start.
-/// 
+///
 /// @param ch       The channel.
 /// @param tcr_bits The 4-byte I/O register value.
 ///
@@ -263,7 +263,7 @@ extern void cpu_dmac_status_get(cpu_dmac_status_t *status);
 /// The CPU-DMAC channel is forcefully stopped upon starting the configuration.
 /// If the channel is currently operating, use @ref cpu_dmac_channel_wait to
 /// wait until the transfer is complete.
-/// 
+///
 /// @param[in] cfg The CPU-DMAC transfer configuration.
 ///
 /// @see cpu_dmac_channel_start

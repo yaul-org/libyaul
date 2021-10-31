@@ -23,16 +23,17 @@ _assert(const char * restrict file, const char * restrict line,
     const char * restrict failed_expr)
 {
         /* In the case where we fail an assertion within _assert() */
-        static uint32_t assertion_count = 0;
+        static int32_t assertion_count = -1;
 
         if (assertion_count >= ASSERTION_MAX_COUNT) {
                 abort();
         }
 
+        assertion_count++;
+
         if (assertion_count == 0) {
                 _internal_reset();
 
-                dbgio_dev_deinit();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2);
 
                 vdp2_tvmd_vblank_in_next_wait(1);
@@ -40,13 +41,9 @@ _assert(const char * restrict file, const char * restrict line,
                 dbgio_dev_font_load();
 
                 dbgio_puts("[H[2J");
-        }
-
-        if (assertion_count > 0) {
+        } else {
                 dbgio_puts("\n");
         }
-
-        assertion_count++;
 
         dbgio_puts("Assertion \"");
         dbgio_puts(failed_expr);

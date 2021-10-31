@@ -187,7 +187,8 @@ cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
         }
 
         /* TE bit will always be set upon normal or abnormal transfer */
-        while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000);
+        while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000) {
+        }
 }
 
 static callback_t *
