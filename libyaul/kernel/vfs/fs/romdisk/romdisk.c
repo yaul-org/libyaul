@@ -87,14 +87,13 @@ romdisk_init(void)
 void *
 romdisk_mount(const uint8_t *image)
 {
-        struct romdisk_hdr *hdr;
-        struct rd_image *mnt;
-
         if (strncmp((char *)image, ROMFS_MAGIC, 8)) {
                 return NULL;
         }
 
-        hdr = (struct romdisk_hdr *)image;
+        struct romdisk_hdr * const hdr = (struct romdisk_hdr *)image;
+
+        struct rd_image *mnt;
         if ((mnt = (struct rd_image *)_internal_malloc(sizeof(struct rd_image))) == NULL) {
                 return NULL;
         }
@@ -110,20 +109,18 @@ romdisk_mount(const uint8_t *image)
 void *
 romdisk_open(void *fh, const char *filename)
 {
-        const struct romdisk_file *f_hdr;
+        struct rd_image * const mnt = (struct rd_image *)fh;
+
+        const bool directory = false;
+
         uint32_t f_idx;
-        bool directory;
-
-        struct rd_image *mnt;
-        mnt = (struct rd_image *)fh;
-
-        directory = false;
         if ((f_idx = _romdisk_find(mnt, filename, directory)) == 0) {
                 /* errno = ENOENT; */
                 return NULL;
         }
 
-        f_hdr = (const struct romdisk_file *)(mnt->image + f_idx);
+        const struct romdisk_file * const f_hdr =
+            (const struct romdisk_file *)(mnt->image + f_idx);
 
         struct rd_file_handle *internal_fh;
         if ((internal_fh = _romdisk_fd_alloc()) == NULL) {
@@ -246,11 +243,13 @@ romdisk_seek(void *fh, off_t offset, int whence)
         }
 
         /* Check bounds */
-        if(internal_fh->ptr < 0)
+        if (internal_fh->ptr < 0) {
                 internal_fh->ptr = 0;
+        }
 
-        if(internal_fh->ptr > (int32_t)internal_fh->len)
+        if (internal_fh->ptr > (int32_t)internal_fh->len) {
                 internal_fh->ptr = internal_fh->len;
+        }
 
         return internal_fh->ptr;
 }
@@ -316,25 +315,27 @@ _romdisk_find_object(struct rd_image *mnt, const char *filename,
                 f_hdr = (const struct romdisk_file *)(mnt->image + offset);
                 next_ofs = f_hdr->next_header;
 
-                /* Since the file headers begin always at a 16 byte
-                 * boundary, the lowest 4 bits would be always zero in
-                 * the next filehdr pointer
+                /* Since the file headers begin always at a 16 byte boundary,
+                 * the lowest 4 bits would be always zero in the next filehdr
+                 * pointer
                  *
                  * These four bits are used for the mode information */
 
-                /* Bits 0..2 specify the type of the file; while bit 4
-                 * shows if the file is executable or not */
+                /* Bits 0..2 specify the type of the file; while bit 4 shows if
+                 * the file is executable or not */
                 type = TYPE_GET(next_ofs);
                 next_ofs &= 0xFFFFFFF0;
 
                 /* Check filename */
                 if ((strlen(f_hdr->filename) == filename_len) &&
                     ((strncmp(f_hdr->filename, filename, filename_len)) == 0)) {
-                        if (directory && (IS_TYPE(type) == TYPE_DIRECTORY))
+                        if (directory && (IS_TYPE(type) == TYPE_DIRECTORY)) {
                                 return offset;
+                        }
 
-                        if (!directory && (IS_TYPE(type) == TYPE_REGULAR_FILE))
+                        if (!directory && (IS_TYPE(type) == TYPE_REGULAR_FILE)) {
                                 return offset;
+                        }
 
                         return 0;
                 }
@@ -349,27 +350,31 @@ _romdisk_find_object(struct rd_image *mnt, const char *filename,
 static uint32_t
 _romdisk_find(struct rd_image *mnt, const char *filename, bool directory)
 {
-        const char *fn_cur;
-        uint32_t ofs;
         int fn_len;
-        const struct romdisk_file *f_hdr;
 
-        fn_cur = NULL;
+        const char *current_filename;
+        current_filename = NULL;
+
+        uint32_t ofs;
         ofs = mnt->files;
 
         /* Traverse directories */
-        while ((fn_cur = strchr(filename, '/'))) {
-                if (fn_cur != filename) {
-                        fn_len = fn_cur - filename;
-                        if ((ofs = _romdisk_find_object(mnt,
-                                    filename, fn_len, /* directory = */ true, ofs)) == 0)
-                                return 0;
+        while ((current_filename = strchr(filename, '/'))) {
+                if (current_filename != filename) {
+                        fn_len = current_filename - filename;
 
-                        f_hdr = (const struct romdisk_file *)(mnt->image + ofs);
+                        ofs = _romdisk_find_object(mnt, filename, fn_len, /* directory = */ true, ofs);
+                        if (ofs == 0) {
+                                return 0;
+                        }
+
+                        const struct romdisk_file * const f_hdr =
+                            (const struct romdisk_file *)(mnt->image + ofs);
+
                         ofs = f_hdr->spec_info;
                 }
 
-                filename = fn_cur + 1;
+                filename = current_filename + 1;
         }
 
         /* Locate the file under the resultant directory */
@@ -385,8 +390,8 @@ _romdisk_find(struct rd_image *mnt, const char *filename, bool directory)
 static struct rd_file_handle *
 _romdisk_fd_alloc(void)
 {
-        struct rd_file_handle *fh;
-        fh = (struct rd_file_handle *)_internal_malloc(sizeof(struct rd_file_handle));
+        struct rd_file_handle * const fh =
+            (struct rd_file_handle *)_internal_malloc(sizeof(struct rd_file_handle));
 
         if (fh == NULL) {
                 return NULL;
