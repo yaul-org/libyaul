@@ -66,7 +66,8 @@ LIB_SRCS+= \
 	kernel/sys/dma-queue.c \
 	kernel/sys/callback-list.c \
 	\
-	kernel/mm/memb.c
+	kernel/mm/memb.c \
+	kernel/mm/mm_stats.c
 
 # TLSF is required
 LIB_SRCS+= \
@@ -287,11 +288,13 @@ INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/
+	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:mm_stats.h:yaul/mm/
 
-# TLSF is required
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:tlsf.h:yaul/mm/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/

@@ -62,6 +62,7 @@
 #include <math.h>
 
 #include <mm/memb.h>
+#include <mm/mm_stats.h>
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
