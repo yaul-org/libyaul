@@ -11,12 +11,14 @@
 
 #include <cpu/cache.h>
 
+#define CALCULATE_PURGE_ADDRESS(x)                                             \
+    (CPU_CACHE_PURGE | ((uintptr_t)(x) & ~(CPU_CACHE_LINE_SIZE - 1)))
+
 void __section(".uncached")
 cpu_cache_line_purge(void *address)
 {
         volatile uint32_t * const purge_address =
-            (volatile uint32_t *)(CPU_CACHE_PURGE |
-                                  ((uintptr_t)address & ~CPU_CACHE_LINE_SIZE));
+            (volatile uint32_t *)CALCULATE_PURGE_ADDRESS(address);
 
         *purge_address = 0x00000000;
 }
@@ -28,8 +30,7 @@ cpu_cache_area_purge(void *address, uint32_t len)
             uint32_pow2_round(len, 4) / CPU_CACHE_LINE_SIZE;
 
         volatile uint32_t *purge_address;
-        purge_address = (volatile uint32_t *)(CPU_CACHE_PURGE |
-                                              ((uintptr_t)address & ~CPU_CACHE_LINE_SIZE));
+        purge_address = (volatile uint32_t *)CALCULATE_PURGE_ADDRESS(address);
 
         for (uint32_t line = 0; line < cache_line_count; line++) {
                 *purge_address = 0x00000000;
