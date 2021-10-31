@@ -58,11 +58,6 @@ void *_internal_realloc(void *, size_t);
 void *_internal_memalign(size_t, size_t);
 void _internal_free(void *);
 
-void *_internal_user_malloc(size_t);
-void *_internal_user_realloc(void *, size_t);
-void *_internal_user_memalign(size_t, size_t);
-void _internal_user_free(void *);
-
 extern void _internal_dma_queue_init(void);
 
 #endif /* !_KERNEL_INTERNAL_H_ */
