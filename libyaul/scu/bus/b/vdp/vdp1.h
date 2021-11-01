@@ -17,8 +17,8 @@
 
 __BEGIN_DECLS
 
-#define vdp1_sync_commit_clear() do {                                          \
-        vdp1_sync_commit_set(NULL, NULL);                                      \
+#define vdp1_sync_render_clear() do {                                          \
+        vdp1_sync_render_set(NULL, NULL);                                      \
 } while (false)
 
 typedef struct vdp1_transfer_status {
@@ -86,18 +86,24 @@ extern void vdp1_sync_wait(void);
 
 /// @htmlinclude vdp1_sync_interval_table.html
 extern void vdp1_sync_interval_set(int8_t interval);
-extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
+extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 
-extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count, uint16_t index);
-extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list, uint16_t index);
+extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count,
+    uint16_t index);
+extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
+    uint16_t index);
 extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist);
 extern void vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
     uint16_t cmdt_index, uint16_t index);
 
 extern void vdp1_sync_put_wait(void);
-extern void vdp1_sync_commit(void);
-extern void vdp1_sync_commit_set(callback_handler_t callback_handler, void *work);
+extern void vdp1_sync_render(void);
+
+extern void vdp1_sync_render_set(callback_handler_t callback_handler,
+    void *work);
+extern void vdp1_sync_transfer_over_set(callback_handler_t callback_handler,
+    void *work);
 
 __END_DECLS
 

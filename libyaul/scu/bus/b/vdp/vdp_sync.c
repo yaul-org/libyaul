@@ -126,9 +126,10 @@ static scu_dma_handle_t _vdp1_dma_handle;
 static scu_dma_handle_t _vdp1_orderlist_dma_handle;
 static scu_dma_handle_t _vdp1_stride_dma_handle;
 
-static callback_t _user_vdp1_sync_callback;
-static callback_t _user_vblank_in_callback;
-static callback_t _user_vblank_out_callback;
+static callback_t _vdp1_render_callback;
+static callback_t _vdp1_transfer_over_callback;
+static callback_t _vblank_in_callback;
+static callback_t _vblank_out_callback;
 
 static const uint16_t _fbcr_bits[] __unused = {
         /* Render even-numbered lines */
@@ -210,7 +211,7 @@ static void _vdp1_init(void);
 
 static inline __always_inline void _vdp1_sync_put(void);
 static inline __always_inline void _vdp1_dma_call(void);
-static inline __always_inline void _vdp1_sync_commit_call(void);
+static inline __always_inline void _vdp1_sync_render_call(void);
 static inline __always_inline void _vdp1_sprite_end_call(void);
 static inline __always_inline void _vdp1_vblank_in_call(void);
 static inline __always_inline void _vdp1_vblank_out_call(void);
@@ -230,8 +231,8 @@ _internal_vdp_sync_init(void)
 
         cpu_intc_mask_set(15);
 
-        callback_init(&_user_vblank_in_callback);
-        callback_init(&_user_vblank_out_callback);
+        callback_init(&_vblank_in_callback);
+        callback_init(&_vblank_out_callback);
 
         _state.flags = SYNC_FLAG_NONE;
 
@@ -442,7 +443,7 @@ vdp1_sync_put_wait(void)
 }
 
 void
-vdp1_sync_commit(void)
+vdp1_sync_render(void)
 {
         DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
@@ -457,7 +458,7 @@ vdp1_sync_commit(void)
         while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
         }
 
-        _vdp1_sync_commit_call();
+        _vdp1_sync_render_call();
 
         const uint32_t sr_mask = cpu_intc_mask_get();
 
@@ -471,9 +472,15 @@ vdp1_sync_commit(void)
 }
 
 void
-vdp1_sync_commit_set(callback_handler_t callback_handler, void *work)
+vdp1_sync_render_set(callback_handler_t callback_handler, void *work)
 {
-        callback_set(&_user_vdp1_sync_callback, callback_handler, work);
+        callback_set(&_vdp1_render_callback, callback_handler, work);
+}
+
+void
+vdp1_sync_transfer_over_set(callback_handler_t callback_handler, void *work)
+{
+        callback_set(&_vdp1_transfer_over_callback, callback_handler, work);
 }
 
 void
@@ -528,13 +535,13 @@ vdp2_sync_wait(void)
 void
 vdp_sync_vblank_in_set(callback_handler_t callback_handler, void *work)
 {
-        callback_set(&_user_vblank_in_callback, callback_handler, work);
+        callback_set(&_vblank_in_callback, callback_handler, work);
 }
 
 void
 vdp_sync_vblank_out_set(callback_handler_t callback_handler, void *work)
 {
-        callback_set(&_user_vblank_out_callback, callback_handler, work);
+        callback_set(&_vblank_out_callback, callback_handler, work);
 }
 
 static void
@@ -571,7 +578,8 @@ _vdp1_init(void)
                 .update          = SCU_DMA_UPDATE_WUP
         };
 
-        callback_init(&_user_vdp1_sync_callback);
+        callback_init(&_vdp1_render_callback);
+        callback_init(&_vdp1_transfer_over_callback);
 
         _state.vdp1.flags = VDP1_FLAG_IDLE;
         _state.vdp1.current_mode = NULL;
@@ -589,6 +597,17 @@ _vdp1_init(void)
         scu_dma_config_buffer(&_vdp1_dma_handle, &dma_cfg);
         scu_dma_config_buffer(&_vdp1_orderlist_dma_handle, &orderlist_dma_cfg);
         scu_dma_config_buffer(&_vdp1_stride_dma_handle, &stride_dma_cfg);
+}
+
+static inline void
+_vdp1_transfer_over_process(void)
+{
+        const vdp1_transfer_status_t transfer_status =
+            vdp1_transfer_status_get();
+
+        if ((transfer_status.cef | transfer_status.bef) == 0) {
+                callback_call(&_vdp1_transfer_over_callback);
+        }
 }
 
 static inline void __always_inline
@@ -636,7 +655,7 @@ _vdp1_dma_call(void)
 }
 
 static inline void __always_inline
-_vdp1_sync_commit_call(void)
+_vdp1_sync_render_call(void)
 {
         DEBUG_PRINTF("%s: Enter\n", __FUNCTION__);
 
@@ -689,7 +708,7 @@ _vdp1_mode_auto_sprite_end(void)
 {
         _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
 
-        callback_call(&_user_vdp1_sync_callback);
+        callback_call(&_vdp1_render_callback);
 }
 
 static void
@@ -725,6 +744,8 @@ _vdp1_mode_auto_vblank_out(void)
          * from aborting plotting, resulting in a soft lock */
         vdp2_tvmd_vcount_wait(0);
 
+        _vdp1_transfer_over_process();
+
         _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
 
         _state.vdp1.flags &= ~VDP1_FLAG_MASK;
@@ -753,7 +774,7 @@ _vdp1_mode_fixed_sprite_end(void)
 
                 _state.vdp1.flags = state_vdp1_flags;
 
-                callback_call(&_user_vdp1_sync_callback);
+                callback_call(&_vdp1_render_callback);
         }
 }
 
@@ -830,6 +851,8 @@ _vdp1_mode_fixed_vblank_out(void)
          * following the VBLANK-OUT interrupt */
         vdp2_tvmd_vcount_wait(0);
 
+        _vdp1_transfer_over_process();
+
         _state.flags &= ~SYNC_FLAG_VDP1_SYNC;
 
         state_vdp1_flags &= ~VDP1_FLAG_MASK;
@@ -854,7 +877,7 @@ _vdp1_mode_variable_sprite_end(void)
 {
         _state.vdp1.flags |= VDP1_FLAG_LIST_COMMITTED;
 
-        callback_call(&_user_vdp1_sync_callback);
+        callback_call(&_vdp1_render_callback);
 }
 
 static void
@@ -1052,7 +1075,7 @@ _vblank_in_handler(void)
                 _vdp1_vblank_in_call();
         }
 
-        callback_call(&_user_vblank_in_callback);
+        callback_call(&_vblank_in_callback);
 
         /* VBLANK-IN interrupt runs at scanline #224 */
         if ((state_flags & SYNC_FLAG_VDP2_SYNC) == SYNC_FLAG_VDP2_SYNC) {
@@ -1085,7 +1108,7 @@ _vblank_out_handler(void)
                 _vdp1_vblank_out_call();
         }
 
-        callback_call(&_user_vblank_out_callback);
+        callback_call(&_vblank_out_callback);
 
         DEBUG_PRINTF("%s: Exit\n", __FUNCTION__);
 }
