@@ -1,5 +1,10 @@
 var NAVTREEINDEX1 =
 {
+"group__CPU__INTC.html#gae4840faaafe151ffd4742294bc928f27":[2,17,8],
+"group__CPU__INTC.html#gae64d60cad807744495dc95081e8fdcdc":[2,17,5],
+"group__CPU__INTC.html#gaf43b4bbb9067581d8fc55d798e87971a":[2,17,3],
+"group__CPU__INTC.html#gafa002f9116625d45d73091517ce3abc0":[2,17,19],
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a0b07e46cde2b38a826cc52883c88a5bb":[2,17,18,10],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a1abc2fa83e1690a95f576c7657e04cf5":[2,17,18,6],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a22c2ac20c68f31b8abb638497062ae55":[2,17,18,27],
 "group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a26f2a59640e39636075347b071dfec0d":[2,17,18,24],
@@ -244,10 +249,5 @@ var NAVTREEINDEX1 =
 "group__MEMORY__MAP__CPU__IO__REGISTERS.html#gad8b218beb1f14cbe19cfec080c8209eb":[2,0,6,30],
 "group__MEMORY__MAP__CPU__IO__REGISTERS.html#gadd4faf455ed1393f052e4b9d219d5370":[2,0,6,36],
 "group__MEMORY__MAP__CPU__IO__REGISTERS.html#gadf9c893740f9d37572320154502cbeee":[2,0,6,48],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae0edca9baed1e85305e1e28be8eafe7a":[2,0,6,62],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae65faedf261e471723827bf4f200e1db":[2,0,6,44],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae6c419a6587e798913b092ceb5fae43f":[2,0,6,71],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae78532ba2005e27b04b693106a3a6511":[2,0,6,50],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae806fee767ca29b2ddd6c5ddebee6971":[2,0,6,21],
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaed30d8745156e8876407767a4e074cde":[2,0,6,68]
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae0edca9baed1e85305e1e28be8eafe7a":[2,0,6,62]
 };

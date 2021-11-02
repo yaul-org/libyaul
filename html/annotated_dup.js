@@ -5,6 +5,8 @@ var annotated_dup =
     [ "color_fix16_rgb", "unioncolor__fix16__rgb.html", "unioncolor__fix16__rgb" ],
     [ "color_rgb1555_t", "unioncolor__rgb1555__t.html", "unioncolor__rgb1555__t" ],
     [ "color_rgb888_t", "unioncolor__rgb888__t.html", "unioncolor__rgb888__t" ],
+    [ "cpu_cache_data_line", "unioncpu__cache__data__line.html", "unioncpu__cache__data__line" ],
+    [ "cpu_cache_data_way", "structcpu__cache__data__way.html", "structcpu__cache__data__way" ],
     [ "cpu_dmac_cfg", "structcpu__dmac__cfg.html", "structcpu__dmac__cfg" ],
     [ "cpu_dmac_status", "structcpu__dmac__status.html", "structcpu__dmac__status" ],
     [ "cpu_registers", "structcpu__registers.html", "structcpu__registers" ],

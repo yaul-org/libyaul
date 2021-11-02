@@ -43,9 +43,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a1abc2fa83e1690a95f576c7657e04cf5",
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gaf09ade181b84e9602f974ecc4a189acc",
-"group__SCU__IC.html#ggafda662d6e8c822f24c6314d7a7b2f2a9afd309d314755075289db5d791aed3998"
+"group__CPU__INTC.html#gae4840faaafe151ffd4742294bc928f27",
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#gae65faedf261e471723827bf4f200e1db",
+"group__SCU__IC.html#ggafda662d6e8c822f24c6314d7a7b2f2a9ac2fa8f5b0cd9542a7648cd65f10b5489"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

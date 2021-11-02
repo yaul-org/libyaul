@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 7177dd8</span>
+   &#160;<span id="projectnumber">Git hash aab83f2</span>
    </div>
   </td>
  </tr>
@@ -58,6 +58,7 @@ $(document).ready(function(){initNavTree('group__CPU__CACHE.html',''); initResiz
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
@@ -67,6 +68,15 @@ $(document).ready(function(){initNavTree('group__CPU__CACHE.html',''); initResiz
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unioncpu__cache__data__line.html">cpu_cache_data_line</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache data line representing the data read from the cache.  <a href="unioncpu__cache__data__line.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcpu__cache__data__way.html">cpu_cache_data_way</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache data way.  <a href="structcpu__cache__data__way.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ga01a5394050391d153a9880d0cc4224a1"><td class="memItemLeft" align="right" valign="top"><a id="ga01a5394050391d153a9880d0cc4224a1"></a>
@@ -109,6 +119,10 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga17bba0f4891bcfe34c303dbc104b6876">CPU_CACHE_WAY_3_ADDR</a>&#160;&#160;&#160;0xC0000C00UL</td></tr>
 <tr class="memdesc:ga17bba0f4891bcfe34c303dbc104b6876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Address for when accessing cache data directly. <br /></td></tr>
 <tr class="separator:ga17bba0f4891bcfe34c303dbc104b6876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacb1ff83bdeb42abac3ab994f6e43ac84"><td class="memItemLeft" align="right" valign="top"><a id="gacb1ff83bdeb42abac3ab994f6e43ac84"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gacb1ff83bdeb42abac3ab994f6e43ac84">CPU_CACHE_WAY_SIZE</a>&#160;&#160;&#160;(<a class="el" href="group__CPU__CACHE.html#ga055b8e3e15474370bdfed6121d5ffa28">CPU_CACHE_WAY_1_ADDR</a> - <a class="el" href="group__CPU__CACHE.html#gacc74b410744bd58c554d51ea8be7ea6a">CPU_CACHE_WAY_0_ADDR</a>)</td></tr>
+<tr class="memdesc:gacb1ff83bdeb42abac3ab994f6e43ac84"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size in bytes of a cache way. <br /></td></tr>
+<tr class="separator:gacb1ff83bdeb42abac3ab994f6e43ac84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga305e02a50983e44b80817a55586b94ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">CPU_CACHE_2_WAY_SIZE</a>&#160;&#160;&#160;(<a class="el" href="group__CPU__CACHE.html#gab8c1fa0e47ab64ca48e363a0f4024ae3">CPU_CACHE_WAY_2_ADDR</a> - <a class="el" href="group__CPU__CACHE.html#gacc74b410744bd58c554d51ea8be7ea6a">CPU_CACHE_WAY_0_ADDR</a>)</td></tr>
 <tr class="memdesc:ga305e02a50983e44b80817a55586b94ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size in bytes of the 2KiB RAM.  <a href="group__CPU__CACHE.html#ga305e02a50983e44b80817a55586b94ab">More...</a><br /></td></tr>
 <tr class="separator:ga305e02a50983e44b80817a55586b94ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,6 +130,9 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga6e6f8872956bea56a103cade85015f2f">CPU_CACHE_LINE_SIZE</a>&#160;&#160;&#160;16UL</td></tr>
 <tr class="memdesc:ga6e6f8872956bea56a103cade85015f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of a cache line in bytes. <br /></td></tr>
 <tr class="separator:ga6e6f8872956bea56a103cade85015f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3d5faf41f897c1a40438031eb2543c13"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga3d5faf41f897c1a40438031eb2543c13">CPU_CACHE_TAG_ADDRESS</a>(x)&#160;&#160;&#160;((uint32_t)(x) &gt;&gt; 10)</td></tr>
+<tr class="memdesc:ga3d5faf41f897c1a40438031eb2543c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given cpu_cache_data_line_t.bits.tag, convert to a physical address.  <a href="group__CPU__CACHE.html#ga3d5faf41f897c1a40438031eb2543c13">More...</a><br /></td></tr>
+<tr class="separator:ga3d5faf41f897c1a40438031eb2543c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -127,6 +144,12 @@ typedef enum <a class="el" href="group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc
 typedef enum <a class="el" href="group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037">cpu_cache_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852">cpu_cache_type_t</a></td></tr>
 <tr class="memdesc:gafd9cc331e952f55eb6a3ded73f0ec852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache type. <br /></td></tr>
 <tr class="separator:gafd9cc331e952f55eb6a3ded73f0ec852"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae7f1ef8f8daf268b7063cd2485d4824f"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unioncpu__cache__data__line.html">cpu_cache_data_line</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gae7f1ef8f8daf268b7063cd2485d4824f">cpu_cache_data_line_t</a></td></tr>
+<tr class="memdesc:gae7f1ef8f8daf268b7063cd2485d4824f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache data line representing the data read from the cache.  <a href="group__CPU__CACHE.html#gae7f1ef8f8daf268b7063cd2485d4824f">More...</a><br /></td></tr>
+<tr class="separator:gae7f1ef8f8daf268b7063cd2485d4824f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8a62c0ea1b679a8168851b95f2646ac7"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structcpu__cache__data__way.html">cpu_cache_data_way</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7">cpu_cache_data_way_t</a></td></tr>
+<tr class="memdesc:ga8a62c0ea1b679a8168851b95f2646ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache data way.  <a href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7">More...</a><br /></td></tr>
+<tr class="separator:ga8a62c0ea1b679a8168851b95f2646ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -169,6 +192,9 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 <tr class="memitem:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#gacd31f9c6aad6d5e315dae3794c0652c7">cpu_cache_purge</a> (void) <a class="el" href="group__GCC__ATTRIBUTES.html#ga19d4dd67e3a51d6dd20b6ab3f3507bbd">__no_reorder</a> <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
 <tr class="memdesc:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purge the entire cache.  <a href="group__CPU__CACHE.html#gacd31f9c6aad6d5e315dae3794c0652c7">More...</a><br /></td></tr>
 <tr class="separator:gacd31f9c6aad6d5e315dae3794c0652c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga34be9bbdfef11ca40c1987ff1519e181"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CPU__CACHE.html#ga34be9bbdfef11ca40c1987ff1519e181">cpu_cache_data_way_read</a> (uint8_t way, <a class="el" href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7">cpu_cache_data_way_t</a> *data_way) <a class="el" href="group__GCC__ATTRIBUTES.html#ga4d0b72ccc36b88935355451e332b5deb">__section</a>(&quot;.uncached&quot;)</td></tr>
+<tr class="memdesc:ga34be9bbdfef11ca40c1987ff1519e181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Walk all four ways the CPU cache and dump cache state bits.  <a href="group__CPU__CACHE.html#ga34be9bbdfef11ca40c1987ff1519e181">More...</a><br /></td></tr>
+<tr class="separator:ga34be9bbdfef11ca40c1987ff1519e181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -186,6 +212,64 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
 
 <p>The size in bytes of the 2KiB RAM. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#ga48557c885d1318a326d2554580e50990" title="Change the mode the cache operates.">cpu_cache_way_mode_set</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga3d5faf41f897c1a40438031eb2543c13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3d5faf41f897c1a40438031eb2543c13">&#9670;&nbsp;</a></span>CPU_CACHE_TAG_ADDRESS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CPU_CACHE_TAG_ADDRESS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;((uint32_t)(x) &gt;&gt; 10)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Given cpu_cache_data_line_t.bits.tag, convert to a physical address. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#gae7f1ef8f8daf268b7063cd2485d4824f" title="Cache data line representing the data read from the cache.">cpu_cache_data_line_t</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="gae7f1ef8f8daf268b7063cd2485d4824f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae7f1ef8f8daf268b7063cd2485d4824f">&#9670;&nbsp;</a></span>cpu_cache_data_line_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef union <a class="el" href="unioncpu__cache__data__line.html">cpu_cache_data_line</a> <a class="el" href="group__CPU__CACHE.html#gae7f1ef8f8daf268b7063cd2485d4824f">cpu_cache_data_line_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cache data line representing the data read from the cache. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7" title="Cache data way.">cpu_cache_data_way_t</a> </dd>
+<dd>
+<a class="el" href="group__CPU__CACHE.html#ga34be9bbdfef11ca40c1987ff1519e181" title="Walk all four ways the CPU cache and dump cache state bits.">cpu_cache_data_way_read</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga8a62c0ea1b679a8168851b95f2646ac7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8a62c0ea1b679a8168851b95f2646ac7">&#9670;&nbsp;</a></span>cpu_cache_data_way_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structcpu__cache__data__way.html">cpu_cache_data_way</a> <a class="el" href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7">cpu_cache_data_way_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cache data way. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__CACHE.html#ga34be9bbdfef11ca40c1987ff1519e181" title="Walk all four ways the CPU cache and dump cache state bits.">cpu_cache_data_way_read</a> </dd></dl>
 
 </div>
 </div>
@@ -267,6 +351,44 @@ static void <a class="el" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd
   <table class="params">
     <tr><td class="paramname">address</td><td>The starting address. </td></tr>
     <tr><td class="paramname">len</td><td>The area in bytes. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga34be9bbdfef11ca40c1987ff1519e181"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga34be9bbdfef11ca40c1987ff1519e181">&#9670;&nbsp;</a></span>cpu_cache_data_way_read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cpu_cache_data_way_read </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>way</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7">cpu_cache_data_way_t</a> *&#160;</td>
+          <td class="paramname"><em>data_way</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Walk all four ways the CPU cache and dump cache state bits. </p>
+<p>It's imperative that the entire function be uncached so that it doesn't taint the cache itself.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">way</td><td>The cache way to read from. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cache_way</td><td>The cache way buffer to write to. </td></tr>
   </table>
   </dd>
 </dl>
