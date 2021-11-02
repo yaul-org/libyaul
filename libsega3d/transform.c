@@ -422,7 +422,7 @@ _z_calculate(transform_t * const trans)
         const XPDATA * const xpdata = trans->xpdata;
         const ATTR * const attr = &xpdata->attbl[trans->index];
 
-        const uint32_t sort = attr->sort & 0x03; 
+        const uint32_t sort = attr->sort & 0x03;
 
         if (sort == SORT_CEN) {
                 const FIXED z_avg = trans->polygon[0]->point_z +
@@ -433,7 +433,7 @@ _z_calculate(transform_t * const trans)
                 /* Divide by 4 to get the average (bit shift) */
                 trans->z_value = z_avg >> 2;
         } else if (sort == SORT_MIN) {
-                trans->z_value = trans->polygon[0]->point_z; 
+                trans->z_value = trans->polygon[0]->point_z;
 
                 trans->z_value = (trans->polygon[1]->point_z < trans->z_value)
                     ? trans->polygon[1]->point_z
@@ -486,13 +486,13 @@ _cmdt_prepare(const transform_t * const trans)
                                                     trans->polygon[1]->clip_flags |
                                                     trans->polygon[2]->clip_flags |
                                                     trans->polygon[3]->clip_flags);
-        
+
                 if (or_clip_flags == CLIP_FLAGS_NONE) {
                         /* Since no clip flags are set, disable pre-clipping.
                          * This should help with performance */
                         cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
                 }
-        
+
                 /* Even when there is not texture list, there is the default
                  * texture that zeroes out CMDSRCA and CMDSIZE */
                 const TEXTURE * const textures = _internal_state->tlist->list;
