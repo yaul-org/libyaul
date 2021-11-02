@@ -51,7 +51,8 @@ __BEGIN_DECLS
 /// @brief The size of a cache line in bytes.
 #define CPU_CACHE_LINE_SIZE     16UL
 
-/// @brief Given @ref cpu_cache_data_line_t.bits.tag, convert to a physical address.
+/// @brief Given the tag bits from @ref cpu_cache_data_line_t, convert to a
+/// physical address.
 /// @see cpu_cache_data_line_t
 #define CPU_CACHE_TAG_ADDRESS(x) ((uint32_t)(x) >> 10)
 
@@ -189,10 +190,11 @@ extern void cpu_cache_area_purge(void *address, uint32_t len) __section(".uncach
 /// initialized to `0`. Calling this function will not pollute the cache.
 extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
 
-/// @brief Walk all four ways the CPU cache and dump cache state bits.
+/// @brief Walk one of the 4 ways the CPU cache and dump cache state bits.
 ///
-/// @details It's imperative that the entire function be uncached so that it
-/// doesn't taint the cache itself.
+/// @details It's imperative that the function that calls @ref
+/// cpu_cache_data_way_read must be uncached so that it doesn't taint the cache
+/// itself.
 ///
 /// @param     way       The cache way to read from.
 /// @param[in] cache_way The cache way buffer to write to.
