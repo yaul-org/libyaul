@@ -157,8 +157,9 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
         const int16_vec2_t system_clip_coords =
             _state_vdp2()->tv.resolution;
 
+        int16_vec2_t center_local_coords;
+
         if (local_coords == NULL) {
-                int16_vec2_t center_local_coords;
                 local_coords = &center_local_coords;
 
                 center_local_coords.x = _state_vdp2()->tv.resolution.x / 2;
