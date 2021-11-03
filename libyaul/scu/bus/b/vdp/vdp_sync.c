@@ -25,7 +25,9 @@
 
 #define SCU_MASK_MASK   (SCU_IC_MASK_VBLANK_IN |                               \
                          SCU_IC_MASK_VBLANK_OUT |                              \
-                         SCU_IC_MASK_LEVEL_0_DMA_END)
+                         SCU_IC_MASK_LEVEL_0_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_1_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_2_DMA_END)
 #define SCU_MASK_UNMASK (SCU_IC_MASK_ALL & ~SCU_MASK_MASK)
 
 #define SYNC_FLAG_NONE                  (0x00)
@@ -126,6 +128,7 @@ static scu_dma_handle_t _vdp1_dma_handle;
 static scu_dma_handle_t _vdp1_orderlist_dma_handle;
 static scu_dma_handle_t _vdp1_stride_dma_handle;
 
+static callback_t _vdp1_put_callback;
 static callback_t _vdp1_render_callback;
 static callback_t _vdp1_transfer_over_callback;
 static callback_t _vblank_in_callback;
@@ -472,6 +475,12 @@ vdp1_sync_render(void)
 }
 
 void
+vdp1_sync_put_set(callback_handler_t callback_handler, void *work)
+{
+        callback_set(&_vdp1_put_callback, callback_handler, work);
+}
+
+void
 vdp1_sync_render_set(callback_handler_t callback_handler, void *work)
 {
         callback_set(&_vdp1_render_callback, callback_handler, work);
@@ -578,6 +587,7 @@ _vdp1_init(void)
                 .update          = SCU_DMA_UPDATE_WUP
         };
 
+        callback_init(&_vdp1_put_callback);
         callback_init(&_vdp1_render_callback);
         callback_init(&_vdp1_transfer_over_callback);
 
@@ -696,6 +706,8 @@ _vdp1_mode_auto_dma(void)
         MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
 
         _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
+
+        callback_call(&_vdp1_put_callback);
 }
 
 static void
@@ -755,6 +767,8 @@ static void
 _vdp1_mode_fixed_dma(void)
 {
         _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
+
+        callback_call(&_vdp1_put_callback);
 }
 
 static void
@@ -864,6 +878,8 @@ static void
 _vdp1_mode_variable_dma(void)
 {
         _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
+
+        callback_call(&_vdp1_put_callback);
 }
 
 static void
