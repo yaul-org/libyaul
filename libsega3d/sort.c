@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #include "sega3d.h"
 
@@ -16,7 +17,7 @@ static struct {
         /* Top pointer to the pool of singles */
         sort_single_t *pool_free_top;
         /* The maximum indexed Z value when adding packets */
-        uint32_t max_z;
+        int32_t max_z;
 } _state;
 
 static inline void __always_inline
