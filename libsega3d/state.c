@@ -28,19 +28,19 @@ static list_t _tlist __aligned(16);
 static list_t _plist __aligned(16);
 
 static state_t _state = {
-        .flags = FLAGS_NONE,
-        .results = &_results,
-        .fog = &_fog,
-        .info = &_info,
-        .transform = &_transform,
+        .flags               = FLAGS_NONE,
+        .results             = &_results,
+        .fog                 = &_fog,
+        .info                = &_info,
+        .transform           = &_transform,
         .transform_proj_pool = _transform_proj_pool,
-        .clip_camera = &_clip_camera,
-        .clip_planes = &_clip_planes,
-        .matrices = _matrices,
-        .sort_list = _sort_list,
-        .sort_single_pool = _sort_single_pool,
-        .tlist = &_tlist,
-        .plist = &_plist
+        .clip_camera         = &_clip_camera,
+        .clip_planes         = &_clip_planes,
+        .matrices            = _matrices,
+        .sort_list           = _sort_list,
+        .sort_single_pool    = _sort_single_pool,
+        .tlist               = &_tlist,
+        .plist               = &_plist
 };
 
 state_t * const _internal_state = &_state;

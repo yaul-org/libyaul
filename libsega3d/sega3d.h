@@ -16,6 +16,7 @@
 
 #include "sega3d-types.h"
 #include "sgl.h"
+#include "perf.h"
 #include "ztp.h"
 
 extern void sega3d_init(void);

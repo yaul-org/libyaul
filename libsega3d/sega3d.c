@@ -53,6 +53,8 @@ sega3d_init(void)
         _internal_sort_init();
         _internal_tlist_init();
         _internal_transform_init();
+
+        _internal_perf_init();
 }
 
 void

@@ -14,11 +14,10 @@
 
 #include <vdp1/cmdt.h>
 
+#include "perf.h"
 #include "sgl.h"
 
 typedef struct sega3d_object sega3d_object_t;
-
-typedef void (*sega3d_iterate_fn)(sega3d_object_t *, const vdp1_cmdt_t *);
 
 typedef enum sega3d_matrix_type {
         SEGA3D_MATRIX_TYPE_PUSH     = 0,
@@ -70,6 +69,13 @@ typedef struct sega3d_fog {
 typedef struct sega3d_results {
         uint16_t object_count;
         uint16_t polygon_count;
+
+        perf_counter_t perf_sort;
+        perf_counter_t perf_dma;
+        perf_counter_t perf_aabb_culling;
+        perf_counter_t perf_transform;
+        perf_counter_t perf_clipping;
+        perf_counter_t perf_polygon_process;
 } sega3d_results_t;
 
 typedef struct sega3d_cull_sphere {

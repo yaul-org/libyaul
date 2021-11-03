@@ -97,6 +97,15 @@ _internal_transform_init(void)
         vdp1_cmdt_end_set(&_cmdt_end);
 
         sega3d_matrix_identity(_internal_state->clip_camera);
+
+        sega3d_results_t * const internal_results = _internal_state->results;
+
+        perf_counter_init(&internal_results->perf_sort);
+        perf_counter_init(&internal_results->perf_dma);
+        perf_counter_init(&internal_results->perf_aabb_culling);
+        perf_counter_init(&internal_results->perf_transform);
+        perf_counter_init(&internal_results->perf_clipping);
+        perf_counter_init(&internal_results->perf_polygon_process);
 }
 
 void
@@ -110,10 +119,10 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
         trans->current_orderlist = &orderlist[orderlist_offset];
         trans->current_cmdt = cmdts;
 
-        sega3d_results_t * const results = _internal_state->results;
+        sega3d_results_t * const internal_results = _internal_state->results;
 
-        results->object_count = 0;
-        results->polygon_count = 0;
+        internal_results->object_count = 0;
+        internal_results->polygon_count = 0;
 
         const FIXED * const camera_matrix =
             (const FIXED *)_internal_state->clip_camera;
@@ -155,7 +164,11 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
 void
 sega3d_finish(sega3d_results_t *results)
 {
+        sega3d_results_t * const internal_results = _internal_state->results;
+
+        perf_counter_start(&internal_results->perf_sort);
         _internal_sort_iterate(_sort_iterate);
+        perf_counter_end(&internal_results->perf_sort);
 
         transform_t * const trans = _internal_state->transform;
 
@@ -165,13 +178,22 @@ sega3d_finish(sega3d_results_t *results)
 
         vdp1_cmdt_orderlist_end(trans->current_orderlist);
 
+        perf_counter_start(&internal_results->perf_dma);
         vdp1_sync_cmdt_orderlist_put(trans->orderlist);
+        /* XXX: REMOVE */
+        vdp1_sync_put_wait();
+        perf_counter_end(&internal_results->perf_dma);
 
         if (results != NULL) {
-                sega3d_results_t * const internal_results = _internal_state->results;
-
                 results->object_count = internal_results->object_count;
                 results->polygon_count = trans->current_orderlist - trans->orderlist;
+
+                results->perf_sort = internal_results->perf_sort;
+                results->perf_dma = internal_results->perf_dma;
+                results->perf_aabb_culling = internal_results->perf_aabb_culling;
+                results->perf_transform = internal_results->perf_transform;
+                results->perf_clipping = internal_results->perf_clipping;
+                results->perf_polygon_process = internal_results->perf_polygon_process;
         }
 }
 
@@ -190,6 +212,8 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
                 return;
         }
 
+        sega3d_results_t * const internal_results = _internal_state->results;
+
         transform_t * const trans = _internal_state->transform;
 
         trans->object = object;
@@ -197,6 +221,7 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
         trans->vertex_count = vertex_count;
         trans->polygon_count = polygon_count;
 
+        perf_counter_start(&internal_results->perf_aabb_culling);
         if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_AABB) != SEGA3D_OBJECT_FLAGS_NONE) {
                 if ((_object_aabb_cull_test(trans))) {
                         return;
@@ -206,12 +231,22 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
                         return;
                 }
         }
+        perf_counter_end(&internal_results->perf_aabb_culling);
 
         sega3d_matrix_push(SEGA3D_MATRIX_TYPE_PUSH); {
                 _camera_world_transform();
+
+                perf_counter_start(&internal_results->perf_transform);
                 _vertex_pool_transform(trans, xpdata->pntbl);
+                perf_counter_end(&internal_results->perf_transform);
+
+                perf_counter_start(&internal_results->perf_clipping);
                 _vertex_pool_clipping(trans);
+                perf_counter_end(&internal_results->perf_clipping);
+
+                perf_counter_start(&internal_results->perf_polygon_process);
                 _polygon_process(trans, xpdata->pltbl);
+                perf_counter_end(&internal_results->perf_polygon_process);
         } sega3d_matrix_pop();
 
         sega3d_results_t * const results = _internal_state->results;
