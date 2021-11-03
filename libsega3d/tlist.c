@@ -30,7 +30,7 @@ _internal_tlist_init(void)
 TEXTURE *
 sega3d_tlist_alloc(uint16_t texture_count)
 {
-        internal_list_alloc(_internal_state->tlist, texture_count);
+        _internal_list_alloc(_internal_state->tlist, texture_count);
 
         return _internal_state->tlist->list;
 }
@@ -38,11 +38,11 @@ sega3d_tlist_alloc(uint16_t texture_count)
 void
 sega3d_tlist_free(void)
 {
-        internal_list_free(_internal_state->tlist);
+        _internal_list_free(_internal_state->tlist);
 }
 
 void
 sega3d_tlist_set(TEXTURE *textures, uint16_t texture_count)
 {
-        internal_list_set(_internal_state->tlist, textures, texture_count);
+        _internal_list_set(_internal_state->tlist, textures, texture_count);
 }

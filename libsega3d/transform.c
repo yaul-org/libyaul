@@ -501,8 +501,7 @@ _cmdt_prepare(const transform_t * const trans)
 
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
 
-        const ATTR *attr;
-        attr = &xpdata->attbl[trans->index];
+        const ATTR * const attr = &xpdata->attbl[trans->index];
 
         cmdt->cmd_ctrl = attr->dir; /* We care about (Dir) and (Comm) bits */
         cmdt->cmd_link = 0x0000;

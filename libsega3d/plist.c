@@ -26,7 +26,7 @@ _internal_plist_init(void)
 PALETTE *
 sega3d_plist_alloc(uint16_t palette_count)
 {
-        internal_list_alloc(_internal_state->plist, palette_count);
+        _internal_list_alloc(_internal_state->plist, palette_count);
 
         return _internal_state->plist->list;
 }
@@ -34,11 +34,11 @@ sega3d_plist_alloc(uint16_t palette_count)
 void
 sega3d_plist_free(void)
 {
-        internal_list_free(_internal_state->plist);
+        _internal_list_free(_internal_state->plist);
 }
 
 void
 sega3d_plist_set(PALETTE *palettes, uint16_t palette_count)
 {
-        internal_list_set(_internal_state->plist, palettes, palette_count);
+        _internal_list_set(_internal_state->plist, palettes, palette_count);
 }
