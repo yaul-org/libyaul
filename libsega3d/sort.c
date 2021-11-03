@@ -59,14 +59,14 @@ _internal_sort_add(void *packet, int32_t pz)
 
         _state.max_z = max(pz, _state.max_z);
 
-        sort_single_t ** const list_head = &_internal_state->sort_list[pz].head;
+        sort_list_t * const list_head = &_internal_state->sort_list[pz];
 
         sort_single_t * const new_single = _pool_stack_alloc();
 
         new_single->packet = packet;
-        new_single->next_single = (*list_head != NULL) ? *list_head : NULL;
+        new_single->next_single = list_head->head;
 
-        *list_head = new_single;
+        list_head->head = new_single;
 }
 
 void
