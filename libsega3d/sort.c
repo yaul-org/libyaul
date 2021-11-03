@@ -35,10 +35,18 @@ _pool_stack_alloc(void)
         return single;
 }
 
+static inline void __always_inline
+_state_reset(void)
+{
+        _pool_stack_reset();
+
+        _state.max_z = 0;
+}
+
 void
 _internal_sort_init(void)
 {
-        _pool_stack_reset();
+        _state_reset();
 
         (void)memset(_internal_state->sort_list, 0, sizeof(sort_list_t) * SORT_Z_RANGE);
 }
@@ -47,6 +55,8 @@ void
 _internal_sort_add(void *packet, int32_t pz)
 {
         pz = clamp(pz, 0, SORT_Z_RANGE - 1);
+
+        _state.max_z = max(pz, _state.max_z);
 
         sort_single_t ** const list_head = &_internal_state->sort_list[pz].head;
 
@@ -79,5 +89,5 @@ _internal_sort_iterate(sort_iterate_fn_t iterate_fn)
                 list_head->head = NULL;
         }
 
-        _pool_stack_reset();
+        _state_reset();
 }
