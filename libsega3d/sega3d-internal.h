@@ -132,8 +132,8 @@ typedef struct {
 
 extern state_t * const _internal_state;
 
-extern void internal_list_alloc(list_t *list, uint16_t count);
-extern void internal_list_free(list_t *list);
-extern void internal_list_set(list_t *list, void *list_p, uint16_t count);
+extern void _internal_list_alloc(list_t *list, uint16_t count);
+extern void _internal_list_free(list_t *list);
+extern void _internal_list_set(list_t *list, void *list_p, uint16_t count);
 
 #endif /* !_SEGA3D_INTERNAL_H_ */

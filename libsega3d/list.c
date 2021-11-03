@@ -12,7 +12,7 @@
 #include "sega3d-internal.h"
 
 void
-internal_list_alloc(list_t *list, uint16_t count)
+_internal_list_alloc(list_t *list, uint16_t count)
 {
         assert(count > 0);
 
@@ -27,13 +27,13 @@ internal_list_alloc(list_t *list, uint16_t count)
 }
 
 void
-internal_list_free(list_t *list)
+_internal_list_free(list_t *list)
 {
-        internal_list_set(list, NULL, 0);
+        _internal_list_set(list, NULL, 0);
 }
 
 void
-internal_list_set(list_t *list, void *list_p, uint16_t count)
+_internal_list_set(list_t *list, void *list_p, uint16_t count)
 {
         if ((list->flags & LIST_FLAGS_ALLOCATED) == LIST_FLAGS_ALLOCATED) {
                 free(list->list);
