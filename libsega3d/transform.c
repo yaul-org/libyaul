@@ -27,6 +27,8 @@ static void _vertex_pool_clipping(const transform_t * const trans);
 static void _vertex_pool_transform(const transform_t * const trans, const POINT * const points);
 static void _z_calculate(transform_t * const trans);
 
+static void _put_set_handler(void *work);
+
 static inline FIXED __always_inline __unused
 _point_component_transform(const fix16_vec3_t *p, const FIXED *matrix)
 {
@@ -106,6 +108,8 @@ _internal_transform_init(void)
         perf_counter_init(&internal_results->perf_transform);
         perf_counter_init(&internal_results->perf_clipping);
         perf_counter_init(&internal_results->perf_polygon_process);
+
+        vdp1_sync_put_set(_put_set_handler, &internal_results->perf_dma);
 }
 
 void
@@ -180,9 +184,7 @@ sega3d_finish(sega3d_results_t *results)
 
         perf_counter_start(&internal_results->perf_dma);
         vdp1_sync_cmdt_orderlist_put(trans->orderlist);
-        /* XXX: REMOVE */
-        vdp1_sync_put_wait();
-        perf_counter_end(&internal_results->perf_dma);
+        /* Performance counter end is inside a callback */
 
         if (results != NULL) {
                 results->object_count = internal_results->object_count;
@@ -742,4 +744,12 @@ _object_aabb_cull_test(const transform_t * const trans)
         }
 
         return false;
+}
+
+static void
+_put_set_handler(void *work)
+{
+        perf_counter_t * const perf_counter = work;
+
+        perf_counter_end(perf_counter);
 }

@@ -100,6 +100,8 @@ extern void vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
 extern void vdp1_sync_put_wait(void);
 extern void vdp1_sync_render(void);
 
+extern void vdp1_sync_put_set(callback_handler_t callback_handler,
+    void *work);
 extern void vdp1_sync_render_set(callback_handler_t callback_handler,
     void *work);
 extern void vdp1_sync_transfer_over_set(callback_handler_t callback_handler,
