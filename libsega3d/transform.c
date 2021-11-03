@@ -12,9 +12,8 @@
 
 #include "sega3d-internal.h"
 
-extern void _internal_sort_clear(void);
 extern void _internal_sort_add(void *packet, int32_t pz);
-extern void _internal_sort_iterate(iterate_fn fn);
+extern void _internal_sort_iterate(sort_iterate_fn_t fn);
 
 static bool _object_aabb_cull_test(const transform_t * const trans) __unused;
 static bool _object_sphere_cull_test(const transform_t * const trans);
@@ -104,8 +103,6 @@ void
 sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_cmdt_t *cmdts)
 {
         assert(orderlist != NULL);
-
-        _internal_sort_clear();
 
         transform_t * const trans = _internal_state->transform;
 
