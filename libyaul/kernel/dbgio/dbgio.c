@@ -82,6 +82,16 @@ dbgio_dev_deinit(void)
         _dbgio_state.dev_ops = NULL;
 }
 
+dbgio_dev_t
+dbgio_dev_selected_get(void)
+{
+        if (_dbgio_state.dev_ops == NULL) {
+                return DBGIO_DEV_NULL;
+        }
+
+        return _dbgio_state.dev_ops->dev;
+}
+
 void
 dbgio_dev_font_load(void)
 {

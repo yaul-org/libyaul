@@ -55,6 +55,7 @@ typedef struct dbgio_usb_cart {
 extern void dbgio_dev_init(dbgio_dev_t, const void *);
 extern void dbgio_dev_default_init(dbgio_dev_t);
 extern void dbgio_dev_deinit(void);
+extern dbgio_dev_t dbgio_dev_selected_get(void);
 
 extern void dbgio_dev_font_load(void);
 
