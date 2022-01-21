@@ -179,7 +179,7 @@ typedef struct vdp2_sprite_type_f {
         unsigned int dc:6; /* Dot color data bits */
 } __packed vdp2_sprite_type_f_t;
 
-extern void vdp2_sprite_priority_set(vdp2_sprite_register_t, uint8_t);
+extern void vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priority);
 
 __END_DECLS
 

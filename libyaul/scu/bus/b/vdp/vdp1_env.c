@@ -69,6 +69,12 @@ vdp1_env_default_set(void)
         vdp1_env_set(&_default_env);
 }
 
+const vdp1_env_t *
+vdp1_env_get(void)
+{
+        return &_current_env;
+}
+
 void
 vdp1_env_set(const vdp1_env_t *env)
 {
