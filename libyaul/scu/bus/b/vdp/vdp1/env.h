@@ -77,12 +77,14 @@ typedef struct vdp1_env {
 /// @addtogroup VDP1_ENV_FUNCTIONS
 /// @{
 /// @brief Not yet documented.
-extern void vdp1_env_default_init(vdp1_env_t *);
+extern void vdp1_env_default_init(vdp1_env_t *env);
 
+/// @brief Not yet documented.
+const vdp1_env_t *vdp1_env_get(void);
 /// @brief Not yet documented.
 extern void vdp1_env_default_set(void);
 /// @brief Not yet documented.
-extern void vdp1_env_set(const vdp1_env_t *);
+extern void vdp1_env_set(const vdp1_env_t *env);
 
 /// @brief Not yet documented.
 extern void vdp1_env_stop(void);

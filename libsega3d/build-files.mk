@@ -10,12 +10,11 @@ LIB_SRCS:= \
 	sort.c \
 	state.c \
 	tlist.c \
-	transform.c \
-	ztp.c
+	plist.c \
+	transform.c
 
 INSTALL_HEADER_FILES:= \
 	./:perf.h:./sega3d/ \
 	./:sega3d-types.h:./sega3d/ \
 	./:sega3d.h:./sega3d/ \
-	./:sgl.h:./sega3d/ \
-	./:ztp.h:./sega3d/
+	./:sgl.h:./sega3d/

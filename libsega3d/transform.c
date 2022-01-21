@@ -533,7 +533,7 @@ _cmdt_prepare(const transform_t * const trans)
                 /* When there is no palette list, simply use the value directly */
                 const PALETTE * const palettes = _internal_state->plist->list;
 
-                if ((attr->dir == FUNC_Texture) && ((attr->sort & UseTexture) == UseTexture)) {
+                if ((attr->sort & UseTexture) == UseTexture) {
                         const TEXTURE * const texture = &textures[attr->texno];
 
                         if (palettes != NULL) {
@@ -624,13 +624,13 @@ _screen_cull_test(const transform_t * const trans)
         const int16_vec2_t * const p3 = &trans->polygon[3]->screen;
 
         const int32_vec2_t u1 = {
-                .x = p1->x - p0->x,
-                .y = p1->y - p0->y
+                .x = p3->x - p0->x,
+                .y = p3->y - p0->y
         };
 
         const int32_vec2_t v1 = {
-                .x = p3->x - p0->x,
-                .y = p3->y - p0->y
+                .x = p1->x - p0->x,
+                .y = p1->y - p0->y
         };
 
         /* Ideally, we only need to do a cross product on one winding order, but
@@ -641,23 +641,23 @@ _screen_cull_test(const transform_t * const trans)
 
         const int32_t z1 = (u1.x * v1.y) - (u1.y * v1.x);
 
-        if (z1 < 0) {
+        if (z1 >= 0) {
                 return false;
         }
 
         const int16_vec2_t u2 = {
-                .x = p3->x - p2->x,
-                .y = p3->y - p2->y
-        };
-
-        const int16_vec2_t v2 = {
                 .x = p1->x - p2->x,
                 .y = p1->y - p2->y
         };
 
+        const int16_vec2_t v2 = {
+                .x = p3->x - p2->x,
+                .y = p3->y - p2->y
+        };
+
         const int16_t z2 = (u2.x * v2.y) - (u2.y * v2.x);
 
-        return (z2 >= 0);
+        return (z2 < 0);
 }
 
 static bool

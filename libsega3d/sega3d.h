@@ -17,7 +17,6 @@
 #include "sega3d-types.h"
 #include "sgl.h"
 #include "perf.h"
-#include "ztp.h"
 
 extern void sega3d_init(void);
 
@@ -57,12 +56,5 @@ extern void sega3d_finish(sega3d_results_t *results);
 extern Uint16 sega3d_object_polycount_get(const sega3d_object_t *object);
 extern void sega3d_object_transform(const sega3d_object_t *object,
     uint16_t xpdata_index);
-
-extern sega3d_ztp_handle_t sega3d_ztp_parse(sega3d_object_t *object,
-    const sega3d_ztp_t *ztp);
-extern void sega3d_ztp_textures_parse(sega3d_ztp_handle_t *handle, void *vram,
-    sega3d_ztp_tex_fn_t tex_fn);
-extern void sega3d_ztp_update(sega3d_ztp_handle_t *handle,
-    uint16_t texture_num);
 
 #endif /* !_SEGA3D_H_ */

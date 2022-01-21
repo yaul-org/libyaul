@@ -207,7 +207,7 @@ typedef struct {
         Uint16 colno;
         Uint16 gstb;
         Uint16 dir;
-} ATTR;
+} __packed ATTR;
 
 typedef struct {
         POINT *pntbl;
@@ -215,7 +215,7 @@ typedef struct {
         POLYGON *pltbl;
         Uint32 nbPolygon;
         ATTR *attbl;
-} __packed __aligned(4) PDATA;
+} __packed PDATA;
 
 typedef struct {
         POINT *pntbl;
@@ -224,7 +224,7 @@ typedef struct {
         Uint32 nbPolygon;
         ATTR *attbl;
         VECTOR *vntbl;
-} __packed __aligned(4) XPDATA;
+} __packed XPDATA;
 
 typedef struct OBJECT {
         PDATA *pat;
@@ -243,8 +243,9 @@ typedef struct {
 } TEXTURE;
 
 typedef struct {
+        Uint16 Flags;
         Uint16 Color;
-} PALETTE;
+} __packed PALETTE;
 
 typedef struct {
         Uint16 texno;
