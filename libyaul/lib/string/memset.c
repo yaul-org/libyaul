@@ -79,7 +79,7 @@ memset(void *dest, int c, size_t n)
         /* In preparation to copy 32 bytes at a time, aligned on an 8-byte
          * bounary, fill head/tail up to 28 bytes each. As in the initial
          * byte-based head/tail fill, each conditional below ensures that the
-         * subsequent offsets are valid (e.g. !(n<=24) implies n>=28). */
+         * subsequent offsets are valid (e.g. !(n<=24) implies n>=28) */
 
         *(a_uint32_t *)(s + 0) = c32;
         *(a_uint32_t *)(s + n - 4) = c32;
@@ -108,14 +108,14 @@ memset(void *dest, int c, size_t n)
 
         /* Align to a multiple of 8 so we can fill 64 bits at a time, and avoid
          * writing the same bytes twice as much as is practical without
-         * introducing additional branching. */
+         * introducing additional branching */
 
         k = 24 + ((uintptr_t)s & 4);
         s += k;
         n -= k;
 
         /* If this loop is reached, 28 tail bytes have already been filled, so
-         * any remainder when n drops below 32 can be safely ignored. */
+         * any remainder when n drops below 32 can be safely ignored */
 
         a_uint64_t c64 = c32 | ((a_uint64_t)c32 << 32);
 

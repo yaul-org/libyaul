@@ -1,5 +1,5 @@
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
+#ifndef _LIB_ASSERT_H_
+#define _LIB_ASSERT_H_
 
 #include <sys/cdefs.h>
 
@@ -42,4 +42,4 @@ extern void _assert(const char * __restrict, const char * __restrict,
 
 __END_DECLS
 
-#endif /* !_ASSERT_H_ */
+#endif /* !_LIB_ASSERT_H_ */

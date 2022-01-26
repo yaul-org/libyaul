@@ -1,5 +1,5 @@
-#ifndef _CTYPE_H_
-#define _CTYPE_H_
+#ifndef _LIB_CTYPE_H_
+#define _LIB_CTYPE_H_
 
 #include <sys/cdefs.h>
 
@@ -26,4 +26,4 @@ extern int toupper(int);
 
 __END_DECLS
 
-#endif /* _CTYPE_H_ */
+#endif /* _LIB_CTYPE_H_ */

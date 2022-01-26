@@ -75,6 +75,8 @@ LIB_SRCS+= \
 
 LIB_SRCS+= \
 	lib/ctype/ctype.c \
+	lib/errno/strerror.c \
+	lib/errno/__errno_location.c \
 	lib/string/bcmp.c \
 	lib/string/bcopy.c \
 	lib/string/bzero.c \
@@ -118,7 +120,47 @@ LIB_SRCS+= \
 	lib/string/strtok_r.c \
 	lib/string/strverscmp.c \
 	lib/string/swab.c \
-	lib/stdio/snprintf.c \
+	lib/stdio/clearerr.c \
+	lib/stdio/stdio.c \
+    lib/stdio/fclose.c \
+    lib/stdio/feof.c \
+    lib/stdio/ferror.c \
+    lib/stdio/fflush.c \
+    lib/stdio/fgetc.c \
+    lib/stdio/fgetpos.c \
+    lib/stdio/fgets.c \
+    lib/stdio/fopen.c \
+    lib/stdio/fprintf.c \
+    lib/stdio/fputc.c \
+    lib/stdio/fputs.c \
+    lib/stdio/fread.c \
+    lib/stdio/freopen.c \
+    lib/stdio/fseek.c \
+    lib/stdio/fsetpos.c \
+    lib/stdio/ftell.c \
+    lib/stdio/fwrite.c \
+    lib/stdio/getc.c \
+    lib/stdio/getchar.c \
+    lib/stdio/gets.c \
+    lib/stdio/perror.c \
+    lib/stdio/printf.c \
+    lib/stdio/putc.c \
+    lib/stdio/putchar.c \
+    lib/stdio/puts.c \
+    lib/stdio/remove.c \
+    lib/stdio/rename.c \
+    lib/stdio/rewind.c \
+    lib/stdio/setbuf.c \
+    lib/stdio/setvbuf.c \
+    lib/stdio/snprintf.c \
+    lib/stdio/sprintf.c \
+    lib/stdio/tmpfile.c \
+    lib/stdio/tmpnam.c \
+    lib/stdio/ungetc.c \
+    lib/stdio/vfprintf.c \
+    lib/stdio/vprintf.c \
+    lib/stdio/vsnprintf.c \
+    lib/stdio/vsprintf.c \
 	lib/stdlib/abort.c \
 	lib/stdlib/abs.c
 
@@ -243,19 +285,25 @@ INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:alloca.h:./ \
-	./lib/lib/:assert.h:./ \
-	./lib/lib/:ctype.h:./ \
-	./lib/lib/:errno.h:./ \
-	./lib/lib/:stdio.h:./ \
-	./lib/lib/:stdlib.h:./ \
-	./lib/lib/:string.h:./ \
+	./lib/lib/bits/:alltypes.h:./bits/ \
+	./lib/lib/bits/:fcntl.h:./bits/ \
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/sys/:cdefs.h:./sys/ \
 	./lib/lib/sys/:queue.h:./sys/ \
 	./lib/lib/sys/:types.h:./sys/ \
 	./kernel/sys/:init.h:./sys/
+
+INSTALL_HEADER_FILES+= \
+	./lib/lib/:alloca.h:./ \
+	./lib/lib/:assert.h:./ \
+	./lib/lib/:ctype.h:./ \
+	./lib/lib/:errno.h:./ \
+	./lib/lib/:fcntl.h:./ \
+	./lib/lib/:stdio.h:./ \
+	./lib/lib/:stdlib.h:./ \
+	./lib/lib/:string.h:./ \
+	./lib/lib/:unistd.h:./ \
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/:crc.h:./ \

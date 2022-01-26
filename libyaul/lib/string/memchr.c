@@ -25,11 +25,11 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define SS (sizeof(size_t))
-#define ALIGN (sizeof(size_t)-1)
-#define ONES ((size_t)-1/UCHAR_MAX)
-#define HIGHS (ONES * (UCHAR_MAX/2+1))
-#define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
+#define SS              (sizeof(size_t))
+#define ALIGN           (sizeof(size_t)-1)
+#define ONES            ((size_t)-1/UCHAR_MAX)
+#define HIGHS           (ONES * (UCHAR_MAX/2+1))
+#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
 
 void *
 memchr(const void *src, int c, size_t n)
@@ -39,7 +39,8 @@ memchr(const void *src, int c, size_t n)
 
 #ifdef __GNUC__
 
-        for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--);
+        for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--) {
+        }
 
         if (n && *s != c) {
                 typedef size_t __may_alias word;
@@ -47,14 +48,16 @@ memchr(const void *src, int c, size_t n)
                 const word *w;
                 size_t k = ONES * c;
 
-                for (w = (const void *)s; n >= SS && !HASZERO(*w ^ k); w++, n -= SS);
+                for (w = (const void *)s; n >= SS && !HAS_ZERO(*w ^ k); w++, n -= SS) {
+                }
 
                 s = (const void *)w;
         }
 
 #endif /* __GNUC__ */
 
-        for (; n && *s != c; s++, n--);
+        for (; n && *s != c; s++, n--) {
+        }
 
-        return n ? (void *)s : 0;
+        return (n ? (void *)s : 0);
 }

@@ -1,5 +1,5 @@
-#ifndef _STRING_H_
-#define _STRING_H_
+#ifndef _LIB_STRING_H_
+#define _LIB_STRING_H_
 
 #include <sys/cdefs.h>
 
@@ -41,6 +41,8 @@ extern char *strtok(char * __restrict, const char * __restrict);
 
 extern size_t strlen(const char *);
 
+extern char *strerror(int);
+
 extern char *strtok_r(char * __restrict, const char * __restrict, char ** __restrict);
 extern char *stpcpy(char * __restrict, const char * __restrict);
 extern char *stpncpy(char * __restrict, const char * __restrict, size_t);
@@ -63,4 +65,4 @@ extern void *mempcpy(void *, const void *, size_t);
 
 __END_DECLS
 
-#endif /* _STRING_H_ */
+#endif /* _LIB_STRING_H_ */

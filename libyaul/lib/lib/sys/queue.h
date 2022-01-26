@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_QUEUE_H_
-#define _SYS_QUEUE_H_
+#ifndef _LIB_SYS_QUEUE_H_
+#define _LIB_SYS_QUEUE_H_
 
 #include <stdint.h>
 
@@ -750,4 +750,4 @@ struct {                                                                       \
                 (head2)->tqh_last = &(head2)->tqh_first;                       \
 } while (0)
 
-#endif /* !_SYS_QUEUE_H_ */
+#endif /* !_LIB_SYS_QUEUE_H_ */

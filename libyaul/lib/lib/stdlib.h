@@ -1,5 +1,5 @@
-#ifndef _STDLIB_H_
-#define _STDLIB_H_
+#ifndef _LIB_STDLIB_H_
+#define _LIB_STDLIB_H_
 
 #include <sys/cdefs.h>
 
@@ -25,4 +25,4 @@ extern void abort(void) __noreturn;
 
 __END_DECLS
 
-#endif /* _STDLIB_H_ */
+#endif /* _LIB_STDLIB_H_ */
