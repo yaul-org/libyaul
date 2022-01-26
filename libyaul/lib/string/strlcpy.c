@@ -26,10 +26,11 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define ALIGN (sizeof(size_t)-1)
-#define ONES ((size_t)-1/UCHAR_MAX)
-#define HIGHS (ONES * (UCHAR_MAX/2+1))
-#define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN           (sizeof(size_t)-1)
+#define ONES            ((size_t)-1/UCHAR_MAX)
+#define HIGHS           (ONES * (UCHAR_MAX/2+1))
+
+#define HAS_ZERO(x)      (((x)-ONES) & ~(x) & HIGHS)
 
 size_t
 strlcpy(char *d, const char *s, size_t n)
@@ -52,7 +53,7 @@ strlcpy(char *d, const char *s, size_t n)
                         wd = (void *)d;
                         ws = (const void *)s;
 
-                        for (; n >= sizeof(size_t) && !HASZERO(*ws);
+                        for (; n >= sizeof(size_t) && !HAS_ZERO(*ws);
                                         n -= sizeof(size_t), ws++, wd++) {
                                 *wd = *ws;
                         }
@@ -63,7 +64,8 @@ strlcpy(char *d, const char *s, size_t n)
         }
 #endif /* __GNUC__ */
 
-        for (; n && (*d = *s); n--, s++, d++);
+        for (; n && (*d = *s); n--, s++, d++) {
+        }
 
         *d = 0;
 finish:

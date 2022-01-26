@@ -56,12 +56,14 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
         } else if (c == '+') {
                 c = *s++;
         }
+
         if ((base == 0 || base == 16) &&
             (c == '0') && ((*s == 'x') || (*s == 'X'))) {
                 c = s[1];
                 s += 2;
                 base = 16;
         }
+
         if (base == 0) {
                 base = (c == '0') ? 8 : 10;
         }
@@ -92,9 +94,11 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
                 } else {
                         break;
                 }
+
                 if (c >= base) {
                         break;
                 }
+
                 if ((any < 0) || (acc > cutoff) || ((acc == cutoff) && (c > cutlim))) {
                         any = -1;
                 } else {
@@ -103,12 +107,14 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
                         acc += c;
                 }
         }
+
         if (any < 0) {
                 acc = neg ? LONG_MIN : LONG_MAX;
                 /* rptr->_errno = ERANGE; */
         } else if (neg) {
                 acc = -acc;
         }
+
         if (endptr != 0) {
                 *endptr = (char *) (any ? (char *)s - 1 : nptr);
         }

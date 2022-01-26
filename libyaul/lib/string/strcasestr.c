@@ -28,7 +28,7 @@ strcasestr(const char *h, const char *n)
 {
         size_t l = strlen(n);
 
-        for (; *h; h++) {
+        for (; *h != '\0'; h++) {
                 if (!strncasecmp(h, n, l)) {
                         return (char *)h;
                 }

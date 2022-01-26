@@ -30,8 +30,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_CDEFS_H_
-#define _SYS_CDEFS_H_
+#ifndef _LIB_SYS_CDEFS_H_
+#define _LIB_SYS_CDEFS_H_
 
 #include <stddef.h>
 
@@ -171,6 +171,12 @@
 /// @def __hot
 /// @brief Not yet documented.
 #define __hot                   __attribute__ ((hot))
+/// @def __fallthrough
+/// @brief Not yet documented.
+#define __fallthrough           __attribute__ ((fallthrough))
+/// @def __hidden
+/// @brief Not yet documented.
+#define __hidden                __attribute__ ((__visibility__ ("hidden")))
 
 /// @def __alloc_align(yyy)
 /// @brief Not yet documented.
@@ -291,4 +297,4 @@
 #define __weak_alias(name, aliasname)                                          \
         extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
 
-#endif /* !_SYS_CDEFS_H_ */
+#endif /* !_LIB_SYS_CDEFS_H_ */

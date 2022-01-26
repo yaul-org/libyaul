@@ -25,10 +25,10 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define ALIGN (sizeof(size_t)-1)
-#define ONES ((size_t)-1/UCHAR_MAX)
-#define HIGHS (ONES * (UCHAR_MAX/2+1))
-#define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN           (sizeof(size_t)-1)
+#define ONES            ((size_t)-1/UCHAR_MAX)
+#define HIGHS           (ONES * (UCHAR_MAX/2+1))
+#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
 
 void *
 memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
@@ -45,7 +45,8 @@ memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
         const word *ws;
 
         if (((uintptr_t)s & ALIGN) == ((uintptr_t)d & ALIGN)) {
-                for (; ((uintptr_t)s & ALIGN) && n && (*d = *s) != c; n--, s++, d++);
+                for (; ((uintptr_t)s & ALIGN) && n && (*d = *s) != c; n--, s++, d++) {
+                }
 
                 if ((uintptr_t)s & ALIGN) {
                         goto tail;
@@ -55,7 +56,7 @@ memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
                 wd = (void *)d;
                 ws = (const void *)s;
 
-                for (; n >= sizeof(size_t) && !HASZERO(*ws ^ k);
+                for (; n >= sizeof(size_t) && !HAS_ZERO(*ws ^ k);
                                 n -= sizeof(size_t), ws++, wd++) {
                         *wd = *ws;
                 }
@@ -66,7 +67,8 @@ memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
 
 #endif /* __GNUC__  */
 
-        for (; n && (*d = *s) != c; n--, s++, d++);
+        for (; n && (*d = *s) != c; n--, s++, d++) {
+        }
 
 tail:
 

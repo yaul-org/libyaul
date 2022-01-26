@@ -30,7 +30,7 @@ strncat(char *restrict d, const char *restrict s, size_t n)
 
         d += strlen(d);
 
-        while (n && *s) {
+        while ((n != 0) && (*s != '\0')) {
                 n--, *d++ = *s++;
         }
 

@@ -24,7 +24,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-long atol(const char *s)
+long
+atol(const char *s)
 {
         long n = 0;
         int neg = 0;
@@ -47,5 +48,5 @@ long atol(const char *s)
                 n = 10 * n - (*s++ - '0');
         }
 
-        return neg ? n : -n;
+        return ((neg) ? n : -n);
 }

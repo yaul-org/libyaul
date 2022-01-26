@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 static char *
-twobyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
+_two_byte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 {
         uint16_t nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
 
@@ -39,7 +39,7 @@ twobyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 }
 
 static char *
-threebyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
+_three_byte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8;
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8;
@@ -71,11 +71,10 @@ fourbyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-#define BITOP(a,b,op) \
- ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+#define BITOP(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
 static char *
-twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
+_twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
 {
         size_t i, ip, jp, k, p, ms, p0, mem, mem0;
         size_t byteset[32 / sizeof(size_t)] = { 0 };
@@ -201,7 +200,8 @@ twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
 void *
 memmem(const void *h0, size_t k, const void *n0, size_t l)
 {
-        const uint8_t *h = h0, *n = n0;
+        const uint8_t *h = h0;
+        const uint8_t *n = n0;
 
         /* Return immediately on empty needle */
         if (!l) {
@@ -227,16 +227,16 @@ memmem(const void *h0, size_t k, const void *n0, size_t l)
         }
 
         if (l == 2) {
-                return twobyte_memmem(h, k, n);
+                return _two_byte_memmem(h, k, n);
         }
 
         if (l == 3) {
-                return threebyte_memmem(h, k, n);
+                return _three_byte_memmem(h, k, n);
         }
 
         if (l == 4) {
                 return fourbyte_memmem(h, k, n);
         }
 
-        return twoway_memmem(h, h + k, n, l);
+        return _twoway_memmem(h, h + k, n, l);
 }

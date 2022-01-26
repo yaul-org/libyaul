@@ -29,5 +29,5 @@ strchr(const char *s, int c)
 {
         char *r = strchrnul(s, c);
 
-        return *(uint8_t *)r == (uint8_t)c ? r : 0;
+        return ((*(uint8_t *)r == (uint8_t)c) ? r : 0);
 }
