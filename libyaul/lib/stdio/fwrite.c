@@ -26,8 +26,21 @@
 
 #include <sys/cdefs.h>
 
-size_t __weak
-fwrite(const void * restrict src __unused, size_t size __unused, size_t nmemb __unused, FILE * restrict f __unused)
+size_t
+fwrite(const void * restrict src, size_t size, size_t nmemb, FILE * restrict f)
 {
-        return 0;
+        if (size == 0) {
+                nmemb = 0;
+        }
+
+        const size_t l = size * nmemb;
+
+        size_t k;
+        k = 0;
+
+        if (l > (size_t)(f->wend - f->wpos)) {
+                k = f->write(f, src, l);
+        }
+
+        return ((k == l) ? nmemb : (k / size));
 }

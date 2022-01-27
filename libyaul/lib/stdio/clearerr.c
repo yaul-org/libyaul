@@ -25,7 +25,8 @@
 
 #include <sys/cdefs.h>
 
-void __weak
-clearerr(FILE *f __unused)
+void
+clearerr(FILE *f)
 {
+        f->flags &= ~(F_EOF | F_ERR);
 }

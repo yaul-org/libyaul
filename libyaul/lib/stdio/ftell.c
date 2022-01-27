@@ -27,19 +27,36 @@
 
 #include <sys/cdefs.h>
 
-off_t __weak
-__ftello(FILE *f __unused)
+off_t
+__ftell(FILE *f)
 {
-        return 0;
+        const int whence =
+            ((f->flags & F_APP) && (f->wpos != f->wbase))
+            ? SEEK_END : SEEK_CUR;
+
+        off_t pos = f->seek(f, 0, whence);
+
+        if (pos < 0) {
+                return pos;
+        }
+
+        /* Adjust for data in buffer */
+        if (f->rend != NULL) {
+                pos += f->rpos - f->rend;
+        } else if (f->wbase) {
+                pos += f->wpos - f->wbase;
+        }
+
+        return pos;
 }
 
 long
 ftell(FILE *f)
 {
-        off_t pos = __ftello(f);
+        off_t pos = __ftell(f);
 
         if (pos > LONG_MAX) {
-                /* errno = EOVERFLOW; */
+                errno = EOVERFLOW;
                 return -1;
         }
 

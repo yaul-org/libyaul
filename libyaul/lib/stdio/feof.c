@@ -27,8 +27,8 @@
 
 #undef feof
 
-int __weak
-feof(FILE *f __unused)
+int
+feof(FILE *f)
 {
-        return 0;
+        return (!!(f->flags & F_EOF));
 }

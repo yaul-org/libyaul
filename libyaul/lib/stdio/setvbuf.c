@@ -2,9 +2,22 @@
 
 #include <sys/cdefs.h>
 
-int __weak
-setvbuf(FILE *restrict f __unused, char *restrict buf __unused, int type __unused,
-    size_t size __unused)
+int
+setvbuf(FILE *restrict f, char *restrict buf, int type, size_t size)
 {
-        return -1;
+        if (type == _IONBF) {
+                f->buf_size = 0;
+        } else if ((type == _IOLBF) || (type == _IOFBF)) {
+                if (buf && (size >= UNGET)) {
+                        f->buf = (void *)(buf + UNGET);
+                        f->buf_size = size - UNGET;
+                }
+        } else {
+                return -1;
+        }
+
+        f->flags |= F_SVB;
+
+        return 0;
+
 }

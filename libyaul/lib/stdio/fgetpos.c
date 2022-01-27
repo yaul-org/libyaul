@@ -23,12 +23,12 @@
 
 #include <stdio.h>
 
-off_t __ftello(FILE *) __weak;
+off_t __ftell(FILE *);
 
 int
 fgetpos(FILE * restrict f, fpos_t * restrict pos)
 {
-        off_t off = __ftello(f);
+        off_t off = __ftell(f);
 
         if (off < 0) {
                 return -1;
