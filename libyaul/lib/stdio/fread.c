@@ -26,8 +26,40 @@
 
 #include <sys/cdefs.h>
 
-size_t __weak
-fread(void * restrict destv __unused, size_t size __unused, size_t nmemb __unused, FILE * restrict f __unused)
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+size_t
+fread(void * restrict destv, size_t size, size_t nmemb, FILE * restrict f)
 {
-        return 0;
+        if (size == 0) {
+                nmemb = 0;
+        }
+
+        const size_t len = size * nmemb;
+
+        unsigned char *dest = destv;
+        size_t l = len;
+        size_t k;
+
+        if (f->rpos != f->rend) {
+                /* First exhaust the buffer */
+                k = MIN((size_t)(f->rend - f->rpos), l);
+
+                (void)memcpy(dest, f->rpos, k);
+
+                f->rpos += k;
+                dest += k;
+                l -= k;
+        }
+
+        /* Read the remainder directly */
+        for (; l; l -= k, dest += k) {
+                k = f->read(f, dest, l);
+
+                if (k == 0) {
+                        return ((len - l) / size);
+                }
+        }
+
+        return nmemb;
 }

@@ -2,8 +2,20 @@
 
 #include <sys/cdefs.h>
 
-int __weak
-ungetc(int c __unused, FILE *f __unused)
+int
+ungetc(int c, FILE *f)
 {
-        return EOF;
+        if (c == EOF) {
+                return c;
+        }
+
+        if ((f->rpos == NULL) || (f->rpos <= (f->buf - UNGET))) {
+                return EOF;
+        }
+
+        *--f->rpos = c;
+
+        f->flags &= ~F_EOF;
+
+        return (unsigned char)c;
 }

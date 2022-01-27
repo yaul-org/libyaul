@@ -26,8 +26,15 @@
 
 #include <sys/cdefs.h>
 
-int __weak
-fclose(FILE *f __unused)
+int
+fclose(FILE *f)
 {
-        return 0;
+        int r;
+
+        r = fflush(f);
+        r |= f->close(f);
+
+        /* _fclose() */
+
+        return r;
 }

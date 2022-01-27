@@ -2,8 +2,8 @@
 
 #include <sys/cdefs.h>
 
-int __weak
-putchar(int c __unused)
+int
+putchar(int c)
 {
-        return EOF;
+        return putc(c, stdout);
 }

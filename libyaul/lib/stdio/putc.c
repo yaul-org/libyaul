@@ -2,8 +2,18 @@
 
 #include <sys/cdefs.h>
 
-int __weak
-putc(int c __unused, FILE *f __unused)
+int
+putc(int c, FILE *f)
 {
-        return EOF;
+        const unsigned char buf[] = {
+                c
+        };
+
+        if (f->wpos != f->wend) {
+                *f->wpos++ = c;
+        } else if ((f->write(f, buf, 1)) != 1) {
+                c = EOF;
+        }
+
+        return c;
 }

@@ -23,10 +23,8 @@
 
 #include <stdio.h>
 
-int __fseeko(FILE *, off_t, int) __weak;
-
 int
 fsetpos(FILE *f, const fpos_t *pos)
 {
-        return __fseeko(f, *(const long *)pos, SEEK_SET);
+        return fseek(f, *(const long *)pos, SEEK_SET);
 }

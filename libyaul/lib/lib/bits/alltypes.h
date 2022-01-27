@@ -8,4 +8,4 @@ typedef long long off_t;
 typedef int ssize_t;
 typedef unsigned mode_t;
 
-typedef void FILE;
+typedef struct _IO_FILE FILE;

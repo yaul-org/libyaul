@@ -27,8 +27,8 @@
 
 #undef ferror
 
-int __weak
-ferror(FILE *f __unused)
+int
+ferror(FILE *f)
 {
-        return 0;
+        return (!!(f->flags & F_ERR));
 }
