@@ -33,6 +33,7 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -42,39 +43,42 @@ __BEGIN_DECLS
  * Statically declare a block pool.
  */
 #define MEMB(name, structure, num, align)                                      \
-static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
+static struct memb_ref __CONCAT(name, _memb_ref)[(num)];                       \
                                                                                \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
-        structure __CONCAT1(name, _memb_mem)[(num)] __unused;                  \
+        structure __CONCAT1(name, _memb_mem)[(num)];                           \
                                                                                \
-static memb_t name __unused = {                                                \
+static memb_t name = {                                                         \
         sizeof(structure),                                                     \
         num,                                                                   \
-        &__CONCAT(name, _memb_refcnt)[0],                                      \
+        &__CONCAT(name, _memb_ref)[0],                                         \
         0,                                                                     \
         0,                                                                     \
         (void *)&__CONCAT(name, _memb_mem)[0]                                  \
 }
 
-typedef enum memb_ref_type {
-        MEMB_REF_AVAILABLE,
-        MEMB_REF_RESERVED
-} memb_ref_type_t;
+typedef struct memb_ref {
+        uint16_t count;
+} __packed memb_ref_t;
 
 typedef struct memb {
-        uint32_t m_bsize; /* Size (in bytes) of a unit block */
-        uint32_t m_bnum; /* Number of unit blocks in the block pool */
-        memb_ref_type_t *m_breftype; /* Reference type array */
-        uint32_t m_bidx; /* Index to next unreferenced block */
-        uint32_t m_size; /* Number of allocated unit blocks */
-        void *m_bpool;
+        uint32_t size;        /* Size (in bytes) of a unit block */
+        uint32_t count;       /* Number of unit blocks in the block pool */
+        memb_ref_t *ref;      /* Reference array */
+        uint32_t next_index;  /* Index to next unreferenced block */
+        uint32_t alloc_count; /* Number of allocated unit blocks */
+        void *pool;
 } memb_t;
 
-void memb_init(memb_t *);
-void *memb_alloc(memb_t *);
-int memb_free(memb_t *, void *);
-int32_t memb_size(memb_t *);
-bool memb_bounds(memb_t *, void *);
+void memb_init(memb_t *memb);
+memb_t *memb_memb_alloc(uint32_t block_size, uint32_t block_count,
+    uint32_t align);
+void memb_memb_free(memb_t *memb);
+void *memb_alloc(memb_t *memb);
+void *memb_contiguous_alloc(memb_t *memb, uint32_t count);
+int memb_free(memb_t *mbemb, void *addr);
+int32_t memb_size(memb_t *memb);
+bool memb_bounds(memb_t *memb, void *addr);
 
 __END_DECLS
 
