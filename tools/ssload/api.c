@@ -9,7 +9,6 @@
 #include <ctype.h>
 #include <libgen.h>
 #include <limits.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,15 +30,9 @@ void fileserver_quit(const struct device_driver *);
 void console_exec(const struct device_driver *, uint8_t);
 void console_quit(const struct device_driver *);
 
-static void _catch_signals(void);
-
-static void _signal_handler(int signum, siginfo_t *info, void *ptr);
-
 void
 api_handle(const struct device_driver *device)
 {
-        _catch_signals();
-
         _state.running = true;
 
         while (_state.running) {
@@ -105,25 +98,4 @@ api_variable_read(const struct device_driver *device, void *buffer, uint32_t buf
         }
 
         return false;
-}
-
-static void
-_catch_signals(void)
-{
-        struct sigaction act;
-
-        act.sa_flags = 0;
-
-        sigemptyset(&act.sa_mask);
-
-        act.sa_sigaction = _signal_handler;
-
-        if ((sigaction(SIGINT, &act, NULL)) < 0) {
-        }
-}
-
-static void
-_signal_handler(int signum, siginfo_t *info, void *ptr)
-{
-        _state.running = false;
 }
