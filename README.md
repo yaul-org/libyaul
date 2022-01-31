@@ -36,23 +36,26 @@ Visit [yaul.org][1].
   <summary>MSYS2</summary>
 
 If you already have MSYS2 installed, follow the directions below to setup access
-to the package repository.
+to the package repository. If not, download and install MSYS2 [here][7] first,
+then continue to follow the instructions below.
 
-1. Open `/etc/pacman.conf` and at the end of the file, add the following:
+1. From the Start menu, open _MSYS MinGW 64-bit_.
+
+2. Open `/etc/pacman.conf` and at the end of the file, add the following:
 
        [yaul-mingw-w64]
        SigLevel = Optional TrustAll
        Server = http://packages.yaul.org/mingw-w64/x86_64
 
-2. Sync and refresh the databases.
+3. Sync and refresh the databases.
 
        pacman -Syy
 
-3. To list the packages for the `yaul-mingw-w64` repository, use:
+4. To list the packages for the `yaul-mingw-w64` repository, use:
 
        pacman -Sl yaul-mingw-w64
 
-4. Install everything.
+5. Install everything.
 
        pacman -S \
          yaul-tool-chain-git \
@@ -61,15 +64,14 @@ to the package repository.
          yaul-emulator-mednafen \
          yaul-examples-git
 
-5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
-   environment file.
-
-6. Once copied, follow the steps in setting up your [environment
+6. Follow the steps in setting up your [environment
    file](#setting-up-environment-file).
 
 7. Test your environment by [building an example](#building-and-running-an-example).
 
 </details>
+
+<a name="linux"></a>
 
 ### Linux
 
@@ -103,10 +105,7 @@ repository, or build the [packages][6] yourself.
          yaul-emulator-kronos \
          yaul-examples-git
 
-5. Be sure to copy `/opt/tool-chains/sh2eb-elf/yaul.env.in`. This is your
-   environment file.
-
-6. Once copied, follow the steps in setting up your [environment
+6. Follow the steps in setting up your [environment
    file](#setting-up-environment-file).
 
 7. Test your environment by [building an example](#building-and-running-an-example).
@@ -122,7 +121,7 @@ There are currently no `.deb` packages available. You will need to [build Yaul](
 
 ### MacOS X
 
-There are currently no packages available.
+There are currently no packages available. Follow the [Linux Arch](#linux) instructions.
 
 ## Building tool-chain from source
 
@@ -147,6 +146,8 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
        git submodule update
 
 </details>
+
+<a name="setting-up-environment-file"></a>
 
 <details>
   <summary>Setting up environment file</summary>
@@ -189,7 +190,7 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
 
 1. Build and install the supported libraries.
 
-       SILENT=1 make install-release
+       SILENT=1 make install-debug
 
    If any given library in Yaul is being debugged, use the `install-debug`
    target instead. Either _release_ or _debug_ can currently be installed at one
@@ -244,3 +245,4 @@ You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 [4]: https://github.com/ijacquez/libyaul-examples
 [5]: https://github.com/ijacquez/libyaul-build-scripts
 [6]: https://github.com/ijacquez/libyaul-packages
+[7]: https://www.msys2.org/
