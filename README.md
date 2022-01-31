@@ -28,16 +28,12 @@ providing lightweight abstractions between your program and the hardware.
 
 Visit [yaul.org][1].
 
-## Pre-built environment
+## Installation
 
 ### Windows
 
-#### Installer
-
-If you don't already have MSYS2 installed, download the _Yaul MSYS2 64-bit_
-installer from the release [page][2].
-
-#### Existing MSYS2
+<details>
+  <summary>MSYS2</summary>
 
 If you already have MSYS2 installed, follow the directions below to setup access
 to the package repository.
@@ -71,12 +67,14 @@ to the package repository.
 6. Once copied, follow the steps in setting up your [environment
    file](#setting-up-environment-file).
 
-7. Test your environment by building an
-   [example](#building-and-running-an-example).
+7. Test your environment by [building an example](#building-and-running-an-example).
+
+</details>
 
 ### Linux
 
-#### Arch
+<details>
+  <summary>Arch</summary>
 
 Follow the directions below to setup access to the Arch Linux package
 repository, or build the [packages][6] yourself.
@@ -111,12 +109,16 @@ repository, or build the [packages][6] yourself.
 6. Once copied, follow the steps in setting up your [environment
    file](#setting-up-environment-file).
 
-7. Test your environment by building an
-   [example](#building-and-running-an-example).
+7. Test your environment by [building an example](#building-and-running-an-example).
 
-#### Debian based
+</details>
 
-There are currently no `.deb` packages available.
+<details>
+  <summary>Debian based</summary>
+
+There are currently no `.deb` packages available. You will need to [build Yaul](#building-yaul-manually).
+
+</details>
 
 ### MacOS X
 
@@ -127,37 +129,27 @@ There are currently no packages available.
 Follow the instructions found in the [`build-scripts/`][5] submodule directory.
 Please note, you still need to [build Yaul](#building-yaul-manually).
 
-## Building Yaul manually
+## Setting and building Yaul manually
 
-### Cloning the repository
+<details>
+  <summary>Cloning the repository</summary>
 
-1. Clone the repository.
+1. Clone the respository
 
-       git clone --recursive "https://github.com/ijacquez/libyaul.git"
+       git clone "https://github.com/ijacquez/libyaul.git"
 
-### Building
+2. Initialize the submodules
 
-1. Follow the steps in setting up your [environment
-   file](#setting-up-environment-file).
+       git submodule init
 
-2. Build and install the supported libraries.
+3. Update the registered submodules
 
-       SILENT=1 make install-release
+       git submodule update
 
-   If any given library in Yaul is being debugged, use the `install-debug`
-   target instead. Either _release_ or _debug_ can currently be installed at one
-   time. It's possible to switch between the two in the same installation.
+</details>
 
-   To find more about other targets, call `make list-targets`.
-
-3. Build and install the tools.
-
-       SILENT=1 make install-tools
-
-4. Test your environment by building an
-   [example](#building-and-running-an-example).
-
-## Setting up environment file
+<details>
+  <summary>Setting up environment file</summary>
 
 1. Copy the template `yaul.env.in` to your home directory as `.yaul.env`. This
    is your environment file.
@@ -190,12 +182,38 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
    If `.bash_profile` is not used, use `.profile` instead. This is dependent on
    your set up.
 
+</details>
+
+<details>
+  <summary>Building</summary>
+
+1. Build and install the supported libraries.
+
+       SILENT=1 make install-release
+
+   If any given library in Yaul is being debugged, use the `install-debug`
+   target instead. Either _release_ or _debug_ can currently be installed at one
+   time. It's possible to switch between the two in the same installation.
+
+   To find more about other targets, call `make list-targets`.
+
+2. Build and install the tools.
+
+       SILENT=1 make install-tools
+
+3. Test your environment by building an
+   [example](#building-and-running-an-example).
+
+</details>
+
+<a name="building-and-running-an-example"></a>
+
 ## Building and running an example
 
 1. If you've built Yaul manually, check out any example in the [`examples`][4]
    submodule. Otherwise, go to `/opt/yaul-examples/`.
 
-2. Copy the `vdp1-balls` example to your home directory
+2. Copy the `vdp1-balls` directory to your home directory
 
        cp -r vdp1-balls ~
 
