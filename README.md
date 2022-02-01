@@ -114,7 +114,8 @@ need to [build Yaul](#building-tool-chain-from-source).
 
 ### MacOS X
 
-There are currently no packages available. Follow the [Linux Arch](#linux) instructions.
+There are currently no packages available. You will
+need to [build Yaul](#building-tool-chain-from-source).
 
 <a href="building-tool-chain-from-source"></a>
 
