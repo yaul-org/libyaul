@@ -42,15 +42,17 @@ __BEGIN_DECLS
 /*
  * Statically declare a block pool.
  */
-#define MEMB(name, structure, num, align)                                      \
-static struct memb_ref __CONCAT(name, _memb_ref)[(num)];                       \
+#define MEMB(name, structure, count, align)                                    \
+static struct memb_ref                                                         \
+    __CONCAT(name, _memb_ref)[((count) <= 0) ? 1 : (count)];                   \
                                                                                \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
-        structure __CONCAT1(name, _memb_mem)[(num)];                           \
+        structure __CONCAT1(name, _memb_mem)[((count) <= 0) ? 1 : (count)];    \
                                                                                \
 static memb_t name = {                                                         \
+        MEMB_TYPE_STATIC,                                                      \
         sizeof(structure),                                                     \
-        num,                                                                   \
+        ((count) <= 0) ? 1 : (count),                                          \
         &__CONCAT(name, _memb_ref)[0],                                         \
         0,                                                                     \
         0,                                                                     \
@@ -61,22 +63,33 @@ typedef struct memb_ref {
         uint16_t count;
 } __packed memb_ref_t;
 
+typedef enum memb_type {
+        MEMB_TYPE_STATIC,
+        MEMB_TYPE_DYNAMIC,
+        MEMB_TYPE_SET
+} memb_type_t;
+
 typedef struct memb {
+        memb_type_t type;     /* Type of MEMB */
         uint32_t size;        /* Size (in bytes) of a unit block */
         uint32_t count;       /* Number of unit blocks in the block pool */
-        memb_ref_t *ref;      /* Reference array */
+        memb_ref_t *refs;     /* Reference array */
         uint32_t next_index;  /* Index to next unreferenced block */
         uint32_t alloc_count; /* Number of allocated unit blocks */
         void *pool;
 } memb_t;
 
 void memb_init(memb_t *memb);
-memb_t *memb_memb_alloc(uint32_t block_size, uint32_t block_count,
+int memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
+    uint32_t block_size);
+int memb_memb_alloc(memb_t *memb, uint32_t block_size, uint32_t block_count,
     uint32_t align);
 void memb_memb_free(memb_t *memb);
+
 void *memb_alloc(memb_t *memb);
 void *memb_contiguous_alloc(memb_t *memb, uint32_t count);
-int memb_free(memb_t *mbemb, void *addr);
+int memb_free(memb_t *memb, void *addr);
+
 int32_t memb_size(memb_t *memb);
 bool memb_bounds(memb_t *memb, void *addr);
 

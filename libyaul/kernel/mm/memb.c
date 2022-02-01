@@ -51,8 +51,10 @@ static inline uint32_t _block_index_wrap(const memb_t *memb, uint32_t index) __a
 void
 memb_init(memb_t *memb)
 {
+        assert(memb != NULL);
+
         for (uint32_t i = 0; i < memb->count; i++) {
-                memb->ref[i].count = 0;
+                memb->refs[i].count = 0;
         }
 
         memb->next_index = 0;
@@ -61,51 +63,86 @@ memb_init(memb_t *memb)
         (void)memset(memb->pool, 0x00, memb->size * memb->count);
 }
 
-memb_t *
-memb_memb_alloc(uint32_t block_count, uint32_t block_size, uint32_t align)
+int
+memb_memb_init(memb_t *memb, void *pool, uint32_t block_count, uint32_t block_size)
 {
-        block_count = max(block_count, 4UL);
+        assert(memb != NULL);
+        assert(pool != NULL);
+
+        assert(block_count != 0);
+        assert(block_size != 0);
+
+        const size_t ref_size = sizeof(memb_ref_t) * block_count;
+        memb_ref_t * const refs = malloc(ref_size);
+
+        if (refs == NULL) {
+                return -1;
+        }
+
+        memb->type = MEMB_TYPE_SET;
+        memb->size = block_size;
+        memb->count = block_count;
+        memb->refs = refs;
+        memb->pool = pool;
+
+        memb_init(memb);
+
+        return 0;
+}
+
+int
+memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size, uint32_t align)
+{
+        assert(memb != NULL);
+
+        assert(block_count != 0);
+        assert(block_size != 0);
+
         align = max(align, 4UL);
 
         const size_t ref_size = sizeof(memb_ref_t) * block_count;
         const size_t pool_size = block_size * block_count;
 
         /* Allocate all memory needed in a single request */
-        void * const area = malloc(sizeof(memb_t) + ref_size + pool_size);
+        void * const area = memalign(ref_size + pool_size, align);
 
         if (area == NULL) {
-                return NULL;
+                return -1;
         }
 
-        uintptr_t area_ptr;
-        area_ptr = (uintptr_t)area;
+        uintptr_t area_ptr = (uintptr_t)area;
 
-        /* Have the memb_t structure be at the top of the allocation request.
-         * This way, we can easily free */
-        memb_t * const memb = (void *)area_ptr;
-        area_ptr += sizeof(memb_t);
-
+        memb->type = MEMB_TYPE_DYNAMIC;
         memb->size = block_size;
         memb->count = block_count;
-
-        memb->ref = (void *)area_ptr;
-        area_ptr += ref_size;
-
+        memb->refs = (void *)(area_ptr + pool_size);
+        /* Have the pool be at the top of the allocation request for
+         * alignment */
         memb->pool = (void *)area_ptr;
 
         memb_init(memb);
 
-        return memb;
+        return 0;
 }
 
 void
 memb_memb_free(memb_t *memb)
 {
-        if (memb == NULL) {
+        assert(memb != NULL);
+
+        switch (memb->type) {
+        case MEMB_TYPE_STATIC:
                 return;
+        case MEMB_TYPE_DYNAMIC:
+                free(memb->pool);
+                break;
+        case MEMB_TYPE_SET:
+                free(memb->refs);
+                break;
         }
 
-        free(memb);
+        memb->pool = NULL;
+        memb->refs = NULL;
 }
 
 /*-
@@ -120,9 +157,7 @@ memb_memb_free(memb_t *memb)
 void *
 memb_alloc(memb_t *memb)
 {
-        if (memb == NULL) {
-                return NULL;
-        }
+        assert(memb != NULL);
 
         /* Are we full? */
         if (memb->alloc_count == memb->count) {
@@ -130,7 +165,7 @@ memb_alloc(memb_t *memb)
         }
 
         while (true) {
-                if (memb->ref[memb->next_index].count == 0) {
+                if (memb->refs[memb->next_index].count == 0) {
                         break;
                 }
 
@@ -140,7 +175,7 @@ memb_alloc(memb_t *memb)
         void * const block = (void *)((uintptr_t)memb->pool +
             (memb->next_index * memb->size));
 
-        memb->ref[memb->next_index].count = 1;
+        memb->refs[memb->next_index].count = 1;
         memb->next_index = _block_index_wrap(memb, memb->next_index + 1);
         memb->alloc_count++;
 
@@ -150,13 +185,9 @@ memb_alloc(memb_t *memb)
 void *
 memb_contiguous_alloc(memb_t *memb, uint32_t count)
 {
-        if (memb == NULL) {
-                return NULL;
-        }
+        assert(memb != NULL);
 
-        if (count == 0) {
-                return NULL;
-        }
+        assert (count != 0);
 
         if (count == 1) {
                 return memb_alloc(memb);
@@ -173,7 +204,7 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
         next_index = memb->next_index;
 
         for (uint32_t contiguous_count = 0; ; ) {
-                if (memb->ref[next_index].count == 0) {
+                if (memb->refs[next_index].count == 0) {
                         contiguous_count++;
                 }
 
@@ -194,7 +225,7 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
         const uint32_t start_index = next_index - (count - 1);
 
         for (uint32_t i = start_index; i <= next_index; i++) {
-                memb->ref[i].count = count;
+                memb->refs[i].count = count;
         }
 
         memb->next_index = _block_index_wrap(memb, next_index + 1);
@@ -215,9 +246,7 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
 int
 memb_free(memb_t *memb, void *addr)
 {
-        if (memb == NULL) {
-                return -1;
-        }
+        assert(memb != NULL);
 
         /* Not within bounds */
         if (!MEMB_PTR_BOUND(memb, addr)) {
@@ -228,7 +257,7 @@ memb_free(memb_t *memb, void *addr)
         const uintptr_t addr_ptr = (uintptr_t)addr;
 
         const uint32_t block_index = (addr_ptr - pool_ptr) / memb->size;
-        memb_ref_t * const ref = &memb->ref[block_index];
+        memb_ref_t * const ref = &memb->refs[block_index];
 
         const uint32_t contiguous_count = ref[0].count;
 
@@ -251,9 +280,7 @@ memb_free(memb_t *memb, void *addr)
 int32_t
 memb_size(memb_t *memb)
 {
-        if (memb == NULL) {
-                return -1;
-        }
+        assert(memb != NULL);
 
         return memb->alloc_count;
 }
