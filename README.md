@@ -62,12 +62,7 @@ then continue to follow the instructions below.
 
 5. Follow the steps in setting up your [environment file](#setting-up-the-environment-file).
 
-6. Unfortunately, due to a kludge in MSYS2, append the following line to your
-   `$HOME/.bashrc`
-
-       echo 'export PATH="/mingw64/bin:${PATH}"' >> $HOME/.bash_profile
-
-7. Test your environment by [building an example](#building-and-running-an-example).
+6. Test your environment by [building an example](#building-and-running-an-example).
 
 </details>
 
