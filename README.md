@@ -60,7 +60,8 @@ then continue to follow the instructions below.
          yaul-emulator-mednafen \
          yaul-examples-git
 
-5. Follow the steps in setting up your [environment file](#setting-up-the-environment-file).
+5. Once all the packages have been installed, close the existing shell and start
+   a new one.
 
 6. Test your environment by [building an example](#building-and-running-an-example).
 
@@ -96,7 +97,8 @@ repository, or build the [packages][6] yourself.
          yaul-emulator-kronos \
          yaul-examples-git
 
-4. Follow the steps in setting up your [environment file](#setting-up-the-environment-file).
+4. Once all the packages have been installed, close the existing shell and start
+   a new one.
 
 5. Test your environment by [building an example](#building-and-running-an-example).
 
@@ -105,7 +107,8 @@ repository, or build the [packages][6] yourself.
 <details>
   <summary>Debian based</summary>
 
-There are currently no `.deb` packages available. You will need to [build Yaul](#building-yaul-manually).
+There are currently no `.deb` packages available. You will
+need to [build Yaul](#building-tool-chain-from-source).
 
 </details>
 
@@ -113,10 +116,14 @@ There are currently no `.deb` packages available. You will need to [build Yaul](
 
 There are currently no packages available. Follow the [Linux Arch](#linux) instructions.
 
+<a href="building-tool-chain-from-source"></a>
+
 ## Building tool-chain from source
 
-Follow the instructions found in the [`build-scripts/`][5] submodule directory.
-Please note, you still need to [build Yaul](#building-yaul-manually).
+Follow the instructions found in the [`build-scripts/`][5] directory. Please
+note that you still need to [build Yaul](#building-yaul-manually).
+
+<a href="building-yaul-manually"></a>
 
 ## Setting and building Yaul manually
 
@@ -142,8 +149,8 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
 <details>
   <summary>Setting up the environment file</summary>
 
-1. Copy the template `/opt/tool-chains/sh2eb-elf/yaul.env.in` to your home directory (`$HOME` being `/home/<user>`) as `.yaul.env`. This
-   is your environment file.
+1. Copy the template `/opt/tool-chains/sh2eb-elf/yaul.env.in` to your home
+   directory as `.yaul.env`. This is your environment file.
 
 2. Read the environment file `.yaul.env` into your current shell.
 
