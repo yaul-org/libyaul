@@ -47,15 +47,11 @@ then continue to follow the instructions below.
        SigLevel = Optional TrustAll
        Server = http://packages.yaul.org/mingw-w64/x86_64
 
-3. Sync and refresh the databases.
+3. Go back to the shell and sync and refresh the databases.
 
        pacman -Syy
 
-4. To list the packages for the `yaul-mingw-w64` repository, use:
-
-       pacman -Sl yaul-mingw-w64
-
-5. Install everything.
+4. Install everything.
 
        pacman -S \
          yaul-tool-chain-git \
@@ -64,8 +60,12 @@ then continue to follow the instructions below.
          yaul-emulator-mednafen \
          yaul-examples-git
 
-6. Follow the steps in setting up your [environment
-   file](#setting-up-environment-file).
+5. Follow the steps in setting up your [environment file](#setting-up-the-environment-file).
+
+6. Unfortunately, due to a kludge in MSYS2, append the following line to your
+   `$HOME/.bashrc`
+
+       echo 'export PATH="/mingw64/bin:${PATH}"' >> $HOME/.bash_profile
 
 7. Test your environment by [building an example](#building-and-running-an-example).
 
@@ -92,11 +92,7 @@ repository, or build the [packages][6] yourself.
 
        pacman -Syy
 
-3. To list the packages for the `yaul-linux` repository, use:
-
-       pacman -Sl yaul-linux
-
-4. Install everything.
+3. Install everything.
 
        pacman -S \
          yaul-tool-chain-git \
@@ -105,10 +101,9 @@ repository, or build the [packages][6] yourself.
          yaul-emulator-kronos \
          yaul-examples-git
 
-6. Follow the steps in setting up your [environment
-   file](#setting-up-environment-file).
+4. Follow the steps in setting up your [environment file](#setting-up-the-environment-file).
 
-7. Test your environment by [building an example](#building-and-running-an-example).
+5. Test your environment by [building an example](#building-and-running-an-example).
 
 </details>
 
@@ -147,16 +142,33 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
 
 </details>
 
-<a name="setting-up-environment-file"></a>
+<a name="setting-up-the-environment-file"></a>
 
 <details>
-  <summary>Setting up environment file</summary>
+  <summary>Setting up the environment file</summary>
 
-1. Copy the template `yaul.env.in` to your home directory as `.yaul.env`. This
+1. Copy the template `/opt/tool-chains/sh2eb-elf/yaul.env.in` to your home directory (`$HOME` being `/home/<user>`) as `.yaul.env`. This
    is your environment file.
 
-2. Open `.yaul.env` in a text editor and change the following to define your
-   environment:
+2. Read the environment file `.yaul.env` into your current shell.
+
+       source $HOME/.yaul.env
+
+3. Reading the environment file needs to be done every time a new shell is
+   opened. To avoid having to do this every time, add the line below to your
+   shell's startup file.
+
+       echo 'source $HOME/.yaul.env' >> $HOME/.bash_profile
+
+   If `.bash_profile` is not used, use `.profile` instead. This is dependent on
+   your set up.
+
+</details>
+
+<details>
+  <summary>Configuring the environment file</summary>
+
+Open `$HOME/.yaul.env` in a text editor and change the following to define your environment:
 
    1. Set the absolute path to the tool-chain in `YAUL_INSTALL_ROOT`.
    2. If necessary, set `YAUL_PROG_SH_PREFIX` and `YAUL_ARCH_SH_PREFIX`.
@@ -169,19 +181,6 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
       set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.
-
-3. Read the environment file `.yaul.env` into your current shell.
-
-       source ~/.yaul.env
-
-4. Reading the environment file needs to be done every time a new shell is
-   opened. To avoid having to do this every time, add the line below to your
-   shell's startup file.
-
-       echo 'source ~/.yaul.env' >> ~/.bash_profile
-
-   If `.bash_profile` is not used, use `.profile` instead. This is dependent on
-   your set up.
 
 </details>
 
@@ -214,26 +213,22 @@ Please note, you still need to [build Yaul](#building-yaul-manually).
 1. If you've built Yaul manually, check out any example in the [`examples`][4]
    submodule. Otherwise, go to `/opt/yaul-examples/`.
 
-2. Copy the `vdp1-balls` directory to your home directory
+2. Copy the `vdp1-zoom-sprite` directory to your home directory
 
-       cp -r vdp1-balls ~
+       cp -r vdp1-zoom-sprite $HOME/
 
-3. Build `vdp1-balls`
+3. Build `vdp1-sprite`
 
-       cd ~/vdp1-balls
+       cd $HOME/vdp1-zoom-sprite
        SILENT=1 make clean
        SILENT=1 make
 
 4. If you have Mednafen or Yabause correctly configured, you can test the
    example.
 
-       mednafen vdp1-balls.cue
+       mednafen vdp1-zoom-sprite.cue
 
 5. Success! :tada:
-
-<p align="center">
-  <img src=".images/results.png" alt="Balls!">
-</p>
 
 ## Contact
 
