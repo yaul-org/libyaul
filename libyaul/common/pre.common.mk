@@ -69,6 +69,17 @@ BUILD_ROOT:= $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
 ifeq '$(OS)' "Windows_NT"
 EXE_EXT:= .exe
+
+# In order to avoid the following error under MSYS2 and MinGW-w32:
+#
+# /opt/tool-chains/sh2eb-elf/bin/sh2eb-elf-gcc.exe: error while loading shared
+# libraries: libwinpthread-1.dll: cannot open shared object file: No such file
+# or directory
+#
+# We need to have /mingw/bin in our path. It's unclear exactly why, but
+# libwinpthread-1.dll resides in /mingw64/bin. Copying libwinpthread-1.dll to
+# /opt/tool-chains/sh2eb-elf/bin does not resolve the issue
+PATH:= /mingw64/bin:$(PATH)
 endif
 
 # Customizable (must be overwritten in user's Makefile)
