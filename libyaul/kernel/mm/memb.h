@@ -82,7 +82,7 @@ typedef struct memb {
 void memb_init(memb_t *memb);
 int memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
     uint32_t block_size);
-int memb_memb_alloc(memb_t *memb, uint32_t block_size, uint32_t block_count,
+int memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
     uint32_t align);
 void memb_memb_free(memb_t *memb);
 
