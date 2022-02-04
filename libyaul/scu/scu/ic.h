@@ -384,7 +384,7 @@ scu_ic_status_get(void)
 /// @details Below describes what happens when reading and writing to the @ref
 /// IST register:
 /// @htmlinclude scu_ic_status_table.html
-/// 
+///
 /// @param value The 32-bit-value.
 static inline void __always_inline
 scu_ic_status_set(scu_ic_status_reg_t value)
