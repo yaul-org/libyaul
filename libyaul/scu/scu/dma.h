@@ -414,11 +414,14 @@ extern void scu_dma_config_set(scu_dma_level_t level,
 
 /// @brief Perform a transfer.
 ///
+/// @details Transfer is asynchronous. Use @p scu_dma_transfer_wait to wait for
+/// the transfer to complete.
+///
 /// @param     level The SCU-DMA level.
 /// @param[in] dst   The pointer to write to.
 /// @param[in] src   The pointer to read from.
 /// @param     len   The amount to transfer in bytes.
-extern void scu_dma_transfer(scu_dma_level_t level, void *dst, void *src,
+extern void scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src,
     size_t len);
 
 /// @brief Wait for a transfer to complete.
