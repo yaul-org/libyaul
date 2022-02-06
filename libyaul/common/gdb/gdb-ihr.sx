@@ -66,17 +66,17 @@
 .text
 .align 1
 
-.global __gdb_ihr_ubc
-.type __gdb_ihr_ubc, @function
+.global ___gdb_ihr_ubc
+.type ___gdb_ihr_ubc, @function
 
-__gdb_ihr_ubc:
+___gdb_ihr_ubc:
         rte
         nop
 
-.global __gdb_ihr_break
-.type __gdb_ihr_break, @function
+.global ___gdb_ihr_break
+.type ___gdb_ihr_break, @function
 
-__gdb_ihr_break:
+___gdb_ihr_break:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -90,10 +90,10 @@ __gdb_ihr_break:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global __gdb_exception_illegal_instruction
-.type __gdb_exception_illegal_instruction, @function
+.global ___gdb_exception_illegal_instruction
+.type ___gdb_exception_illegal_instruction, @function
 
-__gdb_exception_illegal_instruction:
+___gdb_exception_illegal_instruction:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -107,17 +107,17 @@ __gdb_exception_illegal_instruction:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global __gdb_exception_illegal_slot
-.type __gdb_exception_illegal_slot, @function
+.global ___gdb_exception_illegal_slot
+.type ___gdb_exception_illegal_slot, @function
 
-__gdb_exception_illegal_slot:
-        bra __gdb_exception_illegal_instruction
+___gdb_exception_illegal_slot:
+        bra ___gdb_exception_illegal_instruction
         nop
 
-.global __gdb_exception_cpu_address_error
-.type __gdb_exception_cpu_address_error, @function
+.global ___gdb_exception_cpu_address_error
+.type ___gdb_exception_cpu_address_error, @function
 
-__gdb_exception_cpu_address_error:
+___gdb_exception_cpu_address_error:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -131,11 +131,11 @@ __gdb_exception_cpu_address_error:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global __gdb_exception_dma_address_error
-.type __gdb_exception_dma_address_error, @function
+.global ___gdb_exception_dma_address_error
+.type ___gdb_exception_dma_address_error, @function
 
-__gdb_exception_dma_address_error:
-        bra __gdb_exception_cpu_address_error
+___gdb_exception_dma_address_error:
+        bra ___gdb_exception_cpu_address_error
         nop
 
 .align 2

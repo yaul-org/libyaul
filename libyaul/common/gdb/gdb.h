@@ -12,7 +12,7 @@
 
 __BEGIN_DECLS
 
-#define GDB_TRAPA_VECTOR_NUMBER 32
+#define GDB_TRAPA_VECTOR_NUMBER (32)
 
 static inline void __always_inline
 gdb_break(void)

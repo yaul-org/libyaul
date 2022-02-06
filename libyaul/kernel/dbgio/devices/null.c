@@ -8,8 +8,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <dbgio.h>
-
 #include "../dbgio-internal.h"
 
 static void _init(const void *);

@@ -31,14 +31,11 @@
 
 #include <smpc/smc.h>
 
+#include <mm/memb.h>
+
 #include <internal.h>
 
-extern void internal_gdb_ihr_break(void);
-extern void internal_gdb_exception_cpu_address_error(void);
-extern void internal_gdb_exception_dma_address_error(void);
-extern void internal_gdb_exception_illegal_instruction(void);
-extern void internal_gdb_exception_illegal_slot(void);
-extern void internal_gdb_ihr_ubc(void);
+#include "gdb.h"
 
 #define REG_R0          0
 #define REG_R1          1
@@ -93,7 +90,14 @@ extern void internal_gdb_ihr_ubc(void);
 #define OPCODE_TRAPA(op)        (((op) & 0xFF00) == 0xC300)
 #define OPCODE_TRAPA_IMM(op)    ((op) & 0x00FF)
 
-static uintptr_t _calculate_pc(cpu_registers_t *);
+extern void __gdb_ihr_break(void);
+extern void __gdb_exception_cpu_address_error(void);
+extern void __gdb_exception_dma_address_error(void);
+extern void __gdb_exception_illegal_instruction(void);
+extern void __gdb_exception_illegal_slot(void);
+extern void __gdb_ihr_ubc(void);
+
+static uintptr_t _calculate_pc(cpu_registers_t *reg_file);
 
 typedef TAILQ_HEAD(bp_list, bp) bp_list_t;
 
@@ -104,68 +108,66 @@ struct bp {
         uint16_t instruction;
 
         TAILQ_ENTRY(bp) entries;
-};
+} __aligned(16);
 
-static bp_list_t *_bp_list_alloc(void);
-static bool _bp_list_empty(bp_list_t *);
-static void _bp_list_free(bp_list_t **) __unused;
+static_assert(sizeof(bp_t) == 16);
+
+static void _bp_init(void);
+static bool _bp_list_empty(void);
 static bp_t *_bp_list_breakpoint_alloc(void);
-static void _bp_list_breakpoint_free(bp_list_t *, bp_t *);
-static int _bp_list_breakpoint_add(bp_list_t *, void *);
-static bp_t *_bp_list_breakpoint_find(bp_list_t *, void *);
+static void _bp_list_breakpoint_free(bp_t *bp);
+static int _bp_list_breakpoint_add(void *addr);
+static bp_t *_bp_list_breakpoint_find(void *addr);
 
 static void _device_init(void);
 static uint8_t _device_read(void);
-static void _device_write(uint8_t);
+static void _device_write(uint8_t value);
 
 /* Overwritten instruction meant to allow stepping through */
 static bool _stepping = false;
+
+static bp_list_t _bp_list;
+static memb_t _bp_memb;
+
 static bp_t _bp_step = {
-        .addr = NULL,
+        .addr        = NULL,
         .instruction = 0x0000
 };
-
-static bp_list_t *_bp_list = NULL;
 
 static void
 _gdb_sh2_init(void)
 {
-        /* Disable interrupts */
-        uint32_t mask;
-        mask = cpu_intc_mask_get();
-
+        const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
         _device_init();
 
-        _bp_list = _bp_list_alloc();
+        _bp_init();
 
         /* Clear */
-        _bp_step.addr = 0x00000000;
-        _bp_step.instruction = 0x0000;
         _stepping = false;
 
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
-            internal_gdb_exception_illegal_instruction);
+            __gdb_exception_illegal_instruction);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
-            internal_gdb_exception_illegal_slot);
+            __gdb_exception_illegal_slot);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
-            internal_gdb_exception_cpu_address_error);
+            __gdb_exception_cpu_address_error);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR,
-            internal_gdb_exception_dma_address_error);
+            __gdb_exception_dma_address_error);
 
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, internal_gdb_ihr_ubc);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_UBC, __gdb_ihr_ubc);
 
-        cpu_intc_ihr_set(GDB_TRAPA_VECTOR_NUMBER, internal_gdb_ihr_break);
+        cpu_intc_ihr_set(GDB_TRAPA_VECTOR_NUMBER, __gdb_ihr_break);
 
         /* Initialize UBC */
+
         /*
          * Channel A is to be a queue of breakpoints/watchpoints
          * Channel B is used to break into GDB
          */
 
-        /* Enable interrupts */
-        cpu_intc_mask_set(mask);
+        cpu_intc_mask_set(sr_mask);
 
         gdb_break();
 }
@@ -179,7 +181,6 @@ _gdb_putc(int c)
 static int
 _gdb_getc(void)
 {
-        /* Blocks */
         return _device_read();
 }
 
@@ -187,11 +188,9 @@ static void
 _gdb_step(cpu_registers_t *reg_file, uint32_t address)
 {
         /* Determine where we'll be going */
-        uintptr_t pc;
-        pc = (address != 0x00000000) ? address : _calculate_pc(reg_file);
+        const uintptr_t pc = (address != 0x00000000) ? address : _calculate_pc(reg_file);
 
-        uint16_t *p;
-        p = (uint16_t *)pc;
+        uint16_t * const p = (uint16_t *)pc;
 
         _bp_step.addr = (void *)p;
         _bp_step.instruction = *p;
@@ -213,11 +212,11 @@ _gdb_remove_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 
         switch (type) {
         case 0x00:
-                if ((bp = _bp_list_breakpoint_find(_bp_list, (void *)addr)) == NULL) {
+                if ((bp = _bp_list_breakpoint_find((void *)addr)) == NULL) {
                         return -1;
                 }
 
-                _bp_list_breakpoint_free(_bp_list, bp);
+                _bp_list_breakpoint_free(bp);
 
                 return 0;
         default:
@@ -234,7 +233,7 @@ _gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 
         switch (type) {
         case 0x00:
-                if ((_bp_list_breakpoint_add(_bp_list, (void *)addr)) < 0) {
+                if ((_bp_list_breakpoint_add((void *)addr)) < 0) {
                         return -1;
                 }
 
@@ -264,7 +263,7 @@ _gdb_monitor_entry(cpu_registers_t *reg_file)
 
         bp_t *bp;
 
-        if (!_stepping && _bp_list_empty(_bp_list)) {
+        if (!_stepping && _bp_list_empty()) {
                 return;
         }
 
@@ -275,7 +274,7 @@ _gdb_monitor_entry(cpu_registers_t *reg_file)
 
         /* Determine if we're stepping into/over a breakpoint */
         p = (uint16_t *)reg_file->pc;
-        if ((bp = _bp_list_breakpoint_find(_bp_list, (void *)p)) != NULL) {
+        if ((bp = _bp_list_breakpoint_find((void *)p)) != NULL) {
                 p = (uint16_t *)bp->addr;
                 *p = bp->instruction;
         }
@@ -396,6 +395,7 @@ _gdb_register_file_write(cpu_registers_t *reg_file, uint32_t n, uint32_t r)
         }
 
         *p = r;
+
         return true;
 }
 
@@ -455,38 +455,25 @@ _calculate_pc(cpu_registers_t *reg_file)
         return pc;
 }
 
-static bp_list_t *
-_bp_list_alloc(void)
+static void
+_bp_init(void)
 {
-        bp_list_t *bpl;
+        _bp_step.addr = 0x00000000;
+        _bp_step.instruction = 0x0000;
 
-        if ((bpl = (bp_list_t *)__malloc(sizeof(bp_list_t))) == NULL) {
-                return NULL;
-        }
+        __memb_memb_alloc(&_bp_memb, 16, sizeof(bp_t), 4);
 
-        /* Initialize queue */
-        TAILQ_INIT(bpl);
-
-        return bpl;
+        TAILQ_INIT(&_bp_list);
 }
 
 static bool
-_bp_list_empty(bp_list_t *bpl)
+_bp_list_empty(void)
 {
-        if (TAILQ_EMPTY(bpl)) {
+        if (TAILQ_EMPTY(&_bp_list)) {
                 return true;
         }
 
         return false;
-}
-
-static void
-_bp_list_free(bp_list_t **bplp)
-{
-        assert(*bplp != NULL);
-
-        __free(*bplp);
-        *bplp = NULL;
 }
 
 static bp_t *
@@ -494,7 +481,7 @@ _bp_list_breakpoint_alloc(void)
 {
         bp_t *bp;
 
-        if ((bp = (bp_t *)__malloc(sizeof(bp_t))) == NULL) {
+        if ((bp = memb_alloc(&_bp_memb)) == NULL) {
                 return NULL;
         }
 
@@ -505,32 +492,30 @@ _bp_list_breakpoint_alloc(void)
 }
 
 static void
-_bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
+_bp_list_breakpoint_free(bp_t *bp)
 {
-        uint16_t *p;
-
         assert(bp != NULL);
 
-        if (TAILQ_EMPTY(bpl)) {
+        if (TAILQ_EMPTY(&_bp_list)) {
                 return;
         }
 
-        p = (uint16_t *)bp->addr;
-        *p = bp->instruction;
+        volatile uint16_t * const addr_p = (volatile uint16_t *)bp->addr;
 
-        TAILQ_REMOVE(bpl, bp, entries);
-        __free(bp);
+        *addr_p = bp->instruction;
+
+        TAILQ_REMOVE(&_bp_list, bp, entries);
+
+        memb_free(&_bp_memb, bp);
 }
 
 static int
-_bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
+_bp_list_breakpoint_add(void *addr)
 {
         bp_t *bp;
 
-        assert(bpl != NULL);
-
         /* Check if we have a breakpoint of the same address already present */
-        if ((_bp_list_breakpoint_find(_bp_list, (void *)addr)) != NULL) {
+        if ((_bp_list_breakpoint_find((void *)addr)) != NULL) {
                 return 0;
         }
 
@@ -538,28 +523,28 @@ _bp_list_breakpoint_add(bp_list_t *bpl, void *addr)
                 return -1;
         }
 
-        bp->addr = addr;
-        bp->instruction = *(uint16_t *)addr;
-        *(uint16_t *)addr = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
+        volatile uint16_t *addr_p = (volatile uint16_t *)addr;
 
-        /* Insert */
-        TAILQ_INSERT_TAIL(bpl, bp, entries);
+        bp->addr = addr;
+        bp->instruction = *addr_p;
+
+        *addr_p = INSTRN_TRAPA(GDB_TRAPA_VECTOR_NUMBER);
+
+        TAILQ_INSERT_TAIL(&_bp_list, bp, entries);
 
         return 0;
 }
 
 static bp_t *
-_bp_list_breakpoint_find(bp_list_t *bpl, void *addr)
+_bp_list_breakpoint_find(void *addr)
 {
         bp_t *bp_np;
 
-        assert(bpl != NULL);
-
-        if (TAILQ_EMPTY(bpl)) {
+        if (TAILQ_EMPTY(&_bp_list)) {
                 return NULL;
         }
 
-        TAILQ_FOREACH (bp_np, bpl, entries) {
+        TAILQ_FOREACH (bp_np, &_bp_list, entries) {
                 if (bp_np->addr == addr) {
                         return bp_np;
                 }
@@ -583,7 +568,6 @@ static uint8_t
 _device_read(void)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_txe_wait();
         return usb_cart_byte_read();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         return arp_byte_read();
@@ -594,7 +578,6 @@ static void
 _device_write(uint8_t value)
 {
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_rxf_wait();
         usb_cart_byte_send(value);
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
         arp_byte_xchg(value);

@@ -33,7 +33,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <internal.h>
+
 #include "memb.h"
+#include "memb-internal.h"
 
 /*
  * Returns 1 if PTR is within bounds of the block pool NAME.
@@ -43,7 +46,8 @@
          ((int8_t *)(ptr) < ((int8_t *)(name)->pool +                          \
              ((name)->count * (name)->size))))
 
-static inline uint32_t _block_index_wrap(const memb_t *memb, uint32_t index) __always_inline;
+static inline uint32_t _block_index_wrap(const memb_t *memb,
+    uint32_t index) __always_inline;
 
 /*
  * Initialize a block pool MEMB.
@@ -64,65 +68,33 @@ memb_init(memb_t *memb)
 }
 
 int
-memb_memb_init(memb_t *memb, void *pool, uint32_t block_count, uint32_t block_size)
+memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
+    uint32_t block_size)
 {
-        assert(memb != NULL);
-        assert(pool != NULL);
+        const memb_request_t request = {
+                .malloc      = malloc,
+                .free        = free,
+                .block_count = block_count,
+                .block_size  = block_size
+        };
 
-        assert(block_count != 0);
-        assert(block_size != 0);
-
-        const size_t ref_size = sizeof(memb_ref_t) * block_count;
-        memb_ref_t * const refs = malloc(ref_size);
-
-        if (refs == NULL) {
-                return -1;
-        }
-
-        memb->type = MEMB_TYPE_SET;
-        memb->size = block_size;
-        memb->count = block_count;
-        memb->refs = refs;
-        memb->pool = pool;
-
-        memb_init(memb);
-
-        return 0;
+        return __memb_memb_request_init(memb, pool, &request);
 }
 
 int
-memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size, uint32_t align)
+memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
+    uint32_t align)
 {
-        assert(memb != NULL);
+        const memb_request_t request = {
+                .malloc      = malloc,
+                .memalign    = memalign,
+                .free        = free,
+                .block_count = block_count,
+                .block_size  = block_size,
+                .align       = align
+        };
 
-        assert(block_count != 0);
-        assert(block_size != 0);
-
-        align = max(align, 4UL);
-
-        const size_t ref_size = sizeof(memb_ref_t) * block_count;
-        const size_t pool_size = block_size * block_count;
-
-        /* Allocate all memory needed in a single request */
-        void * const area = memalign(ref_size + pool_size, align);
-
-        if (area == NULL) {
-                return -1;
-        }
-
-        uintptr_t area_ptr = (uintptr_t)area;
-
-        memb->type = MEMB_TYPE_DYNAMIC;
-        memb->size = block_size;
-        memb->count = block_count;
-        memb->refs = (void *)(area_ptr + pool_size);
-        /* Have the pool be at the top of the allocation request for
-         * alignment */
-        memb->pool = (void *)area_ptr;
-
-        memb_init(memb);
-
-        return 0;
+        return __memb_memb_request_alloc(memb, &request);
 }
 
 void
@@ -134,10 +106,10 @@ memb_memb_free(memb_t *memb)
         case MEMB_TYPE_STATIC:
                 return;
         case MEMB_TYPE_DYNAMIC:
-                free(memb->pool);
+                memb->free(memb->pool);
                 break;
         case MEMB_TYPE_SET:
-                free(memb->refs);
+                memb->free(memb->refs);
                 break;
         }
 
