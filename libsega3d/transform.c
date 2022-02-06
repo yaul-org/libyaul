@@ -8,7 +8,7 @@
 #include <cpu/divu.h>
 #include <vdp.h>
 
-#include <dbgio.h>
+#include <dbgio/dbgio.h>
 
 #include "sega3d-internal.h"
 
