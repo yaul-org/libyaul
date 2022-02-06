@@ -88,8 +88,8 @@ _vdp2_init(void)
 
         (void)memset(_state_vdp2()->regs, 0x00, sizeof(vdp2_registers_t));
 
-        _state_vdp2()->tv.resolution.x = 0;
-        _state_vdp2()->tv.resolution.y = 0;
+        _state_vdp2()->tv.resolution.x = 320;
+        _state_vdp2()->tv.resolution.y = 224;
 
         vdp2_scrn_priority_set(VDP2_SCRN_NBG0, 1);
         vdp2_scrn_priority_set(VDP2_SCRN_NBG1, 1);
@@ -117,15 +117,15 @@ static void
 _memory_area_clear(uint32_t address, uint16_t value, uint32_t len)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
-                .channel = 0,
+                .channel  = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .src = 0x00000000,
-                .dst = 0x00000000,
+                .src      = 0x00000000,
+                .dst      = 0x00000000,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len = 0x00000000,
-                .stride = CPU_DMAC_STRIDE_2_BYTES,
+                .len      = 0x00000000,
+                .stride   = CPU_DMAC_STRIDE_2_BYTES,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr = NULL
+                .ihr      = NULL
         };
 
         dmac_cfg.dst = CPU_CACHE_THROUGH | address;
