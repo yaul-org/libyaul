@@ -119,6 +119,10 @@ need to [build Yaul](#building-tool-chain-from-source).
 
 <a href="building-tool-chain-from-source"></a>
 
+### Docker
+
+A [`Dockerfile`][8] file is available.
+
 ## Building tool-chain from source
 
 Follow the instructions found in the [`build-scripts/`][5] directory. Please
@@ -218,7 +222,7 @@ Open `$HOME/.yaul.env` in a text editor and change the following to define your 
 
 2. Copy the `vdp1-zoom-sprite` directory to your home directory
 
-       cp -r vdp1-zoom-sprite $HOME/
+       cp -r /opt/yaul-examples/vdp1-zoom-sprite $HOME/
 
 3. Build `vdp1-sprite`
 
@@ -226,10 +230,16 @@ Open `$HOME/.yaul.env` in a text editor and change the following to define your 
        SILENT=1 make clean
        SILENT=1 make
 
-4. If you have Mednafen or Yabause correctly configured, you can test the
-   example.
+4. Use Mednafen to test the example.
 
        mednafen vdp1-zoom-sprite.cue
+
+   If Mednafen is unable to find the Sega Saturn BIOS image, please confirm that,
+
+     1. The file is named `mpr-17933.bin` and that it exists relative to the
+        `firmware` directory under the [Mednafen base directory][9].
+
+     2. The calculated MD5 hash of the file is `3240872c70984b6cbfda1586cab68dbe`.
 
 5. Success! :tada:
 
@@ -238,9 +248,9 @@ Open `$HOME/.yaul.env` in a text editor and change the following to define your 
 You can find me (*@mrkotfw*) on [Discord]( https://discord.gg/S434dWA).
 
 [1]: https://yaul.org/
-[2]: https://github.com/ijacquez/libyaul-installer/releases/latest
-[3]: https://github.com/ijacquez/libyaul-packages/releases/latest
 [4]: https://github.com/ijacquez/libyaul-examples
 [5]: https://github.com/ijacquez/libyaul-build-scripts
 [6]: https://github.com/ijacquez/libyaul-packages
 [7]: https://www.msys2.org/
+[8]: https://github.com/ijacquez/libyaul-docker
+[9]: https://mednafen.github.io/documentation/#Section_base_directory
