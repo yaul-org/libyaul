@@ -7,8 +7,6 @@
 
 #include <string.h>
 
-#include <gdb.h>
-
 #include <cpu/cache.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>

@@ -67,6 +67,7 @@ LIB_SRCS+= \
 	kernel/sys/callback-list.c \
 	\
 	kernel/mm/memb.c \
+	kernel/mm/memb-internal.c \
 	kernel/mm/mm_stats.c
 
 # TLSF is required

@@ -19,10 +19,7 @@
 
 #include <sys/dma-queue.h>
 
-#include <dbgio.h>
 #include <internal.h>
-
-#include "../dbgio-internal.h"
 
 #include "cons/cons.h"
 

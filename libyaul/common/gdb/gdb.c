@@ -31,14 +31,14 @@ typedef union {
 } lc_t;
 
 /* Helpers */
-static char *_hex_buffer_to_mem(const char *, void *, size_t);
-static char *_parse_unsigned_long(char *, uint32_t *, int);
-static char _low_nibble_to_hex(char);
-static int _hex_digit_to_integer(char);
-static int _mem_to_hex_buffer(const void *, char *, size_t);
-static uint8_t _put_buf(const char *, int);
-static void _get_packet(char *);
-static void _put_packet(char, const char *, size_t);
+static char *_hex_buffer_to_mem(const char *buf, void *mem, size_t len);
+static char *_parse_unsigned_long(char *hargs, uint32_t *l, int delim);
+static char _low_nibble_to_hex(char c);
+static int _hex_digit_to_integer(char h);
+static int _mem_to_hex_buffer(const void *mem, char *h_buf, size_t len);
+static uint8_t _put_buf(const char *buffer, int len);
+static void _get_packet(char *rx_buffer);
+static void _put_packet(char c, const char *buffer, size_t len);
 
 /* GDB commands */
 static void _gdb_command_read_memory(uint32_t, uint32_t);

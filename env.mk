@@ -183,11 +183,8 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 SHARED_INCLUDE_DIRS:= \
 	../lib$(MAIN_TARGET)/. \
 	../lib$(MAIN_TARGET)/common \
-	../lib$(MAIN_TARGET)/common/gdb \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
-	../lib$(MAIN_TARGET)/kernel/dbgio \
-	../lib$(MAIN_TARGET)/kernel/vfs \
 	../lib$(MAIN_TARGET)/math \
 	../lib$(MAIN_TARGET)/scu \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/arp \

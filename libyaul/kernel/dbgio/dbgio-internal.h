@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <dbgio.h>
+#include "dbgio.h"
 
 __BEGIN_DECLS
 

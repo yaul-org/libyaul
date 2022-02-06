@@ -11,8 +11,6 @@
 #include <cpu/intc.h>
 #include <vdp.h>
 
-#include <dbgio.h>
-
 #include <internal.h>
 
 #define ASSERTION_MAX_COUNT 3

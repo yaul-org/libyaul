@@ -10,11 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <dbgio.h>
-
 #include <usb-cart.h>
-
-#include "../dbgio-internal.h"
 
 #include <ssload.h>
 #include <internal.h>

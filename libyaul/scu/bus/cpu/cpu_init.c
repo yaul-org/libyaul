@@ -24,8 +24,6 @@
 
 #include <vdp.h>
 
-#include <dbgio.h>
-
 #include <internal.h>
 
 #define EXCEPTION_TRAMPOLINE_EMIT(name)                                        \

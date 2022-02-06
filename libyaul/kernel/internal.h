@@ -11,8 +11,9 @@
 #include <sys/cdefs.h>
 
 #include <cpu-internal.h>
-#include <dbgio-internal.h>
+#include <dbgio/dbgio-internal.h>
 #include <dram-cart-internal.h>
+#include <mm/memb-internal.h>
 #include <smpc-internal.h>
 #include <vdp-internal.h>
 

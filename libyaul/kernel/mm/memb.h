@@ -56,7 +56,8 @@ static memb_t name = {                                                         \
         &__CONCAT(name, _memb_ref)[0],                                         \
         0,                                                                     \
         0,                                                                     \
-        (void *)&__CONCAT(name, _memb_mem)[0]                                  \
+        (void *)&__CONCAT(name, _memb_mem)[0],                                 \
+        NULL                                                                   \
 }
 
 typedef struct memb_ref {
@@ -77,6 +78,8 @@ typedef struct memb {
         uint32_t next_index;  /* Index to next unreferenced block */
         uint32_t alloc_count; /* Number of allocated unit blocks */
         void *pool;
+
+        void (*free)(void *p);
 } memb_t;
 
 void memb_init(memb_t *memb);
