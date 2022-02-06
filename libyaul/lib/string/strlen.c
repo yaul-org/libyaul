@@ -26,10 +26,10 @@
 #include <limits.h>
 
 #define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t)-1/UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX/2+1))
+#define ONES            ((size_t) - 1 / UCHAR_MAX)
+#define HIGHS           (ONES * (UCHAR_MAX / 2 + 1))
 
-#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
+#define HAS_ZERO(x)     (((x) - ONES) & ~(x) & HIGHS)
 
 size_t
 strlen(const char *s)
@@ -55,5 +55,5 @@ strlen(const char *s)
         for (; *s != '\0'; s++) {
         }
 
-        return s - a;
+        return (s - a);
 }
