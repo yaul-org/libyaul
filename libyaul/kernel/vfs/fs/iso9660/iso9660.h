@@ -8,14 +8,15 @@
 #ifndef _YAUL_KERNEL_FS_ISO9660_H_
 #define _YAUL_KERNEL_FS_ISO9660_H_
 
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
 #include <cd-block.h>
-
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 
 __BEGIN_DECLS
 
