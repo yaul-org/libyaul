@@ -94,7 +94,7 @@ romdisk_mount(const uint8_t *image)
         struct romdisk_hdr * const hdr = (struct romdisk_hdr *)image;
 
         struct rd_image *mnt;
-        if ((mnt = (struct rd_image *)_internal_malloc(sizeof(struct rd_image))) == NULL) {
+        if ((mnt = (struct rd_image *)__malloc(sizeof(struct rd_image))) == NULL) {
                 return NULL;
         }
 
@@ -391,7 +391,7 @@ static struct rd_file_handle *
 _romdisk_fd_alloc(void)
 {
         struct rd_file_handle * const fh =
-            (struct rd_file_handle *)_internal_malloc(sizeof(struct rd_file_handle));
+            (struct rd_file_handle *)__malloc(sizeof(struct rd_file_handle));
 
         if (fh == NULL) {
                 return NULL;
@@ -427,5 +427,5 @@ _romdisk_fd_free(struct rd_file_handle *fd)
 
         TAILQ_REMOVE(&_fhs, fh, handles);
 
-        _internal_free(fh);
+        __free(fh);
 }

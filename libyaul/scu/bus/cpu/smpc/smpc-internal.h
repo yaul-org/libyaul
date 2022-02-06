@@ -17,7 +17,7 @@ struct smpc_peripheral_port;
 extern struct smpc_peripheral_port smpc_peripheral_port_1;
 extern struct smpc_peripheral_port smpc_peripheral_port_2;
 
-extern void _internal_smpc_init(void);
-extern void _internal_smpc_peripheral_init(void);
+extern void __smpc_init(void);
+extern void __smpc_peripheral_init(void);
 
 #endif /* !_SMPC_INTERNAL_H_ */

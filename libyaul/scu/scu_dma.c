@@ -40,7 +40,7 @@ static void _scu_dma_level1_handler(void);
 static void _scu_dma_level2_handler(void);
 
 void
-_internal_scu_dma_init(void)
+__scu_dma_init(void)
 {
         scu_dma_stop();
 

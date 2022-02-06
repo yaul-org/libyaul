@@ -14,7 +14,7 @@
 
 static void _nop(void);
 
-const struct dbgio_dev_ops _internal_dev_ops_vdp1 = {
+const struct dbgio_dev_ops __dev_ops_vdp1 = {
         .dev            = DBGIO_DEV_VDP1,
         .default_params = NULL,
         .init           = (void (*)(const void *))_nop,

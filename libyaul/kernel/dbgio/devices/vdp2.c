@@ -308,7 +308,7 @@ _font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
 static void
 _dev_state_init(const dbgio_vdp2_t *params)
 {
-        _dev_state = _internal_malloc(sizeof(struct dev_state));
+        _dev_state = __malloc(sizeof(struct dev_state));
         assert(_dev_state != NULL);
 
         (void)memset(_dev_state, 0x00, sizeof(struct dev_state));
@@ -332,7 +332,7 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
         _pnd_values_update(/* force = */ true);
 
-        _dev_state->page_pnd = _internal_malloc(_dev_state->page_size);
+        _dev_state->page_pnd = __malloc(_dev_state->page_size);
         assert(_dev_state->page_pnd != NULL);
 
         _dev_state->tv_resolution = _state_vdp2()->tv.resolution;
@@ -438,9 +438,9 @@ _shared_deinit(void)
                 return;
         }
 
-        _internal_free(_dev_state->page_pnd);
+        __free(_dev_state->page_pnd);
 
-        _internal_free(_dev_state);
+        __free(_dev_state);
 
         _dev_state = NULL;
 }

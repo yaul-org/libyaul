@@ -460,7 +460,7 @@ _bp_list_alloc(void)
 {
         bp_list_t *bpl;
 
-        if ((bpl = (bp_list_t *)_internal_malloc(sizeof(bp_list_t))) == NULL) {
+        if ((bpl = (bp_list_t *)__malloc(sizeof(bp_list_t))) == NULL) {
                 return NULL;
         }
 
@@ -485,7 +485,7 @@ _bp_list_free(bp_list_t **bplp)
 {
         assert(*bplp != NULL);
 
-        _internal_free(*bplp);
+        __free(*bplp);
         *bplp = NULL;
 }
 
@@ -494,7 +494,7 @@ _bp_list_breakpoint_alloc(void)
 {
         bp_t *bp;
 
-        if ((bp = (bp_t *)_internal_malloc(sizeof(bp_t))) == NULL) {
+        if ((bp = (bp_t *)__malloc(sizeof(bp_t))) == NULL) {
                 return NULL;
         }
 
@@ -519,7 +519,7 @@ _bp_list_breakpoint_free(bp_list_t *bpl, bp_t *bp)
         *p = bp->instruction;
 
         TAILQ_REMOVE(bpl, bp, entries);
-        _internal_free(bp);
+        __free(bp);
 }
 
 static int
@@ -574,7 +574,7 @@ _device_init(void)
         /* This is useful to have USB cart initialized here explicitly, as we
          * could be debugging kernel/sys/init.c */
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        _internal_usb_cart_init();
+        __usb_cart_init();
 #elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #endif /* HAVE_DEV_CARTRIDGE */
 }

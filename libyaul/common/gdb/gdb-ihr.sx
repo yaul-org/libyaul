@@ -66,17 +66,17 @@
 .text
 .align 1
 
-.global _internal_gdb_ihr_ubc
-.type _internal_gdb_ihr_ubc, @function
+.global __gdb_ihr_ubc
+.type __gdb_ihr_ubc, @function
 
-_internal_gdb_ihr_ubc:
+__gdb_ihr_ubc:
         rte
         nop
 
-.global _internal_gdb_ihr_break
-.type _internal_gdb_ihr_break, @function
+.global __gdb_ihr_break
+.type __gdb_ihr_break, @function
 
-_internal_gdb_ihr_break:
+__gdb_ihr_break:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -90,10 +90,10 @@ _internal_gdb_ihr_break:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _internal_gdb_exception_illegal_instruction
-.type _internal_gdb_exception_illegal_instruction, @function
+.global __gdb_exception_illegal_instruction
+.type __gdb_exception_illegal_instruction, @function
 
-_internal_gdb_exception_illegal_instruction:
+__gdb_exception_illegal_instruction:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -107,17 +107,17 @@ _internal_gdb_exception_illegal_instruction:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _internal_gdb_exception_illegal_slot
-.type _internal_gdb_exception_illegal_slot, @function
+.global __gdb_exception_illegal_slot
+.type __gdb_exception_illegal_slot, @function
 
-_internal_gdb_exception_illegal_slot:
-        bra _internal_gdb_exception_illegal_instruction
+__gdb_exception_illegal_slot:
+        bra __gdb_exception_illegal_instruction
         nop
 
-.global _internal_gdb_exception_cpu_address_error
-.type _internal_gdb_exception_cpu_address_error, @function
+.global __gdb_exception_cpu_address_error
+.type __gdb_exception_cpu_address_error, @function
 
-_internal_gdb_exception_cpu_address_error:
+__gdb_exception_cpu_address_error:
         /* Sends a SIGTRAP to GDB */
         MACRO_TRAMPOLINE_PROLOGUE
 
@@ -131,11 +131,11 @@ _internal_gdb_exception_cpu_address_error:
 
         MACRO_TRAMPOLINE_EPILOGUE
 
-.global _internal_gdb_exception_dma_address_error
-.type _internal_gdb_exception_dma_address_error, @function
+.global __gdb_exception_dma_address_error
+.type __gdb_exception_dma_address_error, @function
 
-_internal_gdb_exception_dma_address_error:
-        bra _internal_gdb_exception_cpu_address_error
+__gdb_exception_dma_address_error:
+        bra __gdb_exception_cpu_address_error
         nop
 
 .align 2

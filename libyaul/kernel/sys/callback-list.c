@@ -23,11 +23,11 @@ callback_list_alloc(uint8_t count)
         assert(count > 0);
 
         callback_list_t *callback_list;
-        callback_list = _internal_malloc(sizeof(callback_list_t));
+        callback_list = __malloc(sizeof(callback_list_t));
         assert(callback_list != NULL);
 
         callback_t *callbacks;
-        callbacks = _internal_malloc(count * sizeof(callback_t));
+        callbacks = __malloc(count * sizeof(callback_t));
         assert(callbacks != NULL);
 
         callback_list_init(callback_list, callbacks, count);
@@ -44,8 +44,8 @@ callback_list_free(callback_list_t *callback_list)
 
         callback_list->count = 0;
 
-        _internal_free(callback_list->callbacks);
-        _internal_free(callback_list);
+        __free(callback_list->callbacks);
+        __free(callback_list);
 }
 
 void

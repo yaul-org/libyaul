@@ -9,7 +9,7 @@
 void * __weak
 malloc(size_t n)
 {
-        extern void *_internal_user_malloc(size_t n);
+        extern void *__user_malloc(size_t n);
 
-        return _internal_user_malloc(n);
+        return __user_malloc(n);
 }

@@ -41,7 +41,7 @@ static inline void __always_inline _env_current_update(const vdp1_env_t *env);
 static void _env_default_erase_update(void);
 
 void
-_internal_vdp1_env_init(void)
+__vdp1_env_init(void)
 {
         _state_vdp1()->current_env = &_current_env;
 

@@ -28,30 +28,30 @@ static vdp1_vram_partitions_t _vdp1_vram_partitions;
 static vdp2_registers_t _vdp2_registers __aligned(16);
 
 void
-_internal_vdp_init(void)
+__vdp_init(void)
 {
         /* Should only be internal to vdp_init.c */
-        extern void _internal_vdp_sync_init(void);
+        extern void __vdp_sync_init(void);
 
         /* VDP2 must be initialized first before VDP1 as the VDP1 writes to VDP2
          * registers */
         _vdp2_init();
         _vdp1_init();
 
-        _internal_vdp_sync_init();
+        __vdp_sync_init();
 }
 
 static void
 _vdp1_init(void)
 {
-        extern void _internal_vdp1_env_init(void);
+        extern void __vdp1_env_init(void);
 
         _state_vdp1()->regs = &_vdp1_registers;
         _state_vdp1()->vram_partitions = &_vdp1_vram_partitions;
 
         (void)memset(_state_vdp1()->regs, 0x00, sizeof(vdp1_registers_t));
 
-        _internal_vdp1_env_init();
+        __vdp1_env_init();
 
         vdp1_vram_partitions_set(VDP1_VRAM_DEFAULT_CMDT_COUNT,
                                  VDP1_VRAM_DEFAULT_TEXTURE_SIZE,
@@ -80,7 +80,7 @@ _vdp1_init(void)
 static void
 _vdp2_init(void)
 {
-        extern void _internal_vdp2_vram_init(void);
+        extern void __vdp2_vram_init(void);
 
         MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
 
@@ -105,7 +105,7 @@ _vdp2_init(void)
 
         vdp2_scrn_back_screen_color_set(VDP2_VRAM_ADDR(3, 0x0001FFFE), COLOR_RGB1555(0, 0, 0, 0));
 
-        _internal_vdp2_vram_init();
+        __vdp2_vram_init();
 
         _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
         _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);

@@ -10,14 +10,14 @@
 .text
 .align 4
 
-.global __internal_asm_vertex_pool_transform
-.type __internal_asm_vertex_pool_transform, @function
+.global ___asm_vertex_pool_transform
+.type ___asm_vertex_pool_transform, @function
 
 ! r4: void *        State
 ! r5: transform_t * Transform
 ! r6: POINT *       Points
 ! r7: uint32_t      Vertex count
-__internal_asm_vertex_pool_transform:
+___asm_vertex_pool_transform:
         mov     #12,r1                  ! Stride in bytes for each point
         mov.l   r9,@-r15
         mul.l   r1,r7                   ! vertex_count * 12

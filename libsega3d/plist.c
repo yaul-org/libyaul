@@ -12,9 +12,9 @@
 #include "sega3d-internal.h"
 
 void
-_internal_plist_init(void)
+__plist_init(void)
 {
-        list_t * const plist = _internal_state->plist;
+        list_t * const plist = __state->plist;
 
         plist->flags = LIST_FLAGS_NONE;
         plist->list = NULL;
@@ -26,19 +26,19 @@ _internal_plist_init(void)
 PALETTE *
 sega3d_plist_alloc(uint16_t palette_count)
 {
-        _internal_list_alloc(_internal_state->plist, palette_count);
+        __list_alloc(__state->plist, palette_count);
 
-        return _internal_state->plist->list;
+        return __state->plist->list;
 }
 
 void
 sega3d_plist_free(void)
 {
-        _internal_list_free(_internal_state->plist);
+        __list_free(__state->plist);
 }
 
 void
 sega3d_plist_set(PALETTE *palettes, uint16_t palette_count)
 {
-        _internal_list_set(_internal_state->plist, palettes, palette_count);
+        __list_set(__state->plist, palettes, palette_count);
 }
