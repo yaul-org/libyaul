@@ -13,7 +13,7 @@
 #include <scu/ic.h>
 
 void
-_internal_scu_timer_init(void)
+__scu_timer_init(void)
 {
         scu_timer_disable();
 

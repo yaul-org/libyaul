@@ -5,7 +5,7 @@ static scu_dma_handle_t _dma_handle;
 static void _async_init(const dbgio_vdp2_t *);
 static void _async_flush(void);
 
-const struct dbgio_dev_ops _internal_dev_ops_vdp2_async = {
+const struct dbgio_dev_ops __dev_ops_vdp2_async = {
         .dev            = DBGIO_DEV_VDP2_ASYNC,
         .default_params = &_default_params,
         .init           = (dev_ops_init_t)_async_init,

@@ -13,7 +13,7 @@ static volatile struct {
 static uint32_t _absolute_ticks_get(void);
 
 void
-_internal_perf_init(void)
+__perf_init(void)
 {
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_frt_ovi_set(_frt_ovi_handler);

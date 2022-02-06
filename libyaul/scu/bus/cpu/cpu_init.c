@@ -79,7 +79,7 @@ static void _ihr_exception_show(const cpu_registers_t * restrict,
     const char * restrict);
 
 void
-_internal_cpu_init(void)
+__cpu_init(void)
 {
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
@@ -99,11 +99,11 @@ _internal_cpu_init(void)
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
-        _internal_cpu_divu_init();
+        __cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         cpu_sci_init();
-        _internal_cpu_dmac_init();
+        __cpu_dmac_init();
         cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
 }
 
@@ -112,7 +112,7 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
 {
         const char * const buffer = _exception_message_format(regs, exception_name);
 
-        _internal_reset();
+        __reset();
 
         dbgio_dev_deinit();
         dbgio_dev_default_init(DBGIO_DEV_VDP2);
@@ -126,8 +126,8 @@ _ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict
 
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
-        _internal_vdp2_commit(0);
-        _internal_vdp2_commit_wait(0);
+        __vdp2_commit(0);
+        __vdp2_commit_wait(0);
 }
 
 static void __noreturn __used

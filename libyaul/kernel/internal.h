@@ -34,30 +34,30 @@ struct state {
 static inline struct state * __always_inline
 master_state(void)
 {
-        extern struct state _internal_master_state;
+        extern struct state __master_state;
 
-        return &_internal_master_state;
+        return &__master_state;
 }
 
 static inline struct state * __always_inline
 slave_state(void)
 {
-        extern struct state _internal_slave_state;
+        extern struct state __slave_state;
 
-        return &_internal_slave_state;
+        return &__slave_state;
 }
 
 extern void *_end;
 
-void _internal_reset(void);
+void __reset(void);
 
-void _internal_mm_init(void);
+void __mm_init(void);
 
-void *_internal_malloc(size_t);
-void *_internal_realloc(void *, size_t);
-void *_internal_memalign(size_t, size_t);
-void _internal_free(void *);
+void *__malloc(size_t);
+void *__realloc(void *, size_t);
+void *__memalign(size_t, size_t);
+void __free(void *);
 
-extern void _internal_dma_queue_init(void);
+extern void __dma_queue_init(void);
 
 #endif /* !_KERNEL_INTERNAL_H_ */

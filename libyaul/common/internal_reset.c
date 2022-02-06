@@ -21,7 +21,7 @@
 #include <sys/dma-queue.h>
 
 void
-_internal_reset(void)
+__reset(void)
 {
         cpu_intc_mask_set(15);
 

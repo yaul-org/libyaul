@@ -233,7 +233,7 @@ static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
 
 void
-_internal_vdp_sync_init(void)
+__vdp_sync_init(void)
 {
         const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
@@ -1014,9 +1014,9 @@ _vdp1_dma_transfer(const scu_dma_handle_t *dma_handle)
 static void
 _vdp2_init(void)
 {
-        extern void _internal_vdp2_xfer_table_init(void);
+        extern void __vdp2_xfer_table_init(void);
 
-        _internal_vdp2_xfer_table_init();
+        __vdp2_xfer_table_init();
 
         _state.vdp2.flags = VDP2_FLAG_IDLE;
 }
@@ -1049,7 +1049,7 @@ _vdp2_sync_commit(void)
         _state.vdp2.commit_level = level;
         _state.vdp2.flags = state_vdp2_flags;
 
-        _internal_vdp2_commit(level);
+        __vdp2_commit(level);
 
         DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
 }
@@ -1066,7 +1066,7 @@ _vdp2_sync_commit_wait(void)
                 return;
         }
 
-        _internal_vdp2_commit_wait(_state.vdp2.commit_level);
+        __vdp2_commit_wait(_state.vdp2.commit_level);
 
         state_vdp2_flags &= ~VDP2_FLAG_REQUEST_COMMIT_REGS;
         state_vdp2_flags |= VDP2_FLAG_REGS_COMMITTED;

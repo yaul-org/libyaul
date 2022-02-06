@@ -36,7 +36,7 @@ static void _default_stats_walker(const mm_stats_walk_entry_t *walk_entry);
 static void _tlsf_walker(void *ptr, size_t size, int used, void *user);
 
 void
-_internal_mm_init(void)
+__mm_init(void)
 {
         master_state()->tlsf_handles = &_handles[0];
 
@@ -52,7 +52,7 @@ _internal_mm_init(void)
 }
 
 void *
-_internal_malloc(size_t n)
+__malloc(size_t n)
 {
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 
@@ -60,7 +60,7 @@ _internal_malloc(size_t n)
 }
 
 void *
-_internal_realloc(void *old, size_t new_len)
+__realloc(void *old, size_t new_len)
 {
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 
@@ -68,7 +68,7 @@ _internal_realloc(void *old, size_t new_len)
 }
 
 void *
-_internal_memalign(size_t n, size_t align)
+__memalign(size_t n, size_t align)
 {
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 
@@ -76,7 +76,7 @@ _internal_memalign(size_t n, size_t align)
 }
 
 void
-_internal_free(void *addr)
+__free(void *addr)
 {
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 
@@ -84,7 +84,7 @@ _internal_free(void *addr)
 }
 
 void *
-_internal_user_malloc(size_t n __unused) /* Keep as __unused */
+__user_malloc(size_t n __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
@@ -94,7 +94,7 @@ _internal_user_malloc(size_t n __unused) /* Keep as __unused */
 }
 
 void *
-_internal_user_realloc(void *old __unused, size_t new_len __unused) /* Keep as __unused */
+__user_realloc(void *old __unused, size_t new_len __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
@@ -104,7 +104,7 @@ _internal_user_realloc(void *old __unused, size_t new_len __unused) /* Keep as _
 }
 
 void *
-_internal_user_memalign(size_t n __unused, size_t align __unused) /* Keep as __unused */
+__user_memalign(size_t n __unused, size_t align __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
@@ -114,7 +114,7 @@ _internal_user_memalign(size_t n __unused, size_t align __unused) /* Keep as __u
 }
 
 void
-_internal_user_free(void *addr __unused) /* Keep as __unused */
+__user_free(void *addr __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
@@ -126,7 +126,7 @@ _internal_user_free(void *addr __unused) /* Keep as __unused */
 }
 
 void
-_internal_mm_stats_walk(mm_stats_walker_t walker __unused, void *work __unused) /* Keep as __unused */
+__mm_stats_walk(mm_stats_walker_t walker __unused, void *work __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
@@ -136,7 +136,7 @@ _internal_mm_stats_walk(mm_stats_walker_t walker __unused, void *work __unused) 
 }
 
 void
-_internal_mm_stats_private_walk(mm_stats_walker_t walker, void *work)
+__mm_stats_private_walk(mm_stats_walker_t walker, void *work)
 {
         tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 

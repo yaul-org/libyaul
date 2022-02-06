@@ -172,7 +172,7 @@ _queue_request_start(const struct dma_queue_request *request)
 }
 
 void
-_internal_dma_queue_init(void)
+__dma_queue_init(void)
 {
         _state.current_tag = DMA_QUEUE_TAG_INVALID;
         _state.dma_queues = &_dma_queues[0];

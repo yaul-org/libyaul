@@ -43,4 +43,4 @@ static state_t _state = {
         .plist               = &_plist
 };
 
-state_t * const _internal_state = &_state;
+state_t * const __state = &_state;

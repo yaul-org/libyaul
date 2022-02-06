@@ -32,7 +32,7 @@ _assert(const char * restrict file, const char * restrict line,
         assertion_count++;
 
         if (assertion_count == 0) {
-                _internal_reset();
+                __reset();
 
                 dbgio_dev_default_init(DBGIO_DEV_VDP2);
 
@@ -68,8 +68,8 @@ _assert(const char * restrict file, const char * restrict line,
 
         /* Use the internal calls to commit VDP2 to avoid dealing with VDP2 sync
          * state */
-        _internal_vdp2_commit(0);
-        _internal_vdp2_commit_wait(0);
+        __vdp2_commit(0);
+        __vdp2_commit_wait(0);
 
         abort();
 }

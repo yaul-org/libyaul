@@ -26,7 +26,7 @@ static callback_t _slave_ihr_callbacks[2];
 static callback_t *_dmac_executor_ihr_callbacks_get(void);
 
 void
-_internal_cpu_dmac_init(void)
+__cpu_dmac_init(void)
 {
         cpu_dmac_channel_wait(0);
         cpu_dmac_channel_wait(1);

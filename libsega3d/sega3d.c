@@ -21,12 +21,12 @@
 #include "sega3d.h"
 #include "sega3d-internal.h"
 
-extern void _internal_fog_init(void);
-extern void _internal_matrix_init(void);
-extern void _internal_plist_init(void);
-extern void _internal_sort_init(void);
-extern void _internal_tlist_init(void);
-extern void _internal_transform_init(void);
+extern void __fog_init(void);
+extern void __matrix_init(void);
+extern void __plist_init(void);
+extern void __sort_init(void);
+extern void __tlist_init(void);
+extern void __transform_init(void);
 
 static void _perspective_calculate(FIXED fov_angle);
 static void _frustrum_nf_clip_planes_calculate(void);
@@ -36,31 +36,31 @@ void
 sega3d_init(void)
 {
         /* Prevent re-initialization */
-        if ((_internal_state->flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
+        if ((__state->flags & FLAGS_INITIALIZED) != FLAGS_NONE) {
                 return;
         }
 
-        _internal_state->flags = FLAGS_INITIALIZED;
+        __state->flags = FLAGS_INITIALIZED;
 
-        (void)memset(_internal_state->info, 0, sizeof(sega3d_info_t));
+        (void)memset(__state->info, 0, sizeof(sega3d_info_t));
 
         sega3d_display_level_set(0);
         sega3d_perspective_set(DEGtoANG(90.0f));
 
-        _internal_fog_init();
-        _internal_matrix_init();
-        _internal_plist_init();
-        _internal_sort_init();
-        _internal_tlist_init();
-        _internal_transform_init();
+        __fog_init();
+        __matrix_init();
+        __plist_init();
+        __sort_init();
+        __tlist_init();
+        __transform_init();
 
-        _internal_perf_init();
+        __perf_init();
 }
 
 void
 sega3d_display_level_set(uint16_t level)
 {
-        sega3d_info_t * const info = _internal_state->info;
+        sega3d_info_t * const info = __state->info;
 
         info->level = level & (DISPLAY_LEVEL_COUNT - 1);
         info->near = info->view_distance >> info->level;
@@ -79,7 +79,7 @@ sega3d_perspective_set(ANGLE fov)
         if (fov > MAX_FOV_ANGLE) {
                 fov = MAX_FOV_ANGLE;
         }
-        sega3d_info_t * const info = _internal_state->info;
+        sega3d_info_t * const info = __state->info;
 
         const FIXED fov_angle = fix16_mul(fov, FIX16_2PI) >> 1;
 
@@ -93,7 +93,7 @@ void
 sega3d_frustum_camera_set(const POINT position, const VECTOR rx,
     const VECTOR ry, const VECTOR rz)
 {
-        FIXED * const clip_camera = (FIXED *)_internal_state->clip_camera;
+        FIXED * const clip_camera = (FIXED *)__state->clip_camera;
 
         clip_camera[M00] = rx[X];
         clip_camera[M01] = rx[Y];
@@ -114,7 +114,7 @@ sega3d_frustum_camera_set(const POINT position, const VECTOR rx,
 void
 sega3d_info_get(sega3d_info_t *info)
 {
-        (void)memcpy(info, _internal_state->info, sizeof(sega3d_info_t));
+        (void)memcpy(info, __state->info, sizeof(sega3d_info_t));
 }
 
 Uint16
@@ -128,8 +128,8 @@ sega3d_object_polycount_get(const sega3d_object_t *object)
 static void
 _perspective_calculate(FIXED fov_angle)
 {
-        transform_t * const trans = _internal_state->transform;
-        sega3d_info_t * const info = _internal_state->info;
+        transform_t * const trans = __state->transform;
+        sega3d_info_t * const info = __state->info;
 
         uint16_t i_width;
         uint16_t i_height;
@@ -157,8 +157,8 @@ _perspective_calculate(FIXED fov_angle)
 static void
 _frustrum_nf_clip_planes_calculate(void)
 {
-        const sega3d_info_t * const info = _internal_state->info;
-        clip_planes_t * const clip_planes = _internal_state->clip_planes;
+        const sega3d_info_t * const info = __state->info;
+        clip_planes_t * const clip_planes = __state->clip_planes;
 
         fix16_vec3_t * const near_d = &clip_planes->near_d;
         near_d->x = FIX16(0.0f);
@@ -177,8 +177,8 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
         static const fix16_vec3_t axis_up    = FIX16_VEC3_INITIALIZER(0.0f, -1.0f, 0.0f);
         static const fix16_vec3_t axis_right = FIX16_VEC3_INITIALIZER(1.0f,  0.0f, 0.0f);
 
-        const sega3d_info_t * const info = _internal_state->info;
-        clip_planes_t * const clip_planes = _internal_state->clip_planes;
+        const sega3d_info_t * const info = __state->info;
+        clip_planes_t * const clip_planes = __state->clip_planes;
 
         const FIXED aspect_ratio = info->ratio;
 

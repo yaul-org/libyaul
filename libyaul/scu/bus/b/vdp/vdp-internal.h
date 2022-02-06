@@ -55,24 +55,24 @@ struct state_vdp2 {
 static inline struct state_vdp1 * __always_inline
 _state_vdp1(void)
 {
-        extern struct state_vdp1 _internal_state_vdp1;
+        extern struct state_vdp1 __state_vdp1;
 
-        return &_internal_state_vdp1;
+        return &__state_vdp1;
 }
 
 static inline struct state_vdp2 * __always_inline
 _state_vdp2(void)
 {
-        extern struct state_vdp2 _internal_state_vdp2;
+        extern struct state_vdp2 __state_vdp2;
 
-        return &_internal_state_vdp2;
+        return &__state_vdp2;
 }
 
-extern void _internal_vdp_init(void);
+extern void __vdp_init(void);
 
-extern void _internal_vdp2_xfer_table_update(uint32_t xfer_index);
+extern void __vdp2_xfer_table_update(uint32_t xfer_index);
 
-extern void _internal_vdp2_commit(scu_dma_level_t level);
-extern void _internal_vdp2_commit_wait(scu_dma_level_t level);
+extern void __vdp2_commit(scu_dma_level_t level);
+extern void __vdp2_commit_wait(scu_dma_level_t level);
 
 #endif /* !_VDP_INTERNAL_H_ */

@@ -16,9 +16,9 @@ static TEXTURE _default_texture[] = {
 };
 
 void
-_internal_tlist_init(void)
+__tlist_init(void)
 {
-        list_t * const tlist = _internal_state->tlist;
+        list_t * const tlist = __state->tlist;
 
         tlist->flags = LIST_FLAGS_NONE;
         tlist->list = _default_texture;
@@ -30,19 +30,19 @@ _internal_tlist_init(void)
 TEXTURE *
 sega3d_tlist_alloc(uint16_t texture_count)
 {
-        _internal_list_alloc(_internal_state->tlist, texture_count);
+        __list_alloc(__state->tlist, texture_count);
 
-        return _internal_state->tlist->list;
+        return __state->tlist->list;
 }
 
 void
 sega3d_tlist_free(void)
 {
-        _internal_list_free(_internal_state->tlist);
+        __list_free(__state->tlist);
 }
 
 void
 sega3d_tlist_set(TEXTURE *textures, uint16_t texture_count)
 {
-        _internal_list_set(_internal_state->tlist, textures, texture_count);
+        __list_set(__state->tlist, textures, texture_count);
 }

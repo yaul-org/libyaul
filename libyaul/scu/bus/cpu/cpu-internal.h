@@ -12,8 +12,8 @@
 
 #include <cpu/map.h>
 
-extern void _internal_cpu_init(void);
-extern void _internal_cpu_divu_init(void);
-extern void _internal_cpu_dmac_init(void);
+extern void __cpu_init(void);
+extern void __cpu_divu_init(void);
+extern void __cpu_dmac_init(void);
 
 #endif /* !_CPU_INTERNAL_H_ */

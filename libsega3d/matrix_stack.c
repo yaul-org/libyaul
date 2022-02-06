@@ -16,12 +16,12 @@ static struct {
 } _state;
 
 void
-_internal_matrix_init(void)
+__matrix_init(void)
 {
-        _state.top_matrix = (FIXED *)&_internal_state->matrices[0];
+        _state.top_matrix = (FIXED *)&__state->matrices[0];
 
         for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
-                sega3d_matrix_identity(&_internal_state->matrices[i]);
+                sega3d_matrix_identity(&__state->matrices[i]);
         }
 }
 
@@ -40,7 +40,7 @@ sega3d_matrix_identity(MATRIX *matrix)
 void
 sega3d_matrix_push(sega3d_matrix_type_t matrix_type)
 {
-        assert((MATRIX *)_state.top_matrix < &_internal_state->matrices[MATRIX_STACK_MAX - 1]);
+        assert((MATRIX *)_state.top_matrix < &__state->matrices[MATRIX_STACK_MAX - 1]);
 
         _state.top_matrix += MTRX;
 
@@ -55,7 +55,7 @@ sega3d_matrix_push(sega3d_matrix_type_t matrix_type)
 void
 sega3d_matrix_pop(void)
 {
-        if ((MATRIX *)_state.top_matrix != _internal_state->matrices) {
+        if ((MATRIX *)_state.top_matrix != __state->matrices) {
                 _state.top_matrix -= MTRX;
         }
 }

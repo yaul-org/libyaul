@@ -15,7 +15,7 @@ static void *_base = NULL;
 static bool _detect_dram_cart(void);
 
 void
-_internal_dram_cart_init(void)
+__dram_cart_init(void)
 {
         /* Write to A-Bus "dummy" area */
         MEMORY_WRITE(16, DUMMY(UNKNOWN), 0x0001);

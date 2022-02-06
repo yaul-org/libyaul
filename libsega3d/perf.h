@@ -17,7 +17,7 @@ typedef struct perf_counter {
         uint32_t max_ticks;
 } perf_counter_t;
 
-void _internal_perf_init(void);
+void __perf_init(void);
 
 void perf_counter_init(perf_counter_t *perf_counter);
 void perf_counter_start(perf_counter_t *perf_counter);

@@ -10,6 +10,6 @@
 
 #include <usb-cart/map.h>
 
-extern void _internal_usb_cart_init(void);
+extern void __usb_cart_init(void);
 
 #endif /* !_USB_CART_INTERNAL_H_ */

@@ -18,7 +18,7 @@ static vdp2_vram_ctl_t _vdp2_vram_ctl = {
 };
 
 void
-_internal_vdp2_vram_init(void)
+__vdp2_vram_init(void)
 {
         _state_vdp2()->vram_ctl = &_vdp2_vram_ctl;
 

@@ -130,10 +130,10 @@ typedef struct {
         list_t * const plist;
 } __aligned(16) state_t;
 
-extern state_t * const _internal_state;
+extern state_t * const __state;
 
-extern void _internal_list_alloc(list_t *list, uint16_t count);
-extern void _internal_list_free(list_t *list);
-extern void _internal_list_set(list_t *list, void *list_p, uint16_t count);
+extern void __list_alloc(list_t *list, uint16_t count);
+extern void __list_free(list_t *list);
+extern void __list_set(list_t *list, void *list_p, uint16_t count);
 
 #endif /* !_SEGA3D_INTERNAL_H_ */

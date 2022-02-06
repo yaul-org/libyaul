@@ -53,25 +53,25 @@ _global_dtors_call(void)
 static void __used __section(".init")
 _init(void)
 {
-        _internal_mm_init();
+        __mm_init();
 
         _global_ctors_call();
 
-        _internal_cpu_init();
-        _internal_scu_init();
-        _internal_smpc_init();
-        _internal_smpc_peripheral_init();
+        __cpu_init();
+        __scu_init();
+        __smpc_init();
+        __smpc_peripheral_init();
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        _internal_usb_cart_init();
+        __usb_cart_init();
 #else
-        _internal_dram_cart_init();
+        __dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
 
-        _internal_dma_queue_init();
+        __dma_queue_init();
 
-        _internal_vdp_init();
-        _internal_dbgio_init();
+        __vdp_init();
+        __dbgio_init();
 
         /* XXX: Fix hard coded value */
         cd_block_init(0x0002);

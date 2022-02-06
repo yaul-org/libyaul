@@ -3,7 +3,7 @@
 static void _init(const dbgio_vdp2_t *);
 static void _flush(void);
 
-const struct dbgio_dev_ops _internal_dev_ops_vdp2 = {
+const struct dbgio_dev_ops __dev_ops_vdp2 = {
         .dev            = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
         .init           = (dev_ops_init_t)_init,
