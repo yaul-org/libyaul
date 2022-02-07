@@ -6,11 +6,10 @@
  */
 
 #include <assert.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include <math.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <cd-block.h>
 
@@ -24,49 +23,88 @@ static struct {
         iso9660_pvd_t pvd;
 } _state;
 
-static inline uint32_t __always_inline
-_length_sector_round(uint32_t length)
-{
-        return (uint32_pow2_round(length, 11) / ISO9660_SECTOR_SIZE);
-}
+static void _dirent_root_walk(iso9660_filelist_t *filelist,
+    iso9660_filelist_walk_t walker, void *args);
+static void _dirent_walk(iso9660_filelist_t *filelist,
+    iso9660_filelist_walk_t walker, sector_t sector, void *args);
+static bool _dirent_interleave(const iso9660_dirent_t *dirent);
 
-static void _dirent_root_walk(iso9660_filelist_walk_t, void *);
-static void _dirent_walk(iso9660_filelist_walk_t, uint32_t, void *);
-static bool _dirent_interleave(const iso9660_dirent_t *);
+static void _filelist_entry_populate(const iso9660_dirent_t *dirent,
+    iso9660_entry_type_t type, iso9660_filelist_entry_t *filelist_entry);
+static void _filelist_read_walker(iso9660_filelist_t *filelist,
+        const iso9660_filelist_entry_t *entry, void *args);
 
-static void _filelist_initialize(iso9660_filelist_t *, int32_t);
-static void _filelist_entry_populate(const iso9660_dirent_t *, iso9660_entry_type_t,
-    iso9660_filelist_entry_t *);
-static void _filelist_read_walker(const iso9660_filelist_entry_t *, void *);
-
-static void _bread(uint32_t, void *);
+static uint32_t _filelist_entry_count_clamp(int32_t count);
 
 static uint8_t _sector_buffer[ISO9660_SECTOR_SIZE] __aligned(ISO9660_SECTOR_SIZE);
 
 void
-iso9660_filelist_root_read(iso9660_filelist_t *filelist, int32_t count)
+iso9660_filelist_default_init(iso9660_filelist_t *filelist,
+    iso9660_filelist_entry_t *entries, int32_t count)
 {
-        _filelist_initialize(filelist, count);
-
-        iso9660_filelist_walk(NULL, _filelist_read_walker, filelist);
+        iso9660_filelist_init(filelist, entries, iso9660_sector_read, count);
 }
 
 void
-iso9660_filelist_read(const iso9660_filelist_entry_t root_entry,
-    iso9660_filelist_t *filelist, int32_t count)
+iso9660_filelist_init(iso9660_filelist_t *filelist,
+    iso9660_filelist_entry_t *entries,
+    iso9660_sector_read_t sector_read,
+    int32_t count)
 {
-        _filelist_initialize(filelist, count);
+        assert(filelist != NULL);
+        assert(entries != NULL);
+        assert(sector_read != NULL);
 
-        iso9660_filelist_walk(&root_entry, _filelist_read_walker, filelist);
+        filelist->sector_read = sector_read;
+        filelist->entries = entries;
+        filelist->entries_pooled_count = _filelist_entry_count_clamp(count);
+        filelist->entries_count = 0;
+}
+
+iso9660_filelist_entry_t *
+iso9660_entries_alloc(int32_t count)
+{
+        const uint32_t clamped_count = _filelist_entry_count_clamp(count);
+
+        return malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
 }
 
 void
-iso9660_filelist_walk(const iso9660_filelist_entry_t *root_entry,
-    iso9660_filelist_walk_t walker, void *args)
+iso9660_filelist_entries_free(iso9660_filelist_entry_t *entries)
 {
+        assert(entries != NULL);
+
+        free(entries);
+}
+
+void
+iso9660_filelist_root_read(iso9660_filelist_t *filelist)
+{
+        assert(filelist != NULL);
+
+        iso9660_filelist_walk(filelist, NULL, _filelist_read_walker, NULL);
+}
+
+void
+iso9660_filelist_read(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t root_entry)
+{
+        assert(filelist != NULL);
+
+        iso9660_filelist_walk(filelist, &root_entry, _filelist_read_walker, NULL);
+}
+
+void
+iso9660_filelist_walk(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t *root_entry,
+    iso9660_filelist_walk_t walker,
+    void *args)
+{
+        const iso9660_sector_read_t sector_read = filelist->sector_read;
+
         if (root_entry == NULL) {
                 /* Skip IP.BIN (16 sectors) */
-                _bread(16, &_state.pvd);
+                sector_read(16, &_state.pvd);
 
                 /* We are interested in the Primary Volume Descriptor, which
                  * points us to the root directory and path tables, which both
@@ -88,20 +126,18 @@ iso9660_filelist_walk(const iso9660_filelist_entry_t *root_entry,
                 /* Logical block size must be ISO9660_SECTOR_SIZE bytes */
                 assert(isonum_723(_state.pvd.logical_block_size) == ISO9660_SECTOR_SIZE);
 
-                _dirent_root_walk(walker, args);
+                _dirent_root_walk(filelist, walker, args);
         } else {
                 const uint32_t sector = FAD2LBA(root_entry->starting_fad);
 
-                _dirent_walk(walker, sector, args);
+                _dirent_walk(filelist, walker, sector, args);
         }
 }
 
 static void
-_filelist_read_walker(const iso9660_filelist_entry_t *entry, void *args)
+_filelist_read_walker(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t *entry, void *args __unused)
 {
-        iso9660_filelist_t *filelist;
-        filelist = args;
-
         if (filelist->entries_count >= filelist->entries_pooled_count) {
                 return;
         }
@@ -121,7 +157,8 @@ _dirent_interleave(const iso9660_dirent_t *dirent)
 }
 
 static void
-_dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
+_dirent_root_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
+    void *args)
 {
         iso9660_dirent_t dirent_root;
 
@@ -132,12 +169,16 @@ _dirent_root_walk(iso9660_filelist_walk_t walker, void *args)
         /* Start walking the root directory */
         const uint32_t sector = isonum_733(dirent_root.extent);
 
-        _dirent_walk(walker, sector, args);
+        _dirent_walk(filelist, walker, sector, args);
 }
 
 static void
-_dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
+_dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
+    sector_t sector, void *args)
 {
+        const iso9660_sector_read_t sector_read =
+            filelist->sector_read;
+
         const iso9660_dirent_t *dirent;
         dirent = NULL;
 
@@ -163,16 +204,16 @@ _dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
 
                         dirent_offset = 0;
 
-                        _bread(sector, _sector_buffer);
+                        sector_read(sector, _sector_buffer);
 
-                        dirent = (const iso9660_dirent_t *)&_sector_buffer[0];
+                        dirent = (const iso9660_dirent_t *)_sector_buffer;
                         dirent_length = isonum_711(dirent->length);
 
                         if (dirent->name[0] == '\0') {
                                 uint32_t data_length;
                                 data_length = isonum_733(dirent->data_length);
 
-                                dirent_sectors = _length_sector_round(data_length);
+                                dirent_sectors = iso9660_sector_count_round(data_length);
                         }
 
                         /* Interleave mode must be disabled */
@@ -201,7 +242,7 @@ _dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
 
                                 _filelist_entry_populate(dirent, type, &filelist_entry);
 
-                                walker(&filelist_entry, args);
+                                walker(filelist, &filelist_entry, args);
                         }
                 }
 
@@ -216,35 +257,13 @@ _dirent_walk(iso9660_filelist_walk_t walker, uint32_t sector, void *args)
 }
 
 static void
-_filelist_initialize(iso9660_filelist_t *filelist, int32_t count)
-{
-        int32_t clamped_count;
-        clamped_count = count;
-
-        if (clamped_count <= 0) {
-                clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
-        } else if (clamped_count > ISO9660_FILELIST_ENTRIES_COUNT) {
-                clamped_count = ISO9660_FILELIST_ENTRIES_COUNT;
-        }
-
-        if (filelist->entries == NULL) {
-                filelist->entries = malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
-        }
-
-        assert(filelist->entries != NULL);
-
-        filelist->entries_pooled_count = (uint32_t)clamped_count;
-        filelist->entries_count = 0;
-}
-
-static void
 _filelist_entry_populate(const iso9660_dirent_t *dirent, iso9660_entry_type_t type,
     iso9660_filelist_entry_t *filelist_entry)
 {
         filelist_entry->type = type;
         filelist_entry->size = isonum_733(dirent->data_length);
         filelist_entry->starting_fad = LBA2FAD(isonum_733(dirent->extent));
-        filelist_entry->sector_count = _length_sector_round(filelist_entry->size);
+        filelist_entry->sector_count = iso9660_sector_count_round(filelist_entry->size);
 
         uint8_t name_len;
         name_len = isonum_711(dirent->file_id_len);
@@ -263,10 +282,16 @@ _filelist_entry_populate(const iso9660_dirent_t *dirent, iso9660_entry_type_t ty
         filelist_entry->name[name_len] = '\0';
 }
 
-static void
-_bread(uint32_t sector, void *ptr)
+static uint32_t
+_filelist_entry_count_clamp(int32_t count)
 {
-        int ret __unused;
-        ret = cd_block_sector_read(LBA2FAD(sector), ptr);
-        assert(ret == 0);
+        if (count <= 0) {
+                return ISO9660_FILELIST_ENTRIES_COUNT;
+        }
+
+        if (count >= ISO9660_FILELIST_ENTRIES_COUNT) {
+                return ISO9660_FILELIST_ENTRIES_COUNT;
+        }
+
+        return count;
 }
