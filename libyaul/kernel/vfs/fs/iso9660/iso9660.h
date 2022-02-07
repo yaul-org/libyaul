@@ -9,6 +9,7 @@
 #define _YAUL_KERNEL_FS_ISO9660_H_
 
 #include <assert.h>
+#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -27,10 +28,9 @@ __BEGIN_DECLS
 #define ISO_DIR_LEVEL_MAX       8
 #define ISO_FILENAME_MAX_LENGTH 11
 
-/* Remove */
-typedef struct iso9660_filelist_entry iso9660_filelist_entry_t;
+typedef uint32_t sector_t;
 
-typedef void (*iso9660_filelist_walk_t)(const iso9660_filelist_entry_t *, void *);
+typedef void (*iso9660_sector_read_t)(sector_t sector, void *ptr);
 
 typedef enum iso9660_entry_type {
         ISO9660_ENTRY_TYPE_INVALID   = 0,
@@ -38,28 +38,53 @@ typedef enum iso9660_entry_type {
         ISO9660_ENTRY_TYPE_DIRECTORY = 2
 } iso9660_entry_type_t;
 
-struct iso9660_filelist_entry {
+typedef struct {
         iso9660_entry_type_t type;
         char name[ISO_FILENAME_MAX_LENGTH + 1];
         fad_t starting_fad;
         size_t size;
         uint16_t sector_count;
-} __aligned(32);
+} __aligned(32) iso9660_filelist_entry_t;
 
 static_assert(sizeof(iso9660_filelist_entry_t) == 32);
 
 typedef struct {
+        iso9660_sector_read_t sector_read;
         iso9660_filelist_entry_t *entries;
         uint32_t entries_pooled_count;
         uint32_t entries_count;
 } iso9660_filelist_t;
 
-extern void iso9660_filelist_root_read(iso9660_filelist_t *filelist,
+typedef void (*iso9660_filelist_walk_t)(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t *entry, void *args);
+
+extern void iso9660_filelist_init(iso9660_filelist_t *filelist,
+    iso9660_filelist_entry_t *entries,
+    iso9660_sector_read_t sector_read,
     int32_t count);
-extern void iso9660_filelist_read(const iso9660_filelist_entry_t root_entry,
-    iso9660_filelist_t *filelist, int32_t count);
-extern void iso9660_filelist_walk(const iso9660_filelist_entry_t *filelist_entry,
-    iso9660_filelist_walk_t walker, void *args);
+
+static inline uint32_t __always_inline
+iso9660_sector_count_round(uint32_t length)
+{
+        return (uint32_pow2_round(length, 11) >> 11);
+}
+
+extern void iso9660_filelist_default_init(iso9660_filelist_t *filelist,
+    iso9660_filelist_entry_t *entries, int32_t count);
+
+extern iso9660_filelist_entry_t *iso9660_entries_alloc(int32_t count);
+extern void iso9660_entries_free(iso9660_filelist_entry_t *entries);
+
+extern void iso9660_filelist_root_read(iso9660_filelist_t *filelist);
+extern void iso9660_filelist_read(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t root_entry);
+extern void iso9660_filelist_walk(iso9660_filelist_t *filelist,
+    const iso9660_filelist_entry_t *filelist_entry,
+    iso9660_filelist_walk_t walker,
+    void *args);
+
+void iso9660_sector_read(sector_t sector, void *ptr);
+void iso9660_sector_usb_cart_read(sector_t sector, void *ptr);
 
 __END_DECLS
 
