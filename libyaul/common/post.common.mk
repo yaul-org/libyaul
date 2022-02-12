@@ -69,12 +69,8 @@ endif
 SH_LDFLAGS+= $(SH_DEFSYMS)
 SH_LXXFLAGS+= $(SH_DEFSYMS)
 
-SH_SPECS= yaul.specs
-
-ifeq ($(strip $(SH_CUSTOM_SPECS)),)
-  SH_SPECS+= yaul-main.specs
-else
-  SH_SPECS+= $(SH_CUSTOM_SPECS)
+ifeq ($(strip $(SH_SPECS)),)
+  SH_SPECS:= yaul.specs yaul-main.specs
 endif
 
 SH_DEPS:= $(SH_OBJS_UNIQ:.o=.d)
