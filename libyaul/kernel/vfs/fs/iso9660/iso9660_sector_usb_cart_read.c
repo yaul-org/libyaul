@@ -15,6 +15,8 @@
 void
 iso9660_sector_usb_cart_read(sector_t sector, void *ptr)
 {
+        usb_cart_byte_send(SSLOAD_COMM_CMD_ISO9660);
+
         while (true) {
                 usb_cart_long_send(sector);
 
@@ -34,9 +36,12 @@ iso9660_sector_usb_cart_read(sector_t sector, void *ptr)
 
                 const crc_t read_crc = usb_cart_byte_read();
 
-                /* XXX: There is no SYN/ACK to continue/break loading sector */
                 if (read_crc == crc) {
+                        usb_cart_byte_send(SSLOAD_COMM_RET_OK);
+                        usb_cart_byte_read();
                         break;
                 }
+
+                usb_cart_byte_send(SSLOAD_COMM_RET_ERROR);
         }
 }

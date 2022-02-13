@@ -129,7 +129,7 @@ _buffer_partial_flush(const uint8_t *buffer, uint32_t len)
                 return;
         }
 
-        usb_cart_byte_send(SSLOAD_API_CMD_LOG);
+        usb_cart_byte_send(SSLOAD_COMM_CMD_LOG);
         usb_cart_long_send(len);
 
         for (uint32_t i = 0; i < len; i++) {

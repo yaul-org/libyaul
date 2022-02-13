@@ -39,6 +39,7 @@ SUPPORT_SRCS+= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
+	kernel/ssload.c \
 	kernel/internal.c \
 	kernel/mm/internal.c \
 	common/internal_reset.c
@@ -357,6 +358,9 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/
+
+INSTALL_HEADER_FILES+= \
+	./kernel/:ssload.h:yaul/
 
 INSTALL_HEADER_FILES+= \
 	./scu/:scu.h:yaul/scu/ \

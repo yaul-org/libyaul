@@ -71,6 +71,8 @@
 #include <sys/init.h>
 #include <sys/dma-queue.h>
 
+#include <ssload.h>
+
 #include <fs/iso9660/iso9660.h>
 #include <fs/romdisk/romdisk.h>
 
