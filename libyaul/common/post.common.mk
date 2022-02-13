@@ -213,7 +213,7 @@ $(SH_PROGRAM).ss: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/CART-IP.BI
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)cat $(SH_BUILD_PATH)/CART-IP.BIN $(SH_BUILD_PATH)/$(SH_PROGRAM).bin > $@
 
-$(SH_PROGRAM).cue: $(SH_PROGRAM).iso
+$(SH_PROGRAM).cue: | $(SH_PROGRAM).iso
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
 	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso"
 
