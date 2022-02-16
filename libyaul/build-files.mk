@@ -185,9 +185,6 @@ LIB_SRCS+= \
 	lib/crc/crc.c
 
 LIB_SRCS+= \
-	kernel/vfs/fs/romdisk/romdisk.c
-
-LIB_SRCS+= \
 	kernel/vfs/fs/iso9660/iso9660.c \
 	kernel/vfs/fs/iso9660/iso9660_sector_read.c
 
@@ -352,9 +349,6 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:callback-list.h:yaul/sys/
-
-INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/

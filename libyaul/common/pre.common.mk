@@ -88,7 +88,6 @@ SH_SRCS?=
 SH_SRCS_NO_LINK?=
 SH_LIBRARIES?=
 SH_BUILD_DIR?= build
-ROMDISK_DIRS?=
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
 
@@ -151,9 +150,7 @@ CDB_FILE:= compile_commands.json
 CDB_GCC?= /usr/bin/gcc
 CDB_CPP?= /usr/bin/g++
 
-ROMDISK_FLAGS:= -v -a 16 -V "ROOT"
-
-SUFFIXES:= .c .cc .C .cpp .cxx .sx .o .bin .elf .romdisk .romdisk.o
+SUFFIXES:= .c .cc .C .cpp .cxx .sx .o .bin .elf
 
 .PHONY: all clean list-targets
 
