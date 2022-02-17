@@ -82,11 +82,13 @@ EXE_EXT:= .exe
 PATH:= /mingw64/bin:$(PATH)
 endif
 
-# Each relative or absolute path will be converted to using '@' instead of '/'
+# $1 -> Relative/absolute path to be converted using '@' instead of '/'
 define macro-convert-build-path
 $(SH_BUILD_PATH)/$(subst /,@,$(abspath $1))
 endef
 
+# $1 -> Variable
+# $2 -> Index
 define macro-word-split
 $(word $2,$(subst ;, ,$1))
 endef
@@ -159,8 +161,6 @@ CDB_FILE:= compile_commands.json
 CDB_GCC?= /usr/bin/gcc
 CDB_CPP?= /usr/bin/g++
 
-SUFFIXES:= .c .cc .C .cpp .cxx .sx .o .bin .elf
-
 .PHONY: all clean list-targets
 
 # The targets which .SECONDARY depends on are treated as intermediate files,
@@ -168,7 +168,7 @@ SUFFIXES:= .c .cc .C .cpp .cxx .sx .o .bin .elf
 .SECONDARY: pre-build-iso post-build-iso build
 
 .SUFFIXES:
-.SUFFIXES: $(SUFFIXES)
+.SUFFIXES: .c .cc .C .cpp .cxx .sx .o .bin .elf
 
 .PRECIOUS: %.elf %.c %.o
 
