@@ -46,8 +46,8 @@ LIB_SRCS:= \
 
 ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 LIB_SRCS+= \
-	common/gdb/gdb.c \
-	common/gdb/gdb-ihr.sx
+	gdb/gdb.c \
+	gdb/gdb-ihr.sx
 endif
 
 LIB_SRCS+= \
@@ -329,7 +329,7 @@ INSTALL_HEADER_FILES+= \
 
 ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 INSTALL_HEADER_FILES+= \
-	./common/gdb/:gdb.h:yaul/common/gdb/
+	./gdb/:gdb.h:yaul/gdb/
 endif
 
 INSTALL_HEADER_FILES+= \
