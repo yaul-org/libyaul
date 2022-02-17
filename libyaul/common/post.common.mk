@@ -6,10 +6,24 @@ ifeq ($(strip $(SH_PROGRAM)),)
   $(error Empty SH_PROGRAM (SH program name))
 endif
 
-# Check that SH_SRCS and SH_SRCS_NO_LINK don't include duplicates. Be mindful
-# that sort remove duplicates
+# $1 -> Path to asset file
+# $2 -> Valid C symbol asset name
+define macro-builtin-asset-rule
+$(call macro-convert-build-path,$(addsuffix .o,$1)): $1
+	@printf -- "$(V_BEGIN_CYAN)$(strip $1)$(V_END)\n"
+	$(ECHO)$(YAUL_INSTALL_ROOT)/bin/bin2o $1 $2 $$@
+
+SH_SRCS+= $(addsuffix .o,$1)
+endef
+
+$(foreach BUILTIN_ASSET,$(BUILTIN_ASSETS), \
+	$(eval $(call macro-builtin-asset-rule,\
+		$(call macro-word-split,$(BUILTIN_ASSET),1), \
+		$(call macro-word-split,$(BUILTIN_ASSET),2))))
+
+# Check that SH_SRCS don't include duplicates. Be mindful that sort remove
+# duplicates
 SH_SRCS_UNIQ= $(sort $(SH_SRCS))
-SH_SRCS_NO_LINK_UNIQ= $(sort $(SH_SRCS_NO_LINK))
 
 SH_SRCS_C:= $(filter %.c,$(SH_SRCS_UNIQ))
 SH_SRCS_CXX:= $(filter %.cxx,$(SH_SRCS_UNIQ)) \
@@ -19,20 +33,8 @@ SH_SRCS_CXX:= $(filter %.cxx,$(SH_SRCS_UNIQ)) \
 SH_SRCS_S:= $(filter %.sx,$(SH_SRCS_UNIQ))
 SH_SRCS_OTHER:= $(filter-out %.c %.cxx %.cpp %.cc %.C %.sx,$(SH_SRCS_UNIQ))
 
-SH_SRCS_NO_LINK_C:= $(filter %.c,$(SH_SRCS_NO_LINK_UNIQ))
-
 SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRCS_S) $(SH_SRCS_OTHER),$(basename $(SRC))))
 SH_OBJS_UNIQ:= $(foreach OBJ,$(SH_OBJS_UNIQ),$(call macro-convert-build-path,$(OBJ)))
-
-SH_OBJS_NO_LINK_UNIQ:= $(addsuffix .o,$(foreach dir,$(SH_SRCS_NO_LINK_C),$(basename $(dir))))
-SH_OBJS_NO_LINK_UNIQ:= $(foreach OBJ,$(SH_OBJS_NO_LINK_UNIQ),$(call macro-convert-build-path,$(OBJ)))
-
-ifeq ($(strip $(SH_OBJS_UNIQ)),)
-  # If both SH_OBJS_UNIQ and SH_OBJS_NO_LINK_UNIQ is empty
-  ifeq ($(strip $(SH_OBJS_NO_LINK_UNIQ)),)
-    $(error Empty SH_OBJS (SH source list))
-  endif
-endif
 
 SH_DEFSYMS=
 
@@ -53,7 +55,6 @@ endif
 
 SH_DEPS:= $(SH_OBJS_UNIQ:.o=.d)
 SH_TEMPS:= $(SH_OBJS_UNIQ:.o=.i) $(SH_OBJS_UNIQ:.o=.ii) $(SH_OBJS_UNIQ:.o=.s)
-SH_DEPS_NO_LINK:= $(SH_OBJS_NO_LINK_UNIQ:.o=.d)
 
 # Parse out included paths from GCC when the specs files are used. This is used
 # to explictly populate each command database entry with include paths
@@ -122,7 +123,7 @@ $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 	$(ECHO)$(SH_OBJCOPY) -O binary $< $@
 	@[ -z "${SILENT}" ] && du -hs $@ | awk '{ print $$1; }' || true
 
-$(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ) $(SH_OBJS_NO_LINK_UNIQ)
+$(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
 	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(SH_OBJS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
 	$(ECHO)$(SH_NM) $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).sym
@@ -197,15 +198,12 @@ clean:
 	    $(SH_PROGRAM).ss \
 	    $(SH_OBJS_UNIQ) \
 	    $(SH_DEPS) \
-	    $(SH_DEPS_NO_LINK) \
 	    $(SH_TEMPS) \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).asm \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).bin \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).elf \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).map \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).sym \
-	    $(SH_OBJS_NO_LINK_UNIQ) \
-	    $(SH_DEPS_NO_LINK) \
 	    $(SH_BUILD_PATH)/IP.BIN \
 	    $(SH_BUILD_PATH)/IP.BIN.map \
 	    $(SH_BUILD_PATH)/CART-IP.BIN \
@@ -219,4 +217,10 @@ list-targets:
 	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 -include $(SH_DEPS)
--include $(SH_DEPS_NO_LINK)
+
+undefine macro-update-cdb
+undefine macro-generate-sh-build-object
+undefine macro-generate-sh-build-asm-object
+undefine macro-generate-sh-build-c++-object
+
+undefine macro-builtin-asset-rule
