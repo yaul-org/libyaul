@@ -82,6 +82,15 @@ EXE_EXT:= .exe
 PATH:= /mingw64/bin:$(PATH)
 endif
 
+# Each relative or absolute path will be converted to using '@' instead of '/'
+define macro-convert-build-path
+$(SH_BUILD_PATH)/$(subst /,@,$(abspath $1))
+endef
+
+define macro-word-split
+$(word $2,$(subst ;, ,$1))
+endef
+
 # Customizable (must be overwritten in user's Makefile)
 SH_PROGRAM?= unknown-program
 SH_SRCS?=
