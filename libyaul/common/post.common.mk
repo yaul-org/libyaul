@@ -6,15 +6,6 @@ ifeq ($(strip $(SH_PROGRAM)),)
   $(error Empty SH_PROGRAM (SH program name))
 endif
 
-# Each relative or absolute path will be converted to using '@' instead of '/'
-define macro-convert-build-path
-$(SH_BUILD_PATH)/$(subst /,@,$(abspath $1))
-endef
-
-define macro-word-split
-$(word $2,$(subst ;, ,$1))
-endef
-
 # Check that SH_SRCS and SH_SRCS_NO_LINK don't include duplicates. Be mindful
 # that sort remove duplicates
 SH_SRCS_UNIQ= $(sort $(SH_SRCS))
@@ -26,10 +17,11 @@ SH_SRCS_CXX:= $(filter %.cxx,$(SH_SRCS_UNIQ)) \
 	$(filter %.cc,$(SH_SRCS_UNIQ)) \
 	$(filter %.C,$(SH_SRCS_UNIQ))
 SH_SRCS_S:= $(filter %.sx,$(SH_SRCS_UNIQ))
+SH_SRCS_OTHER:= $(filter-out %.c %.cxx %.cpp %.cc %.C %.sx,$(SH_SRCS_UNIQ))
 
 SH_SRCS_NO_LINK_C:= $(filter %.c,$(SH_SRCS_NO_LINK_UNIQ))
 
-SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRCS_S),$(basename $(SRC))))
+SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRCS_S) $(SH_SRCS_OTHER),$(basename $(SRC))))
 SH_OBJS_UNIQ:= $(foreach OBJ,$(SH_OBJS_UNIQ),$(call macro-convert-build-path,$(OBJ)))
 
 SH_OBJS_NO_LINK_UNIQ:= $(addsuffix .o,$(foreach dir,$(SH_SRCS_NO_LINK_C),$(basename $(dir))))
