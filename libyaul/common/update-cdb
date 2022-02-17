@@ -72,15 +72,15 @@ def run(compiler_executable, input_file, output_file, directory, out_stream, fla
         return
     # Parse output CDB
     cdb = build_cdb(out_stream)
-    # print("cdb: {}".format(cdb))
+
     pruned_flags = prune_flags(flags)
-    # print("pruned_flags: {}".format(pruned_flags))
+
     cdb_entry = new_cdb_entry(
         compiler_executable, input_file, output_file, directory, pruned_flags
     )
-    # print("cdb_entry: {}".format(cdb_entry))
+
     updated_cdb = append_cdb(cdb, cdb_entry)
-    # print("updated_cdb: {}".format(updated_cdb))
+
     if len(updated_cdb) > len(cdb):
         write_cdb(updated_cdb, out_stream, pretty_print=False)
 
