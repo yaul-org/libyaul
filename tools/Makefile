@@ -1,7 +1,6 @@
 PROJECTS:= \
 	bin2c \
 	bin2o \
-	genromfs \
 	make-cue \
 	make-iso \
 	make-ip
