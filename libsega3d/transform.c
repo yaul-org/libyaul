@@ -548,6 +548,8 @@ _cmdt_prepare(const transform_t * const trans)
                         cmdt->cmd_size = texture->HVsize;
 
                         cmdt->cmd_pmod |= VDP1_CMDT_PMOD_HSS_ENABLE;
+                } else {
+                        cmdt->cmd_colr = attr->colno;
                 }
         } else {
                 cmdt->cmd_ctrl = 0x0004 | ((object->flags & debug_flags) >> 1);
