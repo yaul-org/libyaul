@@ -98,7 +98,7 @@ endef
 define macro-generate-sh-build-asm-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)$(SH_AS) $(SH_AFLAGS) -o $2 $1
+	$(ECHO)$(SH_CC) $(SH_CFLAGS) -c -o $2 $1
 endef
 
 # $1 -> $<
