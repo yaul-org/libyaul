@@ -325,15 +325,19 @@ typedef struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
 typedef struct vdp2_scrn_ls_format {
-        vdp2_scrn_t scroll_screen; /* Normal background */
-        vdp2_vram_t line_scroll_table; /* Line scroll table (lead addr.) */
-        uint8_t interval; /* Dependent on the interlace setting */
+        vdp2_scrn_t scroll_screen;    /* Normal background */
+        vdp2_vram_t table;            /* Line scroll table (lead addr.) */
+        uint8_t interval;             /* Dependent on the interlace setting */
         vdp2_scrn_ls_enable_t enable; /* Enable line scroll */
 } vdp2_scrn_ls_format_t;
 
 typedef struct vdp2_scrn_ls_h {
         fix16_t horz;
 } __packed vdp2_scrn_ls_h_t;
+
+typedef struct vdp2_scrn_ls_v {
+        fix16_t vert;
+} __packed vdp2_scrn_ls_v_t;
 
 typedef struct vdp2_scrn_ls_hv {
         fix16_t horz;
@@ -348,7 +352,7 @@ typedef struct vdp2_scrn_ls_hvz {
 
 typedef struct vdp2_scrn_vcs_format {
         vdp2_scrn_t scroll_screen; /* Normal background */
-        vdp2_vram_t vcs_table; /* Vertical cell scroll table (lead addr.) */
+        vdp2_vram_t table;         /* Vertical cell scroll table (lead addr.) */
 } vdp2_scrn_vcs_format_t;
 
 typedef struct vdp2_scrn_color_offset_rgb {
