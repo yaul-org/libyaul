@@ -20,8 +20,8 @@ vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs)
                (vcs->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
-        _state_vdp2()->regs->vcstau = VDP2_VRAM_BANK(vcs->vcs_table);
-        _state_vdp2()->regs->vcstal = (vcs->vcs_table >> 1) & 0xFFFF;
+        _state_vdp2()->regs->vcstau = VDP2_VRAM_BANK(vcs->table);
+        _state_vdp2()->regs->vcstal = (vcs->table >> 1) & 0xFFFF;
 
         switch (vcs->scroll_screen) {
         case VDP2_SCRN_NBG0:

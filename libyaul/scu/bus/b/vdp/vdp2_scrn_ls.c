@@ -19,8 +19,8 @@ vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls)
                (ls->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
-        const uint16_t lstau = VDP2_VRAM_BANK(ls->line_scroll_table);
-        const uint16_t lstal = (ls->line_scroll_table >> 1) & 0xFFFF;
+        const uint16_t lstau = VDP2_VRAM_BANK(ls->table);
+        const uint16_t lstal = (ls->table >> 1) & 0xFFFF;
 
         const uint16_t interval_bit = uint32_log2(ls->interval & 0x0F);
 
