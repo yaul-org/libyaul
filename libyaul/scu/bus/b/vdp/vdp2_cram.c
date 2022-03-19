@@ -37,7 +37,6 @@ vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram_addr)
                (scroll_screen == VDP2_SCRN_NBG2) ||
                (scroll_screen == VDP2_SCRN_NBG3) ||
                (scroll_screen == VDP2_SCRN_RBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_SPRITE));
 
         assert((cram_addr >= VDP2_CRAM_ADDR(0x000)) &&
@@ -49,7 +48,6 @@ vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram_addr)
             : (cram_addr >> 9)) & 0x07;
 
         switch (scroll_screen) {
-        case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->craofa &= 0xFFF8;
                 _state_vdp2()->regs->craofa |= cram_addr;

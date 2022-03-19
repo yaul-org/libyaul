@@ -46,15 +46,12 @@ vdp2_scrn_scroll_x_set(vdp2_scrn_t scroll_screen, fix16_t scroll)
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG1));
+               (scroll_screen == VDP2_SCRN_NBG3));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
-        case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _fixed_point_scroll_set(&_state_vdp2()->regs->scxin0, scroll);
                 break;
@@ -78,15 +75,12 @@ vdp2_scrn_scroll_y_set(vdp2_scrn_t scroll_screen, fix16_t scroll)
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG1));
+               (scroll_screen == VDP2_SCRN_NBG3));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
-        case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _fixed_point_scroll_set(&_state_vdp2()->regs->scyin0, scroll);
                 break;
@@ -110,15 +104,12 @@ vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta)
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG1));
+               (scroll_screen == VDP2_SCRN_NBG3));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
-        case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _fixed_point_scroll_update(&_state_vdp2()->regs->scxin0, delta);
                 break;
@@ -142,15 +133,12 @@ vdp2_scrn_scroll_y_update(vdp2_scrn_t scroll_screen, fix16_t delta)
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG1));
+               (scroll_screen == VDP2_SCRN_NBG3));
 #endif /* DEBUG */
 
         switch (scroll_screen) {
-        case VDP2_SCRN_RBG1:
         case VDP2_SCRN_NBG0:
                 _fixed_point_scroll_update(&_state_vdp2()->regs->scyin0, delta);
                 break;

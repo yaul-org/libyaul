@@ -20,22 +20,48 @@ __BEGIN_DECLS
 
 typedef enum vdp2_scrn {
         /// Normal background.
-        VDP2_SCRN_NBG0   = 0 ,
+        VDP2_SCRN_NBG0   = 1 << 0,
+        /// Normal background.
+        VDP2_SCRN_NBG1   = 1 << 1,
+        /// Normal background.
+        VDP2_SCRN_NBG2   = 1 << 2,
+        /// Normal background.
+        VDP2_SCRN_NBG3   = 1 << 3,
         /// Rotational background.
-        VDP2_SCRN_RBG1   = 5,
-        /// Normal background.
-        VDP2_SCRN_NBG1   = 1,
-        /// Normal background.
-        VDP2_SCRN_NBG2   = 2,
-        /// Normal background.
-        VDP2_SCRN_NBG3   = 3,
-        /// Rotational background.
-        VDP2_SCRN_RBG0   = 4,
-        /// Back screen.
-        VDP2_SCRN_BACK   = 5,
+        VDP2_SCRN_RBG0   = 1 << 4,
         /// Sprite layer.
-        VDP2_SCRN_SPRITE = 6
+        VDP2_SCRN_SPRITE = 1 << 5,
+        /// Back screen.
+        VDP2_SCRN_BACK   = 1 << 6
 } vdp2_scrn_t;
+
+typedef enum vdp2_scrn_disp {
+        /// Normal background.
+        VDP2_SCRN_NBG0_DISP   = 1 << 0,
+        /// Normal background.
+        VDP2_SCRN_NBG1_DISP   = 1 << 1,
+        /// Normal background.
+        VDP2_SCRN_NBG2_DISP   = 1 << 2,
+        /// Normal background.
+        VDP2_SCRN_NBG3_DISP   = 1 << 3,
+        /// Rotational background.
+        VDP2_SCRN_RBG0_DISP   = 1 << 4,
+        /// Rotational background.
+        VDP2_SCRN_RBG1_DISP   = 1 << 5,
+
+        /// Normal background.
+        VDP2_SCRN_NBG0_TPDISP = VDP2_SCRN_NBG0_DISP | (1 << 8),
+        /// Normal background.
+        VDP2_SCRN_NBG1_TPDISP = VDP2_SCRN_NBG1_DISP | (1 << 9),
+        /// Normal background.
+        VDP2_SCRN_NBG2_TPDISP = VDP2_SCRN_NBG2_DISP | (1 << 10),
+        /// Normal background.
+        VDP2_SCRN_NBG3_TPDISP = VDP2_SCRN_NBG3_DISP | (1 << 11),
+        /// Rotational background.
+        VDP2_SCRN_RBG0_TPDISP = VDP2_SCRN_RBG0_DISP | (1 << 12),
+        /// Rotational background.
+        VDP2_SCRN_RBG1_TPDISP = VDP2_SCRN_RBG1_DISP | (1 << 8)
+} vdp2_scrn_disp_t;
 
 typedef enum vdp2_scrn_ccc {
         VDP2_SCRN_CCC_PALETTE_16   = 0,
@@ -361,9 +387,15 @@ typedef struct vdp2_scrn_color_offset_rgb {
         int16_t b;
 } vdp2_scrn_color_offset_rgb_t;
 
-extern void vdp2_scrn_back_screen_color_set(vdp2_vram_t, const color_rgb1555_t);
-extern void vdp2_scrn_back_screen_buffer_set(vdp2_vram_t, const color_rgb1555_t *,
-    const uint16_t);
+extern void vdp2_scrn_back_color_set(vdp2_vram_t vram,
+    const color_rgb1555_t color);
+extern void vdp2_scrn_back_buffer_set(vdp2_vram_t vram,
+    const color_rgb1555_t *buffer, const uint16_t count);
+
+extern void vdp2_scrn_lncl_color_set(vdp2_vram_t vram,
+    const uint16_t cram_index);
+extern void vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram,
+    const uint16_t *buffer, const uint16_t count);
 
 extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 
@@ -375,8 +407,8 @@ extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t,
 extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, vdp2_scrn_color_offset_t);
 extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
 
-extern void vdp2_scrn_display_set(vdp2_scrn_t, bool);
-extern void vdp2_scrn_display_unset(vdp2_scrn_t);
+extern void vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask);
+extern void vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask);
 extern void vdp2_scrn_display_clear(void);
 
 extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *);

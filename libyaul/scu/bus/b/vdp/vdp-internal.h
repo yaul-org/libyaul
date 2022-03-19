@@ -22,8 +22,9 @@
 
 #define COMMIT_XFER_VDP2_REG_TVMD       (0)
 #define COMMIT_XFER_VDP2_REGS           (1)
-#define COMMIT_XFER_BACK_SCREEN         (2)
-#define COMMIT_XFER_COUNT               (3)
+#define COMMIT_XFER_LNCL_SCREEN         (2)
+#define COMMIT_XFER_BACK_SCREEN         (3)
+#define COMMIT_XFER_COUNT               (4)
 #define COMMIT_XFER_TABLE_ALIGNMENT     (4 * 16)
 
 struct state_vdp1 {
@@ -35,6 +36,12 @@ struct state_vdp1 {
 struct state_vdp2 {
         vdp2_registers_t *regs;
         vdp2_vram_ctl_t *vram_ctl;
+
+        struct {
+                vdp2_vram_t vram;
+                uintptr_t buffer;
+                uint32_t count;
+        } lncl;
 
         struct {
                 vdp2_vram_t vram;
