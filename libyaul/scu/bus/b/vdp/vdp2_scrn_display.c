@@ -11,37 +11,10 @@
 
 #include "vdp-internal.h"
 
-static const uint8_t _bgon_bits[] __aligned(4) = {
-        0x01, /* NBG0 */
-        0x02, /* NBG1 */
-        0x04, /* NBG2 */
-        0x08, /* NBG3 */
-        0x10, /* RBG0 */
-        0x20, /* RBG1 */
-        0x00,
-        0x00
-};
-
 void
-vdp2_scrn_display_set(vdp2_scrn_t scroll_screen, bool transparent)
+vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0));
-#endif /* DEBUG */
-
-        const uint16_t bgon_bits = _bgon_bits[scroll_screen];
-
-        _state_vdp2()->regs->bgon |= bgon_bits;
-
-        if (!transparent) {
-                _state_vdp2()->regs->bgon |= bgon_bits << 8;
-        }
+        _state_vdp2()->regs->bgon |= disp_mask;
 
 #ifdef DEBUG
         uint16_t cc_count;
@@ -80,21 +53,9 @@ vdp2_scrn_display_set(vdp2_scrn_t scroll_screen, bool transparent)
 }
 
 void
-vdp2_scrn_display_unset(vdp2_scrn_t scroll_screen)
+vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0));
-#endif /* DEBUG */
-
-        const uint16_t bgon_bits = _bgon_bits[scroll_screen];
-
-        _state_vdp2()->regs->bgon &= (~bgon_bits) | (~(bgon_bits << 8));
+        _state_vdp2()->regs->bgon &= ~disp_mask;
 }
 
 void

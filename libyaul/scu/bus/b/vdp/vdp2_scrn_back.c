@@ -7,29 +7,27 @@
 
 #include <assert.h>
 
-#include <cpu/cache.h>
-
 #include <vdp2/tvmd.h>
 #include <vdp2/vram.h>
 
 #include "vdp-internal.h"
 
-static inline void _back_screen_set(vdp2_vram_t vram,
+static void _back_set(vdp2_vram_t vram,
     const color_rgb1555_t *buffer, const uint16_t count);
 
 void
-vdp2_scrn_back_screen_color_set(vdp2_vram_t vram, const color_rgb1555_t color)
+vdp2_scrn_back_color_set(vdp2_vram_t vram, const color_rgb1555_t color)
 {
         static color_rgb1555_t buffered_color =
             COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
 
         buffered_color = color;
 
-        _back_screen_set(vram, &buffered_color, 1);
+        _back_set(vram, &buffered_color, 1);
 }
 
 void
-vdp2_scrn_back_screen_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer,
+vdp2_scrn_back_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer,
     const uint16_t count)
 {
 #ifdef DEBUG
@@ -37,11 +35,11 @@ vdp2_scrn_back_screen_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer
         assert(count > 0);
 #endif /* DEBUG */
 
-        _back_screen_set(vram, buffer, count);
+        _back_set(vram, buffer, count);
 }
 
-static inline void
-_back_screen_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t count)
+static void
+_back_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t count)
 {
         /* If set to single color, transfer only one color value. Otherwise,
          * transfer a color buffer */

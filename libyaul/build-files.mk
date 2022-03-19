@@ -224,8 +224,6 @@ LIB_SRCS+= \
 	\
 	scu/bus/b/scsp/scsp_init.c \
 	\
-	scu/bus/b/vdp/vdp_init.c \
-	scu/bus/b/vdp/vdp_sync.c \
 	scu/bus/b/vdp/vdp-internal.c \
 	scu/bus/b/vdp/vdp1_cmdt.c \
 	scu/bus/b/vdp/vdp1_env.c \
@@ -233,9 +231,10 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_cram.c \
 	scu/bus/b/vdp/vdp2_regs.c \
 	scu/bus/b/vdp/vdp2_scrn.c \
-	scu/bus/b/vdp/vdp2_scrn_back_screen.c \
+	scu/bus/b/vdp/vdp2_scrn_back.c \
 	scu/bus/b/vdp/vdp2_scrn_color_offset.c \
 	scu/bus/b/vdp/vdp2_scrn_display.c \
+	scu/bus/b/vdp/vdp2_scrn_lncl.c \
 	scu/bus/b/vdp/vdp2_scrn_ls.c \
 	scu/bus/b/vdp/vdp2_scrn_mosaic.c \
 	scu/bus/b/vdp/vdp2_scrn_priority.c \
@@ -246,6 +245,8 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_sprite.c \
 	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
+	scu/bus/b/vdp/vdp_init.c \
+	scu/bus/b/vdp/vdp_sync.c \
 	\
 	scu/bus/cpu/cpu_cache.c \
 	scu/bus/cpu/cpu_divu.c \

@@ -23,6 +23,7 @@ __vdp2_xfer_table_init(void)
 
         __vdp2_xfer_table_update(COMMIT_XFER_VDP2_REG_TVMD);
         __vdp2_xfer_table_update(COMMIT_XFER_VDP2_REGS);
+        __vdp2_xfer_table_update(COMMIT_XFER_LNCL_SCREEN);
         __vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);
 
         scu_dma_xfer_t * const xfer_table =
@@ -58,15 +59,21 @@ __vdp2_xfer_table_update(uint32_t xfer_index)
                 /* Skip committing the first 7 VDP2 registers:
                  * 0x0000 TVMD
                  * 0x0002 EXTEN
-                 * 0x0004 TVSTAT R/O
-                 * 0x0006 VRSIZE R/W
-                 * 0x0008 HCNT   R/O
-                 * 0x000A VCNT   R/O
-                 * 0x000C Reserved
+                 * 0x0004 TVSTAT   R/O
+                 * 0x0006 VRSIZE   R/W
+                 * 0x0008 HCNT     R/O
+                 * 0x000A VCNT     R/O
+                 * 0x000C Reserved ---
                  * 0x000E RAMCTL */
                 xfer->len = sizeof(vdp2_registers_t) - 14;
                 xfer->dst = VDP2(0x000E);
                 xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs->buffer[7];
+                break;
+        case COMMIT_XFER_LNCL_SCREEN:
+                xfer->len = _state_vdp2()->lncl.count * sizeof(uint16_t);
+                xfer->dst = (uint32_t)_state_vdp2()->lncl.vram;
+                xfer->src = CPU_CACHE_THROUGH |
+                            (uint32_t)_state_vdp2()->lncl.buffer;
                 break;
         case COMMIT_XFER_BACK_SCREEN:
                 xfer->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t);
