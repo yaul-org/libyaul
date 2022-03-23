@@ -7,7 +7,9 @@
 
 #include <dram-cart.h>
 
-#include "dram-cart-internal.h"
+#include <dram-cart/map.h>
+
+#define DRAM_CART_BANKS (4)
 
 static dram_cart_id_t _id = DRAM_CART_ID_INVALID;
 static void *_base = NULL;
@@ -15,20 +17,18 @@ static void *_base = NULL;
 static bool _detect_dram_cart(void);
 
 void
-__dram_cart_init(void)
+dram_cart_init(void)
 {
         /* Write to A-Bus "dummy" area */
         MEMORY_WRITE(16, DUMMY(UNKNOWN), 0x0001);
 
         /* Set the SCU wait */
         /* Don't ask about this magic constant */
-        uint32_t asr0_bits;
-        asr0_bits = MEMORY_READ(32, SCU(ASR0));
+        const uint32_t asr0_bits = MEMORY_READ(32, SCU(ASR0));
         MEMORY_WRITE(32, SCU(ASR0), 0x23301FF0);
 
         /* Write to A-Bus refresh */
-        uint32_t aref_bits;
-        aref_bits = MEMORY_READ(32, SCU(AREF));
+        const uint32_t aref_bits = MEMORY_READ(32, SCU(AREF));
         MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
         /* Determine ID and base address */
