@@ -42,7 +42,7 @@ LIB_SRCS:= \
 	kernel/ssload.c \
 	kernel/internal.c \
 	kernel/mm/internal.c \
-	common/internal_reset.c
+	common/reset-internal.c
 
 ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 LIB_SRCS+= \
@@ -65,6 +65,7 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
+	kernel/sys/dma-queue-internal.c \
 	kernel/sys/callback-list.c \
 	\
 	kernel/mm/memb.c \

@@ -7,28 +7,45 @@
 
 #include <assert.h>
 
-#include <cpu/cache.h>
-
-#include <vdp2/vram.h>
+#include <vdp.h>
 
 #include "vdp-internal.h"
 
 static void _lncl_set(vdp2_vram_t vram,
-    const uint16_t *buffer, const uint16_t count);
+    const uint16_t *buffer, const uint32_t count);
+
+void
+vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask)
+{
+        _state_vdp2()->regs->lnclen &= 0xFFC0;
+        _state_vdp2()->regs->lnclen |= scrn_mask;
+}
+
+void
+vdp2_scrn_lncl_unset(vdp2_scrn_t scrn_mask)
+{
+        _state_vdp2()->regs->lnclen &= ~scrn_mask;
+}
+
+void
+vdp2_scrn_lncl_clear(void)
+{
+        _state_vdp2()->regs->lnclen = 0x0000;
+}
 
 void
 vdp2_scrn_lncl_color_set(vdp2_vram_t vram, const uint16_t cram_index)
 {
-        static uint16_t buffered_index = 0;
+        static uint16_t buffer = 0;
 
-        buffered_index = cram_index;
+        buffer = cram_index;
 
-        _lncl_set(vram, &buffered_index, 1);
+        _lncl_set(vram, &buffer, 1);
 }
 
 void
 vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram, const uint16_t *buffer,
-    const uint16_t count)
+    const uint32_t count)
 {
 #ifdef DEBUG
         assert(buffer != NULL);
@@ -39,32 +56,32 @@ vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram, const uint16_t *buffer,
 }
 
 void
-vdp2_scrn_lncl_set(vdp2_scrn_t scroll_screen)
+vdp2_scrn_lncl_sync(void)
 {
-        vdp2_registers_t * const vdp2_regs = _state_vdp2()->regs;
+        const size_t len = _state_vdp2()->lncl.len;
 
-        vdp2_regs->lnclen &= scroll_screen;
-}
+        if (len == 0) {
+                return;
+        }
 
-void
-vdp2_scrn_lncl_clear(void)
-{
-        _state_vdp2()->regs->lnclen = 0x0000;
+        vdp_dma_enqueue((void *)_state_vdp2()->lncl.vram,
+            _state_vdp2()->lncl.buffer,
+            len);
 }
 
 static void
-_lncl_set(vdp2_vram_t vram, const uint16_t *buffer, const uint16_t count)
+_lncl_set(vdp2_vram_t vram, const uint16_t *buffer, const uint32_t count)
 {
-        /* If set to single color, transfer only one color value. Otherwise,
-         * transfer a color buffer */
         const uint16_t lcclmd = (count == 1) ? 0x0000 : 0x8000;
 
         _state_vdp2()->regs->lctau = lcclmd | VDP2_VRAM_BANK(vram);
         _state_vdp2()->regs->lctal = (vram >> 1) & 0xFFFF;
 
-        _state_vdp2()->lncl.vram = vram;
-        _state_vdp2()->lncl.buffer = (uintptr_t)buffer;
-        _state_vdp2()->lncl.count = count;
-
-        __vdp2_xfer_table_update(COMMIT_XFER_LNCL_SCREEN);
+        if (count == 1) {
+                MEMORY_WRITE(16, vram, buffer[0]);
+        } else {
+                _state_vdp2()->lncl.vram = vram;
+                _state_vdp2()->lncl.buffer = buffer;
+                _state_vdp2()->lncl.len = count * sizeof(uint16_t);
+        }
 }

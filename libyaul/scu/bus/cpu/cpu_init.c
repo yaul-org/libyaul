@@ -23,7 +23,10 @@
 #include <cpu/wdt.h>
 
 #include <vdp.h>
+#include <dbgio/dbgio.h>
 
+#include <cpu-internal.h>
+#include <vdp-internal.h>
 #include <internal.h>
 
 #define EXCEPTION_TRAMPOLINE_EMIT(name)                                        \

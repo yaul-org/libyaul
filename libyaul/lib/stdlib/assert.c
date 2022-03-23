@@ -10,8 +10,10 @@
 
 #include <cpu/intc.h>
 #include <vdp.h>
+#include <dbgio/dbgio.h>
 
 #include <internal.h>
+#include <vdp-internal.h>
 
 #define ASSERTION_MAX_COUNT 3
 

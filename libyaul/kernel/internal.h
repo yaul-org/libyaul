@@ -8,14 +8,10 @@
 #ifndef _KERNEL_INTERNAL_H_
 #define _KERNEL_INTERNAL_H_
 
-#include <sys/cdefs.h>
+#include <stdint.h>
+#include <math.h>
 
-#include <cpu-internal.h>
-#include <dbgio/dbgio-internal.h>
-#include <dram-cart-internal.h>
-#include <mm/memb-internal.h>
-#include <smpc-internal.h>
-#include <vdp-internal.h>
+#include <sys/cdefs.h>
 
 #if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart-internal.h>
@@ -50,15 +46,17 @@ slave_state(void)
 
 extern void *_end;
 
+typedef void *(*malloc_func_t)(size_t n);
+typedef void *(*memalign_func_t)(size_t n, size_t align);
+typedef void (*free_func_t)(void *p);
+
 void __reset(void);
 
 void __mm_init(void);
 
-void *__malloc(size_t);
-void *__realloc(void *, size_t);
-void *__memalign(size_t, size_t);
-void __free(void *);
-
-extern void __dma_queue_init(void);
+void *__malloc(size_t n);
+void *__realloc(void *p, size_t n);
+void *__memalign(size_t n, size_t align);
+void __free(void *p);
 
 #endif /* !_KERNEL_INTERNAL_H_ */

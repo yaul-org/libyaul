@@ -7,28 +7,26 @@
 
 #include <assert.h>
 
-#include <vdp2/tvmd.h>
-#include <vdp2/vram.h>
+#include <vdp.h>
 
 #include "vdp-internal.h"
 
 static void _back_set(vdp2_vram_t vram,
-    const color_rgb1555_t *buffer, const uint16_t count);
+    const color_rgb1555_t *buffer, const uint32_t count);
 
 void
 vdp2_scrn_back_color_set(vdp2_vram_t vram, const color_rgb1555_t color)
 {
-        static color_rgb1555_t buffered_color =
-            COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
+        static color_rgb1555_t buffer = COLOR_RGB1555_INITIALIZER(1, 0, 0, 0);
 
-        buffered_color = color;
+        buffer = color;
 
-        _back_set(vram, &buffered_color, 1);
+        _back_set(vram, &buffer, 1);
 }
 
 void
 vdp2_scrn_back_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer,
-    const uint16_t count)
+    const uint32_t count)
 {
 #ifdef DEBUG
         assert(buffer != NULL);
@@ -38,8 +36,22 @@ vdp2_scrn_back_buffer_set(vdp2_vram_t vram, const color_rgb1555_t *buffer,
         _back_set(vram, buffer, count);
 }
 
+void
+vdp2_scrn_back_sync(void)
+{
+        const size_t len = _state_vdp2()->back.len;
+
+        if (len == 0) {
+                return;
+        }
+
+        vdp_dma_enqueue((void *)_state_vdp2()->back.vram,
+            _state_vdp2()->back.buffer,
+            len);
+}
+
 static void
-_back_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t count)
+_back_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint32_t count)
 {
         /* If set to single color, transfer only one color value. Otherwise,
          * transfer a color buffer */
@@ -48,9 +60,11 @@ _back_set(vdp2_vram_t vram, const color_rgb1555_t *buffer, const uint16_t count)
         _state_vdp2()->regs->bktau = bkclmd | VDP2_VRAM_BANK(vram);
         _state_vdp2()->regs->bktal = (vram >> 1) & 0xFFFF;
 
-        _state_vdp2()->back.vram = vram;
-        _state_vdp2()->back.buffer = (uintptr_t)buffer;
-        _state_vdp2()->back.count = count;
-
-        __vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);
+        if (count == 1) {
+                MEMORY_WRITE(16, vram, buffer->raw);
+        } else {
+                _state_vdp2()->back.vram = vram;
+                _state_vdp2()->back.buffer = buffer;
+                _state_vdp2()->back.len = count * sizeof(color_rgb1555_t);
+        }
 }

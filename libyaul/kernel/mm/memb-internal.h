@@ -5,19 +5,17 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _YAUL_KERNEL_MM_MEMB_INTERNAL_H_
-#define _YAUL_KERNEL_MM_MEMB_INTERNAL_H_
-
-#include <sys/cdefs.h>
-
-#include <internal.h>
+#ifndef _KERNEL_MM_MEMB_INTERNAL_H_
+#define _KERNEL_MM_MEMB_INTERNAL_H_
 
 #include "memb.h"
 
+#include <internal.h>
+
 typedef struct memb_request {
-        void *(*malloc)(size_t n);
-        void *(*memalign)(size_t n, size_t align);
-        void (*free)(void *p);
+        malloc_func_t malloc;
+        memalign_func_t memalign;
+        free_func_t free;
 
         uint32_t block_count;
         uint32_t block_size;
@@ -33,4 +31,4 @@ int __memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
 int __memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
     uint32_t align);
 
-#endif /* !_YAUL_KERNEL_MM_MEMB_INTERNAL_H_ */
+#endif /* !_KERNEL_MM_MEMB_INTERNAL_H_ */

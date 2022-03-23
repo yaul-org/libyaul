@@ -14,38 +14,24 @@
 
 __BEGIN_DECLS
 
-#define DMA_QUEUE_TAG_IMMEDIATE         (0)
-#define DMA_QUEUE_TAG_VBLANK_IN         (1)
-#define DMA_QUEUE_TAG_VBLANK_OUT        (2)
-#define DMA_QUEUE_TAG_INVALID           (255)
-#define DMA_QUEUE_TAG_COUNT             (3)
+#define DMA_QUEUE_REQUESTS_MAX_COUNT (16)
+#define DMA_QUEUE_REQUESTS_MASK      (DMA_QUEUE_REQUESTS_MAX_COUNT - 1)
 
-typedef struct dma_queue_transfer {
-/* DMA request unknown */
-#define DMA_QUEUE_STATUS_UNKNOWN        (0x00)
-/* DMA request not yet processed */
-#define DMA_QUEUE_STATUS_UNPROCESSED    (0x01)
-/* DMA request is being processed */
-#define DMA_QUEUE_STATUS_PROCESSING     (0x02)
-/* DMA request explicitly canceled */
-#define DMA_QUEUE_STATUS_CANCELED       (0x04)
-/* DMA request has been completed */
-#define DMA_QUEUE_STATUS_COMPLETE       (0x08)
-        uint8_t status;
-        void *work;
-} __aligned(4) dma_queue_transfer_t;
+typedef struct dma_queue {
+        scu_dma_xfer_t *xfer_table;
+        uint32_t count;
+} __aligned(4) dma_queue_t;
 
-typedef void (*dma_queue_request_handler_t)(const dma_queue_transfer_t *);
+static_assert(sizeof(struct dma_queue) == 8);
 
-extern int8_t dma_queue_enqueue(const scu_dma_handle_t *, uint8_t,
-    dma_queue_request_handler_t, void *);
-extern int8_t dma_queue_simple_enqueue(uint8_t, void *, void *, size_t);
-extern void dma_queue_tag_clear(uint8_t);
-extern void dma_queue_clear(void);
-extern uint32_t dma_queue_flush(uint8_t);
-extern void dma_queue_flush_wait(void);
-extern uint32_t dma_queue_count_get(uint8_t);
-extern uint32_t dma_queue_capacity_get(void);
+extern dma_queue_t *dma_queue_alloc(void);
+extern void dma_queue_free(dma_queue_t *queue);
+extern void dma_queue_init(dma_queue_t *queue);
+extern void dma_queue_deinit(dma_queue_t *queue);
+extern int32_t dma_queue_enqueue(dma_queue_t *queue, void *dst,
+    const void *src, size_t len);
+extern void dma_queue_clear(dma_queue_t *queue);
+extern uint32_t dma_queue_count_get(const dma_queue_t *queue);
 
 __END_DECLS
 

@@ -15,10 +15,10 @@
 
 #include <internal.h>
 
-static void _default_handler(void *);
+static void _default_handler(void *work);
 
 callback_list_t *
-callback_list_alloc(uint8_t count)
+callback_list_alloc(uint32_t count)
 {
         assert(count > 0);
 
@@ -49,7 +49,7 @@ callback_list_free(callback_list_t *callback_list)
 }
 
 void
-callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint8_t count)
+callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint32_t count)
 {
         assert(callback_list != NULL);
         assert(callbacks != NULL);
@@ -60,23 +60,16 @@ callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint8_
 }
 
 void
-callback_list_process(callback_list_t *callback_list, bool clear)
+callback_list_process(callback_list_t *callback_list)
 {
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
 
-        uint8_t id;
-        for (id = 0; id < callback_list->count; id++) {
-                callback_handler_t handler;
-                handler = callback_list->callbacks[id].handler;
-
-                void *work;
-                work = callback_list->callbacks[id].work;
-
-                if (clear) {
-                        callback_init(&callback_list->callbacks[id]);
-                }
+        for (uint32_t id = 0; id < callback_list->count; id++) {
+                callback_handler_t const handler =
+                    callback_list->callbacks[id].handler;
+                void * const work = callback_list->callbacks[id].work;
 
                 handler(work);
         }
@@ -130,8 +123,7 @@ callback_list_clear(callback_list_t *callback_list)
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
 
-        uint8_t i;
-        for (i = 0; i < callback_list->count; i++) {
+        for (uint32_t i = 0; i < callback_list->count; i++) {
                 callback_init(&callback_list->callbacks[i]);
         }
 }
