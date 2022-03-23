@@ -18,6 +18,11 @@
 #include <cd-block.h>
 
 #include <internal.h>
+#include <cpu-internal.h>
+#include <dbgio/dbgio-internal.h>
+#include <dram-cart-internal.h>
+#include <smpc-internal.h>
+#include <vdp-internal.h>
 
 void __weak
 user_init(void)
@@ -67,8 +72,6 @@ _init(void)
 #else
         __dram_cart_init();
 #endif /* HAVE_DEV_CARTRIDGE */
-
-        __dma_queue_init();
 
         __vdp_init();
         __dbgio_init();

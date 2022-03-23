@@ -15,22 +15,26 @@
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
 
+#include <dbgio/dbgio.h>
+
 #include <vdp.h>
 
 #include <sys/dma-queue.h>
 
 #include <internal.h>
+#include <dbgio/dbgio-internal.h>
+#include <vdp-internal.h>
 
 #include "cons/cons.h"
 
 #include "vdp2_font.inc"
 
-#define STATE_IDLE                      (0x00)
-#define STATE_INITIALIZED               (0x01)
-#define STATE_BUFFER_DIRTY              (0x02)
-#define STATE_BUFFER_CLEARED            (0x04)
-#define STATE_BUFFER_FLUSHING           (0x08)
-#define STATE_BUFFER_FORCE_FLUSHING     (0x10)
+#define STATE_IDLE                  (0x00)
+#define STATE_INITIALIZED           (0x01)
+#define STATE_BUFFER_DIRTY          (0x02)
+#define STATE_BUFFER_CLEARED        (0x04)
+#define STATE_BUFFER_FLUSHING       (0x08)
+#define STATE_BUFFER_FORCE_FLUSHING (0x10)
 
 /* CPU-DMAC channel used for _flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0

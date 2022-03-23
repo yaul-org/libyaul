@@ -11,6 +11,8 @@
 
 #include <internal.h>
 
+#include "dbgio-internal.h"
+
 /* This is enough for a 352x256 character resolution */
 #define SPRINTF_BUFFER_SIZE (1408)
 

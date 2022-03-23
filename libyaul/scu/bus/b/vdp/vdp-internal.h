@@ -20,13 +20,6 @@
 #include <vdp2/scrn.h>
 #include <vdp2/vram.h>
 
-#define COMMIT_XFER_VDP2_REG_TVMD       (0)
-#define COMMIT_XFER_VDP2_REGS           (1)
-#define COMMIT_XFER_LNCL_SCREEN         (2)
-#define COMMIT_XFER_BACK_SCREEN         (3)
-#define COMMIT_XFER_COUNT               (4)
-#define COMMIT_XFER_TABLE_ALIGNMENT     (4 * 16)
-
 struct state_vdp1 {
         vdp1_registers_t *regs;
         vdp1_env_t const *current_env;
@@ -39,14 +32,14 @@ struct state_vdp2 {
 
         struct {
                 vdp2_vram_t vram;
-                uintptr_t buffer;
-                uint32_t count;
+                const void *buffer;
+                size_t len;
         } lncl;
 
         struct {
                 vdp2_vram_t vram;
-                uintptr_t buffer;
-                uint32_t count;
+                const void *buffer;
+                size_t len;
         } back;
 
         struct {
@@ -76,8 +69,6 @@ _state_vdp2(void)
 }
 
 extern void __vdp_init(void);
-
-extern void __vdp2_xfer_table_update(uint32_t xfer_index);
 
 extern void __vdp2_commit(scu_dma_level_t level);
 extern void __vdp2_commit_wait(scu_dma_level_t level);

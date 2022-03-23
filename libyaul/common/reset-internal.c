@@ -29,10 +29,6 @@ __reset(void)
 
         scu_dma_stop();
 
-        dma_queue_tag_clear(DMA_QUEUE_TAG_IMMEDIATE);
-        dma_queue_tag_clear(DMA_QUEUE_TAG_VBLANK_IN);
-        dma_queue_tag_clear(DMA_QUEUE_TAG_VBLANK_OUT);
-
         scu_dsp_program_stop();
 
         cpu_dmac_stop();

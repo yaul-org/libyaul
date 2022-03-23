@@ -390,12 +390,17 @@ typedef struct vdp2_scrn_color_offset_rgb {
 extern void vdp2_scrn_back_color_set(vdp2_vram_t vram,
     const color_rgb1555_t color);
 extern void vdp2_scrn_back_buffer_set(vdp2_vram_t vram,
-    const color_rgb1555_t *buffer, const uint16_t count);
+    const color_rgb1555_t *buffer, const uint32_t count);
+extern void vdp2_scrn_back_sync(void);
 
+extern void vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask);
+extern void vdp2_scrn_lncl_unset(vdp2_scrn_t scrn_mask);
+extern void vdp2_scrn_lncl_clear(void);
 extern void vdp2_scrn_lncl_color_set(vdp2_vram_t vram,
     const uint16_t cram_index);
 extern void vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram,
-    const uint16_t *buffer, const uint16_t count);
+    const uint16_t *buffer, const uint32_t count);
+extern void vdp2_scrn_lncl_sync(void);
 
 extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
 

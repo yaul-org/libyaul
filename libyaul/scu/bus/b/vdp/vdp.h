@@ -28,6 +28,13 @@ extern void vdp_sync_vblank_in_set(callback_handler_t callback_handler,
 extern void vdp_sync_vblank_out_set(callback_handler_t callback_handler,
     void *work);
 
+extern void vdp_dma_enqueue(void *dst, const void *src, size_t len);
+extern uint32_t vdp_dma_count_get(void);
+
+extern callback_id_t vdp_dma_callback_add(callback_handler_t callback_handler,
+    void *work);
+extern void vdp_dma_callback_remove(callback_id_t callback_id);
+
 __END_DECLS
 
 #endif /* !_YAUL_VDP_H_ */
