@@ -14,15 +14,18 @@
 
 #include <vdp1/cmdt.h>
 
-#include "sega3d-types.h"
-#include "sgl.h"
-#include "perf.h"
+#include <sega3d/sega3d-types.h>
+#include <sega3d/sgl.h>
+#include <sega3d/perf.h>
+#include <sega3d/s3d.h>
 
 extern void sega3d_init(void);
 
 extern TEXTURE *sega3d_tlist_alloc(Uint16 count);
 extern void sega3d_tlist_free(void);
 extern void sega3d_tlist_set(TEXTURE *textures, Uint16 count);
+
+extern void sega3d_plist_set(PALETTE *palettes, Uint16 count);
 
 extern void sega3d_matrix_identity(MATRIX *matrix);
 extern void sega3d_matrix_push(sega3d_matrix_type_t matrix_type);

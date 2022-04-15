@@ -14,8 +14,8 @@
 
 #include <vdp1/cmdt.h>
 
-#include "perf.h"
-#include "sgl.h"
+#include <sega3d/perf.h>
+#include <sega3d/sgl.h>
 
 typedef struct sega3d_object sega3d_object_t;
 

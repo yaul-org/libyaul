@@ -4,14 +4,14 @@ FLAG_BUILD_GDB:= $(shell test "x$(YAUL_OPTION_DEV_CARTRIDGE)" != x0 -a \
                               \( "x$(TYPE)" = xdebug -o \
                                  "x$(YAUL_OPTION_BUILD_GDB)" != x0 \) && printf "yes")
 
-BOOTSTRAP_FILES:= \
-	common/bootstrap/ip.sx \
-	common/bootstrap/sys_aree.bin \
-	common/bootstrap/sys_arej.bin \
-	common/bootstrap/sys_aret.bin \
-	common/bootstrap/sys_areu.bin \
-	common/bootstrap/sys_init.bin \
-	common/bootstrap/sys_sec.bin
+IP_FILES:= \
+	ip/ip.sx \
+	ip/blobs/sys_aree.bin \
+	ip/blobs/sys_arej.bin \
+	ip/blobs/sys_aret.bin \
+	ip/blobs/sys_areu.bin \
+	ip/blobs/sys_init.bin \
+	ip/blobs/sys_sec.bin
 
 USER_FILES:= \
 	common/pre.common.mk \
@@ -187,12 +187,12 @@ LIB_SRCS+= \
 	lib/crc/crc.c
 
 LIB_SRCS+= \
-	kernel/vfs/fs/cd/cdfs.c \
-	kernel/vfs/fs/cd/cdfs_sector_read.c
+	kernel/fs/cd/cdfs.c \
+	kernel/fs/cd/cdfs_sector_read.c
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
-	kernel/vfs/fs/cd/cdfs_sector_usb_cart_read.c
+	kernel/fs/cd/cdfs_sector_usb_cart_read.c
 endif
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
@@ -279,7 +279,7 @@ LIB_SRCS+= \
 
 HEADER_FILES:= \
 	./yaul.h \
-	./common/bootstrap/ip.h
+	./ip/ip.h
 
 INSTALL_HEADER_FILES:= \
 	./:yaul.h:./yaul/
@@ -328,7 +328,7 @@ INSTALL_HEADER_FILES+= \
 	./math/:uint8.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
-	./common/bootstrap/:ip.h:yaul/common/
+	./ip/:ip.h:yaul/ip/
 
 ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
 INSTALL_HEADER_FILES+= \
@@ -354,7 +354,7 @@ INSTALL_HEADER_FILES+= \
 	./kernel/sys/:callback-list.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/cd/:cdfs.h:yaul/fs/cd/
+	./kernel/fs/cd/:cdfs.h:yaul/fs/cd/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/:ssload.h:yaul/

@@ -31,16 +31,16 @@
 .long $1ST_READ_SIZE            ! 1st read size
 .long 0x00000000                ! Reserved
 .long 0x00000000                ! Reserved
-.incbin "sys_sec.bin"
-.incbin "sys_arej.bin"
-.incbin "sys_aret.bin"
-.incbin "sys_areu.bin"
-.incbin "sys_aree.bin"
+.incbin "blobs/sys_sec.bin"
+.incbin "blobs/sys_arej.bin"
+.incbin "blobs/sys_aret.bin"
+.incbin "blobs/sys_areu.bin"
+.incbin "blobs/sys_aree.bin"
 
 .text
 .align 1
 
-.incbin "sys_init.bin"
+.incbin "blobs/sys_init.bin"
 
         mov.l .LC1, r1
         mov.l @r1, r1
