@@ -181,8 +181,7 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 # These include directories are strictly from libyaul, and are meant to be
 # shared amongst the other libraries
 SHARED_INCLUDE_DIRS:= \
-	../lib$(MAIN_TARGET)/. \
-	../lib$(MAIN_TARGET)/common \
+	../lib$(MAIN_TARGET)/ \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
 	../lib$(MAIN_TARGET)/math \

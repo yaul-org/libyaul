@@ -14,7 +14,7 @@ if [ -z "${YAUL_PROG_SH_PREFIX}" ]; then
 fi
 
 SH_AS="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-as"
-SH_AS_ARGS="--fatal-warnings -I"${YAUL_INSTALL_ROOT}/share/yaul/bootstrap""
+SH_AS_ARGS="--fatal-warnings -I"${YAUL_INSTALL_ROOT}/share/yaul/ip""
 SH_CC="${YAUL_INSTALL_ROOT}/bin/${YAUL_PROG_SH_PREFIX}-gcc"
 SH_CC_ARGS="-nostdlib -m2 -mb -nostartfiles -specs=ip.specs"
 
@@ -117,7 +117,7 @@ fi
       /\.long \$1ST_READ_ADDR/ { sub(/\$1ST_READ_ADDR/, "'"${IP_1ST_READ_ADDR}"'"); }
       /\.long \$1ST_READ_SIZE/ { sub(/\$1ST_READ_SIZE/, "'"${IP_1ST_READ_SIZE}"'"); }
       { print; }' \
-          "${YAUL_INSTALL_ROOT}/share/yaul/bootstrap/ip.sx") >"${TMP2_FILE}" 2>"${TMP3_FILE}" || {
+          "${YAUL_INSTALL_ROOT}/share/yaul/ip/ip.sx") >"${TMP2_FILE}" 2>"${TMP3_FILE}" || {
      panic "Can't generate IP.BIN .sx file
 >>>
 $(cat "${TMP3_FILE}")
