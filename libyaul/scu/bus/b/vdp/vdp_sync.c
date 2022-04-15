@@ -16,6 +16,7 @@
 #include <vdp.h>
 
 #include <sys/dma-queue-internal.h>
+#include <sys/callback-list-internal.h>
 
 #include "vdp-internal.h"
 
@@ -97,7 +98,7 @@
 
 struct vdp1_mode_table;
 
-typedef void (*vdp1_mode_func_ptr)(void);
+typedef void (*vdp1_mode_func_t)(void);
 
 struct vdp1_state {
         unsigned int flags:6;
@@ -191,11 +192,11 @@ static void _vdp1_mode_variable_vblank_out(void);
 
 /* Interface to either of the three modes */
 static const struct vdp1_mode_table {
-        vdp1_mode_func_ptr dma;
-        vdp1_mode_func_ptr sync_render;
-        vdp1_mode_func_ptr sprite_end;
-        vdp1_mode_func_ptr vblank_in;
-        vdp1_mode_func_ptr vblank_out;
+        vdp1_mode_func_t dma;
+        vdp1_mode_func_t sync_render;
+        vdp1_mode_func_t sprite_end;
+        vdp1_mode_func_t vblank_in;
+        vdp1_mode_func_t vblank_out;
 } _vdp1_mode_table[] = {
         {
                 .dma         = _vdp1_mode_auto_dma,
@@ -587,7 +588,7 @@ _dma_queue_init(void)
 {
         __dma_queue_init(&_state.dma_queue);
 
-        _dma_callback_list = callback_list_alloc(DMA_QUEUE_REQUESTS_MAX_COUNT);
+        _dma_callback_list = __callback_list_alloc(DMA_QUEUE_REQUESTS_MAX_COUNT);
 
         const scu_dma_level_cfg_t dma_cfg = {
                 .mode          = SCU_DMA_MODE_INDIRECT,

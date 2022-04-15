@@ -15,40 +15,40 @@
 
 #include <scu/map.h>
 
-#include "iso9660-internal.h"
+#include "cdfs-internal.h"
 
-#include "iso9660.h"
+#include "cdfs.h"
 
 static struct {
-        iso9660_pvd_t pvd;
+        cdfs_pvd_t pvd;
 } _state;
 
-static void _dirent_root_walk(iso9660_filelist_t *filelist,
-    iso9660_filelist_walk_t walker, void *args);
-static void _dirent_walk(iso9660_filelist_t *filelist,
-    iso9660_filelist_walk_t walker, sector_t sector, void *args);
-static bool _dirent_interleave(const iso9660_dirent_t *dirent);
+static void _dirent_root_walk(cdfs_filelist_t *filelist,
+    cdfs_filelist_walk_t walker, void *args);
+static void _dirent_walk(cdfs_filelist_t *filelist,
+    cdfs_filelist_walk_t walker, sector_t sector, void *args);
+static bool _dirent_interleave(const cdfs_dirent_t *dirent);
 
-static void _filelist_entry_populate(const iso9660_dirent_t *dirent,
-    iso9660_entry_type_t type, iso9660_filelist_entry_t *filelist_entry);
-static void _filelist_read_walker(iso9660_filelist_t *filelist,
-        const iso9660_filelist_entry_t *entry, void *args);
+static void _filelist_entry_populate(const cdfs_dirent_t *dirent,
+    cdfs_entry_type_t type, cdfs_filelist_entry_t *filelist_entry);
+static void _filelist_read_walker(cdfs_filelist_t *filelist,
+        const cdfs_filelist_entry_t *entry, void *args);
 
 static uint32_t _filelist_entry_count_clamp(int32_t count);
 
-static uint8_t _sector_buffer[ISO9660_SECTOR_SIZE] __aligned(ISO9660_SECTOR_SIZE);
+static uint8_t _sector_buffer[CDFS_SECTOR_SIZE] __aligned(CDFS_SECTOR_SIZE);
 
 void
-iso9660_filelist_default_init(iso9660_filelist_t *filelist,
-    iso9660_filelist_entry_t *entries, int32_t count)
+cdfs_filelist_default_init(cdfs_filelist_t *filelist,
+    cdfs_filelist_entry_t *entries, int32_t count)
 {
-        iso9660_filelist_init(filelist, entries, iso9660_sector_read, count);
+        cdfs_filelist_init(filelist, entries, cdfs_sector_read, count);
 }
 
 void
-iso9660_filelist_init(iso9660_filelist_t *filelist,
-    iso9660_filelist_entry_t *entries,
-    iso9660_sector_read_t sector_read,
+cdfs_filelist_init(cdfs_filelist_t *filelist,
+    cdfs_filelist_entry_t *entries,
+    cdfs_sector_read_t sector_read,
     int32_t count)
 {
         assert(filelist != NULL);
@@ -61,16 +61,16 @@ iso9660_filelist_init(iso9660_filelist_t *filelist,
         filelist->entries_count = 0;
 }
 
-iso9660_filelist_entry_t *
-iso9660_entries_alloc(int32_t count)
+cdfs_filelist_entry_t *
+cdfs_entries_alloc(int32_t count)
 {
         const uint32_t clamped_count = _filelist_entry_count_clamp(count);
 
-        return malloc(sizeof(iso9660_filelist_entry_t) * clamped_count);
+        return malloc(sizeof(cdfs_filelist_entry_t) * clamped_count);
 }
 
 void
-iso9660_filelist_entries_free(iso9660_filelist_entry_t *entries)
+cdfs_filelist_entries_free(cdfs_filelist_entry_t *entries)
 {
         assert(entries != NULL);
 
@@ -78,29 +78,29 @@ iso9660_filelist_entries_free(iso9660_filelist_entry_t *entries)
 }
 
 void
-iso9660_filelist_root_read(iso9660_filelist_t *filelist)
+cdfs_filelist_root_read(cdfs_filelist_t *filelist)
 {
         assert(filelist != NULL);
 
-        iso9660_filelist_walk(filelist, NULL, _filelist_read_walker, NULL);
+        cdfs_filelist_walk(filelist, NULL, _filelist_read_walker, NULL);
 }
 
 void
-iso9660_filelist_read(iso9660_filelist_t *filelist,
-    const iso9660_filelist_entry_t root_entry)
+cdfs_filelist_read(cdfs_filelist_t *filelist,
+    const cdfs_filelist_entry_t root_entry)
 {
         assert(filelist != NULL);
 
-        iso9660_filelist_walk(filelist, &root_entry, _filelist_read_walker, NULL);
+        cdfs_filelist_walk(filelist, &root_entry, _filelist_read_walker, NULL);
 }
 
 void
-iso9660_filelist_walk(iso9660_filelist_t *filelist,
-    const iso9660_filelist_entry_t *root_entry,
-    iso9660_filelist_walk_t walker,
+cdfs_filelist_walk(cdfs_filelist_t *filelist,
+    const cdfs_filelist_entry_t *root_entry,
+    cdfs_filelist_walk_t walker,
     void *args)
 {
-        const iso9660_sector_read_t sector_read = filelist->sector_read;
+        const cdfs_sector_read_t sector_read = filelist->sector_read;
 
         if (root_entry == NULL) {
                 /* Skip IP.BIN (16 sectors) */
@@ -123,8 +123,8 @@ iso9660_filelist_walk(iso9660_filelist_t *filelist,
                 assert((strncmp(cd001_str, ISO_STANDARD_ID, cd001_len)) != 0);
 #endif /* DEBUG */
 
-                /* Logical block size must be ISO9660_SECTOR_SIZE bytes */
-                assert(isonum_723(_state.pvd.logical_block_size) == ISO9660_SECTOR_SIZE);
+                /* Logical block size must be CDFS_SECTOR_SIZE bytes */
+                assert(isonum_723(_state.pvd.logical_block_size) == CDFS_SECTOR_SIZE);
 
                 _dirent_root_walk(filelist, walker, args);
         } else {
@@ -135,32 +135,32 @@ iso9660_filelist_walk(iso9660_filelist_t *filelist,
 }
 
 static void
-_filelist_read_walker(iso9660_filelist_t *filelist,
-    const iso9660_filelist_entry_t *entry, void *args __unused)
+_filelist_read_walker(cdfs_filelist_t *filelist,
+    const cdfs_filelist_entry_t *entry, void *args __unused)
 {
         if (filelist->entries_count >= filelist->entries_pooled_count) {
                 return;
         }
 
-        iso9660_filelist_entry_t *this_entry;
+        cdfs_filelist_entry_t *this_entry;
         this_entry = &filelist->entries[filelist->entries_count];
 
-        (void)memcpy(this_entry, entry, sizeof(iso9660_filelist_entry_t));
+        (void)memcpy(this_entry, entry, sizeof(cdfs_filelist_entry_t));
 
         filelist->entries_count++;
 }
 
 static bool __unused
-_dirent_interleave(const iso9660_dirent_t *dirent)
+_dirent_interleave(const cdfs_dirent_t *dirent)
 {
         return ((isonum_711(dirent->interleave)) != 0x00);
 }
 
 static void
-_dirent_root_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
+_dirent_root_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
     void *args)
 {
-        iso9660_dirent_t dirent_root;
+        cdfs_dirent_t dirent_root;
 
         /* Populate filesystem mount structure */
         /* Copy of directory record */
@@ -173,13 +173,13 @@ _dirent_root_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
 }
 
 static void
-_dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
+_dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
     sector_t sector, void *args)
 {
-        const iso9660_sector_read_t sector_read =
+        const cdfs_sector_read_t sector_read =
             filelist->sector_read;
 
-        const iso9660_dirent_t *dirent;
+        const cdfs_dirent_t *dirent;
         dirent = NULL;
 
         int32_t dirent_sectors;
@@ -195,7 +195,7 @@ _dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
 
                 if ((dirent == NULL) ||
                     (dirent_length == 0) ||
-                    ((dirent_offset + dirent_length) >= ISO9660_SECTOR_SIZE)) {
+                    ((dirent_offset + dirent_length) >= CDFS_SECTOR_SIZE)) {
                         dirent_sectors--;
 
                         if (dirent_sectors == 0) {
@@ -206,14 +206,14 @@ _dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
 
                         sector_read(sector, _sector_buffer);
 
-                        dirent = (const iso9660_dirent_t *)_sector_buffer;
+                        dirent = (const cdfs_dirent_t *)_sector_buffer;
                         dirent_length = isonum_711(dirent->length);
 
                         if (dirent->name[0] == '\0') {
                                 uint32_t data_length;
                                 data_length = isonum_733(dirent->data_length);
 
-                                dirent_sectors = iso9660_sector_count_round(data_length);
+                                dirent_sectors = cdfs_sector_count_round(data_length);
                         }
 
                         /* Interleave mode must be disabled */
@@ -231,14 +231,14 @@ _dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
                         if (walker != NULL) {
                                 const uint8_t file_flags = isonum_711(dirent->file_flags);
 
-                                iso9660_entry_type_t type;
-                                type = ISO9660_ENTRY_TYPE_FILE;
+                                cdfs_entry_type_t type;
+                                type = CDFS_ENTRY_TYPE_FILE;
 
                                 if ((file_flags & DIRENT_FILE_FLAGS_DIRECTORY) == DIRENT_FILE_FLAGS_DIRECTORY) {
-                                        type = ISO9660_ENTRY_TYPE_DIRECTORY;
+                                        type = CDFS_ENTRY_TYPE_DIRECTORY;
                                 }
 
-                                iso9660_filelist_entry_t filelist_entry;
+                                cdfs_filelist_entry_t filelist_entry;
 
                                 _filelist_entry_populate(dirent, type, &filelist_entry);
 
@@ -249,7 +249,7 @@ _dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
                 if (dirent != NULL) {
                         const uintptr_t p = (uintptr_t)dirent + dirent_length;
 
-                        dirent = (const iso9660_dirent_t *)p;
+                        dirent = (const cdfs_dirent_t *)p;
 
                         dirent_offset += dirent_length;
                 }
@@ -257,18 +257,18 @@ _dirent_walk(iso9660_filelist_t *filelist, iso9660_filelist_walk_t walker,
 }
 
 static void
-_filelist_entry_populate(const iso9660_dirent_t *dirent, iso9660_entry_type_t type,
-    iso9660_filelist_entry_t *filelist_entry)
+_filelist_entry_populate(const cdfs_dirent_t *dirent, cdfs_entry_type_t type,
+    cdfs_filelist_entry_t *filelist_entry)
 {
         filelist_entry->type = type;
         filelist_entry->size = isonum_733(dirent->data_length);
         filelist_entry->starting_fad = LBA2FAD(isonum_733(dirent->extent));
-        filelist_entry->sector_count = iso9660_sector_count_round(filelist_entry->size);
+        filelist_entry->sector_count = cdfs_sector_count_round(filelist_entry->size);
 
         uint8_t name_len;
         name_len = isonum_711(dirent->file_id_len);
 
-        if (type == ISO9660_ENTRY_TYPE_FILE) {
+        if (type == CDFS_ENTRY_TYPE_FILE) {
                 /* Minus the ';1' */
                 name_len -= 2;
 
@@ -286,11 +286,11 @@ static uint32_t
 _filelist_entry_count_clamp(int32_t count)
 {
         if (count <= 0) {
-                return ISO9660_FILELIST_ENTRIES_COUNT;
+                return CDFS_FILELIST_ENTRIES_COUNT;
         }
 
-        if (count >= ISO9660_FILELIST_ENTRIES_COUNT) {
-                return ISO9660_FILELIST_ENTRIES_COUNT;
+        if (count >= CDFS_FILELIST_ENTRIES_COUNT) {
+                return CDFS_FILELIST_ENTRIES_COUNT;
         }
 
         return count;

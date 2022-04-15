@@ -13,7 +13,9 @@
 #include <usb-cart.h>
 
 #include <ssload.h>
+
 #include <internal.h>
+#include <dbgio/dbgio-internal.h>
 
 #define STATE_IDLE              0x00
 #define STATE_INITIALIZED       0x01
@@ -23,15 +25,15 @@
 #define BUFFER_FLUSH_POW        (5)
 #define BUFFER_FLUSH_REM_MASK   (0x1F)
 
-static void _init(const dbgio_usb_cart_t *);
+static void _init(const dbgio_usb_cart_t *params);
 static void _deinit(void);
-static void _puts(const char *);
+static void _puts(const char *buffer);
 static void _flush(void);
 static void _font_load(void);
 
 typedef struct {
+        uint8_t *buffer_base;
         uint8_t *buffer;
-        uint8_t *buffer_p;
         uint32_t buffer_size;
 
         uint8_t state;
@@ -43,7 +45,7 @@ static const dbgio_usb_cart_t _default_params = {
 
 static dev_state_t *_dev_state;
 
-const struct dbgio_dev_ops __dev_ops_usb_cart = {
+const dbgio_dev_ops_t __dev_ops_usb_cart = {
         .dev            = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
         .init           = (dev_ops_init_t)_init,
@@ -80,7 +82,7 @@ _init(const dbgio_usb_cart_t *params)
         }
         assert(_dev_state->buffer != NULL);
 
-        _dev_state->buffer_p = _dev_state->buffer;
+        _dev_state->buffer_base = _dev_state->buffer;
         _dev_state->buffer_size = params->buffer_size;
 
         _dev_state->state = STATE_INITIALIZED;
@@ -102,22 +104,20 @@ _deinit(void)
 static void
 _puts(const char *buffer)
 {
-        size_t len;
-        len = strlen(buffer);
+        const size_t len = strlen(buffer);
 
-        uint32_t current_len;
-        current_len = (uint32_t)(_dev_state->buffer_p - _dev_state->buffer);
+        const uint32_t current_len =
+            _dev_state->buffer_base - _dev_state->buffer;
 
-        uint32_t new_len;
-        new_len = current_len + len;
+        const uint32_t new_len = current_len + len;
 
         if (new_len >= _dev_state->buffer_size) {
                 return;
         }
 
-        (void)memcpy(_dev_state->buffer_p, buffer, len);
+        (void)memcpy(_dev_state->buffer_base, buffer, len);
 
-        _dev_state->buffer_p += len;
+        _dev_state->buffer_base += len;
 
         _dev_state->state |= STATE_BUFFER_DIRTY;
 }
@@ -146,11 +146,11 @@ _flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        const uint32_t len = _dev_state->buffer_p - _dev_state->buffer;
+        const uint32_t len = _dev_state->buffer_base - _dev_state->buffer;
 
         _buffer_partial_flush(&_dev_state->buffer[0], len);
 
-        _dev_state->buffer_p = _dev_state->buffer;
+        _dev_state->buffer_base = _dev_state->buffer;
 
         _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
 }

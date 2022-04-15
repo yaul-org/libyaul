@@ -13,7 +13,7 @@
 
 #include <cd-block/cmd.h>
 
-#define ISO9660_SECTOR_SIZE (2048U)
+#define CDFS_SECTOR_SIZE (2048U)
 
 __BEGIN_DECLS
 

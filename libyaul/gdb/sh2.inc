@@ -34,6 +34,7 @@
 #include <mm/memb.h>
 
 #include <internal.h>
+#include <mm/memb-internal.h>
 
 #include "gdb.h"
 

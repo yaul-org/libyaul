@@ -10,8 +10,9 @@
 #include <mm/tlsf.h>
 #include <mm/mm_stats.h>
 
-#include <internal.h>
 #include <scu/map.h>
+
+#include <internal.h>
 
 #define TLSF_HANDLE_PRIVATE       (0)
 #define TLSF_HANDLE_USER          (1)

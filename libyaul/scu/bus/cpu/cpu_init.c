@@ -25,9 +25,9 @@
 #include <vdp.h>
 #include <dbgio/dbgio.h>
 
+#include <internal.h>
 #include <cpu-internal.h>
 #include <vdp-internal.h>
-#include <internal.h>
 
 #define EXCEPTION_TRAMPOLINE_EMIT(name)                                        \
 __asm__ (".align 4\n"                                                          \

@@ -67,6 +67,7 @@ LIB_SRCS+= \
 	kernel/sys/dma-queue.c \
 	kernel/sys/dma-queue-internal.c \
 	kernel/sys/callback-list.c \
+	kernel/sys/callback-list-internal.c \
 	\
 	kernel/mm/memb.c \
 	kernel/mm/memb-internal.c \
@@ -186,12 +187,12 @@ LIB_SRCS+= \
 	lib/crc/crc.c
 
 LIB_SRCS+= \
-	kernel/vfs/fs/iso9660/iso9660.c \
-	kernel/vfs/fs/iso9660/iso9660_sector_read.c
+	kernel/vfs/fs/cd/cdfs.c \
+	kernel/vfs/fs/cd/cdfs_sector_read.c
 
 ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
 LIB_SRCS+= \
-	kernel/vfs/fs/iso9660/iso9660_sector_usb_cart_read.c
+	kernel/vfs/fs/cd/cdfs_sector_usb_cart_read.c
 endif
 
 ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
@@ -353,7 +354,7 @@ INSTALL_HEADER_FILES+= \
 	./kernel/sys/:callback-list.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/
+	./kernel/vfs/fs/cd/:cdfs.h:yaul/fs/cd/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/:ssload.h:yaul/

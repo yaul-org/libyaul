@@ -13,39 +13,20 @@
 
 #include <sys/callback-list.h>
 
-#include <internal.h>
+#include "callback-list-internal.h"
 
 static void _default_handler(void *work);
 
 callback_list_t *
 callback_list_alloc(uint32_t count)
 {
-        assert(count > 0);
-
-        callback_list_t *callback_list;
-        callback_list = __malloc(sizeof(callback_list_t));
-        assert(callback_list != NULL);
-
-        callback_t *callbacks;
-        callbacks = __malloc(count * sizeof(callback_t));
-        assert(callbacks != NULL);
-
-        callback_list_init(callback_list, callbacks, count);
-        callback_list_clear(callback_list);
-
-        return callback_list;
+        return __callback_list_request_alloc(count, malloc);
 }
 
 void
 callback_list_free(callback_list_t *callback_list)
 {
-        assert(callback_list != NULL);
-        assert(callback_list->callbacks != NULL);
-
-        callback_list->count = 0;
-
-        __free(callback_list->callbacks);
-        __free(callback_list);
+        __callback_list_request_free(callback_list, free);
 }
 
 void

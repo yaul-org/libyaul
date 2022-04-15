@@ -39,18 +39,22 @@ callback_call(const callback_t *callback)
         callback->handler(callback->work);
 }
 
-extern callback_list_t *callback_list_alloc(uint32_t);
-extern void callback_list_free(callback_list_t *);
-extern void callback_list_init(callback_list_t *, callback_t *, uint32_t);
+extern callback_list_t *callback_list_alloc(uint32_t count);
+extern void callback_list_free(callback_list_t *callback_list);
+extern void callback_list_init(callback_list_t *callback_list,
+    callback_t *callbacks, uint32_t count);
 
-extern void callback_list_process(callback_list_t *);
+extern void callback_list_process(callback_list_t *callback_list);
 
-extern callback_id_t callback_list_callback_add(callback_list_t *, callback_handler_t, void *);
-extern void callback_list_callback_remove(callback_list_t *, callback_id_t);
-extern void callback_list_clear(callback_list_t *);
+extern callback_id_t callback_list_callback_add(callback_list_t *callback_list,
+    callback_handler_t handler, void *work);
+extern void callback_list_callback_remove(callback_list_t *callback_list,
+    callback_id_t id);
+extern void callback_list_clear(callback_list_t *callback_list);
 
-extern void callback_init(callback_t *);
-extern void callback_set(callback_t *, callback_handler_t, void *);
+extern void callback_init(callback_t *callback);
+extern void callback_set(callback_t *callback, callback_handler_t handler,
+    void *work);
 
 __END_DECLS
 
