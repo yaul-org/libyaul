@@ -6,55 +6,35 @@
  */
 
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include <cpu/cache.h>
 #include <cpu/intc.h>
-#include <cpu/registers.h>
 
-#include <sys/dma-queue.h>
-
-#include <scu-internal.h>
-
-#include <internal.h>
+#include "dma-queue-internal.h"
 
 dma_queue_t *
 dma_queue_alloc(void)
 {
-        dma_queue_t * const queue = malloc(sizeof(dma_queue_t));
-
-        dma_queue_init(queue);
-
-        return queue;
+        return __dma_queue_request_alloc(malloc);
 }
 
 void
 dma_queue_free(dma_queue_t *queue)
 {
-        assert(queue != NULL);
-
-        dma_queue_deinit(queue);
-
-        free(queue);
+        __dma_queue_request_free(queue, free);
 }
 
 void
 dma_queue_init(dma_queue_t *queue)
 {
-        assert(queue != NULL);
-
-        queue->xfer_table = memalign(sizeof(dma_queue_t) * DMA_QUEUE_REQUESTS_MAX_COUNT, 256);
-        queue->count = 0;
-
-        assert(queue->xfer_table != NULL);
+        __dma_queue_request_init(queue, memalign);
 }
 
 void
 dma_queue_deinit(dma_queue_t *queue)
 {
-        free(queue->xfer_table);
-        queue->count = 0;
+        __dma_queue_request_deinit(queue, free);
 }
 
 int32_t

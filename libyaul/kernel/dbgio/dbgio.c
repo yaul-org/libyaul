@@ -18,10 +18,10 @@
 
 static struct {
         volatile uint32_t state;
-        const struct dbgio_dev_ops *dev_ops;
+        const dbgio_dev_ops_t *dev_ops;
 } _dbgio_state;
 
-static const struct dbgio_dev_ops *_dev_ops_table[] = {
+static const dbgio_dev_ops_t *_dev_ops_table[] = {
         &__dev_ops_null,
         NULL,
         &__dev_ops_vdp2,

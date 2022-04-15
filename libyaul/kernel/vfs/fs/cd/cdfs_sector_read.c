@@ -10,10 +10,10 @@
 #include <usb-cart.h>
 #include <cd-block.h>
 
-#include "iso9660.h"
+#include "cdfs.h"
 
 void
-iso9660_sector_read(sector_t sector, void *ptr)
+cdfs_sector_read(sector_t sector, void *ptr)
 {
         cd_block_sector_read(LBA2FAD(sector), ptr);
 }

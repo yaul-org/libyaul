@@ -72,8 +72,8 @@ memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
     uint32_t block_size)
 {
         const memb_request_t request = {
-                .malloc      = malloc,
-                .free        = free,
+                .malloc_func = malloc,
+                .free_func   = free,
                 .block_count = block_count,
                 .block_size  = block_size
         };
@@ -86,12 +86,12 @@ memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
     uint32_t align)
 {
         const memb_request_t request = {
-                .malloc      = malloc,
-                .memalign    = memalign,
-                .free        = free,
-                .block_count = block_count,
-                .block_size  = block_size,
-                .align       = align
+                .malloc_func   = malloc,
+                .memalign_func = memalign,
+                .free_func     = free,
+                .block_count   = block_count,
+                .block_size    = block_size,
+                .align         = align
         };
 
         return __memb_memb_request_alloc(memb, &request);

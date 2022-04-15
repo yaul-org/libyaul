@@ -2,8 +2,8 @@
  * See LICENSE for details.
  */
 
-#ifndef _KERNEL_FS_ISO9660_INTERNAL_H_
-#define _KERNEL_FS_ISO9660_INTERNAL_H_
+#ifndef _KERNEL_FS_CDFS_INTERNAL_H_
+#define _KERNEL_FS_CDFS_INTERNAL_H_
 
 #include <sys/types.h>
 #include <sys/cdefs.h>
@@ -35,9 +35,9 @@ typedef struct {
         uint8_t id[ISODCL(2, 6)];
         uint8_t version[ISODCL(7, 7)];
         uint8_t data[ISODCL(8, 2048)];
-} iso9660_vd_t;
+} cdfs_vd_t;
 
-typedef struct iso9660_pvd {
+typedef struct cdfs_pvd {
         uint8_t type[ISODCL(1, 1)];                       /* 711 */
         uint8_t id[ISODCL(2, 6)];
         uint8_t version[ISODCL(7, 7)];                    /* 711 */
@@ -71,7 +71,7 @@ typedef struct iso9660_pvd {
         uint8_t unused_4[ISODCL(883, 883)];
         uint8_t application_data[ISODCL(884, 1395)];
         uint8_t unused_5[ISODCL(1396, 2048)];
-} __packed iso9660_pvd_t;
+} __packed cdfs_pvd_t;
 
 typedef struct {
         uint8_t length[ISODCL(1, 1)];                   /* 711 */
@@ -85,7 +85,7 @@ typedef struct {
         uint8_t volume_sequence_number[ISODCL(29, 32)]; /* 723 */
         uint8_t file_id_len[ISODCL(33, 33)];            /* 711 */
         uint8_t name[ISODCL(34, 34)];                   /* 711 */
-} __packed iso9660_dirent_t;
+} __packed cdfs_dirent_t;
 
 #undef ISODCL
 
@@ -154,4 +154,4 @@ isonum_733(const uint8_t *p)
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 }
 
-#endif /* !_KERNEL_FS_ISO9660_INTERNAL_H_ */
+#endif /* !_KERNEL_FS_CDFS_INTERNAL_H_ */

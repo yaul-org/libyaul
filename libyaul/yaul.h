@@ -73,6 +73,6 @@
 
 #include <ssload.h>
 
-#include <fs/iso9660/iso9660.h>
+#include <fs/cd/cdfs.h>
 
 #endif /* !_YAUL_H_ */

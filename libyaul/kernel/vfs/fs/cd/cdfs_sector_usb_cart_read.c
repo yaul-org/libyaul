@@ -10,12 +10,12 @@
 #include <crc.h>
 #include <ssload.h>
 
-#include "iso9660.h"
+#include "cdfs.h"
 
 void
-iso9660_sector_usb_cart_read(sector_t sector, void *ptr)
+cdfs_sector_usb_cart_read(sector_t sector, void *ptr)
 {
-        usb_cart_byte_send(SSLOAD_COMM_CMD_ISO9660);
+        usb_cart_byte_send(SSLOAD_COMM_CMD_CDFS);
 
         while (true) {
                 usb_cart_long_send(sector);
@@ -23,14 +23,14 @@ iso9660_sector_usb_cart_read(sector_t sector, void *ptr)
                 uint32_t *dst_p;
                 dst_p = (uint32_t *)ptr;
 
-                for (uint32_t i = 0; i < (ISO9660_SECTOR_SIZE / 16); i++) {
+                for (uint32_t i = 0; i < (CDFS_SECTOR_SIZE / 16); i++) {
                         *dst_p++ = usb_cart_long_read();
                         *dst_p++ = usb_cart_long_read();
                         *dst_p++ = usb_cart_long_read();
                         *dst_p++ = usb_cart_long_read();
                 }
 
-                const crc_t crc = crc_calculate(ptr, ISO9660_SECTOR_SIZE);
+                const crc_t crc = crc_calculate(ptr, CDFS_SECTOR_SIZE);
 
                 usb_cart_byte_send(crc);
 

@@ -13,9 +13,9 @@
 #include <internal.h>
 
 typedef struct memb_request {
-        malloc_func_t malloc;
-        memalign_func_t memalign;
-        free_func_t free;
+        malloc_func_t malloc_func;
+        memalign_func_t memalign_func;
+        free_func_t free_func;
 
         uint32_t block_count;
         uint32_t block_size;
