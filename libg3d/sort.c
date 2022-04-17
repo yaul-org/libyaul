@@ -9,9 +9,9 @@
 #include <string.h>
 #include <math.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 static struct {
         /* Top pointer to the pool of singles */

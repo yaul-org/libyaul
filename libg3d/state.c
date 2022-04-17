@@ -5,13 +5,13 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
-static sega3d_results_t _results;
+static g3d_results_t _results;
 
-static sega3d_fog_t _fog;
+static g3d_fog_t _fog;
 
-static sega3d_info_t _info;
+static g3d_info_t _info;
 
 static MATRIX _matrices[MATRIX_STACK_MAX] __aligned(16);
 

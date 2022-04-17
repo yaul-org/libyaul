@@ -2,12 +2,12 @@
  * No copyright.
  */
 
-#ifndef _SEGA3D_INTERNAL_H_
-#define _SEGA3D_INTERNAL_H_
+#ifndef _G3D_INTERNAL_H_
+#define _G3D_INTERNAL_H_
 
 #include <stdint.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
 #include <math.h>
 #include <vdp1/cmdt.h>
@@ -63,7 +63,7 @@ typedef struct {
         FIXED z_value;                 /* Z value of the current polygon */
         const transform_proj_t *polygon[4]; /* Pointers to the pool that make up the current polygon */
 
-        const sega3d_object_t *object; /* Current object */
+        const g3d_object_t *object; /* Current object */
         const void *xpdata;            /* Current XPDATA */
 
         vdp1_cmdt_orderlist_t *current_orderlist;
@@ -115,10 +115,10 @@ typedef struct {
 
 typedef struct {
         flags_t flags;
-        sega3d_results_t * const results;
+        g3d_results_t * const results;
 
-        sega3d_fog_t * const fog;
-        sega3d_info_t * const info;
+        g3d_fog_t * const fog;
+        g3d_info_t * const info;
         transform_t * const transform;
         transform_proj_t * const transform_proj_pool;
         MATRIX * const clip_camera;
@@ -136,4 +136,4 @@ extern void __list_alloc(list_t *list, uint16_t count);
 extern void __list_free(list_t *list);
 extern void __list_set(list_t *list, void *list_p, uint16_t count);
 
-#endif /* !_SEGA3D_INTERNAL_H_ */
+#endif /* !_G3D_INTERNAL_H_ */

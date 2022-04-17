@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 void
 __plist_init(void)
@@ -24,7 +24,7 @@ __plist_init(void)
 }
 
 PALETTE *
-sega3d_plist_alloc(uint16_t palette_count)
+g3d_plist_alloc(uint16_t palette_count)
 {
         __list_alloc(__state->plist, palette_count);
 
@@ -32,13 +32,13 @@ sega3d_plist_alloc(uint16_t palette_count)
 }
 
 void
-sega3d_plist_free(void)
+g3d_plist_free(void)
 {
         __list_free(__state->plist);
 }
 
 void
-sega3d_plist_set(PALETTE *palettes, uint16_t palette_count)
+g3d_plist_set(PALETTE *palettes, uint16_t palette_count)
 {
         __list_set(__state->plist, palettes, palette_count);
 }

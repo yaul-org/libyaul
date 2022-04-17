@@ -31,7 +31,7 @@ ___asm_vertex_pool_transform:
         mov.l   r14,@-r15
         mov.l   @(20,r5),r7             ! Offset into trans->dst_matrix
         mov     r6,r14                  ! points/current_point
-        mov.l   @(44,r4),r3             ! sega3d_info_t::near
+        mov.l   @(44,r4),r3             ! g3d_info_t::near
         add     r1,r14                  ! last_point
         mov     r5,r1
         mov     r7,r5

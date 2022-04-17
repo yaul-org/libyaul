@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SEGA3D_TYPES_H_
-#define _SEGA3D_TYPES_H_
+#ifndef _G3D_TYPES_H_
+#define _G3D_TYPES_H_
 
 #include <stdint.h>
 
@@ -14,35 +14,35 @@
 
 #include <vdp1/cmdt.h>
 
-#include <sega3d/perf.h>
-#include <sega3d/sgl.h>
+#include <g3d/perf.h>
+#include <g3d/sgl.h>
 
-typedef struct sega3d_object sega3d_object_t;
+typedef struct g3d_object g3d_object_t;
 
-typedef enum sega3d_matrix_type {
-        SEGA3D_MATRIX_TYPE_PUSH     = 0,
-        SEGA3D_MATRIX_TYPE_MOVE_PTR = 1
-} sega3d_matrix_type_t;
+typedef enum g3d_matrix_type {
+        G3D_MATRIX_TYPE_PUSH     = 0,
+        G3D_MATRIX_TYPE_MOVE_PTR = 1
+} g3d_matrix_type_t;
 
-typedef enum sega3d_flags {
-        SEGA3D_OBJECT_FLAGS_NONE         = 0,
+typedef enum g3d_flags {
+        G3D_OBJECT_FLAGS_NONE         = 0,
         /// Display non-textured polygons
-        SEGA3D_OBJECT_FLAGS_NON_TEXTURED = 1 << 0,
+        G3D_OBJECT_FLAGS_NON_TEXTURED = 1 << 0,
         /// Display wireframe
-        SEGA3D_OBJECT_FLAGS_WIREFRAME    = 1 << 1,
+        G3D_OBJECT_FLAGS_WIREFRAME    = 1 << 1,
         /// Cull in world space
-        SEGA3D_OBJECT_FLAGS_CULL_VIEW    = 1 << 2,
+        G3D_OBJECT_FLAGS_CULL_VIEW    = 1 << 2,
         /// Cull in screen space
-        SEGA3D_OBJECT_FLAGS_CULL_SCREEN  = 1 << 3,
+        G3D_OBJECT_FLAGS_CULL_SCREEN  = 1 << 3,
         /// Cull object using a bounding sphere
-        SEGA3D_OBJECT_FLAGS_CULL_SPHERE  = 1 << 4,
+        G3D_OBJECT_FLAGS_CULL_SPHERE  = 1 << 4,
         /// Cull object using an AABB
-        SEGA3D_OBJECT_FLAGS_CULL_AABB    = 1 << 5,
+        G3D_OBJECT_FLAGS_CULL_AABB    = 1 << 5,
         /// Exclude from fog calculation
-        SEGA3D_OBJECT_FLAGS_FOG_EXCLUDE  = 1 << 6
-} sega3d_flags_t;
+        G3D_OBJECT_FLAGS_FOG_EXCLUDE  = 1 << 6
+} g3d_flags_t;
 
-typedef struct sega3d_info {
+typedef struct g3d_info {
         FIXED ratio;         /* Screen ratio */
         ANGLE fov;           /* FOV */
         FIXED near;          /* Distance between view point and near plane */
@@ -51,11 +51,11 @@ typedef struct sega3d_info {
          * is */
         uint16_t level;
         FIXED view_distance; /* Distance between view point (eye) and view plane */
-} __aligned(4) sega3d_info_t;
+} __aligned(4) g3d_info_t;
 
-static_assert(sizeof(sega3d_info_t) == 24);
+static_assert(sizeof(g3d_info_t) == 24);
 
-typedef struct sega3d_fog {
+typedef struct g3d_fog {
         const color_rgb1555_t * const depth_colors;
         const uint8_t * const depth_z;
         uint8_t depth_count;
@@ -64,9 +64,9 @@ typedef struct sega3d_fog {
         FIXED end_z;
         color_rgb1555_t near_ambient_color;
         color_rgb1555_t far_ambient_color;
-} sega3d_fog_t;
+} g3d_fog_t;
 
-typedef struct sega3d_results {
+typedef struct g3d_results {
         uint16_t object_count;
         uint16_t polygon_count;
 
@@ -76,20 +76,20 @@ typedef struct sega3d_results {
         perf_counter_t perf_transform;
         perf_counter_t perf_clipping;
         perf_counter_t perf_polygon_process;
-} sega3d_results_t;
+} g3d_results_t;
 
-typedef struct sega3d_cull_sphere {
+typedef struct g3d_cull_sphere {
         FIXED origin[XYZ];
         FIXED radius;
-} sega3d_cull_sphere_t;
+} g3d_cull_sphere_t;
 
-typedef struct sega3d_cull_aabb {
+typedef struct g3d_cull_aabb {
         FIXED origin[XYZ];
         FIXED length[XYZ];
-} sega3d_cull_aabb_t;
+} g3d_cull_aabb_t;
 
-struct sega3d_object {
-        sega3d_flags_t flags;
+struct g3d_object {
+        g3d_flags_t flags;
 
         void *xpdatas;
         uint16_t xpdata_count;
@@ -99,4 +99,4 @@ struct sega3d_object {
         void *user_data;
 };
 
-#endif /* !_SEGA3D_TYPES_H_ */
+#endif /* !_G3D_TYPES_H_ */

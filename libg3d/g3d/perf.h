@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SEGA3D_PERF_H_
-#define _SEGA3D_PERF_H_
+#ifndef _G3D_PERF_H_
+#define _G3D_PERF_H_
 
 #include <stdint.h>
 
@@ -23,4 +23,4 @@ void perf_counter_init(perf_counter_t *perf_counter);
 void perf_counter_start(perf_counter_t *perf_counter);
 void perf_counter_end(perf_counter_t *perf_counter);
 
-#endif /* !_SEGA3D_PERF_H_ */
+#endif /* !_G3D_PERF_H_ */

@@ -2,8 +2,8 @@
  * No copyright.
  */
 
-#ifndef _SEGA3D_SGL_H_
-#define _SEGA3D_SGL_H_
+#ifndef _G3D_SGL_H_
+#define _G3D_SGL_H_
 
 #include <sys/cdefs.h>
 
@@ -253,4 +253,4 @@ typedef struct {
         void *pcsrc;
 } PICTURE;
 
-#endif /* !_SEGA3D_SGL_H_ */
+#endif /* !_G3D_SGL_H_ */

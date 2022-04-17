@@ -2,8 +2,8 @@
 
 include ../env.mk
 
-TARGET:= sega3d
-TYPE:= debug
+TARGET:= g3d
+TYPE:= release
 
 include build-files.mk
 include base.mk
