@@ -14,7 +14,7 @@
 
 #include <vdp1/cmdt.h>
 
-#include <sega3d/sega3d-types.h>
+#include <sega3d/types.h>
 #include <sega3d/sgl.h>
 #include <sega3d/perf.h>
 #include <sega3d/s3d.h>

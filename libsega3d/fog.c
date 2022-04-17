@@ -58,14 +58,14 @@ static const uint8_t _depth_fog_z[DEPTH_FOG_DEPTH_COUNT] = {
 };
 
 static const sega3d_fog_t default_fog = {
-        .depth_colors = _depth_fog_colors,
-        .depth_z = _depth_fog_z,
-        .depth_count = DEPTH_FOG_DEPTH_COUNT,
-        .step = DEPTH_FOG_STEP,
-        .start_z = DEPTH_FOG_START,
-        .end_z = DEPTH_FOG_END,
+        .depth_colors       = _depth_fog_colors,
+        .depth_z            = _depth_fog_z,
+        .depth_count        = DEPTH_FOG_DEPTH_COUNT,
+        .step               = DEPTH_FOG_STEP,
+        .start_z            = DEPTH_FOG_START,
+        .end_z              = DEPTH_FOG_END,
         .near_ambient_color = _depth_fog_colors[0],
-        .far_ambient_color = _depth_fog_colors[31],
+        .far_ambient_color  = _depth_fog_colors[31]
 };
 
 void

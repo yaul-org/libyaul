@@ -1,4 +1,4 @@
-#include "s3d.h"
+#include <sega3d/s3d.h>
 
 #define PATCH_ADDRESS(s3d, x) ((void *)((uintptr_t)(x) + (uintptr_t)(s3d)))
 
