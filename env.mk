@@ -181,6 +181,7 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 # These include directories are strictly from libyaul, and are meant to be
 # shared amongst the other libraries
 SHARED_INCLUDE_DIRS:= \
+	$(abspath .) \
 	../lib$(MAIN_TARGET)/ \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
@@ -231,7 +232,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir)))); \
+	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) -Ilib$(TARGET)/); \
 	done
 endef
 else

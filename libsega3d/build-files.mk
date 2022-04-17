@@ -15,8 +15,8 @@ LIB_SRCS:= \
 	transform.c
 
 INSTALL_HEADER_FILES:= \
-	./:perf.h:./sega3d/ \
-	./:s3d.h:./sega3d/ \
-	./:sega3d-types.h:./sega3d/ \
+	./sega3d/:perf.h:./sega3d/ \
+	./sega3d/:s3d.h:./sega3d/ \
+	./sega3d/:types.h:./sega3d/ \
+	./sega3d/:sgl.h:./sega3d/ \
 	./:sega3d.h:./sega3d/ \
-	./:sgl.h:./sega3d/

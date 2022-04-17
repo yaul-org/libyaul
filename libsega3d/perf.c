@@ -2,7 +2,7 @@
 
 #include <cpu/frt.h>
 
-#include "perf.h"
+#include <sega3d/perf.h>
 
 static void _frt_ovi_handler(void);
 
