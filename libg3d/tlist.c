@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 static TEXTURE _default_texture[] = {
         TEXDEF(0, 0, 0x00000000)
@@ -28,7 +28,7 @@ __tlist_init(void)
 }
 
 TEXTURE *
-sega3d_tlist_alloc(uint16_t texture_count)
+g3d_tlist_alloc(uint16_t texture_count)
 {
         __list_alloc(__state->tlist, texture_count);
 
@@ -36,13 +36,13 @@ sega3d_tlist_alloc(uint16_t texture_count)
 }
 
 void
-sega3d_tlist_free(void)
+g3d_tlist_free(void)
 {
         __list_free(__state->tlist);
 }
 
 void
-sega3d_tlist_set(TEXTURE *textures, uint16_t texture_count)
+g3d_tlist_set(TEXTURE *textures, uint16_t texture_count)
 {
         __list_set(__state->tlist, textures, texture_count);
 }

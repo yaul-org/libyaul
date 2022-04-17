@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 void
 __list_alloc(list_t *list, uint16_t count)

@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 #define DEPTH_FOG_START         FIX16(1.f)
 #define DEPTH_FOG_END           FIX16(512.0f)
@@ -57,7 +57,7 @@ static const uint8_t _depth_fog_z[DEPTH_FOG_DEPTH_COUNT] = {
         28, 29, 29, 29, 29, 29, 30, 30, 30, 30, 30, 30, 30, 30, 30, 31
 };
 
-static const sega3d_fog_t default_fog = {
+static const g3d_fog_t default_fog = {
         .depth_colors       = _depth_fog_colors,
         .depth_z            = _depth_fog_z,
         .depth_count        = DEPTH_FOG_DEPTH_COUNT,
@@ -71,11 +71,11 @@ static const sega3d_fog_t default_fog = {
 void
 __fog_init(void)
 {
-        sega3d_fog_set(&default_fog);
+        g3d_fog_set(&default_fog);
 }
 
 void
-sega3d_fog_set(const sega3d_fog_t *fog)
+g3d_fog_set(const g3d_fog_t *fog)
 {
         __state->flags &= ~FLAGS_FOG_ENABLED;
 
@@ -87,13 +87,13 @@ sega3d_fog_set(const sega3d_fog_t *fog)
         assert(fog->depth_z != NULL);
         assert(fog->depth_count > 0);
 
-        (void)memcpy(__state->fog, fog, sizeof(sega3d_fog_t));
+        (void)memcpy(__state->fog, fog, sizeof(g3d_fog_t));
 
         __state->flags |= FLAGS_FOG_ENABLED;
 }
 
 void
-sega3d_fog_limits_set(FIXED start_z, FIXED end_z)
+g3d_fog_limits_set(FIXED start_z, FIXED end_z)
 {
         __state->fog->start_z = start_z;
         __state->fog->end_z = end_z;

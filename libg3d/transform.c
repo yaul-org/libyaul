@@ -10,7 +10,7 @@
 
 #include <dbgio/dbgio.h>
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 extern void __sort_add(void *packet, int32_t pz);
 extern void __sort_iterate(sort_iterate_fn_t fn);
@@ -98,9 +98,9 @@ __transform_init(void)
 {
         vdp1_cmdt_end_set(&_cmdt_end);
 
-        sega3d_matrix_identity(__state->clip_camera);
+        g3d_matrix_identity(__state->clip_camera);
 
-        sega3d_results_t * const internal_results = __state->results;
+        g3d_results_t * const internal_results = __state->results;
 
         perf_counter_init(&internal_results->perf_sort);
         perf_counter_init(&internal_results->perf_dma);
@@ -113,7 +113,7 @@ __transform_init(void)
 }
 
 void
-sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_cmdt_t *cmdts)
+g3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_cmdt_t *cmdts)
 {
         assert(orderlist != NULL);
 
@@ -123,7 +123,7 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
         trans->current_orderlist = &orderlist[orderlist_offset];
         trans->current_cmdt = cmdts;
 
-        sega3d_results_t * const internal_results = __state->results;
+        g3d_results_t * const internal_results = __state->results;
 
         internal_results->object_count = 0;
         internal_results->polygon_count = 0;
@@ -166,9 +166,9 @@ sega3d_start(vdp1_cmdt_orderlist_t *orderlist, uint16_t orderlist_offset, vdp1_c
 }
 
 void
-sega3d_finish(sega3d_results_t *results)
+g3d_finish(g3d_results_t *results)
 {
-        sega3d_results_t * const internal_results = __state->results;
+        g3d_results_t * const internal_results = __state->results;
 
         perf_counter_start(&internal_results->perf_sort);
         __sort_iterate(_sort_iterate);
@@ -200,7 +200,7 @@ sega3d_finish(sega3d_results_t *results)
 }
 
 void
-sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
+g3d_object_transform(const g3d_object_t *object, uint16_t xpdata_index)
 {
         const XPDATA * const object_xpdata = object->xpdatas;
         const XPDATA * const xpdata = &object_xpdata[xpdata_index];
@@ -214,7 +214,7 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
                 return;
         }
 
-        sega3d_results_t * const internal_results = __state->results;
+        g3d_results_t * const internal_results = __state->results;
 
         transform_t * const trans = __state->transform;
 
@@ -224,18 +224,18 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
         trans->polygon_count = polygon_count;
 
         perf_counter_start(&internal_results->perf_aabb_culling);
-        if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_AABB) != SEGA3D_OBJECT_FLAGS_NONE) {
+        if ((object->flags & G3D_OBJECT_FLAGS_CULL_AABB) != G3D_OBJECT_FLAGS_NONE) {
                 if ((_object_aabb_cull_test(trans))) {
                         return;
                 }
-        } else if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SPHERE) != SEGA3D_OBJECT_FLAGS_NONE) {
+        } else if ((object->flags & G3D_OBJECT_FLAGS_CULL_SPHERE) != G3D_OBJECT_FLAGS_NONE) {
                 if ((_object_sphere_cull_test(trans))) {
                         return;
                 }
         }
         perf_counter_end(&internal_results->perf_aabb_culling);
 
-        sega3d_matrix_push(SEGA3D_MATRIX_TYPE_PUSH); {
+        g3d_matrix_push(G3D_MATRIX_TYPE_PUSH); {
                 _camera_world_transform();
 
                 perf_counter_start(&internal_results->perf_transform);
@@ -249,9 +249,9 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
                 perf_counter_start(&internal_results->perf_polygon_process);
                 _polygon_process(trans, xpdata->pltbl);
                 perf_counter_end(&internal_results->perf_polygon_process);
-        } sega3d_matrix_pop();
+        } g3d_matrix_pop();
 
-        sega3d_results_t * const results = __state->results;
+        g3d_results_t * const results = __state->results;
 
         results->object_count++;
 }
@@ -259,7 +259,7 @@ sega3d_object_transform(const sega3d_object_t *object, uint16_t xpdata_index)
 static void
 _camera_world_transform(void)
 {
-        FIXED * const top_matrix = (FIXED *)sega3d_matrix_top();
+        FIXED * const top_matrix = (FIXED *)g3d_matrix_top();
         const FIXED * const camera_matrix =
             (const FIXED *)__state->clip_camera;
 
@@ -275,7 +275,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 #define OFFSET_CPU_DVDNTH       (0x10 / 4)
 #define OFFSET_CPU_DVDNTL       (0x14 / 4)
 
-        const sega3d_info_t * const info = __state->info;
+        const g3d_info_t * const info = __state->info;
 
         const FIXED *current_point = (const FIXED *)points;
         const FIXED * const last_point = (const FIXED * const)&points[trans->vertex_count];
@@ -288,7 +288,7 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         const FIXED z_near = info->near;
         const FIXED ratio = info->ratio;
 
-        const FIXED * const top_matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const top_matrix = (const FIXED *)g3d_matrix_top();
         const FIXED * const matrix = &top_matrix[M20];
 
         register uint32_t * const cpu_divu_regs = (uint32_t *)CPU(DVSR);
@@ -414,7 +414,7 @@ _polygon_process(transform_t * const trans, POLYGON const *polygons)
         transform_proj_t * const transform_proj_pool =
             &__state->transform_proj_pool[0];
 
-        const sega3d_object_t * const object = trans->object;
+        const g3d_object_t * const object = trans->object;
         const uint16_t polygon_count = trans->polygon_count;
 
         for (trans->index = 0; trans->index < polygon_count; trans->index++, polygons++) {
@@ -434,7 +434,7 @@ _polygon_process(transform_t * const trans, POLYGON const *polygons)
                         continue;
                 }
 
-                if ((object->flags & SEGA3D_OBJECT_FLAGS_CULL_SCREEN) != SEGA3D_OBJECT_FLAGS_NONE) {
+                if ((object->flags & G3D_OBJECT_FLAGS_CULL_SCREEN) != G3D_OBJECT_FLAGS_NONE) {
                         if ((_screen_cull_test(trans))) {
                                 continue;
                         }
@@ -498,7 +498,7 @@ _z_calculate(transform_t * const trans)
 static void
 _cmdt_prepare(const transform_t * const trans)
 {
-        const sega3d_object_t * const object = trans->object;
+        const g3d_object_t * const object = trans->object;
         const XPDATA * const xpdata = trans->xpdata;
 
         vdp1_cmdt_t * const cmdt = trans->current_cmdt;
@@ -510,11 +510,11 @@ _cmdt_prepare(const transform_t * const trans)
         cmdt->cmd_pmod = attr->atrb;
         cmdt->cmd_colr = attr->colno;
 
-        const sega3d_flags_t debug_flags =
-            (SEGA3D_OBJECT_FLAGS_WIREFRAME | SEGA3D_OBJECT_FLAGS_NON_TEXTURED);
+        const g3d_flags_t debug_flags =
+            (G3D_OBJECT_FLAGS_WIREFRAME | G3D_OBJECT_FLAGS_NON_TEXTURED);
 
         /* For debugging */
-        if ((object->flags & debug_flags) == SEGA3D_OBJECT_FLAGS_NONE) {
+        if ((object->flags & debug_flags) == G3D_OBJECT_FLAGS_NONE) {
                 const clip_flags_t or_clip_flags = (trans->polygon[0]->clip_flags |
                                                     trans->polygon[1]->clip_flags |
                                                     trans->polygon[2]->clip_flags |
@@ -579,7 +579,7 @@ _cmdt_prepare(const transform_t * const trans)
         cmdt->cmd_grda = attr->gstb;
 
         if ((__state->flags & FLAGS_FOG_ENABLED) != FLAGS_NONE) {
-                if ((object->flags & SEGA3D_OBJECT_FLAGS_FOG_EXCLUDE) == SEGA3D_OBJECT_FLAGS_NONE) {
+                if ((object->flags & G3D_OBJECT_FLAGS_FOG_EXCLUDE) == G3D_OBJECT_FLAGS_NONE) {
                         _fog_calculate(trans);
                 }
         }
@@ -667,10 +667,10 @@ _object_sphere_cull_test(const transform_t * const trans)
 {
         const fix16_plane_t * const clip_planes =
             (fix16_plane_t *)__state->clip_planes;
-        const sega3d_object_t * const object = trans->object;
-        const sega3d_cull_sphere_t * const sphere = object->cull_shape;
+        const g3d_object_t * const object = trans->object;
+        const g3d_cull_sphere_t * const sphere = object->cull_shape;
 
-        const FIXED * const world_matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const world_matrix = (const FIXED *)g3d_matrix_top();
 
         /* Transform the shape's origin
          * Because we're working with spheres and AABBs, it's enough to just
@@ -704,10 +704,10 @@ _object_aabb_cull_test(const transform_t * const trans)
 {
         const fix16_plane_t * const clip_planes =
             (fix16_plane_t *)__state->clip_planes;
-        const sega3d_object_t * const object = trans->object;
-        const sega3d_cull_aabb_t * const aabb = object->cull_shape;
+        const g3d_object_t * const object = trans->object;
+        const g3d_cull_aabb_t * const aabb = object->cull_shape;
 
-        const FIXED * const world_matrix = (const FIXED *)sega3d_matrix_top();
+        const FIXED * const world_matrix = (const FIXED *)g3d_matrix_top();
 
         const fix16_vec3_t aabb_min = {
                 .x = world_matrix[M03] + aabb->origin[X] - aabb->length[X],

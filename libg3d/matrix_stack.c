@@ -7,9 +7,9 @@
 
 #include <string.h>
 
-#include "sega3d.h"
+#include "g3d.h"
 
-#include "sega3d-internal.h"
+#include "g3d-internal.h"
 
 static struct {
         FIXED *top_matrix;
@@ -21,12 +21,12 @@ __matrix_init(void)
         _state.top_matrix = (FIXED *)&__state->matrices[0];
 
         for (uint8_t i = 0; i < MATRIX_STACK_MAX; i++) {
-                sega3d_matrix_identity(&__state->matrices[i]);
+                g3d_matrix_identity(&__state->matrices[i]);
         }
 }
 
 void
-sega3d_matrix_identity(MATRIX *matrix)
+g3d_matrix_identity(MATRIX *matrix)
 {
         FIXED * const matrix_p = (FIXED *)matrix;
 
@@ -38,13 +38,13 @@ sega3d_matrix_identity(MATRIX *matrix)
 }
 
 void
-sega3d_matrix_push(sega3d_matrix_type_t matrix_type)
+g3d_matrix_push(g3d_matrix_type_t matrix_type)
 {
         assert((MATRIX *)_state.top_matrix < &__state->matrices[MATRIX_STACK_MAX - 1]);
 
         _state.top_matrix += MTRX;
 
-        if (matrix_type == SEGA3D_MATRIX_TYPE_PUSH) {
+        if (matrix_type == G3D_MATRIX_TYPE_PUSH) {
                 MATRIX * const dst_matrix = (MATRIX *)_state.top_matrix;
                 MATRIX * const src_matrix = dst_matrix - 1;
 
@@ -53,7 +53,7 @@ sega3d_matrix_push(sega3d_matrix_type_t matrix_type)
 }
 
 void
-sega3d_matrix_pop(void)
+g3d_matrix_pop(void)
 {
         if ((MATRIX *)_state.top_matrix != __state->matrices) {
                 _state.top_matrix -= MTRX;
@@ -61,13 +61,13 @@ sega3d_matrix_pop(void)
 }
 
 const MATRIX *
-sega3d_matrix_top(void)
+g3d_matrix_top(void)
 {
         return (MATRIX *)_state.top_matrix;
 }
 
 void
-sega3d_matrix_load(const MATRIX *matrix)
+g3d_matrix_load(const MATRIX *matrix)
 {
         assert(matrix != NULL);
 
@@ -75,7 +75,7 @@ sega3d_matrix_load(const MATRIX *matrix)
 }
 
 void
-sega3d_matrix_copy(MATRIX *matrix)
+g3d_matrix_copy(MATRIX *matrix)
 {
         assert(matrix != NULL);
 
@@ -83,7 +83,7 @@ sega3d_matrix_copy(MATRIX *matrix)
 }
 
 void
-sega3d_matrix_transpose_in(MATRIX *matrix)
+g3d_matrix_transpose_in(MATRIX *matrix)
 {
         FIXED * const dst_matrix = (FIXED *)matrix;
 
@@ -102,7 +102,7 @@ sega3d_matrix_transpose_in(MATRIX *matrix)
 }
 
 void
-sega3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz)
+g3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -112,7 +112,7 @@ sega3d_matrix_trans(FIXED tx, FIXED ty, FIXED tz)
 }
 
 void
-sega3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz)
+g3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -122,7 +122,7 @@ sega3d_matrix_trans_load(FIXED tx, FIXED ty, FIXED tz)
 }
 
 void
-sega3d_matrix_trans_reset(void)
+g3d_matrix_trans_reset(void)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -132,7 +132,7 @@ sega3d_matrix_trans_reset(void)
 }
 
 void
-sega3d_matrix_rot_load(const ANGLE rx, const ANGLE ry, const ANGLE rz)
+g3d_matrix_rot_load(const ANGLE rx, const ANGLE ry, const ANGLE rz)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -163,7 +163,7 @@ sega3d_matrix_rot_load(const ANGLE rx, const ANGLE ry, const ANGLE rz)
 }
 
 void
-sega3d_matrix_rot_x(const ANGLE angle)
+g3d_matrix_rot_x(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -187,7 +187,7 @@ sega3d_matrix_rot_x(const ANGLE angle)
 }
 
 void
-sega3d_matrix_rot_y(const ANGLE angle)
+g3d_matrix_rot_y(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -211,7 +211,7 @@ sega3d_matrix_rot_y(const ANGLE angle)
 }
 
 void
-sega3d_matrix_rot_z(const ANGLE angle)
+g3d_matrix_rot_z(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
@@ -235,7 +235,7 @@ sega3d_matrix_rot_z(const ANGLE angle)
 }
 
 void
-sega3d_matrix_transpose(void)
+g3d_matrix_transpose(void)
 {
-        sega3d_matrix_transpose_in((MATRIX *)_state.top_matrix);
+        g3d_matrix_transpose_in((MATRIX *)_state.top_matrix);
 }
