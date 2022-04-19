@@ -83,7 +83,7 @@ endif
 define macro-generate-sh-build-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)$(SH_CC) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
+	$(ECHO)$(SH_CC) -MT '$2' -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
 	$(ECHO)$(call macro-update-cdb,\
 		$(CDB_GCC),\
 		$(abspath $1),\
@@ -106,7 +106,7 @@ endef
 define macro-generate-sh-build-c++-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)$(SH_CXX) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
+	$(ECHO)$(SH_CXX) -MT '$2' -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
 	$(ECHO)$(call macro-update-cdb,\
 		$(CDB_CPP),\
 		$(abspath $1),\
