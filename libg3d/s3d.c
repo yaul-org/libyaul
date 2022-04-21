@@ -1,6 +1,6 @@
 #include <g3d/s3d.h>
 
-#define PATCH_ADDRESS(s3d, x) ((void *)((uintptr_t)(x) + (uintptr_t)(s3d)))
+#define PATCH_ADDRESS(s3d, x) ((void *)((uintptr_t)(s3d) + (uintptr_t)(x)))
 
 static void _textures_patch(g3d_s3d_t *s3d, g3d_s3d_memory_usage_t *memory_usage);
 static void _palettes_patch(g3d_s3d_t *s3d, g3d_s3d_memory_usage_t *memory_usage);
@@ -24,12 +24,12 @@ g3d_s3d_patch(g3d_s3d_t *s3d, g3d_s3d_memory_usage_t *memory_usage)
         _textures_patch(s3d, memory_usage);
         _palettes_patch(s3d, memory_usage);
 
-        for (uint32_t xpdata_index = 0; xpdata_index < s3d->object_count; xpdata_index++) {
-                g3d_s3d_object_t * const object = &s3d_objects[xpdata_index];
+        for (uint32_t i = 0; i < s3d->object_count; i++) {
+                g3d_s3d_object_t * const object = &s3d_objects[i];
 
                 _object_patch(s3d, object);
-                _pictures_patch(s3d, object);
                 _gouraud_tables_patch(s3d, object, memory_usage);
+                _pictures_patch(s3d, object);
         }
 }
 
@@ -197,17 +197,13 @@ _object_patch(g3d_s3d_t *s3d, g3d_s3d_object_t *object)
         object->xpdata.attbl = PATCH_ADDRESS(s3d, object->xpdata.attbl);
         object->xpdata.vntbl = PATCH_ADDRESS(s3d, object->xpdata.vntbl);
 
-        object->pictures = PATCH_ADDRESS(s3d, object->pictures);
         object->gouraud_tables = PATCH_ADDRESS(s3d, object->gouraud_tables);
+        object->pictures = PATCH_ADDRESS(s3d, object->pictures);
 }
 
 static void
-_pictures_patch(g3d_s3d_t *s3d __unused, g3d_s3d_object_t *object)
+_pictures_patch(g3d_s3d_t *s3d, g3d_s3d_object_t *object)
 {
-        if (object->picture_count == 0) {
-                return;
-        }
-
         for (uint32_t i = 0; i < object->picture_count; i++) {
                 PICTURE * const picture = &object->pictures[i];
 
