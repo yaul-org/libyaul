@@ -183,7 +183,7 @@ _frustum_clip_planes_calculate(FIXED fov_angle)
         const FIXED aspect_ratio = info->ratio;
 
         const FIXED sin = fix16_sin(fov_angle);
-        const FIXED cos = fix16_sin(fov_angle);
+        const FIXED cos = fix16_cos(fov_angle);
         cpu_divu_fix16_set(FIX16(1.0f), cos);
         const FIXED inv_cos = cpu_divu_quotient_get();
 
