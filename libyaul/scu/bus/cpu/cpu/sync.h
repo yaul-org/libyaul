@@ -8,9 +8,9 @@
 #ifndef _YAUL_CPU_SYNC_H_
 #define _YAUL_CPU_SYNC_H_
 
-#include <sys/cdefs.h>
-
 #include <stdint.h>
+
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -41,10 +41,10 @@ typedef uint8_t cpu_sync_lock_t;
 static inline bool __always_inline
 cpu_sync_mutex(cpu_sync_lock_t b)
 {
-        register uint8_t *bios_address;
+        __register uint8_t *bios_address;
         bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);
 
-        register uint32_t result;
+        __register uint32_t result;
         result = 0;
 
         /* Currently using cpu_sync_mutex() to compare the value results in
@@ -84,7 +84,7 @@ cpu_sync_mutex_clear(cpu_sync_lock_t b)
 static inline void __always_inline
 cpu_sync_spinlock(cpu_sync_lock_t b)
 {
-        register uint8_t *bios_address;
+        __register uint8_t *bios_address;
         bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);
 
         __asm__ volatile ("\tadd %[b], %[bios_address]\n"

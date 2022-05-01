@@ -35,16 +35,24 @@ SECTIONS
      *(.gnu.linkonce.t.*)
 
      . = ALIGN (0x10);
+     __CTOR_SECTION__ = .;
+     KEEP (*(.ctor))
+     SHORT (0x000B) /* RTS */
+     SHORT (0x0009) /* NOP */
+
+     . = ALIGN (0x10);
      __INIT_SECTION__ = .;
      KEEP (*(.init))
+
+     . = ALIGN (0x10);
+     __DTOR_SECTION__ = .;
+     KEEP (*(.dtor))
      SHORT (0x000B) /* RTS */
      SHORT (0x0009) /* NOP */
 
      . = ALIGN (0x10);
      __FINI_SECTION__ = .;
      KEEP (*(.fini))
-     SHORT (0x000B) /* RTS */
-     SHORT (0x0009) /* NOP */
 
      . = ALIGN (0x10);
      __CTOR_LIST__ = .;
@@ -126,6 +134,7 @@ SECTIONS
   {
      PROVIDE_HIDDEN (__uncached_start = .);
      *(.uncached)
+     *(.uncached.*)
      . = ALIGN (0x10);
      PROVIDE_HIDDEN (__uncached_end = .);
   }

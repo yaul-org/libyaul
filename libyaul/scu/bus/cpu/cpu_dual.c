@@ -56,7 +56,7 @@ static void _slave_ici_handler(void);
 static void _default_entry(void);
 
 static cpu_dual_master_entry_t _master_entry = _default_entry;
-static cpu_dual_slave_entry_t _slave_entry __section(".uncached") = _default_entry;
+static cpu_dual_slave_entry_t _slave_entry __uncached = _default_entry;
 
 static slave_entry_t _slave_entry_table[] = {
         &_slave_polling_entry_trampoline,

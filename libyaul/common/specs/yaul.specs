@@ -33,6 +33,9 @@
 -fomit-frame-pointer \
 -ffast-math \
 -fstrict-aliasing \
+-flto \
+-ffunction-sections \
+-fdata-sections \
 %(includes)
 
 %rename cc1plus old_cc1plus

@@ -19,12 +19,12 @@
 #define FAKE_SECTOR_SIZE        2352
 #define FAKE_NUM_SECTORS        150
 
-static int _status_flags_get(uint8_t *);
-static int _hirq_flag_wait(uint16_t);
+static int _status_flags_get(uint8_t *flags);
+static int _hirq_flag_wait(uint16_t flag);
 static int _cd_block_auth(void);
 
 int
-cd_block_init(int16_t standby)
+cd_block_init(void)
 {
         int ret;
 
@@ -36,7 +36,7 @@ cd_block_init(int16_t standby)
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_cd_system_init(standby)) != 0) {
+        if ((ret = cd_block_cmd_cd_system_init(0x0002)) != 0) {
                 return ret;
         }
 

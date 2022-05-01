@@ -38,7 +38,7 @@ cpu_instr_trapa(const uint8_t vector)
 static inline uint32_t __always_inline
 cpu_instr_swapb(uint32_t x)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
         __asm__ volatile ("swap.b %[in], %[out]\n"
                 : [out] "=&r" (out)
@@ -55,7 +55,7 @@ cpu_instr_swapb(uint32_t x)
 static inline uint32_t __always_inline
 cpu_instr_swapw(uint32_t x)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
         __asm__ volatile ("swap.w %[in], %[out]\n"
                 : [out] "=&r" (out)
@@ -81,8 +81,8 @@ cpu_instr_clrmac(void)
 static inline void __always_inline
 cpu_instr_macw(void *a, void *b)
 {
-        register uint16_t **ap = (uint16_t **)a;
-        register uint16_t **bp = (uint16_t **)b;
+        __register uint16_t **ap = (uint16_t **)a;
+        __register uint16_t **bp = (uint16_t **)b;
 
         __asm__ volatile ("mac.w @%[a]+, @%[b]+"
             : [a] "+&r" (*ap),
@@ -98,8 +98,8 @@ cpu_instr_macw(void *a, void *b)
 static inline void __always_inline
 cpu_instr_macl(void *a, void *b)
 {
-        register uint32_t **ap = (uint32_t **)a;
-        register uint32_t **bp = (uint32_t **)b;
+        __register uint32_t **ap = (uint32_t **)a;
+        __register uint32_t **bp = (uint32_t **)b;
 
         __asm__ volatile ("mac.l @%[a]+, @%[b]+"
             : [a] "+&r" (*ap),
@@ -113,7 +113,7 @@ cpu_instr_macl(void *a, void *b)
 static inline uint32_t __always_inline
 cpu_instr_sts_mach(void)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
         __asm__ volatile ("sts mach, %[out]"
             : [out] "=r" (out)
@@ -128,7 +128,7 @@ cpu_instr_sts_mach(void)
 static inline uint32_t __always_inline
 cpu_instr_sts_macl(void)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
         __asm__ volatile ("sts macl, %[out]"
             : [out] "=r" (out)
@@ -146,7 +146,7 @@ cpu_instr_sts_macl(void)
 static inline uint32_t __always_inline
 cpu_instr_extsw(const uint32_t rm)
 {
-        register uint32_t rn;
+        __register uint32_t rn;
 
         __asm__ volatile ("exts.w %[rm], %[rn]"
             : [rn] "=&r" (rn)
@@ -163,7 +163,7 @@ cpu_instr_extsw(const uint32_t rm)
 static inline uint32_t __always_inline
 cpu_instr_neg(uint32_t rm)
 {
-        register uint32_t rn;
+        __register uint32_t rn;
 
         __asm__ volatile ("neg %[rm], %[rn]"
             : [rn] "=&r" (rn)

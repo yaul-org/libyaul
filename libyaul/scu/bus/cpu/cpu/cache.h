@@ -56,6 +56,12 @@ __BEGIN_DECLS
 /// @see cpu_cache_data_line_t
 #define CPU_CACHE_TAG_ADDRESS(x) ((uint32_t)(x) >> 10)
 
+/// @brief Specify variable to be uncached.
+#define __uncached          __section(".uncached")
+
+/// @brief Specify function to be uncached.
+#define __uncached_function __section(".uncached.function")
+
 /// @brief Cache mode.
 typedef enum cpu_cache_mode {
         /// Four-way set associative.
@@ -172,7 +178,7 @@ cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 /// Calling this function will not pollute the cache.
 ///
 /// @param address The address associated with cache line.
-extern void cpu_cache_line_purge(void *address) __section(".uncached");
+extern void cpu_cache_line_purge(void *address) __uncached_function;
 
 /// @brief Cache lines of the specified address are purged.
 ///
@@ -182,13 +188,13 @@ extern void cpu_cache_line_purge(void *address) __section(".uncached");
 ///
 /// @param address The starting address.
 /// @param len     The area in bytes.
-extern void cpu_cache_area_purge(void *address, uint32_t len) __section(".uncached");
+extern void cpu_cache_area_purge(void *address, uint32_t len) __uncached_function;
 
 /// @brief Purge the entire cache.
 ///
 /// @details All cache entries and all valid bits and LRU bits of all ways are
 /// initialized to `0`. Calling this function will not pollute the cache.
-extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
+extern void cpu_cache_purge(void) __no_reorder __uncached_function;
 
 /// @brief Walk one of the 4 ways the CPU cache and dump cache state bits.
 ///
@@ -198,7 +204,7 @@ extern void cpu_cache_purge(void) __no_reorder __section(".uncached");
 ///
 /// @param     way       The cache way to read from.
 /// @param[in] cache_way The cache way buffer to write to.
-extern void cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way) __section(".uncached");
+extern void cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way) __uncached_function;
 
 /// @}
 

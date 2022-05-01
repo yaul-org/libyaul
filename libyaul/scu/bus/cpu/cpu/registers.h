@@ -8,9 +8,9 @@
 #ifndef _YAUL_CPU_REGISTERS_H_
 #define _YAUL_CPU_REGISTERS_H_
 
-#include <sys/cdefs.h>
-
 #include <stdint.h>
+
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -50,7 +50,7 @@ typedef struct cpu_registers {
         uint32_t pc;
         /// `sr` register.
         uint32_t sr;
-} __packed cpu_registers_t;
+} __packed __aligned(4) cpu_registers_t;
 
 /// @brief Set the `gbr` register.
 ///
@@ -77,7 +77,7 @@ cpu_reg_gbr_set(uint32_t reg_gbr)
 static inline uint32_t __always_inline
 cpu_reg_gbr_get(void)
 {
-        register uint32_t reg_gbr;
+        __register uint32_t reg_gbr;
 
         __asm__ volatile ("stc gbr, %0"
             : "=r" (reg_gbr)
@@ -113,7 +113,7 @@ cpu_reg_vbr_set(uint32_t reg_vbr)
 static inline uint32_t __always_inline
 cpu_reg_vbr_get(void)
 {
-        register uint32_t reg_vbr;
+        __register uint32_t reg_vbr;
 
         __asm__ volatile ("stc vbr, %0"
             : "=r" (reg_vbr)
@@ -146,7 +146,7 @@ cpu_reg_mach_set(uint32_t reg_mach)
 static inline uint32_t __always_inline
 cpu_reg_mach_get(void)
 {
-        register uint32_t reg_mach;
+        __register uint32_t reg_mach;
 
         __asm__ volatile ("sts mach, %0"
             : "=r" (reg_mach)
@@ -179,7 +179,7 @@ cpu_reg_macl_set(uint32_t reg_macl)
 static inline uint32_t __always_inline
 cpu_reg_macl_get(void)
 {
-        register uint32_t reg_macl;
+        __register uint32_t reg_macl;
 
         __asm__ volatile ("sts macl, %0"
             : "=r" (reg_macl)
@@ -212,7 +212,7 @@ cpu_reg_pr_set(uint32_t reg_pr)
 static inline uint32_t __always_inline
 cpu_reg_pr_get(void)
 {
-        register uint32_t reg_pr;
+        __register uint32_t reg_pr;
 
         __asm__ volatile ("sts pr, %0"
             : "=r" (reg_pr)
@@ -245,7 +245,7 @@ cpu_reg_sr_set(uint32_t reg_sr)
 static inline uint32_t __always_inline
 cpu_reg_sr_get(void)
 {
-        register uint32_t reg_sr;
+        __register uint32_t reg_sr;
 
         __asm__ volatile ("stc sr, %0"
             : "=r" (reg_sr)
@@ -267,7 +267,7 @@ cpu_reg_sr_get(void)
 static inline uint32_t __always_inline
 cpu_reg_fp_get(void)
 {
-        register uint32_t reg_r14;
+        __register uint32_t reg_r14;
 
         __asm__ volatile ("mov r14, %0"
             : "=r" (reg_r14)
@@ -286,7 +286,7 @@ cpu_reg_fp_get(void)
 static inline uint32_t __always_inline
 cpu_reg_sp_get(void)
 {
-        register uint32_t reg_r15;
+        __register uint32_t reg_r15;
 
         __asm__ volatile ("mov r15, %0"
             : "=r" (reg_r15)

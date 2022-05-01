@@ -117,7 +117,9 @@ SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
 SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
-	-ggdb3 \
+	-flto \
+	-ffunction-sections \
+	-fdata-sections \
 	-pedantic \
 	-s \
 	-ffreestanding \

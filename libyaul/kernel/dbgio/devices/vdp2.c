@@ -113,10 +113,10 @@ static const dbgio_vdp2_t _default_params = {
 static struct dev_state *_dev_state;
 
 static void _buffer_clear(void);
-static void _buffer_area_clear(int16_t, int16_t, int16_t, int16_t);
-static void _buffer_line_clear(int16_t);
-static void _buffer_line_partial_clear(int16_t, int16_t, int16_t);
-static void _buffer_write(int16_t, int16_t, uint8_t);
+static void _buffer_area_clear(int16_t col_start, int16_t col_end, int16_t row_start, int16_t row_end);
+static void _buffer_line_clear(int16_t row);
+static void _buffer_line_partial_clear(int16_t col_start, int16_t col_end, int16_t row);
+static void _buffer_write(int16_t col, int16_t row, uint8_t ch);
 
 static const cons_ops_t _cons_ops = {
         .clear              = _buffer_clear,
