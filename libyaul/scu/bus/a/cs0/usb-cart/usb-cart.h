@@ -95,6 +95,9 @@ usb_cart_byte_send(uint8_t c)
         MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
 
+/// @brief Initialize USB cart.
+extern void usb_cart_init(void);
+
 /// @brief Reads an 8-bit value and writes an 8-bit value.
 ///
 /// @details The function first waits until the receive buffer is non-empty, the

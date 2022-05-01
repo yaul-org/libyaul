@@ -3,21 +3,16 @@ PROJECTS:= \
 	bin2o \
 	make-cue \
 	make-iso \
-	make-ip
+	make-ip \
+	ssload
 
 include ../env.mk
-
-# Build ssload only if we have a development cartridge to use
-ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
-PROJECTS+= \
-	ssload
 
 # XXX: Currently, gdb-ftdi-proxy is broken under Windows
 ifneq ($(OS), Windows_NT)
 ifeq ($(strip $(BUILD_CROSS)),)
 PROJECTS+= \
 	gdb-ftdi-proxy
-endif
 endif
 endif
 

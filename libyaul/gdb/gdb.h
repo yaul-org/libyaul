@@ -22,6 +22,10 @@ gdb_break(void)
 
 extern void gdb_init(void);
 
+extern void gdb_device_init(void);
+extern uint8_t gdb_device_byte_read(void);
+extern void gdb_device_byte_write(uint8_t value);
+
 __END_DECLS
 
 #endif /* !_YAUL_GDB_H_ */

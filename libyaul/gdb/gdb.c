@@ -56,7 +56,7 @@ gdb_init(void)
  *
  * All other commands are optional */
 void
-gdb_monitor(cpu_registers_t *reg_file, int sigval)
+__gdb_monitor(cpu_registers_t *reg_file, int sigval)
 {
         static char buffer[GDB_RX_BUF_LEN];
 
