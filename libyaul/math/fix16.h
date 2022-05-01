@@ -67,7 +67,7 @@ typedef int32_t fix16_t;
 static inline fix16_t __always_inline
 fix16_int16_mul(const fix16_t a, const int16_t b)
 {
-        register fix16_t out;
+        __register fix16_t out;
 
         __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
                           "\tsts macl, %[out]\n"
@@ -84,7 +84,7 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
 static inline int16_t __always_inline
 fix16_int16_muls(const fix16_t a, const fix16_t b)
 {
-        register int16_t out;
+        __register int16_t out;
 
         __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
                           "\tsts mach, %[out]\n"
@@ -101,8 +101,8 @@ fix16_int16_muls(const fix16_t a, const fix16_t b)
 static inline fix16_t __always_inline
 fix16_mul(const fix16_t a, const fix16_t b)
 {
-        register uint32_t mach;
-        register fix16_t out;
+        __register uint32_t mach;
+        __register fix16_t out;
 
         __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
                           "\tsts mach, %[mach]\n"

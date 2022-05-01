@@ -53,6 +53,12 @@ ifeq ($(strip $(SH_SPECS)),)
   SH_SPECS:= yaul.specs yaul-main.specs
 endif
 
+# If there are any C++ files, add the specific C++ specs file. This is done to
+# avoid adding (small) bloat to any C-only projects
+ifneq ($(strip $(SH_SRCS_CXX)),)
+  SH_CXX_SPECS:= yaul-main-c++.specs
+endif
+
 SH_DEPS:= $(SH_OBJS_UNIQ:.o=.d)
 SH_TEMPS:= $(SH_OBJS_UNIQ:.o=.i) $(SH_OBJS_UNIQ:.o=.ii) $(SH_OBJS_UNIQ:.o=.s)
 
@@ -106,7 +112,7 @@ endef
 define macro-generate-sh-build-c++-object
 $2: $1
 	@printf -- "$(V_BEGIN_YELLOW)$1$(V_END)\n"
-	$(ECHO)$(SH_CXX) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) -c -o $2 $1
+	$(ECHO)$(SH_CXX) -MF $(addsuffix .d,$(basename $2)) -MD $(SH_CXXFLAGS) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(foreach specs,$(SH_CXX_SPECS),-specs=$(specs)) -c -o $2 $1
 	$(ECHO)$(call macro-update-cdb,\
 		$(CDB_CPP),\
 		$(abspath $1),\
@@ -125,7 +131,7 @@ $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 
 $(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
-	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(SH_OBJS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(foreach specs,$(SH_CXX_SPECS),-specs=$(specs)) $(SH_OBJS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
 	$(ECHO)$(SH_NM) $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).sym
 	$(ECHO)$(SH_OBJDUMP) -S $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).asm
 

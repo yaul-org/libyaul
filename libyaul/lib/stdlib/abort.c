@@ -25,7 +25,8 @@
 #endif
 #endif /* defined(DEBUG) */
 
-void __noreturn
+/* To avoid from LTO discarding abort (as it's considered a builtin by GCC) */
+void __noreturn __used
 abort(void)
 {
         /* Disable interrupts */

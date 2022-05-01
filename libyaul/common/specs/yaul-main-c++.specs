@@ -1,0 +1,9 @@
+%rename startfile old_startfile
+*startfile:
+%(old_startfile) c++-support%O%s
+
+*endfile:
+
+
+*lib:
+-lyaul -lgcc

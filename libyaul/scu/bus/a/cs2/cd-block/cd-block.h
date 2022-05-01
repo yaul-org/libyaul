@@ -23,7 +23,7 @@ __BEGIN_DECLS
  * @param standby Controls the time before the CD stops moving while idle
  *                (default timer is 0x1000).
  */
-extern int cd_block_init(int16_t standby);
+extern int cd_block_init(void);
 
 /**
  * Bypass copy protection (by using JHL and CyberWarriorX exploit).

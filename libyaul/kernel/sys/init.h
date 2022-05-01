@@ -8,6 +8,8 @@
 #ifndef _YAUL_KERNEL_SYS_INIT_H_
 #define _YAUL_KERNEL_SYS_INIT_H_
 
+#include <sys/cdefs.h>
+
 __BEGIN_DECLS
 
 extern void user_init(void);

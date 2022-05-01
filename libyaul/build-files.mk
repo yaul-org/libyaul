@@ -28,6 +28,7 @@ LDSCRIPTS:= \
 SPECS:= \
 	common/specs/yaul.specs \
 	common/specs/yaul-main.specs \
+	common/specs/yaul-main-c++.specs \
 	common/specs/ip.specs
 
 SUPPORT_SRCS:= \

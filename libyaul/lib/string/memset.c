@@ -24,7 +24,8 @@
 #include <string.h>
 #include <stdint.h>
 
-void *
+/* To avoid from LTO discarding memset (as it's considered a builtin by GCC) */
+void * __used
 memset(void *dest, int c, size_t n)
 {
         uint8_t *s = dest;

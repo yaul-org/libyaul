@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <sys/cdefs.h>
+
 #include <cpu/registers.h>
 #include <cpu/dual.h>
 
@@ -139,7 +141,7 @@ typedef void (*cpu_intc_ihr_t)(void);
 static inline void __always_inline
 cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr_t ihr)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000310;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000310;
 
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
@@ -173,7 +175,7 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 static inline cpu_intc_ihr_t __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000314;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000314;
 
         return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
@@ -184,8 +186,8 @@ cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 static inline uint8_t __always_inline
 cpu_intc_mask_get(void)
 {
-        register const uint32_t reg_sr = cpu_reg_sr_get();
-        register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
+        __register const uint32_t reg_sr = cpu_reg_sr_get();
+        __register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
 
         return mask;
 }
@@ -196,7 +198,7 @@ cpu_intc_mask_get(void)
 static inline void __always_inline
 cpu_intc_mask_set(uint8_t mask)
 {
-        register uint32_t reg_sr;
+        __register uint32_t reg_sr;
         reg_sr = cpu_reg_sr_get();
 
         reg_sr &= ~CPU_SR_I_BITS_MASK;

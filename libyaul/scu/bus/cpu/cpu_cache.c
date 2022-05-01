@@ -14,7 +14,7 @@
 #define CALCULATE_PURGE_ADDRESS(x)                                             \
     (CPU_CACHE_PURGE | ((uintptr_t)(x) & ~(CPU_CACHE_LINE_SIZE - 1)))
 
-void __section(".uncached")
+void __uncached_function
 cpu_cache_line_purge(void *address)
 {
         volatile uint32_t * const purge_address =
@@ -23,7 +23,7 @@ cpu_cache_line_purge(void *address)
         *purge_address = 0x00000000;
 }
 
-void __section(".uncached")
+void __uncached_function
 cpu_cache_area_purge(void *address, uint32_t len)
 {
         const uint32_t cache_line_count =
@@ -39,7 +39,7 @@ cpu_cache_area_purge(void *address, uint32_t len)
         }
 }
 
-void __no_reorder __section(".uncached")
+void __no_reorder __uncached_function
 cpu_cache_purge(void)
 {
         volatile uint8_t * const reg_ccr = (volatile uint8_t * const)CPU(CCR);
@@ -55,7 +55,7 @@ cpu_cache_purge(void)
         *reg_ccr = t0; /* Enable cache */
 }
 
-void __section(".uncached")
+void __uncached_function
 cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way)
 {
         volatile uint8_t * const reg_ccr = (volatile uint8_t * const)CPU(CCR);

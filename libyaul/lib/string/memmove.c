@@ -29,7 +29,8 @@ typedef __may_alias size_t WT;
 #define WS (sizeof(WT))
 #endif /* __GNUC__ */
 
-void *
+/* To avoid from LTO discarding memmove (as it's considered a builtin by GCC) */
+void * __used
 memmove(void *dest, const void *src, size_t n)
 {
         char *d = dest;

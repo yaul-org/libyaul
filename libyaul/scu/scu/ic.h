@@ -269,7 +269,7 @@ typedef void (*scu_ic_ihr_t)(void);
 static inline void __always_inline
 scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000300;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000300;
 
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
@@ -297,7 +297,7 @@ scu_ic_ihr_clear(scu_ic_interrupt_t vector)
 static inline scu_ic_ihr_t
 scu_ic_ihr_get(scu_ic_interrupt_t vector)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000304;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000304;
 
         return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
@@ -310,7 +310,7 @@ scu_ic_ihr_get(scu_ic_interrupt_t vector)
 static inline void __always_inline
 scu_ic_mask_set(scu_ic_mask_t mask)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000340;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000340;
 
         ((void (*)(uint32_t))*bios_address)(mask);
 }
@@ -353,7 +353,7 @@ scu_ic_mask_set(scu_ic_mask_t mask)
 static inline void __always_inline
 scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000344;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000344;
 
         ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
@@ -366,7 +366,7 @@ scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 static inline scu_ic_mask_t __always_inline
 scu_ic_mask_get(void)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000348;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000348;
 
         return (scu_ic_mask_t)*bios_address;
 }
@@ -426,7 +426,7 @@ scu_ic_status_chg(scu_ic_status_reg_t and_mask, scu_ic_status_reg_t or_mask)
 static inline const scu_ic_priority_t * __always_inline
 scu_ic_priority_table_get(void)
 {
-        register scu_ic_priority_t * const bios_address =
+        __register scu_ic_priority_t * const bios_address =
             (scu_ic_priority_t *)0x06000A80;
 
         return bios_address;
@@ -443,7 +443,7 @@ scu_ic_priority_table_get(void)
 static inline void __always_inline
 scu_ic_priority_table_set(const scu_ic_priority_t *table)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000280;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000280;
 
         ((void (*)(const scu_ic_priority_t *))*bios_address)(table);
 }
