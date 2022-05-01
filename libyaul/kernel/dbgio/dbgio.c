@@ -26,11 +26,7 @@ static const dbgio_dev_ops_t *_dev_ops_table[] = {
         NULL,
         &__dev_ops_vdp2,
         &__dev_ops_vdp2_async,
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        &__dev_ops_usb_cart,
-#else
-        NULL,
-#endif /* HAVE_DEV_CARTRIDGE */
+        &__dev_ops_usb_cart
 };
 
 static char *_sprintf_buffer;

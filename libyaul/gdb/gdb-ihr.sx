@@ -141,4 +141,4 @@ ___gdb_exception_dma_address_error:
 .align 2
 
 .LC1:
-.long _gdb_monitor
+.long ___gdb_monitor

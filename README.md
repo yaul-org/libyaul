@@ -181,10 +181,7 @@ Open `$HOME/.yaul.env` in a text editor and change the following to define your 
    2. If necessary, set `YAUL_PROG_SH_PREFIX` and `YAUL_ARCH_SH_PREFIX`.
    3. Set the absolute path to where the `libyaul` source tree is located in
       `YAUL_BUILD_ROOT`.
-   4. Set the type of development cart you own in `YAUL_OPTION_DEV_CARTRIDGE`.
-      If you don't own a development cart, or you will only test on emulators,
-      set to 0 (zero).
-   5. Enable RTags/Irony/ccls support by setting `YAUL_CDB` to 1. To disable,
+   4. Enable RTags/Irony/ccls support by setting `YAUL_CDB` to 1. To disable,
       set to 0 (zero).
 
    Setting the wrong values may result in compilation errors.

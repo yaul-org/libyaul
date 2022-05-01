@@ -15,13 +15,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
+
 #include <arp.h>
-#else
-#error "Invalid value for `HAVE_DEV_CARTRIDGE'"
-#endif /* HAVE_DEV_CARTRIDGE */
 
 #include <bios.h>
 
@@ -120,10 +116,6 @@ static void _bp_list_breakpoint_free(bp_t *bp);
 static int _bp_list_breakpoint_add(void *addr);
 static bp_t *_bp_list_breakpoint_find(void *addr);
 
-static void _device_init(void);
-static uint8_t _device_read(void);
-static void _device_write(uint8_t value);
-
 /* Overwritten instruction meant to allow stepping through */
 static bool _stepping = false;
 
@@ -141,7 +133,7 @@ _gdb_sh2_init(void)
         const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(15);
 
-        _device_init();
+        gdb_device_init();
 
         _bp_init();
 
@@ -176,13 +168,13 @@ _gdb_sh2_init(void)
 static void
 _gdb_putc(int c)
 {
-        _device_write(c);
+        gdb_device_byte_write(c);
 }
 
 static int
 _gdb_getc(void)
 {
-        return _device_read();
+        return gdb_device_byte_read();
 }
 
 static void
@@ -554,33 +546,18 @@ _bp_list_breakpoint_find(void *addr)
         return NULL;
 }
 
-static void
-_device_init(void)
+void __weak
+gdb_device_init(void)
 {
-        /* This is useful to have USB cart initialized here explicitly, as we
-         * could be debugging kernel/sys/init.c */
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        __usb_cart_init();
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#endif /* HAVE_DEV_CARTRIDGE */
 }
 
-static uint8_t
-_device_read(void)
+uint8_t __weak
+gdb_device_byte_read(void)
 {
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        return usb_cart_byte_read();
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-        return arp_byte_read();
-#endif /* HAVE_DEV_CARTRIDGE */
+        return 0;
 }
 
-static void
-_device_write(uint8_t value)
+void __weak
+gdb_device_byte_write(uint8_t value __unused)
 {
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        usb_cart_byte_send(value);
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-        arp_byte_xchg(value);
-#endif /* HAVE_DEV_CARTRIDGE */
 }

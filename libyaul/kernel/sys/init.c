@@ -38,10 +38,6 @@ _init(void)
         __smpc_init();
         __smpc_peripheral_init();
 
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        __usb_cart_init();
-#endif /* HAVE_DEV_CARTRIDGE */
-
         __vdp_init();
         __dbgio_init();
 

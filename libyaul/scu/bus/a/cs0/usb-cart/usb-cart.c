@@ -18,7 +18,7 @@
 #include "usb-cart-internal.h"
 
 void
-__usb_cart_init(void)
+usb_cart_init(void)
 {
         /* Disabling A-bus refresh adds ~20 KiB/s */
         MEMORY_WRITE(32, SCU(AREF), 0x00000000);

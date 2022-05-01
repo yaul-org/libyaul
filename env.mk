@@ -55,14 +55,6 @@ ifneq ($(YAUL_CDB),$(filter $(YAUL_CDB),0 1))
   $(error Invalid value for YAUL_CDB (update JSON compile command database))
 endif
 
-# Check options
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
-endif
-ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1 2))
-  $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
-endif
-
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif
@@ -140,8 +132,6 @@ SH_CFLAGS_shared:= \
 	-Wnull-dereference \
 	-Wshadow \
 	-Wunused \
-	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
-	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB) \
 	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
@@ -172,7 +162,7 @@ SH_CXXFLAGS:= \
 	$(SH_CXXFLAGS_shared)
 
 SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
-SH_CFLAGS_shared_debug:= -Og -DDEBUG
+SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)

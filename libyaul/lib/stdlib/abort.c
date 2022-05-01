@@ -15,16 +15,6 @@
 
 #include <smpc.h>
 
-#ifdef DEBUG
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <arp.h>
-#elif HAVE_DEV_CARTRIDGE != 0
-#error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif
-#endif /* defined(DEBUG) */
-
 /* To avoid from LTO discarding abort (as it's considered a builtin by GCC) */
 void __noreturn __used
 abort(void)
@@ -32,26 +22,12 @@ abort(void)
         /* Disable interrupts */
         cpu_intc_mask_set(15);
 
-        /* This does not execute cleanup functions registered with
-         * 'atexit' or 'on_exit' */
+        /* This does not execute cleanup functions registered with 'atexit' or
+         * 'on_exit' */
 #ifdef DEBUG
-#if HAVE_DEV_CARTRIDGE == 0 /* No dev cartridge */
-        while (true) {
-        }
-#elif HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-        while (true) {
-                /* XXX: Call for waiting for data instead of returning */
-        }
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-        while (true) {
-                arp_function_nonblock();
-        }
-#else
-#error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif
-#else /* DEBUG */
 #ifdef SPIN_ON_ABORT
         while (true) {
+                /* atexit(); */
         }
 #else
         smpc_smc_sysres_call();

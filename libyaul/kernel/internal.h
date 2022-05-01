@@ -13,12 +13,6 @@
 
 #include <sys/cdefs.h>
 
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
-#include <usb-cart-internal.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
-#include <arp.h>
-#endif /* HAVE_DEV_CARTRIDGE */
-
 #include <mm/tlsf.h>
 
 struct state {

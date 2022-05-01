@@ -14,13 +14,6 @@
 #ifndef _YAUL_H_
 #define _YAUL_H_
 
-/* Check if HAVE_DEV_CARTRIDGE has a valid value */
-/* USB flash cartridge */
-/* Datel Action Replay cartridge */
-#if (HAVE_DEV_CARTRIDGE < 0) || (HAVE_DEV_CARTRIDGE > 2)
-#error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif /* HAVE_DEV_CARTRIDGE */
-
 #include <bios.h>
 
 /* CPU-bus CPU */
@@ -33,11 +26,8 @@
 #include <scu/scu.h>
 
 /* CS0 */
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
-#endif /* HAVE_DEV_CARTRIDGE */
 
 #include <scu/bus/a/cs0/dram-cart/dram-cart.h>
 
@@ -53,9 +43,7 @@
 /* Kernel */
 #include <ip/ip.h>
 
-#if HAVE_GDB_SUPPORT == 1
 #include <gdb/gdb.h>
-#endif /* HAVE_GDB_SUPPORT */
 
 #include <dbgio/dbgio.h>
 

@@ -22,11 +22,6 @@ ifeq ($(strip $(YAUL_CDB)),)
   $(error Undefined YAUL_CDB (update JSON compile command database))
 endif
 
-# Check options
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge option))
-endif
-
 ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),)
   $(error Undefined YAUL_OPTION_BUILD_ASSERT (build ASSERT))
 endif
@@ -135,8 +130,6 @@ SH_CFLAGS= \
 	-Wstrict-aliasing \
 	-Wno-main \
 	-Wno-format \
-	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
-	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB) \
 	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
 
 SH_LDFLAGS= \
