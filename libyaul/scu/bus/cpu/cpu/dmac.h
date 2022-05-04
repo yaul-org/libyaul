@@ -280,6 +280,15 @@ extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg);
 /// @param ch The channel.
 extern void cpu_dmac_channel_wait(cpu_dmac_channel_t ch);
 
+/// @brief Memory clear using CPU-DMAC using @p ref channel.
+///
+/// @param     ch    The channel.
+/// @param[in] dst   The destination address to clear.
+/// @param     value The value to write.
+/// @param     size  The amount of bytes to clear.
+extern void cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst,
+    uint32_t value, size_t size);
+
 /// @}
 
 __END_DECLS
