@@ -38,12 +38,8 @@ _init(void)
         __cpu_init();
         __scu_init();
         __smpc_init();
-        __smpc_peripheral_init();
 
         __vdp_init();
-        __dbgio_init();
-
-        cd_block_init();
 
         cpu_cache_purge();
 

@@ -17,7 +17,8 @@
 #define SPRINTF_BUFFER_SIZE (1408)
 
 static struct {
-        volatile uint32_t state;
+        bool initialized;
+        char *buffer;
         const dbgio_dev_ops_t *dev_ops;
 } _dbgio_state;
 
@@ -29,21 +30,27 @@ static const dbgio_dev_ops_t *_dev_ops_table[] = {
         &__dev_ops_usb_cart
 };
 
-static char *_sprintf_buffer;
-
 void
-__dbgio_init(void)
+dbgio_init(void)
 {
+        if (_dbgio_state.initialized) {
+                return;
+        }
+
+        _dbgio_state.initialized = true;
+
         dbgio_dev_default_init(DBGIO_DEV_NULL);
 
-        if (_sprintf_buffer == NULL) {
-                _sprintf_buffer = __malloc(SPRINTF_BUFFER_SIZE);
+        if (_dbgio_state.buffer == NULL) {
+                _dbgio_state.buffer = __malloc(SPRINTF_BUFFER_SIZE);
         }
 }
 
 void
 dbgio_dev_init(dbgio_dev_t dev, const void *params)
 {
+        assert(_dbgio_state.initialized);
+
         assert(params != NULL);
         assert(_dev_ops_table[dev]->init != NULL);
 
@@ -65,6 +72,8 @@ dbgio_dev_default_init(dbgio_dev_t dev)
 void
 dbgio_dev_deinit(void)
 {
+        assert(_dbgio_state.initialized);
+
         if (_dbgio_state.dev_ops == NULL) {
                 return;
         }
@@ -79,6 +88,8 @@ dbgio_dev_deinit(void)
 dbgio_dev_t
 dbgio_dev_selected_get(void)
 {
+        assert(_dbgio_state.initialized);
+
         if (_dbgio_state.dev_ops == NULL) {
                 return DBGIO_DEV_NULL;
         }
@@ -89,6 +100,8 @@ dbgio_dev_selected_get(void)
 void
 dbgio_dev_font_load(void)
 {
+        assert(_dbgio_state.initialized);
+
         assert(_dbgio_state.dev_ops != NULL);
 
         _dbgio_state.dev_ops->font_load();
@@ -97,6 +110,8 @@ dbgio_dev_font_load(void)
 void
 dbgio_puts(const char *buffer)
 {
+        assert(_dbgio_state.initialized);
+
         assert(_dbgio_state.dev_ops != NULL);
 
         assert(buffer != NULL);
@@ -111,24 +126,28 @@ dbgio_puts(const char *buffer)
 void
 dbgio_printf(const char *format, ...)
 {
+        assert(_dbgio_state.initialized);
+
         assert(_dbgio_state.dev_ops != NULL);
 
         va_list args;
 
         va_start(args, format);
-        (void)vsprintf(_sprintf_buffer, format, args);
+        (void)vsprintf(_dbgio_state.buffer, format, args);
         va_end(args);
 
-        if (*_sprintf_buffer == '\0') {
+        if (*_dbgio_state.buffer == '\0') {
                 return;
         }
 
-        _dbgio_state.dev_ops->puts(_sprintf_buffer);
+        _dbgio_state.dev_ops->puts(_dbgio_state.buffer);
 }
 
 void
 dbgio_flush(void)
 {
+        assert(_dbgio_state.initialized);
+
         assert(_dbgio_state.dev_ops != NULL);
 
         _dbgio_state.dev_ops->flush();

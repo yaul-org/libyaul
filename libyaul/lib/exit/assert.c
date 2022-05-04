@@ -34,6 +34,7 @@ _assert(const char * restrict file, const char * restrict line,
         if (assertion_count == 0) {
                 __reset();
 
+                dbgio_init();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2);
 
                 vdp2_tvmd_vblank_in_next_wait(1);
