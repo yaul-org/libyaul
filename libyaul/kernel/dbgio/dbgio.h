@@ -52,6 +52,8 @@ typedef struct dbgio_usb_cart {
         uint16_t buffer_size;
 } dbgio_usb_cart_t;
 
+extern void dbgio_init(void);
+
 extern void dbgio_dev_init(dbgio_dev_t dev, const void *params);
 extern void dbgio_dev_default_init(dbgio_dev_t dev);
 extern void dbgio_dev_deinit(void);

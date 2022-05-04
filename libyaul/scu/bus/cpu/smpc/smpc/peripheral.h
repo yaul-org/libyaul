@@ -427,6 +427,8 @@ struct smpc_peripheral_port {
         smpc_peripherals_t peripherals;
 };
 
+extern void smpc_peripheral_init(void);
+
 extern void smpc_peripheral_analog_get(smpc_peripheral_t const *,
     smpc_peripheral_analog_t * const);
 extern void smpc_peripheral_analog_port(uint8_t port,

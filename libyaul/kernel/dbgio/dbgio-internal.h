@@ -39,7 +39,7 @@ extern const dbgio_dev_ops_t __dev_ops_vdp2;
 extern const dbgio_dev_ops_t __dev_ops_vdp2_async;
 extern const dbgio_dev_ops_t __dev_ops_usb_cart;
 
-extern void __dbgio_init(void);
+extern void dbgio_init(void);
 
 __END_DECLS
 

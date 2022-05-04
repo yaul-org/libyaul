@@ -84,7 +84,7 @@ static void _system_manager_handler(void);
 MEMB(peripherals, smpc_peripheral_t, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
 
 void
-__smpc_peripheral_init(void)
+smpc_peripheral_init(void)
 {
         memb_init(&peripherals);
 
