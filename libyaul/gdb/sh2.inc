@@ -239,13 +239,7 @@ _gdb_break(uint32_t type, uint32_t addr, uint32_t kind __unused)
 static void __noreturn
 _gdb_kill(void)
 {
-        smpc_smc_resenab_call();
-        cpu_intc_mask_set(0);
-        smpc_smc_sysres_call();
-
-        /* If for some reason calling SMPC system reset doesn't work, we can
-         * always force our way to reset the hardware */
-        bios_execute();
+        abort();
 }
 
 static void
