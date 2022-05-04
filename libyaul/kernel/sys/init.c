@@ -31,6 +31,8 @@ user_init(void)
 static void __used __section(".init")
 _init(void)
 {
+        __atexit_init();
+
         __mm_init();
 
         __cpu_init();
@@ -53,8 +55,5 @@ _init(void)
 static void __section(".fini") __used __noreturn
 _fini(void)
 {
-        while (true) {
-        }
-
-        __builtin_unreachable();
+        exit(0);
 }

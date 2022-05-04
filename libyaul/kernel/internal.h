@@ -53,4 +53,6 @@ void *__realloc(void *p, size_t n);
 void *__memalign(size_t n, size_t align);
 void __free(void *p);
 
+void __atexit_init(void);
+
 #endif /* !_KERNEL_INTERNAL_H_ */

@@ -30,7 +30,8 @@ callback_list_free(callback_list_t *callback_list)
 }
 
 void
-callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint32_t count)
+callback_list_init(callback_list_t *callback_list, callback_t *callbacks,
+    uint32_t count)
 {
         assert(callback_list != NULL);
         assert(callbacks != NULL);
@@ -38,6 +39,8 @@ callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint32
 
         callback_list->count = count;
         callback_list->callbacks = callbacks;
+
+        callback_list_clear(callback_list);
 }
 
 void
@@ -47,25 +50,41 @@ callback_list_process(callback_list_t *callback_list)
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
 
-        for (uint32_t id = 0; id < callback_list->count; id++) {
-                callback_handler_t const handler =
-                    callback_list->callbacks[id].handler;
-                void * const work = callback_list->callbacks[id].work;
+        callback_t *callback = callback_list->callbacks;
+        const callback_t * const last_callback =
+            &callback_list->callbacks[callback_list->count - 1];
 
-                handler(work);
+        for (; callback <= last_callback; callback++) {
+                callback_call(callback);
+        }
+}
+
+void
+callback_list_rev_process(callback_list_t *callback_list)
+{
+        assert(callback_list != NULL);
+        assert(callback_list->callbacks != NULL);
+        assert(callback_list->count > 0);
+
+        callback_t *callback =
+            &callback_list->callbacks[callback_list->count - 1];
+        const callback_t * const first_callback =
+            callback_list->callbacks;
+
+        for (; callback >= first_callback; callback--) {
+                callback_call(callback);
         }
 }
 
 callback_id_t
-callback_list_callback_add(callback_list_t *callback_list, callback_handler_t handler, void *work)
+callback_list_callback_add(callback_list_t *callback_list,
+    callback_handler_t handler, void *work)
 {
-#ifdef DEBUG
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
-#endif /* DEBUG */
 
-        callback_id_t id;
+        uint32_t id;
         for (id = 0; id < callback_list->count; id++) {
                 if (callback_list->callbacks[id].handler != _default_handler) {
                         continue;
@@ -76,9 +95,7 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler_t ha
                 return id;
         }
 
-#ifdef DEBUG
         assert(id != callback_list->count);
-#endif /* DEBUG */
 
         return -1;
 }
@@ -86,12 +103,10 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler_t ha
 void
 callback_list_callback_remove(callback_list_t *callback_list, callback_id_t id)
 {
-#ifdef DEBUG
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
-        assert(id < callback_list->count);
-#endif /* DEBUG */
+        assert((uint32_t)id < callback_list->count);
 
         callback_list->callbacks[id].handler = _default_handler;
         callback_list->callbacks[id].work = NULL;
