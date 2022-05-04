@@ -8,6 +8,7 @@
 #include <bios.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
+#include <cpu/cache.h>
 #include <scu/ic.h>
 
 #include <sys/callback-list.h>
@@ -189,6 +190,40 @@ cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
         /* TE bit will always be set upon normal or abnormal transfer */
         while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000) {
         }
+}
+
+void
+cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
+    size_t size)
+{
+        static cpu_dmac_cfg_t dmac_cfg = {
+                .channel  = 0,
+                .src_mode = CPU_DMAC_SOURCE_FIXED,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .stride   = CPU_DMAC_STRIDE_4_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .src      = 0x00000000,
+                .dst      = 0x00000000,
+                .len      = 0x00000000,
+                .ihr      = NULL,
+                .ihr_work = NULL
+        };
+
+        static uint32_t clear_value;
+
+        dmac_cfg.channel = ch;
+        dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
+        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&clear_value;
+        dmac_cfg.len = size;
+
+        cpu_dmac_channel_wait(ch);
+
+        clear_value = value;
+
+        cpu_dmac_channel_config_set(&dmac_cfg);
+        cpu_dmac_channel_start(ch);
+
+        cpu_dmac_channel_wait(ch);
 }
 
 static callback_t *

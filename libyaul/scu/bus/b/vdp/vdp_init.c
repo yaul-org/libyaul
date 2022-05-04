@@ -20,8 +20,6 @@
 static void _vdp1_init(void);
 static void _vdp2_init(void);
 
-static void _memory_area_clear(uint32_t address, uint16_t value, uint32_t len);
-
 static vdp1_registers_t _vdp1_registers __aligned(16);
 static vdp1_vram_partitions_t _vdp1_vram_partitions;
 
@@ -58,7 +56,7 @@ _vdp1_init(void)
                                  VDP1_VRAM_DEFAULT_GOURAUD_COUNT,
                                  VDP1_VRAM_DEFAULT_CLUT_COUNT);
 
-        _memory_area_clear(VDP1_VRAM(0x0000), 0x0000, VDP1_VRAM_SIZE);
+        cpu_dmac_memset(0, (void *)VDP1_VRAM(0x0000), 0x00000000, VDP1_VRAM_SIZE);
 
         for (uint32_t fb = 0; fb < VDP1_FB_COUNT; fb++) {
                 /* Wait until the at the start of VBLANK-IN */
@@ -70,7 +68,7 @@ _vdp1_init(void)
                 /* Wait until the change of frame buffer takes effect */
                 vdp2_tvmd_vcount_wait(0);
 
-                _memory_area_clear(VDP1_FB(0x0000), 0x0000, VDP1_FB_SIZE);
+                cpu_dmac_memset(0, (void *)VDP1_FB(0x0000), 0x00000000, VDP1_FB_SIZE);
         }
 
         /* Force draw end */
@@ -107,33 +105,8 @@ _vdp2_init(void)
 
         __vdp2_vram_init();
 
-        _memory_area_clear(VDP2_VRAM(0x0000), 0x0000, VDP2_VRAM_SIZE);
-        _memory_area_clear(VDP2_CRAM(0x0000), 0x0000, VDP2_CRAM_SIZE);
+        cpu_dmac_memset(0, (void *)VDP2_VRAM(0x0000), 0x00000000, VDP2_VRAM_SIZE);
+        cpu_dmac_memset(0, (void *)VDP2_CRAM(0x0000), 0x00000000, VDP2_CRAM_SIZE);
 
         vdp2_cram_mode_set(1);
-}
-
-static void
-_memory_area_clear(uint32_t address, uint16_t value, uint32_t len)
-{
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .channel  = 0,
-                .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .src      = 0x00000000,
-                .dst      = 0x00000000,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len      = 0x00000000,
-                .stride   = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr      = NULL
-        };
-
-        dmac_cfg.dst = CPU_CACHE_THROUGH | address;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&value;
-        dmac_cfg.len = len;
-
-        cpu_dmac_channel_wait(0);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-        cpu_dmac_channel_start(0);
-        cpu_dmac_channel_wait(0);
 }
