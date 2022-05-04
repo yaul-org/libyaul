@@ -16,9 +16,9 @@
 
 __BEGIN_DECLS
 
-typedef uint32_t callback_id_t;
+typedef int32_t callback_id_t;
 
-typedef void (*callback_handler_t)(void *);
+typedef void (*callback_handler_t)(void *work);
 
 typedef struct callback {
         callback_handler_t handler;
@@ -45,6 +45,7 @@ extern void callback_list_init(callback_list_t *callback_list,
     callback_t *callbacks, uint32_t count);
 
 extern void callback_list_process(callback_list_t *callback_list);
+extern void callback_list_rev_process(callback_list_t *callback_list);
 
 extern callback_id_t callback_list_callback_add(callback_list_t *callback_list,
     callback_handler_t handler, void *work);

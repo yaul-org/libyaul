@@ -7,6 +7,8 @@
 
 __BEGIN_DECLS
 
+#define ATEXIT_MAX (32)
+
 extern int abs(int);
 extern long labs(long);
 
@@ -22,6 +24,8 @@ extern void *realloc(void *, size_t);
 extern void free(void *);
 
 extern void abort(void) __noreturn;
+extern int atexit(void (*function)(void));
+extern void exit(int code) __noreturn;
 
 __END_DECLS
 

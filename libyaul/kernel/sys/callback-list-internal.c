@@ -33,7 +33,6 @@ __callback_list_request_alloc(uint32_t count, malloc_func_t malloc_func)
         assert(callbacks != NULL);
 
         callback_list_init(callback_list, callbacks, count);
-        callback_list_clear(callback_list);
 
         return callback_list;
 }
