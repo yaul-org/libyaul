@@ -1,9 +1,29 @@
-/*
- * Copyright (c) 2012-2019 Israel Jacquez
- * See LICENSE for details.
+/*-
+ * Copyright (c) 2012, 2015 Anders Montonen
  *
- * Israel Jacquez <mrkotfw@gmail.com>
- */
+ * Original software by ExCyber. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE. */
 
 #ifndef _YAUL_FLASH_H_
 #define _YAUL_FLASH_H_
@@ -24,33 +44,33 @@ __BEGIN_DECLS
 /// @addtogroup FLASH
 /// @{
 
-/// @brief Test.
+/// @brief Not yet documented.
 #define FLASH_CMD_ID_ENTRY  0x9090
 
-/// @brief Test.
+/// @brief Not yet documented.
 #define FLASH_CMD_ID_EXIT   0xF0F0
 
-/// @brief Test.
+/// @brief Not yet documented.
 #define FLASH_CMD_PAGEWRITE 0xA0A0
 
-/// @brief Test.
+/// @brief Not yet documented.
 static inline void __always_inline
 flash_unlock(void)
 {
-        MEMORY_WRITE(16, FLASH(_55), 0xAAAA);
-        MEMORY_WRITE(16, FLASH(_AA), 0x5555);
+        MEMORY_WRITE(16, FLASH(ADDR_55), 0xAAAA);
+        MEMORY_WRITE(16, FLASH(ADDR_AA), 0x5555);
 }
 
-/// @brief Test.
+/// @brief Not yet documented.
 static inline void __always_inline
 flash_command_write(const uint16_t command)
 {
         flash_unlock();
 
-        MEMORY_WRITE(16, FLASH(_55), command);
+        MEMORY_WRITE(16, FLASH(ADDR_55), command);
 }
 
-/// @brief Test.
+/// @brief Not yet documented.
 static inline uint16_t __always_inline
 flash_vendor_get(void)
 {
@@ -61,7 +81,7 @@ flash_vendor_get(void)
         return vendor_id;
 }
 
-/// @brief Test.
+/// @brief Not yet documented.
 static inline uint16_t __always_inline
 flash_device_get(void)
 {

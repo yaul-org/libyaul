@@ -28,6 +28,7 @@
 /* CS0 */
 #include <usb-cart.h>
 #include <arp.h>
+#include <flash.h>
 
 #include <scu/bus/a/cs0/dram-cart/dram-cart.h>
 

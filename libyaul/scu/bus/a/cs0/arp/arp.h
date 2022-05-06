@@ -60,12 +60,21 @@ extern bool arp_busy_status(void);
 /// @returns `true` if the handshake is successful. Otherwise, `false`.
 extern bool arp_sync_nonblock(void);
 
+/// @brief Detect if the ARP cartridge in inserted.
+///
+/// @note The detection scheme simply checks if the vendor is a valid 16-bit
+/// value.
+///
+/// @returns `true` if the ARP cartridge is detected.
+extern bool arp_detect(void);
+
 /// @brief Obtain a copy of the ARP cartridge version string.
 ///
-/// @note This function uses @ref malloc.
+/// @note This function allocates a 256-byte buffer with @ref malloc. The caller
+/// is responsible for freeing the allocated string.
 ///
 /// @returns A copy of the ARP cartridge version string.
-extern char *arp_version_get(void);
+extern char *arp_version_string_get(void);
 
 /// @brief Read a 32-bit value via the parallel port.
 ///

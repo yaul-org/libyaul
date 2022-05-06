@@ -169,6 +169,7 @@ SHARED_INCLUDE_DIRS:= \
 	../lib$(MAIN_TARGET)/scu \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/arp \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/dram-cart \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs0/flash \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/usb-cart \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs2/cd-block \
 	../lib$(MAIN_TARGET)/scu/bus/b/scsp \
