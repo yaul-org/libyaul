@@ -227,7 +227,7 @@ endif
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
+	$(ECHO)$(SH_CC) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c -o $@ $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
@@ -243,7 +243,7 @@ endef
 define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
+	$(ECHO)$(SH_CXX) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
