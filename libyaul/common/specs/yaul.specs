@@ -17,6 +17,7 @@
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs0/arp)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs0/dram-cart)) \
+-I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs0/flash)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs0/usb-cart)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/a/cs2/cd-block)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/scu/bus/b/scsp)) \

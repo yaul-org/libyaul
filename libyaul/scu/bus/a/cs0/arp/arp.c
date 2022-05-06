@@ -13,11 +13,14 @@
 #include <sys/cdefs.h>
 
 #include <arp.h>
+#include <flash.h>
 
 #include <cpu/intc.h>
 #include <cpu/instructions.h>
 
 #include "arp-internal.h"
+
+#define VERSION_STRING_LEN (255)
 
 typedef void (*arp_function_t)(void);
 
@@ -75,11 +78,11 @@ arp_busy_status(void)
 uint8_t
 arp_byte_read(void)
 {
-        while ((arp_busy_status()));
+        while ((arp_busy_status())) {
+        }
 
-        uint8_t b;
-        b = MEMORY_READ(8, ARP(INPUT));
-        /* Write back */
+        const uint8_t b = MEMORY_READ(8, ARP(INPUT));
+
         MEMORY_WRITE(8, ARP(OUTPUT), b);
 
         return b;
@@ -88,11 +91,10 @@ arp_byte_read(void)
 uint8_t
 arp_byte_xchg(uint8_t c)
 {
-        while ((arp_busy_status()));
+        while ((arp_busy_status())) {
+        }
 
-        /* Read back a byte */
-        uint8_t b;
-        b = MEMORY_READ(8, ARP(INPUT));
+        const uint8_t b = MEMORY_READ(8, ARP(INPUT));
 
         MEMORY_WRITE(8, ARP(OUTPUT), c);
 
@@ -192,29 +194,26 @@ arp_sync_nonblock(void)
         return true;
 }
 
+bool
+arp_detect(void)
+{
+        const uint16_t vendor_id = flash_vendor_get();
+
+        return (vendor_id != 0xFFFF);
+}
+
 char *
-arp_version_get(void)
+arp_version_string_get(void)
 {
         const char * const version_str = (const char *)ARP(VERSION);
 
-        size_t calculated_len;
-        calculated_len = 255;
-
-        const char *in_buffer;
-        in_buffer = version_str;
-
-        while (isspace(*in_buffer)) {
-                in_buffer++;
-        }
-
-        calculated_len = in_buffer - version_str;
-
         char *buffer;
-        if ((buffer = (char *)malloc(calculated_len + 1)) == NULL) {
+        if ((buffer = (char *)malloc(VERSION_STRING_LEN + 1)) == NULL) {
                 return NULL;
         }
 
-        /* (void)memcpy(buffer, version_str, version_len); */
+        (void)memset(buffer, '\0', VERSION_STRING_LEN + 1);
+        (void)memcpy(buffer, version_str, VERSION_STRING_LEN);
 
         return buffer;
 }

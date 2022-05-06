@@ -366,6 +366,10 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
 
 INSTALL_HEADER_FILES+= \
+	./scu/bus/a/cs0/flash/:flash.h:yaul/scu/bus/a/cs0/flash/ \
+	./scu/bus/a/cs0/flash/flash/:map.h:yaul/scu/bus/a/cs0/flash/flash/
+
+INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/arp/:arp.h:yaul/scu/bus/a/cs0/arp/ \
 	./scu/bus/a/cs0/arp/arp/:map.h:yaul/scu/bus/a/cs0/arp/arp/
 
