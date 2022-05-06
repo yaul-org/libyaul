@@ -163,10 +163,14 @@ int
 cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_buffer, uint32_t buffer_length)
 {
         assert(output_buffer != NULL);
+        assert(buffer_length > 0);
+
+        const uint32_t sectors_to_read = (buffer_length + (CDFS_SECTOR_SIZE - 1)) / CDFS_SECTOR_SIZE;
+
+        int ret;
 
         /* Start transfer */
-        int ret;
-        ret = cd_block_cmd_sector_data_get_delete(offset, buffer_number, 1);
+        ret = cd_block_cmd_sector_data_get_delete(offset, buffer_number, sectors_to_read);
         if (ret != 0) {
                 return ret;
         }
@@ -180,13 +184,9 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         uint16_t *read_buffer;
         read_buffer = (uint16_t *)output_buffer;
 
-        uint32_t bytes_to_read = CDFS_SECTOR_SIZE;
-        if (bytes_to_read > buffer_length) {
-                bytes_to_read = buffer_length;
-        }
-
-        uint32_t read_bytes = 0;
-        for (uint32_t i = 0; i < bytes_to_read; i += 2) {
+        uint32_t read_bytes;
+        read_bytes = 0;
+        for (uint32_t i = 0; i < buffer_length; i += 2) {
                 *read_buffer = MEMORY_READ(16, CD_BLOCK(DTR));
                 read_buffer++;
                 read_bytes += 2;
