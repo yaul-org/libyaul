@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <sys/cdefs.h>
 
@@ -194,20 +195,28 @@ arp_sync_nonblock(void)
 char *
 arp_version_get(void)
 {
-        const char *arp_ver;
-        char *buf;
-        size_t ver_len;
+        const char * const version_str = (const char *)ARP(VERSION);
 
-        arp_ver = (const char *)ARP(VERSION);
-        ver_len = 255;
-        if ((buf = (char *)malloc(ver_len + 1)) == NULL) {
+        size_t calculated_len;
+        calculated_len = 255;
+
+        const char *in_buffer;
+        in_buffer = version_str;
+
+        while (isspace(*in_buffer)) {
+                in_buffer++;
+        }
+
+        calculated_len = in_buffer - version_str;
+
+        char *buffer;
+        if ((buffer = (char *)malloc(calculated_len + 1)) == NULL) {
                 return NULL;
         }
-        (void)memset(buf, '\0', ver_len);
-        (void)memcpy(buf, arp_ver, ver_len);
-        buf[ver_len] = '\0';
 
-        return buf;
+        /* (void)memcpy(buffer, version_str, version_len); */
+
+        return buffer;
 }
 
 static void
