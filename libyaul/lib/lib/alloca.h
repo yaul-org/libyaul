@@ -1,4 +1,5 @@
-/* Written 2000, Werner Almesberger
+/*-
+ * Written 2000, Werner Almesberger
  *         2001, Corinna Vinschen <vinschen@redhat.com> */
 
 #ifndef _LIB_ALLOCA_H_

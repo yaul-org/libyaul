@@ -145,7 +145,7 @@ typedef int32_t error_t;
 #ifdef __GNUC__
 __const
 #endif
-__hidden int *__errno_location(void) __weak;
+__hidden int *__errno_location(void);
 
 #undef errno
 #define errno (*__errno_location())
