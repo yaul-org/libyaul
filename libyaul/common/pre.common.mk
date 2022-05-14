@@ -22,13 +22,6 @@ ifeq ($(strip $(YAUL_CDB)),)
   $(error Undefined YAUL_CDB (update JSON compile command database))
 endif
 
-ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),)
-  $(error Undefined YAUL_OPTION_BUILD_ASSERT (build ASSERT))
-endif
-ifneq ($(YAUL_OPTION_BUILD_ASSERT),$(filter $(YAUL_OPTION_BUILD_ASSERT),0 1))
-  $(error Invalid value for YAUL_OPTION_BUILD_ASSERT (build assert))
-endif
-
 ifeq ($(strip $(SILENT)),)
   ECHO=
 else
@@ -129,8 +122,7 @@ SH_CFLAGS= \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
-	-Wno-format \
-	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
+	-Wno-format
 
 SH_LDFLAGS= \
 	-Wl,--gc-sections \

@@ -7,7 +7,7 @@ __BEGIN_DECLS
 
 #undef assert
 
-#if defined(DEBUG) || (HAVE_ASSERT_SUPPORT == 1)
+#ifdef DEBUG
 #define assert(e) ((e)                                                         \
         ? (void)0                                                              \
         : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                \

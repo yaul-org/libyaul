@@ -68,17 +68,18 @@ struct dev_state {
         int16_vec2_t tv_resolution;
 };
 
-/* Restrictions:
- * 1. Screen will always be displayed
- * 2. Rotational backgrounds are not supported
- * 3. Screen priority is always 7
- * 4. 1x1 plane size is enforced
- * 5. Page 0 of plane A will always be used
- * 6. Resets scroll position to (0, 0) */
+/* XXX: Move this comment to documentation */
+/* The following parameter restrictions are enforced:
+ *   - Screen will always be displayed
+ *   - Rotational backgrounds are not supported
+ *   - Screen priority is always 7
+ *   - 1x1 plane size is enforced
+ *   - Page 0 of plane A will always be used
+ *   - scroll position is reset to (0, 0) */
 
 static const dbgio_vdp2_t _default_params = {
-        .font_cpd      = &_font_cpd[0],
-        .font_pal      = &_font_pal[0],
+        .font_cpd      = _font_cpd,
+        .font_pal      = _font_pal,
         .font_fg       = 7,
         .font_bg       = 0,
         .scroll_screen = VDP2_SCRN_NBG3,
@@ -185,18 +186,6 @@ _pnd_values_update(bool force)
 static void
 _buffer_clear(void)
 {
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .channel  = DEV_DMAC_CHANNEL,
-                .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .src      = 0x00000000,
-                .dst      = 0x00000000,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .len      = 0x00000000,
-                .stride   = CPU_DMAC_STRIDE_2_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr      = NULL
-        };
-
         /* Don't try to clear the buffer again if it's already been cleared */
         if ((_dev_state->state & STATE_BUFFER_CLEARED) == STATE_BUFFER_CLEARED) {
                 return;
@@ -204,16 +193,9 @@ _buffer_clear(void)
 
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        dmac_cfg.dst = (uint32_t)&_dev_state->page_pnd[0];
-        dmac_cfg.src = _dev_state->pnd_value_clear;
-        dmac_cfg.len = _dev_state->page_size;
-
-        /* Force enable DMAC, in case cpu_dmac_stop() is called */
-        cpu_dmac_enable();
-        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-        cpu_dmac_channel_start(DEV_DMAC_CHANNEL);
-        cpu_dmac_channel_wait(DEV_DMAC_CHANNEL);
+        cpu_dmac_memset(DEV_DMAC_CHANNEL, _dev_state->page_pnd,
+            _dev_state->pnd_value_clear,
+            _dev_state->page_size);
 
         _dev_state->state |= STATE_BUFFER_CLEARED;
 }
