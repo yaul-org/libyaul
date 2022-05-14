@@ -118,11 +118,11 @@ SH_CFLAGS= \
 	-W \
 	-Wall \
 	-Wextra \
-	-Werror \
 	-Wunused-parameter \
 	-Wstrict-aliasing \
 	-Wno-main \
-	-Wno-format
+	-Wno-format \
+	-save-temps=obj
 
 SH_LDFLAGS= \
 	-Wl,--gc-sections \
