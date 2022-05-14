@@ -72,15 +72,15 @@ usb_cart_dma_read(void *buffer, uint32_t len)
         }
 
         const cpu_dmac_cfg_t dmac_cfg = {
-                .channel = 0,
+                .channel  = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .stride = CPU_DMAC_STRIDE_1_BYTE,
+                .stride   = CPU_DMAC_STRIDE_1_BYTE,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .src = USB_CART(FIFO),
-                .dst = (uint32_t)buffer,
-                .len = USB_CART_OUT_EP_SIZE,
-                .ihr = NULL
+                .src      = USB_CART(FIFO),
+                .dst      = (uint32_t)buffer,
+                .len      = USB_CART_OUT_EP_SIZE,
+                .ihr      = NULL
         };
 
         uint32_t aref_bits;
