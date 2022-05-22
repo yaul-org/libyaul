@@ -184,9 +184,12 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         uint16_t *read_buffer;
         read_buffer = (uint16_t *)output_buffer;
 
+        uint32_t to_read;
+        to_read = (buffer_length % 2) ? buffer_length - 1 : buffer_length;
+
         uint32_t read_bytes;
         read_bytes = 0;
-        for (uint32_t i = 0; i < buffer_length; i += 2) {
+        for (uint32_t i = 0; i < to_read; i += 2) {
                 *read_buffer = MEMORY_READ(16, CD_BLOCK(DTR));
                 read_buffer++;
                 read_bytes += 2;
@@ -196,7 +199,7 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         if (read_bytes < buffer_length) {
                 const uint16_t tmp = MEMORY_READ(16, CD_BLOCK(DTR));
 
-                output_buffer[buffer_length - 1] = tmp >> 8;
+                output_buffer[buffer_length - 1] = (tmp >> 8) & 0xFF;
         }
 
         if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
