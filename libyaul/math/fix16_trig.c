@@ -39,6 +39,17 @@ fix16_cos(fix16_t radians)
         return fix16_bradians_cos(_rad2brad_convert(radians));
 }
 
+void
+fix16_sincos(fix16_t radians, fix16_t* result_sin, fix16_t* result_cos)
+{
+        int bradians;
+        bradians = _rad2brad_convert(radians);
+
+        *result_sin = fix16_bradians_sin(bradians);
+
+        *result_cos = fix16_bradians_cos(bradians);
+}
+
 fix16_t
 fix16_bradians_sin(int32_t bradians)
 {

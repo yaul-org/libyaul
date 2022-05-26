@@ -15,6 +15,7 @@
 extern fix16_t fix16_sin(fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_cos(fix16_t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_tan(fix16_t) FIXMATH_FUNC_ATTRS;
+extern void fix16_sincos(fix16_t, fix16_t*, fix16_t*) __attribute__ ((leaf, nothrow,));
 
 extern fix16_t fix16_atan2(fix16_t y, fix16_t x) FIXMATH_FUNC_ATTRS;
 
