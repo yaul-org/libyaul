@@ -33,7 +33,8 @@ __BEGIN_DECLS
 /// @addtogroup MATH
 /// @{
 
-#define FIXMATH_FUNC_ATTRS __attribute__ ((leaf, nothrow, const))
+#define FIXMATH_FUNC_ATTRS          __attribute__ ((leaf, nothrow, const))
+#define FIXMATH_FUNC_NONCONST_ATTRS __attribute__ ((leaf, nothrow))
 
 /* Macro for defining fix16_t constant values. The functions above can't be used
  * from e.g. global variable initializers, and their names are quite long also.
