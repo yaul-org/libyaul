@@ -40,13 +40,11 @@ fix16_cos(fix16_t radians)
 }
 
 void
-fix16_sincos(fix16_t radians, fix16_t* result_sin, fix16_t* result_cos)
+fix16_sincos(fix16_t radians, fix16_t *result_sin, fix16_t *result_cos)
 {
-        int bradians;
-        bradians = _rad2brad_convert(radians);
+        const int32_t bradians = _rad2brad_convert(radians);
 
         *result_sin = fix16_bradians_sin(bradians);
-
         *result_cos = fix16_bradians_cos(bradians);
 }
 
