@@ -90,18 +90,18 @@ typedef enum vdp1_cmdt_zoom_point {
 #define CMDT_VTX_USER_CLIP_LR           (2)
 #define CMDT_VTX_USER_CLIP_COUNT        (2)
 
-#define CMDT_CC_REPLACE                 (0)
-#define CMDT_CC_SHADOW                  (1)
-#define CMDT_CC_HALF_LUMINANCE          (2)
-#define CMDT_CC_HALF_TRANSPARENT        (3)
-#define CMDT_CC_GOURAUD                 (4)
+#define CMDT_PMOD_CC_REPLACE            (0)
+#define CMDT_PMOD_CC_SHADOW             (1)
+#define CMDT_PMOD_CC_HALF_LUMINANCE     (2)
+#define CMDT_PMOD_CC_HALF_TRANSPARENT   (3)
+#define CMDT_PMOD_CC_GOURAUD            (4)
 
-#define CMDT_CM_COLOR_BANK_16_COLORS    (0)
-#define CMDT_CM_COLOR_LUT_16_COLORS     (1)
-#define CMDT_CM_COLOR_BANK_64_COLORS    (2)
-#define CMDT_CM_COLOR_BANK_128_COLORS   (3)
-#define CMDT_CM_COLOR_BANK_256_COLORS   (4)
-#define CMDT_CM_RGB_32768_COLORS        (5)
+#define CMDT_PMOD_CM_COLOR_BANK_16_COLORS  (0)
+#define CMDT_PMOD_CM_COLOR_LUT_16_COLORS   (1)
+#define CMDT_PMOD_CM_COLOR_BANK_64_COLORS  (2)
+#define CMDT_PMOD_CM_COLOR_BANK_128_COLORS (3)
+#define CMDT_PMOD_CM_COLOR_BANK_256_COLORS (4)
+#define CMDT_PMOD_CM_RGB_32768_COLORS      (5)
 
 typedef struct vdp1_color_bank_type_0 {
         vdp2_sprite_type_0_t data;
