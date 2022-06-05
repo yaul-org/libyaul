@@ -193,7 +193,8 @@ _buffer_clear(void)
 
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        cpu_dmac_memset(DEV_DMAC_CHANNEL, _dev_state->page_pnd,
+        cpu_dmac_memset(DEV_DMAC_CHANNEL,
+            _dev_state->page_pnd,
             _dev_state->pnd_value_clear,
             _dev_state->page_size);
 
