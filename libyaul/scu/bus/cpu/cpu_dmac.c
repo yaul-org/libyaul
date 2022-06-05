@@ -13,6 +13,8 @@
 
 #include <sys/callback-list.h>
 
+#include <sys/cdefs.h>
+
 #include "cpu-internal.h"
 
 static void _dmac_ch0_ihr_handler(void);
@@ -209,11 +211,11 @@ cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
                 .ihr_work = NULL
         };
 
-        static uint32_t clear_value;
+        static volatile uint32_t clear_value __uncached;
 
         dmac_cfg.channel = ch;
         dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&clear_value;
+        dmac_cfg.src = (uintptr_t)&clear_value;
         dmac_cfg.len = size;
 
         cpu_dmac_channel_wait(ch);
