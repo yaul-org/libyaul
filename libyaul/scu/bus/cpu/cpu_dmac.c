@@ -153,14 +153,14 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
                 }
         }
 
-        callback_t * const ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t * const ihr_callback = &ihr_callbacks[cfg->channel];
-
-        callback_init(ihr_callback);
-
         if (cfg->ihr != NULL) {
                 /* Enable interrupt */
                 reg_chcr |= 0x00000004;
+
+                callback_t * const ihr_callbacks =
+                    _dmac_executor_ihr_callbacks_get();
+                callback_t * const ihr_callback =
+                    &ihr_callbacks[cfg->channel];
 
                 /* Set interrupt handling routine */
                 callback_set(ihr_callback, cfg->ihr, cfg->ihr_work);
@@ -197,32 +197,29 @@ cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
     size_t size)
 {
         static cpu_dmac_cfg_t dmac_cfg = {
-                .channel  = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
                 .stride   = CPU_DMAC_STRIDE_4_BYTES,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .src      = 0x00000000,
-                .dst      = 0x00000000,
-                .len      = 0x00000000,
                 .ihr      = NULL,
                 .ihr_work = NULL
         };
 
-        static uint32_t clear_value;
+        static volatile uint32_t clear_value __uncached = 0;
 
         dmac_cfg.channel = ch;
+        dmac_cfg.src = (uint32_t)&clear_value;
         dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
-        dmac_cfg.src = CPU_CACHE_THROUGH | (uint32_t)&clear_value;
         dmac_cfg.len = size;
 
         cpu_dmac_channel_wait(ch);
 
         clear_value = value;
 
+        cpu_dmac_channel_stop(ch);
         cpu_dmac_channel_config_set(&dmac_cfg);
         cpu_dmac_channel_start(ch);
-
+        cpu_dmac_enable();
         cpu_dmac_channel_wait(ch);
 }
 
@@ -233,21 +230,21 @@ _dmac_executor_ihr_callbacks_get(void)
 
         switch (which_cpu) {
         case CPU_MASTER:
-                return &_master_ihr_callbacks[0];
+                return _master_ihr_callbacks;
         case CPU_SLAVE:
-                return &_slave_ihr_callbacks[0];
+                return _slave_ihr_callbacks;
+        default:
+                return NULL;
         }
-
-        return NULL;
 }
 
 static void __interrupt_handler
 _dmac_ch0_ihr_handler(void)
 {
-        callback_t *ihr_callbacks;
-        ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t *ihr_callback;
-        ihr_callback = &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH0];
+        callback_t * const ihr_callbacks =
+            _dmac_executor_ihr_callbacks_get();
+        callback_t * const ihr_callback =
+            &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH0];
 
         callback_call(ihr_callback);
 
@@ -257,10 +254,10 @@ _dmac_ch0_ihr_handler(void)
 static void __interrupt_handler
 _dmac_ch1_ihr_handler(void)
 {
-        callback_t *ihr_callbacks;
-        ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t *ihr_callback;
-        ihr_callback = &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH1];
+        callback_t * const ihr_callbacks =
+            _dmac_executor_ihr_callbacks_get();
+        callback_t * const ihr_callback =
+            &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH1];
 
         callback_call(ihr_callback);
 
