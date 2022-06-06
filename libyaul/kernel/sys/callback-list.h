@@ -23,7 +23,7 @@ typedef void (*callback_handler_t)(void *work);
 typedef struct callback {
         callback_handler_t handler;
         void *work;
-} __packed callback_t;
+} callback_t;
 
 typedef struct callback_list {
         callback_t *callbacks;

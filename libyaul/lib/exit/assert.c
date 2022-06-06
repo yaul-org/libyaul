@@ -19,8 +19,7 @@
 
 void __noreturn
 _assert(const char * restrict file, const char * restrict line,
-    const char * restrict func,
-    const char * restrict failed_expr)
+    const char * restrict func, const char * restrict failed_expr)
 {
         /* In the case where we fail an assertion within _assert() */
         static int32_t assertion_count = -1;
@@ -35,10 +34,9 @@ _assert(const char * restrict file, const char * restrict line,
                 __reset();
 
                 dbgio_init();
+                dbgio_dev_deinit();
                 dbgio_dev_default_init(DBGIO_DEV_VDP2);
-
                 vdp2_tvmd_vblank_in_next_wait(1);
-
                 dbgio_dev_font_load();
 
                 dbgio_puts("[H[2J");
@@ -66,9 +64,6 @@ _assert(const char * restrict file, const char * restrict line,
 
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
-
-        /* Use the internal calls to commit VDP2 to avoid dealing with VDP2 sync
-         * state */
         __vdp2_commit(0);
         __vdp2_commit_wait(0);
 
