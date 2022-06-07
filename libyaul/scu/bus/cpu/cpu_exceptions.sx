@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2012-2022 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+.macro MACRO_EXCEPTION_TRAMPOLINE symbol:req message:req
+.align 4
+.global \symbol
+.type \symbol, @function
+
+\symbol:
+        /* At this point, PC and SR have been pushed onto the stack by
+         * the CPU */
+        sts.l pr, @-r15
+        stc.l gbr, @-r15
+        stc.l vbr, @-r15
+        sts.l mach, @-r15
+        sts.l macl, @-r15
+        mov.l r14, @-r15
+
+        /* Disable interrupts */
+        mov #0xF0, r14
+        mov.l r13, @-r15
+        ldc r14, sr
+
+        mov.l 1f, r14
+        mov.l r12, @-r15
+        mov r15, r13
+        mov.l r11, @-r15
+        add #0x28, r13
+        mov.l r10, @-r15
+        mov.l r9, @-r15
+        mov.l r8, @-r15
+        mov.l r7, @-r15
+        mov.l r6, @-r15
+        mov.l r5, @-r15
+        mov.l r4, @-r15
+        mov.l r3, @-r15
+        mov.l r2, @-r15
+        mov.l r1, @-r15
+        mov.l r0, @-r15
+        mova 2f, r0
+        mov.l r13, @-r15
+        mov r0, r5
+        jsr @r14
+        mov r15, r4
+
+.align 4
+
+1: .long  ___exception_assert
+2: .asciz "\message"
+.endm
+
+.text
+
+MACRO_EXCEPTION_TRAMPOLINE ___exception_illegal_instruction "Illegal instruction"
+MACRO_EXCEPTION_TRAMPOLINE ___exception_illegal_slot "Illegal slot"
+MACRO_EXCEPTION_TRAMPOLINE ___exception_cpu_address_error "CPU address error"
+MACRO_EXCEPTION_TRAMPOLINE ___exception_dma_address_error "DMA address error"
