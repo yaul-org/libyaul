@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2012-2022 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+.macro MACRO_SLAVE_ENTRY_TRAMPOLINE symbol:req entry:req
+.align 4
+.global \symbol
+.type \symbol, @function
+
+\symbol:
+         mov.l 1f, r15
+         mov.l 2f, r1
+         mov r15, r14
+         jmp @r1
+         nop
+
+.align 4
+1: .long __slave_stack
+2: .long \entry
+.endm
+
+.text
+
+MACRO_SLAVE_ENTRY_TRAMPOLINE ___slave_polling_entry_trampoline ___slave_polling_entry
+MACRO_SLAVE_ENTRY_TRAMPOLINE ___slave_ici_entry_trampoline ___slave_ici_entry

@@ -29,68 +29,26 @@
 #include <cpu-internal.h>
 #include <vdp-internal.h>
 
-#define EXCEPTION_TRAMPOLINE_EMIT(name)                                        \
-__asm__ (".align 4\n"                                                          \
-         "\n"                                                                  \
-         ".local __exception_" __STRING(name) "\n"                             \
-         ".type __exception_" __STRING(name) ", @function\n"                   \
-         "\n"                                                                  \
-         "__exception_" __STRING(name) ":\n"                                   \
-         "\tsts.l pr, @-r15\n"                                                 \
-         "\tstc.l gbr, @-r15\n"                                                \
-         "\tstc.l vbr, @-r15\n"                                                \
-         "\tsts.l mach, @-r15\n"                                               \
-         "\tsts.l macl, @-r15\n"                                               \
-         "\tmov.l r14, @-r15\n"                                                \
-         "\tmov #0xF0, r14\n"                                                  \
-         "\tmov.l r13, @-r15\n"                                                \
-         "\tldc r14, sr\n"                                                     \
-         "\tmov.l 1f, r14\n"                                                   \
-         "\tmov.l r12, @-r15\n"                                                \
-         "\tmov r15, r13\n"                                                    \
-         "\tmov.l r11, @-r15\n"                                                \
-         "\tadd #0x28, r13\n"                                                  \
-         "\tmov.l r10, @-r15\n"                                                \
-         "\tmov.l r9, @-r15\n"                                                 \
-         "\tmov.l r8, @-r15\n"                                                 \
-         "\tmov.l r7, @-r15\n"                                                 \
-         "\tmov.l r6, @-r15\n"                                                 \
-         "\tmov.l r5, @-r15\n"                                                 \
-         "\tmov.l r4, @-r15\n"                                                 \
-         "\tmov.l r3, @-r15\n"                                                 \
-         "\tmov.l r2, @-r15\n"                                                 \
-         "\tmov.l r1, @-r15\n"                                                 \
-         "\tmov.l r0, @-r15\n"                                                 \
-         "\tmov.l r13, @-r15\n"                                                \
-         "\tjmp @r14\n"                                                        \
-         "\tmov r15, r4\n"                                                     \
-         "\t.align 2\n"                                                        \
-         "\n"                                                                  \
-         "\t1:\n"                                                              \
-         "\t.long __ihr_exception_" __STRING(name) "\n")
-
-void _exception_illegal_instruction(void) __used;
-void _exception_illegal_slot(void) __used;
-void _exception_cpu_address_error(void) __used;
-void _exception_dma_address_error(void) __used;
-
-static const char *_exception_message_format(const cpu_registers_t * restrict,
-    const char *restrict);
-static void _ihr_exception_show(const cpu_registers_t * restrict,
-    const char * restrict);
+static void _exception_message_puts(const cpu_registers_t * restrict regs,
+    const char * restrict exception_name);
 
 void
 __cpu_init(void)
 {
+        extern void __exception_illegal_instruction(void);
+        extern void __exception_illegal_slot(void);
+        extern void __exception_cpu_address_error(void);
+        extern void __exception_dma_address_error(void);
+
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
-            _exception_illegal_instruction);
+            __exception_illegal_instruction);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
-            _exception_illegal_slot);
+            __exception_illegal_slot);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
-            _exception_cpu_address_error);
+            __exception_cpu_address_error);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR,
-            _exception_dma_address_error);
+            __exception_dma_address_error);
 
         /* Set the appropriate vector numbers for the on-chip peripheral
          * modules */
@@ -108,111 +66,73 @@ __cpu_init(void)
         cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
 }
 
-static void
-_ihr_exception_show(const cpu_registers_t * restrict regs, const char * restrict exception_name)
+void __used
+__exception_assert(const cpu_registers_t * restrict regs, const char * restrict exception_name)
 {
-        const char * const buffer = _exception_message_format(regs, exception_name);
-
         __reset();
 
+        dbgio_init();
         dbgio_dev_deinit();
         dbgio_dev_default_init(DBGIO_DEV_VDP2);
-
         vdp2_tvmd_vblank_in_next_wait(1);
-
         dbgio_dev_font_load();
 
         dbgio_puts("[H[2J");
-        dbgio_puts(buffer);
+
+        _exception_message_puts(regs, exception_name);
 
         vdp2_tvmd_vblank_in_next_wait(1);
         dbgio_flush();
         __vdp2_commit(0);
         __vdp2_commit_wait(0);
-}
-
-static void __noreturn __used
-_ihr_exception_illegal_instruction(const cpu_registers_t *regs)
-{
-        _ihr_exception_show(regs, "Illegal instruction");
 
         abort();
 }
 
-static void __noreturn __used
-_ihr_exception_illegal_slot(const cpu_registers_t *regs)
+static void
+_exception_message_puts(const cpu_registers_t * restrict regs,
+    const char * restrict exception_name)
 {
-        _ihr_exception_show(regs, "Illegal slot");
+        dbgio_printf("[1;44mException occurred: %s[m\n", exception_name);
 
-        abort();
-}
+        dbgio_printf("\n"
+            "   r0 = 0x%08X  r11 = 0x%08X\n"
+            "   r1 = 0x%08X  r12 = 0x%08X\n"
+            "   r2 = 0x%08X  r13 = 0x%08X\n"
+            "   r3 = 0x%08X  r14 = 0x%08X\n"
+            "   r4 = 0x%08X   sp = 0x%08X\n"
+            "   r5 = 0x%08X   sr = 0x%08X\n"
+            "   r6 = 0x%08X  gbr = 0x%08X\n"
+            "   r7 = 0x%08X  vbr = 0x%08X\n"
+            "   r8 = 0x%08X mach = 0x%08X\n"
+            "   r9 = 0x%08X macl = 0x%08X\n"
+            "  r10 = 0x%08X   pr = 0x%08X\n"
+            "                     pc = 0x%08X\n",
+            (uintptr_t)regs->r[0],  (uintptr_t)regs->r[11],
+            (uintptr_t)regs->r[1],  (uintptr_t)regs->r[12],
+            (uintptr_t)regs->r[2],  (uintptr_t)regs->r[13],
+            (uintptr_t)regs->r[3],  (uintptr_t)regs->r[14],
+            (uintptr_t)regs->r[4],  (uintptr_t)regs->sp,
+            (uintptr_t)regs->r[5],  (uintptr_t)regs->sr,
+            (uintptr_t)regs->r[6],  (uintptr_t)regs->gbr,
+            (uintptr_t)regs->r[7],  (uintptr_t)regs->vbr,
+            (uintptr_t)regs->r[8],  (uintptr_t)regs->mach,
+            (uintptr_t)regs->r[9],  (uintptr_t)regs->macl,
+            (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
+            (uintptr_t)regs->pc);
 
-static void __noreturn __used
-_ihr_exception_cpu_address_error(const cpu_registers_t *regs)
-{
-        _ihr_exception_show(regs, "CPU address error");
+        dbgio_puts("----------------------------------------\n");
 
-        abort();
-}
-
-static void __noreturn __used
-_ihr_exception_dma_address_error(const cpu_registers_t *regs)
-{
-        _ihr_exception_show(regs, "DMA address error");
-
-        abort();
-}
-
-EXCEPTION_TRAMPOLINE_EMIT(illegal_instruction);
-EXCEPTION_TRAMPOLINE_EMIT(illegal_slot);
-EXCEPTION_TRAMPOLINE_EMIT(cpu_address_error);
-EXCEPTION_TRAMPOLINE_EMIT(dma_address_error);
-
-static const char *
-_exception_message_format(const cpu_registers_t * restrict regs,
-    const char *restrict exception_name)
-{
-        static char buffer[512];
-
-        (void)sprintf(buffer,
-            "[H[2J[1;44mException occurred: %s[m\n\n"
-            "\t r0 = 0x%08X  r11 = 0x%08X\n"
-            "\t r1 = 0x%08X  r12 = 0x%08X\n"
-            "\t r2 = 0x%08X  r13 = 0x%08X\n"
-            "\t r3 = 0x%08X  r14 = 0x%08X\n"
-            "\t r4 = 0x%08X   sp = 0x%08X\n"
-            "\t r5 = 0x%08X   sr = 0x%08X\n"
-            "\t r6 = 0x%08X  gbr = 0x%08X\n"
-            "\t r7 = 0x%08X  vbr = 0x%08X\n"
-            "\t r8 = 0x%08X mach = 0x%08X\n"
-            "\t r9 = 0x%08X macl = 0x%08X\n"
-            "\tr10 = 0x%08X   pr = 0x%08X\n"
-            "                     pc = 0x%08X\n"
-            "----------------------------------------\n"
-            "SR bits\n\n"
+        dbgio_printf("SR bits\n"
+            "\n"
             "\tM Q I3 I2 I1 I0 - - S T\n"
             "\t%lu %lu  %lu  %lu  %lu  %lu     %lu %lu\n",
-            exception_name,
-            (uintptr_t)regs->r[0], (uintptr_t)regs->r[11],
-            (uintptr_t)regs->r[1], (uintptr_t)regs->r[12],
-            (uintptr_t)regs->r[2], (uintptr_t)regs->r[13],
-            (uintptr_t)regs->r[3], (uintptr_t)regs->r[14],
-            (uintptr_t)regs->r[4], (uintptr_t)regs->sp,
-            (uintptr_t)regs->r[5], (uintptr_t)regs->sr,
-            (uintptr_t)regs->r[6], (uintptr_t)regs->gbr,
-            (uintptr_t)regs->r[7], (uintptr_t)regs->vbr,
-            (uintptr_t)regs->r[8], (uintptr_t)regs->mach,
-            (uintptr_t)regs->r[9], (uintptr_t)regs->macl,
-            (uintptr_t)regs->r[10], (uintptr_t)regs->pr,
-            (uintptr_t)regs->pc,
-            (uint32_t)((regs->sr >> 9) & 0x01),
-            (uint32_t)((regs->sr >> 8) & 0x01),
-            (uint32_t)((regs->sr >> 7) & 0x01),
-            (uint32_t)((regs->sr >> 6) & 0x01),
-            (uint32_t)((regs->sr >> 5) & 0x01),
-            (uint32_t)((regs->sr >> 4) & 0x01),
-            (uint32_t)((regs->sr >> 1) & 0x01),
-            (uint32_t)((regs->sr >> 0) & 0x01));
-
-        return buffer;
+            ((regs->sr >> 9) & 0x01UL),
+            ((regs->sr >> 8) & 0x01UL),
+            ((regs->sr >> 7) & 0x01UL),
+            ((regs->sr >> 6) & 0x01UL),
+            ((regs->sr >> 5) & 0x01UL),
+            ((regs->sr >> 4) & 0x01UL),
+            ((regs->sr >> 1) & 0x01UL),
+            ((regs->sr >> 0) & 0x01UL));
 }
