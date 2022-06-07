@@ -247,6 +247,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_dual.c \
+	scu/bus/cpu/cpu_dual_entries.sx \
 	scu/bus/cpu/cpu_exceptions.sx \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
