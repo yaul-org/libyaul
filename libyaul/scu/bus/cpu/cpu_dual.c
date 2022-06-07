@@ -22,33 +22,12 @@
 
 #include <cpu-internal.h>
 
-#define SLAVE_ENTRY_TRAMPOLINE_EMIT(type)                                      \
-__asm__ (".align 1\n"                                                          \
-         "\n"                                                                  \
-         ".local __slave_" __STRING(type) "_entry_trampoline\n"                \
-         ".type __slave_" __STRING(type) "_entry_trampoline, @function\n"      \
-         "\n"                                                                  \
-         "__slave_" __STRING(type) "_entry_trampoline:\n"                      \
-         "\tmov.l 1f, r15\n"                                                   \
-         "\tmov.l 2f, r1\n"                                                    \
-         "\tmov r15, r14\n"                                                    \
-         "\tjmp @r1\n"                                                         \
-         "\tnop\n"                                                             \
-         ".align 4\n"                                                          \
-         "1:\n"                                                                \
-         ".long __slave_stack\n"                                               \
-         "2:\n"                                                                \
-         ".long __slave_" __STRING(type) "_entry\n")
+extern void __slave_polling_entry_trampoline(void);
+extern void __slave_ici_entry_trampoline(void);
 
 typedef void (*slave_entry_t)(void);
 
 static void _slave_init(void);
-
-void _slave_polling_entry_trampoline(void);
-void _slave_ici_entry_trampoline(void);
-
-static void _slave_polling_entry(void);
-static void _slave_ici_entry(void);
 
 static void _master_ici_handler(void);
 static void _slave_ici_handler(void);
@@ -59,8 +38,8 @@ static cpu_dual_master_entry_t _master_entry = _default_entry;
 static cpu_dual_slave_entry_t _slave_entry __uncached = _default_entry;
 
 static slave_entry_t _slave_entry_table[] = {
-        &_slave_polling_entry_trampoline,
-        &_slave_ici_entry_trampoline
+        &__slave_polling_entry_trampoline,
+        &__slave_ici_entry_trampoline
 };
 
 void
@@ -141,6 +120,29 @@ cpu_dual_executor_get(void)
         return -1;
 }
 
+void __noreturn __aligned(16) __used
+__slave_polling_entry(void)
+{
+        _slave_init();
+
+        while (true) {
+                cpu_dual_notification_wait();
+
+                _slave_entry();
+        }
+}
+
+void __noreturn __used
+__slave_ici_entry(void)
+{
+        _slave_init();
+
+        MEMORY_WRITE_OR(8, CPU(TIER), 0x80);
+
+        while (true) {
+        }
+}
+
 static void
 _slave_init(void)
 {
@@ -153,33 +155,6 @@ _slave_init(void)
         cpu_intc_mask_set(0);
 
         cpu_cache_purge();
-}
-
-SLAVE_ENTRY_TRAMPOLINE_EMIT(polling);
-
-static void __noreturn __aligned(16) __used
-_slave_polling_entry(void)
-{
-        _slave_init();
-
-        while (true) {
-                cpu_dual_notification_wait();
-
-                _slave_entry();
-        }
-}
-
-SLAVE_ENTRY_TRAMPOLINE_EMIT(ici);
-
-static void __noreturn __used
-_slave_ici_entry(void)
-{
-        _slave_init();
-
-        MEMORY_WRITE_OR(8, CPU(TIER), 0x80);
-
-        while (true) {
-        }
 }
 
 static void __interrupt_handler
