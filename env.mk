@@ -89,6 +89,7 @@ SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
 	-flto \
+	-ffat-lto-objects \
 	-ffunction-sections \
 	-fdata-sections \
 	-pedantic \
