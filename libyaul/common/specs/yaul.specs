@@ -35,6 +35,7 @@
 -ffast-math \
 -fstrict-aliasing \
 -flto \
+-ffat-lto-objects \
 -ffunction-sections \
 -fdata-sections \
 %(includes)

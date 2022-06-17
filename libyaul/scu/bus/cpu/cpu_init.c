@@ -43,7 +43,7 @@ __cpu_init(void)
         /* Set hardware exception handling routines */
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION,
             __exception_illegal_instruction);
-        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_ILLEGAL_SLOT,
             __exception_illegal_slot);
         cpu_intc_ihr_set(CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR,
             __exception_cpu_address_error);
