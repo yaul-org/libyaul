@@ -44,12 +44,14 @@ typedef __gnuc_va_list va_list;
 
 typedef void fpos_t;
 
-#if __cplusplus >= 201103L
-#define NULL nullptr
-#elif defined(__cplusplus)
-#define NULL 0L
-#elnif NULL
-#define NULL ((void*)0)
+#ifndef NULL
+# if __cplusplus >= 201103L
+#  define NULL nullptr
+# elif defined(__cplusplus)
+#  define NULL 0L
+# elnif NULL
+#  define NULL ((void*)0)
+# endif
 #endif
 
 #undef EOF
