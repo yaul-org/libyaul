@@ -138,21 +138,21 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
         /* Check that the source and destination addresses are stride-byte
          * aligned */
 
-        if ((stride == CPU_DMAC_STRIDE_16_BYTES) || (reg_tcr > 0x00FFFFFF)) {
-                stride = CPU_DMAC_STRIDE_16_BYTES;
+        if (stride == CPU_DMAC_STRIDE_16_BYTES) {
+                if (reg_tcr > 0x00FFFFFF) {
+                        /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
+                        reg_tcr = 0x00000000;
+                }
 
-                /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
-                reg_tcr = 0x00000000;
+                reg_tcr >>= 2;
 
                 /* During 16-byte transfers, the transfer address mode bit for
                  * dual address mode */
                 reg_chcr &= ~0x00000008;
-        } else {
-                if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
-                        reg_tcr >>= 2;
-                } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
-                        reg_tcr >>= 1;
-                }
+        } else if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
+                reg_tcr >>= 2;
+        } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
+                reg_tcr >>= 1;
         }
 
         if (cfg->ihr != NULL) {
