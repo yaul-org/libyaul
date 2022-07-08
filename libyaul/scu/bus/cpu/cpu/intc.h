@@ -85,6 +85,8 @@ typedef enum cpu_intc_interrupt {
         /// Interrupt vector.
         CPU_INTC_INTERRUPT_BREAK               = 0x20,
         /// Interrupt vector.
+        CPU_INTC_INTERRUPT_NETLINK             = 0x5C,
+        /// Interrupt vector.
         CPU_INTC_INTERRUPT_SCI_ERI             = 0x60,
         /// Interrupt vector.
         CPU_INTC_INTERRUPT_SCI_RXI             = 0x61,
