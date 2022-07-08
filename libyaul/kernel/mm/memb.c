@@ -262,7 +262,7 @@ memb_size(memb_t *memb)
  * returned.
  */
 bool
-memb_bounds(memb_t *memb, void *addr)
+memb_bounds(memb_t *memb, const void *addr)
 {
         return MEMB_PTR_BOUND(memb, addr);
 }
