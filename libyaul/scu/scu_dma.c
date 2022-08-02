@@ -16,16 +16,9 @@
 
 #include <scu-internal.h>
 
-/* Debug: Keep a copy of the SCU-DMA registers for each level */
-#define DEBUG_COPY_DMA_HANDLES_ENABLE 0
-
 /* Each block of SCU-DMA registers is 0x20 bytes, and luckily, each block is
  * contiguous */
 #define REGISTER_BLOCK_OFFSET(level) (((level) & SCU_DMA_LEVEL_COUNT) << 5)
-
-#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
-static scu_dma_handle_t _dma_handles[SCU_DMA_LEVEL_COUNT];
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
 #define LEVEL_STATE_IDLING      0x00
 #define LEVEL_STATE_WORKING     0x01
@@ -64,12 +57,6 @@ __scu_dma_init(void)
 
                 callback_init(&level_state->callback);
         }
-
-#if DEBUG_COPY_DMA_HANDLES_ENABLE
-        (void)memset(&_dma_handles[0], 0x00, sizeof(scu_dma_handle_t));
-        (void)memset(&_dma_handles[1], 0x00, sizeof(scu_dma_handle_t));
-        (void)memset(&_dma_handles[2], 0x00, sizeof(scu_dma_handle_t));
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
         scu_ic_mask_chg(~scu_mask, SCU_IC_MASK_NONE);
 }
@@ -174,10 +161,6 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
         assert(level <= 2);
 
         assert(start_factor <= 7);
-
-#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
-        (void)memcpy(&_dma_handles[level], handle, sizeof(scu_dma_handle_t));
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
         /* To prevent operation errors, do not activate DMA level 2 during DMA
          * level 1 operation. */
