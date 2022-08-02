@@ -1,6 +1,0 @@
-[submodule "examples"]
-	path = examples
-	url = http://github.com/ijacquez/libyaul-examples.git
-[submodule "build-scripts"]
-	path = build-scripts
-	url = https://github.com/ijacquez/libyaul-build-scripts.git
