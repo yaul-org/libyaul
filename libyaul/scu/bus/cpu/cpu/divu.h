@@ -124,7 +124,7 @@ cpu_divu_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0x7FFF);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0x0FFF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 

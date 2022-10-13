@@ -14,6 +14,7 @@
 #include <sys/cdefs.h>
 
 #include <cpu/cache.h>
+#include <cpu/intc.h>
 
 #include <cd-block.h>
 
@@ -31,6 +32,8 @@ user_init(void)
 static void __used __section(".init")
 _init(void)
 {
+        cpu_intc_mask_set(15);
+
         __atexit_init();
 
         __mm_init();
@@ -42,6 +45,8 @@ _init(void)
         __vdp_init();
 
         cpu_cache_purge();
+
+        cpu_intc_mask_set(0);
 
         user_init();
 

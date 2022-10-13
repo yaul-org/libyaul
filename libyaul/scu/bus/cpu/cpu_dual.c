@@ -132,7 +132,7 @@ __slave_polling_entry(void)
         }
 }
 
-void __noreturn __used
+void __noreturn __aligned(16) __used
 __slave_ici_entry(void)
 {
         _slave_init();
@@ -146,13 +146,22 @@ __slave_ici_entry(void)
 static void
 _slave_init(void)
 {
+        cpu_intc_mask_set(15);
+
         __cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
-
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         __cpu_dmac_init();
 
-        cpu_intc_mask_set(0);
+        /* If there is a pending interrupt, SCU interrupts 0x41 and 0x43 are
+         * raised even if both these interrupts are masked. The only way to
+         * disable the interrupts from being raised is by setting the priority
+         * level to 14.
+         *
+         * In the case where an interrupt does need to be raised, for example
+         * the CPU-FRT ICI interrupt, then its priority level must be set to
+         * 15 */
+        cpu_intc_mask_set(14);
 
         cpu_cache_purge();
 }

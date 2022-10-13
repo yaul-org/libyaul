@@ -73,7 +73,8 @@ scu_timer_line_enable(void)
 
 /// @brief Set behavior of the SCU timer #1 interrupt to occur at every line.
 ///
-/// This function also enables the SCU timers.
+/// This function also enables the SCU timers. To turn timers on/off,
+/// use @p scu_timer_enable and @p scu_timer_disable.
 ///
 /// @see scu_timer_line_enable
 static inline void __always_inline

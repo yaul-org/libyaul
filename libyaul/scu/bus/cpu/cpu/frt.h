@@ -136,7 +136,7 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 {
         /* Set the interrupt priority level for FRT (shared amongst all FRT
          * related interrupts */
-        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF7FF);
+        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF0FF);
         MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 

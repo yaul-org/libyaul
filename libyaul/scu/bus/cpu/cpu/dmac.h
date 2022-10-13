@@ -199,7 +199,7 @@ cpu_dmac_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF7FF);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF0FF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 

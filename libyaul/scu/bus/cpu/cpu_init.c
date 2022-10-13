@@ -63,6 +63,7 @@ __cpu_init(void)
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         cpu_sci_init();
         __cpu_dmac_init();
+
         cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
 }
 

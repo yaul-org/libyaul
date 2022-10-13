@@ -108,7 +108,7 @@ cpu_wdt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF7F);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF0F);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
 

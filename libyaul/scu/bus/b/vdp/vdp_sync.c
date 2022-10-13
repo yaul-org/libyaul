@@ -240,9 +240,6 @@ static void _vblank_out_handler(void);
 void
 __vdp_sync_init(void)
 {
-        const uint32_t sr_mask = cpu_intc_mask_get();
-        cpu_intc_mask_set(15);
-
         callback_init(&_vblank_in_callback);
         callback_init(&_vblank_out_callback);
 
@@ -259,8 +256,6 @@ __vdp_sync_init(void)
         scu_ic_ihr_set(SCU_IC_INTERRUPT_VBLANK_OUT, _vblank_out_handler);
 
         scu_ic_mask_chg(SCU_MASK_UNMASK, SCU_IC_MASK_NONE);
-
-        cpu_intc_mask_set(sr_mask);
 }
 
 void
