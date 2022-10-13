@@ -59,17 +59,17 @@ cpu_frt_init(uint8_t clock_div)
         cpu_frt_ocb_clear();
         cpu_frt_ovi_clear();
 
-        const uint8_t which_cpu = cpu_dual_executor_get();
+        const cpu_intc_interrupt_t vbr_base = ((cpu_dual_executor_get()) == CPU_MASTER)
+            ? CPU_INTC_INTERRUPT_MASTER_BASE
+            : CPU_INTC_INTERRUPT_SLAVE_BASE;
 
-        if (which_cpu == CPU_MASTER) {
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
+        cpu_intc_ihr_set(vbr_base + CPU_INTC_INTERRUPT_FRT_OCI, _frt_oci_handler);
+        cpu_intc_ihr_set(vbr_base + CPU_INTC_INTERRUPT_FRT_OVI, _frt_ovi_handler);
 
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OCI + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _frt_oci_handler);
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_FRT_OVI + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _frt_ovi_handler);
-        }
+        cpu_intc_ihr_set(vbr_base + CPU_INTC_INTERRUPT_FRT_OCI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+            _frt_oci_handler);
+        cpu_intc_ihr_set(vbr_base + CPU_INTC_INTERRUPT_FRT_OVI + CPU_INTC_INTERRUPT_SLAVE_BASE,
+            _frt_ovi_handler);
 
         cpu_frt_count_set(0);
 }

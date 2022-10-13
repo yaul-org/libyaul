@@ -39,9 +39,6 @@ static inline void _flags_update(uint32_t ppaf_bits);
 void
 __scu_dsp_init(void)
 {
-        /* Disable DSP END interrupt */
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
-
         scu_dsp_program_clear();
 
         scu_dsp_end_clear();

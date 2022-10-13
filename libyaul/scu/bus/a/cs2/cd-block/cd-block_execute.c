@@ -30,8 +30,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         uint32_t w;
 
         /* Disable interrupts */
-        uint32_t mask;
-        mask = cpu_intc_mask_get();
+        const uint8_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
         error = -1;
@@ -82,7 +81,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         error = 0;
 
 busy:
-        cpu_intc_mask_set(mask);
+        cpu_intc_mask_set(sr_mask);
 
         /* Command executed was successful */
         return error;

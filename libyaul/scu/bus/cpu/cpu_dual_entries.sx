@@ -11,11 +11,10 @@
 .type \symbol, @function
 
 \symbol:
-         mov.l 1f, r15
-         mov.l 2f, r1
-         mov r15, r14
-         jmp @r1
-         nop
+        mov.l 1f, r15
+        mov.l 2f, r1
+        jmp @r1
+        mov r15, r14
 
 .align 4
 1: .long __slave_stack

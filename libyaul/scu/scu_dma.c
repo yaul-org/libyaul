@@ -16,6 +16,12 @@
 
 #include <scu-internal.h>
 
+#define SCU_MASK_MASK   (SCU_IC_MASK_LEVEL_0_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_1_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_2_DMA_END |                         \
+                         SCU_IC_MASK_DMA_ILLEGAL)
+#define SCU_MASK_UNMASK (SCU_IC_MASK_ALL & ~SCU_MASK_MASK)
+
 /* Each block of SCU-DMA registers is 0x20 bytes, and luckily, each block is
  * contiguous */
 #define REGISTER_BLOCK_OFFSET(level) (((level) & SCU_DMA_LEVEL_COUNT) << 5)
@@ -37,18 +43,11 @@ __scu_dma_init(void)
 {
         scu_dma_stop();
 
-        const uint32_t scu_mask = SCU_IC_MASK_LEVEL_0_DMA_END |
-                                  SCU_IC_MASK_LEVEL_1_DMA_END |
-                                  SCU_IC_MASK_LEVEL_2_DMA_END |
-                                  SCU_IC_MASK_DMA_ILLEGAL;
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, scu_mask);
-
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, _scu_dma_level0_handler);
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, _scu_dma_level1_handler);
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, _scu_dma_level2_handler);
 
-        scu_dma_illegal_set(NULL);
+        scu_dma_illegal_clear();
 
         for (scu_dma_level_t level = 0; level <= 2; level++) {
                 struct level_state * const level_state = &_level_state[level];
@@ -58,7 +57,7 @@ __scu_dma_init(void)
                 callback_init(&level_state->callback);
         }
 
-        scu_ic_mask_chg(~scu_mask, SCU_IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_UNMASK, SCU_IC_MASK_NONE);
 }
 
 void
