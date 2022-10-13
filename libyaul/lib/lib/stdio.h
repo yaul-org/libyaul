@@ -42,8 +42,6 @@ typedef __gnuc_va_list va_list;
 #define _VA_LIST_DEFINED
 #endif /* !_VA_LIST_DEFINED */
 
-typedef void fpos_t;
-
 #ifndef NULL
 # if __cplusplus >= 201103L
 #  define NULL nullptr
@@ -114,12 +112,14 @@ struct _IO_FILE {
         FILE *next;
 };
 
+typedef long fpos_t;
+
 extern FILE * const stdin;
 extern FILE * const stdout;
 extern FILE * const stderr;
 
-FILE *fopen(const char *__restrict, const char *__restrict) __weak;
-FILE *freopen(const char *__restrict, const char *__restrict, FILE *__restrict);
+FILE *fopen(const char * __restrict, const char * __restrict) __weak;
+FILE *freopen(const char * __restrict, const char * __restrict, FILE * __restrict);
 int fclose(FILE *);
 
 int remove(const char *);
@@ -134,11 +134,11 @@ int fseek(FILE *, long, int);
 long ftell(FILE *);
 void rewind(FILE *);
 
-int fgetpos(FILE *__restrict, fpos_t *__restrict);
+int fgetpos(FILE * __restrict, fpos_t * __restrict);
 int fsetpos(FILE *, const fpos_t *);
 
-size_t fread(void *__restrict, size_t, size_t, FILE *__restrict);
-size_t fwrite(const void *__restrict, size_t, size_t, FILE *__restrict);
+size_t fread(void * __restrict, size_t, size_t, FILE * __restrict);
+size_t fwrite(const void * __restrict, size_t, size_t, FILE * __restrict);
 
 int fgetc(FILE *);
 int getc(FILE *);
@@ -149,29 +149,29 @@ int fputc(int, FILE *);
 int putc(int, FILE *);
 int putchar(int);
 
-char *fgets(char *__restrict, int, FILE *__restrict);
+char *fgets(char * __restrict, int, FILE * __restrict);
 
 #if (__STDC_VERSION__ < 201112L)
 char *gets(char *);
 #endif
 
-int fputs(const char *__restrict, FILE *__restrict);
+int fputs(const char * __restrict, FILE * __restrict);
 int puts(const char *);
 
 int printf(const char * __restrict, ...) __printflike(1, 2);
-int fprintf(FILE *__restrict, const char *__restrict, ...) __printflike(2, 3);
+int fprintf(FILE * __restrict, const char * __restrict, ...) __printflike(2, 3);
 int sprintf(char * __restrict, const char * __restrict, ...) __printflike(2, 3);
 int snprintf(char * __restrict, size_t, const char * __restrict, ...) __printflike(3, 4);
 
 int vsprintf(char * __restrict, const char * __restrict, va_list);
-int vprintf(const char *__restrict, va_list);
-int vfprintf(FILE *__restrict, const char *__restrict, va_list);
-int vsnprintf(char *__restrict, size_t, const char *__restrict, va_list);
+int vprintf(const char * __restrict, va_list);
+int vfprintf(FILE * __restrict, const char * __restrict, va_list);
+int vsnprintf(char * __restrict, size_t, const char * __restrict, va_list);
 
 void perror(const char *);
 
-int setvbuf(FILE *__restrict, char *__restrict, int, size_t);
-void setbuf(FILE *__restrict, char *__restrict);
+int setvbuf(FILE * __restrict, char * __restrict, int, size_t);
+void setbuf(FILE * __restrict, char * __restrict);
 
 char *tmpnam(char *);
 FILE *tmpfile(void);
