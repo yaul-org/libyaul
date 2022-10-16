@@ -12,22 +12,22 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls)
+vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls_format)
 {
 #ifdef DEBUG
         assert((ls->scroll_screen == VDP2_SCRN_NBG0) ||
                (ls->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
-        const uint16_t lstau = VDP2_VRAM_BANK(ls->table);
-        const uint16_t lstal = (ls->table >> 1) & 0xFFFF;
+        const uint16_t lstau = VDP2_VRAM_BANK(ls_format->table);
+        const uint16_t lstal = (ls_format->table >> 1) & 0xFFFF;
 
-        const uint16_t interval_bit = uint32_log2(ls->interval & 0x0F);
+        const uint16_t interval_bit = uint32_log2(ls_format->interval & 0x0F);
 
-        switch (ls->scroll_screen) {
+        switch (ls_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->scrctl &= 0xFFC1;
-                _state_vdp2()->regs->scrctl |= ls->enable << 1;
+                _state_vdp2()->regs->scrctl |= ls_format->enable << 1;
                 _state_vdp2()->regs->scrctl |= interval_bit << 4;
 
                 _state_vdp2()->regs->lsta0u = lstau;
@@ -35,7 +35,7 @@ vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls)
                 break;
         case VDP2_SCRN_NBG1:
                 _state_vdp2()->regs->scrctl &= 0xC1FF;
-                _state_vdp2()->regs->scrctl |= ls->enable << 9;
+                _state_vdp2()->regs->scrctl |= ls_format->enable << 9;
                 _state_vdp2()->regs->scrctl |= interval_bit << 12;
 
                 _state_vdp2()->regs->lsta1u = lstau;

@@ -127,14 +127,15 @@ typedef struct vdp2_vram_cycp {
         vdp2_vram_cycp_bank_t pt[4];
 } __packed vdp2_vram_cycp_t;
 
-extern void vdp2_vram_control_set(const vdp2_vram_ctl_t *);
+extern void vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl);
 
-extern void vdp2_vram_cycp_set(const vdp2_vram_cycp_t *);
+extern void vdp2_vram_cycp_set(const vdp2_vram_cycp_t *vram_cycp);
 extern void vdp2_vram_cycp_clear(void);
 
-extern vdp2_vram_cycp_bank_t vdp2_vram_cycp_bank_get(vdp2_vram_bank_t);
-extern void vdp2_vram_cycp_bank_set(vdp2_vram_bank_t, const vdp2_vram_cycp_bank_t *);
-extern void vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t);
+extern vdp2_vram_cycp_bank_t vdp2_vram_cycp_bank_get(vdp2_vram_bank_t bank);
+extern void vdp2_vram_cycp_bank_set(vdp2_vram_bank_t bank,
+    const vdp2_vram_cycp_bank_t *cycp_bank);
+extern void vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t bank);
 
 __END_DECLS
 
