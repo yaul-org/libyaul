@@ -112,6 +112,17 @@ cpu_wdt_interrupt_priority_set(uint8_t priority)
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
 
+/// @ingroup CPU_INTC_HELPERS
+/// @brief Clear the interrupt handler for the CPU-WDT timer mode interrupt.
+///
+/// @param mode The mode.
+///
+/// @see cpu_wdt_timer_mode_set
+#define cpu_wdt_timer_mode_clear(mode)                                         \
+do {                                                                           \
+        cpu_wdt_timer_mode_clear(mode, NULL);                                  \
+} while (false)
+
 /// @brief Fully initialize the CPU-WDT depending with a specific clock divisor.
 ///
 /// @param clock_div The clock divisor.

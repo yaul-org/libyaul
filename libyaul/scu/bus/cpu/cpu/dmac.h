@@ -87,10 +87,10 @@ typedef uint8_t cpu_dmac_channel_t;
 
 /// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
-        /// Channel
+        /// Channel.
         cpu_dmac_channel_t channel:2;
 
-        /// Source mode
+        /// Source mode.
         cpu_dmac_src_t src_mode:2;
 
         /// Destination mode.

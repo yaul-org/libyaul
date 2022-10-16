@@ -142,6 +142,7 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCA interrupt.
+///
 /// @see cpu_frt_oca_set
 #define cpu_frt_oca_clear()                                                    \
 do {                                                                           \
@@ -150,6 +151,7 @@ do {                                                                           \
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCB interrupt.
+///
 /// @see cpu_frt_ocb_set
 #define cpu_frt_ocb_clear()                                                    \
 do {                                                                           \
@@ -158,6 +160,7 @@ do {                                                                           \
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OVI interrupt.
+///
 /// @see cpu_frt_ovi_set
 #define cpu_frt_ovi_clear()                                                    \
 do {                                                                           \
@@ -181,8 +184,8 @@ extern void cpu_frt_init(uint8_t clock_div);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler.
 /// @param count The tick count to trigger OCA on.
+/// @param ihr   The interrupt handler.
 ///
 /// @see cpu_frt_oca_clear
 extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
@@ -192,8 +195,8 @@ extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler.
 /// @param count The tick count to trigger OCB on.
+/// @param ihr   The interrupt handler.
 ///
 /// @see cpu_frt_ocb_clear
 extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr);
