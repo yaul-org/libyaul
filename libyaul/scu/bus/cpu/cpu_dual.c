@@ -96,30 +96,6 @@ cpu_dual_slave_set(cpu_dual_slave_entry_t entry)
         }
 }
 
-cpu_which_t
-cpu_dual_executor_get(void)
-{
-        extern uint32_t _master_stack;
-        extern uint32_t _master_stack_end;
-
-        extern uint32_t _slave_stack;
-        extern uint32_t _slave_stack_end;
-
-        const uint32_t stack = cpu_reg_sp_get();
-
-        if ((stack >= (uint32_t)&_master_stack_end) &&
-            (stack <= (uint32_t)&_master_stack)) {
-                return CPU_MASTER;
-        }
-
-        if ((stack >= (uint32_t)&_slave_stack_end) &&
-            (stack <= (uint32_t)&_slave_stack)) {
-                return CPU_SLAVE;
-        }
-
-        return -1;
-}
-
 void __noreturn __aligned(16) __used
 __slave_polling_entry(void)
 {
@@ -153,14 +129,12 @@ _slave_init(void)
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
         __cpu_dmac_init();
 
-        /* If there is a pending interrupt, SCU interrupts 0x41 and 0x43 are
-         * raised even if both these interrupts are masked. The only way to
-         * disable the interrupts from being raised is by setting the priority
-         * level to 14.
+        /* SCU interrupts 0x41 (H-BLANK-IN, IRL2) and 0x41 (V-BLANK-IN, IRL6)
+         * can only be masked is by setting the priority level to 14.
          *
          * In the case where an interrupt does need to be raised, for example
-         * the CPU-FRT ICI interrupt, then its priority level must be set to
-         * 15 */
+         * the CPU-FRT ICI interrupt, then its priority level must be set to 15
+         * through the CPU(IPRA) and CPU(IPRB) I/O registers */
         cpu_intc_mask_set(14);
 
         cpu_cache_purge();

@@ -412,6 +412,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:wdt.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:which.h:yaul/scu/bus/cpu/cpu/ \
 	\
 	./scu/bus/cpu/smpc/:smpc.h:yaul/scu/bus/cpu/smpc/ \
 	./scu/bus/cpu/smpc/smpc/:peripheral.h:yaul/scu/bus/cpu/smpc/smpc/ \

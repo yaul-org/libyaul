@@ -13,6 +13,7 @@
 #include <scu/map.h>
 #include <cpu/frt.h>
 #include <cpu/registers.h>
+#include <cpu/which.h>
 
 __BEGIN_DECLS
 
@@ -20,14 +21,6 @@ __BEGIN_DECLS
 
 /// @addtogroup CPU_DUAL
 /// @{
-
-/// ID for which CPU.
-typedef enum cpu_which {
-        /// ID for master CPU
-        CPU_MASTER,
-        /// ID for slave CPU.
-        CPU_SLAVE,
-} cpu_which_t;
 
 /// The communication mode used for the slave CPU.
 typedef enum cpu_dual_comm_mode {
@@ -123,7 +116,7 @@ cpu_dual_master_stack_get(void)
 ///
 /// @note The stack grows downward toward zero. Be sure to also specify an
 /// address on a 4-byte boundary.
-/// 
+///
 /// @returns A pointer.
 static inline void * __always_inline
 cpu_dual_slave_stack_get(void)
@@ -181,11 +174,12 @@ extern void cpu_dual_slave_set(cpu_dual_slave_entry_t entry);
 
 /// @brief Obtain which of the two CPUs this function was called on.
 ///
-/// @details Currently, the way the which CPU is determined is by comparing the
-/// stack pointers.
-///
 /// @returns Which CPU.
-extern cpu_which_t cpu_dual_executor_get(void);
+static inline cpu_which_t __always_inline
+cpu_dual_executor_get(void)
+{
+        return (MEMORY_READ(16, CPU(BCR1)) >> 15);
+}
 
 /// @}
 

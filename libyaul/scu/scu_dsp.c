@@ -8,11 +8,11 @@
 #include <scu/dsp.h>
 #include <scu/ic.h>
 
+#include <bios-internal.h>
+
 #include <scu-internal.h>
 
 static void _dsp_end_handler(void);
-
-static void _default_ihr(void);
 
 #define PPAF_LOAD_ENABLE        (1 << 15UL)
 #define PPAF_EX                 (1 << 16UL)
@@ -31,7 +31,7 @@ static volatile struct {
         .end_bit = true
 };
 
-static scu_dsp_ihr_t _dsp_end_ihr = _default_ihr;
+static scu_dsp_ihr_t _dsp_end_ihr = __BIOS_DEFAULT_HANDLER;
 
 static inline uint32_t _ppaf_read(void);
 static inline void _flags_update(uint32_t ppaf_bits);
@@ -54,7 +54,7 @@ scu_dsp_end_set(scu_dsp_ihr_t ihr)
 {
         scu_ic_mask_chg(SCU_IC_MASK_ALL, SCU_IC_MASK_DSP_END);
 
-        _dsp_end_ihr = _default_ihr;
+        _dsp_end_ihr = __BIOS_DEFAULT_HANDLER;
 
         if (ihr != NULL) {
                 _dsp_end_ihr = ihr;
@@ -283,11 +283,6 @@ _dsp_end_handler(void)
         _ppaf_read();
 
         _dsp_end_ihr();
-}
-
-static void
-_default_ihr(void)
-{
 }
 
 static inline uint32_t
