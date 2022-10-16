@@ -63,8 +63,8 @@ __BEGIN_DECLS
 typedef uint32_t vdp2_cram_mode_t;
 
 extern vdp2_cram_mode_t vdp2_cram_mode_get(void);
-extern void vdp2_cram_mode_set(vdp2_cram_mode_t);
-extern void vdp2_cram_offset_set(vdp2_scrn_t, vdp2_cram_t);
+extern void vdp2_cram_mode_set(vdp2_cram_mode_t mode);
+extern void vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram);
 
 __END_DECLS
 

@@ -265,15 +265,16 @@ vdp1_cmdt_orderlist_end(vdp1_cmdt_orderlist_t *cmdt_orderlist)
         dma_xfer->src |= SCU_DMA_INDIRECT_TABLE_END;
 }
 
-extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t);
-extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *);
-extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *, vdp1_cmdt_t *);
+extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t count);
+extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *cmdt_list);
+extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *cmdt_list, vdp1_cmdt_t *cmdts);
 
-extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t);
-extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *);
-extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *, uint16_t);
-extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *,
-    const vdp1_cmdt_t *, uint16_t);
+extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t count);
+extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *cmdt_orderlist);
+extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *cmdt_orderlist,
+    uint16_t count);
+extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist,
+    const vdp1_cmdt_t *cmdt_base, uint16_t count);
 
 static inline void __always_inline
 vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,

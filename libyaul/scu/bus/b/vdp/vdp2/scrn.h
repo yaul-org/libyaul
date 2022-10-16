@@ -402,46 +402,48 @@ extern void vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram,
     const uint16_t *buffer, const uint32_t count);
 extern void vdp2_scrn_lncl_sync(void);
 
-extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
+extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *bitmap_format);
 
-extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *cell_format);
 
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t,
-    const vdp2_scrn_color_offset_rgb_t * const);
-extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, vdp2_scrn_color_offset_t);
-extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
+extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
+    const vdp2_scrn_color_offset_rgb_t * const rgb);
+extern void vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen,
+    vdp2_scrn_color_offset_t select);
+extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen);
 
 extern void vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask);
 extern void vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask);
 extern void vdp2_scrn_display_clear(void);
 
-extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *);
+extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls_format);
 
-extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *);
-extern void vdp2_scrn_vcs_unset(vdp2_scrn_t);
+extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs_format);
+extern void vdp2_scrn_vcs_unset(vdp2_scrn_t scroll_screen);
 extern void vdp2_scrn_vcs_clear(void);
 
-extern void vdp2_scrn_mosaic_set(vdp2_scrn_t);
-extern void vdp2_scrn_mosaic_unset(vdp2_scrn_t);
+extern void vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen);
+extern void vdp2_scrn_mosaic_unset(vdp2_scrn_t scroll_screen);
 extern void vdp2_scrn_mosaic_clear(void);
-extern void vdp2_scrn_mosaic_horizontal_set(uint8_t);
-extern void vdp2_scrn_mosaic_vertical_set(uint8_t);
+extern void vdp2_scrn_mosaic_horizontal_set(uint8_t horizontal);
+extern void vdp2_scrn_mosaic_vertical_set(uint8_t vertical);
 
-extern void vdp2_scrn_priority_set(vdp2_scrn_t, uint8_t);
-extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t);
+extern void vdp2_scrn_priority_set(vdp2_scrn_t scroll_screen, uint8_t priority);
+extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen);
 
-extern void vdp2_scrn_reduction_set(vdp2_scrn_t, vdp2_scrn_reduction_t);
-extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t, q0_3_8_t);
-extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t, q0_3_8_t);
+extern void vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen,
+    vdp2_scrn_reduction_t reduction);
+extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
+extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
 
-extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t, fix16_t);
+extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t scroll_screen, fix16_t scroll);
+extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta);
+extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t scroll_screen, fix16_t scroll);
+extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t scroll_screen, fix16_t delta);
 
-extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t,
-    vdp2_scrn_sf_code_range_t);
+extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t code,
+    vdp2_scrn_sf_code_range_t code_range);
 
 __END_DECLS
 
