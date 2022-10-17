@@ -178,7 +178,7 @@ extern void cpu_dual_slave_set(cpu_dual_slave_entry_t entry);
 static inline cpu_which_t __always_inline
 cpu_dual_executor_get(void)
 {
-        return (MEMORY_READ(16, CPU(BCR1)) >> 15);
+        return (cpu_which_t)(MEMORY_READ(16, CPU(BCR1)) >> 15);
 }
 
 /// @}
