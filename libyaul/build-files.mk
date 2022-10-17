@@ -42,10 +42,6 @@ LIB_SRCS:= \
 	common/reset-internal.c
 
 LIB_SRCS+= \
-	gdb/gdb.c \
-	gdb/gdb-ihr.sx
-
-LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
 	kernel/dbgio/devices/null.c \
 	kernel/dbgio/devices/vdp1.c \
@@ -324,9 +320,6 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./ip/:ip.h:yaul/ip/
-
-INSTALL_HEADER_FILES+= \
-	./gdb/:gdb.h:yaul/gdb/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/

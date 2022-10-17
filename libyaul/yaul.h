@@ -44,8 +44,6 @@
 /* Kernel */
 #include <ip/ip.h>
 
-#include <gdb/gdb.h>
-
 #include <dbgio/dbgio.h>
 
 #include <math.h>
