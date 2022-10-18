@@ -188,7 +188,7 @@ typedef struct smpc_peripheral_keyboard {
 
                 uint8_t keycode;
         } __packed button;
-} __packed __may_alias smpc_peripheral_keyboard_t;
+} __may_alias smpc_peripheral_keyboard_t;
 
 typedef struct smpc_peripheral_mouse {
         bool connected;
@@ -210,10 +210,10 @@ typedef struct smpc_peripheral_mouse {
                 uint8_t x;
                 uint8_t y;
         } __packed button;
-} __packed __may_alias smpc_peripheral_mouse_t;
+} __may_alias smpc_peripheral_mouse_t;
 
 typedef struct smpc_peripheral_analog {
-        bool connected; /* Number of peripherals connected */
+        bool connected;
         uint8_t port;
         uint8_t type;
         uint8_t size;
@@ -317,7 +317,7 @@ typedef struct smpc_peripheral_analog {
 #undef REPR_DIGITAL
 
         struct smpc_peripheral_port *parent;
-} __packed smpc_peripheral_analog_t;
+} smpc_peripheral_analog_t;
 
 typedef struct smpc_peripheral_racing {
         bool connected;
@@ -343,10 +343,10 @@ typedef struct smpc_peripheral_racing {
 
                 uint8_t wheel;
         } __packed button;
-} __packed __may_alias smpc_peripheral_racing_t;
+} __may_alias smpc_peripheral_racing_t;
 
 typedef struct smpc_peripheral_digital {
-        bool connected; /* Number of peripherals connected */
+        bool connected;
         uint8_t port;
         uint8_t type;
         uint8_t size;
@@ -402,7 +402,7 @@ typedef struct smpc_peripheral_digital {
 #undef REPR
 
         struct smpc_peripheral_port *parent;
-} __packed smpc_peripheral_digital_t;
+} smpc_peripheral_digital_t;
 
 typedef struct smpc_peripheral smpc_peripheral_t;
 typedef struct smpc_peripheral_port smpc_peripheral_port_t;
@@ -429,14 +429,14 @@ struct smpc_peripheral_port {
 
 extern void smpc_peripheral_init(void);
 
-extern void smpc_peripheral_analog_get(smpc_peripheral_t *peripheral,
+extern void smpc_peripheral_analog_get(const smpc_peripheral_t *peripheral,
     smpc_peripheral_analog_t *analog);
 extern void smpc_peripheral_analog_port(uint8_t port,
-    smpc_peripheral_analog_t *peripheral);
-extern void smpc_peripheral_digital_get(smpc_peripheral_t *peripheral,
+    smpc_peripheral_analog_t *analog);
+extern void smpc_peripheral_digital_get(const smpc_peripheral_t *peripheral,
     smpc_peripheral_digital_t *digital);
 extern void smpc_peripheral_digital_port(uint8_t port,
-    smpc_peripheral_digital_t *peripheral);
+    smpc_peripheral_digital_t *digital);
 extern const smpc_peripheral_keyboard_t *smpc_peripheral_keyboard_port(uint8_t port);
 extern const smpc_peripheral_mouse_t *smpc_peripheral_mouse_port(uint8_t port);
 extern const smpc_peripheral_racing_t *smpc_peripheral_racing_port(uint8_t port);

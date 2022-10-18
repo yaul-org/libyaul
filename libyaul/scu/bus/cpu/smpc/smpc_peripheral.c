@@ -60,8 +60,7 @@
 
 smpc_time_t __smpc_time;
 
-smpc_peripheral_port_t __smpc_peripheral_port_1;
-smpc_peripheral_port_t __smpc_peripheral_port_2;
+smpc_peripheral_port_t __smpc_peripheral_ports[2];
 
 static volatile bool _collection_complete = false;
 static volatile uint32_t _oreg_offset = 0;
@@ -82,18 +81,18 @@ static void _system_manager_handler(void);
 /* A memory pool that holds two peripherals directly connected to each port that
  * also hold MAX_PERIPHERALS (6) each making a total of 14 possible peripherals
  * connected at one time */
-MEMB(peripherals, smpc_peripheral_t, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
+MEMB(_peripherals_memb, smpc_peripheral_t, (2 * MAX_PERIPHERALS) + MAX_PORTS, 4);
 
 void
 smpc_peripheral_init(void)
 {
-        memb_init(&peripherals);
+        memb_init(&_peripherals_memb);
 
-        __smpc_peripheral_port_1.peripheral = _peripheral_alloc();
-        TAILQ_INIT(&__smpc_peripheral_port_1.peripherals);
+        __smpc_peripheral_ports[0].peripheral = _peripheral_alloc();
+        TAILQ_INIT(&__smpc_peripheral_ports[0].peripherals);
 
-        __smpc_peripheral_port_2.peripheral = _peripheral_alloc();
-        TAILQ_INIT(&__smpc_peripheral_port_2.peripherals);
+        __smpc_peripheral_ports[1].peripheral = _peripheral_alloc();
+        TAILQ_INIT(&__smpc_peripheral_ports[1].peripherals);
 
         /* Set both ports to "SMPC" control mode */
         MEMORY_WRITE(8, SMPC(EXLE1), 0x00);
@@ -120,42 +119,21 @@ smpc_peripheral_intback_issue(void)
 void
 smpc_peripheral_process(void)
 {
-        static smpc_peripheral_port_t * const peripheral_ports[] = {
-                &__smpc_peripheral_port_1,
-                &__smpc_peripheral_port_2,
-                NULL
-        };
-
         if (!_collection_complete) {
                 return;
         }
 
         _collection_complete = false;
 
-        _oreg_offset = 0;
-
         /* Ignore OREG0 */
-        _oreg_offset++;
 
-        __smpc_time.year = (OREG_GET(_oreg_offset) << 8) | OREG_GET(_oreg_offset + 1);
-        _oreg_offset++;
-        _oreg_offset++;
-
-        __smpc_time.week_day = OREG_GET(_oreg_offset) >> 4;
-        __smpc_time.month = OREG_GET(_oreg_offset) & 0x0F;
-        _oreg_offset++;
-
-        __smpc_time.day = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        __smpc_time.hours = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        __smpc_time.minutes = OREG_GET(_oreg_offset);
-        _oreg_offset++;
-
-        __smpc_time.seconds = OREG_GET(_oreg_offset);
-        _oreg_offset++;
+        __smpc_time.year = (OREG_GET(1) << 8) | OREG_GET(2);
+        __smpc_time.week_day = OREG_GET(3) >> 4;
+        __smpc_time.month = OREG_GET(3) & 0x0F;
+        __smpc_time.day = OREG_GET(4);
+        __smpc_time.hours = OREG_GET(5);
+        __smpc_time.minutes = OREG_GET(6);
+        __smpc_time.seconds = OREG_GET(7);
 
         /* Ignore OREG8
          * Ignore OREG9
@@ -163,15 +141,12 @@ smpc_peripheral_process(void)
          * Ignore OREG11
          * ... */
 
-        int32_t port_idx;
-
         /* Peripheral data starts at offset 32 (OREG0) in the OREG buffer */
         _oreg_offset = SMPC_OREGS;
 
-        for (port_idx = 0; peripheral_ports[port_idx] != NULL; port_idx++) {
-                smpc_peripheral_port_t *per_port;
-
-                per_port = peripheral_ports[port_idx];
+        for (uint32_t port_idx = 0; port_idx < MAX_PORTS; port_idx++) {
+                smpc_peripheral_port_t * const per_port =
+                    &__smpc_peripheral_ports[port_idx];
 
                 int32_t connected;
 
@@ -232,7 +207,7 @@ _peripheral_alloc(void)
 {
         smpc_peripheral_t *peripheral;
 
-        peripheral = memb_alloc(&peripherals);
+        peripheral = memb_alloc(&_peripherals_memb);
         assert(peripheral != NULL);
 
         /* Ignore all other fields if peripheral is not connected */
@@ -247,7 +222,7 @@ _peripheral_free(smpc_peripheral_t *peripheral)
         assert(peripheral != NULL);
 
         int ret __unused;
-        ret = memb_free(&peripherals, peripheral);
+        ret = memb_free(&_peripherals_memb, peripheral);
         assert(ret == 0);
 }
 
@@ -257,8 +232,8 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
 {
         uint8_t multitap_id;
 
-        uint32_t connected;
-        connected = 0;
+        uint32_t connected_count;
+        connected_count = 0;
 
         if (per_port_parent == NULL) {
                 multitap_id = PC_GET_MULTITAP_ID(_oreg_offset);
@@ -271,23 +246,23 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
                         /* ID: Clocked serial */
                 case 0x03:
                 case 0x0E:
-                        connected = PC_GET_NUM_CONNECTIONS(_oreg_offset);
+                        connected_count = PC_GET_NUM_CONNECTIONS(_oreg_offset);
                         /* At least two peripheral ports are required */
-                        connected = (connected < 2) ? 0 : connected;
+                        connected_count = (connected_count < MAX_PORTS) ? 0 : connected_count;
                         break;
                 case 0x0F:
-                        connected = PC_GET_NUM_CONNECTIONS(_oreg_offset);
+                        connected_count = PC_GET_NUM_CONNECTIONS(_oreg_offset);
                         /* Only a single peripheral can be directly connected */
-                        connected = (connected > 1) ? 0 : connected;
+                        connected_count = (connected_count > 1) ? 0 : connected_count;
                         break;
                 default:
-                        connected = 0;
+                        connected_count = 0;
                 }
 
                 _oreg_offset++;
         }
 
-        if (connected == 0) {
+        if (connected_count == 0) {
                 /* Nothing directly connected to the port */
                 return -1;
         }
@@ -296,14 +271,14 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         uint8_t size;
         uint8_t id;
 
-        if (connected > 1) {
-                peripheral->connected = connected;
+        if (connected_count > 1) {
+                peripheral->connected = connected_count;
                 peripheral->port = port;
                 peripheral->type = multitap_id;
                 peripheral->size = 0x00;
                 peripheral->parent = per_port_parent;
 
-                return connected;
+                return connected_count;
         }
 
         /* Check if the type is valid */
@@ -405,7 +380,7 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         /* Move onto the next peripheral */
         _oreg_offset += size;
 
-        return connected;
+        return connected_count;
 }
 
 static void

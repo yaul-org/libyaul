@@ -255,14 +255,8 @@ LIB_SRCS+= \
 	scu/bus/cpu/cpu_wdt.c \
 	\
 	scu/bus/cpu/smpc/smpc_init.c \
-	scu/bus/cpu/smpc/smpc_peripheral_analog_port.c \
-	scu/bus/cpu/smpc/smpc_peripheral_digital_get.c \
-	scu/bus/cpu/smpc/smpc_peripheral_digital_port.c \
-	scu/bus/cpu/smpc/smpc_peripheral_init.c \
-	scu/bus/cpu/smpc/smpc_peripheral_keyboard_port.c \
-	scu/bus/cpu/smpc/smpc_peripheral_mouse_port.c \
-	scu/bus/cpu/smpc/smpc_peripheral_racing_port.c \
-	scu/bus/cpu/smpc/smpc_peripheral_raw_port.c \
+	scu/bus/cpu/smpc/smpc_peripheral.c \
+	scu/bus/cpu/smpc/smpc_peripherals.c \
 	scu/bus/cpu/smpc/smpc_rtc.c \
 	\
 	scu/scu-internal.c \

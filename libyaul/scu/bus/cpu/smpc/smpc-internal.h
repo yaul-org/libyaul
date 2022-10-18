@@ -11,14 +11,12 @@
 #include <scu-internal.h>
 
 #include <smpc/map.h>
+#include <smpc/peripheral.h>
+#include <smpc/rtc.h>
 
-struct smpc_time;
-struct smpc_peripheral_port;
+extern smpc_time_t __smpc_time;
 
-extern struct smpc_time __smpc_time;
-
-extern struct smpc_peripheral_port __smpc_peripheral_port_1;
-extern struct smpc_peripheral_port __smpc_peripheral_port_2;
+extern smpc_peripheral_port_t __smpc_peripheral_ports[];
 
 extern void __smpc_init(void);
 
