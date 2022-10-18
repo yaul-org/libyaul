@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _BIOS_H_
-#define _BIOS_H_
+#ifndef _YAUL_BIOS_H_
+#define _YAUL_BIOS_H_
 
 #include <sys/cdefs.h>
 
@@ -29,7 +29,7 @@ bios_power_persistent_memory_get(void)
 static inline void __always_inline
 bios_clock_speed_chg(uint8_t mode)
 {
-        register uint32_t *bios_address;
+        __register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000320;
 
         ((void (*)(uint8_t))*bios_address)(mode);
@@ -38,7 +38,7 @@ bios_clock_speed_chg(uint8_t mode)
 static inline uint32_t __always_inline
 bios_clock_speed_get(void)
 {
-        register uint32_t *bios_address;
+        __register uint32_t *bios_address;
         bios_address = (uint32_t *)0x06000324;
 
         return *bios_address;
@@ -47,7 +47,7 @@ bios_clock_speed_get(void)
 static inline void __noreturn __always_inline
 bios_cd_player_execute(void)
 {
-        register uint32_t *bios_address;
+        __register uint32_t *bios_address;
         bios_address = (uint32_t *)0x0600026C;
 
         ((void (*)(void))*bios_address)();
@@ -65,4 +65,4 @@ bios_execute(void)
 
 __END_DECLS
 
-#endif /* !_BIOS_H_ */
+#endif /* !_YAUL_BIOS_H_ */

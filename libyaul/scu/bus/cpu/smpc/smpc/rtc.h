@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_RTC_H_
-#define _SMPC_RTC_H_
+#ifndef _YAUL_SMPC_RTC_H_
+#define _YAUL_SMPC_RTC_H_
 
 #include <sys/cdefs.h>
 
@@ -42,4 +42,4 @@ typedef struct cpu_smpc_time {
 
 __END_DECLS
 
-#endif /* !_SMPC_RTC_H_ */
+#endif /* !_YAUL_SMPC_RTC_H_ */

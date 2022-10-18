@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 static char *
-twobyte_strstr(const uint8_t *h, const uint8_t *n)
+_two_byte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint16_t nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
 
@@ -35,7 +35,7 @@ twobyte_strstr(const uint8_t *h, const uint8_t *n)
 }
 
 static char *
-threebyte_strstr(const uint8_t *h, const uint8_t *n)
+_three_byte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8;
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8;
@@ -46,7 +46,7 @@ threebyte_strstr(const uint8_t *h, const uint8_t *n)
 }
 
 static char *
-fourbyte_strstr(const uint8_t *h, const uint8_t *n)
+_four_byte_strstr(const uint8_t *h, const uint8_t *n)
 {
         uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
         uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8 | h[3];
@@ -59,11 +59,10 @@ fourbyte_strstr(const uint8_t *h, const uint8_t *n)
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-#define BITOP(a,b,op) \
- ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+#define BITOP(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
 static char *
-twoway_strstr(const uint8_t *h, const uint8_t *n)
+_twoway_strstr(const uint8_t *h, const uint8_t *n)
 {
         const uint8_t *z;
         size_t l, ip, jp, k, p, ms, p0, mem, mem0;
@@ -226,7 +225,7 @@ strstr(const char *h, const char *n)
         }
 
         if (!n[2]) {
-                return twobyte_strstr((void *)h, (void *)n);
+                return _two_byte_strstr((void *)h, (void *)n);
         }
 
         if (!h[2]) {
@@ -234,7 +233,7 @@ strstr(const char *h, const char *n)
         }
 
         if (!n[3]) {
-                return threebyte_strstr((void *)h, (void *)n);
+                return _three_byte_strstr((void *)h, (void *)n);
         }
 
         if (!h[3]) {
@@ -242,8 +241,8 @@ strstr(const char *h, const char *n)
         }
 
         if (!n[4]) {
-                return fourbyte_strstr((void *)h, (void *)n);
+                return _four_byte_strstr((void *)h, (void *)n);
         }
 
-        return twoway_strstr((void *)h, (void *)n);
+        return _twoway_strstr((void *)h, (void *)n);
 }

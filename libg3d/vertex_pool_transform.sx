@@ -1,0 +1,130 @@
+/*
+ * Copyright (c) 2020
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+/* -*- mode: asm -*- */
+
+.text
+.align 4
+
+.global ___asm_vertex_pool_transform
+.type ___asm_vertex_pool_transform, @function
+
+! r4: void *        State
+! r5: transform_t * Transform
+! r6: POINT *       Points
+! r7: uint32_t      Vertex count
+___asm_vertex_pool_transform:
+        mov     #12,r1                  ! Stride in bytes for each point
+        mov.l   r9,@-r15
+        mul.l   r1,r7                   ! vertex_count * 12
+        mov.l   r10,@-r15
+        sts     macl,r1
+        mov.w   REG_CPU_DSVR,r10
+        mov.l   r11,@-r15
+        mov.l   r12,@-r15
+        mov.w   REG_CPU_DVDNTH,r11
+        mov.l   r13,@-r15
+        mov.l   r14,@-r15
+        mov.l   @(20,r5),r7             ! Offset into trans->dst_matrix
+        mov     r6,r14                  ! points/current_point
+        mov.l   @(44,r4),r3             ! g3d_info_t::near
+        add     r1,r14                  ! last_point
+        mov     r5,r1
+        mov     r7,r5
+        mov.l   @(20,r4),r7             ! state::cached_inv_right
+        add     #32,r1                  ! trans
+        mov.w   REG_CPU_DVDNTL,r4
+
+.L_LOOP:
+        mov     #0,r2
+        mov     r5,r12
+        mov.l   r2,@(8,r1)              ! next_trans_proj->clip_flags = CLIP_FLAGS_NONE;
+        clrmac
+        mov     r6,r0
+        add     #32,r12                 ! trans->dst_matrix[M20]
+
+        ! Z component
+        mac.l   @r0+,@r12+
+        mac.l   @r0+,@r12+
+        mac.l   @r0+,@r12+
+        mov.l   @r12,r0
+        sts     mach,r12
+        sts     macl,r13
+        xtrct   r12,r13
+        add     r13,r0
+        mov.l   r0,@r1                  ! trans_proj::point_z = ...
+
+        ! Test: near clip
+        cmp/ge  r0,r3
+        bf      .L_NO_NEAR_CLIP
+
+        mov.l   @(8,r1),r0
+        mov.l   r3,@r1                  ! trans_proj->point_z = _state.info.near;
+        or      #1,r0
+        mov.l   r0,@(8,r1)              ! trans_proj->clip_flags |= CLIP_FLAGS_NEAR;
+
+.L_NO_NEAR_CLIP:
+        swap.w  r7,r12
+        mov     r7,r13
+        exts.w  r12,r0
+        mov.l   @r1,r12
+        shll16  r13
+        mov.l   r12,@r10                ! CPU(DSVR)
+        mov     r5,r9                   ! trans->dst_matrix[M00]
+        mov.l   r0,@r11                 ! CPU(DVDNTH)
+        mov     r6,r12
+        mov.l   r13,@r4                 ! CPU(DVDNTL)
+
+        ! X component
+        clrmac
+        mac.l   @r12+,@r9+
+        mac.l   @r12+,@r9+
+        mac.l   @r12+,@r9+
+        mov.l   @r9+,r12
+        sts     mach,r0
+        sts     macl,r13
+        clrmac
+        xtrct   r0,r13
+        add     r13,r12
+
+        ! Y component
+        mac.l   @r6+,@r9+
+        mac.l   @r6+,@r9+
+        mac.l   @r6+,@r9+
+        mov.l   @r9,r0                  ! Next point
+        sts     mach,r9
+        mov.l   @r4,r2                  ! Read quotient (1 / transform_proj_t::point_z)
+        sts     macl,r13
+        dmuls.l r12,r2                  ! point_x * inv_z
+        xtrct   r9,r13
+        add     r13,r9
+        sts     mach,r0
+
+        dmuls.l r9,r2
+        mov.w   r0,@(4,r1)              ! Write to transform_proj_t::screen::x
+        cmp/hs  r6,r14                  ! current_point <= last_point
+        sts     mach,r0
+        mov.w   r0,@(6,r1)              ! Write to transform_proj_t::screen::y
+
+        bt.s    .L_LOOP                 !
+        add     #16,r1                  ! Next transform_proj_t
+
+        ! Epilogue
+        mov.l   @r15+,r14
+        mov.l   @r15+,r13
+        mov.l   @r15+,r12
+        mov.l   @r15+,r11
+        mov.l   @r15+,r10
+        mov.l   @r15+,r9
+        rts
+        nop
+
+.align 4
+
+REG_CPU_DSVR:   .word 0xFF00UL
+REG_CPU_DVDNTH: .word 0xFF10UL
+REG_CPU_DVDNTL: .word 0xFF14UL

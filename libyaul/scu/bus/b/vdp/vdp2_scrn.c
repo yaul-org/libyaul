@@ -29,23 +29,23 @@ static void _nbg1_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format
 static void _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format);
 
 void
-vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
+vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *cell_format)
 {
-        switch (format->scroll_screen) {
+        switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _nbg0_scrn_cell_format_set(format);
+                _nbg0_scrn_cell_format_set(cell_format);
                 break;
         case VDP2_SCRN_NBG1:
-                _nbg1_scrn_cell_format_set(format);
+                _nbg1_scrn_cell_format_set(cell_format);
                 break;
         case VDP2_SCRN_NBG2:
-                _nbg2_scrn_cell_format_set(format);
+                _nbg2_scrn_cell_format_set(cell_format);
                 break;
         case VDP2_SCRN_NBG3:
-                _nbg3_scrn_cell_format_set(format);
+                _nbg3_scrn_cell_format_set(cell_format);
                 break;
         case VDP2_SCRN_RBG0:
-                _rbg0_scrn_cell_format_set(format);
+                _rbg0_scrn_cell_format_set(cell_format);
                 break;
         default:
                 return;
@@ -53,17 +53,17 @@ vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
 }
 
 void
-vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
+vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
 {
-        switch (format->scroll_screen) {
+        switch (bitmap_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _nbg0_scrn_bitmap_format_set(format);
+                _nbg0_scrn_bitmap_format_set(bitmap_format);
                 break;
         case VDP2_SCRN_NBG1:
-                _nbg1_scrn_bitmap_format_set(format);
+                _nbg1_scrn_bitmap_format_set(bitmap_format);
                 break;
         case VDP2_SCRN_RBG0:
-                _rbg0_scrn_bitmap_format_set(format);
+                _rbg0_scrn_bitmap_format_set(bitmap_format);
                 break;
         default:
                 return;

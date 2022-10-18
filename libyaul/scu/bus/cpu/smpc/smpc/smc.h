@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_SMC_H_
-#define _SMPC_SMC_H_
+#ifndef _YAUL_SMPC_SMC_H_
+#define _YAUL_SMPC_SMC_H_
 
 #include <sys/cdefs.h>
 
@@ -43,18 +43,18 @@ typedef enum cpu_smpc_cmd {
         SMPC_SMC_CKCHG352 = 0x0E,
         /// SMPC command to change clock to 320-mode.
         SMPC_SMC_CKCHG320 = 0x0F,
+        /// SMPC command to acquire SMPC status and peripheral data.
+        SMPC_SMC_INTBACK  = 0x10,
+        /// SMPC command to set RTC time.
+        SMPC_RTC_SETTIME  = 0x16,
+        /// SMPC command to set data to SMEM.
+        SMPC_SMC_SETSMEM  = 0x17,
         /// SMPC command to send an NMI request to the master CPU.
         SMPC_SMC_NMIREQ   = 0x18,
         /// SMPC command to enable NMI generation.
         SMPC_SMC_RESENAB  = 0x19,
         /// SMPC command to disable NMI generation.
-        SMPC_SMC_RESDISA  = 0x1A,
-        /// SMPC command to acquire SMPC status and peripheral data.
-        SMPC_SMC_INTBACK  = 0x10,
-        /// SMPC command to set data to SMEM.
-        SMPC_SMC_SETSMEM  = 0x17,
-        /// SMPC command to set RTC time.
-        SMPC_RTC_SETTIME  = 0x16
+        SMPC_SMC_RESDISA  = 0x1A
 } cpu_smpc_cmd_t;
 
 /// @brief Wait either to call an SMPC command, or wait until called SMPC
@@ -251,4 +251,4 @@ smpc_smc_sysres_call(void)
 
 __END_DECLS
 
-#endif /* !_SMPC_SMC_H_ */
+#endif /* !_YAUL_SMPC_SMC_H_ */

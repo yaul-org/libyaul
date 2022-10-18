@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_SCRN_H_
-#define _VDP2_SCRN_H_
+#ifndef _YAUL_VDP2_SCRN_H_
+#define _YAUL_VDP2_SCRN_H_
 
 #include <math.h>
 #include <stdbool.h>
@@ -20,22 +20,48 @@ __BEGIN_DECLS
 
 typedef enum vdp2_scrn {
         /// Normal background.
-        VDP2_SCRN_NBG0   = 0 ,
+        VDP2_SCRN_NBG0   = 1 << 0,
+        /// Normal background.
+        VDP2_SCRN_NBG1   = 1 << 1,
+        /// Normal background.
+        VDP2_SCRN_NBG2   = 1 << 2,
+        /// Normal background.
+        VDP2_SCRN_NBG3   = 1 << 3,
         /// Rotational background.
-        VDP2_SCRN_RBG1   = 5,
-        /// Normal background.
-        VDP2_SCRN_NBG1   = 1,
-        /// Normal background.
-        VDP2_SCRN_NBG2   = 2,
-        /// Normal background.
-        VDP2_SCRN_NBG3   = 3,
-        /// Rotational background.
-        VDP2_SCRN_RBG0   = 4,
-        /// Back screen.
-        VDP2_SCRN_BACK   = 5,
+        VDP2_SCRN_RBG0   = 1 << 4,
         /// Sprite layer.
-        VDP2_SCRN_SPRITE = 6
+        VDP2_SCRN_SPRITE = 1 << 5,
+        /// Back screen.
+        VDP2_SCRN_BACK   = 1 << 6
 } vdp2_scrn_t;
+
+typedef enum vdp2_scrn_disp {
+        /// Normal background.
+        VDP2_SCRN_NBG0_DISP   = 1 << 0,
+        /// Normal background.
+        VDP2_SCRN_NBG1_DISP   = 1 << 1,
+        /// Normal background.
+        VDP2_SCRN_NBG2_DISP   = 1 << 2,
+        /// Normal background.
+        VDP2_SCRN_NBG3_DISP   = 1 << 3,
+        /// Rotational background.
+        VDP2_SCRN_RBG0_DISP   = 1 << 4,
+        /// Rotational background.
+        VDP2_SCRN_RBG1_DISP   = 1 << 5,
+
+        /// Normal background.
+        VDP2_SCRN_NBG0_TPDISP = VDP2_SCRN_NBG0_DISP | (1 << 8),
+        /// Normal background.
+        VDP2_SCRN_NBG1_TPDISP = VDP2_SCRN_NBG1_DISP | (1 << 9),
+        /// Normal background.
+        VDP2_SCRN_NBG2_TPDISP = VDP2_SCRN_NBG2_DISP | (1 << 10),
+        /// Normal background.
+        VDP2_SCRN_NBG3_TPDISP = VDP2_SCRN_NBG3_DISP | (1 << 11),
+        /// Rotational background.
+        VDP2_SCRN_RBG0_TPDISP = VDP2_SCRN_RBG0_DISP | (1 << 12),
+        /// Rotational background.
+        VDP2_SCRN_RBG1_TPDISP = VDP2_SCRN_RBG1_DISP | (1 << 8)
+} vdp2_scrn_disp_t;
 
 typedef enum vdp2_scrn_ccc {
         VDP2_SCRN_CCC_PALETTE_16   = 0,
@@ -325,15 +351,19 @@ typedef struct vdp2_scrn_rotation_table {
 #define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
 
 typedef struct vdp2_scrn_ls_format {
-        vdp2_scrn_t scroll_screen; /* Normal background */
-        vdp2_vram_t line_scroll_table; /* Line scroll table (lead addr.) */
-        uint8_t interval; /* Dependent on the interlace setting */
+        vdp2_scrn_t scroll_screen;    /* Normal background */
+        vdp2_vram_t table;            /* Line scroll table (lead addr.) */
+        uint8_t interval;             /* Dependent on the interlace setting */
         vdp2_scrn_ls_enable_t enable; /* Enable line scroll */
 } vdp2_scrn_ls_format_t;
 
 typedef struct vdp2_scrn_ls_h {
         fix16_t horz;
 } __packed vdp2_scrn_ls_h_t;
+
+typedef struct vdp2_scrn_ls_v {
+        fix16_t vert;
+} __packed vdp2_scrn_ls_v_t;
 
 typedef struct vdp2_scrn_ls_hv {
         fix16_t horz;
@@ -348,7 +378,7 @@ typedef struct vdp2_scrn_ls_hvz {
 
 typedef struct vdp2_scrn_vcs_format {
         vdp2_scrn_t scroll_screen; /* Normal background */
-        vdp2_vram_t vcs_table; /* Vertical cell scroll table (lead addr.) */
+        vdp2_vram_t table;         /* Vertical cell scroll table (lead addr.) */
 } vdp2_scrn_vcs_format_t;
 
 typedef struct vdp2_scrn_color_offset_rgb {
@@ -357,51 +387,64 @@ typedef struct vdp2_scrn_color_offset_rgb {
         int16_t b;
 } vdp2_scrn_color_offset_rgb_t;
 
-extern void vdp2_scrn_back_screen_color_set(vdp2_vram_t, const color_rgb1555_t);
-extern void vdp2_scrn_back_screen_buffer_set(vdp2_vram_t, const color_rgb1555_t *,
-    const uint16_t);
+extern void vdp2_scrn_back_color_set(vdp2_vram_t vram,
+    const color_rgb1555_t color);
+extern void vdp2_scrn_back_buffer_set(vdp2_vram_t vram,
+    const color_rgb1555_t *buffer, const uint32_t count);
+extern void vdp2_scrn_back_sync(void);
 
-extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *);
+extern void vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask);
+extern void vdp2_scrn_lncl_unset(vdp2_scrn_t scrn_mask);
+extern void vdp2_scrn_lncl_clear(void);
+extern void vdp2_scrn_lncl_color_set(vdp2_vram_t vram,
+    const uint16_t cram_index);
+extern void vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram,
+    const uint16_t *buffer, const uint32_t count);
+extern void vdp2_scrn_lncl_sync(void);
 
-extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *);
+extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *bitmap_format);
+
+extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *cell_format);
 
 extern void vdp2_scrn_color_offset_clear(void);
-extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t,
-    const vdp2_scrn_color_offset_rgb_t * const);
-extern void vdp2_scrn_color_offset_set(vdp2_scrn_t, vdp2_scrn_color_offset_t);
-extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t);
+extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
+    const vdp2_scrn_color_offset_rgb_t * const rgb);
+extern void vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen,
+    vdp2_scrn_color_offset_t select);
+extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen);
 
-extern void vdp2_scrn_display_set(vdp2_scrn_t, bool);
-extern void vdp2_scrn_display_unset(vdp2_scrn_t);
+extern void vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask);
+extern void vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask);
 extern void vdp2_scrn_display_clear(void);
 
-extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *);
+extern void vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls_format);
 
-extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *);
-extern void vdp2_scrn_vcs_unset(vdp2_scrn_t);
+extern void vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs_format);
+extern void vdp2_scrn_vcs_unset(vdp2_scrn_t scroll_screen);
 extern void vdp2_scrn_vcs_clear(void);
 
-extern void vdp2_scrn_mosaic_set(vdp2_scrn_t);
-extern void vdp2_scrn_mosaic_unset(vdp2_scrn_t);
+extern void vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen);
+extern void vdp2_scrn_mosaic_unset(vdp2_scrn_t scroll_screen);
 extern void vdp2_scrn_mosaic_clear(void);
-extern void vdp2_scrn_mosaic_horizontal_set(uint8_t);
-extern void vdp2_scrn_mosaic_vertical_set(uint8_t);
+extern void vdp2_scrn_mosaic_horizontal_set(uint8_t horizontal);
+extern void vdp2_scrn_mosaic_vertical_set(uint8_t vertical);
 
-extern void vdp2_scrn_priority_set(vdp2_scrn_t, uint8_t);
-extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t);
+extern void vdp2_scrn_priority_set(vdp2_scrn_t scroll_screen, uint8_t priority);
+extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen);
 
-extern void vdp2_scrn_reduction_set(vdp2_scrn_t, vdp2_scrn_reduction_t);
-extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t, q0_3_8_t);
-extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t, q0_3_8_t);
+extern void vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen,
+    vdp2_scrn_reduction_t reduction);
+extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
+extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
 
-extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t, fix16_t);
-extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t, fix16_t);
+extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t scroll_screen, fix16_t scroll);
+extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta);
+extern void vdp2_scrn_scroll_y_set(vdp2_scrn_t scroll_screen, fix16_t scroll);
+extern void vdp2_scrn_scroll_y_update(vdp2_scrn_t scroll_screen, fix16_t delta);
 
-extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t,
-    vdp2_scrn_sf_code_range_t);
+extern void vdp2_scrn_sf_codes_set(vdp2_scrn_sf_code_t code,
+    vdp2_scrn_sf_code_range_t code_range);
 
 __END_DECLS
 
-#endif /* !_VDP2_SCRN_H_ */
+#endif /* !_YAUL_VDP2_SCRN_H_ */

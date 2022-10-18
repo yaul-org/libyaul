@@ -24,7 +24,8 @@
 #include <string.h>
 #include <stdint.h>
 
-void *
+/* To avoid from LTO discarding memcpy (as it's considered a builtin by GCC) */
+void * __used
 memcpy(void *restrict dest, const void *restrict src, size_t n)
 {
         uint8_t *d = dest;

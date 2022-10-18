@@ -5,30 +5,33 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CALLBACK_LIST_H_
-#define _CALLBACK_LIST_H_
+#ifndef _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
+#define _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <sys/cdefs.h>
+
 __BEGIN_DECLS
 
-typedef uint8_t callback_id_t;
+typedef int32_t callback_id_t;
 
-typedef void (*callback_handler)(void *);
+typedef void (*callback_handler_t)(void *work);
 
 typedef struct callback {
-        callback_handler handler;
+        callback_handler_t handler;
         void *work;
-} __packed callback_t;
+} callback_t;
 
 typedef struct callback_list {
         callback_t *callbacks;
-        uint8_t count;
+        uint32_t count;
 } callback_list_t;
 
 static inline void __always_inline
-callback_call(callback_t *callback)
+callback_call(const callback_t *callback)
 {
         assert(callback != NULL);
         assert(callback->handler != NULL);
@@ -36,19 +39,24 @@ callback_call(callback_t *callback)
         callback->handler(callback->work);
 }
 
-extern callback_list_t *callback_list_alloc(uint8_t);
-extern void callback_list_free(callback_list_t *);
-extern void callback_list_init(callback_list_t *, callback_t *, uint8_t);
+extern callback_list_t *callback_list_alloc(uint32_t count);
+extern void callback_list_free(callback_list_t *callback_list);
+extern void callback_list_init(callback_list_t *callback_list,
+    callback_t *callbacks, uint32_t count);
 
-extern void callback_list_process(callback_list_t *, bool);
+extern void callback_list_process(callback_list_t *callback_list);
+extern void callback_list_rev_process(callback_list_t *callback_list);
 
-extern callback_id_t callback_list_callback_add(callback_list_t *, callback_handler, void *);
-extern void callback_list_callback_remove(callback_list_t *, callback_id_t);
-extern void callback_list_clear(callback_list_t *);
+extern callback_id_t callback_list_callback_add(callback_list_t *callback_list,
+    callback_handler_t handler, void *work);
+extern void callback_list_callback_remove(callback_list_t *callback_list,
+    callback_id_t id);
+extern void callback_list_clear(callback_list_t *callback_list);
 
-extern void callback_init(callback_t *);
-extern void callback_set(callback_t *, callback_handler, void *);
+extern void callback_init(callback_t *callback);
+extern void callback_set(callback_t *callback, callback_handler_t handler,
+    void *work);
 
 __END_DECLS
 
-#endif /* !_CALLBACK_LIST_H_ */
+#endif /* !_YAUL_KERNEL_SYS_CALLBACK_LIST_H_ */

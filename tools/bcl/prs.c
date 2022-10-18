@@ -1,341 +1,259 @@
+/* Archive of the original code from fuzziqer. No license was provided with the
+ * released files, although fuzziqer stated using the source freely was fine as
+ * long as he's credited for the compression and decompression code. */
+
+#include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "shared.h"
+
+#define PROGNAME "bcl_prs"
 
 typedef struct {
-        uint8_t bitpos;
-        //uint8_t controlbyte;
-        uint8_t* controlbyteptr;
-        uint8_t* srcptr_orig;
-        uint8_t* dstptr_orig;
-        uint8_t* srcptr;
-        uint8_t* dstptr;
-} PRS_COMPRESSOR;
+        uint8_t bit_pos;
+        uint8_t *control_byte_ptr;
+        uint8_t *src_ptr_orig;
+        uint8_t *dst_ptr_orig;
+        uint8_t *src_ptr;
+        uint8_t *dst_ptr;
+} prs_compressor_t;
 
-void prs_put_control_bit(PRS_COMPRESSOR* pc,uint8_t bit)
+static uint32_t _prs_compress(void *in, void *dest, uint32_t size);
+
+int
+main(int argc, char *argv[])
 {
-        *pc->controlbyteptr = *pc->controlbyteptr >> 1;
-        *pc->controlbyteptr |= ((!!bit) << 7);
-        pc->bitpos++;
-        if (pc->bitpos >= 8) {
-                pc->bitpos = 0;
-                pc->controlbyteptr = pc->dstptr;
-                pc->dstptr++;
+        if (argc != 3) {
+                print_usage(PROGNAME);
+
+                return 0;
+        }
+
+        const char *const in_filename = argv[1];
+        const char *const out_filename = argv[2];
+
+        input_file_t input_file;
+
+        if ((input_file_open(in_filename, &input_file)) != 0) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        /* Allocate a buffer of equal to twice the size since we don't know how
+         * big the out file size will be */
+        void *out_buffer;
+
+        /* According to the original sources, the output buffer must be 0.4%
+         * larger plus 1 byte */
+        size_t out_size = (size_t)floor(1.004f * (float)input_file.buffer_len) + 1;
+
+        if ((out_buffer = malloc(out_size)) == NULL) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        const uint32_t out_file_size =
+                _prs_compress(input_file.buffer, out_buffer, input_file.buffer_len);
+
+        (void)printf("%zu -> %"PRIu32"\n", input_file.buffer_len, out_file_size);
+
+        if (out_file_size == 0) {
+                fprintf(stderr, "Error: %s: RLE compression failed\n", PROGNAME);
+
+                return 1;
+        }
+
+        if ((output_file_write(out_filename, out_buffer, out_file_size)) != 0) {
+                print_errno(PROGNAME);
+
+                return 1;
+        }
+
+        input_file_close(&input_file);
+
+        free(out_buffer);
+
+        return 0;
+}
+
+static void
+_prs_put_control_bit(prs_compressor_t *pc, uint8_t bit)
+{
+        *pc->control_byte_ptr = *pc->control_byte_ptr >> 1;
+        *pc->control_byte_ptr |= ((!!bit) << 7);
+        pc->bit_pos++;
+
+        if (pc->bit_pos >= 8) {
+                pc->bit_pos = 0;
+                pc->control_byte_ptr = pc->dst_ptr;
+                pc->dst_ptr++;
         }
 }
 
-void prs_put_control_bit_nosave(PRS_COMPRESSOR* pc,uint8_t bit)
+static void
+_prs_put_control_bit_nosave(prs_compressor_t *pc, uint8_t bit)
 {
-        *pc->controlbyteptr = *pc->controlbyteptr >> 1;
-        *pc->controlbyteptr |= ((!!bit) << 7);
-        pc->bitpos++;
+        *pc->control_byte_ptr = *pc->control_byte_ptr >> 1;
+        *pc->control_byte_ptr |= ((!!bit) << 7);
+        pc->bit_pos++;
 }
 
-void prs_put_control_save(PRS_COMPRESSOR* pc)
+static void
+_prs_put_control_save(prs_compressor_t *pc)
 {
-        if (pc->bitpos >= 8) {
-                pc->bitpos = 0;
-                pc->controlbyteptr = pc->dstptr;
-                pc->dstptr++;
+        if (pc->bit_pos >= 8) {
+                pc->bit_pos = 0;
+                pc->control_byte_ptr = pc->dst_ptr;
+                pc->dst_ptr++;
         }
 }
 
-void prs_put_static_data(PRS_COMPRESSOR* pc,uint8_t data)
+static void
+_prs_put_static_data(prs_compressor_t *pc, uint8_t data)
 {
-        *pc->dstptr = data;
-        pc->dstptr++;
+        *pc->dst_ptr = data;
+        pc->dst_ptr++;
 }
 
-uint8_t prs_get_static_data(PRS_COMPRESSOR* pc)
+static uint8_t
+_prs_get_static_data(prs_compressor_t *pc)
 {
-        uint8_t data = *pc->srcptr;
-        pc->srcptr++;
+        uint8_t data = *pc->src_ptr;
+        pc->src_ptr++;
         return data;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void prs_init(PRS_COMPRESSOR* pc,void* src,void* dst)
+static void
+_prs_init(prs_compressor_t *pc, void *src, void *dst)
 {
-        pc->bitpos = 0;
-        //pc->controlbyte = 0;
-        pc->srcptr = (uint8_t*) src;
-        pc->srcptr_orig = (uint8_t*) src;
-        pc->dstptr = (uint8_t*) dst;
-        pc->dstptr_orig = (uint8_t*) dst;
-        pc->controlbyteptr = pc->dstptr;
-        pc->dstptr++;
+        pc->bit_pos = 0;
+        pc->src_ptr = (uint8_t *)src;
+        pc->src_ptr_orig = (uint8_t *)src;
+        pc->dst_ptr = (uint8_t *)dst;
+        pc->dst_ptr_orig = (uint8_t *)dst;
+        pc->control_byte_ptr = pc->dst_ptr;
+        pc->dst_ptr++;
 }
 
-void prs_finish(PRS_COMPRESSOR* pc)
+static void
+_prs_finish(prs_compressor_t *pc)
 {
-        //printf("> > > prs_finish[1]: %08X->%08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig);
-        prs_put_control_bit(pc,0);
-        prs_put_control_bit(pc,1);
-        //printf("> > > prs_finish[2]: %08X->%08X %d\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig,pc->bitpos);
-        //pc->controlbyte = pc->controlbyte << (8 - pc->bitpos);
-        if (pc->bitpos != 0) {
-                *pc->controlbyteptr = ((*pc->controlbyteptr << pc->bitpos) >> 8);
-                //*pc->controlbyteptr = pc->controlbyte;
-                //pc->dstptr++;
+        _prs_put_control_bit(pc, 0);
+        _prs_put_control_bit(pc, 1);
+
+        if (pc->bit_pos != 0) {
+                *pc->control_byte_ptr = ((*pc->control_byte_ptr << pc->bit_pos) >> 8);
         }
-        //printf("> > > prs_finish[3]: %08X->%08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig);
-        prs_put_static_data(pc,0);
-        prs_put_static_data(pc,0);
-        //printf("> > > prs_finish[4]: %08X->%08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig);
+
+        _prs_put_static_data(pc, 0);
+        _prs_put_static_data(pc, 0);
 }
 
-void prs_rawbyte(PRS_COMPRESSOR* pc)
+static void
+_prs_rawbyte(prs_compressor_t *pc)
 {
-        prs_put_control_bit_nosave(pc,1);
-        prs_put_static_data(pc,prs_get_static_data(pc));
-        prs_put_control_save(pc);
+        _prs_put_control_bit_nosave(pc, 1);
+        _prs_put_static_data(pc, _prs_get_static_data(pc));
+        _prs_put_control_save(pc);
 }
 
-void prs_shortcopy(PRS_COMPRESSOR* pc,int offset,uint8_t size)
+static void
+_prs_shortcopy(prs_compressor_t *pc, int offset, uint8_t size)
 {
         size -= 2;
-        prs_put_control_bit(pc,0);
-        prs_put_control_bit(pc,0);
-        prs_put_control_bit(pc, (size >> 1) & 1);
-        prs_put_control_bit_nosave(pc,size & 1);
-        prs_put_static_data(pc,offset & 0xFF);
-        prs_put_control_save(pc);
+        _prs_put_control_bit(pc, 0);
+        _prs_put_control_bit(pc, 0);
+        _prs_put_control_bit(pc, (size >> 1) & 1);
+        _prs_put_control_bit_nosave(pc, size & 1);
+        _prs_put_static_data(pc, offset & 0xFF);
+        _prs_put_control_save(pc);
 }
 
-void prs_longcopy(PRS_COMPRESSOR* pc,int offset,uint8_t size)
+static void
+_prs_longcopy(prs_compressor_t *pc, int offset, uint8_t size)
 {
-        uint8_t byte1,byte2;
+        uint8_t byte1, byte2;
+
         if (size <= 9) {
-                //offset = ((offset << 3) & 0xFFF8) | ((size - 2) & 7);
-                prs_put_control_bit(pc,0);
-                prs_put_control_bit_nosave(pc,1);
-                prs_put_static_data(pc, ((offset << 3) & 0xF8) | ((size - 2) & 0x07));
-                prs_put_static_data(pc, (offset >> 5) & 0xFF);
-                prs_put_control_save(pc);
+                _prs_put_control_bit(pc, 0);
+                _prs_put_control_bit_nosave(pc, 1);
+                _prs_put_static_data(pc, ((offset << 3) & 0xF8) | ((size - 2) & 0x07));
+                _prs_put_static_data(pc, (offset >> 5) & 0xFF);
+                _prs_put_control_save(pc);
         } else {
-                //offset = (offset << 3) & 0xFFF8;
-                prs_put_control_bit(pc,0);
-                prs_put_control_bit_nosave(pc,1);
-                prs_put_static_data(pc, (offset << 3) & 0xF8);
-                prs_put_static_data(pc, (offset >> 5) & 0xFF);
-                prs_put_static_data(pc,size - 1);
-                prs_put_control_save(pc);
-                //printf("[%08X, %08X, %02X%02X %02X]",offset,size,(offset >> 5) & 0xFF,(offset << 3) & 0xF8,size - 1);
+                _prs_put_control_bit(pc, 0);
+                _prs_put_control_bit_nosave(pc, 1);
+                _prs_put_static_data(pc, (offset << 3) & 0xF8);
+                _prs_put_static_data(pc, (offset >> 5) & 0xFF);
+                _prs_put_static_data(pc, size - 1);
+                _prs_put_control_save(pc);
         }
 }
 
-void prs_copy(PRS_COMPRESSOR* pc,int offset,uint8_t size)
+static void
+_prs_copy(prs_compressor_t *pc, int offset, uint8_t size)
 {
-        /*bool err = false;
-          if (((offset & 0xFFFFE000) != 0xFFFFE000) || ((offset & 0x1FFF) == 0))
-          {
-          printf("> > > error: bad offset: %08X\n",offset);
-          err = true;
-          }
-          if ((size > 0xFF) || (size < 3))
-          {
-          printf("> > > error: bad size: %08X\n",size);
-          err = true;
-          }
-          if (err) system("PAUSE"); */
-        //else printf("> > > prs_copy: %08X->%08X @ %08X:%08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig,offset,size);
         if ((offset > -0x100) && (size <= 5)) {
-                printf("> > > %08X->%08X sdat %08X %08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig,offset,size);
-                prs_shortcopy(pc,offset,size);
+                _prs_shortcopy(pc, offset, size);
         } else {
-                printf("> > > %08X->%08X ldat %08X %08X\n",pc->srcptr - pc->srcptr_orig,pc->dstptr - pc->dstptr_orig,offset,size);
-                prs_longcopy(pc,offset,size);
+                _prs_longcopy(pc, offset, size);
         }
-        pc->srcptr += size;
+
+        pc->src_ptr += size;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-uint32_t prs_decompress(void* source,void* dest)    // 800F7CB0 through 800F7DE4 in mem
+static uint32_t
+_prs_compress(void *in, void *dest, uint32_t size)
 {
-        uint32_t r0,r3,r5,r6,r9; // 6 unnamed registers
-        uint32_t bitpos = 9; // 4 named registers
-        uint8_t* sourceptr = (uint8_t*) source;
-        uint8_t* sourceptr_orig = (uint8_t*) source;
-        uint8_t* destptr = (uint8_t*) dest;
-        uint8_t* destptr_orig = (uint8_t*) dest;
-        uint8_t currentbyte;
-        bool flag;
-        int offset;
-        uint32_t x,t; // 2 placed variables
+        prs_compressor_t pc;
+        int x, y, z;
+        uint32_t xsize;
+        int lsoffset, lssize;
 
-        printf("\n> decompressing\n");
-        currentbyte = sourceptr[0];
-        sourceptr++;
-        for (;;) {
-                bitpos--;
-                if (bitpos == 0) {
-                        currentbyte = sourceptr[0];
-                        bitpos = 8;
-                        sourceptr++;
-                }
-                flag = currentbyte & 1;
-                currentbyte = currentbyte >> 1;
-                if (flag) {
-                        destptr[0] = sourceptr[0];
-                        printf("> > > %08X->%08X byte\n",sourceptr - sourceptr_orig,destptr - destptr_orig);
-                        sourceptr++;
-                        destptr++;
-                        continue;
-                }
-                bitpos--;
-                if (bitpos == 0) {
-                        currentbyte = sourceptr[0];
-                        bitpos = 8;
-                        sourceptr++;
-                }
-                flag = currentbyte & 1;
-                currentbyte = currentbyte >> 1;
-                if (flag) {
-                        r3 = sourceptr[0] & 0xFF;
-                        //printf("> > > > > first: %02X - ",sourceptr[0]); system("PAUSE");
-                        offset = ((sourceptr[1] & 0xFF) << 8) | r3;
-                        //printf("> > > > > second: %02X - ",sourceptr[1]); system("PAUSE");
-                        sourceptr += 2;
-                        if (offset == 0) {
-                                return (uint32_t)(destptr - destptr_orig);
-                        }
-                        r3 = r3 & 0x00000007;
-                        r5 = (offset >> 3) | 0xFFFFE000;
-                        if (r3 == 0) {
-                                flag = 0;
-                                r3 = sourceptr[0] & 0xFF;
-                                sourceptr++;
-                                r3++;
-                        } else {
-                                r3 += 2;
-                        }
-                        r5 += (uint32_t) destptr;
-                        printf("> > > %08X->%08X ldat %08X %08X %s\n",sourceptr - sourceptr_orig,destptr - destptr_orig,r5 - (uint32_t) destptr,r3,flag ? "inline" : "extended");
-                } else {
-                        r3 = 0;
-                        for (x = 0; x < 2; x++) {
-                                bitpos--;
-                                if (bitpos == 0) {
-                                        currentbyte = sourceptr[0];
-                                        bitpos = 8;
-                                        sourceptr++;
+        _prs_init(&pc, in, dest);
+
+        for (x = 0; x < size; x++) {
+                lsoffset = lssize = xsize = 0;
+
+                for (y = x - 3; (y > 0) && (y > (x - 0x1FF0)) && (xsize < 255); y--) {
+                        xsize = 3;
+
+                        if (!memcmp((void *)((uintptr_t)in + y), (void *)((uintptr_t)in + x), xsize)) {
+                                do {
+                                        xsize++;
+                                } while (!memcmp((void *)((uintptr_t)in + y),
+
+                                                 (void *)((uintptr_t)in + x),
+                                                 xsize) &&
+                                                (xsize < 256) &&
+                                                ((y + xsize) < x) &&
+                                                ((x + xsize) <= size)
+                                        );
+
+                                xsize--;
+
+                                if (xsize > lssize) {
+                                        lsoffset = -(x - y);
+                                        lssize = xsize;
                                 }
-                                flag = currentbyte & 1;
-                                currentbyte = currentbyte >> 1;
-                                offset = r3 << 1;
-                                r3 = offset | flag;
                         }
-                        offset = sourceptr[0] | 0xFFFFFF00;
-                        r3 += 2;
-                        sourceptr++;
-                        r5 = offset + (uint32_t) destptr;
-                        printf("> > > %08X->%08X sdat %08X %08X\n",sourceptr - sourceptr_orig,destptr - destptr_orig,r5 - (uint32_t) destptr,r3);
                 }
-                if (r3 == 0) {
-                        continue;
-                }
-                t = r3;
-                for (x = 0; x < t; x++) {
-                        destptr[0] = * (uint8_t*) r5;
-                        r5++;
-                        r3++;
-                        destptr++;
+
+                if (lssize == 0) {
+                        _prs_rawbyte(&pc);
+                } else {
+                        _prs_copy(&pc, lsoffset, lssize);
+                        x += (lssize - 1);
                 }
         }
-}
 
-uint32_t prs_decompress_size(void* source)
-{
-        uint32_t r0,r3,r5,r6,r9; // 6 unnamed registers
-        uint32_t bitpos = 9; // 4 named registers
-        uint8_t* sourceptr = (uint8_t*) source;
-        uint8_t* destptr = NULL;
-        uint8_t* destptr_orig = NULL;
-        uint8_t currentbyte,lastbyte;
-        bool flag;
-        int offset;
-        uint32_t x,t; // 2 placed variables
+        _prs_finish(&pc);
 
-        //printf("> %08X -> %08X: begin\n",sourceptr,destptr);
-        currentbyte = sourceptr[0];
-        //printf("> [ ] %08X -> %02X: command stream\n",sourceptr,currentbyte);
-        sourceptr++;
-        for (;;) {
-                bitpos--;
-                if (bitpos == 0) {
-                        lastbyte = currentbyte = sourceptr[0];
-                        bitpos = 8;
-                        //printf("> [ ] %08X -> %02X: command stream\n",sourceptr,currentbyte);
-                        sourceptr++;
-                }
-                flag = currentbyte & 1;
-                currentbyte = currentbyte >> 1;
-                if (flag) {
-                        //printf("> [1] %08X -> %08X: %02X\n",sourceptr,destptr,*sourceptr);
-                        sourceptr++;
-                        destptr++;
-                        continue;
-                }
-                //printf("> [0] extended\n");
-                bitpos--;
-                if (bitpos == 0) {
-                        lastbyte = currentbyte = sourceptr[0];
-                        bitpos = 8;
-                        //printf("> [ ] %08X -> %02X: command stream\n",sourceptr,currentbyte);
-                        sourceptr++;
-                }
-                flag = currentbyte & 1;
-                currentbyte = currentbyte >> 1;
-                if (flag) {
-                        r3 = sourceptr[0];
-                        offset = (sourceptr[1] << 8) | r3;
-                        sourceptr += 2;
-                        if (offset == 0) {
-                                return (uint32_t)(destptr - destptr_orig);
-                        }
-                        r3 = r3 & 0x00000007;
-                        r5 = (offset >> 3) | 0xFFFFE000;
-                        if (r3 == 0) {
-                                r3 = sourceptr[0];
-                                sourceptr++;
-                                r3++;
-                        } else {
-                                r3 += 2;
-                        }
-                        r5 += (uint32_t) destptr;
-                        //printf("> > [1] %08X -> %08X: block copy (%d)\n",r5,destptr,r3);
-                } else {
-                        r3 = 0;
-                        for (x = 0; x < 2; x++) {
-                                bitpos--;
-                                if (bitpos == 0) {
-                                        lastbyte = currentbyte = sourceptr[0];
-                                        bitpos = 8;
-                                        //printf("> [ ] %08X -> %02X: command stream\n",sourceptr,currentbyte);
-                                        sourceptr++;
-                                }
-                                flag = currentbyte & 1;
-                                currentbyte = currentbyte >> 1;
-                                offset = r3 << 1;
-                                r3 = offset | flag;
-                        }
-                        offset = sourceptr[0] | 0xFFFFFF00;
-                        r3 += 2;
-                        sourceptr++;
-                        r5 = offset + (uint32_t) destptr;
-                        //printf("> > [0] %08X -> %08X: block copy (%d)\n",r5,destptr,r3);
-                }
-                if (r3 == 0) {
-                        continue;
-                }
-                t = r3;
-                //printf("> > [ ] copying %d bytes\n",t);
-                for (x = 0; x < t; x++) {
-                        r5++;
-                        r3++;
-                        destptr++;
-                }
-        }
+        return (pc.dst_ptr - pc.dst_ptr_orig);
 }

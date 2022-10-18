@@ -35,16 +35,24 @@ SECTIONS
      *(.gnu.linkonce.t.*)
 
      . = ALIGN (0x10);
+     __CTOR_SECTION__ = .;
+     KEEP (*(.ctor))
+     SHORT (0x000B) /* RTS */
+     SHORT (0x0009) /* NOP */
+
+     . = ALIGN (0x10);
      __INIT_SECTION__ = .;
      KEEP (*(.init))
+
+     . = ALIGN (0x10);
+     __DTOR_SECTION__ = .;
+     KEEP (*(.dtor))
      SHORT (0x000B) /* RTS */
      SHORT (0x0009) /* NOP */
 
      . = ALIGN (0x10);
      __FINI_SECTION__ = .;
      KEEP (*(.fini))
-     SHORT (0x000B) /* RTS */
-     SHORT (0x0009) /* NOP */
 
      . = ALIGN (0x10);
      __CTOR_LIST__ = .;
@@ -70,7 +78,7 @@ SECTIONS
 
   .rodata __text_end :
   {
-     . = ALIGN (0x400);
+     . = ALIGN (0x10);
 
      *(.rdata)
      *(.rodata)
@@ -80,15 +88,9 @@ SECTIONS
      . = ALIGN (0x04);
   }
 
-  .text_hot ALIGN(0x400) : SUBALIGN(0x400)
-  {
-     *(.text_hot)
-     *(.text_hot.*)
-  }
-
   .data . :
   {
-     . = ALIGN (0x400);
+     . = ALIGN (0x10);
      PROVIDE_HIDDEN (__data_start = .);
 
      *(.data)
@@ -105,7 +107,7 @@ SECTIONS
 
   .bss __data_end :
   {
-     . = ALIGN (0x400);
+     . = ALIGN (0x10);
      PROVIDE (__bss_start = .);
 
      *(.bss)
@@ -119,18 +121,21 @@ SECTIONS
 
      . = ALIGN (0x10);
      PROVIDE (__bss_end = .);
+
      __bss_end__ = .;
   }
 
   .uncached (0x20000000 | __bss_end) : AT (__bss_end)
   {
      PROVIDE_HIDDEN (__uncached_start = .);
+
      *(.uncached)
+     *(.uncached.*)
+
      . = ALIGN (0x10);
      PROVIDE_HIDDEN (__uncached_end = .);
   }
 
   /* Back to cached addresses */
   __end = __bss_end + SIZEOF (.uncached);
-  PROVIDE (_end = __bss_end + SIZEOF (.uncached));
 }

@@ -21,8 +21,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _MATH_UINT32_H_
-#define _MATH_UINT32_H_
+#ifndef _YAUL_MATH_UINT32_H_
+#define _YAUL_MATH_UINT32_H_
 
 #include <sys/cdefs.h>
 
@@ -30,8 +30,16 @@
 
 __BEGIN_DECLS
 
-extern uint32_t uint32_log2(uint32_t);
+extern uint32_t uint32_log2(uint32_t value);
+extern uint32_t uint32_loop_log2(uint32_t value);
+extern uint32_t uint32_pow2_round_next(uint32_t value);
+
+static inline uint32_t __always_inline
+uint32_pow2_round(uint32_t value, uint32_t pow)
+{
+        return (((value + ((1 << pow) - 1)) >> pow) << pow);
+}
 
 __END_DECLS
 
-#endif /* !_MATH_UINT32_H_ */
+#endif /* !_YAUL_MATH_UINT32_H_ */

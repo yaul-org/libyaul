@@ -6,8 +6,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_SCI_H_
-#define _CPU_SCI_H_
+#ifndef _YAUL_CPU_SCI_H_
+#define _YAUL_CPU_SCI_H_
 
 #include <sys/cdefs.h>
 
@@ -39,7 +39,8 @@ typedef enum cpu_sci_length {
         /// @brief 8-bit data.
         CPU_SCI_LENGTH_8_BITS = 0x00,
         /// @brief 7-bit data.
-        /// @details When 7-bit data is selected, the MSB (bit 7) of the transmit data register is not transmitted.
+        /// @details When 7-bit data is selected, the MSB (bit 7) of the
+        /// transmit data register is not transmitted.
         CPU_SCI_LENGTH_7_BITS = 0x01
 } cpu_sci_length_t;
 
@@ -49,7 +50,9 @@ typedef enum cpu_sci_parity {
         /// @brief Parity bit not added or checked.
         CPU_SCI_PARITY_OFF = 0x00,
         /// @brief Parity bit added and checked.
-        /// @details When enabled, an even or odd parity bit is added to transmit data, depending on the parity mode setting. Receive data parity is checked according to the even/odd mode setting.
+        /// @details When enabled, an even or odd parity bit is added to
+        /// transmit data, depending on the parity mode setting. Receive data
+        /// parity is checked according to the even/odd mode setting.
         CPU_SCI_PARITY_ON  = 0x01
 } cpu_sci_parity_t;
 
@@ -95,14 +98,14 @@ typedef enum cpu_sci_clock_div {
 
 /// @brief SCK pin configuration.
 /// @see cpu_sci_cfg_t
-typedef enum cpu_sci_sck_config {
+typedef enum cpu_sci_sck_cfg {
         /// @brief SCK pin is unused.
         CPU_SCI_SCK_DONTCARE = 0x00,
         /// @brief SCK pin is used as a clock output.
         CPU_SCI_SCK_OUTPUT   = 0x01,
         /// @brief SCK pin is used as a clock input.
         CPU_SCI_SCK_INPUT    = 0x02,
-} cpu_sci_sck_config_t;
+} cpu_sci_sck_cfg_t;
 
 /// @brief Callback type.
 /// @see cpu_sci_cfg_t.ihr_eri
@@ -110,7 +113,7 @@ typedef enum cpu_sci_sck_config {
 /// @see cpu_sci_cfg_t.ihr_txi
 /// @see cpu_sci_cfg_t.ihr_tei
 /// @see cpu_sci_cfg_t.ihr_work
-typedef void (*cpu_sci_ihr)(void *);
+typedef void (*cpu_sci_ihr)(void *ihr);
 
 /// @brief CPU-SCI configuration.
 typedef struct cpu_sci_cfg {
@@ -136,7 +139,7 @@ typedef struct cpu_sci_cfg {
         cpu_sci_clock_div_t clock_div:2;
 
         /// SCK pin configuration.
-        cpu_sci_sck_config_t sck_config:2;
+        cpu_sci_sck_cfg_t sck_config:2;
 
         /// Baudrate.
         uint8_t baudrate;
@@ -148,13 +151,16 @@ typedef struct cpu_sci_cfg {
         cpu_sci_ihr ihr_eri;
 
         /// @ingroup CPU_INTC_HELPERS
-        /// @brief Callback when new serial data is received in receive data register.
+        /// @brief Callback when new serial data is received in receive data
+        /// register.
         ///
         /// @details Set to `NULL` if no callback is desired.
         cpu_sci_ihr ihr_rxi;
 
         /// @ingroup CPU_INTC_HELPERS
-        /// @brief Callback when transmit data register content is dispatched for transfer.
+
+        /// @brief Callback when transmit data register content is dispatched
+        /// for transfer.
         ///
         /// @details Set to `NULL` if no callback is desired.
         cpu_sci_ihr ihr_txi;
@@ -194,88 +200,93 @@ cpu_sci_interrupt_priority_set(uint8_t priority)
 
 /// @brief Reset CPU-SCI status.
 static inline void __always_inline
-cpu_sci_reset_status(void)
+cpu_sci_status_reset(void)
 {
-        MEMORY_WRITE(8,CPU(SSR),0x00);
+        MEMORY_WRITE(8, CPU(SSR), 0x00);
 }
 
 /// @brief Configure a CPU-SCI for transfer.
 ///
-/// @details Configuring the CPU-SCI in @p cfg does not start the transfer.
-/// To start the transfer, use either @ref cpu_sci_enable_with_dmac
-/// (for SCI+DMAC mode) or @ref cpu_sci_set_write_value (for normal mode).
-/// The CPU-SCI is forcefully stopped upon starting the configuration.
-/// If the CPU_SCI is currently operating int SCI+DMAC mode, use @ref cpu_dma_wait
-/// with the corresponding DMA channel to wait until the transfer is complete.
-/// 
+/// @details Configuring the CPU-SCI in @p cfg does not start the transfer. To
+/// start the transfer, use either @ref cpu_sci_enable_with_dmac (for SCI+DMAC
+/// mode) or @ref cpu_sci_write_value_set (for normal mode). The CPU-SCI is
+/// forcefully stopped upon starting the configuration. If the CPU_SCI is
+/// currently operating int SCI+DMAC mode, use @ref cpu_dma_wait with the
+/// corresponding DMA channel to wait until the transfer is complete.
+///
 /// @param[in] cfg The CPU-SCI transfer configuration.
 ///
 /// @see cpu_sci_enable_with_dmac
-/// @see cpu_sci_set_write_value
-/// @see cpu_sci_get_read_value
-void 
-cpu_sci_config_set(const cpu_sci_cfg_t *cfg);
+/// @see cpu_sci_write_value_set
+/// @see cpu_sci_read_value_get
+void cpu_sci_config_set(const cpu_sci_cfg_t *cfg);
 
 /// @brief Execute a CPU-SCI transfer in CPI+DMAC mode.
 ///
-/// @details Every transfer should be configured with @ref cpu_sci_config_set first.
-/// The corresponding DMAC channed should be started with @ref cpu_dmac_channel_start
-/// as well. 
-/// 
+/// @details Every transfer should be configured with @ref cpu_sci_config_set
+/// first. The corresponding DMAC channed should be started with @ref
+/// cpu_dmac_channel_start as well.
+///
 /// @param[in] cfg The CPU-SCI transfer configuration.
 ///
 /// @see cpu_sci_config_set
-/// @see cpu_sci_set_write_value
-/// @see cpu_sci_get_read_value
-void
-cpu_sci_enable_with_dmac(const cpu_sci_cfg_t *cfg);
+/// @see cpu_sci_write_value_set
+/// @see cpu_sci_read_value_get
+void cpu_sci_with_dmac_enable(const cpu_sci_cfg_t *cfg);
 
 /// @brief Execute a single byte CPU-SCI transfer in normal mode.
 ///
-/// @details Every transfer is bidirectional, reading is done alowng with writing.
-/// To get the readen valuer call @ref cpu_sci_get_read_value.
+/// @details Every transfer is bidirectional, reading is done alowng with
+/// writing. To get the readen valuer call @ref cpu_sci_read_value_get.
 ///
 /// @param[in] value Value for transmitting.
 ///
 /// @see cpu_sci_config_set
-/// @see cpu_sci_get_read_value
+/// @see cpu_sci_read_value_get
 static inline void __always_inline
-cpu_sci_set_write_value(uint8_t value)
+cpu_sci_write_value_set(uint8_t value)
 {
         MEMORY_WRITE(8, CPU(TDR), value);
 }
 
-/// @brief Returns the last value readen during CPU-SCI transfer in normal mode.
+/// @brief Returns the last value read during CPU-SCI transfer in normal mode.
 ///
-/// @details This function returns the value readen diring last @ref cpu_sci_set_write_value call.
+/// @details This function returns the value readen diring last @ref
+/// cpu_sci_write_value_set call.
 ///
 /// @see cpu_sci_config_set
-/// @see cpu_sci_set_write_value
+/// @see cpu_sci_write_value_set
 static inline uint8_t __always_inline
-cpu_sci_get_read_value()
+cpu_sci_read_value_get(void)
 {
-        uint8_t value = MEMORY_READ(8, CPU(RDR));
-        //if RDRF is set, clear it
-        if ( (MEMORY_READ(8, CPU(SSR)) & 0x40)>0)
-                MEMORY_WRITE_AND(8,CPU(SSR),~0x40);
+        const uint8_t value = MEMORY_READ(8, CPU(RDR));
+
+        /* If RDRF is set, clear it */
+        if ((MEMORY_READ(8, CPU(SSR)) & 0x40) > 0) {
+                MEMORY_WRITE_AND(8, CPU(SSR), ~0x40);
+        }
+
         return value;
 }
 
 /// @brief Waits for CPU-SCI transfer end.
 ///
 /// @see cpu_sci_config_set
-/// @see cpu_sci_set_write_value
+/// @see cpu_sci_value_write_set
 static inline void __always_inline
-cpu_sci_wait()
+cpu_sci_wait(void)
 {
-        while (0 == (MEMORY_READ(8, CPU(SSR)) & 0x04))
-                ; //waiting for TEND 
-        while (0 == (MEMORY_READ(8, CPU(SSR)) & 0x40))
-                ; //waiting for RDRF 
+        /* Waiting for TEND */
+        while ((MEMORY_READ(8, CPU(SSR)) & 0x04) == 0) {
+        }
+
+        /* Waiting for RDRF */
+        while ((MEMORY_READ(8, CPU(SSR)) & 0x40) == 0) {
+        }
 }
 
 /// @}
 
 __END_DECLS
 
-#endif /* !_CPU_DMAC_H */
+#endif /* !_YAUL_CPU_SCI_H_ */

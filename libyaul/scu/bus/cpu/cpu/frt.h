@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_FRT_H_
-#define _CPU_FRT_H_
+#ifndef _YAUL_CPU_FRT_H_
+#define _YAUL_CPU_FRT_H_
 
 #include <stdbool.h>
 
@@ -136,12 +136,13 @@ cpu_frt_interrupt_priority_set(uint8_t priority)
 {
         /* Set the interrupt priority level for FRT (shared amongst all FRT
          * related interrupts */
-        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF7FF);
+        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF0FF);
         MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
 }
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCA interrupt.
+///
 /// @see cpu_frt_oca_set
 #define cpu_frt_oca_clear()                                                    \
 do {                                                                           \
@@ -150,6 +151,7 @@ do {                                                                           \
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCB interrupt.
+///
 /// @see cpu_frt_ocb_set
 #define cpu_frt_ocb_clear()                                                    \
 do {                                                                           \
@@ -158,6 +160,7 @@ do {                                                                           \
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OVI interrupt.
+///
 /// @see cpu_frt_ovi_set
 #define cpu_frt_ovi_clear()                                                    \
 do {                                                                           \
@@ -181,8 +184,8 @@ extern void cpu_frt_init(uint8_t clock_div);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler.
 /// @param count The tick count to trigger OCA on.
+/// @param ihr   The interrupt handler.
 ///
 /// @see cpu_frt_oca_clear
 extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
@@ -192,8 +195,8 @@ extern void cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr);
 ///
 /// @details There is no need to explicitly return via `rte` for @p ihr.
 ///
-/// @param ihr   The interrupt handler.
 /// @param count The tick count to trigger OCB on.
+/// @param ihr   The interrupt handler.
 ///
 /// @see cpu_frt_ocb_clear
 extern void cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr);
@@ -212,4 +215,4 @@ extern void cpu_frt_ovi_set(cpu_frt_ihr_t ihr);
 
 __END_DECLS
 
-#endif /* !_CPU_FRT_H_ */
+#endif /* !_YAUL_CPU_FRT_H_ */

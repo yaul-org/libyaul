@@ -1,7 +1,7 @@
 /build/
-.ccls-cache/
+/.ccls-cache/
+/compile_commands.json
 /yaul.env
 .#*
 *~
 .DS_Store
-/compile_commands.json

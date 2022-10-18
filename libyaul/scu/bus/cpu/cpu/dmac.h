@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_DMAC_H_
-#define _CPU_DMAC_H_
+#ifndef _YAUL_CPU_DMAC_H_
+#define _YAUL_CPU_DMAC_H_
 
 #include <sys/cdefs.h>
 
@@ -140,17 +140,17 @@ typedef enum cpu_dmac_resource_select {
 /// @brief Callback type.
 /// @see cpu_dmac_cfg_t.ihr
 /// @see cpu_dmac_cfg_t.ihr_work
-typedef void (*cpu_dmac_ihr)(void *);
+typedef void (*cpu_dmac_ihr_t)(void *);
 
 /// CPU-DMAC channel.
 typedef uint8_t cpu_dmac_channel_t;
 
 /// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
-        /// Channel
+        /// Channel.
         cpu_dmac_channel_t channel:2;
 
-        /// Source mode
+        /// Source mode.
         cpu_dmac_src_t src_mode:2;
 
         /// Destination mode.
@@ -196,7 +196,7 @@ typedef struct cpu_dmac_cfg {
         /// @brief Callback when transfer is completed.
         ///
         /// @details Set to `NULL` if no callback is desired.
-        cpu_dmac_ihr ihr;
+        cpu_dmac_ihr_t ihr;
 
         /// @ingroup CPU_INTC_HELPERS
         /// @brief Pointer to any work passed onto @ref cpu_dmac_cfg_t.ihr.
@@ -232,10 +232,10 @@ typedef struct cpu_dmac_status {
 ///
 /// There is no waiting if the CPU-DMAC or the specific channel @p ch is
 /// operating.
-/// 
+///
 /// While this function resets the transfer length, it does not start the
 /// transfer again. For that, use @ref cpu_dmac_channel_start.
-/// 
+///
 /// @param ch       The channel.
 /// @param tcr_bits The 4-byte I/O register value.
 ///
@@ -280,7 +280,7 @@ cpu_dmac_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF7FF);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF0FF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
 }
 
@@ -344,7 +344,7 @@ extern void cpu_dmac_status_get(cpu_dmac_status_t *status);
 /// The CPU-DMAC channel is forcefully stopped upon starting the configuration.
 /// If the channel is currently operating, use @ref cpu_dmac_channel_wait to
 /// wait until the transfer is complete.
-/// 
+///
 /// @param[in] cfg The CPU-DMAC transfer configuration.
 ///
 /// @see cpu_dmac_channel_start
@@ -361,8 +361,17 @@ extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg);
 /// @param ch The channel.
 extern void cpu_dmac_channel_wait(cpu_dmac_channel_t ch);
 
+/// @brief Memory clear using CPU-DMAC using @p ref channel.
+///
+/// @param     ch    The channel.
+/// @param[in] dst   The destination address to clear.
+/// @param     value The value to write.
+/// @param     size  The amount of bytes to clear.
+extern void cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst,
+    uint32_t value, size_t size);
+
 /// @}
 
 __END_DECLS
 
-#endif /* !_CPU_DMAC_H */
+#endif /* !_YAUL_CPU_DMAC_H_ */

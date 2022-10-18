@@ -71,7 +71,7 @@ cd_block_cmd_status_get(cd_block_status_t *cd_status)
 }
 
 int
-cd_block_cmd_get_hardware_info(cd_block_hardware_info_t *info)
+cd_block_cmd_hw_info_get(cd_block_hardware_info_t *info)
 {
         int ret;
         cd_block_regs_t regs;
@@ -100,7 +100,7 @@ cd_block_cmd_get_hardware_info(cd_block_hardware_info_t *info)
 }
 
 int
-cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize)
+cd_block_cmd_toc_get(uint8_t *cd_status, uint16_t *tocsize)
 {
         int ret;
         cd_block_regs_t regs;
@@ -130,8 +130,10 @@ cd_block_cmd_get_toc(uint8_t *cd_status, uint16_t *tocsize)
 }
 
 int
-cd_block_cmd_get_session_info(uint8_t session_number __unused, uint8_t *cd_status,
-    uint8_t *num_sessions, uint32_t *session_lBA)
+cd_block_cmd_session_info_get(uint8_t session_num __unused,
+    uint8_t *cd_status,
+    uint8_t *session_count,
+    uint32_t *session_lba)
 {
         int ret;
         cd_block_regs_t regs;
@@ -151,19 +153,19 @@ cd_block_cmd_get_session_info(uint8_t session_number __unused, uint8_t *cd_statu
                 *cd_status = status.cr1 >> 8;
         }
 
-        if (num_sessions != NULL) {
-                *num_sessions = status.cr3 >> 8;
+        if (session_count != NULL) {
+                *session_count = status.cr3 >> 8;
         }
 
-        if (session_lBA != NULL) {
-                *session_lBA = ((status.cr3 & 0xFF) << 16) | status.cr4;
+        if (session_lba != NULL) {
+                *session_lba = ((status.cr3 & 0xFF) << 16) | status.cr4;
         }
 
         return 0;
 }
 
 int
-cd_block_cmd_init_cd_system(int16_t standby)
+cd_block_cmd_cd_system_init(int16_t standby)
 {
         cd_block_regs_t regs;
         cd_block_regs_t status;
@@ -178,7 +180,7 @@ cd_block_cmd_init_cd_system(int16_t standby)
 }
 
 int
-cd_block_cmd_open_tray(int16_t standby __unused)
+cd_block_cmd_tray_open(int16_t standby __unused)
 {
         int ret;
         cd_block_regs_t regs;
@@ -198,7 +200,7 @@ cd_block_cmd_open_tray(int16_t standby __unused)
 }
 
 int
-cd_block_cmd_end_data_transfer(void)
+cd_block_cmd_data_transfer_end(void)
 {
         int ret;
         cd_block_regs_t regs;
@@ -221,7 +223,7 @@ cd_block_cmd_end_data_transfer(void)
 }
 
 int
-cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors)
+cd_block_cmd_disk_play(int32_t mode, fad_t start_fad, int32_t num_sectors)
 {
         /* Clear flags */
         MEMORY_WRITE_AND(16, CD_BLOCK(HIRQ), ~(PEND | CSCT));
@@ -248,7 +250,7 @@ cd_block_cmd_play_disk(int32_t mode, uint32_t start_fad, int32_t num_sectors)
 }
 
 int
-cd_block_cmd_seek_disk(uint32_t start_play_pos)
+cd_block_cmd_disk_seek(uint32_t start_play_pos)
 {
         int ret;
         cd_block_regs_t regs;
@@ -268,7 +270,7 @@ cd_block_cmd_seek_disk(uint32_t start_play_pos)
 }
 
 int
-cd_block_cmd_scan_disk(uint8_t scan_direction, uint8_t *cd_status)
+cd_block_cmd_disk_scan(uint8_t scan_direction, uint8_t *cd_status)
 {
         int ret;
         cd_block_regs_t regs;
@@ -292,7 +294,7 @@ cd_block_cmd_scan_disk(uint8_t scan_direction, uint8_t *cd_status)
 }
 
 int
-cd_block_cmd_get_subcode(uint8_t type, uint8_t *cd_status,
+cd_block_cmd_subcode_get(uint8_t type, uint8_t *cd_status,
     uint16_t *size_in_words, uint16_t *flags)
 {
         int ret;
@@ -325,7 +327,7 @@ cd_block_cmd_get_subcode(uint8_t type, uint8_t *cd_status,
 }
 
 int
-cd_block_cmd_set_cd_device_connection(uint8_t filter)
+cd_block_cmd_cd_dev_connection_set(uint8_t filter)
 {
         int ret;
         cd_block_regs_t regs;
@@ -345,7 +347,7 @@ cd_block_cmd_set_cd_device_connection(uint8_t filter)
 }
 
 int
-cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *filter_num)
+cd_block_cmd_cd_dev_connection_get(uint8_t *cd_status, uint8_t *filter_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -365,15 +367,15 @@ cd_block_cmd_get_cd_device_connection(uint8_t *cd_status, uint8_t *filter_num)
                 *cd_status = status.cr1 >> 8;
         }
 
-        if (filter_num != NULL) {
-                *filter_num = status.cr3 >> 8;
+        if (filter_number != NULL) {
+                *filter_number = status.cr3 >> 8;
         }
 
         return 0;
 }
 
 int
-cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num)
+cd_block_cmd_last_buffer_destination_get(uint8_t *cd_status, uint8_t *buffer_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -393,15 +395,15 @@ cd_block_cmd_get_last_buffer_destination(uint8_t *cd_status, uint8_t *buff_num)
                 *cd_status = status.cr1 >> 8;
         }
 
-        if (buff_num != NULL) {
-                *buff_num = status.cr3 >> 8;
+        if (buffer_number != NULL) {
+                *buffer_number = status.cr3 >> 8;
         }
 
         return 0;
 }
 
 int
-cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range)
+cd_block_cmd_filter_range_set(uint8_t filter, fad_t fad, uint32_t range)
 {
         int ret;
         cd_block_regs_t regs;
@@ -424,24 +426,46 @@ cd_block_cmd_set_filter_range(uint8_t filter, uint32_t fad, uint32_t range)
 
 /* TODO:
  * Get Filter Range                0x41
- * Set Filter Subheader Conditions 0x42
  * Get Filter Subheader Conditions 0x43
- * Set Filter Mode                 0x44
  * Get Filter Mode                 0x45
  * Set Filter Connection           0x46
  * Get Filter Connection           0x47 */
 
 int
-cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
+cd_block_cmd_filter_subheader_conditions_set(uint8_t channel, uint8_t submode_mask,
+    uint8_t code_info_mask, uint8_t filter_number, uint8_t file_id, uint8_t sub_mode_val,
+    uint8_t code_info_val)
 {
         int ret;
         cd_block_regs_t regs;
         cd_block_regs_t status;
 
-        regs.hirq_mask = EFLS;
-        regs.cr1 = 0x4800 | flags;
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4200 | channel;
+        regs.cr2 = (submode_mask << 8) | code_info_mask;
+        regs.cr3 = (filter_number << 8) | file_id;
+        regs.cr4 = (sub_mode_val << 8) | code_info_val;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
+
+int
+cd_block_cmd_filter_mode_set(uint8_t mode, uint16_t filter_number)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4400 | mode;
         regs.cr2 = 0x0000;
-        regs.cr3 = (sel_num << 8);
+        regs.cr3 = filter_number;
         regs.cr4 = 0x0000;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
@@ -454,7 +478,52 @@ cd_block_cmd_reset_selector(uint8_t flags, uint8_t sel_num)
 }
 
 int
-cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space,
+cd_block_cmd_filter_connection_set(uint8_t conn_number, uint8_t true_conn,
+    uint8_t false_conn, uint16_t filter_number)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = 0;
+        regs.cr1 = 0x4600 | conn_number;
+        regs.cr2 = (true_conn << 8) | false_conn;
+        regs.cr3 = filter_number;
+        regs.cr4 = 0x0000;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
+
+int
+cd_block_cmd_selector_reset(uint8_t flags, uint8_t sel_number)
+{
+        int ret;
+        cd_block_regs_t regs;
+        cd_block_regs_t status;
+
+        regs.hirq_mask = EFLS;
+        regs.cr1 = 0x4800 | flags;
+        regs.cr2 = 0x0000;
+        regs.cr3 = (sel_number << 8);
+        regs.cr4 = 0x0000;
+
+        if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
+                return ret;
+        }
+
+        _hirq_flag_wait(ESEL);
+
+        return _return_status_check(&status);
+}
+
+int
+cd_block_cmd_buffer_size_get(uint8_t *cd_status, uint16_t *block_free_space,
     uint8_t *max_selectors, uint16_t *max_blocks)
 {
         int ret;
@@ -491,7 +560,7 @@ cd_block_cmd_get_buffer_size(uint8_t *cd_status, uint16_t *block_free_space,
 }
 
 int
-cd_block_cmd_get_sector_number(uint8_t buffer_number)
+cd_block_cmd_sector_number_get(uint8_t buffer_number)
 {
         cd_block_regs_t regs;
 
@@ -520,7 +589,7 @@ cd_block_cmd_get_sector_number(uint8_t buffer_number)
  * Get FAD Search Results 0x56 */
 
 int
-cd_block_cmd_set_sector_length(uint16_t size)
+cd_block_cmd_sector_length_set(uint8_t size)
 {
         cd_block_regs_t regs;
 
@@ -542,8 +611,8 @@ cd_block_cmd_set_sector_length(uint16_t size)
 }
 
 int
-cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num,
-    uint16_t sec_num)
+cd_block_cmd_sector_data_get(uint16_t sec_offset, uint8_t buffer_number,
+    uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -552,8 +621,8 @@ cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num,
         regs.hirq_mask = 0;
         regs.cr1 = 0x6100;
         regs.cr2 = sec_offset;
-        regs.cr3 = buf_num << 8;
-        regs.cr4 = sec_num;
+        regs.cr3 = buffer_number << 8;
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -563,8 +632,8 @@ cd_block_cmd_get_sector_data(uint16_t sec_offset, uint8_t buf_num,
 }
 
 int
-cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num,
-    uint16_t sec_num)
+cd_block_cmd_sector_data_delete(uint16_t sec_position, uint8_t buffer_number,
+    uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -573,8 +642,8 @@ cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num,
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6200;
         regs.cr2 = sec_position;
-        regs.cr3 = buf_num << 8;
-        regs.cr4 = sec_num;
+        regs.cr3 = buffer_number << 8;
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -584,8 +653,8 @@ cd_block_cmd_delete_sector_data(uint16_t sec_position, uint8_t buf_num,
 }
 
 int
-cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num,
-    uint16_t sec_num)
+cd_block_cmd_sector_data_get_delete(uint16_t offset, uint8_t buffer_number,
+    uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -594,8 +663,8 @@ cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num,
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6300;
         regs.cr2 = offset;
-        regs.cr3 = (buff_num << 8);
-        regs.cr4 = sec_num;
+        regs.cr3 = (buffer_number << 8);
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -605,7 +674,7 @@ cd_block_cmd_get_then_delete_sector_data(uint16_t offset, uint8_t buff_num,
 }
 
 int
-cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num)
+cd_block_cmd_sector_data_put(uint8_t buffer_number, uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -614,8 +683,8 @@ cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num)
         regs.hirq_mask = EHST;
         regs.cr1 = 0x6400;
         regs.cr2 = 0x0000;
-        regs.cr3 = (buff_num << 8);
-        regs.cr4 = sec_num;
+        regs.cr3 = (buffer_number << 8);
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -625,8 +694,8 @@ cd_block_cmd_put_sector_data(uint8_t buff_num, uint16_t sec_num)
 }
 
 int
-cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset,
-    uint8_t buff_num, uint16_t sec_num)
+cd_block_cmd_sector_data_copy(uint8_t dst_filter, uint16_t sec_offset,
+    uint8_t buffer_number, uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -635,8 +704,8 @@ cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset,
         regs.hirq_mask = 0;
         regs.cr1 = 0x6500 | dst_filter;
         regs.cr2 = sec_offset;
-        regs.cr3 = (buff_num << 8);
-        regs.cr4 = sec_num;
+        regs.cr3 = (buffer_number << 8);
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -646,8 +715,8 @@ cd_block_cmd_copy_sector_data(uint8_t dst_filter, uint16_t sec_offset,
 }
 
 int
-cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset,
-    uint8_t buff_num, uint16_t sec_num)
+cd_block_cmd_sector_data_move(uint8_t dst_filter, uint16_t sec_offset,
+    uint8_t buffer_number, uint16_t sec_number)
 {
         int ret;
         cd_block_regs_t regs;
@@ -656,8 +725,8 @@ cd_block_cmd_move_sector_data(uint8_t dst_filter, uint16_t sec_offset,
         regs.hirq_mask = 0;
         regs.cr1 = 0x6600 | dst_filter;
         regs.cr2 = sec_offset;
-        regs.cr3 = (buff_num << 8);
-        regs.cr4 = sec_num;
+        regs.cr3 = (buffer_number << 8);
+        regs.cr4 = sec_number;
 
         if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
                 return ret;
@@ -702,7 +771,7 @@ cd_block_cmd_get_copy_error(uint8_t *cd_status, uint8_t *error_code)
  * Read File             0x74 */
 
 int
-cd_block_cmd_abort_file(void)
+cd_block_cmd_file_abort(void)
 {
         int ret;
         cd_block_regs_t regs;
@@ -723,7 +792,7 @@ cd_block_cmd_abort_file(void)
 }
 
 int
-cd_block_cmd_auth_disk(void)
+cd_block_cmd_disk_auth(void)
 {
         cd_block_regs_t regs;
         cd_block_regs_t status;
@@ -738,7 +807,7 @@ cd_block_cmd_auth_disk(void)
 }
 
 int
-cd_block_cmd_is_auth(uint16_t *disk_type_auth)
+cd_block_cmd_auth_check(uint16_t *disk_type_auth)
 {
         int ret;
         cd_block_regs_t regs;

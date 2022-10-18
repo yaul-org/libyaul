@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DBGIO_H_
-#define _DBGIO_H_
+#ifndef _YAUL_KERNEL_DBGIO_H_
+#define _YAUL_KERNEL_DBGIO_H_
 
 #include <sys/cdefs.h>
 
@@ -19,11 +19,11 @@
 __BEGIN_DECLS
 
 typedef enum dbgio_dev {
-        DBGIO_DEV_NULL        = 0,
-        DBGIO_DEV_VDP1        = 1,
-        DBGIO_DEV_VDP2_SIMPLE = 2,
-        DBGIO_DEV_VDP2_ASYNC  = 3,
-        DBGIO_DEV_USB_CART    = 4
+        DBGIO_DEV_NULL,
+        DBGIO_DEV_VDP1,
+        DBGIO_DEV_VDP2,
+        DBGIO_DEV_VDP2_ASYNC,
+        DBGIO_DEV_USB_CART
 } dbgio_dev_t;
 
 #define DBGIO_DEV_COUNT 5
@@ -52,17 +52,19 @@ typedef struct dbgio_usb_cart {
         uint16_t buffer_size;
 } dbgio_usb_cart_t;
 
-extern void dbgio_dev_init(dbgio_dev_t, const void *);
-extern void dbgio_dev_default_init(dbgio_dev_t);
+extern void dbgio_init(void);
+
+extern void dbgio_dev_init(dbgio_dev_t dev, const void *params);
+extern void dbgio_dev_default_init(dbgio_dev_t dev);
 extern void dbgio_dev_deinit(void);
+extern dbgio_dev_t dbgio_dev_selected_get(void);
 
 extern void dbgio_dev_font_load(void);
-extern void dbgio_dev_font_load_wait(void);
 
-extern void dbgio_puts(const char *);
-extern void dbgio_printf(const char *, ...) __printflike(1, 2);
+extern void dbgio_puts(const char *buffer);
+extern void dbgio_printf(const char *format, ...) __printflike(1, 2);
 extern void dbgio_flush(void);
 
 __END_DECLS
 
-#endif /* !_DBGIO_H_ */
+#endif /* !_YAUL_KERNEL_DBGIO_H_ */

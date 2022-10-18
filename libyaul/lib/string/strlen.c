@@ -25,10 +25,11 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define ALIGN (sizeof(size_t))
-#define ONES ((size_t)-1/UCHAR_MAX)
-#define HIGHS (ONES * (UCHAR_MAX/2+1))
-#define HASZERO(x) (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN           (sizeof(size_t))
+#define ONES            ((size_t) - 1 / UCHAR_MAX)
+#define HIGHS           (ONES * (UCHAR_MAX / 2 + 1))
+
+#define HAS_ZERO(x)     (((x) - ONES) & ~(x) & HIGHS)
 
 size_t
 strlen(const char *s)
@@ -39,18 +40,20 @@ strlen(const char *s)
         typedef size_t __may_alias word;
         const word *w;
 
-        for (; (uintptr_t)s % ALIGN; s++) {
+        for (; ((uintptr_t)s % ALIGN); s++) {
                 if (!*s) {
                         return s - a;
                 }
         }
 
-        for (w = (const void *)s; !HASZERO(*w); w++);
+        for (w = (const void *)s; !HAS_ZERO(*w); w++) {
+        }
 
         s = (const void *)w;
 #endif /* __GNUC__ */
 
-        for (; *s; s++);
+        for (; *s != '\0'; s++) {
+        }
 
-        return s - a;
+        return (s - a);
 }

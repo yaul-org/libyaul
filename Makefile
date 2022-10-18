@@ -2,15 +2,15 @@ PROJECTS:= \
 	libyaul \
 	libtga \
 	libbcl \
-	libsega3d
+	libg3d
 
 include env.mk
 
 THIS_ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 export THIS_ROOT
 
-# $1 ->
-# $2 ->
+# $1 -> Project directory
+# $2 -> Project name
 define macro-generate-build-rule
 .PHONY: $1-$2
 
@@ -20,8 +20,8 @@ $1-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk $2) || exit $${?}
 endef
 
-# $1 ->
-# $2 ->
+# $1 -> Project directory
+# $2 -> Project name
 define macro-generate-install-rule
 .PHONY: $1-install-$2
 
@@ -32,7 +32,7 @@ $1-install-$2:
 	$(ECHO)($(MAKE) -C $1 -f $2.mk install-$2) || exit $${?}
 endef
 
-# $1 ->
+# $1 -> Project directory
 define macro-generate-generate-cdb-rule
 .PHONY: $1-generate-cdb
 

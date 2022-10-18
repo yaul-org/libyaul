@@ -13,43 +13,25 @@
 
 #include <sys/callback-list.h>
 
-#include <internal.h>
+#include "callback-list-internal.h"
 
-static void _default_handler(void *);
+static void _default_handler(void *work);
 
 callback_list_t *
-callback_list_alloc(uint8_t count)
+callback_list_alloc(uint32_t count)
 {
-        assert(count > 0);
-
-        callback_list_t *callback_list;
-        callback_list = _internal_malloc(sizeof(callback_list_t));
-        assert(callback_list != NULL);
-
-        callback_t *callbacks;
-        callbacks = _internal_malloc(count * sizeof(callback_t));
-        assert(callbacks != NULL);
-
-        callback_list_init(callback_list, callbacks, count);
-        callback_list_clear(callback_list);
-
-        return callback_list;
+        return __callback_list_request_alloc(count, malloc);
 }
 
 void
 callback_list_free(callback_list_t *callback_list)
 {
-        assert(callback_list != NULL);
-        assert(callback_list->callbacks != NULL);
-
-        callback_list->count = 0;
-
-        _internal_free(callback_list->callbacks);
-        _internal_free(callback_list);
+        __callback_list_request_free(callback_list, free);
 }
 
 void
-callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint8_t count)
+callback_list_init(callback_list_t *callback_list, callback_t *callbacks,
+    uint32_t count)
 {
         assert(callback_list != NULL);
         assert(callbacks != NULL);
@@ -57,41 +39,52 @@ callback_list_init(callback_list_t *callback_list, callback_t *callbacks, uint8_
 
         callback_list->count = count;
         callback_list->callbacks = callbacks;
+
+        callback_list_clear(callback_list);
 }
 
 void
-callback_list_process(callback_list_t *callback_list, bool clear)
+callback_list_process(callback_list_t *callback_list)
 {
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
 
-        uint8_t id;
-        for (id = 0; id < callback_list->count; id++) {
-                callback_handler handler;
-                handler = callback_list->callbacks[id].handler;
+        callback_t *callback = callback_list->callbacks;
+        const callback_t * const last_callback =
+            &callback_list->callbacks[callback_list->count - 1];
 
-                void *work;
-                work = callback_list->callbacks[id].work;
+        for (; callback <= last_callback; callback++) {
+                callback_call(callback);
+        }
+}
 
-                if (clear) {
-                        callback_init(&callback_list->callbacks[id]);
-                }
+void
+callback_list_rev_process(callback_list_t *callback_list)
+{
+        assert(callback_list != NULL);
+        assert(callback_list->callbacks != NULL);
+        assert(callback_list->count > 0);
 
-                handler(work);
+        callback_t *callback =
+            &callback_list->callbacks[callback_list->count - 1];
+        const callback_t * const first_callback =
+            callback_list->callbacks;
+
+        for (; callback >= first_callback; callback--) {
+                callback_call(callback);
         }
 }
 
 callback_id_t
-callback_list_callback_add(callback_list_t *callback_list, callback_handler handler, void *work)
+callback_list_callback_add(callback_list_t *callback_list,
+    callback_handler_t handler, void *work)
 {
-#ifdef DEBUG
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
-#endif /* DEBUG */
 
-        callback_id_t id;
+        uint32_t id;
         for (id = 0; id < callback_list->count; id++) {
                 if (callback_list->callbacks[id].handler != _default_handler) {
                         continue;
@@ -102,9 +95,7 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler hand
                 return id;
         }
 
-#ifdef DEBUG
         assert(id != callback_list->count);
-#endif /* DEBUG */
 
         return -1;
 }
@@ -112,12 +103,10 @@ callback_list_callback_add(callback_list_t *callback_list, callback_handler hand
 void
 callback_list_callback_remove(callback_list_t *callback_list, callback_id_t id)
 {
-#ifdef DEBUG
         assert(callback_list != NULL);
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
-        assert(id < callback_list->count);
-#endif /* DEBUG */
+        assert((uint32_t)id < callback_list->count);
 
         callback_list->callbacks[id].handler = _default_handler;
         callback_list->callbacks[id].work = NULL;
@@ -130,8 +119,7 @@ callback_list_clear(callback_list_t *callback_list)
         assert(callback_list->callbacks != NULL);
         assert(callback_list->count > 0);
 
-        uint8_t i;
-        for (i = 0; i < callback_list->count; i++) {
+        for (uint32_t i = 0; i < callback_list->count; i++) {
                 callback_init(&callback_list->callbacks[i]);
         }
 }
@@ -146,7 +134,7 @@ callback_init(callback_t *callback)
 }
 
 void
-callback_set(callback_t *callback, callback_handler handler, void *work)
+callback_set(callback_t *callback, callback_handler_t handler, void *work)
 {
         assert(callback != NULL);
 

@@ -19,12 +19,12 @@
 #define FAKE_SECTOR_SIZE        2352
 #define FAKE_NUM_SECTORS        150
 
-static int _status_flags_get(uint8_t *);
-static int _hirq_flag_wait(uint16_t);
+static int _status_flags_get(uint8_t *flags);
+static int _hirq_flag_wait(uint16_t flag);
 static int _cd_block_auth(void);
 
 int
-cd_block_init(int16_t standby)
+cd_block_init(void)
 {
         int ret;
 
@@ -32,30 +32,25 @@ cd_block_init(int16_t standby)
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & CMOK) == 0) {
         }
 
-        if ((ret = cd_block_cmd_abort_file()) != 0) {
+        if ((ret = cd_block_cmd_file_abort()) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_init_cd_system(standby)) != 0) {
+        if ((ret = cd_block_cmd_cd_system_init(0x0002)) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_end_data_transfer()) != 0) {
+        if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_reset_selector(0xFC, 0)) != 0) {
+        if ((ret = cd_block_cmd_selector_reset(0xFC, 0)) != 0) {
                 return ret;
         }
 
         /* Wait for ESEL */
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & ESEL) == 0) {
         }
-
-        /* Bypass auth */
-        /* if ((ret = cd_block_auth()) != 0) { */
-        /*         return ret; */
-        /* } */
 
         return 0;
 }
@@ -69,14 +64,14 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
         struct cd_block_status cd_status;
         uint16_t is_authenticated;
 
-        cd_block_cmd_move_sector_data(dst_filter, sector_pos, sel_num,
+        cd_block_cmd_sector_data_move(dst_filter, sector_pos, sel_num,
                                       num_sectors);
 
         /* Clear hirq flags */
         MEMORY_WRITE(16, CD_BLOCK(HIRQ), ~(DCHG | EFLS));
 
         /* Authenticate disc */
-        if ((ret = cd_block_cmd_auth_disk()) != 0) {
+        if ((ret = cd_block_cmd_disk_auth()) != 0) {
                 return ret;
         }
 
@@ -85,7 +80,7 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
                 ;
 
         /* Wait until drive has finished seeking */
-        for (;;) {
+        while (true) {
                 /* Wait a bit */
                 for (i = 0; i < 100000; i++) {
                 }
@@ -104,7 +99,7 @@ cd_sector_data_cd_auth_move(uint8_t dst_filter, uint16_t sector_pos,
         }
 
         /* Was Authentication successful? */
-        if (cd_block_cmd_is_auth(&is_authenticated) == 0) {
+        if ((cd_block_cmd_auth_check(&is_authenticated)) == 0) {
                 return -1;
         }
 
@@ -120,12 +115,12 @@ cd_block_security_bypass(void)
         cd_block_regs_t regs __unused;
         cd_block_regs_t status __unused;
 
-        if ((ret = cd_block_cmd_set_sector_length(SECTOR_LENGTH_2352)) != 0) {
+        if ((ret = cd_block_cmd_sector_length_set(SECTOR_LENGTH_2352)) != 0) {
                 return ret;
         }
 
         /* Write 150 x 2353 sectors */
-        if ((ret = cd_block_cmd_put_sector_data(0, 150)) != 0) {
+        if ((ret = cd_block_cmd_sector_data_put(0, 150)) != 0) {
                 return ret;
         }
 
@@ -135,7 +130,7 @@ cd_block_security_bypass(void)
                 }
         }
 
-        if ((ret = cd_block_cmd_end_data_transfer()) != 0) {
+        if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
                 return ret;
         }
 
@@ -144,20 +139,20 @@ cd_block_security_bypass(void)
 
         cd_sector_data_cd_auth_move(0, 0, 0, 50);
 
-        cd_block_cmd_is_auth(NULL);
+        cd_block_cmd_auth_check(NULL);
 
         while ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & ECPY) == 0) {
         }
 
-        if ((ret = cd_block_cmd_end_data_transfer()) != 0) {
+        if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_set_sector_length(SECTOR_LENGTH_2048)) != 0) {
+        if ((ret = cd_block_cmd_sector_length_set(SECTOR_LENGTH_2048)) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_reset_selector(0xFC, 0)) != 0) {
+        if ((ret = cd_block_cmd_selector_reset(0xFC, 0)) != 0) {
                 return ret;
         }
 
@@ -168,10 +163,14 @@ int
 cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_buffer, uint32_t buffer_length)
 {
         assert(output_buffer != NULL);
+        assert(buffer_length > 0);
+
+        const uint32_t sectors_to_read = (buffer_length + (CDFS_SECTOR_SIZE - 1)) / CDFS_SECTOR_SIZE;
+
+        int ret;
 
         /* Start transfer */
-        int ret;
-        ret = cd_block_cmd_get_then_delete_sector_data(offset, buffer_number, 1);
+        ret = cd_block_cmd_sector_data_get_delete(offset, buffer_number, sectors_to_read);
         if (ret != 0) {
                 return ret;
         }
@@ -185,13 +184,12 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         uint16_t *read_buffer;
         read_buffer = (uint16_t *)output_buffer;
 
-        uint32_t bytes_to_read = ISO9660_SECTOR_SIZE;
-        if (bytes_to_read > buffer_length) {
-                bytes_to_read = buffer_length;
-        }
+        uint32_t to_read;
+        to_read = (buffer_length % 2) ? buffer_length - 1 : buffer_length;
 
-        uint32_t read_bytes = 0;
-        for (uint32_t i = 0; i < bytes_to_read; i += 2) {
+        uint32_t read_bytes;
+        read_bytes = 0;
+        for (uint32_t i = 0; i < to_read; i += 2) {
                 *read_buffer = MEMORY_READ(16, CD_BLOCK(DTR));
                 read_buffer++;
                 read_bytes += 2;
@@ -201,10 +199,10 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
         if (read_bytes < buffer_length) {
                 const uint16_t tmp = MEMORY_READ(16, CD_BLOCK(DTR));
 
-                output_buffer[buffer_length - 1] = tmp >> 8;
+                output_buffer[buffer_length - 1] = (tmp >> 8) & 0xFF;
         }
 
-        if ((ret = cd_block_cmd_end_data_transfer()) != 0) {
+        if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
                 return ret;
         }
 
@@ -212,43 +210,43 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
 }
 
 int
-cd_block_sector_read(uint32_t fad, void *output_buffer)
+cd_block_sector_read(fad_t fad, void *output_buffer)
 {
         assert(fad >= 150);
         assert(output_buffer != NULL);
 
         int ret;
 
-        if ((ret = cd_block_cmd_set_sector_length(SECTOR_LENGTH_2048)) != 0) {
+        if ((ret = cd_block_cmd_sector_length_set(SECTOR_LENGTH_2048)) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_reset_selector(0, 0)) != 0) {
+        if ((ret = cd_block_cmd_selector_reset(0, 0)) != 0) {
                 return ret;
         }
 
-        if ((ret = cd_block_cmd_set_cd_device_connection(0)) != 0) {
+        if ((ret = cd_block_cmd_cd_dev_connection_set(0)) != 0) {
                 return ret;
         }
 
         /* Start reading */
-        if ((ret = cd_block_cmd_play_disk(0, fad, /* num_sectors */ 1)) != 0) {
+        if ((ret = cd_block_cmd_disk_play(0, fad, /* num_sectors */ 1)) != 0) {
                 return ret;
         }
 
         /* If at least one sector has transferred, we copy it */
-        while ((cd_block_cmd_get_sector_number(0)) == 0) {
+        while ((cd_block_cmd_sector_number_get(0)) == 0) {
         }
 
-        if ((ret = cd_block_transfer_data(0, 0, output_buffer, ISO9660_SECTOR_SIZE)) != 0) {
+        if ((ret = cd_block_transfer_data(0, 0, output_buffer, CDFS_SECTOR_SIZE)) != 0) {
                 return ret;
         }
 
         return 0;
 }
 
-void
-cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
+int
+cd_block_sectors_read(fad_t fad, void *output_buffer, uint32_t length)
 {
         assert(fad >= 150);
         assert(output_buffer != NULL);
@@ -257,11 +255,21 @@ cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
         uint8_t *buffer_ptr = (uint8_t *)output_buffer;
 
         /* Get the sector count from length */
-        const uint32_t sector_count = (length + (ISO9660_SECTOR_SIZE - 1)) / ISO9660_SECTOR_SIZE;
+        const uint32_t sector_count = (length + (CDFS_SECTOR_SIZE - 1)) / CDFS_SECTOR_SIZE;
 
-        cd_block_cmd_reset_selector(0, 0);
-        cd_block_cmd_set_cd_device_connection(0);
-        cd_block_cmd_play_disk(0, fad, sector_count);
+        int ret;
+
+        if ((ret = cd_block_cmd_selector_reset(0, 0)) != 0) {
+                return ret;
+        }
+
+        if ((ret = cd_block_cmd_cd_dev_connection_set(0)) != 0) {
+                return ret;
+        }
+
+        if ((ret = cd_block_cmd_disk_play(0, fad, sector_count)) != 0) {
+                return ret;
+        }
 
         uint32_t bytes_missing = length;
 
@@ -270,24 +278,28 @@ cd_block_sectors_read(uint32_t fad, void *output_buffer, uint32_t length)
                 uint32_t sectors_ready;
 
                 do {
-                        sectors_ready = cd_block_cmd_get_sector_number(0);
+                        sectors_ready = cd_block_cmd_sector_number_get(0);
                 } while (sectors_ready == 0);
 
                 uint32_t bytes_to_read;
 
-                if ((sectors_ready * ISO9660_SECTOR_SIZE) > bytes_missing) {
+                if ((sectors_ready * CDFS_SECTOR_SIZE) > bytes_missing) {
                         bytes_to_read = bytes_missing;
                 } else {
-                        bytes_to_read = sectors_ready * ISO9660_SECTOR_SIZE;
+                        bytes_to_read = sectors_ready * CDFS_SECTOR_SIZE;
                 }
 
                 /* Setup a transfer from CD buffer to buffer, then delete data
                  * from CD buffer */
-                cd_block_transfer_data(0, 0, buffer_ptr, bytes_to_read);
+                if ((ret = cd_block_transfer_data(0, 0, buffer_ptr, bytes_to_read)) != 0) {
+                        return ret;
+                }
 
                 buffer_ptr += bytes_to_read;
                 bytes_missing -= bytes_to_read;
         }
+
+        return 0;
 }
 
 static int

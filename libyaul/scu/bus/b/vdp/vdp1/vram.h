@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_VRAM_H_
-#define _VDP1_VRAM_H_
+#ifndef _YAUL_VDP1_VRAM_H_
+#define _YAUL_VDP1_VRAM_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -20,12 +20,14 @@ __BEGIN_DECLS
 #define VDP1_VRAM_DEFAULT_GOURAUD_COUNT (1024)
 #define VDP1_VRAM_DEFAULT_CLUT_COUNT    (256)
 
-#define VDP1_FB_POINT(x, y)     (0x25C80000UL + (((x) & 0x1) << 18) + (y))
-#define VDP1_CMD_TABLE(x, y)    (0x25C00000UL + ((x) << 5) + (((y) << 1) & 0x1F))
+#define VDP1_FB_POINT(x, y)     VDP1_FB((((x) & 0x1) << 18) + (y)))
+#define VDP1_CMD_TABLE(x, y)    VDP1_VRAM(((x) << 5) + (((y) << 1) & 0x1F))
 
 #define VDP1_VRAM_SIZE  0x00080000UL /* In bytes */
 
-#define VDP1_FB_SIZE    0x00040000UL
+#define VDP1_FB_COUNT   2UL
+
+#define VDP1_FB_SIZE    0x00040000UL /* In bytes */
 
 typedef struct vdp1_gouraud_table {
         color_rgb1555_t colors[4];
@@ -75,10 +77,11 @@ typedef struct vdp1_vram_partitions {
         uint32_t remaining_size;
 } vdp1_vram_partitions_t;
 
-extern void vdp1_vram_partitions_set(uint32_t, uint32_t, uint32_t, uint32_t);
+extern void vdp1_vram_partitions_set(uint32_t cmdt_count, uint32_t texture_size,
+    uint32_t gouraud_count, uint32_t clut_count);
 
-extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *);
+extern void vdp1_vram_partitions_get(vdp1_vram_partitions_t *vram_partitions);
 
 __END_DECLS
 
-#endif /* !_VDP1_VRAM_H_ */
+#endif /* !_YAUL_VDP1_VRAM_H_ */

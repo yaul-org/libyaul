@@ -14,13 +14,6 @@
 #ifndef _YAUL_H_
 #define _YAUL_H_
 
-/* Check if HAVE_DEV_CARTRIDGE has a valid value */
-/* USB flash cartridge */
-/* Datel Action Replay cartridge */
-#if (HAVE_DEV_CARTRIDGE < 0) || (HAVE_DEV_CARTRIDGE > 2)
-#error "Invalid `HAVE_DEV_CARTRIDGE' value"
-#endif /* HAVE_DEV_CARTRIDGE */
-
 #include <bios.h>
 
 /* CPU-bus CPU */
@@ -33,11 +26,9 @@
 #include <scu/scu.h>
 
 /* CS0 */
-#if HAVE_DEV_CARTRIDGE == 1 /* USB flash cartridge */
 #include <usb-cart.h>
-#elif HAVE_DEV_CARTRIDGE == 2 /* Datel Action Replay cartridge */
 #include <arp.h>
-#endif /* HAVE_DEV_CARTRIDGE */
+#include <flash.h>
 
 #include <scu/bus/a/cs0/dram-cart/dram-cart.h>
 
@@ -51,17 +42,14 @@
 #include <scu/bus/b/scsp/scsp.h>
 
 /* Kernel */
-#include <common/ip.h>
-
-#if HAVE_GDB_SUPPORT == 1
-#include <common/gdb/gdb.h>
-#endif /* HAVE_GDB_SUPPORT */
+#include <ip/ip.h>
 
 #include <dbgio/dbgio.h>
 
 #include <math.h>
 
 #include <mm/memb.h>
+#include <mm/mm_stats.h>
 
 #if defined(MALLOC_IMPL_TLSF)
 #include <mm/tlsf.h>
@@ -70,11 +58,8 @@
 #include <sys/init.h>
 #include <sys/dma-queue.h>
 
-#include <fs/iso9660/iso9660.h>
-#include <fs/romdisk/romdisk.h>
+#include <ssload.h>
 
-#if HAVE_DEV_CARTRIDGE != 0
-#include <fs/fileclient/fileclient.h>
-#endif /* HAVE_DEV_CARTRIDGE */
+#include <fs/cd/cdfs.h>
 
 #endif /* !_YAUL_H_ */

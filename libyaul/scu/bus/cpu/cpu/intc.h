@@ -5,10 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_INTC_H_
-#define _CPU_INTC_H_
+#ifndef _YAUL_CPU_INTC_H_
+#define _YAUL_CPU_INTC_H_
 
 #include <stdint.h>
+
+#include <sys/cdefs.h>
 
 #include <cpu/registers.h>
 #include <cpu/dual.h>
@@ -83,6 +85,8 @@ typedef enum cpu_intc_interrupt {
         /// Interrupt vector.
         CPU_INTC_INTERRUPT_BREAK               = 0x20,
         /// Interrupt vector.
+        CPU_INTC_INTERRUPT_NETLINK             = 0x5C,
+        /// Interrupt vector.
         CPU_INTC_INTERRUPT_SCI_ERI             = 0x60,
         /// Interrupt vector.
         CPU_INTC_INTERRUPT_SCI_RXI             = 0x61,
@@ -120,7 +124,7 @@ typedef enum cpu_intc_interrupt {
 
 /// @brief Callback type.
 /// @see cpu_intc_ihr_set
-typedef void (*cpu_intc_ihr)(void);
+typedef void (*cpu_intc_ihr_t)(void);
 
 /// @brief Set the interrupt handler for the specified CPU related interrupt.
 ///
@@ -137,9 +141,9 @@ typedef void (*cpu_intc_ihr)(void);
 /// @param vector The vector number.
 /// @param ihr    The interrupt handler.
 static inline void __always_inline
-cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr ihr)
+cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr_t ihr)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000310;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000310;
 
         ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
@@ -170,10 +174,10 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 /// CPU_INTC_INTERRUPT_SLAVE_BASE to @p vector.
 ///
 /// @param vector The vector number.
-static inline cpu_intc_ihr __always_inline
+static inline cpu_intc_ihr_t __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 {
-        register uint32_t * const bios_address = (uint32_t *)0x06000314;
+        __register uint32_t * const bios_address = (uint32_t *)0x06000314;
 
         return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
@@ -184,8 +188,8 @@ cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 static inline uint8_t __always_inline
 cpu_intc_mask_get(void)
 {
-        register const uint32_t reg_sr = cpu_reg_sr_get();
-        register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
+        __register const uint32_t reg_sr = cpu_reg_sr_get();
+        __register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
 
         return mask;
 }
@@ -196,7 +200,7 @@ cpu_intc_mask_get(void)
 static inline void __always_inline
 cpu_intc_mask_set(uint8_t mask)
 {
-        register uint32_t reg_sr;
+        __register uint32_t reg_sr;
         reg_sr = cpu_reg_sr_get();
 
         reg_sr &= ~CPU_SR_I_BITS_MASK;
@@ -243,4 +247,4 @@ cpu_intc_priority_b_set(uint16_t iprb)
 
 __END_DECLS
 
-#endif /* !_CPU_INTC_H */
+#endif /* !_YAUL_CPU_INTC_H_ */

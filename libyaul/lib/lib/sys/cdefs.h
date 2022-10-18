@@ -30,8 +30,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_CDEFS_H_
-#define _SYS_CDEFS_H_
+#ifndef _LIB_SYS_CDEFS_H_
+#define _LIB_SYS_CDEFS_H_
 
 #include <stddef.h>
 
@@ -171,6 +171,12 @@
 /// @def __hot
 /// @brief Not yet documented.
 #define __hot                   __attribute__ ((hot))
+/// @def __fallthrough
+/// @brief Not yet documented.
+#define __fallthrough           __attribute__ ((fallthrough))
+/// @def __hidden
+/// @brief Not yet documented.
+#define __hidden                __attribute__ ((__visibility__ ("hidden")))
 
 /// @def __alloc_align(yyy)
 /// @brief Not yet documented.
@@ -245,20 +251,19 @@
  * false.
  *
  * A few notes about usage:
- *   * Generally, __predict_false() error condition checks (unless
- *     you have some _strong_ reason to do otherwise, in which case
- *     document it), and/or __predict_true() `no-error' condition
- *     checks, assuming you want to optimize for the no-error case.
  *
- *   * Other than that, if you don't know the likelihood of a test
- *     succeeding from empirical or other `hard' evidence, don't
- *     make predictions.
+ *   * Generally, __predict_false() error condition checks (unless you have some
+ *     _strong_ reason to do otherwise, in which case document it), and/or
+ *     __predict_true() `no-error' condition checks, assuming you want to
+ *     optimize for the no-error case.
  *
- *   * These are meant to be used in places that are run `a lot'.
- *     It is wasteful to make predictions in code that is run
- *     seldomly (e.g. at subsystem initialization time) as the
- *     basic block reordering that this affects can often generate
- *     larger code. */
+ *   * Other than that, if you don't know the likelihood of a test succeeding
+ *     from empirical or other `hard' evidence, don't make predictions.
+ *
+ *   * These are meant to be used in places that are run `a lot'. It is wasteful
+ *     to make predictions in code that is run seldomly (e.g. at subsystem
+ *     initialization time) as the basic block reordering that this affects can
+ *     often generate larger code. */
 /// @private
 #define __predict_true(exp)     __builtin_expect((exp), 1)
 /// @private
@@ -291,4 +296,14 @@
 #define __weak_alias(name, aliasname)                                          \
         extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
 
-#endif /* !_SYS_CDEFS_H_ */
+/*
+ * Prior to C++17 the register storage class specifier was deprecated; in C++17
+ * it has been removed. */
+/// @private
+#if (__cplusplus - 0) >= 201703L
+#define __register
+#else
+#define __register register
+#endif
+
+#endif /* !_LIB_SYS_CDEFS_H_ */

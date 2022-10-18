@@ -8,25 +8,36 @@
 #include <bios.h>
 #include <cpu/dmac.h>
 #include <cpu/intc.h>
+#include <cpu/cache.h>
 #include <scu/ic.h>
 
 #include <sys/callback-list.h>
 
+#include <sys/cdefs.h>
+
 #include "cpu-internal.h"
 
-static void _dmac_ch0_ihr_handler(void);
-static void _dmac_ch1_ihr_handler(void);
+static void _master_ch0_ihr_handler(void);
+static void _slave_ch0_ihr_handler(void);
 
-#define CPU_DMAC_IHR_INDEX_CH0 0
-#define CPU_DMAC_IHR_INDEX_CH1 1
+static void _master_ch1_ihr_handler(void);
+static void _slave_ch1_ihr_handler(void);
+
+static callback_t *_ihr_callback_get(void);
+
+#define IHR_INDEX_CH0 0
+#define IHR_INDEX_CH1 1
 
 static callback_t _master_ihr_callbacks[2];
 static callback_t _slave_ihr_callbacks[2];
 
-static callback_t *_dmac_executor_ihr_callbacks_get(void);
+static callback_t * const _ihr_callback_tables[] = {
+        _master_ihr_callbacks,
+        _slave_ihr_callbacks
+};
 
 void
-_internal_cpu_dmac_init(void)
+__cpu_dmac_init()
 {
         cpu_dmac_channel_wait(0);
         cpu_dmac_channel_wait(1);
@@ -42,23 +53,23 @@ _internal_cpu_dmac_init(void)
         MEMORY_WRITE(8, CPU(DRCR0), 0x00);
         MEMORY_WRITE(8, CPU(DRCR1), 0x00);
 
-        const uint8_t which_cpu = cpu_dual_executor_get();
+        const cpu_which_t which_cpu = cpu_dual_executor_get();
 
         if (which_cpu == CPU_MASTER) {
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0, _dmac_ch0_ihr_handler);
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1, _dmac_ch1_ihr_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0, _master_ch0_ihr_handler);
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1, _master_ch1_ihr_handler);
 
                 cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0 + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _dmac_ch0_ihr_handler);
+                    _slave_ch0_ihr_handler);
                 cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1 + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _dmac_ch1_ihr_handler);
+                    _slave_ch1_ihr_handler);
+
+                callback_init(&_master_ihr_callbacks[0]);
+                callback_init(&_master_ihr_callbacks[1]);
+        } else {
+                callback_init(&_slave_ihr_callbacks[0]);
+                callback_init(&_slave_ihr_callbacks[1]);
         }
-
-        callback_init(&_master_ihr_callbacks[0]);
-        callback_init(&_master_ihr_callbacks[1]);
-
-        callback_init(&_slave_ihr_callbacks[0]);
-        callback_init(&_slave_ihr_callbacks[1]);
 
         cpu_dmac_enable();
 }
@@ -149,31 +160,30 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
         /* Check that the source and destination addresses are stride-byte
          * aligned */
 
-        if ((stride == CPU_DMAC_STRIDE_16_BYTES) || (reg_tcr > 0x00FFFFFF)) {
-                stride = CPU_DMAC_STRIDE_16_BYTES;
+        if (stride == CPU_DMAC_STRIDE_16_BYTES) {
+                if (reg_tcr > 0x00FFFFFF) {
+                        /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
+                        reg_tcr = 0x00000000;
+                }
 
-                /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
-                reg_tcr = 0x00000000;
+                reg_tcr >>= 2;
 
                 /* During 16-byte transfers, the transfer address mode bit for
                  * dual address mode */
                 reg_chcr &= ~0x00000008;
-        } else {
-                if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
-                        reg_tcr >>= 2;
-                } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
-                        reg_tcr >>= 1;
-                }
+        } else if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
+                reg_tcr >>= 2;
+        } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
+                reg_tcr >>= 1;
         }
-
-        callback_t * const ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t * const ihr_callback = &ihr_callbacks[cfg->channel];
-
-        callback_init(ihr_callback);
 
         if (cfg->ihr != NULL) {
                 /* Enable interrupt */
                 reg_chcr |= 0x00000004;
+
+                callback_t * const ihr_callbacks = _ihr_callback_get();
+                callback_t * const ihr_callback =
+                    &ihr_callbacks[cfg->channel];
 
                 /* Set interrupt handling routine */
                 callback_set(ihr_callback, cfg->ihr, cfg->ihr_work);
@@ -202,46 +212,77 @@ cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
         }
 
         /* TE bit will always be set upon normal or abnormal transfer */
-        while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000);
+        while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000) {
+        }
 }
 
-static callback_t *
-_dmac_executor_ihr_callbacks_get(void)
+void
+cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
+    size_t size)
 {
-        const uint8_t which_cpu = cpu_dual_executor_get();
+        static cpu_dmac_cfg_t dmac_cfg = {
+                .src_mode = CPU_DMAC_SOURCE_FIXED,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .stride   = CPU_DMAC_STRIDE_4_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr      = NULL,
+                .ihr_work = NULL
+        };
 
-        switch (which_cpu) {
-        case CPU_MASTER:
-                return &_master_ihr_callbacks[0];
-        case CPU_SLAVE:
-                return &_slave_ihr_callbacks[0];
-        }
+        static volatile uint32_t clear_value __uncached = 0;
 
-        return NULL;
+        dmac_cfg.channel = ch;
+        dmac_cfg.src = (uint32_t)&clear_value;
+        dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
+        dmac_cfg.len = size;
+
+        cpu_dmac_channel_wait(ch);
+
+        clear_value = value;
+
+        cpu_dmac_channel_stop(ch);
+        cpu_dmac_channel_config_set(&dmac_cfg);
+        cpu_dmac_channel_start(ch);
+        cpu_dmac_enable();
+        cpu_dmac_channel_wait(ch);
 }
 
 static void __interrupt_handler
-_dmac_ch0_ihr_handler(void)
+_master_ch0_ihr_handler(void)
 {
-        callback_t *ihr_callbacks;
-        ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t *ihr_callback;
-        ihr_callback = &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH0];
-
-        callback_call(ihr_callback);
+        callback_call(&_master_ihr_callbacks[IHR_INDEX_CH0]);
 
         MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
 }
 
 static void __interrupt_handler
-_dmac_ch1_ihr_handler(void)
+_slave_ch0_ihr_handler(void)
 {
-        callback_t *ihr_callbacks;
-        ihr_callbacks = _dmac_executor_ihr_callbacks_get();
-        callback_t *ihr_callback;
-        ihr_callback = &ihr_callbacks[CPU_DMAC_IHR_INDEX_CH1];
+        callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH0]);
 
-        callback_call(ihr_callback);
+        MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
+}
+
+static void __interrupt_handler
+_master_ch1_ihr_handler(void)
+{
+        callback_call(&_master_ihr_callbacks[IHR_INDEX_CH1]);
 
         MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
+}
+
+static void __interrupt_handler
+_slave_ch1_ihr_handler(void)
+{
+        callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH1]);
+
+        MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
+}
+
+static callback_t *
+_ihr_callback_get(void)
+{
+        const cpu_which_t which_cpu = cpu_dual_executor_get();
+
+        return _ihr_callback_tables[which_cpu];
 }

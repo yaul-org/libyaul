@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_ENV_H_
-#define _VDP1_ENV_H_
+#ifndef _YAUL_VDP1_ENV_H_
+#define _YAUL_VDP1_ENV_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -77,22 +77,24 @@ typedef struct vdp1_env {
 /// @addtogroup VDP1_ENV_FUNCTIONS
 /// @{
 /// @brief Not yet documented.
-extern void vdp1_env_default_init(vdp1_env_t *);
+extern void vdp1_env_default_init(vdp1_env_t *env);
 
+/// @brief Not yet documented.
+const vdp1_env_t *vdp1_env_get(void);
 /// @brief Not yet documented.
 extern void vdp1_env_default_set(void);
 /// @brief Not yet documented.
-extern void vdp1_env_set(const vdp1_env_t *);
+extern void vdp1_env_set(const vdp1_env_t *env);
 
 /// @brief Not yet documented.
 extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
-extern void vdp1_env_preamble_populate(vdp1_cmdt_t *,
-    const int16_vec2_t *);
+extern void vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
+    const int16_vec2_t *local_coords);
 
 /// @}
 
 __END_DECLS
 
-#endif /* !_VDP1_ENV_H_ */
+#endif /* !_YAUL_VDP1_ENV_H_ */

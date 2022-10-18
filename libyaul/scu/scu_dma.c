@@ -16,16 +16,15 @@
 
 #include <scu-internal.h>
 
-/* Debug: Keep a copy of the SCU-DMA registers for each level */
-#define DEBUG_COPY_DMA_HANDLES_ENABLE 0
+#define SCU_MASK_MASK   (SCU_IC_MASK_LEVEL_0_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_1_DMA_END |                         \
+                         SCU_IC_MASK_LEVEL_2_DMA_END |                         \
+                         SCU_IC_MASK_DMA_ILLEGAL)
+#define SCU_MASK_UNMASK (SCU_IC_MASK_ALL & ~SCU_MASK_MASK)
 
 /* Each block of SCU-DMA registers is 0x20 bytes, and luckily, each block is
  * contiguous */
 #define REGISTER_BLOCK_OFFSET(level) (((level) & SCU_DMA_LEVEL_COUNT) << 5)
-
-#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
-static scu_dma_handle_t _dma_handles[SCU_DMA_LEVEL_COUNT];
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
 #define LEVEL_STATE_IDLING      0x00
 #define LEVEL_STATE_WORKING     0x01
@@ -40,22 +39,15 @@ static void _scu_dma_level1_handler(void);
 static void _scu_dma_level2_handler(void);
 
 void
-_internal_scu_dma_init(void)
+__scu_dma_init(void)
 {
         scu_dma_stop();
-
-        const uint32_t scu_mask = SCU_IC_MASK_LEVEL_0_DMA_END |
-                                  SCU_IC_MASK_LEVEL_1_DMA_END |
-                                  SCU_IC_MASK_LEVEL_2_DMA_END |
-                                  SCU_IC_MASK_DMA_ILLEGAL;
-
-        scu_ic_mask_chg(SCU_IC_MASK_ALL, scu_mask);
 
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, _scu_dma_level0_handler);
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, _scu_dma_level1_handler);
         scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, _scu_dma_level2_handler);
 
-        scu_dma_illegal_set(NULL);
+        scu_dma_illegal_clear();
 
         for (scu_dma_level_t level = 0; level <= 2; level++) {
                 struct level_state * const level_state = &_level_state[level];
@@ -65,13 +57,7 @@ _internal_scu_dma_init(void)
                 callback_init(&level_state->callback);
         }
 
-#if DEBUG_COPY_DMA_HANDLES_ENABLE
-        (void)memset(&_dma_handles[0], 0x00, sizeof(scu_dma_handle_t));
-        (void)memset(&_dma_handles[1], 0x00, sizeof(scu_dma_handle_t));
-        (void)memset(&_dma_handles[2], 0x00, sizeof(scu_dma_handle_t));
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
-
-        scu_ic_mask_chg(~scu_mask, SCU_IC_MASK_NONE);
+        scu_ic_mask_chg(SCU_MASK_UNMASK, SCU_IC_MASK_NONE);
 }
 
 void
@@ -110,14 +96,10 @@ scu_dma_level_wait(scu_dma_level_t level)
                         return;
                 }
 
-                const uint32_t busy = scu_dma_level_busy(level);
+                if ((scu_dma_level_busy(level)) == 0x00000000) {
+                        _level_state[level].flags = LEVEL_STATE_IDLING;
 
-                if (busy == 0x00000000) {
                         return;
-                }
-
-                for (register uint32_t i = 0; i < 0x30; i++) {
-                        cpu_instr_nop();
                 }
         }
 }
@@ -160,9 +142,11 @@ scu_dma_config_buffer(scu_dma_handle_t *handle,
                 break;
         }
 
-        /* Since bit 8 being unset is effective only for the CS2 space
-         * of the A bus, everything else should set it */
-        handle->dnad = 0x00000100 | (cfg->stride & 0x07);
+        handle->dnad = cfg->stride & 0x07;
+
+        if (cfg->space != SCU_DMA_SPACE_BUS_A) {
+                handle->dnad |= 0x00000100;
+        }
 
         handle->dnmd |= cfg->update & 0x00010100;
 }
@@ -176,10 +160,6 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
         assert(level <= 2);
 
         assert(start_factor <= 7);
-
-#if DEBUG_COPY_DMA_HANDLES_ENABLE == 1
-        (void)memcpy(&_dma_handles[level], handle, sizeof(scu_dma_handle_t));
-#endif /* DEBUG_COPY_DMA_HANDLES_ENABLE */
 
         /* To prevent operation errors, do not activate DMA level 2 during DMA
          * level 1 operation. */
@@ -207,6 +187,28 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
         if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
                 *reg_dxen = 0x00000100;
         }
+}
+
+void
+scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src, size_t len)
+{
+        const scu_dma_handle_t dma_handle = {
+                .dnr = CPU_CACHE_THROUGH | (uint32_t)src,
+                .dnw = (uint32_t)dst,
+                .dnc = len,
+                .dnad = 0x00000101,
+                .dnmd = 0x00010100
+        };
+
+        scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, &dma_handle, NULL);
+        scu_dma_level_end_set(level, NULL, NULL);
+        scu_dma_level_fast_start(level);
+}
+
+void
+scu_dma_transfer_wait(scu_dma_level_t level)
+{
+        scu_dma_level_wait(level);
 }
 
 void

@@ -28,11 +28,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _MEMB_H_
-#define _MEMB_H_
+#ifndef _YAUL_KERNEL_MM_MEMB_H_
+#define _YAUL_KERNEL_MM_MEMB_H_
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -41,41 +42,60 @@ __BEGIN_DECLS
 /*
  * Statically declare a block pool.
  */
-#define MEMB(name, structure, num, align)                                      \
-static enum memb_ref_type __CONCAT(name, _memb_refcnt)[(num)] __unused;        \
+#define MEMB(name, structure, count, align)                                    \
+static struct memb_ref                                                         \
+    __CONCAT(name, _memb_ref)[((count) <= 0) ? 1 : (count)];                   \
                                                                                \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
-        structure __CONCAT1(name, _memb_mem)[(num)] __unused;                  \
+        structure __CONCAT1(name, _memb_mem)[((count) <= 0) ? 1 : (count)];    \
                                                                                \
-static memb_t name __unused = {                                                \
+static memb_t name = {                                                         \
+        MEMB_TYPE_STATIC,                                                      \
         sizeof(structure),                                                     \
-        num,                                                                   \
-        &__CONCAT(name, _memb_refcnt)[0],                                      \
+        ((count) <= 0) ? 1 : (count),                                          \
+        &__CONCAT(name, _memb_ref)[0],                                         \
         0,                                                                     \
         0,                                                                     \
-        (void *)&__CONCAT(name, _memb_mem)[0]                                  \
+        (void *)&__CONCAT(name, _memb_mem)[0],                                 \
+        NULL                                                                   \
 }
 
-typedef enum memb_ref_type {
-        MEMB_REF_AVAILABLE,
-        MEMB_REF_RESERVED
-} memb_ref_type_t;
+typedef struct memb_ref {
+        uint16_t count;
+} __packed memb_ref_t;
+
+typedef enum memb_type {
+        MEMB_TYPE_STATIC,
+        MEMB_TYPE_DYNAMIC,
+        MEMB_TYPE_SET
+} memb_type_t;
 
 typedef struct memb {
-        uint32_t m_bsize; /* Size (in bytes) of a unit block */
-        uint32_t m_bnum; /* Number of unit blocks in the block pool */
-        memb_ref_type_t *m_breftype; /* Reference type array */
-        uint32_t m_bidx; /* Index to next unreferenced block */
-        uint32_t m_size; /* Number of allocated unit blocks */
-        void *m_bpool;
+        memb_type_t type;     /* Type of MEMB */
+        uint32_t size;        /* Size (in bytes) of a unit block */
+        uint32_t count;       /* Number of unit blocks in the block pool */
+        memb_ref_t *refs;     /* Reference array */
+        uint32_t next_index;  /* Index to next unreferenced block */
+        uint32_t alloc_count; /* Number of allocated unit blocks */
+        void *pool;
+
+        void (*free)(void *p);
 } memb_t;
 
-void memb_init(memb_t *);
-void *memb_alloc(memb_t *);
-int memb_free(memb_t *, void *);
-int32_t memb_size(memb_t *);
-bool memb_bounds(memb_t *, void *);
+void memb_init(memb_t *memb);
+int memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
+    uint32_t block_size);
+int memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
+    uint32_t align);
+void memb_memb_free(memb_t *memb);
+
+void *memb_alloc(memb_t *memb);
+void *memb_contiguous_alloc(memb_t *memb, uint32_t count);
+int memb_free(memb_t *memb, void *addr);
+
+int32_t memb_size(memb_t *memb);
+bool memb_bounds(memb_t *memb, const void *addr);
 
 __END_DECLS
 
-#endif /* _MEMB_H_ */
+#endif /* _YAUL_KERNEL_MM_MEMB_H_ */

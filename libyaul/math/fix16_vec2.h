@@ -76,8 +76,8 @@ fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
 static inline fix16_t __always_inline
 fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 {
-        register uint32_t aux0;
-        register uint32_t aux1;
+        __register uint32_t aux0;
+        __register uint32_t aux1;
 
         __asm__ volatile ("\tclrmac\n"
                           "\tmac.l @%[a]+, @%[b]+\n"

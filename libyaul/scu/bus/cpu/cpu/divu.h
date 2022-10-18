@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_DIVU_H_
-#define _CPU_DIVU_H_
+#ifndef _YAUL_CPU_DIVU_H_
+#define _YAUL_CPU_DIVU_H_
 
 #include <cpu/instructions.h>
 #include <cpu/map.h>
@@ -22,7 +22,7 @@ __BEGIN_DECLS
 
 /// @brief Callback type.
 /// @see cpu_divu_ovfi_set
-typedef void (*cpu_divu_ihr)(void);
+typedef void (*cpu_divu_ihr_t)(void);
 
 /// @brief Determine if an overflow has occurred.
 /// @returns `true` if an overflow has occurred. Otherwise, `false`.
@@ -124,7 +124,7 @@ cpu_divu_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_divu_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0x7FFF);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0x0FFF);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 12);
 }
 
@@ -144,10 +144,10 @@ do {                                                                           \
 /// @param ihr The interrupt handler.
 ///
 /// @see cpu_divu_ovfi_clear
-extern void cpu_divu_ovfi_set(cpu_divu_ihr ihr);
+extern void cpu_divu_ovfi_set(cpu_divu_ihr_t ihr);
 
 /// @}
 
 __END_DECLS
 
-#endif /* !_CPU_DIVU_H_ */
+#endif /* !_YAUL_CPU_DIVU_H_ */

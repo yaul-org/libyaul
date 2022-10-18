@@ -9,84 +9,84 @@
 
 #include <smpc/smc.h>
 
+#include <bios-internal.h>
+
 #include <cpu/divu.h>
 #include <cpu/frt.h>
 #include <cpu/intc.h>
 #include <cpu/map.h>
+#include <cpu/which.h>
 
-static void _divu_ovfi_handler(void);
+static void _master_ovfi_handler(void);
+static void _slave_ovfi_handler(void);
 
-static void _default_ihr(void);
+static void _ovfi_handler(cpu_divu_ihr_t ovfi_ihr);
 
-static cpu_divu_ihr _master_divu_ovfi_ihr = _default_ihr;
-static cpu_divu_ihr _slave_divu_ovfi_ihr = _default_ihr;
+static cpu_divu_ihr_t _ovfi_ihr_table[] = {
+        __BIOS_DEFAULT_HANDLER,
+        __BIOS_DEFAULT_HANDLER
+};
 
-static cpu_divu_ihr *_divu_ovfi_ihr_get(void);
+static cpu_divu_ihr_t *_ovfi_ihr_get(void);
 
 void
-_internal_cpu_divu_init(void)
+__cpu_divu_init(void)
 {
         cpu_divu_ovfi_clear();
 
         MEMORY_WRITE(32, CPU(VCRDIV), CPU_INTC_INTERRUPT_DIVU_OVFI);
 
-        const uint8_t which_cpu = cpu_dual_executor_get();
+        const cpu_which_t which_cpu = cpu_dual_executor_get();
 
         if (which_cpu == CPU_MASTER) {
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI, _divu_ovfi_handler);
-
+                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI, _master_ovfi_handler);
                 cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DIVU_OVFI + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _divu_ovfi_handler);
+                    _slave_ovfi_handler);
         }
 }
 
 void
-cpu_divu_ovfi_set(cpu_divu_ihr ihr)
+cpu_divu_ovfi_set(cpu_divu_ihr_t ihr)
 {
-        volatile uint32_t *reg_dvcr;
-        reg_dvcr = (volatile uint32_t *)CPU(DVCR);
+        volatile uint32_t * const reg_dvcr = (volatile uint32_t *)CPU(DVCR);
 
         *reg_dvcr &= ~0x00000003;
 
-        cpu_divu_ihr *divu_ovfi_ihr;
-        divu_ovfi_ihr = _divu_ovfi_ihr_get();
+        cpu_divu_ihr_t * const ovfi_ihr = _ovfi_ihr_get();
 
-        *divu_ovfi_ihr = _default_ihr;
+        *ovfi_ihr = __BIOS_DEFAULT_HANDLER;
 
         if (ihr != NULL) {
-                *divu_ovfi_ihr = ihr;
+                *ovfi_ihr = ihr;
 
                 *reg_dvcr |= 0x00000002;
         }
 }
 
 static void __interrupt_handler
-_divu_ovfi_handler(void)
+_master_ovfi_handler(void)
 {
-        MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);
-
-        cpu_divu_ihr *divu_ovfi_ihr;
-        divu_ovfi_ihr = _divu_ovfi_ihr_get();
-
-        (*divu_ovfi_ihr)();
+        _ovfi_handler(_ovfi_ihr_table[CPU_MASTER]);
 }
 
-static cpu_divu_ihr *
-_divu_ovfi_ihr_get(void)
+static void __interrupt_handler
+_slave_ovfi_handler(void)
 {
-        const uint8_t which_cpu = cpu_dual_executor_get();
-
-        switch (which_cpu) {
-                case CPU_MASTER:
-                        return &_master_divu_ovfi_ihr;
-                case CPU_SLAVE:
-                        return &_slave_divu_ovfi_ihr;
-        }
-
-        return NULL;
+        _ovfi_handler(_ovfi_ihr_table[CPU_SLAVE]);
 }
 
 static void
-_default_ihr(void)
+_ovfi_handler(cpu_divu_ihr_t ovfi_ihr)
 {
+        MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);
+
+        ovfi_ihr();
+}
+
+static cpu_divu_ihr_t *
+_ovfi_ihr_get(void)
+{
+        const cpu_which_t which_cpu = cpu_dual_executor_get();
+
+        return &_ovfi_ihr_table[which_cpu];
 }

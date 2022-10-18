@@ -42,7 +42,7 @@ SUPPORT_DEPS_base:= $(SUPPORT_OBJS_base:.o=.d)
 
 LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
-BOOTSTRAP_FILES_all = $(BOOTSTRAP_FILES)
+IP_FILES_all = $(IP_FILES)
 USER_FILES_all = $(USER_FILES)
 HELPER_FILES_all = $(HELPER_FILES)
 
@@ -109,8 +109,8 @@ $(foreach SPECS,$(SPECS_all), \
 $(foreach LDSCRIPT,$(LDSCRIPTS_all), \
 	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),644)))
 
-$(foreach BOOTSTRAP,$(BOOTSTRAP_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(BOOTSTRAP),$(notdir $(BOOTSTRAP)),share/$(TARGET)/bootstrap,$(TYPE),644)))
+$(foreach IP,$(IP_FILES_all), \
+	$(eval $(call macro-generate-install-file-rule,$(IP),$(IP),share/$(TARGET),$(TYPE),644)))
 
 $(foreach USER_FILE,$(USER_FILES_all), \
 	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),644)))

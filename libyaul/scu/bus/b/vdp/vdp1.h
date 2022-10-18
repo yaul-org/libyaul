@@ -5,15 +5,21 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP1_H_
-#define _VDP1_H_
+#ifndef _YAUL_VDP1_H_
+#define _YAUL_VDP1_H_
 
 #include <vdp1/cmdt.h>
 #include <vdp1/env.h>
 #include <vdp1/map.h>
 #include <vdp1/vram.h>
 
+#include <sys/callback-list.h>
+
 __BEGIN_DECLS
+
+#define vdp1_sync_render_clear() do {                                          \
+        vdp1_sync_render_set(NULL, NULL);                                      \
+} while (false)
 
 typedef struct vdp1_transfer_status {
         union {
@@ -45,22 +51,62 @@ typedef struct vdp1_mode_status {
         };
 } __packed __aligned(2) vdp1_mode_status_t;
 
-static inline void __always_inline
-vdp1_mode_status_get(vdp1_mode_status_t *status)
+typedef enum vdp_sync_mode {
+        VDP1_SYNC_MODE_ERASE_CHANGE = 0x00,
+        VDP1_SYNC_MODE_CHANGE_ONLY  = 0x01
+} vdp_sync_mode_t;
+
+static inline __always_inline vdp1_mode_status_t
+vdp1_mode_status_get(void)
 {
-        /* If the structure isn't aligned on a 2-byte boundary, GCC will
-         * attempt to invoke memcpy() */
-        status->raw = MEMORY_READ(16, VDP1(MODR));
+        /* If the structure isn't aligned on a 2-byte boundary, GCC will attempt
+         * to invoke memcpy() */
+        vdp1_mode_status_t status;
+
+        status.raw = MEMORY_READ(16, VDP1(MODR));
+
+        return status;
 }
 
-static inline void __always_inline
-vdp1_transfer_status_get(vdp1_transfer_status_t *status)
+static inline __always_inline vdp1_transfer_status_t
+vdp1_transfer_status_get(void)
 {
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
-        status->raw = MEMORY_READ(16, VDP1(EDSR));
+        vdp1_transfer_status_t status;
+
+        status.raw = MEMORY_READ(16, VDP1(EDSR));
+
+        return status;
 }
+
+extern void vdp1_sync(void);
+extern bool vdp1_sync_busy(void);
+extern void vdp1_sync_wait(void);
+
+/// @htmlinclude vdp1_sync_interval_table.html
+extern void vdp1_sync_interval_set(int8_t interval);
+extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
+extern vdp_sync_mode_t vdp1_sync_mode_get(void);
+
+extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count,
+    uint16_t index);
+extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,
+    uint16_t index);
+extern void vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist);
+extern void vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
+    uint16_t cmdt_index, uint16_t index);
+
+extern void vdp1_sync_put_wait(void);
+extern void vdp1_sync_render(void);
+
+extern void vdp1_sync_put_set(callback_handler_t callback_handler,
+    void *work);
+extern void vdp1_sync_render_set(callback_handler_t callback_handler,
+    void *work);
+extern void vdp1_sync_transfer_over_set(callback_handler_t callback_handler,
+    void *work);
 
 __END_DECLS
 
-#endif /* !_VDP1_H_ */
+#endif /* !_YAUL_VDP1_H_ */

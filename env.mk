@@ -55,40 +55,11 @@ ifneq ($(YAUL_CDB),$(filter $(YAUL_CDB),0 1))
   $(error Invalid value for YAUL_CDB (update JSON compile command database))
 endif
 
-# Check options
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),)
-  $(error Undefined YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
-endif
-ifneq ($(YAUL_OPTION_DEV_CARTRIDGE),$(filter $(YAUL_OPTION_DEV_CARTRIDGE),0 1 2))
-  $(error Invalid value for YAUL_OPTION_DEV_CARTRIDGE (development cartridge))
-endif
-
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif
 ifneq ($(YAUL_OPTION_MALLOC_IMPL),$(filter $(YAUL_OPTION_MALLOC_IMPL),tlsf))
   $(error Invalid value for YAUL_OPTION_MALLOC_IMPL (malloc implementation))
-endif
-
-ifeq ($(strip $(YAUL_OPTION_BUILD_GDB)),)
-  $(error Undefined YAUL_OPTION_BUILD_GDB (build GDB))
-endif
-ifneq ($(YAUL_OPTION_BUILD_GDB),$(filter $(YAUL_OPTION_BUILD_GDB),0 1))
-  $(error Invalid value for YAUL_OPTION_BUILD_GDB (build GDB))
-endif
-
-ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),)
-  $(error Undefined YAUL_OPTION_BUILD_ASSERT (build ASSERT))
-endif
-ifneq ($(YAUL_OPTION_BUILD_ASSERT),$(filter $(YAUL_OPTION_BUILD_ASSERT),0 1))
-  $(error Invalid value for YAUL_OPTION_BUILD_ASSERT (build assert))
-endif
-
-ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),)
-  $(error Undefined YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
-endif
-ifneq ($(YAUL_OPTION_SPIN_ON_ABORT),$(filter $(YAUL_OPTION_SPIN_ON_ABORT),0 1))
-  $(error Invalid value for YAUL_OPTION_SPIN_ON_ABORT (spin on calling abort()))
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -108,16 +79,19 @@ YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
 SH_AS:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
-SH_AR:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-ar$(EXE_EXT)
+SH_AR:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc-ar$(EXE_EXT)
 SH_CC:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
 SH_CXX:=     $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-g++$(EXE_EXT)
 SH_LD:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
-SH_NM:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-nm$(EXE_EXT)
+SH_NM:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc-nm$(EXE_EXT)
 SH_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objcopy$(EXE_EXT)
 SH_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-objdump$(EXE_EXT)
 
 SH_CFLAGS_shared:= \
-	-ggdb3 \
+	-flto \
+	-ffat-lto-objects \
+	-ffunction-sections \
+	-fdata-sections \
 	-pedantic \
 	-s \
 	-ffreestanding \
@@ -137,19 +111,11 @@ SH_CFLAGS_shared:= \
 	-Wno-format \
 	-Wnull-dereference \
 	-Wshadow \
-	-Wunused \
-	-DHAVE_DEV_CARTRIDGE=$(YAUL_OPTION_DEV_CARTRIDGE) \
-	-DHAVE_GDB_SUPPORT=$(YAUL_OPTION_BUILD_GDB) \
-	-DHAVE_ASSERT_SUPPORT=$(YAUL_OPTION_BUILD_ASSERT)
+	-Wunused
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 SH_CFLAGS_shared += \
 	-DMALLOC_IMPL_TLSF
-endif
-
-ifeq ($(strip $(YAUL_OPTION_SPIN_ON_ABORT)),1)
-SH_CFLAGS_shared += \
-	-DSPIN_ON_ABORT=1
 endif
 
 SH_CFLAGS:= \
@@ -170,7 +136,7 @@ SH_CXXFLAGS:= \
 	$(SH_CXXFLAGS_shared)
 
 SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
-SH_CFLAGS_shared_debug:= -Og -DDEBUG
+SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
@@ -181,17 +147,15 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 # These include directories are strictly from libyaul, and are meant to be
 # shared amongst the other libraries
 SHARED_INCLUDE_DIRS:= \
-	../lib$(MAIN_TARGET)/. \
-	../lib$(MAIN_TARGET)/common \
-	../lib$(MAIN_TARGET)/common/gdb \
+	$(abspath .) \
+	../lib$(MAIN_TARGET)/ \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
-	../lib$(MAIN_TARGET)/kernel/dbgio \
-	../lib$(MAIN_TARGET)/kernel/vfs \
 	../lib$(MAIN_TARGET)/math \
 	../lib$(MAIN_TARGET)/scu \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/arp \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/dram-cart \
+	../lib$(MAIN_TARGET)/scu/bus/a/cs0/flash \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/usb-cart \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs2/cd-block \
 	../lib$(MAIN_TARGET)/scu/bus/b/scsp \
@@ -235,7 +199,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir)))); \
+	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) -Ilib$(TARGET)/); \
 	done
 endef
 else
@@ -250,7 +214,7 @@ endif
 define macro-sh-build-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CC) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
+	$(ECHO)$(SH_CC) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c -o $@ $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\
@@ -266,7 +230,7 @@ endef
 define macro-sh-build-c++-object
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)mkdir -p $(@D)
-	$(ECHO)$(SH_CXX) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
+	$(ECHO)$(SH_CXX) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
 	$(ECHO)$(call macro-update-cdb,\

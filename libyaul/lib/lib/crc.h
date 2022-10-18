@@ -9,7 +9,7 @@ typedef uint8_t crc_t;
 
 __BEGIN_DECLS
 
-extern crc_t crc_calculate(const uint8_t *, size_t);
+extern crc_t crc_calculate(const uint8_t *buffer, size_t len);
 
 __END_DECLS
 

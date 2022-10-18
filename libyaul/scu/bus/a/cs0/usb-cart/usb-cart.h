@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _USB_CART_H_
-#define _USB_CART_H_
+#ifndef _YAUL_USB_CART_H_
+#define _YAUL_USB_CART_H_
 
 #include <sys/cdefs.h>
 
@@ -95,6 +95,9 @@ usb_cart_byte_send(uint8_t c)
         MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
 
+/// @brief Initialize USB cart.
+extern void usb_cart_init(void);
+
 /// @brief Reads an 8-bit value and writes an 8-bit value.
 ///
 /// @details The function first waits until the receive buffer is non-empty, the
@@ -148,4 +151,4 @@ extern void usb_cart_dma_send(const void *buffer, uint32_t len);
 
 __END_DECLS
 
-#endif /* !_USB_CART_H_ */
+#endif /* !_YAUL_USB_CART_H_ */

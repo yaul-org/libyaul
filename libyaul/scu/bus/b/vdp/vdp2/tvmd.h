@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_TVMD_H_
-#define _VDP2_TVMD_H_
+#ifndef _YAUL_VDP2_TVMD_H_
+#define _YAUL_VDP2_TVMD_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -21,8 +21,8 @@ __BEGIN_DECLS
  * VBLANK=1 | Top blanking    |
  *          +-----------------+
  * VBLANK=1 | Top border      | <--- scanline #262 (top border)
- *          +-----------------+ <--- scanline #0 (active display,
- * VBLANK=0 | Active display  |                   start of V-BLANK-OUT (scan))
+ *          +-----------------+ <--- scanline #0   (active display,
+ * VBLANK=0 | Active display  |                     start of V-BLANK-OUT (scan))
  *          +-----------------+ <--- scanline #223
  * VBLANK=1 | Bottom border   | <--- scanline #224 (bottom border,
  *          +-----------------+                     start of V-BLANK-IN (retrace))
@@ -118,6 +118,21 @@ vdp2_tvmd_vcount_get(void)
         return (MEMORY_READ(16, VDP2(VCNT)) & 0x03FF);
 }
 
+static inline void __always_inline
+vdp2_tvmd_vcount_wait(uint16_t scanline)
+{
+        /* There are 1024 maximum counter values */
+        scanline &= 0x03FF;
+
+        while (true) {
+                vdp2_tvmd_extern_latch();
+
+                if ((vdp2_tvmd_vcount_get()) == scanline) {
+                        break;
+                }
+        }
+}
+
 static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
@@ -138,12 +153,13 @@ vdp2_tvmd_display(void)
 
 extern void vdp2_tvmd_display_clear(void);
 extern void vdp2_tvmd_display_set(void);
-extern void vdp2_tvmd_display_res_get(uint16_t *, uint16_t *);
-extern void vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t, vdp2_tvmd_horz_t, vdp2_tvmd_vert_t);
-extern void vdp2_tvmd_border_set(bool);
+extern void vdp2_tvmd_display_res_get(uint16_t *width, uint16_t *height);
+extern void vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t horizontal,
+    vdp2_tvmd_vert_t vertical);
+extern void vdp2_tvmd_border_set(bool enable);
 
-extern void vdp2_tvmd_vblank_in_next_wait(uint32_t);
+extern void vdp2_tvmd_vblank_in_next_wait(uint32_t count);
 
 __END_DECLS
 
-#endif /* !_VDP2_TVMD_H_ */
+#endif /* !_YAUL_VDP2_TVMD_H_ */

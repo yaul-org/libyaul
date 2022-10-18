@@ -1,21 +1,20 @@
 # -*- mode: makefile -*-
 
-FLAG_BUILD_GDB:= $(shell test "x$(YAUL_OPTION_DEV_CARTRIDGE)" != x0 -a \
-                              \( "x$(TYPE)" = xdebug -o \
-                                 "x$(YAUL_OPTION_BUILD_GDB)" != x0 \) && printf "yes")
-
-BOOTSTRAP_FILES:= \
-	common/bootstrap/ip.sx \
-	common/bootstrap/sys_aree.bin \
-	common/bootstrap/sys_arej.bin \
-	common/bootstrap/sys_aret.bin \
-	common/bootstrap/sys_areu.bin \
-	common/bootstrap/sys_init.bin \
-	common/bootstrap/sys_sec.bin
+IP_FILES:= \
+	ip/ip.sx \
+	ip/blobs/sys_aree.bin \
+	ip/blobs/sys_arej.bin \
+	ip/blobs/sys_aret.bin \
+	ip/blobs/sys_areu.bin \
+	ip/blobs/sys_init.bin \
+	ip/blobs/sys_sec.bin
 
 USER_FILES:= \
-	common/pre.common.mk \
-	common/post.common.mk
+	common/build.pre.mk \
+	common/build.post.bin.mk \
+	common/build.post.iso-cue.mk \
+	common/build.post.ss.mk \
+	common/common.ip.bin.mk
 
 HELPER_FILES:= \
 	common/update-cdb \
@@ -28,6 +27,7 @@ LDSCRIPTS:= \
 SPECS:= \
 	common/specs/yaul.specs \
 	common/specs/yaul-main.specs \
+	common/specs/yaul-main-c++.specs \
 	common/specs/ip.specs
 
 SUPPORT_SRCS:= \
@@ -39,15 +39,10 @@ SUPPORT_SRCS+= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
+	kernel/ssload.c \
 	kernel/internal.c \
 	kernel/mm/internal.c \
-	common/internal_reset.c
-
-ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
-LIB_SRCS+= \
-	common/gdb/gdb.c \
-	common/gdb/gdb-ihr.sx
-endif
+	common/reset-internal.c
 
 LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
@@ -55,25 +50,33 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
 
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
 	kernel/dbgio/devices/usb-cart.c
-endif
 
 LIB_SRCS+= \
 	kernel/dbgio/devices/cons/cons.c \
 	\
 	kernel/sys/dma-queue.c \
+	kernel/sys/dma-queue-internal.c \
 	kernel/sys/callback-list.c \
+	kernel/sys/callback-list-internal.c \
 	\
-	kernel/mm/memb.c
+	kernel/mm/memb.c \
+	kernel/mm/memb-internal.c \
+	kernel/mm/mm_stats.c
 
 # TLSF is required
 LIB_SRCS+= \
 	kernel/mm/tlsf.c
 
 LIB_SRCS+= \
-	lib/ctype/ctype.c \
+	lib/ctype/ctype.c
+
+LIB_SRCS+= \
+	lib/errno/strerror.c \
+	lib/errno/__errno_location.c \
+
+LIB_SRCS+= \
 	lib/string/bcmp.c \
 	lib/string/bcopy.c \
 	lib/string/bzero.c \
@@ -116,17 +119,59 @@ LIB_SRCS+= \
 	lib/string/strtok.c \
 	lib/string/strtok_r.c \
 	lib/string/strverscmp.c \
-	lib/string/swab.c \
-	lib/stdio/snprintf.c \
-	lib/stdlib/abort.c \
-	lib/stdlib/abs.c
-
-ifeq ($(strip $(YAUL_OPTION_BUILD_ASSERT)),1)
-LIB_SRCS+= \
-	lib/stdlib/assert.c
-endif
+	lib/string/swab.c
 
 LIB_SRCS+= \
+	lib/stdio/clearerr.c \
+	lib/stdio/stdio.c \
+    lib/stdio/fclose.c \
+    lib/stdio/feof.c \
+    lib/stdio/ferror.c \
+    lib/stdio/fflush.c \
+    lib/stdio/fgetc.c \
+    lib/stdio/fgetpos.c \
+    lib/stdio/fgets.c \
+    lib/stdio/fopen.c \
+    lib/stdio/fprintf.c \
+    lib/stdio/fputc.c \
+    lib/stdio/fputs.c \
+    lib/stdio/fread.c \
+    lib/stdio/freopen.c \
+    lib/stdio/fseek.c \
+    lib/stdio/fsetpos.c \
+    lib/stdio/ftell.c \
+    lib/stdio/fwrite.c \
+    lib/stdio/getc.c \
+    lib/stdio/getchar.c \
+    lib/stdio/gets.c \
+    lib/stdio/perror.c \
+    lib/stdio/printf.c \
+    lib/stdio/putc.c \
+    lib/stdio/putchar.c \
+    lib/stdio/puts.c \
+    lib/stdio/remove.c \
+    lib/stdio/rename.c \
+    lib/stdio/rewind.c \
+    lib/stdio/setbuf.c \
+    lib/stdio/setvbuf.c \
+    lib/stdio/snprintf.c \
+    lib/stdio/sprintf.c \
+    lib/stdio/tmpfile.c \
+    lib/stdio/tmpnam.c \
+    lib/stdio/ungetc.c \
+    lib/stdio/vfprintf.c \
+    lib/stdio/vprintf.c \
+    lib/stdio/vsnprintf.c \
+    lib/stdio/vsprintf.c
+
+LIB_SRCS+= \
+	lib/exit/abort.c \
+	lib/exit/assert.c \
+	lib/exit/atexit.c \
+	lib/exit/exit.c
+
+LIB_SRCS+= \
+	lib/stdlib/abs.c \
 	lib/stdlib/atoi.c \
 	lib/stdlib/atol.c \
 	lib/stdlib/free.c \
@@ -140,28 +185,20 @@ LIB_SRCS+= \
 	lib/crc/crc.c
 
 LIB_SRCS+= \
-	kernel/vfs/fs/romdisk/romdisk.c
+	kernel/fs/cd/cdfs.c \
+	kernel/fs/cd/cdfs_sector_read.c
 
 LIB_SRCS+= \
-	kernel/vfs/fs/iso9660/iso9660.c
+	kernel/fs/cd/cdfs_sector_usb_cart_read.c
 
-ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
-LIB_SRCS+= \
-	kernel/vfs/fs/fileclient/fileclient.c
-endif
-
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
 LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp.c
-endif
 
 LIB_SRCS+= \
 	scu/bus/a/cs0/dram-cart/dram-cart.c
 
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
 LIB_SRCS+= \
 	scu/bus/a/cs0/usb-cart/usb-cart.c
-endif
 
 LIB_SRCS+= \
 	math/color.c \
@@ -181,8 +218,6 @@ LIB_SRCS+= \
 	\
 	scu/bus/b/scsp/scsp_init.c \
 	\
-	scu/bus/b/vdp/vdp_init.c \
-	scu/bus/b/vdp/vdp_sync.c \
 	scu/bus/b/vdp/vdp-internal.c \
 	scu/bus/b/vdp/vdp1_cmdt.c \
 	scu/bus/b/vdp/vdp1_env.c \
@@ -190,9 +225,10 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_cram.c \
 	scu/bus/b/vdp/vdp2_regs.c \
 	scu/bus/b/vdp/vdp2_scrn.c \
-	scu/bus/b/vdp/vdp2_scrn_back_screen.c \
+	scu/bus/b/vdp/vdp2_scrn_back.c \
 	scu/bus/b/vdp/vdp2_scrn_color_offset.c \
 	scu/bus/b/vdp/vdp2_scrn_display.c \
+	scu/bus/b/vdp/vdp2_scrn_lncl.c \
 	scu/bus/b/vdp/vdp2_scrn_ls.c \
 	scu/bus/b/vdp/vdp2_scrn_mosaic.c \
 	scu/bus/b/vdp/vdp2_scrn_priority.c \
@@ -203,11 +239,15 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_sprite.c \
 	scu/bus/b/vdp/vdp2_tvmd.c \
 	scu/bus/b/vdp/vdp2_vram.c \
+	scu/bus/b/vdp/vdp_init.c \
+	scu/bus/b/vdp/vdp_sync.c \
 	\
 	scu/bus/cpu/cpu_cache.c \
 	scu/bus/cpu/cpu_divu.c \
 	scu/bus/cpu/cpu_dmac.c \
 	scu/bus/cpu/cpu_dual.c \
+	scu/bus/cpu/cpu_dual_entries.sx \
+	scu/bus/cpu/cpu_exceptions.sx \
 	scu/bus/cpu/cpu_frt.c \
 	scu/bus/cpu/cpu_init.c \
 	scu/bus/cpu/cpu_sci.c \
@@ -233,7 +273,7 @@ LIB_SRCS+= \
 
 HEADER_FILES:= \
 	./yaul.h \
-	./common/bootstrap/ip.h
+	./ip/ip.h
 
 INSTALL_HEADER_FILES:= \
 	./:yaul.h:./yaul/
@@ -242,19 +282,25 @@ INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:alloca.h:./ \
-	./lib/lib/:assert.h:./ \
-	./lib/lib/:ctype.h:./ \
-	./lib/lib/:errno.h:./ \
-	./lib/lib/:stdio.h:./ \
-	./lib/lib/:stdlib.h:./ \
-	./lib/lib/:string.h:./ \
+	./lib/lib/bits/:alltypes.h:./bits/ \
+	./lib/lib/bits/:fcntl.h:./bits/ \
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/sys/:cdefs.h:./sys/ \
 	./lib/lib/sys/:queue.h:./sys/ \
 	./lib/lib/sys/:types.h:./sys/ \
 	./kernel/sys/:init.h:./sys/
+
+INSTALL_HEADER_FILES+= \
+	./lib/lib/:alloca.h:./ \
+	./lib/lib/:assert.h:./ \
+	./lib/lib/:ctype.h:./ \
+	./lib/lib/:errno.h:./ \
+	./lib/lib/:fcntl.h:./ \
+	./lib/lib/:stdio.h:./ \
+	./lib/lib/:stdlib.h:./ \
+	./lib/lib/:string.h:./ \
+	./lib/lib/:unistd.h:./ \
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/:crc.h:./ \
@@ -268,29 +314,27 @@ INSTALL_HEADER_FILES+= \
 	./math/:fix16_trig.h:yaul/math/ \
 	./math/:fix16_vec2.h:yaul/math/ \
 	./math/:fix16_vec3.h:yaul/math/ \
-	./math/:int8.h:yaul/math/ \
 	./math/:int16.h:yaul/math/ \
 	./math/:int32.h:yaul/math/ \
+	./math/:int8.h:yaul/math/ \
 	./math/:math.h:yaul/math/ \
-	./math/:uint32.h:yaul/math/
+	./math/:uint32.h:yaul/math/ \
+	./math/:uint8.h:yaul/math/
 
 INSTALL_HEADER_FILES+= \
-	./common/bootstrap/:ip.h:yaul/common/
-
-ifeq ($(strip $(FLAG_BUILD_GDB)),yes)
-INSTALL_HEADER_FILES+= \
-	./common/gdb/:gdb.h:yaul/common/gdb/
-endif
+	./ip/:ip.h:yaul/ip/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/mm/:memb.h:yaul/mm/
+	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:mm_stats.h:yaul/mm/
 
-# TLSF is required
+ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:tlsf.h:yaul/mm/
+endif
 
 INSTALL_HEADER_FILES+= \
 	./kernel/sys/:dma-queue.h:yaul/sys/
@@ -299,15 +343,10 @@ INSTALL_HEADER_FILES+= \
 	./kernel/sys/:callback-list.h:yaul/sys/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/romdisk/:romdisk.h:yaul/fs/romdisk/
+	./kernel/fs/cd/:cdfs.h:yaul/fs/cd/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/iso9660/:iso9660.h:yaul/fs/iso9660/
-
-ifneq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),0)
-INSTALL_HEADER_FILES+= \
-	./kernel/vfs/fs/fileclient/:fileclient.h:yaul/fs/fileclient/
-endif
+	./kernel/:ssload.h:yaul/
 
 INSTALL_HEADER_FILES+= \
 	./scu/:scu.h:yaul/scu/ \
@@ -324,17 +363,17 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/scu/bus/a/cs0/dram-cart/ \
 	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
 
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),2)
+INSTALL_HEADER_FILES+= \
+	./scu/bus/a/cs0/flash/:flash.h:yaul/scu/bus/a/cs0/flash/ \
+	./scu/bus/a/cs0/flash/flash/:map.h:yaul/scu/bus/a/cs0/flash/flash/
+
 INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/arp/:arp.h:yaul/scu/bus/a/cs0/arp/ \
 	./scu/bus/a/cs0/arp/arp/:map.h:yaul/scu/bus/a/cs0/arp/arp/
-endif
 
-ifeq ($(strip $(YAUL_OPTION_DEV_CARTRIDGE)),1)
 INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/scu/bus/a/cs0/usb-cart/ \
 	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/scu/bus/a/cs0/usb-cart/usb-cart/
-endif
 
 INSTALL_HEADER_FILES+= \
 	./scu/bus/b/scsp/:scsp.h:yaul/scu/bus/b/scsp/ \
@@ -369,6 +408,7 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
 	./scu/bus/cpu/cpu/:wdt.h:yaul/scu/bus/cpu/cpu/ \
+	./scu/bus/cpu/cpu/:which.h:yaul/scu/bus/cpu/cpu/ \
 	\
 	./scu/bus/cpu/smpc/:smpc.h:yaul/scu/bus/cpu/smpc/ \
 	./scu/bus/cpu/smpc/smpc/:peripheral.h:yaul/scu/bus/cpu/smpc/smpc/ \

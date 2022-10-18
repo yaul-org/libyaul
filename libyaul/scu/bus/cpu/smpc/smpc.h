@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _SMPC_H_
-#define _SMPC_H_
+#ifndef _YAUL_SMPC_H_
+#define _YAUL_SMPC_H_
 
 #include <smpc/peripheral.h>
 #include <smpc/rtc.h>
@@ -16,4 +16,4 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-#endif /* !_SMPC_H_ */
+#endif /* !_YAUL_SMPC_H_ */

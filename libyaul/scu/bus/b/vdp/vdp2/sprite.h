@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _VDP2_SPRITE_H_
-#define _VDP2_SPRITE_H_
+#ifndef _YAUL_VDP2_SPRITE_H_
+#define _YAUL_VDP2_SPRITE_H_
 
 #include <sys/cdefs.h>
 
@@ -179,8 +179,8 @@ typedef struct vdp2_sprite_type_f {
         unsigned int dc:6; /* Dot color data bits */
 } __packed vdp2_sprite_type_f_t;
 
-extern void vdp2_sprite_priority_set(vdp2_sprite_register_t, uint8_t);
+extern void vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priority);
 
 __END_DECLS
 
-#endif /* !_VDP2_SPRITE_H_ */
+#endif /* !_YAUL_VDP2_SPRITE_H_ */

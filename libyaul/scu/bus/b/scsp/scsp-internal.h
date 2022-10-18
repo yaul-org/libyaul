@@ -10,6 +10,6 @@
 
 #include <scu-internal.h>
 
-extern void _internal_scsp_init(void);
+extern void __scsp_init(void);
 
 #endif /* !_SCSP_INTERNAL_H_ */

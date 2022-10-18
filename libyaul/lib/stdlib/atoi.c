@@ -24,7 +24,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-int atoi(const char *s)
+int
+atoi(const char *s)
 {
         int n = 0, neg = 0;
 
@@ -46,5 +47,5 @@ int atoi(const char *s)
                 n = 10 * n - (*s++ - '0');
         }
 
-        return neg ? n : -n;
+        return ((neg) ? n : -n);
 }

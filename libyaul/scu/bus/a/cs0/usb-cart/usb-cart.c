@@ -18,7 +18,7 @@
 #include "usb-cart-internal.h"
 
 void
-_internal_usb_cart_init(void)
+usb_cart_init(void)
 {
         /* Disabling A-bus refresh adds ~20 KiB/s */
         MEMORY_WRITE(32, SCU(AREF), 0x00000000);
@@ -30,13 +30,9 @@ _internal_usb_cart_init(void)
 void
 usb_cart_long_send(uint32_t w)
 {
-        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 24);
-        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 16);
-        usb_cart_txe_wait();
         usb_cart_byte_send(w >> 8);
-        usb_cart_txe_wait();
         usb_cart_byte_send(w & 0xFF);
 }
 
@@ -46,13 +42,9 @@ usb_cart_long_read(void)
         uint32_t b;
         b = 0;
 
-        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 24;
-        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 16;
-        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read()) << 8;
-        usb_cart_rxf_wait();
         b |= (usb_cart_byte_read());
 
         return b;
@@ -61,11 +53,8 @@ usb_cart_long_read(void)
 uint8_t
 usb_cart_byte_xchg(uint8_t c)
 {
-        uint8_t b;
-        usb_cart_rxf_wait();
-        b = usb_cart_byte_read();
+        const uint8_t b = usb_cart_byte_read();
 
-        usb_cart_txe_wait();
         usb_cart_byte_send(c);
 
         return b;
@@ -83,15 +72,15 @@ usb_cart_dma_read(void *buffer, uint32_t len)
         }
 
         const cpu_dmac_cfg_t dmac_cfg = {
-                .channel = 0,
+                .channel  = 0,
                 .src_mode = CPU_DMAC_SOURCE_FIXED,
                 .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .stride = CPU_DMAC_STRIDE_1_BYTE,
+                .stride   = CPU_DMAC_STRIDE_1_BYTE,
                 .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .src = USB_CART(FIFO),
-                .dst = (uint32_t)buffer,
-                .len = USB_CART_OUT_EP_SIZE,
-                .ihr = NULL
+                .src      = USB_CART(FIFO),
+                .dst      = (uint32_t)buffer,
+                .len      = USB_CART_OUT_EP_SIZE,
+                .ihr      = NULL
         };
 
         uint32_t aref_bits;

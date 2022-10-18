@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _CPU_WDT_H_
-#define _CPU_WDT_H_
+#ifndef _YAUL_CPU_WDT_H_
+#define _YAUL_CPU_WDT_H_
 
 __BEGIN_DECLS
 
@@ -47,7 +47,7 @@ typedef enum cpu_wdt_mode {
 
 /// @brief Callback type.
 /// @see cpu_wdt_timer_mode_set
-typedef void (*cpu_wdt_ihr)(void);
+typedef void (*cpu_wdt_ihr_t)(void);
 
 /// @brief Set the 1-byte WDT tick count.
 ///
@@ -108,9 +108,20 @@ cpu_wdt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF7F);
+        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF0F);
         MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
 }
+
+/// @ingroup CPU_INTC_HELPERS
+/// @brief Clear the interrupt handler for the CPU-WDT timer mode interrupt.
+///
+/// @param mode The mode.
+///
+/// @see cpu_wdt_timer_mode_set
+#define cpu_wdt_timer_mode_clear(mode)                                         \
+do {                                                                           \
+        cpu_wdt_timer_mode_clear(mode, NULL);                                  \
+} while (false)
 
 /// @brief Fully initialize the CPU-WDT depending with a specific clock divisor.
 ///
@@ -122,10 +133,10 @@ extern void cpu_wdt_init(cpu_wdt_clock_t clock_div);
 ///
 /// @param mode The mode.
 /// @param ihr  The interrupt handler.
-extern void cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr ihr);
+extern void cpu_wdt_timer_mode_set(cpu_wdt_mode_t mode, cpu_wdt_ihr_t ihr);
 
 /// @}
 
 __END_DECLS
 
-#endif /* !_CPU_WDT_H_ */
+#endif /* !_YAUL_CPU_WDT_H_ */

@@ -22,52 +22,30 @@
 
 #include <cpu-internal.h>
 
-#define SLAVE_ENTRY_TRAMPOLINE_EMIT(type)                                      \
-__asm__ (".align 1\n"                                                          \
-         "\n"                                                                  \
-         ".local __slave_" __STRING(type) "_entry_trampoline\n"                \
-         ".type __slave_" __STRING(type) "_entry_trampoline, @function\n"      \
-         "\n"                                                                  \
-         "__slave_" __STRING(type) "_entry_trampoline:\n"                      \
-         "\tmov.l 1f, r15\n"                                                   \
-         "\tmov.l 2f, r1\n"                                                    \
-         "\tmov r15, r14\n"                                                    \
-         "\tjmp @r1\n"                                                         \
-         "\tnop\n"                                                             \
-         ".align 4\n"                                                          \
-         "1:\n"                                                                \
-         ".long __slave_stack\n"                                               \
-         "2:\n"                                                                \
-         ".long __slave_" __STRING(type) "_entry\n")
+extern void __slave_polling_entry_trampoline(void);
+extern void __slave_ici_entry_trampoline(void);
 
-typedef void (*slave_entry)(void);
+typedef void (*slave_entry_t)(void);
 
 static void _slave_init(void);
-
-void _slave_polling_entry_trampoline(void);
-void _slave_ici_entry_trampoline(void);
-
-static void _slave_polling_entry(void);
-static void _slave_ici_entry(void);
 
 static void _master_ici_handler(void);
 static void _slave_ici_handler(void);
 
 static void _default_entry(void);
 
-static cpu_dual_master_entry _master_entry = _default_entry;
-static cpu_dual_slave_entry _slave_entry __section(".uncached") = _default_entry;
+static cpu_dual_master_entry_t _master_entry = _default_entry;
+static cpu_dual_slave_entry_t _slave_entry __uncached = _default_entry;
 
-static slave_entry _slave_entry_table[] = {
-        &_slave_polling_entry_trampoline,
-        &_slave_ici_entry_trampoline
+static slave_entry_t _slave_entry_table[] = {
+        &__slave_polling_entry_trampoline,
+        &__slave_ici_entry_trampoline
 };
 
 void
 cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 {
-        uint8_t sr_mask;
-        sr_mask = cpu_intc_mask_get();
+        const uint8_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
 
@@ -90,10 +68,10 @@ cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 }
 
 void
-cpu_dual_master_set(cpu_dual_master_entry entry)
+cpu_dual_master_set(cpu_dual_master_entry_t entry)
 {
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile uint8_t * const reg_tier =
+            (volatile uint8_t *)CPU(TIER);
 
         *reg_tier &= ~0x80;
 
@@ -109,7 +87,7 @@ cpu_dual_master_set(cpu_dual_master_entry entry)
 }
 
 void
-cpu_dual_slave_set(cpu_dual_slave_entry entry)
+cpu_dual_slave_set(cpu_dual_slave_entry_t entry)
 {
         _slave_entry = _default_entry;
 
@@ -118,48 +96,8 @@ cpu_dual_slave_set(cpu_dual_slave_entry entry)
         }
 }
 
-cpu_which_t
-cpu_dual_executor_get(void)
-{
-        extern uint32_t _master_stack;
-        extern uint32_t _master_stack_end;
-
-        extern uint32_t _slave_stack;
-        extern uint32_t _slave_stack_end;
-
-        const uint32_t stack = cpu_reg_sp_get();
-
-        if ((stack >= (uint32_t)&_master_stack_end) &&
-            (stack <= (uint32_t)&_master_stack)) {
-                return CPU_MASTER;
-        }
-
-        if ((stack >= (uint32_t)&_slave_stack_end) &&
-            (stack <= (uint32_t)&_slave_stack)) {
-                return CPU_SLAVE;
-        }
-
-        return -1;
-}
-
-static void
-_slave_init(void)
-{
-        _internal_cpu_divu_init();
-        cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
-
-        cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
-        _internal_cpu_dmac_init();
-
-        cpu_intc_mask_set(0);
-
-        cpu_cache_purge();
-}
-
-SLAVE_ENTRY_TRAMPOLINE_EMIT(polling);
-
-static void __noreturn __aligned(16) __used
-_slave_polling_entry(void)
+void __noreturn __aligned(16) __used
+__slave_polling_entry(void)
 {
         _slave_init();
 
@@ -170,10 +108,8 @@ _slave_polling_entry(void)
         }
 }
 
-SLAVE_ENTRY_TRAMPOLINE_EMIT(ici);
-
-static void __noreturn __used
-_slave_ici_entry(void)
+void __noreturn __aligned(16) __used
+__slave_ici_entry(void)
 {
         _slave_init();
 
@@ -181,6 +117,27 @@ _slave_ici_entry(void)
 
         while (true) {
         }
+}
+
+static void
+_slave_init(void)
+{
+        cpu_intc_mask_set(15);
+
+        __cpu_divu_init();
+        cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
+        cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
+        __cpu_dmac_init();
+
+        /* SCU interrupts 0x41 (H-BLANK-IN, IRL2) and 0x41 (V-BLANK-IN, IRL6)
+         * can only be masked is by setting the priority level to 14.
+         *
+         * In the case where an interrupt does need to be raised, for example
+         * the CPU-FRT ICI interrupt, then its priority level must be set to 15
+         * through the CPU(IPRA) and CPU(IPRB) I/O registers */
+        cpu_intc_mask_set(14);
+
+        cpu_cache_purge();
 }
 
 static void __interrupt_handler
@@ -201,8 +158,8 @@ _master_ici_handler(void)
 static void __interrupt_handler
 _slave_ici_handler(void)
 {
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile uint8_t * const reg_tier =
+            (volatile uint8_t *)CPU(TIER);
 
         *reg_tier &= ~0x80;
 

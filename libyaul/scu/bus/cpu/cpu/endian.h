@@ -2,10 +2,12 @@
  * See LICENSE for details.
  */
 
-#ifndef _CPU_ENDIAN_H_
-#define _CPU_ENDIAN_H_
+#ifndef _YAUL_CPU_ENDIAN_H_
+#define _YAUL_CPU_ENDIAN_H_
 
 #include <stdint.h>
+
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -44,7 +46,7 @@ __BEGIN_DECLS
 static inline uint16_t __always_inline
 cpu_bswap16(uint16_t x)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
         __asm__ volatile ("swap.b %[in], %[out]\n"
                 : [out] "=&r" (out)
@@ -64,11 +66,11 @@ cpu_bswap16(uint16_t x)
 static inline uint32_t __always_inline
 cpu_bswap32(uint32_t x)
 {
-        register uint32_t out;
+        __register uint32_t out;
 
-        register uint32_t t0;
+        __register uint32_t t0;
         t0 = 0;
-        register uint32_t t1;
+        __register uint32_t t1;
         t1 = 0;
 
         __asm__ volatile ("swap.b %[in], %[ot0]\n"
@@ -88,4 +90,4 @@ cpu_bswap32(uint32_t x)
 
 __END_DECLS
 
-#endif /* !_CPU_ENDIAN_H_ */
+#endif /* !_YAUL_CPU_ENDIAN_H_ */

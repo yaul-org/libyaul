@@ -7,5 +7,5 @@
 
 #include "internal.h"
 
-struct state _internal_master_state __aligned(16);
-struct state _internal_slave_state __aligned(16);
+struct state __master_state __aligned(16);
+struct state __slave_state __aligned(16);

@@ -9,70 +9,34 @@
 
 #include <cpu/cache.h>
 
-struct state_vdp1 _internal_state_vdp1;
-struct state_vdp2 _internal_state_vdp2;
+struct state_vdp1 __state_vdp1;
+struct state_vdp2 __state_vdp2;
 
-static scu_dma_handle_t _commit_handle;
-static scu_dma_xfer_t _commit_xfer_table[COMMIT_XFER_COUNT] __aligned(COMMIT_XFER_TABLE_ALIGNMENT);
+
+/*                 xfer->len = _state_vdp2()->lncl.count * sizeof(uint16_t); */
+/*                 xfer->dst = (uint32_t)_state_vdp2()->lncl.vram; */
+/*                 xfer->src = CPU_CACHE_THROUGH | */
+/*                             (uint32_t)_state_vdp2()->lncl.buffer; */
+/*                 break; */
+/*         case COMMIT_XFER_BACK_SCREEN: */
+/*                 xfer->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t); */
+/*                 xfer->dst = (uint32_t)_state_vdp2()->back.vram; */
+/*                 xfer->src = SCU_DMA_INDIRECT_TABLE_END | */
+/*                             CPU_CACHE_THROUGH | */
+/*                             (uint32_t)_state_vdp2()->back.buffer; */
 
 void
-_internal_vdp2_xfer_table_init(void)
+__vdp2_commit(scu_dma_level_t level)
 {
-        _state_vdp2()->commit.handle = &_commit_handle;
-        _state_vdp2()->commit.xfer_table = &_commit_xfer_table[0];
+        vdp2_registers_t * const vdp2_regs = _state_vdp2()->regs;
 
-        _internal_vdp2_xfer_table_update(COMMIT_XFER_VDP2_REG_TVMD);
-        _internal_vdp2_xfer_table_update(COMMIT_XFER_VDP2_REGS);
-        _internal_vdp2_xfer_table_update(COMMIT_XFER_BACK_SCREEN);
-
-        scu_dma_xfer_t *xfer_table;
-        xfer_table = &_state_vdp2()->commit.xfer_table[0];
-
-        scu_dma_level_cfg_t dma_cfg = {
-                .mode = SCU_DMA_MODE_INDIRECT,
-                .xfer.indirect = xfer_table,
-                .stride = SCU_DMA_STRIDE_2_BYTES,
-                .update = SCU_DMA_UPDATE_NONE
-        };
-
-        scu_dma_handle_t *handle;
-        handle = _state_vdp2()->commit.handle;
-
-        scu_dma_config_buffer(handle, &dma_cfg);
+        cpu_cache_area_purge(vdp2_regs->buffer, sizeof(vdp2_registers_t));
+        scu_dma_level_end_set(level, NULL, NULL);
+        scu_dma_transfer(level, (void *)VDP2(0x0000), vdp2_regs->buffer, sizeof(vdp2_registers_t));
 }
 
 void
-_internal_vdp2_xfer_table_update(uint32_t xfer_index)
+__vdp2_commit_wait(scu_dma_level_t level)
 {
-        scu_dma_xfer_t *xfer;
-        xfer = &_state_vdp2()->commit.xfer_table[xfer_index];
-
-        switch (xfer_index) {
-        case COMMIT_XFER_VDP2_REG_TVMD:
-                xfer->len = 2;
-                xfer->dst = VDP2(0x0000);
-                xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs->tvmd;
-                break;
-        case COMMIT_XFER_VDP2_REGS:
-                /* Skip committing the first 7 VDP2 registers:
-                 * 0x0000 TVMD
-                 * 0x0002 EXTEN
-                 * 0x0004 TVSTAT R/O
-                 * 0x0006 VRSIZE R/W
-                 * 0x0008 HCNT   R/O
-                 * 0x000A VCNT   R/O
-                 * 0x000C Reserved
-                 * 0x000E RAMCTL */
-                xfer->len = sizeof(vdp2_registers_t) - 14;
-                xfer->dst = VDP2(0x000E);
-                xfer->src = CPU_CACHE_THROUGH | (uint32_t)&_state_vdp2()->regs->buffer[7];
-                break;
-        case COMMIT_XFER_BACK_SCREEN:
-                xfer->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t);
-                xfer->dst = (uint32_t)_state_vdp2()->back.vram;
-                xfer->src = SCU_DMA_INDIRECT_TABLE_END |
-                            CPU_CACHE_THROUGH |
-                            (uint32_t)_state_vdp2()->back.buffer;
-                break;
-        }
+        scu_dma_level_wait(level);
 }

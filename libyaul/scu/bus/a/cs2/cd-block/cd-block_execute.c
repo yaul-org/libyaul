@@ -30,8 +30,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         uint32_t w;
 
         /* Disable interrupts */
-        uint32_t mask;
-        mask = cpu_intc_mask_get();
+        const uint8_t sr_mask = cpu_intc_mask_get();
 
         cpu_intc_mask_set(15);
         error = -1;
@@ -75,14 +74,14 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         cd_status >>= 8;
 
         /* Checking if waiting or if command was rejected */
-        if (cd_status == 0xFF || cd_status & 0x80) {
+        if ((cd_status == 0xFF) || ((cd_status & 0x80) != 0x00)) {
                 goto busy;
         }
 
         error = 0;
 
 busy:
-        cpu_intc_mask_set(mask);
+        cpu_intc_mask_set(sr_mask);
 
         /* Command executed was successful */
         return error;

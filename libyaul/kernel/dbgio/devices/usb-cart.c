@@ -10,14 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <dbgio.h>
-
 #include <usb-cart.h>
 
-#include "../dbgio-internal.h"
-
 #include <ssload.h>
+
 #include <internal.h>
+#include <dbgio/dbgio-internal.h>
 
 #define STATE_IDLE              0x00
 #define STATE_INITIALIZED       0x01
@@ -27,15 +25,15 @@
 #define BUFFER_FLUSH_POW        (5)
 #define BUFFER_FLUSH_REM_MASK   (0x1F)
 
-static void _init(const dbgio_usb_cart_t *);
+static void _init(const dbgio_usb_cart_t *params);
 static void _deinit(void);
-static void _puts(const char *);
+static void _puts(const char *buffer);
 static void _flush(void);
-static void _font_load(font_load_callback_t);
+static void _font_load(void);
 
 typedef struct {
+        uint8_t *buffer_base;
         uint8_t *buffer;
-        uint8_t *buffer_p;
         uint32_t buffer_size;
 
         uint8_t state;
@@ -47,7 +45,7 @@ static const dbgio_usb_cart_t _default_params = {
 
 static dev_state_t *_dev_state;
 
-const struct dbgio_dev_ops _internal_dev_ops_usb_cart = {
+const dbgio_dev_ops_t __dev_ops_usb_cart = {
         .dev            = DBGIO_DEV_USB_CART,
         .default_params = &_default_params,
         .init           = (dev_ops_init_t)_init,
@@ -63,7 +61,7 @@ _init(const dbgio_usb_cart_t *params)
         assert(params != NULL);
 
         if (_dev_state == NULL) {
-                _dev_state = _internal_malloc(sizeof(dev_state_t));
+                _dev_state = __malloc(sizeof(dev_state_t));
 
                 (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
         }
@@ -72,19 +70,19 @@ _init(const dbgio_usb_cart_t *params)
         /* Resize the buffer if needed */
         if ((_dev_state->buffer != NULL) &&
             (_dev_state->buffer_size < params->buffer_size)) {
-                _internal_free(_dev_state->buffer);
+                __free(_dev_state->buffer);
 
                 _dev_state->buffer = NULL;
         }
 
         if (_dev_state->buffer == NULL) {
-                _dev_state->buffer = _internal_malloc(params->buffer_size);
+                _dev_state->buffer = __malloc(params->buffer_size);
 
                 (void)memset(_dev_state->buffer, '\0', params->buffer_size);
         }
         assert(_dev_state->buffer != NULL);
 
-        _dev_state->buffer_p = _dev_state->buffer;
+        _dev_state->buffer_base = _dev_state->buffer;
         _dev_state->buffer_size = params->buffer_size;
 
         _dev_state->state = STATE_INITIALIZED;
@@ -97,8 +95,8 @@ _deinit(void)
                 return;
         }
 
-        _internal_free(_dev_state->buffer);
-        _internal_free(_dev_state);
+        __free(_dev_state->buffer);
+        __free(_dev_state);
 
         _dev_state = NULL;
 }
@@ -106,22 +104,20 @@ _deinit(void)
 static void
 _puts(const char *buffer)
 {
-        size_t len;
-        len = strlen(buffer);
+        const size_t len = strlen(buffer);
 
-        uint32_t current_len;
-        current_len = (uint32_t)(_dev_state->buffer_p - _dev_state->buffer);
+        const uint32_t current_len =
+            _dev_state->buffer_base - _dev_state->buffer;
 
-        uint32_t new_len;
-        new_len = current_len + len;
+        const uint32_t new_len = current_len + len;
 
         if (new_len >= _dev_state->buffer_size) {
                 return;
         }
 
-        (void)memcpy(_dev_state->buffer_p, buffer, len);
+        (void)memcpy(_dev_state->buffer_base, buffer, len);
 
-        _dev_state->buffer_p += len;
+        _dev_state->buffer_base += len;
 
         _dev_state->state |= STATE_BUFFER_DIRTY;
 }
@@ -133,7 +129,7 @@ _buffer_partial_flush(const uint8_t *buffer, uint32_t len)
                 return;
         }
 
-        usb_cart_byte_send(SSLOAD_API_CMD_LOG);
+        usb_cart_byte_send(SSLOAD_COMM_CMD_LOG);
         usb_cart_long_send(len);
 
         for (uint32_t i = 0; i < len; i++) {
@@ -150,19 +146,16 @@ _flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        const uint32_t len = _dev_state->buffer_p - _dev_state->buffer;
+        const uint32_t len = _dev_state->buffer_base - _dev_state->buffer;
 
         _buffer_partial_flush(&_dev_state->buffer[0], len);
 
-        _dev_state->buffer_p = _dev_state->buffer;
+        _dev_state->buffer_base = _dev_state->buffer;
 
         _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
 }
 
 static void
-_font_load(font_load_callback_t callback)
+_font_load(void)
 {
-        if (callback != NULL) {
-                callback();
-        }
 }

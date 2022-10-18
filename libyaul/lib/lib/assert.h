@@ -1,5 +1,5 @@
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
+#ifndef _LIB_ASSERT_H_
+#define _LIB_ASSERT_H_
 
 #include <sys/cdefs.h>
 
@@ -7,7 +7,7 @@ __BEGIN_DECLS
 
 #undef assert
 
-#if defined(DEBUG) || (HAVE_ASSERT_SUPPORT == 1)
+#ifdef DEBUG
 #define assert(e) ((e)                                                         \
         ? (void)0                                                              \
         : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                \
@@ -42,4 +42,4 @@ extern void _assert(const char * __restrict, const char * __restrict,
 
 __END_DECLS
 
-#endif /* !_ASSERT_H_ */
+#endif /* !_LIB_ASSERT_H_ */

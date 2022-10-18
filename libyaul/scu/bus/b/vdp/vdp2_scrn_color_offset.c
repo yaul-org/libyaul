@@ -17,7 +17,6 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t s
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
                (scroll_screen == VDP2_SCRN_NBG3) ||
@@ -87,7 +86,6 @@ vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
 #ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_RBG1) ||
                (scroll_screen == VDP2_SCRN_NBG1) ||
                (scroll_screen == VDP2_SCRN_NBG2) ||
                (scroll_screen == VDP2_SCRN_NBG3) ||

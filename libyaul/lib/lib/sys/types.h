@@ -1,8 +1,6 @@
-#ifndef _SYS_TYPES_H_
-#define _SYS_TYPES_H_
+#ifndef _LIB_SYS_TYPES_H_
+#define _LIB_SYS_TYPES_H_
 
-#include <sys/cdefs.h>
+#include <bits/alltypes.h>
 
-typedef int ssize_t;
-
-#endif /* !_SYS_TYPES_H_ */
+#endif /* !_LIB_SYS_TYPES_H_ */

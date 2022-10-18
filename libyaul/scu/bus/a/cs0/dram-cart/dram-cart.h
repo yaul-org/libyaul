@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _DRAM_CART_H_
-#define _DRAM_CART_H_
+#ifndef _YAUL_DRAM_CART_H_
+#define _YAUL_DRAM_CART_H_
 
 #include <sys/cdefs.h>
 
@@ -53,6 +53,9 @@ typedef enum dram_cart_id {
         DRAM_CART_ID_4MIB    = 0x5C
 } dram_cart_id_t;
 
+/// @brief Initialize DRAM cart.
+extern void dram_cart_init(void);
+
 /// @brief Return base pointer for DRAM cart.
 /// @returns The base DRAM cart pointer.
 extern void *dram_cart_area_get(void);
@@ -69,4 +72,4 @@ extern size_t dram_cart_size_get(void);
 
 __END_DECLS
 
-#endif /* !_DRAM_CART_H_ */
+#endif /* !_YAUL_DRAM_CART_H_ */

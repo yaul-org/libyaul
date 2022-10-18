@@ -1,0 +1,3 @@
+%compile_commands.json
+-m32
+-Wno-unknown-attributes

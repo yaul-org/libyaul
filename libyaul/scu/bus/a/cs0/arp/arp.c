@@ -8,15 +8,19 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <sys/cdefs.h>
 
 #include <arp.h>
+#include <flash.h>
 
 #include <cpu/intc.h>
 #include <cpu/instructions.h>
 
 #include "arp-internal.h"
+
+#define VERSION_STRING_LEN (255)
 
 typedef void (*arp_function_t)(void);
 
@@ -74,11 +78,11 @@ arp_busy_status(void)
 uint8_t
 arp_byte_read(void)
 {
-        while ((arp_busy_status()));
+        while ((arp_busy_status())) {
+        }
 
-        uint8_t b;
-        b = MEMORY_READ(8, ARP(INPUT));
-        /* Write back */
+        const uint8_t b = MEMORY_READ(8, ARP(INPUT));
+
         MEMORY_WRITE(8, ARP(OUTPUT), b);
 
         return b;
@@ -87,11 +91,10 @@ arp_byte_read(void)
 uint8_t
 arp_byte_xchg(uint8_t c)
 {
-        while ((arp_busy_status()));
+        while ((arp_busy_status())) {
+        }
 
-        /* Read back a byte */
-        uint8_t b;
-        b = MEMORY_READ(8, ARP(INPUT));
+        const uint8_t b = MEMORY_READ(8, ARP(INPUT));
 
         MEMORY_WRITE(8, ARP(OUTPUT), c);
 
@@ -191,23 +194,28 @@ arp_sync_nonblock(void)
         return true;
 }
 
-char *
-arp_version_get(void)
+bool
+arp_detect(void)
 {
-        const char *arp_ver;
-        char *buf;
-        size_t ver_len;
+        const uint16_t vendor_id = flash_vendor_get();
 
-        arp_ver = (const char *)ARP(VERSION);
-        ver_len = 255;
-        if ((buf = (char *)malloc(ver_len + 1)) == NULL) {
+        return (vendor_id != 0xFFFF);
+}
+
+char *
+arp_version_string_get(void)
+{
+        const char * const version_str = (const char *)ARP(VERSION);
+
+        char *buffer;
+        if ((buffer = (char *)malloc(VERSION_STRING_LEN + 1)) == NULL) {
                 return NULL;
         }
-        (void)memset(buf, '\0', ver_len);
-        (void)memcpy(buf, arp_ver, ver_len);
-        buf[ver_len] = '\0';
 
-        return buf;
+        (void)memset(buffer, '\0', VERSION_STRING_LEN + 1);
+        (void)memcpy(buffer, version_str, VERSION_STRING_LEN);
+
+        return buffer;
 }
 
 static void

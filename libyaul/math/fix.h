@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _FIX_H_
-#define _FIX_H_
+#ifndef _YAUL_MATH_FIX_H_
+#define _YAUL_MATH_FIX_H_
 
 __BEGIN_DECLS
 
@@ -19,4 +19,4 @@ typedef uint16_t q0_3_8_t;
 
 __END_DECLS
 
-#endif /* !_FIX_H_ */
+#endif /* !_YAUL_MATH_FIX_H_ */
