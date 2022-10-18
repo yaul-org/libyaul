@@ -10,8 +10,11 @@ IP_FILES:= \
 	ip/blobs/sys_sec.bin
 
 USER_FILES:= \
-	common/pre.common.mk \
-	common/post.common.mk
+	common/build.pre.mk \
+	common/build.post.bin.mk \
+	common/build.post.iso-cue.mk \
+	common/build.post.ss.mk \
+	common/common.ip.bin.mk
 
 HELPER_FILES:= \
 	common/update-cdb \

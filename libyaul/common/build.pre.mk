@@ -83,6 +83,7 @@ endef
 
 # Customizable (must be overwritten in user's Makefile)
 SH_PROGRAM?= unknown-program
+SH_DEFSYMS?=
 SH_SRCS?=
 SH_SRCS_NO_LINK?=
 SH_LIBRARIES?=
@@ -133,33 +134,17 @@ SH_LXXFLAGS= $(SH_LDFLAGS)
 
 SH_BUILD_PATH:= $(abspath $(SH_BUILD_DIR))
 
-IP_VERSION?= V1.000
-IP_RELEASE_DATE?= YYYYMMDD
-IP_AREAS?= JTUBKAEL
-IP_PERIPHERALS?= JAMKST
-IP_TITLE?= Title
-IP_MASTER_STACK_ADDR?= 0x06004000
-IP_SLAVE_STACK_ADDR?= 0x06002000
-IP_1ST_READ_ADDR?= 0x06004000
-IP_1ST_READ_SIZE?= 0
-
 CDB_FILE:= compile_commands.json
 CDB_GCC?= /usr/bin/gcc
 CDB_CPP?= /usr/bin/g++
 
-.PHONY: all clean list-targets
-
-# The targets which .SECONDARY depends on are treated as intermediate files,
-# except that they are never automatically deleted
-.SECONDARY: pre-build-iso post-build-iso build
+.PHONY: all clean .build
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .C .cpp .cxx .sx .o .bin .elf
 
 .PRECIOUS: %.elf %.c %.o
 
-all: build
+.SECONDARY: .build
 
-pre-build-iso:
-
-post-build-iso:
+all: .build
