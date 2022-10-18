@@ -136,7 +136,7 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
                    ((cfg->stride & 0x03) << 10) |
                    ((cfg->bus_mode & 0x01) << 4);
 
-        if (cfg->nondefault) {
+        if (cfg->non_default) {
                 /* Non-default DMAC settings */
                 reg_chcr |= ((cfg->request_mode & 0x01) << 9) |
                             ((cfg->dack_mode & 0x01) << 8) |

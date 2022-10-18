@@ -158,28 +158,63 @@ typedef struct cpu_dmac_cfg {
         cpu_dmac_stride_t stride:3;
 
         /// Request mode.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_request_mode_t request_mode:1;
 
         /// Acknowledge mode.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_dack_mode_t dack_mode:1;
 
         /// Acknowledge level.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_dack_level_t dack_level:1;
 
         /// Detect mode.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_detect_mode_t detect_mode:1;
 
         /// Request level.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_dreq_level_t dreq_level:1;
 
         /// Bus mode.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_bus_mode_t bus_mode:1;
 
         /// Resource select.
+        ///
+        /// @note This is a non-default flag.
+        ///
+        /// @see cpu_dmac_cfg_t.non_default
         cpu_dmac_resource_select_t resource_select:2;
 
-        // Enable this flag to use non-default settings
-        bool nondefault:1;
+        /// Enable this flag to use non-default settings.
+        ///
+        /// @see cpu_dmac_cfg_t.request_mode
+        /// @see cpu_dmac_cfg_t.dack_mode
+        /// @see cpu_dmac_cfg_t.dack_level
+        /// @see cpu_dmac_cfg_t.detect_mode
+        /// @see cpu_dmac_cfg_t.dreq_level
+        /// @see cpu_dmac_cfg_t.bus_mode
+        bool non_default:1;
 
         /// Memory transfer source address.
         uint32_t src;
