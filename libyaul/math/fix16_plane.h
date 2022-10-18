@@ -6,9 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _FIX16_INCLUDE_ONCE
+#ifndef _YAUL_MATH_FIX16_H_
 #error "Header file must not be directly included"
-#endif /* !_FIX16_INCLUDE_ONCE */
+#endif /* !_YAUL_MATH_FIX16_H_ */
 
 #define FIX16_PLANE_INITIALIZER(nx, ny, nz, dx, dy, dz)                        \
     {                                                                          \
@@ -29,4 +29,4 @@ typedef struct fix16_plane {
         fix16_vec3_t d;
 } __packed __aligned(4) fix16_plane_t;
 
-extern uint32_t fix16_plane_str(const fix16_plane_t *, char *, int);
+extern uint32_t fix16_plane_str(const fix16_plane_t *plane, char *buffer, int decimals);

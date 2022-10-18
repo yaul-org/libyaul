@@ -5,9 +5,9 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _FIX16_INCLUDE_ONCE
+#ifndef _YAUL_MATH_FIX16_H_
 #error "Header file must not be directly included"
-#endif /* !_FIX16_INCLUDE_ONCE */
+#endif /* !_YAUL_MATH_FIX16_H_ */
 
 #define FIX16_LUT_SIN_TABLE_COUNT  (1024)
 #define FIX16_LUT_ATAN_TABLE_COUNT (256)

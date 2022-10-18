@@ -6,9 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _FIX16_INCLUDE_ONCE
+#ifndef _YAUL_MATH_FIX16_H_
 #error "Header file must not be directly included"
-#endif /* !_FIX16_INCLUDE_ONCE */
+#endif /* !_YAUL_MATH_FIX16_H_ */
 
 union fix16_vec3;
 
@@ -27,9 +27,9 @@ typedef union fix16_mat3 {
         fix16_vec3_t row[3];
 } __aligned(4) fix16_mat3_t;
 
-extern void fix16_mat3_dup(const fix16_mat3_t *, fix16_mat3_t *);
-extern void fix16_mat3_identity(fix16_mat3_t *);
-extern void fix16_mat3_str(const fix16_mat3_t *, char *, int);
-extern void fix16_mat3_transpose(const fix16_mat3_t * __restrict,
-    fix16_mat3_t * __restrict);
-extern void fix16_mat3_zero(fix16_mat3_t *);
+extern void fix16_mat3_dup(const fix16_mat3_t *m0, fix16_mat3_t *result);
+extern void fix16_mat3_identity(fix16_mat3_t *m0);
+extern void fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int decimals);
+extern void fix16_mat3_transpose(const fix16_mat3_t * __restrict m0,
+    fix16_mat3_t * __restrict result);
+extern void fix16_mat3_zero(fix16_mat3_t *m0);

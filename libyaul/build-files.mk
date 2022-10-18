@@ -211,6 +211,7 @@ LIB_SRCS+= \
 	math/fix16_vec2.c \
 	math/fix16_vec3.c \
 	math/int16.c \
+	math/int32.c \
 	math/uint32.c \
 	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \

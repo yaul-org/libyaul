@@ -26,7 +26,7 @@
 
 #include "fix16.h"
 
-static char *_itoa_loop(char *buf, uint32_t scale, uint32_t value, bool skip);
+static char *_itoa_loop(char *buffer, uint32_t scale, uint32_t value, bool skip);
 
 static const uint32_t _scales[8] = {
         /* 5 decimals is enough for full fix16_t precision */
@@ -41,14 +41,14 @@ static const uint32_t _scales[8] = {
 };
 
 uint32_t
-fix16_str(fix16_t value, char *buf, int decimals)
+fix16_str(fix16_t value, char *buffer, int decimals)
 {
         const uint32_t uvalue = (value >= 0) ? value : -value;
 
-        const char *start_buf = buf;
+        const char *start_buf = buffer;
 
         if (value < 0) {
-                *buf++ = '-';
+                *buffer++ = '-';
         }
 
         /* Separate the integer and decimal parts of the value */
@@ -65,17 +65,17 @@ fix16_str(fix16_t value, char *buf, int decimals)
         }
 
         /* Format integer part */
-        buf = _itoa_loop(buf, 10000, int_part, true);
+        buffer = _itoa_loop(buffer, 10000, int_part, true);
 
         /* Format decimal part (if any) */
         if (scale != 1) {
-                *buf++ = '.';
-                buf = _itoa_loop(buf, scale / 10, frac_part, false);
+                *buffer++ = '.';
+                buffer = _itoa_loop(buffer, scale / 10, frac_part, false);
         }
 
-        *buf = '\0';
+        *buffer = '\0';
 
-        return (buf - start_buf);
+        return (buffer - start_buf);
 }
 
 static char *

@@ -30,11 +30,6 @@ color_rgb888_fix16_rgb_convert(const color_rgb888_t *color __unused,
     color_fix16_rgb_t *result __unused)
 {
         /* XXX: Not yet implemented */
-#if 0
-        result->r = fix16_div(fix16_int32_from(color->r), FIX16(255.0f));
-        result->g = fix16_div(fix16_int32_from(color->g), FIX16(255.0f));
-        result->b = fix16_div(fix16_int32_from(color->b), FIX16(255.0f));
-#endif
 }
 
 void
@@ -75,54 +70,6 @@ color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color __unused,
     color_fix16_rgb_t *result __unused)
 {
         /* XXX: Not yet implemented */
-#if 0
-        fix16_t c;
-        c = fix16_mul(color->v, color->s);
-
-        fix16_t x;
-        /* X=C*(1-|((H/60.0)%2)-1|) */
-        x = fix16_mul(c, fix16_sub(FIX16_ONE, fix16_abs(fix16_sub(fix16_mod(
-                                fix16_div(color->h, FIX16(60.0f)),
-                                FIX16(2.0f)), FIX16_ONE))));
-
-        fix16_t m;
-        m = fix16_sub(color->v, c);
-
-        color_fix16_rgb_t rgb;
-        rgb.r = FIX16(0.0f);
-        rgb.g = FIX16(0.0f);
-        rgb.b = FIX16(0.0f);
-
-        if ((color->h >= FIX16(0.0f)) && (color->h < FIX16(60.0f))) {
-                rgb.r = c;
-                rgb.g = x;
-                rgb.b = FIX16(0.0f);
-        } else if ((color->h >= FIX16(60.0f)) && (color->h < FIX16(120.0f))) {
-                rgb.r = x;
-                rgb.g = c;
-                rgb.b = FIX16(0.0f);
-        } else if ((color->h >= FIX16(120.0f)) && (color->h < FIX16(180.0f))) {
-                rgb.r = FIX16(0.0f);
-                rgb.g = c;
-                rgb.b = x;
-        } else if ((color->h >= FIX16(180.0f)) && (color->h < FIX16(240.0f))) {
-                rgb.r = FIX16(0.0f);
-                rgb.g = x;
-                rgb.b = c;
-        } else if ((color->h >= FIX16(240.0f)) && (color->h < FIX16(300.0f))) {
-                rgb.r = x;
-                rgb.g = FIX16(0.0f);
-                rgb.b = c;
-        } else if ((color->h >= FIX16(300.0f)) && (color->h < FIX16(360.0f))) {
-                rgb.r = c;
-                rgb.g = FIX16(0.0f);
-                rgb.b = x;
-        }
-
-        result->r = fix16_add(rgb.r, m);
-        result->g = fix16_add(rgb.g, m);
-        result->b = fix16_add(rgb.b, m);
-#endif
 }
 
 void
@@ -152,56 +99,6 @@ color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color __unused,
     color_fix16_hsv_t *result __unused)
 {
         /* XXX: Not yet implemented */
-#if 0
-        fix16_t min;
-        fix16_t max;
-        fix16_t delta;
-
-        min = color_fix16_rgb_min(color);
-        max = color_fix16_rgb_max(color);
-
-        result->v = max;
-
-        delta = fix16_sub(max, min);
-
-        if (delta < FIX16(0.0000153f)) {
-                result->s = FIX16(0.0f);
-                /* Undefined, maybe NAN? */
-                result->h = FIX16(0.0f);
-                return;
-        }
-
-        if (max <= FIX16(0.0f)) {
-                /* If max is 0, then R = G = B = 0. So, s = 0, v is
-                 * undefined */
-                result->s = FIX16(0.0f);
-                result->h = FIX16(0.0f);
-                return;
-        }
-
-        result->s = fix16_div(delta, max);
-
-        if (color->r >= max) {
-                /* Between yellow & magenta */
-                result->h = fix16_div(fix16_sub(color->g, color->b), delta);
-        } else {
-                if (color->g >= max) {
-                        /* Between cyan & yellow */
-                        result->h = fix16_add(FIX16(2.0f),
-                            fix16_div(fix16_sub(color->b, color->r), delta));
-                } else {
-                        /* Between magenta & cyan */
-                        result->h = fix16_add(FIX16(4.0f),
-                            fix16_div(fix16_sub(color->r, color->g), delta));
-                }
-        }
-
-        result->h = fix16_mul(result->h, FIX16(60.0f));
-
-        if (result->h < FIX16(0.0f)) {
-                result->h = fix16_add(result->h, FIX16(360.0f));
-        }
-#endif
 }
 
 void
@@ -224,32 +121,32 @@ color_fix16_hsv_lerp(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
 }
 
 void
-color_fix16_hsv_str(const color_fix16_hsv_t *c0, char *buf, int32_t decimals)
+color_fix16_hsv_str(const color_fix16_hsv_t *c0, char *buffer, int decimals)
 {
-        char component_buf[13] __aligned(16);
-        size_t component_buf_len;
+        char component_buffer[13] __aligned(16);
+        size_t component_buffer_size;
 
-        char *buf_ptr;
-        buf_ptr = buf;
+        char *buffer_ptr;
+        buffer_ptr = buffer;
 
-        *buf_ptr++ = '(';
-        fix16_str(c0->h, component_buf, decimals);
-        component_buf_len = strlen(component_buf);
-        (void)memcpy(buf_ptr, component_buf, component_buf_len);
-        buf_ptr += component_buf_len;
-        *buf_ptr++ = ',';
+        *buffer_ptr++ = '(';
+        fix16_str(c0->h, component_buffer, decimals);
+        component_buffer_size = strlen(component_buffer);
+        (void)memcpy(buffer_ptr, component_buffer, component_buffer_size);
+        buffer_ptr += component_buffer_size;
+        *buffer_ptr++ = ',';
 
-        fix16_str(c0->s, component_buf, decimals);
-        component_buf_len = strlen(component_buf);
-        (void)memcpy(buf_ptr, component_buf, component_buf_len);
-        buf_ptr += component_buf_len;
-        *buf_ptr++ = ',';
+        fix16_str(c0->s, component_buffer, decimals);
+        component_buffer_size = strlen(component_buffer);
+        (void)memcpy(buffer_ptr, component_buffer, component_buffer_size);
+        buffer_ptr += component_buffer_size;
+        *buffer_ptr++ = ',';
 
-        fix16_str(c0->v, component_buf, decimals);
-        component_buf_len = strlen(component_buf);
-        (void)memcpy(buf_ptr, component_buf, component_buf_len);
-        buf_ptr += component_buf_len;
-        *buf_ptr++ = ')';
+        fix16_str(c0->v, component_buffer, decimals);
+        component_buffer_size = strlen(component_buffer);
+        (void)memcpy(buffer_ptr, component_buffer, component_buffer_size);
+        buffer_ptr += component_buffer_size;
+        *buffer_ptr++ = ')';
 
-        *buf_ptr = '\0';
+        *buffer_ptr = '\0';
 }

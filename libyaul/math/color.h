@@ -124,29 +124,30 @@ typedef union {
 
 extern void color_rgb555_fix16_hsv_convert(const color_rgb1555_t *,
     color_fix16_hsv_t *);
-extern void color_rgb888_fix16_hsv_convert(const color_rgb888_t *,
-    color_fix16_hsv_t *);
-extern void color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *,
-    color_fix16_hsv_t *);
+extern void color_rgb888_fix16_hsv_convert(const color_rgb888_t *color,
+    color_fix16_hsv_t *result);
+extern void color_fix16_rgb_fix16_hsv_convert(const color_fix16_rgb_t *color,
+    color_fix16_hsv_t *result);
 extern void color_fix16_hsv_rgb555_convert(const color_fix16_hsv_t *,
     color_rgb1555_t *);
-extern void color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *,
-    color_rgb888_t *);
-extern void color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *,
-    color_fix16_rgb_t *);
-extern void color_rgb555_rgb888_convert(const color_rgb1555_t *,
-    color_rgb888_t *);
-extern void color_rgb888_fix16_rgb_convert(const color_rgb888_t *,
-    color_fix16_rgb_t *);
-extern void color_rgb888_rgb555_convert(const color_rgb888_t *,
-    color_rgb1555_t *);
-extern void color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *,
-    color_rgb888_t *);
+extern void color_fix16_hsv_rgb888_convert(const color_fix16_hsv_t *color,
+    color_rgb888_t *result);
+extern void color_fix16_hsv_fix16_rgb_convert(const color_fix16_hsv_t *color,
+    color_fix16_rgb_t *result);
+extern void color_rgb555_rgb888_convert(const color_rgb1555_t *color_1555,
+    color_rgb888_t *result);
+extern void color_rgb888_fix16_rgb_convert(const color_rgb888_t *color,
+    color_fix16_rgb_t *result);
+extern void color_rgb888_rgb555_convert(const color_rgb888_t *color_888,
+    color_rgb1555_t *result);
+extern void color_fix16_rgb_rgb888_convert(const color_fix16_rgb_t *color,
+    color_rgb888_t *result);
 
-extern void color_fix16_hsv_lerp8(const color_fix16_hsv_t *,
-    const color_fix16_hsv_t *, uint8_t, color_fix16_hsv_t *);
-extern void color_fix16_hsv_lerp(const color_fix16_hsv_t *,
-    const color_fix16_hsv_t *, fix16_t, color_fix16_hsv_t *);
-extern void color_fix16_hsv_str(const color_fix16_hsv_t *, char *, int32_t);
+extern void color_fix16_hsv_lerp8(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+    uint8_t t, color_fix16_hsv_t *result);
+extern void color_fix16_hsv_lerp(const color_fix16_hsv_t *a, const color_fix16_hsv_t *b,
+    fix16_t t, color_fix16_hsv_t *result);
+
+extern void color_fix16_hsv_str(const color_fix16_hsv_t *c0, char *buffer, int decimals);
 
 #endif /* !_YAUL_MATH_COLOR_H_ */

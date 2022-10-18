@@ -27,7 +27,7 @@
 #include "fix16.h"
 
 fix16_t
-fix16_overflow_add(const fix16_t a, const fix16_t b)
+fix16_overflow_add(fix16_t a, fix16_t b)
 {
         /* Use unsigned integers because overflow with signed integers is an
          * undefined operation <http://www.airs.com/blog/archives/120> */
@@ -45,7 +45,7 @@ fix16_overflow_add(const fix16_t a, const fix16_t b)
 }
 
 fix16_t
-fix16_overflow_sub(const fix16_t a, const fix16_t b)
+fix16_overflow_sub(fix16_t a, fix16_t b)
 {
         uint32_t ta = a;
         uint32_t tb = b;
@@ -61,13 +61,13 @@ fix16_overflow_sub(const fix16_t a, const fix16_t b)
 }
 
 fix16_t
-fix16_lerp(const fix16_t a, const fix16_t b, const fix16_t t)
+fix16_lerp(fix16_t a, fix16_t b, fix16_t t)
 {
         return (fix16_mul(a, (FIX16_ONE - t)) + fix16_mul(b, t));
 }
 
 fix16_t
-fix16_lerp8(const fix16_t a, const fix16_t b, const uint8_t t)
+fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t)
 {
         /* Make sure when t =   0 => 0.0f
          *                t = 255 => 1.0f */

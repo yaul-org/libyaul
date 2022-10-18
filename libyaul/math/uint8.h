@@ -23,13 +23,13 @@ typedef struct {
         uint8_t z;
 } uint8_vec3_t;
 
-#define UINT8_VEC2_INITIALIZER(x, y)                                            \
+#define UINT8_VEC2_INITIALIZER(x, y)                                           \
     {                                                                          \
             (x),                                                               \
             (y)                                                                \
     }
 
-#define UINT8_VEC3_INITIALIZER(x, y)                                            \
+#define UINT8_VEC3_INITIALIZER(x, y)                                           \
     {                                                                          \
             (x),                                                               \
             (y),                                                               \

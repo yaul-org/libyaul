@@ -6,9 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _FIX16_INCLUDE_ONCE
+#ifndef _YAUL_MATH_FIX16_H_
 #error "Header file must not be directly included"
-#endif /* !_FIX16_INCLUDE_ONCE */
+#endif /* !_YAUL_MATH_FIX16_H_ */
 
 #define FIX16_VEC3_INITIALIZER(x, y, z)                                        \
     {                                                                          \
@@ -113,16 +113,16 @@ fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
         return aux1;
 }
 
-extern fix16_t fix16_vec3_length(const fix16_vec3_t *);
-extern fix16_t fix16_vec3_sqr_length(const fix16_vec3_t *);
-extern void fix16_vec3_normalize(fix16_vec3_t *);
-extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict,
-    fix16_vec3_t * __restrict);
-extern fix16_t fix16_vec3_dot(const fix16_vec3_t *, const fix16_vec3_t *);
-extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict,
-    const fix16_vec3_t * const __restrict, fix16_vec3_t * __restrict);
+extern fix16_t fix16_vec3_length(const fix16_vec3_t *v0);
+extern fix16_t fix16_vec3_sqr_length(const fix16_vec3_t *v0);
+extern void fix16_vec3_normalize(fix16_vec3_t *v0);
+extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
+    fix16_vec3_t * __restrict result);
+extern fix16_t fix16_vec3_dot(const fix16_vec3_t *, const fix16_vec3_t *v1);
+extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict v0,
+    const fix16_vec3_t * const __restrict v1, fix16_vec3_t * __restrict result);
 
-extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict,
-    const fix16_vec3_t * __restrict);
+extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict v0,
+    const fix16_vec3_t * __restrict v1);
 
-extern uint32_t fix16_vec3_str(const fix16_vec3_t *, char *, int);
+extern uint32_t fix16_vec3_str(const fix16_vec3_t *v0, char *buffer, int decimals);

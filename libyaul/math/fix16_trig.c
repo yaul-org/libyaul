@@ -13,10 +13,8 @@
 #include "math.h"
 #include "fix16.h"
 
-#define _FIX16_TRIG_INCLUDE_ONCE
 #include "fix16_sin.inc"
 #include "fix16_atan.inc"
-#undef _FIX16_TRIG_INCLUDE_ONCE
 
 static inline int32_t __always_inline
 _rad2brad_convert(fix16_t radians)

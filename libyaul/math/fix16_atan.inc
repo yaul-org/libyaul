@@ -1,9 +1,5 @@
 /* -*- mode: c -*- */
 
-#ifndef _FIX16_TRIG_INCLUDE_ONCE
-#error "Include file must not be directly included"
-#endif /* !_FIX16_TRIG_INCLUDE_ONCE */
-
 /*
  * LUT for atan([0,π/4]). */
 static const fix16_t _lut_brads_atan[FIX16_LUT_ATAN_TABLE_COUNT + 2] __aligned(16) = {

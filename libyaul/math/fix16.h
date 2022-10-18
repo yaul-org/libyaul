@@ -208,17 +208,15 @@ fix16_deg_rad_to(fix16_t degrees)
         return fix16_mul(degrees, FIX16_DEG2RAD);
 }
 
-extern fix16_t fix16_overflow_add(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_overflow_sub(const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_lerp(const fix16_t, const fix16_t, const fix16_t) FIXMATH_FUNC_ATTRS;
-extern fix16_t fix16_lerp8(const fix16_t, const fix16_t, const uint8_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp(fix16_t a, fix16_t b, fix16_t t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t) FIXMATH_FUNC_ATTRS;
 
-extern fix16_t fix16_sqrt(const fix16_t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
 
-extern uint32_t fix16_str(fix16_t, char *, int);
-
-#define _FIX16_INCLUDE_ONCE
+extern uint32_t fix16_str(fix16_t value, char *buffer, int decimals);
 
 #include "fix16_trig.h"
 
@@ -228,8 +226,6 @@ extern uint32_t fix16_str(fix16_t, char *, int);
 #include "fix16_mat3.h"
 
 #include "fix16_plane.h"
-
-#undef _FIX16_INCLUDE_ONCE
 
 #undef FIXMATH_FUNC_ATTRS
 

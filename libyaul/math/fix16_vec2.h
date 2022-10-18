@@ -6,9 +6,9 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _FIX16_INCLUDE_ONCE
+#ifndef _YAUL_MATH_FIX16_H_
 #error "Header file must not be directly included"
-#endif /* !_FIX16_INCLUDE_ONCE */
+#endif /* !_YAUL_MATH_FIX16_H_ */
 
 #define FIX16_VEC2_INITIALIZER(x, y)                                           \
     {                                                                          \
@@ -96,9 +96,9 @@ fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
         return aux1;
 }
 
-extern fix16_t fix16_vec2_length(const fix16_vec2_t *);
-extern fix16_t fix16_vec2_sqr_length(const fix16_vec2_t *);
-extern void fix16_vec2_normalize(fix16_vec2_t *);
-extern void fix16_vec2_normalized(const fix16_vec2_t * __restrict, fix16_vec2_t * __restrict);
-extern fix16_t fix16_vec2_dot(const fix16_vec2_t *, const fix16_vec2_t *);
-extern void fix16_vec2_str(const fix16_vec2_t *, char *, int);
+extern fix16_t fix16_vec2_length(const fix16_vec2_t *v0);
+extern fix16_t fix16_vec2_sqr_length(const fix16_vec2_t *v0);
+extern void fix16_vec2_normalize(fix16_vec2_t *v0);
+extern void fix16_vec2_normalized(const fix16_vec2_t * __restrict v0, fix16_vec2_t * __restrict result);
+extern fix16_t fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1);
+extern void fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int decimals);

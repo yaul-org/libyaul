@@ -33,7 +33,7 @@ fix16_mat3_identity(fix16_mat3_t *m0)
 }
 
 void
-fix16_mat3_transpose(const fix16_mat3_t *m0, fix16_mat3_t *result)
+fix16_mat3_transpose(const fix16_mat3_t * __restrict m0, fix16_mat3_t * __restrict result)
 {
         result->frow[0][0] = m0->frow[0][0];
         result->frow[0][1] = m0->frow[1][0];
@@ -49,24 +49,24 @@ fix16_mat3_transpose(const fix16_mat3_t *m0, fix16_mat3_t *result)
 }
 
 void
-fix16_mat3_str(const fix16_mat3_t *m0, char *buf, int decimals)
+fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int decimals)
 {
         for (uint32_t row_idx = 0; row_idx < 3; row_idx++) {
                 char *buf_start;
                 char *buf_end;
 
-                *buf++ = '|';
-                buf_start = buf;
-                buf_end = buf;
+                *buffer++ = '|';
+                buf_start = buffer;
+                buf_end = buffer;
 
-                fix16_vec3_str(&m0->row[row_idx], buf, decimals);
+                fix16_vec3_str(&m0->row[row_idx], buffer, decimals);
 
                 for (; *buf_end != '\0'; buf_end++);
 
-                buf += buf_end - buf_start;
-                *buf++ = '|';
-                *buf++ = '\n';
+                buffer += buf_end - buf_start;
+                *buffer++ = '|';
+                *buffer++ = '\n';
         }
 
-        *(--buf) = '\0';
+        *(--buffer) = '\0';
 }

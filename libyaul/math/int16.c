@@ -11,7 +11,7 @@
 #include "int16.h"
 
 void
-int16_vec2_str(const int16_vec2_t *v0, char *buf)
+int16_vec2_str(const int16_vec2_t *v0, char *buffer)
 {
-        (void)sprintf(buf, "(%i,%i)", v0->x, v0->y);
+        (void)sprintf(buffer, "(%i,%i)", v0->x, v0->y);
 }
