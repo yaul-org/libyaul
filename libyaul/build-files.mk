@@ -302,7 +302,6 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
-	./math/:fix.h:yaul/math/ \
 	./math/:fix16.h:yaul/math/ \
 	./math/:fix16_mat3.h:yaul/math/ \
 	./math/:fix16_plane.h:yaul/math/ \

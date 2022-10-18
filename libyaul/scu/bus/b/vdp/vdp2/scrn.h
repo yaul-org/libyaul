@@ -346,9 +346,9 @@ typedef struct vdp2_scrn_rotation_table {
  * | (1,7]          | Reduc. out (1/7)  | 16  |
  * +----------------+-------------------+-----+ */
 
-#define VDP2_SCRN_REDUCTION_STEP        Q0_3_8(1.0f / 256.0f)
+#define VDP2_SCRN_REDUCTION_STEP        FIX16(1.0f / 256.0f)
 #define VDP2_SCRN_REDUCTION_MIN         VDP2_SCRN_REDUCTION_STEP
-#define VDP2_SCRN_REDUCTION_MAX         Q0_3_8(7.0f)
+#define VDP2_SCRN_REDUCTION_MAX         FIX16(7.0f)
 
 typedef struct vdp2_scrn_ls_format {
         vdp2_scrn_t scroll_screen;    /* Normal background */
@@ -434,8 +434,8 @@ extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen);
 
 extern void vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen,
     vdp2_scrn_reduction_t reduction);
-extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
-extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale);
+extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale);
+extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, fix16_t scale);
 
 extern void vdp2_scrn_scroll_x_set(vdp2_scrn_t scroll_screen, fix16_t scroll);
 extern void vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta);

@@ -7,7 +7,6 @@
 #include <sys/cdefs.h>
 
 #include "color.h"
-#include "fix.h"
 #include "fix16.h"
 #include "int16.h"
 #include "int32.h"

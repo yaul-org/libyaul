@@ -35,7 +35,7 @@ vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reducti
 }
 
 void
-vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale)
+vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
@@ -43,22 +43,24 @@ vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale)
                (scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
+        fix16_vec2_t *zm_reg;
+
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->zmxin0 = Q0_3_8_INT(scale);
-                _state_vdp2()->regs->zmxdn0 = Q0_3_8_FRAC(scale) << 8;
+                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin0;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->zmxin1 = Q0_3_8_INT(scale);
-                _state_vdp2()->regs->zmxdn1 = Q0_3_8_FRAC(scale) << 8;
+                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin1;
                 break;
         default:
-                break;
+                return;
         }
+
+        zm_reg->x = scale;
 }
 
 void
-vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale)
+vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
 #ifdef DEBUG
         /* Check if the background passed is valid */
@@ -66,16 +68,18 @@ vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, q0_3_8_t scale)
                (scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
+        fix16_vec2_t *zm_reg;
+
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->zmyin0 = Q0_3_8_INT(scale);
-                _state_vdp2()->regs->zmydn0 = Q0_3_8_FRAC(scale) << 8;
+                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin0;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->zmyin1 = Q0_3_8_INT(scale);
-                _state_vdp2()->regs->zmydn1 = Q0_3_8_FRAC(scale) << 8;
+                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin1;
                 break;
         default:
-                break;
+                return;
         }
+
+        zm_reg->y = scale;
 }
