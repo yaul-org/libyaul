@@ -36,16 +36,6 @@ SH_SRCS_OTHER:= $(filter-out %.c %.cxx %.cpp %.cc %.C %.sx,$(SH_SRCS_UNIQ))
 SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRCS_S) $(SH_SRCS_OTHER),$(basename $(SRC))))
 SH_OBJS_UNIQ:= $(foreach OBJ,$(SH_OBJS_UNIQ),$(call macro-convert-build-path,$(OBJ)))
 
-SH_DEFSYMS=
-
-ifneq ($(strip $(IP_MASTER_STACK_ADDR)),)
-  SH_DEFSYMS+= -Wl,--defsym=__master_stack=$(IP_MASTER_STACK_ADDR)
-endif
-
-ifneq ($(strip $(IP_SLAVE_STACK_ADDR)),)
-  SH_DEFSYMS+= -Wl,--defsym=__slave_stack=$(IP_SLAVE_STACK_ADDR)
-endif
-
 SH_LDFLAGS+= $(SH_DEFSYMS)
 SH_LXXFLAGS+= $(SH_DEFSYMS)
 
@@ -122,7 +112,17 @@ $2: $1
 		$(SH_CXXFLAGS) $(SH_SYSTEM_INCLUDE_DIRS) $(SH_INCLUDE_DIRS))
 endef
 
-build: $(SH_PROGRAM).cue
+OUTPUT_FILES?=
+
+ifeq ($(strip $(OUTPUT_FILES)),)
+OUTPUT_FILES= $(SH_PROGRAM).bin
+CLEAN_OUTPUT_FILES?= $(OUTPUT_FILES)
+
+$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin
+	$(ECHO)cp $< $@
+endif
+
+.build: $(OUTPUT_FILES)
 
 $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
@@ -147,61 +147,9 @@ $(foreach SRC,$(SH_SRCS_S), \
 	$(eval $(call macro-generate-sh-build-asm-object,$(SRC),\
 		$(call macro-convert-build-path,$(addsuffix .o,$(basename $(SRC)))))))
 
-$(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-    # This is a rather nasty hack to suppress any output from running the
-    # pre/post-build-iso targets
-	$(ECHO)$(MAKE) --no-print-directory $$([ -z "$(SILENT)" ] || printf -- "-s") -f $(THIS_FILE) pre-build-iso
-	$(ECHO)mkdir -p $(IMAGE_DIRECTORY)
-	$(ECHO)cp $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(IMAGE_DIRECTORY)/$(IMAGE_1ST_READ_BIN)
-	$(ECHO)for txt in "ABS.TXT" "BIB.TXT" "CPY.TXT"; do \
-	    if ! [ -s $(IMAGE_DIRECTORY)/$$txt ]; then \
-		printf -- "empty\n" > $(IMAGE_DIRECTORY)/$$txt; \
-	    fi \
-	done
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-iso $(IMAGE_DIRECTORY) $(SH_BUILD_PATH)/IP.BIN $(SH_PROGRAM)
-	$(ECHO)$(MAKE) --no-print-directory $$([ -z "$(SILENT)" ] || printf -- "-s") -f $(THIS_FILE) post-build-iso
-
-$(SH_PROGRAM).ss: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/CART-IP.BIN
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)cat $(SH_BUILD_PATH)/CART-IP.BIN $(SH_BUILD_PATH)/$(SH_PROGRAM).bin > $@
-
-$(SH_PROGRAM).cue: | $(SH_PROGRAM).iso
-	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso"
-
-$(SH_BUILD_PATH)/IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/ip/ip.sx $(SH_BUILD_PATH)/$(SH_PROGRAM).bin
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-ip \
-	    "$(SH_BUILD_PATH)/$(SH_PROGRAM).bin" \
-		"$(IP_VERSION)" \
-		$(IP_RELEASE_DATE) \
-		"$(IP_AREAS)" \
-		"$(IP_PERIPHERALS)" \
-		'"$(IP_TITLE)"' \
-		$(IP_MASTER_STACK_ADDR) \
-		$(IP_SLAVE_STACK_ADDR) \
-		$(IP_1ST_READ_ADDR) \
-	    $(IP_1ST_READ_SIZE)
-
-$(SH_BUILD_PATH)/CART-IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/ip/ip.sx $(SH_BUILD_PATH)/$(SH_PROGRAM).bin
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-ip \
-	    "$(SH_BUILD_PATH)/$(SH_PROGRAM).bin" \
-		"$(IP_VERSION)" \
-		$(IP_RELEASE_DATE) \
-		"$(IP_AREAS)" \
-		"$(IP_PERIPHERALS)" \
-		'"$(IP_TITLE)"' \
-		$(IP_MASTER_STACK_ADDR) \
-		$(IP_SLAVE_STACK_ADDR) \
-		$(IP_1ST_READ_ADDR) \
-	    -1 && mv -f $(SH_BUILD_PATH)/IP.BIN $(SH_BUILD_PATH)/CART-IP.BIN
-
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
 	$(ECHO)-rm -f \
-	    $(SH_PROGRAM).cue \
-	    $(SH_PROGRAM).iso \
-	    $(SH_PROGRAM).ss \
 	    $(SH_OBJS_UNIQ) \
 	    $(SH_DEPS) \
 	    $(SH_TEMPS) \
@@ -210,23 +158,13 @@ clean:
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).elf \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).map \
 	    $(SH_BUILD_PATH)/$(SH_PROGRAM).sym \
-	    $(SH_BUILD_PATH)/IP.BIN \
-	    $(SH_BUILD_PATH)/IP.BIN.map \
-	    $(SH_BUILD_PATH)/CART-IP.BIN \
-	    $(SH_BUILD_PATH)/CART-IP.BIN.map \
-	    $(CDB_FILE)
-
-list-targets:
-	@$(MAKE) -pRrq -f $(THIS_FILE) : 2>/dev/null | \
-	awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
-	sort | \
-	grep -E -v -e '^[^[:alnum:]]' -e '^$@$$'
+	    $(CDB_FILE) \
+	    $(CLEAN_OUTPUT_FILES)
 
 -include $(SH_DEPS)
 
+undefine macro-builtin-asset-rule
 undefine macro-update-cdb
 undefine macro-generate-sh-build-object
 undefine macro-generate-sh-build-asm-object
 undefine macro-generate-sh-build-c++-object
-
-undefine macro-builtin-asset-rule
