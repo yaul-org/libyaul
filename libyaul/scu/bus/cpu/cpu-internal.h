@@ -15,5 +15,6 @@
 extern void __cpu_init(void);
 extern void __cpu_divu_init(void);
 extern void __cpu_dmac_init(void);
+extern void __cpu_sci_init(void);
 
 #endif /* !_CPU_INTERNAL_H_ */

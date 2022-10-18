@@ -19,7 +19,6 @@
 #include <cpu/intc.h>
 #include <cpu/map.h>
 #include <cpu/registers.h>
-#include <cpu/sci.h>
 #include <cpu/wdt.h>
 
 #include <vdp.h>
@@ -52,16 +51,13 @@ __cpu_init(void)
 
         /* Set the appropriate vector numbers for the on-chip peripheral
          * modules */
-        MEMORY_WRITE(16, CPU(VCRA), (CPU_INTC_INTERRUPT_SCI_ERI << 8) | CPU_INTC_INTERRUPT_SCI_RXI);
-        MEMORY_WRITE(16, CPU(VCRB), (CPU_INTC_INTERRUPT_SCI_TXI << 8) | CPU_INTC_INTERRUPT_SCI_TEI);
-
         MEMORY_WRITE_AND(16, CPU(VCRWDT), ~0x007F);
         MEMORY_WRITE_OR(16, CPU(VCRWDT), CPU_INTC_INTERRUPT_BSC);
 
         __cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);
         cpu_wdt_init(CPU_WDT_CLOCK_DIV_2);
-        cpu_sci_init();
+        __cpu_sci_init();
         __cpu_dmac_init();
 
         cpu_dual_comm_mode_set(CPU_DUAL_ENTRY_POLLING);
