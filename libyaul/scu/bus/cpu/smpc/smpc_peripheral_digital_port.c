@@ -12,7 +12,7 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_digital_port(uint8_t port, smpc_peripheral_digital_t * const peripheral)
+smpc_peripheral_digital_port(uint8_t port, smpc_peripheral_digital_t *peripheral)
 {
         smpc_peripheral_t *port_peripheral;
 
@@ -21,10 +21,10 @@ smpc_peripheral_digital_port(uint8_t port, smpc_peripheral_digital_t * const per
         switch (port) {
         default:
         case 1:
-                port_peripheral = smpc_peripheral_port_1.peripheral;
+                port_peripheral = __smpc_peripheral_port_1.peripheral;
                 break;
         case 2:
-                port_peripheral = smpc_peripheral_port_2.peripheral;
+                port_peripheral = __smpc_peripheral_port_2.peripheral;
                 break;
         }
 

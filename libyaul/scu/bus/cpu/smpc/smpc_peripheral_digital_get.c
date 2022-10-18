@@ -12,8 +12,8 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_digital_get(smpc_peripheral_t const *peripheral,
-    smpc_peripheral_digital_t * const digital)
+smpc_peripheral_digital_get(smpc_peripheral_t *peripheral,
+    smpc_peripheral_digital_t *digital)
 {
         assert(peripheral != NULL);
         assert(digital != NULL);
@@ -26,9 +26,7 @@ smpc_peripheral_digital_get(smpc_peripheral_t const *peripheral,
         digital->previous.pressed.raw = *(uint16_t *)&peripheral->previous_data[0];
         digital->pressed.raw = *(uint16_t *)&peripheral->data[0];
 
-        uint32_t diff;
-
-        diff = digital->pressed.raw ^ digital->previous.pressed.raw;
+        const uint32_t diff = digital->pressed.raw ^ digital->previous.pressed.raw;
 
         digital->held.raw = diff & digital->pressed.raw;
         digital->released.raw = diff & digital->previous.pressed.raw;

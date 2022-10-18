@@ -12,12 +12,14 @@
 
 #include <smpc/map.h>
 
+struct smpc_time;
 struct smpc_peripheral_port;
 
-extern struct smpc_peripheral_port smpc_peripheral_port_1;
-extern struct smpc_peripheral_port smpc_peripheral_port_2;
+extern struct smpc_time __smpc_time;
+
+extern struct smpc_peripheral_port __smpc_peripheral_port_1;
+extern struct smpc_peripheral_port __smpc_peripheral_port_2;
 
 extern void __smpc_init(void);
-extern void smpc_peripheral_init(void);
 
 #endif /* !_SMPC_INTERNAL_H_ */

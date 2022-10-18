@@ -9,20 +9,14 @@
 
 #include "smpc-internal.h"
 
-smpc_peripheral_racing_t *
+const smpc_peripheral_racing_t *
 smpc_peripheral_racing_port(uint8_t port)
 {
-        smpc_peripheral_racing_t *port_1;
-        smpc_peripheral_racing_t *port_2;
-
-        port_1 = (smpc_peripheral_racing_t *)smpc_peripheral_port_1.peripheral;
-        port_2 = (smpc_peripheral_racing_t *)smpc_peripheral_port_2.peripheral;
-
         switch (port) {
         case 1:
-                return port_1;
+                return (smpc_peripheral_racing_t *)__smpc_peripheral_port_1.peripheral;
         case 2:
-                return port_2;
+                return (smpc_peripheral_racing_t *)__smpc_peripheral_port_2.peripheral;
         default:
                 return NULL;
         }

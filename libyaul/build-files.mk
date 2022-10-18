@@ -263,7 +263,7 @@ LIB_SRCS+= \
 	scu/bus/cpu/smpc/smpc_peripheral_mouse_port.c \
 	scu/bus/cpu/smpc/smpc_peripheral_racing_port.c \
 	scu/bus/cpu/smpc/smpc_peripheral_raw_port.c \
-	scu/bus/cpu/smpc/smpc_rtc_settime_call.c \
+	scu/bus/cpu/smpc/smpc_rtc.c \
 	\
 	scu/scu-internal.c \
 	scu/scu_init.c \

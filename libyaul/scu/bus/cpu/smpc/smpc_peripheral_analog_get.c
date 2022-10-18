@@ -13,8 +13,8 @@
 #include "smpc-internal.h"
 
 void
-smpc_peripheral_analog_get(smpc_peripheral_t const *peripheral,
-    smpc_peripheral_analog_t * const analog)
+smpc_peripheral_analog_get(smpc_peripheral_t *peripheral,
+    smpc_peripheral_analog_t *analog)
 {
         assert(peripheral != NULL);
         assert(analog != NULL);
@@ -29,14 +29,9 @@ smpc_peripheral_analog_get(smpc_peripheral_t const *peripheral,
         memset(&analog->pressed.raw[0], &peripheral->data[0],
             (sizeof(analog->pressed.raw) / sizeof(analog->pressed.raw[0])));
 
-        uint16_t diff;
-        uint16_t raw;
-        uint16_t previous_raw;
-
-        raw = *(uint16_t *)&analog->pressed.raw[0];
-        previous_raw = *(uint16_t *)&analog->previous.pressed.raw[0];
-
-        diff = raw ^ previous_raw;
+        const uint16_t raw = *(uint16_t *)&analog->pressed.raw[0];
+        const uint16_t previous_raw = *(uint16_t *)&analog->previous.pressed.raw[0];
+        const uint16_t diff = raw ^ previous_raw;
 
         analog->held.raw = diff & raw;
         analog->released.raw = diff & previous_raw;
