@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) 2012-2022
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -118,7 +118,7 @@ extern fix16_t fix16_vec3_sqr_length(const fix16_vec3_t *v0);
 extern void fix16_vec3_normalize(fix16_vec3_t *v0);
 extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
     fix16_vec3_t * __restrict result);
-extern fix16_t fix16_vec3_dot(const fix16_vec3_t *, const fix16_vec3_t *v1);
+extern fix16_t fix16_vec3_dot(const fix16_vec3_t *v0, const fix16_vec3_t *v1);
 extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict v0,
     const fix16_vec3_t * const __restrict v1, fix16_vec3_t * __restrict result);
 
