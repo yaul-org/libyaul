@@ -56,10 +56,6 @@ __BEGIN_DECLS
 #define COLOR_PALETTE_DATA      0x0000
 #define COLOR_RGB_DATA          0x8000
 
-#define COLOR_RGB888(r, g, b)   (((b) << 16) | ((g) << 8) | (r))
-#define COLOR_RGB888_TO_RGB555(r, g, b)                                        \
-        ((((b) >> 3) << 10) | (((g) >> 3) << 5) | ((r) >> 3))
-
 typedef uint32_t vdp2_cram_mode_t;
 
 extern vdp2_cram_mode_t vdp2_cram_mode_get(void);

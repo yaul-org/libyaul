@@ -56,14 +56,14 @@ typedef struct g3d_info {
 static_assert(sizeof(g3d_info_t) == 24);
 
 typedef struct g3d_fog {
-        const color_rgb1555_t * const depth_colors;
+        const rgb1555_t * const depth_colors;
         const uint8_t * const depth_z;
         uint8_t depth_count;
         FIXED step;
         FIXED start_z;
         FIXED end_z;
-        color_rgb1555_t near_ambient_color;
-        color_rgb1555_t far_ambient_color;
+        rgb1555_t near_ambient_color;
+        rgb1555_t far_ambient_color;
 } g3d_fog_t;
 
 typedef struct g3d_results {

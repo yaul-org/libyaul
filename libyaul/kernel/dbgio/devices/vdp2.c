@@ -506,7 +506,7 @@ _shared_font_load(void)
 
         (void)memcpy((void *)_dev_state->color_palette,
             params->font_pal,
-            FONT_4BPP_COLOR_COUNT * sizeof(color_rgb1555_t));
+            FONT_4BPP_COLOR_COUNT * sizeof(rgb1555_t));
 }
 
 #include "vdp2.inc"

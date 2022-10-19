@@ -30,7 +30,7 @@ __BEGIN_DECLS
 #define VDP1_FB_SIZE    0x00040000UL /* In bytes */
 
 typedef struct vdp1_gouraud_table {
-        color_rgb1555_t colors[4];
+        rgb1555_t colors[4];
 } __aligned(8) vdp1_gouraud_table_t;
 
 typedef struct vdp1_clut {
@@ -55,7 +55,7 @@ typedef struct vdp1_clut {
                                 vdp1_color_bank_type_f_t type_f;
                         } sprite_type;
 
-                        color_rgb1555_t color;
+                        rgb1555_t color;
                 };
         } entries[16];
 } __aligned(32) vdp1_clut_t;

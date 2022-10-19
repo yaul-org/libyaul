@@ -302,7 +302,7 @@ vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_set(vdp1_cmdt_t *cmdt, color_rgb1555_t color)
+vdp1_cmdt_param_color_set(vdp1_cmdt_t *cmdt, rgb1555_t color)
 {
         cmdt->cmd_colr = color.raw;
 }

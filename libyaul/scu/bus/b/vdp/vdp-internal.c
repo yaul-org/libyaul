@@ -12,19 +12,6 @@
 struct state_vdp1 __state_vdp1;
 struct state_vdp2 __state_vdp2;
 
-
-/*                 xfer->len = _state_vdp2()->lncl.count * sizeof(uint16_t); */
-/*                 xfer->dst = (uint32_t)_state_vdp2()->lncl.vram; */
-/*                 xfer->src = CPU_CACHE_THROUGH | */
-/*                             (uint32_t)_state_vdp2()->lncl.buffer; */
-/*                 break; */
-/*         case COMMIT_XFER_BACK_SCREEN: */
-/*                 xfer->len = _state_vdp2()->back.count * sizeof(color_rgb1555_t); */
-/*                 xfer->dst = (uint32_t)_state_vdp2()->back.vram; */
-/*                 xfer->src = SCU_DMA_INDIRECT_TABLE_END | */
-/*                             CPU_CACHE_THROUGH | */
-/*                             (uint32_t)_state_vdp2()->back.buffer; */
-
 void
 __vdp2_commit(scu_dma_level_t level)
 {

@@ -6,13 +6,13 @@
 
 #include <sys/cdefs.h>
 
-#include "color.h"
-#include "fix16.h"
-#include "int16.h"
-#include "int32.h"
-#include "int8.h"
-#include "uint32.h"
-#include "uint8.h"
+#include <color.h>
+#include <fix16.h>
+#include <int16.h>
+#include <int32.h>
+#include <int8.h>
+#include <uint32.h>
+#include <uint8.h>
 
 __BEGIN_DECLS
 

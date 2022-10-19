@@ -67,7 +67,7 @@ typedef struct vdp1_env {
                 vdp2_sprite_type_t sprite_type:4;
         } __packed;
 
-        color_rgb1555_t erase_color;
+        rgb1555_t erase_color;
 
         int16_vec2_t erase_points[2];
 } vdp1_env_t;
