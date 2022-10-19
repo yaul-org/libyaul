@@ -202,14 +202,14 @@ LIB_SRCS+= \
 
 LIB_SRCS+= \
 	math/color.c \
-	math/fix16.c \
-	math/fix16_mat3.c \
-	math/fix16_plane.c \
-	math/fix16_sqrt.c \
-	math/fix16_str.c \
-	math/fix16_trig.c \
-	math/fix16_vec2.c \
-	math/fix16_vec3.c \
+	math/fix16/fix16.c \
+	math/fix16/fix16_mat3.c \
+	math/fix16/fix16_plane.c \
+	math/fix16/fix16_sqrt.c \
+	math/fix16/fix16_str.c \
+	math/fix16/fix16_trig.c \
+	math/fix16/fix16_vec2.c \
+	math/fix16/fix16_vec3.c \
 	math/int16.c \
 	math/int32.c \
 	math/uint32.c \
@@ -303,11 +303,11 @@ INSTALL_HEADER_FILES+= \
 INSTALL_HEADER_FILES+= \
 	./math/:color.h:yaul/math/ \
 	./math/:fix16.h:yaul/math/ \
-	./math/:fix16_mat3.h:yaul/math/ \
-	./math/:fix16_plane.h:yaul/math/ \
-	./math/:fix16_trig.h:yaul/math/ \
-	./math/:fix16_vec2.h:yaul/math/ \
-	./math/:fix16_vec3.h:yaul/math/ \
+	./math/fix16/:fix16_mat3.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_plane.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_trig.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_vec2.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_vec3.h:yaul/math/fix16/ \
 	./math/:int16.h:yaul/math/ \
 	./math/:int32.h:yaul/math/ \
 	./math/:int8.h:yaul/math/ \
