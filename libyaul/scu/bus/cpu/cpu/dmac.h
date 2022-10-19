@@ -214,6 +214,7 @@ typedef struct cpu_dmac_cfg {
         /// @see cpu_dmac_cfg_t.detect_mode
         /// @see cpu_dmac_cfg_t.dreq_level
         /// @see cpu_dmac_cfg_t.bus_mode
+        /// @see cpu_dmac_cfg_t.resource_select
         bool non_default:1;
 
         /// Memory transfer source address.
