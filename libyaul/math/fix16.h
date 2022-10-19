@@ -218,14 +218,14 @@ extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
 
 extern uint32_t fix16_str(fix16_t value, char *buffer, int decimals);
 
-#include "fix16_trig.h"
+#include "fix16/fix16_trig.h"
 
-#include "fix16_vec2.h"
-#include "fix16_vec3.h"
+#include "fix16/fix16_vec2.h"
+#include "fix16/fix16_vec3.h"
 
-#include "fix16_mat3.h"
+#include "fix16/fix16_mat3.h"
 
-#include "fix16_plane.h"
+#include "fix16/fix16_plane.h"
 
 #undef FIXMATH_FUNC_ATTRS
 
