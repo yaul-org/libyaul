@@ -39,8 +39,8 @@ vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram)
                (scroll_screen == VDP2_SCRN_RBG0) ||
                (scroll_screen == VDP2_SCRN_SPRITE));
 
-        assert((cram_addr >= VDP2_CRAM_ADDR(0x000)) &&
-               (cram_addr < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
+        assert((cram >= VDP2_CRAM_ADDR(0x000)) &&
+               (cram < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
 #endif /* DEBUG */
 
         cram = (((vdp2_cram_mode_get()) == 2)

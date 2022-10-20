@@ -16,8 +16,8 @@ void
 vdp2_scrn_vcs_set(const vdp2_scrn_vcs_format_t *vcs_format)
 {
 #ifdef DEBUG
-        assert((vcs->scroll_screen == VDP2_SCRN_NBG0) ||
-               (vcs->scroll_screen == VDP2_SCRN_NBG1));
+        assert((vcs_format->scroll_screen == VDP2_SCRN_NBG0) ||
+               (vcs_format->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
         _state_vdp2()->regs->vcstau = VDP2_VRAM_BANK(vcs_format->table);

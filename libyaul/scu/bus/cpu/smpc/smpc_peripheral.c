@@ -188,7 +188,7 @@ smpc_peripheral_process(void)
 static void
 _port_peripherals_free(smpc_peripheral_port_t *per_port)
 {
-        assert(port != NULL);
+        assert(per_port != NULL);
 
         smpc_peripheral_t *peripheral;
         smpc_peripheral_t *tmp_peripheral;

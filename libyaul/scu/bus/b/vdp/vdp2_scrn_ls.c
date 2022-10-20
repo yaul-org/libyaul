@@ -15,8 +15,8 @@ void
 vdp2_scrn_ls_set(const vdp2_scrn_ls_format_t *ls_format)
 {
 #ifdef DEBUG
-        assert((ls->scroll_screen == VDP2_SCRN_NBG0) ||
-               (ls->scroll_screen == VDP2_SCRN_NBG1));
+        assert((ls_format->scroll_screen == VDP2_SCRN_NBG0) ||
+               (ls_format->scroll_screen == VDP2_SCRN_NBG1));
 #endif /* DEBUG */
 
         const uint16_t lstau = VDP2_VRAM_BANK(ls_format->table);
