@@ -10,6 +10,7 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 
 #include <scu/map.h>
@@ -74,7 +75,9 @@ typedef struct scu_dsp_status {
         unsigned int :7;
         /// Not yet documented.
         scu_dsp_pc_t pc:8;
-} __packed scu_dsp_status_t;
+} __packed __aligned(4) scu_dsp_status_t;
+
+static_assert(sizeof(scu_dsp_status_t) == 4);
 
 /// @brief Pause SCU-DSP execution.
 ///
@@ -178,7 +181,7 @@ extern void scu_dsp_data_read(scu_dsp_ram_t ram_page, uint8_t offset,
 ///
 /// @details If @p offset + @p count exceeds @ref DSP_RAM_PAGE_WORD_COUNT, the
 /// function returns without copying.
-/// 
+///
 /// @param      ram_page The RAM page.
 /// @param      offset   The offset in the RAM page.
 /// @param[in]  data     The pointer to the buffer to write to.

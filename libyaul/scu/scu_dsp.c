@@ -268,10 +268,9 @@ scu_dsp_status_get(scu_dsp_status_t *status)
 
         const uint32_t ppaf_bits = _ppaf_read();
 
-        uint32_t *status_p;
-        status_p = (uint32_t *)status;
+        uint32_t * const status_ptr = (uint32_t *)status;
 
-        *status_p = ppaf_bits;
+        *status_ptr = ppaf_bits;
 
         status->v = status->v || _ppaf_state.overflow_bit;
         status->e = status->e || _ppaf_state.end_bit;
