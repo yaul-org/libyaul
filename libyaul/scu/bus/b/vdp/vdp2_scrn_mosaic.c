@@ -23,7 +23,7 @@ vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen)
         /* If performing mosaic processing in NBG0 or NBG1, the vertical
          * cell-scroll function cannot be used.
          *
-         * Mosaic processing is then ignored for NBG0 or NBG1. */
+         * Mosaic processing is then ignored for NBG0 or NBG1 */
 
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
@@ -104,9 +104,7 @@ vdp2_scrn_mosaic_clear(void)
 void
 vdp2_scrn_mosaic_vertical_set(uint8_t vertical)
 {
-        if ((vertical < 1) || (vertical > 16)) {
-                return;
-        }
+        vertical = clamp(vertical, 1, 16);
 
         _state_vdp2()->regs->mzctl &= 0x0FFF;
         _state_vdp2()->regs->mzctl |= (vertical - 1) << 12;
@@ -115,9 +113,7 @@ vdp2_scrn_mosaic_vertical_set(uint8_t vertical)
 void
 vdp2_scrn_mosaic_horizontal_set(uint8_t horizontal)
 {
-        if ((horizontal < 1) || (horizontal > 16)) {
-                return;
-        }
+        horizontal = clamp(horizontal, 1, 16);
 
         _state_vdp2()->regs->mzctl &= 0xF0FF;
         _state_vdp2()->regs->mzctl |= (horizontal - 1) << 8;
