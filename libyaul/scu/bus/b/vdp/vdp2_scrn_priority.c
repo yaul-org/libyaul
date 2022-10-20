@@ -22,7 +22,7 @@ vdp2_scrn_priority_set(vdp2_scrn_t scroll_screen, uint8_t priority)
                (scroll_screen == VDP2_SCRN_RBG0));
 #endif /* DEBUG */
 
-        /* When priority is zero, scroll screen is transparent. */
+        /* When priority is zero, scroll screen is transparent */
         priority &= 0x07;
 
         switch (scroll_screen) {
@@ -74,6 +74,6 @@ vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen)
         case VDP2_SCRN_RBG0:
                 return _state_vdp2()->regs->prir & 0x0007;
         default:
-                return 0;
+                return -1;
         }
 }
