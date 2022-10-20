@@ -11,11 +11,10 @@
 
 #include "vdp-internal.h"
 
-static void _back_set(vdp2_vram_t vram,
-    const rgb1555_t *buffer, const uint32_t count);
+static void _back_set(vdp2_vram_t vram, const rgb1555_t *buffer, uint32_t count);
 
 void
-vdp2_scrn_back_color_set(vdp2_vram_t vram, const rgb1555_t color)
+vdp2_scrn_back_color_set(vdp2_vram_t vram, rgb1555_t color)
 {
         static rgb1555_t buffer = RGB1555_INITIALIZER(1, 0, 0, 0);
 
@@ -26,7 +25,7 @@ vdp2_scrn_back_color_set(vdp2_vram_t vram, const rgb1555_t color)
 
 void
 vdp2_scrn_back_buffer_set(vdp2_vram_t vram, const rgb1555_t *buffer,
-    const uint32_t count)
+    uint32_t count)
 {
 #ifdef DEBUG
         assert(buffer != NULL);
@@ -51,7 +50,7 @@ vdp2_scrn_back_sync(void)
 }
 
 static void
-_back_set(vdp2_vram_t vram, const rgb1555_t *buffer, const uint32_t count)
+_back_set(vdp2_vram_t vram, const rgb1555_t *buffer, uint32_t count)
 {
         /* If set to single color, transfer only one color value. Otherwise,
          * transfer a color buffer */

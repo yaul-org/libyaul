@@ -388,18 +388,18 @@ typedef struct vdp2_scrn_color_offset_rgb {
 } vdp2_scrn_color_offset_rgb_t;
 
 extern void vdp2_scrn_back_color_set(vdp2_vram_t vram,
-    const rgb1555_t color);
+    rgb1555_t color);
 extern void vdp2_scrn_back_buffer_set(vdp2_vram_t vram,
-    const rgb1555_t *buffer, const uint32_t count);
+    const rgb1555_t *buffer, uint32_t count);
 extern void vdp2_scrn_back_sync(void);
 
 extern void vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask);
 extern void vdp2_scrn_lncl_unset(vdp2_scrn_t scrn_mask);
 extern void vdp2_scrn_lncl_clear(void);
 extern void vdp2_scrn_lncl_color_set(vdp2_vram_t vram,
-    const uint16_t cram_index);
+    uint16_t cram_index);
 extern void vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram,
-    const uint16_t *buffer, const uint32_t count);
+    const uint16_t *buffer, uint32_t count);
 extern void vdp2_scrn_lncl_sync(void);
 
 extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *bitmap_format);
@@ -408,7 +408,7 @@ extern void vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *cell_format
 
 extern void vdp2_scrn_color_offset_clear(void);
 extern void vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
-    const vdp2_scrn_color_offset_rgb_t * const rgb);
+    const vdp2_scrn_color_offset_rgb_t *rgb);
 extern void vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen,
     vdp2_scrn_color_offset_t select);
 extern void vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen);

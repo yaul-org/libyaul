@@ -34,7 +34,7 @@ vdp2_scrn_lncl_clear(void)
 }
 
 void
-vdp2_scrn_lncl_color_set(vdp2_vram_t vram, const uint16_t cram_index)
+vdp2_scrn_lncl_color_set(vdp2_vram_t vram, uint16_t cram_index)
 {
         static uint16_t buffer = 0;
 
@@ -45,7 +45,7 @@ vdp2_scrn_lncl_color_set(vdp2_vram_t vram, const uint16_t cram_index)
 
 void
 vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram, const uint16_t *buffer,
-    const uint32_t count)
+    uint32_t count)
 {
 #ifdef DEBUG
         assert(buffer != NULL);

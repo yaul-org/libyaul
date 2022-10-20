@@ -130,7 +130,7 @@ vdp2_scrn_color_offset_clear(void)
 
 void
 vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
-        const vdp2_scrn_color_offset_rgb_t * const rgb)
+        const vdp2_scrn_color_offset_rgb_t *rgb)
 {
 #ifdef DEBUG
         /* Check range: [-256,256] */
