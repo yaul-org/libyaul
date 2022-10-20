@@ -53,7 +53,7 @@ __BEGIN_DECLS
  * +----------+-----------+---------------+
  *
  * Page dimension is 64x64 if cell size is 1x1.
- * Page dimension is 32x32 if cell size is 2x2. */
+ * Page dimension is 32x32 if cell size is 2x2 */
 #define VDP2_SCRN_CALCULATE_PAGE_SIZE(format)                                  \
         (VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->pnd_size * 2))
 

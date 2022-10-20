@@ -295,7 +295,26 @@ _cell_plane_calculate(const vdp2_scrn_cell_format_t *format, uint16_t plane_coun
         const uint32_t page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
 
         for (uint32_t plane = 0; plane < plane_count; plane++) {
-                const uint16_t map_bits = (format->map_bases.planes[plane] / page_size) & 0x03FF;
+                /* A bit less clear than just dividing the plane address by the
+                 * page size to get the map bits */
+                uint16_t map_bits;
+                map_bits = format->map_bases.planes[plane] >> 11;
+
+                switch (page_size) {
+                case 0x0800:
+                        break;
+                case 0x1000:
+                        map_bits >>= 1;
+                        break;
+                case 0x2000:
+                        map_bits >>= 2;
+                        break;
+                case 0x4000:
+                        map_bits >>= 3;
+                        break;
+                }
+
+                map_bits &= 0x03FF;
 
                 planes[plane] = map_bits & 0x003F;
 
