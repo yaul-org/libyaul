@@ -124,7 +124,7 @@ vdp2_scrn_scroll_x_update(vdp2_scrn_t scroll_screen, fix16_t delta)
                 break;
         default:
                 break;
-        }        
+        }
 }
 
 void
@@ -153,5 +153,5 @@ vdp2_scrn_scroll_y_update(vdp2_scrn_t scroll_screen, fix16_t delta)
                 break;
         default:
                 break;
-        }        
+        }
 }
