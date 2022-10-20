@@ -12,56 +12,57 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <vdp2/map.h>
 #include <vdp2/vram.h>
 
 __BEGIN_DECLS
 
-#define VDP2_SCRN_CALCULATE_PAGE_COUNT(format)                                 \
+#define VDP2_SCRN_PAGE_COUNT_CALCULATE(format)                                 \
         ((format)->plane_size)
 
-#define VDP2_SCRN_CALCULATE_PAGE_WIDTH(format)                                 \
-        (((format)->character_size == (1 * 1)) ? 64 : 32)
+#define VDP2_SCRN_PAGE_WIDTH_CALCULATE(format)                                 \
+        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
-#define VDP2_SCRN_CALCULATE_PAGE_HEIGHT(format)                                \
-        (((format)->character_size == (1 * 1)) ? 64 : 32)
+#define VDP2_SCRN_PAGE_HEIGHT_CALCULATE(format)                                \
+        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
-#define VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format)                             \
-        (((format)->character_size == (1 * 1)) ? (64 * 64) : (32 * 32))
+#define VDP2_SCRN_PAGE_DIMENSION_CALCULATE(format)                             \
+        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1)                      \
+            ? (64 * 64)                                                        \
+            : (32 * 32))
 
-#define VDP2_SCRN_CALCULATE_PAGE_COUNT_M(plsz)                                 \
-        (plsz)
+#define VDP2_SCRN_PAGE_COUNT_M_CALCULATE(plane_size)                           \
+        (plane_size)
 
-#define VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(chsz)                                 \
-        (((chsz) == (1 * 1)) ? 64 : 32)
+#define VDP2_SCRN_PAGE_WIDTH_M_CALCULATE(char_size)                            \
+        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
-#define VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(chsz)                                \
-        (((chsz) == (1 * 1)) ? 64 : 32)
+#define VDP2_SCRN_PAGE_HEIGHT_M_CALCULATE(char_size)                           \
+        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
-#define VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz)                             \
-        (((chsz) == (1 * 1)) ? (64 * 64) : (32 * 32))
+#define VDP2_SCRN_PAGE_DIMENSION_M_CALCULATE(char_size)                        \
+        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? (64 * 64) : (32 * 32))
 
 /*-
- * Possible values for VDP2_SCRN_CALCULATE_PAGE_SIZE() (in bytes):
+ * Possible values for VDP2_SCRN_PAGE_SIZE_CALCULATE() (in bytes):
  * +----------+-----------+---------------+
  * | PND size | Cell size | Size of page  |
  * +----------+-----------+---------------+
- * | 1-word   | 1x1       | 0x2000        |
  * | 1-word   | 2x2       | 0x0800        |
- * | 2-word   | 1x1       | 0x4000        |
  * | 2-word   | 2x2       | 0x1000        |
+ * | 1-word   | 1x1       | 0x2000        |
+ * | 2-word   | 1x1       | 0x4000        |
  * +----------+-----------+---------------+
  *
  * Page dimension is 64x64 if cell size is 1x1.
  * Page dimension is 32x32 if cell size is 2x2 */
-#define VDP2_SCRN_CALCULATE_PAGE_SIZE(format)                                  \
-        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION(format) * ((format)->pnd_size * 2))
+#define VDP2_SCRN_PAGE_SIZE_CALCULATE(format)                                  \
+        (VDP2_SCRN_PAGE_DIMENSION_CALCULATE(format) * ((format)->pnd_size * 2))
 
-#define VDP2_SCRN_CALCULATE_PAGE_SIZE_M(chsz, pndsz)                           \
-        (VDP2_SCRN_CALCULATE_PAGE_DIMENSION_M(chsz) * ((pndsz) * 2))
+#define VDP2_SCRN_PAGE_SIZE_M_CALCULATE(char_size, pnd_size)                   \
+        (VDP2_SCRN_PAGE_DIMENSION_M_CALCULATE(char_size) * ((pnd_size) * 2))
 
 /*-
- * Possible vales for VDP2_SCRN_CALCULATE_PLANE_SIZE() (in bytes):
+ * Possible vales for VDP2_SCRN_PLANE_SIZE_CALCULATE() (in bytes):
  * +------------+----------+-----------+---------------+
  * | Plane size | PND size | Cell size | Size of plane |
  * +------------+----------+-----------+---------------+
@@ -82,8 +83,8 @@ __BEGIN_DECLS
  * +------------+----------+-----------+---------------+
  */
 
-#define VDP2_SCRN_CALCULATE_PLANE_SIZE(format)                                 \
-        (((format)->plane_size) * VDP2_SCRN_CALCULATE_PAGE_SIZE(format))
+#define VDP2_SCRN_PLANE_SIZE_CALCULATE(format)                                 \
+        (((format)->plane_size) * VDP2_SCRN_PAGE_SIZE_CALCULATE(format))
 
 /*-
  * Possible values (plane count) that can fit within a 4Mbit VRAM bank:
@@ -108,17 +109,11 @@ __BEGIN_DECLS
  * +-------------+------------+----------+------------+------------+
  */
 
-#define VDP2_SCRN_CALCULATE_PLANES_2_CNT(format)                               \
-        (VDP2_VRAM_BSIZE_2 / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_PLANES_2_CNT_CALCULATE(format)                               \
+        (VDP2_VRAM_BSIZE_2 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
 
-#define VDP2_SCRN_CALCULATE_PLANES_4_CNT(format)                               \
-        (VDP2_VRAM_BSIZE_4 / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
-
-#define VDP2_SCRN_CALCULATE_PLANES_2_8MBIT_CNT(format)                         \
-        (VDP2_VRAM_BSIZE_2_8MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
-
-#define VDP2_SCRN_CALCULATE_PLANES_4_8MBIT_CNT(format)                         \
-        (VDP2_VRAM_BSIZE_4_8MBIT / VDP2_SCRN_CALCULATE_PLANE_SIZE((format)))
+#define VDP2_SCRN_PLANES_4_CNT_CALCULATE(format)                               \
+        (VDP2_VRAM_BSIZE_4 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
 
 /*-
  * Configuration table mapping. Depending on how the normal/rotational
@@ -138,13 +133,13 @@ __BEGIN_DECLS
  * +-----+--------+------+-----------+------------+------------+-------------+
  */
 
-#define VDP2_SCRN_PND_CP_NUM(address)                   (((uint32_t)(address)) >> 5)
-#define VDP2_SCRN_PND_MODE_0_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 5) & 0x007F)
-#define VDP2_SCRN_PND_MODE_1_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 5) & 0x007F)
-#define VDP2_SCRN_PND_MODE_2_PAL_NUM(cram_address)      ((((uint32_t)(cram_address)) >> 6) & 0x007F)
+#define VDP2_SCRN_PND_CP_NUM(addr)              (((uint32_t)(addr)) >> 5)
+#define VDP2_SCRN_PND_MODE_0_PAL_NUM(cram_addr) ((((uint32_t)(cram_addr)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_1_PAL_NUM(cram_addr) ((((uint32_t)(cram_addr)) >> 5) & 0x007F)
+#define VDP2_SCRN_PND_MODE_2_PAL_NUM(cram_addr) ((((uint32_t)(cram_addr)) >> 6) & 0x007F)
 
-#define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_address)                         \
-        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(cram_address)
+#define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_addr)                            \
+        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(cram_addr)
 
 #define VDP2_SCRN_PND_CONFIG_0(cram_mode, cpd_addr, pal_addr, vf, hf)          \
         (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \

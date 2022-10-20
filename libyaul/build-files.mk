@@ -233,8 +233,9 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp1_vram.c \
 	scu/bus/b/vdp/vdp2_cram.c \
 	scu/bus/b/vdp/vdp2_regs.c \
-	scu/bus/b/vdp/vdp2_scrn.c \
 	scu/bus/b/vdp/vdp2_scrn_back.c \
+	scu/bus/b/vdp/vdp2_scrn_bitmap.c \
+	scu/bus/b/vdp/vdp2_scrn_cell.c \
 	scu/bus/b/vdp/vdp2_scrn_color_offset.c \
 	scu/bus/b/vdp/vdp2_scrn_display.c \
 	scu/bus/b/vdp/vdp2_scrn_lncl.c \
@@ -242,6 +243,7 @@ LIB_SRCS+= \
 	scu/bus/b/vdp/vdp2_scrn_mosaic.c \
 	scu/bus/b/vdp/vdp2_scrn_priority.c \
 	scu/bus/b/vdp/vdp2_scrn_reduction.c \
+	scu/bus/b/vdp/vdp2_scrn_rotation.c \
 	scu/bus/b/vdp/vdp2_scrn_scroll.c \
 	scu/bus/b/vdp/vdp2_scrn_sf.c \
 	scu/bus/b/vdp/vdp2_scrn_vcs.c \
@@ -399,7 +401,12 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/b/vdp/vdp2/:cram.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:map.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:scrn.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_bitmap.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_cell.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_funcs.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:scrn_macros.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_rotation.h:yaul/scu/bus/b/vdp/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_shared.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:sprite.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:tvmd.h:yaul/scu/bus/b/vdp/vdp2/ \
 	./scu/bus/b/vdp/vdp2/:vram.h:yaul/scu/bus/b/vdp/vdp2/ \

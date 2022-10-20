@@ -62,6 +62,8 @@ vdp2_scrn_mosaic_unset(vdp2_scrn_t scroll_screen)
                 _state_vdp2()->regs->mzctl &= 0xFFF7;
                 break;
         case VDP2_SCRN_RBG0:
+        case VDP2_SCRN_RBG0_PA:
+        case VDP2_SCRN_RBG0_PB:
                 _state_vdp2()->regs->mzctl &= 0xFFEF;
                 break;
         default:

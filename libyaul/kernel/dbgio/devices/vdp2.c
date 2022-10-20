@@ -300,9 +300,9 @@ _dev_state_init(const dbgio_vdp2_t *params)
         _dev_state->state = STATE_IDLE;
         _dev_state->params = *params;
 
-        _dev_state->page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE_M(1 * 1, 1);
-        _dev_state->page_width = VDP2_SCRN_CALCULATE_PAGE_WIDTH_M(1 * 1);
-        _dev_state->page_height = VDP2_SCRN_CALCULATE_PAGE_HEIGHT_M(1 * 1);
+        _dev_state->page_size = VDP2_SCRN_PAGE_SIZE_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1, 1);
+        _dev_state->page_width = VDP2_SCRN_PAGE_WIDTH_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1);
+        _dev_state->page_height = VDP2_SCRN_PAGE_HEIGHT_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1);
 
         /* One page per plane */
         _dev_state->page_base = VDP2_VRAM_ADDR(params->pnd_bank,
@@ -329,21 +329,24 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         assert(_dev_state != NULL);
 
         const vdp2_scrn_cell_format_t cell_format = {
-                .scroll_screen     = params->scroll_screen,
-                .cc_count          = VDP2_SCRN_CCC_PALETTE_16,
-                .character_size    = 1 * 1,
-                .pnd_size          = 1, /* 1-word */
-                .auxiliary_mode    = 0,
-                .cp_table          = _dev_state->cp_table,
-                .color_palette     = _dev_state->color_palette,
-                .plane_size        = 1 * 1,
-                .map_bases.plane_a = _dev_state->page_base,
-                .map_bases.plane_b = _dev_state->page_base,
-                .map_bases.plane_c = _dev_state->page_base,
-                .map_bases.plane_d = _dev_state->page_base
+                .scroll_screen = params->scroll_screen,
+                .ccc           = VDP2_SCRN_CCC_PALETTE_16,
+                .char_size     = VDP2_SCRN_CHAR_SIZE_1X1,
+                .pnd_size      = 1,
+                .aux_mode      = VDP2_SCRN_AUX_MODE_0,
+                .cpd_base      = _dev_state->cp_table,
+                .palette_base  = _dev_state->color_palette,
+                .plane_size    = VDP2_SCRN_PLANE_SIZE_1X1
         };
 
-        vdp2_scrn_cell_format_set(&cell_format);
+        const vdp2_scrn_normal_map_t normal_map = {
+                .plane_a = _dev_state->page_base,
+                .plane_b = _dev_state->page_base,
+                .plane_c = _dev_state->page_base,
+                .plane_d = _dev_state->page_base
+        };
+
+        vdp2_scrn_cell_format_set(&cell_format, &normal_map);
 }
 
 static void

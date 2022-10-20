@@ -11,8 +11,7 @@
 
 #include "vdp-internal.h"
 
-static void _lncl_set(vdp2_vram_t vram,
-    const uint16_t *buffer, const uint32_t count);
+static void _lncl_set(vdp2_vram_t vram, const uint16_t *buffer, uint32_t count);
 
 void
 vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask)
@@ -68,7 +67,7 @@ vdp2_scrn_lncl_sync(void)
 }
 
 static void
-_lncl_set(vdp2_vram_t vram, const uint16_t *buffer, const uint32_t count)
+_lncl_set(vdp2_vram_t vram, const uint16_t *buffer, uint32_t count)
 {
         const uint16_t lcclmd = (count == 1) ? 0x0000 : 0x8000;
 

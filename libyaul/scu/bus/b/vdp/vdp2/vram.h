@@ -10,6 +10,7 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -43,10 +44,10 @@ __BEGIN_DECLS
 #define VDP2_VRAM_BSIZE_4       (VDP2_VRAM_SIZE / 4)
 
 typedef enum vdp2_vram_bank {
-        VDP2_VRAM_BANK_A0 = 0,
-        VDP2_VRAM_BANK_A1 = 1,
-        VDP2_VRAM_BANK_B0 = 2,
-        VDP2_VRAM_BANK_B1 = 3
+        VDP2_VRAM_BANK_A0,
+        VDP2_VRAM_BANK_A1,
+        VDP2_VRAM_BANK_B0,
+        VDP2_VRAM_BANK_B1
 } vdp2_vram_bank_t;
 
 typedef enum vdp2_vram_mode {
@@ -61,32 +62,49 @@ typedef enum vdp2_vram_mode {
 
 typedef enum vdp2_vram_ctl_coeff_table {
         /// Store coefficient table in VRAM.
-        VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM = 0x00,
+        VDP2_VRAM_CTL_COEFF_TABLE_VRAM,
         /// Store coefficient table in CRAM.
-        VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM = 0x01,
+        VDP2_VRAM_CTL_COEFF_TABLE_CRAM
 } vdp2_vram_ctl_coeff_table_t;
 
+typedef enum vdp2_vram_usage_type {
+        VDP2_VRAM_USAGE_TYPE_NONE,
+        VDP2_VRAM_USAGE_TYPE_COEFF_TBL,
+        VDP2_VRAM_USAGE_TYPE_PND,
+        VDP2_VRAM_USAGE_TYPE_CPD_BPD
+} __packed vdp2_vram_usage_type_t;
+
+typedef struct vdp2_vram_usage {
+        vdp2_vram_usage_type_t a0;
+        vdp2_vram_usage_type_t a1;
+        vdp2_vram_usage_type_t b0;
+        vdp2_vram_usage_type_t b1;
+} __packed __aligned(4) vdp2_vram_usage_t;
+
+static_assert(sizeof(vdp2_vram_usage_t) == 4);
+
 typedef struct vdp2_vram_ctl {
-        vdp2_vram_ctl_coeff_table_t coefficient_table;
+        /// Coefficient table.
+        vdp2_vram_ctl_coeff_table_t coeff_table;
         /// VRAM mode bank partitions.
         vdp2_vram_ctl_mode_t vram_mode;
 } __aligned(4) vdp2_vram_ctl_t;
 
-#define VDP2_VRAM_CYCP_PNDR_NBG0        0x0 /* NBG0 pattern name data read */
-#define VDP2_VRAM_CYCP_PNDR_NBG1        0x1 /* NBG1 pattern name data read */
-#define VDP2_VRAM_CYCP_PNDR_NBG2        0x2 /* NBG2 pattern name data read */
-#define VDP2_VRAM_CYCP_PNDR_NBG3        0x3 /* NBG3 pattern name data read */
-#define VDP2_VRAM_CYCP_CHPNDR_NBG0      0x4 /* NBG0 character pattern name data read */
-#define VDP2_VRAM_CYCP_CHPNDR_NBG1      0x5 /* NBG1 character pattern name data read */
-#define VDP2_VRAM_CYCP_CHPNDR_NBG2      0x6 /* NBG2 character pattern name data read */
-#define VDP2_VRAM_CYCP_CHPNDR_NBG3      0x7 /* NBG3 character pattern name data read */
-#define VDP2_VRAM_CYCP_VCSTDR_NBG0      0xC /* NBG0 vertical cell scroll table data read */
-#define VDP2_VRAM_CYCP_VCSTDR_NBG1      0xD /* NBG0 vertical cell scroll table data read */
-#define VDP2_VRAM_CYCP_CPU_RW           0xE /* CPU read/write */
-#define VDP2_VRAM_CYCP_NO_ACCESS        0xF /* No access */
+#define VDP2_VRAM_CYCP_PNDR_NBG0   0x0 /* NBG0 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG1   0x1 /* NBG1 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG2   0x2 /* NBG2 pattern name data read */
+#define VDP2_VRAM_CYCP_PNDR_NBG3   0x3 /* NBG3 pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG0 0x4 /* NBG0 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG1 0x5 /* NBG1 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG2 0x6 /* NBG2 character pattern name data read */
+#define VDP2_VRAM_CYCP_CHPNDR_NBG3 0x7 /* NBG3 character pattern name data read */
+#define VDP2_VRAM_CYCP_VCSTDR_NBG0 0xC /* NBG0 vertical cell scroll table data read */
+#define VDP2_VRAM_CYCP_VCSTDR_NBG1 0xD /* NBG0 vertical cell scroll table data read */
+#define VDP2_VRAM_CYCP_CPU_RW      0xE /* CPU read/write */
+#define VDP2_VRAM_CYCP_NO_ACCESS   0xF /* No access */
 
 /* Pattern name data read */
-#define VDP2_VRAM_CYCP_PNDR(n)          ((n) & 0x03)
+#define VDP2_VRAM_CYCP_PNDR(n) ((n) & 0x03)
 
 /* Character pattern name data read */
 #define VDP2_VRAM_CYCP_CHPNDR(n)        (((n) & 0x03) + 0x04)
@@ -128,6 +146,8 @@ typedef struct vdp2_vram_cycp {
 } __packed vdp2_vram_cycp_t;
 
 extern void vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl);
+
+extern void vdp2_vram_usage_set(const vdp2_vram_usage_t *vram_usage);
 
 extern void vdp2_vram_cycp_set(const vdp2_vram_cycp_t *vram_cycp);
 extern void vdp2_vram_cycp_clear(void);
