@@ -7,8 +7,6 @@
 
 #include <vdp2/scrn.h>
 
-#include <assert.h>
-
 #include "vdp-internal.h"
 
 void

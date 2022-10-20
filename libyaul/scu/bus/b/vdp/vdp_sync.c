@@ -82,7 +82,7 @@
 #ifdef VDP_SYNC_DEBUG
 #include <sys/cdefs.h>
 
-#include <dbgio.h>
+#include <dbgio/dbgio.h>
 
 #define DEBUG_PRINTF(...) do {                                                 \
         const uint32_t _sr_mask = cpu_intc_mask_get();                         \

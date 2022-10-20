@@ -28,10 +28,8 @@ vdp2_tvmd_display_set(void)
 void
 vdp2_tvmd_display_res_get(uint16_t *width, uint16_t *height)
 {
-#ifdef DEBUG
         assert(width != NULL);
         assert(height != NULL);
-#endif /* DEBUG */
 
         *width = _state_vdp2()->tv.resolution.x;
         *height = _state_vdp2()->tv.resolution.y;

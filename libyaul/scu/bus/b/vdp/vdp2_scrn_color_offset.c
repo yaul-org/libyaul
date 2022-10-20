@@ -7,24 +7,11 @@
 
 #include <vdp2/scrn.h>
 
-#include <assert.h>
-
 #include "vdp-internal.h"
 
 void
 vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t select)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0) ||
-               (scroll_screen == VDP2_SCRN_BACK) ||
-               (scroll_screen == VDP2_SCRN_SPRITE));
-#endif /* DEBUG */
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->clofen &= 0xFFFE;
@@ -83,17 +70,6 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t s
 void
 vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0) ||
-               (scroll_screen == VDP2_SCRN_BACK) ||
-               (scroll_screen == VDP2_SCRN_SPRITE));
-#endif /* DEBUG */
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->clofen &= 0xFFFE;
@@ -132,12 +108,7 @@ void
 vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
         const vdp2_scrn_color_offset_rgb_t *rgb)
 {
-#ifdef DEBUG
-        /* Check range: [-256,256] */
-        assert(((rgb->r >= -256) && (rgb->r <= 255)) &&
-               ((rgb->g >= -256) && (rgb->g <= 255)) &&
-               ((rgb->b >= -256) && (rgb->b <= 255)));
-#endif /* DEBUG */
+        /* Range: [-256,256] */
 
         /* Each color component in the color offset has a range [-256,255] Lower
          * bound: -(2**(9-1)) & upper bound: (2**9)-1 */

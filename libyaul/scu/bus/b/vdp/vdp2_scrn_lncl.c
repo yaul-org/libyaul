@@ -47,10 +47,8 @@ void
 vdp2_scrn_lncl_buffer_set(vdp2_vram_t vram, const uint16_t *buffer,
     uint32_t count)
 {
-#ifdef DEBUG
         assert(buffer != NULL);
         assert(count > 0);
-#endif /* DEBUG */
 
         _lncl_set(vram, buffer, count);
 }

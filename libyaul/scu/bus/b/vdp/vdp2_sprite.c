@@ -15,10 +15,6 @@
 void
 vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priority)
 {
-#ifdef DEBUG
-        assert(sprite_register <= 7);
-#endif /* DEBUG */
-
         /* When priority is zero, scroll screen is transparent. */
         priority &= 0x07;
 

@@ -7,19 +7,11 @@
 
 #include <vdp2/scrn.h>
 
-#include <assert.h>
-
 #include "vdp-internal.h"
 
 void
 vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reduction)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1));
-#endif /* DEBUG */
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->zmctl &= 0xFFFC;
@@ -37,11 +29,9 @@ vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reducti
 void
 vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
-#ifdef DEBUG
         /* Check if the background passed is valid */
         assert((scroll_screen == VDP2_SCRN_NBG0) ||
                (scroll_screen == VDP2_SCRN_NBG1));
-#endif /* DEBUG */
 
         fix16_vec2_t *zm_reg;
 
@@ -62,12 +52,6 @@ vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 void
 vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
-#ifdef DEBUG
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1));
-#endif /* DEBUG */
-
         fix16_vec2_t *zm_reg;
 
         switch (scroll_screen) {

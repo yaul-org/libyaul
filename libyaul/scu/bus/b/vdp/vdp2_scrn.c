@@ -5,7 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <assert.h>
 #include <string.h>
 
 #include <vdp2/cram.h>
@@ -14,7 +13,7 @@
 
 #include "vdp-internal.h"
 
-static void _cell_plane_calc(const vdp2_scrn_cell_format_t *format,
+static void _cell_plane_calculate(const vdp2_scrn_cell_format_t *format,
     uint16_t plane_count, uint16_t *planes, uint16_t *map_offset);
 static uint16_t _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format);
 
@@ -290,7 +289,7 @@ _rbg0_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *format)
 }
 
 static void
-_cell_plane_calc(const vdp2_scrn_cell_format_t *format, uint16_t plane_count,
+_cell_plane_calculate(const vdp2_scrn_cell_format_t *format, uint16_t plane_count,
     uint16_t *planes, uint16_t *map_offset)
 {
         const uint32_t page_size = VDP2_SCRN_CALCULATE_PAGE_SIZE(format);
@@ -329,8 +328,7 @@ _cell_pattern_name_control_calc(const vdp2_scrn_cell_format_t *format)
         uint16_t sp_number; /* Supplementary palette number bits */
         sp_number = 0;
 
-        uint16_t character_number;
-        character_number = VDP2_SCRN_PND_CP_NUM(format->cp_table);
+        const uint16_t character_number = VDP2_SCRN_PND_CP_NUM(format->cp_table);
 
         uint16_t palette_number;
 
@@ -437,7 +435,7 @@ _nbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, 4, planes, &map_offset);
+        _cell_plane_calculate(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctla |= format->cc_count << 4;
@@ -472,7 +470,7 @@ _nbg1_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, 4, planes, &map_offset);
+        _cell_plane_calculate(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctla |= format->cc_count << 12;
@@ -507,7 +505,7 @@ _nbg2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, 4, planes, &map_offset);
+        _cell_plane_calculate(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 1;
@@ -542,7 +540,7 @@ _nbg3_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         uint16_t planes[4];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, 4, planes, &map_offset);
+        _cell_plane_calculate(format, 4, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 5;
@@ -596,7 +594,7 @@ _rbg0_scrn_cell_format_set(const vdp2_scrn_cell_format_t *format)
         uint16_t planes[16];
         uint16_t map_offset;
 
-        _cell_plane_calc(format, 16, planes, &map_offset);
+        _cell_plane_calculate(format, 16, planes, &map_offset);
 
         /* Character color count */
         _state_vdp2()->regs->chctlb |= format->cc_count << 12;

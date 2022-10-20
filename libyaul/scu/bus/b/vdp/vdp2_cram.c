@@ -18,10 +18,6 @@ vdp2_cram_mode_get(void)
 void
 vdp2_cram_mode_set(vdp2_cram_mode_t mode)
 {
-#ifdef DEBUG
-        assert(mode <= 2);
-#endif /* DEBUG */
-
         _state_vdp2()->regs->ramctl &= 0xCFFF;
         _state_vdp2()->regs->ramctl |= mode << 12;
 
@@ -31,18 +27,6 @@ vdp2_cram_mode_set(vdp2_cram_mode_t mode)
 void
 vdp2_cram_offset_set(vdp2_scrn_t scroll_screen, vdp2_cram_t cram)
 {
-#ifdef DEBUG
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0) ||
-               (scroll_screen == VDP2_SCRN_SPRITE));
-
-        assert((cram >= VDP2_CRAM_ADDR(0x000)) &&
-               (cram < VDP2_CRAM_ADDR(VDP2_CRAM_SIZE >> 1)));
-#endif /* DEBUG */
-
         cram = (((vdp2_cram_mode_get()) == 2)
             ? (cram >> 10)
             : ((cram >> 9)) & 0x07);

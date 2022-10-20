@@ -12,14 +12,6 @@
 void
 vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen)
 {
-#ifdef DEBUG
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0));
-#endif /* DEBUG */
-
         /* If performing mosaic processing in NBG0 or NBG1, the vertical
          * cell-scroll function cannot be used.
          *
@@ -27,22 +19,12 @@ vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen)
 
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-#ifdef DEBUG
-                /* Make sure that the vertical cell scroll function is
-                 * not being used */
-                assert((_state_vdp2()->regs->scrctl & 0x0001) == 0x0000);
-#endif /* DEBUG */
-
+                /* Note that vertical cell scroll function cannot be used */
                 _state_vdp2()->regs->mzctl &= 0xFFFE;
                 _state_vdp2()->regs->mzctl |= 0x0001;
                 break;
         case VDP2_SCRN_NBG1:
-#ifdef DEBUG
-                /* Make sure that the vertical cell scroll function is
-                 * not being used */
-                assert((_state_vdp2()->regs->scrctl & 0x0100) == 0x0000);
-#endif /* DEBUG */
-
+                /* Note that vertical cell scroll function cannot be used */
                 _state_vdp2()->regs->mzctl &= 0xFFFD;
                 _state_vdp2()->regs->mzctl |= 0x0002;
                 break;
@@ -66,14 +48,6 @@ vdp2_scrn_mosaic_set(vdp2_scrn_t scroll_screen)
 void
 vdp2_scrn_mosaic_unset(vdp2_scrn_t scroll_screen)
 {
-#ifdef DEBUG
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1) ||
-               (scroll_screen == VDP2_SCRN_NBG2) ||
-               (scroll_screen == VDP2_SCRN_NBG3) ||
-               (scroll_screen == VDP2_SCRN_RBG0));
-#endif /* DEBUG */
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
                 _state_vdp2()->regs->mzctl &= 0xFFFE;

@@ -29,14 +29,7 @@ __vdp2_vram_init(void)
 void
 vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 {
-#ifdef DEBUG
         assert(vram_ctl != NULL);
-
-        assert((vram_ctl->vram_mode & 0xFC) == 0x00);
-
-        assert((vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM) ||
-              ((vram_ctl->coefficient_table == VDP2_VRAM_CTL_COEFFICIENT_TABLE_CRAM)));
-#endif /* DEBUG */
 
         /* If the coefficient table is set to be stored in CRAM, the
          * color mode must be 1 */
@@ -61,9 +54,7 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 void
 vdp2_vram_cycp_set(const vdp2_vram_cycp_t *vram_cycp)
 {
-#ifdef DEBUG
         assert(vram_cycp != NULL);
-#endif /* DEBUG */
 
         vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_A0, &vram_cycp->pt[0]);
         vdp2_vram_cycp_bank_set(VDP2_VRAM_BANK_A1, &vram_cycp->pt[1]);
@@ -83,22 +74,16 @@ vdp2_vram_cycp_clear(void)
 vdp2_vram_cycp_bank_t
 vdp2_vram_cycp_bank_get(vdp2_vram_bank_t bank)
 {
-#ifdef DEBUG
-        assert(bank <= 3);
-#endif /* DEBUG */
-
-        return *(vdp2_vram_cycp_bank_t *)&_state_vdp2()->regs->cyc[bank];
+        return *(vdp2_vram_cycp_bank_t *)&_state_vdp2()->regs->cyc[bank & 3];
 }
 
 void
 vdp2_vram_cycp_bank_set(vdp2_vram_bank_t bank,
     const vdp2_vram_cycp_bank_t *cycp_bank)
 {
-#ifdef DEBUG
         assert(cycp_bank != NULL);
-#endif /* DEBUG */
 
-        _state_vdp2()->regs->cyc[bank] = cycp_bank->raw;
+        _state_vdp2()->regs->cyc[bank & 3] = cycp_bank->raw;
 }
 
 void

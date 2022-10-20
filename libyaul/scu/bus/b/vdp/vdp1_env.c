@@ -28,14 +28,6 @@ static vdp1_env_t _default_env = {
 
 static vdp1_env_t _current_env;
 
-#ifdef DEBUG
-static inline void __always_inline _env_assert(const vdp1_env_t *);
-static inline void __always_inline _env_erase_assert(const vdp1_env_t *);
-#else
-#define _env_assert(x)
-#define _env_erase_assert(x)
-#endif /* DEBUG */
-
 static inline void __always_inline _env_current_update(const vdp1_env_t *env);
 
 static void _env_default_erase_update(void);
@@ -78,7 +70,7 @@ vdp1_env_get(void)
 void
 vdp1_env_set(const vdp1_env_t *env)
 {
-        _env_assert(env);
+        assert(env != NULL);
 
         _env_current_update(env);
 
@@ -202,7 +194,10 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
 }
 
 static inline void __always_inline
-_env_current_update(const vdp1_env_t *env) {
+_env_current_update(const vdp1_env_t *env)
+{
+        assert(env != NULL);
+
         (void)memcpy(&_current_env, env, sizeof(vdp1_env_t));
 }
 
@@ -218,48 +213,3 @@ _env_default_erase_update(void)
         _default_env.erase_points[1].x = width;
         _default_env.erase_points[1].y = height;
 }
-
-#ifdef DEBUG
-static inline void __always_inline
-_env_assert(const vdp1_env_t *env)
-{
-        assert(env != NULL);
-
-        assert((env->bpp == VDP1_ENV_BPP_8) || (env->bpp == VDP1_ENV_BPP_16));
-
-        assert((env->rotation == VDP1_ENV_ROTATION_0) ||
-               (env->rotation == VDP1_ENV_ROTATION_90));
-
-        assert((env->color_mode == VDP1_ENV_COLOR_MODE_PALETTE) ||
-               (env->color_mode == VDP1_ENV_COLOR_MODE_RGB_PALETTE));
-
-        _env_erase_assert(env);
-
-        assert((env->sprite_type >= 0x0) && (env->sprite_type <= 0xF));
-
-        /* If frame buffer bit-depth is 8, only sprite types 0x8 to 0xF are
-         * valid. If frame buffer bit-depth is 16, only sprite types 0x0 to 0x7
-         * are valid */
-        assert(((env->bpp == VDP1_ENV_BPP_8) && (env->sprite_type >= 0x8)) ||
-               ((env->bpp == VDP1_ENV_BPP_16) && (env->sprite_type <= 0x7)));
-}
-
-static inline void __always_inline
-_env_erase_assert(const vdp1_env_t *env)
-{
-        assert((env->erase_points[0].x >= 0) &&
-               (env->erase_points[0].y >= 0));
-
-        assert((env->erase_points[1].x > 0) &&
-               (env->erase_points[1].y >= 0));
-
-        assert((env->erase_points[0].x <= 1008) &&
-               (env->erase_points[0].y < 512));
-
-        assert((env->erase_points[1].x <= 1024) &&
-               (env->erase_points[1].y < 512));
-
-        assert((env->erase_points[0].x < env->erase_points[1].x) &&
-               (env->erase_points[0].y <= env->erase_points[1].y));
-}
-#endif /* DEBUG */
