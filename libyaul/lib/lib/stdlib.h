@@ -15,8 +15,11 @@ extern long labs(long number);
 extern int atoi(const char *s);
 extern long atol(const char *s);
 
-unsigned long strtoul(const char *__restrict, char **__restrict, int);
-long strtol(const char * __restrict nptr, char ** __restrict endptr, int base);
+extern unsigned long strtoul(const char *__restrict, char **__restrict, int);
+extern long strtol(const char * __restrict nptr, char ** __restrict endptr, int base);
+
+extern int rand(void);
+extern void srand(unsigned s);
 
 extern void *malloc(size_t n);
 extern void *memalign(size_t n, size_t align);

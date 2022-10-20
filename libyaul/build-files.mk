@@ -122,6 +122,11 @@ LIB_SRCS+= \
 	lib/string/swab.c
 
 LIB_SRCS+= \
+	lib/prng/prng_xorshift32.c \
+	lib/prng/prng_xorwow.c \
+	lib/prng/rand.c
+
+LIB_SRCS+= \
 	lib/stdio/clearerr.c \
 	lib/stdio/stdio.c \
     lib/stdio/fclose.c \
@@ -302,6 +307,9 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/:crc.h:./ \
+
+INSTALL_HEADER_FILES+= \
+	./lib/lib/:prng.h:./ \
 
 INSTALL_HEADER_FILES+= \
 	./math/:math.h:yaul/math/ \
