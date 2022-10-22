@@ -33,7 +33,7 @@ __list_free(list_t *list)
 }
 
 void
-__list_set(list_t *list, void *list_p, uint16_t count)
+__list_set(list_t *list, void *list_ptr, uint16_t count)
 {
         if ((list->flags & LIST_FLAGS_ALLOCATED) == LIST_FLAGS_ALLOCATED) {
                 free(list->list);
@@ -41,8 +41,8 @@ __list_set(list_t *list, void *list_p, uint16_t count)
                 list->flags &= ~LIST_FLAGS_ALLOCATED;
         }
 
-        if ((list_p != NULL) && (count != 0)) {
-                list->list = list_p;
+        if ((list_ptr != NULL) && (count != 0)) {
+                list->list = list_ptr;
                 list->count = count;
 
                 list->flags |= LIST_FLAGS_USER_ALLOCATED;

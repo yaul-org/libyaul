@@ -28,13 +28,13 @@ __matrix_init(void)
 void
 g3d_matrix_identity(MATRIX *matrix)
 {
-        FIXED * const matrix_p = (FIXED *)matrix;
+        FIXED * const matrix_ptr = (FIXED *)matrix;
 
         (void)memset(matrix, 0, sizeof(MATRIX));
 
-        matrix_p[M00] = toFIXED(1.0f);
-        matrix_p[M11] = toFIXED(1.0f);
-        matrix_p[M22] = toFIXED(1.0f);
+        matrix_ptr[M00] = toFIXED(1.0f);
+        matrix_ptr[M11] = toFIXED(1.0f);
+        matrix_ptr[M22] = toFIXED(1.0f);
 }
 
 void

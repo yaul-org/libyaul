@@ -155,8 +155,8 @@ _rle_compress(const void *in, void *out, size_t in_size)
         uint32_t i;
         uint32_t histogram[256];
 
-        const uint8_t * const in_p = in;
-        uint8_t * const out_p = out;
+        const uint8_t * const in_ptr = in;
+        uint8_t * const out_ptr = out;
 
         /* Do we have anything to compress? */
         if (in_size < 1) {
@@ -169,7 +169,7 @@ _rle_compress(const void *in, void *out, size_t in_size)
         }
 
         for (i = 0; i < in_size; ++i) {
-                ++histogram[in_p[i]];
+                ++histogram[in_ptr[i]];
         }
 
         /* Find the least common byte, and use it as the repetition marker */
@@ -182,17 +182,17 @@ _rle_compress(const void *in, void *out, size_t in_size)
         }
 
         /* Remember the repetition marker for the decoder */
-        out_p[0] = marker;
+        out_ptr[0] = marker;
         outpos = 1;
 
         /* Start of compression */
-        byte1 = in_p[0];
+        byte1 = in_ptr[0];
         inpos = 1;
         count = 1;
 
         /* Are there at least two bytes? */
         if (in_size >= 2) {
-                byte2 = in_p[inpos++];
+                byte2 = in_ptr[inpos++];
                 count = 2;
 
                 /* Main compression loop */
@@ -201,7 +201,7 @@ _rle_compress(const void *in, void *out, size_t in_size)
                                 /* Do we meet only a sequence of identical bytes? */
                                 while ((inpos < in_size) && (byte1 == byte2) &&
                                        (count < 32768)) {
-                                        byte2 = in_p[inpos++];
+                                        byte2 = in_ptr[inpos++];
                                         ++count;
                                 }
 
@@ -209,7 +209,7 @@ _rle_compress(const void *in, void *out, size_t in_size)
                                         _rle_rep_write(out, &outpos, marker, byte1, count);
 
                                         if (inpos < in_size) {
-                                                byte1 = in_p[inpos++];
+                                                byte1 = in_ptr[inpos++];
                                                 count = 1;
                                         } else {
                                                 count = 0;
@@ -227,7 +227,7 @@ _rle_compress(const void *in, void *out, size_t in_size)
                         }
 
                         if (inpos < in_size) {
-                                byte2 = in_p[inpos++];
+                                byte2 = in_ptr[inpos++];
                                 count = 2;
                         }
                 } while ((inpos < in_size) || (count >= 2));

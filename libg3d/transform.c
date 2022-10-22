@@ -34,18 +34,18 @@ _point_component_transform(const fix16_vec3_t *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
 
-        const fix16_vec3_t *p_p = p;
-        const FIXED *matrix_p = matrix;
+        const fix16_vec3_t *p_ptr = p;
+        const FIXED *matrix_ptr = matrix;
 
-        cpu_instr_macl(&p_p, &matrix_p);
-        cpu_instr_macl(&p_p, &matrix_p);
-        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
 
         register const uint32_t mach = cpu_instr_sts_mach();
         register const uint32_t macl = cpu_instr_sts_macl();
         register const uint32_t xtrct = cpu_instr_xtrct(mach, macl);
 
-        return (xtrct + (*matrix_p));
+        return (xtrct + (*matrix_ptr));
 }
 
 static inline fix16_vec3_t __always_inline __unused
@@ -65,12 +65,12 @@ _normal_component_rotate(const fix16_vec3_t *p, const FIXED *matrix)
 {
         cpu_instr_clrmac();
 
-        const fix16_vec3_t *p_p = p;
-        const FIXED *matrix_p = matrix;
+        const fix16_vec3_t *p_ptr = p;
+        const FIXED *matrix_ptr = matrix;
 
-        cpu_instr_macl(&p_p, &matrix_p);
-        cpu_instr_macl(&p_p, &matrix_p);
-        cpu_instr_macl(&p_p, &matrix_p);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
+        cpu_instr_macl(&p_ptr, &matrix_ptr);
 
         register const uint32_t mach = cpu_instr_sts_mach();
         register const uint32_t macl = cpu_instr_sts_macl();
@@ -296,20 +296,20 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
         do {
                 cpu_instr_clrmac();
 
-                const FIXED *matrix_p = matrix;
+                const FIXED *matrix_ptr = matrix;
 
                 trans_proj->clip_flags = CLIP_FLAGS_NONE;
 
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
                 const uint32_t dh1 = cpu_instr_swapw(view_distance);
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
                 const uint32_t dh2 = cpu_instr_extsw(dh1);
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
                 cpu_divu_regs[OFFSET_CPU_DVDNTH] = dh2;
 
                 register const uint32_t z_mach = cpu_instr_sts_mach();
 
-                const uint32_t tz = *matrix_p;
+                const uint32_t tz = *matrix_ptr;
 
                 const uint32_t z_macl = cpu_instr_sts_macl();
                 current_point -= XYZ;
@@ -326,18 +326,18 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 
                 cpu_instr_clrmac();
 
-                matrix_p -= M23; /* Move back to start of matrix */
+                matrix_ptr -= M23; /* Move back to start of matrix */
 
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
                 cpu_divu_regs[OFFSET_CPU_DVSR] = trans_proj->point_z;
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
                 cpu_divu_regs[OFFSET_CPU_DVDNTL] = view_distance_16;
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
 
                 const uint32_t x_mach = cpu_instr_sts_mach();
-                const uint32_t tx = *matrix_p;
+                const uint32_t tx = *matrix_ptr;
                 const uint32_t x_macl = cpu_instr_sts_macl();
-                matrix_p++;
+                matrix_ptr++;
 
                 const uint32_t x_xtrct = cpu_instr_xtrct(x_mach, x_macl);
 
@@ -347,13 +347,13 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 
                 const FIXED point_x = (x_xtrct + tx);
 
-                cpu_instr_macl(&current_point, &matrix_p);
-                cpu_instr_macl(&current_point, &matrix_p);
-                cpu_instr_macl(&current_point, &matrix_p);
+                cpu_instr_macl(&current_point, &matrix_ptr);
+                cpu_instr_macl(&current_point, &matrix_ptr);
+                cpu_instr_macl(&current_point, &matrix_ptr);
 
                 const uint32_t y_mach = cpu_instr_sts_mach();
                 const uint32_t y_macl = cpu_instr_sts_macl();
-                const uint32_t ty = *matrix_p;
+                const uint32_t ty = *matrix_ptr;
                 const uint32_t y_xtrct = cpu_instr_xtrct(y_mach, y_macl);
 
                 const FIXED point_y = (y_xtrct + ty);

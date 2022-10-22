@@ -134,6 +134,6 @@ extern state_t * const __state;
 
 extern void __list_alloc(list_t *list, uint16_t count);
 extern void __list_free(list_t *list);
-extern void __list_set(list_t *list, void *list_p, uint16_t count);
+extern void __list_set(list_t *list, void *list_ptr, uint16_t count);
 
 #endif /* !_G3D_INTERNAL_H_ */

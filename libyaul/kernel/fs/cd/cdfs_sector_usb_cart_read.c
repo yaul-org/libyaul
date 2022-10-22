@@ -20,14 +20,14 @@ cdfs_sector_usb_cart_read(sector_t sector, void *ptr)
         while (true) {
                 usb_cart_long_send(sector);
 
-                uint32_t *dst_p;
-                dst_p = (uint32_t *)ptr;
+                uint32_t *dst_ptr;
+                dst_ptr = (uint32_t *)ptr;
 
                 for (uint32_t i = 0; i < (CDFS_SECTOR_SIZE / 16); i++) {
-                        *dst_p++ = usb_cart_long_read();
-                        *dst_p++ = usb_cart_long_read();
-                        *dst_p++ = usb_cart_long_read();
-                        *dst_p++ = usb_cart_long_read();
+                        *dst_ptr++ = usb_cart_long_read();
+                        *dst_ptr++ = usb_cart_long_read();
+                        *dst_ptr++ = usb_cart_long_read();
+                        *dst_ptr++ = usb_cart_long_read();
                 }
 
                 const crc_t crc = crc_calculate(ptr, CDFS_SECTOR_SIZE);
