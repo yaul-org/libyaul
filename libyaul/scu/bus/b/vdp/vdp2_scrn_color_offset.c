@@ -42,6 +42,8 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t s
                 _state_vdp2()->regs->clofsl |= select << 3;
                 break;
         case VDP2_SCRN_RBG0:
+        case VDP2_SCRN_RBG0_PA:
+        case VDP2_SCRN_RBG0_PB:
                 _state_vdp2()->regs->clofen &= 0xFFEF;
                 _state_vdp2()->regs->clofen |= 0x0010;
 
@@ -84,6 +86,8 @@ vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
                 _state_vdp2()->regs->clofen &= 0xFFF7;
                 break;
         case VDP2_SCRN_RBG0:
+        case VDP2_SCRN_RBG0_PA:
+        case VDP2_SCRN_RBG0_PB:
                 _state_vdp2()->regs->clofen &= 0xFFEF;
                 break;
         case VDP2_SCRN_BACK:

@@ -36,7 +36,7 @@ _integer_scroll_set(uint16_t *scroll, fix16_t amount)
 static inline __always_inline void
 _integer_scroll_update(uint16_t *scroll, fix16_t amount)
 {
-        *scroll = (uint16_t)fix16_int32_to(amount);
+        *scroll += (uint16_t)fix16_int32_to(amount);
 }
 
 void
