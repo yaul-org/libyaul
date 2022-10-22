@@ -13,8 +13,8 @@
 #include "vdp-internal.h"
 
 static vdp2_vram_ctl_t _vdp2_vram_ctl = {
-        .coefficient_table = VDP2_VRAM_CTL_COEFFICIENT_TABLE_VRAM,
-        .vram_mode = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
+        .coeff_table = VDP2_VRAM_CTL_COEFF_TABLE_VRAM,
+        .vram_mode         = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
 };
 
 void
@@ -31,14 +31,14 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 {
         assert(vram_ctl != NULL);
 
-        /* If the coefficient table is set to be stored in CRAM, the
-         * color mode must be 1 */
+        /* If the coefficient table is set to be stored in CRAM, the color mode
+         * must be 1 */
         _state_vdp2()->regs->ramctl &= 0xEFFF;
-        _state_vdp2()->regs->ramctl |= 1 << vram_ctl->coefficient_table;
+        _state_vdp2()->regs->ramctl |= 1 << vram_ctl->coeff_table;
 
         /* Coefficient table storage */
         _state_vdp2()->regs->ramctl &= 0x7FFF;
-        _state_vdp2()->regs->ramctl |= vram_ctl->coefficient_table << 15;
+        _state_vdp2()->regs->ramctl |= vram_ctl->coeff_table << 15;
 
         /* VRAM mode */
         _state_vdp2()->regs->ramctl &= 0xFCFF;
@@ -49,6 +49,17 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 
         (void)memcpy(_state_vdp2()->vram_ctl, &vram_ctl,
             sizeof(vdp2_vram_ctl_t));
+}
+
+void
+vdp2_vram_usage_set(const vdp2_vram_usage_t *vram_usage)
+{
+        _state_vdp2()->regs->ramctl &= 0xFF00;
+
+        _state_vdp2()->regs->ramctl |= vram_usage->a0;
+        _state_vdp2()->regs->ramctl |= vram_usage->a1 << 2;
+        _state_vdp2()->regs->ramctl |= vram_usage->b0 << 4;
+        _state_vdp2()->regs->ramctl |= vram_usage->b1 << 6;
 }
 
 void

@@ -54,6 +54,8 @@ vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen)
         case VDP2_SCRN_NBG3:
                 return (_state_vdp2()->regs->prinb & 0x0700) >> 8;
         case VDP2_SCRN_RBG0:
+        case VDP2_SCRN_RBG0_PA:
+        case VDP2_SCRN_RBG0_PB:
                 return _state_vdp2()->regs->prir & 0x0007;
         default:
                 return -1;
