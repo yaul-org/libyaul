@@ -21,18 +21,6 @@ vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask)
 }
 
 void
-vdp2_scrn_lncl_unset(vdp2_scrn_t scrn_mask)
-{
-        _state_vdp2()->regs->lnclen &= ~scrn_mask;
-}
-
-void
-vdp2_scrn_lncl_clear(void)
-{
-        _state_vdp2()->regs->lnclen = 0x0000;
-}
-
-void
 vdp2_scrn_lncl_color_set(vdp2_vram_t vram, uint16_t cram_index)
 {
         static uint16_t buffer = 0;

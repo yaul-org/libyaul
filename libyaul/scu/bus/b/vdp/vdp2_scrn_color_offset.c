@@ -10,7 +10,7 @@
 #include "vdp-internal.h"
 
 void
-vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t select)
+vdp2_scrn_coff_set(vdp2_scrn_t scroll_screen, vdp2_scrn_coff_t select)
 {
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
@@ -18,7 +18,7 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t s
                 _state_vdp2()->regs->clofen |= 0x0001;
 
                 _state_vdp2()->regs->clofsl &= 0xFFFE;
-                _state_vdp2()->regs->clofsl |= select << 0;
+                _state_vdp2()->regs->clofsl |= select;
                 break;
         case VDP2_SCRN_NBG1:
                 _state_vdp2()->regs->clofen &= 0xFFFD;
@@ -70,7 +70,7 @@ vdp2_scrn_color_offset_set(vdp2_scrn_t scroll_screen, vdp2_scrn_color_offset_t s
 }
 
 void
-vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
+vdp2_scrn_coff_unset(vdp2_scrn_t scroll_screen)
 {
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
@@ -102,27 +102,27 @@ vdp2_scrn_color_offset_unset(vdp2_scrn_t scroll_screen)
 }
 
 void
-vdp2_scrn_color_offset_clear(void)
+vdp2_scrn_coff_clear(void)
 {
         _state_vdp2()->regs->clofen = 0x0000;
         _state_vdp2()->regs->clofsl = 0x0000;
 }
 
 void
-vdp2_scrn_color_offset_rgb_set(vdp2_scrn_color_offset_t select,
-        const vdp2_scrn_color_offset_rgb_t *rgb)
+vdp2_scrn_coff_rgb_set(vdp2_scrn_coff_t select,
+    const vdp2_scrn_coff_rgb_t *rgb)
 {
         /* Range: [-256,256] */
 
         /* Each color component in the color offset has a range [-256,255] Lower
          * bound: -(2**(9-1)) & upper bound: (2**9)-1 */
         switch (select) {
-        case VDP2_SCRN_COLOR_OFFSET_A:
+        case VDP2_SCRN_COFF_A:
                 _state_vdp2()->regs->coar = rgb->r & 0x01FF;
                 _state_vdp2()->regs->coag = rgb->g & 0x01FF;
                 _state_vdp2()->regs->coab = rgb->b & 0x01FF;
                 break;
-        case VDP2_SCRN_COLOR_OFFSET_B:
+        case VDP2_SCRN_COFF_B:
                 _state_vdp2()->regs->cobr = rgb->r & 0x01FF;
                 _state_vdp2()->regs->cobg = rgb->g & 0x01FF;
                 _state_vdp2()->regs->cobb = rgb->b & 0x01FF;

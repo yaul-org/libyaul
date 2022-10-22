@@ -18,6 +18,7 @@
 __BEGIN_DECLS
 
 typedef enum vdp2_scrn {
+        VDP2_SCRN_NONE    = 0,
         /// Normal background.
         VDP2_SCRN_NBG0    = 1 << 0,
         /// Normal background.
@@ -28,42 +29,44 @@ typedef enum vdp2_scrn {
         VDP2_SCRN_NBG3    = 1 << 3,
         /// Rotational background.
         VDP2_SCRN_RBG0    = 1 << 4,
-        /// Rotational background Parameter A.
-        VDP2_SCRN_RBG0_PA = 1 << 5,
-        /// Rotational background Parameter B.
-        VDP2_SCRN_RBG0_PB = 1 << 6,
         /// Sprite layer.
-        VDP2_SCRN_SPRITE  = 1 << 7,
+        VDP2_SCRN_SPRITE  = 1 << 5,
         /// Back screen.
-        VDP2_SCRN_BACK    = 1 << 8
+        VDP2_SCRN_BACK    = 1 << 6,
+        /// Rotational background Parameter A.
+        VDP2_SCRN_RBG0_PA = 1 << 7,
+        /// Rotational background Parameter B.
+        VDP2_SCRN_RBG0_PB = 1 << 8
 } __packed vdp2_scrn_t;
 
 typedef enum vdp2_scrn_disp {
+        VDP2_SCRN_DISP_NONE   = 0,
         /// Normal background.
-        VDP2_SCRN_NBG0_DISP   = 1 << 0,
+        VDP2_SCRN_DISP_NBG0   = 1 << 0,
         /// Normal background.
-        VDP2_SCRN_NBG1_DISP   = 1 << 1,
+        VDP2_SCRN_DISP_NBG1   = 1 << 1,
         /// Normal background.
-        VDP2_SCRN_NBG2_DISP   = 1 << 2,
+        VDP2_SCRN_DISP_NBG2   = 1 << 2,
         /// Normal background.
-        VDP2_SCRN_NBG3_DISP   = 1 << 3,
+        VDP2_SCRN_DISP_NBG3   = 1 << 3,
         /// Rotational background.
-        VDP2_SCRN_RBG0_DISP   = 1 << 4,
+        VDP2_SCRN_DISP_RBG0   = 1 << 4,
         /// Rotational background.
-        VDP2_SCRN_RBG1_DISP   = 1 << 5,
+        VDP2_SCRN_DISP_RBG1   = 1 << 5,
 
+        VDP2_SCRN_DISPTP_NONE = 0,
         /// Normal background.
-        VDP2_SCRN_NBG0_TPDISP = VDP2_SCRN_NBG0_DISP | (1 << 8),
+        VDP2_SCRN_DISPTP_NBG0 = VDP2_SCRN_DISP_NBG0 | (1 << 8),
         /// Normal background.
-        VDP2_SCRN_NBG1_TPDISP = VDP2_SCRN_NBG1_DISP | (1 << 9),
+        VDP2_SCRN_DISPTP_NBG1 = VDP2_SCRN_DISP_NBG1 | (1 << 9),
         /// Normal background.
-        VDP2_SCRN_NBG2_TPDISP = VDP2_SCRN_NBG2_DISP | (1 << 10),
+        VDP2_SCRN_DISPTP_NBG2 = VDP2_SCRN_DISP_NBG2 | (1 << 10),
         /// Normal background.
-        VDP2_SCRN_NBG3_TPDISP = VDP2_SCRN_NBG3_DISP | (1 << 11),
+        VDP2_SCRN_DISPTP_NBG3 = VDP2_SCRN_DISP_NBG3 | (1 << 11),
         /// Rotational background.
-        VDP2_SCRN_RBG0_TPDISP = VDP2_SCRN_RBG0_DISP | (1 << 12),
+        VDP2_SCRN_DISPTP_RBG0 = VDP2_SCRN_DISP_RBG0 | (1 << 12),
         /// Rotational background.
-        VDP2_SCRN_RBG1_TPDISP = VDP2_SCRN_RBG1_DISP | (1 << 8)
+        VDP2_SCRN_DISPTP_RBG1 = VDP2_SCRN_DISP_RBG1 | (1 << 8)
 } vdp2_scrn_disp_t;
 
 typedef enum vdp2_scrn_ccc {
@@ -79,8 +82,6 @@ extern void vdp2_scrn_back_buffer_set(vdp2_vram_t vram, const rgb1555_t *buffer,
 extern void vdp2_scrn_back_sync(void);
 
 extern void vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask);
-extern void vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask);
-extern void vdp2_scrn_display_clear(void);
 
 extern void vdp2_scrn_priority_set(vdp2_scrn_t scroll_screen, uint8_t priority);
 extern uint8_t vdp2_scrn_priority_get(vdp2_scrn_t scroll_screen);

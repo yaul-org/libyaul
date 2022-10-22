@@ -365,17 +365,17 @@ _scroll_screen_reset(void)
 
         switch (params->scroll_screen) {
         case VDP2_SCRN_NBG1:
-                disp_mask = VDP2_SCRN_NBG1_DISP;
+                disp_mask = VDP2_SCRN_DISP_NBG1;
                 break;
         case VDP2_SCRN_NBG2:
-                disp_mask = VDP2_SCRN_NBG2_DISP;
+                disp_mask = VDP2_SCRN_DISP_NBG2;
                 break;
         case VDP2_SCRN_NBG3:
-                disp_mask = VDP2_SCRN_NBG3_DISP;
+                disp_mask = VDP2_SCRN_DISP_NBG3;
                 break;
         default:
         case VDP2_SCRN_NBG0:
-                disp_mask = VDP2_SCRN_NBG0_DISP;
+                disp_mask = VDP2_SCRN_DISP_NBG0;
                 break;
         }
 
