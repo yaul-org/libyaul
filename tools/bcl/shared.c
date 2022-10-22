@@ -24,9 +24,9 @@ input_file_open(const char *file_name, input_file_t *input_file)
 
         input_file->buffer_len = in_stat.st_size;
 
-        void **buffer_p = (void **)&input_file->buffer;
+        void **buffer_ptr = (void **)&input_file->buffer;
 
-        if ((*buffer_p = malloc(input_file->buffer_len)) == NULL) {
+        if ((*buffer_ptr = malloc(input_file->buffer_len)) == NULL) {
                 goto exit;
         }
 
@@ -47,9 +47,9 @@ input_file_close(input_file_t *input_file)
 {
         free(input_file->buffer);
 
-        const void **buffer_p = (const void **)&input_file->buffer;
+        const void **buffer_ptr = (const void **)&input_file->buffer;
 
-        *buffer_p = NULL;
+        *buffer_ptr = NULL;
 
         input_file->buffer_len = 0;
 }

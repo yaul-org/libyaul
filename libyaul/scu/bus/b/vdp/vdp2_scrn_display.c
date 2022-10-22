@@ -12,17 +12,5 @@
 void
 vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask)
 {
-        _state_vdp2()->regs->bgon |= disp_mask;
-}
-
-void
-vdp2_scrn_display_unset(vdp2_scrn_disp_t disp_mask)
-{
-        _state_vdp2()->regs->bgon &= ~disp_mask;
-}
-
-void
-vdp2_scrn_display_clear(void)
-{
-        _state_vdp2()->regs->bgon = 0x0000;
+        _state_vdp2()->regs->bgon = disp_mask;
 }

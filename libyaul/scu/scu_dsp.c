@@ -80,9 +80,11 @@ scu_dsp_program_load(const void *program, uint32_t count)
         MEMORY_WRITE(32, SCU(PPAF), PPAF_LOAD_ENABLE);
 
         // Transfer
-        uint32_t * const program_p = (uint32_t *)program;
+        uint32_t *program_ptr;
+        program_ptr = (uint32_t *)program;
         for (uint32_t i = 0; i < clamped_count; i++) {
-                MEMORY_WRITE(32, SCU(PPD), program_p[i]);
+                MEMORY_WRITE(32, SCU(PPD), *program_ptr);
+                program_ptr++;
         }
 
         scu_dsp_program_pc_set(0);
@@ -216,14 +218,16 @@ scu_dsp_data_read(scu_dsp_ram_t ram_page, uint8_t offset, void *data, uint32_t c
         scu_dsp_program_end_wait();
         scu_dsp_program_pc_set(0);
 
-        uint32_t * const data_p = (uint32_t *)data;
+        uint32_t *data_ptr;
+        data_ptr = (uint32_t *)data;
 
         const uint8_t address = (ram_page & 0x03) << 6;
 
         MEMORY_WRITE(32, SCU(PDA), address | offset);
 
         for (uint32_t i = 0; i < count; i++) {
-                data_p[i] = MEMORY_READ(32, SCU(PDD));
+                *data_ptr = MEMORY_READ(32, SCU(PDD));
+                data_ptr++;
         }
 }
 
@@ -245,17 +249,17 @@ scu_dsp_data_write(scu_dsp_ram_t ram_page, uint8_t offset, void *data, uint32_t 
         scu_dsp_program_end_wait();
         scu_dsp_program_pc_set(0);
 
-        uint32_t *data_p;
-        data_p = (uint32_t *)data;
+        uint32_t *data_ptr;
+        data_ptr = (uint32_t *)data;
 
         uint8_t address;
         address = (ram_page & 0x03) << 6;
 
         MEMORY_WRITE(32, SCU(PDA), address | offset);
 
-        uint32_t i;
-        for (i = 0; i < count; i++) {
-                MEMORY_WRITE(32, SCU(PDD), data_p[i]);
+        for (uint32_t i = 0; i < count; i++) {
+                MEMORY_WRITE(32, SCU(PDD), *data_ptr);
+                data_ptr++;
         }
 }
 

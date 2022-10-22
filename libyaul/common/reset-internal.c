@@ -44,7 +44,7 @@ __reset(void)
 
         vdp1_env_stop();
 
-        vdp2_scrn_display_clear();
+        vdp2_scrn_display_set(VDP2_SCRN_DISP_NONE);
 
         vdp2_sprite_priority_set(0, 0);
         vdp2_sprite_priority_set(1, 0);
