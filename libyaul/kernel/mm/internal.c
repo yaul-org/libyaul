@@ -21,7 +21,7 @@
 #define TLSF_POOL_PRIVATE_START ((uint32_t)&_private_pool[0])
 #define TLSF_POOL_PRIVATE_SIZE  (0xA000)
 
-#define TLSF_POOL_USER_START    ((uint32_t)&_end)
+#define TLSF_POOL_USER_START    ((uint32_t)&__end)
 #define TLSF_POOL_USER_END      (HWRAM(HWRAM_SIZE))
 #define TLSF_POOL_USER_SIZE     (TLSF_POOL_USER_END - TLSF_POOL_USER_START)
 

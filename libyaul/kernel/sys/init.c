@@ -73,10 +73,10 @@ __sys_init(void)
 static void
 _bss_clear(void)
 {
-        extern uint32_t _bss_start[];
-        extern uint32_t _bss_end[];
+        extern uint32_t __bss_start[];
+        extern uint32_t __bss_end[];
 
-        for (uint32_t *bss_ptr = _bss_start; bss_ptr < _bss_end; ) {
+        for (uint32_t *bss_ptr = __bss_start; bss_ptr < __bss_end; ) {
                 *bss_ptr++ = 0x00000000;
                 *bss_ptr++ = 0x00000000;
                 *bss_ptr++ = 0x00000000;

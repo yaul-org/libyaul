@@ -38,7 +38,7 @@ slave_state(void)
         return &__slave_state;
 }
 
-extern void *_end;
+extern void *__end;
 
 typedef void *(*malloc_func_t)(size_t n);
 typedef void *(*memalign_func_t)(size_t n, size_t align);

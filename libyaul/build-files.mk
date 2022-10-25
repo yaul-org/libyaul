@@ -22,6 +22,7 @@ HELPER_FILES:= \
 
 LDSCRIPTS:= \
 	common/ldscripts/yaul.x \
+	common/ldscripts/yaul-c++.x \
 	common/ldscripts/ip.x
 
 SPECS:= \

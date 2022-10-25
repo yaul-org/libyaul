@@ -8,6 +8,9 @@ post-build-iso:
 
 include $(YAUL_INSTALL_ROOT)/share/common.ip.bin.mk
 
+IMAGE_DIRECTORY?= cd
+IMAGE_1ST_READ_BIN?= A.BIN
+
 OUTPUT_FILES= $(SH_PROGRAM).iso $(SH_PROGRAM).cue
 CLEAN_OUTPUT_FILES= $(OUTPUT_FILES) $(SH_BUILD_PATH)/IP.BIN $(SH_BUILD_PATH)/IP.BIN.map
 
