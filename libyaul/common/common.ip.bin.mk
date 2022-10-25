@@ -35,5 +35,5 @@ ifeq ($(strip $(IP_1ST_READ_SIZE)),)
 endif
 
 SH_DEFSYMS+= \
-	-Wl,--defsym=__master_stack=$(IP_MASTER_STACK_ADDR) \
-	-Wl,--defsym=__slave_stack=$(IP_SLAVE_STACK_ADDR)
+	-Wl,--defsym=___master_stack=$(IP_MASTER_STACK_ADDR) \
+	-Wl,--defsym=___slave_stack=$(IP_SLAVE_STACK_ADDR)

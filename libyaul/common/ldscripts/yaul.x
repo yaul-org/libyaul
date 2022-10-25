@@ -19,10 +19,10 @@ MEMORY {
   ram (Wx)         : ORIGIN = 0x06004000, LENGTH = 0x000FC000
 }
 
-PROVIDE (__master_stack = ORIGIN (master_stack));
-PROVIDE (__master_stack_end = ORIGIN (master_stack) - LENGTH (master_stack));
-PROVIDE_HIDDEN (__slave_stack = ORIGIN (slave_stack));
-PROVIDE_HIDDEN (__slave_stack_end = ORIGIN (slave_stack) - LENGTH (slave_stack));
+PROVIDE (___master_stack = ORIGIN (master_stack));
+PROVIDE (___master_stack_end = ORIGIN (master_stack) - LENGTH (master_stack));
+PROVIDE_HIDDEN (___slave_stack = ORIGIN (slave_stack));
+PROVIDE_HIDDEN (___slave_stack_end = ORIGIN (slave_stack) - LENGTH (slave_stack));
 
 SECTIONS
 {
@@ -34,27 +34,7 @@ SECTIONS
      *(.text.*)
      *(.gnu.linkonce.t.*)
 
-     . = ALIGN (0x10);
-     __CTOR_SECTION__ = .;
-     KEEP (*(.ctor))
-     SHORT (0x000B) /* RTS */
-     SHORT (0x0009) /* NOP */
-
-     . = ALIGN (0x10);
-     __INIT_SECTION__ = .;
-     KEEP (*(.init))
-
-     . = ALIGN (0x10);
-     __DTOR_SECTION__ = .;
-     KEEP (*(.dtor))
-     SHORT (0x000B) /* RTS */
-     SHORT (0x0009) /* NOP */
-
-     . = ALIGN (0x10);
-     __FINI_SECTION__ = .;
-     KEEP (*(.fini))
-
-     . = ALIGN (0x10);
+     . = ALIGN (16);
      __CTOR_LIST__ = .;
      ___CTOR_LIST__ = .;
      LONG (((__CTOR_END__ - __CTOR_LIST__) / 4) - 2)
@@ -63,7 +43,7 @@ SECTIONS
      LONG (0x00000000)
      __CTOR_END__ = .;
 
-     . = ALIGN (0x10);
+     . = ALIGN (16);
      __DTOR_LIST__ = .;
      ___DTOR_LIST__ = .;
      LONG (((__DTOR_END__ - __DTOR_LIST__) / 4) - 2)
@@ -72,25 +52,25 @@ SECTIONS
      LONG (0x00000000)
      __DTOR_END__ = .;
 
-     . = ALIGN (0x10);
+     . = ALIGN (4);
      PROVIDE_HIDDEN (__text_end = .);
   }
 
   .rodata __text_end :
   {
-     . = ALIGN (0x10);
+     . = ALIGN (16);
 
      *(.rdata)
      *(.rodata)
      *(.rodata.*)
      *(.gnu.linkonce.r.*)
 
-     . = ALIGN (0x04);
+     . = ALIGN (4);
   }
 
   .data . :
   {
-     . = ALIGN (0x10);
+     . = ALIGN (16);
      PROVIDE_HIDDEN (__data_start = .);
 
      *(.data)
@@ -101,13 +81,13 @@ SECTIONS
      *(.sdata.*)
      *(.gnu.linkonce.s.*)
 
-     . = ALIGN (0x10);
+     . = ALIGN (4);
      PROVIDE_HIDDEN (__data_end = .);
   }
 
   .bss __data_end :
   {
-     . = ALIGN (0x10);
+     . = ALIGN (16);
      PROVIDE (__bss_start = .);
 
      *(.bss)
@@ -119,7 +99,7 @@ SECTIONS
      *(.scommon)
      *(COMMON)
 
-     . = ALIGN (0x10);
+     . = ALIGN (16);
      PROVIDE (__bss_end = .);
 
      __bss_end__ = .;
@@ -132,7 +112,7 @@ SECTIONS
      *(.uncached)
      *(.uncached.*)
 
-     . = ALIGN (0x10);
+     . = ALIGN (4);
      PROVIDE_HIDDEN (__uncached_end = .);
   }
 

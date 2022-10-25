@@ -202,7 +202,6 @@ cpu_instr_rotr(uint32_t rn)
         return rn;
 }
 
-
 /// @brief Emit a `xtrct` instruction.
 ///
 /// @param rm The `rm` register.

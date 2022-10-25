@@ -16,23 +16,24 @@
 #include <cpu/cache.h>
 #include <cpu/intc.h>
 
-#include <cd-block.h>
-
 #include <internal.h>
 #include <cpu-internal.h>
-#include <dbgio/dbgio-internal.h>
 #include <smpc-internal.h>
 #include <vdp-internal.h>
 
-void __weak
-user_init(void)
-{
-}
+void user_init(void) __weak;
 
-static void __used __section(".init")
-_init(void)
+static void _bss_clear(void);
+
+void __noreturn
+__sys_init(void)
 {
-        cpu_intc_mask_set(15);
+        extern int main(void);
+
+        void __global_ctors(void) __weak;
+        void __global_dtors(void) __weak;
+
+        _bss_clear();
 
         __atexit_init();
 
@@ -46,15 +47,39 @@ _init(void)
 
         cpu_cache_purge();
 
+        if (__global_ctors != NULL) {
+                __global_ctors();
+        }
+
         cpu_intc_mask_set(0);
 
-        user_init();
+        if (user_init != NULL) {
+                user_init();
+        }
 
         cpu_cache_purge();
+
+        const int ret = main();
+
+        cpu_intc_mask_set(15);
+
+        if (__global_dtors != NULL) {
+                __global_dtors();
+        }
+
+        exit(ret);
 }
 
-static void __section(".fini") __used __noreturn
-_fini(void)
+static void
+_bss_clear(void)
 {
-        exit(0);
+        extern uint32_t _bss_start[];
+        extern uint32_t _bss_end[];
+
+        for (uint32_t *bss_ptr = _bss_start; bss_ptr < _bss_end; ) {
+                *bss_ptr++ = 0x00000000;
+                *bss_ptr++ = 0x00000000;
+                *bss_ptr++ = 0x00000000;
+                *bss_ptr++ = 0x00000000;
+        }
 }

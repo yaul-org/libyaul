@@ -17,7 +17,7 @@
         mov r15, r14
 
 .align 4
-1: .long __slave_stack
+1: .long ___slave_stack
 2: .long \entry
 .endm
 

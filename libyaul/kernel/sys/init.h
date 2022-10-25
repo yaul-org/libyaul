@@ -12,7 +12,12 @@
 
 __BEGIN_DECLS
 
-extern void user_init(void);
+/* This prototype declaration is needed (only) for C++ to void name mangling. We
+ * also don't want to explicitly declare the prototype for C either (hence the
+ * redundant extern "C") */
+#ifdef __cplusplus
+extern "C" void user_init(void);
+#endif /* __cplusplus */
 
 __END_DECLS
 

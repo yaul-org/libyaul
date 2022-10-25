@@ -41,8 +41,9 @@ void __weak operator delete(void* ptr, unsigned int) {
     free(ptr);
 }
 
-static void __section(".ctor") __used
-_global_ctors_call(void)
+extern "C"
+void __used
+__global_ctors(void)
 {
     extern void (*__CTOR_LIST__[])(void);
 
@@ -54,8 +55,9 @@ _global_ctors_call(void)
     }
 }
 
-static void __section(".dtor") __used
-_global_dtors_call(void)
+extern "C"
+void __used
+__global_dtors(void)
 {
     extern void (*__DTOR_LIST__[])(void);
 
