@@ -362,20 +362,21 @@ _scroll_screen_reset(void)
         vdp2_scrn_scroll_y_set(params->scroll_screen, FIX16(0.0f));
 
         vdp2_scrn_disp_t disp_mask;
+        disp_mask = vdp2_scrn_display_get();
 
         switch (params->scroll_screen) {
         case VDP2_SCRN_NBG1:
-                disp_mask = VDP2_SCRN_DISP_NBG1;
+                disp_mask |= VDP2_SCRN_DISP_NBG1;
                 break;
         case VDP2_SCRN_NBG2:
-                disp_mask = VDP2_SCRN_DISP_NBG2;
+                disp_mask |= VDP2_SCRN_DISP_NBG2;
                 break;
         case VDP2_SCRN_NBG3:
-                disp_mask = VDP2_SCRN_DISP_NBG3;
+                disp_mask |= VDP2_SCRN_DISP_NBG3;
                 break;
         default:
         case VDP2_SCRN_NBG0:
-                disp_mask = VDP2_SCRN_DISP_NBG0;
+                disp_mask |= VDP2_SCRN_DISP_NBG0;
                 break;
         }
 

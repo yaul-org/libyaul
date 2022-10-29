@@ -9,6 +9,12 @@
 
 #include "vdp-internal.h"
 
+vdp2_scrn_disp_t
+vdp2_scrn_display_get(void)
+{
+        return _state_vdp2()->regs->bgon;
+}
+
 void
 vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask)
 {
