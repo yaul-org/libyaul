@@ -14,7 +14,7 @@
 
 static vdp2_vram_ctl_t _vdp2_vram_ctl = {
         .coeff_table = VDP2_VRAM_CTL_COEFF_TABLE_VRAM,
-        .vram_mode         = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
+        .vram_mode   = VDP2_VRAM_CTL_MODE_PART_BANK_BOTH
 };
 
 void
@@ -62,6 +62,12 @@ vdp2_vram_usage_set(const vdp2_vram_usage_t *vram_usage)
         _state_vdp2()->regs->ramctl |= vram_usage->b1 << 6;
 }
 
+vdp2_vram_cycp_t *
+vdp2_vram_cycp_get(void)
+{
+        return (vdp2_vram_cycp_t *)&_state_vdp2()->regs->cyc[0];
+}
+
 void
 vdp2_vram_cycp_set(const vdp2_vram_cycp_t *vram_cycp)
 {
@@ -82,10 +88,10 @@ vdp2_vram_cycp_clear(void)
         vdp2_vram_cycp_bank_clear(VDP2_VRAM_BANK_B1);
 }
 
-vdp2_vram_cycp_bank_t
+vdp2_vram_cycp_bank_t *
 vdp2_vram_cycp_bank_get(vdp2_vram_bank_t bank)
 {
-        return *(vdp2_vram_cycp_bank_t *)&_state_vdp2()->regs->cyc[bank & 3];
+        return (vdp2_vram_cycp_bank_t *)&_state_vdp2()->regs->cyc[bank & 3];
 }
 
 void

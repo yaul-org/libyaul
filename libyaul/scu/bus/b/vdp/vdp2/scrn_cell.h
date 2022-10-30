@@ -54,7 +54,7 @@ typedef enum vdp2_scrn_aux_mode {
         /// Auxiliary mode #0 (flip function).
         VDP2_SCRN_AUX_MODE_0,
         /// Auxiliary mode #1 (no flip function).
-        VDP2_SCRN_AUX_MODE_1,
+        VDP2_SCRN_AUX_MODE_1
 } vdp2_scrn_aux_mode_t;
 
 typedef struct vdp2_scrn_cell_format {

@@ -49,9 +49,13 @@ _async_flush(void)
 
         _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        _scroll_screen_reset();
+        const vdp2_scrn_normal_map_t * const normal_map =
+            _dev_state->params.normal_map;
 
-        vdp_dma_enqueue((void *)_dev_state->page_base, _dev_state->page_pnd, _dev_state->page_size);
+        uint16_t * const plane = (uint16_t *)normal_map->plane_a;
+        uint16_t * const page = plane;
+
+        vdp_dma_enqueue(page, _dev_state->page_ptr, _dev_state->page_size);
         vdp_dma_callback_add(_flush_dma_handler, NULL);
 }
 

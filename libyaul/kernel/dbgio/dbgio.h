@@ -28,24 +28,22 @@ typedef enum dbgio_dev {
 
 #define DBGIO_DEV_COUNT 5
 
+typedef struct dbgio_vdp2_charmap {
+        uint16_t pnd;
+} dbgio_vdp2_charmap_t;
+
 typedef struct dbgio_vdp2 {
+        const dbgio_vdp2_charmap_t *font_charmap;
         const uint8_t *font_cpd;
         const uint16_t *font_pal;
         uint8_t font_fg;
         uint8_t font_bg;
 
-        vdp2_scrn_t scroll_screen;
+        const vdp2_scrn_cell_format_t *cell_format;
+        const vdp2_scrn_normal_map_t *normal_map;
 
-        vdp2_vram_bank_t cpd_bank;
-        vdp2_vram_t cpd_offset;
-
-        vdp2_vram_bank_t pnd_bank;
-        uint8_t map_index;
-
-        vdp2_vram_cycp_bank_t cpd_cycp;
-        vdp2_vram_cycp_bank_t pnd_cycp;
-
-        uint8_t cram_index;
+        uint8_t cycp_cpd;
+        uint8_t cycp_pnd;
 } dbgio_vdp2_t;
 
 typedef struct dbgio_usb_cart {

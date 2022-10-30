@@ -44,26 +44,9 @@ struct dev_state {
 
         dbgio_vdp2_t params;
 
-        /* Base CPD VRAM address */
-        vdp2_vram_t cp_table;
-        /* Base palette CRAM address */
-        vdp2_cram_t color_palette;
-
-        /* Base page VRAM address */
-        uint32_t page_base;
-        uint16_t *page_pnd;
-        /* Size of split page */
-        uint16_t page_size;
-        uint16_t page_width;
-        uint16_t page_height;
-
-        vdp2_cram_mode_t cram_mode;
-
-        /* PND value */
-        uint16_t pnd_value;
-
-        /* PND value for clearing a page */
-        uint16_t pnd_value_clear;
+        uint16_t *page_ptr;
+        uint16_t page_size; /* Size of split page */
+        uint16_t page_stride;
 
         int16_vec2_t tv_resolution;
 };
@@ -73,41 +56,38 @@ struct dev_state {
  *   - Screen will always be displayed
  *   - Rotational backgrounds are not supported
  *   - Screen priority is always 7
- *   - 1x1 plane size is enforced
  *   - Page 0 of plane A will always be used
  *   - scroll position is reset to (0, 0) */
 
-static const dbgio_vdp2_t _default_params = {
-        .font_cpd      = _font_cpd,
-        .font_pal      = _font_pal,
-        .font_fg       = 7,
-        .font_bg       = 0,
+static const vdp2_scrn_cell_format_t _default_cell_format = {
         .scroll_screen = VDP2_SCRN_NBG3,
-        .cpd_bank      = VDP2_VRAM_BANK_B1,
-        .cpd_offset    = 0x00000,
-        .pnd_bank      = VDP2_VRAM_BANK_B1,
-        .map_index     = 2,
-        .cpd_cycp      = {
-                .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
-                .t1 = VDP2_VRAM_CYCP_CPU_RW,
-                .t2 = VDP2_VRAM_CYCP_CPU_RW,
-                .t3 = VDP2_VRAM_CYCP_CPU_RW,
-                .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VDP2_VRAM_CYCP_CPU_RW,
-                .t6 = VDP2_VRAM_CYCP_CPU_RW,
-                .t7 = VDP2_VRAM_CYCP_CPU_RW
-        },
-        .pnd_cycp      = {
-                .t0 = VDP2_VRAM_CYCP_PNDR_NBG3,
-                .t1 = VDP2_VRAM_CYCP_CPU_RW,
-                .t2 = VDP2_VRAM_CYCP_CPU_RW,
-                .t3 = VDP2_VRAM_CYCP_CPU_RW,
-                .t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3,
-                .t5 = VDP2_VRAM_CYCP_CPU_RW,
-                .t6 = VDP2_VRAM_CYCP_CPU_RW,
-                .t7 = VDP2_VRAM_CYCP_CPU_RW
-        },
-        .cram_index    = 0
+        .ccc           = VDP2_SCRN_CCC_PALETTE_16,
+        .char_size     = VDP2_SCRN_CHAR_SIZE_1X1,
+        .pnd_size      = 1,
+        .aux_mode      = VDP2_SCRN_AUX_MODE_1,
+        .plane_size    = VDP2_SCRN_PLANE_SIZE_1X1,
+        .cpd_base      = VDP2_VRAM_ADDR(3, 0x1C000),
+        .palette_base  = VDP2_CRAM_MODE_0_OFFSET(0, 127, 0)
+};
+
+static const vdp2_scrn_normal_map_t _default_normal_map = {
+        .plane_a = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
+        .plane_b = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
+        .plane_c = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
+        .plane_d = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000)
+};
+
+static const dbgio_vdp2_t _default_params = {
+        .font_charmap = _font_charmap,
+        .font_cpd     = _font_cpd,
+        .font_pal     = _font_pal,
+        .font_fg      = 7,
+        .font_bg      = 0,
+
+        .cell_format  = &_default_cell_format,
+        .normal_map   = &_default_normal_map,
+        .cycp_cpd     = 0,
+        .cycp_pnd     = 4
 };
 
 /* Device state for both async and direct VDP2 devices */
@@ -127,60 +107,20 @@ static const cons_ops_t _cons_ops = {
         .write              = _buffer_write
 };
 
+static void _vram_cycp_timing_set(vdp2_vram_cycp_bank_t *cycp_bank, uint8_t value, uint8_t timing);
+
 static inline void __always_inline
 _pnd_write(int16_t col, int16_t row, uint16_t value)
 {
-        const uint32_t offset = col + (row * _dev_state->page_width);
+        const uint32_t offset = col + (row * _dev_state->page_stride);
 
-        _dev_state->page_pnd[offset] = value;
+        _dev_state->page_ptr[offset] = value;
 }
 
 static inline void __always_inline
 _pnd_clear(int16_t col, int16_t row)
 {
-        _pnd_write(col, row, _dev_state->pnd_value_clear);
-}
-
-static void
-_pnd_values_update(bool force)
-{
-        const vdp2_cram_mode_t cram_mode = vdp2_cram_mode_get();
-
-        if (!force && (_dev_state->cram_mode != cram_mode)) {
-                return;
-        }
-
-        _dev_state->cram_mode = cram_mode;
-
-        uint16_t pnd_value;
-
-        switch (cram_mode) {
-        case 0:
-        case 1:
-        default:
-                pnd_value = VDP2_SCRN_PND_CONFIG_0(0,
-                    _dev_state->cp_table,
-                    _dev_state->color_palette,
-                    /* vf = */ 0,
-                    /* hf = */ 0);
-                break;
-        case 2:
-                pnd_value = VDP2_SCRN_PND_CONFIG_0(2,
-                    _dev_state->cp_table,
-                    _dev_state->color_palette,
-                    /* vf = */ 0,
-                    /* hf = */ 0);
-                break;
-        }
-
-        _dev_state->pnd_value = pnd_value;
-        /* PND value used to clear pages */
-        _dev_state->pnd_value_clear = pnd_value;
-
-        for (uint32_t i = 0; i < _dev_state->page_size; i++) {
-                _dev_state->page_pnd[i] &= ~0xF000;
-                _dev_state->page_pnd[i] |= pnd_value;
-        }
+        _pnd_write(col, row, _dev_state->params.font_charmap['\0'].pnd);
 }
 
 static void
@@ -194,8 +134,8 @@ _buffer_clear(void)
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
         cpu_dmac_memset(DEV_DMAC_CHANNEL,
-            _dev_state->page_pnd,
-            _dev_state->pnd_value_clear,
+            _dev_state->page_ptr,
+            _dev_state->params.font_charmap['\0'].pnd,
             _dev_state->page_size);
 
         _dev_state->state |= STATE_BUFFER_CLEARED;
@@ -219,7 +159,7 @@ _buffer_line_clear(int16_t row)
 {
         _dev_state->state |= STATE_BUFFER_DIRTY;
 
-        for (int16_t col = 0; col < _dev_state->page_width; col++) {
+        for (int16_t col = 0; col < _dev_state->page_stride; col++) {
                 _pnd_clear(col, row);
         }
 }
@@ -240,15 +180,7 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
         _dev_state->state |= STATE_BUFFER_DIRTY;
         _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
-        /* We can get away with this because of the imposed limitations of the
-         * device.
-         *
-         * Pattern name data must be 1-word, character size must be 1x1, and no
-         * character flipping */
-        _dev_state->pnd_value &= 0xF000;
-        _dev_state->pnd_value |= ch;
-
-        _pnd_write(col, row, _dev_state->pnd_value);
+        _pnd_write(col, row, _dev_state->params.font_charmap[ch].pnd);
 }
 
 static inline uint8_t __always_inline
@@ -295,29 +227,22 @@ _dev_state_init(const dbgio_vdp2_t *params)
         _dev_state = __malloc(sizeof(struct dev_state));
         assert(_dev_state != NULL);
 
-        (void)memset(_dev_state, 0x00, sizeof(struct dev_state));
+        (void)memset(_dev_state, 0, sizeof(struct dev_state));
 
         _dev_state->state = STATE_IDLE;
         _dev_state->params = *params;
 
-        _dev_state->page_size = VDP2_SCRN_PAGE_SIZE_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1, 1);
-        _dev_state->page_width = VDP2_SCRN_PAGE_WIDTH_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1);
-        _dev_state->page_height = VDP2_SCRN_PAGE_HEIGHT_M_CALCULATE(VDP2_SCRN_CHAR_SIZE_1X1);
+        const vdp2_scrn_cell_format_t * const cell_format =
+            params->cell_format;
 
-        /* One page per plane */
-        _dev_state->page_base = VDP2_VRAM_ADDR(params->pnd_bank,
-            params->map_index * _dev_state->page_size);
-
-        _dev_state->cp_table = VDP2_VRAM_ADDR(params->cpd_bank, params->cpd_offset);
-        _dev_state->color_palette = VDP2_CRAM_ADDR(params->cram_index << 3);
+        _dev_state->page_size = VDP2_SCRN_PAGE_SIZE_CALCULATE(cell_format);
+        _dev_state->page_stride = VDP2_SCRN_PAGE_WIDTH_CALCULATE(cell_format);
 
         /* Restricting the page to 64x32 avoids wasting space */
         _dev_state->page_size >>= 1;
 
-        _pnd_values_update(/* force = */ true);
-
-        _dev_state->page_pnd = __malloc(_dev_state->page_size);
-        assert(_dev_state->page_pnd != NULL);
+        _dev_state->page_ptr = __malloc(_dev_state->page_size);
+        assert(_dev_state->page_ptr != NULL);
 
         _dev_state->tv_resolution = _state_vdp2()->tv.resolution;
 }
@@ -328,101 +253,105 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         assert(params != NULL);
         assert(_dev_state != NULL);
 
-        const vdp2_scrn_cell_format_t cell_format = {
-                .scroll_screen = params->scroll_screen,
-                .ccc           = VDP2_SCRN_CCC_PALETTE_16,
-                .char_size     = VDP2_SCRN_CHAR_SIZE_1X1,
-                .pnd_size      = 1,
-                .aux_mode      = VDP2_SCRN_AUX_MODE_0,
-                .cpd_base      = _dev_state->cp_table,
-                .palette_base  = _dev_state->color_palette,
-                .plane_size    = VDP2_SCRN_PLANE_SIZE_1X1
-        };
+        const vdp2_scrn_cell_format_t * const cell_format =
+            params->cell_format;
 
-        const vdp2_scrn_normal_map_t normal_map = {
-                .plane_a = _dev_state->page_base,
-                .plane_b = _dev_state->page_base,
-                .plane_c = _dev_state->page_base,
-                .plane_d = _dev_state->page_base
-        };
+        const vdp2_scrn_normal_map_t * const normal_map =
+            params->normal_map;
 
-        vdp2_scrn_cell_format_set(&cell_format, &normal_map);
-}
+        vdp2_scrn_cell_format_set(cell_format, normal_map);
 
-static void
-_scroll_screen_reset(void)
-{
-        /* Force reset */
-        _pnd_values_update(/* force = */ false);
+        vdp2_scrn_priority_set(cell_format->scroll_screen, 7);
+        vdp2_scrn_scroll_x_set(cell_format->scroll_screen, FIX16(0.0f));
+        vdp2_scrn_scroll_y_set(cell_format->scroll_screen, FIX16(0.0f));
 
-        const dbgio_vdp2_t * const params = &_dev_state->params;
-
-        vdp2_scrn_priority_set(params->scroll_screen, 7);
-        vdp2_scrn_scroll_x_set(params->scroll_screen, FIX16(0.0f));
-        vdp2_scrn_scroll_y_set(params->scroll_screen, FIX16(0.0f));
+        uint32_t scroll_screen;
 
         vdp2_scrn_disp_t disp_mask;
         disp_mask = vdp2_scrn_display_get();
 
-        switch (params->scroll_screen) {
+        switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG1:
+                scroll_screen = 1;
                 disp_mask |= VDP2_SCRN_DISP_NBG1;
                 break;
         case VDP2_SCRN_NBG2:
+                scroll_screen = 2;
                 disp_mask |= VDP2_SCRN_DISP_NBG2;
                 break;
         case VDP2_SCRN_NBG3:
+                scroll_screen = 3;
                 disp_mask |= VDP2_SCRN_DISP_NBG3;
                 break;
         default:
         case VDP2_SCRN_NBG0:
+                scroll_screen = 0;
                 disp_mask |= VDP2_SCRN_DISP_NBG0;
                 break;
         }
 
         vdp2_scrn_display_set(disp_mask);
 
-        vdp2_vram_cycp_bank_set(params->cpd_bank, &params->cpd_cycp);
-        vdp2_vram_cycp_bank_set(params->pnd_bank, &params->pnd_cycp);
+        const uint32_t cpd_bank =
+            VDP2_VRAM_BANK(cell_format->cpd_base);
+        const uint32_t pnd_bank =
+            VDP2_VRAM_BANK(normal_map->plane_a);
+
+        vdp2_vram_cycp_t * const vram_cycp = vdp2_vram_cycp_get();
+
+        vdp2_vram_cycp_bank_t * const cycp_cpd_bank = &vram_cycp->pt[cpd_bank];
+        const uint8_t cpd_value = VDP2_VRAM_CYCP_CHPNDR(scroll_screen);
+
+        _vram_cycp_timing_set(cycp_cpd_bank, cpd_value, params->cycp_cpd);
+
+        vdp2_vram_cycp_bank_t * const cycp_pnd_bank = &vram_cycp->pt[pnd_bank];
+        const uint8_t pnd_value = VDP2_VRAM_CYCP_PNDR(scroll_screen);
+
+        _vram_cycp_timing_set(cycp_pnd_bank, pnd_value, params->cycp_pnd);
 }
 
-static inline void __always_inline
-_assert_shared_init(const dbgio_vdp2_t *params __unused)
+static void
+_vram_cycp_timing_set(vdp2_vram_cycp_bank_t *cycp_bank, uint8_t value, uint8_t timing)
 {
-        assert(params != NULL);
-
-        assert(params->font_cpd != NULL);
-        assert(params->font_pal != NULL);
-
-        assert(params->font_bg <= 15);
-        assert(params->font_bg <= 15);
-
-        assert((params->scroll_screen == VDP2_SCRN_NBG0) ||
-               (params->scroll_screen == VDP2_SCRN_NBG1) ||
-               (params->scroll_screen == VDP2_SCRN_NBG2) ||
-               (params->scroll_screen == VDP2_SCRN_NBG3));
-
-        assert((params->scroll_screen != VDP2_SCRN_RBG0));
-
-        assert(params->cpd_bank <= 3);
-        /* XXX: Fetch the VRAM bank split configuration and determine the VRAM
-         *      bank size */
-        assert(params->cpd_offset < VDP2_VRAM_BSIZE_4);
-
-        assert(params->pnd_bank <= 3);
-        /* XXX: Determine the page size and check against the number of
-         *      available offsets */
-
-        /* There are 128 16-color banks, depending on CRAM mode */
-        /* XXX: Fetch CRAM mode and check number of available 16-color banks */
-        assert(params->cram_index < 128);
+        switch (timing) {
+        case 0:
+                cycp_bank->raw &= 0xFFFFFFF0;
+                cycp_bank->raw |= value;
+                break;
+        case 1:
+                cycp_bank->raw &= 0xFFFFFF0F;
+                cycp_bank->raw |= value << 4;
+                break;
+        case 2:
+                cycp_bank->raw &= 0xFFFFF0FF;
+                cycp_bank->raw |= value << 8;
+                break;
+        case 3:
+                cycp_bank->raw &= 0xFFFF0FFF;
+                cycp_bank->raw |= value << 12;
+                break;
+        case 4:
+                cycp_bank->raw &= 0xFFF0FFFF;
+                cycp_bank->raw |= value << 16;
+                break;
+        case 5:
+                cycp_bank->raw &= 0xFF0FFFFF;
+                cycp_bank->raw |= value << 20;
+                break;
+        case 6:
+                cycp_bank->raw &= 0xF0FFFFFF;
+                cycp_bank->raw |= value << 24;
+                break;
+        case 7:
+                cycp_bank->raw &= 0x0FFFFFFF;
+                cycp_bank->raw |= value << 28;
+                break;
+        }
 }
 
 static void
 _shared_init(const dbgio_vdp2_t *params)
 {
-        _assert_shared_init(params);
-
         _dev_state_init(params);
 
         const uint16_t cols = _dev_state->tv_resolution.x / FONT_CHAR_WIDTH;
@@ -444,7 +373,7 @@ _shared_deinit(void)
                 return;
         }
 
-        __free(_dev_state->page_pnd);
+        __free(_dev_state->page_ptr);
 
         __free(_dev_state);
 
@@ -503,12 +432,15 @@ _shared_font_load(void)
 
         const dbgio_vdp2_t * const params = &_dev_state->params;
 
-        _font_1bpp_4bpp_decompress((void *)_dev_state->cp_table,
+        const vdp2_scrn_cell_format_t * const cell_format =
+            params->cell_format;
+
+        _font_1bpp_4bpp_decompress((void *)cell_format->cpd_base,
             params->font_cpd,
             params->font_fg,
             params->font_bg);
 
-        (void)memcpy((void *)_dev_state->color_palette,
+        (void)memcpy((void *)cell_format->palette_base,
             params->font_pal,
             FONT_4BPP_COLOR_COUNT * sizeof(rgb1555_t));
 }
