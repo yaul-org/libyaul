@@ -36,6 +36,17 @@
 #define STATE_BUFFER_FLUSHING       (0x08)
 #define STATE_BUFFER_FORCE_FLUSHING (0x10)
 
+#define DEFAULT_NBGX_CPD_BANK    (3)
+#define DEFAULT_NBGX_CPD         VDP2_VRAM_ADDR(3, 0x1C000)
+
+#define DEFAULT_NBGX_PND_BANK    (3)
+#define DEFAULT_NBGX_MAP_PLANE_A VDP2_VRAM_ADDR(3, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_B VDP2_VRAM_ADDR(3, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_C VDP2_VRAM_ADDR(3, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_D VDP2_VRAM_ADDR(3, 0x1E000)
+
+#define DEFAULT_NBGX_PAL         VDP2_CRAM_MODE_0_OFFSET(0, 127, 0)
+
 /* CPU-DMAC channel used for _flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
 
@@ -66,15 +77,15 @@ static const vdp2_scrn_cell_format_t _default_cell_format = {
         .pnd_size      = 1,
         .aux_mode      = VDP2_SCRN_AUX_MODE_1,
         .plane_size    = VDP2_SCRN_PLANE_SIZE_1X1,
-        .cpd_base      = VDP2_VRAM_ADDR(3, 0x1C000),
-        .palette_base  = VDP2_CRAM_MODE_0_OFFSET(0, 127, 0)
+        .cpd_base      = DEFAULT_NBGX_CPD,
+        .palette_base  = DEFAULT_NBGX_PAL
 };
 
 static const vdp2_scrn_normal_map_t _default_normal_map = {
-        .plane_a = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
-        .plane_b = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
-        .plane_c = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000),
-        .plane_d = (vdp2_vram_t)VDP2_VRAM_ADDR(3, 0x1E000)
+        .plane_a = DEFAULT_NBGX_MAP_PLANE_A,
+        .plane_b = DEFAULT_NBGX_MAP_PLANE_B,
+        .plane_c = DEFAULT_NBGX_MAP_PLANE_C,
+        .plane_d = DEFAULT_NBGX_MAP_PLANE_D
 };
 
 static const dbgio_vdp2_t _default_params = {
@@ -86,8 +97,6 @@ static const dbgio_vdp2_t _default_params = {
 
         .cell_format  = &_default_cell_format,
         .normal_map   = &_default_normal_map,
-        .cycp_cpd     = 0,
-        .cycp_pnd     = 4
 };
 
 /* Device state for both async and direct VDP2 devices */
@@ -106,8 +115,6 @@ static const cons_ops_t _cons_ops = {
         .line_partial_clear = _buffer_line_partial_clear,
         .write              = _buffer_write
 };
-
-static void _vram_cycp_timing_set(vdp2_vram_cycp_bank_t *cycp_bank, uint8_t value, uint8_t timing);
 
 static inline void __always_inline
 _pnd_write(int16_t col, int16_t row, uint16_t value)
@@ -265,87 +272,33 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
         vdp2_scrn_scroll_x_set(cell_format->scroll_screen, FIX16(0.0f));
         vdp2_scrn_scroll_y_set(cell_format->scroll_screen, FIX16(0.0f));
 
-        uint32_t scroll_screen;
-
         vdp2_scrn_disp_t disp_mask;
         disp_mask = vdp2_scrn_display_get();
 
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG1:
-                scroll_screen = 1;
-                disp_mask |= VDP2_SCRN_DISP_NBG1;
+                disp_mask |= VDP2_SCRN_DISPTP_NBG1;
                 break;
         case VDP2_SCRN_NBG2:
-                scroll_screen = 2;
-                disp_mask |= VDP2_SCRN_DISP_NBG2;
+                disp_mask |= VDP2_SCRN_DISPTP_NBG2;
                 break;
         case VDP2_SCRN_NBG3:
-                scroll_screen = 3;
-                disp_mask |= VDP2_SCRN_DISP_NBG3;
+                disp_mask |= VDP2_SCRN_DISPTP_NBG3;
                 break;
         default:
         case VDP2_SCRN_NBG0:
-                scroll_screen = 0;
-                disp_mask |= VDP2_SCRN_DISP_NBG0;
+                disp_mask |= VDP2_SCRN_DISPTP_NBG0;
                 break;
         }
 
         vdp2_scrn_display_set(disp_mask);
 
-        const uint32_t cpd_bank =
-            VDP2_VRAM_BANK(cell_format->cpd_base);
-        const uint32_t pnd_bank =
-            VDP2_VRAM_BANK(normal_map->plane_a);
+        /* If default */
+        if (params == &_default_params) {
+                vdp2_vram_cycp_t * const vram_cycp = vdp2_vram_cycp_get();
 
-        vdp2_vram_cycp_t * const vram_cycp = vdp2_vram_cycp_get();
-
-        vdp2_vram_cycp_bank_t * const cycp_cpd_bank = &vram_cycp->pt[cpd_bank];
-        const uint8_t cpd_value = VDP2_VRAM_CYCP_CHPNDR(scroll_screen);
-
-        _vram_cycp_timing_set(cycp_cpd_bank, cpd_value, params->cycp_cpd);
-
-        vdp2_vram_cycp_bank_t * const cycp_pnd_bank = &vram_cycp->pt[pnd_bank];
-        const uint8_t pnd_value = VDP2_VRAM_CYCP_PNDR(scroll_screen);
-
-        _vram_cycp_timing_set(cycp_pnd_bank, pnd_value, params->cycp_pnd);
-}
-
-static void
-_vram_cycp_timing_set(vdp2_vram_cycp_bank_t *cycp_bank, uint8_t value, uint8_t timing)
-{
-        switch (timing) {
-        case 0:
-                cycp_bank->raw &= 0xFFFFFFF0;
-                cycp_bank->raw |= value;
-                break;
-        case 1:
-                cycp_bank->raw &= 0xFFFFFF0F;
-                cycp_bank->raw |= value << 4;
-                break;
-        case 2:
-                cycp_bank->raw &= 0xFFFFF0FF;
-                cycp_bank->raw |= value << 8;
-                break;
-        case 3:
-                cycp_bank->raw &= 0xFFFF0FFF;
-                cycp_bank->raw |= value << 12;
-                break;
-        case 4:
-                cycp_bank->raw &= 0xFFF0FFFF;
-                cycp_bank->raw |= value << 16;
-                break;
-        case 5:
-                cycp_bank->raw &= 0xFF0FFFFF;
-                cycp_bank->raw |= value << 20;
-                break;
-        case 6:
-                cycp_bank->raw &= 0xF0FFFFFF;
-                cycp_bank->raw |= value << 24;
-                break;
-        case 7:
-                cycp_bank->raw &= 0x0FFFFFFF;
-                cycp_bank->raw |= value << 28;
-                break;
+                vram_cycp->pt[DEFAULT_NBGX_CPD_BANK].t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3;
+                vram_cycp->pt[DEFAULT_NBGX_PND_BANK].t0 = VDP2_VRAM_CYCP_PNDR_NBG3;
         }
 }
 

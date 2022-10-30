@@ -41,9 +41,6 @@ typedef struct dbgio_vdp2 {
 
         const vdp2_scrn_cell_format_t *cell_format;
         const vdp2_scrn_normal_map_t *normal_map;
-
-        uint8_t cycp_cpd;
-        uint8_t cycp_pnd;
 } dbgio_vdp2_t;
 
 typedef struct dbgio_usb_cart {
