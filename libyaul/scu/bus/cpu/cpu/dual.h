@@ -104,9 +104,9 @@ cpu_dual_notification_wait(void)
 static inline void * __always_inline
 cpu_dual_master_stack_get(void)
 {
-        extern uint32_t _master_stack;
+        extern uint32_t __master_stack;
 
-        return (void *)&_master_stack;
+        return (void *)&__master_stack;
 }
 
 /// @brief Obtain the top of the slave CPU stack.
@@ -121,9 +121,9 @@ cpu_dual_master_stack_get(void)
 static inline void * __always_inline
 cpu_dual_slave_stack_get(void)
 {
-        extern uint32_t _slave_stack;
+        extern uint32_t __slave_stack;
 
-        return (void *)&_slave_stack;
+        return (void *)&__slave_stack;
 }
 
 /// @ingroup CPU_INTC_HELPERS
