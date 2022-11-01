@@ -84,7 +84,6 @@ extern void cdfs_filelist_walk(cdfs_filelist_t *filelist,
     void *args);
 
 void cdfs_sector_read(sector_t sector, void *ptr);
-void cdfs_sector_usb_cart_read(sector_t sector, void *ptr);
 
 __END_DECLS
 

@@ -58,8 +58,6 @@
 #include <sys/init.h>
 #include <sys/dma-queue.h>
 
-#include <ssload.h>
-
 #include <fs/cd/cdfs.h>
 
 #endif /* !_YAUL_H_ */

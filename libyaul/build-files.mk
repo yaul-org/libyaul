@@ -40,7 +40,6 @@ SUPPORT_SRCS+= \
 	kernel/sys/init.c
 
 LIB_SRCS:= \
-	kernel/ssload.c \
 	kernel/reset-internal.c \
 	kernel/internal.c \
 	kernel/mm/internal.c
@@ -193,9 +192,6 @@ LIB_SRCS+= \
 LIB_SRCS+= \
 	kernel/fs/cd/cdfs.c \
 	kernel/fs/cd/cdfs_sector_read.c
-
-LIB_SRCS+= \
-	kernel/fs/cd/cdfs_sector_usb_cart_read.c
 
 LIB_SRCS+= \
 	scu/bus/a/cs0/arp/arp.c
@@ -358,9 +354,6 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/fs/cd/:cdfs.h:yaul/fs/cd/
-
-INSTALL_HEADER_FILES+= \
-	./kernel/:ssload.h:yaul/
 
 INSTALL_HEADER_FILES+= \
 	./scu/:scu.h:yaul/scu/ \
