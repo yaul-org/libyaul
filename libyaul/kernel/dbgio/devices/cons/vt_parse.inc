@@ -107,8 +107,8 @@ _vt_parse(vt_parse_t *parser, const char *data, int32_t len)
         }
 }
 
-static
-void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
+static void
+_do_action(vt_parse_t *parser, vt_parse_action_t action, char ch)
 {
         int32_t num_intermediate_chars;
 

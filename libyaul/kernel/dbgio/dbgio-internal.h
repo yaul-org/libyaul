@@ -33,13 +33,15 @@ typedef struct dbgio_dev_ops {
         dev_ops_flush_t flush;
 } dbgio_dev_ops_t;
 
-extern const dbgio_dev_ops_t __dev_ops_null;
-extern const dbgio_dev_ops_t __dev_ops_vdp1;
-extern const dbgio_dev_ops_t __dev_ops_vdp2;
-extern const dbgio_dev_ops_t __dev_ops_vdp2_async;
-extern const dbgio_dev_ops_t __dev_ops_usb_cart;
+extern const dbgio_dev_ops_t __dbgio_dev_ops_null;
+extern const dbgio_dev_ops_t __dbgio_dev_ops_vdp1;
+extern const dbgio_dev_ops_t __dbgio_dev_ops_vdp2;
+extern const dbgio_dev_ops_t __dbgio_dev_ops_vdp2_async;
+extern const dbgio_dev_ops_t __dbgio_dev_ops_usb_cart;
 
-extern void dbgio_init(void);
+extern const dbgio_font_t __dbgio_default_font;
+
+extern void __dbgio_font_1bpp_4bpp_decompress(const dbgio_font_t *font, uint8_t *dec_cg);
 
 __END_DECLS
 

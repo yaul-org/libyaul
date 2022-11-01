@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cons.h"
+#include "cons-internal.h"
 
 #include "vt_parse.inc"
 
@@ -50,7 +50,7 @@ typedef struct {
 static cons_t _cons;
 
 void
-cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
+__cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
 {
         assert(ops != NULL);
 
@@ -70,7 +70,7 @@ cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
         _cons.cursor.col = 0;
         _cons.cursor.row = 0;
 
-        cons_resize(cols, rows);
+        __cons_resize(cols, rows);
 
         ops->clear();
 
@@ -78,7 +78,7 @@ cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows)
 }
 
 void
-cons_resize(uint16_t cols, uint16_t rows)
+__cons_resize(uint16_t cols, uint16_t rows)
 {
         assert((cols >= CONS_COLS_MIN) && (cols <= CONS_COLS_MAX));
         assert((rows >= CONS_ROWS_MIN) && (rows <= CONS_ROWS_MAX));
@@ -91,7 +91,7 @@ cons_resize(uint16_t cols, uint16_t rows)
 }
 
 void
-cons_buffer(const char *buffer)
+__cons_buffer(const char *buffer)
 {
         assert(buffer != NULL);
 

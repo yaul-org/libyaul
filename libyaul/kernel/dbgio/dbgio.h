@@ -28,16 +28,22 @@ typedef enum dbgio_dev {
 
 #define DBGIO_DEV_COUNT 5
 
+typedef struct dbgio_font {
+        const uint8_t *cg;
+        size_t cg_size;
+        const uint16_t *pal;
+        size_t pal_size;
+        uint8_t fg;
+        uint8_t bg;
+} dbgio_font_t;
+
 typedef struct dbgio_vdp2_charmap {
         uint16_t pnd;
 } dbgio_vdp2_charmap_t;
 
 typedef struct dbgio_vdp2 {
+        const dbgio_font_t *font;
         const dbgio_vdp2_charmap_t *font_charmap;
-        const uint8_t *font_cpd;
-        const uint16_t *font_pal;
-        uint8_t font_fg;
-        uint8_t font_bg;
 
         const vdp2_scrn_cell_format_t *cell_format;
         const vdp2_scrn_normal_map_t *normal_map;

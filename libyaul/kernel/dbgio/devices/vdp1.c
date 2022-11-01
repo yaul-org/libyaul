@@ -8,11 +8,11 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "../dbgio-internal.h"
+#include <dbgio/dbgio-internal.h>
 
 static void _nop(void);
 
-const dbgio_dev_ops_t __dev_ops_vdp1 = {
+const dbgio_dev_ops_t __dbgio_dev_ops_vdp1 = {
         .dev            = DBGIO_DEV_VDP1,
         .default_params = NULL,
         .init           = (dev_ops_init_t)_nop,

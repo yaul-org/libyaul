@@ -23,11 +23,11 @@ static struct {
 } _dbgio_state;
 
 static const dbgio_dev_ops_t *_dev_ops_table[] = {
-        &__dev_ops_null,
-        NULL,
-        &__dev_ops_vdp2,
-        &__dev_ops_vdp2_async,
-        &__dev_ops_usb_cart
+        &__dbgio_dev_ops_null,
+        &__dbgio_dev_ops_vdp1,
+        &__dbgio_dev_ops_vdp2,
+        &__dbgio_dev_ops_vdp2_async,
+        &__dbgio_dev_ops_usb_cart,
 };
 
 void
@@ -43,6 +43,7 @@ dbgio_init(void)
 
         if (_dbgio_state.buffer == NULL) {
                 _dbgio_state.buffer = __malloc(SPRINTF_BUFFER_SIZE);
+                assert(_dbgio_state.buffer != NULL);
         }
 }
 

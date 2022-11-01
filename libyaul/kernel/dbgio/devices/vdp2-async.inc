@@ -3,9 +3,9 @@
 static void _async_init(const dbgio_vdp2_t *params);
 static void _async_flush(void);
 
-static void _flush_dma_handler(void *work);
+static void _dma_handler_flush(void *work);
 
-const dbgio_dev_ops_t __dev_ops_vdp2_async = {
+const dbgio_dev_ops_t __dbgio_dev_ops_vdp2_async = {
         .dev            = DBGIO_DEV_VDP2_ASYNC,
         .default_params = &_default_params,
         .init           = (dev_ops_init_t)_async_init,
@@ -56,11 +56,11 @@ _async_flush(void)
         uint16_t * const page = plane;
 
         vdp_dma_enqueue(page, _dev_state->page_ptr, _dev_state->page_size);
-        vdp_dma_callback_add(_flush_dma_handler, NULL);
+        vdp_dma_callback_add(_dma_handler_flush, NULL);
 }
 
 static void
-_flush_dma_handler(void *work __unused)
+_dma_handler_flush(void *work __unused)
 {
         const uint8_t state_mask = STATE_BUFFER_DIRTY |
                                    STATE_BUFFER_FLUSHING |

@@ -7,7 +7,7 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
-static state_change_t _vt_parse_state_table[15][256] = {
+static state_change_t _vt_parse_state_table[15][256] __aligned(4) = {
         {
                 0,
                 0,

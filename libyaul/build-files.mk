@@ -49,6 +49,8 @@ LIB_SRCS+= \
 	kernel/dbgio/devices/null.c \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
+	kernel/dbgio/font/default_font.c \
+	kernel/dbgio/font/font.c
 
 LIB_SRCS+= \
 	kernel/dbgio/devices/usb-cart.c

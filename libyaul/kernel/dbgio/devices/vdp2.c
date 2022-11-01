@@ -25,9 +25,9 @@
 #include <dbgio/dbgio-internal.h>
 #include <vdp-internal.h>
 
-#include "cons/cons.h"
+#include "cons/cons-internal.h"
 
-#include "vdp2_font.inc"
+#include "vdp2_charmap.inc"
 
 #define STATE_IDLE                  (0x00)
 #define STATE_INITIALIZED           (0x01)
@@ -89,11 +89,8 @@ static const vdp2_scrn_normal_map_t _default_normal_map = {
 };
 
 static const dbgio_vdp2_t _default_params = {
+        .font         = &__dbgio_default_font,
         .font_charmap = _font_charmap,
-        .font_cpd     = _font_cpd,
-        .font_pal     = _font_pal,
-        .font_fg      = 7,
-        .font_bg      = 0,
 
         .cell_format  = &_default_cell_format,
         .normal_map   = &_default_normal_map,
@@ -115,6 +112,27 @@ static const cons_ops_t _cons_ops = {
         .line_partial_clear = _buffer_line_partial_clear,
         .write              = _buffer_write
 };
+
+static void
+_cons_dimensions_calculate(uint16_t *cols, uint16_t *rows)
+{
+        *cols = _dev_state->tv_resolution.x >> 3;
+        *rows = _dev_state->tv_resolution.y >> 3;
+
+        const dbgio_vdp2_t * const params = &_dev_state->params;
+
+        const vdp2_scrn_cell_format_t * const cell_format =
+            params->cell_format;
+
+        switch (cell_format->char_size) {
+        case VDP2_SCRN_CHAR_SIZE_1X1:
+                break;
+        case VDP2_SCRN_CHAR_SIZE_2X2:
+                *cols >>= 1;
+                *rows >>= 1;
+                break;
+        }
+}
 
 static inline void __always_inline
 _pnd_write(int16_t col, int16_t row, uint16_t value)
@@ -188,44 +206,6 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
         _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
         _pnd_write(col, row, _dev_state->params.font_charmap[ch].pnd);
-}
-
-static inline uint8_t __always_inline
-_1bpp_4bpp_convert(const uint8_t byte, const uint8_t *fgbg)
-{
-        const uint8_t ubyte = (byte >> 1) & 0x01;
-        const uint8_t lbyte = byte & 0x01;
-
-        return (fgbg[lbyte] << 4) | fgbg[ubyte];
-}
-
-static void
-_font_1bpp_4bpp_decompress(uint8_t *dec_cpd, const uint8_t *cmp_cpd,
-    const uint8_t fg, const uint8_t bg)
-{
-        assert(dec_cpd != NULL);
-        assert(cmp_cpd != NULL);
-        assert(((uintptr_t)cmp_cpd & 0x00000003) == 0x00000000);
-
-        const uint8_t fgbg[] = {
-                bg & 0x0F,
-                fg & 0x0F
-        };
-
-        for (uint32_t i = 0, j = 0; i < FONT_1BPP_CPD_SIZE; i++) {
-                uint8_t cpd;
-                cpd = cmp_cpd[i];
-
-                dec_cpd[j + 0] = _1bpp_4bpp_convert(cpd, fgbg);
-                cpd >>= 2;
-                dec_cpd[j + 1] = _1bpp_4bpp_convert(cpd, fgbg);
-                cpd >>= 2;
-                dec_cpd[j + 2] = _1bpp_4bpp_convert(cpd, fgbg);
-                cpd >>= 2;
-                dec_cpd[j + 3] = _1bpp_4bpp_convert(cpd, fgbg);
-
-                j += 4;
-        }
 }
 
 static void
@@ -307,10 +287,12 @@ _shared_init(const dbgio_vdp2_t *params)
 {
         _dev_state_init(params);
 
-        const uint16_t cols = _dev_state->tv_resolution.x / FONT_CHAR_WIDTH;
-        const uint16_t rows = _dev_state->tv_resolution.y / FONT_CHAR_HEIGHT;
+        uint16_t cols;
+        uint16_t rows;
 
-        cons_init(&_cons_ops, cols, rows);
+        _cons_dimensions_calculate(&cols, &rows);
+
+        __cons_init(&_cons_ops, cols, rows);
 
         _scroll_screen_init(params);
 }
@@ -363,13 +345,15 @@ _shared_puts(const char *buffer)
             (tv_resolution->y != vdp2_tv_resolution->y)) {
                 *tv_resolution = *vdp2_tv_resolution;
 
-                const uint16_t cols = tv_resolution->x / FONT_CHAR_WIDTH;
-                const uint16_t rows = tv_resolution->y / FONT_CHAR_HEIGHT;
+                uint16_t cols;
+                uint16_t rows;
 
-                cons_resize(cols, rows);
+                _cons_dimensions_calculate(&cols, &rows);
+
+                __cons_resize(cols, rows);
         }
 
-        cons_buffer(buffer);
+        __cons_buffer(buffer);
 }
 
 static void
@@ -388,14 +372,10 @@ _shared_font_load(void)
         const vdp2_scrn_cell_format_t * const cell_format =
             params->cell_format;
 
-        _font_1bpp_4bpp_decompress((void *)cell_format->cpd_base,
-            params->font_cpd,
-            params->font_fg,
-            params->font_bg);
+        __dbgio_font_1bpp_4bpp_decompress(params->font, (void *)cell_format->cpd_base);
 
-        (void)memcpy((void *)cell_format->palette_base,
-            params->font_pal,
-            FONT_4BPP_COLOR_COUNT * sizeof(rgb1555_t));
+        (void)memcpy((void *)cell_format->palette_base, params->font->pal,
+            params->font->pal_size);
 }
 
 #include "vdp2.inc"

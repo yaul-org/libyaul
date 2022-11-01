@@ -5,8 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _KERNEL_DBGIO_CONS_H_
-#define _KERNEL_DBGIO_CONS_H_
+#ifndef _KERNEL_DBGIO_CONS_INTERNAL_H_
+#define _KERNEL_DBGIO_CONS_INTERNAL_H_
 
 #include <sys/cdefs.h>
 
@@ -37,10 +37,10 @@ typedef struct con_ops {
         cons_ops_write_t write;
 } cons_ops_t;
 
-extern void cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows);
-extern void cons_resize(uint16_t cols, uint16_t rows);
-extern void cons_buffer(const char *buffer);
+extern void __cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows);
+extern void __cons_resize(uint16_t cols, uint16_t rows);
+extern void __cons_buffer(const char *buffer);
 
 __END_DECLS
 
-#endif /* !_KERNEL_DBGIO_CONS_H_ */
+#endif /* !_KERNEL_DBGIO_CONS_INTERNAL_H_ */

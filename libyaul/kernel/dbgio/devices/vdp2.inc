@@ -1,20 +1,20 @@
 /* -*- mode: c -*- */
 
-static void _init(const dbgio_vdp2_t *params);
-static void _flush(void);
+static void _sync_init(const dbgio_vdp2_t *params);
+static void _sync_flush(void);
 
-const dbgio_dev_ops_t __dev_ops_vdp2 = {
+const dbgio_dev_ops_t __dbgio_dev_ops_vdp2 = {
         .dev            = DBGIO_DEV_VDP2,
         .default_params = &_default_params,
-        .init           = (dev_ops_init_t)_init,
+        .init           = (dev_ops_init_t)_sync_init,
         .deinit         = _shared_deinit,
         .font_load      = _shared_font_load,
         .puts           = _shared_puts,
-        .flush          = _flush
+        .flush          = _sync_flush
 };
 
 static void
-_init(const dbgio_vdp2_t *params)
+_sync_init(const dbgio_vdp2_t *params)
 {
         _shared_init(params);
 
@@ -27,7 +27,7 @@ _init(const dbgio_vdp2_t *params)
 }
 
 static void
-_flush(void)
+_sync_flush(void)
 {
         if (_dev_state == NULL) {
                 return;
