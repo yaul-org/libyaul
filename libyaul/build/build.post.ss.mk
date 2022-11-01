@@ -1,4 +1,4 @@
-include $(YAUL_INSTALL_ROOT)/share/common.ip.bin.mk
+include $(YAUL_INSTALL_ROOT)/share/ip.bin.mk
 
 OUTPUT_FILES= $(SH_PROGRAM).ss
 CLEAN_OUTPUT_FILES?= $(OUTPUT_FILES) $(SH_BUILD_PATH)/CART-IP.BIN $(SH_BUILD_PATH)/CART-IP.BIN.map

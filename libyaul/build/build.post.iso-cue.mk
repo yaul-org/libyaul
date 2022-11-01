@@ -6,7 +6,7 @@ pre-build-iso:
 
 post-build-iso:
 
-include $(YAUL_INSTALL_ROOT)/share/common.ip.bin.mk
+include $(YAUL_INSTALL_ROOT)/share/ip.bin.mk
 
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN

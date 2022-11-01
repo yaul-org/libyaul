@@ -10,11 +10,11 @@ IP_FILES:= \
 	ip/blobs/sys_sec.bin
 
 USER_FILES:= \
-	common/build.pre.mk \
-	common/build.post.bin.mk \
-	common/build.post.iso-cue.mk \
-	common/build.post.ss.mk \
-	common/common.ip.bin.mk
+	build/build.post.bin.mk \
+	build/build.post.iso-cue.mk \
+	build/build.post.ss.mk \
+	build/build.pre.mk \
+	build/ip.bin.mk
 
 HELPER_FILES:= \
 	common/update-cdb \
@@ -41,9 +41,9 @@ SUPPORT_SRCS+= \
 
 LIB_SRCS:= \
 	kernel/ssload.c \
+	kernel/reset-internal.c \
 	kernel/internal.c \
-	kernel/mm/internal.c \
-	common/reset-internal.c
+	kernel/mm/internal.c
 
 LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
