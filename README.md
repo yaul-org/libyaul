@@ -55,7 +55,7 @@ then continue to follow the instructions below.
 
        pacman -S \
          yaul-tool-chain-git \
-         yaul-git \
+         yaul \
          yaul-emulator-yabause \
          yaul-emulator-mednafen \
          yaul-examples-git
@@ -92,7 +92,7 @@ repository, or build the [packages][6] yourself.
 
        pacman -S \
          yaul-tool-chain-git \
-         yaul-git \
+         yaul \
          yaul-emulator-mednafen \
          yaul-emulator-kronos \
          yaul-examples-git
