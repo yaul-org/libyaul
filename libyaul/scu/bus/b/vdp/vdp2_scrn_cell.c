@@ -140,7 +140,7 @@ vdp2_scrn_map_plane_set(const vdp2_scrn_cell_format_t *cell_format,
         map_bits = plane_base >> 11;
 
         const uint8_t page_config =
-            (cell_format->char_size << 1) | cell_format->pnd_size;
+            (cell_format->char_size << 2) | cell_format->pnd_size;
 
         switch (page_config) {
         case ((VDP2_SCRN_CHAR_SIZE_2X2 << 2) | 1):
