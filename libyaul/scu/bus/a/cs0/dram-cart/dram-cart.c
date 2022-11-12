@@ -14,7 +14,7 @@
 static dram_cart_id_t _id = DRAM_CART_ID_INVALID;
 static void *_base = NULL;
 
-static bool _detect_dram_cart(void);
+static bool _detect(void);
 
 void
 dram_cart_init(void)
@@ -32,7 +32,7 @@ dram_cart_init(void)
         MEMORY_WRITE(32, SCU(AREF), 0x00000013);
 
         /* Determine ID and base address */
-        if (!(_detect_dram_cart())) {
+        if (!(_detect())) {
                 /* Restore values in case we can't detect DRAM
                  * cartridge */
                 MEMORY_WRITE(32, SCU(ASR0), asr0_bits);
@@ -66,7 +66,7 @@ dram_cart_size_get(void)
 }
 
 static bool
-_detect_dram_cart(void)
+_detect(void)
 {
         /* Check the ID */
         _id = MEMORY_READ(8, CS1(ID));
@@ -79,20 +79,17 @@ _detect_dram_cart(void)
                 return false;
         }
 
-        uint32_t b;
-        for (b = 0; b < DRAM_CART_BANKS; b++) {
+        for (uint32_t b = 0; b < DRAM_CART_BANKS; b++) {
                 MEMORY_WRITE(32, DRAM(0, b, 0x00000000), 0x00000000);
                 MEMORY_WRITE(32, DRAM(1, b, 0x00000000), 0x00000000);
         }
 
         /* Check DRAM #0 for mirrored banks */
-        uint32_t write;
-        write = 0x5A5A5A5A;
+        const uint32_t write = 0x5A5A5A5A;
         MEMORY_WRITE(32, DRAM(0, 0, 0x00000000), write);
 
-        for (b = 1; b < DRAM_CART_BANKS; b++) {
-                uint32_t read;
-                read = MEMORY_READ(32, DRAM(0, b, 0x00000000));
+        for (uint32_t b = 1; b < DRAM_CART_BANKS; b++) {
+                const uint32_t read = MEMORY_READ(32, DRAM(0, b, 0x00000000));
 
                 /* Is it mirrored? */
                 if (read != write) {
