@@ -92,9 +92,8 @@ repository, or build the [packages][6] yourself.
 
        pacman -S \
          yaul-tool-chain-git \
-         yaul-git \
+         yaul \
          yaul-emulator-mednafen \
-         yaul-emulator-kronos \
          yaul-examples-git
 
 4. Once all the packages have been installed, close the existing shell and start
