@@ -26,8 +26,8 @@ clean_up() {
 trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
 trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
 
-if ! [ ${#} -eq 3 ]; then
-    printf -- "Usage: %s cd-directory IP.BIN-path image-output-name\n" "${PROGNAME}" >&2
+if ! [ ${#} -eq 4 ]; then
+    printf -- "Usage: %s cd-directory IP.BIN-path image-output-path image-output-name\n" "${PROGNAME}" >&2
     exit 2
 fi
 
@@ -36,7 +36,7 @@ fi
 
 [ -n "${MAKE_ISO_XORRISOFS}" ] || [ -n "${MAKE_ISO_XORRISO}" ] || panic "Undefined MAKE_ISO_XORRISOFS (xorrisofs executable absolute path)" 1
 
-# XXX: Remove when updating
+# XXX: Remove when bumping version
 if ! [ -n "${MAKE_ISO_XORRISOFS}" ]; then
     MAKE_ISO_XORRISOFS="${MAKE_ISO_XORRISO}"
 fi
@@ -47,18 +47,26 @@ fi
 # distinguish between xorriso and xorrisofs
 "${MAKE_ISO_XORRISOFS}" --help 2>&1 | grep -q 'xorriso -as mkisofs' || panic "Executable is not \`xorrisofs'" 1
 
-directory=$(my_readlink "${1}")
+cd_directory=$(my_readlink "${1}")
 ip_bin_path=$(my_readlink "${2}")
-image="${3}"
+output_directory=$(my_readlink "${3}")
+image="${4}"
 
 # Check if the CD directory exists and is a directory
-[ -L "${directory}" ] && { panic "${directory}: Directory must not be a symbolic link" 1; }
-[ -d "${directory}" ] || { panic "${directory}: Directory does not exist" 1; }
-[ -r "${directory}" ] || { panic "${directory}: Directory is not readable" 1; }
-[ -x "${directory}" ] || { panic "${directory}: Directory is inaccessible" 1; }
+[ -L "${cd_directory}" ] && { panic "${cd_directory}: CD directory must not be a symbolic link" 1; }
+[ -d "${cd_directory}" ] || { panic "${cd_directory}: CD directory does not exist" 1; }
+[ -r "${cd_directory}" ] || { panic "${cd_directory}: CD directory is not readable" 1; }
+[ -x "${cd_directory}" ] || { panic "${cd_directory}: CD directory is inaccessible" 1; }
+
+# Check if the output directory exists and is a directory
+[ -L "${output_directory}" ] && { panic "${output_directory}: Output directory must not be a symbolic link" 1; }
+[ -d "${output_directory}" ] || { panic "${output_directory}: Output directory does not exist" 1; }
+[ -r "${output_directory}" ] || { panic "${output_directory}: Output directory is not readable" 1; }
+[ -w "${output_directory}" ] || { panic "${output_directory}: Output directory is not writable" 1; }
+[ -x "${output_directory}" ] || { panic "${output_directory}: Output directory is inaccessible" 1; }
 
 # Check if all the files are present
-for file in "${ip_bin_path}" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${directory}/CPY.TXT"; do
+for file in "${ip_bin_path}" "${cd_directory}/ABS.TXT" "${cd_directory}/BIB.TXT" "${cd_directory}/CPY.TXT"; do
     # Needs to be portable (alternative to readlink)
     realpath=$(my_readlink "${file}")
 
@@ -86,7 +94,7 @@ printf -- "%s %s" "${MAKE_ISO_XORRISOFS}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
 # Force delete the existing ISO
 rm -f "${image}.iso"
 
-if ! (eval "${MAKE_ISO_XORRISOFS}" "--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -generic-boot \"\${ip_bin_path}\" -verbose -o \"${image}.iso\" \"\${directory}\"") >>"${TMP1_FILE}" 2>&1; then
+if ! (eval "${MAKE_ISO_XORRISOFS}" "--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -generic-boot \"\${ip_bin_path}\" -verbose -o \"${output_directory}/${image}.iso\" \"\${cd_directory}\"") >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
 $(sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}")
