@@ -33,7 +33,8 @@ typedef struct {
 typedef struct huff_encodenode huff_encodenode_t;
 
 struct huff_encodenode {
-        huff_encodenode_t *child_a, *child_b;
+        huff_encodenode_t *child_a;
+        huff_encodenode_t *child_b;
         int32_t count;
         int32_t symbol;
 };
@@ -53,9 +54,12 @@ static huff_decodenode_t *_tree_recover(huff_decodenode_t *nodes, huff_bitstream
 void
 bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out_size)
 {
-        huff_decodenode_t nodes[MAX_TREE_NODES], *root, *node;
-        huff_bitstream_t  stream;
-        uint32_t k, node_count;
+        huff_decodenode_t nodes[MAX_TREE_NODES];
+        huff_decodenode_t *root;
+        huff_decodenode_t *node;
+        huff_bitstream_t stream;
+        uint32_t k;
+        uint32_t node_count;
         uint8_t *buffer;
 
         /* Do we have anything to decompress? */
@@ -95,15 +99,16 @@ bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out
 static void
 _bitstream_init(huff_bitstream_t *stream, uint8_t *buffer)
 {
-        stream->byte_ptr  = buffer;
-        stream->bit_pos   = 0;
+        stream->byte_ptr = buffer;
+        stream->bit_pos = 0;
 }
 
 /* Read one bit from a bitstream */
 static uint32_t
 _bit_read(huff_bitstream_t *stream)
 {
-        uint32_t  x, bit;
+        uint32_t x;
+        uint32_t bit;
         uint8_t *buffer;
 
         /* Get current stream state */
@@ -129,7 +134,8 @@ _bit_read(huff_bitstream_t *stream)
 static uint32_t
 _8bits_read(huff_bitstream_t *stream)
 {
-        uint32_t  x, bit;
+        uint32_t x;
+        uint32_t bit;
         uint8_t *buffer;
 
         /* Get current stream state */

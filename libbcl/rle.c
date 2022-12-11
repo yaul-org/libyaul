@@ -23,15 +23,19 @@
  *       compression schemes", 1994. The main differences from David's
  *       implementation are the addition of long (15-bit) run counts, the
  *       removal of file I/O (this implementation works solely with preallocated
- *       memory buffers), and that the code is now 100% reentrant. */
+ *       memory buffers), and that the code is now 100% reentrant */
 
 #include <stdint.h>
 
 void
 bcl_rle_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 {
-        uint8_t marker, symbol;
-        uint32_t  i, inpos, outpos, count;
+        uint8_t marker;
+        uint8_t symbol;
+        uint32_t i;
+        uint32_t inpos;
+        uint32_t outpos;
+        uint32_t count;
 
         /* Do we have anything to uncompress? */
         if (in_size < 1) {
@@ -40,38 +44,38 @@ bcl_rle_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 
         /* Get marker symbol from input stream */
         inpos = 0;
-        marker = in[ inpos ++ ];
+        marker = in[inpos++];
 
         /* Main decompression loop */
         outpos = 0;
 
         do {
-                symbol = in[ inpos ++ ];
+                symbol = in[inpos++];
 
                 if (symbol == marker) {
                         /* We had a marker byte */
-                        count = in[ inpos ++ ];
+                        count = in[inpos++];
 
                         if (count <= 2) {
                                 /* Counts 0, 1 and 2 are used for marker byte repetition
                                    only */
-                                for (i = 0; i <= count; ++ i) {
-                                        out[ outpos ++ ] = marker;
+                                for (i = 0; i <= count; ++i) {
+                                        out[outpos++] = marker;
                                 }
                         } else {
                                 if (count & 0x80) {
-                                        count = ((count & 0x7f) << 8) + in[ inpos ++ ];
+                                        count = ((count & 0x7f) << 8) + in[inpos++];
                                 }
 
-                                symbol = in[ inpos ++ ];
+                                symbol = in[inpos++];
 
-                                for (i = 0; i <= count; ++ i) {
-                                        out[ outpos ++ ] = symbol;
+                                for (i = 0; i <= count; ++i) {
+                                        out[outpos++] = symbol;
                                 }
                         }
                 } else {
                         /* No marker, plain copy */
-                        out[ outpos ++ ] = symbol;
+                        out[outpos++] = symbol;
                 }
         } while (inpos < in_size);
 }
