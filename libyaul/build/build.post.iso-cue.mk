@@ -10,6 +10,7 @@ include $(YAUL_INSTALL_ROOT)/share/ip.bin.mk
 
 IMAGE_DIRECTORY?= cd
 IMAGE_1ST_READ_BIN?= A.BIN
+AUDIO_TRACKS_DIRECTORY?= audio-tracks
 
 OUTPUT_FILES= $(SH_PROGRAM).iso $(SH_PROGRAM).cue
 CLEAN_OUTPUT_FILES= $(OUTPUT_FILES) $(SH_BUILD_PATH)/IP.BIN $(SH_BUILD_PATH)/IP.BIN.map
@@ -33,7 +34,8 @@ $(SH_PROGRAM).iso: $(SH_BUILD_PATH)/$(SH_PROGRAM).bin $(SH_BUILD_PATH)/IP.BIN
 
 $(SH_PROGRAM).cue: | $(SH_PROGRAM).iso
 	@printf -- "$(V_BEGIN_YELLOW)$@$(V_END)\n"
-	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-cue "$(SH_PROGRAM).iso"
+	$(ECHO)mkdir -p $(AUDIO_TRACKS_DIRECTORY)
+	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-cue $(AUDIO_TRACKS_DIRECTORY) "$(SH_PROGRAM).iso"
 
 $(SH_BUILD_PATH)/IP.BIN: $(YAUL_INSTALL_ROOT)/share/yaul/ip/ip.sx $(SH_BUILD_PATH)/$(SH_PROGRAM).bin
 	$(ECHO)$(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/bin/make-ip \

@@ -26,17 +26,26 @@ clean_up () {
 trap '_exit_code=${?}; clean_up; exit ${_exit_code}' 0
 trap 'clean_up; exit 1' HUP INT QUIT ABRT SEGV PIPE
 
-if ! [ ${#} -eq 1 ]; then
-    printf -- "Usage: %s image-output-name\n" "${PROGNAME}" >&2
+if ! [ ${#} -eq 2 ]; then
+    printf -- "Usage: %s audio-tracks-directory image-output-name\n" "${PROGNAME}" >&2
     exit 2
 fi
 
 [ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
 [ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
 
-image=$(my_readlink "${1}")
+audio_directory=$(my_readlink "${1}")
+basename_audio_directory=$(basename "${audio_directory}")
+dirname_audio_directory=$(dirname "${audio_directory}")
+image=$(my_readlink "${2}")
 basename_image=$(basename "${image}")
 cue="${image%%.iso}.cue"
+
+# Check if the audio track directory exists and is a directory
+[ -L "${audio_directory}" ] && { panic "${audio_directory}: Directory must not be a symbolic link" 1; }
+[ -d "${audio_directory}" ] || { panic "${audio_directory}: Directory does not exist" 1; }
+[ -r "${audio_directory}" ] || { panic "${audio_directory}: Directory is not readable" 1; }
+[ -x "${audio_directory}" ] || { panic "${audio_directory}: Directory is inaccessible" 1; }
 
 # Check if the image file exists
 if [ -z "${image}" ]; then
@@ -52,5 +61,17 @@ FILE "${basename_image}" BINARY
   TRACK 01 MODE1/2048
     INDEX 01 00:00:00
 EOF
+
+track_no=2
+(cd "${dirname_audio_directory}"; find "${basename_audio_directory}" -maxdepth 1 -type f) | sort -n | while read line; do
+    cat >> "${cue}" <<EOF
+FILE "${line}" BINARY
+  TRACK $(printf "%02i" ${track_no}) AUDIO
+    INDEX 00 00:00:00
+    INDEX 01 00:02:00
+EOF
+
+    track_no=$(($track_no + 1))
+done
 
 clean_up
