@@ -7,8 +7,6 @@
 
 PROGNAME="${0##*/}"
 
-MKISOFS_OPTIONS="--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -verbose -G \"\${ip_bin_path}\" \"\${directory}\""
-
 panic() {
     printf -- "%s: Error: %s\\n" "${PROGNAME}" "${1}" >&2
     exit "${2}"
@@ -33,10 +31,21 @@ if ! [ ${#} -eq 3 ]; then
     exit 2
 fi
 
-[ -n "${YAUL_INSTALL_ROOT}" ] || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
-[ -d "${YAUL_INSTALL_ROOT}" ] || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
-[ -n "${MAKE_ISO_XORRISO}" ] || panic "Undefined MAKE_ISO_XORRISO (make-iso xorriso executable path)" 1
-[ -x "${MAKE_ISO_XORRISO}" ] || panic "Invalid executable \`${MAKE_ISO_XORRISO}'" 1
+[ -n "${YAUL_INSTALL_ROOT}" ]  || panic "Undefined YAUL_INSTALL_ROOT (install root directory)" 1
+[ -d "${YAUL_INSTALL_ROOT}" ]  || panic "Invalid YAUL_INSTALL_ROOT (install root directory) value" 1
+
+[ -n "${MAKE_ISO_XORRISOFS}" ] || [ -n "${MAKE_ISO_XORRISO}" ] || panic "Undefined MAKE_ISO_XORRISOFS (xorrisofs executable absolute path)" 1
+
+# XXX: Remove when updating
+if ! [ -n "${MAKE_ISO_XORRISOFS}" ]; then
+    MAKE_ISO_XORRISOFS="${MAKE_ISO_XORRISO}"
+fi
+
+[ -x "${MAKE_ISO_XORRISOFS}" ] || panic "Invalid executable: \`${MAKE_ISO_XORRISOFS}'" 1
+
+# Detect that xorrisofs was specified. As of version 1.5.4, this helps to
+# distinguish between xorriso and xorrisofs
+"${MAKE_ISO_XORRISOFS}" --help 2>&1 | grep -q 'xorriso -as mkisofs' || panic "Executable is not \`xorrisofs'" 1
 
 directory=$(my_readlink "${1}")
 ip_bin_path=$(my_readlink "${2}")
@@ -60,26 +69,24 @@ for file in "${ip_bin_path}" "${directory}/ABS.TXT" "${directory}/BIB.TXT" "${di
 done
 unset realpath
 
-# Check if ${MAKE_ISO_XORRISO} is installed
-iso_tool_realpath=$(my_readlink "${MAKE_ISO_XORRISO}")
+# Check if ${MAKE_ISO_XORRISOFS} is installed
+iso_tool_realpath=$(my_readlink "${MAKE_ISO_XORRISOFS}")
 if ! [ -f "${iso_tool_realpath}" ] && ! [ -L "${iso_tool_realpath}" ]; then
-    panic "${MAKE_ISO_XORRISO}: Does not exist" 1
+    panic "${MAKE_ISO_XORRISOFS}: Does not exist" 1
 fi
 
 if ! [ -x "${iso_tool_realpath}" ]; then
-    panic "${MAKE_ISO_XORRISO}: Not an executable" 1
+    panic "${MAKE_ISO_XORRISOFS}: Not an executable" 1
 fi
 unset iso_tool_realpath
 
 # Echo options used
-printf -- "%s %s" "${MAKE_ISO_XORRISO}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
+printf -- "%s %s" "${MAKE_ISO_XORRISOFS}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
 
 # Force delete the existing ISO
 rm -f "${image}.iso"
 
-# Format: -as mkisofs ....... -- .......
-#         xorriso     mkisofs    xorriso
-if ! (eval "${MAKE_ISO_XORRISO}" -as mkisofs "${MKISOFS_OPTIONS}" -- -outdev "${image}.iso" -cd / -map "${directory}" /) >>"${TMP1_FILE}" 2>&1; then
+if ! (eval "${MAKE_ISO_XORRISOFS}" "--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -generic-boot \"\${ip_bin_path}\" -verbose -o \"${image}.iso\" \"\${directory}\"") >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
 $(sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}")
