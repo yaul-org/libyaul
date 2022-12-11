@@ -88,7 +88,8 @@ repository, or build the [packages][6] yourself.
 
        pacman -Syy
 
-3. Install everything.
+3. Install everything. Keep in mind that `yaul-emulator-kronos` is only
+   available on Linux. For MinGW-w64, install `yaul-emulator-yabause` instead.
 
        pacman -S \
          yaul-tool-chain-git \
