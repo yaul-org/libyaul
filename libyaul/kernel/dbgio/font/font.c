@@ -25,7 +25,6 @@ void
 __dbgio_font_1bpp_4bpp_decompress(const dbgio_font_t *font, uint8_t *dec_cg)
 {
         assert(dec_cg != NULL);
-        assert(cmp_cg != NULL);
         assert(((uintptr_t)font->cg & 0x00000003) == 0x00000000);
 
         const uint8_t fgbg[] = {
