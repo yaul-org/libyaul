@@ -33,31 +33,28 @@ typedef struct vdp1_gouraud_table {
         rgb1555_t colors[4];
 } __aligned(8) vdp1_gouraud_table_t;
 
-typedef struct vdp1_clut {
-        struct {
-                union {
-                        union {
-                                vdp1_color_bank_type_0_t type_0;
-                                vdp1_color_bank_type_1_t type_1;
-                                vdp1_color_bank_type_2_t type_2;
-                                vdp1_color_bank_type_3_t type_3;
-                                vdp1_color_bank_type_4_t type_4;
-                                vdp1_color_bank_type_5_t type_5;
-                                vdp1_color_bank_type_6_t type_6;
-                                vdp1_color_bank_type_7_t type_7;
-                                vdp1_color_bank_type_8_t type_8;
-                                vdp1_color_bank_type_9_t type_9;
-                                vdp1_color_bank_type_a_t type_a;
-                                vdp1_color_bank_type_b_t type_b;
-                                vdp1_color_bank_type_c_t type_c;
-                                vdp1_color_bank_type_d_t type_d;
-                                vdp1_color_bank_type_e_t type_e;
-                                vdp1_color_bank_type_f_t type_f;
-                        } sprite_type;
+typedef union vdp1_color_bank {
+        vdp1_color_bank_type_0_t type_0;
+        vdp1_color_bank_type_1_t type_1;
+        vdp1_color_bank_type_2_t type_2;
+        vdp1_color_bank_type_3_t type_3;
+        vdp1_color_bank_type_4_t type_4;
+        vdp1_color_bank_type_5_t type_5;
+        vdp1_color_bank_type_6_t type_6;
+        vdp1_color_bank_type_7_t type_7;
+        vdp1_color_bank_type_8_t type_8;
+        vdp1_color_bank_type_9_t type_9;
+        vdp1_color_bank_type_a_t type_a;
+        vdp1_color_bank_type_b_t type_b;
+        vdp1_color_bank_type_c_t type_c;
+        vdp1_color_bank_type_d_t type_d;
+        vdp1_color_bank_type_e_t type_e;
+        vdp1_color_bank_type_f_t type_f;
+} vdp1_color_bank_t;
 
-                        rgb1555_t color;
-                };
-        } entries[16];
+typedef union vdp1_clut {
+        vdp1_color_bank_t entries[16];
+        rgb1555_t colors[16];
 } __aligned(32) vdp1_clut_t;
 
 typedef struct vdp1_vram_partitions {
