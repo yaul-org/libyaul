@@ -443,12 +443,6 @@ vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt)
 }
 
 static inline void __always_inline
-vdp1_cmdt_jump_clear(vdp1_cmdt_t *cmdt)
-{
-        cmdt->cmd_ctrl &= 0x8FFF;
-}
-
-static inline void __always_inline
 vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
