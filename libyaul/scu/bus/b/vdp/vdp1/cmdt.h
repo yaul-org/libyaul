@@ -242,10 +242,10 @@ extern vdp1_cmdt_list_t *vdp1_cmdt_list_alloc(uint16_t count);
 extern void vdp1_cmdt_list_free(vdp1_cmdt_list_t *cmdt_list);
 extern void vdp1_cmdt_list_init(vdp1_cmdt_list_t *cmdt_list, vdp1_cmdt_t *cmdts);
 
-extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t count);
-extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *cmdt_orderlist);
 extern void vdp1_cmdt_orderlist_init(vdp1_cmdt_orderlist_t *cmdt_orderlist,
     uint16_t count);
+extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t count);
+extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *cmdt_orderlist);
 extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist,
     const vdp1_cmdt_t *cmdt_base, uint16_t count);
 
