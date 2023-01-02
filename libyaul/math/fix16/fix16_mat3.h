@@ -29,7 +29,7 @@ typedef union fix16_mat3 {
 
 extern void fix16_mat3_dup(const fix16_mat3_t *m0, fix16_mat3_t *result);
 extern void fix16_mat3_identity(fix16_mat3_t *m0);
-extern void fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int decimals);
+extern size_t fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int32_t decimals);
 extern void fix16_mat3_transpose(const fix16_mat3_t * __restrict m0,
     fix16_mat3_t * __restrict result);
 extern void fix16_mat3_zero(fix16_mat3_t *m0);

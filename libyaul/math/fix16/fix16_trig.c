@@ -70,7 +70,7 @@ fix16_tan(const fix16_t radians)
         const int32_t bradians = _rad2brad_convert(radians);
         const fix16_t cos = fix16_bradians_cos(bradians);
 
-        cpu_divu_fix16_set(FIX16(1.0f), cos);
+        cpu_divu_fix16_set(FIX16_ONE, cos);
 
         const fix16_t sin = fix16_bradians_sin(bradians);
 

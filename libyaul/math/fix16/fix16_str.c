@@ -40,21 +40,25 @@ static const uint32_t _scales[8] = {
         100000
 };
 
-uint32_t
-fix16_str(fix16_t value, char *buffer, int decimals)
+size_t
+fix16_str(fix16_t value, char *buffer, int32_t decimals)
 {
         const uint32_t uvalue = (value >= 0) ? value : -value;
 
-        const char *start_buf = buffer;
+        const char * const start_buffer = buffer;
 
         if (value < 0) {
                 *buffer++ = '-';
         }
 
         /* Separate the integer and decimal parts of the value */
-        unsigned int_part = uvalue >> 16;
-        uint32_t frac_part = uvalue & 0xFFFF;
-        uint32_t scale = _scales[decimals & 7];
+        uint32_t int_part;
+        int_part = uvalue >> 16;
+
+        uint32_t frac_part;
+        frac_part = uvalue & 0xFFFF;
+
+        const uint32_t scale = _scales[decimals & 7];
 
         frac_part = fix16_mul(frac_part, scale);
 
@@ -75,7 +79,7 @@ fix16_str(fix16_t value, char *buffer, int decimals)
 
         *buffer = '\0';
 
-        return (buffer - start_buf);
+        return (buffer - start_buffer);
 }
 
 static char *

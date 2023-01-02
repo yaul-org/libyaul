@@ -30,8 +30,8 @@ typedef union fix16_vec2 {
 static inline void __always_inline
 fix16_vec2_zero(fix16_vec2_t *result)
 {
-        result->x = FIX16(0.0f);
-        result->y = FIX16(0.0f);
+        result->x = FIX16_ZERO;
+        result->y = FIX16_ZERO;
 }
 
 static inline void __always_inline
@@ -101,4 +101,4 @@ extern fix16_t fix16_vec2_sqr_length(const fix16_vec2_t *v0);
 extern void fix16_vec2_normalize(fix16_vec2_t *v0);
 extern void fix16_vec2_normalized(const fix16_vec2_t * __restrict v0, fix16_vec2_t * __restrict result);
 extern fix16_t fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1);
-extern void fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int decimals);
+extern size_t fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int32_t decimals);

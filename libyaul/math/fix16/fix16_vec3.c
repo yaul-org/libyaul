@@ -17,7 +17,7 @@ fix16_vec3_normalize(fix16_vec3_t *v0)
 {
         const fix16_t length = fix16_vec3_length(v0);
 
-        cpu_divu_fix16_set(FIX16(1.0f), length);
+        cpu_divu_fix16_set(FIX16_ONE, length);
 
         const fix16_t scale = cpu_divu_quotient_get();
 
@@ -30,7 +30,7 @@ fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
 {
         const fix16_t length = fix16_vec3_length(v0);
 
-        cpu_divu_fix16_set(FIX16(1.0f), length);
+        cpu_divu_fix16_set(FIX16_ONE, length);
 
         const fix16_t scale = cpu_divu_quotient_get();
 
@@ -103,32 +103,20 @@ fix16_vec3_cross_mag(const fix16_vec3_t * __restrict v0,
         return result;
 }
 
-uint32_t
-fix16_vec3_str(const fix16_vec3_t *v0, char *buffer, int decimals)
+size_t
+fix16_vec3_str(const fix16_vec3_t *v0, char *buffer, int32_t decimals)
 {
-        char component_buffer[13] __aligned(16);
-        size_t component_buffer_size;
-
         char *buffer_ptr;
         buffer_ptr = buffer;
 
         *buffer_ptr++ = '(';
-        fix16_str(v0->x, component_buffer, decimals);
-        component_buffer_size = strlen(component_buffer);
-        memcpy(buffer_ptr, component_buffer, component_buffer_size);
-        buffer_ptr += component_buffer_size;
+        buffer_ptr += fix16_str(v0->x, buffer_ptr, decimals);
         *buffer_ptr++ = ',';
 
-        fix16_str(v0->y, component_buffer, decimals);
-        component_buffer_size = strlen(component_buffer);
-        memcpy(buffer_ptr, component_buffer, component_buffer_size);
-        buffer_ptr += component_buffer_size;
+        buffer_ptr += fix16_str(v0->y, buffer_ptr, decimals);
         *buffer_ptr++ = ',';
 
-        fix16_str(v0->z, component_buffer, decimals);
-        component_buffer_size = strlen(component_buffer);
-        memcpy(buffer_ptr, component_buffer, component_buffer_size);
-        buffer_ptr += component_buffer_size;
+        buffer_ptr += fix16_str(v0->z, buffer_ptr, decimals);
         *buffer_ptr++ = ')';
 
         *buffer_ptr = '\0';

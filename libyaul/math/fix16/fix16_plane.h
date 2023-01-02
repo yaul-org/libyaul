@@ -29,4 +29,4 @@ typedef struct fix16_plane {
         fix16_vec3_t d;
 } __packed __aligned(4) fix16_plane_t;
 
-extern uint32_t fix16_plane_str(const fix16_plane_t *plane, char *buffer, int decimals);
+extern size_t fix16_plane_str(const fix16_plane_t *plane, char *buffer, int32_t decimals);

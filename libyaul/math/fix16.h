@@ -58,6 +58,7 @@ __BEGIN_DECLS
 #define FIX16_PI_2      (0x00019220)
 #define FIX16_PI_4      (0x0000C910)
 #define FIX16_E         (0x0002B7E1)
+#define FIX16_ZERO      (0x00000000)
 #define FIX16_ONE       (0x00010000)
 #define FIX16_RAD2DEG   (0x00394BB8)
 #define FIX16_DEG2RAD   (0x00000478)
@@ -216,13 +217,15 @@ extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t) FIXMATH_FUNC_A
 
 extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
 
-extern uint32_t fix16_str(fix16_t value, char *buffer, int decimals);
+extern size_t fix16_str(fix16_t value, char *buffer, int32_t decimals);
 
 #include "fix16/fix16_trig.h"
 
 #include "fix16/fix16_vec2.h"
 #include "fix16/fix16_vec3.h"
+#include "fix16/fix16_vec4.h"
 
+#include "fix16/fix16_mat.h"
 #include "fix16/fix16_mat3.h"
 
 #include "fix16/fix16_plane.h"
