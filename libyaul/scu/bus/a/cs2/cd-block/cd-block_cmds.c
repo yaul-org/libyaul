@@ -174,7 +174,7 @@ cd_block_cmd_cd_system_init(int16_t standby)
         regs.cr1 = 0x0400;
         regs.cr2 = standby;
         regs.cr3 = 0x0000;
-        regs.cr4 = 0x040F;
+        regs.cr4 = 0x0001;
 
         return cd_block_cmd_execute(&regs, &status);
 }
