@@ -71,6 +71,6 @@ int32_vec2_scaled(const int8_t scalar, int32_vec2_t *in_out)
         in_out->y = scalar * in_out->y;
 }
 
-extern void int32_vec2_str(const int32_vec2_t *v0, char *buffer);
+extern size_t int32_vec2_str(const int32_vec2_t *v0, char *buffer);
 
 #endif /* !_YAUL_MATH_INT32_H_ */

@@ -10,8 +10,8 @@
 
 #include "int32.h"
 
-void
+size_t
 int32_vec2_str(const int32_vec2_t *v0, char *buffer)
 {
-        (void)sprintf(buffer, "(%i,%i)", v0->x, v0->y);
+        return sprintf(buffer, "(%i,%i)", v0->x, v0->y);
 }
