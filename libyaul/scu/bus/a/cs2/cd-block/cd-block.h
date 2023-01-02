@@ -26,6 +26,11 @@ __BEGIN_DECLS
 extern int cd_block_init(void);
 
 /**
+ * Return if the cd block is busy for commands (HIRQ & CMOK) == false
+ */
+extern int cd_block_busy(void);
+
+/**
  * Bypass copy protection (by using JHL and CyberWarriorX exploit).
  */
 extern int cd_block_security_bypass(void);

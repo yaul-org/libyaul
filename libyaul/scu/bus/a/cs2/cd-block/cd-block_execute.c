@@ -12,10 +12,10 @@
 #include <stdbool.h>
 
 #include "cd-block-internal.h"
+#include "cd-block/cmd.h"
 
-static inline bool
-_cd_block_busy(void)
-{
+int
+cd_block_busy(void) {
         /* Is the CD-block busy? */
         return ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & CMOK) == 0x0000);
 }
@@ -36,7 +36,7 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         error = -1;
 
         /* Check if we can continue */
-        if (_cd_block_busy()) {
+        if (cd_block_busy()) {
                 goto busy;
         }
 
@@ -53,13 +53,13 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         /* Wait */
         for (w = 0; w < 0x00240000; w++) {
                 /* Check if we can continue */
-                if (!_cd_block_busy()) {
+                if (!cd_block_busy()) {
                         break;
                 }
         }
 
         /* Check if we can continue */
-        if (_cd_block_busy()) {
+        if (cd_block_busy()) {
                 goto busy;
         }
 
@@ -74,7 +74,8 @@ cd_block_cmd_execute(struct cd_block_regs *regs, struct cd_block_regs *status)
         cd_status >>= 8;
 
         /* Checking if waiting or if command was rejected */
-        if ((cd_status == 0xFF) || ((cd_status & 0x80) != 0x00)) {
+        if ((cd_status == CD_STATUS_REJECT) || ((cd_status & CD_STATUS_WAIT) != 0)) {
+                error = cd_status;
                 goto busy;
         }
 
