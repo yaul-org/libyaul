@@ -26,49 +26,6 @@
 
 __BEGIN_DECLS
 
-#define CMDT_VTX_NORMAL_SPRITE          (0)
-#define CMDT_VTX_NORMAL_SPRITE_COUNT    (1)
-
-#define CMDT_VTX_SCALE_SPRITE_UL        (0)
-#define CMDT_VTX_SCALE_SPRITE_LR        (2)
-#define CMDT_VTX_SCALE_SPRITE_COUNT     (2)
-
-#define CMDT_VTX_ZOOM_SPRITE_POINT      (0)
-#define CMDT_VTX_ZOOM_SPRITE_DISPLAY    (1)
-#define CMDT_VTX_ZOOM_SPRITE_COUNT      (2)
-
-#define CMDT_VTX_DISTORTED_SPRITE_A     (0)
-#define CMDT_VTX_DISTORTED_SPRITE_B     (1)
-#define CMDT_VTX_DISTORTED_SPRITE_C     (2)
-#define CMDT_VTX_DISTORTED_SPRITE_D     (3)
-#define CMDT_VTX_DISTORTED_SPRITE_COUNT (4)
-
-#define CMDT_VTX_POLYGON_A              (0)
-#define CMDT_VTX_POLYGON_B              (1)
-#define CMDT_VTX_POLYGON_C              (2)
-#define CMDT_VTX_POLYGON_D              (3)
-#define CMDT_VTX_POLYGON_COUNT          (4)
-
-#define CMDT_VTX_POLYLINE_A             (0)
-#define CMDT_VTX_POLYLINE_B             (1)
-#define CMDT_VTX_POLYLINE_C             (2)
-#define CMDT_VTX_POLYLINE_D             (3)
-#define CMDT_VTX_POLYLINE_COUNT         (4)
-
-#define CMDT_VTX_LINE_A                 (0)
-#define CMDT_VTX_LINE_B                 (1)
-#define CMDT_VTX_LINE_COUNT             (2)
-
-#define CMDT_VTX_LOCAL_COORD            (0)
-#define CMDT_VTX_LOCAL_COORD_COUNT      (1)
-
-#define CMDT_VTX_SYSTEM_CLIP            (2)
-#define CMDT_VTX_SYSTEM_CLIP_COUNT      (1)
-
-#define CMDT_VTX_USER_CLIP_UL           (0)
-#define CMDT_VTX_USER_CLIP_LR           (2)
-#define CMDT_VTX_USER_CLIP_COUNT        (2)
-
 typedef enum vdp1_cmdt_command {
         VDP1_CMDT_NORMAL_SPRITE     = 0,
         VDP1_CMDT_SCALED_SPRITE     = 1,
@@ -111,12 +68,12 @@ typedef enum vdp1_cmdt_cm {
         VDP1_CMDT_CM_RGB_32768 = 5
 } vdp1_cmdt_cm_t;
 
-typedef enum vdp1_cmdt_flip {
-        VDP1_CMDT_FLIP_NONE = 0,
-        VDP1_CMDT_FLIP_H    = 1 << 4,
-        VDP1_CMDT_FLIP_V    = 1 << 5,
-        VDP1_CMDT_FLIP_HV   = VDP1_CMDT_FLIP_H | VDP1_CMDT_FLIP_V
-} vdp1_cmdt_flip_t;
+typedef enum vdp1_cmdt_char_flip {
+        VDP1_CMDT_CHAR_FLIP_NONE = 0,
+        VDP1_CMDT_CHAR_FLIP_H    = 1 << 4,
+        VDP1_CMDT_CHAR_FLIP_V    = 1 << 5,
+        VDP1_CMDT_CHAR_FLIP_HV   = VDP1_CMDT_CHAR_FLIP_H | VDP1_CMDT_CHAR_FLIP_V
+} vdp1_cmdt_char_flip_t;
 
 typedef struct vdp1_cmdt {
         uint16_t cmd_ctrl;
@@ -125,15 +82,24 @@ typedef struct vdp1_cmdt {
         uint16_t cmd_colr;
         uint16_t cmd_srca;
         uint16_t cmd_size;
-        int16_t cmd_xa;
-        int16_t cmd_ya;
-        int16_t cmd_xb;
-        int16_t cmd_yb;
-        int16_t cmd_xc;
-        int16_t cmd_yc;
-        int16_t cmd_xd;
-        int16_t cmd_yd;
+
+        union {
+                struct {
+                        int16_t cmd_xa;
+                        int16_t cmd_ya;
+                        int16_t cmd_xb;
+                        int16_t cmd_yb;
+                        int16_t cmd_xc;
+                        int16_t cmd_yc;
+                        int16_t cmd_xd;
+                        int16_t cmd_yd;
+                } __packed;
+
+                int16_vec2_t cmd_vertices[4];
+        };
+
         uint16_t cmd_grda;
+
         uint16_t reserved;
 } __aligned(32) vdp1_cmdt_t;
 
@@ -248,9 +214,9 @@ extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t count);
 extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *cmdt_orderlist);
 extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist,
     const vdp1_cmdt_t *cmdt_base, uint16_t count);
-
+
 static inline void __always_inline
-vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_draw_mode_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_draw_mode_t draw_mode)
 {
         /* Values 0x4, 0x5, 0x6 for comm indicate a non-textured command table,
@@ -262,33 +228,27 @@ vdp1_cmdt_param_draw_mode_set(vdp1_cmdt_t *cmdt,
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_zoom_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_zoom_point_t zoom_point)
+vdp1_cmdt_zoom_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_zoom_point_t zoom_point)
 {
         cmdt->cmd_ctrl &= 0xF0F0;
         cmdt->cmd_ctrl |= (zoom_point << 8) | 0x0001;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_char_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
-{
-        cmdt->cmd_srca = (base >> 3) & 0xFFFF;
-}
-
-static inline void __always_inline
-vdp1_cmdt_param_color_set(vdp1_cmdt_t *cmdt, rgb1555_t color)
+vdp1_cmdt_color_set(vdp1_cmdt_t *cmdt, rgb1555_t color)
 {
         cmdt->cmd_colr = color.raw;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_bank_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_color_bank_set(vdp1_cmdt_t *cmdt,
     const vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_colr = color_bank.raw;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_color_mode0_set(vdp1_cmdt_t *cmdt,
     const vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
@@ -296,7 +256,7 @@ vdp1_cmdt_param_color_mode0_set(vdp1_cmdt_t *cmdt,
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+vdp1_cmdt_color_mode1_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 {
         cmdt->cmd_pmod &= 0xFFC7;
         cmdt->cmd_pmod |= 0x0008;
@@ -304,7 +264,7 @@ vdp1_cmdt_param_color_mode1_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_color_mode2_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
@@ -313,7 +273,7 @@ vdp1_cmdt_param_color_mode2_set(vdp1_cmdt_t *cmdt,
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_color_mode3_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
@@ -322,7 +282,7 @@ vdp1_cmdt_param_color_mode3_set(vdp1_cmdt_t *cmdt,
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *cmdt,
+vdp1_cmdt_color_mode4_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_color_bank_t color_bank)
 {
         cmdt->cmd_pmod &= 0xFFC7;
@@ -331,38 +291,73 @@ vdp1_cmdt_param_color_mode4_set(vdp1_cmdt_t *cmdt,
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_size_set(vdp1_cmdt_t *cmdt, uint16_t width, uint16_t height)
+vdp1_cmdt_char_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+{
+        cmdt->cmd_srca = (base >> 3) & 0xFFFF;
+}
+
+static inline void __always_inline
+vdp1_cmdt_char_size_set(vdp1_cmdt_t *cmdt, uint16_t width, uint16_t height)
 {
         cmdt->cmd_size = (((width >> 3) << 8) | height) & 0x3FFF;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_flip_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_flip_t flip)
+vdp1_cmdt_char_flip_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_char_flip_t flip)
 {
         cmdt->cmd_ctrl &= 0xFFCF;
         cmdt->cmd_ctrl |= flip;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_vertex_set(vdp1_cmdt_t *cmdt,
-    uint16_t vertex_index,
-    const int16_vec2_t *p)
+vdp1_cmdt_vtx_zoom_point_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
 {
-        int16_vec2_t * const vertex =
-            (int16_vec2_t *)(&cmdt->cmd_xa + ((vertex_index & 0x3) << 1));
-
-        vertex->x = p->x;
-        vertex->y = p->y;
+        cmdt->cmd_vertices[0] = p;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_vertices_set(vdp1_cmdt_t *cmdt, const int16_vec2_t *p)
+vdp1_cmdt_vtx_zoom_display_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
 {
-        (void)memcpy(&cmdt->cmd_xa, p, sizeof(int16_vec2_t) * 4);
+        cmdt->cmd_vertices[1] = p;
 }
 
 static inline void __always_inline
-vdp1_cmdt_param_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
+vdp1_cmdt_vtx_scale_set(vdp1_cmdt_t *cmdt, int16_vec2_t ulp, int16_vec2_t lrp)
+{
+        cmdt->cmd_vertices[0] = ulp;
+        cmdt->cmd_vertices[2] = lrp;
+}
+
+static inline void __always_inline
+vdp1_cmdt_vtx_local_coord_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
+{
+        cmdt->cmd_vertices[0] = p;
+}
+
+static inline void __always_inline
+vdp1_cmdt_vtx_system_clip_coord_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
+{
+        cmdt->cmd_vertices[0] = p;
+}
+
+static inline void __always_inline
+vdp1_cmdt_vtx_user_clip_coord_set(vdp1_cmdt_t *cmdt, int16_vec2_t ulp, int16_vec2_t lrp)
+{
+        cmdt->cmd_vertices[0] = ulp;
+        cmdt->cmd_vertices[2] = lrp;
+}
+
+static inline void __always_inline
+vdp1_cmdt_vtx_set(vdp1_cmdt_t * __restrict cmdt, const int16_vec2_t * __restrict vertices)
+{
+        cmdt->cmd_vertices[0] = vertices[0];
+        cmdt->cmd_vertices[1] = vertices[1];
+        cmdt->cmd_vertices[2] = vertices[2];
+        cmdt->cmd_vertices[3] = vertices[3];
+}
+
+static inline void __always_inline
+vdp1_cmdt_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
 {
         /* Gouraud shading processing is valid when a color calculation mode is
          * specified */
@@ -500,7 +495,7 @@ vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *cmdt)
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x7000;
 }
-
+
 __END_DECLS
 
 #endif /* !_YAUL_VDP1_CMDT_H_ */

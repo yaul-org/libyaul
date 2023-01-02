@@ -147,47 +147,23 @@ vdp1_env_stop(void)
 }
 
 void
-vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
-    const int16_vec2_t *local_coords)
+vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts, const vdp1_env_coords_t *env_coords)
 {
         assert(cmdts != NULL);
 
-        const int16_vec2_t system_clip_coords =
-            _state_vdp2()->tv.resolution;
-
-        int16_vec2_t center_local_coords;
-
-        if (local_coords == NULL) {
-                local_coords = &center_local_coords;
-
-                center_local_coords.x = _state_vdp2()->tv.resolution.x / 2;
-                center_local_coords.y = _state_vdp2()->tv.resolution.y / 2;
-        }
-
-        const int16_vec2_t user_clip_ul =
-            INT16_VEC2_INITIALIZER(0, 0);
-        const int16_vec2_t user_clip_lr =
-            INT16_VEC2_INITIALIZER(system_clip_coords.x - 1,
-                                   system_clip_coords.y - 1);
-
         vdp1_cmdt_t *cmdt;
-        cmdt = &cmdts[0];
+        cmdt = cmdts;
 
         vdp1_cmdt_system_clip_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_SYSTEM_CLIP,
-            &system_clip_coords);
+        vdp1_cmdt_vtx_system_clip_coord_set(cmdt, env_coords->system_clip);
         cmdt++;
 
         vdp1_cmdt_user_clip_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_UL,
-            &user_clip_ul);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_USER_CLIP_LR,
-            &user_clip_lr);
-        cmdt++;
+        vdp1_cmdt_vtx_user_clip_coord_set(cmdt, env_coords->user_clip_ul,
+            env_coords->user_clip_lr);
 
         vdp1_cmdt_local_coord_set(cmdt);
-        vdp1_cmdt_param_vertex_set(cmdt, CMDT_VTX_LOCAL_COORD,
-            local_coords);
+        vdp1_cmdt_vtx_local_coord_set(cmdt, env_coords->local);
         cmdt++;
 
         vdp1_cmdt_end_set(cmdt);

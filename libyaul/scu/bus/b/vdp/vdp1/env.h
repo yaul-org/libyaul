@@ -72,6 +72,15 @@ typedef struct vdp1_env {
         int16_vec2_t erase_points[2];
 } vdp1_env_t;
 
+/// @compound
+/// @brief Not yet documented.
+typedef struct {
+        int16_vec2_t system_clip;
+        int16_vec2_t user_clip_ul;
+        int16_vec2_t user_clip_lr;
+        int16_vec2_t local;
+} vdp1_env_coords_t;
+
 /// @}
 
 /// @addtogroup VDP1_ENV_FUNCTIONS
@@ -91,7 +100,7 @@ extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
 extern void vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
-    const int16_vec2_t *local_coords);
+    const vdp1_env_coords_t *env_coords);
 
 /// @}
 
