@@ -89,7 +89,7 @@ fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int32_t decimals)
         buffer_ptr = buffer;
 
         for (uint32_t i = 0; i < 3; i++) {
-                *buffer++ = '|';
+                *buffer_ptr++ = '|';
                 buffer_ptr += fix16_vec3_str(&m0->row[i], buffer_ptr, decimals);
                 *buffer_ptr++ = '|';
                 *buffer_ptr++ = '\n';

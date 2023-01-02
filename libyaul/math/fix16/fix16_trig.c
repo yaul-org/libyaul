@@ -14,65 +14,62 @@
 #include "fix16.h"
 
 #include "fix16_sin.inc"
-#include "fix16_atan.inc"
 
-static inline int32_t __always_inline
-_rad2brad_convert(fix16_t radians)
+typedef uint32_t brad_t;
+
+static inline brad_t __always_inline
+_convert(angle_t angle)
 {
-        const fix16_t converted =
-            fix16_mul(radians, FIX16(FIX16_LUT_SIN_TABLE_COUNT / (2.0f * M_PI)));
+        /* Shifting by (16 - shift) is equivalent to:
+         * ((angle * FIX16_LUT_SIN_TABLE_COUNT) / 65536.0) */
+        return (((uint32_t)angle >> (16 - FIX16_LUT_SIN_TABLE_SHIFT)) + FIX16_LUT_SIN_TABLE_COUNT);
+}
 
-        return (fix16_int32_to(converted) + FIX16_LUT_SIN_TABLE_COUNT);
+static inline fix16_t __always_inline
+_sin(brad_t bradians)
+{
+        return _lut_brads_sin[bradians & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
+}
+
+static inline fix16_t __always_inline
+_cos(brad_t bradians)
+{
+        /* Shift by (π/2),
+         *    angle_t: 0x4000,
+         *   bradians: (FIX16_LUT_SIN_TABLE_COUNT / 4) = π/2 */
+        return _lut_brads_sin[(bradians + (FIX16_LUT_SIN_TABLE_COUNT / 4)) & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
 }
 
 fix16_t
-fix16_sin(fix16_t radians)
+fix16_sin(angle_t angle)
 {
-        return fix16_bradians_sin(_rad2brad_convert(radians));
+        return _sin(_convert(angle));
 }
 
 fix16_t
-fix16_cos(fix16_t radians)
+fix16_cos(angle_t angle)
 {
-        return fix16_bradians_cos(_rad2brad_convert(radians));
+        return _cos(_convert(angle));
 }
 
 void
-fix16_sincos(fix16_t radians, fix16_t *result_sin, fix16_t *result_cos)
+fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos)
 {
-        const int32_t bradians = _rad2brad_convert(radians);
+        const brad_t bradians = _convert(angle);
 
-        *result_sin = fix16_bradians_sin(bradians);
-        *result_cos = fix16_bradians_cos(bradians);
+        *result_sin = _sin(bradians);
+        *result_cos = _cos(bradians);
 }
 
 fix16_t
-fix16_bradians_sin(int32_t bradians)
+fix16_tan(const angle_t angle)
 {
-        const uint32_t index =
-            (bradians + FIX16_LUT_SIN_TABLE_COUNT);
+        fix16_t cos;
+        fix16_t sin;
 
-        return _lut_brads_sin[index & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
-}
-
-fix16_t
-fix16_bradians_cos(int32_t bradians)
-{
-        const uint32_t index =
-            (bradians + (FIX16_LUT_SIN_TABLE_COUNT / 4) + FIX16_LUT_SIN_TABLE_COUNT);
-
-        return _lut_brads_sin[index & (FIX16_LUT_SIN_TABLE_COUNT - 1)];
-}
-
-fix16_t
-fix16_tan(const fix16_t radians)
-{
-        const int32_t bradians = _rad2brad_convert(radians);
-        const fix16_t cos = fix16_bradians_cos(bradians);
+        fix16_sincos(angle, &sin, &cos);
 
         cpu_divu_fix16_set(FIX16_ONE, cos);
-
-        const fix16_t sin = fix16_bradians_sin(bradians);
 
         const fix16_t quotient = cpu_divu_quotient_get();
         const fix16_t result = fix16_mul(sin, quotient);
@@ -80,28 +77,28 @@ fix16_tan(const fix16_t radians)
         return result;
 }
 
-fix16_t
+angle_t
 fix16_atan2(fix16_t y, fix16_t x)
 {
-        if (y == 0) {
-                return ((x >= 0) ? 0 : FIX16_PI);
+        if (y == FIX16_ZERO) {
+                return ((x >= FIX16_ZERO) ? RAD2ANGLE(0.0f) : RAD2ANGLE(M_PI));
         }
 
-        int32_t phi;
-        phi = 0;
+        angle_t phi;
+        phi = RAD2ANGLE(0.0f);
 
-        if (y < 0) {
+        if (y < FIX16_ZERO) {
                 x = -x;
                 y = -y;
-                phi += 4;
+                phi = RAD2ANGLE(M_PI);
         }
 
-        if (x <= 0) {
-                const fix16_t t = x;
+        if (x <= FIX16_ZERO) {
+                const fix16_t t = -x;
 
                 x = y;
-                y = -t;
-                phi += 2;
+                y = t;
+                phi += RAD2ANGLE(M_PI * 0.5f);
         }
 
         if (x <= y) {
@@ -109,14 +106,19 @@ fix16_atan2(fix16_t y, fix16_t x)
 
                 x = x + y;
                 y = t;
-                phi++;
+                phi += RAD2ANGLE(M_PI * 0.25f);
         }
 
         cpu_divu_fix16_set(y, x);
 
         const fix16_t q = cpu_divu_quotient_get();
-        const int32_t index = fix16_int32_to(q * FIX16_LUT_ATAN_TABLE_COUNT);
-        const fix16_t dphi = _lut_brads_atan[index];
 
-        return ((phi * (FIX16_PI / 4)) + dphi);
+        /* Perform effectively dphi=atan(q), but instead convert to angle_t.
+         *
+         * Since q ranges from [-1,1], this can be scaled to π/4. However an
+         * extra step is taken to convert to angle_t: Dividing by 2π:
+         * q*((π/4)/(2π)) */
+        const angle_t dphi = fix16_int32_mul(q, FIX16(0.125f));
+
+        return (phi + dphi);
 }

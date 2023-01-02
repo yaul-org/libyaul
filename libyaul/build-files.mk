@@ -317,6 +317,7 @@ INSTALL_HEADER_FILES+= \
 INSTALL_HEADER_FILES+= \
 	./math/:math.h:yaul/math/ \
 \
+	./math/:angle.h:yaul/math/ \
 	./math/:color.h:yaul/math/ \
 	./math/color/:hsv.h:yaul/math/color/ \
 	./math/color/:rgb1555.h:yaul/math/color/ \

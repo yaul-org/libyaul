@@ -83,8 +83,8 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
         return out;
 }
 
-static inline int16_t __always_inline
-fix16_int16_muls(const fix16_t a, const fix16_t b)
+static inline int32_t __always_inline
+fix16_int32_mul(const fix16_t a, const fix16_t b)
 {
         __register int16_t out;
 
@@ -218,6 +218,8 @@ extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t) FIXMATH_FUNC_A
 extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
 
 extern size_t fix16_str(fix16_t value, char *buffer, int32_t decimals);
+
+#include "angle.h"
 
 #include "fix16/fix16_trig.h"
 
