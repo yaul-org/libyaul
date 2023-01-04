@@ -38,7 +38,7 @@ fix16_mat_dup(const fix16_mat_t *m0, fix16_mat_t *result)
 }
 
 void
-fix16_mat_inverse(const fix16_mat_t *m0, fix16_mat_t *result)
+fix16_mat_invert(const fix16_mat_t *m0, fix16_mat_t *result)
 {
         /* The expectation is that the rotation part of the matrix is
          * orthogonal.
@@ -46,14 +46,28 @@ fix16_mat_inverse(const fix16_mat_t *m0, fix16_mat_t *result)
          * It's then possible to just transpose the 3x3 rotation matrix within
          * the 4x3 matrix and negate the translation vector */
 
-        _mat_row_transpose(&m0->arr[0], (fix16_vec3_t *)&result->row[0]);
-        result->frow[0][3] = -m0->frow[0][3];
+        fix16_vec3_t * const result_m00 = (fix16_vec3_t *)&result->row[0];
+        fix16_vec3_t * const result_m01 = (fix16_vec3_t *)&result->row[1];
+        fix16_vec3_t * const result_m02 = (fix16_vec3_t *)&result->row[2];
 
-        _mat_row_transpose(&m0->arr[1], (fix16_vec3_t *)&result->row[1]);
-        result->frow[1][3] = -m0->frow[1][3];
+        const fix16_vec3_t * const m00 = (const fix16_vec3_t *)&m0->row[0];
+        const fix16_vec3_t * const m01 = (const fix16_vec3_t *)&m0->row[1];
+        const fix16_vec3_t * const m02 = (const fix16_vec3_t *)&m0->row[2];
 
-        _mat_row_transpose(&m0->arr[2], (fix16_vec3_t *)&result->row[2]);
-        result->frow[2][3] = -m0->frow[2][3];
+        const fix16_vec3_t neg_t = {
+                .x = -m0->frow[0][3],
+                .y = -m0->frow[1][3],
+                .z = -m0->frow[2][3]
+        };
+
+        _mat_row_transpose(&m0->arr[0], result_m00);
+        result->frow[0][3] = fix16_vec3_dot(m00, &neg_t);
+
+        _mat_row_transpose(&m0->arr[1], result_m01);
+        result->frow[1][3] = fix16_vec3_dot(m01, &neg_t);
+
+        _mat_row_transpose(&m0->arr[2], result_m02);
+        result->frow[2][3] = fix16_vec3_dot(m02, &neg_t);
 }
 
 void

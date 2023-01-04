@@ -47,7 +47,6 @@ fix16_mat_x_translate(const fix16_mat_t *m0, fix16_mat_t *result, fix16_t x)
         result->frow[0][3] = m0->frow[0][3] + x;
 }
 
-
 static inline void __always_inline
 fix16_mat_y_translate(const fix16_mat_t *m0, fix16_mat_t *result, fix16_t y)
 {
@@ -70,7 +69,7 @@ fix16_mat_translate(const fix16_mat_t *m0, fix16_mat_t *result, const fix16_vec3
 }
 
 extern void fix16_mat_dup(const fix16_mat_t *m0, fix16_mat_t *result);
-extern void fix16_mat_inverse(const fix16_mat_t *m0, fix16_mat_t *result);
+extern void fix16_mat_invert(const fix16_mat_t *m0, fix16_mat_t *result);
 extern void fix16_mat_mul(const fix16_mat_t *m0, const fix16_mat_t *m1, fix16_mat_t *result);
 extern void fix16_mat_x_rotate(const fix16_mat_t *m0, fix16_mat_t *result, angle_t angle);
 extern void fix16_mat_y_rotate(const fix16_mat_t *m0, fix16_mat_t *result, angle_t angle);
