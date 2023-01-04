@@ -14,7 +14,7 @@
 #include "cd-block-internal.h"
 #include "cd-block/cmd.h"
 
-int
+bool
 cd_block_busy(void) {
         /* Is the CD-block busy? */
         return ((MEMORY_READ(16, CD_BLOCK(HIRQ)) & CMOK) == 0x0000);

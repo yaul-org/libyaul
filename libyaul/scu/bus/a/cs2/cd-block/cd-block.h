@@ -9,6 +9,7 @@
 #ifndef _YAUL_CD_BLOCK_H_
 #define _YAUL_CD_BLOCK_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <cd-block/cmd.h>
@@ -28,7 +29,7 @@ extern int cd_block_init(void);
 /**
  * Return if the cd block is busy for commands (HIRQ & CMOK) == false
  */
-extern int cd_block_busy(void);
+extern bool cd_block_busy(void);
 
 /**
  * Bypass copy protection (by using JHL and CyberWarriorX exploit).
