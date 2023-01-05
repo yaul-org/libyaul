@@ -15,6 +15,36 @@ __BEGIN_DECLS
 /// @addtogroup CPU_WDT
 /// @{
 
+/// @brief Value to write to the CPU-WDT @ref WTCNTW register.
+///
+/// @param x The 2-byte value.
+#define CPU_WDT_WTCNT(x)          (0x5A00U | ((x) & 0x00FF))
+
+/// @brief Value to write to the CPU-WDT @ref WTCSRW register.
+///
+/// @details When clearing the `WOVF` bit:
+/// @code{.c}
+/// *(volatile uint16_t *)RSTCSRW = 0xA500 | 0x00;
+/// @endcode
+///
+/// @param x The 2-byte value.
+#define CPU_WDT_WTCSR(x)          (0xA500U | ((x) & 0x00FF))
+
+/// @brief Value to write to the CPU-WDT @ref RSTCSRW register.
+///
+/// @details For writing to @ref WTCSRW and @ref WTCNTW, use 16-bit writes only:
+///
+/// @code{.c}
+/// *(volatile uint16_t *)WTCSRW = 0xA518 | (value & 0xFF);
+/// *(volatile uint16_t *)WTCNTW = 0x5A00 | (value & 0xFF);
+/// @endcode
+#define CPU_WDT_CLEAR_WOVF_RSTCSR (0xA500U)
+
+/// @brief Value to write to the CPU-WDT @ref RSTCSRW register.
+///
+/// @param x The 2-byte value.
+#define CPU_WDT_CLEAR_RSTCSR(x)   (0x5A3FU | ((x) & 0x00FF))
+
 /// @brief CPU-WDT clock divisors.
 /// @see cpu_wdt_init
 typedef enum cpu_wdt_clock {
@@ -55,7 +85,9 @@ typedef void (*cpu_wdt_ihr_t)(void);
 static inline void __always_inline
 cpu_wdt_count_set(uint8_t count)
 {
-        MEMORY_WRITE_WTCNT(count);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->wtcntw = CPU_WDT_WTCNT(count);
 }
 
 /// @brief Obtain the current 1-byte WDT tick count.
@@ -63,32 +95,38 @@ cpu_wdt_count_set(uint8_t count)
 static inline uint8_t __always_inline
 cpu_wdt_count_get(void)
 {
-        return MEMORY_READ(8, CPU(WTCNTR));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        return cpu_map->wtcntr;
 }
 
 /// @brief Enable the CPU-WDT.
 static inline void __always_inline
 cpu_wdt_enable(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         uint8_t wtcr_bits;
-        wtcr_bits = MEMORY_READ(8, CPU(WTCSRR));
+        wtcr_bits = cpu_map->wtcsrr;
 
         wtcr_bits &= ~0x80;
         wtcr_bits |= 0x20;
 
-        MEMORY_WRITE_WTCSR(wtcr_bits);
+        cpu_map->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
 }
 
 /// @brief Disable the CPU-WDT.
 static inline void __always_inline
 cpu_wdt_disable(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         uint8_t wtcr_bits;
-        wtcr_bits = MEMORY_READ(8, CPU(WTCSRR));
+        wtcr_bits = cpu_map->wtcsrr;
 
         wtcr_bits &= ~0xA0;
 
-        MEMORY_WRITE_WTCSR(wtcr_bits);
+        cpu_map->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
 }
 
 /// @brief Obtain the interrupt priority level for CPU-WDT.
@@ -96,10 +134,9 @@ cpu_wdt_disable(void)
 static inline uint8_t __always_inline
 cpu_wdt_interrupt_priority_get(void)
 {
-        uint16_t ipra;
-        ipra = MEMORY_READ(16, CPU(IPRA));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        return ((ipra >> 4) & 0x0F);
+        return ((cpu_map->ipra >> 4) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-WDT.
@@ -108,8 +145,10 @@ cpu_wdt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xFF0F);
-        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 4);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->ipra &= 0xFF0F;
+        cpu_map->ipra |= (priority & 0x0F) << 4;
 }
 
 /// @ingroup CPU_INTC_HELPERS

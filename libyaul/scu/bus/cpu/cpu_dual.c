@@ -70,19 +70,17 @@ cpu_dual_comm_mode_set(cpu_dual_comm_mode_t mode)
 void
 cpu_dual_master_set(cpu_dual_master_entry_t entry)
 {
-        volatile uint8_t * const reg_tier =
-            (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_tier &= ~0x80;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
+        cpu_map->tier &= ~0x80;
+        cpu_map->ftcsr &= ~0x80;
 
         _master_entry = _default_entry;
 
         if (entry != NULL) {
                 _master_entry = entry;
 
-                *reg_tier |= 0x80;
+                cpu_map->tier |= 0x80;
         }
 }
 
@@ -111,9 +109,11 @@ __slave_polling_entry(void)
 void __noreturn __aligned(16) __used
 __slave_ici_entry(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         _slave_init();
 
-        MEMORY_WRITE_OR(8, CPU(TIER), 0x80);
+        cpu_map->tier |= 0x80;
 
         while (true) {
         }
@@ -143,31 +143,27 @@ _slave_init(void)
 static void __interrupt_handler
 _master_ici_handler(void)
 {
-        volatile uint8_t *reg_tier;
-        reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_tier &= ~0x80;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
+        cpu_map->tier &= ~0x80;
+        cpu_map->ftcsr &= ~0x80;
 
         _master_entry();
 
-        *reg_tier |= 0x80;
+        cpu_map->tier |= 0x80;
 }
 
 static void __interrupt_handler
 _slave_ici_handler(void)
 {
-        volatile uint8_t * const reg_tier =
-            (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_tier &= ~0x80;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x80);
+        cpu_map->tier &= ~0x80;
+        cpu_map->ftcsr &= ~0x80;
 
         _slave_entry();
 
-        *reg_tier |= 0x80;
+        cpu_map->tier |= 0x80;
 }
 
 static void

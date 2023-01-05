@@ -212,6 +212,8 @@ fix16_deg_rad_to(fix16_t degrees)
 extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
 
+extern fix16_t fix16_div(fix16_t dividend, fix16_t divisor) FIXMATH_FUNC_ATTRS;
+
 extern fix16_t fix16_lerp(fix16_t a, fix16_t b, fix16_t t) FIXMATH_FUNC_ATTRS;
 extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t) FIXMATH_FUNC_ATTRS;
 

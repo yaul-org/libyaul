@@ -82,8 +82,10 @@ typedef void (*cpu_frt_ihr_t)(void);
 static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
 {
-        MEMORY_WRITE(8, CPU(FRCH), (uint8_t)(count >> 8));
-        MEMORY_WRITE(8, CPU(FRCL), (uint8_t)(count & 0xFF));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->frch = (uint8_t)(count >> 8);
+        cpu_map->frcl = (uint8_t)(count & 0xFF);
 }
 
 /// @brief Obtain the current 2-byte FRT tick count.
@@ -91,11 +93,10 @@ cpu_frt_count_set(uint16_t count)
 static inline uint16_t __always_inline
 cpu_frt_count_get(void)
 {
-        uint16_t reg_frth;
-        reg_frth = MEMORY_READ(8, CPU(FRCH));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        uint16_t reg_frtl;
-        reg_frtl = MEMORY_READ(8, CPU(FRCL));
+        const uint16_t reg_frth = cpu_map->frch;
+        const uint16_t reg_frtl = cpu_map->frcl;
 
         return (reg_frth << 8) | reg_frtl;
 }
@@ -109,11 +110,10 @@ cpu_frt_count_get(void)
 static inline uint16_t __always_inline
 cpu_frt_input_capture_get(void)
 {
-        uint8_t reg_ficrh;
-        reg_ficrh = MEMORY_READ(8, CPU(FICRH));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        uint8_t reg_ficrl;
-        reg_ficrl = MEMORY_READ(8, CPU(FICRL));
+        const uint8_t reg_ficrh = cpu_map->ficrh;
+        const uint8_t reg_ficrl = cpu_map->ficrl;
 
         return (reg_ficrh << 8) | reg_ficrl;
 }
@@ -123,9 +123,9 @@ cpu_frt_input_capture_get(void)
 static inline uint8_t __always_inline
 cpu_frt_interrupt_priority_get(void)
 {
-        const uint16_t iprb = MEMORY_READ(16, CPU(IPRB));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        return ((iprb >> 8) & 0x0F);
+        return ((cpu_map->iprb >> 8) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-FRT.
@@ -134,10 +134,12 @@ cpu_frt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_frt_interrupt_priority_set(uint8_t priority)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         /* Set the interrupt priority level for FRT (shared amongst all FRT
          * related interrupts */
-        MEMORY_WRITE_AND(16, CPU(IPRB), 0xF0FF);
-        MEMORY_WRITE_OR(16, CPU(IPRB), (priority & 0x0F) << 8);
+        cpu_map->iprb &= 0xF0FF;
+        cpu_map->iprb |= (priority & 0x0F) << 8;
 }
 
 /// @ingroup CPU_INTC_HELPERS

@@ -32,9 +32,11 @@ static cpu_divu_ihr_t *_ovfi_ihr_get(void);
 void
 __cpu_divu_init(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         cpu_divu_ovfi_clear();
 
-        MEMORY_WRITE(32, CPU(VCRDIV), CPU_INTC_INTERRUPT_DIVU_OVFI);
+        cpu_map->vcrdiv = CPU_INTC_INTERRUPT_DIVU_OVFI;
 
         const cpu_which_t which_cpu = cpu_dual_executor_get();
 
@@ -48,9 +50,9 @@ __cpu_divu_init(void)
 void
 cpu_divu_ovfi_set(cpu_divu_ihr_t ihr)
 {
-        volatile uint32_t * const reg_dvcr = (volatile uint32_t *)CPU(DVCR);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_dvcr &= ~0x00000003;
+        cpu_map->dvcr &= ~0x00000003;
 
         cpu_divu_ihr_t * const ovfi_ihr = _ovfi_ihr_get();
 
@@ -59,7 +61,7 @@ cpu_divu_ovfi_set(cpu_divu_ihr_t ihr)
         if (ihr != NULL) {
                 *ovfi_ihr = ihr;
 
-                *reg_dvcr |= 0x00000002;
+                cpu_map->dvcr |= 0x00000002;
         }
 }
 
@@ -78,7 +80,9 @@ _slave_ovfi_handler(void)
 static void
 _ovfi_handler(cpu_divu_ihr_t ovfi_ihr)
 {
-        MEMORY_WRITE_AND(32, CPU(DVCR), ~0x00000001);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->dvcr &= ~0x00000001;
 
         ovfi_ihr();
 }

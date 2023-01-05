@@ -54,17 +54,19 @@ static cpu_frt_ihr_t * const _ihr_tables[] = {
 void
 cpu_frt_init(uint8_t clock_div)
 {
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x8E);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x8F);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        MEMORY_WRITE(16, CPU(VCRC), (CPU_INTC_INTERRUPT_FRT_ICI << 8) | CPU_INTC_INTERRUPT_FRT_OCI);
-        MEMORY_WRITE(16, CPU(VCRD), CPU_INTC_INTERRUPT_FRT_OVI << 8);
+        cpu_map->tier &= ~0x8E;
+        cpu_map->ftcsr &= ~0x8F;
+
+        cpu_map->vcrc = (CPU_INTC_INTERRUPT_FRT_ICI << 8) | CPU_INTC_INTERRUPT_FRT_OCI;
+        cpu_map->vcrd = CPU_INTC_INTERRUPT_FRT_OVI << 8;
 
         cpu_frt_interrupt_priority_set(15);
 
         /* Set internal clock (divisor) */
-        MEMORY_WRITE_AND(8, CPU(TCR), ~0x83);
-        MEMORY_WRITE_OR(8, CPU(TCR), clock_div & 0x03);
+        cpu_map->tcr &= ~0x83;
+        cpu_map->tcr |= clock_div & 0x03;
 
         cpu_frt_oca_clear();
         cpu_frt_ocb_clear();
@@ -88,27 +90,29 @@ cpu_frt_init(uint8_t clock_div)
 void
 cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         /* Disable interrupt */
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x08);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x08);
+        cpu_map->tier &= ~0x08;
+        cpu_map->ftcsr &= ~0x08;
 
         /* Select OCRA register and select output compare A match */
-        MEMORY_WRITE_AND(8, CPU(TOCR), ~0x12);
-        MEMORY_WRITE(8, CPU(OCRAH), 0);
-        MEMORY_WRITE(8, CPU(OCRAL), 0);
+        cpu_map->tocr &= ~0x12;
+        cpu_map->ocrah = 0x00;
+        cpu_map->ocral = 0x00;
 
         cpu_frt_ihr_t * const ihr_table = _ihr_table_get();
 
         ihr_table[IHR_INDEX_OCAI] = __BIOS_DEFAULT_HANDLER;
 
         if ((count > 0) && (ihr != NULL)) {
-                MEMORY_WRITE_AND(8, CPU(TOCR), ~0x10);
-                MEMORY_WRITE(8, CPU(OCRAH), (uint8_t)(count >> 8));
-                MEMORY_WRITE(8, CPU(OCRAL), (uint8_t)(count & 0xFF));
+                cpu_map->tocr &= ~0x10;
+                cpu_map->ocrah = (uint8_t)(count >> 8);
+                cpu_map->ocral = (uint8_t)(count & 0xFF);
 
                 /* Compare on match A */
-                MEMORY_WRITE_OR(8, CPU(TOCR), 0x02);
-                MEMORY_WRITE_OR(8, CPU(TIER), 0x08);
+                cpu_map->tocr |= 0x02;
+                cpu_map->tier |= 0x08;
 
                 ihr_table[IHR_INDEX_OCAI] = ihr;
         }
@@ -117,28 +121,30 @@ cpu_frt_oca_set(uint16_t count, cpu_frt_ihr_t ihr)
 void
 cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         /* Disable interrupt */
-        MEMORY_WRITE_AND(8, CPU(TIER), ~0x04);
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x04);
+        cpu_map->tier &= ~0x04;
+        cpu_map->ftcsr &= ~0x04;
 
         /* Select output compare B match */
-        MEMORY_WRITE_AND(8, CPU(TOCR), ~0x01);
+        cpu_map->tocr &= ~0x01;
 
         /* Select OCRB register */
-        MEMORY_WRITE_OR(8, CPU(TOCR), 0x10);
-        MEMORY_WRITE(8, CPU(OCRBH), 0);
-        MEMORY_WRITE(8, CPU(OCRBL), 0);
+        cpu_map->tocr |= 0x10;
+        cpu_map->ocrbh = 0x00;
+        cpu_map->ocrbl = 0x00;
 
         cpu_frt_ihr_t * const ihr_table = _ihr_table_get();
 
         ihr_table[IHR_INDEX_OCBI] = __BIOS_DEFAULT_HANDLER;
 
         if ((count > 0) && (ihr != NULL)) {
-                MEMORY_WRITE(8, CPU(OCRBH), (uint8_t)(count >> 8));
-                MEMORY_WRITE(8, CPU(OCRBL), (uint8_t)(count & 0xFF));
+                cpu_map->ocrbh = (uint8_t)(count >> 8);
+                cpu_map->ocrbl = (uint8_t)(count & 0xFF);
 
-                MEMORY_WRITE_OR(8, CPU(TOCR), 0x01);
-                MEMORY_WRITE_OR(8, CPU(TIER), 0x04);
+                cpu_map->tocr |= 0x01;
+                cpu_map->tier |= 0x04;
 
                 ihr_table[IHR_INDEX_OCBI] = ihr;
         }
@@ -147,11 +153,10 @@ cpu_frt_ocb_set(uint16_t count, cpu_frt_ihr_t ihr)
 void
 cpu_frt_ovi_set(cpu_frt_ihr_t ihr)
 {
-        volatile uint8_t * const reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_tier &= ~0x02;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
+        cpu_map->tier &= ~0x02;
+        cpu_map->ftcsr &= ~0x02;
 
         cpu_frt_ihr_t * const ihr_table = _ihr_table_get();
 
@@ -160,7 +165,7 @@ cpu_frt_ovi_set(cpu_frt_ihr_t ihr)
         if (ihr != NULL) {
                 ihr_table[IHR_INDEX_OVI] = ihr;
 
-                *reg_tier |= 0x02;
+                cpu_map->tier |= 0x02;
         }
 }
 
@@ -179,26 +184,22 @@ _slave_oci_handler(void)
 static void
 _frt_oci_handler(cpu_frt_ihr_t *ihr_table)
 {
-        volatile uint8_t * const reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        volatile uint8_t * const reg_ftcsr = (volatile uint8_t *)CPU(FTCSR);
-
-        uint8_t ftcsr_bits;
-        ftcsr_bits = *reg_ftcsr;
+        const uint8_t ftcsr_bits = cpu_map->ftcsr;
 
         /* Disable OCA or OCB interrupt (or neither), invoke the callback and
          * enable interrupt again */
 
-        uint32_t ocf_bits;
-        ocf_bits = ftcsr_bits & 0x0C;
+        const uint32_t ocf_bits = ftcsr_bits & 0x0C;
 
-        *reg_tier &= ~ocf_bits;
-        *reg_ftcsr = ftcsr_bits & ~0x0C;
+        cpu_map->tier &= ~ocf_bits;
+        cpu_map->ftcsr = ftcsr_bits & ~0x0C;
 
         ihr_table[(ocf_bits & 0x08) >> 2]();
         ihr_table[(ocf_bits & 0x04) >> 2]();
 
-        *reg_tier |= ocf_bits;
+        cpu_map->tier |= ocf_bits;
 }
 
 static void __interrupt_handler
@@ -216,15 +217,14 @@ _slave_ovi_handler(void)
 static void
 _frt_ovi_handler(cpu_frt_ihr_t *ihr_table)
 {
-        volatile uint8_t * const reg_tier = (volatile uint8_t *)CPU(TIER);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        *reg_tier &= ~0x02;
-
-        MEMORY_WRITE_AND(8, CPU(FTCSR), ~0x02);
+        cpu_map->tier &= ~0x02;
+        cpu_map->ftcsr &= ~0x02;
 
         ihr_table[IHR_INDEX_OVI]();
 
-        *reg_tier |= 0x02;
+        cpu_map->tier |= 0x02;
 }
 
 static cpu_frt_ihr_t *

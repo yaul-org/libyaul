@@ -278,24 +278,35 @@ typedef struct cpu_dmac_status {
 static inline void __always_inline
 cpu_dmac_channel_transfer_set(cpu_dmac_channel_t ch, uint32_t tcr_bits)
 {
-        const uint32_t n = (ch & 0x01) << 4;
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        MEMORY_WRITE(32, CPU(TCR0 | n), tcr_bits);
+        switch (ch) {
+        case 0:
+                cpu_map->tcr0 = tcr_bits;
+                break;
+        case 1:
+                cpu_map->tcr1 = tcr_bits;
+                break;
+        }
 }
 
 /// @brief Enable CPU-DMAC.
 static inline void __always_inline
 cpu_dmac_enable(void)
 {
-        MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x0000000F);
-        MEMORY_WRITE_OR(32, CPU(DMAOR), 0x00000001);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->dmaor &= ~0x0000000F;
+        cpu_map->dmaor |= 0x00000001;
 }
 
 /// @brief Disable CPU-DMAC.
 static inline void __always_inline
 cpu_dmac_disable(void)
 {
-        MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->dmaor &= ~0x00000001;
 }
 
 /// @brief Obtain the interrupt priority level for CPU-DMAC.
@@ -303,9 +314,9 @@ cpu_dmac_disable(void)
 static inline uint8_t __always_inline
 cpu_dmac_interrupt_priority_get(void)
 {
-        const uint16_t ipra = MEMORY_READ(16, CPU(IPRA));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        return ((ipra >> 8) & 0x0F);
+        return ((cpu_map->ipra >> 8) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-DMAC.
@@ -314,8 +325,10 @@ cpu_dmac_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        MEMORY_WRITE_AND(16, CPU(IPRA), 0xF0FF);
-        MEMORY_WRITE_OR(16, CPU(IPRA), (priority & 0x0F) << 8);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->ipra &= 0xF0FF;
+        cpu_map->ipra |= (priority & 0x0F) << 8;
 }
 
 /// @brief Set the priority mode.
@@ -324,8 +337,10 @@ cpu_dmac_interrupt_priority_set(uint8_t priority)
 static inline void __always_inline
 cpu_dmac_priority_mode_set(cpu_dmac_priority_mode_t mode)
 {
-        MEMORY_WRITE_AND(32, CPU(DMAOR), ~0x00000001);
-        MEMORY_WRITE_OR(32, CPU(DMAOR), (mode & 0x01) << 3);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->dmaor &= ~0x00000001;
+        cpu_map->dmaor |= (mode & 0x01) << 3;
 }
 
 /// @brief Start the CPU-DMAC channel transfer.
@@ -337,10 +352,18 @@ cpu_dmac_priority_mode_set(cpu_dmac_priority_mode_t mode)
 static inline void __always_inline
 cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 {
-        const uint32_t n = (ch & 0x01) << 4;
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000003);
-        MEMORY_WRITE_OR(32, CPU(CHCR0 | n), 0x00000001);
+        switch (ch) {
+        case 0:
+                cpu_map->chcr0 &= ~0x00000003;
+                cpu_map->chcr0 |= 0x00000001;
+                break;
+        case 1:
+                cpu_map->chcr1 &= ~0x00000003;
+                cpu_map->chcr1 |= 0x00000001;
+                break;
+        }
 }
 
 /// @brief Stop specific CPU-DMAC channel transfer.
@@ -349,10 +372,17 @@ cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 static inline void __always_inline
 cpu_dmac_channel_stop(cpu_dmac_channel_t ch)
 {
-        const uint32_t n = (ch & 0x01) << 4;
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
         /* Don't clear the status bits */
-        MEMORY_WRITE_AND(32, CPU(CHCR0 | n), ~0x00000001);
+        switch (ch) {
+        case 0:
+                cpu_map->chcr0 &= ~0x00000001;
+                break;
+        case 1:
+                cpu_map->chcr1 &= ~0x00000001;
+                break;
+        }
 }
 
 /// @brief Stop all CPU-DMAC channel transfers (if any).

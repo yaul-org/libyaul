@@ -45,13 +45,15 @@ __cpu_dmac_init()
         cpu_dmac_channel_stop(1);
         cpu_dmac_disable();
 
-        MEMORY_WRITE(32, CPU(VCRDMA0), CPU_INTC_INTERRUPT_DMAC0);
-        MEMORY_WRITE(32, CPU(VCRDMA1), CPU_INTC_INTERRUPT_DMAC1);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->vcrdma0 = CPU_INTC_INTERRUPT_DMAC0;
+        cpu_map->vcrdma1 = CPU_INTC_INTERRUPT_DMAC1;
 
         cpu_dmac_interrupt_priority_set(15);
 
-        MEMORY_WRITE(8, CPU(DRCR0), 0x00);
-        MEMORY_WRITE(8, CPU(DRCR1), 0x00);
+        cpu_map->drcr0 = 0x00;
+        cpu_map->drcr1 = 0x00;
 
         const cpu_which_t which_cpu = cpu_dual_executor_get();
 
@@ -81,15 +83,17 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
                 return;
         }
 
-        const uint32_t reg_dmaor = MEMORY_READ(32, CPU(DMAOR));
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        const uint32_t reg_dmaor = cpu_map->dmaor;
 
         status->enabled = reg_dmaor & 0x00000001;
         status->priority_mode = (reg_dmaor >> 3) & 0x00000001;
         status->address_error = (reg_dmaor >> 2) & 0x00000001;
         status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
 
-        const uint32_t reg_chcr0 = MEMORY_READ(32, CPU(CHCR0));
-        const uint32_t reg_chcr1 = MEMORY_READ(32, CPU(CHCR1));
+        const uint32_t reg_chcr0 = cpu_map->chcr0;
+        const uint32_t reg_chcr1 = cpu_map->chcr1;
 
         const uint8_t ch0_enabled = reg_chcr0 & 0x00000001;
         const uint8_t ch1_enabled = reg_chcr1 & 0x00000001;
@@ -125,7 +129,6 @@ void
 cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 {
         const uint32_t channel = cfg->channel & 0x01;
-        const uint32_t n = channel << 4;
 
         cpu_dmac_channel_stop(cfg->channel);
 
@@ -188,30 +191,57 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
                 callback_set(ihr_callback, cfg->ihr, cfg->ihr_work);
         }
 
-        MEMORY_WRITE(32, CPU(DAR0 | n), (uint32_t)cfg->dst);
-        MEMORY_WRITE(32, CPU(SAR0 | n), (uint32_t)cfg->src);
-        MEMORY_WRITE(32, CPU(TCR0 | n), reg_tcr);
-        MEMORY_WRITE(32, CPU(CHCR0 | n), reg_chcr);
-        MEMORY_WRITE(8,  CPU(DRCR0 | channel), reg_drcr);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        switch (channel) {
+        case 0:
+                cpu_map->dar0 = cfg->dst;
+                cpu_map->sar0 = cfg->src;
+                cpu_map->tcr0 = reg_tcr;
+                cpu_map->chcr0 = reg_chcr;
+                cpu_map->drcr0 = reg_drcr;
+                break;
+        case 1:
+                cpu_map->dar1 = cfg->dst;
+                cpu_map->sar1 = cfg->src;
+                cpu_map->tcr1 = reg_tcr;
+                cpu_map->chcr1 = reg_chcr;
+                cpu_map->drcr1 = reg_drcr;
+                break;
+        }
 }
 
 void
 cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
 {
-        const uint32_t n = (ch & 0x01) << 4;
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
         /* Don't wait if DMAC is disabled */
-        if ((MEMORY_READ(32, CPU(DMAOR)) & 0x00000001) == 0x00000000) {
+        if ((cpu_map->dmaor & 0x00000001) == 0x00000000) {
                 return;
         }
 
-        /* Don't wait if the channel isn't enabled */
-        if ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000001) == 0x00000000) {
-                return;
-        }
+        switch (ch) {
+        case 0:
+                /* Don't wait if the channel isn't enabled */
+                if ((cpu_map->chcr0 & 0x00000001) == 0x00000000) {
+                        return;
+                }
 
-        /* TE bit will always be set upon normal or abnormal transfer */
-        while ((MEMORY_READ(32, CPU(CHCR0 | n)) & 0x00000002) == 0x00000000) {
+                /* TE bit will always be set upon normal or abnormal transfer */
+                while ((cpu_map->chcr0 & 0x00000002) == 0x00000000) {
+                }
+                break;
+        case 1:
+                /* Don't wait if the channel isn't enabled */
+                if ((cpu_map->chcr1 & 0x00000001) == 0x00000000) {
+                        return;
+                }
+
+                /* TE bit will always be set upon normal or abnormal transfer */
+                while ((cpu_map->chcr1 & 0x00000002) == 0x00000000) {
+                }
+                break;
         }
 }
 
@@ -249,33 +279,41 @@ cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
 static void __interrupt_handler
 _master_ch0_ihr_handler(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         callback_call(&_master_ihr_callbacks[IHR_INDEX_CH0]);
 
-        MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
+        cpu_map->chcr0 &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _slave_ch0_ihr_handler(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH0]);
 
-        MEMORY_WRITE_AND(32, CPU(CHCR0), ~0x00000005);
+        cpu_map->chcr0 &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _master_ch1_ihr_handler(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         callback_call(&_master_ihr_callbacks[IHR_INDEX_CH1]);
 
-        MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
+        cpu_map->chcr1 &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _slave_ch1_ihr_handler(void)
 {
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
         callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH1]);
 
-        MEMORY_WRITE_AND(32, CPU(CHCR1), ~0x00000005);
+        cpu_map->chcr1 &= ~0x00000005;
 }
 
 static callback_t *

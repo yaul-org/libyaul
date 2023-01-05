@@ -24,6 +24,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include <cpu/divu.h>
+
 #include "fix16.h"
 
 fix16_t
@@ -58,6 +60,14 @@ fix16_overflow_sub(fix16_t a, fix16_t b)
         }
 
         return diff;
+}
+
+fix16_t
+fix16_div(fix16_t dividend, fix16_t divisor)
+{
+        cpu_divu_fix16_set(dividend, divisor);
+
+        return cpu_divu_quotient_get();
 }
 
 fix16_t

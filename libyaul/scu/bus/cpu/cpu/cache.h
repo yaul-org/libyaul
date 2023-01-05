@@ -53,6 +53,9 @@ __BEGIN_DECLS
 
 /// @brief Given the tag bits from @ref cpu_cache_data_line_t, convert to a
 /// physical address.
+///
+/// @param x The 32-bit address value.
+///
 /// @see cpu_cache_data_line_t
 #define CPU_CACHE_TAG_ADDRESS(x) ((uint32_t)(x) >> 10)
 
@@ -103,14 +106,18 @@ typedef struct cpu_cache_data_way {
 static inline void __always_inline
 cpu_cache_enable(void)
 {
-        MEMORY_WRITE_OR(8, CPU(CCR), 0x01);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->ccr |= 0x01;
 }
 
 /// @brief Disable cache.
 static inline void __always_inline
 cpu_cache_disable(void)
 {
-        MEMORY_WRITE_AND(8, CPU(CCR), ~0x01);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+
+        cpu_map->ccr &= ~0x01;
 }
 
 /// @brief Enable type replacement.
@@ -122,13 +129,12 @@ cpu_cache_disable(void)
 static inline void __always_inline
 cpu_cache_repl_enable(cpu_cache_type_t type)
 {
-        volatile uint8_t * const reg_ccr =
-            (volatile uint8_t *)CPU(CCR);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        const uint8_t t0 = *reg_ccr & ~((uint8_t)type | 0x01);
+        const uint8_t t0 = cpu_map->ccr & ~((uint8_t)type | 0x01);
 
-        *reg_ccr = t0;
-        *reg_ccr = t0 | 0x01;
+        cpu_map->ccr = t0;
+        cpu_map->ccr = t0 | 0x01;
 }
 
 /// @brief Disable type replacement in the cache.
@@ -140,15 +146,14 @@ cpu_cache_repl_enable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_repl_disable(cpu_cache_type_t type)
 {
-        volatile uint8_t * const reg_ccr =
-            (volatile uint8_t *)CPU(CCR);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        const uint8_t t0 = *reg_ccr & ~0x01;
+        const uint8_t t0 = cpu_map->ccr & ~0x01;
 
         /* Set bit with cache disabled */
-        *reg_ccr = t0 | (uint8_t)type;
+        cpu_map->ccr = t0 | (uint8_t)type;
         /* Enable cache and set bit(s) */
-        *reg_ccr = t0 | (uint8_t)type | 0x01;
+        cpu_map->ccr = t0 | (uint8_t)type | 0x01;
 }
 
 /// @brief Change the mode the cache operates.
@@ -162,14 +167,13 @@ cpu_cache_repl_disable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 {
-        volatile uint8_t * const reg_ccr =
-            (volatile uint8_t *)CPU(CCR);
+        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
 
-        const uint8_t t0 = *reg_ccr & ~0x0F;
+        const uint8_t t0 = cpu_map->ccr & ~0x0F;
 
-        *reg_ccr = t0;
-        *reg_ccr = t0 | (uint8_t)mode;
-        *reg_ccr = t0 | (uint8_t)mode | 0x01;
+        cpu_map->ccr = t0;
+        cpu_map->ccr = t0 | (uint8_t)mode;
+        cpu_map->ccr = t0 | (uint8_t)mode | 0x01;
 }
 
 /// @brief Cache line of the specified address is purged.
