@@ -11,7 +11,7 @@
 #include "fix16.h"
 
 void
-fix16_mat3_zero(fix16_mat3_t *m0)
+fix16_mat33_zero(fix16_mat33_t *m0)
 {
         fix16_t *arr_ptr;
         arr_ptr = m0->arr;
@@ -28,7 +28,7 @@ fix16_mat3_zero(fix16_mat3_t *m0)
 }
 
 void
-fix16_mat3_dup(const fix16_mat3_t *m0, fix16_mat3_t *result)
+fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result)
 {
         const fix16_t *arr_ptr;
         arr_ptr = m0->arr;
@@ -50,7 +50,7 @@ fix16_mat3_dup(const fix16_mat3_t *m0, fix16_mat3_t *result)
 }
 
 void
-fix16_mat3_identity(fix16_mat3_t *m0)
+fix16_mat33_identity(fix16_mat33_t *m0)
 {
         fix16_t *arr_ptr;
         arr_ptr = m0->arr;
@@ -67,7 +67,7 @@ fix16_mat3_identity(fix16_mat3_t *m0)
 }
 
 void
-fix16_mat3_transpose(const fix16_mat3_t * __restrict m0, fix16_mat3_t * __restrict result)
+fix16_mat33_transpose(const fix16_mat33_t * __restrict m0, fix16_mat33_t * __restrict result)
 {
         result->frow[0][0] = m0->frow[0][0];
         result->frow[0][1] = m0->frow[1][0];
@@ -83,7 +83,7 @@ fix16_mat3_transpose(const fix16_mat3_t * __restrict m0, fix16_mat3_t * __restri
 }
 
 size_t
-fix16_mat3_str(const fix16_mat3_t *m0, char *buffer, int32_t decimals)
+fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals)
 {
         char *buffer_ptr;
         buffer_ptr = buffer;

@@ -15,26 +15,26 @@
 __BEGIN_DECLS
 
 typedef struct mat_stack {
-        fix16_mat_t *pool_matrix;
-        fix16_mat_t *top_matrix;
-        fix16_mat_t *bottom_matrix;
+        fix16_mat43_t *pool_matrix;
+        fix16_mat43_t *top_matrix;
+        fix16_mat43_t *bottom_matrix;
         uint32_t stack_count;
 } mat_stack_t;
 
-static inline fix16_mat_t * __always_inline
+static inline fix16_mat43_t * __always_inline
 mat_stack_top(mat_stack_t *mat_stack)
 {
         return mat_stack->top_matrix;
 }
 
-extern void mat_stack_init(mat_stack_t *mat_stack, fix16_mat_t *matrix_pool, uint32_t count);
+extern void mat_stack_init(mat_stack_t *mat_stack, fix16_mat43_t *matrix_pool, uint32_t count);
 extern void mat_stack_reset(mat_stack_t *mat_stack);
 
 extern void mat_stack_push(mat_stack_t *mat_stack);
 extern void mat_stack_ptr_push(mat_stack_t *mat_stack);
 extern void mat_stack_pop(mat_stack_t *mat_stack);
-extern void mat_stack_set(mat_stack_t *mat_stack, const fix16_mat_t *m0);
-extern void mat_stack_copy(mat_stack_t *mat_stack, fix16_mat_t *m0);
+extern void mat_stack_set(mat_stack_t *mat_stack, const fix16_mat43_t *m0);
+extern void mat_stack_copy(mat_stack_t *mat_stack, fix16_mat43_t *m0);
 
 extern void mat_stack_identity(mat_stack_t *mat_stack);
 

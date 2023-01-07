@@ -229,8 +229,8 @@ extern size_t fix16_str(fix16_t value, char *buffer, int32_t decimals);
 #include "fix16/fix16_vec3.h"
 #include "fix16/fix16_vec4.h"
 
-#include "fix16/fix16_mat.h"
-#include "fix16/fix16_mat3.h"
+#include "fix16/fix16_mat33.h"
+#include "fix16/fix16_mat43.h"
 
 #include "fix16/fix16_plane.h"
 

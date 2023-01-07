@@ -208,8 +208,8 @@ LIB_SRCS+= \
 	math/color/color.c \
 \
 	math/fix16/fix16.c \
-	math/fix16/fix16_mat.c \
-	math/fix16/fix16_mat3.c \
+	math/fix16/fix16_mat43.c \
+	math/fix16/fix16_mat33.c \
 	math/fix16/fix16_plane.c \
 	math/fix16/fix16_sqrt.c \
 	math/fix16/fix16_str.c \
@@ -325,8 +325,8 @@ INSTALL_HEADER_FILES+= \
 	./math/color/:rgb888.h:yaul/math/color/ \
 \
 	./math/:fix16.h:yaul/math/ \
-	./math/fix16/:fix16_mat.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_mat3.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_mat43.h:yaul/math/fix16/ \
+	./math/fix16/:fix16_mat33.h:yaul/math/fix16/ \
 	./math/fix16/:fix16_plane.h:yaul/math/fix16/ \
 	./math/fix16/:fix16_trig.h:yaul/math/fix16/ \
 	./math/fix16/:fix16_vec2.h:yaul/math/fix16/ \
