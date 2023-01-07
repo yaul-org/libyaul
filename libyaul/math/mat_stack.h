@@ -43,6 +43,7 @@ extern void mat_stack_y_translate(mat_stack_t *mat_stack, fix16_t y);
 extern void mat_stack_z_translate(mat_stack_t *mat_stack, fix16_t z);
 extern void mat_stack_translate(mat_stack_t *mat_stack, const fix16_vec3_t *t);
 extern void mat_stack_translation_set(mat_stack_t *mat_stack, const fix16_vec3_t *t);
+extern void mat_stack_translation_get(mat_stack_t *mat_stack, fix16_vec3_t *t);
 
 extern void mat_stack_x_rotate(mat_stack_t *mat_stack, angle_t angle);
 extern void mat_stack_y_rotate(mat_stack_t *mat_stack, angle_t angle);

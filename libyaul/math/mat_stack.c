@@ -133,6 +133,18 @@ mat_stack_translation_set(mat_stack_t *mat_stack, const fix16_vec3_t *t)
 }
 
 void
+mat_stack_translation_get(mat_stack_t *mat_stack, fix16_vec3_t *t)
+{
+        assert(mat_stack != NULL);
+
+        fix16_mat_t * const top_matrix = mat_stack->top_matrix;
+
+        t->x = top_matrix->frow[0][3];
+        t->y = top_matrix->frow[1][3];
+        t->z = top_matrix->frow[2][3];
+}
+
+void
 mat_stack_x_rotate(mat_stack_t *mat_stack, angle_t angle)
 {
         assert(mat_stack != NULL);
