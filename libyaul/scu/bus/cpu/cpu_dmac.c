@@ -37,7 +37,7 @@ static callback_t * const _ihr_callback_tables[] = {
 };
 
 void
-__cpu_dmac_init()
+__cpu_dmac_init(void)
 {
         cpu_dmac_channel_wait(0);
         cpu_dmac_channel_wait(1);
