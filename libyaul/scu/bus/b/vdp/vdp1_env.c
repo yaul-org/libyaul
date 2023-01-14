@@ -161,6 +161,7 @@ vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts, const vdp1_env_coords_t *env_coor
         vdp1_cmdt_user_clip_coord_set(cmdt);
         vdp1_cmdt_vtx_user_clip_coord_set(cmdt, env_coords->user_clip_ul,
             env_coords->user_clip_lr);
+        cmdt++;
 
         vdp1_cmdt_local_coord_set(cmdt);
         vdp1_cmdt_vtx_local_coord_set(cmdt, env_coords->local);

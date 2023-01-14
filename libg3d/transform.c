@@ -360,8 +360,8 @@ _vertex_pool_transform(const transform_t * const trans, const POINT * const poin
 
                 const FIXED inv_z = cpu_divu_regs[OFFSET_CPU_DVDNTL];
 
-                trans_proj->screen.x = fix16_int16_muls(point_x, inv_z);
-                trans_proj->screen.y = fix16_int16_muls(point_y, fix16_mul(ratio, inv_z));
+                trans_proj->screen.x = fix16_int32_mul(point_x, inv_z);
+                trans_proj->screen.y = fix16_int32_mul(point_y, fix16_mul(ratio, inv_z));
 
                 trans_proj++;
         } while (current_point <= last_point);
@@ -505,6 +505,9 @@ _cmdt_prepare(const transform_t * const trans)
 
         const ATTR * const attr = &xpdata->attbl[trans->index];
 
+        vdp1_cmdt_draw_mode_t * const draw_mode =
+            (vdp1_cmdt_draw_mode_t *)&cmdt->cmd_pmod;
+
         cmdt->cmd_ctrl = attr->dir; /* We care about (Dir) and (Comm) bits */
         cmdt->cmd_link = 0x0000;
         cmdt->cmd_pmod = attr->atrb;
@@ -523,7 +526,7 @@ _cmdt_prepare(const transform_t * const trans)
                 if (or_clip_flags == CLIP_FLAGS_NONE) {
                         /* Since no clip flags are set, disable pre-clipping.
                          * This should help with performance */
-                        cmdt->cmd_pmod |= VDP1_CMDT_PMOD_PRE_CLIPPING_DISABLE;
+                        draw_mode->pre_clipping_disable = true;
                 }
 
                 /* Even when there is not texture list, there is the default
@@ -547,34 +550,21 @@ _cmdt_prepare(const transform_t * const trans)
                         cmdt->cmd_srca = texture->CGadr;
                         cmdt->cmd_size = texture->HVsize;
 
-                        cmdt->cmd_pmod |= VDP1_CMDT_PMOD_HSS_ENABLE;
+                        draw_mode->hss_enable = true;
                 } else {
                         cmdt->cmd_colr = attr->colno;
                 }
         } else {
                 cmdt->cmd_ctrl = 0x0004 | ((object->flags & debug_flags) >> 1);
-                cmdt->cmd_pmod = VDP1_CMDT_PMOD_END_CODE_DISABLE | VDP1_CMDT_PMOD_TRANS_PIXEL_DISABLE;
+                draw_mode->end_code_disable = true;
+                draw_mode->trans_pixel_disable = true;
                 cmdt->cmd_colr = 0xFFFF;
         }
 
-        int16_vec2_t *cmd_vertex;
-        cmd_vertex = (int16_vec2_t *)(&cmdt->cmd_xa);
-
-        cmd_vertex->x = trans->polygon[0]->screen.x;
-        cmd_vertex->y = trans->polygon[0]->screen.y;
-        cmd_vertex++;
-
-        cmd_vertex->x = trans->polygon[1]->screen.x;
-        cmd_vertex->y = trans->polygon[1]->screen.y;
-        cmd_vertex++;
-
-        cmd_vertex->x = trans->polygon[2]->screen.x;
-        cmd_vertex->y = trans->polygon[2]->screen.y;
-        cmd_vertex++;
-
-        cmd_vertex->x = trans->polygon[3]->screen.x;
-        cmd_vertex->y = trans->polygon[3]->screen.y;
-        cmd_vertex++;
+        cmdt->cmd_vertices[0] = trans->polygon[0]->screen;
+        cmdt->cmd_vertices[1] = trans->polygon[1]->screen;
+        cmdt->cmd_vertices[2] = trans->polygon[2]->screen;
+        cmdt->cmd_vertices[3] = trans->polygon[3]->screen;
 
         cmdt->cmd_grda = attr->gstb;
 
@@ -603,7 +593,7 @@ _fog_calculate(const transform_t * const trans)
         }
 
         int32_t int_z_depth;
-        int_z_depth = fix16_int16_muls(trans->z_value, __state->fog->step);
+        int_z_depth = fix16_int32_mul(trans->z_value, __state->fog->step);
 
         if (int_z_depth < 0) {
                 int_z_depth = 0;

@@ -93,7 +93,7 @@ typedef struct vdp1_cmdt {
                         int16_t cmd_yc;
                         int16_t cmd_xd;
                         int16_t cmd_yd;
-                } __packed;
+                } __aligned(4) __packed;
 
                 int16_vec2_t cmd_vertices[4];
         };
@@ -214,7 +214,7 @@ extern vdp1_cmdt_orderlist_t *vdp1_cmdt_orderlist_alloc(uint16_t count);
 extern void vdp1_cmdt_orderlist_free(vdp1_cmdt_orderlist_t *cmdt_orderlist);
 extern void vdp1_cmdt_orderlist_vram_patch(vdp1_cmdt_orderlist_t *cmdt_orderlist,
     const vdp1_cmdt_t *cmdt_base, uint16_t count);
-
+
 static inline void __always_inline
 vdp1_cmdt_draw_mode_set(vdp1_cmdt_t *cmdt,
     vdp1_cmdt_draw_mode_t draw_mode)
@@ -337,7 +337,7 @@ vdp1_cmdt_vtx_local_coord_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
 static inline void __always_inline
 vdp1_cmdt_vtx_system_clip_coord_set(vdp1_cmdt_t *cmdt, int16_vec2_t p)
 {
-        cmdt->cmd_vertices[0] = p;
+        cmdt->cmd_vertices[2] = p;
 }
 
 static inline void __always_inline
@@ -495,7 +495,7 @@ vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *cmdt)
         cmdt->cmd_ctrl &= 0x8FFF;
         cmdt->cmd_ctrl |= 0x7000;
 }
-
+
 __END_DECLS
 
 #endif /* !_YAUL_VDP1_CMDT_H_ */

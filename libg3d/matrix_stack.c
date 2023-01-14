@@ -136,17 +136,14 @@ g3d_matrix_rot_load(const ANGLE rx, const ANGLE ry, const ANGLE rz)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
-        const int32_t rx_bradians = fix16_int16_muls(rx, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sx = fix16_bradians_sin(rx_bradians);
-        const FIXED cx = fix16_bradians_cos(rx_bradians);
+        const FIXED sx = fix16_sin(rx);
+        const FIXED cx = fix16_cos(rx);
 
-        const int32_t ry_bradians = fix16_int16_muls(ry, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sy = fix16_bradians_sin(ry_bradians);
-        const FIXED cy = fix16_bradians_cos(ry_bradians);
+        const FIXED sy = fix16_sin(ry);
+        const FIXED cy = fix16_cos(ry);
 
-        const int32_t rz_bradians = fix16_int16_muls(rz, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sz = fix16_bradians_sin(rz_bradians);
-        const FIXED cz = fix16_bradians_cos(rz_bradians);
+        const FIXED sz = fix16_sin(rz);
+        const FIXED cz = fix16_cos(rz);
 
         const FIXED sxsy = fix16_mul(sx, sy);
         const FIXED cxsy = fix16_mul(cx, sy);
@@ -167,9 +164,8 @@ g3d_matrix_rot_x(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
-        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sin = fix16_bradians_sin(bradians);
-        const FIXED cos = fix16_bradians_cos(bradians);
+        const FIXED sin = fix16_sin(angle);
+        const FIXED cos = fix16_cos(angle);
 
         const FIXED m01 = top_matrix[M01];
         const FIXED m02 = top_matrix[M02];
@@ -191,9 +187,8 @@ g3d_matrix_rot_y(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
-        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sin_value = fix16_bradians_sin(bradians);
-        const FIXED cos_value = fix16_bradians_cos(bradians);
+        const FIXED sin_value = fix16_sin(angle);
+        const FIXED cos_value = fix16_cos(angle);
 
         const FIXED m00 = top_matrix[M00];
         const FIXED m02 = top_matrix[M02];
@@ -215,9 +210,8 @@ g3d_matrix_rot_z(const ANGLE angle)
 {
         FIXED * const top_matrix = _state.top_matrix;
 
-        const int32_t bradians = fix16_int16_muls(angle, FIX16(FIX16_LUT_SIN_TABLE_COUNT));
-        const FIXED sin_value = fix16_bradians_sin(bradians);
-        const FIXED cos_value = fix16_bradians_cos(bradians);
+        const FIXED sin_value = fix16_sin(angle);
+        const FIXED cos_value = fix16_cos(angle);
 
         const FIXED m00 = top_matrix[M00];
         const FIXED m01 = top_matrix[M01];
