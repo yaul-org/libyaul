@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef _MIC3D_MATRIX_H_
 #define _MIC3D_MATRIX_H_
 

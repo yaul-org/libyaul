@@ -1,10 +1,8 @@
 /*
- * Copyright (c) 2006-2023
+ * Copyright (c) 2022-2023 Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
- * Mic
- * Shazz
  */
 
 #include <math.h>

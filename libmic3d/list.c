@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
