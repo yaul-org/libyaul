@@ -141,7 +141,7 @@ typedef enum cpu_dmac_resource_select {
 typedef void (*cpu_dmac_ihr_t)(void *);
 
 /// CPU-DMAC channel.
-typedef uint8_t cpu_dmac_channel_t;
+typedef int32_t cpu_dmac_channel_t;
 
 /// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
