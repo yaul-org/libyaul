@@ -2,7 +2,7 @@ PROJECTS:= \
 	libyaul \
 	libtga \
 	libbcl \
-	libg3d
+	libmic3d
 
 include env.mk
 
