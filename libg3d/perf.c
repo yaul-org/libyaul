@@ -1,14 +1,13 @@
 #include <math.h>
+#include <stdio.h>
 
 #include <cpu/frt.h>
+#include <cpu/intc.h>
 
-#include <g3d/perf.h>
+#include "internal.h"
 
+#ifdef PERF
 static void _frt_ovi_handler(void);
-
-static volatile struct {
-        uint32_t overflow_count;
-} _state;
 
 static uint32_t _absolute_ticks_get(void);
 
@@ -22,36 +21,62 @@ __perf_init(void)
 
         cpu_frt_count_set(0);
 
-        _state.overflow_count = 0;
+        __state.perf->overflow_count = 0;
+        __state.perf->active_counters = 0;
 }
 
 void
-perf_counter_init(perf_counter_t *perf_counter)
+__perf_counter_init(perf_counter_t *perf_counter)
 {
         perf_counter->ticks = 0;
+        perf_counter->start_tick = 0;
+        perf_counter->end_tick = 0;
         perf_counter->max_ticks = 0;
 }
 
 void
-perf_counter_start(perf_counter_t *perf_counter)
+__perf_counter_start(perf_counter_t *perf_counter)
 {
+        if (__state.perf->active_counters == 0) {
+                const uint32_t sr_mask = cpu_intc_mask_get();
+
+                cpu_intc_mask_set(15);
+
+                cpu_frt_count_set(0);
+                __state.perf->overflow_count = 0;
+
+                cpu_intc_mask_set(sr_mask);
+        }
+
         perf_counter->start_tick = _absolute_ticks_get();
+
+        __state.perf->active_counters++;
 }
 
 void
-perf_counter_end(perf_counter_t *perf_counter)
+__perf_counter_end(perf_counter_t *perf_counter)
 {
         perf_counter->end_tick = _absolute_ticks_get();
         perf_counter->ticks = perf_counter->end_tick - perf_counter->start_tick;
-
         perf_counter->max_ticks = max(perf_counter->ticks, perf_counter->max_ticks);
+
+        __state.perf->active_counters--;
+}
+
+size_t
+__perf_str(uint32_t ticks, char *buffer)
+{
+        /* Check clock: 320 or 352 */
+        const fix16_t time = fix16_div(ticks << 8, CPU_FRT_NTSC_320_8_COUNT_1MS << 8);
+
+        return fix16_str(time, buffer, 1);
 }
 
 static uint32_t
 _absolute_ticks_get(void)
 {
         const uint32_t ticks_remaining = cpu_frt_count_get();
-        const uint32_t overflow_ticks = _state.overflow_count * 65536;
+        const uint32_t overflow_ticks = __state.perf->overflow_count * 65536;
 
         const uint32_t ticks = (ticks_remaining + overflow_ticks);
 
@@ -61,5 +86,6 @@ _absolute_ticks_get(void)
 static void
 _frt_ovi_handler(void)
 {
-        _state.overflow_count++;
+        __state.perf->overflow_count++;
 }
+#endif /* PERF */

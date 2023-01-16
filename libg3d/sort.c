@@ -1,94 +1,87 @@
-/*
- * Copyright (c) 2020
- * See LICENSE for details.
- *
- * misscelan
- */
-
-#include <assert.h>
-#include <string.h>
 #include <math.h>
 
-#include "g3d.h"
-
-#include "g3d-internal.h"
-
-static struct {
-        /* Top pointer to the pool of singles */
-        sort_single_t *pool_free_top;
-        /* The maximum indexed Z value when adding packets */
-        int32_t max_z;
-} _state;
+#include "internal.h"
 
 static inline void __always_inline
-_pool_stack_reset(void)
+_singles_reset(void)
 {
-        _state.pool_free_top = &__state->sort_single_pool[0];
+        __state.sort->singles_top = __state.sort->singles_pool + 1;
+        __state.sort->singles_index = 0;
 }
 
 static inline sort_single_t * __always_inline
-_pool_stack_alloc(void)
+_singles_alloc(void)
 {
-        sort_single_t * const single = _state.pool_free_top;
+        sort_single_t * const single = __state.sort->singles_top;
 
-        _state.pool_free_top++;
+        __state.sort->singles_top++;
+        __state.sort->singles_index++;
 
         return single;
-}
-
-static inline void __always_inline
-_state_reset(void)
-{
-        _pool_stack_reset();
-
-        _state.max_z = 0;
 }
 
 void
 __sort_init(void)
 {
-        _state_reset();
+        extern sort_list_t __pool_sort_lists[];
+        extern sort_single_t __pool_sort_singles[];
 
-        (void)memset(__state->sort_list, 0, sizeof(sort_list_t) * SORT_Z_RANGE);
+        __state.sort->singles_pool = __pool_sort_singles;
+        __state.sort->sort_lists_pool = __pool_sort_lists;
+
+        __sort_start();
 }
 
 void
-__sort_add(void *packet, int32_t pz)
+__sort_start(void)
 {
-        pz = clamp(pz, 0, SORT_Z_RANGE - 1);
+        _singles_reset();
 
-        _state.max_z = max(pz, _state.max_z);
+        __state.sort->max_depth = 0;
+}
 
-        sort_list_t * const list_head = &__state->sort_list[pz];
+void
+__sort_insert(vdp1_link_t cmdt_link, int32_t z)
+{
+        const uint32_t index = clamp(z, 0, SORT_DEPTH - 1);
 
-        sort_single_t * const new_single = _pool_stack_alloc();
+        __state.sort->max_depth = max(index, __state.sort->max_depth);
 
-        new_single->packet = packet;
+        sort_list_t * const list_head = &__state.sort->sort_lists_pool[z];
+
+        sort_single_t * const new_single = _singles_alloc();
+        const uint32_t new_index = __state.sort->singles_index;
+
+        new_single->link = cmdt_link;
         new_single->next_single = list_head->head;
 
-        list_head->head = new_single;
+        list_head->head = new_index;
 }
 
 void
-__sort_iterate(sort_iterate_fn_t iterate_fn)
+__sort_iterate(sort_iterate_t iterate)
 {
-        assert(iterate_fn != NULL);
-
         sort_list_t *list_head;
-        list_head = &__state->sort_list[SORT_Z_RANGE - 1];
+        list_head = &__state.sort->sort_lists_pool[__state.sort->max_depth];
 
-        for (int32_t i = 0; i < SORT_Z_RANGE; i++, list_head--) {
-                const sort_single_t *single;
-                single = list_head->head;
-
-                while (single != NULL) {
-                        iterate_fn(single);
-
-                        single = single->next_single;
+        for (uint32_t i = 0; i <= __state.sort->max_depth; i++, list_head--) {
+                if (list_head->head == 0) {
+                        continue;
                 }
 
-                list_head->head = NULL;
-        }
+                const sort_single_t *single;
+                single = &__state.sort->singles_pool[list_head->head];
 
-        _state_reset();
+                while (true) {
+                        iterate(single);
+
+                        if (single->next_single == 0) {
+                                break;
+                        }
+
+                        single = &__state.sort->singles_pool[single->next_single];
+                }
+
+                list_head->head = 0;
+        }
 }

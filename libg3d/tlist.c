@@ -1,48 +1,52 @@
-/*
- * Copyright (c) 2020
- * See LICENSE for details.
- *
- * Israel Jacquez <mrkotfw@gmail.com>
- */
+#include "internal.h"
 
-#include <stdlib.h>
-
-#include "g3d.h"
-
-#include "g3d-internal.h"
-
-static TEXTURE _default_texture[] = {
-        TEXDEF(0, 0, 0x00000000)
+static texture_t _default_texture[] = {
+        {
+                .vram_index = TEXTURE_VRAM_INDEX(0),
+                .size       = TEXTURE_SIZE(0, 0)
+        }
 };
 
 void
 __tlist_init(void)
 {
-        list_t * const tlist = __state->tlist;
+        list_t * const tlist = &__state.tlist->list;
 
         tlist->flags = LIST_FLAGS_NONE;
-        tlist->list = _default_texture;
+        tlist->buffer = _default_texture;
         tlist->count = 0;
-        tlist->size = sizeof(TEXTURE);
+        tlist->size = sizeof(texture_t);
         tlist->default_element = _default_texture;
 }
 
-TEXTURE *
-g3d_tlist_alloc(uint16_t texture_count)
+texture_t *
+tlist_acquire(uint32_t count)
 {
-        __list_alloc(__state->tlist, texture_count);
+        list_t * const list = &__state.tlist->list;
 
-        return __state->tlist->list;
+        __list_alloc(list, count);
+
+        return list->buffer;
 }
 
 void
-g3d_tlist_free(void)
+tlist_release(void)
 {
-        __list_free(__state->tlist);
+        list_t * const list = &__state.tlist->list;
+
+        __list_free(list);
+}
+
+texture_t *
+tlist_get(void)
+{
+        return __state.tlist->list.buffer;
 }
 
 void
-g3d_tlist_set(TEXTURE *textures, uint16_t texture_count)
+tlist_set(texture_t *textures, uint16_t count)
 {
-        __list_set(__state->tlist, textures, texture_count);
+        list_t * const list = &__state.tlist->list;
+
+        __list_set(list, textures, count);
 }
