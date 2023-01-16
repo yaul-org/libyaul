@@ -1,5 +1,5 @@
-#ifndef MIC3D_H
-#define MIC3D_H
+#ifndef _MIC3D_H_
+#define _MIC3D_H_
 
 #include <mic3d/types.h>
 
@@ -55,4 +55,4 @@ void gst_unset(void);
 void gst_put(const vdp1_gouraud_table_t *gouraud_tables, uint32_t put_count);
 void gst_put_wait(void); /* XXX: Not yet implemented */
 
-#endif /* MIC3D_H */
+#endif /* _MIC3D_H_ */

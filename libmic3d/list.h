@@ -1,5 +1,5 @@
-#ifndef MIC3D_LIST_H
-#define MIC3D_LIST_H
+#ifndef _MIC3D_LIST_H_
+#define _MIC3D_LIST_H_
 
 #include <stdint.h>
 
@@ -21,4 +21,4 @@ void __list_alloc(list_t *list, uint16_t count);
 void __list_free(list_t *list);
 void __list_set(list_t *list, void *list_ptr, uint16_t count);
 
-#endif /* MIC3D_LIST_H */
+#endif /* _MIC3D_LIST_H_ */

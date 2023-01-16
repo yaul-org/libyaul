@@ -1,5 +1,5 @@
-#ifndef MIC3D_PERF_H
-#define MIC3D_PERF_H
+#ifndef _MIC3D_PERF_H_
+#define _MIC3D_PERF_H_
 
 #include <stdint.h>
 
@@ -32,4 +32,4 @@ size_t __perf_str(uint32_t ticks, char *buffer);
 #define __perf_str(x, y)
 #endif /* PERF */
 
-#endif /* !MIC3D_PERF_H */
+#endif /* !_MIC3D_PERF_H_ */

@@ -1,5 +1,5 @@
-#ifndef MIC3D_STATE_H
-#define MIC3D_STATE_H
+#ifndef _MIC3D_STATE_H_
+#define _MIC3D_STATE_H_
 
 #include <fix16.h>
 #include <mat_stack.h>
@@ -26,4 +26,4 @@ typedef struct {
 
 extern state_t __state;
 
-#endif /* MIC3D_STATE_H */
+#endif /* _MIC3D_STATE_H_ */

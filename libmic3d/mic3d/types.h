@@ -1,5 +1,5 @@
-#ifndef MIC3D_TYPES_H
-#define MIC3D_TYPES_H
+#ifndef _MIC3D_TYPES_H_
+#define _MIC3D_TYPES_H_
 
 #include <assert.h>
 
@@ -133,4 +133,4 @@ typedef struct {
 
 static_assert(sizeof(palette_t) == 8);
 
-#endif /* MIC3D_TYPES_H */
+#endif /* _MIC3D_TYPES_H_ */

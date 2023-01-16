@@ -1,5 +1,5 @@
-#ifndef MIC3D_SORT_H
-#define MIC3D_SORT_H
+#ifndef _MIC3D_SORT_H_
+#define _MIC3D_SORT_H_
 
 #include <assert.h>
 #include <stdint.h>
@@ -35,4 +35,4 @@ void __sort_start(void);
 void __sort_insert(vdp1_link_t cmdt_link, int32_t z);
 void __sort_iterate(sort_iterate_t iterate);
 
-#endif /* MIC3D_SORT_H */
+#endif /* _MIC3D_SORT_H_ */
