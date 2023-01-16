@@ -38,6 +38,17 @@ typedef enum vdp1_cmdt_command {
         VDP1_CMDT_LOCAL_COORD       = 10
 } vdp1_cmdt_command_t;
 
+typedef enum vdp1_cmdt_link_type {
+        VDP1_CMDT_LINK_TYPE_JUMP_NEXT   = 0,
+        VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN = 1 << 12,
+        VDP1_CMDT_LINK_TYPE_JUMP_CALL   = 2 << 12,
+        VDP1_CMDT_LINK_TYPE_JUMP_RETURN = 3 << 12,
+        VDP1_CMDT_LINK_TYPE_SKIP_NEXT   = 4 << 12,
+        VDP1_CMDT_LINK_TYPE_SKIP_ASSIGN = 5 << 12,
+        VDP1_CMDT_LINK_TYPE_SKIP_CALL   = 6 << 12,
+        VDP1_CMDT_LINK_TYPE_SKIP_RETURN = 7 << 12
+} vdp1_cmdt_link_type_t;
+
 typedef enum vdp1_cmdt_zoom_point {
         VDP1_CMDT_ZOOM_POINT_NONE         = 0x00,
         VDP1_CMDT_ZOOM_POINT_UPPER_LEFT   = 0x05,
@@ -438,35 +449,16 @@ vdp1_cmdt_end_set(vdp1_cmdt_t *cmdt)
 }
 
 static inline void __always_inline
-vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+vdp1_cmdt_link_type_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_link_type_t link_type)
 {
         cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x1000;
-        cmdt->cmd_link = index << 2;
+        cmdt->cmd_ctrl |= link_type;
 }
 
 static inline void __always_inline
-vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
+vdp1_cmdt_link_set(vdp1_cmdt_t *cmdt, vdp1_link_t link)
 {
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x2000;
-        cmdt->cmd_link = index << 2;
-}
-
-static inline void __always_inline
-vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, vdp1_link_t index)
-{
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x5000;
-        cmdt->cmd_link = index << 2;
-}
-
-static inline void __always_inline
-vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, vdp1_link_t index)
-{
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x6000;
-        cmdt->cmd_link = index << 2;
+        cmdt->cmd_link = link << 2;
 }
 
 static inline void __always_inline
@@ -476,24 +468,50 @@ vdp1_cmdt_jump_next(vdp1_cmdt_t *cmdt)
 }
 
 static inline void __always_inline
+vdp1_cmdt_jump_assign(vdp1_cmdt_t *cmdt, vdp1_link_t link)
+{
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
+        vdp1_cmdt_link_set(cmdt, link);
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_call(vdp1_cmdt_t *cmdt, vdp1_link_t link)
+{
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_CALL);
+        vdp1_cmdt_link_set(cmdt, link);
+}
+
+static inline void __always_inline
 vdp1_cmdt_jump_return(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x3000;
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_RETURN);
 }
 
 static inline void __always_inline
 vdp1_cmdt_jump_skip_next(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x4000;
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_SKIP_NEXT);
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_assign(vdp1_cmdt_t *cmdt, vdp1_link_t link)
+{
+
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_SKIP_ASSIGN);
+        vdp1_cmdt_link_set(cmdt, link);
+}
+
+static inline void __always_inline
+vdp1_cmdt_jump_skip_call(vdp1_cmdt_t *cmdt, vdp1_link_t link)
+{
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_SKIP_CALL);
+        vdp1_cmdt_link_set(cmdt, link);
 }
 
 static inline void __always_inline
 vdp1_cmdt_jump_skip_return(vdp1_cmdt_t *cmdt)
 {
-        cmdt->cmd_ctrl &= 0x8FFF;
-        cmdt->cmd_ctrl |= 0x7000;
+        vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_SKIP_RETURN);
 }
 
 __END_DECLS
