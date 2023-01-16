@@ -246,6 +246,36 @@ cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
 }
 
 void
+cpu_dmac_transfer(cpu_dmac_channel_t ch, void *dst, const void *src, size_t size)
+{
+        cpu_dmac_cfg_t dmac_cfg = {
+                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
+                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+                .stride   = CPU_DMAC_STRIDE_4_BYTES,
+                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+                .ihr      = NULL,
+                .ihr_work = NULL
+        };
+
+        dmac_cfg.channel = ch;
+        dmac_cfg.src     = (uint32_t)src;
+        dmac_cfg.dst     = CPU_CACHE_THROUGH | (uintptr_t)dst;
+        dmac_cfg.len     = size;
+
+        cpu_dmac_channel_wait(ch);
+        cpu_dmac_channel_stop(ch);
+        cpu_dmac_channel_config_set(&dmac_cfg);
+        cpu_dmac_channel_start(ch);
+        cpu_dmac_enable();
+}
+
+void
+cpu_dmac_transfer_wait(cpu_dmac_channel_t ch)
+{
+        cpu_dmac_channel_wait(ch);
+}
+
+void
 cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
     size_t size)
 {

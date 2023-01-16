@@ -425,6 +425,20 @@ extern void cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg);
 /// @param ch The channel.
 extern void cpu_dmac_channel_wait(cpu_dmac_channel_t ch);
 
+/// @brief Memory copy using CPU-DMAC using @p ref channel.
+///
+/// @param     ch   The channel.
+/// @param[in] dst  The destination address to copy to.
+/// @param[in] src  The source address to copy from.
+/// @param     size The amount of bytes to clear.
+extern void cpu_dmac_transfer(cpu_dmac_channel_t ch, void *dst, const void *src,
+    size_t size);
+
+/// @brief Wait for memory copy to complete.
+///
+/// @param ch The channel.
+extern void cpu_dmac_transfer_wait(cpu_dmac_channel_t ch);
+
 /// @brief Memory clear using CPU-DMAC using @p ref channel.
 ///
 /// @param     ch    The channel.
