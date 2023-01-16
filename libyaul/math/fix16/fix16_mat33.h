@@ -14,9 +14,8 @@
 #define FIX16_MAT33_ROWS      (3)
 #define FIX16_MAT33_ARR_COUNT (FIX16_MAT33_COLUMNS * FIX16_MAT33_ROWS)
 
-union fix16_vec3;
-
 typedef union fix16_vec3 fix16_vec3_t;
+typedef union fix16_mat43 fix16_mat43_t;
 
 /* Row-major matrix */
 typedef union fix16_mat33 {
@@ -29,10 +28,12 @@ typedef union fix16_mat33 {
         fix16_t arr[FIX16_MAT33_ARR_COUNT];
         fix16_t frow[FIX16_MAT33_COLUMNS][FIX16_MAT33_ROWS];
         fix16_vec3_t row[FIX16_MAT33_ROWS];
-} __aligned(4) fix16_mat33_t;
+} __packed __aligned(4) fix16_mat33_t;
 
 extern void fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result);
 extern void fix16_mat33_identity(fix16_mat33_t *m0);
+extern void fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1, fix16_mat33_t *result);
+extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result);
 extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals);
 extern void fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
     fix16_mat33_t * __restrict result);

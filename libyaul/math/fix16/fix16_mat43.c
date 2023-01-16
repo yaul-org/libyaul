@@ -10,7 +10,7 @@
 
 #include "fix16.h"
 
-static void _mat_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
+static void _mat43_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 
 void
 fix16_mat43_dup(const fix16_mat43_t *m0, fix16_mat43_t *result)
@@ -38,6 +38,28 @@ fix16_mat43_dup(const fix16_mat43_t *m0, fix16_mat43_t *result)
 }
 
 void
+fix16_mat43_identity(fix16_mat43_t *m0)
+{
+        fix16_t *arr_ptr;
+        arr_ptr = m0->arr;
+
+        *arr_ptr++ = FIX16_ONE;
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ZERO;
+
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ONE;
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ZERO;
+
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ZERO;
+        *arr_ptr++ = FIX16_ONE;
+        *arr_ptr   = FIX16_ZERO;
+}
+
+void
 fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result)
 {
         /* The expectation is that the rotation part of the matrix is
@@ -60,13 +82,13 @@ fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result)
                 .z = -m0->frow[2][3]
         };
 
-        _mat_row_transpose(&m0->arr[0], result_m00);
+        _mat43_row_transpose(&m0->arr[0], result_m00);
         result->frow[0][3] = fix16_vec3_dot(m00, &neg_t);
 
-        _mat_row_transpose(&m0->arr[1], result_m01);
+        _mat43_row_transpose(&m0->arr[1], result_m01);
         result->frow[1][3] = fix16_vec3_dot(m01, &neg_t);
 
-        _mat_row_transpose(&m0->arr[2], result_m02);
+        _mat43_row_transpose(&m0->arr[2], result_m02);
         result->frow[2][3] = fix16_vec3_dot(m02, &neg_t);
 }
 
@@ -79,22 +101,22 @@ fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t 
         const fix16_vec3_t * const m01 = (const fix16_vec3_t *)&m0->row[1];
         const fix16_vec3_t * const m02 = (const fix16_vec3_t *)&m0->row[2];
 
-        _mat_row_transpose(&m1->arr[0], &transposed_row);
+        _mat43_row_transpose(&m1->arr[0], &transposed_row);
         result->frow[0][0] = fix16_vec3_dot(m00, &transposed_row);
         result->frow[1][0] = fix16_vec3_dot(m01, &transposed_row);
         result->frow[2][0] = fix16_vec3_dot(m02, &transposed_row);
 
-        _mat_row_transpose(&m1->arr[1], &transposed_row);
+        _mat43_row_transpose(&m1->arr[1], &transposed_row);
         result->frow[0][1] = fix16_vec3_dot(m00, &transposed_row);
         result->frow[1][1] = fix16_vec3_dot(m01, &transposed_row);
         result->frow[2][1] = fix16_vec3_dot(m02, &transposed_row);
 
-        _mat_row_transpose(&m1->arr[2], &transposed_row);
+        _mat43_row_transpose(&m1->arr[2], &transposed_row);
         result->frow[0][2] = fix16_vec3_dot(m00, &transposed_row);
         result->frow[1][2] = fix16_vec3_dot(m01, &transposed_row);
         result->frow[2][2] = fix16_vec3_dot(m02, &transposed_row);
 
-        _mat_row_transpose(&m1->arr[3], &transposed_row);
+        _mat43_row_transpose(&m1->arr[3], &transposed_row);
         result->frow[0][3] = fix16_vec3_dot(m00, &transposed_row) + m0->frow[0][3];
         result->frow[1][3] = fix16_vec3_dot(m01, &transposed_row) + m0->frow[1][3];
         result->frow[2][3] = fix16_vec3_dot(m02, &transposed_row) + m0->frow[2][3];
@@ -225,28 +247,6 @@ fix16_mat43_rotation_set(const fix16_mat33_t *r, fix16_mat43_t *result)
         *result_arr_ptr   = *r_arr_ptr;
 }
 
-void
-fix16_mat43_identity(fix16_mat43_t *m0)
-{
-        fix16_t *arr_ptr;
-        arr_ptr = m0->arr;
-
-        *arr_ptr++ = FIX16_ONE;
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ZERO;
-
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ONE;
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ZERO;
-
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ZERO;
-        *arr_ptr++ = FIX16_ONE;
-        *arr_ptr   = FIX16_ZERO;
-}
-
 size_t
 fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t decimals)
 {
@@ -287,14 +287,9 @@ fix16_mat43_zero(fix16_mat43_t *m0)
 }
 
 static void
-_mat_row_transpose(const fix16_t *arr, fix16_vec3_t *m0)
+_mat43_row_transpose(const fix16_t *arr, fix16_vec3_t *m0)
 {
-        const fix16_t *arr_ptr;
-        arr_ptr = arr;
-
-        m0->x = *arr_ptr;
-        arr_ptr += 4;
-        m0->y = *arr_ptr;
-        arr_ptr += 4;
-        m0->z = *arr_ptr;
+        m0->x = arr[0];
+        m0->y = arr[4];
+        m0->z = arr[8];
 }
