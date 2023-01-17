@@ -20,8 +20,8 @@
 /// @param x The byte offset.
 #define CPU(x) (0xFFFFF000UL + (x))
 
-/// @brief Base CPU address, for use with @ref cpu_map_t.
-#define CPU_MAP_BASE CPU(0x00000E00UL)
+/// @brief Base CPU address, for use with @ref cpu_ioregs_t.
+#define CPU_IOREG_BASE CPU(0x00000E00UL)
 
 /// @}
 
@@ -32,7 +32,7 @@
 
 /// @brief CPU I/O register map.
 /// @see CPU_MAP_BASE
-typedef struct cpu_map {
+typedef struct cpu_ioregs {
         uint8_t  smr;     /* 0x00000E00, 0x00000000 */
         uint8_t  brr;     /* 0x00000E01, 0x00000000 */
         uint8_t  scr;     /* 0x00000E02, 0x00000000 */
@@ -467,7 +467,7 @@ typedef struct cpu_map {
         uint32_t rtcsr;   /* 0x00000FF0, 0x00000174 */
         uint32_t rtcnt;   /* 0x00000FF4, 0x00000174 */
         uint32_t rtcor;   /* 0x00000FF8, 0x00000174 */
-} __packed cpu_map_t;
+} __packed cpu_ioregs_t;
 
 /// @brief CPU I/O register.
 /// @see CPU

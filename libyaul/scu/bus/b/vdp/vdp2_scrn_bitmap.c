@@ -35,19 +35,19 @@ vdp2_scrn_bitmap_ccc_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
 
         switch (bitmap_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->chctla &= 0xFF8C; /* Bits 0, 4, 5, 6 */
-                _state_vdp2()->regs->chctla |= ((bitmap_format->ccc & 0x07) << 4) | 0x0002;
+                _state_vdp2()->shadow_regs.chctla &= 0xFF8C; /* Bits 0, 4, 5, 6 */
+                _state_vdp2()->shadow_regs.chctla |= ((bitmap_format->ccc & 0x07) << 4) | 0x0002;
 
-                bmp_reg = &_state_vdp2()->regs->bmpna;
+                bmp_reg = &_state_vdp2()->shadow_regs.bmpna;
                 bmpna_bits = palette_number;
 
                 *bmp_reg &= 0xFFC8; /* Bits 0, 1, 2, 4, 5 */
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->chctla &= 0xCCFF; /* Bits 8, 9, 12, 13 */
-                _state_vdp2()->regs->chctla |= ((bitmap_format->ccc & 0x03) << 12) | 0x0200;
+                _state_vdp2()->shadow_regs.chctla &= 0xCCFF; /* Bits 8, 9, 12, 13 */
+                _state_vdp2()->shadow_regs.chctla |= ((bitmap_format->ccc & 0x03) << 12) | 0x0200;
 
-                bmp_reg = &_state_vdp2()->regs->bmpna;
+                bmp_reg = &_state_vdp2()->shadow_regs.bmpna;
                 bmpna_bits = palette_number << 8;
 
                 *bmp_reg &= 0xC8FF; /* Bits 8, 9, 10, 12, 13 */
@@ -55,10 +55,10 @@ vdp2_scrn_bitmap_ccc_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->chctlb &= 0x8CFF; /* Bits 8, 9, 12, 13, 14 */
-                _state_vdp2()->regs->chctlb |= ((bitmap_format->ccc & 0x03) << 12) | 0x0200;
+                _state_vdp2()->shadow_regs.chctlb &= 0x8CFF; /* Bits 8, 9, 12, 13, 14 */
+                _state_vdp2()->shadow_regs.chctlb |= ((bitmap_format->ccc & 0x03) << 12) | 0x0200;
 
-                bmp_reg = &_state_vdp2()->regs->bmpnb;
+                bmp_reg = &_state_vdp2()->shadow_regs.bmpnb;
                 bmpna_bits = palette_number;
 
                 *bmp_reg &= 0xFFC8; /* Bits 0, 1, 2, 4, 5 */
@@ -91,21 +91,21 @@ vdp2_scrn_bitmap_base_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
 
         switch (bitmap_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->mpofn &= 0xFFF8; /* Bits 0, 1, 2 */
-                _state_vdp2()->regs->mpofn |= bank;
+                _state_vdp2()->shadow_regs.mpofn &= 0xFFF8; /* Bits 0, 1, 2 */
+                _state_vdp2()->shadow_regs.mpofn |= bank;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->mpofn &= 0xFF8F; /* Bits 4,5,6 */
-                _state_vdp2()->regs->mpofn |= bank << 4;
+                _state_vdp2()->shadow_regs.mpofn &= 0xFF8F; /* Bits 4,5,6 */
+                _state_vdp2()->shadow_regs.mpofn |= bank << 4;
                 break;
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
-                _state_vdp2()->regs->mpofr &= 0xFFF8;
-                _state_vdp2()->regs->mpofr |= bank;
+                _state_vdp2()->shadow_regs.mpofr &= 0xFFF8;
+                _state_vdp2()->shadow_regs.mpofr |= bank;
                 break;
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->mpofr &= 0xFF8F;
-                _state_vdp2()->regs->mpofr |= bank << 4;
+                _state_vdp2()->shadow_regs.mpofr &= 0xFF8F;
+                _state_vdp2()->shadow_regs.mpofr |= bank << 4;
                 break;
         default:
                 break;
@@ -117,17 +117,17 @@ vdp2_scrn_bitmap_size_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
 {
         switch (bitmap_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->chctla &= 0xFFF3;
-                _state_vdp2()->regs->chctla |= bitmap_format->bitmap_size;
+                _state_vdp2()->shadow_regs.chctla &= 0xFFF3;
+                _state_vdp2()->shadow_regs.chctla |= bitmap_format->bitmap_size;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->chctla &= 0xF3FF;
-                _state_vdp2()->regs->chctla |= bitmap_format->bitmap_size << 8;
+                _state_vdp2()->shadow_regs.chctla &= 0xF3FF;
+                _state_vdp2()->shadow_regs.chctla |= bitmap_format->bitmap_size << 8;
                 break;
         case VDP2_SCRN_RBG0_PA:
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->chctlb &= 0xFBFF;
-                _state_vdp2()->regs->chctlb |= (bitmap_format->bitmap_size & 0x0004) << 10;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFBFF;
+                _state_vdp2()->shadow_regs.chctlb |= (bitmap_format->bitmap_size & 0x0004) << 10;
                 break;
         default:
                 break;

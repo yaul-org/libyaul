@@ -37,7 +37,7 @@ typedef enum vdp2_scrn {
         VDP2_SCRN_RBG0_PA = 1 << 7,
         /// Rotational background Parameter B.
         VDP2_SCRN_RBG0_PB = 1 << 8
-} __packed vdp2_scrn_t;
+} vdp2_scrn_t;
 
 typedef enum vdp2_scrn_disp {
         VDP2_SCRN_DISPTP_NONE = 0x0000,

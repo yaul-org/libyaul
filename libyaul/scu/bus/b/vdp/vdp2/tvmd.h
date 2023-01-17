@@ -67,13 +67,17 @@ typedef enum vdp2_tvmd_horz {
 static inline bool __always_inline
 vdp2_tvmd_vblank_in(void)
 {
-        return ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0008);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return ((vdp2_ioregs->tvstat & 0x0008) == 0x0008);
 }
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_out(void)
 {
-        return ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0008) == 0x0000);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return ((vdp2_ioregs->tvstat & 0x0008) == 0x0000);
 }
 
 static inline void __always_inline
@@ -95,27 +99,35 @@ vdp2_tvmd_vblank_out_wait(void)
 static inline void __always_inline
 vdp2_tvmd_extern_wait(void)
 {
-        for (; ((MEMORY_READ(16, VDP2(EXTEN)) & 0x0200) == 0x0200); );
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        for (; ((vdp2_ioregs->exten & 0x0200) == 0x0200); );
 }
 
 static inline void __always_inline
 vdp2_tvmd_extern_latch(void)
 {
-        MEMORY_WRITE_AND(16, VDP2(EXTEN), ~0x0200);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        for (; ((MEMORY_READ(16, VDP2(TVSTAT)) & 0x0200) == 0x0200); );
+        vdp2_ioregs->exten &= ~0x0200;
+
+        for (; ((vdp2_ioregs->tvstat & 0x0200) == 0x0200); );
 }
 
 static inline uint16_t __always_inline
 vdp2_tvmd_hcount_get(void)
 {
-        return (MEMORY_READ(16, VDP2(HCNT)) & 0x03FF);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return (vdp2_ioregs->hcnt & 0x03FF);
 }
 
 static inline uint16_t __always_inline
 vdp2_tvmd_vcount_get(void)
 {
-        return (MEMORY_READ(16, VDP2(VCNT)) & 0x03FF);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return (vdp2_ioregs->vcnt & 0x03FF);
 }
 
 static inline void __always_inline
@@ -136,19 +148,25 @@ vdp2_tvmd_vcount_wait(uint16_t scanline)
 static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
-        return (vdp2_tvmd_tv_standard_t)(MEMORY_READ(16, VDP2(TVSTAT)) & 0x0001);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return (vdp2_tvmd_tv_standard_t)(vdp2_ioregs->tvstat & 0x0001);
 }
 
 static inline vdp2_tvmd_tv_field_t __always_inline
 vdp2_tvmd_field_scan_get(void)
 {
-        return (vdp2_tvmd_tv_field_t)((MEMORY_READ(16, VDP2(TVSTAT)) >> 1) & 0x0001);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return (vdp2_tvmd_tv_field_t)((vdp2_ioregs->tvstat >> 1) & 0x0001);
 }
 
 static inline bool __always_inline
 vdp2_tvmd_display(void)
 {
-        return (((MEMORY_READ(16, VDP2(TVMD))) & 0x8000) == 0x8000);
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        return ((vdp2_ioregs->tvmd & 0x8000) == 0x8000);
 }
 
 extern void vdp2_tvmd_display_clear(void);

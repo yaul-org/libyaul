@@ -299,7 +299,7 @@ vdp1_sync_busy(void)
         const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(0);
 
-        bool busy = ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC);
+        const bool busy = ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC);
 
         cpu_intc_mask_set(sr_mask);
 
@@ -325,16 +325,18 @@ vdp1_sync_wait(void)
 void
 vdp1_sync_interval_set(int8_t interval)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
+
+        vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+
         uint8_t mode;
-
-        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
-
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
 
         if (interval == 0) {
                 mode = VDP1_INTERVAL_MODE_AUTO;
 
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
+                vdp1_ioregs->fbcr = VDP1_FBCR_NONE;
         } else if (interval < 0) {
                 mode = VDP1_INTERVAL_MODE_VARIABLE;
 
@@ -349,8 +351,8 @@ vdp1_sync_interval_set(int8_t interval)
                 _state.vdp1.frame_count = 0;
 
                 vdp2_tvmd_vblank_in_next_wait(1);
-                MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                vdp1_ioregs->ptmr = VDP1_PTMR_IDLE;
+                vdp1_ioregs->fbcr = VDP1_FBCR_FCM_FCT;
                 vdp2_tvmd_vcount_wait(0);
         } else {
                 mode = VDP1_INTERVAL_MODE_FIXED;
@@ -358,7 +360,7 @@ vdp1_sync_interval_set(int8_t interval)
                 _state.vdp1.frame_rate = interval;
                 _state.vdp1.frame_count = 0;
 
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                vdp1_ioregs->fbcr = VDP1_FBCR_FCM_FCT;
         }
 
         _state.vdp1.interval_mode = mode;
@@ -522,7 +524,7 @@ vdp2_sync(void)
         _state.flags &= ~SYNC_FLAG_INTERLACE_SINGLE;
         _state.flags &= ~SYNC_FLAG_INTERLACE_DOUBLE;
 
-        switch ((_state_vdp2()->regs->tvmd >> 6) & 0x3) {
+        switch ((_state_vdp2()->shadow_regs.tvmd >> 6) & 0x3) {
         case 0x2:
                 _state.flags |= SYNC_FLAG_INTERLACE_SINGLE;
                 break;
@@ -775,7 +777,9 @@ _vdp1_vblank_out_call(void)
 static void
 _vdp1_mode_auto_dma(void)
 {
-        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_AUTO);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        vdp1_ioregs->ptmr = VDP1_PTMR_AUTO;
 
         _state.vdp1.flags |= VDP1_FLAG_LIST_XFERRED;
 
@@ -808,19 +812,21 @@ _vdp1_mode_auto_vblank_in(void)
 static void
 _vdp1_mode_auto_vblank_out(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         /* Going from manual to 1-cycle mode requires the FCM and FCT bits to be
          * cleared. Otherwise, we get weird behavior from the VDP1.
          *
          * However, VDP1(FBCR) must not be entirely cleared. This caused a lot
          * of glitching when in double-density interlace mode */
-        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
+        vdp1_ioregs->fbcr = VDP1_FBCR_NONE;
 
         switch (_state.vdp1.fb_mode) {
         case VDP1_FB_MODE_ERASE_CHANGE:
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_NONE);
+                vdp1_ioregs->fbcr = VDP1_FBCR_NONE;
                 break;
         case VDP1_FB_MODE_CHANGE_ONLY:
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                vdp1_ioregs->fbcr = VDP1_FBCR_FCM_FCT;
                 break;
         }
 
@@ -846,7 +852,9 @@ _vdp1_mode_fixed_dma(void)
 static void
 _vdp1_mode_fixed_sync_render(void)
 {
-        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_PLOT);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        vdp1_ioregs->ptmr = VDP1_PTMR_PLOT;
 }
 
 static void
@@ -867,6 +875,8 @@ _vdp1_mode_fixed_sprite_end(void)
 static void
 _vdp1_mode_fixed_vblank_in(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         /* Cache the state to avoid multiple loads */
         uint8_t state_vdp1_flags;
         state_vdp1_flags = _state.vdp1.flags;
@@ -890,10 +900,10 @@ _vdp1_mode_fixed_vblank_in(void)
                  * display frame buffer so that by the next frame we can call to
                  * change frame buffers */
                 if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
-                        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+                        _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
 
-                        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-                        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM);
+                        vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+                        vdp1_ioregs->fbcr = VDP1_FBCR_FCM;
                 }
         } else if (_state.vdp1.frame_count == _state.vdp1.frame_rate) {
                 /* Undo the increment at the end of function */
@@ -901,14 +911,14 @@ _vdp1_mode_fixed_vblank_in(void)
 
                 /* Force stop plotting */
                 if (!list_committed && !transfer_status.cef) {
-                        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_IDLE);
+                        vdp1_ioregs->ptmr = VDP1_PTMR_IDLE;
 
                         _vdp1_sprite_end_call();
                 }
 
                 state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
 
-                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                vdp1_ioregs->fbcr = VDP1_FBCR_FCM_FCT;
         }
 
         _state.vdp1.flags = state_vdp1_flags;
@@ -957,7 +967,9 @@ _vdp1_mode_variable_dma(void)
 static void
 _vdp1_mode_variable_sync_render(void)
 {
-        MEMORY_WRITE(16, VDP1(PTMR), VDP1_PTMR_PLOT);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        vdp1_ioregs->ptmr = VDP1_PTMR_PLOT;
 }
 
 static void
@@ -971,6 +983,8 @@ _vdp1_mode_variable_sprite_end(void)
 static void
 _vdp1_mode_variable_vblank_in(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         /* Cache the state to avoid multiple loads */
         uint8_t state_vdp1_flags;
         state_vdp1_flags = _state.vdp1.flags;
@@ -1001,10 +1015,10 @@ _vdp1_mode_variable_vblank_in(void)
 
                 if ((frame_count + 1) == frame_rate) {
                         if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
-                                _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+                                _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
 
-                                MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-                                MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM);
+                                vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+                                vdp1_ioregs->fbcr = VDP1_FBCR_FCM;
                         }
                 /* Resetting (-1 for undoing the increment at the end of
                  * function) the frame count only when the list has been
@@ -1015,15 +1029,14 @@ _vdp1_mode_variable_vblank_in(void)
 
                         state_vdp1_flags |= VDP1_FLAG_REQUEST_CHANGE;
 
-                        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+                        _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
 
                         if (_state.vdp1.fb_mode == VDP1_FB_MODE_ERASE_CHANGE) {
-                                _state_vdp1()->regs->tvmr |= VDP1_TVMR_VBE;
+                                _state_vdp1()->shadow_ioregs.tvmr |= VDP1_TVMR_VBE;
                         }
 
-                        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-
-                        MEMORY_WRITE(16, VDP1(FBCR), VDP1_FBCR_FCM_FCT);
+                        vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+                        vdp1_ioregs->fbcr = VDP1_FBCR_FCM_FCT;
                 }
         }
 
@@ -1036,6 +1049,8 @@ _vdp1_mode_variable_vblank_in(void)
 static void
 _vdp1_mode_variable_vblank_out(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         uint8_t state_vdp1_flags;
         state_vdp1_flags = _state.vdp1.flags;
 
@@ -1047,9 +1062,9 @@ _vdp1_mode_variable_vblank_out(void)
                 return;
         }
 
-        _state_vdp1()->regs->tvmr &= ~VDP1_TVMR_VBE;
+        _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
 
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
+        vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
 
         /* Wait until scanline #0 is reached to avoid the frame buffer change
          * from aborting plotting, resulting in a soft lock.

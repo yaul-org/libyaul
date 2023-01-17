@@ -30,26 +30,26 @@ vdp2_scrn_cell_ccc_set(const vdp2_scrn_cell_format_t *cell_format)
 {
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->chctla &= 0xFF8F;
-                _state_vdp2()->regs->chctla |= cell_format->ccc << 4;
+                _state_vdp2()->shadow_regs.chctla &= 0xFF8F;
+                _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 4;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->chctla &= 0xCFFF;
-                _state_vdp2()->regs->chctla |= cell_format->ccc << 12;
+                _state_vdp2()->shadow_regs.chctla &= 0xCFFF;
+                _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 12;
                 break;
         case VDP2_SCRN_NBG2:
-                _state_vdp2()->regs->chctlb &= 0xFFFD;
-                _state_vdp2()->regs->chctlb |= cell_format->ccc << 1;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFFFD;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->ccc << 1;
                 break;
         case VDP2_SCRN_NBG3:
-                _state_vdp2()->regs->chctlb &= 0xFFDF;
-                _state_vdp2()->regs->chctlb |= cell_format->ccc << 5;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFFDF;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->ccc << 5;
                 break;
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->chctlb &= 0x8FFF;
-                _state_vdp2()->regs->chctlb |= cell_format->ccc << 12;
+                _state_vdp2()->shadow_regs.chctlb &= 0x8FFF;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->ccc << 12;
                 break;
         default:
                 break;
@@ -61,26 +61,26 @@ vdp2_scrn_char_size_set(const vdp2_scrn_cell_format_t *cell_format)
 {
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->chctla &= 0xFFFE;
-                _state_vdp2()->regs->chctla |= cell_format->char_size;
+                _state_vdp2()->shadow_regs.chctla &= 0xFFFE;
+                _state_vdp2()->shadow_regs.chctla |= cell_format->char_size;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->chctla &= 0xFEFF;
-                _state_vdp2()->regs->chctla |= cell_format->char_size << 8;
+                _state_vdp2()->shadow_regs.chctla &= 0xFEFF;
+                _state_vdp2()->shadow_regs.chctla |= cell_format->char_size << 8;
                 break;
         case VDP2_SCRN_NBG2:
-                _state_vdp2()->regs->chctlb &= 0xFFFE;
-                _state_vdp2()->regs->chctlb |= cell_format->char_size;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFFFE;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->char_size;
                 break;
         case VDP2_SCRN_NBG3:
-                _state_vdp2()->regs->chctlb &= 0xFFEF;
-                _state_vdp2()->regs->chctlb |= cell_format->char_size << 4;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFFEF;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->char_size << 4;
                 break;
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->chctlb &= 0xFEFF;
-                _state_vdp2()->regs->chctlb |= cell_format->char_size << 8;
+                _state_vdp2()->shadow_regs.chctlb &= 0xFEFF;
+                _state_vdp2()->shadow_regs.chctlb |= cell_format->char_size << 8;
                 break;
         default:
                 break;
@@ -94,29 +94,29 @@ vdp2_scrn_plane_size_set(const vdp2_scrn_cell_format_t *cell_format)
 
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->plsz &= 0xFFFC;
-                _state_vdp2()->regs->plsz |= plane_size >> 2;
+                _state_vdp2()->shadow_regs.plsz &= 0xFFFC;
+                _state_vdp2()->shadow_regs.plsz |= plane_size >> 2;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->plsz &= 0xFFF3;
-                _state_vdp2()->regs->plsz |= plane_size;
+                _state_vdp2()->shadow_regs.plsz &= 0xFFF3;
+                _state_vdp2()->shadow_regs.plsz |= plane_size;
                 break;
         case VDP2_SCRN_NBG2:
-                _state_vdp2()->regs->plsz &= 0xFFCF;
-                _state_vdp2()->regs->plsz |= plane_size << 2;
+                _state_vdp2()->shadow_regs.plsz &= 0xFFCF;
+                _state_vdp2()->shadow_regs.plsz |= plane_size << 2;
                 break;
         case VDP2_SCRN_NBG3:
-                _state_vdp2()->regs->plsz &= 0xFF3F;
-                _state_vdp2()->regs->plsz |= plane_size << 4;
+                _state_vdp2()->shadow_regs.plsz &= 0xFF3F;
+                _state_vdp2()->shadow_regs.plsz |= plane_size << 4;
                 break;
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
-                _state_vdp2()->regs->plsz &= 0xFCFF;
-                _state_vdp2()->regs->plsz |= plane_size << 8;
+                _state_vdp2()->shadow_regs.plsz &= 0xFCFF;
+                _state_vdp2()->shadow_regs.plsz |= plane_size << 8;
                 break;
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->plsz &= 0xCFFF;
-                _state_vdp2()->regs->plsz |= plane_size << 12;
+                _state_vdp2()->shadow_regs.plsz &= 0xCFFF;
+                _state_vdp2()->shadow_regs.plsz |= plane_size << 12;
                 break;
         default:
                 break;
@@ -167,36 +167,36 @@ vdp2_scrn_map_plane_set(const vdp2_scrn_cell_format_t *cell_format,
 
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->mpofn &= 0xFFF8;
-                _state_vdp2()->regs->mpofn |= map_offset_bits;
+                _state_vdp2()->shadow_regs.mpofn &= 0xFFF8;
+                _state_vdp2()->shadow_regs.mpofn |= map_offset_bits;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->mpofn &= 0xFF8F;
-                _state_vdp2()->regs->mpofn |= map_offset_bits << 4;
+                _state_vdp2()->shadow_regs.mpofn &= 0xFF8F;
+                _state_vdp2()->shadow_regs.mpofn |= map_offset_bits << 4;
                 break;
         case VDP2_SCRN_NBG2:
-                _state_vdp2()->regs->mpofn &= 0xF8FF;
-                _state_vdp2()->regs->mpofn |= map_offset_bits << 8;
+                _state_vdp2()->shadow_regs.mpofn &= 0xF8FF;
+                _state_vdp2()->shadow_regs.mpofn |= map_offset_bits << 8;
                 break;
         case VDP2_SCRN_NBG3:
-                _state_vdp2()->regs->mpofn &= 0x8FFF;
-                _state_vdp2()->regs->mpofn |= map_offset_bits << 12;
+                _state_vdp2()->shadow_regs.mpofn &= 0x8FFF;
+                _state_vdp2()->shadow_regs.mpofn |= map_offset_bits << 12;
                 break;
         case VDP2_SCRN_RBG0:
         case VDP2_SCRN_RBG0_PA:
-                _state_vdp2()->regs->mpofr &= 0xFFF8;
-                _state_vdp2()->regs->mpofr |= map_offset_bits;
+                _state_vdp2()->shadow_regs.mpofr &= 0xFFF8;
+                _state_vdp2()->shadow_regs.mpofr |= map_offset_bits;
                 break;
         case VDP2_SCRN_RBG0_PB:
-                _state_vdp2()->regs->mpofr &= 0xFF8F;
-                _state_vdp2()->regs->mpofr |= map_offset_bits << 4;
+                _state_vdp2()->shadow_regs.mpofr &= 0xFF8F;
+                _state_vdp2()->shadow_regs.mpofr |= map_offset_bits << 4;
                 break;
         default:
                 break;
         }
 
         uint16_t *mp_reg;
-        mp_reg = (uint16_t *)&_state_vdp2()->regs->mpabn0;
+        mp_reg = (uint16_t *)&_state_vdp2()->shadow_regs.mpabn0;
 
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:
@@ -268,7 +268,7 @@ vdp2_scrn_pnd_set(const vdp2_scrn_cell_format_t *cell_format)
         }
 
         uint16_t *pnc_reg;
-        pnc_reg = &_state_vdp2()->regs->pncn0;
+        pnc_reg = &_state_vdp2()->shadow_regs.pncn0;
 
         switch (cell_format->scroll_screen) {
         case VDP2_SCRN_NBG0:

@@ -21,8 +21,8 @@ vdp2_scrn_mosaic_set(vdp2_scrn_t scrn_mask)
                 scrn_mask |= VDP2_SCRN_RBG0;
         }
 
-        _state_vdp2()->regs->mzctl &= 0xFFE0;
-        _state_vdp2()->regs->mzctl |= scrn_mask;
+        _state_vdp2()->shadow_regs.mzctl &= 0xFFE0;
+        _state_vdp2()->shadow_regs.mzctl |= scrn_mask;
 }
 
 void
@@ -30,8 +30,8 @@ vdp2_scrn_mosaic_vertical_set(uint8_t vertical)
 {
         vertical = clamp(vertical, 1, 16);
 
-        _state_vdp2()->regs->mzctl &= 0x0FFF;
-        _state_vdp2()->regs->mzctl |= (vertical - 1) << 12;
+        _state_vdp2()->shadow_regs.mzctl &= 0x0FFF;
+        _state_vdp2()->shadow_regs.mzctl |= (vertical - 1) << 12;
 }
 
 void
@@ -39,6 +39,6 @@ vdp2_scrn_mosaic_horizontal_set(uint8_t horizontal)
 {
         horizontal = clamp(horizontal, 1, 16);
 
-        _state_vdp2()->regs->mzctl &= 0xF0FF;
-        _state_vdp2()->regs->mzctl |= (horizontal - 1) << 8;
+        _state_vdp2()->shadow_regs.mzctl &= 0xF0FF;
+        _state_vdp2()->shadow_regs.mzctl |= (horizontal - 1) << 8;
 }

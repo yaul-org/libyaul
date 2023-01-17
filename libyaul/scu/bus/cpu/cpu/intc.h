@@ -214,9 +214,9 @@ cpu_intc_mask_set(uint8_t mask)
 static inline uint16_t __always_inline
 cpu_intc_priority_a_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return cpu_map->ipra;
+        return cpu_ioregs->ipra;
 }
 
 /// @brief Obtain the value of the 2-byte value of the @ref IPRB I/O register.
@@ -224,9 +224,9 @@ cpu_intc_priority_a_get(void)
 static inline uint16_t __always_inline
 cpu_intc_priority_b_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return cpu_map->iprb;
+        return cpu_ioregs->iprb;
 }
 
 /// @brief Write a 2-byte value to the @ref IPRA I/O register.
@@ -235,9 +235,9 @@ cpu_intc_priority_b_get(void)
 static inline void __always_inline
 cpu_intc_priority_a_set(uint16_t ipra)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ipra = ipra;
+        cpu_ioregs->ipra = ipra;
 }
 
 /// @brief Write a 2-byte value to the @ref IPRB I/O register.
@@ -246,9 +246,9 @@ cpu_intc_priority_a_set(uint16_t ipra)
 static inline void __always_inline
 cpu_intc_priority_b_set(uint16_t iprb)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->iprb = iprb;
+        cpu_ioregs->iprb = iprb;
 }
 
 /// @}

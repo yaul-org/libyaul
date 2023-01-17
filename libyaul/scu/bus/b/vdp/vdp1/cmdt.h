@@ -197,20 +197,23 @@ static_assert(sizeof(vdp1_cmdt_orderlist_t) == 12);
 static inline uint16_t __always_inline
 vdp1_cmdt_current_get(void)
 {
-        return (MEMORY_READ(16, VDP1(COPR)) >> 2);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        return (vdp1_ioregs->copr >> 2);
 }
 
 static inline uint16_t __always_inline
 vdp1_cmdt_last_get(void)
 {
-        return (MEMORY_READ(16, VDP1(LOPR)) >> 2);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        return (vdp1_ioregs->lopr >> 2);
 }
 
 static inline void __always_inline
 vdp1_cmdt_orderlist_end(vdp1_cmdt_orderlist_t *cmdt_orderlist)
 {
-        scu_dma_xfer_t *dma_xfer;
-        dma_xfer = (scu_dma_xfer_t *)cmdt_orderlist;
+        scu_dma_xfer_t * const dma_xfer = (scu_dma_xfer_t *)cmdt_orderlist;
 
         dma_xfer->src |= SCU_DMA_INDIRECT_TABLE_END;
 }

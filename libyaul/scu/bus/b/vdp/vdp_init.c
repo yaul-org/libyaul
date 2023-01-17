@@ -20,10 +20,7 @@
 static void _vdp1_init(void);
 static void _vdp2_init(void);
 
-static vdp1_registers_t _vdp1_registers __aligned(16);
 static vdp1_vram_partitions_t _vdp1_vram_partitions;
-
-static vdp2_registers_t _vdp2_registers __aligned(16);
 
 void
 __vdp_init(void)
@@ -42,12 +39,11 @@ __vdp_init(void)
 static void
 _vdp1_init(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         extern void __vdp1_env_init(void);
 
-        _state_vdp1()->regs = &_vdp1_registers;
         _state_vdp1()->vram_partitions = &_vdp1_vram_partitions;
-
-        (void)memset(_state_vdp1()->regs, 0x00, sizeof(vdp1_registers_t));
 
         __vdp1_env_init();
 
@@ -63,7 +59,7 @@ _vdp1_init(void)
                 vdp2_tvmd_vblank_in_next_wait(1);
 
                 /* Change frame buffer */
-                MEMORY_WRITE(16, VDP1(FBCR), 0x0003);
+                vdp1_ioregs->fbcr = 0x0003;
 
                 /* Wait until the change of frame buffer takes effect */
                 vdp2_tvmd_vcount_wait(0);
@@ -78,13 +74,14 @@ _vdp1_init(void)
 static void
 _vdp2_init(void)
 {
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
+        extern void __vdp2_cram_init(void);
         extern void __vdp2_vram_init(void);
 
-        MEMORY_WRITE(16, VDP2(TVMD), 0x0000);
+        vdp2_ioregs->tvmd = 0x0000;
 
-        _state_vdp2()->regs = &_vdp2_registers;
-
-        (void)memset(_state_vdp2()->regs, 0x00, sizeof(vdp2_registers_t));
+        (void)memset(&_state_vdp2()->shadow_regs, 0x00, sizeof(vdp2_ioregs_t));
 
         _state_vdp2()->tv.resolution.x = 320;
         _state_vdp2()->tv.resolution.y = 224;
@@ -103,10 +100,6 @@ _vdp2_init(void)
 
         vdp2_scrn_back_color_set(VDP2_VRAM_ADDR(3, 0x0001FFFE), RGB1555(0, 0, 0, 0));
 
+        __vdp2_cram_init();
         __vdp2_vram_init();
-
-        cpu_dmac_memset(0, (void *)VDP2_VRAM(0x0000), 0x00000000, VDP2_VRAM_SIZE);
-        cpu_dmac_memset(0, (void *)VDP2_CRAM(0x0000), 0x00000000, VDP2_CRAM_SIZE);
-
-        vdp2_cram_mode_set(1);
 }

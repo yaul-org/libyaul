@@ -75,9 +75,9 @@ vdp1_env_set(const vdp1_env_t *env)
         _env_current_update(env);
 
         /* Always clear TVM and VBE bits */
-        _state_vdp1()->regs->tvmr = (env->rotation << 1) | env->bpp;
+        _state_vdp1()->shadow_ioregs.tvmr = (env->rotation << 1) | env->bpp;
 
-        _state_vdp1()->regs->ewdr = env->erase_color.raw;
+        _state_vdp1()->shadow_ioregs.ewdr = env->erase_color.raw;
 
         uint16_t x1;
         x1 = env->erase_points[0].x >> 3;
@@ -96,22 +96,22 @@ vdp1_env_set(const vdp1_env_t *env)
                 x3 >>= 1;
         }
 
-        if ((_state_vdp2()->regs->tvmd & 0xC0) == 0xC0) {
+        if ((_state_vdp2()->shadow_regs.tvmd & 0xC0) == 0xC0) {
                 y1 >>= 1;
                 y3 >>= 1;
         }
 
-        _state_vdp1()->regs->ewlr = (x1 << 9) | y1;
-        _state_vdp1()->regs->ewrr = (x3 << 9) | y3;
+        _state_vdp1()->shadow_ioregs.ewlr = (x1 << 9) | y1;
+        _state_vdp1()->shadow_ioregs.ewrr = (x3 << 9) | y3;
 
         const uint16_t spclmd = env->color_mode << 5;
 
-        _state_vdp2()->regs->spctl &= 0xFFC0;
+        _state_vdp2()->shadow_regs.spctl &= 0xFFC0;
 
         if ((env->sprite_type < 0x8) && (env->bpp == VDP1_ENV_BPP_16)) {
                 /* Disable sprite window (SPWINEN) when SPCLMD bit is set */
-                _state_vdp2()->regs->spctl &= ~(spclmd >> 1);
-                _state_vdp2()->regs->spctl |= spclmd;
+                _state_vdp2()->shadow_regs.spctl &= ~(spclmd >> 1);
+                _state_vdp2()->shadow_regs.spctl |= spclmd;
         }
 
         /* Types 0x0 to 0x7 are for low resolution (320 or 352), and types 0x8
@@ -125,25 +125,28 @@ vdp1_env_set(const vdp1_env_t *env)
                 sprite_type += 8;
         }
 
-        _state_vdp2()->regs->spctl |= sprite_type & 0x000F;
+        _state_vdp2()->shadow_regs.spctl |= sprite_type & 0x000F;
 
-        MEMORY_WRITE(16, VDP1(TVMR), _state_vdp1()->regs->tvmr);
-        MEMORY_WRITE(16, VDP1(EWDR), _state_vdp1()->regs->ewdr);
-        MEMORY_WRITE(16, VDP1(EWLR), _state_vdp1()->regs->ewlr);
-        MEMORY_WRITE(16, VDP1(EWRR), _state_vdp1()->regs->ewrr);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+        vdp1_ioregs->ewdr = _state_vdp1()->shadow_ioregs.ewdr;
+        vdp1_ioregs->ewlr = _state_vdp1()->shadow_ioregs.ewlr;
+        vdp1_ioregs->ewrr = _state_vdp1()->shadow_ioregs.ewrr;
 }
 
 void
 vdp1_env_stop(void)
 {
-        (void)memset(&_state_vdp1()->regs->buffer[0],
-            0x00,
-            sizeof(vdp1_registers_t));
+        (void)memset(_state_vdp1()->shadow_ioregs.buffer, 0x00,
+            sizeof(vdp1_ioregs_t));
 
-        MEMORY_WRITE(16, VDP1(TVMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(PTMR), 0x0000);
-        MEMORY_WRITE(16, VDP1(FBCR), 0x0000);
-        MEMORY_WRITE(16, VDP1(ENDR), 0x0000);
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
+        vdp1_ioregs->tvmr = 0x0000;
+        vdp1_ioregs->ptmr = 0x0000;
+        vdp1_ioregs->fbcr = 0x0000;
+        vdp1_ioregs->tvmr = 0x0000;
 }
 
 void

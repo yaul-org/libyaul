@@ -14,12 +14,12 @@ vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reducti
 {
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-                _state_vdp2()->regs->zmctl &= 0xFFFC;
-                _state_vdp2()->regs->zmctl |= reduction;
+                _state_vdp2()->shadow_regs.zmctl &= 0xFFFC;
+                _state_vdp2()->shadow_regs.zmctl |= reduction;
                 break;
         case VDP2_SCRN_NBG1:
-                _state_vdp2()->regs->zmctl &= 0xFCFF;
-                _state_vdp2()->regs->zmctl |= reduction << 8;
+                _state_vdp2()->shadow_regs.zmctl &= 0xFCFF;
+                _state_vdp2()->shadow_regs.zmctl |= reduction << 8;
                 break;
         default:
                 break;
@@ -29,41 +29,44 @@ vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen, vdp2_scrn_reduction_t reducti
 void
 vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
-        /* Check if the background passed is valid */
-        assert((scroll_screen == VDP2_SCRN_NBG0) ||
-               (scroll_screen == VDP2_SCRN_NBG1));
-
-        fix16_vec2_t *zm_reg;
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin0;
+                _state_vdp2()->shadow_regs.zm0.x = scale;
                 break;
         case VDP2_SCRN_NBG1:
-                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin1;
+                _state_vdp2()->shadow_regs.zm1.x = scale;
                 break;
         default:
-                return;
+                break;
         }
-
-        zm_reg->x = scale;
 }
 
 void
 vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, fix16_t scale)
 {
-        fix16_vec2_t *zm_reg;
-
         switch (scroll_screen) {
         case VDP2_SCRN_NBG0:
-                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin0;
+                _state_vdp2()->shadow_regs.zm0.y = scale;
                 break;
         case VDP2_SCRN_NBG1:
-                zm_reg = (fix16_vec2_t *)&_state_vdp2()->regs->zmxin1;
+                _state_vdp2()->shadow_regs.zm1.y = scale;
                 break;
         default:
-                return;
+                break;
         }
+}
 
-        zm_reg->y = scale;
+void
+vdp2_scrn_reduction_xy_set(vdp2_scrn_t scroll_screen, const fix16_vec2_t *scale)
+{
+        switch (scroll_screen) {
+        case VDP2_SCRN_NBG0:
+                _state_vdp2()->shadow_regs.zm0 = *scale;
+                break;
+        case VDP2_SCRN_NBG1:
+                _state_vdp2()->shadow_regs.zm1 = *scale;
+                break;
+        default:
+                break;
+        }
 }

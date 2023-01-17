@@ -204,6 +204,8 @@ extern void vdp2_scrn_reduction_set(vdp2_scrn_t scroll_screen,
     vdp2_scrn_reduction_t reduction);
 extern void vdp2_scrn_reduction_x_set(vdp2_scrn_t scroll_screen, fix16_t scale);
 extern void vdp2_scrn_reduction_y_set(vdp2_scrn_t scroll_screen, fix16_t scale);
+extern void vdp2_scrn_reduction_xy_set(vdp2_scrn_t scroll_screen,
+    const fix16_vec2_t *scale);
 
 extern void vdp2_scrn_sf_set(vdp2_scrn_t scroll_screen, uint32_t sf_mode,
     vdp2_scrn_sf_type_t sf_type, vdp2_scrn_sf_code_t sf_code);

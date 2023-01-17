@@ -15,13 +15,13 @@ struct state_vdp2 __state_vdp2;
 void
 __vdp2_commit(scu_dma_level_t level)
 {
-        vdp2_registers_t * const vdp2_regs = _state_vdp2()->regs;
+        vdp2_ioregs_t * const vdp2_regs = &_state_vdp2()->shadow_regs;
 
-        cpu_cache_area_purge(vdp2_regs->buffer, sizeof(vdp2_registers_t));
+        cpu_cache_area_purge(vdp2_regs->buffer, sizeof(vdp2_ioregs_t));
 
         scu_dma_level_end_set(level, NULL, NULL);
 
-        scu_dma_transfer(level, (void *)VDP2(0x0000), vdp2_regs->buffer, sizeof(vdp2_registers_t));
+        scu_dma_transfer(level, (void *)VDP2(0x0000), vdp2_regs->buffer, sizeof(vdp2_ioregs_t));
 }
 
 void

@@ -38,7 +38,7 @@ typedef struct vdp2_scrn_bitmap_format {
         vdp2_vram_t bitmap_base;
 } __packed __aligned(4) vdp2_scrn_bitmap_format_t;
 
-static_assert(sizeof(vdp2_scrn_bitmap_format_t) == 12);
+static_assert(sizeof(vdp2_scrn_bitmap_format_t) == 16);
 
 extern void vdp2_scrn_bitmap_format_set(const vdp2_scrn_bitmap_format_t *bitmap_format);
 extern void vdp2_scrn_bitmap_ccc_set(const vdp2_scrn_bitmap_format_t *bitmap_format);
