@@ -135,7 +135,7 @@ SH_CXXFLAGS:= \
 	-fno-use-cxa-atexit \
 	$(SH_CXXFLAGS_shared)
 
-SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
+SH_CFLAGS_shared_release:= -O2 -g -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
 SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
