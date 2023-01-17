@@ -299,7 +299,7 @@ vdp1_sync_busy(void)
         const uint32_t sr_mask = cpu_intc_mask_get();
         cpu_intc_mask_set(0);
 
-        bool busy = ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC);
+        const bool busy = ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC);
 
         cpu_intc_mask_set(sr_mask);
 
@@ -327,11 +327,11 @@ vdp1_sync_interval_set(int8_t interval)
 {
         volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
 
-        uint8_t mode;
-
         _state_vdp1()->shadow_ioregs.tvmr &= ~VDP1_TVMR_VBE;
 
         vdp1_ioregs->tvmr = _state_vdp1()->shadow_ioregs.tvmr;
+
+        uint8_t mode;
 
         if (interval == 0) {
                 mode = VDP1_INTERVAL_MODE_AUTO;
