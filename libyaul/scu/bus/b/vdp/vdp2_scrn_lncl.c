@@ -16,8 +16,8 @@ static void _lncl_set(vdp2_vram_t vram, const uint16_t *buffer, uint32_t count);
 void
 vdp2_scrn_lncl_set(vdp2_scrn_t scrn_mask)
 {
-        _state_vdp2()->regs->lnclen &= 0xFFC0;
-        _state_vdp2()->regs->lnclen |= scrn_mask;
+        _state_vdp2()->shadow_regs.lnclen &= 0xFFC0;
+        _state_vdp2()->shadow_regs.lnclen |= scrn_mask;
 }
 
 void
@@ -59,8 +59,8 @@ _lncl_set(vdp2_vram_t vram, const uint16_t *buffer, uint32_t count)
 {
         const uint16_t lcclmd = (count == 1) ? 0x0000 : 0x8000;
 
-        _state_vdp2()->regs->lctau = lcclmd | VDP2_VRAM_BANK(vram);
-        _state_vdp2()->regs->lctal = (vram >> 1) & 0xFFFF;
+        _state_vdp2()->shadow_regs.lctau = lcclmd | VDP2_VRAM_BANK(vram);
+        _state_vdp2()->shadow_regs.lctal = (vram >> 1) & 0xFFFF;
 
         if (count == 1) {
                 MEMORY_WRITE(16, vram, buffer[0]);

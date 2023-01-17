@@ -26,8 +26,8 @@
 
 typedef uint32_t vdp1_vram_t;
 
-typedef union vdp1_registers {
-        uint16_t buffer[11];
+typedef union vdp1_ioregs {
+        uint16_t buffer[12];
 
         struct {
                 uint16_t tvmr;
@@ -38,10 +38,11 @@ typedef union vdp1_registers {
                 uint16_t ewrr;
                 uint16_t endr;
                 unsigned int :16;
-                unsigned int :16;
-                unsigned int :16;
-                unsigned int :16;
+                uint16_t edsr;
+                uint16_t lopr;
+                uint16_t copr;
+                uint16_t modr;
         };
-} __packed vdp1_registers_t;
+} __aligned(2) __packed vdp1_ioregs_t;
 
 #endif /* !_YAUL_VDP1_MAP_H_ */

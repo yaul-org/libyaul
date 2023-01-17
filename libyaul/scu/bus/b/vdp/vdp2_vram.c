@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+#include <cpu/dmac.h>
+
 #include <vdp2/cram.h>
 #include <vdp2/vram.h>
 
@@ -24,28 +26,32 @@ __vdp2_vram_init(void)
 
         vdp2_vram_control_set(&_vdp2_vram_ctl);
         vdp2_vram_cycp_clear();
+
+        cpu_dmac_memset(0, (void *)VDP2_VRAM(0x0000), 0x00000000, VDP2_VRAM_SIZE);
 }
 
 void
 vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 {
+        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+
         assert(vram_ctl != NULL);
 
         /* If the coefficient table is set to be stored in CRAM, the color mode
          * must be 1 */
-        _state_vdp2()->regs->ramctl &= 0xEFFF;
-        _state_vdp2()->regs->ramctl |= 1 << vram_ctl->coeff_table;
+        _state_vdp2()->shadow_regs.ramctl &= 0xEFFF;
+        _state_vdp2()->shadow_regs.ramctl |= 1 << vram_ctl->coeff_table;
 
         /* Coefficient table storage */
-        _state_vdp2()->regs->ramctl &= 0x7FFF;
-        _state_vdp2()->regs->ramctl |= vram_ctl->coeff_table << 15;
+        _state_vdp2()->shadow_regs.ramctl &= 0x7FFF;
+        _state_vdp2()->shadow_regs.ramctl |= vram_ctl->coeff_table << 15;
 
         /* VRAM mode */
-        _state_vdp2()->regs->ramctl &= 0xFCFF;
-        _state_vdp2()->regs->ramctl |= vram_ctl->vram_mode << 8;
+        _state_vdp2()->shadow_regs.ramctl &= 0xFCFF;
+        _state_vdp2()->shadow_regs.ramctl |= vram_ctl->vram_mode << 8;
 
-        MEMORY_WRITE(16, VDP2(VRSIZE), 0x0000);
-        MEMORY_WRITE(16, VDP2(RAMCTL), _state_vdp2()->regs->ramctl);
+        vdp2_ioregs->vrsize = 0x0000;
+        vdp2_ioregs->ramctl = _state_vdp2()->shadow_regs.ramctl;
 
         (void)memcpy(_state_vdp2()->vram_ctl, &vram_ctl,
             sizeof(vdp2_vram_ctl_t));
@@ -54,18 +60,18 @@ vdp2_vram_control_set(const vdp2_vram_ctl_t *vram_ctl)
 void
 vdp2_vram_usage_set(const vdp2_vram_usage_t *vram_usage)
 {
-        _state_vdp2()->regs->ramctl &= 0xFF00;
+        _state_vdp2()->shadow_regs.ramctl &= 0xFF00;
 
-        _state_vdp2()->regs->ramctl |= vram_usage->a0;
-        _state_vdp2()->regs->ramctl |= vram_usage->a1 << 2;
-        _state_vdp2()->regs->ramctl |= vram_usage->b0 << 4;
-        _state_vdp2()->regs->ramctl |= vram_usage->b1 << 6;
+        _state_vdp2()->shadow_regs.ramctl |= vram_usage->a0;
+        _state_vdp2()->shadow_regs.ramctl |= vram_usage->a1 << 2;
+        _state_vdp2()->shadow_regs.ramctl |= vram_usage->b0 << 4;
+        _state_vdp2()->shadow_regs.ramctl |= vram_usage->b1 << 6;
 }
 
 vdp2_vram_cycp_t *
 vdp2_vram_cycp_get(void)
 {
-        return (vdp2_vram_cycp_t *)&_state_vdp2()->regs->cyc[0];
+        return (vdp2_vram_cycp_t *)&_state_vdp2()->shadow_regs.cyc[0];
 }
 
 void
@@ -91,7 +97,7 @@ vdp2_vram_cycp_clear(void)
 vdp2_vram_cycp_bank_t *
 vdp2_vram_cycp_bank_get(vdp2_vram_bank_t bank)
 {
-        return (vdp2_vram_cycp_bank_t *)&_state_vdp2()->regs->cyc[bank & 3];
+        return (vdp2_vram_cycp_bank_t *)&_state_vdp2()->shadow_regs.cyc[bank & 3];
 }
 
 void
@@ -100,11 +106,11 @@ vdp2_vram_cycp_bank_set(vdp2_vram_bank_t bank,
 {
         assert(cycp_bank != NULL);
 
-        _state_vdp2()->regs->cyc[bank & 3] = cycp_bank->raw;
+        _state_vdp2()->shadow_regs.cyc[bank & 3] = cycp_bank->raw;
 }
 
 void
 vdp2_vram_cycp_bank_clear(vdp2_vram_bank_t bank)
 {
-        _state_vdp2()->regs->cyc[bank] = 0xFFFFFFFF;
+        _state_vdp2()->shadow_regs.cyc[bank] = 0xFFFFFFFF;
 }

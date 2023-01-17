@@ -20,36 +20,36 @@ vdp2_sprite_priority_set(vdp2_sprite_register_t sprite_register, uint8_t priorit
 
         switch (sprite_register) {
         case 0:
-                _state_vdp2()->regs->prisa &= 0xFFF8;
-                _state_vdp2()->regs->prisa |= priority;
+                _state_vdp2()->shadow_regs.prisa &= 0xFFF8;
+                _state_vdp2()->shadow_regs.prisa |= priority;
                 break;
         case 1:
-                _state_vdp2()->regs->prisa &= 0xF8FF;
-                _state_vdp2()->regs->prisa |= priority << 8;
+                _state_vdp2()->shadow_regs.prisa &= 0xF8FF;
+                _state_vdp2()->shadow_regs.prisa |= priority << 8;
                 break;
         case 2:
-                _state_vdp2()->regs->prisb &= 0xFFF8;
-                _state_vdp2()->regs->prisb |= priority;
+                _state_vdp2()->shadow_regs.prisb &= 0xFFF8;
+                _state_vdp2()->shadow_regs.prisb |= priority;
                 break;
         case 3:
-                _state_vdp2()->regs->prisb &= 0xF8FF;
-                _state_vdp2()->regs->prisb |= priority << 8;
+                _state_vdp2()->shadow_regs.prisb &= 0xF8FF;
+                _state_vdp2()->shadow_regs.prisb |= priority << 8;
                 break;
         case 4:
-                _state_vdp2()->regs->prisc &= 0xFFF8;
-                _state_vdp2()->regs->prisc |= priority;
+                _state_vdp2()->shadow_regs.prisc &= 0xFFF8;
+                _state_vdp2()->shadow_regs.prisc |= priority;
                 break;
         case 5:
-                _state_vdp2()->regs->prisc &= 0xF8FF;
-                _state_vdp2()->regs->prisc |= priority << 8;
+                _state_vdp2()->shadow_regs.prisc &= 0xF8FF;
+                _state_vdp2()->shadow_regs.prisc |= priority << 8;
                 break;
         case 6:
-                _state_vdp2()->regs->prisd &= 0xFFF8;
-                _state_vdp2()->regs->prisd |= priority;
+                _state_vdp2()->shadow_regs.prisd &= 0xFFF8;
+                _state_vdp2()->shadow_regs.prisd |= priority;
                 break;
         case 7:
-                _state_vdp2()->regs->prisd &= 0xF8FF;
-                _state_vdp2()->regs->prisd |= priority << 8;
+                _state_vdp2()->shadow_regs.prisd &= 0xF8FF;
+                _state_vdp2()->shadow_regs.prisd |= priority << 8;
                 break;
         default:
                 break;

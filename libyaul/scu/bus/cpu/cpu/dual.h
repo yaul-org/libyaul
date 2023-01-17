@@ -84,12 +84,12 @@ cpu_dual_slave_notify(void)
 static inline void __always_inline
 cpu_dual_notification_wait(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        while ((cpu_map->ftcsr & 0x80) == 0x00) {
+        while ((cpu_ioregs->ftcsr & 0x80) == 0x00) {
         }
 
-        cpu_map->ftcsr &= ~0x80;
+        cpu_ioregs->ftcsr &= ~0x80;
 }
 
 /// @brief Obtain the top of the master CPU stack.
@@ -178,9 +178,9 @@ extern void cpu_dual_slave_set(cpu_dual_slave_entry_t entry);
 static inline cpu_which_t __always_inline
 cpu_dual_executor_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return (cpu_which_t)((cpu_map->bcr1 >> 15) & 0xFFFF);
+        return (cpu_which_t)((cpu_ioregs->bcr1 >> 15) & 0xFFFF);
 }
 
 /// @}

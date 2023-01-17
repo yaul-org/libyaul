@@ -54,8 +54,8 @@ _back_set(vdp2_vram_t vram, const rgb1555_t *buffer, uint32_t count)
          * transfer a color buffer */
         const uint16_t bkclmd = (count == 1) ? 0x0000 : 0x8000;
 
-        _state_vdp2()->regs->bktau = bkclmd | VDP2_VRAM_BANK(vram);
-        _state_vdp2()->regs->bktal = (vram >> 1) & 0xFFFF;
+        _state_vdp2()->shadow_regs.bktau = bkclmd | VDP2_VRAM_BANK(vram);
+        _state_vdp2()->shadow_regs.bktal = (vram >> 1) & 0xFFFF;
 
         if (count == 1) {
                 MEMORY_WRITE(16, vram, buffer->raw);

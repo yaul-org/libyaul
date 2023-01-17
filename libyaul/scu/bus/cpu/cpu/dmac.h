@@ -278,14 +278,14 @@ typedef struct cpu_dmac_status {
 static inline void __always_inline
 cpu_dmac_channel_transfer_set(cpu_dmac_channel_t ch, uint32_t tcr_bits)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         switch (ch) {
         case 0:
-                cpu_map->tcr0 = tcr_bits;
+                cpu_ioregs->tcr0 = tcr_bits;
                 break;
         case 1:
-                cpu_map->tcr1 = tcr_bits;
+                cpu_ioregs->tcr1 = tcr_bits;
                 break;
         }
 }
@@ -294,19 +294,19 @@ cpu_dmac_channel_transfer_set(cpu_dmac_channel_t ch, uint32_t tcr_bits)
 static inline void __always_inline
 cpu_dmac_enable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->dmaor &= ~0x0000000F;
-        cpu_map->dmaor |= 0x00000001;
+        cpu_ioregs->dmaor &= ~0x0000000F;
+        cpu_ioregs->dmaor |= 0x00000001;
 }
 
 /// @brief Disable CPU-DMAC.
 static inline void __always_inline
 cpu_dmac_disable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->dmaor &= ~0x00000001;
+        cpu_ioregs->dmaor &= ~0x00000001;
 }
 
 /// @brief Obtain the interrupt priority level for CPU-DMAC.
@@ -314,9 +314,9 @@ cpu_dmac_disable(void)
 static inline uint8_t __always_inline
 cpu_dmac_interrupt_priority_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return ((cpu_map->ipra >> 8) & 0x0F);
+        return ((cpu_ioregs->ipra >> 8) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-DMAC.
@@ -325,10 +325,10 @@ cpu_dmac_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_dmac_interrupt_priority_set(uint8_t priority)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ipra &= 0xF0FF;
-        cpu_map->ipra |= (priority & 0x0F) << 8;
+        cpu_ioregs->ipra &= 0xF0FF;
+        cpu_ioregs->ipra |= (priority & 0x0F) << 8;
 }
 
 /// @brief Set the priority mode.
@@ -337,10 +337,10 @@ cpu_dmac_interrupt_priority_set(uint8_t priority)
 static inline void __always_inline
 cpu_dmac_priority_mode_set(cpu_dmac_priority_mode_t mode)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->dmaor &= ~0x00000001;
-        cpu_map->dmaor |= (mode & 0x01) << 3;
+        cpu_ioregs->dmaor &= ~0x00000001;
+        cpu_ioregs->dmaor |= (mode & 0x01) << 3;
 }
 
 /// @brief Start the CPU-DMAC channel transfer.
@@ -352,16 +352,16 @@ cpu_dmac_priority_mode_set(cpu_dmac_priority_mode_t mode)
 static inline void __always_inline
 cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         switch (ch) {
         case 0:
-                cpu_map->chcr0 &= ~0x00000003;
-                cpu_map->chcr0 |= 0x00000001;
+                cpu_ioregs->chcr0 &= ~0x00000003;
+                cpu_ioregs->chcr0 |= 0x00000001;
                 break;
         case 1:
-                cpu_map->chcr1 &= ~0x00000003;
-                cpu_map->chcr1 |= 0x00000001;
+                cpu_ioregs->chcr1 &= ~0x00000003;
+                cpu_ioregs->chcr1 |= 0x00000001;
                 break;
         }
 }
@@ -372,15 +372,15 @@ cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 static inline void __always_inline
 cpu_dmac_channel_stop(cpu_dmac_channel_t ch)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         /* Don't clear the status bits */
         switch (ch) {
         case 0:
-                cpu_map->chcr0 &= ~0x00000001;
+                cpu_ioregs->chcr0 &= ~0x00000001;
                 break;
         case 1:
-                cpu_map->chcr1 &= ~0x00000001;
+                cpu_ioregs->chcr1 &= ~0x00000001;
                 break;
         }
 }

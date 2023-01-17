@@ -52,18 +52,20 @@ typedef struct vdp1_mode_status {
 } __packed __aligned(2) vdp1_mode_status_t;
 
 typedef enum vdp_sync_mode {
-        VDP1_SYNC_MODE_ERASE_CHANGE = 0x00,
-        VDP1_SYNC_MODE_CHANGE_ONLY  = 0x01
+        VDP1_SYNC_MODE_ERASE_CHANGE = 0,
+        VDP1_SYNC_MODE_CHANGE_ONLY  = 1
 } vdp_sync_mode_t;
 
 static inline __always_inline vdp1_mode_status_t
 vdp1_mode_status_get(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         /* If the structure isn't aligned on a 2-byte boundary, GCC will attempt
          * to invoke memcpy() */
         vdp1_mode_status_t status;
 
-        status.raw = MEMORY_READ(16, VDP1(MODR));
+        status.raw = vdp1_ioregs->modr;
 
         return status;
 }
@@ -71,11 +73,13 @@ vdp1_mode_status_get(void)
 static inline __always_inline vdp1_transfer_status_t
 vdp1_transfer_status_get(void)
 {
+        volatile vdp1_ioregs_t * const vdp1_ioregs = (volatile vdp1_ioregs_t *)VDP1_IOREG_BASE;
+
         /* If the structure isn't aligned on a 2-byte boundary, GCC will
          * attempt to invoke memcpy() */
         vdp1_transfer_status_t status;
 
-        status.raw = MEMORY_READ(16, VDP1(EDSR));
+        status.raw = vdp1_ioregs->edsr;
 
         return status;
 }

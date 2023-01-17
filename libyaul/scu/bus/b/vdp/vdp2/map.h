@@ -12,6 +12,9 @@
 
 #include <stdint.h>
 
+#include <fix16.h>
+#include <int16.h>
+
 #define TVMD   0x0000UL
 #define EXTEN  0x0002UL
 #define TVSTAT 0x0004UL
@@ -158,7 +161,7 @@
 typedef uint32_t vdp2_cram_t;
 typedef uint32_t vdp2_vram_t;
 
-typedef union vdp2_registers {
+typedef union vdp2_ioregs {
         uint16_t buffer[144];
 
         struct {
@@ -226,46 +229,133 @@ typedef union vdp2_registers {
                 uint16_t mpklrb;
                 uint16_t mpmnrb;
                 uint16_t mpoprb;
-                uint16_t scxin0;
-                uint16_t scxdn0;
-                uint16_t scyin0;
-                uint16_t scydn0;
-                uint16_t zmxin0;
-                uint16_t zmxdn0;
-                uint16_t zmyin0;
-                uint16_t zmydn0;
-                uint16_t scxin1;
-                uint16_t scxdn1;
-                uint16_t scyin1;
-                uint16_t scydn1;
-                uint16_t zmxin1;
-                uint16_t zmxdn1;
-                uint16_t zmyin1;
-                uint16_t zmydn1;
-                uint16_t scxn2;
-                uint16_t scyn2;
-                uint16_t scxn3;
-                uint16_t scyn3;
+
+                union {
+                        struct {
+                                uint16_t scxin0;
+                                uint16_t scxdn0;
+                                uint16_t scyin0;
+                                uint16_t scydn0;
+                        } __packed;
+
+                        fix16_vec2_t sc0;
+                };
+
+                union {
+                        struct {
+                                uint16_t zmxin0;
+                                uint16_t zmxdn0;
+                                uint16_t zmyin0;
+                                uint16_t zmydn0;
+                        } __packed;
+
+                        fix16_vec2_t zm0;
+                };
+
+                union {
+                        struct {
+                                uint16_t scxin1;
+                                uint16_t scxdn1;
+                                uint16_t scyin1;
+                                uint16_t scydn1;
+                        } __packed;
+
+                        fix16_vec2_t sc1;
+                };
+
+                union {
+                        struct {
+                                uint16_t zmxin1;
+                                uint16_t zmxdn1;
+                                uint16_t zmyin1;
+                                uint16_t zmydn1;
+                        } __packed;
+
+                        fix16_vec2_t zm1;
+                };
+
+                union {
+                        struct {
+                                uint16_t scxn2;
+                                uint16_t scyn2;
+                        } __packed;
+
+                        int16_vec2_t scn2;
+                };
+
+                union {
+                        struct {
+                                uint16_t scxn3;
+                                uint16_t scyn3;
+                        } __packed;
+
+                        int16_vec2_t scn3;
+                };
+
                 uint16_t zmctl;
                 uint16_t scrctl;
-                uint16_t vcstau;
-                uint16_t vcstal;
-                uint16_t lsta0u;
-                uint16_t lsta0l;
-                uint16_t lsta1u;
-                uint16_t lsta1l;
-                uint16_t lctau;
-                uint16_t lctal;
-                uint16_t bktau;
-                uint16_t bktal;
+
+                union {
+                        struct {
+                                uint16_t vcstau;
+                                uint16_t vcstal;
+                        } __packed;
+
+                        uint32_t vcsta;
+                };
+
+                union {
+                        struct {
+                                uint16_t lsta0u;
+                                uint16_t lsta0l;
+                        } __packed;
+
+                        uint32_t lsta0;
+                };
+
+                union {
+                        struct {
+                                uint16_t lsta1u;
+                                uint16_t lsta1l;
+                        } __packed;
+
+                        uint32_t lsta1;
+                };
+
+                union {
+                        struct {
+                                uint16_t lctau;
+                                uint16_t lctal;
+                        } __packed;
+
+                        uint32_t lcta;
+                };
+
+                union {
+                        struct {
+                                uint16_t bktau;
+                                uint16_t bktal;
+                        } __packed;
+
+                        uint32_t bkta;
+                };
+
                 uint16_t rpmd;
                 uint16_t rprctl;
                 uint16_t ktctl;
                 uint16_t ktaof;
                 uint16_t ovpnra;
                 uint16_t ovpnrb;
-                uint16_t rptau;
-                uint16_t rptal;
+
+                union {
+                        struct {
+                                uint16_t rptau;
+                                uint16_t rptal;
+                        } __packed;
+
+                        uint32_t rpta;
+                };
+
                 uint16_t wpsx0;
                 uint16_t wpsy0;
                 uint16_t wpex0;
@@ -278,10 +368,25 @@ typedef union vdp2_registers {
                 uint16_t wctlb;
                 uint16_t wctlc;
                 uint16_t wctld;
-                uint16_t lwta0u;
-                uint16_t lwta0l;
-                uint16_t lwta1u;
-                uint16_t lwta1l;
+
+                union {
+                        struct {
+                                uint16_t lwta0u;
+                                uint16_t lwta0l;
+                        } __packed;
+
+                        uint32_t lwta0;
+                };
+
+                union {
+                        struct {
+                                uint16_t lwta1u;
+                                uint16_t lwta1l;
+                        } __packed;
+
+                        uint32_t lwta1;
+                };
+
                 uint16_t spctl;
                 uint16_t sdctl;
                 uint16_t craofa;
@@ -315,12 +420,12 @@ typedef union vdp2_registers {
                 uint16_t cobg;
                 uint16_t cobb;
         };
-} vdp2_registers_t;
+} __aligned(4) __packed vdp2_ioregs_t;
 
 __BEGIN_DECLS
 
-extern vdp2_registers_t *vdp2_regs_get(void);
-extern vdp2_registers_t vdp2_regs_copy_get(void);
+extern vdp2_ioregs_t *vdp2_regs_get(void);
+extern vdp2_ioregs_t vdp2_regs_copy_get(void);
 
 __END_DECLS
 

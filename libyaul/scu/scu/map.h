@@ -102,6 +102,9 @@ do {                                                                           \
 /// @param x The byte offset.
 #define VDP1(x)                 (0x25D00000UL + (x))
 
+/// @brief Base VDP1 address, for use with @ref vdp1_ioregs_t.
+#define VDP1_IOREG_BASE         VDP1(0x00000000)
+
 /// @brief Specify offset @p x for address space.
 ///
 /// @param x The byte offset.
@@ -116,6 +119,9 @@ do {                                                                           \
 ///
 /// @param x The byte offset.
 #define VDP2(x)                 (0x25F80000UL + (x))
+
+/// @brief Base VDP2 address, for use with @ref vdp2_ioregs_t.
+#define VDP2_IOREG_BASE         VDP2(0x00000000)
 
 /// @brief Specify offset @p x for address space.
 ///

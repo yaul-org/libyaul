@@ -41,10 +41,10 @@ static callback_t *_ihr_callbacks_get(void);
 void
 __cpu_sci_init(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->vcra = (CPU_INTC_INTERRUPT_SCI_ERI << 8) | CPU_INTC_INTERRUPT_SCI_RXI;
-        cpu_map->vcrb = (CPU_INTC_INTERRUPT_SCI_TXI << 8) | CPU_INTC_INTERRUPT_SCI_TEI;
+        cpu_ioregs->vcra = (CPU_INTC_INTERRUPT_SCI_ERI << 8) | CPU_INTC_INTERRUPT_SCI_RXI;
+        cpu_ioregs->vcrb = (CPU_INTC_INTERRUPT_SCI_TXI << 8) | CPU_INTC_INTERRUPT_SCI_TEI;
 
         cpu_sci_interrupt_priority_set(0);
 
@@ -75,7 +75,7 @@ __cpu_sci_init(void)
 void
 cpu_sci_config_set(const cpu_sci_cfg_t *cfg)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         const uint32_t reg_smr = ((cfg->mode & 0x01) << 7) |
                                  ((cfg->length & 0x01) << 6) |
@@ -114,14 +114,14 @@ cpu_sci_config_set(const cpu_sci_cfg_t *cfg)
 
         cpu_sci_disable();
 
-        cpu_map->smr = reg_smr;
-        cpu_map->brr = cfg->baudrate;
+        cpu_ioregs->smr = reg_smr;
+        cpu_ioregs->brr = cfg->baudrate;
 }
 
 void
 cpu_sci_with_dmac_enable(const cpu_sci_cfg_t *cfg)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         bool ihrs_used;
         ihrs_used = false;
@@ -147,64 +147,64 @@ cpu_sci_with_dmac_enable(const cpu_sci_cfg_t *cfg)
 
         reg_scr |= 0x30; /* Enable RX & TX */
 
-        cpu_map->scr = reg_scr & 0xCF;
+        cpu_ioregs->scr = reg_scr & 0xCF;
         /* TODO: Correctly wait for 1 SCI clock period here */
         cpu_instr_nop();
         cpu_instr_nop();
         cpu_instr_nop();
-        cpu_map->scr = reg_scr;
+        cpu_ioregs->scr = reg_scr;
 }
 
 static void __interrupt_handler
 _eri_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         callback_t * const ihr_callbacks = _ihr_callbacks_get();
         callback_t * const ihr_callback = &ihr_callbacks[IHR_INDEX_ERI];
 
         callback_call(ihr_callback);
 
-        cpu_map->ssr &= ~0x38;
+        cpu_ioregs->ssr &= ~0x38;
 }
 
 static void __interrupt_handler
 _rxi_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         callback_t * const ihr_callbacks = _ihr_callbacks_get();
         callback_t * const ihr_callback = &ihr_callbacks[IHR_INDEX_RXI];
 
         callback_call(ihr_callback);
 
-        cpu_map->ssr &= ~0x40;
+        cpu_ioregs->ssr &= ~0x40;
 }
 
 static void __interrupt_handler
 _txi_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         callback_t * const ihr_callbacks = _ihr_callbacks_get();
         callback_t * const ihr_callback = &ihr_callbacks[IHR_INDEX_TXI];
 
         callback_call(ihr_callback);
 
-        cpu_map->ssr &= ~0x80;
+        cpu_ioregs->ssr &= ~0x80;
 }
 
 static void __interrupt_handler
 _tei_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         callback_t * const ihr_callbacks = _ihr_callbacks_get();
         callback_t * const ihr_callback = &ihr_callbacks[IHR_INDEX_TEI];
 
         callback_call(ihr_callback);
 
-        cpu_map->ssr &= ~0x04;
+        cpu_ioregs->ssr &= ~0x04;
 }
 
 static callback_t *

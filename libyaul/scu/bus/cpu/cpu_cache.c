@@ -42,32 +42,32 @@ cpu_cache_area_purge(void *address, uint32_t len)
 void __no_reorder __uncached_function
 cpu_cache_purge(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         uint8_t t0;
-        t0 = cpu_map->ccr;
+        t0 = cpu_ioregs->ccr;
 
         t0 &= ~0x01;
-        cpu_map->ccr = t0; /* Disable cache */
+        cpu_ioregs->ccr = t0; /* Disable cache */
         t0 |= 0x10;
-        cpu_map->ccr = t0; /* Purge cache */
+        cpu_ioregs->ccr = t0; /* Purge cache */
         t0 |= 0x01;
-        cpu_map->ccr = t0; /* Enable cache */
+        cpu_ioregs->ccr = t0; /* Enable cache */
 }
 
 void __uncached_function
 cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         uint8_t t0;
-        t0 = cpu_map->ccr;
+        t0 = cpu_ioregs->ccr;
 
         /* Specify which way to read from */
         t0 &= ~0xC0;
         t0 |= (way & 3) << 6;
 
-        cpu_map->ccr = t0;
+        cpu_ioregs->ccr = t0;
 
         volatile uint32_t *cache_data_rw;
         cache_data_rw = (volatile uint32_t *)CPU_CACHE_ADDRESS_RW;

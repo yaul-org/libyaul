@@ -106,18 +106,18 @@ typedef struct cpu_cache_data_way {
 static inline void __always_inline
 cpu_cache_enable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ccr |= 0x01;
+        cpu_ioregs->ccr |= 0x01;
 }
 
 /// @brief Disable cache.
 static inline void __always_inline
 cpu_cache_disable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ccr &= ~0x01;
+        cpu_ioregs->ccr &= ~0x01;
 }
 
 /// @brief Enable type replacement.
@@ -129,12 +129,12 @@ cpu_cache_disable(void)
 static inline void __always_inline
 cpu_cache_repl_enable(cpu_cache_type_t type)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~((uint8_t)type | 0x01);
+        const uint8_t t0 = cpu_ioregs->ccr & ~((uint8_t)type | 0x01);
 
-        cpu_map->ccr = t0;
-        cpu_map->ccr = t0 | 0x01;
+        cpu_ioregs->ccr = t0;
+        cpu_ioregs->ccr = t0 | 0x01;
 }
 
 /// @brief Disable type replacement in the cache.
@@ -146,14 +146,14 @@ cpu_cache_repl_enable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_repl_disable(cpu_cache_type_t type)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~0x01;
+        const uint8_t t0 = cpu_ioregs->ccr & ~0x01;
 
         /* Set bit with cache disabled */
-        cpu_map->ccr = t0 | (uint8_t)type;
+        cpu_ioregs->ccr = t0 | (uint8_t)type;
         /* Enable cache and set bit(s) */
-        cpu_map->ccr = t0 | (uint8_t)type | 0x01;
+        cpu_ioregs->ccr = t0 | (uint8_t)type | 0x01;
 }
 
 /// @brief Change the mode the cache operates.
@@ -167,13 +167,13 @@ cpu_cache_repl_disable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~0x0F;
+        const uint8_t t0 = cpu_ioregs->ccr & ~0x0F;
 
-        cpu_map->ccr = t0;
-        cpu_map->ccr = t0 | (uint8_t)mode;
-        cpu_map->ccr = t0 | (uint8_t)mode | 0x01;
+        cpu_ioregs->ccr = t0;
+        cpu_ioregs->ccr = t0 | (uint8_t)mode;
+        cpu_ioregs->ccr = t0 | (uint8_t)mode | 0x01;
 }
 
 /// @brief Cache line of the specified address is purged.

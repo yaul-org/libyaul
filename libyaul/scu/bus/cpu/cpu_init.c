@@ -51,10 +51,10 @@ __cpu_init(void)
 
         /* Set the appropriate vector numbers for the on-chip peripheral
          * modules */
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->vcrwdt &= ~0x007F;
-        cpu_map->vcrwdt |= CPU_INTC_INTERRUPT_BSC;
+        cpu_ioregs->vcrwdt &= ~0x007F;
+        cpu_ioregs->vcrwdt |= CPU_INTC_INTERRUPT_BSC;
 
         __cpu_divu_init();
         cpu_frt_init(CPU_FRT_CLOCK_DIV_8);

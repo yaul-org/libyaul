@@ -21,13 +21,13 @@
 #include <vdp2/vram.h>
 
 struct state_vdp1 {
-        vdp1_registers_t *regs;
+        vdp1_ioregs_t shadow_ioregs;
         vdp1_env_t const *current_env;
         vdp1_vram_partitions_t *vram_partitions;
 } __aligned(16);
 
 struct state_vdp2 {
-        vdp2_registers_t *regs;
+        vdp2_ioregs_t shadow_regs;
         vdp2_vram_ctl_t *vram_ctl;
 
         struct {
