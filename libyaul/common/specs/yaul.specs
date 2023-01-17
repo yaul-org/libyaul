@@ -11,6 +11,7 @@
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/tga)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/mic3d)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul)) \
+-I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/bup)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/dbgio)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/math)) \
 -I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul/lib)) \

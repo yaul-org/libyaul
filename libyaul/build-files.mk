@@ -45,6 +45,9 @@ LIB_SRCS:= \
 	kernel/mm/internal.c
 
 LIB_SRCS+= \
+	bup/bup.c
+
+LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
 	kernel/dbgio/devices/null.c \
 	kernel/dbgio/devices/vdp1.c \
@@ -287,6 +290,9 @@ INSTALL_HEADER_FILES:= \
 
 INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/
+
+INSTALL_HEADER_FILES+= \
+	./bup/:bup.h:./yaul/bup/
 
 INSTALL_HEADER_FILES+= \
 	./lib/lib/bits/:alltypes.h:./bits/ \

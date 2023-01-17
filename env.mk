@@ -149,6 +149,7 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 SHARED_INCLUDE_DIRS:= \
 	$(abspath .) \
 	../lib$(MAIN_TARGET)/ \
+	../lib$(MAIN_TARGET)/bup \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
 	../lib$(MAIN_TARGET)/math \
