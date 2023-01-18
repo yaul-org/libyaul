@@ -1,5 +1,12 @@
-#ifndef MIC3D_RENDER_H
-#define MIC3D_RENDER_H
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+#ifndef _MIC3D_RENDER_H_
+#define _MIC3D_RENDER_H_
 
 #include <sys/cdefs.h>
 
@@ -72,4 +79,4 @@ typedef struct render {
 
 void __render_init(void);
 
-#endif /* MIC3D_RENDER_H */
+#endif /* _MIC3D_RENDER_H_ */

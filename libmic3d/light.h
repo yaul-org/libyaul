@@ -1,5 +1,12 @@
-#ifndef MIC3D_LIGHT_H
-#define MIC3D_LIGHT_H
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+#ifndef _MIC3D_LIGHT_H_
+#define _MIC3D_LIGHT_H_
 
 #include <fix16.h>
 
@@ -58,4 +65,4 @@ void __light_transform(void);
 void __light_polygon_process(void);
 void __light_gst_put(void);
 
-#endif /* MIC3D_LIGHT_H */
+#endif /* _MIC3D_LIGHT_H_ */

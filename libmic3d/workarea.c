@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #include "internal.h"
 
 #define POOL_POINTS_COUNT        POINTS_COUNT

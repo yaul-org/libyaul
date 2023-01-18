@@ -1,5 +1,12 @@
-#ifndef MIC3D_TYPES_H
-#define MIC3D_TYPES_H
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+#ifndef _MIC3D_TYPES_H_
+#define _MIC3D_TYPES_H_
 
 #include <assert.h>
 
@@ -27,31 +34,31 @@ typedef union indices {
         uint16_t p[4];
 } __aligned(4) indices_t;
 
-typedef struct {
+typedef struct polygon {
         fix16_vec3_t normal;
         indices_t indices;
 } __aligned(4) polygon_t;
 
-typedef enum {
+typedef enum sort_type {
         SORT_TYPE_BFR,
         SORT_TYPE_MIN,
         SORT_TYPE_MAX,
         SORT_TYPE_CENTER
 } sort_type_t;
 
-typedef enum {
+typedef enum read_dir {
         READ_DIR_NORMAL,
         READ_DIR_H,
         READ_DIR_V,
         READ_DIR_HV
 } read_dir_t;
 
-typedef enum {
+typedef enum plane_type {
         PLANE_TYPE_SINGLE,
         PLANE_TYPE_DOUBLE
 } plane_type_t;
 
-typedef enum {
+typedef enum command_type {
         COMMAND_TYPE_SPRITE           = 0,
         COMMAND_TYPE_SCALED_SPRITE    = 1,
         COMMAND_TYPE_DISTORTED_SPRITE = 2,
@@ -60,7 +67,7 @@ typedef enum {
         COMMAND_TYPE_LINE             = 6
 } command_type_t;
 
-typedef union {
+typedef union attribute_control {
         struct {
                 unsigned int :3;
                 sort_type_t sort_type:3;
@@ -77,7 +84,7 @@ typedef union {
 
 static_assert(sizeof(attribute_control_t) == 2);
 
-typedef struct {
+typedef struct attribute {
         attribute_control_t control;
 
         vdp1_cmdt_draw_mode_t draw_mode;
@@ -95,22 +102,27 @@ typedef struct {
 
 static_assert(sizeof(attribute_t) == 12);
 
-typedef struct {
+typedef struct camera {
         fix16_vec3_t target;
         fix16_vec3_t up;
         fix16_vec3_t position;
 } camera_t;
 
-typedef struct {
+typedef struct mesh {
         const fix16_vec3_t *points;
         uint32_t points_count;
         const fix16_vec3_t *normals;
         const polygon_t *polygons;
         const attribute_t *attributes;
         uint32_t polygons_count;
-} mesh_t;
+} __aligned(4) mesh_t;
 
-typedef struct {
+typedef struct object {
+        mesh_t *meshes;
+        uint32_t mesh_count;
+} __aligned(4) object_t;
+
+typedef struct picture {
         const void *data;
         uint16_t data_size;
         int16_vec2_t dim;
@@ -119,18 +131,18 @@ typedef struct {
 
 static_assert(sizeof(picture_t) == 16);
 
-typedef struct {
+typedef struct texture {
         uint16_t vram_index;
         uint16_t size;
 } texture_t;
 
 static_assert(sizeof(texture_t) == 4);
 
-typedef struct {
+typedef struct palette {
         const void *data;
         uint16_t data_size;
 } palette_t;
 
 static_assert(sizeof(palette_t) == 8);
 
-#endif /* MIC3D_TYPES_H */
+#endif /* _MIC3D_TYPES_H_ */

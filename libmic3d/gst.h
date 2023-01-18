@@ -1,5 +1,12 @@
-#ifndef MIC3D_GST_H
-#define MIC3D_GST_H
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+#ifndef _MIC3D_GST_H_
+#define _MIC3D_GST_H_
 
 #include <fix16.h>
 
@@ -28,4 +35,4 @@ void __gst_init(void);
 
 void __gst_put(const vdp1_gouraud_table_t *gouraud_tables, vdp1_vram_t vram_base, uint32_t put_count);
 
-#endif /* MIC3D_GST_H */
+#endif /* _MIC3D_GST_H_ */
