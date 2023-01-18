@@ -69,34 +69,26 @@ $(document).ready(function(){initNavTree('group__ARP.html',''); initResizable();
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarp__callback.html">arp_callback</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarp__callback.html">arp_callback_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <a href="structarp__callback.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:gadb22dfb87ed438713f0e633be7b72718"><td class="memItemLeft" align="right" valign="top"><a id="gadb22dfb87ed438713f0e633be7b72718"></a>
-typedef enum <a class="el" href="group__ARP.html#gad0d70cf14ca5d7345018022aa5e5950c">arp_function_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#gadb22dfb87ed438713f0e633be7b72718">arp_function_type_t</a></td></tr>
-<tr class="memdesc:gadb22dfb87ed438713f0e633be7b72718"><td class="mdescLeft">&#160;</td><td class="mdescRight">ARP Function types. <br /></td></tr>
-<tr class="separator:gadb22dfb87ed438713f0e633be7b72718"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafba3e183f7aab70c13a2bcb3d3d980e0"><td class="memItemLeft" align="right" valign="top"><a id="gafba3e183f7aab70c13a2bcb3d3d980e0"></a>
-typedef struct <a class="el" href="structarp__callback.html">arp_callback</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#gafba3e183f7aab70c13a2bcb3d3d980e0">arp_callback_t</a></td></tr>
-<tr class="memdesc:gafba3e183f7aab70c13a2bcb3d3d980e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type. <br /></td></tr>
-<tr class="separator:gafba3e183f7aab70c13a2bcb3d3d980e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga30c559c794e36a51626cdefbeb7da00d"><td class="memItemLeft" align="right" valign="top"><a id="ga30c559c794e36a51626cdefbeb7da00d"></a>
-typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#ga30c559c794e36a51626cdefbeb7da00d">arp_callback_handler_t</a>) (const <a class="el" href="group__ARP.html#gafba3e183f7aab70c13a2bcb3d3d980e0">arp_callback_t</a> *)</td></tr>
+typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#ga30c559c794e36a51626cdefbeb7da00d">arp_callback_handler_t</a>) (const arp_callback_t *)</td></tr>
 <tr class="memdesc:ga30c559c794e36a51626cdefbeb7da00d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback handler. <br /></td></tr>
 <tr class="separator:ga30c559c794e36a51626cdefbeb7da00d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:gad0d70cf14ca5d7345018022aa5e5950c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#gad0d70cf14ca5d7345018022aa5e5950c">arp_function_type</a> { <a class="el" href="group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950cad0fbc7def432e0d49ef10994ee852de8">ARP_FUNCTION_TYPE_NONE</a> = 0
-, <a class="el" href="group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950ca75d6fe70bd4b42398cae8b2ebeaef0de">ARP_FUNCTION_TYPE_DOWNLOAD</a> = 1
-, <a class="el" href="group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950caa51cacd0dc3ad0800d98d3286c6aa376">ARP_FUNCTION_TYPE_UPLOAD</a> = 2
-, <a class="el" href="group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950ca9af949c53cca074ed1595a4f12b0391b">ARP_FUNCTION_TYPE_EXEC</a> = 3
+<tr class="memitem:gae2f5988c6fdcd111d894823c73e2f6bd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ARP.html#gae2f5988c6fdcd111d894823c73e2f6bd">arp_function_type_t</a> { <a class="el" href="group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bdad0fbc7def432e0d49ef10994ee852de8">ARP_FUNCTION_TYPE_NONE</a> = 0
+, <a class="el" href="group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bda75d6fe70bd4b42398cae8b2ebeaef0de">ARP_FUNCTION_TYPE_DOWNLOAD</a> = 1
+, <a class="el" href="group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bdaa51cacd0dc3ad0800d98d3286c6aa376">ARP_FUNCTION_TYPE_UPLOAD</a> = 2
+, <a class="el" href="group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bda9af949c53cca074ed1595a4f12b0391b">ARP_FUNCTION_TYPE_EXEC</a> = 3
  }</td></tr>
-<tr class="memdesc:gad0d70cf14ca5d7345018022aa5e5950c"><td class="mdescLeft">&#160;</td><td class="mdescRight">ARP Function types.  <a href="group__ARP.html#gad0d70cf14ca5d7345018022aa5e5950c">More...</a><br /></td></tr>
-<tr class="separator:gad0d70cf14ca5d7345018022aa5e5950c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:gae2f5988c6fdcd111d894823c73e2f6bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">ARP Function types.  <a href="group__ARP.html#gae2f5988c6fdcd111d894823c73e2f6bd">More...</a><br /></td></tr>
+<tr class="separator:gae2f5988c6fdcd111d894823c73e2f6bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -139,27 +131,27 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="gad0d70cf14ca5d7345018022aa5e5950c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad0d70cf14ca5d7345018022aa5e5950c">&#9670;&nbsp;</a></span>arp_function_type</h2>
+<a id="gae2f5988c6fdcd111d894823c73e2f6bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae2f5988c6fdcd111d894823c73e2f6bd">&#9670;&nbsp;</a></span>arp_function_type_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group__ARP.html#gad0d70cf14ca5d7345018022aa5e5950c">arp_function_type</a></td>
+          <td class="memname">enum <a class="el" href="group__ARP.html#gae2f5988c6fdcd111d894823c73e2f6bd">arp_function_type_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>ARP Function types. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggad0d70cf14ca5d7345018022aa5e5950cad0fbc7def432e0d49ef10994ee852de8"></a>ARP_FUNCTION_TYPE_NONE&#160;</td><td class="fielddoc"><p>Invalid function. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggae2f5988c6fdcd111d894823c73e2f6bdad0fbc7def432e0d49ef10994ee852de8"></a>ARP_FUNCTION_TYPE_NONE&#160;</td><td class="fielddoc"><p>Invalid function. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad0d70cf14ca5d7345018022aa5e5950ca75d6fe70bd4b42398cae8b2ebeaef0de"></a>ARP_FUNCTION_TYPE_DOWNLOAD&#160;</td><td class="fielddoc"><p>Download function. </p>
+<tr><td class="fieldname"><a id="ggae2f5988c6fdcd111d894823c73e2f6bda75d6fe70bd4b42398cae8b2ebeaef0de"></a>ARP_FUNCTION_TYPE_DOWNLOAD&#160;</td><td class="fielddoc"><p>Download function. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad0d70cf14ca5d7345018022aa5e5950caa51cacd0dc3ad0800d98d3286c6aa376"></a>ARP_FUNCTION_TYPE_UPLOAD&#160;</td><td class="fielddoc"><p>Upload function. </p>
+<tr><td class="fieldname"><a id="ggae2f5988c6fdcd111d894823c73e2f6bdaa51cacd0dc3ad0800d98d3286c6aa376"></a>ARP_FUNCTION_TYPE_UPLOAD&#160;</td><td class="fielddoc"><p>Upload function. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad0d70cf14ca5d7345018022aa5e5950ca9af949c53cca074ed1595a4f12b0391b"></a>ARP_FUNCTION_TYPE_EXEC&#160;</td><td class="fielddoc"><p>Upload and execute function. </p>
+<tr><td class="fieldname"><a id="ggae2f5988c6fdcd111d894823c73e2f6bda9af949c53cca074ed1595a4f12b0391b"></a>ARP_FUNCTION_TYPE_EXEC&#160;</td><td class="fielddoc"><p>Upload and execute function. </p>
 </td></tr>
 </table>
 

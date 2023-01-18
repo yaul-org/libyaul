@@ -1,0 +1,4 @@
+<map id="bup_devices_t" name="bup_devices_t">
+<area shape="rect" id="node1" title="BUP device configurations connected when BUP is initialized." alt="" coords="5,139,120,165"/>
+<area shape="rect" id="node2" href="$structbup__config__t.html" title="Storage device connection information." alt="" coords="11,5,115,32"/>
+</map>

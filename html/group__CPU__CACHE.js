@@ -1,12 +1,12 @@
 var group__CPU__CACHE =
 [
-    [ "cpu_cache_data_line", "unioncpu__cache__data__line.html", [
-      [ "lru", "unioncpu__cache__data__line.html#a24b08b30e6f282e8939197fa032b4acf", null ],
-      [ "tag", "unioncpu__cache__data__line.html#a2571a800932685e8d912d4296c2cab25", null ],
-      [ "valid", "unioncpu__cache__data__line.html#afc8c34f8fdb635e4156130eefeea9df5", null ]
+    [ "cpu_cache_data_line_t", "unioncpu__cache__data__line__t.html", [
+      [ "lru", "unioncpu__cache__data__line__t.html#a450e795aa75b0283ac61d0b4daab2c0c", null ],
+      [ "tag", "unioncpu__cache__data__line__t.html#a29b1a98e5a226a68e99cd34bafe7e1b6", null ],
+      [ "valid", "unioncpu__cache__data__line__t.html#ad62e9a5f09ed7dc4c75262d55420a13c", null ]
     ] ],
-    [ "cpu_cache_data_way", "structcpu__cache__data__way.html", [
-      [ "data", "structcpu__cache__data__way.html#a4271bd47d77011b9ee879a5d921c550b", null ]
+    [ "cpu_cache_data_way_t", "structcpu__cache__data__way__t.html", [
+      [ "data", "structcpu__cache__data__way__t.html#aa5b91294ed548172b781ea8e09677766", null ]
     ] ],
     [ "__uncached", "group__CPU__CACHE.html#ga60df86520fee4e640ce36c5848e4f9ee", null ],
     [ "__uncached_function", "group__CPU__CACHE.html#gaaf966ad4f24e8d38393c27d8b2a5a2ab", null ],
@@ -24,17 +24,13 @@ var group__CPU__CACHE =
     [ "CPU_CACHE_WAY_2_ADDR", "group__CPU__CACHE.html#gab8c1fa0e47ab64ca48e363a0f4024ae3", null ],
     [ "CPU_CACHE_WAY_3_ADDR", "group__CPU__CACHE.html#ga17bba0f4891bcfe34c303dbc104b6876", null ],
     [ "CPU_CACHE_WAY_SIZE", "group__CPU__CACHE.html#gacb1ff83bdeb42abac3ab994f6e43ac84", null ],
-    [ "cpu_cache_data_line_t", "group__CPU__CACHE.html#gae7f1ef8f8daf268b7063cd2485d4824f", null ],
-    [ "cpu_cache_data_way_t", "group__CPU__CACHE.html#ga8a62c0ea1b679a8168851b95f2646ac7", null ],
-    [ "cpu_cache_mode_t", "group__CPU__CACHE.html#ga425790888be5a412c303fcf59beb190d", null ],
-    [ "cpu_cache_type_t", "group__CPU__CACHE.html#gafd9cc331e952f55eb6a3ded73f0ec852", null ],
-    [ "cpu_cache_mode", "group__CPU__CACHE.html#gac2ab1a6f63685fd7dc4bbc0d15887e2a", [
-      [ "CPU_CACHE_MODE_4_WAY", "group__CPU__CACHE.html#ggac2ab1a6f63685fd7dc4bbc0d15887e2aa9e38df73685fe9ad8e6638cc0a14ed0d", null ],
-      [ "CPU_CACHE_MODE_2_WAY", "group__CPU__CACHE.html#ggac2ab1a6f63685fd7dc4bbc0d15887e2aafc2031a1da4b7dd6507e9c898088ab73", null ]
+    [ "cpu_cache_mode_t", "group__CPU__CACHE.html#gadc5a07f8627e3480b9dd04d91a689ced", [
+      [ "CPU_CACHE_MODE_4_WAY", "group__CPU__CACHE.html#ggadc5a07f8627e3480b9dd04d91a689ceda9e38df73685fe9ad8e6638cc0a14ed0d", null ],
+      [ "CPU_CACHE_MODE_2_WAY", "group__CPU__CACHE.html#ggadc5a07f8627e3480b9dd04d91a689cedafc2031a1da4b7dd6507e9c898088ab73", null ]
     ] ],
-    [ "cpu_cache_type", "group__CPU__CACHE.html#ga0c4b9e3f8d6d8c4ce274da1b88010037", [
-      [ "CPU_CACHE_TYPE_I", "group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037a0cf3fb6de48fafbe16cb74b4c9536f1b", null ],
-      [ "CPU_CACHE_TYPE_D", "group__CPU__CACHE.html#gga0c4b9e3f8d6d8c4ce274da1b88010037aae5be6e2c73c3970b37b7a24fd990890", null ]
+    [ "cpu_cache_type_t", "group__CPU__CACHE.html#ga45c5459a41aeea19db05762418473c67", [
+      [ "CPU_CACHE_TYPE_I", "group__CPU__CACHE.html#gga45c5459a41aeea19db05762418473c67a0cf3fb6de48fafbe16cb74b4c9536f1b", null ],
+      [ "CPU_CACHE_TYPE_D", "group__CPU__CACHE.html#gga45c5459a41aeea19db05762418473c67aae5be6e2c73c3970b37b7a24fd990890", null ]
     ] ],
     [ "cpu_cache_area_purge", "group__CPU__CACHE.html#gaa441b2ed6dcb43aab0a230a2a73fda8a", null ],
     [ "cpu_cache_data_way_read", "group__CPU__CACHE.html#ga9a9abd15e8a11f48a38592d82385050a", null ],

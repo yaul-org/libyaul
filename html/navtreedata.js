@@ -45,11 +45,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "angle_8h_source.html",
-"group__CPU__FRT.html#ga8a4e8a7009dcded7bcad5cc135a1dcb1",
-"group__MEMORY__MAP__AREAS.html#ga298694f5a284a9481357c09aab7aa7e3",
-"group__SCU__DSP.html#ga91d43ca0a5d42d1fedeaef9974335973",
-"structcpu__dmac__cfg.html#a9801a8bd9887b86d390a1f0369ce23c7",
-"structsmpc__peripheral__racing.html#aac85e525dfa7cd5f320425e9a3842e8f"
+"group__CPU__FRT.html#ga5ca5327457080498e0a52dca7660f7b4",
+"group__MEMORY__MAP__AREAS.html#ga7ce57345dd6d637b8f36415f9326f73a",
+"group__SCU__IC.html#ga5031b9bf30ac4139a80ec1fb78fce787",
+"structcpu__ioregs__t.html#a60a1f6556fb8a06efc051b238564e05a"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

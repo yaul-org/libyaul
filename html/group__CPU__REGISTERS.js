@@ -1,22 +1,21 @@
 var group__CPU__REGISTERS =
 [
-    [ "cpu_registers", "structcpu__registers.html", [
-      [ "gbr", "structcpu__registers.html#a3a4b905b7d95c681f8e54ac2cc796a78", null ],
-      [ "mach", "structcpu__registers.html#a5fe152f8e5d0f4d6aa906ebc28e9de2f", null ],
-      [ "macl", "structcpu__registers.html#a9f8860e10ff3b3e67490a7fd3c42f3ce", null ],
-      [ "pc", "structcpu__registers.html#a5bf0f4c5ce29ede04315b3b21cd9963d", null ],
-      [ "pr", "structcpu__registers.html#acffad4fb777cd737865c4a5c5b88bee8", null ],
-      [ "r", "structcpu__registers.html#a6f956317d36cc87e28381154cb4039da", null ],
-      [ "sp", "structcpu__registers.html#a264e1a8cbf4224fda3e3b5f21c128fdf", null ],
-      [ "sr", "structcpu__registers.html#a8af81cac0f0eb4d1c394bc743e63288b", null ],
-      [ "vbr", "structcpu__registers.html#a1f73f7cca28543bc15b4b09f2720864e", null ]
+    [ "cpu_registers_t", "structcpu__registers__t.html", [
+      [ "gbr", "structcpu__registers__t.html#a5347597b0b3b839b59bd4a00e524cfb7", null ],
+      [ "mach", "structcpu__registers__t.html#a828aff551af02d265a0ec7954375b77d", null ],
+      [ "macl", "structcpu__registers__t.html#aae76ce93deec8b574d8bbaaa0cb28538", null ],
+      [ "pc", "structcpu__registers__t.html#a3b7d51811ae546b211c8e199e9843be2", null ],
+      [ "pr", "structcpu__registers__t.html#a8f9c2a6eaac01233ae4727f431252bdf", null ],
+      [ "r", "structcpu__registers__t.html#aa226f6983c66279b6c880f7a2d721282", null ],
+      [ "sp", "structcpu__registers__t.html#aae128eda35f6d32e3f99258aec0f8f7b", null ],
+      [ "sr", "structcpu__registers__t.html#ac9d4ad90f82cc83830e0acc66ed48868", null ],
+      [ "vbr", "structcpu__registers__t.html#a0e1a565ea7ce6011dab9aae780db6d41", null ]
     ] ],
     [ "CPU_SR_I_BITS_MASK", "group__CPU__REGISTERS.html#gaaad2c8295a2578b178750308eab38f76", null ],
     [ "CPU_SR_M_BIT_MASK", "group__CPU__REGISTERS.html#ga40581c85372020540c8d3ac3d5e99a5a", null ],
     [ "CPU_SR_Q_BIT_MASK", "group__CPU__REGISTERS.html#ga54e7e0ca305bd41e1234b5e03b282dfd", null ],
     [ "CPU_SR_S_BIT_MASK", "group__CPU__REGISTERS.html#gac52049ea86e4314b2a3444c60a2fc023", null ],
     [ "CPU_SR_T_BIT_MASK", "group__CPU__REGISTERS.html#ga947c390d9ee4c40173b9cfd60aac4b4c", null ],
-    [ "cpu_registers_t", "group__CPU__REGISTERS.html#gaf1d459c6962a5eae2393f9853095fcdf", null ],
     [ "cpu_reg_fp_get", "group__CPU__REGISTERS.html#ga04bddaf287b5e8c40bad25d20cf868fc", null ],
     [ "cpu_reg_gbr_get", "group__CPU__REGISTERS.html#gaaf1f159d141f9187ccbc84e900055fde", null ],
     [ "cpu_reg_gbr_set", "group__CPU__REGISTERS.html#ga0c4d0a064d63439a2aa883deaa7156bf", null ],

@@ -1,6 +1,7 @@
 var modules =
 [
     [ "Memory map", "group__MEMORY__MAP.html", "group__MEMORY__MAP" ],
+    [ "Backup (BUP)", "group__BUP.html", "group__BUP" ],
     [ "GCC", "group__GCC.html", "group__GCC" ],
     [ "SCU DMA", "group__SCU__DMA.html", "group__SCU__DMA" ],
     [ "SCU DSP", "group__SCU__DSP.html", "group__SCU__DSP" ],

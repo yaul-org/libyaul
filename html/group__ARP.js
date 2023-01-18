@@ -1,18 +1,16 @@
 var group__ARP =
 [
-    [ "arp_callback", "structarp__callback.html", [
-      [ "function_type", "structarp__callback.html#a399e2ea5b2d625e81048256dbaa26a20", null ],
-      [ "len", "structarp__callback.html#ace9e8e90496d2803ce6837fea6459221", null ],
-      [ "ptr", "structarp__callback.html#aa91519b5b687bc9f682e32cf956a5649", null ]
+    [ "arp_callback_t", "structarp__callback.html", [
+      [ "function_type", "structarp__callback.html#a1750e9f373b22b5fca9bb97cb0723e91", null ],
+      [ "len", "structarp__callback.html#a627f2c15e1c0e593ea181780a8e8f946", null ],
+      [ "ptr", "structarp__callback.html#a5fa405fdfa914095a2096141ca2359ae", null ]
     ] ],
     [ "arp_callback_handler_t", "group__ARP.html#ga30c559c794e36a51626cdefbeb7da00d", null ],
-    [ "arp_callback_t", "group__ARP.html#gafba3e183f7aab70c13a2bcb3d3d980e0", null ],
-    [ "arp_function_type_t", "group__ARP.html#gadb22dfb87ed438713f0e633be7b72718", null ],
-    [ "arp_function_type", "group__ARP.html#gad0d70cf14ca5d7345018022aa5e5950c", [
-      [ "ARP_FUNCTION_TYPE_NONE", "group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950cad0fbc7def432e0d49ef10994ee852de8", null ],
-      [ "ARP_FUNCTION_TYPE_DOWNLOAD", "group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950ca75d6fe70bd4b42398cae8b2ebeaef0de", null ],
-      [ "ARP_FUNCTION_TYPE_UPLOAD", "group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950caa51cacd0dc3ad0800d98d3286c6aa376", null ],
-      [ "ARP_FUNCTION_TYPE_EXEC", "group__ARP.html#ggad0d70cf14ca5d7345018022aa5e5950ca9af949c53cca074ed1595a4f12b0391b", null ]
+    [ "arp_function_type_t", "group__ARP.html#gae2f5988c6fdcd111d894823c73e2f6bd", [
+      [ "ARP_FUNCTION_TYPE_NONE", "group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bdad0fbc7def432e0d49ef10994ee852de8", null ],
+      [ "ARP_FUNCTION_TYPE_DOWNLOAD", "group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bda75d6fe70bd4b42398cae8b2ebeaef0de", null ],
+      [ "ARP_FUNCTION_TYPE_UPLOAD", "group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bdaa51cacd0dc3ad0800d98d3286c6aa376", null ],
+      [ "ARP_FUNCTION_TYPE_EXEC", "group__ARP.html#ggae2f5988c6fdcd111d894823c73e2f6bda9af949c53cca074ed1595a4f12b0391b", null ]
     ] ],
     [ "arp_busy_status", "group__ARP.html#ga8a0d23bcfb7279346aaddf0ae0c76b41", null ],
     [ "arp_byte_read", "group__ARP.html#gac219d683a83d01a22ac75472fe875150", null ],

@@ -70,8 +70,8 @@ $(document).ready(function(){initNavTree('group__SCU__DSP.html',''); initResizab
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dsp__status.html">scu_dsp_status</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP status.  <a href="structscu__dsp__status.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dsp__status__t.html">scu_dsp_status_t</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP status.  <a href="structscu__dsp__status__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -95,10 +95,6 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:gafc0907392c5bad64936e9e6533219275"><td class="memItemLeft" align="right" valign="top"><a id="gafc0907392c5bad64936e9e6533219275"></a>
-typedef enum <a class="el" href="group__SCU__DSP.html#gac5316f84cc8999256f18f23738e7ecd7">scu_dsp_ram</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a></td></tr>
-<tr class="memdesc:gafc0907392c5bad64936e9e6533219275"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP RAM pages. <br /></td></tr>
-<tr class="separator:gafc0907392c5bad64936e9e6533219275"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3ff9018a3065ab6d7319e51d16cbc738"><td class="memItemLeft" align="right" valign="top"><a id="ga3ff9018a3065ab6d7319e51d16cbc738"></a>
 typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga3ff9018a3065ab6d7319e51d16cbc738">scu_dsp_ihr_t</a>) (void)</td></tr>
 <tr class="memdesc:ga3ff9018a3065ab6d7319e51d16cbc738"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback type. <br /></td></tr>
@@ -107,20 +103,16 @@ typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga860709ce7fcc39a26d929d85cdc6e69a">scu_dsp_pc_t</a></td></tr>
 <tr class="memdesc:ga860709ce7fcc39a26d929d85cdc6e69a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program counter to reference 256 instructions. <br /></td></tr>
 <tr class="separator:ga860709ce7fcc39a26d929d85cdc6e69a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2b2a616cfbf53d1cf5cc4191face69ce"><td class="memItemLeft" align="right" valign="top"><a id="ga2b2a616cfbf53d1cf5cc4191face69ce"></a>
-typedef struct <a class="el" href="structscu__dsp__status.html">scu_dsp_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga2b2a616cfbf53d1cf5cc4191face69ce">scu_dsp_status_t</a></td></tr>
-<tr class="memdesc:ga2b2a616cfbf53d1cf5cc4191face69ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP status. <br /></td></tr>
-<tr class="separator:ga2b2a616cfbf53d1cf5cc4191face69ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:gac5316f84cc8999256f18f23738e7ecd7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gac5316f84cc8999256f18f23738e7ecd7">scu_dsp_ram</a> { <a class="el" href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7a449eee862b33a201118922877509d910">DSP_RAM_PAGE_0</a> = 0x00
-, <a class="el" href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7abdd449630664b954ecfc04b6be08dcad">DSP_RAM_PAGE_1</a> = 0x01
-, <a class="el" href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7a040fddd429a71d7bae60eb2428e91292">DSP_RAM_PAGE_2</a> = 0x02
-, <a class="el" href="group__SCU__DSP.html#ggac5316f84cc8999256f18f23738e7ecd7ac327f53983e8a1f8d60d453057167411">DSP_RAM_PAGE_3</a> = 0x03
+<tr class="memitem:gad55b7c2d095ed2044697b32d6b2a366d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a> { <a class="el" href="group__SCU__DSP.html#ggad55b7c2d095ed2044697b32d6b2a366da449eee862b33a201118922877509d910">DSP_RAM_PAGE_0</a> = 0x00
+, <a class="el" href="group__SCU__DSP.html#ggad55b7c2d095ed2044697b32d6b2a366dabdd449630664b954ecfc04b6be08dcad">DSP_RAM_PAGE_1</a> = 0x01
+, <a class="el" href="group__SCU__DSP.html#ggad55b7c2d095ed2044697b32d6b2a366da040fddd429a71d7bae60eb2428e91292">DSP_RAM_PAGE_2</a> = 0x02
+, <a class="el" href="group__SCU__DSP.html#ggad55b7c2d095ed2044697b32d6b2a366dac327f53983e8a1f8d60d453057167411">DSP_RAM_PAGE_3</a> = 0x03
  }</td></tr>
-<tr class="memdesc:gac5316f84cc8999256f18f23738e7ecd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP RAM pages.  <a href="group__SCU__DSP.html#gac5316f84cc8999256f18f23738e7ecd7">More...</a><br /></td></tr>
-<tr class="separator:gac5316f84cc8999256f18f23738e7ecd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:gad55b7c2d095ed2044697b32d6b2a366d"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCU-DSP RAM pages.  <a href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">More...</a><br /></td></tr>
+<tr class="separator:gad55b7c2d095ed2044697b32d6b2a366d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -161,39 +153,39 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga11fc8661b312c59893ada229c37e073f">scu_dsp_program_end_wait</a> (void)</td></tr>
 <tr class="memdesc:ga11fc8661b312c59893ada229c37e073f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until the SCU-DSP program has ended. <br /></td></tr>
 <tr class="separator:ga11fc8661b312c59893ada229c37e073f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga35377ec1b29e4654f37194eb77e8dba4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga35377ec1b29e4654f37194eb77e8dba4">scu_dsp_data_read</a> (<a class="el" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset, void *data, uint32_t count)</td></tr>
+<tr class="memitem:ga35377ec1b29e4654f37194eb77e8dba4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga35377ec1b29e4654f37194eb77e8dba4">scu_dsp_data_read</a> (<a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a> ram_page, uint8_t offset, void *data, uint32_t count)</td></tr>
 <tr class="memdesc:ga35377ec1b29e4654f37194eb77e8dba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read from one of the SCU-DSP RAM page.  <a href="group__SCU__DSP.html#ga35377ec1b29e4654f37194eb77e8dba4">More...</a><br /></td></tr>
 <tr class="separator:ga35377ec1b29e4654f37194eb77e8dba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab7edff6efe6f5aeef377d2071f2e83b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gab7edff6efe6f5aeef377d2071f2e83b7">scu_dsp_data_write</a> (<a class="el" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a> ram_page, uint8_t offset, void *data, uint32_t count)</td></tr>
+<tr class="memitem:gab7edff6efe6f5aeef377d2071f2e83b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#gab7edff6efe6f5aeef377d2071f2e83b7">scu_dsp_data_write</a> (<a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a> ram_page, uint8_t offset, void *data, uint32_t count)</td></tr>
 <tr class="memdesc:gab7edff6efe6f5aeef377d2071f2e83b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to one of the SCU-DSP RAM page.  <a href="group__SCU__DSP.html#gab7edff6efe6f5aeef377d2071f2e83b7">More...</a><br /></td></tr>
 <tr class="separator:gab7edff6efe6f5aeef377d2071f2e83b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2edf70b8678416394ea17f582a426278"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">scu_dsp_status_get</a> (<a class="el" href="group__SCU__DSP.html#ga2b2a616cfbf53d1cf5cc4191face69ce">scu_dsp_status_t</a> *status)</td></tr>
+<tr class="memitem:ga2edf70b8678416394ea17f582a426278"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">scu_dsp_status_get</a> (<a class="el" href="structscu__dsp__status__t.html">scu_dsp_status_t</a> *status)</td></tr>
 <tr class="memdesc:ga2edf70b8678416394ea17f582a426278"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain SCU-DSP operation status.  <a href="group__SCU__DSP.html#ga2edf70b8678416394ea17f582a426278">More...</a><br /></td></tr>
 <tr class="separator:ga2edf70b8678416394ea17f582a426278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="gac5316f84cc8999256f18f23738e7ecd7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac5316f84cc8999256f18f23738e7ecd7">&#9670;&nbsp;</a></span>scu_dsp_ram</h2>
+<a id="gad55b7c2d095ed2044697b32d6b2a366d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad55b7c2d095ed2044697b32d6b2a366d">&#9670;&nbsp;</a></span>scu_dsp_ram_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group__SCU__DSP.html#gac5316f84cc8999256f18f23738e7ecd7">scu_dsp_ram</a></td>
+          <td class="memname">enum <a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>SCU-DSP RAM pages. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggac5316f84cc8999256f18f23738e7ecd7a449eee862b33a201118922877509d910"></a>DSP_RAM_PAGE_0&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #0. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggad55b7c2d095ed2044697b32d6b2a366da449eee862b33a201118922877509d910"></a>DSP_RAM_PAGE_0&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #0. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggac5316f84cc8999256f18f23738e7ecd7abdd449630664b954ecfc04b6be08dcad"></a>DSP_RAM_PAGE_1&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #1. </p>
+<tr><td class="fieldname"><a id="ggad55b7c2d095ed2044697b32d6b2a366dabdd449630664b954ecfc04b6be08dcad"></a>DSP_RAM_PAGE_1&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #1. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggac5316f84cc8999256f18f23738e7ecd7a040fddd429a71d7bae60eb2428e91292"></a>DSP_RAM_PAGE_2&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #2. </p>
+<tr><td class="fieldname"><a id="ggad55b7c2d095ed2044697b32d6b2a366da040fddd429a71d7bae60eb2428e91292"></a>DSP_RAM_PAGE_2&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #2. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggac5316f84cc8999256f18f23738e7ecd7ac327f53983e8a1f8d60d453057167411"></a>DSP_RAM_PAGE_3&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #3. </p>
+<tr><td class="fieldname"><a id="ggad55b7c2d095ed2044697b32d6b2a366dac327f53983e8a1f8d60d453057167411"></a>DSP_RAM_PAGE_3&#160;</td><td class="fielddoc"><p>SCU-DSP RAM page #3. </p>
 </td></tr>
 </table>
 
@@ -209,7 +201,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
         <tr>
           <td class="memname">void scu_dsp_data_read </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a>&#160;</td>
           <td class="paramname"><em>ram_page</em>, </td>
         </tr>
         <tr>
@@ -261,7 +253,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
         <tr>
           <td class="memname">void scu_dsp_data_write </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#gafc0907392c5bad64936e9e6533219275">scu_dsp_ram_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#gad55b7c2d095ed2044697b32d6b2a366d">scu_dsp_ram_t</a>&#160;</td>
           <td class="paramname"><em>ram_page</em>, </td>
         </tr>
         <tr>
@@ -498,7 +490,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
         <tr>
           <td class="memname">void scu_dsp_status_get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__SCU__DSP.html#ga2b2a616cfbf53d1cf5cc4191face69ce">scu_dsp_status_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="structscu__dsp__status__t.html">scu_dsp_status_t</a> *&#160;</td>
           <td class="paramname"><em>status</em></td><td>)</td>
           <td></td>
         </tr>
@@ -509,7 +501,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <p>If <code>status</code> is <code>NULL</code>, the status will not be updated.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">status</td><td>The pointer to <a class="el" href="group__SCU__DSP.html#ga2b2a616cfbf53d1cf5cc4191face69ce">scu_dsp_status_t</a>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">status</td><td>The pointer to <a class="el" href="structscu__dsp__status__t.html">scu_dsp_status_t</a>. </td></tr>
   </table>
   </dd>
 </dl>

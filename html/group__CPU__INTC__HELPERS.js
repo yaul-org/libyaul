@@ -16,10 +16,10 @@ var group__CPU__INTC__HELPERS =
     [ "cpu_wdt_timer_mode_set", "group__CPU__INTC__HELPERS.html#gac6885bf2d96be2e0131862c4b9aabbf5", null ],
     [ "scu_dma_illegal_clear", "group__CPU__INTC__HELPERS.html#ga013ffcfcb17626c9f3d3b9472328f778", null ],
     [ "scu_dma_illegal_set", "group__CPU__INTC__HELPERS.html#gad435a35953b1604dd4b9c6d2ca3ca0ed", null ],
-    [ "ihr", "group__CPU__INTC__HELPERS.html#ga53acfc488aaf60e79ee4c24542d2d021", null ],
-    [ "ihr_eri", "group__CPU__INTC__HELPERS.html#gad0bdae52b62d1df84549e895e16c2718", null ],
-    [ "ihr_rxi", "group__CPU__INTC__HELPERS.html#ga989c0ac8fe8d6a9b79432bb9c5f8ff7c", null ],
-    [ "ihr_tei", "group__CPU__INTC__HELPERS.html#ga8b706216062b915dfe43099ae7b872d7", null ],
-    [ "ihr_txi", "group__CPU__INTC__HELPERS.html#ga7b89c074611aac8c287ee5a71fe79e7f", null ],
-    [ "ihr_work", "group__CPU__INTC__HELPERS.html#gadb8bb377ffdb53781aee3ba952508fce", null ]
+    [ "ihr", "group__CPU__INTC__HELPERS.html#gaf62889ed1740a9e07e51438bc5bf4264", null ],
+    [ "ihr_eri", "group__CPU__INTC__HELPERS.html#ga9b4a40d35191ae1d419c0dc2ddcdbc45", null ],
+    [ "ihr_rxi", "group__CPU__INTC__HELPERS.html#ga7ed5fa2b116bc96089bf646771bc741b", null ],
+    [ "ihr_tei", "group__CPU__INTC__HELPERS.html#ga29b85dc380b5d737bdcaf3ef9f44bfc1", null ],
+    [ "ihr_txi", "group__CPU__INTC__HELPERS.html#ga3ad82fb244222409833c27643c1e895e", null ],
+    [ "ihr_work", "group__CPU__INTC__HELPERS.html#ga30c878bc9d6e0e62488bba1976d0651a", null ]
 ];
