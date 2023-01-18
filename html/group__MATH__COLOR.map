@@ -1,0 +1,7 @@
+<map id="Color" name="Color">
+<area shape="rect" id="node1" href="$group__MATH.html" title=" " alt="" coords="5,55,60,80"/>
+<area shape="rect" id="node3" title=" " alt="" coords="108,55,164,80"/>
+<area shape="rect" id="node2" href="$group__MATH__COLOR__RGB888.html" title=" " alt="" coords="216,5,291,31"/>
+<area shape="rect" id="node4" href="$group__MATH__COLOR__RGB1555.html" title=" " alt="" coords="212,55,295,80"/>
+<area shape="rect" id="node5" href="$group__MATH__COLOR__HSV.html" title=" " alt="" coords="229,104,278,129"/>
+</map>

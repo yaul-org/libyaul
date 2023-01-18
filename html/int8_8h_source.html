@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -75,34 +75,44 @@ $(document).ready(function(){initNavTree('int8_8h_source.html',''); initResizabl
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structint8__vec2__t.html">   15</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        int8_t x;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        int8_t y;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;} <a class="code" href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a>(4) <a class="code" href="structint8__vec2__t.html">int8_vec2_t</a>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="structint8__vec3__t.html">   20</a></span>&#160;typedef struct {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        int8_t x;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        int8_t y;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        int8_t z;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;} <a class="code" href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a>(4) <a class="code" href="structint8__vec3__t.html">int8_vec3_t</a>;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define INT8_VEC2_INITIALIZER(x, y)                                            \</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">            (x),                                                               \</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">            (y)                                                                \</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">    }</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#define INT8_VEC3_INITIALIZER(x, y)                                            \</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">            (x),                                                               \</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">            (y),                                                               \</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">            (z)                                                                \</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">    }</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_INT8_H_ */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga5ec304e7577e6c1a8a36c3096fc466af"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a></div><div class="ttdeci">#define __aligned(x)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> cdefs.h:101</div></div>
-<div class="ttc" id="astructint8__vec2__t_html"><div class="ttname"><a href="structint8__vec2__t.html">int8_vec2_t</a></div><div class="ttdef"><b>Definition:</b> int8.h:15</div></div>
-<div class="ttc" id="astructint8__vec3__t_html"><div class="ttname"><a href="structint8__vec3__t.html">int8_vec3_t</a></div><div class="ttdef"><b>Definition:</b> int8.h:20</div></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;__BEGIN_DECLS</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structint8__vec2__t.html">   23</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="structint8__vec2__t.html#a365518b618509035645fd478d78688a9">   25</a></span>&#160;        int8_t <a class="code" href="structint8__vec2__t.html#a365518b618509035645fd478d78688a9">x</a>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="structint8__vec2__t.html#a515b0a779f2f1908552402f55166ae80">   27</a></span>&#160;        int8_t <a class="code" href="structint8__vec2__t.html#a515b0a779f2f1908552402f55166ae80">y</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;} <a class="code" href="structint8__vec2__t.html">int8_vec2_t</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="structint8__vec3__t.html">   31</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="structint8__vec3__t.html#a94a659bb8df82d269424580c65479469">   33</a></span>&#160;        int8_t <a class="code" href="structint8__vec3__t.html#a94a659bb8df82d269424580c65479469">x</a>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="structint8__vec3__t.html#a8dd19d4ccabfecef8ddd551a83aec495">   35</a></span>&#160;        int8_t <a class="code" href="structint8__vec3__t.html#a8dd19d4ccabfecef8ddd551a83aec495">y</a>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="structint8__vec3__t.html#a1aa6005576906a1fd26aac9b1a46921b">   37</a></span>&#160;        int8_t <a class="code" href="structint8__vec3__t.html#a1aa6005576906a1fd26aac9b1a46921b">z</a>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;} <a class="code" href="structint8__vec3__t.html">int8_vec3_t</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="group__MATH__INT8.html#ga426cd0b8ff8fafcb48847b4ad97856f5">   44</a></span>&#160;<span class="preprocessor">#define INT8_VEC2_INITIALIZER(x, y)                                            \</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">            (x),                                                               \</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">            (y)                                                                \</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">    }</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="group__MATH__INT8.html#gac77ffa0f1d896fcf7506437e6360060d">   55</a></span>&#160;<span class="preprocessor">#define INT8_VEC3_INITIALIZER(x, y, z)                                         \</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">            (x),                                                               \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">            (y),                                                               \</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">            (z)                                                                \</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">    }</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_INT8_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="astructint8__vec2__t_html"><div class="ttname"><a href="structint8__vec2__t.html">int8_vec2_t</a></div><div class="ttdoc">2-vector of type int8_t.</div><div class="ttdef"><b>Definition:</b> int8.h:23</div></div>
+<div class="ttc" id="astructint8__vec2__t_html_a365518b618509035645fd478d78688a9"><div class="ttname"><a href="structint8__vec2__t.html#a365518b618509035645fd478d78688a9">int8_vec2_t::x</a></div><div class="ttdeci">int8_t x</div><div class="ttdoc">X component.</div><div class="ttdef"><b>Definition:</b> int8.h:25</div></div>
+<div class="ttc" id="astructint8__vec2__t_html_a515b0a779f2f1908552402f55166ae80"><div class="ttname"><a href="structint8__vec2__t.html#a515b0a779f2f1908552402f55166ae80">int8_vec2_t::y</a></div><div class="ttdeci">int8_t y</div><div class="ttdoc">Y component.</div><div class="ttdef"><b>Definition:</b> int8.h:27</div></div>
+<div class="ttc" id="astructint8__vec3__t_html"><div class="ttname"><a href="structint8__vec3__t.html">int8_vec3_t</a></div><div class="ttdoc">3-vector of type int8_t.</div><div class="ttdef"><b>Definition:</b> int8.h:31</div></div>
+<div class="ttc" id="astructint8__vec3__t_html_a1aa6005576906a1fd26aac9b1a46921b"><div class="ttname"><a href="structint8__vec3__t.html#a1aa6005576906a1fd26aac9b1a46921b">int8_vec3_t::z</a></div><div class="ttdeci">int8_t z</div><div class="ttdoc">Z component.</div><div class="ttdef"><b>Definition:</b> int8.h:37</div></div>
+<div class="ttc" id="astructint8__vec3__t_html_a8dd19d4ccabfecef8ddd551a83aec495"><div class="ttname"><a href="structint8__vec3__t.html#a8dd19d4ccabfecef8ddd551a83aec495">int8_vec3_t::y</a></div><div class="ttdeci">int8_t y</div><div class="ttdoc">Y component.</div><div class="ttdef"><b>Definition:</b> int8.h:35</div></div>
+<div class="ttc" id="astructint8__vec3__t_html_a94a659bb8df82d269424580c65479469"><div class="ttname"><a href="structint8__vec3__t.html#a94a659bb8df82d269424580c65479469">int8_vec3_t::x</a></div><div class="ttdeci">int8_t x</div><div class="ttdoc">X component.</div><div class="ttdef"><b>Definition:</b> int8.h:33</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

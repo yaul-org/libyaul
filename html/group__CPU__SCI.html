@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -396,14 +396,14 @@ cpu_sci_cfg_t.ihr_work </dd></dl>
 </div><div class="memdoc">
 
 <p>Configure a CPU-SCI for transfer. </p>
-<p>Configuring the CPU-SCI in <code>cfg</code> does not start the transfer. To start the transfer, use either cpu_sci_enable_with_dmac (for SCI+DMAC mode) or <a class="el" href="group__CPU__SCI.html#gaced319f0b818ea596b06678baf4e9630">cpu_sci_write_value_set</a> (for normal mode). The CPU-SCI is forcefully stopped upon starting the configuration. If the CPU_SCI is currently operating int SCI+DMAC mode, use cpu_dma_wait with the corresponding DMA channel to wait until the transfer is complete.</p>
+<p>Configuring the CPU-SCI in <code>cfg</code> does not start the transfer. To start the transfer, use either <a class="el" href="group__CPU__SCI.html#gaa68a5fe1572154ea20b19873ba4e36db">cpu_sci_with_dmac_enable</a> (for SCI+DMAC mode) or <a class="el" href="group__CPU__SCI.html#gaced319f0b818ea596b06678baf4e9630">cpu_sci_write_value_set</a> (for normal mode). The CPU-SCI is forcefully stopped upon starting the configuration. If the CPU_SCI is currently operating int SCI+DMAC mode, use <a class="el" href="group__CPU__DMAC.html#gaa25f9dd1ea61b12deaefec4f77d64131">cpu_dmac_channel_wait</a> with the corresponding CPU-DMAC channel to wait until the transfer is complete.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">cfg</td><td>The CPU-SCI transfer configuration.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>cpu_sci_enable_with_dmac </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__CPU__SCI.html#gaa68a5fe1572154ea20b19873ba4e36db" title="Execute a CPU-SCI transfer in CPI+DMAC mode.">cpu_sci_with_dmac_enable</a> </dd>
 <dd>
 <a class="el" href="group__CPU__SCI.html#gaced319f0b818ea596b06678baf4e9630" title="Execute a single byte CPU-SCI transfer in normal mode.">cpu_sci_write_value_set</a> </dd>
 <dd>

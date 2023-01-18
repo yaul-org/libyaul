@@ -22,5 +22,6 @@ var group__SMPC__RTC =
     [ "smpc_time_week_day_t", "group__SMPC__RTC.html#ga49812e4e5555c6699faf838f4954702b", null ],
     [ "smpc_rtc_settime_call", "group__SMPC__RTC.html#gae9cb86d9d62acaa93ccd738b0b0ee319", null ],
     [ "smpc_rtc_time_bcd_from", "group__SMPC__RTC.html#ga288cc57fff4129d2371c443a2f1cd8ce", null ],
+    [ "smpc_rtc_time_bcd_to", "group__SMPC__RTC.html#ga8af259a9153c2db9c299646f4c0c392c", null ],
     [ "smpc_rtc_time_get", "group__SMPC__RTC.html#gad7d66a6d675ee749de8f8c539859fccd", null ]
 ];

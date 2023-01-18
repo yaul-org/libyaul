@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -93,20 +93,28 @@ $(document).ready(function(){initNavTree('uint32_8h_source.html',''); initResiza
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;__BEGIN_DECLS</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">extern</span> uint32_t uint32_log2(uint32_t value);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">extern</span> uint32_t uint32_loop_log2(uint32_t value);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">extern</span> uint32_t uint32_pow2_round_next(uint32_t value);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;uint32_pow2_round(uint32_t value, uint32_t pow)</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">return</span> (((value + ((1 &lt;&lt; pow) - 1)) &gt;&gt; pow) &lt;&lt; pow);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">extern</span> uint32_t <a class="code" href="group__MATH__UINT32.html#ga94941332b4f2a3d62682e3e95c7ee840">uint32_log2</a>(uint32_t value);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_UINT32_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">extern</span> uint32_t <a class="code" href="group__MATH__UINT32.html#ga3eb1b80c83ade373b1404209a1449448">uint32_loop_log2</a>(uint32_t value);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">extern</span> uint32_t <a class="code" href="group__MATH__UINT32.html#gaa259c74f593ef5f308fcba32b6631e46">uint32_pow2_round_next</a>(uint32_t value);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> uint32_t <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="group__MATH__UINT32.html#ga49065ce785e4367e1b15cac15b50d338">   66</a></span>&#160;<a class="code" href="group__MATH__UINT32.html#ga49065ce785e4367e1b15cac15b50d338">uint32_pow2_round</a>(uint32_t value, uint32_t pow)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">return</span> (((value + ((1 &lt;&lt; pow) - 1)) &gt;&gt; pow) &lt;&lt; pow);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;}</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_UINT32_H_ */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
+<div class="ttc" id="agroup__MATH__UINT32_html_ga3eb1b80c83ade373b1404209a1449448"><div class="ttname"><a href="group__MATH__UINT32.html#ga3eb1b80c83ade373b1404209a1449448">uint32_loop_log2</a></div><div class="ttdeci">uint32_t uint32_loop_log2(uint32_t value)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> uint32.c:66</div></div>
+<div class="ttc" id="agroup__MATH__UINT32_html_ga49065ce785e4367e1b15cac15b50d338"><div class="ttname"><a href="group__MATH__UINT32.html#ga49065ce785e4367e1b15cac15b50d338">uint32_pow2_round</a></div><div class="ttdeci">static uint32_t __always_inline uint32_pow2_round(uint32_t value, uint32_t pow)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> uint32.h:66</div></div>
+<div class="ttc" id="agroup__MATH__UINT32_html_ga94941332b4f2a3d62682e3e95c7ee840"><div class="ttname"><a href="group__MATH__UINT32.html#ga94941332b4f2a3d62682e3e95c7ee840">uint32_log2</a></div><div class="ttdeci">uint32_t uint32_log2(uint32_t value)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> uint32.c:29</div></div>
+<div class="ttc" id="agroup__MATH__UINT32_html_gaa259c74f593ef5f308fcba32b6631e46"><div class="ttname"><a href="group__MATH__UINT32.html#gaa259c74f593ef5f308fcba32b6631e46">uint32_pow2_round_next</a></div><div class="ttdeci">uint32_t uint32_pow2_round_next(uint32_t value)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> uint32.c:79</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

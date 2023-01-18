@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -82,7 +82,8 @@ Collaboration diagram for scu_dma_level_cfg_t:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:adb552b1f515bfd11e7dd8fc74b1e03ba"><td class="memItemLeft" align="right" valign="top"><a id="adb552b1f515bfd11e7dd8fc74b1e03ba"></a>
-<a class="el" href="group__SCU__DMA.html#gaf2cef856be1165ad9d6c76d062cf21b5">scu_dma_space_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>space</b>:3</td></tr>
+<a class="el" href="group__SCU__DMA.html#gaf2cef856be1165ad9d6c76d062cf21b5">scu_dma_space_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__level__cfg__t.html#adb552b1f515bfd11e7dd8fc74b1e03ba">space</a>:3</td></tr>
+<tr class="memdesc:adb552b1f515bfd11e7dd8fc74b1e03ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transfer space. <br /></td></tr>
 <tr class="separator:adb552b1f515bfd11e7dd8fc74b1e03ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10eb5d4d00dc127e334435930a3d47ff"><td class="memItemLeft" align="right" valign="top"><a id="a10eb5d4d00dc127e334435930a3d47ff"></a>
 <a class="el" href="group__SCU__DMA.html#gaacb494f106c3c2324c08ea1e9e7ec4f6">scu_dma_mode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscu__dma__level__cfg__t.html#a10eb5d4d00dc127e334435930a3d47ff">mode</a>:8</td></tr>
@@ -106,8 +107,8 @@ Data Fields</h2></td></tr>
 <p>Details goes here.</p>
 <dl class="section warning"><dt>Warning</dt><dd><ul>
 <li>When in indirect mode,<ul>
-<li>The last entry in the transfer table <em>must</em> be bitwise OR'd with the memory transfer source address and scu_dma_xfer.src with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up.</li>
-<li><p class="startli">The base pointer to the table of transfers (scu_dma_xfer_type.indirect) must be byte aligned proportional to the number of transfers in the table. Ignoring this condition <em>will</em> cause the machine to lock up.</p>
+<li>The last entry in the transfer table <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer__t.html#aecc6f31d21ac6c1a9ada8cd627b3082a">scu_dma_xfer_t::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up.</li>
+<li><p class="startli">The base pointer to the table of transfers (<a class="el" href="unionscu__dma__xfer__type__t.html#adcbc3be9bf1986f4ef48cdfaad6af60a">scu_dma_xfer_type_t::indirect</a>) must be byte aligned proportional to the number of transfers in the table. Ignoring this condition <em>will</em> cause the machine to lock up.</p>
 <p class="startli">For example, if the transfer count in the table is 1, and because this structure is 12 bytes, first round to the nearest power of 2, the alignment of the table must be on a 16-byte boundary. If the the transfer count is 3 (36 bytes rounded to 64), then the table must be on a 64-byte boundary.</p>
 <p class="startli">Effectively, the formula to determine the byte alignment is \(2^{\lceil\log_2 N\rceil}\)-bytes where \(N\) is the size of the transfer table in bytes.</p>
 <p class="startli">When allocating dynamically, use memalign. Otherwise, when statically allocating, use the <a class="el" href="group__GCC__ATTRIBUTES.html#ga5ec304e7577e6c1a8a36c3096fc466af">__aligned</a> GCC attribute. </p>

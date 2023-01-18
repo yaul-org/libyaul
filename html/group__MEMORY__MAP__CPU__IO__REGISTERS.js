@@ -1,10 +1,6 @@
 var group__MEMORY__MAP__CPU__IO__REGISTERS =
 [
     [ "cpu_ioregs_t", "structcpu__ioregs__t.html", [
-      [ "__packed", "structcpu__ioregs__t.html#a0bd40a625b2bbe4168381eb1fcae6f9b", null ],
-      [ "__packed", "structcpu__ioregs__t.html#a40d5f94b262a56a72c8b01ca55e4dc8c", null ],
-      [ "__packed", "structcpu__ioregs__t.html#a93d22f3a7bd18e4324db016e07e03a52", null ],
-      [ "__packed", "structcpu__ioregs__t.html#a5b4087cee5f9c483e9cda227b846ce9e", null ],
       [ "bamrah", "structcpu__ioregs__t.html#a4d98c56acf1259967e81d0ead58f2168", null ],
       [ "bamral", "structcpu__ioregs__t.html#afe458efdaa9e080db68a8d283bf33e0c", null ],
       [ "bamrbh", "structcpu__ioregs__t.html#a9d1a809670c59a70f93c5fdd121226f6", null ],

@@ -32,8 +32,8 @@ var NAVTREE =
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Structure Index", "classes.html", null ],
       [ "Data Fields", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Variables", "functions_vars.html", "functions_vars" ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -45,10 +45,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "angle_8h_source.html",
-"group__CPU__FRT.html#ga5ca5327457080498e0a52dca7660f7b4",
-"group__MEMORY__MAP__AREAS.html#ga7ce57345dd6d637b8f36415f9326f73a",
-"group__SCU__IC.html#ga5031b9bf30ac4139a80ec1fb78fce787",
-"structcpu__ioregs__t.html#a60a1f6556fb8a06efc051b238564e05a"
+"group__CPU__DMAC.html#gga5bb98a415aea88ed1786d1d211beeb59aafd9716f55c20388df772d12bc85ca9a",
+"group__DRAM__CART.html#gga54a90d7f6a193650d8448ec566afd48aa1898e8aebaebcee1d0bc88c3a4b7790e",
+"group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f",
+"group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaa198f902c0b9f8b22c4bea1c373843b02",
+"structcpu__ioregs__t.html#a800477cfb79156d20e045ffcf1824b0f"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

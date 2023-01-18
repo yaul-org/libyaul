@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -85,7 +85,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The 3-tuple represents a single transfer in direct or indirect transfer. </p>
-<p>When a SCU-DMA level is configured to operate in direct mode (scu_dma_level_cfg.mode), then this structure represents one transfer.</p>
+<p>When a SCU-DMA level is configured to operate in direct mode (<a class="el" href="structscu__dma__level__cfg__t.html#a10eb5d4d00dc127e334435930a3d47ff">scu_dma_level_cfg_t::mode</a>), then this structure represents one transfer.</p>
 <p>However, when the mode is <a class="el" href="group__SCU__DMA.html#ggaacb494f106c3c2324c08ea1e9e7ec4f6a4b166ce7fb023724a21308e2a5f485cc">SCU_DMA_MODE_INDIRECT</a>, then this structure represents possibly one of many transfers contiguously laid out in memory as a <em>table</em> of transfers. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="aecc6f31d21ac6c1a9ada8cd627b3082a"></a>
@@ -101,7 +101,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><div class="memdoc">
 
 <p>Memory transfer source address. </p>
-<p>When in indirect mode, the last entry <em>must</em> be bitwise OR'd with the memory transfer source address and scu_dma_xfer.src with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up. </p>
+<p>When in indirect mode, the last entry <em>must</em> be bitwise OR'd with the memory transfer source address and <a class="el" href="structscu__dma__xfer__t.html#aecc6f31d21ac6c1a9ada8cd627b3082a">scu_dma_xfer_t::src</a> with <a class="el" href="group__SCU__DMA.html#gabc4a50cba419b468c31d1aee6ab52dd1">SCU_DMA_INDIRECT_TABLE_END</a>. Otherwise, the machine <em>will</em> lock up. </p>
 
 </div>
 </div>

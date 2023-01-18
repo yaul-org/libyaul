@@ -1,0 +1,15 @@
+<map id="Math" name="Math">
+<area shape="rect" id="node1" href="$group__MATH__FIX16__MATRIX.html" title=" " alt="" coords="130,5,233,31"/>
+<area shape="rect" id="node2" href="$group__MATH__FIX16__PLANES.html" title=" " alt="" coords="129,55,233,80"/>
+<area shape="rect" id="node3" href="$group__MATH__FIX16.html" title=" " alt="" coords="153,104,210,129"/>
+<area shape="rect" id="node4" href="$group__MATH__FIX16__VECTOR.html" title=" " alt="" coords="130,153,233,179"/>
+<area shape="rect" id="node5" href="$group__MATH__ANGLE.html" title=" " alt="" coords="152,203,211,228"/>
+<area shape="rect" id="node6" href="$group__MATH__FIX16__TRIG.html" title=" " alt="" coords="108,252,255,277"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,277,60,303"/>
+<area shape="rect" id="node8" href="$group__MATH__UINT8.html" title=" " alt="" coords="153,301,210,327"/>
+<area shape="rect" id="node9" href="$group__MATH__UINT32.html" title=" " alt="" coords="149,351,214,376"/>
+<area shape="rect" id="node10" href="$group__MATH__INT8.html" title=" " alt="" coords="158,400,205,425"/>
+<area shape="rect" id="node11" href="$group__MATH__COLOR.html" title=" " alt="" coords="153,449,209,475"/>
+<area shape="rect" id="node12" href="$group__MATH__INT16.html" title=" " alt="" coords="154,499,209,524"/>
+<area shape="rect" id="node13" href="$group__MATH__INT32.html" title=" " alt="" coords="154,548,209,573"/>
+</map>

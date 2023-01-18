@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('divu_8h_source.html',''); initResizabl
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="group__CPU__DIVU.html#ga4277d6b23ccbba1e8455cbacc2a6bc6f">   97</a></span>&#160;<a class="code" href="group__CPU__DIVU.html#ga4277d6b23ccbba1e8455cbacc2a6bc6f">cpu_divu_fix16_split</a>(<a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> dividend, uint32_t *dh, uint32_t *dl)</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="group__CPU__DIVU.html#ga4277d6b23ccbba1e8455cbacc2a6bc6f">   97</a></span>&#160;<a class="code" href="group__CPU__DIVU.html#ga4277d6b23ccbba1e8455cbacc2a6bc6f">cpu_divu_fix16_split</a>(<a class="code" href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> dividend, uint32_t *dh, uint32_t *dl)</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        *dh = <a class="code" href="group__CPU.html#gad2f9f90a86ea4a02100524ccd912d630">cpu_instr_swapw</a>(dividend);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        *dh = <a class="code" href="group__CPU.html#ga5cb88f68db4c01e2b5207fc260e9b205">cpu_instr_extsw</a>(*dh);</div>
@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('divu_8h_source.html',''); initResizabl
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
-<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b">  112</a></span>&#160;<a class="code" href="group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b">cpu_divu_fix16_set</a>(<a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> dividend, <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> divisor)</div>
+<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b">  112</a></span>&#160;<a class="code" href="group__CPU__DIVU.html#ga233c03d7b53e2026676cd2581179480b">cpu_divu_fix16_set</a>(<a class="code" href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> dividend, <a class="code" href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> divisor)</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        uint32_t dh;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        uint32_t dl;</div>
@@ -187,7 +187,7 @@ $(document).ready(function(){initNavTree('divu_8h_source.html',''); initResizabl
 <div class="ttc" id="agroup__CPU_html_ga5cb88f68db4c01e2b5207fc260e9b205"><div class="ttname"><a href="group__CPU.html#ga5cb88f68db4c01e2b5207fc260e9b205">cpu_instr_extsw</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_extsw(const uint32_t rm)</div><div class="ttdoc">Emit a exts.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:147</div></div>
 <div class="ttc" id="agroup__CPU_html_gad2f9f90a86ea4a02100524ccd912d630"><div class="ttname"><a href="group__CPU.html#gad2f9f90a86ea4a02100524ccd912d630">cpu_instr_swapw</a></div><div class="ttdeci">static uint32_t __always_inline cpu_instr_swapw(uint32_t x)</div><div class="ttdoc">Emit a swap.w instruction.</div><div class="ttdef"><b>Definition:</b> instructions.h:56</div></div>
 <div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
-<div class="ttc" id="agroup__MATH_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> fix16.h:67</div></div>
+<div class="ttc" id="agroup__MATH__FIX16_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">brief Fixed point Q16.16.</div><div class="ttdef"><b>Definition:</b> fix16.h:96</div></div>
 <div class="ttc" id="agroup__MEMORY__MAP__AREAS_html_ga01d1e3f3d77a0675f75fb889bbff33dd"><div class="ttname"><a href="group__MEMORY__MAP__AREAS.html#ga01d1e3f3d77a0675f75fb889bbff33dd">CPU_IOREG_BASE</a></div><div class="ttdeci">#define CPU_IOREG_BASE</div><div class="ttdoc">Base CPU address, for use with cpu_ioregs_t.</div><div class="ttdef"><b>Definition:</b> map.h:24</div></div>
 <div class="ttc" id="astructcpu__ioregs__t_html"><div class="ttname"><a href="structcpu__ioregs__t.html">cpu_ioregs_t</a></div><div class="ttdoc">CPU I/O register map.</div><div class="ttdef"><b>Definition:</b> map.h:35</div></div>
 <div class="ttc" id="astructcpu__ioregs__t_html_a4ce1f121aab8bd5994ec3c32aab9a9e5"><div class="ttname"><a href="structcpu__ioregs__t.html#a4ce1f121aab8bd5994ec3c32aab9a9e5">cpu_ioregs_t::ipra</a></div><div class="ttdeci">uint16_t ipra</div><div class="ttdoc">CPU I/O register.</div><div class="ttdef"><b>Definition:</b> map.h:129</div></div>

@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Yaul
-   &#160;<span id="projectnumber">Git hash 1962fcc</span>
+   &#160;<span id="projectnumber">Git hash fac8ec3</span>
    </div>
   </td>
  </tr>
@@ -70,28 +70,36 @@ $(document).ready(function(){initNavTree('angle_8h_source.html',''); initResizab
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;__BEGIN_DECLS</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#define RAD2ANGLE(d) ((angle_t)((65536.0f * (d)) / (2 * M_PI)))</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#define DEG2ANGLE(d) ((angle_t)((65536.0f * (d)) / 360.0f))</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">typedef</span> int16_t angle_t;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;angle_deg_to(angle_t angle)</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;{</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keywordflow">return</span> (angle * 360);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;}</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;angle_rad_to(angle_t angle)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordflow">return</span> fix16_mul(angle, FIX16_2PI);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;__END_DECLS</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_ANGLE_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="group__MATH__ANGLE.html#gac35365c444a16314148430672e1c346f">   18</a></span>&#160;<span class="preprocessor">#define RAD2ANGLE(d) ((angle_t)((65536.0f * (d)) / (2 * M_PI)))</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="group__MATH__ANGLE.html#ga79835189c886b6949231644d5c214222">   23</a></span>&#160;<span class="preprocessor">#define DEG2ANGLE(d) ((angle_t)((65536.0f * (d)) / 360.0f))</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="group__MATH__ANGLE.html#gabf93c956ebda204c8da416c71ffc2139">   26</a></span>&#160;<span class="keyword">typedef</span> int16_t <a class="code" href="group__MATH__ANGLE.html#gabf93c956ebda204c8da416c71ffc2139">angle_t</a>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="group__MATH__ANGLE.html#gae30941881cc6fd7a63522f00f0a3f60b">   34</a></span>&#160;<a class="code" href="group__MATH__ANGLE.html#gae30941881cc6fd7a63522f00f0a3f60b">angle_deg_to</a>(<a class="code" href="group__MATH__ANGLE.html#gabf93c956ebda204c8da416c71ffc2139">angle_t</a> angle)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;{</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">return</span> (angle * 360);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a> <a class="code" href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="group__MATH__ANGLE.html#ga9063d0e9a13d7033d26b755f71dc575e">   45</a></span>&#160;<a class="code" href="group__MATH__ANGLE.html#ga9063d0e9a13d7033d26b755f71dc575e">angle_rad_to</a>(<a class="code" href="group__MATH__ANGLE.html#gabf93c956ebda204c8da416c71ffc2139">angle_t</a> angle)</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;{</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__MATH__FIX16.html#gad1aa5b586717135bc93aae3195ecc5f6">fix16_mul</a>(angle, <a class="code" href="group__MATH__FIX16.html#ga553eebbef4914d437475e1d36f6e281f">FIX16_2PI</a>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;__END_DECLS</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* !_YAUL_MATH_ANGLE_H_ */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agroup__GCC__ATTRIBUTES_html_ga6034e8cd4bcd5bacfd060abd01bbd8a8"><div class="ttname"><a href="group__GCC__ATTRIBUTES.html#ga6034e8cd4bcd5bacfd060abd01bbd8a8">__always_inline</a></div><div class="ttdeci">#define __always_inline</div><div class="ttdoc">Not yet documented.</div></div>
-<div class="ttc" id="agroup__MATH_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> fix16.h:67</div></div>
+<div class="ttc" id="agroup__MATH__ANGLE_html_ga9063d0e9a13d7033d26b755f71dc575e"><div class="ttname"><a href="group__MATH__ANGLE.html#ga9063d0e9a13d7033d26b755f71dc575e">angle_rad_to</a></div><div class="ttdeci">static fix16_t __always_inline angle_rad_to(angle_t angle)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> angle.h:45</div></div>
+<div class="ttc" id="agroup__MATH__ANGLE_html_gabf93c956ebda204c8da416c71ffc2139"><div class="ttname"><a href="group__MATH__ANGLE.html#gabf93c956ebda204c8da416c71ffc2139">angle_t</a></div><div class="ttdeci">int16_t angle_t</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> angle.h:26</div></div>
+<div class="ttc" id="agroup__MATH__ANGLE_html_gae30941881cc6fd7a63522f00f0a3f60b"><div class="ttname"><a href="group__MATH__ANGLE.html#gae30941881cc6fd7a63522f00f0a3f60b">angle_deg_to</a></div><div class="ttdeci">static fix16_t __always_inline angle_deg_to(angle_t angle)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> angle.h:34</div></div>
+<div class="ttc" id="agroup__MATH__FIX16_html_ga553eebbef4914d437475e1d36f6e281f"><div class="ttname"><a href="group__MATH__FIX16.html#ga553eebbef4914d437475e1d36f6e281f">FIX16_2PI</a></div><div class="ttdeci">#define FIX16_2PI</div><div class="ttdoc">Q16.16 representation of 2π.</div><div class="ttdef"><b>Definition:</b> fix16.h:77</div></div>
+<div class="ttc" id="agroup__MATH__FIX16_html_gaca43c6dc0c416d1e27c18614b7ebcb73"><div class="ttname"><a href="group__MATH__FIX16.html#gaca43c6dc0c416d1e27c18614b7ebcb73">fix16_t</a></div><div class="ttdeci">int32_t fix16_t</div><div class="ttdoc">brief Fixed point Q16.16.</div><div class="ttdef"><b>Definition:</b> fix16.h:96</div></div>
+<div class="ttc" id="agroup__MATH__FIX16_html_gad1aa5b586717135bc93aae3195ecc5f6"><div class="ttname"><a href="group__MATH__FIX16.html#gad1aa5b586717135bc93aae3195ecc5f6">fix16_mul</a></div><div class="ttdeci">static fix16_t __always_inline fix16_mul(const fix16_t a, const fix16_t b)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> fix16.h:151</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
