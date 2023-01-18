@@ -99,6 +99,7 @@ typedef union cpu_cache_data_line {
 /// @brief Cache data way.
 /// @see cpu_cache_data_way_read
 typedef struct cpu_cache_data_way {
+        /// @brief Data.
         cpu_cache_data_line_t data[CPU_CACHE_WAY_SIZE / CPU_CACHE_LINE_SIZE];
 } __aligned(4) cpu_cache_data_way_t;
 
@@ -206,8 +207,8 @@ extern void cpu_cache_purge(void) __no_reorder __uncached_function;
 /// cpu_cache_data_way_read must be uncached so that it doesn't taint the cache
 /// itself.
 ///
-/// @param     way       The cache way to read from.
-/// @param[in] cache_way The cache way buffer to write to.
+/// @param     way      The cache way to read from.
+/// @param[in] data_way The cache way buffer to write to.
 extern void cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way) __uncached_function;
 
 /// @}

@@ -113,10 +113,10 @@ typedef enum scu_dma_update {
 
 /// @brief The bit that signifies the end of the transfer table.
 ///
-/// @details This bit must be set in @ref scu_dma_xfer.src.
+/// @details This bit must be set in @ref scu_dma_xfer_t.src.
 ///
 /// @warning Forgetting to bitwise OR this value to the last @ref
-/// scu_dma_xfer.src in the table @em will result in the machine locking up.
+/// scu_dma_xfer_t.src in the table @em will result in the machine locking up.
 #define SCU_DMA_INDIRECT_TABLE_END (0x80000000UL)
 
 /// @brief Different busses.
@@ -167,7 +167,7 @@ typedef int32_t scu_dma_level_t;
 /// registers.
 ///
 /// @details After configuring with @ref scu_dma_config_buffer using @ref
-/// scu_dma_level_cfg, the end result is a handle.
+/// scu_dma_level_cfg_t, the end result is a handle.
 ///
 /// @see scu_dma_config_buffer
 /// @see scu_dma_config_set
@@ -187,8 +187,9 @@ typedef struct scu_dma_handle {
 /// @brief The 3-tuple represents a single transfer in direct or indirect
 /// transfer.
 ///
-/// @details When a SCU-DMA level is configured to operate in direct mode (@ref
-/// scu_dma_level_cfg.mode), then this structure represents one transfer.
+/// @details When a SCU-DMA level is configured to operate in
+/// direct mode (@ref scu_dma_level_cfg_t.mode), then this structure
+/// represents one transfer.
 ///
 /// However, when the mode is @ref SCU_DMA_MODE_INDIRECT, then this structure
 /// represents possibly one of many transfers contiguously laid out in memory as
@@ -204,7 +205,7 @@ typedef struct scu_dma_xfer {
         ///
         /// @details When in indirect mode, the last entry @em must be bitwise
         /// OR'd with the memory transfer source address and @ref
-        /// scu_dma_xfer.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
+        /// scu_dma_xfer_t.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
         /// the machine @em will lock up.
         uint32_t src;
 /* The alignment must be 4 bytes as the entries in the table are packed
@@ -213,11 +214,11 @@ typedef struct scu_dma_xfer {
 
 /// The transfer type.
 typedef union scu_dma_xfer_type {
-        /// When indirect mode is used via @ref scu_dma_level_cfg.mode, use
+        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
         /// this to point to the transfer table.
         scu_dma_xfer_t *indirect;
 
-        /// When indirect mode is used via @ref scu_dma_level_cfg.mode, use
+        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
         /// this to set the 3-tuple.
         scu_dma_xfer_t direct;
 } scu_dma_xfer_type_t;
@@ -229,11 +230,11 @@ typedef union scu_dma_xfer_type {
 /// @warning
 /// + When in indirect mode,
 ///   - The last entry in the transfer table @em must be bitwise OR'd with the
-///     memory transfer source address and @ref scu_dma_xfer.src with @ref
+///     memory transfer source address and @ref scu_dma_xfer_t.src with @ref
 ///     SCU_DMA_INDIRECT_TABLE_END. Otherwise, the machine @em will lock up.
 ///
-///   - The base pointer to the table of transfers (@ref
-///     scu_dma_xfer_type.indirect) must be byte aligned proportional to the
+///   - The base pointer to the table of transfers (@ref scu_dma_xfer_type_t.indirect)
+///     must be byte aligned proportional to the
 ///     number of transfers in the table. Ignoring this condition @em will cause
 ///     the machine to lock up.
 ///
@@ -250,6 +251,7 @@ typedef union scu_dma_xfer_type {
 ///     When allocating dynamically, use @ref memalign. Otherwise, when
 ///     statically allocating, use the @ref __aligned GCC attribute.
 typedef struct scu_dma_level_cfg {
+        /// Transfer space.
         scu_dma_space_t space:3;
         /// Transfer mode.
         scu_dma_mode_t mode:8;

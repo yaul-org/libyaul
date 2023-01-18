@@ -93,6 +93,7 @@ extern const smpc_time_t *smpc_rtc_time_get(void);
 extern void smpc_rtc_time_bcd_from(const smpc_time_t *time,
     smpc_time_dec_t *time_dec);
 
+/// @brief Not yet documented.
 extern void smpc_rtc_time_bcd_to(const smpc_time_dec_t *time_dec,
     smpc_time_t *time);
 
