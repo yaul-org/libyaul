@@ -734,7 +734,7 @@
 
 /// @brief VDP2 I/O register.
 typedef union vdp2_ioregs {
-        /// @brief VDP2 I/O register.
+        /// @brief VDP2 I/O register buffer.
         uint16_t buffer[144];
 
         struct {

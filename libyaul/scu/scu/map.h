@@ -375,6 +375,7 @@ typedef struct scu_dma_ioregs {
 /// @brief SCU I/O register map.
 /// @see SCU_IOREG_BASE
 typedef union scu_ioregs {
+        /// @brief SCU I/O register buffer.
         uint32_t buffer[52];
 
         struct {
