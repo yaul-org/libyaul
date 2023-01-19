@@ -17,56 +17,67 @@
 /// @ingroup MEMORY_MAP
 /// @{
 
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define TVMR 0x0000UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define FBCR 0x0002UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define PTMR 0x0004UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EWDR 0x0006UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EWLR 0x0008UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EWRR 0x000AUL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define ENDR 0x000CUL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define EDSR 0x0010UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define LOPR 0x0012UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
 /// @see MEMORY_READ
 #define COPR 0x0014UL
+
 /// @brief VDP1 I/O register.
 /// @see VDP1
 /// @see MEMORY_WRITE
