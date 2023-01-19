@@ -22,10 +22,6 @@
                          SCU_IC_MASK_DMA_ILLEGAL)
 #define SCU_MASK_UNMASK (SCU_IC_MASK_ALL & ~SCU_MASK_MASK)
 
-/* Each block of SCU-DMA registers is 0x20 bytes, and luckily, each block is
- * contiguous */
-#define REGISTER_BLOCK_OFFSET(level) (((level) & SCU_DMA_LEVEL_COUNT) << 5)
-
 #define LEVEL_STATE_IDLING      0x00
 #define LEVEL_STATE_WORKING     0x01
 
@@ -63,7 +59,9 @@ __scu_dma_init(void)
 void
 scu_dma_level_fast_start(scu_dma_level_t level)
 {
-        MEMORY_WRITE(32, SCU(D0EN | REGISTER_BLOCK_OFFSET(level)), 0x00000101);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        scu_ioregs->levels[level].dnen = 0x00000101;
 }
 
 void
@@ -83,7 +81,9 @@ scu_dma_level_start(scu_dma_level_t level)
 void
 scu_dma_level_stop(scu_dma_level_t level)
 {
-        MEMORY_WRITE(32, SCU(D0EN | REGISTER_BLOCK_OFFSET(level)), 0x00000000);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        scu_ioregs->levels[level].dnen = 0x00000000;
 
         _level_state[level].flags = LEVEL_STATE_IDLING;
 }
@@ -161,6 +161,8 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
 
         assert(start_factor <= 7);
 
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
         /* To prevent operation errors, do not activate DMA level 2 during DMA
          * level 1 operation. */
         if (level == 2) {
@@ -172,20 +174,14 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
 
         _level_state[level].flags = LEVEL_STATE_WORKING;
 
-        volatile uint32_t *reg_ptr =
-            (volatile uint32_t *)SCU(REGISTER_BLOCK_OFFSET(level));
-
-        *reg_ptr++ = handle->dnr;
-        *reg_ptr++ = handle->dnw;
-        *reg_ptr++ = handle->dnc;
-        *reg_ptr++ = handle->dnad;
-
-        volatile uint32_t * const reg_dxen = (volatile uint32_t *)reg_ptr++;
-
-        *reg_ptr = handle->dnmd | start_factor;
+        scu_ioregs->levels[level].dnr  = handle->dnr;
+        scu_ioregs->levels[level].dnw  = handle->dnw;
+        scu_ioregs->levels[level].dnc  = handle->dnc;
+        scu_ioregs->levels[level].dnad = handle->dnad;
+        scu_ioregs->levels[level].dnmd = handle->dnmd | start_factor;
 
         if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
-                *reg_dxen = 0x00000100;
+                scu_ioregs->levels[level].dnen = 0x00000100;
         }
 }
 

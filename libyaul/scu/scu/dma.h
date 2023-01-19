@@ -171,18 +171,7 @@ typedef int32_t scu_dma_level_t;
 ///
 /// @see scu_dma_config_buffer
 /// @see scu_dma_config_set
-typedef struct scu_dma_handle {
-        /// Value for @ref D0R, @ref D1R, @ref D2R.
-        uint32_t dnr;
-        /// Value for @ref D0W, @ref D1W, @ref D2W.
-        uint32_t dnw;
-        /// Value for @ref D0C, @ref D1C, @ref D2C.
-        uint32_t dnc;
-        /// Value for @ref D0C, @ref D1C, @ref D2C.
-        uint32_t dnad;
-        /// Value for @ref D0MD, @ref D1MD, @ref D2MD.
-        uint32_t dnmd;
-} __packed __aligned(4) scu_dma_handle_t;
+typedef scu_dma_ioregs_t scu_dma_handle_t;
 
 /// @brief The 3-tuple represents a single transfer in direct or indirect
 /// transfer.
@@ -284,7 +273,9 @@ extern void scu_dma_level_stop(scu_dma_level_t level);
 static inline uint32_t __always_inline
 scu_dma_status_get(void)
 {
-        return MEMORY_READ(32, SCU(DSTA));
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return scu_ioregs->dsta;
 }
 
 /// @brief Obtain the status of SCU-DSP DMA.
@@ -293,7 +284,9 @@ scu_dma_status_get(void)
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
-        return (MEMORY_READ(32, SCU(DSTA)) & 0x00010003);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return (scu_ioregs->dsta & 0x00010003);
 }
 
 /// @brief Wait until SCU-DSP DMA is no longer in operation/standby.
@@ -308,7 +301,9 @@ scu_dma_dsp_wait(void)
 static inline scu_dma_bus_t __always_inline
 scu_dma_bus_access_busy(void)
 {
-        return (scu_dma_bus_t)((MEMORY_READ(32, SCU(DSTA)) >> 20) & 0x07);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return (scu_dma_bus_t)((scu_ioregs->dsta >> 20) & 0x07);
 }
 
 /// @brief Wait until the mask of bus(es) are no longer being accessed during
@@ -327,7 +322,9 @@ scu_dma_bus_access_wait(scu_dma_bus_t mask)
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
-        return (MEMORY_READ(32, SCU(DSTA)) & 0x00010030);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return (scu_ioregs->dsta & 0x00010030);
 }
 
 /// @brief Obtain the status of SCU-DMA level 1.
@@ -336,7 +333,9 @@ scu_dma_level0_busy(void)
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
-        return (MEMORY_READ(32, SCU(DSTA)) & 0x00020300);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return (scu_ioregs->dsta & 0x00020300);
 }
 
 /// @brief Obtain the status of SCU-DMA level 2.
@@ -345,7 +344,9 @@ scu_dma_level1_busy(void)
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
-        return (MEMORY_READ(32, SCU(DSTA)) & 0x00003000);
+        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+
+        return (scu_ioregs->dsta & 0x00003000);
 }
 
 /// @brief Obtain the status of SCU-DMA level.
