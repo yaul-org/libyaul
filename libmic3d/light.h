@@ -43,13 +43,17 @@ typedef uint16_t gst_slot_t;
 static inline uint16_t __always_inline
 __light_shading_slot_calculate(gst_slot_t gst_slot)
 {
-        return (__state.light->slot_base + gst_slot);
+        light_t * const light = __state.light;
+
+        return (light->slot_base + gst_slot);
 }
 
 static inline gst_slot_t __always_inline
 __light_gst_alloc(void)
 {
-        const gst_slot_t gst_slot = __state.light->gst_count++;
+        light_t * const light = __state.light;
+
+        const gst_slot_t gst_slot = light->gst_count++;
 
         return gst_slot;
 }
@@ -57,7 +61,9 @@ __light_gst_alloc(void)
 static inline vdp1_gouraud_table_t * __always_inline
 __light_gst_get(gst_slot_t gst_slot)
 {
-        return &__state.light->gouraud_tables[gst_slot];
+        light_t * const light = __state.light;
+
+        return &light->gouraud_tables[gst_slot];
 }
 
 void __light_init(void);

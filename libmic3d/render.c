@@ -71,6 +71,8 @@ __render_init(void)
 
         extern vdp1_cmdt_t __pool_cmdts[];
 
+        extern rgb1555_t __pool_colors[];
+
         extern render_transform_t __render_transform;
 
         render_t * const render = __state.render;
@@ -79,6 +81,7 @@ __render_init(void)
         render->screen_points_pool = __pool_screen_points;
         render->depth_values_pool = __pool_depth_values;
         render->cmdts_pool = __pool_cmdts;
+        render->colors_pool = __pool_colors;
 
         render->mesh = NULL;
         render->render_transform = &__render_transform;
