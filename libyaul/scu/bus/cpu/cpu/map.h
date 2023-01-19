@@ -30,6 +30,19 @@
 /// @ingroup MEMORY_MAP
 /// @{
 
+/// @brief CPU-DMAC I/O register map.
+/// @see CPU_IOREG_BASE
+typedef struct cpu_dmac_ioregs {
+        /// @brief CPU I/O register.
+        uint32_t sarn;
+        /// @brief CPU I/O register.
+        uint32_t darn;
+        /// @brief CPU I/O register.
+        uint32_t tcrn;
+        /// @brief CPU I/O register.
+        uint32_t chcrn;
+} __aligned(4) __packed cpu_dmac_ioregs_t;
+
 /// @brief CPU I/O register map.
 /// @see CPU_IOREG_BASE
 typedef struct cpu_ioregs {
@@ -175,10 +188,18 @@ typedef struct cpu_ioregs {
         unsigned int:8;
         unsigned int:8;
         unsigned int:8;
-        /// @brief CPU I/O register.
-        uint8_t  drcr0;
-        /// @brief CPU I/O register.
-        uint8_t  drcr1;
+
+        union {
+                struct {
+                        /// @brief CPU I/O register.
+                        uint8_t  drcr0;
+                        /// @brief CPU I/O register.
+                        uint8_t  drcr1;
+                } __packed;
+
+                uint8_t drcrn[2];
+        };
+
         unsigned int:8;
         unsigned int:8;
         unsigned int:8;
@@ -455,22 +476,16 @@ typedef struct cpu_ioregs {
         unsigned int:8;
         unsigned int:8;
         unsigned int:8;
-        /// @brief CPU I/O register.
-        uint32_t sar0;
-        /// @brief CPU I/O register.
-        uint32_t dar0;
-        /// @brief CPU I/O register.
-        uint32_t tcr0;
-        /// @brief CPU I/O register.
-        uint32_t chcr0;
-        /// @brief CPU I/O register.
-        uint32_t sar1;
-        /// @brief CPU I/O register.
-        uint32_t dar1;
-        /// @brief CPU I/O register.
-        uint32_t tcr1;
-        /// @brief CPU I/O register.
-        uint32_t chcr1;
+
+        union {
+                struct {
+                        cpu_dmac_ioregs_t channel0;
+                        cpu_dmac_ioregs_t channel1;
+                };
+
+                cpu_dmac_ioregs_t channels[2];
+        };
+
         /// @brief CPU I/O register.
         uint32_t vcrdma0;
         unsigned int:8;
