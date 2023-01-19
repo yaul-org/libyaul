@@ -216,15 +216,15 @@ cpu_sci_status_reset(void)
 /// @brief Configure a CPU-SCI for transfer.
 ///
 /// @details Configuring the CPU-SCI in @p cfg does not start the transfer. To
-/// start the transfer, use either @ref cpu_sci_enable_with_dmac (for SCI+DMAC
+/// start the transfer, use either @ref cpu_sci_with_dmac_enable (for SCI+DMAC
 /// mode) or @ref cpu_sci_write_value_set (for normal mode). The CPU-SCI is
 /// forcefully stopped upon starting the configuration. If the CPU_SCI is
-/// currently operating int SCI+DMAC mode, use @ref cpu_dma_wait with the
-/// corresponding DMA channel to wait until the transfer is complete.
+/// currently operating int SCI+DMAC mode, use @ref cpu_dmac_channel_wait with the
+/// corresponding CPU-DMAC channel to wait until the transfer is complete.
 ///
 /// @param[in] cfg The CPU-SCI transfer configuration.
 ///
-/// @see cpu_sci_enable_with_dmac
+/// @see cpu_sci_with_dmac_enable
 /// @see cpu_sci_write_value_set
 /// @see cpu_sci_read_value_get
 void cpu_sci_config_set(const cpu_sci_cfg_t *cfg);

@@ -10,6 +10,16 @@
 #error "Header file must not be directly included"
 #endif /* !_YAUL_MATH_FIX16_H_ */
 
+/// @addtogroup MATH_FIX16_VECTOR
+/// @defgroup MATH_FIX16_VEC3 3-vector
+/// @ingroup MATH_FIX16_VECTOR
+/// @{
+
+/// @brief Not yet documented.
+///
+/// @param x Not yet documented.
+/// @param y Not yet documented.
+/// @param z Not yet documented.
 #define FIX16_VEC3_INITIALIZER(x, y, z)                                        \
     {                                                                          \
             {                                                                  \
@@ -19,16 +29,24 @@
             }                                                                  \
     }
 
+/// @brief Not yet documented.
 typedef union fix16_vec3 {
         struct {
+                /// @brief Not yet documented.
                 fix16_t x;
+                /// @brief Not yet documented.
                 fix16_t y;
+                /// @brief Not yet documented.
                 fix16_t z;
         };
 
+        /// @brief Not yet documented.
         fix16_t comp[3];
 } __packed __aligned(4) fix16_vec3_t;
 
+/// @brief Not yet documented.
+///
+/// @param result Not yet documented.
 static inline void __always_inline
 fix16_vec3_zero(fix16_vec3_t *result)
 {
@@ -37,6 +55,12 @@ fix16_vec3_zero(fix16_vec3_t *result)
         result->z = FIX16_ZERO;
 }
 
+/// @brief Not yet documented.
+///
+/// @param[out] result Not yet documented.
+/// @param      x      Not yet documented.
+/// @param      y      Not yet documented.
+/// @param      z      Not yet documented.
 static inline void __always_inline
 fix16_vec3_set(fix16_vec3_t *result, fix16_t x, fix16_t y, fix16_t z)
 {
@@ -45,6 +69,10 @@ fix16_vec3_set(fix16_vec3_t *result, fix16_t x, fix16_t y, fix16_t z)
         result->z = z;
 }
 
+/// @brief Not yet documented.
+///
+/// @param      v0     Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec3_dup(const fix16_vec3_t * __restrict v0,
     fix16_vec3_t * __restrict result)
@@ -54,6 +82,11 @@ fix16_vec3_dup(const fix16_vec3_t * __restrict v0,
         result->z = v0->z;
 }
 
+/// @brief Not yet documented.
+///
+/// @param      v0     Not yet documented.
+/// @param      v1     Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec3_add(const fix16_vec3_t * __restrict v0,
     const fix16_vec3_t * __restrict v1, fix16_vec3_t * __restrict result)
@@ -63,6 +96,11 @@ fix16_vec3_add(const fix16_vec3_t * __restrict v0,
         result->z = v0->z + v1->z;
 }
 
+/// @brief Not yet documented.
+///
+/// @param      v1     Not yet documented.
+/// @param      v0     Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
     const fix16_vec3_t * __restrict const v0, fix16_vec3_t * __restrict const result)
@@ -72,6 +110,10 @@ fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
         result->z = v1->z - v0->z;
 }
 
+/// @brief Not yet documented.
+///
+/// @param      scalar Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
 {
@@ -80,6 +122,11 @@ fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
         result->z = fix16_mul(scalar, result->z);
 }
 
+/// @brief Not yet documented.
+///
+/// @param      scalar Not yet documented.
+/// @param      v      Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t * __restrict v,
     fix16_vec3_t * __restrict result)
@@ -89,6 +136,12 @@ fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t * __restrict v,
         result->z = fix16_mul(scalar, v->z);
 }
 
+/// @brief Not yet documented.
+///
+/// @param a Not yet documented.
+/// @param b Not yet documented.
+///
+/// @returns The value.
 static inline fix16_t __always_inline
 fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
 {
@@ -113,16 +166,64 @@ fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
         return aux1;
 }
 
+/// @brief Not yet documented.
+///
+/// @param v0 Not yet documented.
+///
+/// @returns The value.
 extern fix16_t fix16_vec3_length(const fix16_vec3_t *v0);
+
+/// @brief Not yet documented.
+///
+/// @param v0 Not yet documented.
+///
+/// @returns The value.
 extern fix16_t fix16_vec3_sqr_length(const fix16_vec3_t *v0);
+
+/// @brief Not yet documented.
+///
+/// @param v0 Not yet documented.
 extern void fix16_vec3_normalize(fix16_vec3_t *v0);
+
+/// @brief Not yet documented.
+///
+/// @param      v0     Not yet documented.
+/// @param[out] result Not yet documented.
 extern void fix16_vec3_normalized(const fix16_vec3_t * __restrict v0,
     fix16_vec3_t * __restrict result);
+
+/// @brief Not yet documented.
+///
+/// @param v0 Not yet documented.
+/// @param v1 Not yet documented.
+///
+/// @returns The value.
 extern fix16_t fix16_vec3_dot(const fix16_vec3_t *v0, const fix16_vec3_t *v1);
+
+/// @brief Not yet documented.
+///
+/// @param      v0     Not yet documented.
+/// @param      v1     Not yet documented.
+/// @param[out] result Not yet documented.
 extern void fix16_vec3_cross(const fix16_vec3_t * const __restrict v0,
     const fix16_vec3_t * const __restrict v1, fix16_vec3_t * __restrict result);
 
+/// @brief Not yet documented.
+///
+/// @param      v0 Not yet documented.
+/// @param      v1 Not yet documented.
+///
+/// @returns The value.
 extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict v0,
     const fix16_vec3_t * __restrict v1);
 
+/// @brief Not yet documented.
+///
+/// @param      v0       Not yet documented.
+/// @param[out] buffer   Not yet documented.
+/// @param      decimals Not yet documunted.
+///
+/// @returns The string length, not counting the `NUL` character.
 extern size_t fix16_vec3_str(const fix16_vec3_t *v0, char *buffer, int32_t decimals);
+
+/// @}

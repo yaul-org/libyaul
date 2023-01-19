@@ -30,15 +30,45 @@
 
 __BEGIN_DECLS
 
+/// @addtogroup MATH
+/// @defgroup MATH_UINT32 UInt32
+/// @ingroup MATH
+/// @{
+
+/// @brief Not yet documented.
+///
+/// @param value Not yet documented.
+///
+/// @returns Not yet documented.
 extern uint32_t uint32_log2(uint32_t value);
+
+/// @brief Not yet documented.
+///
+/// @param value Not yet documented.
+///
+/// @returns Not yet documented.
 extern uint32_t uint32_loop_log2(uint32_t value);
+
+/// @brief Not yet documented.
+///
+/// @param value Not yet documented.
+///
+/// @returns Not yet documented.
 extern uint32_t uint32_pow2_round_next(uint32_t value);
 
+/// @brief Not yet documented.
+///
+/// @param value Not yet documented.
+/// @param pow   Not yet documented.
+///
+/// @returns Not yet documented.
 static inline uint32_t __always_inline
 uint32_pow2_round(uint32_t value, uint32_t pow)
 {
         return (((value + ((1 << pow) - 1)) >> pow) << pow);
 }
+
+/// @}
 
 __END_DECLS
 
