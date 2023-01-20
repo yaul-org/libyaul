@@ -23,6 +23,9 @@ __BEGIN_DECLS
 /// @addtogroup CPU_DMAC
 /// @{
 
+/// @brief The number of CPU-DMAC channels.
+#define CPU_DMAC_CHANNEL_COUNT (2)
+
 /// @brief CPU-DMAC priority mode.
 /// @see cpu_dmac_priority_mode_set
 typedef enum cpu_dmac_priority_mode {

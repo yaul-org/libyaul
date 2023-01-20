@@ -41,7 +41,7 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief The number of SCU-DMA levels.
-#define SCU_DMA_LEVEL_COUNT 3
+#define SCU_DMA_LEVEL_COUNT (3)
 
 /// @brief SCU-DMA transfer mode.
 typedef enum scu_dma_mode {
