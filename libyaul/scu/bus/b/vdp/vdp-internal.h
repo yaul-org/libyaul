@@ -48,7 +48,7 @@ struct state_vdp2 {
         } commit;
 
         struct {
-                int16_vec2_t resolution;
+                uint16_vec2_t resolution;
         } tv;
 } __aligned(16);
 

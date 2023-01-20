@@ -325,7 +325,7 @@ vdp2_scrn_pnd_set(const vdp2_scrn_cell_format_t *cell_format)
                         case VDP2_SCRN_CHAR_SIZE_1X1:
                                 /* Character number in pattern name table: bits 9~0
                                  * Character number in supplemental data:  bits 14 13 12 11 10 */
-                                scn_bits = (character_number & 0x7C00) >> 10;
+                                scn_bits = (character_number & 0x7C00U) >> 10;
                                 break;
                         case VDP2_SCRN_CHAR_SIZE_2X2:
                                 /* Character number in pattern name table: bits 11~2
@@ -342,7 +342,7 @@ vdp2_scrn_pnd_set(const vdp2_scrn_cell_format_t *cell_format)
                         case VDP2_SCRN_CHAR_SIZE_1X1:
                                 /* Character number in pattern name table: bits 11~0
                                  * Character number in supplemental data:  bits 14 13 12 __ __ */
-                                scn_bits = (character_number & 0x7000) >> 10;
+                                scn_bits = (character_number & 0x7000U) >> 10;
                                 break;
                         case VDP2_SCRN_CHAR_SIZE_2X2:
                                 /* Character number in pattern name table: bits 13~2
