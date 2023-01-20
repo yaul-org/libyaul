@@ -45,9 +45,9 @@ gst_put_wait(void)
 {
         gst_t * const gst = __state.gst;
 
-        if (gst->dma_channel >= 0) {
+        if (gst->dma_channel < CPU_DMAC_CHANNEL_COUNT) {
                 cpu_dmac_transfer_wait(gst->dma_channel);
-        } else if (gst->dma_level >= 0) {
+        } else if (gst->dma_level < SCU_DMA_LEVEL_COUNT) {
                 scu_dma_transfer_wait(gst->dma_level);
         }
 }
@@ -64,7 +64,7 @@ __gst_put(const vdp1_gouraud_table_t *gouraud_tables, vdp1_vram_t vram_base, uin
         const uint32_t address_space = ADDRESS_SPACE_REGION(gouraud_tables);
 
         if (address_space == ADDRESS_SPACE_REGION(HWRAM(0))) {
-                gst->dma_level = max(0, scu_dma_level_unused_get());
+                gst->dma_level = max(0, (int32_t)scu_dma_level_unused_get());
                 gst->dma_channel = -1;
 
                 scu_dma_transfer(gst->dma_level, (void *)vram_base, gouraud_tables, put_count * sizeof(vdp1_gouraud_table_t));
