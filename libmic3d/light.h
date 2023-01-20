@@ -16,7 +16,7 @@
 
 #define LIGHT_COUNT (3)
 
-typedef void (*polygon_process_t)(void);
+typedef void (*light_polygon_processor_t)(void);
 
 typedef struct light {
         vdp1_gouraud_table_t *gouraud_tables;
@@ -31,14 +31,10 @@ typedef struct light {
         /* Count of enabled lights */
         uint32_t light_count;
 
-        polygon_process_t polygon_process;
-
         fix16_mat33_t intensity_matrix;
         /* Count of used GSTs */
         uint32_t gst_count;
 } __aligned(4) light_t;
-
-typedef uint16_t gst_slot_t;
 
 static inline uint16_t __always_inline
 __light_shading_slot_calculate(gst_slot_t gst_slot)
@@ -67,8 +63,7 @@ __light_gst_get(gst_slot_t gst_slot)
 }
 
 void __light_init(void);
-void __light_transform(void);
-void __light_polygon_process(void);
+void __light_transform(light_polygon_processor_t *processor);
 void __light_gst_put(void);
 
 #endif /* _MIC3D_LIGHT_H_ */

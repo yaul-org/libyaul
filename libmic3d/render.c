@@ -41,7 +41,6 @@ static void _vdp1_init(void);
 
 static void _transform(void);
 
-static fix16_t _depth_calculate(void);
 static fix16_t _depth_min_calculate(const fix16_t *z_values);
 static fix16_t _depth_max_calculate(const fix16_t *z_values);
 static fix16_t _depth_center_calculate(const fix16_t *z_values);
@@ -169,13 +168,15 @@ render_mesh_transform(const mesh_t *mesh)
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
+        light_polygon_processor_t light_polygon_processor;
+
         render->mesh = mesh;
 
         __perf_counter_start(&_transform_pc);
 
         _transform();
 
-        __light_transform();
+        __light_transform(&light_polygon_processor);
 
         fix16_t * const z_values = render->z_values_pool;
         int16_vec2_t * const screen_points = render->screen_points_pool;
@@ -187,26 +188,25 @@ render_mesh_transform(const mesh_t *mesh)
                 render_transform->screen_points[2] = screen_points[polygons[i].indices.p2];
                 render_transform->screen_points[3] = screen_points[polygons[i].indices.p3];
 
-                render_transform->ro_attribute = &render->mesh->attributes[i];
-                render_transform->rw_attribute.control = render_transform->ro_attribute->control;
+                const attribute_t * const attribute = &render->mesh->attributes[i];
 
-                if (render_transform->rw_attribute.control.plane_type != PLANE_TYPE_DOUBLE) {
+                if (attribute->control.plane_type != PLANE_TYPE_DOUBLE) {
                         if ((_backface_cull_test())) {
                                 continue;
                         }
                 }
 
-                render_transform->rw_attribute.draw_mode = render_transform->ro_attribute->draw_mode;
+                render_transform->attribute = *attribute;
 
                 render_transform->z_values[0] = z_values[polygons[i].indices.p0];
                 render_transform->z_values[1] = z_values[polygons[i].indices.p1];
                 render_transform->z_values[2] = z_values[polygons[i].indices.p2];
                 render_transform->z_values[3] = z_values[polygons[i].indices.p3];
 
-                const fix16_t depth_z = _depth_calculate();
+                const fix16_t min_depth_z = _depth_min_calculate(render_transform->z_values);
 
                 /* Cull polygons intersecting with the near plane */
-                if ((depth_z < render->near)) {
+                if ((min_depth_z < render->near)) {
                         continue;
                 }
 
@@ -222,32 +222,39 @@ render_mesh_transform(const mesh_t *mesh)
                 if (render_transform->or_flags == CLIP_FLAGS_NONE) {
                         /* If no clip flags are set, disable pre-clipping. This
                          * should help with performance */
-                        render_transform->rw_attribute.draw_mode.pre_clipping_disable = true;
+                        render_transform->attribute.draw_mode.pre_clipping_disable = true;
                 } else {
                         _polygon_orient();
                 }
 
-                __light_polygon_process();
+                light_polygon_processor();
 
                 vdp1_cmdt_t * const cmdt = _cmdts_alloc();
                 const vdp1_link_t cmdt_link = _cmdt_link_calculate(cmdt);
 
                 _cmdt_process(cmdt);
 
+                fix16_t depth_z;
+
+                switch (render_transform->attribute.control.sort_type) {
+                default:
+                case SORT_TYPE_CENTER:
+                        depth_z = _depth_center_calculate(render_transform->z_values);
+                        break;
+                case SORT_TYPE_MIN:
+                        depth_z = min_depth_z;
+                        break;
+                case SORT_TYPE_MAX:
+                        depth_z = _depth_max_calculate(render_transform->z_values);
+                        break;
+                }
+
                 const int32_t scaled_z = fix16_int32_mul(depth_z, render->sort_scale);
 
                 __sort_insert(cmdt_link, scaled_z);
-
-                render->cmdt_count++;
         }
 
         __perf_counter_end(&_transform_pc);
-
-        char buffer[32] __unused;
-        __perf_str(_transform_pc.ticks, buffer);
-
-        /* dbgio_printf("%lu\n", render->cmdt_count); */
-        /* dbgio_printf("ticks: %5lu, %5lu, %sms\n", _transform_pc.ticks, _transform_pc.max_ticks, buffer); */
 
         cpu_intc_mask_set(sr_mask);
 }
@@ -259,7 +266,9 @@ render(void)
 
         vdp1_cmdt_t * const subr_cmdt = (vdp1_cmdt_t *)VDP1_CMD_TABLE(ORDER_SUBR_INDEX, 0);
 
-        if (render->cmdt_count == 0) {
+        const uint32_t cmdt_count = render->cmdts - render->cmdts_pool;
+
+        if (cmdt_count == 0) {
                 vdp1_cmdt_link_type_set(subr_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_NEXT);
 
                 return;
@@ -287,7 +296,7 @@ render(void)
         /* Set to return from subroutine */
         vdp1_cmdt_link_type_set(end_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_RETURN);
 
-        vdp1_sync_cmdt_put(render->cmdts_pool, render->cmdt_count, render->sort_link);
+        vdp1_sync_cmdt_put(render->cmdts_pool, cmdt_count, render->sort_link);
 
         __light_gst_put();
 
@@ -400,23 +409,6 @@ _transform(void)
                 screen_points[i].y = fix16_int32_mul(depth_value, y);
                 z_values[i] = z;
                 /* depth_values[i] = depth_value; */
-        }
-}
-
-static fix16_t
-_depth_calculate(void)
-{
-        render_t * const render = __state.render;
-        render_transform_t * const render_transform = render->render_transform;
-
-        switch (render_transform->rw_attribute.control.sort_type) {
-        default:
-        case SORT_TYPE_CENTER:
-                return _depth_center_calculate(render_transform->z_values);
-        case SORT_TYPE_MIN:
-                return _depth_min_calculate(render_transform->z_values);
-        case SORT_TYPE_MAX:
-                return _depth_max_calculate(render_transform->z_values);
         }
 }
 
@@ -543,7 +535,7 @@ _polygon_orient(void)
                 _screen_points_swap(0, 1);
                 _screen_points_swap(2, 3);
 
-                render_transform->rw_attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_H;
+                render_transform->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_H;
         }
 
         if ((render_transform->clip_flags[0] & CLIP_FLAGS_TB) != CLIP_FLAGS_NONE) {
@@ -560,7 +552,7 @@ _polygon_orient(void)
                 _screen_points_swap(0, 3);
                 _screen_points_swap(1, 2);
 
-                render_transform->rw_attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_V;
+                render_transform->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_V;
         }
 }
 
@@ -593,7 +585,6 @@ _cmdts_reset(void)
         render_t * const render = __state.render;
 
         render->cmdts = render->cmdts_pool;
-        render->cmdt_count = 0;
 }
 
 static vdp1_link_t
@@ -610,23 +601,23 @@ _cmdt_process(vdp1_cmdt_t *cmdt)
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
-        cmdt->cmd_ctrl = VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN | (render_transform->rw_attribute.control.raw & 0x3F);
-        cmdt->cmd_pmod = render_transform->rw_attribute.draw_mode.raw;
+        cmdt->cmd_ctrl = VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN | (render_transform->attribute.control.raw & 0x3F);
+        cmdt->cmd_pmod = render_transform->attribute.draw_mode.raw;
 
-        if (render_transform->rw_attribute.control.use_texture) {
+        if (render_transform->attribute.control.use_texture) {
                 const texture_t * const textures = tlist_get();
-                const texture_t * const texture = &textures[render_transform->ro_attribute->texture_slot];
+                const texture_t * const texture = &textures[render_transform->attribute.texture_slot];
 
                 cmdt->cmd_srca = texture->vram_index;
                 cmdt->cmd_size = texture->size;
         }
 
-        cmdt->cmd_colr = render_transform->ro_attribute->palette.raw;
+        cmdt->cmd_colr = render_transform->attribute.palette.raw;
 
         cmdt->cmd_vertices[0] = render_transform->screen_points[0];
         cmdt->cmd_vertices[1] = render_transform->screen_points[1];
         cmdt->cmd_vertices[2] = render_transform->screen_points[2];
         cmdt->cmd_vertices[3] = render_transform->screen_points[3];
 
-        cmdt->cmd_grda = render_transform->rw_attribute.shading_slot;
+        cmdt->cmd_grda = render_transform->attribute.shading_slot;
 }
