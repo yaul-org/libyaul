@@ -139,9 +139,16 @@ render_near_level_set(uint32_t level)
         const uint32_t clamped_level =
             clamp(level + 1, NEAR_LEVEL_MIN, NEAR_LEVEL_MAX);
 
+        uint32_t near_value;
+        near_value = render->near;
+
         for (int32_t i = clamped_level; i > 0; i--) {
-                render->near >>= 1;
+                /* Prevent GCC from doing an arithmetic shift (results in a
+                 * function call) */
+                near_value >>= 1;
         }
+
+        render->near = near_value;
 }
 
 void
