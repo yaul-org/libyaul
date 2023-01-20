@@ -141,7 +141,7 @@ typedef enum cpu_dmac_resource_select {
 typedef void (*cpu_dmac_ihr_t)(void *);
 
 /// CPU-DMAC channel.
-typedef int32_t cpu_dmac_channel_t;
+typedef uint32_t cpu_dmac_channel_t;
 
 /// @brief CPU-DMAC configuration.
 typedef struct cpu_dmac_cfg {
@@ -213,7 +213,6 @@ typedef struct cpu_dmac_cfg {
         /// @see cpu_dmac_cfg_t.dack_level
         /// @see cpu_dmac_cfg_t.detect_mode
         /// @see cpu_dmac_cfg_t.dreq_level
-        /// @see cpu_dmac_cfg_t.bus_mode
         /// @see cpu_dmac_cfg_t.resource_select
         bool non_default:1;
 
@@ -280,14 +279,7 @@ cpu_dmac_channel_transfer_set(cpu_dmac_channel_t ch, uint32_t tcr_bits)
 {
         volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        switch (ch) {
-        case 0:
-                cpu_ioregs->tcr0 = tcr_bits;
-                break;
-        case 1:
-                cpu_ioregs->tcr1 = tcr_bits;
-                break;
-        }
+        cpu_ioregs->channels[ch].tcrn = tcr_bits;
 }
 
 /// @brief Enable CPU-DMAC.
@@ -354,16 +346,8 @@ cpu_dmac_channel_start(cpu_dmac_channel_t ch)
 {
         volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        switch (ch) {
-        case 0:
-                cpu_ioregs->chcr0 &= ~0x00000003;
-                cpu_ioregs->chcr0 |= 0x00000001;
-                break;
-        case 1:
-                cpu_ioregs->chcr1 &= ~0x00000003;
-                cpu_ioregs->chcr1 |= 0x00000001;
-                break;
-        }
+        cpu_ioregs->channels[ch].chcrn &= ~0x00000003;
+        cpu_ioregs->channels[ch].chcrn |= 0x00000001;
 }
 
 /// @brief Stop specific CPU-DMAC channel transfer.
@@ -375,14 +359,7 @@ cpu_dmac_channel_stop(cpu_dmac_channel_t ch)
         volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         /* Don't clear the status bits */
-        switch (ch) {
-        case 0:
-                cpu_ioregs->chcr0 &= ~0x00000001;
-                break;
-        case 1:
-                cpu_ioregs->chcr1 &= ~0x00000001;
-                break;
-        }
+        cpu_ioregs->channels[ch].chcrn &= ~0x00000001;
 }
 
 /// @brief Stop all CPU-DMAC channel transfers (if any).

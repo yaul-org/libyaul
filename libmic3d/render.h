@@ -57,6 +57,7 @@ typedef struct render {
         int16_vec2_t *screen_points_pool;
         fix16_t *depth_values_pool;
         vdp1_cmdt_t *cmdts_pool;
+        rgb1555_t *colors_pool;
         gst_t *gst;
 
         /* Settings */

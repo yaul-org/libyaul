@@ -20,8 +20,10 @@ __gst_init(void)
 void
 gst_set(vdp1_vram_t vram_base)
 {
-        __state.gst->vram_base = vram_base;
-        __state.gst->slot_base = vram_base >> 3;
+        gst_t * const gst = __state.gst;
+
+        gst->vram_base = vram_base;
+        gst->slot_base = vram_base >> 3;
 }
 
 void
@@ -33,16 +35,20 @@ gst_unset(void)
 void
 gst_put(const vdp1_gouraud_table_t *gouraud_tables, uint32_t put_count)
 {
-        __gst_put(gouraud_tables, __state.gst->vram_base, put_count);
+        gst_t * const gst = __state.gst;
+
+        __gst_put(gouraud_tables, gst->vram_base, put_count);
 }
 
 void
 gst_put_wait(void)
 {
-        if (__state.gst->dma_channel >= 0) {
-                cpu_dmac_transfer_wait(__state.gst->dma_channel);
-        } else if (__state.gst->dma_level >= 0) {
-                scu_dma_transfer_wait(__state.gst->dma_level);
+        gst_t * const gst = __state.gst;
+
+        if (gst->dma_channel >= 0) {
+                cpu_dmac_transfer_wait(gst->dma_channel);
+        } else if (gst->dma_level >= 0) {
+                scu_dma_transfer_wait(gst->dma_level);
         }
 }
 
@@ -53,17 +59,19 @@ __gst_put(const vdp1_gouraud_table_t *gouraud_tables, vdp1_vram_t vram_base, uin
                 return;
         }
 
+        gst_t * const gst = __state.gst;
+
         const uint32_t address_space = ADDRESS_SPACE_REGION(gouraud_tables);
 
         if (address_space == ADDRESS_SPACE_REGION(HWRAM(0))) {
-                __state.gst->dma_level = max(0, scu_dma_level_unused_get());
-                __state.gst->dma_channel = -1;
+                gst->dma_level = max(0, scu_dma_level_unused_get());
+                gst->dma_channel = -1;
 
-                scu_dma_transfer(__state.gst->dma_level, (void *)vram_base, gouraud_tables, put_count * sizeof(vdp1_gouraud_table_t));
+                scu_dma_transfer(gst->dma_level, (void *)vram_base, gouraud_tables, put_count * sizeof(vdp1_gouraud_table_t));
         } else if (address_space == ADDRESS_SPACE_REGION(LWRAM(0))) {
-                __state.gst->dma_channel = 0;
-                __state.gst->dma_level = -1;
+                gst->dma_channel = 0;
+                gst->dma_level = -1;
 
-                cpu_dmac_transfer(__state.gst->dma_channel, (void *)vram_base, gouraud_tables, put_count * sizeof(vdp1_gouraud_table_t));
+                cpu_dmac_transfer(gst->dma_channel, (void *)vram_base, gouraud_tables, put_count * sizeof(vdp1_gouraud_table_t));
         }
 }

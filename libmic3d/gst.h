@@ -28,7 +28,9 @@ typedef struct gst {
 static inline gst_slot_t __always_inline
 __gst_slot_calculate(gst_slot_t gst_slot)
 {
-        return (__state.gst->slot_base + gst_slot);
+        gst_t * const gst = __state.gst;
+
+        return (gst->slot_base + gst_slot);
 }
 
 void __gst_init(void);

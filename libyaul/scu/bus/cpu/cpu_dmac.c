@@ -92,8 +92,8 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
         status->address_error = (reg_dmaor >> 2) & 0x00000001;
         status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
 
-        const uint32_t reg_chcr0 = cpu_ioregs->chcr0;
-        const uint32_t reg_chcr1 = cpu_ioregs->chcr1;
+        const uint32_t reg_chcr0 = cpu_ioregs->channel0.chcrn;
+        const uint32_t reg_chcr1 = cpu_ioregs->channel1.chcrn;
 
         const uint8_t ch0_enabled = reg_chcr0 & 0x00000001;
         const uint8_t ch1_enabled = reg_chcr1 & 0x00000001;
@@ -128,8 +128,6 @@ cpu_dmac_status_get(cpu_dmac_status_t *status)
 void
 cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 {
-        const uint32_t channel = cfg->channel & 0x01;
-
         cpu_dmac_channel_stop(cfg->channel);
 
         /* Source and destination address modes */
@@ -139,6 +137,8 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
                    ((cfg->stride & 0x03) << 10) |
                    ((cfg->bus_mode & 0x01) << 4);
 
+        uint8_t reg_drcr;
+
         if (cfg->non_default) {
                 /* Non-default DMAC settings */
                 reg_chcr |= ((cfg->request_mode & 0x01) << 9) |
@@ -146,18 +146,18 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
                             ((cfg->dack_level & 0x01) << 7) |
                             ((cfg->detect_mode & 0x01) << 6) |
                             ((cfg->dreq_level & 0x01) << 5);
+
+                reg_drcr = (cfg->resource_select & 0x03);
         } else {
                 /* Default DMAC settings, enable AR (auto-request mode) */
                 reg_chcr |= 0x00000200;
+                reg_drcr = 0x00;
         }
 
         uint32_t reg_tcr;
         reg_tcr = cfg->len;
 
-        const uint8_t reg_drcr = (cfg->resource_select & 0x03);
-
-        uint8_t stride;
-        stride = cfg->stride & 0x03;
+        const uint8_t stride = cfg->stride & 0x03;
 
         /* Check that the source and destination addresses are stride-byte
          * aligned */
@@ -193,22 +193,12 @@ cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 
         volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        switch (channel) {
-        case 0:
-                cpu_ioregs->dar0 = cfg->dst;
-                cpu_ioregs->sar0 = cfg->src;
-                cpu_ioregs->tcr0 = reg_tcr;
-                cpu_ioregs->chcr0 = reg_chcr;
-                cpu_ioregs->drcr0 = reg_drcr;
-                break;
-        case 1:
-                cpu_ioregs->dar1 = cfg->dst;
-                cpu_ioregs->sar1 = cfg->src;
-                cpu_ioregs->tcr1 = reg_tcr;
-                cpu_ioregs->chcr1 = reg_chcr;
-                cpu_ioregs->drcr1 = reg_drcr;
-                break;
-        }
+        cpu_ioregs->channels[cfg->channel].darn = cfg->dst;
+        cpu_ioregs->channels[cfg->channel].sarn = cfg->src;
+        cpu_ioregs->channels[cfg->channel].tcrn = reg_tcr;
+        cpu_ioregs->channels[cfg->channel].chcrn = reg_chcr;
+
+        cpu_ioregs->drcrn[cfg->channel] = reg_drcr;
 }
 
 void
@@ -221,27 +211,9 @@ cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
                 return;
         }
 
-        switch (ch) {
-        case 0:
-                /* Don't wait if the channel isn't enabled */
-                if ((cpu_ioregs->chcr0 & 0x00000001) == 0x00000000) {
-                        return;
-                }
-
-                /* TE bit will always be set upon normal or abnormal transfer */
-                while ((cpu_ioregs->chcr0 & 0x00000002) == 0x00000000) {
-                }
-                break;
-        case 1:
-                /* Don't wait if the channel isn't enabled */
-                if ((cpu_ioregs->chcr1 & 0x00000001) == 0x00000000) {
-                        return;
-                }
-
-                /* TE bit will always be set upon normal or abnormal transfer */
-                while ((cpu_ioregs->chcr1 & 0x00000002) == 0x00000000) {
-                }
-                break;
+        /* TE bit will always be set upon normal or abnormal transfer */
+        /* Don't wait if the channel isn't enabled (bit 0) */
+        while ((cpu_ioregs->channels[ch].chcrn & 0x00000003) == 0x00000001) {
         }
 }
 
@@ -313,7 +285,7 @@ _master_ch0_ihr_handler(void)
 
         callback_call(&_master_ihr_callbacks[IHR_INDEX_CH0]);
 
-        cpu_ioregs->chcr0 &= ~0x00000005;
+        cpu_ioregs->channel0.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
@@ -323,7 +295,7 @@ _slave_ch0_ihr_handler(void)
 
         callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH0]);
 
-        cpu_ioregs->chcr0 &= ~0x00000005;
+        cpu_ioregs->channel0.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
@@ -333,7 +305,7 @@ _master_ch1_ihr_handler(void)
 
         callback_call(&_master_ihr_callbacks[IHR_INDEX_CH1]);
 
-        cpu_ioregs->chcr1 &= ~0x00000005;
+        cpu_ioregs->channel1.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
@@ -343,7 +315,7 @@ _slave_ch1_ihr_handler(void)
 
         callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH1]);
 
-        cpu_ioregs->chcr1 &= ~0x00000005;
+        cpu_ioregs->channel1.chcrn &= ~0x00000005;
 }
 
 static callback_t *

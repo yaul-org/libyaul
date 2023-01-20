@@ -161,7 +161,7 @@ typedef enum scu_dma_bus {
 }
 
 /// @brief SCU-DMA level representing one of the 3 levels.
-typedef int32_t scu_dma_level_t;
+typedef uint32_t scu_dma_level_t;
 
 /// @brief A SCU-DMA handle representing a copy of the level's SCU-DMA
 /// registers.
@@ -470,7 +470,7 @@ extern void scu_dma_level_wait(scu_dma_level_t level);
 
 /// @brief Obtain the first unused SCU-DMA level.
 ///
-/// @returns SCU-DMA level 0, then 1, then 2. Otherwise, -1 is returned.
+/// @returns SCU-DMA level 0, then 1, then 2. Otherwise, `0xFFFFFFFF` is returned.
 extern scu_dma_level_t scu_dma_level_unused_get(void);
 
 /// @}
