@@ -223,6 +223,7 @@ LIB_SRCS+= \
 \
 	math/int16.c \
 	math/int32.c \
+	math/uint16.c \
 	math/uint32.c \
 	math/mat_stack.c \
 \
@@ -343,6 +344,7 @@ INSTALL_HEADER_FILES+= \
 	./math/:int16.h:yaul/math/ \
 	./math/:int32.h:yaul/math/ \
 	./math/:uint8.h:yaul/math/ \
+	./math/:uint16.h:yaul/math/ \
 	./math/:uint32.h:yaul/math/ \
 	./math/:mat_stack.h:yaul/math/
 

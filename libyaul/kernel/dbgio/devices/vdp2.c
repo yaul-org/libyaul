@@ -59,7 +59,7 @@ struct dev_state {
         uint16_t page_size; /* Size of split page */
         uint16_t page_stride;
 
-        int16_vec2_t tv_resolution;
+        uint16_vec2_t tv_resolution;
 };
 
 /* XXX: Move this comment to documentation */
@@ -336,9 +336,9 @@ _shared_puts(const char *buffer)
                 return;
         }
 
-        int16_vec2_t * const tv_resolution =
+        uint16_vec2_t * const tv_resolution =
             &_dev_state->tv_resolution;
-        const int16_vec2_t * const vdp2_tv_resolution =
+        const uint16_vec2_t * const vdp2_tv_resolution =
             &_state_vdp2()->tv.resolution;
 
         if ((tv_resolution->x != vdp2_tv_resolution->x) ||
