@@ -532,7 +532,7 @@ _cmap_image_tile_draw(uint8_t *dst, uint16_t tx, uint16_t ty, const tga_t *tga)
                         uint32_t x_offset;
                         x_offset = (tile_width * tx) + x;
                         uint32_t y_offset;
-                        y_offset = ((tile_width * ty) + y) * tga->tga_width;
+                        y_offset = ((tile_height * ty) + y) * tga->tga_width;
                         
                         if (tile_width == 4)
                                 y_offset /= 2;
