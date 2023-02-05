@@ -132,10 +132,10 @@ _polygon_process(void)
         render_transform->attribute.shading_slot =
             __light_shading_slot_calculate(gst_slot);
 
-        gst->colors[0] = render->colors_pool[render_transform->indices.p[0]];
-        gst->colors[1] = render->colors_pool[render_transform->indices.p[1]];
-        gst->colors[2] = render->colors_pool[render_transform->indices.p[2]];
-        gst->colors[3] = render->colors_pool[render_transform->indices.p[3]];
+        gst->colors[0] = render->colors_pool[render_transform->polygon.indices.p[0]];
+        gst->colors[1] = render->colors_pool[render_transform->polygon.indices.p[1]];
+        gst->colors[2] = render->colors_pool[render_transform->polygon.indices.p[2]];
+        gst->colors[3] = render->colors_pool[render_transform->polygon.indices.p[3]];
 }
 
 static void

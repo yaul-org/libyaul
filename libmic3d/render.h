@@ -40,7 +40,7 @@ typedef struct {
         fix16_mat43_t view_matrix;
 
         attribute_t attribute;
-        indices_t indices;
+        polygon_t polygon;
         int16_vec2_t screen_points[4];
         fix16_t z_values[4];
         clip_flags_t clip_flags[4];

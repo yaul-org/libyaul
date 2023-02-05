@@ -12,17 +12,21 @@
 static inline void __always_inline
 _singles_reset(void)
 {
-        __state.sort->singles_top = __state.sort->singles_pool + 1;
-        __state.sort->singles_index = 0;
+        sort_t * const sort = __state.sort;
+
+        sort->singles_top = sort->singles_pool + 1;
+        sort->singles_index = 0;
 }
 
 static inline sort_single_t * __always_inline
 _singles_alloc(void)
 {
-        sort_single_t * const single = __state.sort->singles_top;
+        sort_t * const sort = __state.sort;
 
-        __state.sort->singles_top++;
-        __state.sort->singles_index++;
+        sort_single_t * const single = sort->singles_top;
+
+        sort->singles_top++;
+        sort->singles_index++;
 
         return single;
 }
@@ -33,33 +37,38 @@ __sort_init(void)
         extern sort_list_t __pool_sort_lists[];
         extern sort_single_t __pool_sort_singles[];
 
-        __state.sort->singles_pool = __pool_sort_singles;
-        __state.sort->sort_lists_pool = __pool_sort_lists;
+        sort_t * const sort = __state.sort;
 
-        __sort_start();
+        sort->singles_pool = __pool_sort_singles;
+        sort->sort_lists_pool = __pool_sort_lists;
+
+        __sort_reset();
 }
 
 void
-__sort_start(void)
+__sort_reset(void)
 {
+        sort_t * const sort = __state.sort;
+
         _singles_reset();
 
-        __state.sort->max_depth = 0;
+        sort->max_depth = 0;
 }
 
 void
-__sort_insert(vdp1_link_t cmdt_link, int32_t z)
+__sort_insert(int32_t z)
 {
+        sort_t * const sort = __state.sort;
+
         const uint32_t index = clamp(z, 0, SORT_DEPTH - 1);
 
-        __state.sort->max_depth = max(index, __state.sort->max_depth);
+        sort->max_depth = max(index, sort->max_depth);
 
-        sort_list_t * const list_head = &__state.sort->sort_lists_pool[z];
+        sort_list_t * const list_head = &sort->sort_lists_pool[z];
 
         sort_single_t * const new_single = _singles_alloc();
-        const uint32_t new_index = __state.sort->singles_index;
+        const uint32_t new_index = sort->singles_index;
 
-        new_single->link = cmdt_link;
         new_single->next_single = list_head->head;
 
         list_head->head = new_index;
@@ -68,16 +77,20 @@ __sort_insert(vdp1_link_t cmdt_link, int32_t z)
 void
 __sort_iterate(sort_iterate_t iterate)
 {
-        sort_list_t *list_head;
-        list_head = &__state.sort->sort_lists_pool[__state.sort->max_depth];
+        sort_t * const sort = __state.sort;
 
-        for (uint32_t i = 0; i <= __state.sort->max_depth; i++, list_head--) {
+        sort_list_t *list_head;
+        list_head = &sort->sort_lists_pool[sort->max_depth];
+
+        for (; list_head >= sort->sort_lists_pool; list_head--) {
                 if (list_head->head == 0) {
                         continue;
                 }
 
                 const sort_single_t *single;
-                single = &__state.sort->singles_pool[list_head->head];
+                single = &sort->singles_pool[list_head->head];
+
+                list_head->head = 0;
 
                 while (true) {
                         iterate(single);
@@ -86,9 +99,7 @@ __sort_iterate(sort_iterate_t iterate)
                                 break;
                         }
 
-                        single = &__state.sort->singles_pool[single->next_single];
+                        single = &sort->singles_pool[single->next_single];
                 }
-
-                list_head->head = 0;
         }
 }

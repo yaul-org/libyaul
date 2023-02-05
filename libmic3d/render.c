@@ -9,9 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <cpu/registers.h>
+#include <cpu/cache.h>
 #include <cpu/divu.h>
 #include <cpu/intc.h>
+#include <cpu/registers.h>
 
 #include "internal.h"
 
@@ -56,10 +57,11 @@ static void _render_single(const sort_single_t *single);
 
 static vdp1_cmdt_t *_cmdts_alloc(void);
 static void _cmdts_reset(void);
-static vdp1_link_t _cmdt_link_calculate(const vdp1_cmdt_t *cmdt);
 static void _cmdt_process(vdp1_cmdt_t *cmdt);
 
 static perf_counter_t _transform_pc __unused;
+static perf_counter_t _sort_pc __unused;
+static volatile uint32_t *lwram = (volatile uint32_t *)LWRAM(0x00000000);
 
 void
 __render_init(void)
@@ -94,6 +96,7 @@ __render_init(void)
         _reset();
 
         __perf_counter_init(&_transform_pc);
+        __perf_counter_init(&_sort_pc);
 
         _vdp1_init();
 }
@@ -183,25 +186,23 @@ render_mesh_transform(const mesh_t *mesh)
         const polygon_t * const polygons = render->mesh->polygons;
 
         for (uint32_t i = 0; i < render->mesh->polygons_count; i++) {
-                render_transform->screen_points[0] = screen_points[polygons[i].indices.p0];
-                render_transform->screen_points[1] = screen_points[polygons[i].indices.p1];
-                render_transform->screen_points[2] = screen_points[polygons[i].indices.p2];
-                render_transform->screen_points[3] = screen_points[polygons[i].indices.p3];
+                render_transform->polygon = polygons[i];
 
-                const attribute_t * const attribute = &render->mesh->attributes[i];
+                render_transform->screen_points[0] = screen_points[render_transform->polygon.indices.p0];
+                render_transform->screen_points[1] = screen_points[render_transform->polygon.indices.p1];
+                render_transform->screen_points[2] = screen_points[render_transform->polygon.indices.p2];
+                render_transform->screen_points[3] = screen_points[render_transform->polygon.indices.p3];
 
-                if (attribute->control.plane_type != PLANE_TYPE_DOUBLE) {
+                if (render_transform->polygon.flags.plane_type != PLANE_TYPE_DOUBLE) {
                         if ((_backface_cull_test())) {
                                 continue;
                         }
                 }
 
-                render_transform->attribute = *attribute;
-
-                render_transform->z_values[0] = z_values[polygons[i].indices.p0];
-                render_transform->z_values[1] = z_values[polygons[i].indices.p1];
-                render_transform->z_values[2] = z_values[polygons[i].indices.p2];
-                render_transform->z_values[3] = z_values[polygons[i].indices.p3];
+                render_transform->z_values[0] = z_values[render_transform->polygon.indices.p0];
+                render_transform->z_values[1] = z_values[render_transform->polygon.indices.p1];
+                render_transform->z_values[2] = z_values[render_transform->polygon.indices.p2];
+                render_transform->z_values[3] = z_values[render_transform->polygon.indices.p3];
 
                 const fix16_t min_depth_z = _depth_min_calculate(render_transform->z_values);
 
@@ -217,26 +218,9 @@ render_mesh_transform(const mesh_t *mesh)
                         continue;
                 }
 
-                render_transform->indices = polygons[i].indices;
-
-                if (render_transform->or_flags == CLIP_FLAGS_NONE) {
-                        /* If no clip flags are set, disable pre-clipping. This
-                         * should help with performance */
-                        render_transform->attribute.draw_mode.pre_clipping_disable = true;
-                } else {
-                        _polygon_orient();
-                }
-
-                light_polygon_processor();
-
-                vdp1_cmdt_t * const cmdt = _cmdts_alloc();
-                const vdp1_link_t cmdt_link = _cmdt_link_calculate(cmdt);
-
-                _cmdt_process(cmdt);
-
                 fix16_t depth_z;
 
-                switch (render_transform->attribute.control.sort_type) {
+                switch (render_transform->polygon.flags.sort_type) {
                 default:
                 case SORT_TYPE_CENTER:
                         depth_z = _depth_center_calculate(render_transform->z_values);
@@ -251,10 +235,30 @@ render_mesh_transform(const mesh_t *mesh)
 
                 const int32_t scaled_z = fix16_int32_mul(depth_z, render->sort_scale);
 
-                __sort_insert(cmdt_link, scaled_z);
+                __sort_insert(scaled_z);
+
+                render_transform->attribute = render->mesh->attributes[i];
+
+                if (render_transform->or_flags == CLIP_FLAGS_NONE) {
+                        /* If no clip flags are set, disable pre-clipping. This
+                         * should help with performance */
+                        render_transform->attribute.draw_mode.pre_clipping_disable = true;
+                } else {
+                        _polygon_orient();
+                }
+
+                light_polygon_processor();
+
+                vdp1_cmdt_t * const cmdt = _cmdts_alloc();
+
+                _cmdt_process(cmdt);
         }
 
         __perf_counter_end(&_transform_pc);
+        *lwram = _transform_pc.ticks;
+        lwram++;
+        __perf_str(_transform_pc.ticks, (void *)lwram);
+        lwram += 3;
 
         cpu_intc_mask_set(sr_mask);
 }
@@ -289,7 +293,10 @@ render(void)
                 vdp1_sync_mode_set(VDP1_SYNC_MODE_ERASE_CHANGE);
         }
 
+        __perf_counter_start(&_sort_pc);
         __sort_iterate(_render_single);
+        __perf_counter_end(&_sort_pc);
+        __perf_str(_sort_pc.ticks, (void *)lwram);
 
         vdp1_cmdt_t * const end_cmdt = render->sort_cmdt;
 
@@ -301,13 +308,14 @@ render(void)
         __light_gst_put();
 
         _reset();
+        lwram = (volatile uint32_t *)LWRAM(0x00000000);
 }
 
 static void
 _reset(void)
 {
         _cmdts_reset();
-        __sort_start();
+        __sort_reset();
 }
 
 static void
@@ -374,6 +382,8 @@ _vdp1_init(void)
 static void
 _transform(void)
 {
+        extern void __render_points_transform(render_t *render, render_transform_t *render_transform);
+
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
@@ -383,33 +393,11 @@ _transform(void)
 
         __camera_view_invert(&inv_view_matrix);
 
+        cpu_cache_purge();
+
         fix16_mat43_mul(&inv_view_matrix, world_matrix, &render_transform->view_matrix);
 
-        const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&render_transform->view_matrix.row[0];
-        const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&render_transform->view_matrix.row[1];
-        const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&render_transform->view_matrix.row[2];
-
-        const fix16_vec3_t * const points = render->mesh->points;
-        int16_vec2_t * const screen_points = render->screen_points_pool;
-        fix16_t * const z_values = render->z_values_pool;
-        /* fix16_t * const depth_values = render->depth_values_pool; */
-
-        for (uint32_t i = 0; i < render->mesh->points_count; i++) {
-                const fix16_t z = fix16_vec3_dot(m2, &points[i]) + render_transform->view_matrix.frow[2][3];
-                const fix16_t clamped_z = fix16_max(z, render->near);
-
-                cpu_divu_fix16_set(render->view_distance, clamped_z);
-
-                const fix16_t x = fix16_vec3_dot(m0, &points[i]) + render_transform->view_matrix.frow[0][3];
-                const fix16_t y = fix16_vec3_dot(m1, &points[i]) + render_transform->view_matrix.frow[1][3];
-
-                const fix16_t depth_value = cpu_divu_quotient_get();
-
-                screen_points[i].x = fix16_int32_mul(depth_value, x);
-                screen_points[i].y = fix16_int32_mul(depth_value, y);
-                z_values[i] = z;
-                /* depth_values[i] = depth_value; */
-        }
+        __render_points_transform(render, render_transform);
 }
 
 static fix16_t
@@ -461,7 +449,7 @@ _backface_cull_test(void)
 
         const int32_t z = (a.x * b.y) - (a.y * b.x);
 
-        return (z < 0);
+        return (z <= 0);
 }
 
 static void
@@ -492,10 +480,10 @@ _indices_swap(uint32_t i, uint32_t j)
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
-        const uint16_t tmp = render_transform->indices.p[i];
+        const uint16_t tmp = render_transform->polygon.indices.p[i];
 
-        render_transform->indices.p[i] = render_transform->indices.p[j];
-        render_transform->indices.p[j] = tmp;
+        render_transform->polygon.indices.p[i] = render_transform->polygon.indices.p[j];
+        render_transform->polygon.indices.p[j] = tmp;
 }
 
 static void
@@ -560,11 +548,20 @@ static void
 _render_single(const sort_single_t *single)
 {
         render_t * const render = __state.render;
+        sort_t * const sort = __state.sort;
 
-        vdp1_cmdt_link_set(render->sort_cmdt, single->link + render->sort_link);
+        /* We can calculate the index (link) just from the element index of the
+         * single in the single pool because we always allocate command tables
+         * and singles linearly, from their respective pools.
+         *
+         * This implementation will be an issue should we implement the ability
+         * for users to insert their command tables into the sort */
+        const vdp1_link_t link = single - (sort->singles_pool + 1);
+
+        vdp1_cmdt_link_set(render->sort_cmdt, link + render->sort_link);
 
         /* Point to the next command table */
-        render->sort_cmdt = &render->cmdts_pool[single->link];
+        render->sort_cmdt = &render->cmdts_pool[link];
 }
 
 static vdp1_cmdt_t *
@@ -587,24 +584,16 @@ _cmdts_reset(void)
         render->cmdts = render->cmdts_pool;
 }
 
-static vdp1_link_t
-_cmdt_link_calculate(const vdp1_cmdt_t *cmdt)
-{
-        render_t * const render = __state.render;
-
-        return (cmdt - render->cmdts_pool);
-}
-
 static void
 _cmdt_process(vdp1_cmdt_t *cmdt)
 {
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
-        cmdt->cmd_ctrl = VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN | (render_transform->attribute.control.raw & 0x3F);
+        cmdt->cmd_ctrl = render_transform->attribute.control.raw;
         cmdt->cmd_pmod = render_transform->attribute.draw_mode.raw;
 
-        if (render_transform->attribute.control.use_texture) {
+        if (render_transform->polygon.flags.use_texture) {
                 const texture_t * const textures = tlist_get();
                 const texture_t * const texture = &textures[render_transform->attribute.texture_slot];
 
@@ -612,7 +601,7 @@ _cmdt_process(vdp1_cmdt_t *cmdt)
                 cmdt->cmd_size = texture->size;
         }
 
-        cmdt->cmd_colr = render_transform->attribute.palette.raw;
+        cmdt->cmd_colr = render_transform->attribute.palette_data.raw;
 
         cmdt->cmd_vertices[0] = render_transform->screen_points[0];
         cmdt->cmd_vertices[1] = render_transform->screen_points[1];
