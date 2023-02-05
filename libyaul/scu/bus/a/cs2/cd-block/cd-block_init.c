@@ -210,6 +210,66 @@ cd_block_transfer_data(uint16_t offset, uint16_t buffer_number, uint8_t *output_
 }
 
 int
+cd_block_transfer_data_dmac(uint16_t offset, uint16_t buffer_number,
+        uint8_t *output_buffer, uint32_t buffer_length, cpu_dmac_channel_t ch)
+{
+        assert(output_buffer != NULL);
+        assert(buffer_length > 0);
+
+        const uint32_t sectors_to_read = (buffer_length + (CDFS_SECTOR_SIZE - 1)) / CDFS_SECTOR_SIZE;
+
+        int ret;
+
+        /* Start transfer */
+        ret = cd_block_cmd_sector_data_get_delete(offset, buffer_number, sectors_to_read);
+        if (ret != 0) {
+                return ret;
+        }
+
+        /* Wait for data */
+        // if ((_hirq_flag_wait(DRDY | EHST)) != 0) {
+        if ((_hirq_flag_wait(DRDY)) != 0) {
+                return CD_STATUS_TIMEOUT;
+        }
+
+        /* Transfer from register to user space */
+        uint32_t to_read;
+        to_read = (buffer_length % 2) ? buffer_length - 1 : buffer_length;
+                
+        cpu_dmac_channel_wait(ch);
+
+        cpu_dmac_cfg_t cfg = {
+          .channel = ch,
+          .src_mode = CPU_DMAC_SOURCE_FIXED,
+          .src = CD_BLOCK(DTR),
+          .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+          .dst = (uint32_t) output_buffer,
+          .len = to_read,
+          .stride = CPU_DMAC_STRIDE_2_BYTES,
+          .bus_mode = CPU_DMAC_BUS_MODE_BURST,
+          .ihr = NULL,
+          .ihr_work = NULL
+        };
+
+        cpu_dmac_channel_config_set(&cfg);
+        cpu_dmac_channel_start(ch);
+        cpu_dmac_channel_wait(ch);
+
+        /* If odd number of bytes, read the last one separated */
+        if (to_read < buffer_length) {
+                const uint16_t tmp = MEMORY_READ(16, CD_BLOCK(DTR));
+
+                output_buffer[buffer_length - 1] = (tmp >> 8) & 0xFF;
+        }
+
+        if ((ret = cd_block_cmd_data_transfer_end()) != 0) {
+                return ret;
+        }
+
+        return 0;
+}
+
+int
 cd_block_sector_read(fad_t fad, void *output_buffer)
 {
         assert(fad >= 150);
@@ -332,8 +392,8 @@ _hirq_flag_wait(uint16_t flag)
         }
 
         return -1;
-}
 
+}
 static int __used
 _cd_block_auth(void)
 {
