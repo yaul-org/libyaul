@@ -74,19 +74,18 @@ _world_matrix_invert(fix16_mat33_t *inv_matrix)
 // void light_toggle(light_id_t id, bool toggle)
 
 void
-__light_transform(void)
+__light_transform(light_polygon_processor_t *processor)
 {
         light_t * const light = __state.light;
 
         if (!RENDER_FLAG_TEST(LIGHTING) || (light->light_count == 0)) {
-                light->polygon_process = _polygon_passthrough_process;
-
+                *processor = _polygon_passthrough_process;
                 return;
         }
 
-        render_t * const render = __state.render;
+        *processor = _polygon_process;
 
-        light->polygon_process = _polygon_process;
+        render_t * const render = __state.render;
 
         fix16_mat33_t inv_world_matrix __aligned(16);
 
@@ -109,7 +108,6 @@ __light_transform(void)
                 fix16_t intensity;
 
                 intensity = fix16_vec3_dot(&light->intensity_matrix.row[0], vertex_normal);
-
                 color |= ((uint32_t)intensity >> 16) & 0x001F;
 
                 intensity = fix16_vec3_dot(&light->intensity_matrix.row[1], vertex_normal);
@@ -122,14 +120,6 @@ __light_transform(void)
         }
 }
 
-void
-__light_polygon_process(void)
-{
-        light_t * const light = __state.light;
-
-        light->polygon_process();
-}
-
 static void
 _polygon_process(void)
 {
@@ -139,13 +129,13 @@ _polygon_process(void)
         const gst_slot_t gst_slot = __light_gst_alloc();
         vdp1_gouraud_table_t * const gst = __light_gst_get(gst_slot);
 
-        render_transform->rw_attribute.shading_slot =
+        render_transform->attribute.shading_slot =
             __light_shading_slot_calculate(gst_slot);
 
-        gst->colors[0] = render->colors_pool[render_transform->indices.p[0]];
-        gst->colors[1] = render->colors_pool[render_transform->indices.p[1]];
-        gst->colors[2] = render->colors_pool[render_transform->indices.p[2]];
-        gst->colors[3] = render->colors_pool[render_transform->indices.p[3]];
+        gst->colors[0] = render->colors_pool[render_transform->polygon.indices.p[0]];
+        gst->colors[1] = render->colors_pool[render_transform->polygon.indices.p[1]];
+        gst->colors[2] = render->colors_pool[render_transform->polygon.indices.p[2]];
+        gst->colors[3] = render->colors_pool[render_transform->polygon.indices.p[3]];
 }
 
 static void
@@ -154,8 +144,8 @@ _polygon_passthrough_process(void)
         render_t * const render = __state.render;
         render_transform_t * const render_transform = render->render_transform;
 
-        render_transform->rw_attribute.shading_slot =
-            __gst_slot_calculate(render_transform->ro_attribute->shading_slot);
+        render_transform->attribute.shading_slot =
+            __gst_slot_calculate(render_transform->attribute.shading_slot);
 }
 
 void

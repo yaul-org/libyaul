@@ -13,7 +13,7 @@
 
 #include "internal.h"
 
-#ifdef PERF
+#if MIC3D_PERF == 1
 static void _frt_ovi_handler(void);
 
 static uint32_t _absolute_ticks_get(void);
@@ -95,4 +95,4 @@ _frt_ovi_handler(void)
 {
         __state.perf->overflow_count++;
 }
-#endif /* PERF */
+#endif /* MIC3D_PERF */

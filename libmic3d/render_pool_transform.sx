@@ -1,0 +1,126 @@
+#define DVSR   0x00000000
+#define DVDNT  0x00000004
+#define DVCR   0x00000008
+#define VCRDIV 0x0000000C
+#define DVDNTH 0x00000010
+#define DVDNTL 0x00000014
+
+#define Z_VALUES_PTR      0x00000000
+#define SCREEN_POINTS_PTR 0x00000004
+#define VIEW_DISTANCE     0x00000018
+#define NEAR              0x0000001C
+#define MESH_PTR          0x0000002C
+
+#define POINTS_PTR    0x00000000
+#define POINTS_COUNT  0x00000004
+
+.text
+.align 2
+
+.global ___render_points_transform
+.type ___render_points_transform, @function
+
+//           z = dot([m20 m21 m22], p[i]) + m23
+// depth_value = view_distance / z
+//
+//           y = dot([m10 m11 m12], p[i]) + m13
+//          sy = depth_value * y
+//
+//           x = dot([m00 m01 m02], p[i]) + m03
+//          sx = depth_value * x
+
+// r4 = render
+// r5 = render_transform
+___render_points_transform:
+    mov.l r11,@-r15
+    add #(8*4),r5                      // Move VIEW_MATRIX forward to row #2
+    mov.l r10,@-r15
+    mov.l @(MESH_PTR,r4),r7            // render->mesh
+    mov.l r9,@-r15
+    mov.l @(POINTS_COUNT,r7),r11       // render->mesh->points_count
+    mov.l r8,@-r15
+    mov.l @(POINTS_PTR,r7),r10         // render->mesh->points (POINTS)
+
+.l_start:
+    // Z
+    clrmac                             //
+    mov.l @(VIEW_DISTANCE,r4),r9       // render->view_distance
+    mac.l @r5+,@r10+                   // mac.l
+    swap.w r9,r8                       // dividend_h
+    mac.l @r5+,@r10+                   // mac.l
+    exts.w r8,r0                       // dividend_h
+    mac.l @r5+,@r10+                   // mac.l
+    shll16 r9                          // dividend_l
+    sts mach,r7                        // sts
+    mov.w .cpu_ioregs,r8               //
+    sts macl,r6                        // sts
+    exts.w r8,r8
+    xtrct r7,r6                        // xtrct
+    mov.l r0,@(DVDNTH,r8)              // Write dividend high
+    clrmac                             //
+    mov.l @r5,r7                       // VIEW_MATRIX is already at 4th column
+    add #(-7*4),r5                     // Move VIEW_MATRIX back to row #1
+
+    // Y
+    add r6,r7
+    add #(-3*4),r10                    // Move POINTS back by 3 (4-byte) components
+    add #-1,r11
+    mac.l @r5+,@r10+                   // mac.l
+    mov r11,r0
+    mov.l @r4,r6                       // render->z_values (Z_VALUES)
+    shll2 r0
+    mac.l @r5+,@r10+                   // mac.l
+    mov.l r7,@(r0,r6)                  // Write Z to Z_VALUES (before clamping)
+    mov.l @(NEAR,r4),r6                // render->near
+    mac.l @r5+,@r10+                   // mac.l
+    cmp/gt r7,r6                       // r7 = (r6 > r7) ? r6 : r7
+    bf .l_skip_clamp_z
+    mov r6,r7
+
+.l_skip_clamp_z:
+    mov.l r7,@(DVSR,r8)                // Write divisor Z
+    sts mach,r0                        // sts
+    mov.l r9,@(DVDNTL,r8)              // Write dividend low to start division
+    sts macl,r9                        // sts
+    mov.l @r5,r6                       // VIEW_MATRIX is already at 4th column
+    add #(-3*4),r10                    // Move POINTS back by 3 (4-byte) components
+    xtrct r0,r9                        // xtrct
+    add r6,r9
+
+    // X
+    mov.l @(DVDNTL,r8),r0              // Get quotient
+    mov r11,r7
+    dmuls.l r9,r0                      // dmuls.l, Y*quotient (depth_value)
+    add #(-7*4),r5                     // Move VIEW_MATRIX back to row #0
+    sts mach,r9                        // sts
+    clrmac
+    shll2 r7
+    mac.l @r5+,@r10+                   // mac.l
+    mov.l @(SCREEN_POINTS_PTR,r4),r8   // render->screen_points_pool (SCREEN_POINTS_POOL)
+    mac.l @r5+,@r10+                   // mac.l
+    add r7,r8
+    mac.l @r5+,@r10+                   // mac.l
+    extu.w r9,r9                       // If negative, zero-extend
+    sts mach,r7                        // sts
+    sts macl,r6                        // sts
+    xtrct r7,r6                        // xtrct
+    mov.l @r5,r7                       // VIEW_MATRIX is already at 4th column
+    add r7,r6
+    dmuls.l r6,r0                      // dmuls.l, X*quotient (depth_value)
+    add #(5*4),r5                      // Move VIEW_MATRIX forward by 5 (4-byte) components
+    sts mach,r0                        // sts
+    cmp/pz r11
+    shll16 r0
+    or r9,r0
+    mov.l r0,@r8                       // Write X to SCREEN_POINTS_POOL[i].x
+    bt .l_start
+.l_end:
+    mov.l @r15+,r8
+    mov.l @r15+,r9
+    mov.l @r15+,r10
+    rts
+    mov.l @r15+,r11
+
+.align 1
+
+.cpu_ioregs: .short 0xFF00

@@ -38,10 +38,9 @@ typedef enum clip_flags {
 
 typedef struct {
         fix16_mat43_t view_matrix;
-        const attribute_t *ro_attribute;
 
-        attribute_t rw_attribute;
-        indices_t indices;
+        attribute_t attribute;
+        polygon_t polygon;
         int16_vec2_t screen_points[4];
         fix16_t z_values[4];
         clip_flags_t clip_flags[4];
@@ -55,9 +54,9 @@ typedef struct render {
         /* Pools */
         fix16_t *z_values_pool;
         int16_vec2_t *screen_points_pool;
-        fix16_t *depth_values_pool;
-        vdp1_cmdt_t *cmdts_pool;
         rgb1555_t *colors_pool;
+        vdp1_cmdt_t *cmdts_pool;
+        fix16_t *depth_values_pool;
         gst_t *gst;
 
         /* Settings */
@@ -75,7 +74,6 @@ typedef struct render {
         vdp1_link_t sort_link;
 
         vdp1_cmdt_t *cmdts;
-        uint32_t cmdt_count;
 } __aligned(4) render_t;
 
 void __render_init(void);

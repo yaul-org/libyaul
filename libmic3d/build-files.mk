@@ -12,7 +12,8 @@ LIB_SRCS:= \
 	sort.c \
 	state.c \
 	tlist.c \
-	workarea.c
+	workarea.c \
+	render_pool_transform.sx
 
 INSTALL_HEADER_FILES:= \
 	./mic3d/:types.h:./mic3d/ \

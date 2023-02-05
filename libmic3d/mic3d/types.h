@@ -21,23 +21,8 @@ typedef enum render_flags {
                                 RENDER_FLAGS_NO_CLEAR
 } render_flags_t;
 
+typedef uint16_t texture_slot_t;
 typedef uint16_t gst_slot_t;
-
-typedef union indices {
-        struct {
-                uint16_t p0;
-                uint16_t p1;
-                uint16_t p2;
-                uint16_t p3;
-        };
-
-        uint16_t p[4];
-} __aligned(4) indices_t;
-
-typedef struct polygon {
-        fix16_vec3_t normal;
-        indices_t indices;
-} __aligned(4) polygon_t;
 
 typedef enum sort_type {
         SORT_TYPE_BFR,
@@ -67,25 +52,58 @@ typedef enum command_type {
         COMMAND_TYPE_LINE             = 6
 } command_type_t;
 
-typedef union attribute_control {
+typedef enum link_type {
+        LINK_TYPE_JUMP_NEXT   = 0,
+        LINK_TYPE_JUMP_ASSIGN = 1,
+        LINK_TYPE_JUMP_CALL   = 2,
+        LINK_TYPE_JUMP_RETURN = 3,
+        LINK_TYPE_SKIP_NEXT   = 4,
+        LINK_TYPE_SKIP_ASSIGN = 5,
+        LINK_TYPE_SKIP_CALL   = 6,
+        LINK_TYPE_SKIP_RETURN = 7
+} link_type_t;
+
+typedef union indices {
         struct {
-                unsigned int :3;
-                sort_type_t sort_type:3;
-                plane_type_t plane_type:1;
-                unsigned int use_shading:1;
-                unsigned int use_lighting:1;
-                unsigned int use_texture:1;
-                read_dir_t read_dir:2;
-                command_type_t command:4;
-        } __packed;
+                uint16_t p0;
+                uint16_t p1;
+                uint16_t p2;
+                uint16_t p3;
+        };
 
-        uint16_t raw;
-} __packed attribute_control_t;
+        uint16_t p[4];
+} __aligned(4) indices_t;
 
-static_assert(sizeof(attribute_control_t) == 2);
+static_assert(sizeof(indices_t) == 8);
+
+typedef struct flags {
+        unsigned int :11;
+        sort_type_t sort_type:3;
+        plane_type_t plane_type:1;
+        bool use_texture:1;
+} __packed __aligned(2) flags_t;
+
+static_assert(sizeof(flags_t) == 2);
+
+typedef struct polygon {
+        flags_t flags;
+        indices_t indices;
+} __aligned(4) polygon_t;
+
+static_assert(sizeof(polygon_t) == 12);
 
 typedef struct attribute {
-        attribute_control_t control;
+        union {
+                struct {
+                        unsigned int :1;
+                        link_type_t link_type:3;
+                        unsigned int :6;
+                        read_dir_t read_dir:2;
+                        command_type_t command:4;
+                } __packed;
+
+                uint16_t raw;
+        } __packed __aligned(2) control;
 
         vdp1_cmdt_draw_mode_t draw_mode;
 
@@ -94,9 +112,9 @@ typedef struct attribute {
                 vdp1_color_bank_t color_bank;
                 uint16_t raw;
                 rgb1555_t base_color;
-        } palette;
+        } palette_data;
 
-        uint16_t texture_slot;
+        texture_slot_t texture_slot;
         gst_slot_t shading_slot;
 } __aligned(4) attribute_t;
 
