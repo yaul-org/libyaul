@@ -66,7 +66,7 @@ cdfs_entries_alloc(int32_t count)
 }
 
 void
-cdfs_filelist_entries_free(cdfs_filelist_entry_t *entries)
+cdfs_entries_free(cdfs_filelist_entry_t *entries)
 {
     assert(entries != NULL);
 
