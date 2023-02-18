@@ -9,6 +9,3 @@
 *.d
 *.s
 *.iso
-
-/examples/
-/build-scripts/

@@ -78,12 +78,10 @@ endef
 	clean \
 	clean-cdb \
 	clean-debug \
-	clean-examples \
 	clean-release \
 	clean-tools \
 	debug \
 	distclean \
-	examples \
 	generate-cdb \
 	install \
 	install-debug \
@@ -93,7 +91,7 @@ endef
 	release \
 	tools
 
-all: release debug tools examples
+all: release debug tools
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-build-rule,$(project),debug)))
@@ -123,9 +121,9 @@ install-debug: debug
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
-clean: clean-release clean-debug clean-tools clean-examples clean-cdb
+clean: clean-release clean-debug clean-tools clean-cdb
 
-distclean: clean-examples clean-cdb
+distclean: clean-cdb
 	$(ECHO)$(RM) -r $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 
 clean-release:
@@ -142,12 +140,6 @@ clean-debug:
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-clean-rule,$(project),debug)))
-
-examples:
-	$(ECHO)($(MAKE) -C examples all) || exit $${?}
-
-clean-examples:
-	$(ECHO)($(MAKE) -C examples clean) || exit $${?}
 
 tools:
 	$(ECHO)($(MAKE) -C tools all) || exit $${?}
