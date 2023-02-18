@@ -5,13 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/callback-list.h>
 #include <sys/cdefs.h>
 
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include <sys/callback-list.h>
 
 #include "callback-list-internal.h"
 
@@ -31,7 +30,7 @@ callback_list_free(callback_list_t *callback_list)
 
 void
 callback_list_init(callback_list_t *callback_list, callback_t *callbacks,
-  uint32_t count)
+    uint32_t count)
 {
     assert(callback_list != NULL);
     assert(callbacks != NULL);
@@ -52,7 +51,7 @@ callback_list_process(callback_list_t *callback_list)
 
     callback_t *callback = callback_list->callbacks;
     const callback_t * const last_callback =
-      &callback_list->callbacks[callback_list->count - 1];
+        &callback_list->callbacks[callback_list->count - 1];
 
     for (; callback <= last_callback; callback++) {
         callback_call(callback);
@@ -66,10 +65,8 @@ callback_list_rev_process(callback_list_t *callback_list)
     assert(callback_list->callbacks != NULL);
     assert(callback_list->count > 0);
 
-    callback_t *callback =
-      &callback_list->callbacks[callback_list->count - 1];
-    const callback_t * const first_callback =
-      callback_list->callbacks;
+    callback_t *callback = &callback_list->callbacks[callback_list->count - 1];
+    const callback_t * const first_callback = callback_list->callbacks;
 
     for (; callback >= first_callback; callback--) {
         callback_call(callback);
@@ -78,7 +75,7 @@ callback_list_rev_process(callback_list_t *callback_list)
 
 callback_id_t
 callback_list_callback_add(callback_list_t *callback_list,
-  callback_handler_t handler, void *work)
+    callback_handler_t handler, void *work)
 {
     assert(callback_list != NULL);
     assert(callback_list->callbacks != NULL);

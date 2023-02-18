@@ -3,14 +3,13 @@
  * long as he's credited for the compression and decompression code. */
 
 #include <sys/cdefs.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 
 void
 bcl_prs_decompress(void *in, void *out)
 {
-    uint32_t r3, r5; /* 6 unnamed registers */
+    uint32_t r3, r5;     /* 6 unnamed registers */
     uint32_t bitpos = 9; /* 4 named registers */
     uint8_t *src_ptr = (uint8_t *)in;
     uint8_t *dst_ptr = (uint8_t *)out;
@@ -75,7 +74,7 @@ bcl_prs_decompress(void *in, void *out)
                 r3 += 2;
             }
 
-            r5 += (uint32_t) dst_ptr;
+            r5 += (uint32_t)dst_ptr;
         } else {
             r3 = 0;
 
@@ -107,7 +106,7 @@ bcl_prs_decompress(void *in, void *out)
         t = r3;
 
         for (x = 0; x < t; x++) {
-            dst_ptr[0] = * (uint8_t *)r5;
+            dst_ptr[0] = *(uint8_t *)r5;
             r5++;
             r3++;
             dst_ptr++;

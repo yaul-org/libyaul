@@ -31,8 +31,8 @@
  * SUCH DAMAGE.
  */
 
-#include <limits.h>
 #include <ctype.h>
+#include <limits.h>
 
 long
 strtol(const char *restrict nptr, char **restrict endptr, int base)
@@ -57,8 +57,8 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
         c = *s++;
     }
 
-    if ((base == 0 || base == 16) &&
-      (c == '0') && ((*s == 'x') || (*s == 'X'))) {
+    if ((base == 0 || base == 16) && (c == '0') &&
+        ((*s == 'x') || (*s == 'X'))) {
         c = s[1];
         s += 2;
         base = 16;
@@ -116,7 +116,7 @@ strtol(const char *restrict nptr, char **restrict endptr, int base)
     }
 
     if (endptr != 0) {
-        *endptr = (char *) (any ? (char *)s - 1 : nptr);
+        *endptr = (char *)(any ? (char *)s - 1 : nptr);
     }
 
     return acc;

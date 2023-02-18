@@ -21,10 +21,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
-#define BITOP(a,b,op) ((a)[(size_t)(b) / (8 * sizeof *(a))] op (size_t)1 << ((size_t)(b) % (8 * sizeof *(a))))
+#define BITOP(a, b, op)                                                        \
+    ((a)[(size_t)(b) / (8 * sizeof *(a))]                                      \
+    op(size_t) 1 << ((size_t)(b) % (8 * sizeof *(a))))
 
 size_t
 strcspn(const char *s, const char *c)
@@ -38,7 +40,7 @@ strcspn(const char *s, const char *c)
 
     memset(byteset, 0, sizeof byteset);
 
-    for (; *c && BITOP(byteset, *(uint8_t *)c, |= ); c++) {
+    for (; *c && BITOP(byteset, *(uint8_t *)c, |=); c++) {
     }
 
     for (; *s && !BITOP(byteset, *(uint8_t *)s, &); s++) {

@@ -6,17 +6,15 @@
  */
 
 #include <assert.h>
-#include <math.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <cd-block.h>
-
+#include <math.h>
 #include <scu/map.h>
+#include <stdbool.h>
 
 #include "cdfs-internal.h"
-
 #include "cdfs.h"
 
 static struct {
@@ -24,15 +22,15 @@ static struct {
 } _state;
 
 static void _dirent_root_walk(cdfs_filelist_t *filelist,
-  cdfs_filelist_walk_t walker, void *args);
-static void _dirent_walk(cdfs_filelist_t *filelist,
-  cdfs_filelist_walk_t walker, sector_t sector, void *args);
+    cdfs_filelist_walk_t walker, void *args);
+static void _dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
+    sector_t sector, void *args);
 static bool _dirent_interleave(const cdfs_dirent_t *dirent);
 
 static void _filelist_entry_populate(const cdfs_dirent_t *dirent,
-  cdfs_entry_type_t type, cdfs_filelist_entry_t *filelist_entry);
+    cdfs_entry_type_t type, cdfs_filelist_entry_t *filelist_entry);
 static void _filelist_read_walker(cdfs_filelist_t *filelist,
-  const cdfs_filelist_entry_t *entry, void *args);
+    const cdfs_filelist_entry_t *entry, void *args);
 
 static uint32_t _filelist_entry_count_clamp(int32_t count);
 
@@ -40,16 +38,14 @@ static uint8_t _sector_buffer[CDFS_SECTOR_SIZE] __aligned(CDFS_SECTOR_SIZE);
 
 void
 cdfs_filelist_default_init(cdfs_filelist_t *filelist,
-  cdfs_filelist_entry_t *entries, int32_t count)
+    cdfs_filelist_entry_t *entries, int32_t count)
 {
     cdfs_filelist_init(filelist, entries, cdfs_sector_read, count);
 }
 
 void
-cdfs_filelist_init(cdfs_filelist_t *filelist,
-  cdfs_filelist_entry_t *entries,
-  cdfs_sector_read_t sector_read,
-  int32_t count)
+cdfs_filelist_init(cdfs_filelist_t *filelist, cdfs_filelist_entry_t *entries,
+    cdfs_sector_read_t sector_read, int32_t count)
 {
     assert(filelist != NULL);
     assert(entries != NULL);
@@ -87,7 +83,7 @@ cdfs_filelist_root_read(cdfs_filelist_t *filelist)
 
 void
 cdfs_filelist_read(cdfs_filelist_t *filelist,
-  const cdfs_filelist_entry_t root_entry)
+    const cdfs_filelist_entry_t root_entry)
 {
     assert(filelist != NULL);
 
@@ -96,9 +92,8 @@ cdfs_filelist_read(cdfs_filelist_t *filelist,
 
 void
 cdfs_filelist_walk(cdfs_filelist_t *filelist,
-  const cdfs_filelist_entry_t *root_entry,
-  cdfs_filelist_walk_t walker,
-  void *args)
+    const cdfs_filelist_entry_t *root_entry, cdfs_filelist_walk_t walker,
+    void *args)
 {
     const cdfs_sector_read_t sector_read = filelist->sector_read;
 
@@ -136,7 +131,7 @@ cdfs_filelist_walk(cdfs_filelist_t *filelist,
 
 static void
 _filelist_read_walker(cdfs_filelist_t *filelist,
-  const cdfs_filelist_entry_t *entry, void *args __unused)
+    const cdfs_filelist_entry_t *entry, void *args __unused)
 {
     if (filelist->entries_count >= filelist->entries_pooled_count) {
         return;
@@ -158,13 +153,14 @@ _dirent_interleave(const cdfs_dirent_t *dirent)
 
 static void
 _dirent_root_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
-  void *args)
+    void *args)
 {
     cdfs_dirent_t dirent_root;
 
     /* Populate filesystem mount structure */
     /* Copy of directory record */
-    (void)memcpy(&dirent_root, _state.pvd.root_directory_record, sizeof(dirent_root));
+    (void)memcpy(&dirent_root, _state.pvd.root_directory_record,
+        sizeof(dirent_root));
 
     /* Start walking the root directory */
     const uint32_t sector = isonum_733(dirent_root.extent);
@@ -174,10 +170,9 @@ _dirent_root_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
 
 static void
 _dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
-  sector_t sector, void *args)
+    sector_t sector, void *args)
 {
-    const cdfs_sector_read_t sector_read =
-      filelist->sector_read;
+    const cdfs_sector_read_t sector_read = filelist->sector_read;
 
     const cdfs_dirent_t *dirent;
     dirent = NULL;
@@ -190,12 +185,11 @@ _dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
     dirent_offset = 0;
 
     while (true) {
-        uint8_t dirent_length =
-          (dirent != NULL) ? isonum_711(dirent->length) : 0;
+        uint8_t dirent_length;
+        dirent_length  = (dirent != NULL) ? isonum_711(dirent->length) : 0;
 
-        if ((dirent == NULL) ||
-          (dirent_length == 0) ||
-          ((dirent_offset + dirent_length) >= CDFS_SECTOR_SIZE)) {
+        if ((dirent == NULL) || (dirent_length == 0) ||
+            ((dirent_offset + dirent_length) >= CDFS_SECTOR_SIZE)) {
             dirent_sectors--;
 
             if (dirent_sectors == 0) {
@@ -234,7 +228,8 @@ _dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
                 cdfs_entry_type_t type;
                 type = CDFS_ENTRY_TYPE_FILE;
 
-                if ((file_flags & DIRENT_FILE_FLAGS_DIRECTORY) == DIRENT_FILE_FLAGS_DIRECTORY) {
+                if ((file_flags & DIRENT_FILE_FLAGS_DIRECTORY) ==
+                    DIRENT_FILE_FLAGS_DIRECTORY) {
                     type = CDFS_ENTRY_TYPE_DIRECTORY;
                 }
 
@@ -258,12 +253,13 @@ _dirent_walk(cdfs_filelist_t *filelist, cdfs_filelist_walk_t walker,
 
 static void
 _filelist_entry_populate(const cdfs_dirent_t *dirent, cdfs_entry_type_t type,
-  cdfs_filelist_entry_t *filelist_entry)
+    cdfs_filelist_entry_t *filelist_entry)
 {
     filelist_entry->type = type;
     filelist_entry->size = isonum_733(dirent->data_length);
     filelist_entry->starting_fad = LBA2FAD(isonum_733(dirent->extent));
-    filelist_entry->sector_count = cdfs_sector_count_round(filelist_entry->size);
+    filelist_entry->sector_count = cdfs_sector_count_round(
+        filelist_entry->size);
 
     uint8_t name_len;
     name_len = isonum_711(dirent->file_id_len);

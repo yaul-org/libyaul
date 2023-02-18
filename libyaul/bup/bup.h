@@ -165,25 +165,31 @@ typedef struct bup_directory {
 
 /// @private
 typedef struct {
-    unsigned int :32;
+    unsigned int : 32;
     /// @private
-    bup_status_t (*op_partition_select)(bup_device_t device, uint16_t partition);
+    bup_status_t (
+        *op_partition_select)(bup_device_t device, uint16_t partition);
     /// @private
     bup_status_t (*op_format)(bup_device_t device);
     /// @private
-    bup_status_t (*op_status)(bup_device_t device, size_t data_size, bup_stat_t *tb);
+    bup_status_t (
+        *op_status)(bup_device_t device, size_t data_size, bup_stat_t *tb);
     /// @private
-    bup_status_t (*op_write)(bup_device_t device, bup_directory_t *tb, const void *data, uint8_t wmode);
+    bup_status_t (*op_write)(bup_device_t device, bup_directory_t *tb,
+        const void *data, uint8_t wmode);
     /// @private
-    bup_status_t (*op_read)(bup_device_t device, const char *filename, void *data);
+    bup_status_t (
+        *op_read)(bup_device_t device, const char *filename, void *data);
     /* The "op_" prefix was used to avoid conflict with C++'s reserved
      * keyword "delete" */
     /// @private
     bup_status_t (*op_delete)(bup_device_t device, const char *filename);
     /// @private
-    int32_t (*op_dir)(bup_device_t device, const char *filename, uint16_t tb_size, bup_directory_t *tb);
+    int32_t (*op_dir)(bup_device_t device, const char *filename,
+        uint16_t tb_size, bup_directory_t *tb);
     /// @private
-    bup_status_t (*op_verify)(bup_device_t device, const char *filename, const void *data);
+    bup_status_t (*op_verify)(bup_device_t device, const char *filename,
+        const void *data);
     /// @private
     void (*op_date_get)(bup_dir_date_t dir_date, bup_date_t *tb);
     /// @private
@@ -202,7 +208,8 @@ bup_partition_select(bup_device_t device, uint16_t partition)
     extern bup_stub_t *__bup_stub;
 
     smpc_smc_resdisa_call();
-    const bup_status_t bup_status = __bup_stub->op_partition_select(device, partition);
+    const bup_status_t bup_status = __bup_stub->op_partition_select(device,
+        partition);
     smpc_smc_resenab_call();
 
     return bup_status;
@@ -238,7 +245,8 @@ bup_status(bup_device_t device, size_t data_size, bup_stat_t *tb)
     extern bup_stub_t *__bup_stub;
 
     smpc_smc_resdisa_call();
-    const bup_status_t bup_status = __bup_stub->op_status(device, data_size, tb);
+    const bup_status_t bup_status = __bup_stub->op_status(device, data_size,
+        tb);
     smpc_smc_resenab_call();
 
     return bup_status;
@@ -247,18 +255,21 @@ bup_status(bup_device_t device, size_t data_size, bup_stat_t *tb)
 /// @brief Write to the backup device.
 ///
 /// @param device     The device.
-/// @param tb         The directory structure where @p bup_directory_t.block_size is written.
+/// @param tb         The directory structure where @p
+///                   bup_directory_t.block_size is written.
 /// @param data       The data to write.
 /// @param write_mode The write mode.
 ///
 /// @returns The status.
 static inline bup_status_t __always_inline
-bup_write(bup_device_t device, bup_directory_t *tb, const void *data, bup_write_mode_t write_mode)
+bup_write(bup_device_t device, bup_directory_t *tb, const void *data,
+    bup_write_mode_t write_mode)
 {
     extern bup_stub_t *__bup_stub;
 
     smpc_smc_resdisa_call();
-    const bup_status_t bup_status = __bup_stub->op_write(device, tb, data, write_mode);
+    const bup_status_t bup_status = __bup_stub->op_write(device, tb, data,
+        write_mode);
     smpc_smc_resenab_call();
 
     return bup_status;
@@ -313,7 +324,8 @@ bup_delete(bup_device_t device, const char *filename)
 /// matches found. Negating the return value yields the number of directories
 /// matched. For example, if `-5` is returned, then there are `5` directories.
 static inline int32_t __always_inline
-bup_dir(bup_device_t device, const char *filename, uint16_t tb_size, bup_directory_t *tb)
+bup_dir(bup_device_t device, const char *filename, uint16_t tb_size,
+    bup_directory_t *tb)
 {
     extern bup_stub_t *__bup_stub;
 
@@ -337,7 +349,8 @@ bup_verify(bup_device_t device, const char *filename, const void *data)
     extern bup_stub_t *__bup_stub;
 
     smpc_smc_resdisa_call();
-    const bup_status_t bup_status = __bup_stub->op_verify(device, filename, data);
+    const bup_status_t bup_status = __bup_stub->op_verify(device, filename,
+        data);
     smpc_smc_resenab_call();
 
     return bup_status;

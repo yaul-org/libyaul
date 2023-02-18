@@ -21,17 +21,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 static char *
 _two_byte_strstr(const uint8_t *h, const uint8_t *n)
 {
-    uint16_t nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
+    uint16_t nw;
+    nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
 
-    for (h++; *h && hw != nw; hw = hw << 8 | *++h);
+    for (h++; *h && hw != nw; hw = hw << 8 | *++h) {
+    }
 
-    return *h ? (char *)h - 1 : 0;
+    return (*h) ? ((char *)h - 1) : 0;
 }
 
 static char *
@@ -40,9 +42,10 @@ _three_byte_strstr(const uint8_t *h, const uint8_t *n)
     uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8;
     uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8;
 
-    for (h += 2; *h && hw != nw; hw = (hw | *++h) << 8);
+    for (h += 2; *h && hw != nw; hw = (hw | *++h) << 8) {
+    }
 
-    return *h ? (char *)h - 2 : 0;
+    return (*h) ? (char *)h - 2 : 0;
 }
 
 static char *
@@ -51,15 +54,18 @@ _four_byte_strstr(const uint8_t *h, const uint8_t *n)
     uint32_t nw = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
     uint32_t hw = h[0] << 24 | h[1] << 16 | h[2] << 8 | h[3];
 
-    for (h += 3; *h && hw != nw; hw = hw << 8 | *++h);
+    for (h += 3; *h && hw != nw; hw = hw << 8 | *++h) {
+    }
 
-    return *h ? (char *)h - 3 : 0;
+    return (*h) ? (char *)h - 3 : 0;
 }
 
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#define BITOP(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+#define BITOP(a, b, op)                                                        \
+    ((a)[(size_t)(b) / (8 * sizeof *(a))]                                      \
+    op(size_t) 1 << ((size_t)(b) % (8 * sizeof *(a))))
 
 static char *
 _twoway_strstr(const uint8_t *h, const uint8_t *n)
@@ -71,11 +77,11 @@ _twoway_strstr(const uint8_t *h, const uint8_t *n)
 
     /* Computing length of needle and fill shift table */
     for (l = 0; n[l] && h[l]; l++) {
-        BITOP(byteset, n[l], |= ), shift[n[l]] = l + 1;
+        BITOP(byteset, n[l], |=), shift[n[l]] = l + 1;
     }
 
     if (n[l]) {
-        return 0;        /* hit the end of h */
+        return 0; /* Hit the end of h */
     }
 
     /* Compute maximal suffix */
@@ -185,7 +191,8 @@ _twoway_strstr(const uint8_t *h, const uint8_t *n)
         }
 
         /* Compare right half */
-        for (k = MAX(ms + 1, mem); n[k] && n[k] == h[k]; k++);
+        for (k = MAX(ms + 1, mem); n[k] && n[k] == h[k]; k++) {
+        }
 
         if (n[k]) {
             h += k - ms;
@@ -194,7 +201,8 @@ _twoway_strstr(const uint8_t *h, const uint8_t *n)
         }
 
         /* Compare left half */
-        for (k = ms + 1; k > mem && n[k - 1] == h[k - 1]; k--);
+        for (k = ms + 1; k > mem && n[k - 1] == h[k - 1]; k--) {
+        }
 
         if (k <= mem) {
             return (char *)h;

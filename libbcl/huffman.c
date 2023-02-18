@@ -19,7 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. */
 
 #include <sys/cdefs.h>
-
 #include <stdint.h>
 
 /* The maximum number of nodes in the Huffman tree is 2^(8+1)-1 = 511 */
@@ -49,10 +48,12 @@ struct huff_decodenode {
 static void _bitstream_init(huff_bitstream_t *stream, uint8_t *buffer);
 static uint32_t _bit_read(huff_bitstream_t *stream);
 static uint32_t _8bits_read(huff_bitstream_t *stream);
-static huff_decodenode_t *_tree_recover(huff_decodenode_t *nodes, huff_bitstream_t *stream, uint32_t *nodenum);
+static huff_decodenode_t *_tree_recover(huff_decodenode_t *nodes,
+    huff_bitstream_t *stream, uint32_t *nodenum);
 
 void
-bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out_size)
+bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size,
+    uint32_t out_size)
 {
     huff_decodenode_t nodes[MAX_TREE_NODES];
     huff_decodenode_t *root;
@@ -154,7 +155,8 @@ _8bits_read(huff_bitstream_t *stream)
 
 /* Recover a Huffman tree from a bitstream */
 static huff_decodenode_t *
-_tree_recover(huff_decodenode_t *nodes, huff_bitstream_t *stream, uint32_t *nodenum)
+_tree_recover(huff_decodenode_t *nodes, huff_bitstream_t *stream,
+    uint32_t *nodenum)
 {
     huff_decodenode_t *this_node;
 

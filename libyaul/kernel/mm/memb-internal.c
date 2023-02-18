@@ -2,7 +2,7 @@
 
 int
 __memb_memb_request_init(memb_t *memb, void *pool,
-  const memb_request_t *request)
+    const memb_request_t *request)
 {
     assert(memb != NULL);
     assert(pool != NULL);
@@ -67,7 +67,7 @@ __memb_memb_request_alloc(memb_t *memb, const memb_request_t *request)
 
 int
 __memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
-  uint32_t block_size)
+    uint32_t block_size)
 {
     const memb_request_t request = {
         .malloc_func = __malloc,
@@ -81,7 +81,7 @@ __memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
 
 int
 __memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
-  uint32_t align)
+    uint32_t align)
 {
     const memb_request_t request = {
         .malloc_func   = __malloc,

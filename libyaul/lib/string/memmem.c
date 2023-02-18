@@ -21,8 +21,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 static char *
 _two_byte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
@@ -35,7 +35,7 @@ _two_byte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
         }
     }
 
-    return hw == nw ? (char *)h - 2 : 0;
+    return (hw == nw) ? ((char *)h - 2) : 0;
 }
 
 static char *
@@ -65,13 +65,15 @@ fourbyte_memmem(const uint8_t *h, size_t k, const uint8_t *n)
         }
     }
 
-    return hw == nw ? (char *)h - 4 : 0;
+    return (hw == nw) ? ((char *)h - 4) : 0;
 }
 
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#define BITOP(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+#define BITOP(a, b, op)                                                        \
+    ((a)[(size_t)(b) / (8 * sizeof *(a))]                                      \
+      op(size_t) 1 << ((size_t)(b) % (8 * sizeof *(a))))
 
 static char *
 _twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
@@ -82,7 +84,7 @@ _twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
 
     /* Computing length of needle and fill shift table */
     for (i = 0; i < l; i++) {
-        BITOP(byteset, n[i], |= ), shift[n[i]] = i + 1;
+        BITOP(byteset, n[i], |=), shift[n[i]] = i + 1;
     }
 
     /* Compute maximal suffix */
@@ -177,7 +179,8 @@ _twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
         }
 
         /* Compare right half */
-        for (k = MAX(ms + 1, mem); k < l && n[k] == h[k]; k++);
+        for (k = MAX(ms + 1, mem); k < l && n[k] == h[k]; k++) {
+        }
 
         if (k < l) {
             h += k - ms;
@@ -186,7 +189,8 @@ _twoway_memmem(const uint8_t *h, const uint8_t *z, const uint8_t *n, size_t l)
         }
 
         /* Compare left half */
-        for (k = ms + 1; k > mem && n[k - 1] == h[k - 1]; k--);
+        for (k = ms + 1; k > mem && n[k - 1] == h[k - 1]; k--) {
+        }
 
         if (k <= mem) {
             return (char *)h;

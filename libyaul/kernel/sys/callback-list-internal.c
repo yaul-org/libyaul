@@ -38,7 +38,8 @@ __callback_list_request_alloc(uint32_t count, malloc_func_t malloc_func)
 }
 
 void
-__callback_list_request_free(callback_list_t *callback_list, free_func_t free_func)
+__callback_list_request_free(callback_list_t *callback_list,
+    free_func_t free_func)
 {
     assert(callback_list != NULL);
     assert(callback_list->callbacks != NULL);

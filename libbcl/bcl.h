@@ -9,7 +9,6 @@
 #define _BCL_H_
 
 #include <sys/cdefs.h>
-
 #include <stdint.h>
 
 __BEGIN_DECLS
@@ -25,7 +24,8 @@ __BEGIN_DECLS
 /// @param[out] out      The output buffer.
 /// @param      in_size  The size of the input buffer in bytes.
 /// @param      out_size The size of the output buffer in bytes.
-extern void bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size, uint32_t out_size);
+extern void bcl_huffman_decompress(uint8_t *in, uint8_t *out, uint32_t in_size,
+    uint32_t out_size);
 
 /// @brief Decompress a block of data using PRS.
 ///

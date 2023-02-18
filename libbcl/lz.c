@@ -27,7 +27,7 @@ void
 bcl_lz_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 {
     uint8_t marker, symbol;
-    uint32_t  i, inpos, outpos, length, offset;
+    uint32_t i, inpos, outpos, length, offset;
 
     /* Do we have anything to uncompress? */
     if (in_size < 1) {

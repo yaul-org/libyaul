@@ -21,8 +21,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <ctype.h>
+#include <string.h>
 
 int
 strncasecmp(const char *_l, const char *_r, size_t n)
@@ -34,7 +34,8 @@ strncasecmp(const char *_l, const char *_r, size_t n)
         return 0;
     }
 
-    for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r)); l++, r++, n--) {
+    for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r));
+         l++, r++, n--) {
     }
 
     return tolower(*l) - tolower(*r);

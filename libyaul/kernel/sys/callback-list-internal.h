@@ -18,9 +18,9 @@ extern callback_list_t *__callback_list_alloc(uint32_t count);
 extern void __callback_list_free(callback_list_t *callback_list);
 
 extern callback_list_t *__callback_list_request_alloc(uint32_t count,
-  malloc_func_t malloc_func);
+    malloc_func_t malloc_func);
 extern void __callback_list_request_free(callback_list_t *callback_list,
-  free_func_t free_func);
+    free_func_t free_func);
 
 __END_DECLS
 

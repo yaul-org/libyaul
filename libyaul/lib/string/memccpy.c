@@ -21,14 +21,15 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t)-1)
-#define ONES            ((size_t)-1/UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX/2+1))
-#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN       (sizeof(size_t) - 1)
+#define ONES        ((size_t)-1 / UCHAR_MAX)
+#define HIGHS       (ONES * (UCHAR_MAX / 2 + 1))
+#define HAS_ZERO(x) (((x)-ONES) & ~(x)&HIGHS)
 
 void *
 memccpy(void *restrict dest, const void *restrict src, int c, size_t n)

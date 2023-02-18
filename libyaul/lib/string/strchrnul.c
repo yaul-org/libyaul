@@ -21,14 +21,15 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t)-1/UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX/2+1))
-#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN       (sizeof(size_t))
+#define ONES        ((size_t)-1 / UCHAR_MAX)
+#define HIGHS       (ONES * (UCHAR_MAX / 2 + 1))
+#define HAS_ZERO(x) (((x)-ONES) & ~(x)&HIGHS)
 
 char *
 strchrnul(const char *s, int c)
@@ -51,7 +52,8 @@ strchrnul(const char *s, int c)
 
     size_t k = ONES * c;
 
-    for (w = (void *)s; !HAS_ZERO(*w) && !HAS_ZERO(*w ^ k); w++);
+    for (w = (void *)s; !HAS_ZERO(*w) && !HAS_ZERO(*w ^ k); w++) {
+    }
 
     s = (void *)w;
 #endif /* __GNUC__ */

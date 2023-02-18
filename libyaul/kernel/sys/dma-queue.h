@@ -28,8 +28,8 @@ extern dma_queue_t *dma_queue_alloc(void);
 extern void dma_queue_free(dma_queue_t *queue);
 extern void dma_queue_init(dma_queue_t *queue);
 extern void dma_queue_deinit(dma_queue_t *queue);
-extern int32_t dma_queue_enqueue(dma_queue_t *queue, void *dst,
-  const void *src, size_t len);
+extern int32_t dma_queue_enqueue(dma_queue_t *queue, void *dst, const void *src,
+    size_t len);
 extern void dma_queue_clear(dma_queue_t *queue);
 extern uint32_t dma_queue_count_get(const dma_queue_t *queue);
 

@@ -6,20 +6,20 @@
  * Joe Fenton <jlfenton65@gmail.com>
  */
 
-#include <stdbool.h>
+#include <sys/cdefs.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <sys/cdefs.h>
-
-#include <cpu/cache.h>
-#include <cpu/intc.h>
 
 #include <internal.h>
 #include <cpu-internal.h>
 #include <smpc-internal.h>
 #include <vdp-internal.h>
+
+#include <cpu/cache.h>
+#include <cpu/intc.h>
+#include <stdbool.h>
 
 void user_init(void) __weak;
 

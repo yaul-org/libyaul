@@ -21,15 +21,16 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t) - 1 / UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX / 2 + 1))
+#define ALIGN (sizeof(size_t))
+#define ONES  ((size_t)-1 / UCHAR_MAX)
+#define HIGHS (ONES * (UCHAR_MAX / 2 + 1))
 
-#define HAS_ZERO(x)     (((x) - ONES) & ~(x) & HIGHS)
+#define HAS_ZERO(x) (((x)-ONES) & ~(x)&HIGHS)
 
 size_t
 strlen(const char *s)
