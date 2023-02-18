@@ -17,30 +17,30 @@
 __BEGIN_DECLS
 
 #define VDP2_SCRN_PAGE_COUNT_CALCULATE(format)                                 \
-        ((format)->plane_size)
+    ((format)->plane_size)
 
 #define VDP2_SCRN_PAGE_WIDTH_CALCULATE(format)                                 \
-        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
+    (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
 #define VDP2_SCRN_PAGE_HEIGHT_CALCULATE(format)                                \
-        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
+    (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
 #define VDP2_SCRN_PAGE_DIMENSION_CALCULATE(format)                             \
-        (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1)                      \
-            ? (64 * 64)                                                        \
-            : (32 * 32))
+    (((format)->char_size == VDP2_SCRN_CHAR_SIZE_1X1)                          \
+        ? (64 * 64)                                                            \
+        : (32 * 32))
 
 #define VDP2_SCRN_PAGE_COUNT_M_CALCULATE(plane_size)                           \
-        (plane_size)
+    (plane_size)
 
 #define VDP2_SCRN_PAGE_WIDTH_M_CALCULATE(char_size)                            \
-        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
+    (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
 #define VDP2_SCRN_PAGE_HEIGHT_M_CALCULATE(char_size)                           \
-        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
+    (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? 64 : 32)
 
 #define VDP2_SCRN_PAGE_DIMENSION_M_CALCULATE(char_size)                        \
-        (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? (64 * 64) : (32 * 32))
+    (((char_size) == VDP2_SCRN_CHAR_SIZE_1X1) ? (64 * 64) : (32 * 32))
 
 /*-
  * Possible values for VDP2_SCRN_PAGE_SIZE_CALCULATE() (in bytes):
@@ -56,10 +56,10 @@ __BEGIN_DECLS
  * Page dimension is 64x64 if cell size is 1x1.
  * Page dimension is 32x32 if cell size is 2x2 */
 #define VDP2_SCRN_PAGE_SIZE_CALCULATE(format)                                  \
-        (VDP2_SCRN_PAGE_DIMENSION_CALCULATE(format) * ((format)->pnd_size * 2))
+    (VDP2_SCRN_PAGE_DIMENSION_CALCULATE(format) * ((format)->pnd_size * 2))
 
 #define VDP2_SCRN_PAGE_SIZE_M_CALCULATE(char_size, pnd_size)                   \
-        (VDP2_SCRN_PAGE_DIMENSION_M_CALCULATE(char_size) * ((pnd_size) * 2))
+    (VDP2_SCRN_PAGE_DIMENSION_M_CALCULATE(char_size) * ((pnd_size) * 2))
 
 /*-
  * Possible vales for VDP2_SCRN_PLANE_SIZE_CALCULATE() (in bytes):
@@ -84,7 +84,7 @@ __BEGIN_DECLS
  */
 
 #define VDP2_SCRN_PLANE_SIZE_CALCULATE(format)                                 \
-        (((format)->plane_size) * VDP2_SCRN_PAGE_SIZE_CALCULATE(format))
+    (((format)->plane_size) * VDP2_SCRN_PAGE_SIZE_CALCULATE(format))
 
 /*-
  * Possible values (plane count) that can fit within a 4Mbit VRAM bank:
@@ -110,10 +110,10 @@ __BEGIN_DECLS
  */
 
 #define VDP2_SCRN_PLANES_2_CNT_CALCULATE(format)                               \
-        (VDP2_VRAM_BSIZE_2 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
+    (VDP2_VRAM_BSIZE_2 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
 
 #define VDP2_SCRN_PLANES_4_CNT_CALCULATE(format)                               \
-        (VDP2_VRAM_BSIZE_4 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
+    (VDP2_VRAM_BSIZE_4 / VDP2_SCRN_PLANE_SIZE_CALCULATE((format)))
 
 /*-
  * Configuration table mapping. Depending on how the normal/rotational
@@ -139,55 +139,55 @@ __BEGIN_DECLS
 #define VDP2_SCRN_PND_MODE_2_PAL_NUM(cram_addr) ((((uint32_t)(cram_addr)) >> 6) & 0x007F)
 
 #define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_addr)                            \
-        __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(cram_addr)
+    __CONCAT(VDP2_SCRN_PND_MODE_, __CONCAT(cram_mode, _PAL_NUM))(cram_addr)
 
 #define VDP2_SCRN_PND_CONFIG_0(cram_mode, cpd_addr, pal_addr, vf, hf)          \
-        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
-         (((vf) & 0x01) << 11) |                                               \
-         (((hf) & 0x01) << 10) |                                               \
-         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x03FF))
+    (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |           \
+     (((vf) & 0x01) << 11) |                                                   \
+     (((hf) & 0x01) << 10) |                                                   \
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_1(cram_mode, cpd_addr, pal_addr)                  \
-        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
-         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFF))
+    (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |           \
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFF))
 
 #define VDP2_SCRN_PND_CONFIG_2(cram_mode, cpd_addr, pal_addr, vf, hf)          \
-        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
-         (((vf) & 0x01) << 11) |                                               \
-         (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
+    (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |           \
+     (((vf) & 0x01) << 11) |                                                   \
+     (((hf) & 0x01) << 10) |                                                   \
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_3(cram_mode, cpd_addr, pal_addr)                  \
-        (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |       \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x0FFF))
+    (((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x000F) << 12) |           \
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x0FFF))
 
 #define VDP2_SCRN_PND_CONFIG_4(cram_mode, cpd_addr, pal_addr, vf, hf)          \
-        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
-         (((vf) & 0x01) << 11) |                                               \
-         (((hf) & 0x01) << 10) |                                               \
-         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x01FF))
+    ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
+     (((vf) & 0x01) << 11) |                                                   \
+     (((hf) & 0x01) << 10) |                                                   \
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x01FF))
 
 #define VDP2_SCRN_PND_CONFIG_5(cram_mode, cpd_addr, pal_addr)                  \
-        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
-         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x07FF))
+    ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x07FF))
 
 #define VDP2_SCRN_PND_CONFIG_6(cram_mode, cpd_addr, pal_addr, vf, hf)          \
-        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
-         (((vf) & 0x01) << 11) |                                               \
-         (((hf) & 0x01) << 10) |                                               \
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x01FF))
+    ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
+     (((vf) & 0x01) << 11) |                                                   \
+     (((hf) & 0x01) << 10) |                                                   \
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x01FF))
 
 #define VDP2_SCRN_PND_CONFIG_7(cram_mode, cpd_addr, pal_addr, vf, hf)          \
-        ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |\
-         ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x07FF))
+    ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x07FF))
 
 #define VDP2_SCRN_PND_CONFIG_8(cram_mode, cpd_addr, pal_addr, vf, hf, pr, cc)  \
-        ((((vf) & 0x01) << 31) |                                               \
-         (((hf) & 0x01) << 30) |                                               \
-         (((pr) & 0x01) << 29) |                                               \
-         (((cc) & 0x01) << 28) |                                               \
-         ((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x007F) << 16) |       \
-         (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x7FFF))
+    ((((vf) & 0x01) << 31) |                                                   \
+     (((hf) & 0x01) << 30) |                                                   \
+     (((pr) & 0x01) << 29) |                                                   \
+     (((cc) & 0x01) << 28) |                                                   \
+     ((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr) & 0x007F) << 16) |           \
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x7FFF))
 
 __END_DECLS
 

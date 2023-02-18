@@ -28,5 +28,5 @@
 FILE *
 fopen(const char * restrict filename __unused, const char * restrict mode __unused)
 {
-        return NULL;
+    return NULL;
 }

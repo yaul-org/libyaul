@@ -26,5 +26,5 @@
 int
 fgetc(FILE *f)
 {
-        return getc(f);
+    return getc(f);
 }

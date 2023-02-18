@@ -27,13 +27,13 @@
 int
 printf(const char *restrict fmt, ...)
 {
-        int ret;
+    int ret;
 
-        va_list ap;
+    va_list ap;
 
-        va_start(ap, fmt);
-        ret = vfprintf(stdout, fmt, ap);
-        va_end(ap);
+    va_start(ap, fmt);
+    ret = vfprintf(stdout, fmt, ap);
+    va_end(ap);
 
-        return ret;
+    return ret;
 }

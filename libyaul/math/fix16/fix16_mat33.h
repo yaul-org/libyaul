@@ -33,22 +33,22 @@ typedef union fix16_mat43 fix16_mat43_t;
 ///
 /// @note Row-major matrix.
 typedef union fix16_mat33 {
-        /// @brief Not yet documented.
-        struct {
-                /// @brief Not yet documented. Row 0.
-                fix16_t m00, m01, m02;
-                /// @brief Not yet documented. Row 1.
-                fix16_t m10, m11, m12;
-                /// @brief Not yet documented. Row 2.
-                fix16_t m20, m21, m22;
-        } comp;
+    /// @brief Not yet documented.
+    struct {
+        /// @brief Not yet documented. Row 0.
+        fix16_t m00, m01, m02;
+        /// @brief Not yet documented. Row 1.
+        fix16_t m10, m11, m12;
+        /// @brief Not yet documented. Row 2.
+        fix16_t m20, m21, m22;
+    } comp;
 
-        /// @brief Not yet documented.
-        fix16_t arr[FIX16_MAT33_ARR_COUNT];
-        /// @brief Not yet documented.
-        fix16_t frow[FIX16_MAT33_COLUMNS][FIX16_MAT33_ROWS];
-        /// @brief Not yet documented.
-        fix16_vec3_t row[FIX16_MAT33_ROWS];
+    /// @brief Not yet documented.
+    fix16_t arr[FIX16_MAT33_ARR_COUNT];
+    /// @brief Not yet documented.
+    fix16_t frow[FIX16_MAT33_COLUMNS][FIX16_MAT33_ROWS];
+    /// @brief Not yet documented.
+    fix16_vec3_t row[FIX16_MAT33_ROWS];
 } __packed __aligned(4) fix16_mat33_t;
 
 /// @brief Not yet documented.
@@ -81,7 +81,7 @@ extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
 /// @param      m0     Not yet documented.
 /// @param[out] result Not yet documented.
 extern void fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
-    fix16_mat33_t * __restrict result);
+  fix16_mat33_t * __restrict result);
 
 /// @brief Not yet documented.
 ///

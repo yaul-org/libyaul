@@ -29,72 +29,72 @@ __BEGIN_DECLS
 
 /// @brief Interrupt vectors.
 typedef enum scu_ic_interrupt {
-        /// VBLANK-IN interrupt.
-        SCU_IC_INTERRUPT_VBLANK_IN       = 0x40,
-        /// VBLANK-OUT interrupt.
-        SCU_IC_INTERRUPT_VBLANK_OUT      = 0x41,
-        /// HBLANK-IN interrupt.
-        SCU_IC_INTERRUPT_HBLANK_IN       = 0x42,
-        /// SCU timer #0 interrupt.
-        SCU_IC_INTERRUPT_TIMER_0         = 0x43,
-        /// SCU timer #1 interrupt.
-        SCU_IC_INTERRUPT_TIMER_1         = 0x44,
-        /// SCU-DSP Program end interrupt.
-        SCU_IC_INTERRUPT_DSP_END         = 0x45,
-        /// Sound request interrupt.
-        SCU_IC_INTERRUPT_SOUND_REQUEST   = 0x46,
-        /// SMPC System manager interrupt.
-        SCU_IC_INTERRUPT_SYSTEM_MANAGER  = 0x47,
-        /// SMPC Pad interrupt.
-        SCU_IC_INTERRUPT_PAD_INTERRUPT   = 0x48,
-        /// SCU-DMA level 2 end interrupt.
-        SCU_IC_INTERRUPT_LEVEL_2_DMA_END = 0x49,
-        /// SCU-DMA level 1 end interrupt.
-        SCU_IC_INTERRUPT_LEVEL_1_DMA_END = 0x4A,
-        /// SCU-DMA level 0 end interrupt.
-        SCU_IC_INTERRUPT_LEVEL_0_DMA_END = 0x4B,
-        /// SCU-DMA illegal interrupt.
-        SCU_IC_INTERRUPT_DMA_ILLEGAL     = 0x4C,
-        /// VDP1 sprite end interrupt.
-        SCU_IC_INTERRUPT_SPRITE_END      = 0x4D
+    /// VBLANK-IN interrupt.
+    SCU_IC_INTERRUPT_VBLANK_IN       = 0x40,
+    /// VBLANK-OUT interrupt.
+    SCU_IC_INTERRUPT_VBLANK_OUT      = 0x41,
+    /// HBLANK-IN interrupt.
+    SCU_IC_INTERRUPT_HBLANK_IN       = 0x42,
+    /// SCU timer #0 interrupt.
+    SCU_IC_INTERRUPT_TIMER_0         = 0x43,
+    /// SCU timer #1 interrupt.
+    SCU_IC_INTERRUPT_TIMER_1         = 0x44,
+    /// SCU-DSP Program end interrupt.
+    SCU_IC_INTERRUPT_DSP_END         = 0x45,
+    /// Sound request interrupt.
+    SCU_IC_INTERRUPT_SOUND_REQUEST   = 0x46,
+    /// SMPC System manager interrupt.
+    SCU_IC_INTERRUPT_SYSTEM_MANAGER  = 0x47,
+    /// SMPC Pad interrupt.
+    SCU_IC_INTERRUPT_PAD_INTERRUPT   = 0x48,
+    /// SCU-DMA level 2 end interrupt.
+    SCU_IC_INTERRUPT_LEVEL_2_DMA_END = 0x49,
+    /// SCU-DMA level 1 end interrupt.
+    SCU_IC_INTERRUPT_LEVEL_1_DMA_END = 0x4A,
+    /// SCU-DMA level 0 end interrupt.
+    SCU_IC_INTERRUPT_LEVEL_0_DMA_END = 0x4B,
+    /// SCU-DMA illegal interrupt.
+    SCU_IC_INTERRUPT_DMA_ILLEGAL     = 0x4C,
+    /// VDP1 sprite end interrupt.
+    SCU_IC_INTERRUPT_SPRITE_END      = 0x4D
 } scu_ic_interrupt_t;
 
 /// @brief Mask values.
 typedef enum scu_ic_mask {
-        /// Value of `0`.
-        SCU_IC_MASK_NONE            = 0x00000000,
-        /// VBLANK-IN mask.
-        SCU_IC_MASK_VBLANK_IN       = 0x00000001,
-        /// VBLANK-OUT mask.
-        SCU_IC_MASK_VBLANK_OUT      = 0x00000002,
-        /// HBLANK-IN mask.
-        SCU_IC_MASK_HBLANK_IN       = 0x00000004,
-        /// SCU timer #0 mask.
-        SCU_IC_MASK_TIMER_0         = 0x00000008,
-        /// SCU timer #1 mask.
-        SCU_IC_MASK_TIMER_1         = 0x00000010,
-        /// SCU-DSP Program end mask.
-        SCU_IC_MASK_DSP_END         = 0x00000020,
-        /// Sound request mask.
-        SCU_IC_MASK_SOUND_REQUEST   = 0x00000040,
-        /// SMPC System manager mask.
-        SCU_IC_MASK_SYSTEM_MANAGER  = 0x00000080,
-        /// SMPC Pad mask.
-        SCU_IC_MASK_PAD_INTERRUPT   = 0x00000100,
-        /// SCU-DMA level 2 end mask.
-        SCU_IC_MASK_LEVEL_2_DMA_END = 0x00000200,
-        /// SCU-DMA level 1 end mask.
-        SCU_IC_MASK_LEVEL_1_DMA_END = 0x00000400,
-        /// SCU-DMA level 0 end mask.
-        SCU_IC_MASK_LEVEL_0_DMA_END = 0x00000800,
-        /// SCU-DMA illegal mask.
-        SCU_IC_MASK_DMA_ILLEGAL     = 0x00001000,
-        /// VDP1 sprite end mask.
-        SCU_IC_MASK_SPRITE_END      = 0x00002000,
-        /// A-Bus mask.
-        SCU_IC_MASK_A_BUS           = 0x00008000,
-        /// Defines all mask values.
-        SCU_IC_MASK_ALL             = 0x0000BFFF
+    /// Value of `0`.
+    SCU_IC_MASK_NONE            = 0x00000000,
+    /// VBLANK-IN mask.
+    SCU_IC_MASK_VBLANK_IN       = 0x00000001,
+    /// VBLANK-OUT mask.
+    SCU_IC_MASK_VBLANK_OUT      = 0x00000002,
+    /// HBLANK-IN mask.
+    SCU_IC_MASK_HBLANK_IN       = 0x00000004,
+    /// SCU timer #0 mask.
+    SCU_IC_MASK_TIMER_0         = 0x00000008,
+    /// SCU timer #1 mask.
+    SCU_IC_MASK_TIMER_1         = 0x00000010,
+    /// SCU-DSP Program end mask.
+    SCU_IC_MASK_DSP_END         = 0x00000020,
+    /// Sound request mask.
+    SCU_IC_MASK_SOUND_REQUEST   = 0x00000040,
+    /// SMPC System manager mask.
+    SCU_IC_MASK_SYSTEM_MANAGER  = 0x00000080,
+    /// SMPC Pad mask.
+    SCU_IC_MASK_PAD_INTERRUPT   = 0x00000100,
+    /// SCU-DMA level 2 end mask.
+    SCU_IC_MASK_LEVEL_2_DMA_END = 0x00000200,
+    /// SCU-DMA level 1 end mask.
+    SCU_IC_MASK_LEVEL_1_DMA_END = 0x00000400,
+    /// SCU-DMA level 0 end mask.
+    SCU_IC_MASK_LEVEL_0_DMA_END = 0x00000800,
+    /// SCU-DMA illegal mask.
+    SCU_IC_MASK_DMA_ILLEGAL     = 0x00001000,
+    /// VDP1 sprite end mask.
+    SCU_IC_MASK_SPRITE_END      = 0x00002000,
+    /// A-Bus mask.
+    SCU_IC_MASK_A_BUS           = 0x00008000,
+    /// Defines all mask values.
+    SCU_IC_MASK_ALL             = 0x0000BFFF
 } scu_ic_mask_t;
 
 /* GCC complains:
@@ -103,77 +103,77 @@ typedef enum scu_ic_mask {
 #pragma GCC diagnostic ignored "-Wpedantic"
 /// @brief Interrupt status bits.
 typedef enum scu_ic_status_reg_t {
-        /// Value of 0 (zero).
-        SCU_IC_IST_NONE            = 0x00000000UL,
-        /// HBLANK-IN status bit.
-        SCU_IC_IST_VBLANK_IN       = 0x00000001UL,
-        /// VBLANK-OUT status bit.
-        SCU_IC_IST_VBLANK_OUT      = 0x00000002UL,
-        /// HBLANK-IN status bit.
-        SCU_IC_IST_HBLANK_IN       = 0x00000004UL,
-        /// SCU timer #0 status bit.
-        SCU_IC_IST_TIMER_0         = 0x00000008UL,
-        /// SCU timer #1 status bit.
-        SCU_IC_IST_TIMER_1         = 0x00000010UL,
-        /// SCU-DSP Program end status bit.
-        SCU_IC_IST_DSP_END         = 0x00000020UL,
-        /// Sound request status bit.
-        SCU_IC_IST_SOUND_REQUEST   = 0x00000040UL,
-        /// SMPC System manager status bit.
-        SCU_IC_IST_SYSTEM_MANAGER  = 0x00000080UL,
-        /// SMPC Pad status bit.
-        SCU_IC_IST_PAD_INTERRUPT   = 0x00000100UL,
-        /// SCU-DMA level 2 end status bit.
-        SCU_IC_IST_LEVEL_2_DMA_END = 0x00000200UL,
-        /// SCU-DMA level 1 end status bit.
-        SCU_IC_IST_LEVEL_1_DMA_END = 0x00000400UL,
-        /// SCU-DMA level 0 end status bit.
-        SCU_IC_IST_LEVEL_0_DMA_END = 0x00000800UL,
-        /// SCU-DMA illegal status bit.
-        SCU_IC_IST_DMA_ILLEGAL     = 0x00001000UL,
-        /// VDP1 sprite end status bit.
-        SCU_IC_IST_SPRITE_END      = 0x00002000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_16     = 0x00010000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_15     = 0x00020000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_14     = 0x00040000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_13     = 0x00080000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_12     = 0x00100000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_11     = 0x00200000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_10     = 0x00400000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_09     = 0x00800000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_08     = 0x01000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_07     = 0x02000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_06     = 0x04000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_05     = 0x08000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_04     = 0x10000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_03     = 0x20000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_02     = 0x40000000UL,
-        /// External interrupt status bit.
-        SCU_IC_IST_EXTERNAL_01     = 0x80000000UL
+    /// Value of 0 (zero).
+    SCU_IC_IST_NONE            = 0x00000000UL,
+    /// HBLANK-IN status bit.
+    SCU_IC_IST_VBLANK_IN       = 0x00000001UL,
+    /// VBLANK-OUT status bit.
+    SCU_IC_IST_VBLANK_OUT      = 0x00000002UL,
+    /// HBLANK-IN status bit.
+    SCU_IC_IST_HBLANK_IN       = 0x00000004UL,
+    /// SCU timer #0 status bit.
+    SCU_IC_IST_TIMER_0         = 0x00000008UL,
+    /// SCU timer #1 status bit.
+    SCU_IC_IST_TIMER_1         = 0x00000010UL,
+    /// SCU-DSP Program end status bit.
+    SCU_IC_IST_DSP_END         = 0x00000020UL,
+    /// Sound request status bit.
+    SCU_IC_IST_SOUND_REQUEST   = 0x00000040UL,
+    /// SMPC System manager status bit.
+    SCU_IC_IST_SYSTEM_MANAGER  = 0x00000080UL,
+    /// SMPC Pad status bit.
+    SCU_IC_IST_PAD_INTERRUPT   = 0x00000100UL,
+    /// SCU-DMA level 2 end status bit.
+    SCU_IC_IST_LEVEL_2_DMA_END = 0x00000200UL,
+    /// SCU-DMA level 1 end status bit.
+    SCU_IC_IST_LEVEL_1_DMA_END = 0x00000400UL,
+    /// SCU-DMA level 0 end status bit.
+    SCU_IC_IST_LEVEL_0_DMA_END = 0x00000800UL,
+    /// SCU-DMA illegal status bit.
+    SCU_IC_IST_DMA_ILLEGAL     = 0x00001000UL,
+    /// VDP1 sprite end status bit.
+    SCU_IC_IST_SPRITE_END      = 0x00002000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_16     = 0x00010000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_15     = 0x00020000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_14     = 0x00040000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_13     = 0x00080000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_12     = 0x00100000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_11     = 0x00200000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_10     = 0x00400000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_09     = 0x00800000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_08     = 0x01000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_07     = 0x02000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_06     = 0x04000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_05     = 0x08000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_04     = 0x10000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_03     = 0x20000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_02     = 0x40000000UL,
+    /// External interrupt status bit.
+    SCU_IC_IST_EXTERNAL_01     = 0x80000000UL
 } scu_ic_status_reg_t;
 #pragma GCC diagnostic pop
 
 /// @brief SCU IC priority entry.
 typedef struct scu_ic_priority {
-        /// CPU `sr` register priority level mask.
-        uint16_t sr_mask;
-        /// SCU @ref IMS mask.
-        scu_ic_interrupt_t scu_mask:16;
+    /// CPU `sr` register priority level mask.
+    uint16_t sr_mask;
+    /// SCU @ref IMS mask.
+    scu_ic_interrupt_t scu_mask:16;
 } __packed __aligned(4) scu_ic_priority_t;
 
 static_assert(sizeof(scu_ic_priority_t) == 4);
@@ -269,9 +269,9 @@ typedef void (*scu_ic_ihr_t)(void);
 static inline void __always_inline
 scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000300;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000300;
 
-        ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
+    ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
 /// @brief Clear the interrupt handler for the specified SCU related interrupt.
@@ -286,7 +286,7 @@ scu_ic_ihr_set(scu_ic_interrupt_t vector, scu_ic_ihr_t ihr)
 static inline void __always_inline
 scu_ic_ihr_clear(scu_ic_interrupt_t vector)
 {
-        scu_ic_ihr_set(vector, NULL);
+    scu_ic_ihr_set(vector, NULL);
 }
 
 /// @brief Obtain the interrupt handler for the specified SCU related interrupt.
@@ -297,9 +297,9 @@ scu_ic_ihr_clear(scu_ic_interrupt_t vector)
 static inline scu_ic_ihr_t
 scu_ic_ihr_get(scu_ic_interrupt_t vector)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000304;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000304;
 
-        return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
+    return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
 
 /// @brief Write a mask value the SCU I/O register @ref IMS.
@@ -310,9 +310,9 @@ scu_ic_ihr_get(scu_ic_interrupt_t vector)
 static inline void __always_inline
 scu_ic_mask_set(scu_ic_mask_t mask)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000340;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000340;
 
-        ((void (*)(uint32_t))*bios_address)(mask);
+    ((void (*)(uint32_t))*bios_address)(mask);
 }
 
 /// @brief Change the mask value in the SCU I/O register @ref IMS.
@@ -353,9 +353,9 @@ scu_ic_mask_set(scu_ic_mask_t mask)
 static inline void __always_inline
 scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000344;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000344;
 
-        ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
+    ((void (*)(uint32_t, uint32_t))*bios_address)(and_mask, or_mask);
 }
 
 /// @brief Obtain the SCU @ref IMS mask.
@@ -366,9 +366,9 @@ scu_ic_mask_chg(scu_ic_mask_t and_mask, scu_ic_mask_t or_mask)
 static inline scu_ic_mask_t __always_inline
 scu_ic_mask_get(void)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000348;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000348;
 
-        return (scu_ic_mask_t)*bios_address;
+    return (scu_ic_mask_t)*bios_address;
 }
 
 /// @brief Obtain the 32-bit SCU @ref IST value.
@@ -376,7 +376,7 @@ scu_ic_mask_get(void)
 static inline scu_ic_status_reg_t __always_inline
 scu_ic_status_get(void)
 {
-        return (scu_ic_status_reg_t)MEMORY_READ(32, SCU(IST));
+    return (scu_ic_status_reg_t)MEMORY_READ(32, SCU(IST));
 }
 
 /// @brief Write to the SCU @ref IST register.
@@ -389,7 +389,7 @@ scu_ic_status_get(void)
 static inline void __always_inline
 scu_ic_status_set(scu_ic_status_reg_t value)
 {
-        MEMORY_WRITE(32, SCU(IST), value);
+    MEMORY_WRITE(32, SCU(IST), value);
 }
 
 /// @brief Change value in the SCU @ref IST register.
@@ -402,9 +402,9 @@ scu_ic_status_set(scu_ic_status_reg_t value)
 static inline void __always_inline
 scu_ic_status_chg(scu_ic_status_reg_t and_mask, scu_ic_status_reg_t or_mask)
 {
-        volatile uint32_t * const reg_ist = (volatile uint32_t *)SCU(IST);
+    volatile uint32_t * const reg_ist = (volatile uint32_t *)SCU(IST);
 
-        *reg_ist = (*reg_ist & and_mask) | or_mask;
+    *reg_ist = (*reg_ist & and_mask) | or_mask;
 }
 
 /// @brief Obtain a read-only pointer to the priority table.
@@ -426,10 +426,10 @@ scu_ic_status_chg(scu_ic_status_reg_t and_mask, scu_ic_status_reg_t or_mask)
 static inline const scu_ic_priority_t * __always_inline
 scu_ic_priority_table_get(void)
 {
-        __register scu_ic_priority_t * const bios_address =
-            (scu_ic_priority_t *)0x06000A80;
+    __register scu_ic_priority_t * const bios_address =
+      (scu_ic_priority_t *)0x06000A80;
 
-        return bios_address;
+    return bios_address;
 }
 
 /// @brief Set the priority table.
@@ -443,9 +443,9 @@ scu_ic_priority_table_get(void)
 static inline void __always_inline
 scu_ic_priority_table_set(const scu_ic_priority_t *table)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000280;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000280;
 
-        ((void (*)(const scu_ic_priority_t *))*bios_address)(table);
+    ((void (*)(const scu_ic_priority_t *))*bios_address)(table);
 }
 
 /// @}

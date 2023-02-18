@@ -45,135 +45,135 @@
 #define _B (0x80)
 
 static const uint8_t _ctype_bitmap[1 + 256] __aligned(4) = {
-              0,
-             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
-             _C, _C | _S, _C | _S, _C | _S, _C | _S, _C | _S,      _C, _C,
-             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
-             _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
-        _S | _B,      _P,      _P,      _P,      _P,      _P,      _P, _P,
-             _P,      _P,      _P,      _P,      _P,      _P,      _P, _P,
-             _N,      _N,      _N,      _N,      _N,      _N,      _N, _N,
-             _N,      _N,      _P,      _P,      _P,      _P,      _P, _P,
-             _P, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U,
-             _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
-             _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
-             _U,      _U,      _U,      _P,      _P,      _P,      _P, _P,
-             _P, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L,
-             _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
-             _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
-             _L,      _L,      _L,      _P,      _P,      _P,      _P, _C,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0,
-              0,       0,       0,       0,       0,       0,       0,  0
+          0,
+         _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+         _C, _C | _S, _C | _S, _C | _S, _C | _S, _C | _S,      _C, _C,
+         _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+         _C,      _C,      _C,      _C,      _C,      _C,      _C, _C,
+    _S | _B,      _P,      _P,      _P,      _P,      _P,      _P, _P,
+         _P,      _P,      _P,      _P,      _P,      _P,      _P, _P,
+         _N,      _N,      _N,      _N,      _N,      _N,      _N, _N,
+         _N,      _N,      _P,      _P,      _P,      _P,      _P, _P,
+         _P, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U | _X, _U,
+         _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
+         _U,      _U,      _U,      _U,      _U,      _U,      _U, _U,
+         _U,      _U,      _U,      _P,      _P,      _P,      _P, _P,
+         _P, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L | _X, _L,
+         _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
+         _L,      _L,      _L,      _L,      _L,      _L,      _L, _L,
+         _L,      _L,      _L,      _P,      _P,      _P,      _P, _C,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0,
+          0,       0,       0,       0,       0,       0,       0,  0
 };
 
 int
 isalnum(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_U | _L | _N)) != 0);
+    return ((_CTYPE_LOOKUP(c) & (_U | _L | _N)) != 0);
 }
 
 int
 isalpha(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_U | _L)) != 0);
+    return ((_CTYPE_LOOKUP(c) & (_U | _L)) != 0);
 }
 
 int
 isascii(int c)
 {
-        return (((uint32_t)c) <= 0x7F);
+    return (((uint32_t)c) <= 0x7F);
 }
 
 int
 isblank(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & _B) == _B) || (c == '\t');
+    return ((_CTYPE_LOOKUP(c) & _B) == _B) || (c == '\t');
 }
 
 int
 iscntrl(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & _C) == _C);
+    return ((_CTYPE_LOOKUP(c) & _C) == _C);
 }
 
 int
 isdigit(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & _N) == _N);
+    return ((_CTYPE_LOOKUP(c) & _N) == _N);
 }
 
 int
 isgraph(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N)) != 0);
+    return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N)) != 0);
 }
 
 int
 islower(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _L);
+    return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _L);
 }
 
 int
 isprint(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N | _B)) != 0);
+    return ((_CTYPE_LOOKUP(c) & (_P | _U | _L | _N | _B)) != 0);
 }
 
 int
 ispunct(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & _P) == _P);
+    return ((_CTYPE_LOOKUP(c) & _P) == _P);
 }
 
 int
 isspace(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & _S) == _S);
+    return ((_CTYPE_LOOKUP(c) & _S) == _S);
 }
 
 int
 isupper(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _U);
+    return ((_CTYPE_LOOKUP(c) & (_U | _L)) == _U);
 }
 
 int
 isxdigit(int c)
 {
-        return ((_CTYPE_LOOKUP(c) & (_X | _N)) != 0);
+    return ((_CTYPE_LOOKUP(c) & (_X | _N)) != 0);
 }
 
 int
 tolower(int c)
 {
-        if (isupper(c)) {
-                return (c | _C);
-        }
+    if (isupper(c)) {
+        return (c | _C);
+    }
 
-        return c;
+    return c;
 }
 
 int
 toupper(int c)
 {
-        if (islower(c)) {
-                return (c & 0x5F);
-        }
+    if (islower(c)) {
+        return (c & 0x5F);
+    }
 
-        return c;
+    return c;
 }

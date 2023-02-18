@@ -18,19 +18,19 @@ static perf_t _perf;
 void
 mic3d_init(void)
 {
-        __state.render = &_render;
-        __state.sort = &_sort;
-        __state.tlist = &_tlist;
-        __state.mat_stack = &_mat_stack;
-        __state.light = &_light;
-        __state.gst = &_gst;
-        __state.perf = &_perf;
+    __state.render = &_render;
+    __state.sort = &_sort;
+    __state.tlist = &_tlist;
+    __state.mat_stack = &_mat_stack;
+    __state.light = &_light;
+    __state.gst = &_gst;
+    __state.perf = &_perf;
 
-        __render_init();
-        __sort_init();
-        __tlist_init();
-        __matrix_init();
-        __light_init();
-        __perf_init();
-        __gst_init();
+    __render_init();
+    __sort_init();
+    __tlist_init();
+    __matrix_init();
+    __light_init();
+    __perf_init();
+    __gst_init();
 }

@@ -19,38 +19,38 @@
 __BEGIN_DECLS
 
 typedef enum dbgio_dev {
-        DBGIO_DEV_NULL,
-        DBGIO_DEV_VDP1,
-        DBGIO_DEV_VDP2,
-        DBGIO_DEV_VDP2_ASYNC,
-        DBGIO_DEV_USB_CART
+    DBGIO_DEV_NULL,
+    DBGIO_DEV_VDP1,
+    DBGIO_DEV_VDP2,
+    DBGIO_DEV_VDP2_ASYNC,
+    DBGIO_DEV_USB_CART
 } dbgio_dev_t;
 
 #define DBGIO_DEV_COUNT 5
 
 typedef struct dbgio_font {
-        const uint8_t *cg;
-        size_t cg_size;
-        const uint16_t *pal;
-        size_t pal_size;
-        uint8_t fg;
-        uint8_t bg;
+    const uint8_t *cg;
+    size_t cg_size;
+    const uint16_t *pal;
+    size_t pal_size;
+    uint8_t fg;
+    uint8_t bg;
 } dbgio_font_t;
 
 typedef struct dbgio_vdp2_charmap {
-        uint16_t pnd;
+    uint16_t pnd;
 } dbgio_vdp2_charmap_t;
 
 typedef struct dbgio_vdp2 {
-        const dbgio_font_t *font;
-        const dbgio_vdp2_charmap_t *font_charmap;
+    const dbgio_font_t *font;
+    const dbgio_vdp2_charmap_t *font_charmap;
 
-        const vdp2_scrn_cell_format_t *cell_format;
-        const vdp2_scrn_normal_map_t *normal_map;
+    const vdp2_scrn_cell_format_t *cell_format;
+    const vdp2_scrn_normal_map_t *normal_map;
 } dbgio_vdp2_t;
 
 typedef struct dbgio_usb_cart {
-        uint16_t buffer_size;
+    uint16_t buffer_size;
 } dbgio_usb_cart_t;
 
 extern void dbgio_init(void);

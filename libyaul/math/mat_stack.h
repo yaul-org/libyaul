@@ -15,16 +15,16 @@
 __BEGIN_DECLS
 
 typedef struct mat_stack {
-        fix16_mat43_t *pool_matrix;
-        fix16_mat43_t *top_matrix;
-        fix16_mat43_t *bottom_matrix;
-        uint32_t stack_count;
+    fix16_mat43_t *pool_matrix;
+    fix16_mat43_t *top_matrix;
+    fix16_mat43_t *bottom_matrix;
+    uint32_t stack_count;
 } mat_stack_t;
 
 static inline fix16_mat43_t * __always_inline
 mat_stack_top(mat_stack_t *mat_stack)
 {
-        return mat_stack->top_matrix;
+    return mat_stack->top_matrix;
 }
 
 extern void mat_stack_init(mat_stack_t *mat_stack, fix16_mat43_t *matrix_pool, uint32_t count);

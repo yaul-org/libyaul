@@ -5,15 +5,15 @@
 int
 getc(FILE *f)
 {
-        if (f->rpos != f->rend) {
-                return *f->rpos++;
-        }
+    if (f->rpos != f->rend) {
+        return *f->rpos++;
+    }
 
-        unsigned char c;
+    unsigned char c;
 
-        if ((f->read(f, &c, 1)) == 1) {
-                return c;
-        }
+    if ((f->read(f, &c, 1)) == 1) {
+        return c;
+    }
 
-        return EOF;
+    return EOF;
 }

@@ -9,10 +9,10 @@
 __BEGIN_DECLS
 
 typedef struct mm_stats_walk_entry {
-        uintptr_t address;
-        size_t size;
-        bool used;
-        void *work;
+    uintptr_t address;
+    size_t size;
+    bool used;
+    void *work;
 } mm_stats_walk_entry_t;
 
 typedef void (*mm_stats_walker_t)(const mm_stats_walk_entry_t *walk_entry);

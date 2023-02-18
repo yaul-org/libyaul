@@ -29,5 +29,5 @@
 char * __weak
 fgets(char * restrict s __unused, int n __unused, FILE *restrict f __unused)
 {
-        return NULL;
+    return NULL;
 }

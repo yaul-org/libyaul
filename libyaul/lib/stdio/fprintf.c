@@ -27,12 +27,12 @@
 int
 fprintf(FILE * restrict f, const char * restrict fmt, ...)
 {
-        int ret;
-        va_list ap;
+    int ret;
+    va_list ap;
 
-        va_start(ap, fmt);
-        ret = vfprintf(f, fmt, ap);
-        va_end(ap);
+    va_start(ap, fmt);
+    ret = vfprintf(f, fmt, ap);
+    va_end(ap);
 
-        return ret;
+    return ret;
 }

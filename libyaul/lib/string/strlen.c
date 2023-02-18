@@ -34,26 +34,26 @@
 size_t
 strlen(const char *s)
 {
-        const char *a = s;
+    const char *a = s;
 
 #ifdef __GNUC__
-        typedef size_t __may_alias word;
-        const word *w;
+    typedef size_t __may_alias word;
+    const word *w;
 
-        for (; ((uintptr_t)s % ALIGN); s++) {
-                if (!*s) {
-                        return s - a;
-                }
+    for (; ((uintptr_t)s % ALIGN); s++) {
+        if (!*s) {
+            return s - a;
         }
+    }
 
-        for (w = (const void *)s; !HAS_ZERO(*w); w++) {
-        }
+    for (w = (const void *)s; !HAS_ZERO(*w); w++) {
+    }
 
-        s = (const void *)w;
+    s = (const void *)w;
 #endif /* __GNUC__ */
 
-        for (; *s != '\0'; s++) {
-        }
+    for (; *s != '\0'; s++) {
+    }
 
-        return (s - a);
+    return (s - a);
 }

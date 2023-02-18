@@ -21,8 +21,7 @@
 ///
 /// @param t The bit count: 8, 16, or 32.
 /// @param x The byte offset.
-#define MEMORY_READ(t, x)                                                      \
-    (*(volatile uint ## t ## _t *)(x))
+#define MEMORY_READ(t, x) (*(volatile uint ## t ## _t *)(x))
 
 /// Write value @p y to address @p x of size @p t.
 ///
@@ -30,7 +29,7 @@
 /// @param x The byte offset.
 /// @param y The value to write.
 #define MEMORY_WRITE(t, x, y) do {                                             \
-        (*(volatile uint ## t ## _t *)(x) = (y));                              \
+    (*(volatile uint ## t ## _t *)(x) = (y));                                  \
 } while (false)
 
 /// Bitwise AND value @p y to address @p x of size @p t.
@@ -39,7 +38,7 @@
 /// @param x The byte offset.
 /// @param y The value to bitwise AND.
 #define MEMORY_WRITE_AND(t, x, y) do {                                         \
-        (*(volatile uint ## t ## _t *)(x) &= (y));                             \
+    (*(volatile uint ## t ## _t *)(x) &= (y));                                 \
 } while (false)
 
 /// Bitwise OR value @p y to address @p x of size @p t.
@@ -48,7 +47,7 @@
 /// @param x The byte offset.
 /// @param y The value to bitwise OR.
 #define MEMORY_WRITE_OR(t, x, y) do {                                          \
-        (*(volatile uint ## t ## _t *)(x) |= (y));                             \
+    (*(volatile uint ## t ## _t *)(x) |= (y));                                 \
 } while (false)
 
 /// @}
@@ -356,89 +355,89 @@
 /// @brief SCU DMA I/O register map.
 /// @see SCU_DMA_IOREG_BASE
 typedef struct scu_dma_ioregs {
-        /// @brief SCU I/O register.
-        uint32_t dnr;
-        /// @brief SCU I/O register.
-        uint32_t dnw;
-        /// @brief SCU I/O register.
-        uint32_t dnc;
-        /// @brief SCU I/O register.
-        uint32_t dnad;
-        /// @brief SCU I/O register.
-        uint32_t dnen;
-        /// @brief SCU I/O register.
-        uint32_t dnmd;
-        unsigned int :32;
-        unsigned int :32;
+    /// @brief SCU I/O register.
+    uint32_t dnr;
+    /// @brief SCU I/O register.
+    uint32_t dnw;
+    /// @brief SCU I/O register.
+    uint32_t dnc;
+    /// @brief SCU I/O register.
+    uint32_t dnad;
+    /// @brief SCU I/O register.
+    uint32_t dnen;
+    /// @brief SCU I/O register.
+    uint32_t dnmd;
+    unsigned int :32;
+    unsigned int :32;
 } __aligned(4) __packed scu_dma_ioregs_t;
 
 /// @brief SCU I/O register map.
 /// @see SCU_IOREG_BASE
 typedef union scu_ioregs {
-        /// @brief SCU I/O register buffer.
-        uint32_t buffer[52];
+    /// @brief SCU I/O register buffer.
+    uint32_t buffer[52];
 
-        struct {
-                union {
-                        struct {
-                                /// @brief SCU DMA Level 0 I/O registers.
-                                scu_dma_ioregs_t level0;
-                                /// @brief SCU DMA Level 1 I/O registers.
-                                scu_dma_ioregs_t level1;
-                                /// @brief SCU DMA Level 2 I/O registers.
-                                scu_dma_ioregs_t level2;
-                        };
+    struct {
+        union {
+            struct {
+                /// @brief SCU DMA Level 0 I/O registers.
+                scu_dma_ioregs_t level0;
+                /// @brief SCU DMA Level 1 I/O registers.
+                scu_dma_ioregs_t level1;
+                /// @brief SCU DMA Level 2 I/O registers.
+                scu_dma_ioregs_t level2;
+            };
 
-                        /// @brief SCU DMA Levels I/O registers.
-                        scu_dma_ioregs_t levels[3];
-                };
-
-                /// @brief SCU I/O register.
-                uint32_t dstp;  /* 0x0060 */
-                unsigned int :32;
-                unsigned int :32;
-                unsigned int :32;
-                unsigned int :32;
-                unsigned int :32;
-                unsigned int :32;
-                /// @brief SCU I/O register.
-                uint32_t dsta;  /* 0x007C */
-                /// @brief SCU I/O register.
-                uint32_t ppaf;  /* 0x0080 */
-                /// @brief SCU I/O register.
-                uint32_t ppd;   /* 0x0084 */
-                /// @brief SCU I/O register.
-                uint32_t pda;   /* 0x0088 */
-                /// @brief SCU I/O register.
-                uint32_t pdd;   /* 0x008C */
-                /// @brief SCU I/O register.
-                uint32_t t0c;   /* 0x0090 */
-                /// @brief SCU I/O register.
-                uint32_t t1s;   /* 0x0094 */
-                /// @brief SCU I/O register.
-                uint32_t t1md;  /* 0x0098 */
-                unsigned int :32;
-                /// @brief SCU I/O register.
-                uint32_t ims;   /* 0x00A0 */
-                /// @brief SCU I/O register.
-                uint32_t ist;   /* 0x00A4 */
-                /// @brief SCU I/O register.
-                uint32_t aiack; /* 0x00A8 */
-                unsigned int :32;
-                /// @brief SCU I/O register.
-                uint32_t asr0;  /* 0x00B0 */
-                /// @brief SCU I/O register.
-                uint32_t asr1;  /* 0x00B4 */
-                /// @brief SCU I/O register.
-                uint32_t aref;  /* 0x00B8 */
-                unsigned int :32;
-                unsigned int :32;
-                /// @brief SCU I/O register.
-                uint32_t rsel;  /* 0x00C4 */
-                /// @brief SCU I/O register.
-                uint32_t ver;   /* 0x00C8 */
-                unsigned int :32;
+            /// @brief SCU DMA Levels I/O registers.
+            scu_dma_ioregs_t levels[3];
         };
+
+        /// @brief SCU I/O register.
+        uint32_t dstp;  /* 0x0060 */
+        unsigned int :32;
+        unsigned int :32;
+        unsigned int :32;
+        unsigned int :32;
+        unsigned int :32;
+        unsigned int :32;
+        /// @brief SCU I/O register.
+        uint32_t dsta;  /* 0x007C */
+        /// @brief SCU I/O register.
+        uint32_t ppaf;  /* 0x0080 */
+        /// @brief SCU I/O register.
+        uint32_t ppd;   /* 0x0084 */
+        /// @brief SCU I/O register.
+        uint32_t pda;   /* 0x0088 */
+        /// @brief SCU I/O register.
+        uint32_t pdd;   /* 0x008C */
+        /// @brief SCU I/O register.
+        uint32_t t0c;   /* 0x0090 */
+        /// @brief SCU I/O register.
+        uint32_t t1s;   /* 0x0094 */
+        /// @brief SCU I/O register.
+        uint32_t t1md;  /* 0x0098 */
+        unsigned int :32;
+        /// @brief SCU I/O register.
+        uint32_t ims;   /* 0x00A0 */
+        /// @brief SCU I/O register.
+        uint32_t ist;   /* 0x00A4 */
+        /// @brief SCU I/O register.
+        uint32_t aiack; /* 0x00A8 */
+        unsigned int :32;
+        /// @brief SCU I/O register.
+        uint32_t asr0;  /* 0x00B0 */
+        /// @brief SCU I/O register.
+        uint32_t asr1;  /* 0x00B4 */
+        /// @brief SCU I/O register.
+        uint32_t aref;  /* 0x00B8 */
+        unsigned int :32;
+        unsigned int :32;
+        /// @brief SCU I/O register.
+        uint32_t rsel;  /* 0x00C4 */
+        /// @brief SCU I/O register.
+        uint32_t ver;   /* 0x00C8 */
+        unsigned int :32;
+    };
 } __aligned(4) __packed scu_ioregs_t;
 
 /// @}

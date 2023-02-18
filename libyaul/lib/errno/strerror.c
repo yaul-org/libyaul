@@ -21,5 +21,5 @@ static const unsigned short _errmsgidx[] = {
 char *
 strerror(int e)
 {
-        return ((char *)&_errmsgstr + _errmsgidx[e]);
+    return ((char *)&_errmsgstr + _errmsgidx[e]);
 }

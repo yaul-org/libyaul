@@ -34,30 +34,30 @@
 void *
 memchr(const void *src, int c, size_t n)
 {
-        const uint8_t *s = src;
-        c = (uint8_t)c;
+    const uint8_t *s = src;
+    c = (uint8_t)c;
 
 #ifdef __GNUC__
 
-        for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--) {
+    for (; ((uintptr_t)s & ALIGN) && n && *s != c; s++, n--) {
+    }
+
+    if (n && *s != c) {
+        typedef size_t __may_alias word;
+
+        const word *w;
+        size_t k = ONES * c;
+
+        for (w = (const void *)s; n >= SS && !HAS_ZERO(*w ^ k); w++, n -= SS) {
         }
 
-        if (n && *s != c) {
-                typedef size_t __may_alias word;
-
-                const word *w;
-                size_t k = ONES * c;
-
-                for (w = (const void *)s; n >= SS && !HAS_ZERO(*w ^ k); w++, n -= SS) {
-                }
-
-                s = (const void *)w;
-        }
+        s = (const void *)w;
+    }
 
 #endif /* __GNUC__ */
 
-        for (; n && *s != c; s++, n--) {
-        }
+    for (; n && *s != c; s++, n--) {
+    }
 
-        return (n ? (void *)s : 0);
+    return (n ? (void *)s : 0);
 }

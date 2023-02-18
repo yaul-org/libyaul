@@ -14,5 +14,5 @@
 long
 labs(long number)
 {
-        return (number < 0) ? -number : number;
+    return (number < 0) ? -number : number;
 }

@@ -33,48 +33,48 @@
 void *
 memccpy(void *restrict dest, const void *restrict src, int c, size_t n)
 {
-        uint8_t *d = dest;
-        const uint8_t *s = src;
+    uint8_t *d = dest;
+    const uint8_t *s = src;
 
-        c = (uint8_t)c;
+    c = (uint8_t)c;
 
 #ifdef __GNUC__
-        typedef size_t __may_alias word;
+    typedef size_t __may_alias word;
 
-        word *wd;
-        const word *ws;
+    word *wd;
+    const word *ws;
 
-        if (((uintptr_t)s & ALIGN) == ((uintptr_t)d & ALIGN)) {
-                for (; ((uintptr_t)s & ALIGN) && n && (*d = *s) != c; n--, s++, d++) {
-                }
-
-                if ((uintptr_t)s & ALIGN) {
-                        goto tail;
-                }
-
-                size_t k = ONES * c;
-                wd = (void *)d;
-                ws = (const void *)s;
-
-                for (; n >= sizeof(size_t) && !HAS_ZERO(*ws ^ k);
-                                n -= sizeof(size_t), ws++, wd++) {
-                        *wd = *ws;
-                }
-
-                d = (void *)wd;
-                s = (const void *)ws;
+    if (((uintptr_t)s & ALIGN) == ((uintptr_t)d & ALIGN)) {
+        for (; ((uintptr_t)s & ALIGN) && n && (*d = *s) != c; n--, s++, d++) {
         }
+
+        if ((uintptr_t)s & ALIGN) {
+            goto tail;
+        }
+
+        size_t k = ONES * c;
+        wd = (void *)d;
+        ws = (const void *)s;
+
+        for (; n >= sizeof(size_t) && !HAS_ZERO(*ws ^ k);
+             n -= sizeof(size_t), ws++, wd++) {
+            *wd = *ws;
+        }
+
+        d = (void *)wd;
+        s = (const void *)ws;
+    }
 
 #endif /* __GNUC__  */
 
-        for (; n && (*d = *s) != c; n--, s++, d++) {
-        }
+    for (; n && (*d = *s) != c; n--, s++, d++) {
+    }
 
 tail:
 
-        if (n && *s == c) {
-                return d + 1;
-        }
+    if (n && *s == c) {
+        return d + 1;
+    }
 
-        return 0;
+    return 0;
 }

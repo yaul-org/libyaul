@@ -16,22 +16,22 @@
 
 /// @brief Not yet documented.
 union rgb888 {
-        struct {
-                /// @brief Not yet documented.
-                unsigned int cc:1;
-                unsigned int :7;
-                /// @brief Not yet documented.
-                unsigned int b:8;
-                /// @brief Not yet documented.
-                unsigned int g:8;
-                /// @brief Not yet documented.
-                unsigned int r:8;
-        } __packed;
+    struct {
+        /// @brief Not yet documented.
+        unsigned int cc:1;
+        unsigned int :7;
+        /// @brief Not yet documented.
+        unsigned int b:8;
+        /// @brief Not yet documented.
+        unsigned int g:8;
+        /// @brief Not yet documented.
+        unsigned int r:8;
+    } __packed;
 
-        /// @brief Not yet documented.
-        uint8_t comp[3];
-        /// @brief Not yet documented.
-        uint32_t raw;
+    /// @brief Not yet documented.
+    uint8_t comp[3];
+    /// @brief Not yet documented.
+    uint32_t raw;
 } __aligned(4);
 
 /// @brief Not yet documented.
@@ -41,14 +41,14 @@ union rgb888 {
 /// @param _g  Not yet documented.
 /// @param _b  Not yet documented.
 #define RGB888_INITIALIZER(_cc, _r, _g, _b)                                    \
+{                                                                              \
     {                                                                          \
-            {                                                                  \
-                _cc,                                                           \
-                _b,                                                            \
-                _g,                                                            \
-                _r                                                             \
-            }                                                                  \
-    }
+        _cc,                                                                   \
+        _b,                                                                    \
+        _g,                                                                    \
+        _r                                                                     \
+    }                                                                          \
+}
 
 /// @brief Not yet documented.
 ///
@@ -68,8 +68,8 @@ union rgb888 {
 /// @param _cc  Not yet documunted.
 #define RGB1555_RGB888_INITIALIZER(_msb, _r, _g, _b, _cc)                      \
     RGB888_INITIALIZER(_cc, ((_r) << 3) | ((_r) & 7),                          \
-                             ((_g) << 3) | ((_g) & 7),                         \
-                             ((_b) << 3) | ((_b) & 7))
+                            ((_g) << 3) | ((_g) & 7),                          \
+                            ((_b) << 3) | ((_b) & 7))
 
 /// @brief Not yet documented.
 ///

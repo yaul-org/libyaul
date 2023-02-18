@@ -87,34 +87,34 @@
 /// @brief VDP1 I/O register map.
 /// @see VDP1_IOREG_BASE
 typedef union vdp1_ioregs {
-        /// @brief VDP1 I/O register buffer.
-        uint16_t buffer[12];
+    /// @brief VDP1 I/O register buffer.
+    uint16_t buffer[12];
 
-        struct {
-                /// @brief VDP1 I/O register.
-                uint16_t tvmr;
-                /// @brief VDP1 I/O register.
-                uint16_t fbcr;
-                /// @brief VDP1 I/O register.
-                uint16_t ptmr;
-                /// @brief VDP1 I/O register.
-                uint16_t ewdr;
-                /// @brief VDP1 I/O register.
-                uint16_t ewlr;
-                /// @brief VDP1 I/O register.
-                uint16_t ewrr;
-                /// @brief VDP1 I/O register.
-                uint16_t endr;
-                unsigned int :16;
-                /// @brief VDP1 I/O register.
-                uint16_t edsr;
-                /// @brief VDP1 I/O register.
-                uint16_t lopr;
-                /// @brief VDP1 I/O register.
-                uint16_t copr;
-                /// @brief VDP1 I/O register.
-                uint16_t modr;
-        };
+    struct {
+        /// @brief VDP1 I/O register.
+        uint16_t tvmr;
+        /// @brief VDP1 I/O register.
+        uint16_t fbcr;
+        /// @brief VDP1 I/O register.
+        uint16_t ptmr;
+        /// @brief VDP1 I/O register.
+        uint16_t ewdr;
+        /// @brief VDP1 I/O register.
+        uint16_t ewlr;
+        /// @brief VDP1 I/O register.
+        uint16_t ewrr;
+        /// @brief VDP1 I/O register.
+        uint16_t endr;
+        unsigned int :16;
+        /// @brief VDP1 I/O register.
+        uint16_t edsr;
+        /// @brief VDP1 I/O register.
+        uint16_t lopr;
+        /// @brief VDP1 I/O register.
+        uint16_t copr;
+        /// @brief VDP1 I/O register.
+        uint16_t modr;
+    };
 } __aligned(2) __packed vdp1_ioregs_t;
 
 /// @}

@@ -29,20 +29,20 @@
 size_t
 strcspn(const char *s, const char *c)
 {
-        const char *a = s;
-        size_t byteset[32 / sizeof(size_t)];
+    const char *a = s;
+    size_t byteset[32 / sizeof(size_t)];
 
-        if (!c[0] || !c[1]) {
-                return strchrnul(s, *c) - a;
-        }
+    if (!c[0] || !c[1]) {
+        return strchrnul(s, *c) - a;
+    }
 
-        memset(byteset, 0, sizeof byteset);
+    memset(byteset, 0, sizeof byteset);
 
-        for (; *c && BITOP(byteset, *(uint8_t *)c, |= ); c++) {
-        }
+    for (; *c && BITOP(byteset, *(uint8_t *)c, |= ); c++) {
+    }
 
-        for (; *s && !BITOP(byteset, *(uint8_t *)s, &); s++) {
-        }
+    for (; *s && !BITOP(byteset, *(uint8_t *)s, &); s++) {
+    }
 
-        return s - a;
+    return s - a;
 }

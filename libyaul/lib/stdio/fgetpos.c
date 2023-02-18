@@ -28,13 +28,13 @@ off_t __ftell(FILE *);
 int
 fgetpos(FILE * restrict f, fpos_t * restrict pos)
 {
-        off_t off = __ftell(f);
+    off_t off = __ftell(f);
 
-        if (off < 0) {
-                return -1;
-        }
+    if (off < 0) {
+        return -1;
+    }
 
-        *(long *)pos = off;
+    *(long *)pos = off;
 
-        return 0;
+    return 0;
 }

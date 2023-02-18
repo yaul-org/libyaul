@@ -14,24 +14,24 @@
 #include "render.h"
 
 typedef struct sort_single {
-        int16_t next_single;
+    int16_t next_single;
 } __aligned(2) sort_single_t;
 
 static_assert(sizeof(sort_single_t) == 2);
 
 typedef struct {
-        uint16_t head;
+    uint16_t head;
 } __aligned(2) sort_list_t;
 
 static_assert(sizeof(sort_list_t) == 2);
 
 typedef struct sort {
-        sort_single_t *singles_pool;
-        sort_list_t *sort_lists_pool;
+    sort_single_t *singles_pool;
+    sort_list_t *sort_lists_pool;
 
-        sort_single_t *singles_top;
-        uint32_t singles_index;
-        uint32_t max_depth;
+    sort_single_t *singles_top;
+    uint32_t singles_index;
+    uint32_t max_depth;
 } sort_t;
 
 typedef void (*sort_iterate_t)(const sort_single_t *single);

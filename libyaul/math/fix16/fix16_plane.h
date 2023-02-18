@@ -22,25 +22,25 @@
 /// @param dy Not yet documented.
 /// @param dz Not yet documented.
 #define FIX16_PLANE_INITIALIZER(nx, ny, nz, dx, dy, dz)                        \
-    {                                                                          \
-            .normal = {                                                        \
-                    FIX16(nx),                                                 \
-                    FIX16(ny),                                                 \
-                    FIX16(nz)                                                  \
-            },                                                                 \
-            .d = {                                                             \
-                    FIX16(dx),                                                 \
-                    FIX16(dy),                                                 \
-                    FIX16(dz)                                                  \
-            }                                                                  \
-    }
+{                                                                              \
+    .normal = {                                                                \
+        FIX16(nx),                                                             \
+        FIX16(ny),                                                             \
+        FIX16(nz)                                                              \
+    },                                                                         \
+    .d = {                                                                     \
+        FIX16(dx),                                                             \
+        FIX16(dy),                                                             \
+        FIX16(dz)                                                              \
+    }                                                                          \
+}
 
 /// @param ny Not yet documented.
 typedef struct fix16_plane {
-        /// @param ny Not yet documented.
-        fix16_vec3_t normal;
-        /// @param ny Not yet documented.
-        fix16_vec3_t d;
+    /// @param ny Not yet documented.
+    fix16_vec3_t normal;
+    /// @param ny Not yet documented.
+    fix16_vec3_t d;
 } __packed __aligned(4) fix16_plane_t;
 
 /// @brief Not yet documented.

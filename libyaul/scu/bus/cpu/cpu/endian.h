@@ -17,23 +17,23 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief Convert from host byte order to big-endian order.
-#define cpu_htobe16(x)  ((uint16_t)(x))
+#define cpu_htobe16(x) ((uint16_t)(x))
 /// @brief Convert from host byte order to little-endian order.
-#define cpu_htole16(x)  cpu_bswap16((x))
+#define cpu_htole16(x) cpu_bswap16((x))
 /// @brief Convert from big-endian order to host byte order.
-#define cpu_be16toh(x)  ((uint16_t)(x))
+#define cpu_be16toh(x) ((uint16_t)(x))
 /// @brief Convert from little-endian order to host byte order.
-#define cpu_le16toh(x)  cpu_bswap16((x))
+#define cpu_le16toh(x) cpu_bswap16((x))
 
 /// @brief Convert from host byte order to big-endian order.
-#define cpu_htobe32(x)  ((uint32_t)(x))
+#define cpu_htobe32(x) ((uint32_t)(x))
 /// @brief Convert from host byte order to little-endian order.
-#define cpu_htole32(x)  cpu_bswap32((x))
+#define cpu_htole32(x) cpu_bswap32((x))
 /// @brief Convert from big-endian order to host byte order.
-#define cpu_be32toh(x)  ((uint32_t)(x))
+#define cpu_be32toh(x) ((uint32_t)(x))
 
 /// @brief Convert from little-endian order to host byte order.
-#define cpu_le32toh(x)  cpu_bswap32((x))
+#define cpu_le32toh(x) cpu_bswap32((x))
 
 /// @brief Swap the upper and lower bytes of a 2-byte value.
 ///
@@ -46,13 +46,13 @@ __BEGIN_DECLS
 static inline uint16_t __always_inline
 cpu_bswap16(uint16_t x)
 {
-        __register uint32_t out;
+    __register uint32_t out;
 
-        __asm__ volatile ("swap.b %[in], %[out]\n"
-                : [out] "=&r" (out)
-                : [in] "r" (x));
+    __asm__ volatile ("swap.b %[in], %[out]\n"
+        : [out] "=&r" (out)
+        : [in] "r" (x));
 
-        return out;
+    return out;
 }
 
 /// @brief Swap the upper and lower 2-bytes of a 4-byte value.
@@ -66,24 +66,24 @@ cpu_bswap16(uint16_t x)
 static inline uint32_t __always_inline
 cpu_bswap32(uint32_t x)
 {
-        __register uint32_t out;
+    __register uint32_t out;
 
-        __register uint32_t t0;
-        t0 = 0;
-        __register uint32_t t1;
-        t1 = 0;
+    __register uint32_t t0;
+    t0 = 0;
+    __register uint32_t t1;
+    t1 = 0;
 
-        __asm__ volatile ("swap.b %[in], %[ot0]\n"
-                          "swap.w %[it0], %[ot1]\n"
-                          "swap.b %[it1], %[out]\n"
-                : [out] "=&r" (out),
-                  [ot0] "=r" (t0),
-                  [ot1] "=r" (t1)
-                : [in] "0" "r" (x),
-                  [it0] "1" (t0),
-                  [it1] "2" (t1));
+    __asm__ volatile ("swap.b %[in], %[ot0]\n"
+                      "swap.w %[it0], %[ot1]\n"
+                      "swap.b %[it1], %[out]\n"
+        : [out] "=&r" (out),
+          [ot0] "=r" (t0),
+          [ot1] "=r" (t1)
+        : [in] "0" "r" (x),
+          [it0] "1" (t0),
+          [it1] "2" (t1));
 
-        return out;
+    return out;
 }
 
 /// @}

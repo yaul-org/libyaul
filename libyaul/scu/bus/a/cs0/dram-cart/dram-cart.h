@@ -45,12 +45,12 @@ __BEGIN_DECLS
 
 /// @brief DRAM cart ID.
 typedef enum dram_cart_id {
-        /// Invalid DRAM cart ID.
-        DRAM_CART_ID_INVALID = 0x00,
-        /// DRAM cart ID for cart size of 1MiB (8-MBit).
-        DRAM_CART_ID_1MIB    = 0x5A,
-        /// DRAM cart ID for cart size of 4MiB (32-MBit).
-        DRAM_CART_ID_4MIB    = 0x5C
+    /// Invalid DRAM cart ID.
+    DRAM_CART_ID_INVALID = 0x00,
+    /// DRAM cart ID for cart size of 1MiB (8-MBit).
+    DRAM_CART_ID_1MIB    = 0x5A,
+    /// DRAM cart ID for cart size of 4MiB (32-MBit).
+    DRAM_CART_ID_4MIB    = 0x5C
 } dram_cart_id_t;
 
 /// @brief Initialize DRAM cart.

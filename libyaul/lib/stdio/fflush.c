@@ -28,23 +28,23 @@
 int
 fflush(FILE *f)
 {
-        /* If writing, flush output */
-        if (f->wpos != f->wbase) {
-                f->write(f, 0, 0);
+    /* If writing, flush output */
+    if (f->wpos != f->wbase) {
+        f->write(f, 0, 0);
 
-                if (f->wpos == NULL) {
-                        return EOF;
-                }
+        if (f->wpos == NULL) {
+            return EOF;
         }
+    }
 
-        /* If reading, sync position, per POSIX */
-        if (f->rpos != f->rend) {
-                f->seek(f, f->rpos - f->rend, SEEK_CUR);
-        }
+    /* If reading, sync position, per POSIX */
+    if (f->rpos != f->rend) {
+        f->seek(f, f->rpos - f->rend, SEEK_CUR);
+    }
 
-        /* Clear read and write modes */
-        f->wpos = f->wbase = f->wend = NULL;
-        f->rpos = f->rend = NULL;
+    /* Clear read and write modes */
+    f->wpos = f->wbase = f->wend = NULL;
+    f->rpos = f->rend = NULL;
 
-        return 0;
+    return 0;
 }

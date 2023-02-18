@@ -63,8 +63,8 @@ __BEGIN_DECLS
 ///
 /// @param x The constant value.
 #define FIX16(x) ((fix16_t)(((x) >= 0)                                         \
-        ? ((x) * 65536.0f + 0.5f)                                              \
-        : ((x) * 65536.0f - 0.5f)))
+    ? ((x) * 65536.0f + 0.5f)                                                  \
+    : ((x) * 65536.0f - 0.5f)))
 
 /// @brief Maximum positive value.
 #define FIX16_MAX       (0x7FFFFFFF)
@@ -104,18 +104,18 @@ typedef int32_t fix16_t;
 static inline fix16_t __always_inline
 fix16_int16_mul(const fix16_t a, const int16_t b)
 {
-        __register fix16_t out;
+    __register fix16_t out;
 
-        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                          "\tsts macl, %[out]\n"
-            /* Output */
-            : [out] "=&r" (out)
-            /* Input */
-            : [a] "r" (a),
-              [b] "r" (b)
-            : "macl");
+    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                      "\tsts macl, %[out]\n"
+                      /* Output */
+                      : [out] "=&r" (out)
+                      /* Input */
+                      : [a] "r" (a),
+                        [b] "r" (b)
+                      : "macl");
 
-        return out;
+    return out;
 }
 
 /// @brief Not yet documented.
@@ -127,18 +127,18 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
 static inline int32_t __always_inline
 fix16_int32_mul(const fix16_t a, const fix16_t b)
 {
-        __register int16_t out;
+    __register int16_t out;
 
-        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                          "\tsts mach, %[out]\n"
-            /* Output */
-            : [out] "=&r" (out)
-            /* Input */
-            : [a] "r" (a),
-              [b] "r" (b)
-            : "mach");
+    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                      "\tsts mach, %[out]\n"
+                      /* Output */
+                      : [out] "=&r" (out)
+                      /* Input */
+                      : [a] "r" (a),
+                        [b] "r" (b)
+                      : "mach");
 
-        return out;
+    return out;
 }
 
 /// @brief Not yet documented.
@@ -150,22 +150,22 @@ fix16_int32_mul(const fix16_t a, const fix16_t b)
 static inline fix16_t __always_inline
 fix16_mul(const fix16_t a, const fix16_t b)
 {
-        __register uint32_t mach;
-        __register fix16_t out;
+    __register uint32_t mach;
+    __register fix16_t out;
 
-        __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                          "\tsts mach, %[mach]\n"
-                          "\tsts macl, %[out]\n"
-                          "\txtrct %[mach], %[out]\n"
-            /* Output */
-            : [mach] "=&r" (mach),
-              [out] "=&r" (out)
-            /* Input */
-            : [a] "r" (a),
-              [b] "r" (b)
-            : "mach", "macl");
+    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+                      "\tsts mach, %[mach]\n"
+                      "\tsts macl, %[out]\n"
+                      "\txtrct %[mach], %[out]\n"
+                      /* Output */
+                      : [mach] "=&r" (mach),
+                        [out] "=&r" (out)
+                      /* Input */
+                      : [a] "r" (a),
+                        [b] "r" (b)
+                      : "mach", "macl");
 
-        return out;
+    return out;
 }
 
 /// @brief Not yet documented.
@@ -176,7 +176,7 @@ fix16_mul(const fix16_t a, const fix16_t b)
 static inline fix16_t __always_inline
 fix16_int32_from(int32_t value)
 {
-        return (value * FIX16_ONE);
+    return (value * FIX16_ONE);
 }
 
 /// @brief Not yet documented.
@@ -187,7 +187,7 @@ fix16_int32_from(int32_t value)
 static inline int32_t __always_inline
 fix16_int32_to(const fix16_t value)
 {
-        return (value >> 16);
+    return (value >> 16);
 }
 
 /// @brief Not yet documented.
@@ -198,11 +198,11 @@ fix16_int32_to(const fix16_t value)
 static inline int32_t __always_inline
 fix16_round_int32_to(const fix16_t value)
 {
-        if (value >= 0) {
-                return ((value + (FIX16_ONE >> 1)) / FIX16_ONE);
-        }
+    if (value >= 0) {
+        return ((value + (FIX16_ONE >> 1)) / FIX16_ONE);
+    }
 
-        return ((value - (FIX16_ONE >> 1)) / FIX16_ONE);
+    return ((value - (FIX16_ONE >> 1)) / FIX16_ONE);
 }
 
 /// @brief Not yet documented.
@@ -213,7 +213,7 @@ fix16_round_int32_to(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_integral(const fix16_t value)
 {
-        return (value & 0xFFFF0000);
+    return (value & 0xFFFF0000);
 }
 
 /// @brief Not yet documented.
@@ -224,7 +224,7 @@ fix16_integral(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_fractional(const fix16_t value)
 {
-        return (value & 0x0000FFFF);
+    return (value & 0x0000FFFF);
 }
 
 /// @brief Not yet documented.
@@ -235,7 +235,7 @@ fix16_fractional(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_abs(const fix16_t value)
 {
-        return ((value < 0) ? -value : value);
+    return ((value < 0) ? -value : value);
 }
 
 /// @brief Not yet documented.
@@ -246,7 +246,7 @@ fix16_abs(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_sign(const fix16_t value)
 {
-        return ((value < 0) ? -FIX16_ONE : FIX16_ONE);
+    return ((value < 0) ? -FIX16_ONE : FIX16_ONE);
 }
 
 /// @brief Not yet documented.
@@ -257,7 +257,7 @@ fix16_sign(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_floor(const fix16_t value)
 {
-        return (value & 0xFFFF0000UL);
+    return (value & 0xFFFF0000UL);
 }
 
 /// @brief Not yet documented.
@@ -268,7 +268,7 @@ fix16_floor(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_ceil(const fix16_t value)
 {
-        return (value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16_ONE : 0);
+    return (value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16_ONE : 0);
 }
 
 /// @brief Not yet documented.
@@ -280,7 +280,7 @@ fix16_ceil(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_min(const fix16_t x, const fix16_t y)
 {
-        return ((x < y) ? x : y);
+    return ((x < y) ? x : y);
 }
 
 /// @brief Not yet documented.
@@ -292,7 +292,7 @@ fix16_min(const fix16_t x, const fix16_t y)
 static inline fix16_t __always_inline
 fix16_max(const fix16_t x, const fix16_t y)
 {
-        return ((x > y) ? x : y);
+    return ((x > y) ? x : y);
 }
 
 /// @brief Not yet documented.
@@ -305,7 +305,7 @@ fix16_max(const fix16_t x, const fix16_t y)
 static inline fix16_t __always_inline
 fix16_clamp(fix16_t value, fix16_t value_low, fix16_t value_high)
 {
-        return fix16_min(fix16_max(value, value_low), value_high);
+    return fix16_min(fix16_max(value, value_low), value_high);
 }
 
 /// @brief Not yet documented.
@@ -316,7 +316,7 @@ fix16_clamp(fix16_t value, fix16_t value_low, fix16_t value_high)
 static inline fix16_t __always_inline
 fix16_rad_deg_to(fix16_t radians)
 {
-        return fix16_mul(radians, FIX16_RAD2DEG);
+    return fix16_mul(radians, FIX16_RAD2DEG);
 }
 
 /// @brief Not yet documented.
@@ -327,7 +327,7 @@ fix16_rad_deg_to(fix16_t radians)
 static inline fix16_t __always_inline
 fix16_deg_rad_to(fix16_t degrees)
 {
-        return fix16_mul(degrees, FIX16_DEG2RAD);
+    return fix16_mul(degrees, FIX16_DEG2RAD);
 }
 
 /// @brief Not yet documented.

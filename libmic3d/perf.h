@@ -11,16 +11,16 @@
 #include <stdint.h>
 
 typedef struct perf {
-        volatile uint32_t overflow_count;
-        volatile uint32_t active_counters;
+    volatile uint32_t overflow_count;
+    volatile uint32_t active_counters;
 } perf_t;
 
 typedef struct perf_counter {
-        uint32_t start_tick;
-        uint32_t end_tick;
-        uint32_t ticks;
-        uint32_t max_ticks;
-        uint32_t overflow_count;
+    uint32_t start_tick;
+    uint32_t end_tick;
+    uint32_t ticks;
+    uint32_t max_ticks;
+    uint32_t overflow_count;
 } perf_counter_t;
 
 #if MIC3D_PERF == 1

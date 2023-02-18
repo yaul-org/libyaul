@@ -12,11 +12,11 @@
 vdp2_scrn_disp_t
 vdp2_scrn_display_get(void)
 {
-        return _state_vdp2()->shadow_regs.bgon;
+    return _state_vdp2()->shadow_regs.bgon;
 }
 
 void
 vdp2_scrn_display_set(vdp2_scrn_disp_t disp_mask)
 {
-        _state_vdp2()->shadow_regs.bgon = disp_mask;
+    _state_vdp2()->shadow_regs.bgon = disp_mask;
 }
