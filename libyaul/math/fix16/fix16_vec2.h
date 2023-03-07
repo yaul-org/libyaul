@@ -27,6 +27,18 @@
     }                                                                          \
 }
 
+/// @brief Not yet documented.
+///
+/// @param x Not yet documented.
+/// @param y Not yet documented.
+#define FIX16_VEC2(x, y)                                                       \
+((fix16_vec2_t){                                                               \
+    {                                                                          \
+        FIX16(x),                                                              \
+        FIX16(y)                                                               \
+    }                                                                          \
+})
+
 /// @param x Not yet documented.
 typedef union fix16_vec2 {
     struct {

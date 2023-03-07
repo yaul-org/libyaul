@@ -32,6 +32,22 @@
 }
 
 /// @brief Not yet documented.
+///
+/// @param x Not yet documented.
+/// @param y Not yet documented.
+/// @param z Not yet documented.
+/// @param w Not yet documented.
+#define FIX16_VEC4(x, y, z, w)                                                 \
+((fix16_vec4_t){                                                               \
+    {                                                                          \
+        FIX16(x),                                                              \
+        FIX16(y),                                                              \
+        FIX16(z),                                                              \
+        FIX16(w),                                                              \
+    }                                                                          \
+})
+
+/// @brief Not yet documented.
 typedef union fix16_vec4 {
     struct {
         /// @brief Not yet documented.

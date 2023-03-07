@@ -47,6 +47,16 @@ typedef struct {
     (y)                                                                        \
 }
 
+/// @brief 2-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+#define INT8_VEC2(x, y)                                                        \
+((int8_vec2_t){                                                                \
+    (x),                                                                       \
+    (y)                                                                        \
+})
+
 /// @brief 3-vector initializer.
 ///
 /// @param x The _X_ component.
@@ -58,6 +68,18 @@ typedef struct {
     (y),                                                                       \
     (z)                                                                        \
 }
+
+/// @brief 3-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+/// @param z The _Z_ component.
+#define INT8_VEC3(x, y, z)                                                     \
+((int8_vec3_t){                                                                \
+    (x),                                                                       \
+    (y),                                                                       \
+    (z)                                                                        \
+})
 
 /// @}
 

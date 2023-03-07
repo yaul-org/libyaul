@@ -30,6 +30,20 @@
 }
 
 /// @brief Not yet documented.
+///
+/// @param x Not yet documented.
+/// @param y Not yet documented.
+/// @param z Not yet documented.
+#define FIX16_VEC3(x, y, z)                                                    \
+((fix16_vec3_t){                                                               \
+    {                                                                          \
+        FIX16(x),                                                              \
+        FIX16(y),                                                              \
+        FIX16(z)                                                               \
+    }                                                                          \
+})
+
+/// @brief Not yet documented.
 typedef union fix16_vec3 {
     struct {
         /// @brief Not yet documented.

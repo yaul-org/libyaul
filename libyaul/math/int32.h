@@ -37,6 +37,16 @@ typedef struct {
     (y)                                                                        \
 }
 
+/// @brief 2-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+#define INT32_VEC2(x, y)                                                       \
+((int32_vec2_t){                                                               \
+    (x),                                                                       \
+    (y)                                                                        \
+})
+
 /// @brief Not yet documented.
 ///
 /// @param[out] result Not yet documented.
