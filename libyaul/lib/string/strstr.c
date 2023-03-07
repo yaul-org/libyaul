@@ -28,7 +28,10 @@ static char *
 _two_byte_strstr(const uint8_t *h, const uint8_t *n)
 {
     uint16_t nw;
-    nw = n[0] << 8 | n[1], hw = h[0] << 8 | h[1];
+    nw = n[0] << 8 | n[1];
+
+    uint16_t hw;
+    hw = h[0] << 8 | h[1];
 
     for (h++; *h && hw != nw; hw = hw << 8 | *++h) {
     }
