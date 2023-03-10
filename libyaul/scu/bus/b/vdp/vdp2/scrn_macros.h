@@ -119,7 +119,7 @@ __BEGIN_DECLS
  * Configuration table mapping. Depending on how the normal/rotational
  * background is set up, choose a config:
  * +-----+--------+------+-----------+------------+------------+-------------+
- * | CFG | PND    | Cell | Aux. mode | Chr. count | Pal. banks | Color count |
+ * | CFG | PND    | Cell | Aux. mode | Page size  | Pal. banks | Color count |
  * +-----+--------+------+-----------+------------+------------+-------------+
  * | 0   | 1-word | 1x1  | 0         | 0x0400     | 128        | 16          |
  * | 1   | 1-word | 1x1  | 1         | 0x1000     | 128        | 16          |
@@ -165,21 +165,21 @@ __BEGIN_DECLS
     ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
      (((vf) & 0x01) << 11) |                                                   \
      (((hf) & 0x01) << 10) |                                                   \
-     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x01FF))
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_5(cram_mode, cpd_addr, pal_addr)                  \
     ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
-     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x07FF))
+     (VDP2_SCRN_PND_CP_NUM(cpd_addr) & 0x0FFF))
 
 #define VDP2_SCRN_PND_CONFIG_6(cram_mode, cpd_addr, pal_addr, vf, hf)          \
     ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
      (((vf) & 0x01) << 11) |                                                   \
      (((hf) & 0x01) << 10) |                                                   \
-     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x01FF))
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x03FF))
 
 #define VDP2_SCRN_PND_CONFIG_7(cram_mode, cpd_addr, pal_addr, vf, hf)          \
     ((((VDP2_SCRN_PND_PAL_NUM(cram_mode, pal_addr >> 4)) & 0x0007) << 12) |    \
-     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x07FF))
+     ((VDP2_SCRN_PND_CP_NUM(cpd_addr) >> 2) & 0x0FFF))
 
 #define VDP2_SCRN_PND_CONFIG_8(cram_mode, cpd_addr, pal_addr, vf, hf, pr, cc)  \
     ((((vf) & 0x01) << 31) |                                                   \
