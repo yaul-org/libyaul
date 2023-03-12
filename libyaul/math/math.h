@@ -15,8 +15,6 @@
 #include <uint16.h>
 #include <uint32.h>
 
-#include <mat_stack.h>
-
 __BEGIN_DECLS
 
 #ifndef M_PI

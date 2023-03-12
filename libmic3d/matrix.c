@@ -5,8 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <mat_stack.h>
-
 #include "internal.h"
 
 extern fix16_mat43_t __pool_matrices[];
@@ -14,7 +12,16 @@ extern fix16_mat43_t __pool_matrices[];
 void
 __matrix_init(void)
 {
-    mat_stack_init(__state.mat_stack, &__pool_matrices[1], MATRIX_STACK_COUNT - 1);
+    fix16_mat43_t * const matrix_pool = &__pool_matrices[1];
+
+    __state.mstack->pool_matrix = matrix_pool;
+    __state.mstack->top_matrix = matrix_pool;
+    __state.mstack->bottom_matrix = &matrix_pool[(MATRIX_STACK_COUNT - 1) - 1];
+    __state.mstack->stack_count = MATRIX_STACK_COUNT - 1;
+
+    for (uint32_t i = 0; i < __state.mstack->stack_count; i++) {
+        fix16_mat43_identity(&__state.mstack->top_matrix[i]);
+    }
 
     fix16_mat43_identity(__matrix_view_get());
 }
@@ -28,25 +35,33 @@ __matrix_view_get(void)
 void
 matrix_push(void)
 {
-    mat_stack_push(__state.mat_stack);
+    matrix_ptr_push();
+
+    const fix16_mat43_t * const prev_matrix = __state.mstack->top_matrix - 1;
+
+    fix16_mat43_dup(prev_matrix, __state.mstack->top_matrix);
 }
 
 void
 matrix_ptr_push(void)
 {
-    mat_stack_ptr_push(__state.mat_stack);
+    assert(__state.mstack->top_matrix < __state.mstack->bottom_matrix);
+
+    __state.mstack->top_matrix++;
 }
 
 void
 matrix_pop(void)
 {
-    mat_stack_pop(__state.mat_stack);
+    if (__state.mstack->top_matrix != __state.mstack->bottom_matrix) {
+        __state.mstack->top_matrix--;
+    }
 }
 
 fix16_mat43_t *
 matrix_top(void)
 {
-    return mat_stack_top(__state.mat_stack);
+    return __state.mstack->top_matrix;
 }
 
 void
@@ -64,53 +79,73 @@ matrix_set(const fix16_mat43_t *m0)
 void
 matrix_x_translate(fix16_t x)
 {
-    mat_stack_x_translate(__state.mat_stack, x);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_x_translate(top_matrix, top_matrix, x);
 }
 
 void
 matrix_y_translate(fix16_t y)
 {
-    mat_stack_y_translate(__state.mat_stack, y);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_y_translate(top_matrix, top_matrix, y);
 }
 
 void
 matrix_z_translate(fix16_t z)
 {
-    mat_stack_z_translate(__state.mat_stack, z);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_z_translate(top_matrix, top_matrix, z);
 }
 
 void
 matrix_translate(const fix16_vec3_t *t)
 {
-    mat_stack_translate(__state.mat_stack, t);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_translate(top_matrix, top_matrix, t);
 }
 
 void
 matrix_translation_set(const fix16_vec3_t *t)
 {
-    mat_stack_translation_set(__state.mat_stack, t);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_translation_set(top_matrix, t);
 }
 
 void
 matrix_translation_get(fix16_vec3_t *t)
 {
-    mat_stack_translation_get(__state.mat_stack, t);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    t->x = top_matrix->frow[0][3];
+    t->y = top_matrix->frow[1][3];
+    t->z = top_matrix->frow[2][3];
 }
 
 void
 matrix_x_rotate(angle_t angle)
 {
-    mat_stack_x_rotate(__state.mat_stack, angle);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_x_rotate(top_matrix, top_matrix, angle);
 }
 
 void
 matrix_y_rotate(angle_t angle)
 {
-    mat_stack_y_rotate(__state.mat_stack, angle);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_y_rotate(top_matrix, top_matrix, angle);
 }
 
 void
 matrix_z_rotate(angle_t angle)
 {
-    mat_stack_z_rotate(__state.mat_stack, angle);
+    fix16_mat43_t * const top_matrix = __state.mstack->top_matrix;
+
+    fix16_mat43_z_rotate(top_matrix, top_matrix, angle);
 }
