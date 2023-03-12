@@ -45,70 +45,70 @@ __BEGIN_DECLS
 
 /// @brief SCU-DMA transfer mode.
 typedef enum scu_dma_mode {
-        /// @brief SCU-DMA direct mode.
-        SCU_DMA_MODE_DIRECT   = 0x00,
-        /// @brief SCU-DMA indirect mode.
-        SCU_DMA_MODE_INDIRECT = 0x01
+    /// @brief SCU-DMA direct mode.
+    SCU_DMA_MODE_DIRECT   = 0x00,
+    /// @brief SCU-DMA indirect mode.
+    SCU_DMA_MODE_INDIRECT = 0x01
 } scu_dma_mode_t;
 
 /// @brief SCU-DMA transfer space.
 typedef enum scu_dma_space {
-        /// @brief SCU-DMA transfer space to CS2 (Chip Select), A-Bus.
-        SCU_DMA_SPACE_BUS_A,
-        /// @brief SCU-DMA transfer space to B-Bus.
-        SCU_DMA_SPACE_BUS_B,
-        /// @brief SCU-DMA transfer space to CPU-Bus.
-        SCU_DMA_SPACE_BUS_CPU
+    /// @brief SCU-DMA transfer space to CS2 (Chip Select), A-Bus.
+    SCU_DMA_SPACE_BUS_A,
+    /// @brief SCU-DMA transfer space to B-Bus.
+    SCU_DMA_SPACE_BUS_B,
+    /// @brief SCU-DMA transfer space to CPU-Bus.
+    SCU_DMA_SPACE_BUS_CPU
 } scu_dma_space_t;
 
 /// @brief SCU-DMA starting factors.
 typedef enum scu_dma_start_factor {
-        /// @brief Start DMA transfer at VBLANK-IN.
-        SCU_DMA_START_FACTOR_VBLANK_IN       = 0x00,
-        /// @brief Start DMA transfer at VBLANK-OUT.
-        SCU_DMA_START_FACTOR_VBLANK_OUT      = 0x01,
-        /// @brief Start DMA transfer at HBLANK-IN.
-        SCU_DMA_START_FACTOR_HBLANK_IN       = 0x02,
-        /// @brief Start DMA transfer at SCU timer #0.
-        SCU_DMA_START_FACTOR_TIMER_0         = 0x03,
-        /// @brief Start DMA transfer at SCU timer #1.
-        SCU_DMA_START_FACTOR_TIMER_1         = 0x04,
-        /// @brief Start DMA transfer at sound request.
-        SCU_DMA_START_FACTOR_SOUND_REQ       = 0x05,
-        /// @brief Start DMA transfer at VDP1 sprite end.
-        SCU_DMA_START_FACTOR_SPRITE_DRAW_END = 0x06,
-        /// @brief Start DMA transfer immediately.
-        SCU_DMA_START_FACTOR_ENABLE          = 0x07
+    /// @brief Start DMA transfer at VBLANK-IN.
+    SCU_DMA_START_FACTOR_VBLANK_IN       = 0x00,
+    /// @brief Start DMA transfer at VBLANK-OUT.
+    SCU_DMA_START_FACTOR_VBLANK_OUT      = 0x01,
+    /// @brief Start DMA transfer at HBLANK-IN.
+    SCU_DMA_START_FACTOR_HBLANK_IN       = 0x02,
+    /// @brief Start DMA transfer at SCU timer #0.
+    SCU_DMA_START_FACTOR_TIMER_0         = 0x03,
+    /// @brief Start DMA transfer at SCU timer #1.
+    SCU_DMA_START_FACTOR_TIMER_1         = 0x04,
+    /// @brief Start DMA transfer at sound request.
+    SCU_DMA_START_FACTOR_SOUND_REQ       = 0x05,
+    /// @brief Start DMA transfer at VDP1 sprite end.
+    SCU_DMA_START_FACTOR_SPRITE_DRAW_END = 0x06,
+    /// @brief Start DMA transfer immediately.
+    SCU_DMA_START_FACTOR_ENABLE          = 0x07
 } scu_dma_start_factor_t;
 
 /// @brief SCU-DMA transfer stride.
 typedef enum scu_dma_stride {
-        /// @brief Do not add to read/write addresses.
-        SCU_DMA_STRIDE_0_BYTES   = 0x00,
-        /// @brief 2-byte stride.
-        SCU_DMA_STRIDE_2_BYTES   = 0x01,
-        /// @brief 4-byte stride.
-        SCU_DMA_STRIDE_4_BYTES   = 0x02,
-        /// @brief 8-byte stride.
-        SCU_DMA_STRIDE_8_BYTES   = 0x03,
-        /// @brief 16-byte stride.
-        SCU_DMA_STRIDE_16_BYTES  = 0x04,
-        /// @brief 32-byte stride.
-        SCU_DMA_STRIDE_32_BYTES  = 0x05,
-        /// @brief 64-byte stride.
-        SCU_DMA_STRIDE_64_BYTES  = 0x06,
-        /// @brief 128-byte stride.
-        SCU_DMA_STRIDE_128_BYTES = 0x07
+    /// @brief Do not add to read/write addresses.
+    SCU_DMA_STRIDE_0_BYTES   = 0x00,
+    /// @brief 2-byte stride.
+    SCU_DMA_STRIDE_2_BYTES   = 0x01,
+    /// @brief 4-byte stride.
+    SCU_DMA_STRIDE_4_BYTES   = 0x02,
+    /// @brief 8-byte stride.
+    SCU_DMA_STRIDE_8_BYTES   = 0x03,
+    /// @brief 16-byte stride.
+    SCU_DMA_STRIDE_16_BYTES  = 0x04,
+    /// @brief 32-byte stride.
+    SCU_DMA_STRIDE_32_BYTES  = 0x05,
+    /// @brief 64-byte stride.
+    SCU_DMA_STRIDE_64_BYTES  = 0x06,
+    /// @brief 128-byte stride.
+    SCU_DMA_STRIDE_128_BYTES = 0x07
 } scu_dma_stride_t;
 
 /// @brief SCU-DMA transfer update type.
 typedef enum scu_dma_update {
-        /// @brief Do not update read or write address.
-        SCU_DMA_UPDATE_NONE = 0x00000000UL,
-        /// @brief Read address update.
-        SCU_DMA_UPDATE_RUP  = 0x00010000UL,
-        /// @brief Write address update.
-        SCU_DMA_UPDATE_WUP  = 0x00000100UL
+    /// @brief Do not update read or write address.
+    SCU_DMA_UPDATE_NONE = 0x00000000UL,
+    /// @brief Read address update.
+    SCU_DMA_UPDATE_RUP  = 0x00010000UL,
+    /// @brief Write address update.
+    SCU_DMA_UPDATE_WUP  = 0x00000100UL
 } scu_dma_update_t;
 
 /// @brief The bit that signifies the end of the transfer table.
@@ -121,14 +121,14 @@ typedef enum scu_dma_update {
 
 /// @brief Different busses.
 typedef enum scu_dma_bus {
-        /// @brief None.
-        SCU_DMA_BUS_NONE = 0x00,
-        /// @brief A-Bus.
-        SCU_DMA_BUS_A    = 0x01,
-        /// @brief B-Bus.
-        SCU_DMA_BUS_B    = 0x02,
-        /// @brief SCU-DSP Bus.
-        SCU_DMA_BUS_DSP  = 0x04
+    /// @brief None.
+    SCU_DMA_BUS_NONE = 0x00,
+    /// @brief A-Bus.
+    SCU_DMA_BUS_A    = 0x01,
+    /// @brief B-Bus.
+    SCU_DMA_BUS_B    = 0x02,
+    /// @brief SCU-DSP Bus.
+    SCU_DMA_BUS_DSP  = 0x04
 } scu_dma_bus_t;
 
 /// @brief Initializer for @ref scu_dma_xfer_t.
@@ -138,11 +138,11 @@ typedef enum scu_dma_bus {
 /// @param _len The length.
 /// @param _dst The memory transfer destination address.
 /// @param _src The memory transfer source address.
-#define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src)                        \
-{                                                                              \
-        .len = (_len),                                                         \
-        .dst = (uint32_t)(_dst),                                               \
-        .src = (uint32_t)(_src)                                                \
+
+#define SCU_DMA_MODE_XFER_INITIALIZER(_len, _dst, _src) {                      \
+    .len = (_len),                                                             \
+    .dst = (uint32_t)(_dst),                                                   \
+    .src = (uint32_t)(_src)                                                    \
 }
 
 /// @brief End Initializer for @ref scu_dma_xfer_t.
@@ -153,11 +153,11 @@ typedef enum scu_dma_bus {
 /// @param _len The length.
 /// @param _dst The memory transfer destination address.
 /// @param _src The memory transfer source address.
-#define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src)                    \
-{                                                                              \
-        .len = _len,                                                           \
-        .dst = (uint32_t)(_dst),                                               \
-        .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                   \
+
+#define SCU_DMA_MODE_XFER_END_INITIALIZER(_len, _dst, _src) {                  \
+    .len = _len,                                                               \
+    .dst = (uint32_t)(_dst),                                                   \
+    .src = SCU_DMA_INDIRECT_TABLE_END | (uint32_t)(_src)                       \
 }
 
 /// @brief SCU-DMA level representing one of the 3 levels.
@@ -184,32 +184,32 @@ typedef scu_dma_ioregs_t scu_dma_handle_t;
 /// represents possibly one of many transfers contiguously laid out in memory as
 /// a @em table of transfers.
 typedef struct scu_dma_xfer {
-        /// Transfer length.
-        uint32_t len;
+    /// Transfer length.
+    uint32_t len;
 
-        /// Memory transfer destination address.
-        uint32_t dst;
+    /// Memory transfer destination address.
+    uint32_t dst;
 
-        /// @brief Memory transfer source address.
-        ///
-        /// @details When in indirect mode, the last entry @em must be bitwise
-        /// OR'd with the memory transfer source address and @ref
-        /// scu_dma_xfer_t.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
-        /// the machine @em will lock up.
-        uint32_t src;
+    /// @brief Memory transfer source address.
+    ///
+    /// @details When in indirect mode, the last entry @em must be bitwise
+    /// OR'd with the memory transfer source address and @ref
+    /// scu_dma_xfer_t.src with @ref SCU_DMA_INDIRECT_TABLE_END. Otherwise,
+    /// the machine @em will lock up.
+    uint32_t src;
 /* The alignment must be 4 bytes as the entries in the table are packed
  * together */
 } __packed __aligned(4) scu_dma_xfer_t;
 
 /// The transfer type.
 typedef union scu_dma_xfer_type {
-        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
-        /// this to point to the transfer table.
-        scu_dma_xfer_t *indirect;
+    /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+    /// this to point to the transfer table.
+    scu_dma_xfer_t *indirect;
 
-        /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
-        /// this to set the 3-tuple.
-        scu_dma_xfer_t direct;
+    /// When indirect mode is used via @ref scu_dma_level_cfg_t.mode, use
+    /// this to set the 3-tuple.
+    scu_dma_xfer_t direct;
 } scu_dma_xfer_type_t;
 
 /// @brief Defines a SCU-DMA level configuration.
@@ -240,16 +240,16 @@ typedef union scu_dma_xfer_type {
 ///     When allocating dynamically, use @ref memalign. Otherwise, when
 ///     statically allocating, use the @ref __aligned GCC attribute.
 typedef struct scu_dma_level_cfg {
-        /// Transfer space.
-        scu_dma_space_t space:3;
-        /// Transfer mode.
-        scu_dma_mode_t mode:8;
-        /// Transfer stride.
-        scu_dma_stride_t stride:8;
-        /// Transfer update.
-        scu_dma_update_t update;
-        /// Transfer 3-tuple.
-        scu_dma_xfer_type_t xfer;
+    /// Transfer space.
+    scu_dma_space_t space:3;
+    /// Transfer mode.
+    scu_dma_mode_t mode:8;
+    /// Transfer stride.
+    scu_dma_stride_t stride:8;
+    /// Transfer update.
+    scu_dma_update_t update;
+    /// Transfer 3-tuple.
+    scu_dma_xfer_type_t xfer;
 } __packed __aligned(4) scu_dma_level_cfg_t;
 
 static_assert(sizeof(scu_dma_level_cfg_t) == 20);
@@ -273,9 +273,9 @@ extern void scu_dma_level_stop(scu_dma_level_t level);
 static inline uint32_t __always_inline
 scu_dma_status_get(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return scu_ioregs->dsta;
+    return scu_ioregs->dsta;
 }
 
 /// @brief Obtain the status of SCU-DSP DMA.
@@ -284,16 +284,16 @@ scu_dma_status_get(void)
 static inline uint32_t __always_inline
 scu_dma_dsp_busy(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return (scu_ioregs->dsta & 0x00010003);
+    return (scu_ioregs->dsta & 0x00010003);
 }
 
 /// @brief Wait until SCU-DSP DMA is no longer in operation/standby.
 static inline void __always_inline
 scu_dma_dsp_wait(void)
 {
-        while ((scu_dma_dsp_busy()) != 0x00000000);
+    while ((scu_dma_dsp_busy()) != 0x00000000);
 }
 
 /// @brief Obtain which bus(es) are being accessed during DMA.
@@ -301,9 +301,9 @@ scu_dma_dsp_wait(void)
 static inline scu_dma_bus_t __always_inline
 scu_dma_bus_access_busy(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return (scu_dma_bus_t)((scu_ioregs->dsta >> 20) & 0x07);
+    return (scu_dma_bus_t)((scu_ioregs->dsta >> 20) & 0x07);
 }
 
 /// @brief Wait until the mask of bus(es) are no longer being accessed during
@@ -313,7 +313,7 @@ scu_dma_bus_access_busy(void)
 static inline void __always_inline
 scu_dma_bus_access_wait(scu_dma_bus_t mask)
 {
-        while (((scu_dma_bus_access_busy()) & mask) != 0x00);
+    while (((scu_dma_bus_access_busy()) & mask) != 0x00);
 }
 
 /// @brief Obtain the status of SCU-DMA level 0.
@@ -322,9 +322,9 @@ scu_dma_bus_access_wait(scu_dma_bus_t mask)
 static inline uint32_t __always_inline
 scu_dma_level0_busy(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return (scu_ioregs->dsta & 0x00010030);
+    return (scu_ioregs->dsta & 0x00010030);
 }
 
 /// @brief Obtain the status of SCU-DMA level 1.
@@ -333,9 +333,9 @@ scu_dma_level0_busy(void)
 static inline uint32_t __always_inline
 scu_dma_level1_busy(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return (scu_ioregs->dsta & 0x00020300);
+    return (scu_ioregs->dsta & 0x00020300);
 }
 
 /// @brief Obtain the status of SCU-DMA level 2.
@@ -344,9 +344,9 @@ scu_dma_level1_busy(void)
 static inline uint32_t __always_inline
 scu_dma_level2_busy(void)
 {
-        volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-        return (scu_ioregs->dsta & 0x00003000);
+    return (scu_ioregs->dsta & 0x00003000);
 }
 
 /// @brief Obtain the status of SCU-DMA level.
@@ -357,24 +357,24 @@ scu_dma_level2_busy(void)
 static inline uint32_t __always_inline
 scu_dma_level_busy(scu_dma_level_t level)
 {
-        switch (level & SCU_DMA_LEVEL_COUNT) {
-        case 1:
-                return scu_dma_level1_busy();
-        case 2:
-                return scu_dma_level2_busy();
-        case 0:
-        default:
-                return scu_dma_level0_busy();
-        }
+    switch (level & SCU_DMA_LEVEL_COUNT) {
+    case 1:
+        return scu_dma_level1_busy();
+    case 2:
+        return scu_dma_level2_busy();
+    case 0:
+    default:
+        return scu_dma_level0_busy();
+    }
 }
 
 /// @brief Stop all SCU-DMA levels unconditionally.
 static inline void __always_inline
 scu_dma_stop(void)
 {
-        scu_dma_level_stop(0);
-        scu_dma_level_stop(1);
-        scu_dma_level_stop(2);
+    scu_dma_level_stop(0);
+    scu_dma_level_stop(1);
+    scu_dma_level_stop(2);
 }
 
 /// @ingroup CPU_INTC_HELPERS
@@ -386,7 +386,7 @@ scu_dma_stop(void)
 static inline void __always_inline
 scu_dma_illegal_set(scu_dma_ihr_t ihr)
 {
-        scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
+    scu_ic_ihr_set(SCU_IC_INTERRUPT_DMA_ILLEGAL, ihr);
 }
 
 /// @ingroup CPU_INTC_HELPERS
@@ -395,7 +395,7 @@ scu_dma_illegal_set(scu_dma_ihr_t ihr)
 static inline void __always_inline
 scu_dma_illegal_clear(void)
 {
-        scu_dma_illegal_set(NULL);
+    scu_dma_illegal_set(NULL);
 }
 
 /// @brief Generates a handle from the SCU-DMA level configuration.
@@ -403,7 +403,7 @@ scu_dma_illegal_clear(void)
 /// @param[out] handle The handle.
 /// @param[in]  cfg    The configuration.
 extern void scu_dma_config_buffer(scu_dma_handle_t *handle,
-    const scu_dma_level_cfg_t *cfg);
+  const scu_dma_level_cfg_t *cfg);
 
 /// @brief Commits handle to SCU-DMA level I/O registers.
 ///
@@ -412,8 +412,8 @@ extern void scu_dma_config_buffer(scu_dma_handle_t *handle,
 /// @param[in] handle       The handle.
 /// @param     callback     The callback when transfer is complete.
 extern void scu_dma_config_set(scu_dma_level_t level,
-    scu_dma_start_factor_t start_factor, const scu_dma_handle_t *handle,
-    scu_dma_callback_t callback);
+  scu_dma_start_factor_t start_factor, const scu_dma_handle_t *handle,
+  scu_dma_callback_t callback);
 
 /// @brief Perform a transfer.
 ///
@@ -425,7 +425,7 @@ extern void scu_dma_config_set(scu_dma_level_t level,
 /// @param[in] src   The pointer to read from.
 /// @param     len   The amount to transfer in bytes.
 extern void scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src,
-    size_t len);
+  size_t len);
 
 /// @brief Wait for a transfer to complete.
 ///
@@ -441,7 +441,7 @@ extern void scu_dma_transfer_wait(scu_dma_level_t level);
 /// @param callback The interrupt handler.
 /// @param work     The pointer to the work passed to @p callback.
 extern void scu_dma_level_end_set(scu_dma_level_t level,
-    scu_dma_callback_t callback, void *work);
+  scu_dma_callback_t callback, void *work);
 
 /// @brief Start a SCU-DMA transfer.
 ///

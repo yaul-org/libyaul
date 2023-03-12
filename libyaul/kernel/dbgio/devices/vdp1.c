@@ -13,12 +13,12 @@
 static void _nop(void);
 
 const dbgio_dev_ops_t __dbgio_dev_ops_vdp1 = {
-        .dev            = DBGIO_DEV_VDP1,
-        .default_params = NULL,
-        .init           = (dev_ops_init_t)_nop,
-        .deinit         = _nop,
-        .puts           = (dev_ops_puts_t)_nop,
-        .flush          = _nop
+    .dev            = DBGIO_DEV_VDP1,
+    .default_params = NULL,
+    .init           = (dev_ops_init_t)_nop,
+    .deinit         = _nop,
+    .puts           = (dev_ops_puts_t)_nop,
+    .flush          = _nop
 };
 
 static void

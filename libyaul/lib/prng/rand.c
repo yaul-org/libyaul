@@ -13,11 +13,11 @@
 void __weak
 srand(unsigned s)
 {
-        prng_xorshift32_seed(s);
+    prng_xorshift32_seed(s);
 }
 
 int __weak
 rand(void)
 {
-        return prng_xorshift32();
+    return prng_xorshift32();
 }

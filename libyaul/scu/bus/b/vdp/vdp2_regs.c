@@ -10,11 +10,11 @@
 vdp2_ioregs_t *
 vdp2_regs_get(void)
 {
-        return &_state_vdp2()->shadow_regs;
+    return &_state_vdp2()->shadow_regs;
 }
 
 vdp2_ioregs_t
 vdp2_regs_copy_get(void)
 {
-        return _state_vdp2()->shadow_regs;
+    return _state_vdp2()->shadow_regs;
 }

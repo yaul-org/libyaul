@@ -28,15 +28,15 @@
 void
 perror(const char *msg)
 {
-        FILE *f = stderr;
-        char *errstr = strerror(errno);
+    FILE *f = stderr;
+    char *errstr = strerror(errno);
 
-        if ((msg != NULL) && (*msg != '\0')) {
-                fwrite(msg, strlen(msg), 1, f);
-                fputc(':', f);
-                fputc(' ', f);
-        }
+    if ((msg != NULL) && (*msg != '\0')) {
+        fwrite(msg, strlen(msg), 1, f);
+        fputc(':', f);
+        fputc(' ', f);
+    }
 
-        fwrite(errstr, strlen(errstr), 1, f);
-        fputc('\n', f);
+    fwrite(errstr, strlen(errstr), 1, f);
+    fputc('\n', f);
 }

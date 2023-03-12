@@ -20,24 +20,36 @@
 /// @param x Not yet documented.
 /// @param y Not yet documented.
 #define FIX16_VEC2_INITIALIZER(x, y)                                           \
+{                                                                              \
     {                                                                          \
-            {                                                                  \
-                    FIX16(x),                                                  \
-                    FIX16(y)                                                   \
-            }                                                                  \
-    }
+        FIX16(x),                                                              \
+        FIX16(y)                                                               \
+    }                                                                          \
+}
+
+/// @brief Not yet documented.
+///
+/// @param x Not yet documented.
+/// @param y Not yet documented.
+#define FIX16_VEC2(x, y)                                                       \
+((fix16_vec2_t){                                                               \
+    {                                                                          \
+        FIX16(x),                                                              \
+        FIX16(y)                                                               \
+    }                                                                          \
+})
 
 /// @param x Not yet documented.
 typedef union fix16_vec2 {
-        struct {
-                /// @param x Not yet documented.
-                fix16_t x;
-                /// @param x Not yet documented.
-                fix16_t y;
-        };
-
+    struct {
         /// @param x Not yet documented.
-        fix16_t comp[2];
+        fix16_t x;
+        /// @param x Not yet documented.
+        fix16_t y;
+    };
+
+    /// @param x Not yet documented.
+    fix16_t comp[2];
 } __packed __aligned(4) fix16_vec2_t;
 
 /// @brief Not yet documented.
@@ -46,8 +58,8 @@ typedef union fix16_vec2 {
 static inline void __always_inline
 fix16_vec2_zero(fix16_vec2_t *result)
 {
-        result->x = FIX16_ZERO;
-        result->y = FIX16_ZERO;
+    result->x = FIX16_ZERO;
+    result->y = FIX16_ZERO;
 }
 
 /// @brief Not yet documented.
@@ -56,10 +68,10 @@ fix16_vec2_zero(fix16_vec2_t *result)
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec2_dup(const fix16_vec2_t * __restrict v0,
-    fix16_vec2_t * __restrict result)
+  fix16_vec2_t * __restrict result)
 {
-        result->x = v0->x;
-        result->y = v0->y;
+    result->x = v0->x;
+    result->y = v0->y;
 }
 
 /// @brief Not yet documented.
@@ -69,10 +81,10 @@ fix16_vec2_dup(const fix16_vec2_t * __restrict v0,
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec2_add(const fix16_vec2_t * __restrict v0,
-    const fix16_vec2_t * __restrict v1, fix16_vec2_t * __restrict result)
+  const fix16_vec2_t * __restrict v1, fix16_vec2_t * __restrict result)
 {
-        result->x = v0->x + v1->x;
-        result->y = v0->y + v1->y;
+    result->x = v0->x + v1->x;
+    result->y = v0->y + v1->y;
 }
 
 /// @brief Not yet documented.
@@ -82,10 +94,10 @@ fix16_vec2_add(const fix16_vec2_t * __restrict v0,
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec2_sub(const fix16_vec2_t * __restrict v1,
-    const fix16_vec2_t * __restrict v0, fix16_vec2_t * __restrict result)
+  const fix16_vec2_t * __restrict v0, fix16_vec2_t * __restrict result)
 {
-        result->x = v1->x - v0->x;
-        result->y = v1->y - v0->y;
+    result->x = v1->x - v0->x;
+    result->y = v1->y - v0->y;
 }
 
 /// @brief Not yet documented.
@@ -95,8 +107,8 @@ fix16_vec2_sub(const fix16_vec2_t * __restrict v1,
 static inline void __always_inline
 fix16_vec2_scale(const fix16_t scalar, fix16_vec2_t *result)
 {
-        result->x = fix16_mul(scalar, result->x);
-        result->y = fix16_mul(scalar, result->y);
+    result->x = fix16_mul(scalar, result->x);
+    result->y = fix16_mul(scalar, result->y);
 }
 
 /// @brief Not yet documented.
@@ -106,10 +118,10 @@ fix16_vec2_scale(const fix16_t scalar, fix16_vec2_t *result)
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
-    fix16_vec2_t * __restrict result)
+  fix16_vec2_t * __restrict result)
 {
-        result->x = fix16_mul(scalar, v0->x);
-        result->y = fix16_mul(scalar, v0->y);
+    result->x = fix16_mul(scalar, v0->x);
+    result->y = fix16_mul(scalar, v0->y);
 }
 
 /// @brief Not yet documented.
@@ -121,24 +133,24 @@ fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
 static inline fix16_t __always_inline
 fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 {
-        __register uint32_t aux0;
-        __register uint32_t aux1;
+    __register uint32_t aux0;
+    __register uint32_t aux1;
 
-        __asm__ volatile ("\tclrmac\n"
-                          "\tmac.l @%[a]+, @%[b]+\n"
-                          "\tmac.l @%[a]+, @%[b]+\n"
-                          "\tsts mach, %[aux0]\n"
-                          "\tsts macl, %[aux1]\n"
-                          "\txtrct %[aux0], %[aux1]\n"
-            : [a] "+r" (a),
-              [b] "+r" (b),
-              [aux0] "=&r" (aux0),
-              [aux1] "=&r" (aux1)
-            : "m" (*a),
-              "m" (*b)
-            : "mach", "macl", "memory");
+    __asm__ volatile ("\tclrmac\n"
+                      "\tmac.l @%[a]+, @%[b]+\n"
+                      "\tmac.l @%[a]+, @%[b]+\n"
+                      "\tsts mach, %[aux0]\n"
+                      "\tsts macl, %[aux1]\n"
+                      "\txtrct %[aux0], %[aux1]\n"
+                      : [a] "+r" (a),
+                        [b] "+r" (b),
+                        [aux0] "=&r" (aux0),
+                        [aux1] "=&r" (aux1)
+                      : "m" (*a),
+                        "m" (*b)
+                      : "mach", "macl", "memory");
 
-        return aux1;
+    return aux1;
 }
 
 /// @brief Not yet documented.

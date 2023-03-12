@@ -36,22 +36,22 @@ typedef union fix16_mat33 fix16_mat33_t;
 ///
 /// @note Row-major matrix.
 typedef union fix16_mat43 {
-        /// @brief Not yet documented.
-        struct {
-                /// @brief Not yet documented. Row 0.
-                fix16_t m00, m01, m02, m03;
-                /// @brief Not yet documented. Row 1.
-                fix16_t m10, m11, m12, m13;
-                /// @brief Not yet documented. Row 2.
-                fix16_t m20, m21, m22, m33;
-        } comp;
+    /// @brief Not yet documented.
+    struct {
+        /// @brief Not yet documented. Row 0.
+        fix16_t m00, m01, m02, m03;
+        /// @brief Not yet documented. Row 1.
+        fix16_t m10, m11, m12, m13;
+        /// @brief Not yet documented. Row 2.
+        fix16_t m20, m21, m22, m33;
+    } comp;
 
-        /// @brief Not yet documented.
-        fix16_t arr[FIX16_MAT43_ARR_COUNT];
-        /// @brief Not yet documented.
-        fix16_t frow[FIX16_MAT43_ROWS][FIX16_MAT43_COLUMNS];
-        /// @brief Not yet documented.
-        fix16_vec4_t row[FIX16_MAT43_ROWS];
+    /// @brief Not yet documented.
+    fix16_t arr[FIX16_MAT43_ARR_COUNT];
+    /// @brief Not yet documented.
+    fix16_t frow[FIX16_MAT43_ROWS][FIX16_MAT43_COLUMNS];
+    /// @brief Not yet documented.
+    fix16_vec4_t row[FIX16_MAT43_ROWS];
 } __aligned(4) fix16_mat43_t;
 
 /// @brief Not yet documented.
@@ -61,9 +61,9 @@ typedef union fix16_mat43 {
 static inline void __always_inline
 fix16_mat43_translation_set(fix16_mat43_t *m0, const fix16_vec3_t *t)
 {
-        m0->frow[0][3] = t->x;
-        m0->frow[1][3] = t->y;
-        m0->frow[2][3] = t->z;
+    m0->frow[0][3] = t->x;
+    m0->frow[1][3] = t->y;
+    m0->frow[2][3] = t->z;
 }
 
 /// @brief Not yet documented.
@@ -74,7 +74,7 @@ fix16_mat43_translation_set(fix16_mat43_t *m0, const fix16_vec3_t *t)
 static inline void __always_inline
 fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t x)
 {
-        result->frow[0][3] = m0->frow[0][3] + x;
+    result->frow[0][3] = m0->frow[0][3] + x;
 }
 
 /// @brief Not yet documented.
@@ -85,7 +85,7 @@ fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 static inline void __always_inline
 fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t y)
 {
-        result->frow[1][3] = m0->frow[1][3] + y;
+    result->frow[1][3] = m0->frow[1][3] + y;
 }
 
 /// @brief Not yet documented.
@@ -96,7 +96,7 @@ fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 static inline void __always_inline
 fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t z)
 {
-        result->frow[2][3] = m0->frow[2][3] + z;
+    result->frow[2][3] = m0->frow[2][3] + z;
 }
 
 /// @brief Not yet documented.
@@ -107,9 +107,9 @@ fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 static inline void __always_inline
 fix16_mat43_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, const fix16_vec3_t *t)
 {
-        fix16_mat43_x_translate(m0, result, t->x);
-        fix16_mat43_y_translate(m0, result, t->y);
-        fix16_mat43_z_translate(m0, result, t->z);
+    fix16_mat43_x_translate(m0, result, t->x);
+    fix16_mat43_y_translate(m0, result, t->y);
+    fix16_mat43_z_translate(m0, result, t->z);
 }
 
 /// @brief Not yet documented.

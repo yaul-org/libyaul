@@ -21,20 +21,20 @@ __BEGIN_DECLS
 
 /// @brief 2-vector of type @p uint8_t.
 typedef struct {
-        /// @brief _X_ component.
-        uint8_t x;
-        /// @brief _Y_ component.
-        uint8_t y;
+    /// @brief _X_ component.
+    uint8_t x;
+    /// @brief _Y_ component.
+    uint8_t y;
 } uint8_vec2_t;
 
 /// @brief 3-vector of type @p uint8_t.
 typedef struct {
-        /// @brief _X_ component.
-        uint8_t x;
-        /// @brief _Y_ component.
-        uint8_t y;
-        /// @brief _Z_ component.
-        uint8_t z;
+    /// @brief _X_ component.
+    uint8_t x;
+    /// @brief _Y_ component.
+    uint8_t y;
+    /// @brief _Z_ component.
+    uint8_t z;
 } uint8_vec3_t;
 
 /// @brief 2-vector initializer.
@@ -42,10 +42,20 @@ typedef struct {
 /// @param x The _X_ component.
 /// @param y The _Y_ component.
 #define UINT8_VEC2_INITIALIZER(x, y)                                           \
-    {                                                                          \
-            (x),                                                               \
-            (y)                                                                \
-    }
+{                                                                              \
+    (x),                                                                       \
+    (y)                                                                        \
+}
+
+/// @brief 2-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+#define UINT8_VEC2(x, y)                                                       \
+((uint8_vec2_t){                                                               \
+    (x),                                                                       \
+    (y)                                                                        \
+})
 
 /// @brief 3-vector initializer.
 ///
@@ -53,11 +63,23 @@ typedef struct {
 /// @param y The _Y_ component.
 /// @param z The _Z_ component.
 #define UINT8_VEC3_INITIALIZER(x, y, z)                                        \
-    {                                                                          \
-            (x),                                                               \
-            (y),                                                               \
-            (z)                                                                \
-    }
+{                                                                              \
+    (x),                                                                       \
+    (y),                                                                       \
+    (z)                                                                        \
+}
+
+/// @brief 3-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+/// @param z The _Z_ component.
+#define UINT8_VEC3(x, y, z)                                                    \
+((uint8_vec3_t){                                                               \
+    (x),                                                                       \
+    (y),                                                                       \
+    (z)                                                                        \
+})
 
 /// @}
 

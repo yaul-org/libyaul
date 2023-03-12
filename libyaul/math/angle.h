@@ -33,7 +33,7 @@ typedef int16_t angle_t;
 static inline fix16_t __always_inline
 angle_deg_to(angle_t angle)
 {
-        return (angle * 360);
+    return (angle * 360);
 }
 
 /// @brief Not yet documented.
@@ -44,7 +44,7 @@ angle_deg_to(angle_t angle)
 static inline fix16_t __always_inline
 angle_rad_to(angle_t angle)
 {
-        return fix16_mul(angle, FIX16_2PI);
+    return fix16_mul(angle, FIX16_2PI);
 }
 
 /// @}

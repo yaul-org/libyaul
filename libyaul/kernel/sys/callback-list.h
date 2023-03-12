@@ -8,11 +8,12 @@
 #ifndef _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
 #define _YAUL_KERNEL_SYS_CALLBACK_LIST_H_
 
+#include <sys/cdefs.h>
+
 #include <assert.h>
 #include <stdint.h>
-#include <stdbool.h>
 
-#include <sys/cdefs.h>
+#include <stdbool.h>
 
 __BEGIN_DECLS
 
@@ -21,22 +22,22 @@ typedef int32_t callback_id_t;
 typedef void (*callback_handler_t)(void *work);
 
 typedef struct callback {
-        callback_handler_t handler;
-        void *work;
+    callback_handler_t handler;
+    void *work;
 } callback_t;
 
 typedef struct callback_list {
-        callback_t *callbacks;
-        uint32_t count;
+    callback_t *callbacks;
+    uint32_t count;
 } callback_list_t;
 
 static inline void __always_inline
 callback_call(const callback_t *callback)
 {
-        assert(callback != NULL);
-        assert(callback->handler != NULL);
+    assert(callback != NULL);
+    assert(callback->handler != NULL);
 
-        callback->handler(callback->work);
+    callback->handler(callback->work);
 }
 
 extern callback_list_t *callback_list_alloc(uint32_t count);

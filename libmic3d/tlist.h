@@ -11,7 +11,7 @@
 #include "list.h"
 
 typedef struct tlist {
-        list_t list;
+    list_t list;
 } tlist_t;
 
 void __tlist_init(void);

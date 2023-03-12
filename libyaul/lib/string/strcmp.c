@@ -21,14 +21,14 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 int
 strcmp(const char *l, const char *r)
 {
-        for (; *l == *r && *l; l++, r++) {
-        }
+    for (; *l == *r && *l; l++, r++) {
+    }
 
-        return (*(uint8_t *)l - *(uint8_t *)r);
+    return (*(uint8_t *)l - *(uint8_t *)r);
 }

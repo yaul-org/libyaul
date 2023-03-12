@@ -16,19 +16,19 @@
 
 /// @brief Not yet documented.
 union rgb1555 {
-        struct {
-                /// @brief Not yet documented.
-                unsigned int msb:1;
-                /// @brief Not yet documented.
-                unsigned int b:5;
-                /// @brief Not yet documented.
-                unsigned int g:5;
-                /// @brief Not yet documented.
-                unsigned int r:5;
-        } __packed;
-
+    struct {
         /// @brief Not yet documented.
-        uint16_t raw;
+        unsigned int msb:1;
+        /// @brief Not yet documented.
+        unsigned int b:5;
+        /// @brief Not yet documented.
+        unsigned int g:5;
+        /// @brief Not yet documented.
+        unsigned int r:5;
+    } __packed;
+
+    /// @brief Not yet documented.
+    uint16_t raw;
 } __aligned(2);
 
 /// @brief Not yet documented.
@@ -38,14 +38,14 @@ union rgb1555 {
 /// @param _g   Not yet documented.
 /// @param _b   Not yet documented.
 #define RGB1555_INITIALIZER(_msb, _r, _g, _b)                                  \
+{                                                                              \
     {                                                                          \
-            {                                                                  \
-                _msb,                                                          \
-                _b,                                                            \
-                _g,                                                            \
-                _r                                                             \
-            }                                                                  \
-    }
+        _msb,                                                                  \
+        _b,                                                                    \
+        _g,                                                                    \
+        _r                                                                     \
+    }                                                                          \
+}
 
 /// @brief Not yet documented.
 ///

@@ -30,52 +30,52 @@
 void
 bcl_rle_decompress(uint8_t *in, uint8_t *out, uint32_t in_size)
 {
-        uint8_t marker;
-        uint8_t symbol;
-        uint32_t i;
-        uint32_t inpos;
-        uint32_t outpos;
-        uint32_t count;
+    uint8_t marker;
+    uint8_t symbol;
+    uint32_t i;
+    uint32_t inpos;
+    uint32_t outpos;
+    uint32_t count;
 
-        /* Do we have anything to uncompress? */
-        if (in_size < 1) {
-                return;
-        }
+    /* Do we have anything to uncompress? */
+    if (in_size < 1) {
+        return;
+    }
 
-        /* Get marker symbol from input stream */
-        inpos = 0;
-        marker = in[inpos++];
+    /* Get marker symbol from input stream */
+    inpos = 0;
+    marker = in[inpos++];
 
-        /* Main decompression loop */
-        outpos = 0;
+    /* Main decompression loop */
+    outpos = 0;
 
-        do {
+    do {
+        symbol = in[inpos++];
+
+        if (symbol == marker) {
+            /* We had a marker byte */
+            count = in[inpos++];
+
+            if (count <= 2) {
+                /* Counts 0, 1 and 2 are used for marker byte repetition
+                   only */
+                for (i = 0; i <= count; ++i) {
+                    out[outpos++] = marker;
+                }
+            } else {
+                if (count & 0x80) {
+                    count = ((count & 0x7f) << 8) + in[inpos++];
+                }
+
                 symbol = in[inpos++];
 
-                if (symbol == marker) {
-                        /* We had a marker byte */
-                        count = in[inpos++];
-
-                        if (count <= 2) {
-                                /* Counts 0, 1 and 2 are used for marker byte repetition
-                                   only */
-                                for (i = 0; i <= count; ++i) {
-                                        out[outpos++] = marker;
-                                }
-                        } else {
-                                if (count & 0x80) {
-                                        count = ((count & 0x7f) << 8) + in[inpos++];
-                                }
-
-                                symbol = in[inpos++];
-
-                                for (i = 0; i <= count; ++i) {
-                                        out[outpos++] = symbol;
-                                }
-                        }
-                } else {
-                        /* No marker, plain copy */
-                        out[outpos++] = symbol;
+                for (i = 0; i <= count; ++i) {
+                    out[outpos++] = symbol;
                 }
-        } while (inpos < in_size);
+            }
+        } else {
+            /* No marker, plain copy */
+            out[outpos++] = symbol;
+        }
+    } while (inpos < in_size);
 }

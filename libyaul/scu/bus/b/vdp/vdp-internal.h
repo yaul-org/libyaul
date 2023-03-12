@@ -21,51 +21,51 @@
 #include <vdp2/vram.h>
 
 struct state_vdp1 {
-        vdp1_ioregs_t shadow_ioregs;
-        vdp1_env_t const *current_env;
-        vdp1_vram_partitions_t *vram_partitions;
+    vdp1_ioregs_t shadow_ioregs;
+    vdp1_env_t const *current_env;
+    vdp1_vram_partitions_t *vram_partitions;
 } __aligned(16);
 
 struct state_vdp2 {
-        vdp2_ioregs_t shadow_regs;
-        vdp2_vram_ctl_t *vram_ctl;
+    vdp2_ioregs_t shadow_regs;
+    vdp2_vram_ctl_t *vram_ctl;
 
-        struct {
-                vdp2_vram_t vram;
-                const void *buffer;
-                size_t len;
-        } lncl;
+    struct {
+        vdp2_vram_t vram;
+        const void *buffer;
+        size_t len;
+    } lncl;
 
-        struct {
-                vdp2_vram_t vram;
-                const void *buffer;
-                size_t len;
-        } back;
+    struct {
+        vdp2_vram_t vram;
+        const void *buffer;
+        size_t len;
+    } back;
 
-        struct {
-                scu_dma_handle_t *dma_handle;
-                scu_dma_xfer_t *xfer_table;
-        } commit;
+    struct {
+        scu_dma_handle_t *dma_handle;
+        scu_dma_xfer_t *xfer_table;
+    } commit;
 
-        struct {
-                uint16_vec2_t resolution;
-        } tv;
+    struct {
+        uint16_vec2_t resolution;
+    } tv;
 } __aligned(16);
 
 static inline struct state_vdp1 * __always_inline
 _state_vdp1(void)
 {
-        extern struct state_vdp1 __state_vdp1;
+    extern struct state_vdp1 __state_vdp1;
 
-        return &__state_vdp1;
+    return &__state_vdp1;
 }
 
 static inline struct state_vdp2 * __always_inline
 _state_vdp2(void)
 {
-        extern struct state_vdp2 __state_vdp2;
+    extern struct state_vdp2 __state_vdp2;
 
-        return &__state_vdp2;
+    return &__state_vdp2;
 }
 
 extern void __vdp_init(void);

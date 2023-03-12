@@ -12,9 +12,9 @@
 void __noreturn
 exit(int code __unused)
 {
-        extern void __atexit_call(void);
+    extern void __atexit_call(void);
 
-        __atexit_call();
+    __atexit_call();
 
-        abort();
+    abort();
 }

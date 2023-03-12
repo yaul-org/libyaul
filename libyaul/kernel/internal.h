@@ -16,26 +16,26 @@
 #include <mm/tlsf.h>
 
 struct state {
-        uint8_t which;
+    uint8_t which;
 
-        /* Both master and slave contain their own set of handles */
-        tlsf_t *tlsf_handles;
+    /* Both master and slave contain their own set of handles */
+    tlsf_t *tlsf_handles;
 };
 
 static inline struct state * __always_inline
 master_state(void)
 {
-        extern struct state __master_state;
+    extern struct state __master_state;
 
-        return &__master_state;
+    return &__master_state;
 }
 
 static inline struct state * __always_inline
 slave_state(void)
 {
-        extern struct state __slave_state;
+    extern struct state __slave_state;
 
-        return &__slave_state;
+    return &__slave_state;
 }
 
 extern void *__end;

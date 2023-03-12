@@ -13,5 +13,5 @@
 size_t
 int16_vec2_str(const int16_vec2_t *v0, char *buffer)
 {
-        return sprintf(buffer, "(%i,%i)", v0->x, v0->y);
+    return sprintf(buffer, "(%i,%i)", v0->x, v0->y);
 }

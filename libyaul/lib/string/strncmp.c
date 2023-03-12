@@ -21,21 +21,21 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 int
 strncmp(const char *_l, const char *_r, size_t n)
 {
-        const uint8_t *l = (void *)_l;
-        const uint8_t *r = (void *)_r;
+    const uint8_t *l = (void *)_l;
+    const uint8_t *r = (void *)_r;
 
-        if (!n--) {
-                return 0;
-        }
+    if (!n--) {
+        return 0;
+    }
 
-        for (; *l && *r && n && *l == *r ; l++, r++, n--) {
-        }
+    for (; *l && *r && n && *l == *r; l++, r++, n--) {
+    }
 
-        return *l - *r;
+    return *l - *r;
 }

@@ -47,46 +47,46 @@ static struct memb_ref                                                         \
     __CONCAT(name, _memb_ref)[((count) <= 0) ? 1 : (count)];                   \
                                                                                \
 static __aligned(((align) <= 0) ? 4 : (align))                                 \
-        structure __CONCAT1(name, _memb_mem)[((count) <= 0) ? 1 : (count)];    \
+    structure __CONCAT1(name, _memb_mem)[((count) <= 0) ? 1 : (count)];        \
                                                                                \
 static memb_t name = {                                                         \
-        MEMB_TYPE_STATIC,                                                      \
-        sizeof(structure),                                                     \
-        ((count) <= 0) ? 1 : (count),                                          \
-        &__CONCAT(name, _memb_ref)[0],                                         \
-        0,                                                                     \
-        0,                                                                     \
-        (void *)&__CONCAT(name, _memb_mem)[0],                                 \
-        NULL                                                                   \
+    MEMB_TYPE_STATIC,                                                          \
+    sizeof(structure),                                                         \
+    ((count) <= 0) ? 1 : (count),                                              \
+    &__CONCAT(name, _memb_ref)[0],                                             \
+    0,                                                                         \
+    0,                                                                         \
+    (void *)&__CONCAT(name, _memb_mem)[0],                                     \
+    NULL                                                                       \
 }
 
 typedef struct memb_ref {
-        uint16_t count;
+    uint16_t count;
 } __packed memb_ref_t;
 
 typedef enum memb_type {
-        MEMB_TYPE_STATIC,
-        MEMB_TYPE_DYNAMIC,
-        MEMB_TYPE_SET
+    MEMB_TYPE_STATIC,
+    MEMB_TYPE_DYNAMIC,
+    MEMB_TYPE_SET
 } memb_type_t;
 
 typedef struct memb {
-        memb_type_t type;     /* Type of MEMB */
-        uint32_t size;        /* Size (in bytes) of a unit block */
-        uint32_t count;       /* Number of unit blocks in the block pool */
-        memb_ref_t *refs;     /* Reference array */
-        uint32_t next_index;  /* Index to next unreferenced block */
-        uint32_t alloc_count; /* Number of allocated unit blocks */
-        void *pool;
+    memb_type_t type;     /* Type of MEMB */
+    uint32_t size;        /* Size (in bytes) of a unit block */
+    uint32_t count;       /* Number of unit blocks in the block pool */
+    memb_ref_t *refs;     /* Reference array */
+    uint32_t next_index;  /* Index to next unreferenced block */
+    uint32_t alloc_count; /* Number of allocated unit blocks */
+    void *pool;
 
-        void (*free)(void *p);
+    void (*free)(void *p);
 } memb_t;
 
 void memb_init(memb_t *memb);
 int memb_memb_init(memb_t *memb, void *pool, uint32_t block_count,
-    uint32_t block_size);
+  uint32_t block_size);
 int memb_memb_alloc(memb_t *memb, uint32_t block_count, uint32_t block_size,
-    uint32_t align);
+  uint32_t align);
 void memb_memb_free(memb_t *memb);
 
 void *memb_alloc(memb_t *memb);

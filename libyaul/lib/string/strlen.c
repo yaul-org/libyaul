@@ -21,39 +21,40 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t) - 1 / UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX / 2 + 1))
+#define ALIGN (sizeof(size_t))
+#define ONES  ((size_t)-1 / UCHAR_MAX)
+#define HIGHS (ONES * (UCHAR_MAX / 2 + 1))
 
-#define HAS_ZERO(x)     (((x) - ONES) & ~(x) & HIGHS)
+#define HAS_ZERO(x) (((x)-ONES) & ~(x)&HIGHS)
 
 size_t
 strlen(const char *s)
 {
-        const char *a = s;
+    const char *a = s;
 
 #ifdef __GNUC__
-        typedef size_t __may_alias word;
-        const word *w;
+    typedef size_t __may_alias word;
+    const word *w;
 
-        for (; ((uintptr_t)s % ALIGN); s++) {
-                if (!*s) {
-                        return s - a;
-                }
+    for (; ((uintptr_t)s % ALIGN); s++) {
+        if (!*s) {
+            return s - a;
         }
+    }
 
-        for (w = (const void *)s; !HAS_ZERO(*w); w++) {
-        }
+    for (w = (const void *)s; !HAS_ZERO(*w); w++) {
+    }
 
-        s = (const void *)w;
+    s = (const void *)w;
 #endif /* __GNUC__ */
 
-        for (; *s != '\0'; s++) {
-        }
+    for (; *s != '\0'; s++) {
+    }
 
-        return (s - a);
+    return (s - a);
 }

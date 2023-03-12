@@ -10,6 +10,13 @@
 
 #include <fix16.h>
 
+typedef struct mstack {
+    fix16_mat43_t *pool_matrix;
+    fix16_mat43_t *top_matrix;
+    fix16_mat43_t *bottom_matrix;
+    uint32_t stack_count;
+} mstack_t;
+
 void __matrix_init(void);
 
 fix16_mat43_t *__matrix_view_get(void);

@@ -734,421 +734,421 @@
 
 /// @brief VDP2 I/O register.
 typedef union vdp2_ioregs {
-        /// @brief VDP2 I/O register buffer.
-        uint16_t buffer[144];
+    /// @brief VDP2 I/O register buffer.
+    uint16_t buffer[144];
 
-        struct {
-                /// @brief VDP2 I/O register.
-                uint16_t tvmd;
-                /// @brief VDP2 I/O register.
-                uint16_t exten;
-                /// @brief VDP2 I/O register.
-                uint16_t tvstat;
-                /// @brief VDP2 I/O register.
-                uint16_t vrsize;
-                /// @brief VDP2 I/O register.
-                uint16_t hcnt;
-                /// @brief VDP2 I/O register.
-                uint16_t vcnt;
-                unsigned int :16;
-                /// @brief VDP2 I/O register.
-                uint16_t ramctl;
+    struct {
+        /// @brief VDP2 I/O register.
+        uint16_t tvmd;
+        /// @brief VDP2 I/O register.
+        uint16_t exten;
+        /// @brief VDP2 I/O register.
+        uint16_t tvstat;
+        /// @brief VDP2 I/O register.
+        uint16_t vrsize;
+        /// @brief VDP2 I/O register.
+        uint16_t hcnt;
+        /// @brief VDP2 I/O register.
+        uint16_t vcnt;
+        unsigned int :16;
+        /// @brief VDP2 I/O register.
+        uint16_t ramctl;
 
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t cyca0l;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cyca0u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cyca1l;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cyca1u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cycb0l;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cycb0u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cycb1l;
-                                /// @brief VDP2 I/O register.
-                                uint16_t cycb1u;
-                        } __packed;
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t cyca0l;
+                /// @brief VDP2 I/O register.
+                uint16_t cyca0u;
+                /// @brief VDP2 I/O register.
+                uint16_t cyca1l;
+                /// @brief VDP2 I/O register.
+                uint16_t cyca1u;
+                /// @brief VDP2 I/O register.
+                uint16_t cycb0l;
+                /// @brief VDP2 I/O register.
+                uint16_t cycb0u;
+                /// @brief VDP2 I/O register.
+                uint16_t cycb1l;
+                /// @brief VDP2 I/O register.
+                uint16_t cycb1u;
+            } __packed;
 
-                        /// @brief VDP2 I/O register.
-                        uint32_t cyc[4];
-                };
-
-                /// @brief VDP2 I/O register.
-                uint16_t bgon;
-                /// @brief VDP2 I/O register.
-                uint16_t mzctl;
-                /// @brief VDP2 I/O register.
-                uint16_t sfsel;
-                /// @brief VDP2 I/O register.
-                uint16_t sfcode;
-                /// @brief VDP2 I/O register.
-                uint16_t chctla;
-                /// @brief VDP2 I/O register.
-                uint16_t chctlb;
-                /// @brief VDP2 I/O register.
-                uint16_t bmpna;
-                /// @brief VDP2 I/O register.
-                uint16_t bmpnb;
-                /// @brief VDP2 I/O register.
-                uint16_t pncn0;
-                /// @brief VDP2 I/O register.
-                uint16_t pncn1;
-                /// @brief VDP2 I/O register.
-                uint16_t pncn2;
-                /// @brief VDP2 I/O register.
-                uint16_t pncn3;
-                /// @brief VDP2 I/O register.
-                uint16_t pncr;
-                /// @brief VDP2 I/O register.
-                uint16_t plsz;
-                /// @brief VDP2 I/O register.
-                uint16_t mpofn;
-                /// @brief VDP2 I/O register.
-                uint16_t mpofr;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabn0;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdn0;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabn1;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdn1;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabn2;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdn2;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabn3;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdn3;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpefra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpghra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpijra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpklra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpmnra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpopra;
-                /// @brief VDP2 I/O register.
-                uint16_t mpabrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpcdrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpefrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpghrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpijrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpklrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpmnrb;
-                /// @brief VDP2 I/O register.
-                uint16_t mpoprb;
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxin0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxdn0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scyin0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scydn0;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        fix16_vec2_t sc0;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmxin0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmxdn0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmyin0;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmydn0;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        fix16_vec2_t zm0;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxin1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxdn1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scyin1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scydn1;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        fix16_vec2_t sc1;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmxin1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmxdn1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmyin1;
-                                /// @brief VDP2 I/O register.
-                                uint16_t zmydn1;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        fix16_vec2_t zm1;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxn2;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scyn2;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        int16_vec2_t scn2;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t scxn3;
-                                /// @brief VDP2 I/O register.
-                                uint16_t scyn3;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        int16_vec2_t scn3;
-                };
-
-                /// @brief VDP2 I/O register.
-                uint16_t zmctl;
-                /// @brief VDP2 I/O register.
-                uint16_t scrctl;
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t vcstau;
-                                /// @brief VDP2 I/O register.
-                                uint16_t vcstal;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t vcsta;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t lsta0u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t lsta0l;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t lsta0;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t lsta1u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t lsta1l;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t lsta1;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t lctau;
-                                /// @brief VDP2 I/O register.
-                                uint16_t lctal;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t lcta;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t bktau;
-                                /// @brief VDP2 I/O register.
-                                uint16_t bktal;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t bkta;
-                };
-
-                /// @brief VDP2 I/O register.
-                uint16_t rpmd;
-                /// @brief VDP2 I/O register.
-                uint16_t rprctl;
-                /// @brief VDP2 I/O register.
-                uint16_t ktctl;
-                /// @brief VDP2 I/O register.
-                uint16_t ktaof;
-                /// @brief VDP2 I/O register.
-                uint16_t ovpnra;
-                /// @brief VDP2 I/O register.
-                uint16_t ovpnrb;
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t rptau;
-                                /// @brief VDP2 I/O register.
-                                uint16_t rptal;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t rpta;
-                };
-
-                /// @brief VDP2 I/O register.
-                uint16_t wpsx0;
-                /// @brief VDP2 I/O register.
-                uint16_t wpsy0;
-                /// @brief VDP2 I/O register.
-                uint16_t wpex0;
-                /// @brief VDP2 I/O register.
-                uint16_t wpey0;
-                /// @brief VDP2 I/O register.
-                uint16_t wpsx1;
-                /// @brief VDP2 I/O register.
-                uint16_t wpsy1;
-                /// @brief VDP2 I/O register.
-                uint16_t wpex1;
-                /// @brief VDP2 I/O register.
-                uint16_t wpey1;
-                /// @brief VDP2 I/O register.
-                uint16_t wctla;
-                /// @brief VDP2 I/O register.
-                uint16_t wctlb;
-                /// @brief VDP2 I/O register.
-                uint16_t wctlc;
-                /// @brief VDP2 I/O register.
-                uint16_t wctld;
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t lwta0u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t lwta0l;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t lwta0;
-                };
-
-                union {
-                        struct {
-                                /// @brief VDP2 I/O register.
-                                uint16_t lwta1u;
-                                /// @brief VDP2 I/O register.
-                                uint16_t lwta1l;
-                        } __packed;
-
-                        /// @brief VDP2 I/O register.
-                        uint32_t lwta1;
-                };
-
-                /// @brief VDP2 I/O register.
-                uint16_t spctl;
-                /// @brief VDP2 I/O register.
-                uint16_t sdctl;
-                /// @brief VDP2 I/O register.
-                uint16_t craofa;
-                /// @brief VDP2 I/O register.
-                uint16_t craofb;
-                /// @brief VDP2 I/O register.
-                uint16_t lnclen;
-                /// @brief VDP2 I/O register.
-                uint16_t sfprmd;
-                /// @brief VDP2 I/O register.
-                uint16_t ccctl;
-                /// @brief VDP2 I/O register.
-                uint16_t sfccmd;
-                /// @brief VDP2 I/O register.
-                uint16_t prisa;
-                /// @brief VDP2 I/O register.
-                uint16_t prisb;
-                /// @brief VDP2 I/O register.
-                uint16_t prisc;
-                /// @brief VDP2 I/O register.
-                uint16_t prisd;
-                /// @brief VDP2 I/O register.
-                uint16_t prina;
-                /// @brief VDP2 I/O register.
-                uint16_t prinb;
-                /// @brief VDP2 I/O register.
-                uint16_t prir;
-                unsigned int :16;
-                uint16_t ccrsa;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrsb;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrsc;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrsd;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrna;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrnb;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrr;
-                /// @brief VDP2 I/O register.
-                uint16_t ccrlb;
-                /// @brief VDP2 I/O register.
-                uint16_t clofen;
-                /// @brief VDP2 I/O register.
-                uint16_t clofsl;
-                /// @brief VDP2 I/O register.
-                uint16_t coar;
-                /// @brief VDP2 I/O register.
-                uint16_t coag;
-                /// @brief VDP2 I/O register.
-                uint16_t coab;
-                /// @brief VDP2 I/O register.
-                uint16_t cobr;
-                /// @brief VDP2 I/O register.
-                uint16_t cobg;
-                /// @brief VDP2 I/O register.
-                uint16_t cobb;
+            /// @brief VDP2 I/O register.
+            uint32_t cyc[4];
         };
+
+        /// @brief VDP2 I/O register.
+        uint16_t bgon;
+        /// @brief VDP2 I/O register.
+        uint16_t mzctl;
+        /// @brief VDP2 I/O register.
+        uint16_t sfsel;
+        /// @brief VDP2 I/O register.
+        uint16_t sfcode;
+        /// @brief VDP2 I/O register.
+        uint16_t chctla;
+        /// @brief VDP2 I/O register.
+        uint16_t chctlb;
+        /// @brief VDP2 I/O register.
+        uint16_t bmpna;
+        /// @brief VDP2 I/O register.
+        uint16_t bmpnb;
+        /// @brief VDP2 I/O register.
+        uint16_t pncn0;
+        /// @brief VDP2 I/O register.
+        uint16_t pncn1;
+        /// @brief VDP2 I/O register.
+        uint16_t pncn2;
+        /// @brief VDP2 I/O register.
+        uint16_t pncn3;
+        /// @brief VDP2 I/O register.
+        uint16_t pncr;
+        /// @brief VDP2 I/O register.
+        uint16_t plsz;
+        /// @brief VDP2 I/O register.
+        uint16_t mpofn;
+        /// @brief VDP2 I/O register.
+        uint16_t mpofr;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabn0;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdn0;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabn1;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdn1;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabn2;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdn2;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabn3;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdn3;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpefra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpghra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpijra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpklra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpmnra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpopra;
+        /// @brief VDP2 I/O register.
+        uint16_t mpabrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpcdrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpefrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpghrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpijrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpklrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpmnrb;
+        /// @brief VDP2 I/O register.
+        uint16_t mpoprb;
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t scxin0;
+                /// @brief VDP2 I/O register.
+                uint16_t scxdn0;
+                /// @brief VDP2 I/O register.
+                uint16_t scyin0;
+                /// @brief VDP2 I/O register.
+                uint16_t scydn0;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            fix16_vec2_t sc0;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t zmxin0;
+                /// @brief VDP2 I/O register.
+                uint16_t zmxdn0;
+                /// @brief VDP2 I/O register.
+                uint16_t zmyin0;
+                /// @brief VDP2 I/O register.
+                uint16_t zmydn0;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            fix16_vec2_t zm0;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t scxin1;
+                /// @brief VDP2 I/O register.
+                uint16_t scxdn1;
+                /// @brief VDP2 I/O register.
+                uint16_t scyin1;
+                /// @brief VDP2 I/O register.
+                uint16_t scydn1;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            fix16_vec2_t sc1;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t zmxin1;
+                /// @brief VDP2 I/O register.
+                uint16_t zmxdn1;
+                /// @brief VDP2 I/O register.
+                uint16_t zmyin1;
+                /// @brief VDP2 I/O register.
+                uint16_t zmydn1;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            fix16_vec2_t zm1;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t scxn2;
+                /// @brief VDP2 I/O register.
+                uint16_t scyn2;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            int16_vec2_t scn2;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t scxn3;
+                /// @brief VDP2 I/O register.
+                uint16_t scyn3;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            int16_vec2_t scn3;
+        };
+
+        /// @brief VDP2 I/O register.
+        uint16_t zmctl;
+        /// @brief VDP2 I/O register.
+        uint16_t scrctl;
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t vcstau;
+                /// @brief VDP2 I/O register.
+                uint16_t vcstal;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t vcsta;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t lsta0u;
+                /// @brief VDP2 I/O register.
+                uint16_t lsta0l;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t lsta0;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t lsta1u;
+                /// @brief VDP2 I/O register.
+                uint16_t lsta1l;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t lsta1;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t lctau;
+                /// @brief VDP2 I/O register.
+                uint16_t lctal;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t lcta;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t bktau;
+                /// @brief VDP2 I/O register.
+                uint16_t bktal;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t bkta;
+        };
+
+        /// @brief VDP2 I/O register.
+        uint16_t rpmd;
+        /// @brief VDP2 I/O register.
+        uint16_t rprctl;
+        /// @brief VDP2 I/O register.
+        uint16_t ktctl;
+        /// @brief VDP2 I/O register.
+        uint16_t ktaof;
+        /// @brief VDP2 I/O register.
+        uint16_t ovpnra;
+        /// @brief VDP2 I/O register.
+        uint16_t ovpnrb;
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t rptau;
+                /// @brief VDP2 I/O register.
+                uint16_t rptal;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t rpta;
+        };
+
+        /// @brief VDP2 I/O register.
+        uint16_t wpsx0;
+        /// @brief VDP2 I/O register.
+        uint16_t wpsy0;
+        /// @brief VDP2 I/O register.
+        uint16_t wpex0;
+        /// @brief VDP2 I/O register.
+        uint16_t wpey0;
+        /// @brief VDP2 I/O register.
+        uint16_t wpsx1;
+        /// @brief VDP2 I/O register.
+        uint16_t wpsy1;
+        /// @brief VDP2 I/O register.
+        uint16_t wpex1;
+        /// @brief VDP2 I/O register.
+        uint16_t wpey1;
+        /// @brief VDP2 I/O register.
+        uint16_t wctla;
+        /// @brief VDP2 I/O register.
+        uint16_t wctlb;
+        /// @brief VDP2 I/O register.
+        uint16_t wctlc;
+        /// @brief VDP2 I/O register.
+        uint16_t wctld;
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t lwta0u;
+                /// @brief VDP2 I/O register.
+                uint16_t lwta0l;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t lwta0;
+        };
+
+        union {
+            struct {
+                /// @brief VDP2 I/O register.
+                uint16_t lwta1u;
+                /// @brief VDP2 I/O register.
+                uint16_t lwta1l;
+            } __packed;
+
+            /// @brief VDP2 I/O register.
+            uint32_t lwta1;
+        };
+
+        /// @brief VDP2 I/O register.
+        uint16_t spctl;
+        /// @brief VDP2 I/O register.
+        uint16_t sdctl;
+        /// @brief VDP2 I/O register.
+        uint16_t craofa;
+        /// @brief VDP2 I/O register.
+        uint16_t craofb;
+        /// @brief VDP2 I/O register.
+        uint16_t lnclen;
+        /// @brief VDP2 I/O register.
+        uint16_t sfprmd;
+        /// @brief VDP2 I/O register.
+        uint16_t ccctl;
+        /// @brief VDP2 I/O register.
+        uint16_t sfccmd;
+        /// @brief VDP2 I/O register.
+        uint16_t prisa;
+        /// @brief VDP2 I/O register.
+        uint16_t prisb;
+        /// @brief VDP2 I/O register.
+        uint16_t prisc;
+        /// @brief VDP2 I/O register.
+        uint16_t prisd;
+        /// @brief VDP2 I/O register.
+        uint16_t prina;
+        /// @brief VDP2 I/O register.
+        uint16_t prinb;
+        /// @brief VDP2 I/O register.
+        uint16_t prir;
+        unsigned int :16;
+        uint16_t ccrsa;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrsb;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrsc;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrsd;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrna;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrnb;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrr;
+        /// @brief VDP2 I/O register.
+        uint16_t ccrlb;
+        /// @brief VDP2 I/O register.
+        uint16_t clofen;
+        /// @brief VDP2 I/O register.
+        uint16_t clofsl;
+        /// @brief VDP2 I/O register.
+        uint16_t coar;
+        /// @brief VDP2 I/O register.
+        uint16_t coag;
+        /// @brief VDP2 I/O register.
+        uint16_t coab;
+        /// @brief VDP2 I/O register.
+        uint16_t cobr;
+        /// @brief VDP2 I/O register.
+        uint16_t cobg;
+        /// @brief VDP2 I/O register.
+        uint16_t cobb;
+    };
 } __aligned(4) __packed vdp2_ioregs_t;
 
 /// @}

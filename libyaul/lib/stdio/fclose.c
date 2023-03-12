@@ -29,12 +29,12 @@
 int
 fclose(FILE *f)
 {
-        int r;
+    int r;
 
-        r = fflush(f);
-        r |= f->close(f);
+    r = fflush(f);
+    r |= f->close(f);
 
-        /* _fclose() */
+    /* _fclose() */
 
-        return r;
+    return r;
 }

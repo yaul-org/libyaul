@@ -57,39 +57,39 @@ __BEGIN_DECLS
 static inline void __always_inline
 flash_unlock(void)
 {
-        MEMORY_WRITE(16, FLASH(ADDR_55), 0xAAAA);
-        MEMORY_WRITE(16, FLASH(ADDR_AA), 0x5555);
+    MEMORY_WRITE(16, FLASH(ADDR_55), 0xAAAA);
+    MEMORY_WRITE(16, FLASH(ADDR_AA), 0x5555);
 }
 
 /// @brief Not yet documented.
 static inline void __always_inline
 flash_command_write(const uint16_t command)
 {
-        flash_unlock();
+    flash_unlock();
 
-        MEMORY_WRITE(16, FLASH(ADDR_55), command);
+    MEMORY_WRITE(16, FLASH(ADDR_55), command);
 }
 
 /// @brief Not yet documented.
 static inline uint16_t __always_inline
 flash_vendor_get(void)
 {
-        flash_command_write(FLASH_CMD_ID_ENTRY);
-        const uint16_t vendor_id = MEMORY_READ(16, FLASH(VENDOR_ID));
-        flash_command_write(FLASH_CMD_ID_EXIT);
+    flash_command_write(FLASH_CMD_ID_ENTRY);
+    const uint16_t vendor_id = MEMORY_READ(16, FLASH(VENDOR_ID));
+    flash_command_write(FLASH_CMD_ID_EXIT);
 
-        return vendor_id;
+    return vendor_id;
 }
 
 /// @brief Not yet documented.
 static inline uint16_t __always_inline
 flash_device_get(void)
 {
-        flash_command_write(FLASH_CMD_ID_ENTRY);
-        const uint16_t device_id = MEMORY_READ(16, FLASH(VENDOR_ID));
-        flash_command_write(FLASH_CMD_ID_EXIT);
+    flash_command_write(FLASH_CMD_ID_ENTRY);
+    const uint16_t device_id = MEMORY_READ(16, FLASH(VENDOR_ID));
+    flash_command_write(FLASH_CMD_ID_EXIT);
 
-        return device_id;
+    return device_id;
 }
 
 /// @}

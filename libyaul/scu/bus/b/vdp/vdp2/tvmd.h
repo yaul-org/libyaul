@@ -32,148 +32,148 @@ __BEGIN_DECLS
  *          +-----------------+ */
 
 typedef enum vdp2_tvmd_tv_field {
-        VDP2_TVMD_TV_FIELD_SCAN_EVEN = 0,
-        VDP2_TVMD_TV_FIELD_SCAN_ODD  = 1
+    VDP2_TVMD_TV_FIELD_SCAN_EVEN = 0,
+    VDP2_TVMD_TV_FIELD_SCAN_ODD  = 1
 } vdp2_tvmd_tv_field_t;
 
 typedef enum vdp2_tvmd_tv_standard {
-        VDP2_TVMD_TV_STANDARD_NTSC = 0,
-        VDP2_TVMD_TV_STANDARD_PAL  = 1
+    VDP2_TVMD_TV_STANDARD_NTSC = 0,
+    VDP2_TVMD_TV_STANDARD_PAL  = 1
 } vdp2_tvmd_tv_standard_t;
 
 typedef enum vdp2_tvmd_interlace {
-        VDP2_TVMD_INTERLACE_NONE   = 0,
-        VDP2_TVMD_INTERLACE_SINGLE = 1,
-        VDP2_TVMD_INTERLACE_DOUBLE = 2
+    VDP2_TVMD_INTERLACE_NONE   = 0,
+    VDP2_TVMD_INTERLACE_SINGLE = 1,
+    VDP2_TVMD_INTERLACE_DOUBLE = 2
 } vdp2_tvmd_interlace_t;
 
 typedef enum vdp2_tvmd_vert {
-        VDP2_TVMD_VERT_224 = 0,
-        VDP2_TVMD_VERT_240 = 1,
-        VDP2_TVMD_VERT_256 = 2
+    VDP2_TVMD_VERT_224 = 0,
+    VDP2_TVMD_VERT_240 = 1,
+    VDP2_TVMD_VERT_256 = 2
 } vdp2_tvmd_vert_t;
 
 typedef enum vdp2_tvmd_horz {
-        VDP2_TVMD_HORZ_NORMAL_A  = 0, /* 320x */
-        VDP2_TVMD_HORZ_NORMAL_B  = 1, /* 352x */
-        VDP2_TVMD_HORZ_HIRESO_A  = 2, /* 640x */
-        VDP2_TVMD_HORZ_HIRESO_B  = 3, /* 704x */
-        VDP2_TVMD_HORZ_NORMAL_AE = 4, /* 320x480 */
-        VDP2_TVMD_HORZ_NORMAL_BE = 5, /* 352x480 */
-        VDP2_TVMD_HORZ_HIRESO_AE = 6, /* 640x480 */
-        VDP2_TVMD_HORZ_HIRESO_BE = 7  /* 704x480 */
+    VDP2_TVMD_HORZ_NORMAL_A  = 0, /* 320x */
+    VDP2_TVMD_HORZ_NORMAL_B  = 1, /* 352x */
+    VDP2_TVMD_HORZ_HIRESO_A  = 2, /* 640x */
+    VDP2_TVMD_HORZ_HIRESO_B  = 3, /* 704x */
+    VDP2_TVMD_HORZ_NORMAL_AE = 4, /* 320x480 */
+    VDP2_TVMD_HORZ_NORMAL_BE = 5, /* 352x480 */
+    VDP2_TVMD_HORZ_HIRESO_AE = 6, /* 640x480 */
+    VDP2_TVMD_HORZ_HIRESO_BE = 7  /* 704x480 */
 } vdp2_tvmd_horz_t;
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_in(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return ((vdp2_ioregs->tvstat & 0x0008) == 0x0008);
+    return ((vdp2_ioregs->tvstat & 0x0008) == 0x0008);
 }
 
 static inline bool __always_inline
 vdp2_tvmd_vblank_out(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return ((vdp2_ioregs->tvstat & 0x0008) == 0x0000);
+    return ((vdp2_ioregs->tvstat & 0x0008) == 0x0000);
 }
 
 static inline void __always_inline
 vdp2_tvmd_vblank_in_wait(void)
 {
-        /* Wait until we're in V-BLANK-IN */
-        while (vdp2_tvmd_vblank_out());
-        /* Start of V-BLANK-IN */
+    /* Wait until we're in V-BLANK-IN */
+    while (vdp2_tvmd_vblank_out());
+    /* Start of V-BLANK-IN */
 }
 
 static inline void __always_inline
 vdp2_tvmd_vblank_out_wait(void)
 {
-        /* Wait until we're in V-BLANK-OUT */
-        for (; vdp2_tvmd_vblank_in(); );
-        /* Start of V-BLANK-OUT */
+    /* Wait until we're in V-BLANK-OUT */
+    for (; vdp2_tvmd_vblank_in(); );
+    /* Start of V-BLANK-OUT */
 }
 
 static inline void __always_inline
 vdp2_tvmd_extern_wait(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        for (; ((vdp2_ioregs->exten & 0x0200) == 0x0200); );
+    for (; ((vdp2_ioregs->exten & 0x0200) == 0x0200); );
 }
 
 static inline void __always_inline
 vdp2_tvmd_extern_latch(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        vdp2_ioregs->exten &= ~0x0200;
+    vdp2_ioregs->exten &= ~0x0200;
 
-        for (; ((vdp2_ioregs->tvstat & 0x0200) == 0x0200); );
+    for (; ((vdp2_ioregs->tvstat & 0x0200) == 0x0200); );
 }
 
 static inline uint16_t __always_inline
 vdp2_tvmd_hcount_get(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return (vdp2_ioregs->hcnt & 0x03FF);
+    return (vdp2_ioregs->hcnt & 0x03FF);
 }
 
 static inline uint16_t __always_inline
 vdp2_tvmd_vcount_get(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return (vdp2_ioregs->vcnt & 0x03FF);
+    return (vdp2_ioregs->vcnt & 0x03FF);
 }
 
 static inline void __always_inline
 vdp2_tvmd_vcount_wait(uint16_t scanline)
 {
-        /* There are 1024 maximum counter values */
-        scanline &= 0x03FF;
+    /* There are 1024 maximum counter values */
+    scanline &= 0x03FF;
 
-        while (true) {
-                vdp2_tvmd_extern_latch();
+    while (true) {
+        vdp2_tvmd_extern_latch();
 
-                if ((vdp2_tvmd_vcount_get()) == scanline) {
-                        break;
-                }
+        if ((vdp2_tvmd_vcount_get()) == scanline) {
+            break;
         }
+    }
 }
 
 static inline vdp2_tvmd_tv_standard_t __always_inline
 vdp2_tvmd_tv_standard_get(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return (vdp2_tvmd_tv_standard_t)(vdp2_ioregs->tvstat & 0x0001);
+    return (vdp2_tvmd_tv_standard_t)(vdp2_ioregs->tvstat & 0x0001);
 }
 
 static inline vdp2_tvmd_tv_field_t __always_inline
 vdp2_tvmd_field_scan_get(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return (vdp2_tvmd_tv_field_t)((vdp2_ioregs->tvstat >> 1) & 0x0001);
+    return (vdp2_tvmd_tv_field_t)((vdp2_ioregs->tvstat >> 1) & 0x0001);
 }
 
 static inline bool __always_inline
 vdp2_tvmd_display(void)
 {
-        volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
+    volatile vdp2_ioregs_t * const vdp2_ioregs = (volatile vdp2_ioregs_t *)VDP2_IOREG_BASE;
 
-        return ((vdp2_ioregs->tvmd & 0x8000) == 0x8000);
+    return ((vdp2_ioregs->tvmd & 0x8000) == 0x8000);
 }
 
 extern void vdp2_tvmd_display_clear(void);
 extern void vdp2_tvmd_display_set(void);
 extern void vdp2_tvmd_display_res_get(uint16_t *width, uint16_t *height);
 extern void vdp2_tvmd_display_res_set(vdp2_tvmd_interlace_t interlace, vdp2_tvmd_horz_t horizontal,
-    vdp2_tvmd_vert_t vertical);
+  vdp2_tvmd_vert_t vertical);
 extern void vdp2_tvmd_border_set(bool enable);
 
 extern void vdp2_tvmd_vblank_in_next_wait(uint32_t count);

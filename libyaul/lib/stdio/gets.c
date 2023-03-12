@@ -28,17 +28,17 @@
 char *
 gets(char *s)
 {
-        size_t i = 0;
-        int c;
+    size_t i = 0;
+    int c;
 
-        while (((c = getc(stdin)) != EOF) && (c != '\n')) {
-                s[i++] = c;
-        }
-        s[i] = '\0';
+    while (((c = getc(stdin)) != EOF) && (c != '\n')) {
+        s[i++] = c;
+    }
+    s[i] = '\0';
 
-        if ((c != '\n') && (!feof(stdin) || !i)) {
-                s = '\0';
-        }
+    if ((c != '\n') && (!feof(stdin) || !i)) {
+        s = '\0';
+    }
 
-        return s;
+    return s;
 }

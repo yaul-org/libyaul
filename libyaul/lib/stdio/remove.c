@@ -3,5 +3,5 @@
 int __weak
 remove(const char *path __unused)
 {
-        return 0;
+    return 0;
 }

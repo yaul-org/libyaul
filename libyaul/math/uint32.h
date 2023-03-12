@@ -65,7 +65,7 @@ extern uint32_t uint32_pow2_round_next(uint32_t value);
 static inline uint32_t __always_inline
 uint32_pow2_round(uint32_t value, uint32_t pow)
 {
-        return (((value + ((1 << pow) - 1)) >> pow) << pow);
+    return (((value + ((1 << pow) - 1)) >> pow) << pow);
 }
 
 /// @}

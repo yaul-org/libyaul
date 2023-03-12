@@ -21,10 +21,10 @@ __BEGIN_DECLS
 
 /// @brief 2-vector of type @p uint16_t.
 typedef struct {
-        /// @brief _X_ component.
-        uint16_t x;
-        /// @brief _Y_ component.
-        uint16_t y;
+    /// @brief _X_ component.
+    uint16_t x;
+    /// @brief _Y_ component.
+    uint16_t y;
 } __aligned(4) uint16_vec2_t;
 
 /// @brief 2-vector initializer.
@@ -32,10 +32,20 @@ typedef struct {
 /// @param x The _X_ component.
 /// @param y The _Y_ component.
 #define UINT16_VEC2_INITIALIZER(x, y)                                          \
-    {                                                                          \
-            (x),                                                               \
-            (y)                                                                \
-    }
+{                                                                              \
+    (x),                                                                       \
+    (y)                                                                        \
+}
+
+/// @brief 2-vector.
+///
+/// @param x The _X_ component.
+/// @param y The _Y_ component.
+#define UINT16_VEC2(x, y)                                                      \
+((uint16_vec2_t){                                                              \
+    (x),                                                                       \
+    (y)                                                                        \
+})
 
 /// @brief Not yet documented.
 ///
@@ -43,8 +53,8 @@ typedef struct {
 static inline void __always_inline
 uint16_vec2_zero(uint16_vec2_t *result)
 {
-        result->x = 0;
-        result->y = 0;
+    result->x = 0;
+    result->y = 0;
 }
 
 /// @brief Not yet documented.
@@ -53,10 +63,10 @@ uint16_vec2_zero(uint16_vec2_t *result)
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 uint16_vec2_dup(const uint16_vec2_t * __restrict v0,
-    uint16_vec2_t * __restrict result)
+  uint16_vec2_t * __restrict result)
 {
-        result->x = v0->x;
-        result->y = v0->y;
+    result->x = v0->x;
+    result->y = v0->y;
 }
 
 /// @brief Not yet documented.
@@ -66,11 +76,11 @@ uint16_vec2_dup(const uint16_vec2_t * __restrict v0,
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 uint16_vec2_add(const uint16_vec2_t * __restrict v0,
-    const uint16_vec2_t * __restrict v1,
-    uint16_vec2_t * __restrict result)
+  const uint16_vec2_t * __restrict v1,
+  uint16_vec2_t * __restrict result)
 {
-        result->x = v0->x + v1->x;
-        result->y = v0->y + v1->y;
+    result->x = v0->x + v1->x;
+    result->y = v0->y + v1->y;
 }
 
 /// @brief Not yet documented.
@@ -80,11 +90,11 @@ uint16_vec2_add(const uint16_vec2_t * __restrict v0,
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 uint16_vec2_sub(const uint16_vec2_t * __restrict v0,
-    const uint16_vec2_t * __restrict v1,
-    uint16_vec2_t * __restrict result)
+  const uint16_vec2_t * __restrict v1,
+  uint16_vec2_t * __restrict result)
 {
-        result->x = v0->x - v1->x;
-        result->y = v0->y - v1->y;
+    result->x = v0->x - v1->x;
+    result->y = v0->y - v1->y;
 }
 
 /// @brief Not yet documented.
@@ -94,10 +104,10 @@ uint16_vec2_sub(const uint16_vec2_t * __restrict v0,
 /// @param[out] result Not yet documented.
 static inline void __always_inline
 uint16_vec2_scale(const uint8_t scalar, const uint16_vec2_t * __restrict v0,
-    uint16_vec2_t * __restrict result)
+  uint16_vec2_t * __restrict result)
 {
-        result->x = scalar * v0->x;
-        result->y = scalar * v0->y;
+    result->x = scalar * v0->x;
+    result->y = scalar * v0->y;
 }
 
 /// @brief Not yet documented.
@@ -107,8 +117,8 @@ uint16_vec2_scale(const uint8_t scalar, const uint16_vec2_t * __restrict v0,
 static inline void __always_inline
 uint16_vec2_scaled(const uint8_t scalar, uint16_vec2_t *in_out)
 {
-        in_out->x = scalar * in_out->x;
-        in_out->y = scalar * in_out->y;
+    in_out->x = scalar * in_out->x;
+    in_out->y = scalar * in_out->y;
 }
 
 /// @brief Not yet documented.

@@ -15,10 +15,10 @@
 void __noreturn __used
 abort(void)
 {
-        cpu_intc_mask_set(15);
+    cpu_intc_mask_set(15);
 
-        while (true) {
-        }
+    while (true) {
+    }
 
-        __builtin_unreachable();
+    __builtin_unreachable();
 }
