@@ -30,128 +30,128 @@ static void _flush(void);
 static void _font_load(void);
 
 typedef struct {
-        uint8_t *buffer_base;
-        uint8_t *buffer;
-        uint32_t buffer_size;
+    uint8_t *buffer_base;
+    uint8_t *buffer;
+    uint32_t buffer_size;
 
-        uint8_t state;
+    uint8_t state;
 } dev_state_t;
 
 static const dbgio_usb_cart_t _default_params = {
-        .buffer_size = 4096
+    .buffer_size = 4096
 };
 
 static dev_state_t *_dev_state;
 
 const dbgio_dev_ops_t __dbgio_dev_ops_usb_cart = {
-        .dev            = DBGIO_DEV_USB_CART,
-        .default_params = &_default_params,
-        .init           = (dev_ops_init_t)_init,
-        .deinit         = _deinit,
-        .font_load      = _font_load,
-        .puts           = _puts,
-        .flush          = _flush
+    .dev            = DBGIO_DEV_USB_CART,
+    .default_params = &_default_params,
+    .init           = (dev_ops_init_t)_init,
+    .deinit         = _deinit,
+    .font_load      = _font_load,
+    .puts           = _puts,
+    .flush          = _flush
 };
 
 static void
 _init(const dbgio_usb_cart_t *params)
 {
-        assert(params != NULL);
+    assert(params != NULL);
 
-        if (_dev_state == NULL) {
-                _dev_state = __malloc(sizeof(dev_state_t));
+    if (_dev_state == NULL) {
+        _dev_state = __malloc(sizeof(dev_state_t));
 
-                (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
-        }
-        assert(_dev_state != NULL);
+        (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
+    }
+    assert(_dev_state != NULL);
 
-        /* Resize the buffer if needed */
-        if ((_dev_state->buffer != NULL) &&
-            (_dev_state->buffer_size < params->buffer_size)) {
-                __free(_dev_state->buffer);
+    /* Resize the buffer if needed */
+    if ((_dev_state->buffer != NULL) &&
+      (_dev_state->buffer_size < params->buffer_size)) {
+        __free(_dev_state->buffer);
 
-                _dev_state->buffer = NULL;
-        }
+        _dev_state->buffer = NULL;
+    }
 
-        if (_dev_state->buffer == NULL) {
-                _dev_state->buffer = __malloc(params->buffer_size);
+    if (_dev_state->buffer == NULL) {
+        _dev_state->buffer = __malloc(params->buffer_size);
 
-                (void)memset(_dev_state->buffer, '\0', params->buffer_size);
-        }
-        assert(_dev_state->buffer != NULL);
+        (void)memset(_dev_state->buffer, '\0', params->buffer_size);
+    }
+    assert(_dev_state->buffer != NULL);
 
-        _dev_state->buffer_base = _dev_state->buffer;
-        _dev_state->buffer_size = params->buffer_size;
+    _dev_state->buffer_base = _dev_state->buffer;
+    _dev_state->buffer_size = params->buffer_size;
 
-        _dev_state->state = STATE_INITIALIZED;
+    _dev_state->state = STATE_INITIALIZED;
 }
 
 static void
 _deinit(void)
 {
-        if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
-                return;
-        }
+    if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+        return;
+    }
 
-        __free(_dev_state->buffer);
-        __free(_dev_state);
+    __free(_dev_state->buffer);
+    __free(_dev_state);
 
-        _dev_state = NULL;
+    _dev_state = NULL;
 }
 
 static void
 _puts(const char *buffer)
 {
-        const size_t len = strlen(buffer);
+    const size_t len = strlen(buffer);
 
-        const uint32_t current_len =
-            _dev_state->buffer_base - _dev_state->buffer;
+    const uint32_t current_len =
+      _dev_state->buffer_base - _dev_state->buffer;
 
-        const uint32_t new_len = current_len + len;
+    const uint32_t new_len = current_len + len;
 
-        if (new_len >= _dev_state->buffer_size) {
-                return;
-        }
+    if (new_len >= _dev_state->buffer_size) {
+        return;
+    }
 
-        (void)memcpy(_dev_state->buffer_base, buffer, len);
+    (void)memcpy(_dev_state->buffer_base, buffer, len);
 
-        _dev_state->buffer_base += len;
+    _dev_state->buffer_base += len;
 
-        _dev_state->state |= STATE_BUFFER_DIRTY;
+    _dev_state->state |= STATE_BUFFER_DIRTY;
 }
 
 static void
 _buffer_partial_flush(const uint8_t *buffer, uint32_t len)
 {
-        if (len == 0) {
-                return;
-        }
+    if (len == 0) {
+        return;
+    }
 
-        /* XXX: Needs to be reworked */
-        /* usb_cart_byte_send(SSLOAD_COMM_CMD_LOG); */
-        usb_cart_long_send(len);
+    /* XXX: Needs to be reworked */
+    /* usb_cart_byte_send(SSLOAD_COMM_CMD_LOG); */
+    usb_cart_long_send(len);
 
-        for (uint32_t i = 0; i < len; i++) {
-                usb_cart_byte_send(buffer[i]);
-        }
+    for (uint32_t i = 0; i < len; i++) {
+        usb_cart_byte_send(buffer[i]);
+    }
 }
 
 static void
 _flush(void)
 {
-        if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
-                return;
-        }
+    if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
+        return;
+    }
 
-        _dev_state->state |= STATE_BUFFER_FLUSHING;
+    _dev_state->state |= STATE_BUFFER_FLUSHING;
 
-        const uint32_t len = _dev_state->buffer_base - _dev_state->buffer;
+    const uint32_t len = _dev_state->buffer_base - _dev_state->buffer;
 
-        _buffer_partial_flush(&_dev_state->buffer[0], len);
+    _buffer_partial_flush(&_dev_state->buffer[0], len);
 
-        _dev_state->buffer_base = _dev_state->buffer;
+    _dev_state->buffer_base = _dev_state->buffer;
 
-        _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
+    _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
 }
 
 static void

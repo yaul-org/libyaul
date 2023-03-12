@@ -62,64 +62,64 @@ __BEGIN_DECLS
 
 /// @brief Interrupt vectors.
 typedef enum cpu_intc_interrupt {
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_POWER_ON_RESET_PC   = 0x00,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_POWER_ON_RESET_SP   = 0x01,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_MANUAL_RESET_PC     = 0x02,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_MANUAL_RESET_SP     = 0x03,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION = 0x04,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_ILLEGAL_SLOT        = 0x06,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR   = 0x09,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR   = 0x0A,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_NMI                 = 0x0B,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_UBC                 = 0x0C,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_BREAK               = 0x20,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_NETLINK             = 0x5C,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_SCI_ERI             = 0x60,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_SCI_RXI             = 0x61,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_SCI_TXI             = 0x62,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_SCI_TEI             = 0x63,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FRT_ICI             = 0x64,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FRT_OCI             = 0x65,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FRT_OVI             = 0x66,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FREE_67             = 0x67,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_WDT_ITI             = 0x68,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_BSC                 = 0x69,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FREE_6A             = 0x6A,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FREE_6B             = 0x6B,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_DMAC0               = 0x6C,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_DMAC1               = 0x6D,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_DIVU_OVFI           = 0x6E,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_FREE_6F             = 0x6F,
-        /// Interrupt vector.
-        CPU_INTC_INTERRUPT_SLAVE_ENTRY         = 0x94,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_POWER_ON_RESET_PC   = 0x00,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_POWER_ON_RESET_SP   = 0x01,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_MANUAL_RESET_PC     = 0x02,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_MANUAL_RESET_SP     = 0x03,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_ILLEGAL_INSTRUCTION = 0x04,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_ILLEGAL_SLOT        = 0x06,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_CPU_ADDRESS_ERROR   = 0x09,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_DMA_ADDRESS_ERROR   = 0x0A,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_NMI                 = 0x0B,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_UBC                 = 0x0C,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_BREAK               = 0x20,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_NETLINK             = 0x5C,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_SCI_ERI             = 0x60,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_SCI_RXI             = 0x61,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_SCI_TXI             = 0x62,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_SCI_TEI             = 0x63,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FRT_ICI             = 0x64,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FRT_OCI             = 0x65,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FRT_OVI             = 0x66,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FREE_67             = 0x67,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_WDT_ITI             = 0x68,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_BSC                 = 0x69,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FREE_6A             = 0x6A,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FREE_6B             = 0x6B,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_DMAC0               = 0x6C,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_DMAC1               = 0x6D,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_DIVU_OVFI           = 0x6E,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_FREE_6F             = 0x6F,
+    /// Interrupt vector.
+    CPU_INTC_INTERRUPT_SLAVE_ENTRY         = 0x94,
 } cpu_intc_interrupt_t;
 
 /// @brief Callback type.
@@ -143,9 +143,9 @@ typedef void (*cpu_intc_ihr_t)(void);
 static inline void __always_inline
 cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr_t ihr)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000310;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000310;
 
-        ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
+    ((void (*)(uint32_t, void (*)(void)))*bios_address)(vector, ihr);
 }
 
 /// @brief Clear the interrupt handler for the specified CPU related interrupt.
@@ -163,7 +163,7 @@ cpu_intc_ihr_set(cpu_intc_interrupt_t vector, cpu_intc_ihr_t ihr)
 static inline void __always_inline
 cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 {
-        cpu_intc_ihr_set(vector, NULL);
+    cpu_intc_ihr_set(vector, NULL);
 }
 
 /// @brief Obtain the interrupt handler for the specified CPU related interrupt.
@@ -177,9 +177,9 @@ cpu_intc_ihr_clear(cpu_intc_interrupt_t vector)
 static inline cpu_intc_ihr_t __always_inline
 cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 {
-        __register uint32_t * const bios_address = (uint32_t *)0x06000314;
+    __register uint32_t * const bios_address = (uint32_t *)0x06000314;
 
-        return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
+    return ((void (*(*)(uint32_t))(void))*bios_address)(vector);
 }
 
 /// @brief Obtain the interrupt priority level `I` mask bits from the `sr`
@@ -188,10 +188,10 @@ cpu_intc_ihr_get(cpu_intc_interrupt_t vector)
 static inline uint8_t __always_inline
 cpu_intc_mask_get(void)
 {
-        __register const uint32_t reg_sr = cpu_reg_sr_get();
-        __register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
+    __register const uint32_t reg_sr = cpu_reg_sr_get();
+    __register const uint32_t mask = (reg_sr & CPU_SR_I_BITS_MASK) >> 4;
 
-        return mask;
+    return mask;
 }
 
 /// @brief Set the interrupt priority level.
@@ -200,13 +200,13 @@ cpu_intc_mask_get(void)
 static inline void __always_inline
 cpu_intc_mask_set(uint8_t mask)
 {
-        __register uint32_t reg_sr;
-        reg_sr = cpu_reg_sr_get();
+    __register uint32_t reg_sr;
+    reg_sr = cpu_reg_sr_get();
 
-        reg_sr &= ~CPU_SR_I_BITS_MASK;
-        reg_sr |= (mask << 4) & CPU_SR_I_BITS_MASK;
+    reg_sr &= ~CPU_SR_I_BITS_MASK;
+    reg_sr |= (mask << 4) & CPU_SR_I_BITS_MASK;
 
-        cpu_reg_sr_set(reg_sr);
+    cpu_reg_sr_set(reg_sr);
 }
 
 /// @brief Obtain the value of the 2-byte value of the @ref IPRA I/O register.
@@ -214,9 +214,9 @@ cpu_intc_mask_set(uint8_t mask)
 static inline uint16_t __always_inline
 cpu_intc_priority_a_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return cpu_map->ipra;
+    return cpu_ioregs->ipra;
 }
 
 /// @brief Obtain the value of the 2-byte value of the @ref IPRB I/O register.
@@ -224,9 +224,9 @@ cpu_intc_priority_a_get(void)
 static inline uint16_t __always_inline
 cpu_intc_priority_b_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return cpu_map->iprb;
+    return cpu_ioregs->iprb;
 }
 
 /// @brief Write a 2-byte value to the @ref IPRA I/O register.
@@ -235,9 +235,9 @@ cpu_intc_priority_b_get(void)
 static inline void __always_inline
 cpu_intc_priority_a_set(uint16_t ipra)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ipra = ipra;
+    cpu_ioregs->ipra = ipra;
 }
 
 /// @brief Write a 2-byte value to the @ref IPRB I/O register.
@@ -246,9 +246,9 @@ cpu_intc_priority_a_set(uint16_t ipra)
 static inline void __always_inline
 cpu_intc_priority_b_set(uint16_t iprb)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->iprb = iprb;
+    cpu_ioregs->iprb = iprb;
 }
 
 /// @}

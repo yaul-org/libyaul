@@ -48,30 +48,30 @@
 fix16_t
 fix16_sqrt(fix16_t value)
 {
-        uint32_t t;
+    uint32_t t;
 
-        uint32_t r;
-        r = value;
+    uint32_t r;
+    r = value;
 
-        uint32_t b;
-        b = 0x40000000;
+    uint32_t b;
+    b = 0x40000000;
 
-        uint32_t q;
-        q = 0;
+    uint32_t q;
+    q = 0;
 
-        while (b > 0x40) {
-                t = q + b;
+    while (b > 0x40) {
+        t = q + b;
 
-                if (r >= t) {
-                        r -= t;
-                        q = t + b; /* Equivalent to q += 2 * b */
-                }
-
-                r <<= 1;
-                b >>= 1;
+        if (r >= t) {
+            r -= t;
+            q = t + b; /* Equivalent to q += 2 * b */
         }
 
-        q >>= 8;
+        r <<= 1;
+        b >>= 1;
+    }
 
-        return q;
+    q >>= 8;
+
+    return q;
 }

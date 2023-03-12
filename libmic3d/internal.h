@@ -1,5 +1,12 @@
-#ifndef MIC3D_INTERNAL_H
-#define MIC3D_INTERNAL_H
+/*
+ * Copyright (c) 2022-2023 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+#ifndef _MIC3D_INTERNAL_H_
+#define _MIC3D_INTERNAL_H_
 
 #include "render.h"
 #include "sort.h"
@@ -11,4 +18,4 @@
 #include "perf.h"
 #include "gst.h"
 
-#endif /* MIC3D_INTERNAL_H */
+#endif /* _MIC3D_INTERNAL_H_ */

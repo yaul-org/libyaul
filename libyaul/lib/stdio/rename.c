@@ -5,5 +5,5 @@
 int __weak
 rename(const char *old __unused, const char *new __unused)
 {
-        return 0;
+    return 0;
 }

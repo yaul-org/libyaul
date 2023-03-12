@@ -30,11 +30,11 @@ typedef void (*cons_ops_line_partial_clear_t)(int16_t col_start, int16_t col_end
 typedef void (*cons_ops_write_t)(int16_t col, int16_t row, uint8_t ch);
 
 typedef struct con_ops {
-        cons_ops_clear_t clear;
-        cons_ops_area_clear_t area_clear;
-        cons_ops_line_clear_t line_clear;
-        cons_ops_line_partial_clear_t line_partial_clear;
-        cons_ops_write_t write;
+    cons_ops_clear_t clear;
+    cons_ops_area_clear_t area_clear;
+    cons_ops_line_clear_t line_clear;
+    cons_ops_line_partial_clear_t line_partial_clear;
+    cons_ops_write_t write;
 } cons_ops_t;
 
 extern void __cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows);

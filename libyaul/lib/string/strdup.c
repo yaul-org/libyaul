@@ -27,12 +27,12 @@
 char *
 strdup(const char *s)
 {
-        size_t l = strlen(s);
-        char *d = malloc(l + 1);
+    size_t l = strlen(s);
+    char *d = malloc(l + 1);
 
-        if (!d) {
-                return NULL;
-        }
+    if (!d) {
+        return NULL;
+    }
 
-        return memcpy(d, s, l + 1);
+    return memcpy(d, s, l + 1);
 }

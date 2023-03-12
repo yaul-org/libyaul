@@ -7,7 +7,7 @@ insert_final_newline = true
 
 [*.{c,h,inc}]
 indent_style = space
-indent_size = 8
+indent_size = 4
 trim_trailing_whitespace = true
 
 [*.cxx]

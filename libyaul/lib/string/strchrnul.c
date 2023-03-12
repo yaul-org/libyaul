@@ -21,43 +21,45 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t)-1/UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX/2+1))
-#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
+#define ALIGN       (sizeof(size_t))
+#define ONES        ((size_t)-1 / UCHAR_MAX)
+#define HIGHS       (ONES * (UCHAR_MAX / 2 + 1))
+#define HAS_ZERO(x) (((x)-ONES) & ~(x)&HIGHS)
 
 char *
 strchrnul(const char *s, int c)
 {
-        c = (uint8_t)c;
+    c = (uint8_t)c;
 
-        if (!c) {
-                return (char *)s + strlen(s);
-        }
+    if (!c) {
+        return (char *)s + strlen(s);
+    }
 
 #ifdef __GNUC__
-        typedef size_t __may_alias word;
-        const word *w;
+    typedef size_t __may_alias word;
+    const word *w;
 
-        for (; (uintptr_t)s % ALIGN; s++) {
-                if (!*s || *(uint8_t *)s == c) {
-                        return (char *)s;
-                }
+    for (; (uintptr_t)s % ALIGN; s++) {
+        if (!*s || *(uint8_t *)s == c) {
+            return (char *)s;
         }
+    }
 
-        size_t k = ONES * c;
+    size_t k = ONES * c;
 
-        for (w = (void *)s; !HAS_ZERO(*w) && !HAS_ZERO(*w ^ k); w++);
+    for (w = (void *)s; !HAS_ZERO(*w) && !HAS_ZERO(*w ^ k); w++) {
+    }
 
-        s = (void *)w;
+    s = (void *)w;
 #endif /* __GNUC__ */
 
-        for (; *s && *(uint8_t *)s != c; s++) {
-        }
+    for (; *s && *(uint8_t *)s != c; s++) {
+    }
 
-        return (char *)s;
+    return (char *)s;
 }

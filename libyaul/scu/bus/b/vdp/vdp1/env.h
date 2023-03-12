@@ -31,24 +31,24 @@ __BEGIN_DECLS
 /// @}
 
 typedef enum vdp1_env_rotation {
-        /// Not yet documented.
-        VDP1_ENV_ROTATION_0  = 0,
-        /// Not yet documented.
-        VDP1_ENV_ROTATION_90 = 1
+    /// Not yet documented.
+    VDP1_ENV_ROTATION_0  = 0,
+    /// Not yet documented.
+    VDP1_ENV_ROTATION_90 = 1
 } vdp1_env_rotation_t;
 
 typedef enum vdp1_env_bpp {
-        /// Not yet documented.
-        VDP1_ENV_BPP_16 = 0,
-        /// Not yet documented.
-        VDP1_ENV_BPP_8  = 1
+    /// Not yet documented.
+    VDP1_ENV_BPP_16 = 0,
+    /// Not yet documented.
+    VDP1_ENV_BPP_8  = 1
 } vdp1_env_bpp_t;
 
 typedef enum vdp1_env_color_mode {
-        /// Not yet documented.
-        VDP1_ENV_COLOR_MODE_PALETTE     = 0,
-        /// Not yet documented.
-        VDP1_ENV_COLOR_MODE_RGB_PALETTE = 1
+    /// Not yet documented.
+    VDP1_ENV_COLOR_MODE_PALETTE     = 0,
+    /// Not yet documented.
+    VDP1_ENV_COLOR_MODE_RGB_PALETTE = 1
 } vdp1_env_color_mode_t;
 
 /// @addtogroup VDP1_ENV_STRUCTURES
@@ -57,28 +57,28 @@ typedef enum vdp1_env_color_mode {
 /// @compound
 /// @brief Not yet documented.
 typedef struct vdp1_env {
-        unsigned int :8;
+    unsigned int :8;
 
-        struct {
-                unsigned int :1;
-                vdp1_env_bpp_t bpp:1;
-                vdp1_env_rotation_t rotation:1;
-                vdp1_env_color_mode_t color_mode:1;
-                vdp2_sprite_type_t sprite_type:4;
-        } __packed;
+    struct {
+        unsigned int :1;
+        vdp1_env_bpp_t bpp:1;
+        vdp1_env_rotation_t rotation:1;
+        vdp1_env_color_mode_t color_mode:1;
+        vdp2_sprite_type_t sprite_type:4;
+    } __packed;
 
-        rgb1555_t erase_color;
+    rgb1555_t erase_color;
 
-        int16_vec2_t erase_points[2];
+    int16_vec2_t erase_points[2];
 } vdp1_env_t;
 
 /// @compound
 /// @brief Not yet documented.
 typedef struct {
-        int16_vec2_t system_clip;
-        int16_vec2_t user_clip_ul;
-        int16_vec2_t user_clip_lr;
-        int16_vec2_t local;
+    int16_vec2_t system_clip;
+    int16_vec2_t user_clip_ul;
+    int16_vec2_t user_clip_lr;
+    int16_vec2_t local;
 } vdp1_env_coords_t;
 
 /// @}
@@ -100,7 +100,7 @@ extern void vdp1_env_stop(void);
 
 /// @brief Not yet documented.
 extern void vdp1_env_preamble_populate(vdp1_cmdt_t *cmdts,
-    const vdp1_env_coords_t *env_coords);
+  const vdp1_env_coords_t *env_coords);
 
 /// @}
 

@@ -24,14 +24,14 @@ __BEGIN_DECLS
 
 /// @brief SCU-DSP RAM pages.
 typedef enum scu_dsp_ram {
-        /// SCU-DSP RAM page #0.
-        DSP_RAM_PAGE_0 = 0x00,
-        /// SCU-DSP RAM page #1.
-        DSP_RAM_PAGE_1 = 0x01,
-        /// SCU-DSP RAM page #2.
-        DSP_RAM_PAGE_2 = 0x02,
-        /// SCU-DSP RAM page #3.
-        DSP_RAM_PAGE_3 = 0x03
+    /// SCU-DSP RAM page #0.
+    DSP_RAM_PAGE_0 = 0x00,
+    /// SCU-DSP RAM page #1.
+    DSP_RAM_PAGE_1 = 0x01,
+    /// SCU-DSP RAM page #2.
+    DSP_RAM_PAGE_2 = 0x02,
+    /// SCU-DSP RAM page #3.
+    DSP_RAM_PAGE_3 = 0x03
 } scu_dsp_ram_t;
 
 /// SCU-DSP program size in bytes.
@@ -52,29 +52,29 @@ typedef uint8_t scu_dsp_pc_t;
 
 /// @brief SCU-DSP status.
 typedef struct scu_dsp_status {
-        unsigned int :5;
-        unsigned int :1;
-        unsigned int :1;
-        unsigned int :1;
-        /// D0-Bus DMA execution flag.
-        bool t0:1;
-        /// SCU-DSP @em S (sine) flag.
-        bool s:1;
-        /// SCU-DSP @em Z (zero) flag.
-        bool z:1;
-        /// SCU-DSP @em C (carry) flag.
-        bool c:1;
-        /// SCU-DSP @em V (overflow) flag.
-        bool v:1;
-        /// SCU-DSP @em E (program end interrupt) flag.
-        bool e:1;
-        unsigned int :1;
-        /// Flag to indicate whether execution is in progress or stopped.
-        bool ex:1;
-        unsigned int :1;
-        unsigned int :7;
-        /// Not yet documented.
-        scu_dsp_pc_t pc:8;
+    unsigned int :5;
+    unsigned int :1;
+    unsigned int :1;
+    unsigned int :1;
+    /// D0-Bus DMA execution flag.
+    bool t0:1;
+    /// SCU-DSP @em S (sine) flag.
+    bool s:1;
+    /// SCU-DSP @em Z (zero) flag.
+    bool z:1;
+    /// SCU-DSP @em C (carry) flag.
+    bool c:1;
+    /// SCU-DSP @em V (overflow) flag.
+    bool v:1;
+    /// SCU-DSP @em E (program end interrupt) flag.
+    bool e:1;
+    unsigned int :1;
+    /// Flag to indicate whether execution is in progress or stopped.
+    bool ex:1;
+    unsigned int :1;
+    unsigned int :7;
+    /// Not yet documented.
+    scu_dsp_pc_t pc:8;
 } __packed __aligned(4) scu_dsp_status_t;
 
 static_assert(sizeof(scu_dsp_status_t) == 4);
@@ -85,19 +85,18 @@ static_assert(sizeof(scu_dsp_status_t) == 4);
 static inline void __always_inline
 scu_dsp_program_pause(bool pause)
 {
-        if (pause) {
-                MEMORY_WRITE(32, SCU(PPAF), 0x02010000);
-        } else {
-                MEMORY_WRITE(32, SCU(PPAF), 0x04010000);
-        }
+    if (pause) {
+        MEMORY_WRITE(32, SCU(PPAF), 0x02010000);
+    } else {
+        MEMORY_WRITE(32, SCU(PPAF), 0x04010000);
+    }
 }
 
 /// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU-DSP end interrupt.
 /// @see scu_dsp_end_clear
-#define scu_dsp_end_clear()                                                    \
-do {                                                                           \
-        scu_dsp_end_set(NULL);                                                 \
+#define scu_dsp_end_clear() do {                                               \
+    scu_dsp_end_set(NULL);                                                     \
 } while (false)
 
 /// @ingroup SCU_IC_HELPERS
@@ -175,7 +174,7 @@ extern void scu_dsp_program_end_wait(void);
 /// @param[out] data     The pointer to the buffer to write to.
 /// @param      count    The number of words.
 extern void scu_dsp_data_read(scu_dsp_ram_t ram_page, uint8_t offset,
-    void *data, uint32_t count);
+  void *data, uint32_t count);
 
 /// @brief Write to one of the SCU-DSP RAM page.
 ///
@@ -187,7 +186,7 @@ extern void scu_dsp_data_read(scu_dsp_ram_t ram_page, uint8_t offset,
 /// @param[in]  data     The pointer to the buffer to write to.
 /// @param      count    The number of words.
 extern void scu_dsp_data_write(scu_dsp_ram_t ram_page, uint8_t offset,
-    void *data, uint32_t count);
+  void *data, uint32_t count);
 
 /// @brief Obtain SCU-DSP operation status.
 ///

@@ -21,8 +21,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 #ifdef __GNUC__
 typedef __may_alias size_t WT;
@@ -33,61 +33,61 @@ typedef __may_alias size_t WT;
 void * __used
 memmove(void *dest, const void *src, size_t n)
 {
-        char *d = dest;
-        const char *s = src;
+    char *d = dest;
+    const char *s = src;
 
-        if (d == s) {
-                return d;
-        }
+    if (d == s) {
+        return d;
+    }
 
-        if ((uintptr_t)s - (uintptr_t)d - n <= -2 * n) {
-                return memcpy(d, s, n);
-        }
+    if ((uintptr_t)s - (uintptr_t)d - n <= -2 * n) {
+        return memcpy(d, s, n);
+    }
 
-        if (d < s) {
+    if (d < s) {
 #ifdef __GNUC__
 
-                if ((uintptr_t)s % WS == (uintptr_t)d % WS) {
-                        while ((uintptr_t)d % WS) {
-                                if (!n--) {
-                                        return dest;
-                                }
-
-                                *d++ = *s++;
-                        }
-
-                        for (; n >= WS; n -= WS, d += WS, s += WS) {
-                                *(WT *)d = *(WT *)s;
-                        }
+        if ((uintptr_t)s % WS == (uintptr_t)d % WS) {
+            while ((uintptr_t)d % WS) {
+                if (!n--) {
+                    return dest;
                 }
+
+                *d++ = *s++;
+            }
+
+            for (; n >= WS; n -= WS, d += WS, s += WS) {
+                *(WT *)d = *(WT *)s;
+            }
+        }
 
 #endif /* __GNUC__ */
 
-                for (; n; n--) {
-                        *d++ = *s++;
-                }
-        } else {
+        for (; n; n--) {
+            *d++ = *s++;
+        }
+    } else {
 #ifdef __GNUC__
-                if ((uintptr_t)s % WS == (uintptr_t)d % WS) {
-                        while ((uintptr_t)(d + n) % WS) {
-                                if (!n--) {
-                                        return dest;
-                                }
-
-                                d[n] = s[n];
-                        }
-
-                        while (n >= WS) {
-                                n -= WS, *(WT *)(d + n) = *(WT *)(s + n);
-                        }
+        if ((uintptr_t)s % WS == (uintptr_t)d % WS) {
+            while ((uintptr_t)(d + n) % WS) {
+                if (!n--) {
+                    return dest;
                 }
+
+                d[n] = s[n];
+            }
+
+            while (n >= WS) {
+                n -= WS, *(WT *)(d + n) = *(WT *)(s + n);
+            }
+        }
 
 #endif /* __GNUC__ */
 
-                while (n) {
-                        n--, d[n] = s[n];
-                }
+        while (n) {
+            n--, d[n] = s[n];
         }
+    }
 
-        return dest;
+    return dest;
 }

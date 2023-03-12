@@ -5,17 +5,17 @@
 int
 ungetc(int c, FILE *f)
 {
-        if (c == EOF) {
-                return c;
-        }
+    if (c == EOF) {
+        return c;
+    }
 
-        if ((f->rpos == NULL) || (f->rpos <= (f->buf - UNGET))) {
-                return EOF;
-        }
+    if ((f->rpos == NULL) || (f->rpos <= (f->buf - UNGET))) {
+        return EOF;
+    }
 
-        *--f->rpos = c;
+    *--f->rpos = c;
 
-        f->flags &= ~F_EOF;
+    f->flags &= ~F_EOF;
 
-        return (unsigned char)c;
+    return (unsigned char)c;
 }

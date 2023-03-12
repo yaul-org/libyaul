@@ -135,7 +135,7 @@ SH_CXXFLAGS:= \
 	-fno-use-cxa-atexit \
 	$(SH_CXXFLAGS_shared)
 
-SH_CFLAGS_shared_release:= -Os -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
+SH_CFLAGS_shared_release:= -O2 -g -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
 SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
 SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
@@ -149,6 +149,7 @@ SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 SHARED_INCLUDE_DIRS:= \
 	$(abspath .) \
 	../lib$(MAIN_TARGET)/ \
+	../lib$(MAIN_TARGET)/bup \
 	../lib$(MAIN_TARGET)/lib/lib \
 	../lib$(MAIN_TARGET)/kernel \
 	../lib$(MAIN_TARGET)/math \

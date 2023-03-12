@@ -15,5 +15,5 @@
 void
 cdfs_sector_read(sector_t sector, void *ptr)
 {
-        cd_block_sector_read(LBA2FAD(sector), ptr);
+    cd_block_sector_read(LBA2FAD(sector), ptr);
 }

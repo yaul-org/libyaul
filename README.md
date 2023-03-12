@@ -155,12 +155,12 @@ note that you still need to [build Yaul](#building-yaul-manually).
 <details>
   <summary>Setting up the environment file</summary>
 
-1. Copy the template `$TOOL_CHAIN_PREFIX/sh2eb-elf/yaul.env.in` to your home
-   directory as `.yaul.env`. This is your environment file.
+1. If the tool-chain package was installed, copy the template
+   `$TOOL_CHAIN_PREFIX/sh2eb-elf/yaul.env.in` to your home directory as
+   `.yaul.env`. This is your environment file.
 
-   Note, `$TOOL_CHAIN_PREFIX` is `/opt/tool-chains` if the
-   `yaul-tool-chain-git` package is installed. Otherwise, if the tool-chain was
-   built manually, it's `$HOME/x-tools`.
+   Otherwise, copy `yaul.env.in` from the root of this repository to your home
+   directory as `.yaul.env`.
 
 2. Read the environment file `.yaul.env` into your current shell.
 

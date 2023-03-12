@@ -27,12 +27,12 @@ __BEGIN_DECLS
 typedef uint32_t fad_t;
 
 typedef struct cd_block_hardware_info {
-        uint8_t cd_status;
-        uint8_t hw_flag;
-        uint8_t hw_version;
-        uint8_t mpeg_version;
-        uint8_t drive_version;
-        uint8_t drive_revision;
+    uint8_t cd_status;
+    uint8_t hw_flag;
+    uint8_t hw_version;
+    uint8_t mpeg_version;
+    uint8_t drive_version;
+    uint8_t drive_revision;
 } cd_block_hardware_info_t;
 
 #define CD_STATUS_BUSY          0x00
@@ -52,12 +52,12 @@ typedef struct cd_block_hardware_info {
 #define CD_STATUS_REJECT        0xFF
 
 typedef struct cd_block_status {
-        uint8_t cd_status;
-        uint8_t flag_and_repeat_count;
-        uint8_t ctrl_addr;
-        uint8_t track_number;
-        uint8_t index_number;
-        fad_t fad;
+    uint8_t cd_status;
+    uint8_t flag_and_repeat_count;
+    uint8_t ctrl_addr;
+    uint8_t track_number;
+    uint8_t index_number;
+    fad_t fad;
 } cd_block_status_t;
 
 extern int cd_block_cmd_status_get(cd_block_status_t *cd_status);
@@ -77,8 +77,8 @@ extern int cd_block_cmd_last_buffer_destination_get(uint8_t *cd_status, uint8_t 
 extern int cd_block_cmd_filter_range_set(uint8_t filter, fad_t fad, uint32_t range);
 
 extern int cd_block_cmd_filter_subheader_conditions_set(uint8_t channel, uint8_t submode_mask,
-    uint8_t code_info_mask, uint8_t filter_num, uint8_t file_id, uint8_t sub_mode_val,
-    uint8_t code_info_val);
+  uint8_t code_info_mask, uint8_t filter_num, uint8_t file_id, uint8_t sub_mode_val,
+  uint8_t code_info_val);
 extern int cd_block_cmd_filter_mode_set(uint8_t mode, uint16_t filter_num);
 extern int cd_block_cmd_filter_connection_set(uint8_t conn_num, uint8_t true_conn, uint8_t false_conn, uint16_t filter_num);
 extern int cd_block_cmd_selector_reset(uint8_t flags, uint8_t sel_num);

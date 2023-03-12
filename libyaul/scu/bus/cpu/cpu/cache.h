@@ -67,57 +67,58 @@ __BEGIN_DECLS
 
 /// @brief Cache mode.
 typedef enum cpu_cache_mode {
-        /// Four-way set associative.
-        CPU_CACHE_MODE_4_WAY = 0x00,
-        /// Two-way set associate and 2KiB RAM.
-        CPU_CACHE_MODE_2_WAY = 0x08
+    /// Four-way set associative.
+    CPU_CACHE_MODE_4_WAY = 0x00,
+    /// Two-way set associate and 2KiB RAM.
+    CPU_CACHE_MODE_2_WAY = 0x08
 } cpu_cache_mode_t;
 
 /// @brief Cache type.
 typedef enum cpu_cache_type {
-        /// Instruction cache type.
-        CPU_CACHE_TYPE_I = 0x02,
-        /// Data cache type.
-        CPU_CACHE_TYPE_D = 0x04
+    /// Instruction cache type.
+    CPU_CACHE_TYPE_I = 0x02,
+    /// Data cache type.
+    CPU_CACHE_TYPE_D = 0x04
 } cpu_cache_type_t;
 
 /// @brief Cache data line representing the data read from the cache.
 /// @see cpu_cache_data_way_t
 /// @see cpu_cache_data_way_read
 typedef union cpu_cache_data_line {
-        unsigned int      :3;
-        /// @brief Tag bits.
-        unsigned int   tag:19;
-        /// @brief LRU bits.
-        unsigned int   lru:6;
-        unsigned int      :1;
-        /// @brief Validity bit.
-        unsigned int valid:1;
-        unsigned int      :2;
+    unsigned int      :3;
+    /// @brief Tag bits.
+    unsigned int   tag:19;
+    /// @brief LRU bits.
+    unsigned int   lru:6;
+    unsigned int      :1;
+    /// @brief Validity bit.
+    unsigned int valid:1;
+    unsigned int      :2;
 } __packed cpu_cache_data_line_t;
 
 /// @brief Cache data way.
 /// @see cpu_cache_data_way_read
 typedef struct cpu_cache_data_way {
-        cpu_cache_data_line_t data[CPU_CACHE_WAY_SIZE / CPU_CACHE_LINE_SIZE];
+    /// @brief Data.
+    cpu_cache_data_line_t data[CPU_CACHE_WAY_SIZE / CPU_CACHE_LINE_SIZE];
 } __aligned(4) cpu_cache_data_way_t;
 
 /// @brief Enable cache.
 static inline void __always_inline
 cpu_cache_enable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ccr |= 0x01;
+    cpu_ioregs->ccr |= 0x01;
 }
 
 /// @brief Disable cache.
 static inline void __always_inline
 cpu_cache_disable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ccr &= ~0x01;
+    cpu_ioregs->ccr &= ~0x01;
 }
 
 /// @brief Enable type replacement.
@@ -129,12 +130,12 @@ cpu_cache_disable(void)
 static inline void __always_inline
 cpu_cache_repl_enable(cpu_cache_type_t type)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~((uint8_t)type | 0x01);
+    const uint8_t t0 = cpu_ioregs->ccr & ~((uint8_t)type | 0x01);
 
-        cpu_map->ccr = t0;
-        cpu_map->ccr = t0 | 0x01;
+    cpu_ioregs->ccr = t0;
+    cpu_ioregs->ccr = t0 | 0x01;
 }
 
 /// @brief Disable type replacement in the cache.
@@ -146,14 +147,14 @@ cpu_cache_repl_enable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_repl_disable(cpu_cache_type_t type)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~0x01;
+    const uint8_t t0 = cpu_ioregs->ccr & ~0x01;
 
-        /* Set bit with cache disabled */
-        cpu_map->ccr = t0 | (uint8_t)type;
-        /* Enable cache and set bit(s) */
-        cpu_map->ccr = t0 | (uint8_t)type | 0x01;
+    /* Set bit with cache disabled */
+    cpu_ioregs->ccr = t0 | (uint8_t)type;
+    /* Enable cache and set bit(s) */
+    cpu_ioregs->ccr = t0 | (uint8_t)type | 0x01;
 }
 
 /// @brief Change the mode the cache operates.
@@ -167,13 +168,13 @@ cpu_cache_repl_disable(cpu_cache_type_t type)
 static inline void __always_inline
 cpu_cache_way_mode_set(cpu_cache_mode_t mode)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t t0 = cpu_map->ccr & ~0x0F;
+    const uint8_t t0 = cpu_ioregs->ccr & ~0x0F;
 
-        cpu_map->ccr = t0;
-        cpu_map->ccr = t0 | (uint8_t)mode;
-        cpu_map->ccr = t0 | (uint8_t)mode | 0x01;
+    cpu_ioregs->ccr = t0;
+    cpu_ioregs->ccr = t0 | (uint8_t)mode;
+    cpu_ioregs->ccr = t0 | (uint8_t)mode | 0x01;
 }
 
 /// @brief Cache line of the specified address is purged.
@@ -206,8 +207,8 @@ extern void cpu_cache_purge(void) __no_reorder __uncached_function;
 /// cpu_cache_data_way_read must be uncached so that it doesn't taint the cache
 /// itself.
 ///
-/// @param     way       The cache way to read from.
-/// @param[in] cache_way The cache way buffer to write to.
+/// @param     way      The cache way to read from.
+/// @param[in] data_way The cache way buffer to write to.
 extern void cpu_cache_data_way_read(uint8_t way, cpu_cache_data_way_t *data_way) __uncached_function;
 
 /// @}

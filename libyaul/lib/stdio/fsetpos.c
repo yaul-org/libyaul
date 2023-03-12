@@ -26,5 +26,5 @@
 int
 fsetpos(FILE *f, const fpos_t *pos)
 {
-        return fseek(f, *(const long *)pos, SEEK_SET);
+    return fseek(f, *(const long *)pos, SEEK_SET);
 }

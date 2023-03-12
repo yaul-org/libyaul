@@ -270,14 +270,14 @@
 #define __predict_false(exp)    __builtin_expect((exp), 0)
 
 /// @private
-#define __alignof(x)                                                            \
-        __offsetof(struct { char __a; x __b; }, __b)
+#define __alignof(x)                                                           \
+    __offsetof(struct { char __a; x __b; }, __b)
 /// @private
-#define __offsetof(type, field)                                                 \
-        offsetof(type, field)
+#define __offsetof(type, field)                                                \
+    offsetof(type, field)
 /// @private
-#define __rangeof(type, start, end)                                             \
-        (__offsetof(type, end) - __offsetof(type, start))
+#define __rangeof(type, start, end)                                            \
+    (__offsetof(type, end) - __offsetof(type, start))
 
 /* Compiler-dependent macros to declare that functions take printf-like or
  * scanf-like arguments.
@@ -286,15 +286,15 @@
  * features properly (old versions of GCC-2 didn't permit keeping the keywords
  * out of the application namespace). */
 /// @private
-#define __printflike(fmt_arg, first_vararg)                                     \
-        __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
+#define __printflike(fmt_arg, first_vararg)                                    \
+    __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
 /// @private
-#define __format_arg(fmt_arg)                                                   \
-        __attribute__ ((__format_arg__ (fmt_arg)))
+#define __format_arg(fmt_arg)                                                  \
+    __attribute__ ((__format_arg__ (fmt_arg)))
 
 /// @private
 #define __weak_alias(name, aliasname)                                          \
-        extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
+    extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
 
 /*
  * Prior to C++17 the register storage class specifier was deprecated; in C++17

@@ -3,5 +3,5 @@
 char * __weak
 tmpnam(char *buf __unused)
 {
-        return 0;
+    return 0;
 }

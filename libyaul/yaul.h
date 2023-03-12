@@ -16,6 +16,8 @@
 
 #include <bios.h>
 
+#include <bup.h>
+
 /* CPU-bus CPU */
 #include <scu/bus/cpu/cpu.h>
 

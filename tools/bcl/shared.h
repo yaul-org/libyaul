@@ -4,8 +4,8 @@
 #include <stddef.h>
 
 typedef struct input_file {
-        void * const buffer;
-        size_t buffer_len;
+    void * const buffer;
+    size_t buffer_len;
 } input_file_t;
 
 int input_file_open(const char *file_name, input_file_t *input_file);

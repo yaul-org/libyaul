@@ -21,21 +21,22 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <ctype.h>
+#include <string.h>
 
 int
 strncasecmp(const char *_l, const char *_r, size_t n)
 {
-        const uint8_t *l = (void *)_l;
-        const uint8_t *r = (void *)_r;
+    const uint8_t *l = (void *)_l;
+    const uint8_t *r = (void *)_r;
 
-        if (!n--) {
-                return 0;
-        }
+    if (!n--) {
+        return 0;
+    }
 
-        for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r)); l++, r++, n--) {
-        }
+    for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r));
+         l++, r++, n--) {
+    }
 
-        return tolower(*l) - tolower(*r);
+    return tolower(*l) - tolower(*r);
 }
