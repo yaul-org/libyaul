@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2012-2022 Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
+.text
+.align 4
+
+.global ___context_switch
+.type ___context_switch, @function
+
+___context_switch:
+                                        ! Context switch save
+        mov.l r15, @r4                  ! Offset 0. Save r15 to use it
+        mov r4, r15                     ! Pointer to fiber context
+        add #23*4, r15                  ! Byte offset to &cpu_registers_t::sr + 1 for pre-decrement
+        stc.l sr, @-r15                 ! Offset 22*4
+        add #-4, r15                    ! Offset 21*4
+        sts.l pr, @-r15                 ! Offset 20*4
+        add #-4*4, r15                  ! Skip writing pc, macl, mach, vbr, gbr
+        mov.l r14, @-r15                ! Offset 15*4
+        mov.l r13, @-r15                ! Offset 14*4
+        mov.l r12, @-r15
+        mov.l r11, @-r15
+        mov.l r10, @-r15
+        mov.l r9, @-r15
+        mov.l r8, @-r15
+        mov.l r7, @-r15
+        mov.l r6, @-r15
+        mov.l r5, @-r15
+        mov.l r4, @-r15
+        mov.l r3, @-r15
+        mov.l r2, @-r15
+        mov.l r1, @-r15
+        mov.l r0, @-r15
+                                        ! Context switch restore
+        mov r5, r14
+        mov.l @r14+, r15                ! Offset 0.
+        mov.l @r14+, r0                 ! Offset 1*4.
+        mov.l @r14+, r1
+        mov.l @r14+, r2
+        mov.l @r14+, r3
+        mov.l @r14+, r4
+        mov.l @r14+, r5
+        mov.l @r14+, r6
+        mov.l @r14+, r7
+        mov.l @r14+, r8
+        mov.l @r14+, r9
+        mov.l @r14+, r10
+        mov.l @r14+, r11
+        mov.l @r14+, r12
+        mov.l @r14+, r13
+        add #4*5, r14                   ! Skip restoring r14, macl, mach, vbr, gbr
+        lds.l @r14+, pr
+        add #4, r14                     ! Skip restoring pc
+        ldc.l @r14+, sr
+        add #-(23-15)*4, r14            ! Offset 23 (due to post-increment) to offset 15 (r14)
+        rts
+        mov.l @r14, r14                 ! Restore r14

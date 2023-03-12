@@ -2,7 +2,8 @@ PROJECTS:= \
 	libyaul \
 	libtga \
 	libbcl \
-	libmic3d
+	libmic3d \
+	libfiber
 
 include env.mk
 
