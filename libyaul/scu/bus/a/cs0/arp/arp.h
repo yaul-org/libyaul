@@ -23,14 +23,14 @@ __BEGIN_DECLS
 
 /// @brief ARP Function types.
 typedef enum arp_function_type {
-        /// Invalid function.
-        ARP_FUNCTION_TYPE_NONE     = 0,
-        /// Download function.
-        ARP_FUNCTION_TYPE_DOWNLOAD = 1,
-        /// Upload function.
-        ARP_FUNCTION_TYPE_UPLOAD   = 2,
-        /// Upload and execute function.
-        ARP_FUNCTION_TYPE_EXEC     = 3
+    /// Invalid function.
+    ARP_FUNCTION_TYPE_NONE     = 0,
+    /// Download function.
+    ARP_FUNCTION_TYPE_DOWNLOAD = 1,
+    /// Upload function.
+    ARP_FUNCTION_TYPE_UPLOAD   = 2,
+    /// Upload and execute function.
+    ARP_FUNCTION_TYPE_EXEC     = 3
 } arp_function_type_t;
 
 /// @brief Callback type.
@@ -41,12 +41,12 @@ typedef void (*arp_callback_handler_t)(const arp_callback_t *);
 
 /// @brief Not yet documented.
 struct arp_callback {
-        /// Function recently executed.
-        arp_function_type_t function_type;
-        /// Address.
-        void *ptr;
-        /// Length of transfer.
-        size_t len;
+    /// Function recently executed.
+    arp_function_type_t function_type;
+    /// Address.
+    void *ptr;
+    /// Length of transfer.
+    size_t len;
 } __aligned(4);
 
 /// @brief Determine if the ARP is busy.

@@ -32,324 +32,296 @@ static callback_t _master_ihr_callbacks[2];
 static callback_t _slave_ihr_callbacks[2];
 
 static callback_t * const _ihr_callback_tables[] = {
-        _master_ihr_callbacks,
-        _slave_ihr_callbacks
+    _master_ihr_callbacks,
+    _slave_ihr_callbacks
 };
 
 void
 __cpu_dmac_init(void)
 {
-        cpu_dmac_channel_wait(0);
-        cpu_dmac_channel_wait(1);
-        cpu_dmac_channel_stop(0);
-        cpu_dmac_channel_stop(1);
-        cpu_dmac_disable();
+    cpu_dmac_channel_wait(0);
+    cpu_dmac_channel_wait(1);
+    cpu_dmac_channel_stop(0);
+    cpu_dmac_channel_stop(1);
+    cpu_dmac_disable();
 
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->vcrdma0 = CPU_INTC_INTERRUPT_DMAC0;
-        cpu_map->vcrdma1 = CPU_INTC_INTERRUPT_DMAC1;
+    cpu_ioregs->vcrdma0 = CPU_INTC_INTERRUPT_DMAC0;
+    cpu_ioregs->vcrdma1 = CPU_INTC_INTERRUPT_DMAC1;
 
-        cpu_dmac_interrupt_priority_set(15);
+    cpu_dmac_interrupt_priority_set(15);
 
-        cpu_map->drcr0 = 0x00;
-        cpu_map->drcr1 = 0x00;
+    cpu_ioregs->drcr0 = 0x00;
+    cpu_ioregs->drcr1 = 0x00;
 
-        const cpu_which_t which_cpu = cpu_dual_executor_get();
+    const cpu_which_t which_cpu = cpu_dual_executor_get();
 
-        if (which_cpu == CPU_MASTER) {
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0, _master_ch0_ihr_handler);
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1, _master_ch1_ihr_handler);
+    if (which_cpu == CPU_MASTER) {
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0, _master_ch0_ihr_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1, _master_ch1_ihr_handler);
 
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0 + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _slave_ch0_ihr_handler);
-                cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1 + CPU_INTC_INTERRUPT_SLAVE_BASE,
-                    _slave_ch1_ihr_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC0 + CPU_INTC_INTERRUPT_SLAVE_BASE,
+          _slave_ch0_ihr_handler);
+        cpu_intc_ihr_set(CPU_INTC_INTERRUPT_DMAC1 + CPU_INTC_INTERRUPT_SLAVE_BASE,
+          _slave_ch1_ihr_handler);
 
-                callback_init(&_master_ihr_callbacks[0]);
-                callback_init(&_master_ihr_callbacks[1]);
-        } else {
-                callback_init(&_slave_ihr_callbacks[0]);
-                callback_init(&_slave_ihr_callbacks[1]);
-        }
+        callback_init(&_master_ihr_callbacks[0]);
+        callback_init(&_master_ihr_callbacks[1]);
+    } else {
+        callback_init(&_slave_ihr_callbacks[0]);
+        callback_init(&_slave_ihr_callbacks[1]);
+    }
 
-        cpu_dmac_enable();
+    cpu_dmac_enable();
 }
 
 void
 cpu_dmac_status_get(cpu_dmac_status_t *status)
 {
-        if (status == NULL) {
-                return;
-        }
+    if (status == NULL) {
+        return;
+    }
 
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint32_t reg_dmaor = cpu_map->dmaor;
+    const uint32_t reg_dmaor = cpu_ioregs->dmaor;
 
-        status->enabled = reg_dmaor & 0x00000001;
-        status->priority_mode = (reg_dmaor >> 3) & 0x00000001;
-        status->address_error = (reg_dmaor >> 2) & 0x00000001;
-        status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
+    status->enabled = reg_dmaor & 0x00000001;
+    status->priority_mode = (reg_dmaor >> 3) & 0x00000001;
+    status->address_error = (reg_dmaor >> 2) & 0x00000001;
+    status->nmi_interrupt = (reg_dmaor >> 1) & 0x00000001;
 
-        const uint32_t reg_chcr0 = cpu_map->chcr0;
-        const uint32_t reg_chcr1 = cpu_map->chcr1;
+    const uint32_t reg_chcr0 = cpu_ioregs->channel0.chcrn;
+    const uint32_t reg_chcr1 = cpu_ioregs->channel1.chcrn;
 
-        const uint8_t ch0_enabled = reg_chcr0 & 0x00000001;
-        const uint8_t ch1_enabled = reg_chcr1 & 0x00000001;
+    const uint8_t ch0_enabled = reg_chcr0 & 0x00000001;
+    const uint8_t ch1_enabled = reg_chcr1 & 0x00000001;
 
-        status->channel_enabled = (ch1_enabled << 1) | ch0_enabled;
+    status->channel_enabled = (ch1_enabled << 1) | ch0_enabled;
 
-        /*-
-         * Truth table to determine if a specific channel is enabled or not
-         *
-         * TE DE Busy
-         *  0 0  0
-         *  0 1  1    Could be a false positive
-         *  1 0  0
-         *  1 1  0
-         */
-        uint8_t de;
-        uint8_t te;
+    /*-
+     * Truth table to determine if a specific channel is enabled or not
+     *
+     * TE DE Busy
+     *  0 0  0
+     *  0 1  1    Could be a false positive
+     *  1 0  0
+     *  1 1  0
+     */
+    uint8_t de;
+    uint8_t te;
 
-        uint8_t ch0_busy;
-        de = reg_chcr0 & 0x00000001;
-        te = (reg_chcr0 >> 1) & 0x00000001;
-        ch0_busy = (((de | te) ^ 1) | de) ^ 1;
+    uint8_t ch0_busy;
+    de = reg_chcr0 & 0x00000001;
+    te = (reg_chcr0 >> 1) & 0x00000001;
+    ch0_busy = (((de | te) ^ 1) | de) ^ 1;
 
-        uint8_t ch1_busy;
-        de = reg_chcr1 & 0x00000001;
-        te = (reg_chcr1 >> 1) & 0x00000001;
-        ch1_busy = (((de | te) ^ 1) | de) ^ 1;
+    uint8_t ch1_busy;
+    de = reg_chcr1 & 0x00000001;
+    te = (reg_chcr1 >> 1) & 0x00000001;
+    ch1_busy = (((de | te) ^ 1) | de) ^ 1;
 
-        status->channel_busy = (ch1_busy << 1) | ch0_busy;
+    status->channel_busy = (ch1_busy << 1) | ch0_busy;
 }
 
 void
 cpu_dmac_channel_config_set(const cpu_dmac_cfg_t *cfg)
 {
-        const uint32_t channel = cfg->channel & 0x01;
+    cpu_dmac_channel_stop(cfg->channel);
 
-        cpu_dmac_channel_stop(cfg->channel);
+    /* Source and destination address modes */
+    uint32_t reg_chcr;
+    reg_chcr = ((cfg->src_mode & 0x03) << 12) |
+               ((cfg->dst_mode & 0x03) << 14) |
+               ((cfg->stride & 0x03) << 10) |
+               ((cfg->bus_mode & 0x01) << 4);
 
-        /* Source and destination address modes */
-        uint32_t reg_chcr;
-        reg_chcr = ((cfg->src_mode & 0x03) << 12) |
-                   ((cfg->dst_mode & 0x03) << 14) |
-                   ((cfg->stride & 0x03) << 10) |
-                   ((cfg->bus_mode & 0x01) << 4);
+    uint8_t reg_drcr;
 
-        if (cfg->non_default) {
-                /* Non-default DMAC settings */
-                reg_chcr |= ((cfg->request_mode & 0x01) << 9) |
-                            ((cfg->dack_mode & 0x01) << 8) |
-                            ((cfg->dack_level & 0x01) << 7) |
-                            ((cfg->detect_mode & 0x01) << 6) |
-                            ((cfg->dreq_level & 0x01) << 5);
-        } else {
-                /* Default DMAC settings, enable AR (auto-request mode) */
-                reg_chcr |= 0x00000200;
+    if (cfg->non_default) {
+        /* Non-default DMAC settings */
+        reg_chcr |= ((cfg->request_mode & 0x01) << 9) |
+                    ((cfg->dack_mode & 0x01) << 8) |
+                    ((cfg->dack_level & 0x01) << 7) |
+                    ((cfg->detect_mode & 0x01) << 6) |
+                    ((cfg->dreq_level & 0x01) << 5);
+
+        reg_drcr = (cfg->resource_select & 0x03);
+    } else {
+        /* Default DMAC settings, enable AR (auto-request mode) */
+        reg_chcr |= 0x00000200;
+        reg_drcr = 0x00;
+    }
+
+    uint32_t reg_tcr;
+    reg_tcr = cfg->len;
+
+    const uint8_t stride = cfg->stride & 0x03;
+
+    /* Check that the source and destination addresses are stride-byte
+     * aligned */
+
+    if (stride == CPU_DMAC_STRIDE_16_BYTES) {
+        if (reg_tcr > 0x00FFFFFF) {
+            /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
+            reg_tcr = 0x00000000;
         }
 
-        uint32_t reg_tcr;
-        reg_tcr = cfg->len;
+        reg_tcr >>= 2;
 
-        const uint8_t reg_drcr = (cfg->resource_select & 0x03);
+        /* During 16-byte transfers, the transfer address mode bit for
+         * dual address mode */
+        reg_chcr &= ~0x00000008;
+    } else if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
+        reg_tcr >>= 2;
+    } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
+        reg_tcr >>= 1;
+    }
 
-        uint8_t stride;
-        stride = cfg->stride & 0x03;
+    if (cfg->ihr != NULL) {
+        /* Enable interrupt */
+        reg_chcr |= 0x00000004;
 
-        /* Check that the source and destination addresses are stride-byte
-         * aligned */
+        callback_t * const ihr_callbacks = _ihr_callback_get();
+        callback_t * const ihr_callback =
+          &ihr_callbacks[cfg->channel];
 
-        if (stride == CPU_DMAC_STRIDE_16_BYTES) {
-                if (reg_tcr > 0x00FFFFFF) {
-                        /* Transfer 16MiB inclusive when TCR0 is 0x00000000 */
-                        reg_tcr = 0x00000000;
-                }
+        /* Set interrupt handling routine */
+        callback_set(ihr_callback, cfg->ihr, cfg->ihr_work);
+    }
 
-                reg_tcr >>= 2;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-                /* During 16-byte transfers, the transfer address mode bit for
-                 * dual address mode */
-                reg_chcr &= ~0x00000008;
-        } else if (stride >= CPU_DMAC_STRIDE_4_BYTES) {
-                reg_tcr >>= 2;
-        } else if (stride == CPU_DMAC_STRIDE_2_BYTES) {
-                reg_tcr >>= 1;
-        }
+    cpu_ioregs->channels[cfg->channel].darn = cfg->dst;
+    cpu_ioregs->channels[cfg->channel].sarn = cfg->src;
+    cpu_ioregs->channels[cfg->channel].tcrn = reg_tcr;
+    cpu_ioregs->channels[cfg->channel].chcrn = reg_chcr;
 
-        if (cfg->ihr != NULL) {
-                /* Enable interrupt */
-                reg_chcr |= 0x00000004;
-
-                callback_t * const ihr_callbacks = _ihr_callback_get();
-                callback_t * const ihr_callback =
-                    &ihr_callbacks[cfg->channel];
-
-                /* Set interrupt handling routine */
-                callback_set(ihr_callback, cfg->ihr, cfg->ihr_work);
-        }
-
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
-
-        switch (channel) {
-        case 0:
-                cpu_map->dar0 = cfg->dst;
-                cpu_map->sar0 = cfg->src;
-                cpu_map->tcr0 = reg_tcr;
-                cpu_map->chcr0 = reg_chcr;
-                cpu_map->drcr0 = reg_drcr;
-                break;
-        case 1:
-                cpu_map->dar1 = cfg->dst;
-                cpu_map->sar1 = cfg->src;
-                cpu_map->tcr1 = reg_tcr;
-                cpu_map->chcr1 = reg_chcr;
-                cpu_map->drcr1 = reg_drcr;
-                break;
-        }
+    cpu_ioregs->drcrn[cfg->channel] = reg_drcr;
 }
 
 void
 cpu_dmac_channel_wait(cpu_dmac_channel_t ch)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        /* Don't wait if DMAC is disabled */
-        if ((cpu_map->dmaor & 0x00000001) == 0x00000000) {
-                return;
-        }
+    /* Don't wait if DMAC is disabled */
+    if ((cpu_ioregs->dmaor & 0x00000001) == 0x00000000) {
+        return;
+    }
 
-        switch (ch) {
-        case 0:
-                /* Don't wait if the channel isn't enabled */
-                if ((cpu_map->chcr0 & 0x00000001) == 0x00000000) {
-                        return;
-                }
-
-                /* TE bit will always be set upon normal or abnormal transfer */
-                while ((cpu_map->chcr0 & 0x00000002) == 0x00000000) {
-                }
-                break;
-        case 1:
-                /* Don't wait if the channel isn't enabled */
-                if ((cpu_map->chcr1 & 0x00000001) == 0x00000000) {
-                        return;
-                }
-
-                /* TE bit will always be set upon normal or abnormal transfer */
-                while ((cpu_map->chcr1 & 0x00000002) == 0x00000000) {
-                }
-                break;
-        }
+    /* TE bit will always be set upon normal or abnormal transfer */
+    /* Don't wait if the channel isn't enabled (bit 0) */
+    while ((cpu_ioregs->channels[ch].chcrn & 0x00000003) == 0x00000001) {
+    }
 }
 
 void
 cpu_dmac_transfer(cpu_dmac_channel_t ch, void *dst, const void *src, size_t size)
 {
-        cpu_dmac_cfg_t dmac_cfg = {
-                .src_mode = CPU_DMAC_SOURCE_INCREMENT,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .stride   = CPU_DMAC_STRIDE_4_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr      = NULL,
-                .ihr_work = NULL
-        };
+    cpu_dmac_cfg_t dmac_cfg = {
+        .src_mode = CPU_DMAC_SOURCE_INCREMENT,
+        .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+        .stride   = CPU_DMAC_STRIDE_4_BYTES,
+        .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+        .ihr      = NULL,
+        .ihr_work = NULL
+    };
 
-        dmac_cfg.channel = ch;
-        dmac_cfg.src     = (uint32_t)src;
-        dmac_cfg.dst     = CPU_CACHE_THROUGH | (uintptr_t)dst;
-        dmac_cfg.len     = size;
+    dmac_cfg.channel = ch;
+    dmac_cfg.src     = (uint32_t)src;
+    dmac_cfg.dst     = CPU_CACHE_THROUGH | (uintptr_t)dst;
+    dmac_cfg.len     = size;
 
-        cpu_dmac_channel_wait(ch);
-        cpu_dmac_channel_stop(ch);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-        cpu_dmac_channel_start(ch);
-        cpu_dmac_enable();
+    cpu_dmac_channel_wait(ch);
+    cpu_dmac_channel_stop(ch);
+    cpu_dmac_channel_config_set(&dmac_cfg);
+    cpu_dmac_channel_start(ch);
+    cpu_dmac_enable();
 }
 
 void
 cpu_dmac_transfer_wait(cpu_dmac_channel_t ch)
 {
-        cpu_dmac_channel_wait(ch);
+    cpu_dmac_channel_wait(ch);
 }
 
 void
 cpu_dmac_memset(cpu_dmac_channel_t ch, void *dst, uint32_t value,
-    size_t size)
+  size_t size)
 {
-        static cpu_dmac_cfg_t dmac_cfg = {
-                .src_mode = CPU_DMAC_SOURCE_FIXED,
-                .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
-                .stride   = CPU_DMAC_STRIDE_4_BYTES,
-                .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
-                .ihr      = NULL,
-                .ihr_work = NULL
-        };
+    static cpu_dmac_cfg_t dmac_cfg = {
+        .src_mode = CPU_DMAC_SOURCE_FIXED,
+        .dst_mode = CPU_DMAC_DESTINATION_INCREMENT,
+        .stride   = CPU_DMAC_STRIDE_4_BYTES,
+        .bus_mode = CPU_DMAC_BUS_MODE_CYCLE_STEAL,
+        .ihr      = NULL,
+        .ihr_work = NULL
+    };
 
-        static volatile uint32_t clear_value __uncached = 0;
+    static volatile uint32_t clear_value __uncached = 0;
 
-        dmac_cfg.channel = ch;
-        dmac_cfg.src = (uint32_t)&clear_value;
-        dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
-        dmac_cfg.len = size;
+    dmac_cfg.channel = ch;
+    dmac_cfg.src = (uint32_t)&clear_value;
+    dmac_cfg.dst = CPU_CACHE_THROUGH | (uintptr_t)dst;
+    dmac_cfg.len = size;
 
-        cpu_dmac_channel_wait(ch);
+    cpu_dmac_channel_wait(ch);
 
-        clear_value = value;
+    clear_value = value;
 
-        cpu_dmac_channel_stop(ch);
-        cpu_dmac_channel_config_set(&dmac_cfg);
-        cpu_dmac_channel_start(ch);
-        cpu_dmac_enable();
-        cpu_dmac_channel_wait(ch);
+    cpu_dmac_channel_stop(ch);
+    cpu_dmac_channel_config_set(&dmac_cfg);
+    cpu_dmac_channel_start(ch);
+    cpu_dmac_enable();
+    cpu_dmac_channel_wait(ch);
 }
 
 static void __interrupt_handler
 _master_ch0_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        callback_call(&_master_ihr_callbacks[IHR_INDEX_CH0]);
+    callback_call(&_master_ihr_callbacks[IHR_INDEX_CH0]);
 
-        cpu_map->chcr0 &= ~0x00000005;
+    cpu_ioregs->channel0.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _slave_ch0_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH0]);
+    callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH0]);
 
-        cpu_map->chcr0 &= ~0x00000005;
+    cpu_ioregs->channel0.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _master_ch1_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        callback_call(&_master_ihr_callbacks[IHR_INDEX_CH1]);
+    callback_call(&_master_ihr_callbacks[IHR_INDEX_CH1]);
 
-        cpu_map->chcr1 &= ~0x00000005;
+    cpu_ioregs->channel1.chcrn &= ~0x00000005;
 }
 
 static void __interrupt_handler
 _slave_ch1_ihr_handler(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH1]);
+    callback_call(&_slave_ihr_callbacks[IHR_INDEX_CH1]);
 
-        cpu_map->chcr1 &= ~0x00000005;
+    cpu_ioregs->channel1.chcrn &= ~0x00000005;
 }
 
 static callback_t *
 _ihr_callback_get(void)
 {
-        const cpu_which_t which_cpu = cpu_dual_executor_get();
+    const cpu_which_t which_cpu = cpu_dual_executor_get();
 
-        return _ihr_callback_tables[which_cpu];
+    return _ihr_callback_tables[which_cpu];
 }

@@ -85,9 +85,9 @@ typedef void (*cpu_wdt_ihr_t)(void);
 static inline void __always_inline
 cpu_wdt_count_set(uint8_t count)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->wtcntw = CPU_WDT_WTCNT(count);
+        cpu_ioregs->wtcntw = CPU_WDT_WTCNT(count);
 }
 
 /// @brief Obtain the current 1-byte WDT tick count.
@@ -95,38 +95,38 @@ cpu_wdt_count_set(uint8_t count)
 static inline uint8_t __always_inline
 cpu_wdt_count_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return cpu_map->wtcntr;
+        return cpu_ioregs->wtcntr;
 }
 
 /// @brief Enable the CPU-WDT.
 static inline void __always_inline
 cpu_wdt_enable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         uint8_t wtcr_bits;
-        wtcr_bits = cpu_map->wtcsrr;
+        wtcr_bits = cpu_ioregs->wtcsrr;
 
         wtcr_bits &= ~0x80;
         wtcr_bits |= 0x20;
 
-        cpu_map->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
+        cpu_ioregs->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
 }
 
 /// @brief Disable the CPU-WDT.
 static inline void __always_inline
 cpu_wdt_disable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         uint8_t wtcr_bits;
-        wtcr_bits = cpu_map->wtcsrr;
+        wtcr_bits = cpu_ioregs->wtcsrr;
 
         wtcr_bits &= ~0xA0;
 
-        cpu_map->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
+        cpu_ioregs->wtcsrw = CPU_WDT_WTCSR(wtcr_bits);
 }
 
 /// @brief Obtain the interrupt priority level for CPU-WDT.
@@ -134,9 +134,9 @@ cpu_wdt_disable(void)
 static inline uint8_t __always_inline
 cpu_wdt_interrupt_priority_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return ((cpu_map->ipra >> 4) & 0x0F);
+        return ((cpu_ioregs->ipra >> 4) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-WDT.
@@ -145,10 +145,10 @@ cpu_wdt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_wdt_interrupt_priority_set(uint8_t priority)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ipra &= 0xFF0F;
-        cpu_map->ipra |= (priority & 0x0F) << 4;
+        cpu_ioregs->ipra &= 0xFF0F;
+        cpu_ioregs->ipra |= (priority & 0x0F) << 4;
 }
 
 /// @ingroup CPU_INTC_HELPERS

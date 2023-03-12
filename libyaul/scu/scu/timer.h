@@ -34,7 +34,7 @@ typedef void (*scu_timer_ihr_t)(void);
 static inline void __always_inline
 scu_timer_t0_value_set(uint16_t value)
 {
-        MEMORY_WRITE(32, SCU(T0C), value & 0x03FF);
+    MEMORY_WRITE(32, SCU(T0C), value & 0x03FF);
 }
 
 /// @brief Set the compare value for SCU timer #1.
@@ -43,21 +43,21 @@ scu_timer_t0_value_set(uint16_t value)
 static inline void __always_inline
 scu_timer_t1_value_set(uint16_t value)
 {
-        MEMORY_WRITE(32, SCU(T1S), value & 0x01FF);
+    MEMORY_WRITE(32, SCU(T1S), value & 0x01FF);
 }
 
 /// @brief Disable SCU timers.
 static inline void __always_inline
 scu_timer_disable(void)
 {
-        MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
+    MEMORY_WRITE(32, SCU(T1MD), 0x00000000);
 }
 
 /// @brief Enable SCU timers.
 static inline void __always_inline
 scu_timer_enable(void)
 {
-        MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
+    MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
 }
 
 /// @brief Set behavior of the SCU timer #1 interrupt to occur at lines indicated by SCU timer #0
@@ -68,7 +68,7 @@ scu_timer_enable(void)
 static inline void __always_inline
 scu_timer_line_enable(void)
 {
-        MEMORY_WRITE(32, SCU(T1MD), 0x00000101);
+    MEMORY_WRITE(32, SCU(T1MD), 0x00000101);
 }
 
 /// @brief Set behavior of the SCU timer #1 interrupt to occur at every line.
@@ -80,23 +80,21 @@ scu_timer_line_enable(void)
 static inline void __always_inline
 scu_timer_line_disable(void)
 {
-        MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
+    MEMORY_WRITE(32, SCU(T1MD), 0x00000001);
 }
 
 /// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU timer #0 interrupt.
 /// @see scu_timer_t0_set
-#define scu_timer_t0_clear()                                                   \
-do {                                                                           \
-        scu_timer_t0_set(NULL);                                                \
+#define scu_timer_t0_clear() do {                                              \
+    scu_timer_t0_set(NULL);                                                    \
 } while (false)
 
 /// @ingroup SCU_IC_HELPERS
 /// @brief Clear the interrupt handler for the SCU timer #1 interrupt.
 /// @see scu_timer_t1_set
-#define scu_timer_t1_clear()                                                   \
-do {                                                                           \
-        scu_timer_t1_set(NULL);                                                \
+#define scu_timer_t1_clear() do {                                              \
+    scu_timer_t1_set(NULL);                                                    \
 } while (false)
 
 /// @ingroup SCU_IC_HELPERS

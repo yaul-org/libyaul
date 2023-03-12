@@ -15,6 +15,7 @@
 __BEGIN_DECLS
 
 /// @defgroup CPU_UBC CPU User Break Controller
+/// @{
 
 /// @}
 

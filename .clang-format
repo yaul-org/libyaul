@@ -1,0 +1,164 @@
+# Basic .clang-format
+---
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Left
+AlignOperands: false
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: MultiLine
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: WebKit
+BreakBeforeTernaryOperators: false
+# TODO: BreakStringLiterals can cause very strange formatting so turn it off?
+BreakStringLiterals: false
+# Prefer:
+# some_var = function(arg1,
+#    arg2)
+# over:
+# some_var =
+#     function(arg1, arg2)
+PenaltyBreakAssignment: 100
+# Prefer:
+# some_long_function(arg1, arg2
+#     arg3)
+# over:
+# some_long_function(
+#     arg1, arg2, arg3)
+PenaltyBreakBeforeFirstCallParameter: 100
+CompactNamespaces: true
+DerivePointerAlignment: false
+DisableFormat: false
+ForEachMacros:
+  - SLIST_FOREACH
+  - SLIST_FOREACH_FROM
+  - SLIST_FOREACH_FROM_SAFE
+  - SLIST_FOREACH_SAFE
+  - SLIST_FOREACH_PREVPTR
+  - LIST_FOREACH
+  - LIST_FOREACH_FROM
+  - LIST_FOREACH_FROM_SAFE
+  - LIST_FOREACH_SAFE
+  - STAILQ_FOREACH
+  - STAILQ_FOREACH_FROM
+  - STAILQ_FOREACH_FROM_SAFE
+  - STAILQ_FOREACH_SAFE
+  - TAILQ_FOREACH
+  - TAILQ_FOREACH_FROM
+  - TAILQ_FOREACH_FROM_SAFE
+  - TAILQ_FOREACH_REVERSE
+  - TAILQ_FOREACH_REVERSE_FROM
+  - TAILQ_FOREACH_REVERSE_FROM_SAFE
+  - TAILQ_FOREACH_REVERSE_SAFE
+  - TAILQ_FOREACH_SAFE
+  - VM_MAP_ENTRY_FOREACH
+  - VM_PAGE_DUMP_FOREACH
+IndentCaseLabels: false
+IndentPPDirectives: None
+Language: Cpp
+NamespaceIndentation: None
+PointerAlignment: Right
+ContinuationIndentWidth: 4
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 80
+UseTab: Never
+SpaceAfterCStyleCast: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<sys/.+\.h>'
+    Priority: 1
+    SortPriority: 10
+  - Regex: '^<assert\.h>'
+    Priority: 2
+    SortPriority: 21
+  - Regex: '^<alloca.h>'
+    Priority: 2
+    SortPriority: 22
+  - Regex: '^<assert.h>'
+    Priority: 2
+    SortPriority: 23
+  - Regex: '^<crc.h>'
+    Priority: 2
+    SortPriority: 24
+  - Regex: '^<ctype.h>'
+    Priority: 2
+    SortPriority: 25
+  - Regex: '^<errno.h>'
+    Priority: 2
+    SortPriority: 26
+  - Regex: '^<limits.h>'
+    Priority: 2
+    SortPriority: 27
+  - Regex: '^<fcntl.h>'
+    Priority: 2
+    SortPriority: 28
+  - Regex: '^<prng.h>'
+    Priority: 2
+    SortPriority: 29
+  - Regex: '^<stdint.h>'
+    Priority: 2
+    SortPriority: 30
+  - Regex: '^<stdio.h>'
+    Priority: 2
+    SortPriority: 31
+  - Regex: '^<stdlib.h>'
+    Priority: 2
+    SortPriority: 32
+  - Regex: '^<string.h>'
+    Priority: 2
+    SortPriority: 33
+  - Regex: '^<unistd.h>'
+    Priority: 2
+    SortPriority: 34
+  - Regex: '^<internal\.h'
+    Priority: 4
+    SortPriority: 40
+  - Regex: '^<.*-internal\.h'
+    Priority: 4
+    SortPriority: 41
+  - Regex: '^<[^/].*\.h'
+    Priority: 5
+    SortPriority: 50
+  - Regex: '^\".*\.h\"'
+    Priority: 6
+    SortPriority: 60
+# LLVM's header include ordering style is almost the exact opposite of ours.
+# Unfortunately, they have hard-coded their preferences into clang-format.
+# Clobbering this regular expression to avoid matching prevents non-system
+# headers from being forcibly moved to the top of the include list.
+# http://llvm.org/docs/CodingStandards.html#include-style
+IncludeIsMainRegex: 'BLAH_DONT_MATCH_ANYTHING'
+SortIncludes: true
+KeepEmptyLinesAtTheStartOfBlocks: true
+TypenameMacros:
+  - LIST_CLASS_ENTRY
+  - LIST_CLASS_HEAD
+  - LIST_ENTRY
+  - LIST_HEAD
+  - QUEUE_TYPEOF
+  - SLIST_CLASS_HEAD
+  - SLIST_CLASS_ENTRY
+  - SLIST_HEAD
+  - SLIST_ENTRY
+  - STAILQ_CLASS_ENTRY
+  - STAILQ_CLASS_HEAD
+  - STAILQ_ENTRY
+  - STAILQ_HEAD
+  - TAILQ_CLASS_ENTRY
+  - TAILQ_CLASS_HEAD
+  - TAILQ_ENTRY
+  - TAILQ_HEAD

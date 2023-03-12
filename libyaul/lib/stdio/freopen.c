@@ -28,5 +28,5 @@
 FILE *
 freopen(const char * restrict filename __unused, const char * restrict mode __unused, FILE * restrict f __unused)
 {
-        return NULL;
+    return NULL;
 }

@@ -26,5 +26,5 @@
 int
 puts(const char *s)
 {
-        return (-(fputs(s, stdout)) < 0 || putc('\n', stdout) < 0);
+    return (-(fputs(s, stdout)) < 0 || putc('\n', stdout) < 0);
 }

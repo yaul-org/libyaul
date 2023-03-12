@@ -26,5 +26,5 @@
 int
 fputc(int c, FILE *f)
 {
-        return putc(c, f);
+    return putc(c, f);
 }

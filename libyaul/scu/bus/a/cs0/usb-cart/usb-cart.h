@@ -33,7 +33,7 @@ __BEGIN_DECLS
 static inline bool __always_inline
 usb_cart_rxf_full(void)
 {
-        return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x01) == 0x01);
+    return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x01) == 0x01);
 }
 
 /// @brief Determine if the transfer buffer is full.
@@ -43,7 +43,7 @@ usb_cart_rxf_full(void)
 static inline bool __always_inline
 usb_cart_txe_full(void)
 {
-        return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x02) == 0x02);
+    return ((MEMORY_READ(8, USB_CART(FLAGS)) & 0x02) == 0x02);
 }
 
 /// @brief Wait until the receive buffer is not full, but not necessarily empty.
@@ -54,8 +54,8 @@ usb_cart_txe_full(void)
 static inline void __always_inline
 usb_cart_rxf_wait(void)
 {
-        while ((usb_cart_rxf_full())) {
-        }
+    while ((usb_cart_rxf_full())) {
+    }
 }
 
 /// @brief Wait until the transfer buffer is not full, but not necessarily
@@ -66,8 +66,8 @@ usb_cart_rxf_wait(void)
 static inline void __always_inline
 usb_cart_txe_wait(void)
 {
-        while ((usb_cart_txe_full())) {
-        }
+    while ((usb_cart_txe_full())) {
+    }
 }
 
 /// @brief Read a 8-bit value.
@@ -78,9 +78,9 @@ usb_cart_txe_wait(void)
 static inline uint8_t __always_inline
 usb_cart_byte_read(void)
 {
-        usb_cart_rxf_wait();
+    usb_cart_rxf_wait();
 
-        return MEMORY_READ(8, USB_CART(FIFO));
+    return MEMORY_READ(8, USB_CART(FIFO));
 }
 
 /// @brief Write an 8-bit value.
@@ -91,8 +91,8 @@ usb_cart_byte_read(void)
 static inline void __always_inline
 usb_cart_byte_send(uint8_t c)
 {
-        usb_cart_txe_wait();
-        MEMORY_WRITE(8, USB_CART(FIFO), c);
+    usb_cart_txe_wait();
+    MEMORY_WRITE(8, USB_CART(FIFO), c);
 }
 
 /// @brief Initialize USB cart.

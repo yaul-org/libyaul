@@ -27,44 +27,44 @@
 #include <stdio.h>
 
 struct cookie {
-        char *s;
-        size_t n;
+    char *s;
+    size_t n;
 };
 
 static size_t
 _write(FILE *f, const unsigned char *s, size_t l)
 {
-        struct cookie * const cookie = f->cookie;
+    struct cookie * const cookie = f->cookie;
 
-        for (size_t i = 0; i < l; i++) {
-                *cookie->s++ = *s++;
-        }
+    for (size_t i = 0; i < l; i++) {
+        *cookie->s++ = *s++;
+    }
 
-        return l;
+    return l;
 }
 
 int
 vsnprintf(char * restrict s, size_t n, const char *fmt, va_list ap)
 {
-        char dummy[1];
+    char dummy[1];
 
-        struct cookie cookie = {
-                .s = (n != 0) ? s : dummy,
-                .n = (n != 0) ? (n - 1) : 0
-        };
+    struct cookie cookie = {
+        .s = (n != 0) ? s : dummy,
+        .n = (n != 0) ? (n - 1) : 0
+    };
 
-        FILE f = {
-                .write = _write,
-                .cookie = &cookie
-        };
+    FILE f = {
+        .write = _write,
+        .cookie = &cookie
+    };
 
-        if (n > INT_MAX) {
-                errno = EOVERFLOW;
+    if (n > INT_MAX) {
+        errno = EOVERFLOW;
 
-                return -1;
-        }
+        return -1;
+    }
 
-        *cookie.s = '\0';
+    *cookie.s = '\0';
 
-        return vfprintf(&f, fmt, ap);
+    return vfprintf(&f, fmt, ap);
 }

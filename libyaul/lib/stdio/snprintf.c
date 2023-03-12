@@ -30,12 +30,12 @@
 int
 snprintf(char * restrict buffer, size_t n, const char * restrict fmt, ...)
 {
-        va_list args;
-        int i;
+    va_list args;
+    int i;
 
-        va_start(args, fmt);
-        i = vsnprintf(buffer, n, fmt, args);
-        va_end(args);
+    va_start(args, fmt);
+    i = vsnprintf(buffer, n, fmt, args);
+    va_end(args);
 
-        return i;
+    return i;
 }

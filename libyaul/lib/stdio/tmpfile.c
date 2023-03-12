@@ -5,5 +5,5 @@
 FILE * __weak
 tmpfile(void)
 {
-        return NULL;
+    return NULL;
 }

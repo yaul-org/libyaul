@@ -29,18 +29,18 @@
 size_t
 fwrite(const void * restrict src, size_t size, size_t nmemb, FILE * restrict f)
 {
-        if (size == 0) {
-                nmemb = 0;
-        }
+    if (size == 0) {
+        nmemb = 0;
+    }
 
-        const size_t l = size * nmemb;
+    const size_t l = size * nmemb;
 
-        size_t k;
-        k = 0;
+    size_t k;
+    k = 0;
 
-        if (l > (size_t)(f->wend - f->wpos)) {
-                k = f->write(f, src, l);
-        }
+    if (l > (size_t)(f->wend - f->wpos)) {
+        k = f->write(f, src, l);
+    }
 
-        return ((k == l) ? nmemb : (k / size));
+    return ((k == l) ? nmemb : (k / size));
 }

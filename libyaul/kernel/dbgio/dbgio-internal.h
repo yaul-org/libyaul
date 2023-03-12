@@ -24,13 +24,13 @@ typedef void (*dev_ops_puts_t)(const char *buffer);
 typedef void (*dev_ops_flush_t)(void);
 
 typedef struct dbgio_dev_ops {
-        dbgio_dev_t dev;
-        const void *default_params;
-        dev_ops_init_t init;
-        dev_ops_deinit_t deinit;
-        dev_ops_font_load_t font_load;
-        dev_ops_puts_t puts;
-        dev_ops_flush_t flush;
+    dbgio_dev_t dev;
+    const void *default_params;
+    dev_ops_init_t init;
+    dev_ops_deinit_t deinit;
+    dev_ops_font_load_t font_load;
+    dev_ops_puts_t puts;
+    dev_ops_flush_t flush;
 } dbgio_dev_ops_t;
 
 extern const dbgio_dev_ops_t __dbgio_dev_ops_null;

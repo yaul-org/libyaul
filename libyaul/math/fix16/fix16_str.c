@@ -29,75 +29,75 @@
 static char *_itoa_loop(char *buffer, uint32_t scale, uint32_t value, bool skip);
 
 static const uint32_t _scales[8] = {
-        /* 5 decimals is enough for full fix16_t precision */
-        1,
-        10,
-        100,
-        1000,
-        10000,
-        100000,
-        100000,
-        100000
+    /* 5 decimals is enough for full fix16_t precision */
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    100000,
+    100000
 };
 
 size_t
 fix16_str(fix16_t value, char *buffer, int32_t decimals)
 {
-        const uint32_t uvalue = (value >= 0) ? value : -value;
+    const uint32_t uvalue = (value >= 0) ? value : -value;
 
-        const char * const start_buffer = buffer;
+    const char * const start_buffer = buffer;
 
-        if (value < 0) {
-                *buffer++ = '-';
-        }
+    if (value < 0) {
+        *buffer++ = '-';
+    }
 
-        /* Separate the integer and decimal parts of the value */
-        uint32_t int_part;
-        int_part = uvalue >> 16;
+    /* Separate the integer and decimal parts of the value */
+    uint32_t int_part;
+    int_part = uvalue >> 16;
 
-        uint32_t frac_part;
-        frac_part = uvalue & 0xFFFF;
+    uint32_t frac_part;
+    frac_part = uvalue & 0xFFFF;
 
-        const uint32_t scale = _scales[decimals & 7];
+    const uint32_t scale = _scales[decimals & 7];
 
-        frac_part = fix16_mul(frac_part, scale);
+    frac_part = fix16_mul(frac_part, scale);
 
-        if (frac_part >= scale) {
-                /* Handle carry from decimal part */
-                int_part++;
-                frac_part -= scale;
-        }
+    if (frac_part >= scale) {
+        /* Handle carry from decimal part */
+        int_part++;
+        frac_part -= scale;
+    }
 
-        /* Format integer part */
-        buffer = _itoa_loop(buffer, 10000, int_part, true);
+    /* Format integer part */
+    buffer = _itoa_loop(buffer, 10000, int_part, true);
 
-        /* Format decimal part (if any) */
-        if (scale != 1) {
-                *buffer++ = '.';
-                buffer = _itoa_loop(buffer, scale / 10, frac_part, false);
-        }
+    /* Format decimal part (if any) */
+    if (scale != 1) {
+        *buffer++ = '.';
+        buffer = _itoa_loop(buffer, scale / 10, frac_part, false);
+    }
 
-        *buffer = '\0';
+    *buffer = '\0';
 
-        return (buffer - start_buffer);
+    return (buffer - start_buffer);
 }
 
 static char *
 _itoa_loop(char *buf, uint32_t scale, uint32_t value, bool skip)
 {
-        while (scale) {
-                unsigned digit = (value / scale);
+    while (scale) {
+        unsigned digit = (value / scale);
 
-                if (!skip || digit || (scale == 1)) {
-                        skip = false;
+        if (!skip || digit || (scale == 1)) {
+            skip = false;
 
-                        *buf++ = '0' + digit;
+            *buf++ = '0' + digit;
 
-                        value %= scale;
-                }
-
-                scale /= 10;
+            value %= scale;
         }
 
-        return buf;
+        scale /= 10;
+    }
+
+    return buf;
 }

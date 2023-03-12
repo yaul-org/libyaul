@@ -26,15 +26,15 @@
 char *
 strncat(char *restrict d, const char *restrict s, size_t n)
 {
-        char *a = d;
+    char *a = d;
 
-        d += strlen(d);
+    d += strlen(d);
 
-        while ((n != 0) && (*s != '\0')) {
-                n--, *d++ = *s++;
-        }
+    while ((n != 0) && (*s != '\0')) {
+        n--, *d++ = *s++;
+    }
 
-        *d++ = 0;
+    *d++ = 0;
 
-        return a;
+    return a;
 }

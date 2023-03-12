@@ -82,10 +82,10 @@ typedef void (*cpu_frt_ihr_t)(void);
 static inline void __always_inline
 cpu_frt_count_set(uint16_t count)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->frch = (uint8_t)(count >> 8);
-        cpu_map->frcl = (uint8_t)(count & 0xFF);
+    cpu_ioregs->frch = (uint8_t)(count >> 8);
+    cpu_ioregs->frcl = (uint8_t)(count & 0xFF);
 }
 
 /// @brief Obtain the current 2-byte FRT tick count.
@@ -93,12 +93,12 @@ cpu_frt_count_set(uint16_t count)
 static inline uint16_t __always_inline
 cpu_frt_count_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint16_t reg_frth = cpu_map->frch;
-        const uint16_t reg_frtl = cpu_map->frcl;
+    const uint16_t reg_frth = cpu_ioregs->frch;
+    const uint16_t reg_frtl = cpu_ioregs->frcl;
 
-        return (reg_frth << 8) | reg_frtl;
+    return (reg_frth << 8) | reg_frtl;
 }
 
 /// @brief Obtain the ICR value.
@@ -110,12 +110,12 @@ cpu_frt_count_get(void)
 static inline uint16_t __always_inline
 cpu_frt_input_capture_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t reg_ficrh = cpu_map->ficrh;
-        const uint8_t reg_ficrl = cpu_map->ficrl;
+    const uint8_t reg_ficrh = cpu_ioregs->ficrh;
+    const uint8_t reg_ficrl = cpu_ioregs->ficrl;
 
-        return (reg_ficrh << 8) | reg_ficrl;
+    return (reg_ficrh << 8) | reg_ficrl;
 }
 
 /// @brief Obtain the interrupt priority level for CPU-FRT.
@@ -123,9 +123,9 @@ cpu_frt_input_capture_get(void)
 static inline uint8_t __always_inline
 cpu_frt_interrupt_priority_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        return ((cpu_map->iprb >> 8) & 0x0F);
+    return ((cpu_ioregs->iprb >> 8) & 0x0F);
 }
 
 /// @brief Set the interrupt priority level for CPU-FRT.
@@ -134,39 +134,36 @@ cpu_frt_interrupt_priority_get(void)
 static inline void __always_inline
 cpu_frt_interrupt_priority_set(uint8_t priority)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+    volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        /* Set the interrupt priority level for FRT (shared amongst all FRT
-         * related interrupts */
-        cpu_map->iprb &= 0xF0FF;
-        cpu_map->iprb |= (priority & 0x0F) << 8;
+    /* Set the interrupt priority level for FRT (shared amongst all FRT
+     * related interrupts */
+    cpu_ioregs->iprb &= 0xF0FF;
+    cpu_ioregs->iprb |= (priority & 0x0F) << 8;
 }
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCA interrupt.
 ///
 /// @see cpu_frt_oca_set
-#define cpu_frt_oca_clear()                                                    \
-do {                                                                           \
-        cpu_frt_oca_set(0, NULL);                                              \
+#define cpu_frt_oca_clear() do {                                               \
+    cpu_frt_oca_set(0, NULL);                                                  \
 } while (false)
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OCB interrupt.
 ///
 /// @see cpu_frt_ocb_set
-#define cpu_frt_ocb_clear()                                                    \
-do {                                                                           \
-        cpu_frt_ocb_set(0, NULL);                                              \
+#define cpu_frt_ocb_clear() do {                                               \
+    cpu_frt_ocb_set(0, NULL);                                                  \
 } while (false)
 
 /// @ingroup CPU_INTC_HELPERS
 /// @brief Clear the interrupt handler for the CPU-FRT OVI interrupt.
 ///
 /// @see cpu_frt_ovi_set
-#define cpu_frt_ovi_clear()                                                    \
-do {                                                                           \
-        cpu_frt_ovi_set(NULL);                                                 \
+#define cpu_frt_ovi_clear() do {                                               \
+    cpu_frt_ovi_set(NULL);                                                     \
 } while (false)
 
 /// @brief Fully initialize the CPU-FRT depending with a specific clock divisor.

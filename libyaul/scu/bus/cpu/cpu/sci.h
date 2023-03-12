@@ -178,18 +178,18 @@ static_assert(sizeof(cpu_sci_cfg_t) == 20);
 static inline void __always_inline
 cpu_sci_enable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->scr |= 0x30;
+        cpu_ioregs->scr |= 0x30;
 }
 
 /// @brief Disable CPU-SCI.
 static inline void __always_inline
 cpu_sci_disable(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->scr &= ~0x30;
+        cpu_ioregs->scr &= ~0x30;
 }
 
 /// @brief Set the interrupt priority level for CPU-SCI.
@@ -198,33 +198,33 @@ cpu_sci_disable(void)
 static inline void __always_inline
 cpu_sci_interrupt_priority_set(uint8_t priority)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->iprb &= 0x7FFF;
-        cpu_map->iprb |= (priority & 0x0F) << 12;
+        cpu_ioregs->iprb &= 0x7FFF;
+        cpu_ioregs->iprb |= (priority & 0x0F) << 12;
 }
 
 /// @brief Reset CPU-SCI status.
 static inline void __always_inline
 cpu_sci_status_reset(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->ssr = 0x00;
+        cpu_ioregs->ssr = 0x00;
 }
 
 /// @brief Configure a CPU-SCI for transfer.
 ///
 /// @details Configuring the CPU-SCI in @p cfg does not start the transfer. To
-/// start the transfer, use either @ref cpu_sci_enable_with_dmac (for SCI+DMAC
+/// start the transfer, use either @ref cpu_sci_with_dmac_enable (for SCI+DMAC
 /// mode) or @ref cpu_sci_write_value_set (for normal mode). The CPU-SCI is
 /// forcefully stopped upon starting the configuration. If the CPU_SCI is
-/// currently operating int SCI+DMAC mode, use @ref cpu_dma_wait with the
-/// corresponding DMA channel to wait until the transfer is complete.
+/// currently operating int SCI+DMAC mode, use @ref cpu_dmac_channel_wait with the
+/// corresponding CPU-DMAC channel to wait until the transfer is complete.
 ///
 /// @param[in] cfg The CPU-SCI transfer configuration.
 ///
-/// @see cpu_sci_enable_with_dmac
+/// @see cpu_sci_with_dmac_enable
 /// @see cpu_sci_write_value_set
 /// @see cpu_sci_read_value_get
 void cpu_sci_config_set(const cpu_sci_cfg_t *cfg);
@@ -254,9 +254,9 @@ void cpu_sci_with_dmac_enable(const cpu_sci_cfg_t *cfg);
 static inline void __always_inline
 cpu_sci_write_value_set(uint8_t value)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        cpu_map->tdr = value;
+        cpu_ioregs->tdr = value;
 }
 
 /// @brief Returns the last value read during CPU-SCI transfer in normal mode.
@@ -269,13 +269,13 @@ cpu_sci_write_value_set(uint8_t value)
 static inline uint8_t __always_inline
 cpu_sci_read_value_get(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
-        const uint8_t value = cpu_map->rdr;
+        const uint8_t value = cpu_ioregs->rdr;
 
         /* If RDRF is set, clear it */
-        if ((cpu_map->ssr & 0x40) > 0) {
-                cpu_map->ssr &= ~0x40;
+        if ((cpu_ioregs->ssr & 0x40) > 0) {
+                cpu_ioregs->ssr &= ~0x40;
         }
 
         return value;
@@ -288,14 +288,14 @@ cpu_sci_read_value_get(void)
 static inline void __always_inline
 cpu_sci_wait(void)
 {
-        volatile cpu_map_t * const cpu_map = (volatile cpu_map_t *)CPU_MAP_BASE;
+        volatile cpu_ioregs_t * const cpu_ioregs = (volatile cpu_ioregs_t *)CPU_IOREG_BASE;
 
         /* Waiting for TEND */
-        while ((cpu_map->ssr & 0x04) == 0) {
+        while ((cpu_ioregs->ssr & 0x04) == 0) {
         }
 
         /* Waiting for RDRF */
-        while ((cpu_map->ssr & 0x40) == 0) {
+        while ((cpu_ioregs->ssr & 0x40) == 0) {
         }
 }
 

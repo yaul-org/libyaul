@@ -73,13 +73,13 @@ unsigned sleep(unsigned);
 int pause(void);
 
 pid_t fork(void);
-int execve(const char *, char *const [], char *const []);
-int execv(const char *, char *const []);
+int execve(const char *, char * const [], char * const []);
+int execv(const char *, char * const []);
 int execle(const char *, const char *, ...);
 int execl(const char *, const char *, ...);
-int execvp(const char *, char *const []);
+int execvp(const char *, char * const []);
 int execlp(const char *, const char *, ...);
-int fexecve(int, char *const [], char *const []);
+int fexecve(int, char * const [], char * const []);
 __noreturn void _exit(int);
 
 pid_t getpid(void);

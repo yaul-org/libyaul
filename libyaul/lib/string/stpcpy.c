@@ -21,43 +21,46 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
+
 #include <limits.h>
 
-#define ALIGN           (sizeof(size_t))
-#define ONES            ((size_t)-1/UCHAR_MAX)
-#define HIGHS           (ONES * (UCHAR_MAX/2+1))
+#define ALIGN (sizeof(size_t))
+#define ONES  ((size_t) - 1 / UCHAR_MAX)
+#define HIGHS (ONES * (UCHAR_MAX / 2 + 1))
 
-#define HAS_ZERO(x)     (((x)-ONES) & ~(x) & HIGHS)
+#define HAS_ZERO(x) (((x) - ONES) & ~(x)&HIGHS)
 
 char *
 stpcpy(char *restrict d, const char *restrict s)
 {
 #ifdef __GNUC__
-        typedef size_t __may_alias word;
+    typedef size_t __may_alias word;
 
-        word *wd;
-        const word *ws;
+    word *wd;
+    const word *ws;
 
-        if ((uintptr_t)s % ALIGN == (uintptr_t)d % ALIGN) {
-                for (; (uintptr_t)s % ALIGN; s++, d++) {
-                        if (!(*d = *s)) {
-                                return d;
-                        }
-                }
-
-                wd = (void *)d;
-                ws = (const void *)s;
-
-                for (; !HAS_ZERO(*ws); *wd++ = *ws++);
-
-                d = (void *)wd;
-                s = (const void *)ws;
+    if ((uintptr_t)s % ALIGN == (uintptr_t)d % ALIGN) {
+        for (; (uintptr_t)s % ALIGN; s++, d++) {
+            if (!(*d = *s)) {
+                return d;
+            }
         }
+
+        wd = (void *)d;
+        ws = (const void *)s;
+
+        for (; !HAS_ZERO(*ws); *wd++ = *ws++) {
+        }
+
+        d = (void *)wd;
+        s = (const void *)ws;
+    }
 #endif /* __GNUC__ */
 
-        for (; (*d = *s); s++, d++);
+    for (; (*d = *s); s++, d++) {
+    }
 
-        return d;
+    return d;
 }
