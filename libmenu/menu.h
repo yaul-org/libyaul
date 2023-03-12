@@ -7,27 +7,27 @@
 #include <stddef.h>
 
 #define MENU_ACTION_ENTRY(_label, _action) {                                   \
-        .label        = _label,                                                \
-        .label_format = NULL,                                                  \
-        .action_fn    = _action,                                               \
-        .update_fn    = NULL,                                                  \
-        .cycle_fn     = NULL                                                   \
+    .label        = _label,                                                    \
+    .label_format = NULL,                                                      \
+    .action_fn    = _action,                                                   \
+    .update_fn    = NULL,                                                      \
+    .cycle_fn     = NULL                                                       \
 }
 
 #define MENU_CYCLE_ENTRY(_label_format, _cycle, _update) {                     \
-        .label        = "",                                                    \
-        .label_format = _label_format,                                         \
-        .action_fn    = NULL,                                                  \
-        .update_fn    = _update,                                               \
-        .cycle_fn     = _cycle                                                 \
+    .label        = "",                                                        \
+    .label_format = _label_format,                                             \
+    .action_fn    = NULL,                                                      \
+    .update_fn    = _update,                                                   \
+    .cycle_fn     = _cycle                                                     \
 }
 
 #define MENU_ACTION_CYCLE_ENTRY(_label_format, _action, _cycle, _update) {     \
-        .label        = "",                                                    \
-        .label_format = _label_format,                                         \
-        .action_fn    = _action,                                               \
-        .update_fn    = _update,                                               \
-        .cycle_fn     = _cycle                                                 \
+    .label        = "",                                                        \
+    .label_format = _label_format,                                             \
+    .action_fn    = _action,                                                   \
+    .update_fn    = _update,                                                   \
+    .cycle_fn     = _cycle                                                     \
 }
 
 typedef int8_t menu_cursor_t;
@@ -41,11 +41,11 @@ typedef menu_action_t menu_update_t;
 typedef void (*menu_input_fn_t)(menu_t *menu);
 
 struct menu_entry {
-        char label[48];
-        char *label_format;
-        menu_action_t action_fn;
-        menu_cycle_t cycle_fn;
-        menu_update_t update_fn;
+    char label[48];
+    char *label_format;
+    menu_action_t action_fn;
+    menu_cycle_t cycle_fn;
+    menu_update_t update_fn;
 };
 
 static_assert(sizeof(struct menu_entry) == 64);
@@ -53,21 +53,21 @@ static_assert(sizeof(struct menu_entry) == 64);
 #define MENU_MASK (0x0003)
 
 typedef enum {
-        MENU_NONE          = 0,
-        MENU_ENABLED       = 1 << 0,
-        MENU_INPUT_ENABLED = 1 << 1
+    MENU_NONE          = 0,
+    MENU_ENABLED       = 1 << 0,
+    MENU_INPUT_ENABLED = 1 << 1
 } menu_flags_t;
 
 struct menu {
-        menu_entry_t *current_entry;
-        menu_entry_t *entries;
-        menu_flags_t flags;
-        void *data;
+    menu_entry_t *current_entry;
+    menu_entry_t *entries;
+    menu_flags_t flags;
+    void *data;
 
-        /* Private */
-        menu_cursor_t _cursor;
-        uint16_t _entries_count;
-        menu_input_fn_t _input_fn;
+    /* Private */
+    menu_cursor_t _cursor;
+    uint16_t _entries_count;
+    menu_input_fn_t _input_fn;
 };
 
 void menu_init(menu_t *menu);
