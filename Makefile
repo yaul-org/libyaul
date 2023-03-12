@@ -3,7 +3,8 @@ PROJECTS:= \
 	libtga \
 	libbcl \
 	libmic3d \
-	libfiber
+	libfiber \
+	libmenu
 
 include env.mk
 
