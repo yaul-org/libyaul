@@ -5,4 +5,4 @@ LIB_SRCS:= \
 	context_switch.sx
 
 INSTALL_HEADER_FILES:= \
-	./:fiber.h:./ \
+	./:fiber.h:./
