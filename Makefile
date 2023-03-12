@@ -2,7 +2,9 @@ PROJECTS:= \
 	libyaul \
 	libtga \
 	libbcl \
-	libmic3d
+	libmic3d \
+	libfiber \
+	libmenu
 
 include env.mk
 
