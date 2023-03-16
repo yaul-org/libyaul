@@ -72,7 +72,7 @@ typedef enum memb_type {
 
 typedef struct memb {
     memb_type_t type;     /* Type of MEMB */
-    uint32_t size;        /* Size (in bytes) of a unit block */
+    size_t size;          /* Size (in bytes) of a unit block */
     uint32_t count;       /* Number of unit blocks in the block pool */
     memb_ref_t *refs;     /* Reference array */
     uint32_t next_index;  /* Index to next unreferenced block */

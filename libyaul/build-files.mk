@@ -68,6 +68,7 @@ LIB_SRCS+= \
 	\
 	kernel/mm/memb.c \
 	kernel/mm/memb-internal.c \
+	kernel/mm/pagep.c \
 	kernel/mm/mm_stats.c
 
 # TLSF is required
@@ -354,6 +355,7 @@ INSTALL_HEADER_FILES+= \
 
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:pagep.h:yaul/mm/ \
 	./kernel/mm/:mm_stats.h:yaul/mm/
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
