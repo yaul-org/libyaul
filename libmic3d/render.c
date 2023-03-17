@@ -397,7 +397,31 @@ _transform(void)
 
     fix16_mat43_mul(&inv_view_matrix, world_matrix, &render_transform->view_matrix);
 
-    __render_points_transform(render, render_transform);
+    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&render_transform->view_matrix.row[0];
+    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&render_transform->view_matrix.row[1];
+    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&render_transform->view_matrix.row[2];
+
+    const fix16_vec3_t * const points = render->mesh->points;
+    int16_vec2_t * const screen_points = render->screen_points_pool;
+    fix16_t * const z_values = render->z_values_pool;
+    /* fix16_t * const depth_values = render->depth_values_pool; */
+
+    for (uint32_t i = 0; i < render->mesh->points_count; i++) {
+        const fix16_t z = fix16_vec3_dot(m2, &points[i]) + render_transform->view_matrix.frow[2][3];
+        const fix16_t clamped_z = fix16_max(z, render->near);
+
+        cpu_divu_fix16_set(render->view_distance, clamped_z);
+
+        const fix16_t x = fix16_vec3_dot(m0, &points[i]) + render_transform->view_matrix.frow[0][3];
+        const fix16_t y = fix16_vec3_dot(m1, &points[i]) + render_transform->view_matrix.frow[1][3];
+
+        const fix16_t depth_value = cpu_divu_quotient_get();
+
+        screen_points[i].x = fix16_int32_mul(depth_value, x);
+        screen_points[i].y = fix16_int32_mul(depth_value, y);
+        z_values[i] = z;
+        /* depth_values[i] = depth_value; */
+    }
 }
 
 static fix16_t
