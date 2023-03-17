@@ -66,8 +66,10 @@ LIB_SRCS+= \
 	kernel/sys/callback-list.c \
 	kernel/sys/callback-list-internal.c \
 	\
+	kernel/mm/arena.c \
 	kernel/mm/memb.c \
 	kernel/mm/memb-internal.c \
+	kernel/mm/pagep.c \
 	kernel/mm/mm_stats.c
 
 # TLSF is required
@@ -353,7 +355,9 @@ INSTALL_HEADER_FILES+= \
 	./kernel/dbgio/:dbgio.h:yaul/dbgio/
 
 INSTALL_HEADER_FILES+= \
+	./kernel/mm/:arena.h:yaul/mm/ \
 	./kernel/mm/:memb.h:yaul/mm/ \
+	./kernel/mm/:pagep.h:yaul/mm/ \
 	./kernel/mm/:mm_stats.h:yaul/mm/
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
