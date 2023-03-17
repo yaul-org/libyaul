@@ -1,4 +1,5 @@
 PROJECTS:= \
+	bcl \
 	bin2c \
 	bin2o \
 	make-cue \
