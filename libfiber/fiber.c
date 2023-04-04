@@ -5,9 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <gamemath.h>
 
 #include <cpu/intc.h>
 #include <cpu/registers.h>
