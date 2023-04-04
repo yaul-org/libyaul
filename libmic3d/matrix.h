@@ -8,7 +8,7 @@
 #ifndef _MIC3D_MATRIX_H_
 #define _MIC3D_MATRIX_H_
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
 typedef struct mstack {
     fix16_mat43_t *pool_matrix;

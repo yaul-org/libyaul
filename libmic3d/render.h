@@ -10,7 +10,7 @@
 
 #include <sys/cdefs.h>
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
 #include <mic3d/types.h>
 

@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
+#include <gamemath.h>
 #include <stdio.h>
 #include <stdlib.h>
 
