@@ -139,6 +139,7 @@ SH_CFLAGS= \
 	-save-temps=obj
 
 SH_LDFLAGS= \
+	-static \
 	-Wl,--gc-sections \
 	-Wl,-Map,$(SH_BUILD_PATH)/$(SH_PROGRAM).map
 
