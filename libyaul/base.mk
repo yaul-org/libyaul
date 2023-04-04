@@ -40,7 +40,7 @@ SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 SUPPORT_OBJS_base:= $(SUPPORT_OBJS_C_base) $(SUPPORT_OBJS_CXX_base) $(SUPPORT_OBJS_S_base)
 SUPPORT_DEPS_base:= $(SUPPORT_OBJS_base:.o=.d)
 
-LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
+LDSCRIPTS_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
 IP_FILES_all = $(IP_FILES)
 USER_FILES_all = $(USER_FILES)
@@ -66,7 +66,7 @@ endef
 
 all: $(TYPE)
 
-$(TYPE): $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(LDSCRIPTS_all) $(SPECS_all)
+$(TYPE): $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(SPECS_all)
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
 	$(ECHO)mkdir -p $@
@@ -82,14 +82,6 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
-
-$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)mkdir -p $(@D)
-	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(YAUL_PREFIX)'/'$(YAUL_ARCH_SH_PREFIX)'"); \
-	} \
-	{ print }' > $@
 
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \

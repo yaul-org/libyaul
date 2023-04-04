@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include <cd-block.h>
-#include <math.h>
+#include <gamemath.h>
 #include <scu/map.h>
 #include <stdbool.h>
 

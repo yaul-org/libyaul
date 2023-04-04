@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "memb-internal.h"
 
 int

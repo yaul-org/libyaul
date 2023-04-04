@@ -9,7 +9,6 @@
 #define _YAUL_VDP2_SCRN_FUNCS_H_
 
 #include <assert.h>
-#include <math.h>
 #include <stdint.h>
 
 #include <vdp2/scrn_shared.h>

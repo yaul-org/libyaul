@@ -9,7 +9,6 @@
 #define _KERNEL_INTERNAL_H_
 
 #include <stdint.h>
-#include <math.h>
 
 #include <sys/cdefs.h>
 
