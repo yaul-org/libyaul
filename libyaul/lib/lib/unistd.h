@@ -122,4 +122,4 @@ size_t confstr(int, char *, size_t);
 
 __END_DECLS
 
-#endif
+#endif /* !_LIB_UNISTD_H_ */

@@ -86,30 +86,30 @@ typedef __gnuc_va_list va_list;
 #define F_APP   128
 
 struct _IO_FILE {
-        int fd;
+    int fd;
 
-        unsigned int flags;
+    unsigned int flags;
 
-        unsigned char *rpos;
-        unsigned char *rend;
+    unsigned char *rpos;
+    unsigned char *rend;
 
-        unsigned char *wpos;
-        unsigned char *wend;
+    unsigned char *wpos;
+    unsigned char *wend;
 
-        unsigned char *wbase;
+    unsigned char *wbase;
 
-        size_t (*read)(FILE *, unsigned char *, size_t);
-        size_t (*write)(FILE *, const unsigned char *, size_t);
-        off_t (*seek)(FILE *, off_t, int);
-        int (*close)(FILE *);
+    size_t (*read)(FILE *, unsigned char *, size_t);
+    size_t (*write)(FILE *, const unsigned char *, size_t);
+    off_t (*seek)(FILE *, off_t, int);
+    int (*close)(FILE *);
 
-        unsigned char *buf;
-        size_t buf_size;
+    unsigned char *buf;
+    size_t buf_size;
 
-        void *cookie;
+    void *cookie;
 
-        FILE *prev;
-        FILE *next;
+    FILE *prev;
+    FILE *next;
 };
 
 typedef long fpos_t;

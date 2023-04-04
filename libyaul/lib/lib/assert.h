@@ -9,9 +9,9 @@ __BEGIN_DECLS
 
 #ifdef DEBUG
 #define assert(e) ((e)                                                         \
-        ? (void)0                                                              \
-        : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                \
-              __STRING(e)))
+    ? (void)0                                                                  \
+    : _assert(__FILE__, __XSTRING(__LINE__), __ASSERT_FUNC,                    \
+        __STRING(e)))
 #else
 #define assert(e)
 #endif
@@ -32,13 +32,13 @@ __BEGIN_DECLS
 #if !defined(__cplusplus)
 #ifndef static_assert
 #define static_assert(__e)                                                     \
-        typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                    \
-                __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
+    typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                        \
+        __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
 #endif /* !static_assert */
 #endif /* !defined(__cplusplus) */
 
 extern void _assert(const char * __restrict, const char * __restrict,
-    const char * __restrict, const char * __restrict) __noreturn;
+  const char * __restrict, const char * __restrict) __noreturn;
 
 __END_DECLS
 

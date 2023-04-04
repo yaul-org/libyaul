@@ -78,11 +78,11 @@
  * __XSTRING is like __STRING, but it expands any macros in its argument first.
  * It is only available with ANSI C. */
 
-#define __CONCAT1(x,y)  x ## y
-#define __CONCAT(x,y)   __CONCAT1(x,y)
-#define __STRING(x)     #x /* Stringify without expanding x */
-#define __STRINGIFY(x)  #x /* Stringify without expanding x */
-#define __XSTRING(x)    __STRING(x) /* Expand x, then stringify */
+#define __CONCAT1(x,y) x ## y
+#define __CONCAT(x,y)  __CONCAT1(x,y)
+#define __STRING(x)    #x /* Stringify without expanding x */
+#define __STRINGIFY(x) #x /* Stringify without expanding x */
+#define __XSTRING(x)   __STRING(x) /* Expand x, then stringify */
 
 /* Compiler-dependent macros to help declare dead (non-returning) and pure (no
  * side effects) functions, and unused variables.
@@ -98,90 +98,90 @@
 
 /// @def __aligned(x)
 /// @brief Not yet documented.
-#define __aligned(x)            __attribute__ ((__aligned__ (x)))
+#define __aligned(x)        __attribute__ ((__aligned__ (x)))
 /// @def __alloc_size(x)
 /// @brief Not yet documented.
-#define __alloc_size(x)         __attribute__ ((__alloc_size__ (x)))
+#define __alloc_size(x)     __attribute__ ((__alloc_size__ (x)))
 /// @def __always_inline
 /// @brief Not yet documented.
-#define __always_inline         __attribute__ ((__always_inline__))
+#define __always_inline     __attribute__ ((__always_inline__))
 /// @def __const
 /// @brief Not yet documented.
-#define __const                 __attribute__ ((__const__))
+#define __const             __attribute__ ((__const__))
 /// @def __dead2
 /// @brief Not yet documented.
-#define __dead2                 __attribute__ ((__noreturn__))
+#define __dead2             __attribute__ ((__noreturn__))
 /// @def __fastcall
 /// @brief Not yet documented.
-#define __fastcall              __attribute__ ((__fastcall__))
+#define __fastcall          __attribute__ ((__fastcall__))
 /// @def __interrupt_handler
 /// @brief Not yet documented.
-#define __interrupt_handler     __attribute__ ((interrupt_handler))
+#define __interrupt_handler __attribute__ ((interrupt_handler))
 /// @def __malloc_like
 /// @brief Not yet documented.
-#define __malloc_like           __attribute__ ((__malloc__))
+#define __malloc_like       __attribute__ ((__malloc__))
 /// @def __may_alias
 /// @brief Not yet documented.
-#define __may_alias             __attribute__ ((__may_alias__))
+#define __may_alias         __attribute__ ((__may_alias__))
 /// @def __noinline
 /// @brief Not yet documented.
-#define __noinline              __attribute__ ((__noinline__))
+#define __noinline          __attribute__ ((__noinline__))
 /// @def __nonnull(x)
 /// @brief Not yet documented.
-#define __nonnull(x)            __attribute__ ((__nonnull__ (x)))
+#define __nonnull(x)        __attribute__ ((__nonnull__ (x)))
 /// @def __nonnull_all
 /// @brief Not yet documented.
-#define __nonnull_all           __attribute__ ((__nonnull__))
+#define __nonnull_all       __attribute__ ((__nonnull__))
 /// @def __noreturn
 /// @brief Not yet documented.
-#define __noreturn              __attribute__ ((noreturn))
+#define __noreturn          __attribute__ ((noreturn))
 /// @def __packed
 /// @brief Not yet documented.
-#define __packed                __attribute__ ((__packed__))
+#define __packed            __attribute__ ((__packed__))
 /// @def __pure
 /// @brief Not yet documented.
-#define __pure                  __attribute__ ((__pure__))
+#define __pure              __attribute__ ((__pure__))
 /// @def __pure2
 /// @brief Not yet documented.
-#define __pure2                 __attribute__ ((__const__))
+#define __pure2             __attribute__ ((__const__))
 /// @def __result_use_check
 /// @brief Not yet documented.
-#define __result_use_check      __attribute__ ((__warn_unused_result__))
+#define __result_use_check  __attribute__ ((__warn_unused_result__))
 /// @def __returns_twice
 /// @brief Not yet documented.
-#define __returns_twice         __attribute__ ((__returns_twice__))
+#define __returns_twice     __attribute__ ((__returns_twice__))
 /// @def __section(x)
 /// @brief Not yet documented.
-#define __section(x)            __attribute__ ((__section__ (x)))
+#define __section(x)        __attribute__ ((__section__ (x)))
 /// @def __unused
 /// @brief Not yet documented.
-#define __unused                __attribute__ ((__unused__))
+#define __unused            __attribute__ ((__unused__))
 /// @def __used
 /// @brief Not yet documented.
-#define __used                  __attribute__ ((__used__))
+#define __used              __attribute__ ((__used__))
 /// @def __weak
 /// @brief Not yet documented.
-#define __weak                  __attribute__ ((__weak__))
+#define __weak              __attribute__ ((__weak__))
 /// @def __leaf
 /// @brief Not yet documented.
-#define __leaf                  __attribute__ ((leaf))
+#define __leaf              __attribute__ ((leaf))
 /// @def __no_reorder
 /// @brief Not yet documented.
-#define __no_reorder            __attribute__ ((no_reorder))
+#define __no_reorder        __attribute__ ((no_reorder))
 /// @def __hot
 /// @brief Not yet documented.
-#define __hot                   __attribute__ ((hot))
+#define __hot               __attribute__ ((hot))
 /// @def __fallthrough
 /// @brief Not yet documented.
-#define __fallthrough           __attribute__ ((fallthrough))
+#define __fallthrough       __attribute__ ((fallthrough))
 /// @def __hidden
 /// @brief Not yet documented.
-#define __hidden                __attribute__ ((__visibility__ ("hidden")))
+#define __hidden            __attribute__ ((__visibility__ ("hidden")))
 
 /// @def __alloc_align(yyy)
 /// @brief Not yet documented.
 #if __has_attribute(__alloc_align__)
-#define __alloc_align(x)        __attribute__ ((__alloc_align__ (x)))
+#define __alloc_align(x)    __attribute__ ((__alloc_align__ (x)))
 #else
 /// @def __always_inline
 #define __alloc_align(x)
@@ -193,7 +193,7 @@
  * The attribute is only valid on variadic functions. */
 /// @def __null_sentinel
 /// @brief Not yet documented.
-#define __null_sentinel         __attribute__ ((__sentinel__))
+#define __null_sentinel     __attribute__ ((__sentinel__))
 
 /// @}
 
@@ -265,9 +265,9 @@
  *     initialization time) as the basic block reordering that this affects can
  *     often generate larger code. */
 /// @private
-#define __predict_true(exp)     __builtin_expect((exp), 1)
+#define __predict_true(exp)  __builtin_expect((exp), 1)
 /// @private
-#define __predict_false(exp)    __builtin_expect((exp), 0)
+#define __predict_false(exp) __builtin_expect((exp), 0)
 
 /// @private
 #define __alignof(x)                                                           \
