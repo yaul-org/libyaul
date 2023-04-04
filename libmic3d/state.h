@@ -8,7 +8,7 @@
 #ifndef _MIC3D_STATE_H_
 #define _MIC3D_STATE_H_
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
 #include "mic3d.h"
 
