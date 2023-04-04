@@ -150,9 +150,11 @@ SHARED_INCLUDE_DIRS:= \
 	$(abspath .) \
 	../lib$(MAIN_TARGET)/ \
 	../lib$(MAIN_TARGET)/bup \
-	../lib$(MAIN_TARGET)/lib/lib \
+  ../lib$(MAIN_TARGET)/ip \
+	../lib$(MAIN_TARGET)/libc/libc \
 	../lib$(MAIN_TARGET)/kernel \
-	../lib$(MAIN_TARGET)/math \
+	../lib$(MAIN_TARGET)/kernel/dbgio \
+	../lib$(MAIN_TARGET)/gamemath \
 	../lib$(MAIN_TARGET)/scu \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/arp \
 	../lib$(MAIN_TARGET)/scu/bus/a/cs0/dram-cart \

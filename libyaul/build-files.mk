@@ -77,124 +77,124 @@ LIB_SRCS+= \
 	kernel/mm/tlsf.c
 
 LIB_SRCS+= \
-	lib/ctype/ctype.c
+	libc/ctype/ctype.c
 
 LIB_SRCS+= \
-	lib/errno/strerror.c \
-	lib/errno/__errno_location.c \
+	libc/errno/strerror.c \
+	libc/errno/__errno_location.c \
 
 LIB_SRCS+= \
-	lib/string/bcmp.c \
-	lib/string/bcopy.c \
-	lib/string/bzero.c \
-	lib/string/index.c \
-	lib/string/memccpy.c \
-	lib/string/memchr.c \
-	lib/string/memcmp.c \
-	lib/string/memcpy.c \
-	lib/string/memmem.c \
-	lib/string/memmove.c \
-	lib/string/mempcpy.c \
-	lib/string/memrchr.c \
-	lib/string/memset.c \
-	lib/string/rindex.c \
-	lib/string/stpcpy.c \
-	lib/string/stpncpy.c \
-	lib/string/strcasecmp.c \
-	lib/string/strcasestr.c \
-	lib/string/strcat.c \
-	lib/string/strchr.c \
-	lib/string/strchrnul.c \
-	lib/string/strcmp.c \
-	lib/string/strcpy.c \
-	lib/string/strcspn.c \
-	lib/string/strdup.c \
-	lib/string/strlcat.c \
-	lib/string/strlcpy.c \
-	lib/string/strlen.c \
-	lib/string/strncasecmp.c \
-	lib/string/strncat.c \
-	lib/string/strncmp.c \
-	lib/string/strncpy.c \
-	lib/string/strndup.c \
-	lib/string/strnlen.c \
-	lib/string/strpbrk.c \
-	lib/string/strrchr.c \
-	lib/string/strsep.c \
-	lib/string/strspn.c \
-	lib/string/strstr.c \
-	lib/string/strtok.c \
-	lib/string/strtok_r.c \
-	lib/string/strverscmp.c \
-	lib/string/swab.c
+	libc/string/bcmp.c \
+	libc/string/bcopy.c \
+	libc/string/bzero.c \
+	libc/string/index.c \
+	libc/string/memccpy.c \
+	libc/string/memchr.c \
+	libc/string/memcmp.c \
+	libc/string/memcpy.c \
+	libc/string/memmem.c \
+	libc/string/memmove.c \
+	libc/string/mempcpy.c \
+	libc/string/memrchr.c \
+	libc/string/memset.c \
+	libc/string/rindex.c \
+	libc/string/stpcpy.c \
+	libc/string/stpncpy.c \
+	libc/string/strcasecmp.c \
+	libc/string/strcasestr.c \
+	libc/string/strcat.c \
+	libc/string/strchr.c \
+	libc/string/strchrnul.c \
+	libc/string/strcmp.c \
+	libc/string/strcpy.c \
+	libc/string/strcspn.c \
+	libc/string/strdup.c \
+	libc/string/strlcat.c \
+	libc/string/strlcpy.c \
+	libc/string/strlen.c \
+	libc/string/strncasecmp.c \
+	libc/string/strncat.c \
+	libc/string/strncmp.c \
+	libc/string/strncpy.c \
+	libc/string/strndup.c \
+	libc/string/strnlen.c \
+	libc/string/strpbrk.c \
+	libc/string/strrchr.c \
+	libc/string/strsep.c \
+	libc/string/strspn.c \
+	libc/string/strstr.c \
+	libc/string/strtok.c \
+	libc/string/strtok_r.c \
+	libc/string/strverscmp.c \
+	libc/string/swab.c
 
 LIB_SRCS+= \
-	lib/prng/prng_xorshift32.c \
-	lib/prng/prng_xorwow.c \
-	lib/prng/rand.c
+	libc/prng/prng_xorshift32.c \
+	libc/prng/prng_xorwow.c \
+	libc/prng/rand.c
 
 LIB_SRCS+= \
-	lib/stdio/clearerr.c \
-	lib/stdio/stdio.c \
-    lib/stdio/fclose.c \
-    lib/stdio/feof.c \
-    lib/stdio/ferror.c \
-    lib/stdio/fflush.c \
-    lib/stdio/fgetc.c \
-    lib/stdio/fgetpos.c \
-    lib/stdio/fgets.c \
-    lib/stdio/fopen.c \
-    lib/stdio/fprintf.c \
-    lib/stdio/fputc.c \
-    lib/stdio/fputs.c \
-    lib/stdio/fread.c \
-    lib/stdio/freopen.c \
-    lib/stdio/fseek.c \
-    lib/stdio/fsetpos.c \
-    lib/stdio/ftell.c \
-    lib/stdio/fwrite.c \
-    lib/stdio/getc.c \
-    lib/stdio/getchar.c \
-    lib/stdio/gets.c \
-    lib/stdio/perror.c \
-    lib/stdio/printf.c \
-    lib/stdio/putc.c \
-    lib/stdio/putchar.c \
-    lib/stdio/puts.c \
-    lib/stdio/remove.c \
-    lib/stdio/rename.c \
-    lib/stdio/rewind.c \
-    lib/stdio/setbuf.c \
-    lib/stdio/setvbuf.c \
-    lib/stdio/snprintf.c \
-    lib/stdio/sprintf.c \
-    lib/stdio/tmpfile.c \
-    lib/stdio/tmpnam.c \
-    lib/stdio/ungetc.c \
-    lib/stdio/vfprintf.c \
-    lib/stdio/vprintf.c \
-    lib/stdio/vsnprintf.c \
-    lib/stdio/vsprintf.c
+	libc/stdio/clearerr.c \
+	libc/stdio/stdio.c \
+    libc/stdio/fclose.c \
+    libc/stdio/feof.c \
+    libc/stdio/ferror.c \
+    libc/stdio/fflush.c \
+    libc/stdio/fgetc.c \
+    libc/stdio/fgetpos.c \
+    libc/stdio/fgets.c \
+    libc/stdio/fopen.c \
+    libc/stdio/fprintf.c \
+    libc/stdio/fputc.c \
+    libc/stdio/fputs.c \
+    libc/stdio/fread.c \
+    libc/stdio/freopen.c \
+    libc/stdio/fseek.c \
+    libc/stdio/fsetpos.c \
+    libc/stdio/ftell.c \
+    libc/stdio/fwrite.c \
+    libc/stdio/getc.c \
+    libc/stdio/getchar.c \
+    libc/stdio/gets.c \
+    libc/stdio/perror.c \
+    libc/stdio/printf.c \
+    libc/stdio/putc.c \
+    libc/stdio/putchar.c \
+    libc/stdio/puts.c \
+    libc/stdio/remove.c \
+    libc/stdio/rename.c \
+    libc/stdio/rewind.c \
+    libc/stdio/setbuf.c \
+    libc/stdio/setvbuf.c \
+    libc/stdio/snprintf.c \
+    libc/stdio/sprintf.c \
+    libc/stdio/tmpfile.c \
+    libc/stdio/tmpnam.c \
+    libc/stdio/ungetc.c \
+    libc/stdio/vfprintf.c \
+    libc/stdio/vprintf.c \
+    libc/stdio/vsnprintf.c \
+    libc/stdio/vsprintf.c
 
 LIB_SRCS+= \
-	lib/exit/abort.c \
-	lib/exit/assert.c \
-	lib/exit/atexit.c \
-	lib/exit/exit.c
+	libc/exit/abort.c \
+	libc/exit/assert.c \
+	libc/exit/atexit.c \
+	libc/exit/exit.c
 
 LIB_SRCS+= \
-	lib/stdlib/abs.c \
-	lib/stdlib/atoi.c \
-	lib/stdlib/atol.c \
-	lib/stdlib/free.c \
-	lib/stdlib/labs.c \
-	lib/stdlib/malloc.c \
-	lib/stdlib/memalign.c \
-	lib/stdlib/realloc.c \
-	lib/stdlib/strtol.c
+	libc/stdlib/abs.c \
+	libc/stdlib/atoi.c \
+	libc/stdlib/atol.c \
+	libc/stdlib/free.c \
+	libc/stdlib/labs.c \
+	libc/stdlib/malloc.c \
+	libc/stdlib/memalign.c \
+	libc/stdlib/realloc.c \
+	libc/stdlib/strtol.c
 
 LIB_SRCS+= \
-	lib/crc/crc.c
+	libc/crc/crc.c
 
 LIB_SRCS+= \
 	kernel/fs/cd/cdfs.c \
@@ -210,23 +210,23 @@ LIB_SRCS+= \
 	scu/bus/a/cs0/usb-cart/usb-cart.c
 
 LIB_SRCS+= \
-	math/color/color.c \
+	gamemath/color/color.c \
 \
-	math/fix16/fix16.c \
-	math/fix16/fix16_mat43.c \
-	math/fix16/fix16_mat33.c \
-	math/fix16/fix16_plane.c \
-	math/fix16/fix16_sqrt.c \
-	math/fix16/fix16_str.c \
-	math/fix16/fix16_trig.c \
-	math/fix16/fix16_vec2.c \
-	math/fix16/fix16_vec3.c \
-	math/fix16/fix16_vec4.c \
+	gamemath/fix16/fix16.c \
+	gamemath/fix16/fix16_mat43.c \
+	gamemath/fix16/fix16_mat33.c \
+	gamemath/fix16/fix16_plane.c \
+	gamemath/fix16/fix16_sqrt.c \
+	gamemath/fix16/fix16_str.c \
+	gamemath/fix16/fix16_trig.c \
+	gamemath/fix16/fix16_vec2.c \
+	gamemath/fix16/fix16_vec3.c \
+	gamemath/fix16/fix16_vec4.c \
 \
-	math/int16.c \
-	math/int32.c \
-	math/uint16.c \
-	math/uint32.c \
+	gamemath/int16.c \
+	gamemath/int32.c \
+	gamemath/uint16.c \
+	gamemath/uint32.c \
 \
 	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
@@ -288,71 +288,72 @@ HEADER_FILES:= \
 	./ip/ip.h
 
 INSTALL_HEADER_FILES:= \
-	./:yaul.h:./yaul/
+	./:yaul.h:./
 
 INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
-	./bup/:bup.h:./yaul/bup/
+	./bup/:bup.h:./yaul/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/bits/:alltypes.h:./bits/ \
-	./lib/lib/bits/:fcntl.h:./bits/ \
+	./libc/libc/bits/:alltypes.h:./bits/ \
+	./libc/libc/bits/:fcntl.h:./bits/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/sys/:cdefs.h:./sys/ \
-	./lib/lib/sys/:queue.h:./sys/ \
-	./lib/lib/sys/:types.h:./sys/ \
+	./libc/libc/sys/:cdefs.h:./sys/ \
+	./libc/libc/sys/:queue.h:./sys/ \
+	./libc/libc/sys/:types.h:./sys/ \
 	./kernel/sys/:init.h:./sys/
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:alloca.h:./ \
-	./lib/lib/:assert.h:./ \
-	./lib/lib/:ctype.h:./ \
-	./lib/lib/:errno.h:./ \
-	./lib/lib/:fcntl.h:./ \
-	./lib/lib/:stdio.h:./ \
-	./lib/lib/:stdlib.h:./ \
-	./lib/lib/:string.h:./ \
-	./lib/lib/:unistd.h:./ \
+	./libc/libc/:alloca.h:./ \
+	./libc/libc/:assert.h:./ \
+	./libc/libc/:ctype.h:./ \
+	./libc/libc/:errno.h:./ \
+	./libc/libc/:fcntl.h:./ \
+	./libc/libc/:math.h:./ \
+	./libc/libc/:stdio.h:./ \
+	./libc/libc/:stdlib.h:./ \
+	./libc/libc/:string.h:./ \
+	./libc/libc/:unistd.h:./
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:crc.h:./ \
+	./libc/libc/:crc.h:./
 
 INSTALL_HEADER_FILES+= \
-	./lib/lib/:prng.h:./ \
+	./libc/libc/:prng.h:./
 
 INSTALL_HEADER_FILES+= \
-	./math/:math.h:yaul/math/ \
+	./gamemath/:gamemath.h:yaul/ \
 \
-	./math/:angle.h:yaul/math/ \
-	./math/:color.h:yaul/math/ \
-	./math/color/:hsv.h:yaul/math/color/ \
-	./math/color/:rgb1555.h:yaul/math/color/ \
-	./math/color/:rgb888.h:yaul/math/color/ \
+	./gamemath/gamemath/:angle.h:yaul/gamemath/ \
+	./gamemath/gamemath/:color.h:yaul/gamemath/ \
+	./gamemath/gamemath/color/:hsv.h:yaul/gamemath/color/ \
+	./gamemath/gamemath/color/:rgb1555.h:yaul/gamemath/color/ \
+	./gamemath/gamemath/color/:rgb888.h:yaul/gamemath/color/ \
 \
-	./math/:fix16.h:yaul/math/ \
-	./math/fix16/:fix16_mat43.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_mat33.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_plane.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_trig.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_vec2.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_vec3.h:yaul/math/fix16/ \
-	./math/fix16/:fix16_vec4.h:yaul/math/fix16/ \
+	./gamemath/gamemath/:fix16.h:yaul/gamemath/ \
+	./gamemath/gamemath/fix16/:fix16_mat43.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_mat33.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_plane.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_trig.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_vec2.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_vec3.h:yaul/gamemath/fix16/ \
+	./gamemath/gamemath/fix16/:fix16_vec4.h:yaul/gamemath/fix16/ \
 \
-	./math/:int8.h:yaul/math/ \
-	./math/:int16.h:yaul/math/ \
-	./math/:int32.h:yaul/math/ \
-	./math/:uint8.h:yaul/math/ \
-	./math/:uint16.h:yaul/math/ \
-	./math/:uint32.h:yaul/math/
+	./gamemath/gamemath/:int8.h:yaul/gamemath/ \
+	./gamemath/gamemath/:int16.h:yaul/gamemath/ \
+	./gamemath/gamemath/:int32.h:yaul/gamemath/ \
+	./gamemath/gamemath/:uint8.h:yaul/gamemath/ \
+	./gamemath/gamemath/:uint16.h:yaul/gamemath/ \
+	./gamemath/gamemath/:uint32.h:yaul/gamemath/
 
 INSTALL_HEADER_FILES+= \
-	./ip/:ip.h:yaul/ip/
+	./ip/:ip.h:yaul/
 
 INSTALL_HEADER_FILES+= \
-	./kernel/dbgio/:dbgio.h:yaul/dbgio/
+	./kernel/dbgio/:dbgio.h:yaul/
 
 INSTALL_HEADER_FILES+= \
 	./kernel/mm/:arena.h:yaul/mm/ \
@@ -375,74 +376,78 @@ INSTALL_HEADER_FILES+= \
 	./kernel/fs/cd/:cdfs.h:yaul/fs/cd/
 
 INSTALL_HEADER_FILES+= \
-	./scu/:scu.h:yaul/scu/ \
-	./scu/scu/:dma.h:yaul/scu/scu/ \
-	./scu/scu/:dsp.h:yaul/scu/scu/ \
-	./scu/scu/:ic.h:yaul/scu/scu/ \
-	./scu/scu/:map.h:yaul/scu/scu/ \
-	./scu/scu/:timer.h:yaul/scu/scu/
+	./scu/:scu.h:yaul/ \
+	./scu/scu/:dma.h:yaul/scu/ \
+	./scu/scu/:dsp.h:yaul/scu/ \
+	./scu/scu/:ic.h:yaul/scu/ \
+	./scu/scu/:map.h:yaul/scu/ \
+	./scu/scu/:timer.h:yaul/scu/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs2/cd-block/:cd-block.h:yaul/scu/bus/a/cs2/cd-block/ \
-	./scu/bus/a/cs2/cd-block/cd-block/:cmd.h:yaul/scu/bus/a/cs2/cd-block/cd-block/ \
-	\
-	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/scu/bus/a/cs0/dram-cart/ \
-	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/scu/bus/a/cs0/dram-cart/
+	./scu/bus/a/cs2/cd-block/:cd-block.h:yaul/ \
+	./scu/bus/a/cs2/cd-block/cd-block/:cmd.h:yaul/cd-block/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs0/flash/:flash.h:yaul/scu/bus/a/cs0/flash/ \
-	./scu/bus/a/cs0/flash/flash/:map.h:yaul/scu/bus/a/cs0/flash/flash/
+	./scu/bus/a/cs0/dram-cart/:dram-cart.h:yaul/ \
+	./scu/bus/a/cs0/dram-cart/:dram-cart/map.h:yaul/dram-cart/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs0/arp/:arp.h:yaul/scu/bus/a/cs0/arp/ \
-	./scu/bus/a/cs0/arp/arp/:map.h:yaul/scu/bus/a/cs0/arp/arp/
+	./scu/bus/a/cs0/flash/:flash.h:yaul/ \
+	./scu/bus/a/cs0/flash/flash/:map.h:yaul/flash/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/scu/bus/a/cs0/usb-cart/ \
-	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/scu/bus/a/cs0/usb-cart/usb-cart/
+	./scu/bus/a/cs0/arp/:arp.h:yaul/ \
+	./scu/bus/a/cs0/arp/arp/:map.h:yaul/arp/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/b/scsp/:scsp.h:yaul/scu/bus/b/scsp/ \
-	\
-	./scu/bus/b/vdp/:vdp.h:yaul/scu/bus/b/vdp/ \
-	./scu/bus/b/vdp/:vdp1.h:yaul/scu/bus/b/vdp/ \
-	./scu/bus/b/vdp/vdp1/:cmdt.h:yaul/scu/bus/b/vdp/vdp1/ \
-	./scu/bus/b/vdp/vdp1/:env.h:yaul/scu/bus/b/vdp/vdp1/ \
-	./scu/bus/b/vdp/vdp1/:map.h:yaul/scu/bus/b/vdp/vdp1/ \
-	./scu/bus/b/vdp/vdp1/:vram.h:yaul/scu/bus/b/vdp/vdp1/ \
-	./scu/bus/b/vdp/:vdp2.h:yaul/scu/bus/b/vdp/ \
-	./scu/bus/b/vdp/vdp2/:cram.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:map.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_bitmap.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_cell.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_funcs.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_macros.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_rotation.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:scrn_shared.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:sprite.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:tvmd.h:yaul/scu/bus/b/vdp/vdp2/ \
-	./scu/bus/b/vdp/vdp2/:vram.h:yaul/scu/bus/b/vdp/vdp2/ \
-	\
-	./scu/bus/cpu/:cpu.h:yaul/scu/bus/cpu/ \
-	./scu/bus/cpu/cpu/:cache.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:divu.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:dmac.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:dual.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:endian.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:frt.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:instructions.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:intc.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:map.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:registers.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:sci.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:sync.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:ubc.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:wdt.h:yaul/scu/bus/cpu/cpu/ \
-	./scu/bus/cpu/cpu/:which.h:yaul/scu/bus/cpu/cpu/ \
-	\
-	./scu/bus/cpu/smpc/:smpc.h:yaul/scu/bus/cpu/smpc/ \
-	./scu/bus/cpu/smpc/smpc/:peripheral.h:yaul/scu/bus/cpu/smpc/smpc/ \
-	./scu/bus/cpu/smpc/smpc/:map.h:yaul/scu/bus/cpu/smpc/smpc/ \
-	./scu/bus/cpu/smpc/smpc/:rtc.h:yaul/scu/bus/cpu/smpc/smpc/ \
-	./scu/bus/cpu/smpc/smpc/:smc.h:yaul/scu/bus/cpu/smpc/smpc/
+	./scu/bus/a/cs0/usb-cart/:usb-cart.h:yaul/ \
+	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/usb-cart/
+
+INSTALL_HEADER_FILES+= \
+	./scu/bus/b/scsp/:scsp.h:yaul/
+
+INSTALL_HEADER_FILES+= \
+	./scu/bus/b/vdp/:vdp.h:yaul/ \
+	./scu/bus/b/vdp/:vdp1.h:yaul/ \
+	./scu/bus/b/vdp/vdp1/:cmdt.h:yaul/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:env.h:yaul/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:map.h:yaul/vdp1/ \
+	./scu/bus/b/vdp/vdp1/:vram.h:yaul/vdp1/ \
+	./scu/bus/b/vdp/:vdp2.h:yaul/ \
+	./scu/bus/b/vdp/vdp2/:cram.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:map.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_bitmap.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_cell.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_funcs.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_macros.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_rotation.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:scrn_shared.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:sprite.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:tvmd.h:yaul/vdp2/ \
+	./scu/bus/b/vdp/vdp2/:vram.h:yaul/vdp2/
+
+INSTALL_HEADER_FILES+= \
+	./scu/bus/cpu/:cpu.h:yaul/ \
+	./scu/bus/cpu/cpu/:cache.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:divu.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:dmac.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:dual.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:endian.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:frt.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:instructions.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:intc.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:map.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:registers.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:sci.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:sync.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:ubc.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:wdt.h:yaul/cpu/ \
+	./scu/bus/cpu/cpu/:which.h:yaul/cpu/
+
+INSTALL_HEADER_FILES+= \
+	./scu/bus/cpu/smpc/:smpc.h:yaul/ \
+	./scu/bus/cpu/smpc/smpc/:peripheral.h:yaul/smpc/ \
+	./scu/bus/cpu/smpc/smpc/:map.h:yaul/smpc/ \
+	./scu/bus/cpu/smpc/smpc/:rtc.h:yaul/smpc/ \
+	./scu/bus/cpu/smpc/smpc/:smc.h:yaul/smpc/
