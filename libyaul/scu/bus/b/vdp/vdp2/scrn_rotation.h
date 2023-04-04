@@ -11,7 +11,6 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
-#include <math.h>
 #include <stdint.h>
 
 #include <vdp2/scrn_shared.h>

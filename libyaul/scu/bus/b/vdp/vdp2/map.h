@@ -12,8 +12,8 @@
 
 #include <stdint.h>
 
-#include <fix16.h>
-#include <int16.h>
+#include <gamemath/fix16.h>
+#include <gamemath/int16.h>
 
 /// @addtogroup MEMORY_MAP
 /// @defgroup MEMORY_MAP_VDP2_IO_REGISTERS VDP2 I/O

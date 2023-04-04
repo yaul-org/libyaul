@@ -9,13 +9,14 @@
 #define _YAUL_KERNEL_FS_CDFS_H_
 
 #include <assert.h>
-#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
+
+#include <gamemath.h>
 
 #include <cd-block.h>
 

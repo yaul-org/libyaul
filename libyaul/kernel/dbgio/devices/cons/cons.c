@@ -8,7 +8,7 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
-#include <math.h>
+#include <gamemath.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

@@ -14,15 +14,14 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <int16.h>
+#include <gamemath/color.h>
+#include <gamemath/int16.h>
 
 #include <scu.h>
 
 #include <vdp1/map.h>
 
 #include <vdp2/sprite.h>
-
-#include <color.h>
 
 __BEGIN_DECLS
 

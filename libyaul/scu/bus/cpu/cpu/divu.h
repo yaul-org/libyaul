@@ -11,7 +11,7 @@
 #include <cpu/instructions.h>
 #include <cpu/map.h>
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
 __BEGIN_DECLS
 
