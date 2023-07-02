@@ -41,7 +41,7 @@ slave_state(void)
 extern void *__end;
 
 typedef void *(*malloc_func_t)(size_t n);
-typedef void *(*memalign_func_t)(size_t n, size_t align);
+typedef void *(*memalign_func_t)(size_t align, size_t n);
 typedef void (*free_func_t)(void *p);
 
 void __reset(void);
@@ -50,7 +50,7 @@ void __mm_init(void);
 
 void *__malloc(size_t n);
 void *__realloc(void *p, size_t n);
-void *__memalign(size_t n, size_t align);
+void *__memalign(size_t align, size_t n);
 void __free(void *p);
 
 void __atexit_init(void);
