@@ -20,7 +20,7 @@ struct fiber {
 
 static_assert(sizeof(fiber_t) == ((92 + 20)));
 
-typedef void *(*fiber_stack_alloc_t)(size_t amount, size_t align);
+typedef void *(*fiber_stack_alloc_t)(size_t align, size_t amount);
 typedef void (*fiber_stack_free_t)(void *p);
 
 static inline void __always_inline
