@@ -44,7 +44,7 @@ fiber_fiber_init(fiber_t *fiber, ssize_t stack_size, fiber_entry_t entry)
     const ssize_t round_stack_size = uint32_pow2_round_next(stack_size);
 
     fiber->size = clamp(round_stack_size, 16, 4096);
-    fiber->stack = _stack_alloc(fiber->size, 16);
+    fiber->stack = _stack_alloc(16, fiber->size);
     if (fiber->stack == NULL) {
         return -1;
     }
