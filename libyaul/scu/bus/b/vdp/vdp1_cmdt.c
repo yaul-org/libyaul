@@ -30,7 +30,7 @@ vdp1_cmdt_list_alloc(uint16_t count)
     assert(cmdt_list != NULL);
 
     vdp1_cmdt_t *cmdts;
-    cmdts = memalign(count * sizeof(vdp1_cmdt_t), sizeof(vdp1_cmdt_t));
+    cmdts = memalign(sizeof(vdp1_cmdt_t), count * sizeof(vdp1_cmdt_t));
     assert(cmdts != NULL);
 
     vdp1_cmdt_list_init(cmdt_list, cmdts);
@@ -75,7 +75,7 @@ vdp1_cmdt_orderlist_alloc(uint16_t count)
     }
 
     vdp1_cmdt_orderlist_t * const cmdt_orderlist =
-      memalign(sizeof(vdp1_cmdt_orderlist_t), 1 << aligned_boundary);
+      memalign(1 << aligned_boundary, sizeof(vdp1_cmdt_orderlist_t));
     assert(cmdt_orderlist != NULL);
 
     vdp1_cmdt_orderlist_init(cmdt_orderlist, count);

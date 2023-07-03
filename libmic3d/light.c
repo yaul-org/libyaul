@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
 #include "internal.h"
 

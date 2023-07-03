@@ -49,7 +49,7 @@ __mm_init(void)
     master_state()->tlsf_handles[TLSF_HANDLE_USER] =
       tlsf_pool_create((void *)TLSF_POOL_USER_START, TLSF_POOL_USER_SIZE);
 #else
-    master_state()->tlsf_pools[TLSF_HANDLE_USER] = NULL;
+    master_state()->tlsf_handles[TLSF_HANDLE_USER] = NULL;
 #endif /* MALLOC_IMPL_TLSF */
 }
 
@@ -70,11 +70,11 @@ __realloc(void *old, size_t new_len)
 }
 
 void *
-__memalign(size_t n, size_t align)
+__memalign(size_t align, size_t n)
 {
     tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
 
-    return tlsf_memalign(handle, n, align);
+    return tlsf_memalign(handle, align, n);
 }
 
 void
@@ -106,7 +106,7 @@ __user_realloc(void *old __unused, size_t new_len __unused) /* Keep as __unused 
 }
 
 void *
-__user_memalign(size_t n __unused, size_t align __unused) /* Keep as __unused */
+__user_memalign(size_t align __unused, size_t n __unused) /* Keep as __unused */
 {
 #if defined(MALLOC_IMPL_TLSF)
     tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
