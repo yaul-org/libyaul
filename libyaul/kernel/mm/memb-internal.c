@@ -44,7 +44,7 @@ __memb_memb_request_alloc(memb_t *memb, const memb_request_t *request)
     const size_t pool_size = request->block_size * request->block_count;
 
     /* Allocate all memory needed in a single request */
-    void * const area = request->memalign_func(ref_size + pool_size, align);
+    void * const area = request->memalign_func(align, ref_size + pool_size);
 
     if (area == NULL) {
         return -1;

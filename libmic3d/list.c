@@ -23,7 +23,7 @@ __list_alloc(list_t *list, uint16_t count)
             free(list->buffer);
         }
 
-        list->buffer = memalign(list->size * count, LIST_ALLOC_ALIGN);
+        list->buffer = memalign(LIST_ALLOC_ALIGN, list->size * count);
         assert(list->buffer);
 
         list->count = count;
