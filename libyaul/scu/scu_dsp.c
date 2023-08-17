@@ -294,9 +294,9 @@ _ppaf_read(void)
     /* Read SCU(PPAF) as the program end interrupt flag is reset when read */
     const uint32_t ppaf_bits = MEMORY_READ(32, SCU(PPAF));
 
-    _flags_updatereturn;
+    _flags_update(ppaf_bits);
 
-    (ppaf_bits) ppaf_bits;
+    return ppaf_bits;
 }
 
 static inline void __always_inline
