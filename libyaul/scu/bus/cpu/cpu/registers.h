@@ -63,7 +63,7 @@ typedef struct cpu_registers {
 static inline void __always_inline
 cpu_reg_gbr_set(uint32_t reg_gbr)
 {
-        __asm__ volatile ("ldc %0, gbr"
+        __declare_asm("ldc %0, gbr"
             : /* No outputs */
             : "r" (reg_gbr));
 }
@@ -79,7 +79,7 @@ cpu_reg_gbr_get(void)
 {
         __register uint32_t reg_gbr;
 
-        __asm__ volatile ("stc gbr, %0"
+        __declare_asm("stc gbr, %0"
             : "=r" (reg_gbr)
             : /* No inputs */
         );
@@ -99,7 +99,7 @@ cpu_reg_gbr_get(void)
 static inline void __always_inline
 cpu_reg_vbr_set(uint32_t reg_vbr)
 {
-        __asm__ volatile ("ldc %0, vbr"
+        __declare_asm("ldc %0, vbr"
             : /* No outputs */
             : "r" (reg_vbr));
 }
@@ -115,7 +115,7 @@ cpu_reg_vbr_get(void)
 {
         __register uint32_t reg_vbr;
 
-        __asm__ volatile ("stc vbr, %0"
+        __declare_asm("stc vbr, %0"
             : "=r" (reg_vbr)
             : /* No inputs */
         );
@@ -132,7 +132,7 @@ cpu_reg_vbr_get(void)
 static inline void __always_inline
 cpu_reg_mach_set(uint32_t reg_mach)
 {
-        __asm__ volatile ("lds %0, mach"
+        __declare_asm("lds %0, mach"
             : /* No outputs */
             : "r" (reg_mach));
 }
@@ -148,7 +148,7 @@ cpu_reg_mach_get(void)
 {
         __register uint32_t reg_mach;
 
-        __asm__ volatile ("sts mach, %0"
+        __declare_asm("sts mach, %0"
             : "=r" (reg_mach)
             : /* No inputs */
         );
@@ -165,7 +165,7 @@ cpu_reg_mach_get(void)
 static inline void __always_inline
 cpu_reg_macl_set(uint32_t reg_macl)
 {
-        __asm__ volatile ("lds %0, macl"
+        __declare_asm("lds %0, macl"
             : /* No outputs */
             : "r" (reg_macl));
 }
@@ -181,7 +181,7 @@ cpu_reg_macl_get(void)
 {
         __register uint32_t reg_macl;
 
-        __asm__ volatile ("sts macl, %0"
+        __declare_asm("sts macl, %0"
             : "=r" (reg_macl)
             : /* No inputs */
         );
@@ -198,7 +198,7 @@ cpu_reg_macl_get(void)
 static inline void __always_inline
 cpu_reg_pr_set(uint32_t reg_pr)
 {
-        __asm__ volatile ("lds %0, pr"
+        __declare_asm("lds %0, pr"
             : /* No outputs */
             : "r" (reg_pr));
 }
@@ -214,7 +214,7 @@ cpu_reg_pr_get(void)
 {
         __register uint32_t reg_pr;
 
-        __asm__ volatile ("sts pr, %0"
+        __declare_asm("sts pr, %0"
             : "=r" (reg_pr)
             : /* No inputs */
         );
@@ -231,7 +231,7 @@ cpu_reg_pr_get(void)
 static inline void __always_inline
 cpu_reg_sr_set(uint32_t reg_sr)
 {
-        __asm__ volatile ("ldc %0, sr"
+        __declare_asm("ldc %0, sr"
             : /* No outputs */
             : "r" (reg_sr));
 }
@@ -247,7 +247,7 @@ cpu_reg_sr_get(void)
 {
         __register uint32_t reg_sr;
 
-        __asm__ volatile ("stc sr, %0"
+        __declare_asm("stc sr, %0"
             : "=r" (reg_sr)
             : /* No inputs */
         );
@@ -269,7 +269,7 @@ cpu_reg_fp_get(void)
 {
         __register uint32_t reg_r14;
 
-        __asm__ volatile ("mov r14, %0"
+        __declare_asm("mov r14, %0"
             : "=r" (reg_r14)
             : /* No inputs */
         );
@@ -288,7 +288,7 @@ cpu_reg_sp_get(void)
 {
         __register uint32_t reg_r15;
 
-        __asm__ volatile ("mov r15, %0"
+        __declare_asm("mov r15, %0"
             : "=r" (reg_r15)
             : /* No inputs */
         );

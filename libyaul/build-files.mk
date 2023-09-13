@@ -285,10 +285,14 @@ LIB_SRCS+= \
 
 HEADER_FILES:= \
 	./yaul.h \
+	./intellisense.h \
 	./ip/ip.h
 
 INSTALL_HEADER_FILES:= \
 	./:yaul.h:./
+
+INSTALL_HEADER_FILES+= \
+	./:intellisense.h:./
 
 INSTALL_HEADER_FILES+= \
 	./:bios.h:./yaul/

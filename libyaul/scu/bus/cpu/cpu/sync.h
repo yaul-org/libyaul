@@ -9,8 +9,11 @@
 #define _YAUL_CPU_SYNC_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <sys/cdefs.h>
+
+#include <scu/map.h>
 
 __BEGIN_DECLS
 
@@ -51,9 +54,9 @@ cpu_sync_mutex(cpu_sync_lock_t b)
          * extra instructions being emitted. Because TAS.B sets the T bit in SR,
          * there shouldn't be a need for the MOVT instruction */
 
-        __asm__ volatile ("\tadd %[b], %[bios_address]\n"
-                          "\ttas.b @%[out]\n"
-                          "\tmovt %[result]"
+        __declare_asm("\tadd %[b], %[bios_address]\n"
+                      "\ttas.b @%[out]\n"
+                      "\tmovt %[result]"
             /* Output */
             : [out] "=r" (bios_address),
               [result] "=r" (result)
@@ -87,10 +90,10 @@ cpu_sync_spinlock(cpu_sync_lock_t b)
         __register uint8_t *bios_address;
         bios_address = (uint8_t *)HWRAM_UNCACHED(0x00000B00);
 
-        __asm__ volatile ("\tadd %[b], %[bios_address]\n"
-                          "1:\n"
-                          "\ttas.b @%[out]\n"
-                          "\tbf 1b"
+        __declare_asm("\tadd %[b], %[bios_address]\n"
+                      "1:\n"
+                      "\ttas.b @%[out]\n"
+                      "\tbf 1b"
             /* Output */
             : [out] "=r" (bios_address)
             /* Input */
