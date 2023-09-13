@@ -56,7 +56,7 @@ __dma_queue_request_init(dma_queue_t *queue, memalign_func_t memalign_func)
 {
     assert(queue != NULL);
 
-    queue->xfer_table = memalign_func(sizeof(dma_queue_t) * DMA_QUEUE_REQUESTS_MAX_COUNT, 256);
+    queue->xfer_table = memalign_func(256, sizeof(dma_queue_t) * DMA_QUEUE_REQUESTS_MAX_COUNT);
     queue->count = 0;
 
     assert(queue->xfer_table != NULL);

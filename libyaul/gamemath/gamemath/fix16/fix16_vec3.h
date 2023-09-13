@@ -162,20 +162,20 @@ fix16_vec3_inline_dot(const fix16_vec3_t *a, const fix16_vec3_t *b)
     __register uint32_t aux0;
     __register uint32_t aux1;
 
-    __asm__ volatile ("\tclrmac\n"
-                      "\tmac.l @%[a]+, @%[b]+\n"
-                      "\tmac.l @%[a]+, @%[b]+\n"
-                      "\tmac.l @%[a]+, @%[b]+\n"
-                      "\tsts mach, %[aux0]\n"
-                      "\tsts macl, %[aux1]\n"
-                      "\txtrct %[aux0], %[aux1]\n"
-                      : [a] "+r" (a),
-                        [b] "+r" (b),
-                        [aux0] "=&r" (aux0),
-                        [aux1] "=&r" (aux1)
-                      : "m" (*a),
-                        "m" (*b)
-                      : "mach", "macl", "memory");
+    __declare_asm("\tclrmac\n"
+                  "\tmac.l @%[a]+, @%[b]+\n"
+                  "\tmac.l @%[a]+, @%[b]+\n"
+                  "\tmac.l @%[a]+, @%[b]+\n"
+                  "\tsts mach, %[aux0]\n"
+                  "\tsts macl, %[aux1]\n"
+                  "\txtrct %[aux0], %[aux1]\n"
+                  : [a] "+r" (a),
+                    [b] "+r" (b),
+                    [aux0] "=&r" (aux0),
+                    [aux1] "=&r" (aux1)
+                  : "m" (*a),
+                    "m" (*b)
+                  : "mach", "macl", "memory");
 
     return aux1;
 }

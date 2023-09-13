@@ -106,7 +106,7 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
 {
     __register fix16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
                       "\tsts macl, %[out]\n"
                       /* Output */
                       : [out] "=&r" (out)
@@ -129,14 +129,14 @@ fix16_int32_mul(const fix16_t a, const fix16_t b)
 {
     __register int16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                      "\tsts mach, %[out]\n"
-                      /* Output */
-                      : [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "mach");
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
+                  "\tsts mach, %[out]\n"
+                  /* Output */
+                  : [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "mach");
 
     return out;
 }
@@ -153,17 +153,17 @@ fix16_mul(const fix16_t a, const fix16_t b)
     __register uint32_t mach;
     __register fix16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                      "\tsts mach, %[mach]\n"
-                      "\tsts macl, %[out]\n"
-                      "\txtrct %[mach], %[out]\n"
-                      /* Output */
-                      : [mach] "=&r" (mach),
-                        [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "mach", "macl");
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
+                  "\tsts mach, %[mach]\n"
+                  "\tsts macl, %[out]\n"
+                  "\txtrct %[mach], %[out]\n"
+                  /* Output */
+                  : [mach] "=&r" (mach),
+                    [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "mach", "macl");
 
     return out;
 }

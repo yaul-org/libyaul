@@ -15,13 +15,13 @@
 
 __BEGIN_DECLS
 
-#define CONS_COLS_MIN   40
-#define CONS_ROWS_MIN   28
+#define CONS_COLS_MIN 40
+#define CONS_ROWS_MIN 28
 
-#define CONS_COLS_MAX   64
-#define CONS_ROWS_MAX   64
+#define CONS_COLS_MAX 64
+#define CONS_ROWS_MAX 64
 
-#define CONS_TAB_WIDTH  2
+#define CONS_TAB_WIDTH 2
 
 typedef void (*cons_ops_clear_t)(void);
 typedef void (*cons_ops_area_clear_t)(int16_t col_start, int16_t col_end, int16_t row_start, int16_t row_end);

@@ -95,17 +95,7 @@ __cons_buffer(const char *buffer)
 {
     assert(buffer != NULL);
 
-    size_t len;
-
-    if (*buffer == '\0') {
-        return;
-    }
-
-    if ((len = strlen(buffer)) == 0) {
-        return;
-    }
-
-    _vt_parse(&_cons.vt_parser, buffer, len);
+    _vt_parse(&_cons.vt_parser, buffer);
 }
 
 static void

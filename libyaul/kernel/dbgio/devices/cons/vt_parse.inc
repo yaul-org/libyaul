@@ -12,45 +12,45 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX_INTERMEDIATE_CHARS  2
+#define MAX_INTERMEDIATE_CHARS 2
 
 #define ACTION(sc) ((sc) & 0x0F)
 #define STATE(sc)  ((sc) >> 4)
 
 typedef enum {
-    VT_PARSE_STATE_ANYWHERE = 0,
-    VT_PARSE_STATE_CSI_ENTRY = 1,
-    VT_PARSE_STATE_CSI_IGNORE = 2,
-    VT_PARSE_STATE_CSI_INTERMEDIATE = 3,
-    VT_PARSE_STATE_CSI_PARAM = 4,
-    VT_PARSE_STATE_DCS_ENTRY = 5,
-    VT_PARSE_STATE_DCS_IGNORE = 6,
-    VT_PARSE_STATE_DCS_INTERMEDIATE = 7,
-    VT_PARSE_STATE_DCS_PARAM = 8,
-    VT_PARSE_STATE_DCS_PASSTHROUGH = 9,
-    VT_PARSE_STATE_ESCAPE = 10,
+    VT_PARSE_STATE_ANYWHERE            = 0,
+    VT_PARSE_STATE_CSI_ENTRY           = 1,
+    VT_PARSE_STATE_CSI_IGNORE          = 2,
+    VT_PARSE_STATE_CSI_INTERMEDIATE    = 3,
+    VT_PARSE_STATE_CSI_PARAM           = 4,
+    VT_PARSE_STATE_DCS_ENTRY           = 5,
+    VT_PARSE_STATE_DCS_IGNORE          = 6,
+    VT_PARSE_STATE_DCS_INTERMEDIATE    = 7,
+    VT_PARSE_STATE_DCS_PARAM           = 8,
+    VT_PARSE_STATE_DCS_PASSTHROUGH     = 9,
+    VT_PARSE_STATE_ESCAPE              = 10,
     VT_PARSE_STATE_ESCAPE_INTERMEDIATE = 11,
-    VT_PARSE_STATE_GROUND = 12,
-    VT_PARSE_STATE_OSC_STRING = 13,
-    VT_PARSE_STATE_SOS_PM_APC_STRING = 14
+    VT_PARSE_STATE_GROUND              = 12,
+    VT_PARSE_STATE_OSC_STRING          = 13,
+    VT_PARSE_STATE_SOS_PM_APC_STRING   = 14
 } __packed vt_parse_state_t;
 
 typedef enum {
-    VT_PARSE_ACTION_INVALID = 0,
-    VT_PARSE_ACTION_CLEAR = 1,
-    VT_PARSE_ACTION_COLLECT = 2,
+    VT_PARSE_ACTION_INVALID      = 0,
+    VT_PARSE_ACTION_CLEAR        = 1,
+    VT_PARSE_ACTION_COLLECT      = 2,
     VT_PARSE_ACTION_CSI_DISPATCH = 3,
     VT_PARSE_ACTION_ESC_DISPATCH = 4,
-    VT_PARSE_ACTION_EXECUTE = 5,
-    VT_PARSE_ACTION_HOOK = 6,
-    VT_PARSE_ACTION_IGNORE = 7,
-    VT_PARSE_ACTION_OSC_END = 8,
-    VT_PARSE_ACTION_OSC_PUT = 9,
-    VT_PARSE_ACTION_OSC_START = 10,
-    VT_PARSE_ACTION_PARAM = 11,
-    VT_PARSE_ACTION_PRINT = 12,
-    VT_PARSE_ACTION_PUT = 13,
-    VT_PARSE_ACTION_UNHOOK = 14
+    VT_PARSE_ACTION_EXECUTE      = 5,
+    VT_PARSE_ACTION_HOOK         = 6,
+    VT_PARSE_ACTION_IGNORE       = 7,
+    VT_PARSE_ACTION_OSC_END      = 8,
+    VT_PARSE_ACTION_OSC_PUT      = 9,
+    VT_PARSE_ACTION_OSC_START    = 10,
+    VT_PARSE_ACTION_PARAM        = 11,
+    VT_PARSE_ACTION_PRINT        = 12,
+    VT_PARSE_ACTION_PUT          = 13,
+    VT_PARSE_ACTION_UNHOOK       = 14
 } __packed vt_parse_action_t;
 
 typedef uint8_t state_change_t;
@@ -84,26 +84,32 @@ _vt_parse_init(vt_parse_t *parser, vt_parse_callback callback)
 }
 
 static void
-_vt_parse(vt_parse_t *parser, const char *data, int32_t len)
+_vt_parse(vt_parse_t *parser, const char *data)
 {
-    int32_t i;
-    uint8_t ch;
-    state_change_t change;
+    if (data == NULL) {
+        return;
+    }
 
-    for (i = 0; i < len; i++) {
-        ch = data[i];
+    while (true) {
+        const uint8_t ch = *data;
 
-        /* If a transition is defined from the "anywhere" state,
-         * always use that.  Otherwise use the transition from
-         * the current state */
+        if (ch == '\0') {
+            return;
+        }
 
+        data++;
+
+        /* If a transition is defined from the "anywhere" state, always use
+         * that. Otherwise use the transition from the current state */
+
+        state_change_t change;
         change = _vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][ch];
 
         if (!change) {
             change = _vt_parse_state_table[parser->state][ch];
         }
 
-        _do_state_change(parser, change, data[i]);
+        _do_state_change(parser, change, ch);
     }
 }
 

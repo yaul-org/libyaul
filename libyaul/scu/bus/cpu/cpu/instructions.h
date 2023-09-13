@@ -23,7 +23,7 @@ __BEGIN_DECLS
 static inline void __always_inline
 cpu_instr_trapa(const uint8_t vector)
 {
-    __asm__ volatile ("trapa %[n]"
+    __declare_asm("trapa %[n]"
         : /* No outputs */
         : [n] "n" (vector));
 }
@@ -31,7 +31,7 @@ cpu_instr_trapa(const uint8_t vector)
 /// @brief Emit a `swap.b` instruction.
 ///
 /// @details Swap the upper and lower bytes of a 2-byte value.
-/// 
+///
 /// @param x Value to be swapped.
 ///
 /// @see cpu_bswap16
@@ -40,7 +40,7 @@ cpu_instr_swapb(uint32_t x)
 {
     __register uint32_t out;
 
-    __asm__ volatile ("swap.b %[in], %[out]\n"
+    __declare_asm("swap.b %[in], %[out]\n"
         : [out] "=&r" (out)
         : [in] "r" (x));
 
@@ -50,14 +50,14 @@ cpu_instr_swapb(uint32_t x)
 /// @brief Emit a `swap.w` instruction.
 ///
 /// @details Swap the upper and lower 2-bytes of a 4-byte value.
-/// 
+///
 /// @param x Value to be swapped.
 static inline uint32_t __always_inline
 cpu_instr_swapw(uint32_t x)
 {
     __register uint32_t out;
 
-    __asm__ volatile ("swap.w %[in], %[out]\n"
+    __declare_asm("swap.w %[in], %[out]\n"
         : [out] "=&r" (out)
         : [in] "r" (x));
 
@@ -68,7 +68,7 @@ cpu_instr_swapw(uint32_t x)
 static inline void __always_inline
 cpu_instr_clrmac(void)
 {
-    __asm__ volatile ("clrmac"
+    __declare_asm("clrmac"
         : /* No outputs */
         : /* No inputs */
         : "mach", "macl");
@@ -84,7 +84,7 @@ cpu_instr_macw(void *a, void *b)
     __register uint16_t **ap = (uint16_t **)a;
     __register uint16_t **bp = (uint16_t **)b;
 
-    __asm__ volatile ("mac.w @%[a]+, @%[b]+"
+    __declare_asm("mac.w @%[a]+, @%[b]+"
         : [a] "+&r" (*ap),
           [b] "+&r" (*bp)
         : /* No inputs */
@@ -101,7 +101,7 @@ cpu_instr_macl(void *a, void *b)
     __register uint32_t **ap = (uint32_t **)a;
     __register uint32_t **bp = (uint32_t **)b;
 
-    __asm__ volatile ("mac.l @%[a]+, @%[b]+"
+    __declare_asm("mac.l @%[a]+, @%[b]+"
         : [a] "+&r" (*ap),
           [b] "+&r" (*bp)
         : /* No inputs */
@@ -115,7 +115,7 @@ cpu_instr_sts_mach(void)
 {
     __register uint32_t out;
 
-    __asm__ volatile ("sts mach, %[out]"
+    __declare_asm("sts mach, %[out]"
         : [out] "=r" (out)
         : /* No inputs */
         : "0");
@@ -130,7 +130,7 @@ cpu_instr_sts_macl(void)
 {
     __register uint32_t out;
 
-    __asm__ volatile ("sts macl, %[out]"
+    __declare_asm("sts macl, %[out]"
         : [out] "=r" (out)
         : /* No inputs */
         : "0");
@@ -148,7 +148,7 @@ cpu_instr_extsw(const uint32_t rm)
 {
     __register uint32_t rn;
 
-    __asm__ volatile ("exts.w %[rm], %[rn]"
+    __declare_asm("exts.w %[rm], %[rn]"
         : [rn] "=&r" (rn)
         : [rm] "r" (rm));
 
@@ -165,7 +165,7 @@ cpu_instr_neg(uint32_t rm)
 {
     __register uint32_t rn;
 
-    __asm__ volatile ("neg %[rm], %[rn]"
+    __declare_asm("neg %[rm], %[rn]"
         : [rn] "=&r" (rn)
         : [rm] "r" (rm));
 
@@ -180,7 +180,7 @@ cpu_instr_neg(uint32_t rm)
 static inline uint32_t __always_inline
 cpu_instr_rotl(uint32_t rn)
 {
-    __asm__ volatile ("rotl %[rn]"
+    __declare_asm("rotl %[rn]"
         : [rn] "=&r" (rn)
         : "0" (rn));
 
@@ -195,7 +195,7 @@ cpu_instr_rotl(uint32_t rn)
 static inline uint32_t __always_inline
 cpu_instr_rotr(uint32_t rn)
 {
-    __asm__ volatile ("rotr %[rn]"
+    __declare_asm("rotr %[rn]"
         : [rn] "=&r" (rn)
         : "0" (rn));
 
@@ -212,7 +212,7 @@ cpu_instr_rotr(uint32_t rn)
 static inline uint32_t __always_inline
 cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 {
-    __asm__ volatile ("xtrct %[rm], %[rn]"
+    __declare_asm("xtrct %[rm], %[rn]"
         : [rn] "=&r" (rn)
         : "0" (rn), [rm] "r" (rm));
 
@@ -223,7 +223,7 @@ cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 static inline void __always_inline
 cpu_instr_nop(void)
 {
-    __asm__ volatile ("nop"
+    __declare_asm("nop"
         : /* No outputs */
         : /* No inputs */
     );

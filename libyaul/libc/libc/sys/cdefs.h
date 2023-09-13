@@ -61,11 +61,19 @@
 #endif /* !__has_builtin */
 
 #ifdef __cplusplus
+#ifndef __BEGIN_DECLS
 #define __BEGIN_DECLS   extern "C" {
+#endif
+#ifndef __END_DECLS
 #define __END_DECLS     }
+#endif
 #else
+#ifndef __BEGIN_DECLS
 #define __BEGIN_DECLS
+#endif
+#ifndef __END_DECLS
 #define __END_DECLS
+#endif
 #endif /* __cplusplus */
 
 /* The __CONCAT macro is used to concatenate parts of symbol names, e.g. with
@@ -98,93 +106,151 @@
 
 /// @def __aligned(x)
 /// @brief Not yet documented.
+#ifndef __aligned
 #define __aligned(x)        __attribute__ ((__aligned__ (x)))
+#endif
 /// @def __alloc_size(x)
 /// @brief Not yet documented.
+#ifndef __alloc_size
 #define __alloc_size(x)     __attribute__ ((__alloc_size__ (x)))
+#endif
 /// @def __always_inline
 /// @brief Not yet documented.
+#ifndef __always_inline
 #define __always_inline     __attribute__ ((__always_inline__))
+#endif
 /// @def __const
 /// @brief Not yet documented.
+#ifndef __const
 #define __const             __attribute__ ((__const__))
+#endif
 /// @def __dead2
 /// @brief Not yet documented.
+#ifndef __dead2
 #define __dead2             __attribute__ ((__noreturn__))
+#endif
 /// @def __fastcall
 /// @brief Not yet documented.
+#ifndef __fastcall
 #define __fastcall          __attribute__ ((__fastcall__))
+#endif
 /// @def __interrupt_handler
 /// @brief Not yet documented.
+#ifndef __interrupt_handler
 #define __interrupt_handler __attribute__ ((interrupt_handler))
+#endif
 /// @def __malloc_like
 /// @brief Not yet documented.
+#ifndef __malloc_like
 #define __malloc_like       __attribute__ ((__malloc__))
+#endif
 /// @def __may_alias
 /// @brief Not yet documented.
+#ifndef __may_alias
 #define __may_alias         __attribute__ ((__may_alias__))
+#endif
 /// @def __noinline
 /// @brief Not yet documented.
+#ifndef __noinline
 #define __noinline          __attribute__ ((__noinline__))
+#endif
 /// @def __nonnull(x)
 /// @brief Not yet documented.
+#ifndef __nonnull
 #define __nonnull(x)        __attribute__ ((__nonnull__ (x)))
+#endif
 /// @def __nonnull_all
 /// @brief Not yet documented.
+#ifndef __nonnull_all
 #define __nonnull_all       __attribute__ ((__nonnull__))
+#endif
 /// @def __noreturn
 /// @brief Not yet documented.
+#ifndef __noreturn
 #define __noreturn          __attribute__ ((noreturn))
+#endif
 /// @def __packed
 /// @brief Not yet documented.
+#ifndef __packed
 #define __packed            __attribute__ ((__packed__))
+#endif
 /// @def __pure
 /// @brief Not yet documented.
+#ifndef __pure
 #define __pure              __attribute__ ((__pure__))
+#endif
 /// @def __pure2
 /// @brief Not yet documented.
+#ifndef __pure2
 #define __pure2             __attribute__ ((__const__))
+#endif
 /// @def __result_use_check
 /// @brief Not yet documented.
+#ifndef __result_use_check
 #define __result_use_check  __attribute__ ((__warn_unused_result__))
+#endif
 /// @def __returns_twice
 /// @brief Not yet documented.
+#ifndef __returns_twice
 #define __returns_twice     __attribute__ ((__returns_twice__))
+#endif
 /// @def __section(x)
 /// @brief Not yet documented.
+#ifndef __section
 #define __section(x)        __attribute__ ((__section__ (x)))
+#endif
 /// @def __unused
 /// @brief Not yet documented.
+#ifndef __unused
 #define __unused            __attribute__ ((__unused__))
+#endif
 /// @def __used
 /// @brief Not yet documented.
+#ifndef __used
 #define __used              __attribute__ ((__used__))
+#endif
 /// @def __weak
 /// @brief Not yet documented.
+#ifndef __weak
 #define __weak              __attribute__ ((__weak__))
+#endif
 /// @def __leaf
 /// @brief Not yet documented.
+#ifndef __leaf
 #define __leaf              __attribute__ ((leaf))
+#endif
 /// @def __no_reorder
 /// @brief Not yet documented.
+#ifndef __no_reorder
 #define __no_reorder        __attribute__ ((no_reorder))
+#endif
 /// @def __hot
 /// @brief Not yet documented.
+#ifndef __hot
 #define __hot               __attribute__ ((hot))
+#endif
 /// @def __fallthrough
 /// @brief Not yet documented.
+#ifndef __fallthrough
 #define __fallthrough       __attribute__ ((fallthrough))
+#endif
 /// @def __hidden
 /// @brief Not yet documented.
+#ifndef __hidden
 #define __hidden            __attribute__ ((__visibility__ ("hidden")))
+#endif
 
 /// @def __alloc_align(yyy)
 /// @brief Not yet documented.
 #if __has_attribute(__alloc_align__)
+#ifndef __alloc_align
 #define __alloc_align(x)    __attribute__ ((__alloc_align__ (x)))
+#endif
 #else
 /// @def __always_inline
+#ifndef __alloc_align
 #define __alloc_align(x)
+#endif
 #endif /* __has_attribute(__alloc_align__) */
 
 /* This function attribute indicates that an argument in a call to the function
@@ -193,7 +259,9 @@
  * The attribute is only valid on variadic functions. */
 /// @def __null_sentinel
 /// @brief Not yet documented.
+#ifndef __null_sentinel
 #define __null_sentinel     __attribute__ ((__sentinel__))
+#endif
 
 /// @}
 
@@ -211,9 +279,13 @@
 #if !defined(__cplusplus) &&                                                   \
     (defined(__clang__)) &&                                                    \
     (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#ifndef __min_size
 #define __min_size(x) static (x)
+#endif
 #else
+#ifndef __min_size
 #define __min_size(x) (x)
+#endif
 #endif
 
 /* The identifier __func__ is implicitly declared by the translator as if,
@@ -227,7 +299,9 @@
  * at file (or, in C++, namespace scope), __func__ evaluates to the empty
  * string. */
 /// @private
+#ifndef __func__
 #define __func__ NULL
+#endif
 
 /* GCC 2.95 provides `__restrict' as an extension to C90 to support the
  * C99-specific `restrict' type qualifier. We happen to use `__restrict' as a
@@ -235,9 +309,13 @@
  * that is unaware of C99 keywords. */
 /// @private
 #if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901) || defined(lint)
+#ifndef __restrict
 #define __restrict
+#endif
 #else
+#ifndef __restrict
 #define __restrict restrict
+#endif
 #endif
 
 /* GNU C version 2.96 adds explicit branch prediction so that the CPU back-end
@@ -265,19 +343,29 @@
  *     initialization time) as the basic block reordering that this affects can
  *     often generate larger code. */
 /// @private
+#ifndef __predict_true
 #define __predict_true(exp)  __builtin_expect((exp), 1)
+#endif
 /// @private
+#ifndef __predict_false
 #define __predict_false(exp) __builtin_expect((exp), 0)
+#endif
 
 /// @private
+#ifndef __alignof
 #define __alignof(x)                                                           \
     __offsetof(struct { char __a; x __b; }, __b)
+#endif
 /// @private
+#ifndef __offsetof
 #define __offsetof(type, field)                                                \
     offsetof(type, field)
+#endif
 /// @private
+#ifndef __rangeof
 #define __rangeof(type, start, end)                                            \
     (__offsetof(type, end) - __offsetof(type, start))
+#endif
 
 /* Compiler-dependent macros to declare that functions take printf-like or
  * scanf-like arguments.
@@ -286,24 +374,39 @@
  * features properly (old versions of GCC-2 didn't permit keeping the keywords
  * out of the application namespace). */
 /// @private
+#ifndef __printflike
 #define __printflike(fmt_arg, first_vararg)                                    \
     __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
+#endif
 /// @private
+#ifndef __format_arg
 #define __format_arg(fmt_arg)                                                  \
     __attribute__ ((__format_arg__ (fmt_arg)))
+#endif
 
 /// @private
+#ifndef __weak_alias
 #define __weak_alias(name, aliasname)                                          \
     extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
+#endif
 
 /*
  * Prior to C++17 the register storage class specifier was deprecated; in C++17
  * it has been removed. */
 /// @private
 #if (__cplusplus - 0) >= 201703L
+#ifndef __register
 #define __register
+#endif
 #else
+#ifndef __register
 #define __register register
 #endif
+#endif
+
+/// @private
+#ifndef __declare_asm
+#define __declare_asm(...) __asm__ volatile (__VA_ARGS__)
+#endif /* __declare_asm */
 
 #endif /* !_LIB_SYS_CDEFS_H_ */
