@@ -22,6 +22,8 @@
 #define TEXTURE_SIZE(w, h)       ((uint16_t)((((w) >> 3) << 8) | ((h) & 255)))
 #define TEXTURE_VRAM_INDEX(addr) ((uint16_t)((uintptr_t)(addr) >> 3))
 
+__BEGIN_DECLS
+
 void mic3d_init(void);
 
 void camera_lookat(const camera_t *camera);
@@ -61,5 +63,7 @@ void gst_set(vdp1_vram_t vram_base);
 void gst_unset(void);
 void gst_put(const vdp1_gouraud_table_t *gouraud_tables, uint32_t put_count);
 void gst_put_wait(void); /* XXX: Not yet implemented */
+
+__END_DECLS
 
 #endif /* _MIC3D_H_ */
