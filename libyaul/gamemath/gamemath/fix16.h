@@ -107,13 +107,13 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
     __register fix16_t out;
 
     __declare_asm("\tdmuls.l %[a], %[b]\n"
-                      "\tsts macl, %[out]\n"
-                      /* Output */
-                      : [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "macl");
+                  "\tsts macl, %[out]\n"
+                  /* Output */
+                  : [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "macl");
 
     return out;
 }
