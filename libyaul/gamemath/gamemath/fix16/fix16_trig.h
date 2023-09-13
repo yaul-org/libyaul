@@ -5,9 +5,11 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_TRIG_H_
+#define _YAUL_GAMEMATH_FIX16_TRIG_H_
+
+#include <gamemath/angle.h>
+#include <gamemath/fix16.h>
 
 /// @addtogroup MATH_FIX16_TRIG
 /// @{
@@ -29,28 +31,28 @@
 /// @param angle Not yet documented.
 ///
 /// @returns Value.
-extern fix16_t fix16_sin(angle_t angle) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_sin(angle_t angle);
 
 /// @brief Not yet documented.
 ///
 /// @param angle Not yet documented.
 ///
 /// @returns Value.
-extern fix16_t fix16_cos(angle_t angle) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_cos(angle_t angle);
 
 /// @brief Not yet documented.
 ///
 /// @param angle Not yet documented.
 ///
 /// @returns Value.
-extern fix16_t fix16_tan(angle_t angle) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_tan(angle_t angle);
 
 /// @brief Not yet documented.
 ///
 /// @param      angle      Not yet documented.
 /// @param[out] result_sin Not yet documented.
 /// @param[out] result_cos Not yet documented.
-extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos) FIXMATH_FUNC_NONCONST_ATTRS;
+extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos);
 
 /// @brief Not yet documented.
 ///
@@ -58,6 +60,8 @@ extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos
 /// @param y Not yet documented.
 ///
 /// @returns Value.
-extern angle_t fix16_atan2(fix16_t y, fix16_t x) FIXMATH_FUNC_ATTRS;
+extern angle_t fix16_atan2(fix16_t y, fix16_t x);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_FIX16_TRIG_H_ */

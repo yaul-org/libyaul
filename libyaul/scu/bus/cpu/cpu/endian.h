@@ -63,6 +63,7 @@ cpu_bswap16(uint16_t x)
 /// @param x Value to be swapped.
 ///
 /// @returns Swapped value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_bswap32(uint32_t x __unused)
 {
@@ -85,6 +86,7 @@ cpu_bswap32(uint32_t x __unused)
 
     return out;
 }
+__END_ASM
 
 /// @}
 

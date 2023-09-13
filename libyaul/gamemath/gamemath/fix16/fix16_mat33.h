@@ -6,9 +6,10 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_MAT33_H_
+#define _YAUL_GAMEMATH_FIX16_MAT33_H_
+
+#include <gamemath/fix16/fix16_vec3.h>
 
 /// @addtogroup MATH_FIX16_MATRIX
 /// @defgroup MATH_FIX16_MATRIX3X3 3x3
@@ -25,7 +26,6 @@
 #define FIX16_MAT33_ARR_COUNT (FIX16_MAT33_COLUMNS * FIX16_MAT33_ROWS)
 
 /// @cond
-typedef union fix16_vec3 fix16_vec3_t;
 typedef union fix16_mat43 fix16_mat43_t;
 /// @endcond
 
@@ -96,5 +96,7 @@ extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t dec
 ///
 /// @param m0 Not yet documented.
 extern void fix16_mat33_zero(fix16_mat33_t *m0);
+
+#endif /* !_YAUL_GAMEMATH_FIX16_MAT33_H_ */
 
 /// @}

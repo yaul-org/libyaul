@@ -20,6 +20,7 @@ __BEGIN_DECLS
 /// @brief Emit a `trap` instruction.
 ///
 /// @param vector Interrupt vector number (`rn`).
+__BEGIN_ASM
 static inline void __always_inline
 cpu_instr_trapa(const uint8_t vector)
 {
@@ -27,6 +28,7 @@ cpu_instr_trapa(const uint8_t vector)
         : /* No outputs */
         : [n] "n" (vector));
 }
+__END_ASM
 
 /// @brief Emit a `swap.b` instruction.
 ///
@@ -35,6 +37,7 @@ cpu_instr_trapa(const uint8_t vector)
 /// @param x Value to be swapped.
 ///
 /// @see cpu_bswap16
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_swapb(uint32_t x)
 {
@@ -52,6 +55,7 @@ cpu_instr_swapb(uint32_t x)
 /// @details Swap the upper and lower 2-bytes of a 4-byte value.
 ///
 /// @param x Value to be swapped.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_swapw(uint32_t x)
 {
@@ -63,8 +67,10 @@ cpu_instr_swapw(uint32_t x)
 
     return out;
 }
+__END_ASM
 
 /// @brief Emit a `clrmac` instruction.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_instr_clrmac(void)
 {
@@ -73,11 +79,13 @@ cpu_instr_clrmac(void)
         : /* No inputs */
         : "mach", "macl");
 }
+__END_ASM
 
 /// @brief Emit a `mac.w` instruction.
 ///
 /// @param a The `rm` register.
 /// @param b The `rn` register.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_instr_macw(void *a, void *b)
 {
@@ -90,11 +98,13 @@ cpu_instr_macw(void *a, void *b)
         : /* No inputs */
         : "mach", "macl", "memory");
 }
+__END_ASM
 
 /// @brief Emit a `mac.l` instruction.
 ///
 /// @param a The `rm` register.
 /// @param b The `rn` register.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_instr_macl(void *a, void *b)
 {
@@ -107,9 +117,11 @@ cpu_instr_macl(void *a, void *b)
         : /* No inputs */
         : "mach", "macl", "memory");
 }
+__END_ASM
 
 /// @brief Emit a `sts` instruction to fetch `mach`.
 /// @returns The value of the `mach` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_sts_mach(void)
 {
@@ -122,9 +134,11 @@ cpu_instr_sts_mach(void)
 
     return out;
 }
+__END_ASM
 
 /// @brief Emit a `sts` instruction to fetch `macl`.
 /// @returns The value of the `macl` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_sts_macl(void)
 {
@@ -137,12 +151,14 @@ cpu_instr_sts_macl(void)
 
     return out;
 }
+__END_ASM
 
 /// @brief Emit a `exts.w` instruction.
 ///
 /// @param rm The `rm` register.
 ///
 /// @returns The sign-extended 32-bit value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_extsw(const uint32_t rm)
 {
@@ -154,12 +170,14 @@ cpu_instr_extsw(const uint32_t rm)
 
     return rn;
 }
+__END_ASM
 
 /// @brief Emit a `neg` instruction.
 ///
 /// @param rm The `rm` register.
 ///
 /// @returns The negated 32-bit value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_neg(uint32_t rm)
 {
@@ -171,12 +189,14 @@ cpu_instr_neg(uint32_t rm)
 
     return rn;
 }
+__END_ASM
 
 /// @brief Emit a `rotl` instruction.
 ///
 /// @param rn The `rn` register.
 ///
 /// @returns The rotated to the left 32-bit value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_rotl(uint32_t rn)
 {
@@ -186,12 +206,14 @@ cpu_instr_rotl(uint32_t rn)
 
     return rn;
 }
+__END_ASM
 
 /// @brief Emit a `rotr` instruction.
 ///
 /// @param rn The `rn` register.
 ///
 /// @returns The rotated to the right 32-bit value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_rotr(uint32_t rn)
 {
@@ -201,6 +223,7 @@ cpu_instr_rotr(uint32_t rn)
 
     return rn;
 }
+__END_ASM
 
 /// @brief Emit a `xtrct` instruction.
 ///
@@ -209,6 +232,7 @@ cpu_instr_rotr(uint32_t rn)
 ///
 /// @returns The 32-bit extracted value between the 64-bits of coupled `rm` and
 /// `rn` registers.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 {
@@ -218,8 +242,10 @@ cpu_instr_xtrct(uint32_t rm, uint32_t rn)
 
     return rn;
 }
+__END_ASM
 
 /// @brief Emit a `nop` instruction.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_instr_nop(void)
 {
@@ -228,6 +254,7 @@ cpu_instr_nop(void)
         : /* No inputs */
     );
 }
+__END_ASM
 
 /// @}
 

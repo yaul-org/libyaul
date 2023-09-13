@@ -41,6 +41,7 @@ typedef uint8_t cpu_sync_lock_t;
 /// @param b The lock index in the lock array.
 ///
 /// @returns `true` if locking was previously unlocked, otherwise `false`.
+__BEGIN_ASM
 static inline bool __always_inline
 cpu_sync_mutex(cpu_sync_lock_t b)
 {
@@ -66,6 +67,7 @@ cpu_sync_mutex(cpu_sync_lock_t b)
 
         return result;
 }
+__END_ASM
 
 /// @brief Clear the lock.
 ///
@@ -84,6 +86,7 @@ cpu_sync_mutex_clear(cpu_sync_lock_t b)
 /// available.
 ///
 /// @param b The lock index in the lock array.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_sync_spinlock(cpu_sync_lock_t b)
 {
@@ -100,6 +103,7 @@ cpu_sync_spinlock(cpu_sync_lock_t b)
             : [bios_address] "0" (bios_address),
               [b] "r" (b));
 }
+__END_ASM
 
 /// @brief Clear the lock.
 ///

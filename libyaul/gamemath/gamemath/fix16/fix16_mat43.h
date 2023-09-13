@@ -6,9 +6,12 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_MAT43_H_
+#define _YAUL_GAMEMATH_FIX16_MAT43_H_
+
+#include <gamemath/angle.h>
+#include <gamemath/fix16/fix16_vec3.h>
+#include <gamemath/fix16/fix16_vec4.h>
 
 /// @addtogroup MATH_FIX16_MATRIX
 /// @defgroup MATH_FIX16_MATRIX4X3 4x3
@@ -28,7 +31,6 @@
 union fix16_vec3;
 union fix16_mat33;
 
-typedef union fix16_vec3 fix16_vec3_t;
 typedef union fix16_mat33 fix16_mat33_t;
 /// @endcond
 
@@ -186,3 +188,5 @@ extern size_t fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t dec
 extern void fix16_mat43_zero(fix16_mat43_t *m0);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_FIX16_MAT43_H_ */
