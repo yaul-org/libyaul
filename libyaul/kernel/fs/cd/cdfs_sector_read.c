@@ -13,7 +13,7 @@
 #include "cdfs.h"
 
 void
-cdfs_sector_read(sector_t sector, void *ptr)
+cdfs_sector_read(sector_t sector, sector_buffer_t *sector_buffer)
 {
-    cd_block_sector_read(LBA2FAD(sector), ptr);
+    cd_block_sector_read(LBA2FAD(sector), sector_buffer);
 }
