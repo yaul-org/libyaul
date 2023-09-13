@@ -10,7 +10,7 @@
 
 #include <assert.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath.h>
 #include <vdp1.h>
 
 typedef enum render_flags {
