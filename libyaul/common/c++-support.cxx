@@ -24,7 +24,7 @@ void __weak operator delete[](void* ptr) {
     free(ptr);
 }
 
-void __weak operator delete[](void* ptr __unused, unsigned int) {
+void __weak operator delete[](void*, unsigned int) {
     /* Not yet implemented */
 }
 
