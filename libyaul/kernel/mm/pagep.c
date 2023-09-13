@@ -91,7 +91,4 @@ pagep_free(pagep_t *pagep, pages_t *pages)
     assert(pagep != NULL);
 
     memb_free(&pagep->memb, pages->base);
-
-    pages->base = NULL;
-    pages->count = 0;
 }
