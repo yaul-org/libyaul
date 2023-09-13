@@ -5,9 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_COLOR_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_COLOR_H_ */
+#ifndef _YAUL_GAMEMATH_COLOR_HSV_H_
+#define _YAUL_GAMEMATH_COLOR_HSV_H_
+
+#include <gamemath/color.h>
 
 /// @addtogroup MATH_COLOR
 /// @defgroup MATH_COLOR_HSV HSV
@@ -59,3 +60,5 @@ union hsv {
 extern void rgb888_hsv_conv(const rgb888_t *color_888, hsv_t *result);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_COLOR_HSV_H_ */

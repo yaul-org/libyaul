@@ -9,7 +9,7 @@
 #include <scu/map.h>
 #include <string.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_mat33.h>
 
 static void _mat33_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 

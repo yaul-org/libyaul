@@ -92,6 +92,10 @@
 #define __STRINGIFY(x) #x /* Stringify without expanding x */
 #define __XSTRING(x)   __STRING(x) /* Expand x, then stringify */
 
+#if (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#define __PRAGMA(X) _Pragma(#X)
+#endif
+
 /* Compiler-dependent macros to help declare dead (non-returning) and pure (no
  * side effects) functions, and unused variables.
  *
@@ -353,17 +357,21 @@
 
 /// @private
 #ifndef __alignof
-#define __alignof(x)                                                           \
-    __offsetof(struct { char __a; x __b; }, __b)
+#define __alignof(x)  \
+    __offsetof(       \
+        struct {      \
+            char __a; \
+            x __b;    \
+        },            \
+        __b)
 #endif
 /// @private
 #ifndef __offsetof
-#define __offsetof(type, field)                                                \
-    offsetof(type, field)
+#define __offsetof(type, field) offsetof(type, field)
 #endif
 /// @private
 #ifndef __rangeof
-#define __rangeof(type, start, end)                                            \
+#define __rangeof(type, start, end) \
     (__offsetof(type, end) - __offsetof(type, start))
 #endif
 
@@ -375,19 +383,18 @@
  * out of the application namespace). */
 /// @private
 #ifndef __printflike
-#define __printflike(fmt_arg, first_vararg)                                    \
-    __attribute__ ((__format__ (__printf__, fmt_arg, first_vararg)))
+#define __printflike(fmt_arg, first_vararg) \
+    __attribute__((__format__(__printf__, fmt_arg, first_vararg)))
 #endif
 /// @private
 #ifndef __format_arg
-#define __format_arg(fmt_arg)                                                  \
-    __attribute__ ((__format_arg__ (fmt_arg)))
+#define __format_arg(fmt_arg) __attribute__((__format_arg__(fmt_arg)))
 #endif
 
 /// @private
 #ifndef __weak_alias
-#define __weak_alias(name, aliasname)                                          \
-    extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)))
+#define __weak_alias(name, aliasname) \
+    extern __typeof(name) aliasname __attribute__((weak, alias(#name)))
 #endif
 
 /*
@@ -402,6 +409,14 @@
 #ifndef __register
 #define __register register
 #endif
+#endif
+
+#ifndef __BEGIN_ASM
+#define __BEGIN_ASM
+#endif
+
+#ifndef __END_ASM
+#define __END_ASM
 #endif
 
 /// @private

@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gamemath/color.h>
+#include <gamemath/color/rgb1555.h>
 #include <gamemath/int16.h>
 
 #include <scu.h>

@@ -6,9 +6,10 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_PLANE_H_
+#define _YAUL_GAMEMATH_FIX16_PLANE_H_
+
+#include <gamemath/fix16/fix16_vec3.h>
 
 /// @addtogroup MATH_FIX16_PLANES
 /// @{
@@ -53,3 +54,5 @@ typedef struct fix16_plane {
 extern size_t fix16_plane_str(const fix16_plane_t *plane, char *buffer, int32_t decimals);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_FIX16_PLANE_H_ */

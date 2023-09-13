@@ -119,8 +119,15 @@
 #endif /* !defined(__cplusplus) */
 #define static_assert(__e) typedef char __CONCAT(_, __LINE__)[1]
 
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#pragma GCC diagnostic ignored "-Wunused"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#undef __BEGIN_ASM
+#define __BEGIN_ASM                                                            \
+    __PRAGMA(GCC diagnostic push)                                              \
+    __PRAGMA(GCC diagnostic ignored "-Wuninitialized")                         \
+    __PRAGMA(GCC diagnostic ignored "-Wunused-variable")                       \
+    __PRAGMA(GCC diagnostic ignored "-Wunused-parameter")
+
+#undef __END_ASM
+#define __END_ASM                                                              \
+    __PRAGMA(GCC diagnostic pop)
 
 #endif

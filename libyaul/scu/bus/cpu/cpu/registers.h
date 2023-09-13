@@ -60,6 +60,7 @@ typedef struct cpu_registers {
 /// @warning Yaul may use this register at some point in the future.
 ///
 /// @param reg_gbr The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_gbr_set(uint32_t reg_gbr)
 {
@@ -67,6 +68,7 @@ cpu_reg_gbr_set(uint32_t reg_gbr)
             : /* No outputs */
             : "r" (reg_gbr));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `gbr` register.
 ///
@@ -74,6 +76,7 @@ cpu_reg_gbr_set(uint32_t reg_gbr)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `gbr` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_gbr_get(void)
 {
@@ -86,6 +89,7 @@ cpu_reg_gbr_get(void)
 
         return reg_gbr;
 }
+__END_ASM
 
 /// @brief Set the `vbr` register.
 ///
@@ -96,6 +100,7 @@ cpu_reg_gbr_get(void)
 /// executing this inlined function on.
 ///
 /// @param reg_vbr The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_vbr_set(uint32_t reg_vbr)
 {
@@ -103,6 +108,7 @@ cpu_reg_vbr_set(uint32_t reg_vbr)
             : /* No outputs */
             : "r" (reg_vbr));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `vbr` register.
 ///
@@ -110,6 +116,7 @@ cpu_reg_vbr_set(uint32_t reg_vbr)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `vbr` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_vbr_get(void)
 {
@@ -122,6 +129,7 @@ cpu_reg_vbr_get(void)
 
         return reg_vbr;
 }
+__END_ASM
 
 /// @brief Set the `mach` register.
 ///
@@ -129,6 +137,7 @@ cpu_reg_vbr_get(void)
 /// executing this inlined function on.
 ///
 /// @param reg_mach The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_mach_set(uint32_t reg_mach)
 {
@@ -136,6 +145,7 @@ cpu_reg_mach_set(uint32_t reg_mach)
             : /* No outputs */
             : "r" (reg_mach));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `mach` register.
 ///
@@ -143,6 +153,7 @@ cpu_reg_mach_set(uint32_t reg_mach)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `mach` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_mach_get(void)
 {
@@ -155,6 +166,7 @@ cpu_reg_mach_get(void)
 
         return reg_mach;
 }
+__END_ASM
 
 /// @brief Set the `macl` register.
 ///
@@ -162,6 +174,7 @@ cpu_reg_mach_get(void)
 /// executing this inlined function on.
 ///
 /// @param reg_macl The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_macl_set(uint32_t reg_macl)
 {
@@ -169,6 +182,7 @@ cpu_reg_macl_set(uint32_t reg_macl)
             : /* No outputs */
             : "r" (reg_macl));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `macl` register.
 ///
@@ -176,6 +190,7 @@ cpu_reg_macl_set(uint32_t reg_macl)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `macl` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_macl_get(void)
 {
@@ -188,6 +203,7 @@ cpu_reg_macl_get(void)
 
         return reg_macl;
 }
+__END_ASM
 
 /// @brief Set the `pr` register
 ///
@@ -195,6 +211,7 @@ cpu_reg_macl_get(void)
 /// executing this inlined function on.
 ///
 /// @param reg_pr The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_pr_set(uint32_t reg_pr)
 {
@@ -202,6 +219,7 @@ cpu_reg_pr_set(uint32_t reg_pr)
             : /* No outputs */
             : "r" (reg_pr));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `pr` register.
 ///
@@ -209,6 +227,7 @@ cpu_reg_pr_set(uint32_t reg_pr)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `pr` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_pr_get(void)
 {
@@ -221,6 +240,7 @@ cpu_reg_pr_get(void)
 
         return reg_pr;
 }
+__END_ASM
 
 /// @brief Set the `sr` register
 ///
@@ -228,6 +248,7 @@ cpu_reg_pr_get(void)
 /// executing this inlined function on.
 ///
 /// @param reg_sr The 32-bit value.
+__BEGIN_ASM
 static inline void __always_inline
 cpu_reg_sr_set(uint32_t reg_sr)
 {
@@ -235,6 +256,7 @@ cpu_reg_sr_set(uint32_t reg_sr)
             : /* No outputs */
             : "r" (reg_sr));
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `sr` register.
 ///
@@ -243,6 +265,7 @@ cpu_reg_sr_set(uint32_t reg_sr)
 ///
 /// @returns The 32-bit value of the `sr` register.
 static inline uint32_t __always_inline
+__BEGIN_ASM
 cpu_reg_sr_get(void)
 {
         __register uint32_t reg_sr;
@@ -254,6 +277,7 @@ cpu_reg_sr_get(void)
 
         return reg_sr;
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `fp` (or `r14`) register.
 ///
@@ -264,6 +288,7 @@ cpu_reg_sr_get(void)
 /// not being tracked.
 ///
 /// @returns The 32-bit value of the `fp` (or `r14`) register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_fp_get(void)
 {
@@ -276,6 +301,7 @@ cpu_reg_fp_get(void)
 
         return reg_r14;
 }
+__END_ASM
 
 /// @brief Obtain the 32-bit value of the `sp` register.
 ///
@@ -283,6 +309,7 @@ cpu_reg_fp_get(void)
 /// you're executing this inlined function on.
 ///
 /// @returns The 32-bit value of the `sp` register.
+__BEGIN_ASM
 static inline uint32_t __always_inline
 cpu_reg_sp_get(void)
 {
@@ -295,6 +322,7 @@ cpu_reg_sp_get(void)
 
         return reg_r15;
 }
+__END_ASM
 
 /// @}
 

@@ -6,9 +6,10 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_VEC2_H_
+#define _YAUL_GAMEMATH_FIX16_VEC2_H_
+
+#include <gamemath/fix16.h>
 
 /// @addtogroup MATH_FIX16_VECTOR
 /// @defgroup MATH_FIX16_VEC2 2-vector
@@ -130,6 +131,7 @@ fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
 /// @param b Not yet documented.
 ///
 /// @returns The value.
+__BEGIN_ASM
 static inline fix16_t __always_inline
 fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 {
@@ -152,6 +154,7 @@ fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 
     return aux1;
 }
+__END_ASM
 
 /// @brief Not yet documented.
 ///
@@ -192,3 +195,5 @@ extern fix16_t fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1);
 extern size_t fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int32_t decimals);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_FIX16_VEC2_H_ */

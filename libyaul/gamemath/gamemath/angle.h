@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include <gamemath/fix16.h>
+
 __BEGIN_DECLS
 
 /// @addtogroup MATH
