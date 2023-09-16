@@ -27,9 +27,10 @@
 
 static uint8_t _private_pool[TLSF_POOL_PRIVATE_SIZE];
 
-static tlsf_t _handles[TLSF_HANDLE_COUNT];
+static tlsf_t _tlsf_handles[TLSF_HANDLE_COUNT];
 
 static mm_stats_walker_t _current_stats_walker;
+static mm_stats_walk_entry_t _current_entry;
 
 static void _stats_walker(tlsf_t tlsf, mm_stats_walker_t walker, void *work);
 
@@ -40,7 +41,7 @@ static void _tlsf_walker(void *ptr, size_t size, int used, void *user);
 void
 __mm_init(void)
 {
-    master_state()->tlsf_handles = &_handles[0];
+    master_state()->tlsf_handles = &_tlsf_handles[0];
 
     master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE] =
       tlsf_pool_create((void *)TLSF_POOL_PRIVATE_START, TLSF_POOL_PRIVATE_SIZE);
@@ -133,6 +134,10 @@ __mm_stats_walk(mm_stats_walker_t walker __unused, void *work __unused) /* Keep 
 #if defined(MALLOC_IMPL_TLSF)
     tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_USER];
 
+    _current_entry.pool_type = MM_STATS_TYPE_USER;
+    _current_entry.pool_address = TLSF_POOL_USER_START;
+    _current_entry.pool_size = TLSF_POOL_USER_SIZE;
+
     _stats_walker(handle, walker, work);
 #endif /* MALLOC_IMPL_TLSF */
 }
@@ -141,6 +146,10 @@ void
 __mm_stats_private_walk(mm_stats_walker_t walker, void *work)
 {
     tlsf_t const handle = master_state()->tlsf_handles[TLSF_HANDLE_PRIVATE];
+
+    _current_entry.pool_type = MM_STATS_TYPE_YAUL;
+    _current_entry.pool_address = TLSF_POOL_PRIVATE_START;
+    _current_entry.pool_size = TLSF_POOL_PRIVATE_SIZE;
 
     _stats_walker(handle, walker, work);
 }
@@ -152,11 +161,9 @@ _stats_walker(tlsf_t tlsf, mm_stats_walker_t walker, void *work)
 
     _current_stats_walker = (walker != NULL) ? walker : _default_stats_walker;
 
-    mm_stats_walk_entry_t walk_entry = {
-        .work = work
-    };
+    _current_entry.work = work;
 
-    tlsf_pool_walk(pool, _tlsf_walker, &walk_entry);
+    tlsf_pool_walk(pool, _tlsf_walker, NULL);
 }
 
 static void
@@ -165,13 +172,11 @@ _default_stats_walker(const mm_stats_walk_entry_t *walk_entry __unused)
 }
 
 static void
-_tlsf_walker(void *ptr, size_t size, int used, void *user)
+_tlsf_walker(void *ptr, size_t size, int used, void *user __unused)
 {
-    mm_stats_walk_entry_t * const walk_entry = user;
+    _current_entry.address = (uintptr_t)ptr;
+    _current_entry.size = size;
+    _current_entry.used = (bool)used;
 
-    walk_entry->address = (uintptr_t)ptr;
-    walk_entry->size = size;
-    walk_entry->used = (bool)used;
-
-    _current_stats_walker(walk_entry);
+    _current_stats_walker(&_current_entry);
 }

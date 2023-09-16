@@ -117,7 +117,7 @@
 #if !defined(__cplusplus)
 #undef static_assert
 #endif /* !defined(__cplusplus) */
-#define static_assert(__e) typedef char __CONCAT(_, __LINE__)[1]
+#define static_assert(__e) typedef void *__CONCAT(_, __LINE__)
 
 #undef __BEGIN_ASM
 #define __BEGIN_ASM                                                            \

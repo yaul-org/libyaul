@@ -248,12 +248,20 @@ memb_free(memb_t *memb, void *addr)
  * If successful, the number of blocks allocated is returned. Otherwise -1 is
  * returned.
  */
-int32_t
-memb_size(memb_t *memb)
+uint32_t
+memb_count_get(memb_t *memb)
 {
     assert(memb != NULL);
 
     return memb->alloc_count;
+}
+
+uint32_t
+memb_capacity_get(memb_t *memb)
+{
+    assert(memb != NULL);
+
+    return memb->count;
 }
 
 /*

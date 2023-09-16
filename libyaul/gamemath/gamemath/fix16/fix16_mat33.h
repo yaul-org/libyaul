@@ -11,6 +11,8 @@
 
 #include <gamemath/fix16/fix16_vec3.h>
 
+__BEGIN_DECLS
+
 /// @addtogroup MATH_FIX16_MATRIX
 /// @defgroup MATH_FIX16_MATRIX3X3 3x3
 /// @ingroup MATH_FIX16_MATRIX
@@ -98,5 +100,7 @@ extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t dec
 extern void fix16_mat33_zero(fix16_mat33_t *m0);
 
 #endif /* !_YAUL_GAMEMATH_FIX16_MAT33_H_ */
+
+__END_DECLS
 
 /// @}

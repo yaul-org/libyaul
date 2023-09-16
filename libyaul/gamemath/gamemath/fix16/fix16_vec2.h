@@ -11,6 +11,8 @@
 
 #include <gamemath/fix16.h>
 
+__BEGIN_DECLS
+
 /// @addtogroup MATH_FIX16_VECTOR
 /// @defgroup MATH_FIX16_VEC2 2-vector
 /// @ingroup MATH_FIX16_VECTOR
@@ -195,5 +197,7 @@ extern fix16_t fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1);
 extern size_t fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int32_t decimals);
 
 /// @}
+
+__END_DECLS
 
 #endif /* !_YAUL_GAMEMATH_FIX16_VEC2_H_ */
