@@ -18,7 +18,7 @@ typedef enum {
 
 typedef struct {
     list_flags_t flags;
-    void *buffer;
+    const void *buffer;
     uint16_t count;
     uint16_t size;
     void *default_element;
@@ -26,6 +26,6 @@ typedef struct {
 
 void __list_alloc(list_t *list, uint16_t count);
 void __list_free(list_t *list);
-void __list_set(list_t *list, void *list_ptr, uint16_t count);
+void __list_set(list_t *list, const void *list_ptr, uint16_t count);
 
 #endif /* _MIC3D_LIST_H_ */

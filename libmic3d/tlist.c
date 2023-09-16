@@ -26,32 +26,14 @@ __tlist_init(void)
     tlist->default_element = _default_texture;
 }
 
-texture_t *
-tlist_acquire(uint32_t count)
-{
-    list_t * const list = &__state.tlist->list;
-
-    __list_alloc(list, count);
-
-    return list->buffer;
-}
-
-void
-tlist_release(void)
-{
-    list_t * const list = &__state.tlist->list;
-
-    __list_free(list);
-}
-
-texture_t *
+const texture_t *
 tlist_get(void)
 {
     return __state.tlist->list.buffer;
 }
 
 void
-tlist_set(texture_t *textures, uint16_t count)
+tlist_set(const texture_t *textures, uint16_t count)
 {
     list_t * const list = &__state.tlist->list;
 

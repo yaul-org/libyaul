@@ -27,6 +27,10 @@ __BEGIN_DECLS
 void mic3d_init(void);
 
 void camera_lookat(const camera_t *camera);
+void camera_moveto(const camera_t *camera);
+void camera_forward_get(fix16_vec3_t *forward);
+void camera_right_get(fix16_vec3_t *right);
+void camera_up_get(fix16_vec3_t *up);
 
 void render_enable(render_flags_t flags);
 void render_disable(render_flags_t flags);
@@ -34,12 +38,11 @@ void render_perspective_set(angle_t fov_angle);
 void render_near_level_set(uint32_t level);
 void render_far_set(fix16_t far);
 void render_mesh_transform(const mesh_t *mesh);
-void render(void);
+void render_start(void);
+void render_end(void);
 
-texture_t *tlist_acquire(uint32_t count);
-void tlist_release(void);
-void tlist_set(texture_t *textures, uint16_t count);
-texture_t *tlist_get(void);
+void tlist_set(const texture_t *textures, uint16_t count);
+const texture_t *tlist_get(void);
 
 void matrix_push(void);
 void matrix_ptr_push(void);

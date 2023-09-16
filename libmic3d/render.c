@@ -163,6 +163,15 @@ render_far_set(fix16_t far)
 }
 
 void
+render_start(void)
+{
+    render_t * const render = __state.render;
+    render_transform_t * const render_transform = render->render_transform;
+
+    __camera_view_invert(&render_transform->inv_view_matrix);
+}
+
+void
 render_mesh_transform(const mesh_t *mesh)
 {
     const uint32_t sr_mask = cpu_intc_mask_get();
@@ -264,7 +273,7 @@ render_mesh_transform(const mesh_t *mesh)
 }
 
 void
-render(void)
+render_end(void)
 {
     render_t * const render = __state.render;
 
@@ -389,13 +398,9 @@ _transform(void)
 
     const fix16_mat43_t * const world_matrix = matrix_top();
 
-    fix16_mat43_t inv_view_matrix __aligned(16);
-
-    __camera_view_invert(&inv_view_matrix);
-
     cpu_cache_purge();
 
-    fix16_mat43_mul(&inv_view_matrix, world_matrix, &render_transform->view_matrix);
+    fix16_mat43_mul(&render_transform->inv_view_matrix, world_matrix, &render_transform->view_matrix);
 
     const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&render_transform->view_matrix.row[0];
     const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&render_transform->view_matrix.row[1];

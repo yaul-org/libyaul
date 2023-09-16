@@ -16,11 +16,12 @@
 void
 __list_alloc(list_t *list, uint16_t count)
 {
+    assert(list != NULL);
     assert(count > 0);
 
     if (list->count < count) {
         if ((list->flags & LIST_FLAGS_ALLOCATED) == LIST_FLAGS_ALLOCATED) {
-            free(list->buffer);
+            free((void *)list->buffer);
         }
 
         list->buffer = memalign(LIST_ALLOC_ALIGN, list->size * count);
@@ -35,14 +36,15 @@ __list_alloc(list_t *list, uint16_t count)
 void
 __list_free(list_t *list)
 {
+    assert(list != NULL);
     __list_set(list, NULL, 0);
 }
 
 void
-__list_set(list_t *list, void *list_ptr, uint16_t count)
+__list_set(list_t *list, const void *list_ptr, uint16_t count)
 {
     if ((list->flags & LIST_FLAGS_ALLOCATED) == LIST_FLAGS_ALLOCATED) {
-        free(list->buffer);
+        free((void *)list->buffer);
 
         list->flags &= ~LIST_FLAGS_ALLOCATED;
     }
