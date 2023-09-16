@@ -11,6 +11,8 @@
 #include <gamemath/angle.h>
 #include <gamemath/fix16.h>
 
+__BEGIN_DECLS
+
 /// @addtogroup MATH_FIX16_TRIG
 /// @{
 
@@ -63,5 +65,7 @@ extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos
 extern angle_t fix16_atan2(fix16_t y, fix16_t x);
 
 /// @}
+
+__END_DECLS
 
 #endif /* !_YAUL_GAMEMATH_FIX16_TRIG_H_ */

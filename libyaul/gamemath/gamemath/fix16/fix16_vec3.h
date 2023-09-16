@@ -11,6 +11,8 @@
 
 #include <gamemath/fix16.h>
 
+__BEGIN_DECLS
+
 /// @addtogroup MATH_FIX16_VECTOR
 /// @defgroup MATH_FIX16_VEC3 3-vector
 /// @ingroup MATH_FIX16_VECTOR
@@ -244,5 +246,7 @@ extern fix16_t fix16_vec3_cross_mag(const fix16_vec3_t * __restrict v0,
 extern size_t fix16_vec3_str(const fix16_vec3_t *v0, char *buffer, int32_t decimals);
 
 /// @}
+
+__END_DECLS
 
 #endif /* !_YAUL_GAMEMATH_FIX16_VEC3_H_ */

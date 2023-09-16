@@ -13,6 +13,8 @@
 #include <gamemath/fix16/fix16_vec3.h>
 #include <gamemath/fix16/fix16_vec4.h>
 
+__BEGIN_DECLS
+
 /// @addtogroup MATH_FIX16_MATRIX
 /// @defgroup MATH_FIX16_MATRIX4X3 4x3
 /// @ingroup MATH_FIX16_MATRIX
@@ -188,5 +190,7 @@ extern size_t fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t dec
 extern void fix16_mat43_zero(fix16_mat43_t *m0);
 
 /// @}
+
+__END_DECLS
 
 #endif /* !_YAUL_GAMEMATH_FIX16_MAT43_H_ */
