@@ -261,7 +261,7 @@ $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
 	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/}/$$(@F)$(V_END)\n";
-	$(ECHO)$(INSTALL) -m 644 $$< $$@
+	$(ECHO)$(INSTALL) -m 444 $$< $$@
 
 install-$4: $4 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2
 endef
@@ -273,7 +273,7 @@ define macro-sh-generate-install-lib-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
 	$(ECHO)mkdir -p "$$(@D)"
-	$(ECHO)$(INSTALL) -m 644 $$< $$@
+	$(ECHO)$(INSTALL) -m 444 $$< $$@
 
 install-$3: $3 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2
 endef
