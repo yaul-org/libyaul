@@ -19,8 +19,8 @@ __matrix_init(void)
     __state.mstack->bottom_matrix = &matrix_pool[(MATRIX_STACK_COUNT - 1) - 1];
     __state.mstack->stack_count = MATRIX_STACK_COUNT - 1;
 
-    for (uint32_t i = 0; i < __state.mstack->stack_count; i++) {
-        fix16_mat43_identity(&__state.mstack->top_matrix[i]);
+    for (uint32_t i = 0; i < MATRIX_STACK_COUNT - 1; i++) {
+        fix16_mat43_identity(&matrix_pool[i]);
     }
 
     fix16_mat43_identity(__matrix_view_get());
@@ -53,9 +53,10 @@ matrix_ptr_push(void)
 void
 matrix_pop(void)
 {
-    if (__state.mstack->top_matrix != __state.mstack->bottom_matrix) {
-        __state.mstack->top_matrix--;
-    }
+    assert((__state.mstack->bottom_matrix - __state.mstack->top_matrix) > 1);
+
+    /* Avoid letting the view matrix be "popped" */
+    __state.mstack->top_matrix--;
 }
 
 fix16_mat43_t *
