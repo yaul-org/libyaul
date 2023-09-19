@@ -8,22 +8,20 @@
 #ifndef _MIC3D_H_
 #define _MIC3D_H_
 
+#include <mic3d/config.h>
 #include <mic3d/types.h>
+#include <mic3d/sizes.h>
+#include <mic3d/workarea.h>
 
 #define SCREEN_WIDTH  352
 #define SCREEN_HEIGHT 224
-
-#define POLYGON_COUNT      512
-#define POINTS_COUNT       (POLYGON_COUNT * 4)
-#define SORT_DEPTH         512
-#define CMDT_COUNT         2048
 
 #define TEXTURE_SIZE(w, h)       ((uint16_t)((((w) >> 3) << 8) | ((h) & 255)))
 #define TEXTURE_VRAM_INDEX(addr) ((uint16_t)((uintptr_t)(addr) >> 3))
 
 __BEGIN_DECLS
 
-void mic3d_init(void);
+void mic3d_init(mic3d_workarea_t *workarea);
 
 void camera_lookat(const camera_t *camera);
 void camera_moveto(const camera_t *camera);

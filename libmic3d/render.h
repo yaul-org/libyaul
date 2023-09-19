@@ -46,8 +46,6 @@ typedef struct {
     clip_flags_t or_flags;
 } __aligned(16) render_transform_t;
 
-static_assert(sizeof(render_transform_t) == 80);
-
 typedef struct render {
     /* Pools */
     fix16_t *z_values_pool;

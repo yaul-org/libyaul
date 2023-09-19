@@ -70,32 +70,24 @@ static perf_counter_t _sort_pc __unused;
 void
 __render_init(void)
 {
-    extern fix16_t __pool_z_values[];
-    extern int16_vec2_t __pool_screen_points[];
-    extern fix16_t __pool_depth_values[];
-
-    extern vdp1_cmdt_t __pool_cmdts[];
-
-    extern rgb1555_t __pool_colors[];
-
-    extern fix16_mat43_t __pool_render_matrices[];
-
-    extern render_transform_t __render_transform;
-
+    mic3d_workarea_t * const workarea = __state.workarea;
     render_t * const render = __state.render;
 
-    render->z_values_pool = __pool_z_values;
-    render->screen_points_pool = __pool_screen_points;
-    render->depth_values_pool = __pool_depth_values;
-    render->cmdts_pool = __pool_cmdts;
-    render->colors_pool = __pool_colors;
+    render->z_values_pool = (void *)workarea->z_values;
+    render->screen_points_pool = (void *)workarea->screen_points;
+    render->depth_values_pool = (void *)workarea->depth_values;
+    render->cmdts_pool = (void *)workarea->cmdts;
+    render->colors_pool = (void *)workarea->colors;
 
     render->mesh = NULL;
     render->mesh_world_matrix = NULL;
-    render->matrices.identity = &__pool_render_matrices[MATRIX_INDEX_IDENTITY];
-    render->matrices.view = &__pool_render_matrices[MATRIX_INDEX_VIEW];
-    render->matrices.inv_view = &__pool_render_matrices[MATRIX_INDEX_INVERSE_VIEW];
-    render->render_transform = &__render_transform;
+
+    fix16_mat43_t * const render_matrices = (void *)workarea->render_matrices;
+
+    render->matrices.identity = &render_matrices[MATRIX_INDEX_IDENTITY];
+    render->matrices.view = &render_matrices[MATRIX_INDEX_VIEW];
+    render->matrices.inv_view = &render_matrices[MATRIX_INDEX_INVERSE_VIEW];
+    render->render_transform = (void *)workarea->work;
 
     render->render_flags = RENDER_FLAGS_NONE;
 

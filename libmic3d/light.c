@@ -21,15 +21,16 @@ static void _polygon_passthrough_process(void);
 void
 __light_init(void)
 {
-    extern fix16_mat33_t __pool_light_matrices[];
-
+    mic3d_workarea_t * const workarea = __state.workarea;
     light_t * const light = __state.light;
 
-    light->matrices.inv_world = &__pool_light_matrices[MATRIX_INDEX_INVERSE_WORLD];
-    light->matrices.world_light = &__pool_light_matrices[MATRIX_INDEX_WORLD_LIGHT];
-    light->matrices.light = &__pool_light_matrices[MATRIX_INDEX_LIGHT];
-    light->matrices.color = &__pool_light_matrices[MATRIX_INDEX_COLOR];
-    light->matrices.intensity = &__pool_light_matrices[MATRIX_INDEX_INTENSITY];
+    fix16_mat33_t * const light_matrices = (void *)workarea->light_matrices;
+
+    light->matrices.inv_world = &light_matrices[MATRIX_INDEX_INVERSE_WORLD];
+    light->matrices.world_light = &light_matrices[MATRIX_INDEX_WORLD_LIGHT];
+    light->matrices.light = &light_matrices[MATRIX_INDEX_LIGHT];
+    light->matrices.color = &light_matrices[MATRIX_INDEX_COLOR];
+    light->matrices.intensity = &light_matrices[MATRIX_INDEX_INTENSITY];
 
     light_gst_set(NULL, 0, VDP1_VRAM(0x00000000));
 

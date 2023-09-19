@@ -34,13 +34,12 @@ _singles_alloc(void)
 void
 __sort_init(void)
 {
-    extern sort_list_t __pool_sort_lists[];
-    extern sort_single_t __pool_sort_singles[];
+    mic3d_workarea_t * const workarea = __state.workarea;
 
     sort_t * const sort = __state.sort;
 
-    sort->singles_pool = __pool_sort_singles;
-    sort->sort_lists_pool = __pool_sort_lists;
+    sort->singles_pool = (void *)workarea->sort_singles;
+    sort->sort_lists_pool = (void *)workarea->sort_lists;
 
     __sort_reset();
 }
