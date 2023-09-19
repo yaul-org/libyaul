@@ -21,7 +21,7 @@
 
 __BEGIN_DECLS
 
-void mic3d_init(mic3d_workarea_t *workarea);
+void mic3d_init(workarea_mic3d_t *workarea);
 
 void camera_lookat(const camera_t *camera);
 void camera_moveto(const camera_t *camera);

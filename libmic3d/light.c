@@ -21,7 +21,7 @@ static void _polygon_passthrough_process(void);
 void
 __light_init(void)
 {
-    mic3d_workarea_t * const workarea = __state.workarea;
+    workarea_mic3d_t * const workarea = __state.workarea;
     light_t * const light = __state.light;
 
     fix16_mat33_t * const light_matrices = (void *)workarea->light_matrices;

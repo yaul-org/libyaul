@@ -8,20 +8,18 @@
 #ifndef _MIC3D_CONFIG_H_
 #define _MIC3D_CONFIG_H_
 
-#ifndef POLYGON_COUNT
-#define POLYGON_COUNT 512
-#endif /* POLYGON_COUNT */
+/* Maximum number of command tables per frame */
+#ifndef CONFIG_MIC3D_CMDT_COUNT
+#define CONFIG_MIC3D_CMDT_COUNT   2048
+#endif /* !CMDT_COUNT */
 
-#ifndef POINTS_COUNT
-#define POINTS_COUNT  (POLYGON_COUNT * 4)
-#endif /* POINTS_COUNT */
+#ifndef CONFIG_MIC3D_SORT_DEPTH
+#define CONFIG_MIC3D_SORT_DEPTH   512
+#endif /* !SORT_DEPTH */
 
-#ifndef SORT_DEPTH
-#define SORT_DEPTH    512
-#endif /* SORT_DEPTH */
+/* Maximum number of points per render call */
+#ifndef CONFIG_MIC3D_POINTS_COUNT
+#define CONFIG_MIC3D_POINTS_COUNT (CONFIG_MIC3D_CMDT_COUNT / 4)
+#endif /* !POINTS_COUNT */
 
-#ifndef CMDT_COUNT
-#define CMDT_COUNT    2048
-#endif /* CMDT_COUNT */
-
-#endif /* _MIC3D_CONFIG_H_ */
+#endif /* !_MIC3D_CONFIG_H_ */

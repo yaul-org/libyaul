@@ -34,7 +34,7 @@ _singles_alloc(void)
 void
 __sort_init(void)
 {
-    mic3d_workarea_t * const workarea = __state.workarea;
+    workarea_mic3d_t * const workarea = __state.workarea;
 
     sort_t * const sort = __state.sort;
 

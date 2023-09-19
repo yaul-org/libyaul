@@ -164,4 +164,4 @@ typedef struct palette {
 
 static_assert(sizeof(palette_t) == 8);
 
-#endif /* _MIC3D_TYPES_H_ */
+#endif /* !_MIC3D_TYPES_H_ */

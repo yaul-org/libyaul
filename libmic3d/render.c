@@ -70,7 +70,7 @@ static perf_counter_t _sort_pc __unused;
 void
 __render_init(void)
 {
-    mic3d_workarea_t * const workarea = __state.workarea;
+    workarea_mic3d_t * const workarea = __state.workarea;
     render_t * const render = __state.render;
 
     render->z_values_pool = (void *)workarea->z_values;
