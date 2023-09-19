@@ -37,9 +37,6 @@ typedef enum clip_flags {
 } clip_flags_t;
 
 typedef struct {
-    fix16_mat43_t inv_view_matrix;
-    fix16_mat43_t view_matrix;
-
     attribute_t attribute;
     polygon_t polygon;
     int16_vec2_t screen_points[4];
@@ -49,7 +46,7 @@ typedef struct {
     clip_flags_t or_flags;
 } __aligned(16) render_transform_t;
 
-static_assert(sizeof(render_transform_t) == 176);
+static_assert(sizeof(render_transform_t) == 80);
 
 typedef struct render {
     /* Pools */
@@ -68,6 +65,14 @@ typedef struct render {
     render_flags_t render_flags;
 
     const mesh_t *mesh;
+    const fix16_mat43_t *mesh_world_matrix;
+
+    struct {
+        fix16_mat43_t *identity;
+        fix16_mat43_t *view;
+        fix16_mat43_t *inv_view;
+    } matrices;
+
     render_transform_t *render_transform;
 
     /* Sorting */
