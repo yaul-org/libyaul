@@ -4,7 +4,6 @@ LIB_SRCS:= \
 	camera.c \
 	gst.c \
 	light.c \
-	list.c \
 	mic3d.c \
 	perf.c \
 	render.c \
