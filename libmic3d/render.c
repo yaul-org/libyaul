@@ -29,12 +29,17 @@
 #define NEAR_LEVEL_MIN 1U
 #define NEAR_LEVEL_MAX 8U
 
-#define ORDER_SYSTEM_CLIP_COORDS_INDEX  0
-#define ORDER_SUBR_INDEX                1
-#define ORDER_CLEAR_POLYGON_INDEX       1
-#define ORDER_LOCAL_COORDS_INDEX        2
-#define ORDER_DRAW_END_INDEX            3
-#define ORDER_INDEX                     4
+#define ORDER_SYSTEM_CLIP_COORDS_INDEX 0
+#define ORDER_SUBR_INDEX               1
+#define ORDER_CLEAR_POLYGON_INDEX      1
+#define ORDER_LOCAL_COORDS_INDEX       2
+#define ORDER_DRAW_END_INDEX           3
+#define ORDER_INDEX                    4
+
+#define MATRIX_INDEX_CAMERA         0
+#define MATRIX_INDEX_INVERSE_CAMERA 1
+#define MATRIX_INDEX_VIEW           2
+#define MATRIX_INDEX_IDENTITY       3
 
 static void _reset(void);
 
@@ -61,33 +66,39 @@ static void _cmdt_process(vdp1_cmdt_t *cmdt);
 
 static perf_counter_t _transform_pc __unused;
 static perf_counter_t _sort_pc __unused;
-static volatile uint32_t *lwram = (volatile uint32_t *)LWRAM(0x00000000);
+/* static volatile uint32_t *lwram = (volatile uint32_t *)LWRAM(0x00000000); */
 
 void
 __render_init(void)
 {
-    extern fix16_t __pool_z_values[];
-    extern int16_vec2_t __pool_screen_points[];
-    extern fix16_t __pool_depth_values[];
-
-    extern vdp1_cmdt_t __pool_cmdts[];
-
-    extern rgb1555_t __pool_colors[];
-
-    extern render_transform_t __render_transform;
-
+    workarea_mic3d_t * const workarea = __state.workarea;
     render_t * const render = __state.render;
 
-    render->z_values_pool = __pool_z_values;
-    render->screen_points_pool = __pool_screen_points;
-    render->depth_values_pool = __pool_depth_values;
-    render->cmdts_pool = __pool_cmdts;
-    render->colors_pool = __pool_colors;
+    render->z_values_pool = (void *)workarea->z_values;
+    render->screen_points_pool = (void *)workarea->screen_points;
+    render->depth_values_pool = (void *)workarea->depth_values;
+    render->cmdts_pool = (void *)workarea->cmdts;
+    render->colors_pool = (void *)workarea->colors;
 
     render->mesh = NULL;
-    render->render_transform = &__render_transform;
+    render->mesh_world_matrix = NULL;
+
+    fix16_mat43_t * const render_matrices = (void *)workarea->render_matrices;
+
+    render->matrices.camera = &render_matrices[MATRIX_INDEX_CAMERA];
+    render->matrices.inv_camera = &render_matrices[MATRIX_INDEX_INVERSE_CAMERA];
+    render->matrices.view = &render_matrices[MATRIX_INDEX_VIEW];
+    render->matrices.identity = &render_matrices[MATRIX_INDEX_IDENTITY];
+    render->render_transform = (void *)workarea->work;
 
     render->render_flags = RENDER_FLAGS_NONE;
+
+    fix16_mat43_identity(render->matrices.identity);
+    fix16_mat43_identity(render->matrices.view);
+    fix16_mat43_identity(render->matrices.camera);
+    fix16_mat43_identity(render->matrices.inv_camera);
+
+    render_world_matrix_set(NULL);
 
     render_perspective_set(DEG2ANGLE(90.0f));
     render_near_level_set(7);
@@ -115,6 +126,14 @@ render_disable(render_flags_t flags)
     render_t * const render = __state.render;
 
     render->render_flags &= ~flags;
+}
+
+void
+render_flags_set(render_flags_t flags)
+{
+    render_t * const render = __state.render;
+
+    render->render_flags = flags;
 }
 
 void
@@ -159,7 +178,14 @@ render_far_set(fix16_t far)
     render_t * const render = __state.render;
 
     render->far = fix16_clamp(far, render->near, FIX16(2048.0f));
-    render->sort_scale = fix16_div(FIX16(SORT_DEPTH - 1), render->far);
+    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
+    render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1), render->far);
+}
+
+void
+render_start(void)
+{
+    __camera_view_invert();
 }
 
 void
@@ -254,17 +280,17 @@ render_mesh_transform(const mesh_t *mesh)
         _cmdt_process(cmdt);
     }
 
-    __perf_counter_end(&_transform_pc);
-    *lwram = _transform_pc.ticks;
-    lwram++;
-    __perf_str(_transform_pc.ticks, (void *)lwram);
-    lwram += 3;
+    /* __perf_counter_end(&_transform_pc); */
+    /* *lwram = _transform_pc.ticks; */
+    /* lwram++; */
+    /* __perf_str(_transform_pc.ticks, (void *)lwram); */
+    /* lwram += 3; */
 
     cpu_intc_mask_set(sr_mask);
 }
 
 void
-render(void)
+render_end(void)
 {
     render_t * const render = __state.render;
 
@@ -296,7 +322,7 @@ render(void)
     __perf_counter_start(&_sort_pc);
     __sort_iterate(_render_single);
     __perf_counter_end(&_sort_pc);
-    __perf_str(_sort_pc.ticks, (void *)lwram);
+    /* __perf_str(_sort_pc.ticks, (void *)lwram); */
 
     vdp1_cmdt_t * const end_cmdt = render->sort_cmdt;
 
@@ -308,7 +334,15 @@ render(void)
     __light_gst_put();
 
     _reset();
-    lwram = (volatile uint32_t *)LWRAM(0x00000000);
+    /* lwram = (volatile uint32_t *)LWRAM(0x00000000); */
+}
+
+void
+render_world_matrix_set(const fix16_mat43_t *matrix)
+{
+    render_t * const render = __state.render;
+
+    render->mesh_world_matrix = (matrix != NULL) ? matrix : render->matrices.identity;
 }
 
 static void
@@ -382,24 +416,19 @@ _vdp1_init(void)
 static void
 _transform(void)
 {
-    extern void __render_points_transform(render_t *render, render_transform_t *render_transform);
-
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
 
-    const fix16_mat43_t * const world_matrix = matrix_top();
-
-    fix16_mat43_t inv_view_matrix __aligned(16);
-
-    __camera_view_invert(&inv_view_matrix);
+    const fix16_mat43_t * const world_matrix = render->mesh_world_matrix;
+    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const inv_camera_matrix = render->matrices.inv_camera;
 
     cpu_cache_purge();
 
-    fix16_mat43_mul(&inv_view_matrix, world_matrix, &render_transform->view_matrix);
+    fix16_mat43_mul(inv_camera_matrix, world_matrix, view_matrix);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&render_transform->view_matrix.row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&render_transform->view_matrix.row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&render_transform->view_matrix.row[2];
+    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
+    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
+    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
 
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
@@ -407,13 +436,13 @@ _transform(void)
     /* fix16_t * const depth_values = render->depth_values_pool; */
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
-        const fix16_t z = fix16_vec3_dot(m2, &points[i]) + render_transform->view_matrix.frow[2][3];
+        const fix16_t z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
         const fix16_t clamped_z = fix16_max(z, render->near);
 
         cpu_divu_fix16_set(render->view_distance, clamped_z);
 
-        const fix16_t x = fix16_vec3_dot(m0, &points[i]) + render_transform->view_matrix.frow[0][3];
-        const fix16_t y = fix16_vec3_dot(m1, &points[i]) + render_transform->view_matrix.frow[1][3];
+        const fix16_t x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
+        const fix16_t y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 

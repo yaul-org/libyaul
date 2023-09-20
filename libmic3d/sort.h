@@ -17,13 +17,9 @@ typedef struct sort_single {
     int16_t next_single;
 } __aligned(2) sort_single_t;
 
-static_assert(sizeof(sort_single_t) == 2);
-
 typedef struct {
     uint16_t head;
 } __aligned(2) sort_list_t;
-
-static_assert(sizeof(sort_list_t) == 2);
 
 typedef struct sort {
     sort_single_t *singles_pool;
