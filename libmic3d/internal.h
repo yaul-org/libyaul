@@ -28,6 +28,6 @@ static_assert(sizeof(int16_vec2_t) == STRUCT_MIC3D_SCREEN_POINTS_BYTE_SIZE);
 static_assert(sizeof(fix16_mat43_t) == STRUCT_MIC3D_RENDER_MATRICES_BYTE_SIZE);
 static_assert(sizeof(fix16_mat33_t) == STRUCT_MIC3D_LIGHT_MATRICES_BYTE_SIZE);
 static_assert(sizeof(rgb1555_t) == STRUCT_MIC3D_COLORS_BYTE_SIZE);
-static_assert(sizeof(render_transform_t) == STRUCT_MIC3D_WORK_BYTE_SIZE);
+static_assert(sizeof(pipeline_t) == STRUCT_MIC3D_WORK_BYTE_SIZE);
 
 #endif /* _MIC3D_INTERNAL_H_ */

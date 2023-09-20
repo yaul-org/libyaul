@@ -30,7 +30,7 @@
 //          sx = depth_value * x
 
 // r4 = render
-// r5 = render_transform
+// r5 = pipeline
 ___render_points_transform:
     mov.l r11,@-r15
     add #(8*4),r5                      // Move VIEW_MATRIX forward to row #2

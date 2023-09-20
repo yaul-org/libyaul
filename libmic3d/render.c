@@ -81,22 +81,22 @@ __render_init(void)
     render->colors_pool = (void *)workarea->colors;
 
     render->mesh = NULL;
-    render->mesh_world_matrix = NULL;
+    render->world_matrix = NULL;
 
     fix16_mat43_t * const render_matrices = (void *)workarea->render_matrices;
 
-    render->matrices.camera = &render_matrices[MATRIX_INDEX_CAMERA];
-    render->matrices.inv_camera = &render_matrices[MATRIX_INDEX_INVERSE_CAMERA];
-    render->matrices.view = &render_matrices[MATRIX_INDEX_VIEW];
-    render->matrices.identity = &render_matrices[MATRIX_INDEX_IDENTITY];
-    render->render_transform = (void *)workarea->work;
+    render->camera_matrix = &render_matrices[MATRIX_INDEX_CAMERA];
+    render->inv_camera_matrix = &render_matrices[MATRIX_INDEX_INVERSE_CAMERA];
+    render->view_matrix = &render_matrices[MATRIX_INDEX_VIEW];
+    render->identity_matrix = &render_matrices[MATRIX_INDEX_IDENTITY];
+    render->pipeline = (void *)workarea->work;
 
     render->render_flags = RENDER_FLAGS_NONE;
 
-    fix16_mat43_identity(render->matrices.identity);
-    fix16_mat43_identity(render->matrices.view);
-    fix16_mat43_identity(render->matrices.camera);
-    fix16_mat43_identity(render->matrices.inv_camera);
+    fix16_mat43_identity(render->identity_matrix);
+    fix16_mat43_identity(render->view_matrix);
+    fix16_mat43_identity(render->camera_matrix);
+    fix16_mat43_identity(render->inv_camera_matrix);
 
     render_world_matrix_set(NULL);
 
@@ -195,7 +195,7 @@ render_mesh_transform(const mesh_t *mesh)
     cpu_intc_mask_set(15);
 
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
     light_polygon_processor_t light_polygon_processor;
 
@@ -212,25 +212,25 @@ render_mesh_transform(const mesh_t *mesh)
     const polygon_t * const polygons = render->mesh->polygons;
 
     for (uint32_t i = 0; i < render->mesh->polygons_count; i++) {
-        render_transform->polygon = polygons[i];
+        pipeline->polygon = polygons[i];
 
-        render_transform->screen_points[0] = screen_points[render_transform->polygon.indices.p0];
-        render_transform->screen_points[1] = screen_points[render_transform->polygon.indices.p1];
-        render_transform->screen_points[2] = screen_points[render_transform->polygon.indices.p2];
-        render_transform->screen_points[3] = screen_points[render_transform->polygon.indices.p3];
+        pipeline->screen_points[0] = screen_points[pipeline->polygon.indices.p0];
+        pipeline->screen_points[1] = screen_points[pipeline->polygon.indices.p1];
+        pipeline->screen_points[2] = screen_points[pipeline->polygon.indices.p2];
+        pipeline->screen_points[3] = screen_points[pipeline->polygon.indices.p3];
 
-        if (render_transform->polygon.flags.plane_type != PLANE_TYPE_DOUBLE) {
+        if (pipeline->polygon.flags.plane_type != PLANE_TYPE_DOUBLE) {
             if ((_backface_cull_test())) {
                 continue;
             }
         }
 
-        render_transform->z_values[0] = z_values[render_transform->polygon.indices.p0];
-        render_transform->z_values[1] = z_values[render_transform->polygon.indices.p1];
-        render_transform->z_values[2] = z_values[render_transform->polygon.indices.p2];
-        render_transform->z_values[3] = z_values[render_transform->polygon.indices.p3];
+        pipeline->z_values[0] = z_values[pipeline->polygon.indices.p0];
+        pipeline->z_values[1] = z_values[pipeline->polygon.indices.p1];
+        pipeline->z_values[2] = z_values[pipeline->polygon.indices.p2];
+        pipeline->z_values[3] = z_values[pipeline->polygon.indices.p3];
 
-        const fix16_t min_depth_z = _depth_min_calculate(render_transform->z_values);
+        const fix16_t min_depth_z = _depth_min_calculate(pipeline->z_values);
 
         /* Cull polygons intersecting with the near plane */
         if ((min_depth_z < render->near)) {
@@ -240,22 +240,22 @@ render_mesh_transform(const mesh_t *mesh)
         _clip_flags_calculate();
 
         /* Cull if the polygon is entirely off screen */
-        if (render_transform->and_flags != CLIP_FLAGS_NONE) {
+        if (pipeline->and_flags != CLIP_FLAGS_NONE) {
             continue;
         }
 
         fix16_t depth_z;
 
-        switch (render_transform->polygon.flags.sort_type) {
+        switch (pipeline->polygon.flags.sort_type) {
         default:
         case SORT_TYPE_CENTER:
-            depth_z = _depth_center_calculate(render_transform->z_values);
+            depth_z = _depth_center_calculate(pipeline->z_values);
             break;
         case SORT_TYPE_MIN:
             depth_z = min_depth_z;
             break;
         case SORT_TYPE_MAX:
-            depth_z = _depth_max_calculate(render_transform->z_values);
+            depth_z = _depth_max_calculate(pipeline->z_values);
             break;
         }
 
@@ -263,12 +263,12 @@ render_mesh_transform(const mesh_t *mesh)
 
         __sort_insert(scaled_z);
 
-        render_transform->attribute = render->mesh->attributes[i];
+        pipeline->attribute = render->mesh->attributes[i];
 
-        if (render_transform->or_flags == CLIP_FLAGS_NONE) {
+        if (pipeline->or_flags == CLIP_FLAGS_NONE) {
             /* If no clip flags are set, disable pre-clipping. This
              * should help with performance */
-            render_transform->attribute.draw_mode.pre_clipping_disable = true;
+            pipeline->attribute.draw_mode.pre_clipping_disable = true;
         } else {
             _polygon_orient();
         }
@@ -342,7 +342,7 @@ render_world_matrix_set(const fix16_mat43_t *matrix)
 {
     render_t * const render = __state.render;
 
-    render->mesh_world_matrix = (matrix != NULL) ? matrix : render->matrices.identity;
+    render->world_matrix = (matrix != NULL) ? matrix : render->identity_matrix;
 }
 
 static void
@@ -418,9 +418,9 @@ _transform(void)
 {
     render_t * const render = __state.render;
 
-    const fix16_mat43_t * const world_matrix = render->mesh_world_matrix;
-    fix16_mat43_t * const view_matrix = render->matrices.view;
-    fix16_mat43_t * const inv_camera_matrix = render->matrices.inv_camera;
+    const fix16_mat43_t * const world_matrix = render->world_matrix;
+    fix16_mat43_t * const view_matrix = render->view_matrix;
+    fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
 
     cpu_cache_purge();
 
@@ -488,16 +488,16 @@ static bool
 _backface_cull_test(void)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
     const int32_vec2_t a = {
-        .x = render_transform->screen_points[2].x - render_transform->screen_points[0].x,
-        .y = render_transform->screen_points[2].y - render_transform->screen_points[0].y
+        .x = pipeline->screen_points[2].x - pipeline->screen_points[0].x,
+        .y = pipeline->screen_points[2].y - pipeline->screen_points[0].y
     };
 
     const int32_vec2_t b = {
-        .x = render_transform->screen_points[1].x - render_transform->screen_points[0].x,
-        .y = render_transform->screen_points[1].y - render_transform->screen_points[0].y
+        .x = pipeline->screen_points[1].x - pipeline->screen_points[0].x,
+        .y = pipeline->screen_points[1].y - pipeline->screen_points[0].y
     };
 
     const int32_t z = (a.x * b.y) - (a.y * b.x);
@@ -509,58 +509,58 @@ static void
 _clip_flags_calculate(void)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
-    _clip_flags_lrtb_calculate(render_transform->screen_points[0], &render_transform->clip_flags[0]);
-    _clip_flags_lrtb_calculate(render_transform->screen_points[1], &render_transform->clip_flags[1]);
-    _clip_flags_lrtb_calculate(render_transform->screen_points[2], &render_transform->clip_flags[2]);
-    _clip_flags_lrtb_calculate(render_transform->screen_points[3], &render_transform->clip_flags[3]);
+    _clip_flags_lrtb_calculate(pipeline->screen_points[0], &pipeline->clip_flags[0]);
+    _clip_flags_lrtb_calculate(pipeline->screen_points[1], &pipeline->clip_flags[1]);
+    _clip_flags_lrtb_calculate(pipeline->screen_points[2], &pipeline->clip_flags[2]);
+    _clip_flags_lrtb_calculate(pipeline->screen_points[3], &pipeline->clip_flags[3]);
 
-    render_transform->and_flags = render_transform->clip_flags[0] &
-      render_transform->clip_flags[1] &
-      render_transform->clip_flags[2] &
-      render_transform->clip_flags[3];
+    pipeline->and_flags = pipeline->clip_flags[0] &
+      pipeline->clip_flags[1] &
+      pipeline->clip_flags[2] &
+      pipeline->clip_flags[3];
 
-    render_transform->or_flags = render_transform->clip_flags[0] |
-      render_transform->clip_flags[1] |
-      render_transform->clip_flags[2] |
-      render_transform->clip_flags[3];
+    pipeline->or_flags = pipeline->clip_flags[0] |
+      pipeline->clip_flags[1] |
+      pipeline->clip_flags[2] |
+      pipeline->clip_flags[3];
 }
 
 static void
 _indices_swap(uint32_t i, uint32_t j)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
-    const uint16_t tmp = render_transform->polygon.indices.p[i];
+    const uint16_t tmp = pipeline->polygon.indices.p[i];
 
-    render_transform->polygon.indices.p[i] = render_transform->polygon.indices.p[j];
-    render_transform->polygon.indices.p[j] = tmp;
+    pipeline->polygon.indices.p[i] = pipeline->polygon.indices.p[j];
+    pipeline->polygon.indices.p[j] = tmp;
 }
 
 static void
 _screen_points_swap(uint32_t i, uint32_t j)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
-    const int16_vec2_t tmp = render_transform->screen_points[i];
+    const int16_vec2_t tmp = pipeline->screen_points[i];
 
-    render_transform->screen_points[i] = render_transform->screen_points[j];
-    render_transform->screen_points[j] = tmp;
+    pipeline->screen_points[i] = pipeline->screen_points[j];
+    pipeline->screen_points[j] = tmp;
 }
 
 static void
 _polygon_orient(void)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
     /* Orient the vertices such that vertex A is always on-screen. Doing
      * this is for performance purposes */
 
-    if ((render_transform->clip_flags[0] & CLIP_FLAGS_LR) != CLIP_FLAGS_NONE) {
+    if ((pipeline->clip_flags[0] & CLIP_FLAGS_LR) != CLIP_FLAGS_NONE) {
         /* B-|-A
          * | | |
          * C-|-D
@@ -576,10 +576,10 @@ _polygon_orient(void)
         _screen_points_swap(0, 1);
         _screen_points_swap(2, 3);
 
-        render_transform->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_H;
+        pipeline->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_H;
     }
 
-    if ((render_transform->clip_flags[0] & CLIP_FLAGS_TB) != CLIP_FLAGS_NONE) {
+    if ((pipeline->clip_flags[0] & CLIP_FLAGS_TB) != CLIP_FLAGS_NONE) {
         /*   B---A Outside
          * --|---|--
          *   C---D
@@ -593,7 +593,7 @@ _polygon_orient(void)
         _screen_points_swap(0, 3);
         _screen_points_swap(1, 2);
 
-        render_transform->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_V;
+        pipeline->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_V;
     }
 }
 
@@ -641,25 +641,25 @@ static void
 _cmdt_process(vdp1_cmdt_t *cmdt)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
-    cmdt->cmd_ctrl = render_transform->attribute.control.raw;
-    cmdt->cmd_pmod = render_transform->attribute.draw_mode.raw;
+    cmdt->cmd_ctrl = pipeline->attribute.control.raw;
+    cmdt->cmd_pmod = pipeline->attribute.draw_mode.raw;
 
-    if (render_transform->polygon.flags.use_texture) {
+    if (pipeline->polygon.flags.use_texture) {
         const texture_t * const textures = tlist_get();
-        const texture_t * const texture = &textures[render_transform->attribute.texture_slot];
+        const texture_t * const texture = &textures[pipeline->attribute.texture_slot];
 
         cmdt->cmd_srca = texture->vram_index;
         cmdt->cmd_size = texture->size;
     }
 
-    cmdt->cmd_colr = render_transform->attribute.palette_data.raw;
+    cmdt->cmd_colr = pipeline->attribute.palette_data.raw;
 
-    cmdt->cmd_vertices[0] = render_transform->screen_points[0];
-    cmdt->cmd_vertices[1] = render_transform->screen_points[1];
-    cmdt->cmd_vertices[2] = render_transform->screen_points[2];
-    cmdt->cmd_vertices[3] = render_transform->screen_points[3];
+    cmdt->cmd_vertices[0] = pipeline->screen_points[0];
+    cmdt->cmd_vertices[1] = pipeline->screen_points[1];
+    cmdt->cmd_vertices[2] = pipeline->screen_points[2];
+    cmdt->cmd_vertices[3] = pipeline->screen_points[3];
 
-    cmdt->cmd_grda = render_transform->attribute.shading_slot;
+    cmdt->cmd_grda = pipeline->attribute.shading_slot;
 }
