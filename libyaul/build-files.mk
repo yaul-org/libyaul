@@ -227,6 +227,7 @@ LIB_SRCS+= \
 	gamemath/int32.c \
 	gamemath/uint16.c \
 	gamemath/uint32.c \
+	gamemath/math3d.c \
 \
 	scu/bus/a/cs2/cd-block/cd-block_cmds.c \
 	scu/bus/a/cs2/cd-block/cd-block_execute.c \
