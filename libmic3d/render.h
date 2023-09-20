@@ -66,9 +66,10 @@ typedef struct render {
     const fix16_mat43_t *mesh_world_matrix;
 
     struct {
-        fix16_mat43_t *identity;
+        fix16_mat43_t *camera;
+        fix16_mat43_t *inv_camera;
         fix16_mat43_t *view;
-        fix16_mat43_t *inv_view;
+        fix16_mat43_t *identity;
     } matrices;
 
     render_transform_t *render_transform;

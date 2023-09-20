@@ -18,7 +18,7 @@ camera_lookat(const camera_t *camera)
 
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
 
     fix16_vec3_t * const forward = (fix16_vec3_t *)&view_matrix->row[2];
 
@@ -39,7 +39,7 @@ camera_moveto(const camera_t *camera)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
 
     view_matrix->frow[0][3] = camera->position.x;
     view_matrix->frow[1][3] = camera->position.y;
@@ -51,7 +51,7 @@ camera_forward_get(fix16_vec3_t* forward)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
 
     forward->x = -view_matrix->frow[2][0];
     forward->y = -view_matrix->frow[2][1];
@@ -66,7 +66,7 @@ camera_up_get(fix16_vec3_t* up)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
 
     up->x = view_matrix->frow[1][0];
     up->y = view_matrix->frow[1][1];
@@ -81,7 +81,7 @@ camera_right_get(fix16_vec3_t* right)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
 
     right->x = view_matrix->frow[0][0];
     right->y = view_matrix->frow[0][1];
@@ -96,8 +96,8 @@ __camera_view_invert(void)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->matrices.view;
-    fix16_mat43_t * const inv_view_matrix = render->matrices.inv_view;
+    fix16_mat43_t * const view_matrix = render->matrices.camera;
+    fix16_mat43_t * const inv_camera_matrix = render->matrices.inv_camera;
 
-    fix16_mat43_invert(view_matrix, inv_view_matrix);
+    fix16_mat43_invert(view_matrix, inv_camera_matrix);
 }

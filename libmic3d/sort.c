@@ -59,7 +59,8 @@ __sort_insert(int32_t z)
 {
     sort_t * const sort = __state.sort;
 
-    const uint32_t index = clamp(z, 0, SORT_DEPTH - 1);
+    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
+    const uint32_t index = clamp(z, 0, CONFIG_MIC3D_SORT_DEPTH - 1);
 
     sort->max_depth = max(index, sort->max_depth);
 

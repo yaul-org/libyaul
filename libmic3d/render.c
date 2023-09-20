@@ -36,9 +36,10 @@
 #define ORDER_DRAW_END_INDEX           3
 #define ORDER_INDEX                    4
 
-#define MATRIX_INDEX_VIEW         0
-#define MATRIX_INDEX_INVERSE_VIEW 1
-#define MATRIX_INDEX_IDENTITY     2
+#define MATRIX_INDEX_CAMERA         0
+#define MATRIX_INDEX_INVERSE_CAMERA 1
+#define MATRIX_INDEX_VIEW           2
+#define MATRIX_INDEX_IDENTITY       3
 
 static void _reset(void);
 
@@ -84,16 +85,18 @@ __render_init(void)
 
     fix16_mat43_t * const render_matrices = (void *)workarea->render_matrices;
 
-    render->matrices.identity = &render_matrices[MATRIX_INDEX_IDENTITY];
+    render->matrices.camera = &render_matrices[MATRIX_INDEX_CAMERA];
+    render->matrices.inv_camera = &render_matrices[MATRIX_INDEX_INVERSE_CAMERA];
     render->matrices.view = &render_matrices[MATRIX_INDEX_VIEW];
-    render->matrices.inv_view = &render_matrices[MATRIX_INDEX_INVERSE_VIEW];
+    render->matrices.identity = &render_matrices[MATRIX_INDEX_IDENTITY];
     render->render_transform = (void *)workarea->work;
 
     render->render_flags = RENDER_FLAGS_NONE;
 
     fix16_mat43_identity(render->matrices.identity);
     fix16_mat43_identity(render->matrices.view);
-    fix16_mat43_identity(render->matrices.inv_view);
+    fix16_mat43_identity(render->matrices.camera);
+    fix16_mat43_identity(render->matrices.inv_camera);
 
     render_world_matrix_set(NULL);
 
@@ -175,7 +178,8 @@ render_far_set(fix16_t far)
     render_t * const render = __state.render;
 
     render->far = fix16_clamp(far, render->near, FIX16(2048.0f));
-    render->sort_scale = fix16_div(FIX16(SORT_DEPTH - 1), render->far);
+    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
+    render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1), render->far);
 }
 
 void
@@ -416,11 +420,11 @@ _transform(void)
 
     const fix16_mat43_t * const world_matrix = render->mesh_world_matrix;
     fix16_mat43_t * const view_matrix = render->matrices.view;
-    fix16_mat43_t * const inv_view_matrix = render->matrices.inv_view;
+    fix16_mat43_t * const inv_camera_matrix = render->matrices.inv_camera;
 
     cpu_cache_purge();
 
-    fix16_mat43_mul(inv_view_matrix, world_matrix, view_matrix);
+    fix16_mat43_mul(inv_camera_matrix, world_matrix, view_matrix);
 
     const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
     const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
