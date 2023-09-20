@@ -9,6 +9,7 @@
 #ifndef _YAUL_GAMEMATH_FIX16_MAT33_H_
 #define _YAUL_GAMEMATH_FIX16_MAT33_H_
 
+#include <gamemath/angle.h>
 #include <gamemath/fix16/fix16_vec3.h>
 
 __BEGIN_DECLS
@@ -87,6 +88,44 @@ extern void fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
 
 /// @brief Not yet documented.
 ///
+/// @param      from   Not yet documented.
+/// @param      to     Not yet documented.
+/// @param      up     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
+    const fix16_vec3_t *up, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rx     Not yet documented.
+/// @param      ry     Not yet documented.
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
 /// @param      m0       Not yet documented.
 /// @param[out] buffer   Not yet documented.
 /// @param      decimals Not yet documunted.
@@ -99,8 +138,8 @@ extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t dec
 /// @param m0 Not yet documented.
 extern void fix16_mat33_zero(fix16_mat33_t *m0);
 
-#endif /* !_YAUL_GAMEMATH_FIX16_MAT33_H_ */
+/// @}
 
 __END_DECLS
 
-/// @}
+#endif /* !_YAUL_GAMEMATH_FIX16_MAT33_H_ */

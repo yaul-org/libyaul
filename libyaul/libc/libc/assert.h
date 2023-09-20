@@ -37,8 +37,8 @@ __BEGIN_DECLS
 #endif /* !static_assert */
 #endif /* !defined(__cplusplus) */
 
-extern void _assert(const char * __restrict, const char * __restrict,
-  const char * __restrict, const char * __restrict) __noreturn;
+extern void _assert(const char * __restrict file, const char * __restrict line,
+  const char * __restrict func, const char * __restrict failed_expr) __noreturn;
 
 __END_DECLS
 

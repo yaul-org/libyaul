@@ -95,6 +95,27 @@ fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result)
 }
 
 void
+fix16_mat43_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
+    const fix16_vec3_t *up, fix16_mat43_t *result)
+{
+    /* normalize(forward)
+     * right = normalize(cross(forward, up))
+     * up = cross(forward, right) */
+
+    fix16_vec3_t * const basis_forward = (fix16_vec3_t *)&result->row[2];
+    fix16_vec3_sub(to, from, basis_forward);
+    fix16_vec3_normalize(basis_forward);
+
+    fix16_vec3_t * const basis_right = (fix16_vec3_t *)&result->row[0];
+    fix16_vec3_cross(basis_forward, up, basis_right);
+    fix16_vec3_normalize(basis_right);
+
+    fix16_vec3_t * const basis_up = (fix16_vec3_t *)&result->row[1];
+    fix16_vec3_cross(basis_forward, basis_right, basis_up);
+    fix16_vec3_normalize(basis_up);
+}
+
+void
 fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t *result)
 {
     fix16_vec3_t transposed_row;
@@ -125,12 +146,12 @@ fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t 
 }
 
 void
-fix16_mat43_x_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle)
+fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
 {
-    fix16_t sin;
-    fix16_t cos;
+    fix16_t sin_value;
+    fix16_t cos_value;
 
-    fix16_sincos(angle, &sin, &cos);
+    fix16_sincos(angle, &sin_value, &cos_value);
 
     const fix16_t m01 = m0->frow[0][1];
     const fix16_t m02 = m0->frow[0][2];
@@ -139,16 +160,18 @@ fix16_mat43_x_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t ang
     const fix16_t m21 = m0->frow[2][1];
     const fix16_t m22 = m0->frow[2][2];
 
-    result->frow[0][1] =  fix16_mul(m01, cos) + fix16_mul(m02, sin);
-    result->frow[0][2] = -fix16_mul(m01, sin) + fix16_mul(m02, cos);
-    result->frow[1][1] =  fix16_mul(m11, cos) + fix16_mul(m12, sin);
-    result->frow[1][2] = -fix16_mul(m11, sin) + fix16_mul(m12, cos);
-    result->frow[2][1] =  fix16_mul(m21, cos) + fix16_mul(m22, sin);
-    result->frow[2][2] = -fix16_mul(m21, sin) + fix16_mul(m22, cos);
+    result->frow[0][1] =  fix16_mul(m01, cos_value) + fix16_mul(m02, sin_value);
+    result->frow[0][2] = -fix16_mul(m01, sin_value) + fix16_mul(m02, cos_value);
+
+    result->frow[1][1] =  fix16_mul(m11, cos_value) + fix16_mul(m12, sin_value);
+    result->frow[1][2] = -fix16_mul(m11, sin_value) + fix16_mul(m12, cos_value);
+
+    result->frow[2][1] =  fix16_mul(m21, cos_value) + fix16_mul(m22, sin_value);
+    result->frow[2][2] = -fix16_mul(m21, sin_value) + fix16_mul(m22, cos_value);
 }
 
 void
-fix16_mat43_y_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle)
+fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -171,7 +194,7 @@ fix16_mat43_y_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t ang
 }
 
 void
-fix16_mat43_z_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle)
+fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -194,7 +217,7 @@ fix16_mat43_z_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t ang
 }
 
 void
-fix16_mat43_rotation_create(fix16_mat43_t *m0, angle_t rx, angle_t ry, angle_t rz)
+fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat43_t *result)
 {
     fix16_t sx;
     fix16_t cx;
@@ -214,15 +237,15 @@ fix16_mat43_rotation_create(fix16_mat43_t *m0, angle_t rx, angle_t ry, angle_t r
     const fix16_t sxsy = fix16_mul(sx, sy);
     const fix16_t cxsy = fix16_mul(cx, sy);
 
-    m0->frow[0][0] = fix16_mul(   cy, cz);
-    m0->frow[0][1] = fix16_mul( sxsy, cz) + fix16_mul(cx, sz);
-    m0->frow[0][2] = fix16_mul(-cxsy, cz) + fix16_mul(sx, sz);
-    m0->frow[1][0] = fix16_mul(  -cy, sz);
-    m0->frow[1][1] = fix16_mul(-sxsy, sz) + fix16_mul(cx, cz);
-    m0->frow[1][2] = fix16_mul( cxsy, sz) + fix16_mul(sx, cz);
-    m0->frow[2][0] = sy;
-    m0->frow[2][1] = fix16_mul(  -sx, cy);
-    m0->frow[2][2] = fix16_mul(   cx, cy);
+    result->frow[0][0] = fix16_mul(   cy, cz);
+    result->frow[0][1] = fix16_mul( sxsy, cz) + fix16_mul(cx, sz);
+    result->frow[0][2] = fix16_mul(-cxsy, cz) + fix16_mul(sx, sz);
+    result->frow[1][0] = fix16_mul(  -cy, sz);
+    result->frow[1][1] = fix16_mul(-sxsy, sz) + fix16_mul(cx, cz);
+    result->frow[1][2] = fix16_mul( cxsy, sz) + fix16_mul(sx, cz);
+    result->frow[2][0] = sy;
+    result->frow[2][1] = fix16_mul(  -sx, cy);
+    result->frow[2][2] = fix16_mul(   cx, cy);
 }
 
 void
