@@ -60,23 +60,35 @@ typedef union fix16_mat43 {
 
 /// @brief Not yet documented.
 ///
-/// @param[out] m0 Not yet documented.
-/// @param      t  Not yet documented.
+/// @param      m0      Not yet documented.
+/// @param[out] result  Not yet documented.
 static inline void __always_inline
-fix16_mat43_translation_set(fix16_mat43_t *m0, const fix16_vec3_t *t)
+fix16_mat43_translation_get(const fix16_mat43_t *m0, fix16_vec3_t *result)
 {
-    m0->frow[0][3] = t->x;
-    m0->frow[1][3] = t->y;
-    m0->frow[2][3] = t->z;
+    result->x = m0->frow[0][3];
+    result->y = m0->frow[1][3];
+    result->z = m0->frow[2][3];
+}
+
+/// @brief Not yet documented.
+///
+/// @param      t      Not yet documented.
+/// @param[out] result Not yet documented.
+static inline void __always_inline
+fix16_mat43_translation_set(const fix16_vec3_t *t, fix16_mat43_t *result)
+{
+    result->frow[0][3] = t->x;
+    result->frow[1][3] = t->y;
+    result->frow[2][3] = t->z;
 }
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      x      Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t x)
+fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_t x, fix16_mat43_t *result)
 {
     result->frow[0][3] = m0->frow[0][3] + x;
 }
@@ -84,10 +96,10 @@ fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      y      Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t y)
+fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_t y, fix16_mat43_t *result)
 {
     result->frow[1][3] = m0->frow[1][3] + y;
 }
@@ -95,10 +107,10 @@ fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      z      Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t z)
+fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_t z, fix16_mat43_t *result)
 {
     result->frow[2][3] = m0->frow[2][3] + z;
 }
@@ -109,11 +121,11 @@ fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, fix16_t 
 /// @param[out] result Not yet documented.
 /// @param      t      Not yet documented.
 static inline void __always_inline
-fix16_mat43_translate(const fix16_mat43_t *m0, fix16_mat43_t *result, const fix16_vec3_t *t)
+fix16_mat43_translate(const fix16_mat43_t *m0, const fix16_vec3_t *t, fix16_mat43_t *result)
 {
-    fix16_mat43_x_translate(m0, result, t->x);
-    fix16_mat43_y_translate(m0, result, t->y);
-    fix16_mat43_z_translate(m0, result, t->z);
+    fix16_mat43_x_translate(m0, t->x, result);
+    fix16_mat43_y_translate(m0, t->y, result);
+    fix16_mat43_z_translate(m0, t->z, result);
 }
 
 /// @brief Not yet documented.
@@ -130,6 +142,15 @@ extern void fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
+/// @param      from   Not yet documented.
+/// @param      to     Not yet documented.
+/// @param      up     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
+    const fix16_vec3_t *up, fix16_mat43_t *result);
+
+/// @brief Not yet documented.
+///
 /// @param      m0     Not yet documented.
 /// @param      m1     Not yet documented.
 /// @param[out] result Not yet documented.
@@ -138,31 +159,31 @@ extern void fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fi
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      angle  Not yet documented.
-extern void fix16_mat43_x_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle);
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      angle  Not yet documented.
-extern void fix16_mat43_y_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle);
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
 /// @param      angle  Not yet documented.
-extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, fix16_mat43_t *result, angle_t angle);
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
-/// @param[out] m0 Not yet documented.
-/// @param      rx Not yet documented.
-/// @param      ry Not yet documented.
-/// @param      rz Not yet documented.
-extern void fix16_mat43_rotation_create(fix16_mat43_t *m0, angle_t rx, angle_t ry, angle_t rz);
+/// @param      rx     Not yet documented.
+/// @param      ry     Not yet documented.
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
