@@ -16,6 +16,40 @@
 static void _mat33_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 
 void
+fix16_mat33_zero(fix16_mat33_t *m0)
+{
+    fix16_t *arr_ptr;
+    arr_ptr = m0->arr;
+
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr   = FIX16_ZERO;
+}
+
+void
+fix16_mat33_identity(fix16_mat33_t *m0)
+{
+    fix16_t *arr_ptr;
+    arr_ptr = m0->arr;
+
+    *arr_ptr++ = FIX16_ONE;  /* M[0,0] (0) */
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ONE;  /* M[1,1] (4) */
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr   = FIX16_ONE;  /* M[2,2] (8) */
+}
+
+void
 fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result)
 {
     const fix16_t *arr_ptr;
@@ -38,24 +72,8 @@ fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result)
 }
 
 void
-fix16_mat33_identity(fix16_mat33_t *m0)
-{
-    fix16_t *arr_ptr;
-    arr_ptr = m0->arr;
-
-    *arr_ptr++ = FIX16_ONE;  /* M[0,0] (0) */
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ONE;  /* M[1,1] (4) */
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr   = FIX16_ONE;  /* M[2,2] (8) */
-}
-
-void
-fix16_mat33_transpose(const fix16_mat33_t * __restrict m0, fix16_mat33_t * __restrict result)
+fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
+    fix16_mat33_t * __restrict result)
 {
     result->frow[0][0] = m0->frow[0][0];
     result->frow[0][1] = m0->frow[1][0];
@@ -71,7 +89,8 @@ fix16_mat33_transpose(const fix16_mat33_t * __restrict m0, fix16_mat33_t * __res
 }
 
 void
-fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to, const fix16_vec3_t *up, fix16_mat33_t *result)
+fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
+    const fix16_vec3_t *up, fix16_mat33_t *result)
 {
     /* normalize(forward)
      * right = normalize(cross(forward, up))
@@ -91,7 +110,8 @@ fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to, const fix16
 }
 
 void
-fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1, fix16_mat33_t *result)
+fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
+    fix16_mat33_t *result)
 {
     fix16_vec3_t transposed_row;
 
@@ -116,7 +136,8 @@ fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1, fix16_mat33_t 
 }
 
 void
-fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result)
+fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+    fix16_vec3_t *result)
 {
     result->x = fix16_vec3_dot(&m0->row[0], v);
     result->y = fix16_vec3_dot(&m0->row[1], v);
@@ -124,7 +145,8 @@ fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v, fix16_vec3_
 }
 
 void
-fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result)
+fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle,
+    fix16_mat33_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -149,7 +171,8 @@ fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *resu
 }
 
 void
-fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result)
+fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle,
+    fix16_mat33_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -172,7 +195,8 @@ fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *resu
 }
 
 void
-fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result)
+fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle,
+    fix16_mat33_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -195,7 +219,8 @@ fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *resu
 }
 
 void
-fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat33_t *result)
+fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+    fix16_mat33_t *result)
 {
     fix16_t sx;
     fix16_t cx;
@@ -241,23 +266,6 @@ fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals)
     *buffer_ptr = '\0';
 
     return (buffer_ptr - buffer);
-}
-
-void
-fix16_mat33_zero(fix16_mat33_t *m0)
-{
-    fix16_t *arr_ptr;
-    arr_ptr = m0->arr;
-
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr   = FIX16_ZERO;
 }
 
 static void

@@ -15,28 +15,25 @@
 static void _mat43_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 
 void
-fix16_mat43_dup(const fix16_mat43_t *m0, fix16_mat43_t *result)
+fix16_mat43_zero(fix16_mat43_t *m0)
 {
-    const fix16_t *arr_ptr;
+    fix16_t *arr_ptr;
     arr_ptr = m0->arr;
 
-    fix16_t *result_arr_ptr;
-    result_arr_ptr = result->arr;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
 
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
 
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr++ = *arr_ptr++;
-    *result_arr_ptr   = *arr_ptr;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr++ = FIX16_ZERO;
+    *arr_ptr   = FIX16_ZERO;
 }
 
 void
@@ -62,14 +59,33 @@ fix16_mat43_identity(fix16_mat43_t *m0)
 }
 
 void
+fix16_mat43_dup(const fix16_mat43_t *m0, fix16_mat43_t *result)
+{
+    const fix16_t *arr_ptr;
+    arr_ptr = m0->arr;
+
+    fix16_t *result_arr_ptr;
+    result_arr_ptr = result->arr;
+
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr++ = *arr_ptr++;
+    *result_arr_ptr   = *arr_ptr;
+}
+
+void
 fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result)
 {
-    /* The expectation is that the rotation part of the matrix is
-     * orthogonal.
-     *
-     * It's then possible to just transpose the 3x3 rotation matrix within
-     * the 4x3 matrix and negate the translation vector */
-
     fix16_vec3_t * const result_m00 = (fix16_vec3_t *)&result->row[0];
     fix16_vec3_t * const result_m01 = (fix16_vec3_t *)&result->row[1];
     fix16_vec3_t * const result_m02 = (fix16_vec3_t *)&result->row[2];
@@ -101,6 +117,8 @@ fix16_mat43_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
     /* normalize(forward)
      * right = normalize(cross(forward, up))
      * up = cross(forward, right) */
+
+    fix16_mat43_translation_set(from, result);
 
     fix16_vec3_t * const basis_forward = (fix16_vec3_t *)&result->row[2];
     fix16_vec3_sub(to, from, basis_forward);
@@ -146,7 +164,18 @@ fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t 
 }
 
 void
-fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
+fix16_mat43_pos3_mul(const fix16_mat33_t *m0 __unused, const fix16_vec3_t *v __unused, fix16_vec3_t *result __unused)
+{
+}
+
+void
+fix16_mat43_vec3_mul(const fix16_mat33_t *m0 __unused, const fix16_vec3_t *v __unused, fix16_vec3_t *result __unused)
+{
+}
+
+void
+fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle,
+    fix16_mat43_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -171,7 +200,8 @@ fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *resu
 }
 
 void
-fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
+fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle,
+    fix16_mat43_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -194,7 +224,8 @@ fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *resu
 }
 
 void
-fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result)
+fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle,
+    fix16_mat43_t *result)
 {
     fix16_t sin_value;
     fix16_t cos_value;
@@ -217,7 +248,8 @@ fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *resu
 }
 
 void
-fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat43_t *result)
+fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+    fix16_mat43_t *result)
 {
     fix16_t sx;
     fix16_t cx;
@@ -287,28 +319,6 @@ fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t decimals)
     *buffer_ptr = '\0';
 
     return (buffer_ptr - buffer);
-}
-
-void
-fix16_mat43_zero(fix16_mat43_t *m0)
-{
-    fix16_t *arr_ptr;
-    arr_ptr = m0->arr;
-
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr++ = FIX16_ZERO;
-    *arr_ptr   = FIX16_ZERO;
 }
 
 static void

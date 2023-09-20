@@ -56,9 +56,8 @@ typedef union fix16_mat33 {
 
 /// @brief Not yet documented.
 ///
-/// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
-extern void fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result);
+/// @param m0 Not yet documented.
+extern void fix16_mat33_zero(fix16_mat33_t *m0);
 
 /// @brief Not yet documented.
 ///
@@ -68,16 +67,8 @@ extern void fix16_mat33_identity(fix16_mat33_t *m0);
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param      m1     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1, fix16_mat33_t *result);
-
-/// @brief Not yet documented.
-///
-/// @param      m0     Not yet documented.
-/// @param      v      Not yet documented.
-/// @param[out] result Not yet documented.
-extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result);
+extern void fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -93,28 +84,47 @@ extern void fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
 /// @param      up     Not yet documented.
 /// @param[out] result Not yet documented.
 extern void fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
-    const fix16_vec3_t *up, fix16_mat33_t *result);
+  const fix16_vec3_t *up, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      m1     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      v      Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+  fix16_vec3_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+extern void fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+extern void fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_mat33_t *result);
+extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -122,7 +132,8 @@ extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle, fix16_m
 /// @param      ry     Not yet documented.
 /// @param      rz     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat33_t *result);
+extern void fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+  fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -131,12 +142,8 @@ extern void fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix1
 /// @param      decimals Not yet documunted.
 ///
 /// @returns The string length, not counting the `NUL` character.
-extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals);
-
-/// @brief Not yet documented.
-///
-/// @param m0 Not yet documented.
-extern void fix16_mat33_zero(fix16_mat33_t *m0);
+extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer,
+  int32_t decimals);
 
 /// @}
 
