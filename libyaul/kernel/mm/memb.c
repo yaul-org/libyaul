@@ -249,7 +249,7 @@ memb_free(memb_t *memb, void *addr)
  * returned.
  */
 uint32_t
-memb_count_get(memb_t *memb)
+memb_count_get(const memb_t *memb)
 {
     assert(memb != NULL);
 
@@ -257,11 +257,19 @@ memb_count_get(memb_t *memb)
 }
 
 uint32_t
-memb_capacity_get(memb_t *memb)
+memb_capacity_count_get(const memb_t *memb)
 {
     assert(memb != NULL);
 
     return memb->count;
+}
+
+uint32_t
+memb_allocated_count_get(const memb_t *memb)
+{
+    assert(memb != NULL);
+
+    return memb->alloc_count;
 }
 
 /*
