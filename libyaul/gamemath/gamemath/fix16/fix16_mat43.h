@@ -88,7 +88,8 @@ fix16_mat43_translation_set(const fix16_vec3_t *t, fix16_mat43_t *result)
 /// @param      x      Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_t x, fix16_mat43_t *result)
+fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_t x,
+  fix16_mat43_t *result)
 {
     result->frow[0][3] = m0->frow[0][3] + x;
 }
@@ -99,7 +100,8 @@ fix16_mat43_x_translate(const fix16_mat43_t *m0, fix16_t x, fix16_mat43_t *resul
 /// @param      y      Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_t y, fix16_mat43_t *result)
+fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_t y,
+  fix16_mat43_t *result)
 {
     result->frow[1][3] = m0->frow[1][3] + y;
 }
@@ -110,7 +112,8 @@ fix16_mat43_y_translate(const fix16_mat43_t *m0, fix16_t y, fix16_mat43_t *resul
 /// @param      z      Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_t z, fix16_mat43_t *result)
+fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_t z,
+  fix16_mat43_t *result)
 {
     result->frow[2][3] = m0->frow[2][3] + z;
 }
@@ -121,7 +124,8 @@ fix16_mat43_z_translate(const fix16_mat43_t *m0, fix16_t z, fix16_mat43_t *resul
 /// @param[out] result Not yet documented.
 /// @param      t      Not yet documented.
 static inline void __always_inline
-fix16_mat43_translate(const fix16_mat43_t *m0, const fix16_vec3_t *t, fix16_mat43_t *result)
+fix16_mat43_translate(const fix16_mat43_t *m0, const fix16_vec3_t *t,
+  fix16_mat43_t *result)
 {
     fix16_mat43_x_translate(m0, t->x, result);
     fix16_mat43_y_translate(m0, t->y, result);
@@ -130,11 +134,26 @@ fix16_mat43_translate(const fix16_mat43_t *m0, const fix16_vec3_t *t, fix16_mat4
 
 /// @brief Not yet documented.
 ///
+/// @param m0 Not yet documented.
+extern void fix16_mat43_zero(fix16_mat43_t *m0);
+
+/// @brief Not yet documented.
+///
+/// @param m0 Not yet documented.
+extern void fix16_mat43_identity(fix16_mat43_t *m0);
+
+/// @brief Not yet documented.
+///
 /// @param      m0     Not yet documented.
 /// @param[out] result Not yet documented.
 extern void fix16_mat43_dup(const fix16_mat43_t *m0, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
+///
+/// The expectation is that the rotation part of the matrix is orthogonal.
+///
+/// It's then possible to just transpose the 3x3 rotation matrix within the 4x3
+/// matrix and negate the translation vector.
 ///
 /// @param      m0     Not yet documented.
 /// @param[out] result Not yet documented.
@@ -147,35 +166,55 @@ extern void fix16_mat43_invert(const fix16_mat43_t *m0, fix16_mat43_t *result);
 /// @param      up     Not yet documented.
 /// @param[out] result Not yet documented.
 extern void fix16_mat43_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
-    const fix16_vec3_t *up, fix16_mat43_t *result);
+  const fix16_vec3_t *up, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      m1     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t *result);
+extern void fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1,
+  fix16_mat43_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      v      Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_pos3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+  fix16_vec3_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      v      Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+  fix16_vec3_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
+extern void fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle,
+  fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
+extern void fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle,
+  fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
 /// @param      angle  Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_mat43_t *result);
+extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle,
+  fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -183,18 +222,15 @@ extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle, fix16_m
 /// @param      ry     Not yet documented.
 /// @param      rz     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz, fix16_mat43_t *result);
+extern void fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+  fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
 /// @param      r      Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_rotation_set(const fix16_mat33_t *r, fix16_mat43_t *result);
-
-/// @brief Not yet documented.
-///
-/// @param m0 Not yet documented.
-extern void fix16_mat43_identity(fix16_mat43_t *m0);
+extern void fix16_mat43_rotation_set(const fix16_mat33_t *r,
+  fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -203,12 +239,8 @@ extern void fix16_mat43_identity(fix16_mat43_t *m0);
 /// @param      decimals Not yet documunted.
 ///
 /// @returns The string length, not counting the `NUL` character.
-extern size_t fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t decimals);
-
-/// @brief Not yet documented.
-///
-/// @param m0 Not yet documented.
-extern void fix16_mat43_zero(fix16_mat43_t *m0);
+extern size_t fix16_mat43_str(const fix16_mat43_t *m0, char *buffer,
+  int32_t decimals);
 
 /// @}
 

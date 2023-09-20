@@ -19,12 +19,12 @@
 __BEGIN_DECLS
 
 /// @addtogroup MATH
-/// @defgroup MATH_3D 3D
+/// @defgroup MATH_3D 3D Math
 /// @ingroup MATH
 /// @{
 
 /// @brief Not yet documented.
-typedef struct transform_config {
+typedef struct xform_config {
     /// @brief Not yet documented.
     fix16_t near;
     /// @brief Not yet documented.
@@ -33,23 +33,32 @@ typedef struct transform_config {
     fix16_t view_distance;
     /// @brief Not yet documented.
     const fix16_mat43_t *view_matrix;
-} transform_config_t;
+} xform_config_t;
 
 /// @brief Not yet documented.
-typedef struct transform_result {
+typedef struct xform {
     /// @brief Not yet documented.
     int16_vec2_t screen_point;
     /// @brief Not yet documented.
     fix16_t depth_value;
-} transform_result_t;
+} xform_t;
 
 /// @brief Not yet documented.
 ///
-/// @param      transform_config Not yet documented.
+/// @param screen_width  Not yet documented.
+/// @param fov_angle     Not yet documented.
+///
+/// @returns Not yet documented.
+extern fix16_t math3d_view_distance_calc(int16_t screen_width,
+    angle_t fov_angle);
+
+/// @brief Not yet documented.
+///
+/// @param      xform_config Not yet documented.
 /// @param      point            Not yet documented.
 /// @param[out] result           Not yet documented.
-extern void math3d_point_transform(const transform_config_t *transform_config,
-    const fix16_vec3_t *point, transform_result_t *result);
+extern void math3d_point_xform(const xform_config_t *xform_config,
+    const fix16_vec3_t *point, xform_t *result);
 
 /// @}
 

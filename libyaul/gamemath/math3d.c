@@ -8,21 +8,37 @@
 #include <cpu/divu.h>
 
 #include <gamemath/math3d.h>
+#include <gamemath/fix16/fix16_trig.h>
+
+#define MIN_FOV_ANGLE DEG2ANGLE( 20.0f)
+#define MAX_FOV_ANGLE DEG2ANGLE(120.0f)
+
+fix16_t
+math3d_view_distance_calc(int16_t screen_width, angle_t fov_angle)
+{
+    fov_angle = clamp(fov_angle, MIN_FOV_ANGLE, MAX_FOV_ANGLE);
+
+    const angle_t hfov_angle = fov_angle >> 1;
+    const fix16_t screen_scale = fix16_int32_from(screen_width) >> 1;
+    const fix16_t tan = fix16_tan(hfov_angle);
+
+    return fix16_mul(screen_scale, tan);
+}
 
 void
-math3d_point_transform(const transform_config_t *transform_config,
-    const fix16_vec3_t *point, transform_result_t *result)
+math3d_point_xform(const xform_config_t *xform_config,
+    const fix16_vec3_t *point, xform_t *result)
 {
-    const fix16_mat43_t * const view_matrix = transform_config->view_matrix;
+    const fix16_mat43_t * const view_matrix = xform_config->view_matrix;
 
     const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
     const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
     const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
 
     const fix16_t z = fix16_vec3_dot(m2, point) + view_matrix->frow[2][3];
-    const fix16_t clamped_z = fix16_clamp(z, transform_config->near, transform_config->far);
+    const fix16_t clamped_z = fix16_clamp(z, xform_config->near, xform_config->far);
 
-    cpu_divu_fix16_set(transform_config->view_distance, clamped_z);
+    cpu_divu_fix16_set(xform_config->view_distance, clamped_z);
 
     const fix16_t x = fix16_vec3_dot(m0, point) + view_matrix->frow[0][3];
     const fix16_t y = fix16_vec3_dot(m1, point) + view_matrix->frow[1][3];
