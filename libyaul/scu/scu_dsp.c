@@ -73,13 +73,13 @@ scu_dsp_program_load(const void *program, uint32_t count)
     const uint32_t clamped_count =
       (count < DSP_PROGRAM_WORD_COUNT) ? count : DSP_PROGRAM_WORD_COUNT;
 
-    // Stop execution
+    /* Stop execution */
     MEMORY_WRITE(32, SCU(PPAF), 0x00000000UL);
 
-    // Make the control port recognize the transfer
+    /* Make the control port recognize the transfer */
     MEMORY_WRITE(32, SCU(PPAF), PPAF_LOAD_ENABLE);
 
-    // Transfer
+    /* Transfer */
     uint32_t *program_ptr;
     program_ptr = (uint32_t *)program;
     for (uint32_t i = 0; i < clamped_count; i++) {
