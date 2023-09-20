@@ -49,11 +49,10 @@ typedef struct {
 typedef struct render {
     /* Pools */
     struct {
-        fix16_t *z_values_pool;
         int16_vec2_t *screen_points_pool;
-        rgb1555_t *colors_pool;
-        vdp1_cmdt_t *cmdts_pool;
+        fix16_t *z_values_pool;
         fix16_t *depth_values_pool;
+        vdp1_cmdt_t *cmdts_pool;
     };
 
     /* Settings */

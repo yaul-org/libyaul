@@ -19,11 +19,17 @@
 typedef void (*light_polygon_processor_t)(void);
 
 typedef struct light {
+    /* Pools */
+    struct {
+        rgb1555_t *colors_pool;
+    };
+
     vdp1_gouraud_table_t *gouraud_tables;
     uint32_t count;
     vdp1_vram_t vram_base;
     uint16_t slot_base;
 
+    /* Matrices */
     struct {
         fix16_mat33_t *inv_world_matrix;
         fix16_mat33_t *world_light_matrix;
@@ -36,7 +42,6 @@ typedef struct light {
 
     /* Count of enabled lights */
     uint32_t light_count;
-
     /* Count of used GSTs */
     uint32_t gst_count;
 } __aligned(4) light_t;

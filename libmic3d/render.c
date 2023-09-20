@@ -23,9 +23,6 @@
 #define SCREEN_CLIP_TOP    (-SCREEN_HEIGHT / 2)
 #define SCREEN_CLIP_BOTTOM ( SCREEN_HEIGHT / 2)
 
-#define MIN_FOV_ANGLE DEG2ANGLE( 20.0f)
-#define MAX_FOV_ANGLE DEG2ANGLE(120.0f)
-
 #define NEAR_LEVEL_MIN 1U
 #define NEAR_LEVEL_MAX 8U
 
@@ -78,7 +75,6 @@ __render_init(void)
     render->screen_points_pool = (void *)workarea->screen_points;
     render->depth_values_pool = (void *)workarea->depth_values;
     render->cmdts_pool = (void *)workarea->cmdts;
-    render->colors_pool = (void *)workarea->colors;
 
     render->mesh = NULL;
     render->world_matrix = NULL;
@@ -97,8 +93,6 @@ __render_init(void)
     fix16_mat43_identity(render->view_matrix);
     fix16_mat43_identity(render->camera_matrix);
     fix16_mat43_identity(render->inv_camera_matrix);
-
-    render_world_matrix_set(NULL);
 
     render_perspective_set(DEG2ANGLE(90.0f));
     render_near_level_set(7);
@@ -141,13 +135,8 @@ render_perspective_set(angle_t fov_angle)
 {
     render_t * const render = __state.render;
 
-    fov_angle = clamp(fov_angle, MIN_FOV_ANGLE, MAX_FOV_ANGLE);
-
-    const angle_t hfov_angle = fov_angle >> 1;
-    const fix16_t screen_scale = FIX16(0.5f * (SCREEN_WIDTH - 1));
-    const fix16_t tan = fix16_tan(hfov_angle);
-
-    render->view_distance = fix16_mul(screen_scale, tan);
+    render->view_distance =
+      math3d_view_distance_calc(SCREEN_WIDTH, fov_angle);
 }
 
 void
@@ -183,13 +172,35 @@ render_far_set(fix16_t far)
 }
 
 void
+render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
+    xform_t *xform)
+{
+    render_t * const render = __state.render;
+
+    fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
+
+    fix16_mat43_t view_matrix;
+
+    fix16_mat43_mul(inv_camera_matrix, world_matrix, &view_matrix);
+
+    const xform_config_t xform_config = {
+        .near          = render->near,
+        .far           = render->far,
+        .view_distance = render->view_distance,
+        .view_matrix   = &view_matrix
+    };
+
+    math3d_point_xform(&xform_config, point, xform);
+}
+
+void
 render_start(void)
 {
     __camera_view_invert();
 }
 
 void
-render_mesh_transform(const mesh_t *mesh)
+render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
 {
     const uint32_t sr_mask = cpu_intc_mask_get();
     cpu_intc_mask_set(15);
@@ -200,6 +211,7 @@ render_mesh_transform(const mesh_t *mesh)
     light_polygon_processor_t light_polygon_processor;
 
     render->mesh = mesh;
+    render->world_matrix = (world_matrix != NULL) ? world_matrix : render->identity_matrix;
 
     __perf_counter_start(&_transform_pc);
 
@@ -335,14 +347,6 @@ render_end(void)
 
     _reset();
     /* lwram = (volatile uint32_t *)LWRAM(0x00000000); */
-}
-
-void
-render_world_matrix_set(const fix16_mat43_t *matrix)
-{
-    render_t * const render = __state.render;
-
-    render->world_matrix = (matrix != NULL) ? matrix : render->identity_matrix;
 }
 
 static void
