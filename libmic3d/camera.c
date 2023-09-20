@@ -33,18 +33,18 @@ camera_moveto(const camera_t *camera)
 }
 
 void
-camera_forward_get(fix16_vec3_t* forward)
+camera_right_get(fix16_vec3_t* right)
 {
     render_t * const render = __state.render;
 
     fix16_mat43_t * const view_matrix = render->camera_matrix;
 
-    forward->x = -view_matrix->frow[2][0];
-    forward->y = -view_matrix->frow[2][1];
-    forward->z = -view_matrix->frow[2][2];
+    right->x = view_matrix->frow[0][0];
+    right->y = view_matrix->frow[0][1];
+    right->z = view_matrix->frow[0][2];
 
     /* XXX: Does the vector need to be normalized? */
-    fix16_vec3_normalize(forward);
+    fix16_vec3_normalize(right);
 }
 
 void
@@ -63,27 +63,35 @@ camera_up_get(fix16_vec3_t* up)
 }
 
 void
-camera_right_get(fix16_vec3_t* right)
+camera_forward_get(fix16_vec3_t* forward)
 {
     render_t * const render = __state.render;
 
     fix16_mat43_t * const view_matrix = render->camera_matrix;
 
-    right->x = view_matrix->frow[0][0];
-    right->y = view_matrix->frow[0][1];
-    right->z = view_matrix->frow[0][2];
+    forward->x = -view_matrix->frow[2][0];
+    forward->y = -view_matrix->frow[2][1];
+    forward->z = -view_matrix->frow[2][2];
 
     /* XXX: Does the vector need to be normalized? */
-    fix16_vec3_normalize(right);
+    fix16_vec3_normalize(forward);
+}
+
+const fix16_mat43_t *
+camera_matrix_get(void)
+{
+    render_t * const render = __state.render;
+
+    return render->camera_matrix;
 }
 
 void
-__camera_view_invert(void)
+__camera_matrix_invert(void)
 {
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->camera_matrix;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
     fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
 
-    fix16_mat43_invert(view_matrix, inv_camera_matrix);
+    fix16_mat43_invert(camera_matrix, inv_camera_matrix);
 }

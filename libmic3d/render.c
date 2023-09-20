@@ -196,7 +196,7 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
 void
 render_start(void)
 {
-    __camera_view_invert();
+    __camera_matrix_invert();
 }
 
 void
@@ -361,11 +361,11 @@ _vdp1_init(void)
 {
     static const int16_vec2_t system_clip_coord =
       INT16_VEC2_INITIALIZER(SCREEN_WIDTH - 1,
-        SCREEN_HEIGHT - 1);
+                             SCREEN_HEIGHT - 1);
 
     static const int16_vec2_t local_coord_center =
       INT16_VEC2_INITIALIZER(SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 2);
+                             SCREEN_HEIGHT / 2);
 
     static const vdp1_cmdt_draw_mode_t polygon_draw_mode = {
         .pre_clipping_disable = true
