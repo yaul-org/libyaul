@@ -22,6 +22,7 @@
 #include <gamemath/int16.h>
 #include <gamemath/int32.h>
 #include <gamemath/int8.h>
+#include <gamemath/math3d.h>
 #include <gamemath/uint16.h>
 #include <gamemath/uint32.h>
 #include <gamemath/uint8.h>

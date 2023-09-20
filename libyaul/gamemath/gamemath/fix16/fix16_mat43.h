@@ -60,8 +60,8 @@ typedef union fix16_mat43 {
 
 /// @brief Not yet documented.
 ///
-/// @param      m0      Not yet documented.
-/// @param[out] result  Not yet documented.
+/// @param      m0     Not yet documented.
+/// @param[out] result Not yet documented.
 static inline void __always_inline
 fix16_mat43_translation_get(const fix16_mat43_t *m0, fix16_vec3_t *result)
 {
