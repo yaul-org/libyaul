@@ -33,7 +33,7 @@ typedef enum clip_flags {
     CLIP_FLAGS_BOTTOM = 1 << CLIP_BIT_BOTTOM,
 
     CLIP_FLAGS_LR     = CLIP_FLAGS_LEFT | CLIP_FLAGS_RIGHT,
-    CLIP_FLAGS_TB     = CLIP_FLAGS_TOP | CLIP_FLAGS_BOTTOM
+    CLIP_FLAGS_TB     = CLIP_FLAGS_TOP  | CLIP_FLAGS_BOTTOM
 } clip_flags_t;
 
 typedef struct {
@@ -44,41 +44,48 @@ typedef struct {
     clip_flags_t clip_flags[4];
     clip_flags_t and_flags;
     clip_flags_t or_flags;
-} __aligned(16) render_transform_t;
+} __aligned(16) pipeline_t;
 
 typedef struct render {
     /* Pools */
-    fix16_t *z_values_pool;
-    int16_vec2_t *screen_points_pool;
-    rgb1555_t *colors_pool;
-    vdp1_cmdt_t *cmdts_pool;
-    fix16_t *depth_values_pool;
-    gst_t *gst;
+    struct {
+        fix16_t *z_values_pool;
+        int16_vec2_t *screen_points_pool;
+        rgb1555_t *colors_pool;
+        vdp1_cmdt_t *cmdts_pool;
+        fix16_t *depth_values_pool;
+    };
 
     /* Settings */
-    fix16_t view_distance;
-    fix16_t near;
-    fix16_t far;
-    fix16_t sort_scale;
-    render_flags_t render_flags;
-
-    const mesh_t *mesh;
-    const fix16_mat43_t *mesh_world_matrix;
-
     struct {
-        fix16_mat43_t *camera;
-        fix16_mat43_t *inv_camera;
-        fix16_mat43_t *view;
-        fix16_mat43_t *identity;
-    } matrices;
+        fix16_t view_distance;
+        fix16_t near;
+        fix16_t far;
+        fix16_t sort_scale;
+    };
 
-    render_transform_t *render_transform;
+    /* Rendering */
+    struct {
+        const mesh_t *mesh;
+        const fix16_mat43_t *world_matrix;
+        pipeline_t *pipeline;
+        render_flags_t render_flags;
+    };
+
+    /* Matrices */
+    struct {
+        fix16_mat43_t *camera_matrix;
+        fix16_mat43_t *inv_camera_matrix;
+        fix16_mat43_t *view_matrix;
+        fix16_mat43_t *identity_matrix;
+    };
 
     /* Sorting */
-    vdp1_cmdt_t *sort_cmdt;
-    vdp1_link_t sort_link;
-
-    vdp1_cmdt_t *cmdts;
+    struct {
+        vdp1_cmdt_t *sort_cmdt;
+        vdp1_link_t sort_link;
+        vdp1_cmdt_t *cmdts;
+    };
 } __aligned(4) render_t;
 
 void __render_init(void);
