@@ -10,7 +10,7 @@
 
 #include <cpu/divu.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_vec4.h>
 
 void
 fix16_vec4_normalize(fix16_vec4_t *v0)

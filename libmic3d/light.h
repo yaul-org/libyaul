@@ -24,14 +24,19 @@ typedef struct light {
     vdp1_vram_t vram_base;
     uint16_t slot_base;
 
-    /* Light matrix represents the direction of each light */
-    fix16_mat33_t light_matrix;
-    /* Color matrix represents each light color (column vectors) */
-    fix16_mat33_t color_matrix;
+    struct {
+        fix16_mat33_t *inv_world_matrix;
+        fix16_mat33_t *world_light_matrix;
+        /* Light matrix represents the direction of each light */
+        fix16_mat33_t *light_matrix;
+        /* Color matrix represents each light color (column vectors) */
+        fix16_mat33_t *color_matrix;
+        fix16_mat33_t *intensity_matrix;
+    };
+
     /* Count of enabled lights */
     uint32_t light_count;
 
-    fix16_mat33_t intensity_matrix;
     /* Count of used GSTs */
     uint32_t gst_count;
 } __aligned(4) light_t;

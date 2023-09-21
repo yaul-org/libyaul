@@ -10,7 +10,7 @@
 
 #include <cpu/divu.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_trig.h>
 
 #include "fix16_sin.inc"
 

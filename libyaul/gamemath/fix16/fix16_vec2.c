@@ -10,7 +10,7 @@
 
 #include <cpu/divu.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_vec2.h>
 
 void
 fix16_vec2_normalize(fix16_vec2_t *v0)
@@ -25,7 +25,8 @@ fix16_vec2_normalize(fix16_vec2_t *v0)
 }
 
 void
-fix16_vec2_normalized(const fix16_vec2_t * __restrict v0, fix16_vec2_t * __restrict result)
+fix16_vec2_normalized(const fix16_vec2_t * __restrict v0,
+    fix16_vec2_t * __restrict result)
 {
     const fix16_t length = fix16_vec2_length(v0);
 

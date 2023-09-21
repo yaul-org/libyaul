@@ -76,7 +76,7 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $5 -> Absolute path to output compile DB file
 # $6 -> Compiler flags
 define macro-update-cdb
-  $(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/share/update-cdb $1 "$2" "$3" $4 $5 $6
+  $(YAUL_INSTALL_ROOT)/share/wrap-error $(YAUL_INSTALL_ROOT)/share/update-cdb $1 "$2" "$3" $4 $5 -D__INTELLISENSE__ $6 -include "$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h"
 endef
 else
 define macro-update-cdb

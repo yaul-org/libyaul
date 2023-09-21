@@ -26,8 +26,8 @@
 #define LEVEL_STATE_WORKING     0x01
 
 static struct level_state {
-     volatile uint8_t flags;
-     callback_t callback;
+    volatile uint8_t flags;
+    callback_t callback;
 } _level_state[3];
 
 static void _scu_dma_level0_handler(void);
@@ -37,221 +37,220 @@ static void _scu_dma_level2_handler(void);
 void
 __scu_dma_init(void)
 {
-     scu_dma_stop();
+    scu_dma_stop();
 
-     scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, _scu_dma_level0_handler);
-     scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, _scu_dma_level1_handler);
-     scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, _scu_dma_level2_handler);
+    scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_0_DMA_END, _scu_dma_level0_handler);
+    scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_1_DMA_END, _scu_dma_level1_handler);
+    scu_ic_ihr_set(SCU_IC_INTERRUPT_LEVEL_2_DMA_END, _scu_dma_level2_handler);
 
-     scu_dma_illegal_clear();
+    scu_dma_illegal_clear();
 
-     for (scu_dma_level_t level = 0; level <= 2; level++) {
-          struct level_state * const level_state = &_level_state[level];
+    for (scu_dma_level_t level = 0; level <= 2; level++) {
+        struct level_state * const level_state = &_level_state[level];
 
-          level_state->flags = LEVEL_STATE_IDLING;
+        level_state->flags = LEVEL_STATE_IDLING;
 
-          callback_init(&level_state->callback);
-     }
+        callback_init(&level_state->callback);
+    }
 
-     scu_ic_mask_chg(SCU_MASK_UNMASK, SCU_IC_MASK_NONE);
+    scu_ic_mask_chg(SCU_MASK_UNMASK, SCU_IC_MASK_NONE);
 }
 
 void
 scu_dma_level_fast_start(scu_dma_level_t level)
 {
-     volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-     scu_ioregs->levels[level].dnen = 0x00000101;
+    scu_ioregs->levels[level].dnen = 0x00000101;
 }
 
 void
 scu_dma_level_start(scu_dma_level_t level)
 {
-     if (level == 2) {
-          /* To prevent operation errors, do not activate DMA level 2
-           * during DMA level 1 operation. */
+    if (level == 2) {
+        /* To prevent operation errors, do not activate DMA level 2 during DMA
+         * level 1 operation. */
 
-          scu_dma_level_wait(1);
-     }
+        scu_dma_level_wait(1);
+    }
 
-     scu_dma_level_wait(level);
-     scu_dma_level_fast_start(level);
+    scu_dma_level_wait(level);
+    scu_dma_level_fast_start(level);
 }
 
 void
 scu_dma_level_stop(scu_dma_level_t level)
 {
-     volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-     scu_ioregs->levels[level].dnen = 0x00000000;
+    scu_ioregs->levels[level].dnen = 0x00000000;
 
-     _level_state[level].flags = LEVEL_STATE_IDLING;
+    _level_state[level].flags = LEVEL_STATE_IDLING;
 }
 
 void
 scu_dma_level_wait(scu_dma_level_t level)
 {
-     while (true) {
-          if (_level_state[level].flags != LEVEL_STATE_WORKING) {
-               return;
-          }
+    while (true) {
+        if (_level_state[level].flags != LEVEL_STATE_WORKING) {
+            return;
+        }
 
-          if ((scu_dma_level_busy(level)) == 0x00000000) {
-               _level_state[level].flags = LEVEL_STATE_IDLING;
+        if ((scu_dma_level_busy(level)) == 0x00000000) {
+            _level_state[level].flags = LEVEL_STATE_IDLING;
 
-               return;
-          }
-     }
+            return;
+        }
+    }
 }
 
 void
-scu_dma_config_buffer(scu_dma_handle_t *handle,
-    const scu_dma_level_cfg_t *cfg)
+scu_dma_config_buffer(scu_dma_handle_t *handle, const scu_dma_level_cfg_t *cfg)
 {
-     assert(cfg != NULL);
+    assert(cfg != NULL);
 
-     assert(handle != NULL);
+    assert(handle != NULL);
 
-     /* Clear mode, starting factor and update bits */
-     handle->dnmd &= ~0x01010107;
+    /* Clear mode, starting factor and update bits */
+    handle->dnmd &= ~0x01010107;
 
-     switch (cfg->mode & 0x01) {
-     case SCU_DMA_MODE_DIRECT:
-          assert(cfg->xfer.direct.len != 0x00000000);
-          assert(cfg->xfer.direct.dst != 0x00000000);
-          assert(cfg->xfer.direct.src != 0x00000000);
+    switch (cfg->mode & 0x01) {
+    case SCU_DMA_MODE_DIRECT:
+        assert(cfg->xfer.direct.len != 0x00000000);
+        assert(cfg->xfer.direct.dst != 0x00000000);
+        assert(cfg->xfer.direct.src != 0x00000000);
 
-          /* The absolute address must not be cached */
-          handle->dnw = CPU_CACHE_THROUGH | cfg->xfer.direct.dst;
-          /* The absolute address must not be cached */
-          handle->dnr = CPU_CACHE_THROUGH | cfg->xfer.direct.src;
+        /* The absolute address must not be cached */
+        handle->dnw = CPU_CACHE_THROUGH | cfg->xfer.direct.dst;
+        /* The absolute address must not be cached */
+        handle->dnr = CPU_CACHE_THROUGH | cfg->xfer.direct.src;
 
-          /* Level 0 is able to transfer 1MiB
-           * Level 1 is able to transfer 4KiB
-           * Level 2 is able to transfer 4KiB */
-          handle->dnc = cfg->xfer.direct.len;
-          break;
-     case SCU_DMA_MODE_INDIRECT:
-          assert(cfg->xfer.indirect != NULL);
+        /* Level 0 is able to transfer 1MiB
+         * Level 1 is able to transfer 4KiB
+         * Level 2 is able to transfer 4KiB */
+        handle->dnc = cfg->xfer.direct.len;
+        break;
+    case SCU_DMA_MODE_INDIRECT:
+        assert(cfg->xfer.indirect != NULL);
 
-          /* The absolute address must not be cached */
-          handle->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->xfer.indirect;
-          handle->dnr = 0x00000000;
-          handle->dnc = 0x00000000;
-          handle->dnmd |= 0x01000000;
-          break;
-     }
+        /* The absolute address must not be cached */
+        handle->dnw = CPU_CACHE_THROUGH | (uint32_t)cfg->xfer.indirect;
+        handle->dnr = 0x00000000;
+        handle->dnc = 0x00000000;
+        handle->dnmd |= 0x01000000;
+        break;
+    }
 
-     handle->dnad = cfg->stride & 0x07;
+    handle->dnad = cfg->stride & 0x07;
 
-     if (cfg->space != SCU_DMA_SPACE_BUS_A) {
-          handle->dnad |= 0x00000100;
-     }
+    if (cfg->space != SCU_DMA_SPACE_BUS_A) {
+        handle->dnad |= 0x00000100;
+    }
 
-     handle->dnmd |= cfg->update & 0x00010100;
+    handle->dnmd |= cfg->update & 0x00010100;
 }
 
 void
 scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
-    const scu_dma_handle_t *handle, scu_dma_callback_t callback __unused)
+  const scu_dma_handle_t *handle, scu_dma_callback_t callback __unused)
 {
-     assert(handle != NULL);
+    assert(handle != NULL);
 
-     assert(level <= 2);
+    assert(level <= 2);
 
-     assert(start_factor <= 7);
+    assert(start_factor <= 7);
 
-     volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
+    volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
 
-     /* To prevent operation errors, do not activate DMA level 2 during DMA
-      * level 1 operation. */
-     if (level == 2) {
-          scu_dma_level_wait(1);
-     }
+    /* To prevent operation errors, do not activate DMA level 2 during DMA
+     * level 1 operation */
+    if (level == 2) {
+        scu_dma_level_wait(1);
+    }
 
-     scu_dma_level_wait(level);
-     scu_dma_level_stop(level);
+    scu_dma_level_wait(level);
+    scu_dma_level_stop(level);
 
-     _level_state[level].flags = LEVEL_STATE_WORKING;
+    _level_state[level].flags = LEVEL_STATE_WORKING;
 
-     scu_ioregs->levels[level].dnr  = handle->dnr;
-     scu_ioregs->levels[level].dnw  = handle->dnw;
-     scu_ioregs->levels[level].dnc  = handle->dnc;
-     scu_ioregs->levels[level].dnad = handle->dnad;
-     scu_ioregs->levels[level].dnmd = handle->dnmd | start_factor;
+    scu_ioregs->levels[level].dnr  = handle->dnr;
+    scu_ioregs->levels[level].dnw  = handle->dnw;
+    scu_ioregs->levels[level].dnc  = handle->dnc;
+    scu_ioregs->levels[level].dnad = handle->dnad;
+    scu_ioregs->levels[level].dnmd = handle->dnmd | start_factor;
 
-     if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
-          scu_ioregs->levels[level].dnen = 0x00000100;
-     }
+    if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
+        scu_ioregs->levels[level].dnen = 0x00000100;
+    }
 }
 
 void
 scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src, size_t len)
 {
-     const scu_dma_handle_t dma_handle = {
-          .dnr = CPU_CACHE_THROUGH | (uint32_t)src,
-          .dnw = (uint32_t)dst,
-          .dnc = len,
-          .dnad = 0x00000101,
-          .dnmd = 0x00010100
-     };
+    const scu_dma_handle_t dma_handle = {
+        .dnr = CPU_CACHE_THROUGH | (uint32_t)src,
+        .dnw = (uint32_t)dst,
+        .dnc = len,
+        .dnad = 0x00000101,
+        .dnmd = 0x00010100
+    };
 
-     scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, &dma_handle, NULL);
-     scu_dma_level_end_set(level, NULL, NULL);
-     scu_dma_level_fast_start(level);
+    scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, &dma_handle, NULL);
+    scu_dma_level_end_set(level, NULL, NULL);
+    scu_dma_level_fast_start(level);
 }
 
 void
 scu_dma_transfer_wait(scu_dma_level_t level)
 {
-     scu_dma_level_wait(level);
+    scu_dma_level_wait(level);
 }
 
 void
 scu_dma_level_end_set(scu_dma_level_t level, scu_dma_callback_t callback,
     void *work)
 {
-     callback_set(&_level_state[level].callback, callback, work);
+    callback_set(&_level_state[level].callback, callback, work);
 }
 
 scu_dma_level_t
 scu_dma_level_unused_get(void)
 {
-     if ((scu_dma_level_busy(0)) != 0x00) {
-          return 0;
-     }
+    if ((scu_dma_level_busy(0)) != 0x00) {
+        return 0;
+    }
 
-     if ((scu_dma_level_busy(1)) != 0x00) {
-          return 1;
-     }
+    if ((scu_dma_level_busy(1)) != 0x00) {
+        return 1;
+    }
 
-     if ((scu_dma_level_busy(2)) != 0x00) {
-          return 2;
-     }
+    if ((scu_dma_level_busy(2)) != 0x00) {
+        return 2;
+    }
 
-     return -1;
+    return -1;
 }
 
 static void
 _scu_dma_level0_handler(void)
 {
-     _level_state[0].flags = LEVEL_STATE_IDLING;
+    _level_state[0].flags = LEVEL_STATE_IDLING;
 
-     callback_call(&_level_state[0].callback);
+    callback_call(&_level_state[0].callback);
 }
 
 static void
 _scu_dma_level1_handler(void)
 {
-     _level_state[1].flags = LEVEL_STATE_IDLING;
+    _level_state[1].flags = LEVEL_STATE_IDLING;
 
-     callback_call(&_level_state[1].callback);
+    callback_call(&_level_state[1].callback);
 }
 
 static void
 _scu_dma_level2_handler(void)
 {
-     _level_state[2].flags = LEVEL_STATE_IDLING;
+    _level_state[2].flags = LEVEL_STATE_IDLING;
 
-     callback_call(&_level_state[2].callback);
+    callback_call(&_level_state[2].callback);
 }

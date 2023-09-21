@@ -6,9 +6,13 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_MAT33_H_
+#define _YAUL_GAMEMATH_FIX16_MAT33_H_
+
+#include <gamemath/angle.h>
+#include <gamemath/fix16/fix16_vec3.h>
+
+__BEGIN_DECLS
 
 /// @addtogroup MATH_FIX16_MATRIX
 /// @defgroup MATH_FIX16_MATRIX3X3 3x3
@@ -25,7 +29,6 @@
 #define FIX16_MAT33_ARR_COUNT (FIX16_MAT33_COLUMNS * FIX16_MAT33_ROWS)
 
 /// @cond
-typedef union fix16_vec3 fix16_vec3_t;
 typedef union fix16_mat43 fix16_mat43_t;
 /// @endcond
 
@@ -53,9 +56,8 @@ typedef union fix16_mat33 {
 
 /// @brief Not yet documented.
 ///
-/// @param      m0     Not yet documented.
-/// @param[out] result Not yet documented.
-extern void fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result);
+/// @param m0 Not yet documented.
+extern void fix16_mat33_zero(fix16_mat33_t *m0);
 
 /// @brief Not yet documented.
 ///
@@ -65,16 +67,8 @@ extern void fix16_mat33_identity(fix16_mat33_t *m0);
 /// @brief Not yet documented.
 ///
 /// @param      m0     Not yet documented.
-/// @param      m1     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1, fix16_mat33_t *result);
-
-/// @brief Not yet documented.
-///
-/// @param      m0     Not yet documented.
-/// @param      v      Not yet documented.
-/// @param[out] result Not yet documented.
-extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result);
+extern void fix16_mat33_dup(const fix16_mat33_t *m0, fix16_mat33_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -85,16 +79,74 @@ extern void fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
 
 /// @brief Not yet documented.
 ///
+/// @param      from   Not yet documented.
+/// @param      to     Not yet documented.
+/// @param      up     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
+  const fix16_vec3_t *up, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      m1     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      v      Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+  fix16_vec3_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_x_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_y_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      m0     Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rx     Not yet documented.
+/// @param      ry     Not yet documented.
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+  fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
 /// @param      m0       Not yet documented.
 /// @param[out] buffer   Not yet documented.
 /// @param      decimals Not yet documunted.
 ///
 /// @returns The string length, not counting the `NUL` character.
-extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals);
-
-/// @brief Not yet documented.
-///
-/// @param m0 Not yet documented.
-extern void fix16_mat33_zero(fix16_mat33_t *m0);
+extern size_t fix16_mat33_str(const fix16_mat33_t *m0, char *buffer,
+  int32_t decimals);
 
 /// @}
+
+__END_DECLS
+
+#endif /* !_YAUL_GAMEMATH_FIX16_MAT33_H_ */

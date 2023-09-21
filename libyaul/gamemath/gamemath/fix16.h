@@ -48,13 +48,6 @@ __BEGIN_DECLS
 /// @addtogroup MATH_FIX16
 /// @{
 
-/// @cond
-#define FIXMATH_FUNC_ATTRS          __attribute__ ((leaf, nothrow, const))
-/// @endcond
-/// @cond
-#define FIXMATH_FUNC_NONCONST_ATTRS __attribute__ ((leaf, nothrow))
-/// @endcond
-
 /// @brief Macro for defininge @p fix16_t constant values.
 ///
 /// @note The argument is evaluated multiple times, and also otherwise you
@@ -101,22 +94,24 @@ typedef int32_t fix16_t;
 /// @param b Operand.
 ///
 /// @returns The value.
+__BEGIN_ASM
 static inline fix16_t __always_inline
 fix16_int16_mul(const fix16_t a, const int16_t b)
 {
     __register fix16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                      "\tsts macl, %[out]\n"
-                      /* Output */
-                      : [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "macl");
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
+                  "\tsts macl, %[out]\n"
+                  /* Output */
+                  : [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "macl");
 
     return out;
 }
+__END_ASM
 
 /// @brief Not yet documented.
 ///
@@ -124,22 +119,24 @@ fix16_int16_mul(const fix16_t a, const int16_t b)
 /// @param b Operand.
 ///
 /// @returns The value.
+__BEGIN_ASM
 static inline int32_t __always_inline
 fix16_int32_mul(const fix16_t a, const fix16_t b)
 {
     __register int16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                      "\tsts mach, %[out]\n"
-                      /* Output */
-                      : [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "mach");
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
+                  "\tsts mach, %[out]\n"
+                  /* Output */
+                  : [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "mach");
 
     return out;
 }
+__END_ASM
 
 /// @brief Not yet documented.
 ///
@@ -147,26 +144,28 @@ fix16_int32_mul(const fix16_t a, const fix16_t b)
 /// @param b Operand.
 ///
 /// @returns The value.
+__BEGIN_ASM
 static inline fix16_t __always_inline
 fix16_mul(const fix16_t a, const fix16_t b)
 {
     __register uint32_t mach;
     __register fix16_t out;
 
-    __asm__ volatile ("\tdmuls.l %[a], %[b]\n"
-                      "\tsts mach, %[mach]\n"
-                      "\tsts macl, %[out]\n"
-                      "\txtrct %[mach], %[out]\n"
-                      /* Output */
-                      : [mach] "=&r" (mach),
-                        [out] "=&r" (out)
-                      /* Input */
-                      : [a] "r" (a),
-                        [b] "r" (b)
-                      : "mach", "macl");
+    __declare_asm("\tdmuls.l %[a], %[b]\n"
+                  "\tsts mach, %[mach]\n"
+                  "\tsts macl, %[out]\n"
+                  "\txtrct %[mach], %[out]\n"
+                  /* Output */
+                  : [mach] "=&r" (mach),
+                    [out] "=&r" (out)
+                  /* Input */
+                  : [a] "r" (a),
+                    [b] "r" (b)
+                  : "mach", "macl");
 
     return out;
 }
+__END_ASM
 
 /// @brief Not yet documented.
 ///
@@ -336,7 +335,7 @@ fix16_deg_rad_to(fix16_t degrees)
 /// @param b Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b);
 
 /// @brief Not yet documented.
 ///
@@ -344,7 +343,7 @@ extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
 /// @param b Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b);
 
 /// @brief Not yet documented.
 ///
@@ -352,7 +351,7 @@ extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b) FIXMATH_FUNC_ATTRS;
 /// @param divisor  Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_div(fix16_t dividend, fix16_t divisor) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_div(fix16_t dividend, fix16_t divisor);
 
 /// @brief Not yet documented.
 ///
@@ -361,7 +360,7 @@ extern fix16_t fix16_div(fix16_t dividend, fix16_t divisor) FIXMATH_FUNC_ATTRS;
 /// @param t Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_lerp(fix16_t a, fix16_t b, fix16_t t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp(fix16_t a, fix16_t b, fix16_t t);
 
 /// @brief Not yet documented.
 ///
@@ -370,14 +369,14 @@ extern fix16_t fix16_lerp(fix16_t a, fix16_t b, fix16_t t) FIXMATH_FUNC_ATTRS;
 /// @param t Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t);
 
 /// @brief Not yet documented.
 ///
 /// @param value Operand.
 ///
 /// @returns The value.
-extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
+extern fix16_t fix16_sqrt(fix16_t value);
 
 /// @brief Not yet documented.
 ///
@@ -387,21 +386,6 @@ extern fix16_t fix16_sqrt(fix16_t value) FIXMATH_FUNC_ATTRS;
 ///
 /// @returns The string length, not counting the `NUL` character.
 extern size_t fix16_str(fix16_t value, char *buffer, int32_t decimals);
-
-#include "angle.h"
-
-#include "fix16/fix16_trig.h"
-
-#include "fix16/fix16_vec2.h"
-#include "fix16/fix16_vec3.h"
-#include "fix16/fix16_vec4.h"
-
-#include "fix16/fix16_mat33.h"
-#include "fix16/fix16_mat43.h"
-
-#include "fix16/fix16_plane.h"
-
-#undef FIXMATH_FUNC_ATTRS
 
 /// @}
 

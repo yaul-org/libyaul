@@ -6,9 +6,12 @@
  * Romulo Fernandes <abra185@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_FIX16_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_FIX16_H_ */
+#ifndef _YAUL_GAMEMATH_FIX16_VEC2_H_
+#define _YAUL_GAMEMATH_FIX16_VEC2_H_
+
+#include <gamemath/fix16.h>
+
+__BEGIN_DECLS
 
 /// @addtogroup MATH_FIX16_VECTOR
 /// @defgroup MATH_FIX16_VEC2 2-vector
@@ -130,28 +133,30 @@ fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
 /// @param b Not yet documented.
 ///
 /// @returns The value.
+__BEGIN_ASM
 static inline fix16_t __always_inline
 fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
 {
     __register uint32_t aux0;
     __register uint32_t aux1;
 
-    __asm__ volatile ("\tclrmac\n"
-                      "\tmac.l @%[a]+, @%[b]+\n"
-                      "\tmac.l @%[a]+, @%[b]+\n"
-                      "\tsts mach, %[aux0]\n"
-                      "\tsts macl, %[aux1]\n"
-                      "\txtrct %[aux0], %[aux1]\n"
-                      : [a] "+r" (a),
-                        [b] "+r" (b),
-                        [aux0] "=&r" (aux0),
-                        [aux1] "=&r" (aux1)
-                      : "m" (*a),
-                        "m" (*b)
-                      : "mach", "macl", "memory");
+    __declare_asm("\tclrmac\n"
+                  "\tmac.l @%[a]+, @%[b]+\n"
+                  "\tmac.l @%[a]+, @%[b]+\n"
+                  "\tsts mach, %[aux0]\n"
+                  "\tsts macl, %[aux1]\n"
+                  "\txtrct %[aux0], %[aux1]\n"
+                  : [a] "+r" (a),
+                    [b] "+r" (b),
+                    [aux0] "=&r" (aux0),
+                    [aux1] "=&r" (aux1)
+                  : "m" (*a),
+                    "m" (*b)
+                  : "mach", "macl", "memory");
 
     return aux1;
 }
+__END_ASM
 
 /// @brief Not yet documented.
 ///
@@ -192,3 +197,7 @@ extern fix16_t fix16_vec2_dot(const fix16_vec2_t *v0, const fix16_vec2_t *v1);
 extern size_t fix16_vec2_str(const fix16_vec2_t *v0, char *buffer, int32_t decimals);
 
 /// @}
+
+__END_DECLS
+
+#endif /* !_YAUL_GAMEMATH_FIX16_VEC2_H_ */

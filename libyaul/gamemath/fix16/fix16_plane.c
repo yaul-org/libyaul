@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_plane.h>
 
 size_t
 fix16_plane_str(const fix16_plane_t *plane, char *buffer, int32_t decimals)

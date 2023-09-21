@@ -4,7 +4,9 @@
 #include <sys/cdefs.h>
 
 #include <stdint.h>
-#include <math.h>
+
+#include <gamemath/defs.h>
+#include <gamemath/fix16.h>
 
 __BEGIN_DECLS
 

@@ -44,22 +44,22 @@
 
 __BEGIN_DECLS
 
-/* tlsf_t: a TLSF structure. Can contain 1 to N pools. */
-/* pool_t: a block of memory that TLSF can manage. */
+/* tlsf_t: a TLSF structure. Can contain 1 to N pools */
+/* pool_t: a block of memory that TLSF can manage */
 typedef void *tlsf_t;
 typedef void *tlsf_pool_t;
 
-/* Create/destroy a memory pool. */
+/* Create/destroy a memory pool */
 extern tlsf_t tlsf_create(void *mem);
 extern tlsf_t tlsf_pool_create(void *mem, size_t bytes);
 extern void tlsf_destroy(tlsf_t tlsf);
 extern tlsf_pool_t tlsf_pool_get(tlsf_t tlsf);
 
-/* Add/remove memory pools. */
+/* Add/remove memory pools */
 extern tlsf_pool_t tlsf_pool_add(tlsf_t tlsf, void *mem, size_t bytes);
 extern void tlsf_pool_remove(tlsf_t tlsf, tlsf_pool_t pool);
 
-/* malloc/memalign/realloc/free replacements. */
+/* malloc/memalign/realloc/free replacements */
 extern void *tlsf_malloc(tlsf_t tlsf, size_t bytes);
 extern void *tlsf_memalign(tlsf_t tlsf, size_t align, size_t bytes);
 extern void *tlsf_realloc(tlsf_t tlsf, void *ptr, size_t size);
@@ -68,7 +68,7 @@ extern void tlsf_free(tlsf_t tlsf, void *ptr);
 /* Returns internal block size, not original request size */
 extern size_t tlsf_block_size(void *ptr);
 
-/* Overheads/limits of internal structures. */
+/* Overheads/limits of internal structures */
 extern size_t tlsf_size(void);
 extern size_t tlsf_align_size(void);
 extern size_t tlsf_block_size_min(void);
@@ -76,11 +76,11 @@ extern size_t tlsf_block_size_max(void);
 extern size_t tlsf_pool_overhead(void);
 extern size_t tlsf_alloc_overhead(void);
 
-/* Debugging. */
+/* Debugging */
 typedef void (*tlsf_walker_t)(void *ptr, size_t size, int used, void *user);
 
 extern void tlsf_pool_walk(tlsf_pool_t pool, tlsf_walker_t walker, void *user);
-/* Returns nonzero if any internal consistency check fails. */
+/* Returns nonzero if any internal consistency check fails */
 extern int tlsf_check(tlsf_t tlsf);
 extern int tlsf_pool_check(tlsf_pool_t pool);
 

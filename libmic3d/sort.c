@@ -34,13 +34,12 @@ _singles_alloc(void)
 void
 __sort_init(void)
 {
-    extern sort_list_t __pool_sort_lists[];
-    extern sort_single_t __pool_sort_singles[];
+    workarea_mic3d_t * const workarea = __state.workarea;
 
     sort_t * const sort = __state.sort;
 
-    sort->singles_pool = __pool_sort_singles;
-    sort->sort_lists_pool = __pool_sort_lists;
+    sort->singles_pool = (void *)workarea->sort_singles;
+    sort->sort_lists_pool = (void *)workarea->sort_lists;
 
     __sort_reset();
 }
@@ -60,7 +59,8 @@ __sort_insert(int32_t z)
 {
     sort_t * const sort = __state.sort;
 
-    const uint32_t index = clamp(z, 0, SORT_DEPTH - 1);
+    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
+    const uint32_t index = clamp(z, 0, CONFIG_MIC3D_SORT_DEPTH - 1);
 
     sort->max_depth = max(index, sort->max_depth);
 

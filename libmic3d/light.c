@@ -9,69 +9,93 @@
 
 #include "internal.h"
 
+#define MATRIX_INDEX_INVERSE_WORLD 0
+#define MATRIX_INDEX_WORLD_LIGHT   1
+#define MATRIX_INDEX_LIGHT         2
+#define MATRIX_INDEX_COLOR         3
+#define MATRIX_INDEX_INTENSITY     4
+
 static void _polygon_process(void);
 static void _polygon_passthrough_process(void);
 
 void
 __light_init(void)
 {
+    workarea_mic3d_t * const workarea = __state.workarea;
     light_t * const light = __state.light;
+
+    fix16_mat33_t * const light_matrices = (void *)workarea->light_matrices;
+
+    light->inv_world_matrix = &light_matrices[MATRIX_INDEX_INVERSE_WORLD];
+    light->world_light_matrix = &light_matrices[MATRIX_INDEX_WORLD_LIGHT];
+    light->light_matrix = &light_matrices[MATRIX_INDEX_LIGHT];
+    light->color_matrix = &light_matrices[MATRIX_INDEX_COLOR];
+    light->intensity_matrix = &light_matrices[MATRIX_INDEX_INTENSITY];
 
     light_gst_set(NULL, 0, VDP1_VRAM(0x00000000));
 
-    fix16_mat33_zero(&light->color_matrix);
-    fix16_mat33_zero(&light->light_matrix);
+    fix16_mat33_identity(light->inv_world_matrix);
+    fix16_mat33_identity(light->world_light_matrix);
+    fix16_mat33_zero(light->color_matrix);
+    fix16_mat33_zero(light->light_matrix);
+    fix16_mat33_zero(light->intensity_matrix);
 
     light->light_count = 0;
+
+    /* XXX: Testing */
+    light->color_matrix->frow[0][0] = FIX16(31);
+    light->color_matrix->frow[1][0] = FIX16(31);
+    light->color_matrix->frow[2][0] = FIX16(31);
 
-    // XXX: Testing
-    light->color_matrix.frow[0][0] = FIX16(31);
-    light->color_matrix.frow[1][0] = FIX16(31);
-    light->color_matrix.frow[2][0] = FIX16(31);
+    light->color_matrix->frow[0][1] = FIX16(31);
+    light->color_matrix->frow[1][1] = FIX16( 0);
+    light->color_matrix->frow[2][1] = FIX16( 0);
 
-    light->color_matrix.frow[0][1] = FIX16(31);
-    light->color_matrix.frow[1][1] = FIX16( 0);
-    light->color_matrix.frow[2][1] = FIX16( 0);
+    light->color_matrix->frow[0][2] = FIX16(31);
+    light->color_matrix->frow[1][2] = FIX16( 0);
+    light->color_matrix->frow[2][2] = FIX16( 0);
 
-    light->color_matrix.frow[0][2] = FIX16(31);
-    light->color_matrix.frow[1][2] = FIX16( 0);
-    light->color_matrix.frow[2][2] = FIX16( 0);
+    light->light_matrix->row[0].x = FIX16_ZERO;
+    light->light_matrix->row[0].y = FIX16_ZERO;
+    light->light_matrix->row[0].z = FIX16_ONE;
 
-    light->light_matrix.row[0].x = FIX16_ZERO;
-    light->light_matrix.row[0].y = FIX16_ZERO;
-    light->light_matrix.row[0].z = FIX16_ONE;
     light->light_count = 1;
+
 }
 
 static void
-_world_matrix_invert(fix16_mat33_t *inv_matrix)
+_world_matrix_invert(void)
 {
-    const fix16_mat43_t * const world_matrix = matrix_top();
+    render_t * const render = __state.render;
+    light_t * const light = __state.light;
+
+    const fix16_mat43_t * const world_matrix = render->world_matrix;
+    fix16_mat33_t * const inv_world_matrix = light->inv_world_matrix;
 
     /* Invert here directly to a 3x3 matrix. If we use fix16_mat43_invert,
      * the translation vector is also inverted.
      *
      * The transpose also bakes the negation of the directional light
      * vector: f=dot(vn,-dir) */
-    inv_matrix->frow[0][0] = -world_matrix->frow[0][0];
-    inv_matrix->frow[0][1] = -world_matrix->frow[1][0];
-    inv_matrix->frow[0][2] = -world_matrix->frow[2][0];
+    inv_world_matrix->frow[0][0] = -world_matrix->frow[0][0];
+    inv_world_matrix->frow[0][1] = -world_matrix->frow[1][0];
+    inv_world_matrix->frow[0][2] = -world_matrix->frow[2][0];
 
-    inv_matrix->frow[1][0] = -world_matrix->frow[0][1];
-    inv_matrix->frow[1][1] = -world_matrix->frow[1][1];
-    inv_matrix->frow[1][2] = -world_matrix->frow[2][1];
+    inv_world_matrix->frow[1][0] = -world_matrix->frow[0][1];
+    inv_world_matrix->frow[1][1] = -world_matrix->frow[1][1];
+    inv_world_matrix->frow[1][2] = -world_matrix->frow[2][1];
 
-    inv_matrix->frow[2][0] = -world_matrix->frow[0][2];
-    inv_matrix->frow[2][1] = -world_matrix->frow[1][2];
-    inv_matrix->frow[2][2] = -world_matrix->frow[2][2];
+    inv_world_matrix->frow[2][0] = -world_matrix->frow[0][2];
+    inv_world_matrix->frow[2][1] = -world_matrix->frow[1][2];
+    inv_world_matrix->frow[2][2] = -world_matrix->frow[2][2];
 }
 
-// void light_color_set(light_id_t id, rgb1555_t color)
-// void light_color_comp_set(light_id_t id, uint8_t r, uint8_t g, uint8_t b)
-//
-// void light_dir_set(light_id_t id, const fix16_vec3_t *dir)
-//
-// void light_toggle(light_id_t id, bool toggle)
+/* void light_color_set(light_id_t id, rgb1555_t color) */
+/* void light_color_comp_set(light_id_t id, uint8_t r, uint8_t g, uint8_t b) */
+
+/* void light_dir_set(light_id_t id, const fix16_vec3_t *dir) */
+
+/* void light_toggle(light_id_t id, bool toggle) */
 
 void
 __light_transform(light_polygon_processor_t *processor)
@@ -87,17 +111,18 @@ __light_transform(light_polygon_processor_t *processor)
 
     render_t * const render = __state.render;
 
-    fix16_mat33_t inv_world_matrix __aligned(16);
+    _world_matrix_invert();
 
-    _world_matrix_invert(&inv_world_matrix);
+    fix16_mat33_t * const inv_world_matrix = light->inv_world_matrix;
+    fix16_mat33_t * const world_light_matrix = light->world_light_matrix;
 
-    fix16_mat33_t world_light_matrix __aligned(16);
+    fix16_mat33_mul(light->light_matrix, inv_world_matrix, world_light_matrix);
+    fix16_mat33_mul(light->color_matrix, world_light_matrix, light->intensity_matrix);
 
-    fix16_mat33_mul(&light->light_matrix, &inv_world_matrix, &world_light_matrix);
-    fix16_mat33_mul(&light->color_matrix, &world_light_matrix, &light->intensity_matrix);
+    const mesh_t * const mesh = render->mesh;
 
-    for (uint32_t i = 0; i < render->mesh->points_count; i++) {
-        const fix16_vec3_t * const vertex_normal = &render->mesh->normals[i];
+    for (uint32_t i = 0; i < mesh->points_count; i++) {
+        const fix16_vec3_t * const vertex_normal = &mesh->normals[i];
 
         /* Avoid shifting to the right by 16, then back up by 5
          * (green) and 10 (blue) */
@@ -107,15 +132,16 @@ __light_transform(light_polygon_processor_t *processor)
 
         fix16_t intensity;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix.row[0], vertex_normal);
+        intensity = fix16_vec3_dot(&light->intensity_matrix->row[0], vertex_normal);
         color |= ((uint32_t)intensity >> 16) & 0x001F;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix.row[1], vertex_normal);
+        intensity = fix16_vec3_dot(&light->intensity_matrix->row[1], vertex_normal);
         color |= ((uint32_t)intensity >> 11) & 0x03E0;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix.row[2], vertex_normal);
+        intensity = fix16_vec3_dot(&light->intensity_matrix->row[2], vertex_normal);
         color |= ((uint32_t)intensity >>  6) & 0x7C00;
 
+        /* XXX: Change this */
         render->colors_pool[i].raw = color;
     }
 }
@@ -124,28 +150,28 @@ static void
 _polygon_process(void)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
     const gst_slot_t gst_slot = __light_gst_alloc();
     vdp1_gouraud_table_t * const gst = __light_gst_get(gst_slot);
 
-    render_transform->attribute.shading_slot =
+    pipeline->attribute.shading_slot =
       __light_shading_slot_calculate(gst_slot);
 
-    gst->colors[0] = render->colors_pool[render_transform->polygon.indices.p[0]];
-    gst->colors[1] = render->colors_pool[render_transform->polygon.indices.p[1]];
-    gst->colors[2] = render->colors_pool[render_transform->polygon.indices.p[2]];
-    gst->colors[3] = render->colors_pool[render_transform->polygon.indices.p[3]];
+    gst->colors[0] = render->colors_pool[pipeline->polygon.indices.p[0]];
+    gst->colors[1] = render->colors_pool[pipeline->polygon.indices.p[1]];
+    gst->colors[2] = render->colors_pool[pipeline->polygon.indices.p[2]];
+    gst->colors[3] = render->colors_pool[pipeline->polygon.indices.p[3]];
 }
 
 static void
 _polygon_passthrough_process(void)
 {
     render_t * const render = __state.render;
-    render_transform_t * const render_transform = render->render_transform;
+    pipeline_t * const pipeline = render->pipeline;
 
-    render_transform->attribute.shading_slot =
-      __gst_slot_calculate(render_transform->attribute.shading_slot);
+    pipeline->attribute.shading_slot =
+      __gst_slot_calculate(pipeline->attribute.shading_slot);
 }
 
 void

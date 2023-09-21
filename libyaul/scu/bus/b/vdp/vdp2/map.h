@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-#include <gamemath/fix16.h>
+#include <gamemath/fix16/fix16_vec2.h>
 #include <gamemath/int16.h>
 
 /// @addtogroup MEMORY_MAP

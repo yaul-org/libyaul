@@ -5,9 +5,10 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#ifndef _YAUL_GAMEMATH_COLOR_H_
-#error "Header file must not be directly included"
-#endif /* !_YAUL_GAMEMATH_COLOR_H_ */
+#ifndef _YAUL_GAMEMATH_COLOR_RGB1555_H_
+#define _YAUL_GAMEMATH_COLOR_RGB1555_H_
+
+#include <gamemath/color.h>
 
 /// @addtogroup MATH_COLOR
 /// @defgroup MATH_COLOR_RGB1555 RGB1555
@@ -81,3 +82,5 @@ union rgb1555 {
 extern void rgb888_rgb1555_conv(const rgb888_t *color_888, rgb1555_t *result);
 
 /// @}
+
+#endif /* !_YAUL_GAMEMATH_COLOR_RGB1555_H_ */

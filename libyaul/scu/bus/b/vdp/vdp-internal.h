@@ -8,7 +8,8 @@
 #ifndef _VDP_INTERNAL_H_
 #define _VDP_INTERNAL_H_
 
-#include <gamemath.h>
+#include <gamemath/defs.h>
+#include <gamemath/uint16.h>
 
 #include <scu-internal.h>
 

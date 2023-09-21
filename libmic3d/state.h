@@ -22,6 +22,7 @@ typedef struct mstack mstack_t;
 typedef struct perf perf_t;
 
 typedef struct {
+    workarea_mic3d_t *workarea;
     render_t *render;
     sort_t *sort;
     tlist_t *tlist;

@@ -7,7 +7,8 @@
 
 #include <string.h>
 
-#include <gamemath/color.h>
+#include <gamemath/color/rgb1555.h>
+#include <gamemath/color/rgb888.h>
 
 void
 rgb1555_rgb888_conv(const rgb1555_t *rgb1555, rgb888_t *result)

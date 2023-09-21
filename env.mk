@@ -167,8 +167,8 @@ SHARED_INCLUDE_DIRS:= \
 	../lib$(MAIN_TARGET)/scu/bus/cpu/smpc
 
 CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
-CDB_GCC?= /usr/bin/gcc
-CDB_CPP?= /usr/bin/g++
+CDB_GCC?= /usr/bin/gcc$(EXE_EXT)
+CDB_CPP?= /usr/bin/g++$(EXE_EXT)
 
 ifeq ($(strip $(YAUL_CDB)),1)
 # $1 -> Absolute path to compiler executable
@@ -178,7 +178,7 @@ ifeq ($(strip $(YAUL_CDB)),1)
 # $5 -> Absolute path to output compile DB file
 # $6 -> Compiler flags
 define macro-update-cdb
-  $(THIS_ROOT)/libyaul/common/wrap-error $(THIS_ROOT)/libyaul/common/update-cdb $1 "$2" "$3" $4 $5 $6
+  $(THIS_ROOT)/lib$(MAIN_TARGET)/common/wrap-error $(THIS_ROOT)/lib$(MAIN_TARGET)/common/update-cdb $1 "$2" "$3" $4 $5 -D__INTELLISENSE__ $6 -include "$(THIS_ROOT)/lib$(MAIN_TARGET)/intellisense.h"
 endef
 
 # $1 -> Space delimited list of object files
@@ -261,7 +261,7 @@ $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	mkdir -p "$$(@D)"; \
 	path=$$$$(cd "$$(@D)"; pwd); \
 	printf -- "$(V_BEGIN_BLUE)$$$${path#$$(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/}/$$(@F)$(V_END)\n";
-	$(ECHO)$(INSTALL) -m 644 $$< $$@
+	$(ECHO)$(INSTALL) -m 444 $$< $$@
 
 install-$4: $4 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2
 endef
@@ -273,7 +273,7 @@ define macro-sh-generate-install-lib-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
 	@printf -- "$(V_BEGIN_BLUE)lib/$2$(V_END)\n"
 	$(ECHO)mkdir -p "$$(@D)"
-	$(ECHO)$(INSTALL) -m 644 $$< $$@
+	$(ECHO)$(INSTALL) -m 444 $$< $$@
 
 install-$3: $3 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2
 endef
