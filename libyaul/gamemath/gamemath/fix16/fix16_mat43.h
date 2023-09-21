@@ -181,7 +181,7 @@ extern void fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1,
 /// @param      m0     Not yet documented.
 /// @param      v      Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_pos3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+extern void fix16_mat43_pos3_mul(const fix16_mat43_t *m0, const fix16_vec3_t *v,
   fix16_vec3_t *result);
 
 /// @brief Not yet documented.
@@ -189,7 +189,7 @@ extern void fix16_mat43_pos3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
 /// @param      m0     Not yet documented.
 /// @param      v      Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
+extern void fix16_mat43_vec3_mul(const fix16_mat43_t *m0, const fix16_vec3_t *v,
   fix16_vec3_t *result);
 
 /// @brief Not yet documented.
