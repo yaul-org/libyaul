@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 
+#include <gamemath/angle.h>
 #include <gamemath/fix16/fix16_mat43.h>
 #include <gamemath/fix16/fix16_vec3.h>
 #include <gamemath/int16.h>
@@ -22,6 +23,23 @@ __BEGIN_DECLS
 /// @defgroup MATH_3D 3D Math
 /// @ingroup MATH
 /// @{
+
+/// @brief Not yet documented.
+typedef struct {
+    /// @brief Not yet documented.
+    const fix16_vec3_t *from;
+    /// @brief Not yet documented.
+    const fix16_vec3_t *to;
+    /// @brief Not yet documented.
+    const fix16_vec3_t *up;
+
+    /// @brief Not yet documented.
+    fix16_vec3_t *basis_right;
+    /// @brief Not yet documented.
+    fix16_vec3_t *basis_up;
+    /// @brief Not yet documented.
+    fix16_vec3_t *basis_forward;
+} lookat_t;
 
 /// @brief Not yet documented.
 typedef struct xform_config {
@@ -42,6 +60,8 @@ typedef struct xform {
     /// @brief Not yet documented.
     fix16_t depth_value;
 } xform_t;
+
+extern void math3d_lookat(const lookat_t *lookat);
 
 /// @brief Not yet documented.
 ///

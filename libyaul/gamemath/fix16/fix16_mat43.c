@@ -11,6 +11,7 @@
 #include <gamemath/fix16/fix16_mat33.h>
 #include <gamemath/fix16/fix16_mat43.h>
 #include <gamemath/fix16/fix16_trig.h>
+#include <gamemath/math3d.h>
 
 static void _mat43_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 
@@ -114,23 +115,18 @@ void
 fix16_mat43_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
     const fix16_vec3_t *up, fix16_mat43_t *result)
 {
-    /* normalize(forward)
-     * right = normalize(cross(forward, up))
-     * up = cross(forward, right) */
+    const lookat_t lookat = {
+        .from          = from,
+        .to            = to,
+        .up            = up,
+        .basis_right   = (fix16_vec3_t *)&result->row[0],
+        .basis_up      = (fix16_vec3_t *)&result->row[1],
+        .basis_forward = (fix16_vec3_t *)&result->row[2],
+    };
+
+    math3d_lookat(&lookat);
 
     fix16_mat43_translation_set(from, result);
-
-    fix16_vec3_t * const basis_forward = (fix16_vec3_t *)&result->row[2];
-    fix16_vec3_sub(to, from, basis_forward);
-    fix16_vec3_normalize(basis_forward);
-
-    fix16_vec3_t * const basis_right = (fix16_vec3_t *)&result->row[0];
-    fix16_vec3_cross(basis_forward, up, basis_right);
-    fix16_vec3_normalize(basis_right);
-
-    fix16_vec3_t * const basis_up = (fix16_vec3_t *)&result->row[1];
-    fix16_vec3_cross(basis_forward, basis_right, basis_up);
-    fix16_vec3_normalize(basis_up);
 }
 
 void
@@ -164,13 +160,21 @@ fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t 
 }
 
 void
-fix16_mat43_pos3_mul(const fix16_mat33_t *m0 __unused, const fix16_vec3_t *v __unused, fix16_vec3_t *result __unused)
+fix16_mat43_pos3_mul(const fix16_mat43_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result)
 {
+    fix16_mat43_vec3_mul(m0, v, result);
+
+    result->x = result->x + m0->frow[0][3];
+    result->y = result->y + m0->frow[1][3];
+    result->z = result->z + m0->frow[2][3];
 }
 
 void
-fix16_mat43_vec3_mul(const fix16_mat33_t *m0 __unused, const fix16_vec3_t *v __unused, fix16_vec3_t *result __unused)
+fix16_mat43_vec3_mul(const fix16_mat43_t *m0, const fix16_vec3_t *v, fix16_vec3_t *result)
 {
+    result->x = fix16_vec3_dot((const fix16_vec3_t *)&m0->row[0], v);
+    result->y = fix16_vec3_dot((const fix16_vec3_t *)&m0->row[1], v);
+    result->z = fix16_vec3_dot((const fix16_vec3_t *)&m0->row[2], v);
 }
 
 void

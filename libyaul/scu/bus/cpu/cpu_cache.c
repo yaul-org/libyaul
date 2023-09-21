@@ -7,7 +7,7 @@
 
 #include <sys/cdefs.h>
 
-#include <gamemath.h>
+#include <gamemath/uint32.h>
 
 #include <cpu/cache.h>
 

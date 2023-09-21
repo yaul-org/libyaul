@@ -5,18 +5,18 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <assert.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <cpu/cache.h>
 #include <cpu/instructions.h>
 
 #include <vdp1/cmdt.h>
 #include <vdp1/vram.h>
 
-#include <gamemath.h>
-
-#include <assert.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+#include <gamemath/uint32.h>
 
 #include "vdp-internal.h"
 

@@ -16,9 +16,9 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-#include <gamemath.h>
-
 #include <cd-block.h>
+
+#include <gamemath/uint32.h>
 
 __BEGIN_DECLS
 

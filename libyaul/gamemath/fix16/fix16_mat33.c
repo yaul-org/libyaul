@@ -12,6 +12,7 @@
 #include <gamemath/angle.h>
 #include <gamemath/fix16/fix16_mat33.h>
 #include <gamemath/fix16/fix16_trig.h>
+#include <gamemath/math3d.h>
 
 static void _mat33_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
 
@@ -90,28 +91,23 @@ fix16_mat33_transpose(const fix16_mat33_t * __restrict m0,
 
 void
 fix16_mat33_lookat(const fix16_vec3_t *from, const fix16_vec3_t *to,
-    const fix16_vec3_t *up, fix16_mat33_t *result)
+  const fix16_vec3_t *up, fix16_mat33_t *result)
 {
-    /* normalize(forward)
-     * right = normalize(cross(forward, up))
-     * up = cross(forward, right) */
+    const lookat_t lookat = {
+        .from          = from,
+        .to            = to,
+        .up            = up,
+        .basis_right   = &result->row[0],
+        .basis_up      = &result->row[1],
+        .basis_forward = &result->row[2],
+    };
 
-    fix16_vec3_t * const basis_forward = &result->row[2];
-    fix16_vec3_sub(to, from, basis_forward);
-    fix16_vec3_normalize(basis_forward);
-
-    fix16_vec3_t * const basis_right = &result->row[0];
-    fix16_vec3_cross(basis_forward, up, basis_right);
-    fix16_vec3_normalize(basis_right);
-
-    fix16_vec3_t * const basis_up = &result->row[1];
-    fix16_vec3_cross(basis_forward, basis_right, basis_up);
-    fix16_vec3_normalize(basis_up);
+    math3d_lookat(&lookat);
 }
 
 void
 fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
-    fix16_mat33_t *result)
+  fix16_mat33_t *result)
 {
     fix16_vec3_t transposed_row;
 
@@ -137,7 +133,7 @@ fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
 
 void
 fix16_mat33_vec3_mul(const fix16_mat33_t *m0, const fix16_vec3_t *v,
-    fix16_vec3_t *result)
+  fix16_vec3_t *result)
 {
     result->x = fix16_vec3_dot(&m0->row[0], v);
     result->y = fix16_vec3_dot(&m0->row[1], v);

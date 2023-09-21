@@ -150,8 +150,8 @@ SH_BUILD_PATH= $(abspath $(SH_BUILD_DIR))
 SH_OUTPUT_PATH= $(abspath $(SH_OUTPUT_DIR))
 
 CDB_FILE:= compile_commands.json
-CDB_GCC?= /usr/bin/gcc
-CDB_CPP?= /usr/bin/g++
+CDB_GCC?= /usr/bin/gcc$(EXE_EXT)
+CDB_CPP?= /usr/bin/g++$(EXE_EXT)
 
 .PHONY: all clean .build
 

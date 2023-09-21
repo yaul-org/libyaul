@@ -85,36 +85,6 @@ typedef enum vdp1_cmdt_char_flip {
     VDP1_CMDT_CHAR_FLIP_HV   = VDP1_CMDT_CHAR_FLIP_H | VDP1_CMDT_CHAR_FLIP_V
 } vdp1_cmdt_char_flip_t;
 
-typedef struct vdp1_cmdt {
-    uint16_t cmd_ctrl;
-    uint16_t cmd_link;
-    uint16_t cmd_pmod;
-    uint16_t cmd_colr;
-    uint16_t cmd_srca;
-    uint16_t cmd_size;
-
-    union {
-        struct {
-            int16_t cmd_xa;
-            int16_t cmd_ya;
-            int16_t cmd_xb;
-            int16_t cmd_yb;
-            int16_t cmd_xc;
-            int16_t cmd_yc;
-            int16_t cmd_xd;
-            int16_t cmd_yd;
-        } __aligned(4) __packed;
-
-        int16_vec2_t cmd_vertices[4];
-    };
-
-    uint16_t cmd_grda;
-
-    uint16_t reserved;
-} __aligned(32) vdp1_cmdt_t;
-
-static_assert(sizeof(vdp1_cmdt_t) == 32);
-
 typedef uint16_t vdp1_link_t;
 
 typedef vdp2_sprite_type_0_t vdp1_color_bank_type_0_t;
@@ -177,6 +147,42 @@ typedef union vdp1_cmdt_color_bank {
 } __packed vdp1_cmdt_color_bank_t;
 
 static_assert(sizeof(vdp1_cmdt_color_bank_t) == 2);
+
+typedef struct vdp1_cmdt {
+    uint16_t cmd_ctrl;
+    uint16_t cmd_link;
+
+    union {
+        uint16_t cmd_pmod;
+
+        vdp1_cmdt_draw_mode_t cmd_draw_mode;
+    };
+
+    uint16_t cmd_colr;
+    uint16_t cmd_srca;
+    uint16_t cmd_size;
+
+    union {
+        struct {
+            int16_t cmd_xa;
+            int16_t cmd_ya;
+            int16_t cmd_xb;
+            int16_t cmd_yb;
+            int16_t cmd_xc;
+            int16_t cmd_yc;
+            int16_t cmd_xd;
+            int16_t cmd_yd;
+        } __packed;
+
+        int16_vec2_t cmd_vertices[4];
+    };
+
+    uint16_t cmd_grda;
+
+    uint16_t reserved;
+} __aligned(32) vdp1_cmdt_t;
+
+static_assert(sizeof(vdp1_cmdt_t) == 32);
 
 typedef struct vdp1_cmdt_list {
     vdp1_cmdt_t *cmdts;

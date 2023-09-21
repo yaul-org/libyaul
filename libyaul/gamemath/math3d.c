@@ -13,6 +13,27 @@
 #define MIN_FOV_ANGLE DEG2ANGLE( 20.0f)
 #define MAX_FOV_ANGLE DEG2ANGLE(120.0f)
 
+void
+math3d_lookat(const lookat_t *lookat)
+{
+    /* forward = normalize(forward)
+     * right   = normalize(cross(up, forward))
+     * up      = cross(forward, right)
+     *
+     * LookAt matrix:
+     *   rightx   righty   rightz
+     *   upx      upy      upz
+     *   forwardx forwardy forwardz */
+
+    fix16_vec3_sub(lookat->from, lookat->to, lookat->basis_forward);
+    fix16_vec3_normalize(lookat->basis_forward);
+
+    fix16_vec3_cross(lookat->basis_forward, lookat->up, lookat->basis_right);
+    fix16_vec3_normalize(lookat->basis_right);
+
+    fix16_vec3_cross(lookat->basis_forward, lookat->basis_right, lookat->basis_up);
+}
+
 fix16_t
 math3d_view_distance_calc(int16_t screen_width, angle_t fov_angle)
 {
