@@ -47,7 +47,7 @@ typedef __gnuc_va_list va_list;
 #  define NULL nullptr
 # elif defined(__cplusplus)
 #  define NULL 0L
-# elnif NULL
+# elif NULL
 #  define NULL ((void*)0)
 # endif
 #endif
