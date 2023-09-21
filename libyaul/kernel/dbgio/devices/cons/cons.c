@@ -8,11 +8,12 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
-#include <gamemath.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <gamemath/defs.h>
 
 #include "cons-internal.h"
 

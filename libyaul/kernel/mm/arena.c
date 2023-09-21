@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <gamemath.h>
+#include <gamemath/uint32.h>
 
 #include "arena.h"
 

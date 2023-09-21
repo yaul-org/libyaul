@@ -1,4 +1,4 @@
-#include <math.h>
+#include <gamemath/defs.h>
 
 #include "memb-internal.h"
 

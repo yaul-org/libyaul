@@ -213,8 +213,8 @@ LIB_SRCS+= \
 	gamemath/color/color.c \
 \
 	gamemath/fix16/fix16.c \
-	gamemath/fix16/fix16_mat43.c \
 	gamemath/fix16/fix16_mat33.c \
+	gamemath/fix16/fix16_mat43.c \
 	gamemath/fix16/fix16_plane.c \
 	gamemath/fix16/fix16_sqrt.c \
 	gamemath/fix16/fix16_str.c \
@@ -347,9 +347,11 @@ INSTALL_HEADER_FILES+= \
 	./gamemath/gamemath/fix16/:fix16_vec3.h:yaul/gamemath/fix16/ \
 	./gamemath/gamemath/fix16/:fix16_vec4.h:yaul/gamemath/fix16/ \
 \
+	./gamemath/gamemath/:defs.h:yaul/gamemath/ \
 	./gamemath/gamemath/:int8.h:yaul/gamemath/ \
 	./gamemath/gamemath/:int16.h:yaul/gamemath/ \
 	./gamemath/gamemath/:int32.h:yaul/gamemath/ \
+	./gamemath/gamemath/:math3d.h:yaul/gamemath/ \
 	./gamemath/gamemath/:uint8.h:yaul/gamemath/ \
 	./gamemath/gamemath/:uint16.h:yaul/gamemath/ \
 	./gamemath/gamemath/:uint32.h:yaul/gamemath/

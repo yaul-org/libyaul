@@ -4,13 +4,12 @@
 #ifndef _YAUL_GAMEMATH_H_
 #define _YAUL_GAMEMATH_H_
 
-#include <sys/cdefs.h>
-
 #include <gamemath/angle.h>
 #include <gamemath/color.h>
 #include <gamemath/color/hsv.h>
 #include <gamemath/color/rgb1555.h>
 #include <gamemath/color/rgb888.h>
+#include <gamemath/defs.h>
 #include <gamemath/fix16.h>
 #include <gamemath/fix16/fix16_mat33.h>
 #include <gamemath/fix16/fix16_mat43.h>

@@ -11,7 +11,6 @@
 #include <stdbool.h>
 
 #include <cd-block.h>
-#include <gamemath.h>
 #include <scu/map.h>
 
 #include "cdfs-internal.h"
