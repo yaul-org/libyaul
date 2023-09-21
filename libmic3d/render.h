@@ -12,7 +12,7 @@
 
 #include <gamemath/fix16.h>
 
-#include <mic3d/types.h>
+#include "mic3d/types.h"
 
 #include "gst.h"
 
@@ -69,6 +69,7 @@ typedef struct render {
         const fix16_mat43_t *world_matrix;
         pipeline_t *pipeline;
         render_flags_t render_flags;
+        vdp1_cmdt_t *cmdts;
     };
 
     /* Matrices */
@@ -83,7 +84,6 @@ typedef struct render {
     struct {
         vdp1_cmdt_t *sort_cmdt;
         vdp1_link_t sort_link;
-        vdp1_cmdt_t *cmdts;
     };
 } __aligned(4) render_t;
 

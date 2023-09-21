@@ -5,7 +5,6 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <gamemath.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,7 +13,12 @@
 #include <cpu/intc.h>
 #include <cpu/registers.h>
 
+// TODO: Find a way to not depend on compile-time constants
+#include "mic3d/config.h"
+
 #include "internal.h"
+#include "render.h"
+#include "vdp1/cmdt.h"
 
 #define SCREEN_RATIO       FIX16(SCREEN_WIDTH / (float)SCREEN_HEIGHT)
 
@@ -38,22 +42,27 @@
 #define MATRIX_INDEX_VIEW           2
 #define MATRIX_INDEX_IDENTITY       3
 
-static void _reset(void);
+static void _render_reset(void);
 
 static void _vdp1_init(void);
 
-static void _transform(void);
+static void _perspective_transform(void);
 
 static fix16_t _depth_min_calculate(const fix16_t *z_values);
 static fix16_t _depth_max_calculate(const fix16_t *z_values);
 static fix16_t _depth_center_calculate(const fix16_t *z_values);
 
-static bool _backface_cull_test(void);
+static bool _pipeline_backface_cull_test(void);
 
-static void _clip_flags_calculate(void);
-static void _clip_flags_lrtb_calculate(const int16_vec2_t screen_point, clip_flags_t *clip_flag);
+static void _clip_flags_calculate(const int16_vec2_t *screen_point,
+  clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags);
+static void _clip_flags_lrtb_calculate(const int16_vec2_t screen_point,
+  clip_flags_t *clip_flag);
 
-static void _polygon_orient(void);
+static void _screen_points_swap(int16_vec2_t *screen_points, uint32_t i,
+  uint32_t j);
+
+static void _pipeline_polygon_orient(void);
 
 static void _render_single(const sort_single_t *single);
 
@@ -98,7 +107,7 @@ __render_init(void)
     render_near_level_set(7);
     render_far_set(FIX16(1024));
 
-    _reset();
+    _render_reset();
 
     __perf_counter_init(&_transform_pc);
     __perf_counter_init(&_sort_pc);
@@ -166,6 +175,8 @@ render_far_set(fix16_t far)
 {
     render_t * const render = __state.render;
 
+    /* TODO: Change this hard coded value */
+    /* XXX: Is clamping to the near plane Z value correct? */
     render->far = fix16_clamp(far, render->near, FIX16(2048.0f));
     /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
     render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1), render->far);
@@ -175,6 +186,10 @@ void
 render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
     xform_t *xform)
 {
+    assert(world_matrix != NULL);
+    assert(point != NULL);
+    assert(xform != NULL);
+
     render_t * const render = __state.render;
 
     fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
@@ -202,6 +217,9 @@ render_start(void)
 void
 render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
 {
+    assert(mesh != NULL);
+    assert(world_matrix != NULL);
+
     const uint32_t sr_mask = cpu_intc_mask_get();
     cpu_intc_mask_set(15);
 
@@ -211,11 +229,11 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
     light_polygon_processor_t light_polygon_processor;
 
     render->mesh = mesh;
-    render->world_matrix = (world_matrix != NULL) ? world_matrix : render->identity_matrix;
+    render->world_matrix = world_matrix;
 
     __perf_counter_start(&_transform_pc);
 
-    _transform();
+    _perspective_transform();
 
     __light_transform(&light_polygon_processor);
 
@@ -232,7 +250,7 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
         pipeline->screen_points[3] = screen_points[pipeline->polygon.indices.p3];
 
         if (pipeline->polygon.flags.plane_type != PLANE_TYPE_DOUBLE) {
-            if ((_backface_cull_test())) {
+            if ((_pipeline_backface_cull_test())) {
                 continue;
             }
         }
@@ -249,7 +267,7 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
             continue;
         }
 
-        _clip_flags_calculate();
+        _clip_flags_calculate(pipeline->screen_points, pipeline->clip_flags, &pipeline->and_flags, &pipeline->or_flags);
 
         /* Cull if the polygon is entirely off screen */
         if (pipeline->and_flags != CLIP_FLAGS_NONE) {
@@ -282,7 +300,7 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
              * should help with performance */
             pipeline->attribute.draw_mode.pre_clipping_disable = true;
         } else {
-            _polygon_orient();
+            _pipeline_polygon_orient();
         }
 
         light_polygon_processor();
@@ -299,6 +317,82 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
     /* lwram += 3; */
 
     cpu_intc_mask_set(sr_mask);
+}
+
+void
+render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
+{
+    assert(cmdt != NULL);
+
+    render_t * const render = __state.render;
+
+    /* XXX: Magic number */
+    const vdp1_cmdt_command_t command = cmdt->cmd_ctrl & ~0x7FF0;
+
+    if (command >= VDP1_CMDT_USER_CLIP_COORD) {
+        return;
+    }
+
+    /* Calculate clip flags to either cull or orient vertices */
+    clip_flags_t clip_flags[4];
+    clip_flags_t and_flags;
+    clip_flags_t or_flags;
+
+    _clip_flags_calculate(cmdt->cmd_vertices, clip_flags, &and_flags, &or_flags);
+
+    /* Cull if the polygon is entirely off screen */
+    if (and_flags != CLIP_FLAGS_NONE) {
+        return;
+    }
+
+    const fix16_t clamped_z = fix16_clamp(depth_z, render->near, render->far);
+    const int32_t scaled_z = fix16_int32_mul(clamped_z, render->sort_scale);
+
+    __sort_insert(scaled_z);
+
+    vdp1_cmdt_t * const to_cmdt = _cmdts_alloc();
+
+    /* Copy command table. Compiler will probably stick a memcpy() here */
+    *to_cmdt = *cmdt;
+
+    /* Required */
+    vdp1_cmdt_link_type_set(to_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
+
+    if (or_flags == CLIP_FLAGS_NONE) {
+        /* If no clip flags are set, disable pre-clipping. This should help with
+         * performance */
+        to_cmdt->cmd_draw_mode.pre_clipping_disable = true;
+    } else {
+        if ((clip_flags[0] & CLIP_FLAGS_LR) != CLIP_FLAGS_NONE) {
+            /* B-|-A
+             * | | |
+             * C-|-D
+             *   |
+             *   | Outside
+             *
+             * Swap A & B
+             * Swap D & C */
+
+            _screen_points_swap(to_cmdt->cmd_vertices, 0, 1);
+            _screen_points_swap(to_cmdt->cmd_vertices, 2, 3);
+
+            to_cmdt->cmd_ctrl ^= VDP1_CMDT_CHAR_FLIP_H;
+        }
+
+        if ((clip_flags[0] & CLIP_FLAGS_TB) != CLIP_FLAGS_NONE) {
+            /*   B---A Outside
+             * --|---|--
+             *   C---D
+             *
+             *   Swap A & D
+             *   Swap B & C */
+
+            _screen_points_swap(to_cmdt->cmd_vertices, 0, 3);
+            _screen_points_swap(to_cmdt->cmd_vertices, 1, 2);
+
+            to_cmdt->cmd_ctrl ^= VDP1_CMDT_CHAR_FLIP_V;
+        }
+    }
 }
 
 void
@@ -345,12 +439,12 @@ render_end(void)
 
     __light_gst_put();
 
-    _reset();
+    _render_reset();
     /* lwram = (volatile uint32_t *)LWRAM(0x00000000); */
 }
 
 static void
-_reset(void)
+_render_reset(void)
 {
     _cmdts_reset();
     __sort_reset();
@@ -418,7 +512,7 @@ _vdp1_init(void)
 }
 
 static void
-_transform(void)
+_perspective_transform(void)
 {
     render_t * const render = __state.render;
 
@@ -489,7 +583,7 @@ _clip_flags_lrtb_calculate(const int16_vec2_t screen_point, clip_flags_t *clip_f
 }
 
 static bool
-_backface_cull_test(void)
+_pipeline_backface_cull_test(void)
 {
     render_t * const render = __state.render;
     pipeline_t * const pipeline = render->pipeline;
@@ -510,25 +604,16 @@ _backface_cull_test(void)
 }
 
 static void
-_clip_flags_calculate(void)
+_clip_flags_calculate(const int16_vec2_t *screen_points,
+  clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags)
 {
-    render_t * const render = __state.render;
-    pipeline_t * const pipeline = render->pipeline;
+    _clip_flags_lrtb_calculate(screen_points[0], &clip_flags[0]);
+    _clip_flags_lrtb_calculate(screen_points[1], &clip_flags[1]);
+    _clip_flags_lrtb_calculate(screen_points[2], &clip_flags[2]);
+    _clip_flags_lrtb_calculate(screen_points[3], &clip_flags[3]);
 
-    _clip_flags_lrtb_calculate(pipeline->screen_points[0], &pipeline->clip_flags[0]);
-    _clip_flags_lrtb_calculate(pipeline->screen_points[1], &pipeline->clip_flags[1]);
-    _clip_flags_lrtb_calculate(pipeline->screen_points[2], &pipeline->clip_flags[2]);
-    _clip_flags_lrtb_calculate(pipeline->screen_points[3], &pipeline->clip_flags[3]);
-
-    pipeline->and_flags = pipeline->clip_flags[0] &
-      pipeline->clip_flags[1] &
-      pipeline->clip_flags[2] &
-      pipeline->clip_flags[3];
-
-    pipeline->or_flags = pipeline->clip_flags[0] |
-      pipeline->clip_flags[1] |
-      pipeline->clip_flags[2] |
-      pipeline->clip_flags[3];
+    *and_flags = clip_flags[0] & clip_flags[1] & clip_flags[2] & clip_flags[3];
+    *or_flags = clip_flags[0] | clip_flags[1] | clip_flags[2] | clip_flags[3];
 }
 
 static void
@@ -544,25 +629,22 @@ _indices_swap(uint32_t i, uint32_t j)
 }
 
 static void
-_screen_points_swap(uint32_t i, uint32_t j)
+_screen_points_swap(int16_vec2_t *screen_points, uint32_t i, uint32_t j)
 {
-    render_t * const render = __state.render;
-    pipeline_t * const pipeline = render->pipeline;
+    const int16_vec2_t tmp = screen_points[i];
 
-    const int16_vec2_t tmp = pipeline->screen_points[i];
-
-    pipeline->screen_points[i] = pipeline->screen_points[j];
-    pipeline->screen_points[j] = tmp;
+    screen_points[i] = screen_points[j];
+    screen_points[j] = tmp;
 }
 
 static void
-_polygon_orient(void)
+_pipeline_polygon_orient(void)
 {
     render_t * const render = __state.render;
     pipeline_t * const pipeline = render->pipeline;
 
-    /* Orient the vertices such that vertex A is always on-screen. Doing
-     * this is for performance purposes */
+    /* Orient the vertices such that vertex A is always on-screen. Doing this is
+     * for performance purposes */
 
     if ((pipeline->clip_flags[0] & CLIP_FLAGS_LR) != CLIP_FLAGS_NONE) {
         /* B-|-A
@@ -577,8 +659,8 @@ _polygon_orient(void)
         _indices_swap(0, 1);
         _indices_swap(3, 2);
 
-        _screen_points_swap(0, 1);
-        _screen_points_swap(2, 3);
+        _screen_points_swap(pipeline->screen_points, 0, 1);
+        _screen_points_swap(pipeline->screen_points, 2, 3);
 
         pipeline->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_H;
     }
@@ -594,8 +676,8 @@ _polygon_orient(void)
         _indices_swap(0, 3);
         _indices_swap(1, 2);
 
-        _screen_points_swap(0, 3);
-        _screen_points_swap(1, 2);
+        _screen_points_swap(pipeline->screen_points, 0, 3);
+        _screen_points_swap(pipeline->screen_points, 1, 2);
 
         pipeline->attribute.control.raw ^= VDP1_CMDT_CHAR_FLIP_V;
     }
@@ -629,6 +711,8 @@ _cmdts_alloc(void)
     vdp1_cmdt_t * const cmdt = render->cmdts;
 
     render->cmdts++;
+
+    /* XXX: Assert that we don't exceed the alloted command table count */
 
     return cmdt;
 }

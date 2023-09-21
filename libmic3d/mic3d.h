@@ -42,6 +42,7 @@ extern void render_start(void);
 extern void render_end(void);
 extern void render_mesh_xform(const mesh_t *mesh,
     const fix16_mat43_t *world_matrix);
+extern void render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z);
 
 extern void render_point_xform(const fix16_mat43_t *world_matrix,
     const fix16_vec3_t *point, xform_t *xform);

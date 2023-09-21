@@ -8,6 +8,8 @@
 #ifndef _MIC3D_WORKAREA_H_
 #define _MIC3D_WORKAREA_H_
 
+#include <stdint.h>
+
 #include <mic3d/config.h>
 #include <mic3d/sizes.h>
 
@@ -43,10 +45,10 @@
 #define WORKAREA_MIC3D_COLORS_ALIGNMENT          16
 #define WORKAREA_MIC3D_WORK_ALIGNMENT            16
 
-#define __WORKAREA_MIC3D_DECLARE_STRUCT(lname_, uname_)                              \
-    typedef struct workarea_mic3d_##lname_ {                                   \
-        uint8_t pool[WORKAREA_MIC3D_##uname_##_BYTE_SIZE];                           \
-    } __aligned(WORKAREA_MIC3D_##uname_##_ALIGNMENT) workarea_mic3d_##lname_##_t
+#define __WORKAREA_MIC3D_DECLARE_STRUCT(lname, uname)                          \
+    typedef struct workarea_mic3d_##lname {                                    \
+        uint8_t pool[WORKAREA_MIC3D_##uname##_BYTE_SIZE];                      \
+    } __aligned(WORKAREA_MIC3D_##uname##_ALIGNMENT) workarea_mic3d_##lname##_t
 
 __WORKAREA_MIC3D_DECLARE_STRUCT(sort_lists, SORT_LISTS);
 __WORKAREA_MIC3D_DECLARE_STRUCT(sort_singles, SORT_SINGLES);
