@@ -14,13 +14,12 @@
 #include <cpu/registers.h>
 
 // TODO: Find a way to not depend on compile-time constants
-#include "mic3d/config.h"
-
 #include "internal.h"
+#include "mic3d/config.h"
 #include "render.h"
 #include "vdp1/cmdt.h"
 
-#define SCREEN_RATIO       FIX16(SCREEN_WIDTH / (float)SCREEN_HEIGHT)
+#define SCREEN_RATIO FIX16(SCREEN_WIDTH / (float)SCREEN_HEIGHT)
 
 #define SCREEN_CLIP_LEFT   (-SCREEN_WIDTH / 2)
 #define SCREEN_CLIP_RIGHT  ( SCREEN_WIDTH / 2)
@@ -55,20 +54,22 @@ static fix16_t _depth_center_calculate(const fix16_t *z_values);
 static bool _pipeline_backface_cull_test(void);
 
 static void _clip_flags_calculate(const int16_vec2_t *screen_point,
-  clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags);
+    clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags);
 static void _clip_flags_lrtb_calculate(const int16_vec2_t screen_point,
-  clip_flags_t *clip_flag);
+    clip_flags_t *clip_flag);
 
 static void _screen_points_swap(int16_vec2_t *screen_points, uint32_t i,
-  uint32_t j);
+    uint32_t j);
 
 static void _pipeline_polygon_orient(void);
 
 static void _render_single(const sort_single_t *single);
 
+static uint32_t _cmdts_count_get(void);
 static vdp1_cmdt_t *_cmdts_alloc(void);
 static void _cmdts_reset(void);
 static void _cmdt_process(vdp1_cmdt_t *cmdt);
+static void _cmdts_insert(vdp1_cmdt_t *cmdt, fix16_t depth_z);
 
 static perf_counter_t _transform_pc __unused;
 static perf_counter_t _sort_pc __unused;
@@ -144,8 +145,7 @@ render_perspective_set(angle_t fov_angle)
 {
     render_t * const render = __state.render;
 
-    render->view_distance =
-      math3d_view_distance_calc(SCREEN_WIDTH, fov_angle);
+    render->view_distance = math3d_view_distance_calc(SCREEN_WIDTH, fov_angle);
 }
 
 void
@@ -155,8 +155,8 @@ render_near_level_set(uint32_t level)
 
     render->near = render->view_distance;
 
-    const uint32_t clamped_level =
-      clamp(level + 1, NEAR_LEVEL_MIN, NEAR_LEVEL_MAX);
+    const uint32_t clamped_level = clamp(level + 1, NEAR_LEVEL_MIN,
+        NEAR_LEVEL_MAX);
 
     uint32_t near_value;
     near_value = render->near;
@@ -178,8 +178,10 @@ render_far_set(fix16_t far)
     /* TODO: Change this hard coded value */
     /* XXX: Is clamping to the near plane Z value correct? */
     render->far = fix16_clamp(far, render->near, FIX16(2048.0f));
-    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not compiled in */
-    render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1), render->far);
+    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not
+     * compiled in */
+    render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1),
+        render->far);
 }
 
 void
@@ -244,10 +246,14 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
     for (uint32_t i = 0; i < render->mesh->polygons_count; i++) {
         pipeline->polygon = polygons[i];
 
-        pipeline->screen_points[0] = screen_points[pipeline->polygon.indices.p0];
-        pipeline->screen_points[1] = screen_points[pipeline->polygon.indices.p1];
-        pipeline->screen_points[2] = screen_points[pipeline->polygon.indices.p2];
-        pipeline->screen_points[3] = screen_points[pipeline->polygon.indices.p3];
+        pipeline->screen_points[0] =
+            screen_points[pipeline->polygon.indices.p0];
+        pipeline->screen_points[1] =
+            screen_points[pipeline->polygon.indices.p1];
+        pipeline->screen_points[2] =
+            screen_points[pipeline->polygon.indices.p2];
+        pipeline->screen_points[3] =
+            screen_points[pipeline->polygon.indices.p3];
 
         if (pipeline->polygon.flags.plane_type != PLANE_TYPE_DOUBLE) {
             if ((_pipeline_backface_cull_test())) {
@@ -267,7 +273,8 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
             continue;
         }
 
-        _clip_flags_calculate(pipeline->screen_points, pipeline->clip_flags, &pipeline->and_flags, &pipeline->or_flags);
+        _clip_flags_calculate(pipeline->screen_points, pipeline->clip_flags,
+            &pipeline->and_flags, &pipeline->or_flags);
 
         /* Cull if the polygon is entirely off screen */
         if (pipeline->and_flags != CLIP_FLAGS_NONE) {
@@ -320,11 +327,29 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
 }
 
 void
-render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
+render_cmdt_nocheck_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
 {
     assert(cmdt != NULL);
 
-    render_t * const render = __state.render;
+    /* XXX: Magic number */
+    const vdp1_cmdt_command_t command = cmdt->cmd_ctrl & ~0x7FF0;
+
+    if (command >= VDP1_CMDT_USER_CLIP_COORD) {
+        return;
+    }
+
+    vdp1_cmdt_t * const to_cmdt = _cmdts_alloc();
+
+    /* Copy command table. Compiler will probably stick a memcpy() here */
+    *to_cmdt = *cmdt;
+
+    _cmdts_insert(to_cmdt, depth_z);
+}
+
+void
+render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
+{
+    assert(cmdt != NULL);
 
     /* XXX: Magic number */
     const vdp1_cmdt_command_t command = cmdt->cmd_ctrl & ~0x7FF0;
@@ -345,18 +370,12 @@ render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
         return;
     }
 
-    const fix16_t clamped_z = fix16_clamp(depth_z, render->near, render->far);
-    const int32_t scaled_z = fix16_int32_mul(clamped_z, render->sort_scale);
-
-    __sort_insert(scaled_z);
-
     vdp1_cmdt_t * const to_cmdt = _cmdts_alloc();
 
     /* Copy command table. Compiler will probably stick a memcpy() here */
     *to_cmdt = *cmdt;
 
-    /* Required */
-    vdp1_cmdt_link_type_set(to_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
+    _cmdts_insert(to_cmdt, depth_z);
 
     if (or_flags == CLIP_FLAGS_NONE) {
         /* If no clip flags are set, disable pre-clipping. This should help with
@@ -396,13 +415,24 @@ render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
 }
 
 void
+render_cmdts_reserve(uint32_t cmdt_count __unused)
+{
+}
+
+void
+render_cmdts_relinquish(void)
+{
+}
+
+void
 render_end(void)
 {
     render_t * const render = __state.render;
 
-    vdp1_cmdt_t * const subr_cmdt = (vdp1_cmdt_t *)VDP1_CMD_TABLE(ORDER_SUBR_INDEX, 0);
+    vdp1_cmdt_t * const subr_cmdt = (vdp1_cmdt_t *)
+        VDP1_CMD_TABLE(ORDER_SUBR_INDEX, 0);
 
-    const uint32_t cmdt_count = render->cmdts - render->cmdts_pool;
+    const uint32_t cmdt_count = _cmdts_count_get();
 
     if (cmdt_count == 0) {
         vdp1_cmdt_link_type_set(subr_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_NEXT);
@@ -430,10 +460,10 @@ render_end(void)
     __perf_counter_end(&_sort_pc);
     /* __perf_str(_sort_pc.ticks, (void *)lwram); */
 
-    vdp1_cmdt_t * const end_cmdt = render->sort_cmdt;
+    vdp1_cmdt_t * const last_cmdt = render->sort_cmdt;
 
     /* Set to return from subroutine */
-    vdp1_cmdt_link_type_set(end_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_RETURN);
+    vdp1_cmdt_link_type_set(last_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_RETURN);
 
     vdp1_sync_cmdt_put(render->cmdts_pool, cmdt_count, render->sort_link);
 
@@ -454,12 +484,10 @@ static void
 _vdp1_init(void)
 {
     static const int16_vec2_t system_clip_coord =
-      INT16_VEC2_INITIALIZER(SCREEN_WIDTH - 1,
-                             SCREEN_HEIGHT - 1);
+        INT16_VEC2_INITIALIZER(SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
     static const int16_vec2_t local_coord_center =
-      INT16_VEC2_INITIALIZER(SCREEN_WIDTH / 2,
-                             SCREEN_HEIGHT / 2);
+        INT16_VEC2_INITIALIZER(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     static const vdp1_cmdt_draw_mode_t polygon_draw_mode = {
         .pre_clipping_disable = true
@@ -498,15 +526,18 @@ _vdp1_init(void)
     vdp1_cmdt_t * const cmdts = (vdp1_cmdt_t *)VDP1_CMD_TABLE(0, 0);
 
     vdp1_cmdt_system_clip_coord_set(&cmdts[ORDER_SYSTEM_CLIP_COORDS_INDEX]);
-    vdp1_cmdt_vtx_system_clip_coord_set(&cmdts[ORDER_SYSTEM_CLIP_COORDS_INDEX], system_clip_coord);
+    vdp1_cmdt_vtx_system_clip_coord_set(&cmdts[ORDER_SYSTEM_CLIP_COORDS_INDEX],
+        system_clip_coord);
 
     vdp1_cmdt_polygon_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX]);
-    vdp1_cmdt_draw_mode_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX], polygon_draw_mode);
+    vdp1_cmdt_draw_mode_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX],
+        polygon_draw_mode);
     vdp1_cmdt_color_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX], RGB1555(0, 0, 0, 0));
     vdp1_cmdt_vtx_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX], polygon_points);
 
     vdp1_cmdt_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX]);
-    vdp1_cmdt_vtx_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX], local_coord_center);
+    vdp1_cmdt_vtx_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX],
+        local_coord_center);
 
     vdp1_cmdt_end_set(&cmdts[ORDER_DRAW_END_INDEX]);
 }
@@ -534,13 +565,16 @@ _perspective_transform(void)
     /* fix16_t * const depth_values = render->depth_values_pool; */
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
-        const fix16_t z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+        const fix16_t z = fix16_vec3_dot(m2, &points[i]) +
+            view_matrix->frow[2][3];
         const fix16_t clamped_z = fix16_max(z, render->near);
 
         cpu_divu_fix16_set(render->view_distance, clamped_z);
 
-        const fix16_t x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
-        const fix16_t y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
+        const fix16_t x = fix16_vec3_dot(m0, &points[i]) +
+            view_matrix->frow[0][3];
+        const fix16_t y = fix16_vec3_dot(m1, &points[i]) +
+            view_matrix->frow[1][3];
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
@@ -555,14 +589,14 @@ static fix16_t
 _depth_min_calculate(const fix16_t *z_values)
 {
     return fix16_min(fix16_min(z_values[0], z_values[1]),
-      fix16_min(z_values[2], z_values[3]));
+        fix16_min(z_values[2], z_values[3]));
 }
 
 static fix16_t
 _depth_max_calculate(const fix16_t *z_values)
 {
     return fix16_max(fix16_max(z_values[0], z_values[1]),
-      fix16_max(z_values[2], z_values[3]));
+        fix16_max(z_values[2], z_values[3]));
 }
 
 static fix16_t
@@ -572,7 +606,8 @@ _depth_center_calculate(const fix16_t *z_values)
 }
 
 static void
-_clip_flags_lrtb_calculate(const int16_vec2_t screen_point, clip_flags_t *clip_flag)
+_clip_flags_lrtb_calculate(const int16_vec2_t screen_point,
+    clip_flags_t *clip_flag)
 {
     *clip_flag  = (screen_point.x <   SCREEN_CLIP_LEFT) << CLIP_BIT_LEFT;
     *clip_flag |= (screen_point.x >  SCREEN_CLIP_RIGHT) << CLIP_BIT_RIGHT;
@@ -605,7 +640,7 @@ _pipeline_backface_cull_test(void)
 
 static void
 _clip_flags_calculate(const int16_vec2_t *screen_points,
-  clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags)
+    clip_flags_t *clip_flags, clip_flags_t *and_flags, clip_flags_t *or_flags)
 {
     _clip_flags_lrtb_calculate(screen_points[0], &clip_flags[0]);
     _clip_flags_lrtb_calculate(screen_points[1], &clip_flags[1]);
@@ -703,6 +738,14 @@ _render_single(const sort_single_t *single)
     render->sort_cmdt = &render->cmdts_pool[link];
 }
 
+static uint32_t
+_cmdts_count_get(void)
+{
+    render_t * const render = __state.render;
+
+    return (render->cmdts - render->cmdts_pool);
+}
+
 static vdp1_cmdt_t *
 _cmdts_alloc(void)
 {
@@ -736,7 +779,8 @@ _cmdt_process(vdp1_cmdt_t *cmdt)
 
     if (pipeline->polygon.flags.use_texture) {
         const texture_t * const textures = tlist_get();
-        const texture_t * const texture = &textures[pipeline->attribute.texture_slot];
+        const texture_t * const texture =
+            &textures[pipeline->attribute.texture_slot];
 
         cmdt->cmd_srca = texture->vram_index;
         cmdt->cmd_size = texture->size;
@@ -750,4 +794,18 @@ _cmdt_process(vdp1_cmdt_t *cmdt)
     cmdt->cmd_vertices[3] = pipeline->screen_points[3];
 
     cmdt->cmd_grda = pipeline->attribute.shading_slot;
+}
+
+static void
+_cmdts_insert(vdp1_cmdt_t *cmdt, fix16_t depth_z)
+{
+    render_t * const render = __state.render;
+
+    const fix16_t clamped_z = fix16_clamp(depth_z, render->near, render->far);
+    const int32_t scaled_z = fix16_int32_mul(clamped_z, render->sort_scale);
+
+    __sort_insert(scaled_z);
+
+    /* Required */
+    vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
 }

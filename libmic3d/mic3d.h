@@ -41,17 +41,21 @@ extern void render_far_set(fix16_t far);
 extern void render_start(void);
 extern void render_end(void);
 extern void render_mesh_xform(const mesh_t *mesh,
-    const fix16_mat43_t *world_matrix);
+  const fix16_mat43_t *world_matrix);
 extern void render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z);
+extern void render_cmdt_nocheck_insert(const vdp1_cmdt_t *cmdt,
+  fix16_t depth_z);
+extern void render_cmdts_reserve(uint32_t cmdt_count);
+extern void render_cmdts_relinquish(void);
 
 extern void render_point_xform(const fix16_mat43_t *world_matrix,
-    const fix16_vec3_t *point, xform_t *xform);
+  const fix16_vec3_t *point, xform_t *xform);
 
 extern void tlist_set(const texture_t *textures, uint16_t count);
 extern const texture_t *tlist_get(void);
 
 extern void light_gst_set(vdp1_gouraud_table_t *gouraud_tables, uint32_t count,
-    vdp1_vram_t vram_base);
+  vdp1_vram_t vram_base);
 
 extern void gst_set(vdp1_vram_t vram_base);
 extern void gst_unset(void);

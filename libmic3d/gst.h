@@ -13,7 +13,7 @@
 #include <cpu/dmac.h>
 #include <scu/dma.h>
 
-#include <mic3d/types.h>
+#include "mic3d/types.h"
 
 #include "state.h"
 

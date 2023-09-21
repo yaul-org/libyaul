@@ -10,7 +10,7 @@
 
 #include <gamemath/fix16.h>
 
-#include <mic3d/types.h>
+#include "mic3d/types.h"
 
 #include "state.h"
 
