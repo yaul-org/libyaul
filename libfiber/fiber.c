@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <gamemath.h>
+#include <gamemath/defs.h>
+#include <gamemath/uint32.h>
 
 #include <cpu/intc.h>
 #include <cpu/registers.h>
