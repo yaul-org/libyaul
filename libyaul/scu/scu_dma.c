@@ -180,8 +180,6 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
     if (start_factor != SCU_DMA_START_FACTOR_ENABLE) {
         scu_ioregs->levels[level].dnen = 0x00000100;
     }
-
-    MEMORY_WRITE(32, LWRAM(LWRAM_SIZE - 4), (uintptr_t)&_level_state);
 }
 
 void

@@ -488,10 +488,6 @@ vdp1_sync_render(void)
     }
 
     while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
-        (void)memcpy((void *)LWRAM(0x00), &_vdp1_dma_handle, sizeof(scu_dma_handle_t));
-        (void)memcpy((void *)LWRAM(0x20), &_vdp1_stride_dma_handle, sizeof(scu_dma_handle_t));
-        (void)memcpy((void *)LWRAM(0x40), &_vdp1_orderlist_dma_handle, sizeof(scu_dma_handle_t));
-        (void)memcpy((void *)LWRAM(0x60), &_dma_handle, sizeof(scu_dma_handle_t));
     }
 
     _vdp1_sync_render_call();
