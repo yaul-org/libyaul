@@ -28,6 +28,8 @@
 
 #include <stdint.h>
 
+#include <gamemath/defs.h>
+
 __BEGIN_DECLS
 
 /// @defgroup MATH_FIX16 Fix16
@@ -279,7 +281,7 @@ fix16_ceil(const fix16_t value)
 static inline fix16_t __always_inline
 fix16_min(const fix16_t x, const fix16_t y)
 {
-    return ((x < y) ? x : y);
+    return min(x, y);
 }
 
 /// @brief Not yet documented.
@@ -291,7 +293,7 @@ fix16_min(const fix16_t x, const fix16_t y)
 static inline fix16_t __always_inline
 fix16_max(const fix16_t x, const fix16_t y)
 {
-    return ((x > y) ? x : y);
+    return max(x, y);
 }
 
 /// @brief Not yet documented.
