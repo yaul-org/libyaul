@@ -71,6 +71,8 @@ static void _cmdts_reset(void);
 static void _cmdt_process(vdp1_cmdt_t *cmdt);
 static void _cmdts_insert(vdp1_cmdt_t *cmdt);
 
+static void _cpu_divu_ovfi_handler(void);
+
 static perf_counter_t _transform_pc __unused;
 static perf_counter_t _sort_pc __unused;
 
@@ -99,11 +101,12 @@ __render_init(void)
     fix16_mat43_identity(render->view_matrix);
     fix16_mat43_identity(render->camera_matrix);
 
+    cpu_divu_ovfi_set(_cpu_divu_ovfi_handler);
+
     render_perspective_set(DEG2ANGLE(90.0f));
     render_orthographic_set(FIX16(10.0f));
     render_near_level_set(7);
     render_far_level_set(0);
-    render_sort_depth_set(NULL, 512);
     camera_type_set(CAMERA_TYPE_PERSPECTIVE);
 
     _render_reset();
@@ -272,9 +275,6 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
     assert(mesh != NULL);
     assert(world_matrix != NULL);
 
-    const uint32_t sr_mask = cpu_intc_mask_get();
-    cpu_intc_mask_set(15);
-
     render_t * const render = __state.render;
     pipeline_t * const pipeline = render->pipeline;
 
@@ -374,8 +374,6 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
 
         _cmdt_process(cmdt);
     }
-
-    cpu_intc_mask_set(sr_mask);
 }
 
 void
@@ -714,6 +712,7 @@ _orthographic_transform(void)
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
         fix16_vec3_t p;
+
         p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
         p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
         p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
@@ -934,4 +933,10 @@ _cmdts_insert(vdp1_cmdt_t *cmdt)
 {
     /* Required */
     vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
+}
+
+static void
+_cpu_divu_ovfi_handler(void)
+{
+    assert(false);
 }
