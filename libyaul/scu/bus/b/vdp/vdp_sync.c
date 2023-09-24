@@ -5,6 +5,8 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <sys/cdefs.h>
+
 #include <string.h>
 
 #include <cpu/cache.h>
@@ -273,7 +275,7 @@ vdp_dma_count_get(void)
 void
 vdp1_sync(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     if ((_state.flags & SYNC_FLAG_VDP1_SYNC) == SYNC_FLAG_VDP1_SYNC) {
         return;
@@ -290,7 +292,7 @@ vdp1_sync(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 bool
@@ -309,7 +311,7 @@ vdp1_sync_busy(void)
 void
 vdp1_sync_wait(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     const uint32_t sr_mask = cpu_intc_mask_get();
     cpu_intc_mask_set(0);
@@ -319,7 +321,7 @@ vdp1_sync_wait(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 void
@@ -381,6 +383,14 @@ vdp1_sync_mode_set(vdp_sync_mode_t mode)
 }
 
 void
+vdp1_sync_force_put(void)
+{
+    /* Fake a put */
+    _vdp1_sync_put();
+    _vdp1_dma_call();
+}
+
+void
 vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count, uint16_t index)
 {
     assert(cmdts != NULL);
@@ -391,10 +401,9 @@ vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count, uint16_t index)
 
     _vdp1_sync_put();
 
-    scu_dma_handle_t * const dma_handle =
-      &_vdp1_dma_handle;
+    scu_dma_handle_t * const dma_handle = &_vdp1_dma_handle;
 
-    dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)cmdts;
+    dma_handle->dnr = CPU_CACHE_THROUGH | (uintptr_t)cmdts;
     dma_handle->dnw = VDP1_VRAM(index * sizeof(vdp1_cmdt_t));
     dma_handle->dnc = count * sizeof(vdp1_cmdt_t);
 
@@ -420,7 +429,7 @@ vdp1_sync_cmdt_orderlist_put(const vdp1_cmdt_orderlist_t *cmdt_orderlist)
     scu_dma_handle_t * const dma_handle =
       &_vdp1_orderlist_dma_handle;
 
-    dma_handle->dnw = CPU_CACHE_THROUGH | (uint32_t)cmdt_orderlist;
+    dma_handle->dnw = CPU_CACHE_THROUGH | (uintptr_t)cmdt_orderlist;
 
     _vdp1_dma_transfer(dma_handle);
 }
@@ -440,7 +449,7 @@ vdp1_sync_cmdt_stride_put(const void *buffer, uint16_t count,
     scu_dma_handle_t * const dma_handle =
       &_vdp1_stride_dma_handle;
 
-    dma_handle->dnr = CPU_CACHE_THROUGH | (uint32_t)buffer;
+    dma_handle->dnr = CPU_CACHE_THROUGH | (uintptr_t)buffer;
     dma_handle->dnw = VDP1_CMD_TABLE(index, cmdt_index);
     dma_handle->dnc = count * sizeof(uint16_t);
 
@@ -466,7 +475,7 @@ vdp1_sync_put_wait(void)
 void
 vdp1_sync_render(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     if ((_state.vdp1.flags & VDP1_FLAG_REQUEST_COMMIT_LIST) == VDP1_FLAG_REQUEST_COMMIT_LIST) {
         return;
@@ -488,7 +497,7 @@ vdp1_sync_render(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 void
@@ -512,7 +521,7 @@ vdp1_sync_transfer_over_set(callback_handler_t callback_handler, void *work)
 void
 vdp2_sync(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     if ((_state.flags & (SYNC_FLAG_VDP2_SYNC)) == SYNC_FLAG_VDP2_SYNC) {
         return;
@@ -537,13 +546,13 @@ vdp2_sync(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 void
 vdp2_sync_wait(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     const uint32_t sr_mask = cpu_intc_mask_get();
     cpu_intc_mask_set(0);
@@ -553,7 +562,7 @@ vdp2_sync_wait(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 callback_id_t
@@ -691,7 +700,7 @@ _vdp1_transfer_over_process(void)
 static inline void __always_inline
 _vdp1_sync_put(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     /* Wait when a previous list is still transferring, or when the VDP1 is
      * rendering. We don't have to wait for request for frame buffer change
@@ -718,33 +727,33 @@ _vdp1_sync_put(void)
 
     cpu_intc_mask_set(sr_mask);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static inline void __always_inline
 _vdp1_dma_call(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     _state.vdp1.current_mode->dma();
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static inline void __always_inline
 _vdp1_sync_render_call(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     _state.vdp1.current_mode->sync_render();
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static inline void __always_inline
 _vdp1_sprite_end_call(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     /* Prevent the VBLANK-OUT interrupt from firing in case the callback
      * from the user runs long enough to be interrupted by the VBLANK-OUT
@@ -755,17 +764,17 @@ _vdp1_sprite_end_call(void)
 
     _state.flags |= SYNC_FLAG_VDP1_VBLANK_OUT;
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static inline void __always_inline
 _vdp1_vblank_in_call(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     _state.vdp1.current_mode->vblank_in();
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static inline void __always_inline
@@ -1100,7 +1109,7 @@ _vdp2_init(void)
 static void
 _vdp2_sync_commit(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     uint8_t state_vdp2_flags;
     state_vdp2_flags = _state.vdp2.flags;
@@ -1116,13 +1125,13 @@ _vdp2_sync_commit(void)
 
     __vdp2_commit(2);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 void
 _vdp2_sync_commit_wait(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     uint8_t state_vdp2_flags;
     state_vdp2_flags = _state.vdp2.flags;
@@ -1138,7 +1147,7 @@ _vdp2_sync_commit_wait(void)
 
     _state.vdp2.flags = state_vdp2_flags;
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static void
@@ -1161,7 +1170,7 @@ _vdp1_dma_level_end_handler(void *work __unused)
 static void
 _vblank_in_handler(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     DEBUG_PRINTF("_state.vdp1.flags: 0x%02X\n", _state.vdp1.flags);
 
@@ -1187,13 +1196,13 @@ _vblank_in_handler(void)
 
     _state.flags = state_flags;
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
 
 static void
 _vblank_out_handler(void)
 {
-    DEBUG_PRINTF("%s: Enter L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Enter L%i\n", __function_name, __LINE__);
 
     /* VBLANK-OUT interrupt runs at scanline #511 */
 
@@ -1203,5 +1212,5 @@ _vblank_out_handler(void)
 
     callback_call(&_vblank_out_callback);
 
-    DEBUG_PRINTF("%s: Exit L%i\n", __FUNCTION__, __LINE__);
+    DEBUG_PRINTF("%s: Exit L%i\n", __function_name, __LINE__);
 }
