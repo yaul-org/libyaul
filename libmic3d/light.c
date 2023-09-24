@@ -24,6 +24,8 @@ __light_init(void)
     workarea_mic3d_t * const workarea = __state.workarea;
     light_t * const light = __state.light;
 
+    light->colors_pool = (void *)workarea->colors;
+
     fix16_mat33_t * const light_matrices = (void *)workarea->light_matrices;
 
     light->inv_world_matrix = &light_matrices[MATRIX_INDEX_INVERSE_WORLD];
@@ -115,11 +117,17 @@ __light_transform(light_polygon_processor_t *processor)
 
     fix16_mat33_t * const inv_world_matrix = light->inv_world_matrix;
     fix16_mat33_t * const world_light_matrix = light->world_light_matrix;
+    fix16_mat33_t * const intensity_matrix = light->intensity_matrix;
+    fix16_mat33_t * const light_matrix = light->light_matrix;
+    fix16_mat33_t * const color_matrix = light->color_matrix;
 
-    fix16_mat33_mul(light->light_matrix, inv_world_matrix, world_light_matrix);
-    fix16_mat33_mul(light->color_matrix, world_light_matrix, light->intensity_matrix);
+    fix16_mat33_mul(light_matrix, inv_world_matrix, world_light_matrix);
+    fix16_mat33_mul(color_matrix, world_light_matrix, intensity_matrix);
 
     const mesh_t * const mesh = render->mesh;
+
+    rgb1555_t *colors_ptr;
+    colors_ptr = light->colors_pool;
 
     for (uint32_t i = 0; i < mesh->points_count; i++) {
         const fix16_vec3_t * const vertex_normal = &mesh->normals[i];
@@ -132,23 +140,24 @@ __light_transform(light_polygon_processor_t *processor)
 
         fix16_t intensity;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix->row[0], vertex_normal);
+        intensity = fix16_vec3_dot(&intensity_matrix->row[0], vertex_normal);
         color |= ((uint32_t)intensity >> 16) & 0x001F;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix->row[1], vertex_normal);
+        intensity = fix16_vec3_dot(&intensity_matrix->row[1], vertex_normal);
         color |= ((uint32_t)intensity >> 11) & 0x03E0;
 
-        intensity = fix16_vec3_dot(&light->intensity_matrix->row[2], vertex_normal);
+        intensity = fix16_vec3_dot(&intensity_matrix->row[2], vertex_normal);
         color |= ((uint32_t)intensity >>  6) & 0x7C00;
 
-        /* XXX: Change this */
-        render->colors_pool[i].raw = color;
+        colors_ptr->raw = color;
+        colors_ptr++;
     }
 }
 
 static void
 _polygon_process(void)
 {
+    light_t * const light = __state.light;
     render_t * const render = __state.render;
     pipeline_t * const pipeline = render->pipeline;
 
@@ -158,10 +167,12 @@ _polygon_process(void)
     pipeline->attribute.shading_slot =
       __light_shading_slot_calculate(gst_slot);
 
-    gst->colors[0] = render->colors_pool[pipeline->polygon.indices.p[0]];
-    gst->colors[1] = render->colors_pool[pipeline->polygon.indices.p[1]];
-    gst->colors[2] = render->colors_pool[pipeline->polygon.indices.p[2]];
-    gst->colors[3] = render->colors_pool[pipeline->polygon.indices.p[3]];
+    const rgb1555_t * const colors = light->colors_pool;
+
+    gst->colors[0] = colors[pipeline->polygon.indices.p[0]];
+    gst->colors[1] = colors[pipeline->polygon.indices.p[1]];
+    gst->colors[2] = colors[pipeline->polygon.indices.p[2]];
+    gst->colors[3] = colors[pipeline->polygon.indices.p[3]];
 }
 
 static void

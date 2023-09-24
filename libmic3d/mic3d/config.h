@@ -13,10 +13,6 @@
 #define CONFIG_MIC3D_CMDT_COUNT   2048
 #endif /* !CONFIG_MIC3D_CMDT_COUNT */
 
-#ifndef CONFIG_MIC3D_SORT_DEPTH
-#define CONFIG_MIC3D_SORT_DEPTH   512
-#endif /* !CONFIG_MIC3D_SORT_DEPTH */
-
 /* Maximum number of points per render call */
 #ifndef CONFIG_MIC3D_POINTS_COUNT
 #define CONFIG_MIC3D_POINTS_COUNT (CONFIG_MIC3D_CMDT_COUNT / 4)
