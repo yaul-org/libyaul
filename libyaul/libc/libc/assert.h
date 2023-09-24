@@ -22,7 +22,7 @@ __BEGIN_DECLS
 #if !defined(__cplusplus)
 #ifndef static_assert
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#define static_assert _Static_assert
+#define static_assert(e) _Static_assert(e, "Failed on " __FILE__ ": L" __XSTRING(__LINE__))
 #else
 #define static_assert(e)                                                       \
     typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                        \
