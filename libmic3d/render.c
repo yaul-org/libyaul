@@ -13,43 +13,45 @@
 #include <cpu/intc.h>
 #include <cpu/registers.h>
 
-// TODO: Find a way to not depend on compile-time constants
+#include <gamemath/fix16.h>
+
 #include "internal.h"
-#include "mic3d/config.h"
-#include "render.h"
 #include "vdp1/cmdt.h"
 
-#define SCREEN_RATIO FIX16(SCREEN_WIDTH / (float)SCREEN_HEIGHT)
+/* TODO: Remove constant */
+#define SCREEN_RATIO (SCREEN_WIDTH / (float)SCREEN_HEIGHT)
 
-#define SCREEN_CLIP_LEFT   (-SCREEN_WIDTH / 2)
-#define SCREEN_CLIP_RIGHT  ( SCREEN_WIDTH / 2)
+#define SCREEN_CLIP_LEFT   ( -SCREEN_WIDTH / 2)
+#define SCREEN_CLIP_RIGHT  (  SCREEN_WIDTH / 2)
 #define SCREEN_CLIP_TOP    (-SCREEN_HEIGHT / 2)
 #define SCREEN_CLIP_BOTTOM ( SCREEN_HEIGHT / 2)
 
 #define NEAR_LEVEL_MIN 1U
 #define NEAR_LEVEL_MAX 8U
+#define FAR_LEVEL_MIN  1U
+#define FAR_LEVEL_MAX  3U
 
 #define ORDER_SYSTEM_CLIP_COORDS_INDEX 0
-#define ORDER_SUBR_INDEX               1
-#define ORDER_CLEAR_POLYGON_INDEX      1
-#define ORDER_LOCAL_COORDS_INDEX       2
+#define ORDER_LOCAL_COORDS_INDEX       1
+#define ORDER_CLEAR_POLYGON_INDEX      2
+#define ORDER_SUBR_INDEX               2
 #define ORDER_DRAW_END_INDEX           3
 #define ORDER_INDEX                    4
 
-#define MATRIX_INDEX_CAMERA         0
-#define MATRIX_INDEX_INVERSE_CAMERA 1
-#define MATRIX_INDEX_VIEW           2
-#define MATRIX_INDEX_IDENTITY       3
+#define MATRIX_INDEX_CAMERA 0
+#define MATRIX_INDEX_VIEW   1
 
 static void _render_reset(void);
 
 static void _vdp1_init(void);
 
+static void _orthographic_transform(void);
 static void _perspective_transform(void);
 
-static fix16_t _depth_min_calculate(const fix16_t *z_values);
-static fix16_t _depth_max_calculate(const fix16_t *z_values);
-static fix16_t _depth_center_calculate(const fix16_t *z_values);
+static inline int32_t _depth_normalize(fix16_t z);
+static int16_t _depth_min_calculate(const int16_t *z_values);
+static int16_t _depth_max_calculate(const int16_t *z_values);
+static int16_t _depth_center_calculate(const int16_t *z_values);
 
 static bool _pipeline_backface_cull_test(void);
 
@@ -63,17 +65,14 @@ static void _screen_points_swap(int16_vec2_t *screen_points, uint32_t i,
 
 static void _pipeline_polygon_orient(void);
 
-static void _render_single(const sort_single_t *single);
-
 static uint32_t _cmdts_count_get(void);
 static vdp1_cmdt_t *_cmdts_alloc(void);
 static void _cmdts_reset(void);
 static void _cmdt_process(vdp1_cmdt_t *cmdt);
-static void _cmdts_insert(vdp1_cmdt_t *cmdt, fix16_t depth_z);
+static void _cmdts_insert(vdp1_cmdt_t *cmdt);
 
 static perf_counter_t _transform_pc __unused;
 static perf_counter_t _sort_pc __unused;
-/* static volatile uint32_t *lwram = (volatile uint32_t *)LWRAM(0x00000000); */
 
 void
 __render_init(void)
@@ -92,21 +91,20 @@ __render_init(void)
     fix16_mat43_t * const render_matrices = (void *)workarea->render_matrices;
 
     render->camera_matrix = &render_matrices[MATRIX_INDEX_CAMERA];
-    render->inv_camera_matrix = &render_matrices[MATRIX_INDEX_INVERSE_CAMERA];
     render->view_matrix = &render_matrices[MATRIX_INDEX_VIEW];
-    render->identity_matrix = &render_matrices[MATRIX_INDEX_IDENTITY];
     render->pipeline = (void *)workarea->work;
 
     render->render_flags = RENDER_FLAGS_NONE;
 
-    fix16_mat43_identity(render->identity_matrix);
     fix16_mat43_identity(render->view_matrix);
     fix16_mat43_identity(render->camera_matrix);
-    fix16_mat43_identity(render->inv_camera_matrix);
 
     render_perspective_set(DEG2ANGLE(90.0f));
+    render_orthographic_set(FIX16(10.0f));
     render_near_level_set(7);
-    render_far_set(FIX16(1024));
+    render_far_level_set(0);
+    render_sort_depth_set(NULL, 512);
+    camera_type_set(CAMERA_TYPE_PERSPECTIVE);
 
     _render_reset();
 
@@ -149,17 +147,23 @@ render_perspective_set(angle_t fov_angle)
 }
 
 void
-render_near_level_set(uint32_t level)
+render_orthographic_set(fix16_t scale)
 {
     render_t * const render = __state.render;
 
-    render->near = render->view_distance;
+    render->ortho_size = fix16_div(FIX16(SCREEN_WIDTH * SCREEN_RATIO), scale);
+}
+
+void
+render_near_level_set(uint32_t level)
+{
+    render_t * const render = __state.render;
 
     const uint32_t clamped_level = clamp(level + 1, NEAR_LEVEL_MIN,
         NEAR_LEVEL_MAX);
 
     uint32_t near_value;
-    near_value = render->near;
+    near_value = render->view_distance;
 
     for (int32_t i = clamped_level; i > 0; i--) {
         /* Prevent GCC from doing an arithmetic shift (results in a
@@ -171,17 +175,65 @@ render_near_level_set(uint32_t level)
 }
 
 void
-render_far_set(fix16_t far)
+render_far_level_set(uint32_t level)
 {
+    /*
+     * 0: Origin
+     * V: View distance from: 0.5*(screen_width-1)*tan(0.5*hfov)
+     *
+     * Near values via levels:
+     *  a: V/(1<<4)
+     *  b: V/(1<<3)
+     *  c: V/(1<<2)
+     *  d: V/(1<<1)
+     *
+     * Far values via levels:
+     *  f: V*(1<<1)
+     *  g: V*(1<<2)
+     *  h: V*(1<<3)
+     *
+     *  +------------------------------------------------------------------------> -Z
+     *  ||| |  |   |     |                    |            |                  |
+     *  ||| |  |   |     |                    |            |                  |
+     *  0 a b  c   d     V                    f            g                  h
+     */
+
     render_t * const render = __state.render;
 
-    /* TODO: Change this hard coded value */
-    /* XXX: Is clamping to the near plane Z value correct? */
-    render->far = fix16_clamp(far, render->near, FIX16(2048.0f));
-    /* TODO: Change this so that the value CONFIG_MIC3D_SORT_DEPTH is not
-     * compiled in */
-    render->sort_scale = fix16_div(FIX16(CONFIG_MIC3D_SORT_DEPTH - 1),
-        render->far);
+    const uint32_t clamped_level =
+        clamp(level, FAR_LEVEL_MIN - 1, FAR_LEVEL_MAX);
+
+    uint32_t far_value;
+    far_value = render->view_distance;
+
+    for (int32_t i = clamped_level; i > 0; i--) {
+        /* Prevent GCC from doing an arithmetic shift (results in a function
+         * call) */
+        far_value <<= 1;
+    }
+
+    render->far = far_value;
+}
+
+void
+render_sort_depth_set(sort_list_t *sort_list_buffer, uint16_t count)
+{
+    assert(sort_list_buffer != NULL);
+    assert((count & (count - 1)) == 0);
+
+    render_t * const render = __state.render;
+    sort_t * const sort = __state.sort;
+
+    sort->sort_lists_pool = sort_list_buffer;
+
+    /* To normalize Z [0,1]:            a=-1/(f-n)    The - is to negate the Z-axis
+     *                                  b=a*n
+     *                       normalized_z=(a*z)+b
+     *
+     * We also at the same time need to normalize to the sort scale */
+    render->sort_scale = fix16_int32_from(count - 1);
+    render->depth_scale = fix16_div(FIX16(-1.0f), render->far - render->near);
+    render->depth_offset = fix16_mul(render->depth_scale, render->near);
 }
 
 void
@@ -194,11 +246,10 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
 
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
     fix16_mat43_t view_matrix;
-
-    fix16_mat43_mul(inv_camera_matrix, world_matrix, &view_matrix);
+    fix16_mat43_mul(world_matrix, camera_matrix, &view_matrix);
 
     const xform_config_t xform_config = {
         .near          = render->near,
@@ -213,7 +264,6 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
 void
 render_start(void)
 {
-    __camera_matrix_invert();
 }
 
 void
@@ -235,11 +285,15 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
 
     __perf_counter_start(&_transform_pc);
 
-    _perspective_transform();
+    if (render->camera_type == CAMERA_TYPE_PERSPECTIVE) {
+        _perspective_transform();
+    } else if (render->camera_type == CAMERA_TYPE_ORTHOGRAPHIC) {
+        _orthographic_transform();
+    }
 
     __light_transform(&light_polygon_processor);
 
-    fix16_t * const z_values = render->z_values_pool;
+    int16_t * const z_values = render->z_values_pool;
     int16_vec2_t * const screen_points = render->screen_points_pool;
     const polygon_t * const polygons = render->mesh->polygons;
 
@@ -266,10 +320,16 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
         pipeline->z_values[2] = z_values[pipeline->polygon.indices.p2];
         pipeline->z_values[3] = z_values[pipeline->polygon.indices.p3];
 
-        const fix16_t min_depth_z = _depth_min_calculate(pipeline->z_values);
+        const int16_t min_depth_z = _depth_min_calculate(pipeline->z_values);
 
         /* Cull polygons intersecting with the near plane */
-        if ((min_depth_z < render->near)) {
+        if (min_depth_z < 0) {
+            continue;
+        }
+
+        const int16_t max_depth_z = _depth_max_calculate(pipeline->z_values);
+
+        if (max_depth_z > render->sort_scale) {
             continue;
         }
 
@@ -281,7 +341,7 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
             continue;
         }
 
-        fix16_t depth_z;
+        int32_t depth_z;
 
         switch (pipeline->polygon.flags.sort_type) {
         default:
@@ -292,13 +352,11 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
             depth_z = min_depth_z;
             break;
         case SORT_TYPE_MAX:
-            depth_z = _depth_max_calculate(pipeline->z_values);
+            depth_z = max_depth_z;
             break;
         }
 
-        const int32_t scaled_z = fix16_int32_mul(depth_z, render->sort_scale);
-
-        __sort_insert(scaled_z);
+        __sort_insert(depth_z);
 
         pipeline->attribute = render->mesh->attributes[i];
 
@@ -317,12 +375,6 @@ render_mesh_xform(const mesh_t *mesh, const fix16_mat43_t *world_matrix)
         _cmdt_process(cmdt);
     }
 
-    /* __perf_counter_end(&_transform_pc); */
-    /* *lwram = _transform_pc.ticks; */
-    /* lwram++; */
-    /* __perf_str(_transform_pc.ticks, (void *)lwram); */
-    /* lwram += 3; */
-
     cpu_intc_mask_set(sr_mask);
 }
 
@@ -331,10 +383,21 @@ render_cmdt_nocheck_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
 {
     assert(cmdt != NULL);
 
-    /* XXX: Magic number */
-    const vdp1_cmdt_command_t command = cmdt->cmd_ctrl & ~0x7FF0;
+    const vdp1_cmdt_command_t command = vdp1_cmdt_command_get(cmdt);
 
     if (command >= VDP1_CMDT_USER_CLIP_COORD) {
+        return;
+    }
+
+    render_t * const render = __state.render;
+
+    const int32_t normalized_z = _depth_normalize(depth_z);
+
+    if (normalized_z < 0) {
+        return;
+    }
+
+    if (normalized_z > render->sort_scale) {
         return;
     }
 
@@ -343,7 +406,8 @@ render_cmdt_nocheck_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
     /* Copy command table. Compiler will probably stick a memcpy() here */
     *to_cmdt = *cmdt;
 
-    _cmdts_insert(to_cmdt, depth_z);
+    _cmdts_insert(to_cmdt);
+    __sort_insert(normalized_z);
 }
 
 void
@@ -351,10 +415,21 @@ render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
 {
     assert(cmdt != NULL);
 
-    /* XXX: Magic number */
-    const vdp1_cmdt_command_t command = cmdt->cmd_ctrl & ~0x7FF0;
+    const vdp1_cmdt_command_t command = vdp1_cmdt_command_get(cmdt);
 
     if (command >= VDP1_CMDT_USER_CLIP_COORD) {
+        return;
+    }
+
+    render_t * const render = __state.render;
+
+    const int32_t normalized_z = _depth_normalize(depth_z);
+
+    if (normalized_z < 0) {
+        return;
+    }
+
+    if (normalized_z > render->sort_scale) {
         return;
     }
 
@@ -375,7 +450,7 @@ render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
     /* Copy command table. Compiler will probably stick a memcpy() here */
     *to_cmdt = *cmdt;
 
-    _cmdts_insert(to_cmdt, depth_z);
+    _cmdts_insert(to_cmdt);
 
     if (or_flags == CLIP_FLAGS_NONE) {
         /* If no clip flags are set, disable pre-clipping. This should help with
@@ -412,6 +487,8 @@ render_cmdt_insert(const vdp1_cmdt_t *cmdt, fix16_t depth_z)
             to_cmdt->cmd_ctrl ^= VDP1_CMDT_CHAR_FLIP_V;
         }
     }
+
+    __sort_insert(normalized_z);
 }
 
 void
@@ -437,14 +514,17 @@ render_end(void)
     if (cmdt_count == 0) {
         vdp1_cmdt_link_type_set(subr_cmdt, VDP1_CMDT_LINK_TYPE_JUMP_NEXT);
 
+        /* Force a render to invoke a put callback */
+        vdp1_sync_force_put();
+
         return;
     }
 
     render->sort_cmdt = subr_cmdt;
     render->sort_link = ORDER_INDEX;
 
-    /* Set as a subroutine call. If RENDER_FLAGS_NO_CLEAR is set, skip the
-     * clear polygon (ORDER_SUBR_INDEX), but start the call */
+    /* Set as a subroutine call. If RENDER_FLAGS_NO_CLEAR is set, skip the clear
+     * polygon (ORDER_SUBR_INDEX), but start the call */
     if (RENDER_FLAG_TEST(NO_CLEAR)) {
         vdp1_cmdt_link_type_set(subr_cmdt, VDP1_CMDT_LINK_TYPE_SKIP_CALL);
 
@@ -456,7 +536,7 @@ render_end(void)
     }
 
     __perf_counter_start(&_sort_pc);
-    __sort_iterate(_render_single);
+    __sort_iterate();
     __perf_counter_end(&_sort_pc);
     /* __perf_str(_sort_pc.ticks, (void *)lwram); */
 
@@ -470,7 +550,34 @@ render_end(void)
     __light_gst_put();
 
     _render_reset();
-    /* lwram = (volatile uint32_t *)LWRAM(0x00000000); */
+}
+
+void
+render_debug_log(char *buffer __unused, size_t len __unused)
+{
+#if CONFIG_MIC3D_LOGGING == 1
+/* TODO: Implement */
+#endif
+}
+
+void
+__render_single(const sort_single_t *single)
+{
+    render_t * const render = __state.render;
+    sort_t * const sort = __state.sort;
+
+    /* We can calculate the index (link) just from the element index of the
+     * single in the single pool because we always allocate command tables and
+     * singles linearly, from their respective pools.
+     *
+     * This implementation will be an issue should we implement the ability for
+     * users to insert their command tables into the sort */
+    const vdp1_link_t link = single - (sort->singles_pool + 1);
+
+    vdp1_cmdt_link_set(render->sort_cmdt, link + render->sort_link);
+
+    /* Point to the next command table */
+    render->sort_cmdt = &render->cmdts_pool[link];
 }
 
 static void
@@ -529,15 +636,15 @@ _vdp1_init(void)
     vdp1_cmdt_vtx_system_clip_coord_set(&cmdts[ORDER_SYSTEM_CLIP_COORDS_INDEX],
         system_clip_coord);
 
+    vdp1_cmdt_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX]);
+    vdp1_cmdt_vtx_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX],
+        local_coord_center);
+
     vdp1_cmdt_polygon_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX]);
     vdp1_cmdt_draw_mode_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX],
         polygon_draw_mode);
     vdp1_cmdt_color_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX], RGB1555(0, 0, 0, 0));
     vdp1_cmdt_vtx_set(&cmdts[ORDER_CLEAR_POLYGON_INDEX], polygon_points);
-
-    vdp1_cmdt_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX]);
-    vdp1_cmdt_vtx_local_coord_set(&cmdts[ORDER_LOCAL_COORDS_INDEX],
-        local_coord_center);
 
     vdp1_cmdt_end_set(&cmdts[ORDER_DRAW_END_INDEX]);
 }
@@ -549,11 +656,11 @@ _perspective_transform(void)
 
     const fix16_mat43_t * const world_matrix = render->world_matrix;
     fix16_mat43_t * const view_matrix = render->view_matrix;
-    fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
     cpu_cache_purge();
 
-    fix16_mat43_mul(inv_camera_matrix, world_matrix, view_matrix);
+    fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
 
     const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
     const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
@@ -561,46 +668,92 @@ _perspective_transform(void)
 
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
-    fix16_t * const z_values = render->z_values_pool;
+    int16_t * const z_values = render->z_values_pool;
     /* fix16_t * const depth_values = render->depth_values_pool; */
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
-        const fix16_t z = fix16_vec3_dot(m2, &points[i]) +
-            view_matrix->frow[2][3];
-        const fix16_t clamped_z = fix16_max(z, render->near);
+        fix16_vec3_t p;
 
-        cpu_divu_fix16_set(render->view_distance, clamped_z);
+        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
 
-        const fix16_t x = fix16_vec3_dot(m0, &points[i]) +
-            view_matrix->frow[0][3];
-        const fix16_t y = fix16_vec3_dot(m1, &points[i]) +
-            view_matrix->frow[1][3];
+        cpu_divu_fix16_set(render->view_distance, p.z);
+
+        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
+        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
-        screen_points[i].x = fix16_int32_mul(depth_value, x);
-        screen_points[i].y = fix16_int32_mul(depth_value, y);
-        z_values[i] = z;
+        screen_points[i].x = fix16_int32_mul(depth_value, p.x);
+        screen_points[i].y = fix16_int32_mul(depth_value, p.y);
+        z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
     }
 }
 
-static fix16_t
-_depth_min_calculate(const fix16_t *z_values)
+static void
+_orthographic_transform(void)
 {
-    return fix16_min(fix16_min(z_values[0], z_values[1]),
-        fix16_min(z_values[2], z_values[3]));
+    render_t * const render = __state.render;
+
+    const fix16_mat43_t * const world_matrix = render->world_matrix;
+    fix16_mat43_t * const view_matrix = render->view_matrix;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
+
+    cpu_cache_purge();
+
+    fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
+
+    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
+    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
+    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
+
+    const fix16_vec3_t * const points = render->mesh->points;
+    int16_vec2_t * const screen_points = render->screen_points_pool;
+    int16_t * const z_values = render->z_values_pool;
+    /* fix16_t * const depth_values = render->depth_values_pool; */
+
+    for (uint32_t i = 0; i < render->mesh->points_count; i++) {
+        fix16_vec3_t p;
+        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
+        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
+        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+
+        /* TODO: Combine screen_points and z_values pool */
+        screen_points[i].x = fix16_int32_mul( render->ortho_size, p.x);
+        screen_points[i].y = fix16_int32_mul(-render->ortho_size, p.y);
+
+        z_values[i] = _depth_normalize(p.z);
+        /* depth_values[i] = depth_value; */
+    }
 }
 
-static fix16_t
-_depth_max_calculate(const fix16_t *z_values)
+static inline int32_t
+_depth_normalize(fix16_t z)
 {
-    return fix16_max(fix16_max(z_values[0], z_values[1]),
-        fix16_max(z_values[2], z_values[3]));
+    render_t * const render = __state.render;
+
+    const fix16_t scaled_z =
+      fix16_mul(render->depth_scale, z) + render->depth_offset;
+
+    return fix16_int32_mul(render->sort_scale, scaled_z);
 }
 
-static fix16_t
-_depth_center_calculate(const fix16_t *z_values)
+static int16_t
+_depth_min_calculate(const int16_t *z_values)
+{
+    return min(min(z_values[0], z_values[1]),
+               min(z_values[2], z_values[3]));
+}
+
+static int16_t
+_depth_max_calculate(const int16_t *z_values)
+{
+    return max(max(z_values[0], z_values[1]),
+               max(z_values[2], z_values[3]));
+}
+
+static int16_t
+_depth_center_calculate(const int16_t *z_values)
 {
     return ((z_values[0] + z_values[2]) >> 1);
 }
@@ -648,7 +801,7 @@ _clip_flags_calculate(const int16_vec2_t *screen_points,
     _clip_flags_lrtb_calculate(screen_points[3], &clip_flags[3]);
 
     *and_flags = clip_flags[0] & clip_flags[1] & clip_flags[2] & clip_flags[3];
-    *or_flags = clip_flags[0] | clip_flags[1] | clip_flags[2] | clip_flags[3];
+    *or_flags  = clip_flags[0] | clip_flags[1] | clip_flags[2] | clip_flags[3];
 }
 
 static void
@@ -718,26 +871,6 @@ _pipeline_polygon_orient(void)
     }
 }
 
-static void
-_render_single(const sort_single_t *single)
-{
-    render_t * const render = __state.render;
-    sort_t * const sort = __state.sort;
-
-    /* We can calculate the index (link) just from the element index of the
-     * single in the single pool because we always allocate command tables
-     * and singles linearly, from their respective pools.
-     *
-     * This implementation will be an issue should we implement the ability
-     * for users to insert their command tables into the sort */
-    const vdp1_link_t link = single - (sort->singles_pool + 1);
-
-    vdp1_cmdt_link_set(render->sort_cmdt, link + render->sort_link);
-
-    /* Point to the next command table */
-    render->sort_cmdt = &render->cmdts_pool[link];
-}
-
 static uint32_t
 _cmdts_count_get(void)
 {
@@ -797,15 +930,8 @@ _cmdt_process(vdp1_cmdt_t *cmdt)
 }
 
 static void
-_cmdts_insert(vdp1_cmdt_t *cmdt, fix16_t depth_z)
+_cmdts_insert(vdp1_cmdt_t *cmdt)
 {
-    render_t * const render = __state.render;
-
-    const fix16_t clamped_z = fix16_clamp(depth_z, render->near, render->far);
-    const int32_t scaled_z = fix16_int32_mul(clamped_z, render->sort_scale);
-
-    __sort_insert(scaled_z);
-
     /* Required */
     vdp1_cmdt_link_type_set(cmdt, VDP1_CMDT_LINK_TYPE_JUMP_ASSIGN);
 }

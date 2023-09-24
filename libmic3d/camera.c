@@ -5,7 +5,17 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <gamemath/fix16/fix16_mat33.h>
+
 #include "internal.h"
+
+void
+camera_type_set(camera_type_t type)
+{
+    render_t * const render = __state.render;
+
+    render->camera_type = type;
+}
 
 void
 camera_lookat(const camera_t *camera)
@@ -13,11 +23,20 @@ camera_lookat(const camera_t *camera)
     assert(camera != NULL);
 
     render_t * const render = __state.render;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
-    fix16_mat43_t * const view_matrix = render->camera_matrix;
+    /* fix16_mat33_t lookat_matrix; */
 
-    fix16_mat43_lookat(&camera->position, &camera->target, &camera->up,
-        view_matrix);
+    const lookat_t lookat = {
+        .from          = &camera->position,
+        .to            = &camera->target,
+        .up            = &camera->up,
+        .basis_right   = (fix16_vec3_t *)&camera_matrix->row[0],
+        .basis_up      = (fix16_vec3_t *)&camera_matrix->row[1],
+        .basis_forward = (fix16_vec3_t *)&camera_matrix->row[2],
+    };
+
+    math3d_lookat(&lookat);
 }
 
 void
@@ -27,9 +46,21 @@ camera_moveto(const camera_t *camera)
 
     render_t * const render = __state.render;
 
-    fix16_mat43_t * const view_matrix = render->camera_matrix;
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
-    fix16_mat43_translation_set(&camera->position, view_matrix);
+    const fix16_vec3_t neg_t = {
+        .x = -camera->position.x,
+        .y = -camera->position.y,
+        .z = -camera->position.z
+    };
+
+    const fix16_vec3_t * const m00 = (const fix16_vec3_t *)&camera_matrix->row[0];
+    const fix16_vec3_t * const m01 = (const fix16_vec3_t *)&camera_matrix->row[1];
+    const fix16_vec3_t * const m02 = (const fix16_vec3_t *)&camera_matrix->row[2];
+
+    camera_matrix->frow[0][3] = fix16_vec3_dot(m00, &neg_t);
+    camera_matrix->frow[1][3] = fix16_vec3_dot(m01, &neg_t);
+    camera_matrix->frow[2][3] = fix16_vec3_dot(m02, &neg_t);
 }
 
 void
@@ -63,9 +94,9 @@ camera_forward_get(fix16_vec3_t* forward)
 
     fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
-    forward->x = camera_matrix->frow[2][0];
-    forward->y = camera_matrix->frow[2][1];
-    forward->z = camera_matrix->frow[2][2];
+    forward->x = -camera_matrix->frow[2][0];
+    forward->y = -camera_matrix->frow[2][1];
+    forward->z = -camera_matrix->frow[2][2];
 }
 
 const fix16_mat43_t *
@@ -74,15 +105,4 @@ camera_matrix_get(void)
     render_t * const render = __state.render;
 
     return render->camera_matrix;
-}
-
-void
-__camera_matrix_invert(void)
-{
-    render_t * const render = __state.render;
-
-    fix16_mat43_t * const camera_matrix = render->camera_matrix;
-    fix16_mat43_t * const inv_camera_matrix = render->inv_camera_matrix;
-
-    fix16_mat43_invert(camera_matrix, inv_camera_matrix);
 }

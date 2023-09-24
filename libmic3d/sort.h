@@ -11,15 +11,11 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "render.h"
+#include "state.h"
 
 typedef struct sort_single {
     int16_t next_single;
 } __aligned(2) sort_single_t;
-
-typedef struct {
-    uint16_t head;
-} __aligned(2) sort_list_t;
 
 typedef struct sort {
     sort_single_t *singles_pool;
@@ -30,11 +26,9 @@ typedef struct sort {
     uint32_t max_depth;
 } sort_t;
 
-typedef void (*sort_iterate_t)(const sort_single_t *single);
-
 void __sort_init(void);
 void __sort_reset(void);
-void __sort_insert(int32_t z);
-void __sort_iterate(sort_iterate_t iterate);
+void __sort_insert(uint32_t z);
+void __sort_iterate(void);
 
 #endif /* _MIC3D_SORT_H_ */

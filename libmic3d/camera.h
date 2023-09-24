@@ -10,6 +10,4 @@
 
 #include <gamemath/fix16.h>
 
-void __camera_matrix_invert(void);
-
 #endif /* _MIC3D_CAMERA_H_ */

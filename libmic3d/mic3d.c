@@ -24,7 +24,6 @@ mic3d_init(workarea_mic3d_t *workarea)
     assert(workarea->depth_values != NULL);
     assert(workarea->z_values != NULL);
     assert(workarea->screen_points != NULL);
-    assert(workarea->sort_lists != NULL);
     assert(workarea->sort_singles != NULL);
     assert(workarea->cmdts != NULL);
     assert(workarea->render_matrices != NULL);
@@ -35,7 +34,6 @@ mic3d_init(workarea_mic3d_t *workarea)
     assert((((uintptr_t)workarea->depth_values) & (WORKAREA_MIC3D_DEPTH_VALUES_ALIGNMENT - 1)) == 0);
     assert((((uintptr_t)workarea->z_values) & (WORKAREA_MIC3D_Z_VALUES_ALIGNMENT - 1)) == 0);
     assert((((uintptr_t)workarea->screen_points) & (WORKAREA_MIC3D_SCREEN_POINTS_ALIGNMENT - 1)) == 0);
-    assert((((uintptr_t)workarea->sort_lists) & (WORKAREA_MIC3D_SORT_LISTS_ALIGNMENT - 1)) == 0);
     assert((((uintptr_t)workarea->sort_singles) & (WORKAREA_MIC3D_SORT_SINGLES_ALIGNMENT - 1)) == 0);
     assert((((uintptr_t)workarea->cmdts) & (WORKAREA_MIC3D_CMDTS_ALIGNMENT - 1)) == 0);
     assert((((uintptr_t)workarea->render_matrices) & (WORKAREA_MIC3D_RENDER_MATRICES_ALIGNMENT - 1)) == 0);
