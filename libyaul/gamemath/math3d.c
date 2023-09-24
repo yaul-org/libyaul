@@ -28,7 +28,7 @@ math3d_lookat(const lookat_t *lookat)
     fix16_vec3_sub(lookat->from, lookat->to, lookat->basis_forward);
     fix16_vec3_normalize(lookat->basis_forward);
 
-    fix16_vec3_cross(lookat->basis_forward, lookat->up, lookat->basis_right);
+    fix16_vec3_cross(lookat->up, lookat->basis_forward, lookat->basis_right);
     fix16_vec3_normalize(lookat->basis_right);
 
     fix16_vec3_cross(lookat->basis_forward, lookat->basis_right, lookat->basis_up);

@@ -255,33 +255,6 @@ void
 fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz,
     fix16_mat43_t *result)
 {
-    fix16_t sx;
-    fix16_t cx;
-
-    fix16_sincos(rx, &sx, &cx);
-
-    fix16_t sy;
-    fix16_t cy;
-
-    fix16_sincos(ry, &sy, &cy);
-
-    fix16_t sz;
-    fix16_t cz;
-
-    fix16_sincos(rz, &sz, &cz);
-
-    const fix16_t sxsy = fix16_mul(sx, sy);
-    const fix16_t cxsy = fix16_mul(cx, sy);
-
-    result->frow[0][0] = fix16_mul(   cy, cz);
-    result->frow[0][1] = fix16_mul( sxsy, cz) + fix16_mul(cx, sz);
-    result->frow[0][2] = fix16_mul(-cxsy, cz) + fix16_mul(sx, sz);
-    result->frow[1][0] = fix16_mul(  -cy, sz);
-    result->frow[1][1] = fix16_mul(-sxsy, sz) + fix16_mul(cx, cz);
-    result->frow[1][2] = fix16_mul( cxsy, sz) + fix16_mul(sx, cz);
-    result->frow[2][0] = sy;
-    result->frow[2][1] = fix16_mul(  -sx, cy);
-    result->frow[2][2] = fix16_mul(   cx, cy);
 }
 
 void

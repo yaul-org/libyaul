@@ -202,7 +202,7 @@ define macro-loop-update-cdb
 	      $${object_file},\
 	      $${build_directory},\
 	      $6,\
-	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) -Ilib$(TARGET)/); \
+	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) -Ilib$(TARGET)); \
 	done
 endef
 else
