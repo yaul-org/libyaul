@@ -111,6 +111,9 @@
 #undef __register
 #define __register
 
+#undef __function_name
+#define __function_name ((char *)0)
+
 #undef __declare_asm
 #define __declare_asm(...)
 
@@ -124,5 +127,13 @@
 #undef __END_ASM
 #define __END_ASM                                                              \
     __PRAGMA(GCC diagnostic pop)
+
+#undef static_assert
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#define static_assert(...) _Static_assert(true, "")
+#else
+#define static_assert(...) typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE, \
+    __CONCAT(_, __LINE__))[1]
+#endif
 
 #endif

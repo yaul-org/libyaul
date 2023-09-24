@@ -24,6 +24,9 @@
 
 /* #define VDP_SYNC_DEBUG */
 
+#define SCU_DMA_LEVEL_VDP1  0
+#define SCU_DMA_LEVEL_QUEUE 1
+
 #define SCU_MASK_MASK   (SCU_IC_MASK_VBLANK_IN |                               \
                          SCU_IC_MASK_VBLANK_OUT |                              \
                          SCU_IC_MASK_LEVEL_0_DMA_END |                         \
@@ -234,7 +237,6 @@ static void _vdp1_dma_transfer(const scu_dma_handle_t *dma_handle);
 
 static void _vdp2_init(void);
 
-static void _dma_level_end_handler(void *work);
 static void _vdp1_dma_level_end_handler(void *work);
 static void _vblank_in_handler(void);
 static void _vblank_out_handler(void);
@@ -486,6 +488,10 @@ vdp1_sync_render(void)
     }
 
     while ((_state.vdp1.flags & VDP1_FLAG_LIST_XFERRED) != VDP1_FLAG_LIST_XFERRED) {
+        (void)memcpy((void *)LWRAM(0x00), &_vdp1_dma_handle, sizeof(scu_dma_handle_t));
+        (void)memcpy((void *)LWRAM(0x20), &_vdp1_stride_dma_handle, sizeof(scu_dma_handle_t));
+        (void)memcpy((void *)LWRAM(0x40), &_vdp1_orderlist_dma_handle, sizeof(scu_dma_handle_t));
+        (void)memcpy((void *)LWRAM(0x60), &_dma_handle, sizeof(scu_dma_handle_t));
     }
 
     _vdp1_sync_render_call();
@@ -618,16 +624,18 @@ _dma_queue_transfer(void)
 
     /* Always use SCU-DMA level 0 as there may be transfers larger than
      * 4KiB */
-    scu_dma_level_wait(0);
-    scu_dma_config_set(0, SCU_DMA_START_FACTOR_ENABLE, &_dma_handle, NULL);
-    scu_dma_level_end_set(0, _dma_level_end_handler, NULL);
+    scu_dma_level_wait(SCU_DMA_LEVEL_QUEUE);
+    scu_dma_config_set(SCU_DMA_LEVEL_QUEUE, SCU_DMA_START_FACTOR_ENABLE, &_dma_handle, NULL);
 
     cpu_cache_purge();
 
-    scu_dma_level_fast_start(0);
-    scu_dma_level_wait(0);
+    scu_dma_level_fast_start(SCU_DMA_LEVEL_QUEUE);
+    scu_dma_level_wait(SCU_DMA_LEVEL_QUEUE);
 
     dma_queue_clear(dma_queue);
+
+    callback_list_process(_dma_callback_list);
+    callback_list_clear(_dma_callback_list);
 }
 
 static void
@@ -1092,12 +1100,16 @@ _vdp1_mode_variable_vblank_out(void)
 static void
 _vdp1_dma_transfer(const scu_dma_handle_t *dma_handle)
 {
-    scu_dma_config_set(0, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
-    scu_dma_level_end_set(0, _vdp1_dma_level_end_handler, NULL);
+    assert((dma_handle->dnr & ~CPU_ADDRESS_PARTITION_MASK) != 0x00000000);
+    assert((dma_handle->dnw & ~CPU_ADDRESS_PARTITION_MASK) != 0x00000000);
+    assert(dma_handle->dnc != 0);
+
+    scu_dma_config_set(SCU_DMA_LEVEL_VDP1, SCU_DMA_START_FACTOR_ENABLE, dma_handle, NULL);
+    scu_dma_level_end_set(SCU_DMA_LEVEL_VDP1, _vdp1_dma_level_end_handler, NULL);
 
     cpu_cache_purge();
 
-    scu_dma_level_fast_start(0);
+    scu_dma_level_fast_start(SCU_DMA_LEVEL_VDP1);
 }
 
 static void
@@ -1151,18 +1163,9 @@ _vdp2_sync_commit_wait(void)
 }
 
 static void
-_dma_level_end_handler(void *work __unused)
-{
-    scu_dma_level_end_set(0, NULL, NULL);
-
-    callback_list_process(_dma_callback_list);
-    callback_list_clear(_dma_callback_list);
-}
-
-static void
 _vdp1_dma_level_end_handler(void *work __unused)
 {
-    scu_dma_level_end_set(0, NULL, NULL);
+    scu_dma_level_end_set(SCU_DMA_LEVEL_VDP1, NULL, NULL);
 
     _vdp1_dma_call();
 }

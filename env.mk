@@ -92,26 +92,26 @@ SH_CFLAGS_shared:= \
 	-ffat-lto-objects \
 	-ffunction-sections \
 	-fdata-sections \
-	-pedantic \
-	-s \
-	-ffreestanding \
-	-ffast-math \
-	-fstrict-aliasing \
-	-fdelete-null-pointer-checks \
-	-fmerge-all-constants \
-	-Wmissing-include-dirs \
-	-Wfatal-errors \
 	-Wall \
 	-Wduplicated-branches \
 	-Wduplicated-cond \
 	-Wextra \
 	-Wfatal-errors \
+	-Wfatal-errors \
 	-Winit-self \
+	-Wmissing-include-dirs \
 	-Wmissing-include-dirs \
 	-Wno-format \
 	-Wnull-dereference \
 	-Wshadow \
-	-Wunused
+	-Wunused \
+	-fdelete-null-pointer-checks \
+	-ffast-math \
+	-ffreestanding \
+	-fmerge-all-constants \
+	-fstrict-aliasing \
+	-pedantic \
+	-s
 
 ifeq ($(strip $(YAUL_OPTION_MALLOC_IMPL)),tlsf)
 SH_CFLAGS_shared += \
@@ -138,10 +138,14 @@ SH_CXXFLAGS:= \
 SH_CFLAGS_shared_release:= -O2 -g -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables
 SH_CFLAGS_shared_debug:= -Og -g -DDEBUG
 
-SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
-SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
+ifeq ($(strip $(DEBUG_RELEASE)),1)
+  SH_CFLAGS_shared_release+= -DDEBUG
+endif
 
+SH_CFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CFLAGS)
 SH_CXXFLAGS_release:= $(SH_CFLAGS_shared_release) $(SH_CXXFLAGS)
+
+SH_CFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CFLAGS)
 SH_CXXFLAGS_debug:= $(SH_CFLAGS_shared_debug) $(SH_CXXFLAGS)
 
 # These include directories are strictly from libyaul, and are meant to be

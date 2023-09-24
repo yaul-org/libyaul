@@ -3,24 +3,31 @@
 
 #include <sys/cdefs.h>
 
+#include <stdbool.h>
+
 __BEGIN_DECLS
 
 #undef assert
 
 #ifdef DEBUG
-#define assert(e) ((e)                                                         \
-    ? (void)0                                                                  \
-    : _assert(__FILE__, __XSTRING(__LINE__), __function_name,                  \
-        __STRING(e)))
+#define assert(e) do {                                                         \
+    if (!(e)) {                                                                \
+        _assert(__FILE__, __XSTRING(__LINE__), __function_name, __STRING(e));  \
+    }                                                                          \
+} while (false)
 #else
 #define assert(e)
-#endif
+#endif /* DEBUG */
 
 #if !defined(__cplusplus)
 #ifndef static_assert
-#define static_assert(__e)                                                     \
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#define static_assert _Static_assert
+#else
+#define static_assert(e)                                                       \
     typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE,                        \
-        __CONCAT(_, __LINE__))[(__e) ? 1 : -1]
+        __CONCAT(_, __LINE__))[(e) ? 1 : -1]
+#endif
 #endif /* !static_assert */
 #endif /* !defined(__cplusplus) */
 
