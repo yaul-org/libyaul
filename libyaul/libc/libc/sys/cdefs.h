@@ -306,7 +306,7 @@
  * string. */
 /// @private
 #ifndef __func__
-#define __func__ ((char *)0)
+#define __func__ ((const char *)0)
 #endif
 
 /// @private
@@ -319,7 +319,7 @@
 #define __function_name __func__
 /* Failed to detect __func__ support */
 #else
-#define __function_name ((char *)0)
+#define __function_name ((const char *)0)
 #endif
 #endif /* !__function_name */
 
