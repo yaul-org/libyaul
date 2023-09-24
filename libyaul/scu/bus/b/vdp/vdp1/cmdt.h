@@ -383,6 +383,12 @@ vdp1_cmdt_gouraud_base_set(vdp1_cmdt_t *cmdt, vdp1_vram_t base)
     cmdt->cmd_grda = (base >> 3) & 0xFFFF;
 }
 
+static inline vdp1_cmdt_command_t __always_inline
+vdp1_cmdt_command_get(const vdp1_cmdt_t *cmdt)
+{
+    return (vdp1_cmdt_command_t)(cmdt->cmd_ctrl & ~0x7FF0);
+}
+
 static inline void __always_inline
 vdp1_cmdt_command_set(vdp1_cmdt_t *cmdt, vdp1_cmdt_command_t command)
 {
