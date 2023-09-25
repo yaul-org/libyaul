@@ -1,5 +1,10 @@
 /* -*- mode: c -*- */
 
+#include <gamemath/fix16.h>
+
+#define FIX16_LUT_SIN_TABLE_SHIFT (10)
+#define FIX16_LUT_SIN_TABLE_COUNT (1024)
+
 static const fix16_t _lut_brads_sin[FIX16_LUT_SIN_TABLE_COUNT] __aligned(16) = {
     /* Degree    0  0.00000f */ 0x00000000,
     /* Degree    1  0.00614f */ 0x00000192,

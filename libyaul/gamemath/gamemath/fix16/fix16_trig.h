@@ -17,18 +17,6 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief Not yet documented.
-#define FIX16_LUT_SIN_TABLE_SHIFT  (10)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_SIN_TABLE_COUNT  (1024)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_ATAN_TABLE_SHIFT (8)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_ATAN_TABLE_COUNT (256)
-
-/// @brief Not yet documented.
 ///
 /// @param angle Not yet documented.
 ///
@@ -54,7 +42,8 @@ extern fix16_t fix16_tan(angle_t angle);
 /// @param      angle      Not yet documented.
 /// @param[out] result_sin Not yet documented.
 /// @param[out] result_cos Not yet documented.
-extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos);
+extern void fix16_sincos(angle_t angle, fix16_t *result_sin,
+    fix16_t *result_cos);
 
 /// @brief Not yet documented.
 ///

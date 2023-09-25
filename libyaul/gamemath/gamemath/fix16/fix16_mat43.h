@@ -21,10 +21,10 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief Not yet documented.
-#define FIX16_MAT43_COLUMNS   (4)
+#define FIX16_MAT43_COLUMNS (4)
 
 /// @brief Not yet documented.
-#define FIX16_MAT43_ROWS      (3)
+#define FIX16_MAT43_ROWS    (3)
 
 /// @brief Not yet documented.
 #define FIX16_MAT43_ARR_COUNT (FIX16_MAT43_COLUMNS * FIX16_MAT43_ROWS)

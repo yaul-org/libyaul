@@ -14,8 +14,6 @@
 #include <gamemath/fix16/fix16_trig.h>
 #include <gamemath/math3d.h>
 
-static void _mat33_row_transpose(const fix16_t *arr, fix16_vec3_t *m0);
-
 void
 fix16_mat33_zero(fix16_mat33_t *m0)
 {
@@ -110,6 +108,7 @@ fix16_mat33_mul(const fix16_mat33_t *m0, const fix16_mat33_t *m1,
   fix16_mat33_t *result)
 {
     fix16_mat33_t transpose;
+
     fix16_mat33_transpose(m1, &transpose);
 
     result->frow[0][0] = fix16_vec3_dot(&m0->row[0], &transpose.row[0]);
@@ -267,12 +266,4 @@ fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals)
     *buffer_ptr = '\0';
 
     return (buffer_ptr - buffer);
-}
-
-static void
-_mat33_row_transpose(const fix16_t *arr, fix16_vec3_t *m0)
-{
-    m0->x = arr[0];
-    m0->y = arr[3];
-    m0->z = arr[6];
 }
