@@ -11,23 +11,20 @@
 
 #include <gamemath/fix16.h>
 
-__BEGIN_DECLS
-
 /// @addtogroup MATH_FIX16_VECTOR
 /// @defgroup MATH_FIX16_VEC2 2-vector
 /// @ingroup MATH_FIX16_VECTOR
 /// @{
 
+#if !defined(__cplusplus)
 /// @brief Not yet documented.
 ///
 /// @param x Not yet documented.
 /// @param y Not yet documented.
 #define FIX16_VEC2_INITIALIZER(x, y)                                           \
 {                                                                              \
-    {                                                                          \
         FIX16(x),                                                              \
         FIX16(y)                                                               \
-    }                                                                          \
 }
 
 /// @brief Not yet documented.
@@ -36,33 +33,44 @@ __BEGIN_DECLS
 /// @param y Not yet documented.
 #define FIX16_VEC2(x, y)                                                       \
 ((fix16_vec2_t){                                                               \
-    {                                                                          \
         FIX16(x),                                                              \
         FIX16(y)                                                               \
-    }                                                                          \
 })
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
 /// @param x Not yet documented.
-typedef union fix16_vec2 {
-    struct {
-        /// @param x Not yet documented.
-        fix16_t x;
-        /// @param x Not yet documented.
-        fix16_t y;
-    };
-
+typedef struct fix16_vec2 {
     /// @param x Not yet documented.
-    fix16_t comp[2];
-} __packed __aligned(4) fix16_vec2_t;
+    fix16_t x;
+    /// @param x Not yet documented.
+    fix16_t y;
+} fix16_vec2_t;
+#else
+/// @brief Not yet documented.
+struct fix16_vec2_t {
+    /// @brief Not yet documented.
+    fix16_t x;
+    /// @brief Not yet documented.
+    fix16_t y;
 
+    fix16_vec2_t() { }
+    fix16_vec2_t(fix16_vec2_t&&)      = default;
+    fix16_vec2_t(const fix16_vec2_t&) = default;
+};
+
+static_assert(sizeof(fix16_vec2_t) == 8);
+#endif /* !__cplusplus */
+
+#if !defined(__cplusplus)
 /// @brief Not yet documented.
 ///
 /// @param result Not yet documented.
 static inline void __always_inline
 fix16_vec2_zero(fix16_vec2_t *result)
 {
-    result->x = FIX16_ZERO;
-    result->y = FIX16_ZERO;
+    result->x = FIX16(0.0);
+    result->y = FIX16(0.0);
 }
 
 /// @brief Not yet documented.
@@ -157,6 +165,9 @@ fix16_vec2_inline_dot(const fix16_vec2_t *a, const fix16_vec2_t *b)
     return aux1;
 }
 __END_ASM
+#endif /* !__cplusplus */
+
+__BEGIN_DECLS
 
 /// @brief Not yet documented.
 ///

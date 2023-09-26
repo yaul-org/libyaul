@@ -127,6 +127,7 @@ SH_CXXFLAGS_shared:= \
 	$(SH_CFLAGS_shared)
 
 SH_CXXFLAGS:= \
+	-std=c++17 \
 	-fno-exceptions \
 	-fno-rtti \
 	-fno-unwind-tables \

@@ -28,38 +28,40 @@
 
 #include <gamemath/fix16.h>
 
-fix16_t
-fix16_overflow_add(fix16_t a, fix16_t b)
+bool
+fix16_overflow_add(fix16_t a, fix16_t b, fix16_t *sum)
 {
     /* Use unsigned integers because overflow with signed integers is an
      * undefined operation <http://www.airs.com/blog/archives/120> */
-    uint32_t ta = a;
-    uint32_t tb = b;
-    uint32_t sum = ta + tb;
+    const uint32_t ta = a;
+    const uint32_t tb = b;
 
-    /* Overflow can only happen if sign of a == sign of b, and then it
-     * causes sign of sum != sign of a */
-    if ((((ta ^ tb) & 0x80000000) == 0) && (((ta ^ sum) & 0x80000000) != 0)) {
-        return FIX16_OVERFLOW;
+    /* Overflow can only happen if sign of a == sign of b, and then it causes
+     * sign of sum != sign of a */
+    if ((((ta ^ tb) & 0x80000000) == 0) && (((ta ^ (uint32_t)sum) & 0x80000000) != 0)) {
+        return true;
     }
 
-    return sum;
+    *sum = ta + tb;
+
+    return false;
 }
 
-fix16_t
-fix16_overflow_sub(fix16_t a, fix16_t b)
+bool
+fix16_overflow_sub(fix16_t a, fix16_t b, fix16_t *diff)
 {
     uint32_t ta = a;
     uint32_t tb = b;
-    uint32_t diff = ta - tb;
 
-    /* Overflow can only happen if sign of a != sign of b, and then it
-     * causes sign of diff != sign of a. */
-    if ((((ta ^ tb) & 0x80000000) != 0) && (((ta ^ diff) & 0x80000000) != 0)) {
-        return FIX16_OVERFLOW;
+    /* Overflow can only happen if sign of a != sign of b, and then it causes
+     * sign of diff != sign of a */
+    if ((((ta ^ tb) & 0x80000000) != 0) && (((ta ^ (uint32_t)diff) & 0x80000000) != 0)) {
+        return true;
     }
 
-    return diff;
+    *diff = ta - tb;
+
+    return false;
 }
 
 fix16_t
@@ -73,7 +75,7 @@ fix16_div(fix16_t dividend, fix16_t divisor)
 fix16_t
 fix16_lerp(fix16_t a, fix16_t b, fix16_t t)
 {
-    return (fix16_mul(a, (FIX16_ONE - t)) + fix16_mul(b, t));
+    return (fix16_mul(a, (FIX16(1.0) - t)) + fix16_mul(b, t));
 }
 
 fix16_t
@@ -83,5 +85,5 @@ fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t)
      *                t = 255 => 1.0f */
     const fix16_t fixed_t = fix16_int32_from((t + 1) >> 8);
 
-    return (fix16_mul(a, (FIX16_ONE - t)) + fix16_mul(b, fixed_t));
+    return (fix16_mul(a, (FIX16(1.0) - t)) + fix16_mul(b, fixed_t));
 }

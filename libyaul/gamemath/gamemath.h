@@ -17,7 +17,6 @@
 #include <gamemath/fix16/fix16_trig.h>
 #include <gamemath/fix16/fix16_vec2.h>
 #include <gamemath/fix16/fix16_vec3.h>
-#include <gamemath/fix16/fix16_vec4.h>
 #include <gamemath/int16.h>
 #include <gamemath/int32.h>
 #include <gamemath/int8.h>

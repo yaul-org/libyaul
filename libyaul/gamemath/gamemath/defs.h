@@ -40,8 +40,6 @@ __DEFINE_MIN(min_long, long)
 __DEFINE_MIN(min_ulong, unsigned long)
 __DEFINE_MIN(min_llong, long long)
 __DEFINE_MIN(min_ullong, unsigned long long)
-__DEFINE_MIN(min_float, float)
-__DEFINE_MIN(min_double, double)
 
 #undef __DEFINE_MIN
 
@@ -59,17 +57,15 @@ __DEFINE_MIN(min_double, double)
      unsigned long: min_ulong,                                                 \
          long long: min_llong,                                                 \
 unsigned long long: min_ullong,                                                \
-             float: min_float,                                                 \
-            double: min_double,                                                \
          default: "bad type for min")(a, b)
 #else
 template <typename _T>
-static inline const _T min(const _T& _a, const _T& _b) {
+static inline const _T& min(const _T& _a, const _T& _b) {
   return (_a < _b) ? _a : _b;
 }
 
 template <typename _T, typename _Compare>
-static inline const _T min(const _T& _a, const _T& _b, _Compare _compare) {
+static inline const _T& min(const _T& _a, const _T& _b, _Compare _compare) {
   return _compare(_a, _b) ? _a : _b;
 }
 #endif
@@ -92,8 +88,6 @@ __DEFINE_MAX(max_long, long)
 __DEFINE_MAX(max_ulong, unsigned long)
 __DEFINE_MAX(max_llong, long long)
 __DEFINE_MAX(max_ullong, unsigned long long)
-__DEFINE_MAX(max_float, float)
-__DEFINE_MAX(max_double, double)
 
 #undef __DEFINE_MAX
 
@@ -111,17 +105,15 @@ __DEFINE_MAX(max_double, double)
      unsigned long: max_ulong,                                                 \
          long long: max_llong,                                                 \
 unsigned long long: max_ullong,                                                \
-             float: max_float,                                                 \
-            double: max_double,                                                \
          default: "bad type for max")(a, b)
 #else
 template <typename _T>
-static inline const _T max(const _T& _a, const _T& _b) {
+static inline const _T& max(const _T& _a, const _T& _b) {
   return (_a > _b) ? _a : _b;
 }
 
 template <typename _T, typename _Compare>
-static inline const _T max(const _T& _a, const _T& _b, _Compare _compare) {
+static inline const _T& max(const _T& _a, const _T& _b, _Compare _compare) {
   return _compare(_a, _b) ? _a : _b;
 }
 #endif
@@ -129,10 +121,27 @@ static inline const _T max(const _T& _a, const _T& _b, _Compare _compare) {
 
 #ifndef sign
 #if !defined(__cplusplus)
+
+#define __DEFINE_SIGN(name, T)                                                 \
+    static inline T name(T x) { return (x < 0) ? -1 : 1; }
+
+__DEFINE_SIGN(sign_char, char)
+__DEFINE_SIGN(sign_schar, signed char)
+__DEFINE_SIGN(sign_short, short)
+__DEFINE_SIGN(sign_int, int)
+__DEFINE_SIGN(sign_long, long)
+__DEFINE_SIGN(sign_llong, long long)
+
+#undef __DEFINE_SIGN
 #define sign(x)                                                                \
-    __extension__ ({ __typeof__ (x) _x = (x);                                  \
-       (_x < 0) ? -1 : 1;                                                      \
-    })
+    _Generic(((x) < 0) ? -1 : 1,                                               \
+              char: sign_char,                                                 \
+       signed char: sign_schar,                                                \
+             short: sign_short,                                                \
+               int: sign_int,                                                  \
+              long: sign_long,                                                 \
+         long long: sign_llong,                                                \
+         default: "bad type for sign")(a, b)
 #else
 static inline constexpr int sign(signed int _x) { return (_x < 0) ? -1 : 1; }
 
@@ -164,5 +173,43 @@ clamp(const _T& _value, const _T& _min, const _T& _max, _Comparer _compare) {
 }
 #endif
 #endif /* !clamp */
+
+#ifndef abs
+#if !defined(__cplusplus)
+#define __DEFINE_ABS(name, T)                                                  \
+    static inline T name(T a) { return (a < 0) ? -a : 0; }
+
+__DEFINE_ABS(abs_char, char)
+__DEFINE_ABS(abs_schar, signed char)
+__DEFINE_ABS(abs_short, short)
+__DEFINE_ABS(abs_int, int)
+__DEFINE_ABS(abs_long, long)
+__DEFINE_ABS(abs_llong, long long)
+
+#undef __DEFINE_ABS
+
+#define abs(a)                                                                 \
+    _Generic(((a) < 0) ? -(a) : (a),                                           \
+              char: abs_char,                                                  \
+       signed char: abs_schar,                                                 \
+             short: abs_short,                                                 \
+               int: abs_int,                                                   \
+              long: abs_long,                                                  \
+         long long: abs_llong                                                  \
+         default: "bad type for abs")(a, b)
+#else
+static inline char abs(char _a) { return (_a < 0) ? -_a : _a; }
+
+static inline signed char abs(signed char _a) { return (_a < 0) ? -_a : _a; }
+
+static inline short abs(short _a) { return (_a < 0) ? -_a : _a; }
+
+static inline int abs(int _a) { return (_a < 0) ? -_a : _a; }
+
+static inline long abs(long _a) { return __builtin_labs(_a); }
+
+static inline long long abs(long long _a) { return __builtin_llabs(_a); }
+#endif
+#endif /* !abs */
 
 #endif /* !_YAUL_GAMEMATH_DEFS_H_ */

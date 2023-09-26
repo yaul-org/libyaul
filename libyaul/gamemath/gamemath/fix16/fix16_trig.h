@@ -53,8 +53,20 @@ extern void fix16_sincos(angle_t angle, fix16_t *result_sin,
 /// @returns Value.
 extern angle_t fix16_atan2(fix16_t y, fix16_t x);
 
-/// @}
-
 __END_DECLS
+
+#if defined(__cplusplus)
+static inline fix16_t cos(angle_t angle) { return fix16_cos(angle); }
+
+static inline fix16_t sin(angle_t angle) { return fix16_sin(angle); }
+
+static inline fix16_t tan(angle_t angle) { return fix16_tan(angle); }
+
+static inline void sincos(angle_t angle, fix16_t& out_sin, fix16_t& out_cos) {
+    fix16_sincos(angle, &out_sin, &out_cos);
+}
+#endif /* __cplusplus */
+
+/// @}
 
 #endif /* !_YAUL_GAMEMATH_FIX16_TRIG_H_ */

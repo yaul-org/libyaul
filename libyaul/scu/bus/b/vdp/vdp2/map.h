@@ -10,10 +10,13 @@
 
 #include <sys/cdefs.h>
 
+#include <assert.h>
 #include <stdint.h>
 
+#if !defined(__cplusplus)
 #include <gamemath/fix16/fix16_vec2.h>
 #include <gamemath/int16.h>
+#endif /* !__cplusplus */
 
 /// @addtogroup MEMORY_MAP
 /// @defgroup MEMORY_MAP_VDP2_IO_REGISTERS VDP2 I/O
@@ -859,8 +862,10 @@ typedef union vdp2_ioregs {
         /// @brief VDP2 I/O register.
         uint16_t mpoprb;
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t scxin0;
                 /// @brief VDP2 I/O register.
@@ -869,14 +874,18 @@ typedef union vdp2_ioregs {
                 uint16_t scyin0;
                 /// @brief VDP2 I/O register.
                 uint16_t scydn0;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             fix16_vec2_t sc0;
         };
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t zmxin0;
                 /// @brief VDP2 I/O register.
@@ -885,14 +894,18 @@ typedef union vdp2_ioregs {
                 uint16_t zmyin0;
                 /// @brief VDP2 I/O register.
                 uint16_t zmydn0;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             fix16_vec2_t zm0;
         };
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t scxin1;
                 /// @brief VDP2 I/O register.
@@ -901,14 +914,18 @@ typedef union vdp2_ioregs {
                 uint16_t scyin1;
                 /// @brief VDP2 I/O register.
                 uint16_t scydn1;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             fix16_vec2_t sc1;
         };
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t zmxin1;
                 /// @brief VDP2 I/O register.
@@ -917,35 +934,45 @@ typedef union vdp2_ioregs {
                 uint16_t zmyin1;
                 /// @brief VDP2 I/O register.
                 uint16_t zmydn1;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             fix16_vec2_t zm1;
         };
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t scxn2;
                 /// @brief VDP2 I/O register.
                 uint16_t scyn2;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             int16_vec2_t scn2;
         };
+#endif /* !__cplusplus */
 
+#if !defined(__cplusplus)
         union {
             struct {
+#endif /* !__cplusplus */
                 /// @brief VDP2 I/O register.
                 uint16_t scxn3;
                 /// @brief VDP2 I/O register.
                 uint16_t scyn3;
+#if !defined(__cplusplus)
             } __packed;
 
             /// @brief VDP2 I/O register.
             int16_vec2_t scn3;
         };
+#endif /* !__cplusplus */
 
         /// @brief VDP2 I/O register.
         uint16_t zmctl;
@@ -1149,7 +1176,9 @@ typedef union vdp2_ioregs {
         /// @brief VDP2 I/O register.
         uint16_t cobb;
     };
-} __aligned(4) __packed vdp2_ioregs_t;
+} vdp2_ioregs_t;
+
+static_assert(sizeof(vdp2_ioregs_t) == 288);
 
 /// @}
 

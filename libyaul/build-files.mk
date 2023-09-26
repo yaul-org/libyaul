@@ -183,11 +183,9 @@ LIB_SRCS+= \
 	libc/exit/exit.c
 
 LIB_SRCS+= \
-	libc/stdlib/abs.c \
 	libc/stdlib/atoi.c \
 	libc/stdlib/atol.c \
 	libc/stdlib/free.c \
-	libc/stdlib/labs.c \
 	libc/stdlib/malloc.c \
 	libc/stdlib/memalign.c \
 	libc/stdlib/realloc.c \
@@ -221,7 +219,8 @@ LIB_SRCS+= \
 	gamemath/fix16/fix16_trig.c \
 	gamemath/fix16/fix16_vec2.c \
 	gamemath/fix16/fix16_vec3.c \
-	gamemath/fix16/fix16_vec4.c \
+\
+	gamemath/fix16/c++/fix16_vec3.cxx \
 \
 	gamemath/int16.c \
 	gamemath/int32.c \
@@ -345,7 +344,6 @@ INSTALL_HEADER_FILES+= \
 	./gamemath/gamemath/fix16/:fix16_trig.h:yaul/gamemath/fix16/ \
 	./gamemath/gamemath/fix16/:fix16_vec2.h:yaul/gamemath/fix16/ \
 	./gamemath/gamemath/fix16/:fix16_vec3.h:yaul/gamemath/fix16/ \
-	./gamemath/gamemath/fix16/:fix16_vec4.h:yaul/gamemath/fix16/ \
 \
 	./gamemath/gamemath/:defs.h:yaul/gamemath/ \
 	./gamemath/gamemath/:int8.h:yaul/gamemath/ \
