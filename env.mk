@@ -96,8 +96,6 @@ SH_CFLAGS_shared:= \
 	-Wduplicated-branches \
 	-Wduplicated-cond \
 	-Wextra \
-	-Wfatal-errors \
-	-Wfatal-errors \
 	-Winit-self \
 	-Wmissing-include-dirs \
 	-Wmissing-include-dirs \
@@ -121,11 +119,14 @@ endif
 SH_CFLAGS:= \
 	-std=c11 \
 	-Wbad-function-cast \
+	-Wfatal-errors \
 	$(SH_CFLAGS_shared)
 
 SH_CXXFLAGS_shared:= \
 	$(SH_CFLAGS_shared)
 
+# -Wfatal-errors was removed for C++ as it prevented the compiler from giving
+#  more (better) diagnostics
 SH_CXXFLAGS:= \
 	-std=c++17 \
 	-fno-exceptions \
