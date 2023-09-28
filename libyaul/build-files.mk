@@ -49,18 +49,16 @@ LIB_SRCS+= \
 
 LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
+	kernel/dbgio/devices/cons/cons.c \
+	kernel/dbgio/devices/mednafen-debug.c \
 	kernel/dbgio/devices/null.c \
+	kernel/dbgio/devices/usb-cart.c \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
 	kernel/dbgio/font/default_font.c \
 	kernel/dbgio/font/font.c
 
 LIB_SRCS+= \
-	kernel/dbgio/devices/usb-cart.c
-
-LIB_SRCS+= \
-	kernel/dbgio/devices/cons/cons.c \
-	\
 	kernel/sys/dma-queue.c \
 	kernel/sys/dma-queue-internal.c \
 	kernel/sys/callback-list.c \
