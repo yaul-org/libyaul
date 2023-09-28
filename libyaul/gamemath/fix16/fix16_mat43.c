@@ -135,14 +135,14 @@ fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t decimals)
     char *buffer_ptr;
     buffer_ptr = buffer;
 
-    for (uint32_t i = 0; i < 4; i++) {
-        *buffer_ptr++ = '|';
-        buffer_ptr += fix16_vec3_str(&m0->rotation.row[i], buffer_ptr, decimals);
-        buffer_ptr += fix16_vec3_str(&m0->translation, buffer_ptr, decimals);
-        *buffer_ptr++ = '|';
-        *buffer_ptr++ = '\n';
-    }
-    *buffer_ptr = '\0';
+      buffer_ptr += fix16_mat33_str(&m0->rotation, buffer_ptr, decimals);
+
+    *buffer_ptr++ = '\n';
+    *buffer_ptr++ = '|';
+      buffer_ptr += fix16_vec3_str(&m0->translation, buffer_ptr, decimals);
+    *buffer_ptr++ = '|';
+
+      *buffer_ptr = '\0';
 
     return (buffer_ptr - buffer);
 }
