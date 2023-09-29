@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include <gamemath/fix16/fix16_vec2.h>
+
 #include <vdp2/scrn_shared.h>
 
 #include <vdp2/vram.h>
