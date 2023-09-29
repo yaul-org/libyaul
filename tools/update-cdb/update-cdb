@@ -100,8 +100,6 @@ entry_index = 0
 for line in fileinput.input():
     line = line.strip()
     if entry_index == 0:
-        if entry is not None:
-            entries.append(entry)
         if line == "C":
             entry = CEntry()
         elif line == "C++":
@@ -109,6 +107,7 @@ for line in fileinput.input():
         else:
             # TODO: Improve error handling. Use exceptions
             print("Invalid input.", file=sys.stderr)
+            sys.exit(1)
     elif entry_index == 1:
         entry.compiler = line
     elif entry_index == 2:
@@ -117,6 +116,8 @@ for line in fileinput.input():
         entry.command_line = shlex.split(line, posix=True)
     entry_index += 1
     entry_index %= 4
+    if entry_index == 0:
+        entries.append(entry)
 
 # Check that we've processed the input correctly
 if entry_index != 0:
