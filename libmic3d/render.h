@@ -10,11 +10,12 @@
 
 #include <sys/cdefs.h>
 
-#include <fix16.h>
+#include <gamemath/fix16.h>
 
-#include <mic3d/types.h>
+#include "mic3d/types.h"
 
 #include "gst.h"
+#include "sort.h"
 
 #define RENDER_FLAG_TEST(x) ((__state.render->render_flags & __CONCAT(RENDER_FLAGS_, x)) == __CONCAT(RENDER_FLAGS_, x))
 
@@ -33,49 +34,64 @@ typedef enum clip_flags {
     CLIP_FLAGS_BOTTOM = 1 << CLIP_BIT_BOTTOM,
 
     CLIP_FLAGS_LR     = CLIP_FLAGS_LEFT | CLIP_FLAGS_RIGHT,
-    CLIP_FLAGS_TB     = CLIP_FLAGS_TOP | CLIP_FLAGS_BOTTOM
+    CLIP_FLAGS_TB     = CLIP_FLAGS_TOP  | CLIP_FLAGS_BOTTOM
 } clip_flags_t;
 
 typedef struct {
-    fix16_mat43_t view_matrix;
-
     attribute_t attribute;
     polygon_t polygon;
     int16_vec2_t screen_points[4];
-    fix16_t z_values[4];
+    int16_t z_values[4];
     clip_flags_t clip_flags[4];
     clip_flags_t and_flags;
     clip_flags_t or_flags;
-} __aligned(16) render_transform_t;
-
-static_assert(sizeof(render_transform_t) == 128);
+} __aligned(16) pipeline_t;
 
 typedef struct render {
     /* Pools */
-    fix16_t *z_values_pool;
-    int16_vec2_t *screen_points_pool;
-    rgb1555_t *colors_pool;
-    vdp1_cmdt_t *cmdts_pool;
-    fix16_t *depth_values_pool;
-    gst_t *gst;
+    struct {
+        int16_vec2_t *screen_points_pool;
+        int16_t *z_values_pool;
+        fix16_t *depth_values_pool;
+        vdp1_cmdt_t *cmdts_pool;
+    };
 
     /* Settings */
-    fix16_t view_distance;
-    fix16_t near;
-    fix16_t far;
-    fix16_t sort_scale;
-    render_flags_t render_flags;
+    struct {
+        camera_type_t camera_type;
+        fix16_t view_distance;
+        fix16_t near;
+        fix16_t far;
+        fix16_t ortho_size;
+        int32_t sort_scale;
+        fix16_t depth_scale;
+        fix16_t depth_offset;
+    };
 
-    const mesh_t *mesh;
-    render_transform_t *render_transform;
+    /* Rendering */
+    struct {
+        const mesh_t *mesh;
+        const fix16_mat43_t *world_matrix;
+        pipeline_t *pipeline;
+        render_flags_t render_flags;
+        vdp1_cmdt_t *cmdts;
+    };
+
+    /* Matrices */
+    struct {
+        fix16_mat43_t *camera_matrix;
+        fix16_mat43_t *view_matrix;
+    };
 
     /* Sorting */
-    vdp1_cmdt_t *sort_cmdt;
-    vdp1_link_t sort_link;
-
-    vdp1_cmdt_t *cmdts;
+    struct {
+        vdp1_cmdt_t *sort_cmdt;
+        vdp1_link_t sort_link;
+    };
 } __aligned(4) render_t;
 
 void __render_init(void);
+
+extern void __render_single(const sort_single_t *single);
 
 #endif /* _MIC3D_RENDER_H_ */

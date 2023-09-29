@@ -11,7 +11,8 @@
 #include <sys/cdefs.h>
 
 #include <stdint.h>
-#include <math.h>
+
+#include <gamemath/color.h>
 
 #include <vdp2/vram.h>
 

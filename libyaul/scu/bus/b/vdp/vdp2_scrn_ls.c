@@ -7,6 +7,8 @@
 
 #include <vdp2/scrn.h>
 
+#include <gamemath/uint32.h>
+
 #include "vdp-internal.h"
 
 void

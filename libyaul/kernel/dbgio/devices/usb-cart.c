@@ -15,146 +15,97 @@
 #include <internal.h>
 #include <dbgio/dbgio-internal.h>
 
-#define STATE_IDLE              0x00
-#define STATE_INITIALIZED       0x01
-#define STATE_BUFFER_DIRTY      0x02
-#define STATE_BUFFER_FLUSHING   0x04
+typedef enum state_flags {
+    STATE_IDLE            = 0,
+    STATE_INITIALIZED     = 1 << 0,
+    STATE_BUFFER_DIRTY    = 1 << 1,
+    STATE_BUFFER_FLUSHING = 1 << 2
+} state_flags_t;
 
-#define BUFFER_FLUSH_POW        (5)
-#define BUFFER_FLUSH_REM_MASK   (0x1F)
+#define BUFFER_FLUSH_POW      5
+#define BUFFER_FLUSH_REM_MASK 0x1F
 
-static void _init(const dbgio_usb_cart_t *params);
+static void _init(const void *params);
 static void _deinit(void);
 static void _puts(const char *buffer);
+static void _printf(const char *format, va_list ap);
 static void _flush(void);
-static void _font_load(void);
 
-typedef struct {
-    uint8_t *buffer_base;
-    uint8_t *buffer;
-    uint32_t buffer_size;
-
-    uint8_t state;
-} dev_state_t;
-
-static const dbgio_usb_cart_t _default_params = {
-    .buffer_size = 4096
-};
-
-static dev_state_t *_dev_state;
+static struct {
+    FILE file;
+} _cookie;
 
 const dbgio_dev_ops_t __dbgio_dev_ops_usb_cart = {
     .dev            = DBGIO_DEV_USB_CART,
-    .default_params = &_default_params,
-    .init           = (dev_ops_init_t)_init,
+    .default_params = NULL,
+    .init           = _init,
     .deinit         = _deinit,
-    .font_load      = _font_load,
+    .font_load      = NULL,
+    .display_set    = NULL,
     .puts           = _puts,
+    .printf         = _printf,
     .flush          = _flush
 };
 
-static void
-_init(const dbgio_usb_cart_t *params)
+static size_t
+_file_write(FILE *f __unused, const uint8_t *s, size_t l)
 {
-    assert(params != NULL);
-
-    if (_dev_state == NULL) {
-        _dev_state = __malloc(sizeof(dev_state_t));
-
-        (void)memset(_dev_state, 0x00, sizeof(dev_state_t));
-    }
-    assert(_dev_state != NULL);
-
-    /* Resize the buffer if needed */
-    if ((_dev_state->buffer != NULL) &&
-      (_dev_state->buffer_size < params->buffer_size)) {
-        __free(_dev_state->buffer);
-
-        _dev_state->buffer = NULL;
+    if (l == 0) {
+        return 0;
     }
 
-    if (_dev_state->buffer == NULL) {
-        _dev_state->buffer = __malloc(params->buffer_size);
+    /* XXX: Needs to be reworked */
+    /* usb_cart_byte_send(SSLOAD_COMM_CMD_LOG); */
+    usb_cart_long_send(l);
 
-        (void)memset(_dev_state->buffer, '\0', params->buffer_size);
+    for (uint32_t i = 0; i < l; i++) {
+        usb_cart_byte_send(*s);
+        s++;
     }
-    assert(_dev_state->buffer != NULL);
 
-    _dev_state->buffer_base = _dev_state->buffer;
-    _dev_state->buffer_size = params->buffer_size;
+    return l;
+}
 
-    _dev_state->state = STATE_INITIALIZED;
+static int
+_file_close(FILE *file)
+{
+    __free(file->buf);
+
+    return 0;
+}
+
+static void
+_init(const void *params __unused)
+{
+    void * const buffer = malloc(USB_CART_OUT_EP_SIZE);
+    assert(buffer != NULL);
+
+    _cookie.file.write = _file_write;
+    _cookie.file.close = _file_close;
+    _cookie.file.buf = buffer;
+    _cookie.file.buf_size = USB_CART_OUT_EP_SIZE;
 }
 
 static void
 _deinit(void)
 {
-    if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
-        return;
-    }
-
-    __free(_dev_state->buffer);
-    __free(_dev_state);
-
-    _dev_state = NULL;
+    fclose(&_cookie.file);
 }
 
 static void
 _puts(const char *buffer)
 {
-    const size_t len = strlen(buffer);
-
-    const uint32_t current_len =
-      _dev_state->buffer_base - _dev_state->buffer;
-
-    const uint32_t new_len = current_len + len;
-
-    if (new_len >= _dev_state->buffer_size) {
-        return;
-    }
-
-    (void)memcpy(_dev_state->buffer_base, buffer, len);
-
-    _dev_state->buffer_base += len;
-
-    _dev_state->state |= STATE_BUFFER_DIRTY;
+    (void)fputs(buffer, &_cookie.file);
 }
 
 static void
-_buffer_partial_flush(const uint8_t *buffer, uint32_t len)
+_printf(const char *format, va_list ap)
 {
-    if (len == 0) {
-        return;
-    }
-
-    /* XXX: Needs to be reworked */
-    /* usb_cart_byte_send(SSLOAD_COMM_CMD_LOG); */
-    usb_cart_long_send(len);
-
-    for (uint32_t i = 0; i < len; i++) {
-        usb_cart_byte_send(buffer[i]);
-    }
+    (void)vfprintf(&_cookie.file, format, ap);
 }
 
 static void
 _flush(void)
 {
-    if ((_dev_state->state & STATE_BUFFER_DIRTY) != STATE_BUFFER_DIRTY) {
-        return;
-    }
-
-    _dev_state->state |= STATE_BUFFER_FLUSHING;
-
-    const uint32_t len = _dev_state->buffer_base - _dev_state->buffer;
-
-    _buffer_partial_flush(&_dev_state->buffer[0], len);
-
-    _dev_state->buffer_base = _dev_state->buffer;
-
-    _dev_state->state &= ~(STATE_BUFFER_DIRTY | STATE_BUFFER_FLUSHING);
-}
-
-static void
-_font_load(void)
-{
+    fflush(&_cookie.file);
 }

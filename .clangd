@@ -1,2 +1,0 @@
-CompileFlags:
-  Add: [-m32, -Wno-unknown-attributes]

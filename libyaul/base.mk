@@ -40,7 +40,7 @@ SUPPORT_DEPS:= $(SUPPORT_OBJS:.o=.d)
 SUPPORT_OBJS_base:= $(SUPPORT_OBJS_C_base) $(SUPPORT_OBJS_CXX_base) $(SUPPORT_OBJS_S_base)
 SUPPORT_DEPS_base:= $(SUPPORT_OBJS_base:.o=.d)
 
-LDSCRIPTS_all:= $(addprefix $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/,$(LDSCRIPTS))
+LDSCRIPTS_all:= $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(LDSCRIPTS))
 SPECS_all := $(addprefix $(THIS_ROOT)/lib$(TARGET)/,$(SPECS))
 IP_FILES_all = $(IP_FILES)
 USER_FILES_all = $(USER_FILES)
@@ -66,7 +66,7 @@ endef
 
 all: $(TYPE)
 
-$(TYPE): $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(LDSCRIPTS_all) $(SPECS_all)
+$(TYPE): $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) $(LIB_FILE_base) $(SUPPORT_OBJS_base) $(SPECS_all)
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE):
 	$(ECHO)mkdir -p $@
@@ -82,15 +82,6 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
-
-$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/%.x: %.x
-	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
-	$(ECHO)mkdir -p $(@D)
-	$(ECHO)cat $< | awk '/^SEARCH_DIR[[:space:]]+(.+);$$/ { \
-	    sub(/\$$INSTALL_ROOT/,"'$(YAUL_PREFIX)'/'$(YAUL_ARCH_SH_PREFIX)'"); \
-	} \
-	{ print }' > $@
-
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -121,17 +112,14 @@ $(foreach HELPER_FILE,$(HELPER_FILES_all), \
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
-generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(CDB_CPP),$(SH_CXXFLAGS_release),release,$(CDB_FILE))
+$(foreach FILE,$(LIB_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(TYPE),$(FILE))))
+$(foreach FILE,$(LIB_SRCS_CXX),$(eval $(call macro-sh-c++-generate-cdb-rule,$(TYPE),$(FILE))))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
 		$(FIND) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 	$(ECHO)$(RM) $(LIB_FILE_base)
-	$(ECHO)$(RM) $(CDB_FILE)
 
 -include $(SUPPORT_DEPS_base)
 -include $(LIB_DEPS_base)

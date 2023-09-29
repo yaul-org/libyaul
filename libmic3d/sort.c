@@ -5,7 +5,7 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
+#include <gamemath/defs.h>
 
 #include "internal.h"
 
@@ -34,13 +34,11 @@ _singles_alloc(void)
 void
 __sort_init(void)
 {
-    extern sort_list_t __pool_sort_lists[];
-    extern sort_single_t __pool_sort_singles[];
+    workarea_mic3d_t * const workarea = __state.workarea;
 
     sort_t * const sort = __state.sort;
 
-    sort->singles_pool = __pool_sort_singles;
-    sort->sort_lists_pool = __pool_sort_lists;
+    sort->singles_pool = (void *)workarea->sort_singles;
 
     __sort_reset();
 }
@@ -56,13 +54,14 @@ __sort_reset(void)
 }
 
 void
-__sort_insert(int32_t z)
+__sort_insert(uint32_t z)
 {
     sort_t * const sort = __state.sort;
 
-    const uint32_t index = clamp(z, 0, SORT_DEPTH - 1);
+    assert(sort->sort_lists_pool != NULL);
 
-    sort->max_depth = max(index, sort->max_depth);
+    /* Keep track of the max depth used to save time when iterating */
+    sort->max_depth = max(z, sort->max_depth);
 
     sort_list_t * const list_head = &sort->sort_lists_pool[z];
 
@@ -75,9 +74,11 @@ __sort_insert(int32_t z)
 }
 
 void
-__sort_iterate(sort_iterate_t iterate)
+__sort_iterate(void)
 {
     sort_t * const sort = __state.sort;
+
+    assert(sort->sort_lists_pool != NULL);
 
     sort_list_t *list_head;
     list_head = &sort->sort_lists_pool[sort->max_depth];
@@ -93,7 +94,7 @@ __sort_iterate(sort_iterate_t iterate)
         list_head->head = 0;
 
         while (true) {
-            iterate(single);
+            __render_single(single);
 
             if (single->next_single == 0) {
                 break;

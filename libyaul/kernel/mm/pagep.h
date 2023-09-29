@@ -18,6 +18,8 @@ typedef struct pages {
 
 static_assert(sizeof(pages_t) == 8);
 
+__BEGIN_DECLS
+
 void pagep_pool_hwram_alloc(pagep_t *pagep, uint32_t page_count, size_t page_size);
 void pagep_pool_hwram_free(pagep_t *pagep);
 
@@ -28,5 +30,7 @@ pages_t pagep_byte_alloc(pagep_t *pagep, size_t byte_size);
 pages_t pagep_page_alloc(pagep_t *pagep, uint32_t page_count);
 
 void pagep_free(pagep_t *pagep, pages_t *pages);
+
+__END_DECLS
 
 #endif /* !_YAUL_KERNEL_MM_PAGEP_H_ */

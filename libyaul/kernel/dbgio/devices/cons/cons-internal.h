@@ -15,13 +15,13 @@
 
 __BEGIN_DECLS
 
-#define CONS_COLS_MIN   40
-#define CONS_ROWS_MIN   28
+#define CONS_COLS_MIN 40
+#define CONS_ROWS_MIN 28
 
-#define CONS_COLS_MAX   64
-#define CONS_ROWS_MAX   64
+#define CONS_COLS_MAX 64
+#define CONS_ROWS_MAX 64
 
-#define CONS_TAB_WIDTH  2
+#define CONS_TAB_WIDTH 2
 
 typedef void (*cons_ops_clear_t)(void);
 typedef void (*cons_ops_area_clear_t)(int16_t col_start, int16_t col_end, int16_t row_start, int16_t row_end);
@@ -39,7 +39,9 @@ typedef struct con_ops {
 
 extern void __cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows);
 extern void __cons_resize(uint16_t cols, uint16_t rows);
-extern void __cons_buffer(const char *buffer);
+extern void __cons_putc(char ch);
+extern void __cons_puts(const char *buffer);
+extern void __cons_write(const char *buffer, size_t len);
 
 __END_DECLS
 
