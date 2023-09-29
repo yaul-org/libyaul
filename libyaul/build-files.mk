@@ -17,7 +17,6 @@ USER_FILES:= \
 	build/ip.bin.mk
 
 HELPER_FILES:= \
-	common/update-cdb \
 	common/wrap-error
 
 LDSCRIPTS:= \
