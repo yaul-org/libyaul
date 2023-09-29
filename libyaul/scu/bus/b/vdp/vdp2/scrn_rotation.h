@@ -11,7 +11,6 @@
 #include <sys/cdefs.h>
 
 #include <assert.h>
-#include <math.h>
 #include <stdint.h>
 
 #include <vdp2/scrn_shared.h>
@@ -144,6 +143,7 @@ typedef struct vdp2_scrn_rotation_params {
 
     /// Screen-over process type.
     vdp2_scrn_rsop_type_t rsop_type;
+
     // XXX: Needs the screen-over process pattern name?
 
     /// Coefficient table parameters.

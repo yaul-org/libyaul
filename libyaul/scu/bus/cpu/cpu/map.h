@@ -77,6 +77,10 @@ typedef struct cpu_ioregs {
         /// @brief CPU I/O register.
         uint8_t  frcl;
 
+    /* GCC complains:
+     *   Warning: ISO C++ prohibits anonymous structs */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
         union {
                 struct {
                         /// @brief CPU I/O register.
@@ -92,6 +96,7 @@ typedef struct cpu_ioregs {
                         uint8_t  ocrbl;
                 } __packed;
         };
+#pragma GCC diagnostic pop
 
         /// @brief CPU I/O register.
         uint8_t  tcr;
@@ -189,6 +194,10 @@ typedef struct cpu_ioregs {
         unsigned int:8;
         unsigned int:8;
 
+    /* GCC complains:
+     *   Warning: ISO C++ prohibits anonymous structs */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
         union {
                 struct {
                         /// @brief CPU I/O register.
@@ -199,6 +208,7 @@ typedef struct cpu_ioregs {
 
                 uint8_t drcrn[2];
         };
+#pragma GCC diagnostic pop
 
         unsigned int:8;
         unsigned int:8;
@@ -212,8 +222,12 @@ typedef struct cpu_ioregs {
         unsigned int:8;
         unsigned int:8;
         unsigned int:8;
-        unsigned int:8;
+        unsigned int : 8;
 
+    /* GCC complains:
+     *   Warning: ISO C++ prohibits anonymous structs */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
         union {
                 /// @brief CPU I/O register.
                 uint16_t wtcntw;
@@ -238,6 +252,7 @@ typedef struct cpu_ioregs {
                         uint8_t rstcsrr;
                 } __packed;
         };
+#pragma GCC diagnostic pop
 
         unsigned int:8;
         unsigned int:8;
@@ -477,6 +492,10 @@ typedef struct cpu_ioregs {
         unsigned int:8;
         unsigned int:8;
 
+    /* GCC complains:
+     *   Warning: ISO C++ prohibits anonymous structs */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
         union {
                 struct {
                         cpu_dmac_ioregs_t channel0;
@@ -485,6 +504,7 @@ typedef struct cpu_ioregs {
 
                 cpu_dmac_ioregs_t channels[2];
         };
+#pragma GCC diagnostic pop
 
         /// @brief CPU I/O register.
         uint32_t vcrdma0;

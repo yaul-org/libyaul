@@ -39,7 +39,6 @@ define macro-generate-generate-cdb-rule
 .PHONY: $1-generate-cdb
 
 $1-generate-cdb:
-	$(ECHO)printf -- "$(V_BEGIN_CYAN)$1$(V_END) $(V_BEGIN_GREEN)generate-cdb$(V_END)\n"
 	$(ECHO)($(MAKE) -C $1 -f release.mk generate-cdb) || exit $${?}
 endef
 
@@ -78,7 +77,6 @@ endef
 .PHONY: all \
 	check-tool-chain \
 	clean \
-	clean-cdb \
 	clean-debug \
 	clean-release \
 	clean-tools \
@@ -123,9 +121,9 @@ install-debug: debug
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),release)))
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-install-rule,$(project),debug)))
 
-clean: clean-release clean-debug clean-tools clean-cdb
+clean: clean-release clean-debug clean-tools
 
-distclean: clean-cdb
+distclean:
 	$(ECHO)$(RM) -r $(YAUL_BUILD_ROOT)/$(YAUL_BUILD)
 
 clean-release:
@@ -154,10 +152,7 @@ clean-tools:
 
 $(foreach project,$(PROJECTS),$(eval $(call macro-generate-generate-cdb-rule,$(project))))
 
-generate-cdb: clean-cdb $(patsubst %,%-generate-cdb,$(PROJECTS))
-
-clean-cdb:
-	$(RM) $(CDB_FILE)
+generate-cdb: $(patsubst %,%-generate-cdb,$(PROJECTS))
 
 list-targets:
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | \

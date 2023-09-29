@@ -1,3 +1,5 @@
+#include <gamemath/defs.h>
+
 #include "memb-internal.h"
 
 int
@@ -12,10 +14,7 @@ __memb_memb_request_init(memb_t *memb, void *pool,
 
     const size_t ref_size = sizeof(memb_ref_t) * request->block_count;
     memb_ref_t * const refs = request->malloc_func(ref_size);
-
-    if (refs == NULL) {
-        return -1;
-    }
+    assert(refs != NULL);
 
     memb->type = MEMB_TYPE_SET;
     memb->size = request->block_size;
@@ -42,20 +41,16 @@ __memb_memb_request_alloc(memb_t *memb, const memb_request_t *request)
     const size_t pool_size = request->block_size * request->block_count;
 
     /* Allocate all memory needed in a single request */
-    void * const area = request->memalign_func(ref_size + pool_size, align);
+    void * const area = request->memalign_func(align, ref_size + pool_size);
+    assert(area != NULL);
 
-    if (area == NULL) {
-        return -1;
-    }
-
-    uintptr_t area_ptr = (uintptr_t)area;
+    const uintptr_t area_ptr = (uintptr_t)area;
 
     memb->type = MEMB_TYPE_DYNAMIC;
     memb->size = request->block_size;
     memb->count = request->block_count;
     memb->refs = (void *)(area_ptr + pool_size);
-    /* Have the pool be at the top of the allocation request for
-     * alignment */
+    /* Have the pool be at the top of the allocation request for alignment */
     memb->pool = (void *)area_ptr;
 
     memb->free = request->free_func;

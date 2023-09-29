@@ -8,10 +8,11 @@
 #ifndef _MIC3D_TLIST_H_
 #define _MIC3D_TLIST_H_
 
-#include "list.h"
+#include "mic3d/types.h"
 
 typedef struct tlist {
-    list_t list;
+    const texture_t *textures;
+    uint16_t texture_count;
 } tlist_t;
 
 void __tlist_init(void);

@@ -13,8 +13,8 @@
 
 #include <vdp1/cmdt.h>
 
-#include <color.h>
-#include <int16.h>
+#include <gamemath/color.h>
+#include <gamemath/int16.h>
 
 __BEGIN_DECLS
 

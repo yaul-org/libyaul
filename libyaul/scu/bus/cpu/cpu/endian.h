@@ -63,8 +63,9 @@ cpu_bswap16(uint16_t x)
 /// @param x Value to be swapped.
 ///
 /// @returns Swapped value.
+__BEGIN_ASM
 static inline uint32_t __always_inline
-cpu_bswap32(uint32_t x)
+cpu_bswap32(uint32_t x __unused)
 {
     __register uint32_t out;
 
@@ -73,9 +74,9 @@ cpu_bswap32(uint32_t x)
     __register uint32_t t1;
     t1 = 0;
 
-    __asm__ volatile ("swap.b %[in], %[ot0]\n"
-                      "swap.w %[it0], %[ot1]\n"
-                      "swap.b %[it1], %[out]\n"
+    __declare_asm("swap.b %[in], %[ot0]\n"
+                  "swap.w %[it0], %[ot1]\n"
+                  "swap.b %[it1], %[out]\n"
         : [out] "=&r" (out),
           [ot0] "=r" (t0),
           [ot1] "=r" (t1)
@@ -85,6 +86,7 @@ cpu_bswap32(uint32_t x)
 
     return out;
 }
+__END_ASM
 
 /// @}
 

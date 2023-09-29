@@ -18,10 +18,6 @@ ifneq (1,$(words [$(strip $(YAUL_PROG_SH_PREFIX))]))
   $(error YAUL_PROG_SH_PREFIX (tool-chain program prefix) contains spaces)
 endif
 
-ifeq ($(strip $(YAUL_CDB)),)
-  $(error Undefined YAUL_CDB (update JSON compile command database))
-endif
-
 ifeq ($(strip $(SILENT)),)
   ECHO=
 else
@@ -139,6 +135,7 @@ SH_CFLAGS= \
 	-save-temps=obj
 
 SH_LDFLAGS= \
+	-static \
 	-Wl,--gc-sections \
 	-Wl,-Map,$(SH_BUILD_PATH)/$(SH_PROGRAM).map
 
@@ -148,11 +145,7 @@ SH_LXXFLAGS= $(SH_LDFLAGS)
 SH_BUILD_PATH= $(abspath $(SH_BUILD_DIR))
 SH_OUTPUT_PATH= $(abspath $(SH_OUTPUT_DIR))
 
-CDB_FILE:= compile_commands.json
-CDB_GCC?= /usr/bin/gcc
-CDB_CPP?= /usr/bin/g++
-
-.PHONY: all clean .build
+.PHONY: all generate-cdb clean .build
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .C .cpp .cxx .sx .o .bin .elf

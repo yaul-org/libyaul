@@ -14,6 +14,8 @@
 #include <vdp1/cmdt.h>
 #include <vdp1/vram.h>
 
+#include <gamemath/uint32.h>
+
 #include "vdp-internal.h"
 
 void

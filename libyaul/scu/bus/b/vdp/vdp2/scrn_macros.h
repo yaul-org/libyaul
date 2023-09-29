@@ -8,7 +8,6 @@
 #ifndef _YAUL_VDP2_SCRN_MACROS_H_
 #define _YAUL_VDP2_SCRN_MACROS_H_
 
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 

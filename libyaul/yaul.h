@@ -15,40 +15,30 @@
 #define _YAUL_H_
 
 #include <bios.h>
-
 #include <bup.h>
+#include <ip.h>
 
-/* CPU-bus CPU */
-#include <scu/bus/cpu/cpu.h>
+#include <cpu.h>
+#include <smpc.h>
 
-/* CPU-bus SMPC */
-#include <scu/bus/cpu/smpc/smpc.h>
-
-/* SCU */
-#include <scu/scu.h>
+#include <scu.h>
 
 /* CS0 */
 #include <usb-cart.h>
 #include <arp.h>
 #include <flash.h>
-
-#include <scu/bus/a/cs0/dram-cart/dram-cart.h>
+#include <dram-cart.h>
 
 /* CS2 */
-#include <scu/bus/a/cs2/cd-block/cd-block.h>
+#include <cd-block.h>
 
-/* B-bus VDP1 and VDP2 */
-#include <scu/bus/b/vdp/vdp.h>
-
-/* B-bus SCSP */
-#include <scu/bus/b/scsp/scsp.h>
+#include <vdp.h>
+#include <scsp.h>
 
 /* Kernel */
-#include <ip/ip.h>
+#include <dbgio.h>
 
-#include <dbgio/dbgio.h>
-
-#include <math.h>
+#include <gamemath.h>
 
 #include <mm/arena.h>
 #include <mm/memb.h>
