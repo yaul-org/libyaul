@@ -227,7 +227,7 @@ cd_block_transfer_data_dmac(uint16_t offset, uint16_t buffer_number,
     }
 
     /* Wait for data */
-    // if ((_hirq_flag_wait(DRDY | EHST)) != 0) {
+    /* if ((_hirq_flag_wait(DRDY | EHST)) != 0) { */
     if ((_hirq_flag_wait(DRDY)) != 0) {
         return CD_STATUS_TIMEOUT;
     }
@@ -235,7 +235,7 @@ cd_block_transfer_data_dmac(uint16_t offset, uint16_t buffer_number,
     /* Transfer from register to user space */
     uint32_t to_read;
     to_read = (buffer_length % 2) ? buffer_length - 1 : buffer_length;
-                
+
     cpu_dmac_channel_wait(ch);
 
     cpu_dmac_cfg_t cfg = {

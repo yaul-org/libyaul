@@ -93,6 +93,7 @@ extern void vdp1_sync_interval_set(int8_t interval);
 extern void vdp1_sync_mode_set(vdp_sync_mode_t mode);
 extern vdp_sync_mode_t vdp1_sync_mode_get(void);
 
+extern void vdp1_sync_force_put(void);
 extern void vdp1_sync_cmdt_put(const vdp1_cmdt_t *cmdts, uint16_t count,
   uint16_t index);
 extern void vdp1_sync_cmdt_list_put(const vdp1_cmdt_list_t *cmdt_list,

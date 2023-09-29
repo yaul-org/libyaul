@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "tlsf.h"
+#include <mm/tlsf.h>
 
 #if defined(__cplusplus)
 #define tlsf_decl inline
@@ -26,12 +26,12 @@
  * implementations will be used when available, falling back to a reasonably
  * efficient generic implementation.
  *
- * NOTE: TLSF spec relies on ffs/fls returning value 0..31.
- * ffs/fls return 1-32 by default, returning 0 for error.
+ * NOTE: TLSF spec relies on ffs/fls returning value 0..31. ffs/fls return 1-32
+ *       by default, returning 0 for error.
  */
 
 /* Detect whether or not we are building for a 32- or 64-bit (LP/LLP)
- * architecture. There is no reliable portable method at compile-time. */
+ * architecture. There is no reliable portable method at compile-time */
 #if defined (__alpha__) || defined (__ia64__) || defined (__x86_64__) ||       \
     defined (_WIN64) || defined (__LP64__) || defined (__LLP64__)
 #define TLSF_64BIT
@@ -916,15 +916,14 @@ tlsf_check(tlsf_t tlsf)
 #undef tlsf_insist
 
 static void
-default_walker(void *ptr __unused, size_t size __unused, int used __unused, void *user __unused)
+_default_walker(void *ptr __unused, size_t size __unused, int used __unused, void *user __unused)
 {
-    /* printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (uint32_t)size, block_from_ptr(ptr)); */
 }
 
 void
 tlsf_pool_walk(tlsf_pool_t pool, tlsf_walker_t walker, void *user)
 {
-    tlsf_walker_t pool_walker = walker ? walker : default_walker;
+    tlsf_walker_t pool_walker = walker ? walker : _default_walker;
     block_header_t *block =
       offset_to_block(pool, -(int)block_header_overhead);
 

@@ -7,7 +7,7 @@
  * Joshua Haberman <joshua@reverberate.org>
  */
 
-static state_change_t _vt_parse_state_table[15][256] __aligned(4) = {
+static const state_change_t _vt_parse_state_table[15][256] __aligned(4) = {
     {
         0,
         0,
@@ -2137,7 +2137,7 @@ static state_change_t _vt_parse_state_table[15][256] __aligned(4) = {
     }
 };
 
-static vt_parse_action_t _vt_parse_entry_actions[] = {
+static const vt_parse_action_t _vt_parse_entry_actions[] = {
     0, /* None for ANYWHERE */
     VT_PARSE_ACTION_CLEAR, /* CSI_ENTRY */
     0, /* None for CSI_IGNORE */
@@ -2155,7 +2155,7 @@ static vt_parse_action_t _vt_parse_entry_actions[] = {
     0 /* None for SOS_PM_APC_STRING */
 };
 
-static vt_parse_action_t _vt_parse_exit_actions[] = {
+static const vt_parse_action_t _vt_parse_exit_actions[] = {
     0, /* None for ANYWHERE */
     0, /* None for CSI_ENTRY */
     0, /* None for CSI_IGNORE */

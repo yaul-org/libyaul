@@ -10,8 +10,13 @@
 
 #include <assert.h>
 
-#include <fix16.h>
+#include <gamemath.h>
 #include <vdp1.h>
+
+typedef enum camera_type {
+    CAMERA_TYPE_ORTHOGRAPHIC,
+    CAMERA_TYPE_PERSPECTIVE
+} camera_type_t;
 
 typedef enum render_flags {
     RENDER_FLAGS_NONE     = 0,
@@ -23,6 +28,10 @@ typedef enum render_flags {
 
 typedef uint16_t texture_slot_t;
 typedef uint16_t gst_slot_t;
+
+typedef struct {
+    uint16_t head;
+} __aligned(2) sort_list_t;
 
 typedef enum sort_type {
     SORT_TYPE_BFR,
@@ -143,11 +152,12 @@ typedef struct object {
 typedef struct picture {
     const void *data;
     uint16_t data_size;
-    int16_vec2_t dim;
+    uint16_t width;
+    uint16_t height;
     uint16_t palette_index;
 } picture_t;
 
-static_assert(sizeof(picture_t) == 16);
+static_assert(sizeof(picture_t) == 12);
 
 typedef struct texture {
     uint16_t vram_index;
@@ -163,4 +173,4 @@ typedef struct palette {
 
 static_assert(sizeof(palette_t) == 8);
 
-#endif /* _MIC3D_TYPES_H_ */
+#endif /* !_MIC3D_TYPES_H_ */
