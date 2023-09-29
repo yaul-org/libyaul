@@ -76,7 +76,7 @@ void
 fix16_mat43_mul(const fix16_mat43_t *m0, const fix16_mat43_t *m1, fix16_mat43_t *result)
 {
     fix16_mat33_mul(&m0->rotation, &m1->rotation, &result->rotation);
-    fix16_mat43_pos3_mul(m0, &m0->translation, &result->translation);
+    fix16_mat43_pos3_mul(m0, &m1->translation, &result->translation);
 }
 
 void
