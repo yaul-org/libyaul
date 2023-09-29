@@ -8,9 +8,10 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 #define MAX_INTERMEDIATE_CHARS 2
 
@@ -57,24 +58,24 @@ typedef uint8_t state_change_t;
 
 struct vt_parse;
 
-typedef void (*vt_parse_callback)(struct vt_parse *, vt_parse_action_t, int);
+typedef void (*vt_parse_callback_t)(struct vt_parse *parser, vt_parse_action_t action, char ch);
 
 typedef struct vt_parse {
     vt_parse_state_t state;
-    vt_parse_callback callback;
+    vt_parse_callback_t callback;
     uint8_t intermediate_chars[MAX_INTERMEDIATE_CHARS + 1];
     uint8_t ignore_flagged;
     uint8_t params[16];
     uint8_t num_params;
 } __aligned(32) vt_parse_t;
 
-static void _do_action(vt_parse_t *, vt_parse_action_t, char);
-static void _do_state_change(vt_parse_t *, state_change_t, char);
+static void _do_action(vt_parse_t *parser, vt_parse_action_t action, char ch);
+static void _do_state_change(vt_parse_t *parser, state_change_t change, char ch);
 
 #include "vt_parse_table.inc"
 
 static void
-_vt_parse_init(vt_parse_t *parser, vt_parse_callback callback)
+_vt_parse_init(vt_parse_t *parser, vt_parse_callback_t callback)
 {
     parser->state = VT_PARSE_STATE_GROUND;
     parser->intermediate_chars[0] = '\0';
@@ -84,32 +85,40 @@ _vt_parse_init(vt_parse_t *parser, vt_parse_callback callback)
 }
 
 static void
-_vt_parse(vt_parse_t *parser, const char *data)
+_vt_char_parse(vt_parse_t *parser, char ch)
 {
-    if (data == NULL) {
+    /* If a transition is defined from the "anywhere" state, always use
+     * that. Otherwise use the transition from the current state */
+
+    const uint32_t index = ch;
+
+    state_change_t change;
+    change = _vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][index];
+
+    if (!change) {
+        change = _vt_parse_state_table[parser->state][index];
+    }
+
+    _do_state_change(parser, change, ch);
+}
+
+static void
+_vt_string_parse(vt_parse_t *parser, const char *buffer)
+{
+    if (buffer == NULL) {
         return;
     }
 
     while (true) {
-        const uint8_t ch = *data;
+        const uint8_t ch = *buffer;
 
         if (ch == '\0') {
             return;
         }
 
-        data++;
+        _vt_char_parse(parser, ch);
 
-        /* If a transition is defined from the "anywhere" state, always use
-         * that. Otherwise use the transition from the current state */
-
-        state_change_t change;
-        change = _vt_parse_state_table[VT_PARSE_STATE_ANYWHERE][ch];
-
-        if (!change) {
-            change = _vt_parse_state_table[parser->state][ch];
-        }
-
-        _do_state_change(parser, change, ch);
+        buffer++;
     }
 }
 

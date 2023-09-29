@@ -13,6 +13,11 @@
 #include <gamemath.h>
 #include <vdp1.h>
 
+typedef enum camera_type {
+    CAMERA_TYPE_ORTHOGRAPHIC,
+    CAMERA_TYPE_PERSPECTIVE
+} camera_type_t;
+
 typedef enum render_flags {
     RENDER_FLAGS_NONE     = 0,
     RENDER_FLAGS_LIGHTING = 1 << 0,
@@ -23,6 +28,10 @@ typedef enum render_flags {
 
 typedef uint16_t texture_slot_t;
 typedef uint16_t gst_slot_t;
+
+typedef struct {
+    uint16_t head;
+} __aligned(2) sort_list_t;
 
 typedef enum sort_type {
     SORT_TYPE_BFR,

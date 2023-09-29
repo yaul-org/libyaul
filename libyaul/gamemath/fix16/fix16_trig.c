@@ -68,7 +68,7 @@ fix16_tan(const angle_t angle)
 
     fix16_sincos(angle, &sin, &cos);
 
-    cpu_divu_fix16_set(FIX16_ONE, cos);
+    cpu_divu_fix16_set(FIX16(1.0), cos);
 
     const fix16_t quotient = cpu_divu_quotient_get();
     const fix16_t result = fix16_mul(sin, quotient);
@@ -79,20 +79,20 @@ fix16_tan(const angle_t angle)
 angle_t
 fix16_atan2(fix16_t y, fix16_t x)
 {
-    if (y == FIX16_ZERO) {
-        return ((x >= FIX16_ZERO) ? RAD2ANGLE(0.0f) : RAD2ANGLE(M_PI));
+    if (y == FIX16(0.0)) {
+        return ((x >= FIX16(0.0)) ? RAD2ANGLE(0.0f) : RAD2ANGLE(M_PI));
     }
 
     angle_t phi;
     phi = RAD2ANGLE(0.0f);
 
-    if (y < FIX16_ZERO) {
+    if (y < FIX16(0.0)) {
         x = -x;
         y = -y;
         phi = RAD2ANGLE(M_PI);
     }
 
-    if (x <= FIX16_ZERO) {
+    if (x <= FIX16(0.0)) {
         const fix16_t t = -x;
 
         x = y;

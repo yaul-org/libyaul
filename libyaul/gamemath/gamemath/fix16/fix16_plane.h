@@ -44,7 +44,7 @@ typedef struct fix16_plane {
     fix16_vec3_t normal;
     /// @param ny Not yet documented.
     fix16_vec3_t d;
-} __packed __aligned(4) fix16_plane_t;
+} fix16_plane_t;
 
 /// @brief Not yet documented.
 ///

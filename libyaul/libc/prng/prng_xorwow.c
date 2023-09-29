@@ -26,7 +26,7 @@ prng_xorwow_seed(uint32_t s)
 
 /* The state array must be initialized to not be all zero in the first four words */
 uint32_t
-prng_xorwow()
+prng_xorwow(void)
 {
     /* Algorithm "xorwow" from p. 5 of Marsaglia, "Xorshift RNGs" */
     uint32_t t  = _state.x[4];

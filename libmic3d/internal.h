@@ -19,11 +19,10 @@
 #include "perf.h"
 #include "gst.h"
 
-static_assert(sizeof(sort_list_t) == STRUCT_MIC3D_SORT_LISTS_BYTE_SIZE);
 static_assert(sizeof(sort_single_t) == STRUCT_MIC3D_SORT_SINGLES_BYTE_SIZE);
 static_assert(sizeof(vdp1_cmdt_t) == STRUCT_MIC3D_CMDTS_BYTE_SIZE);
 static_assert(sizeof(fix16_t) == STRUCT_MIC3D_DEPTH_VALUES_BYTE_SIZE);
-static_assert(sizeof(fix16_t) == STRUCT_MIC3D_Z_VALUES_BYTE_SIZE);
+static_assert(sizeof(int16_t) == STRUCT_MIC3D_Z_VALUES_BYTE_SIZE);
 static_assert(sizeof(int16_vec2_t) == STRUCT_MIC3D_SCREEN_POINTS_BYTE_SIZE);
 static_assert(sizeof(fix16_mat43_t) == STRUCT_MIC3D_RENDER_MATRICES_BYTE_SIZE);
 static_assert(sizeof(fix16_mat33_t) == STRUCT_MIC3D_LIGHT_MATRICES_BYTE_SIZE);

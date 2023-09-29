@@ -82,7 +82,6 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
-
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -113,17 +112,14 @@ $(foreach HELPER_FILE,$(HELPER_FILES_all), \
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
-generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(CDB_CPP),$(SH_CXXFLAGS_release),release,$(CDB_FILE))
+$(foreach FILE,$(LIB_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(TYPE),$(FILE))))
+$(foreach FILE,$(LIB_SRCS_CXX),$(eval $(call macro-sh-c++-generate-cdb-rule,$(TYPE),$(FILE))))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
 		$(FIND) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 	$(ECHO)$(RM) $(LIB_FILE_base)
-	$(ECHO)$(RM) $(CDB_FILE)
 
 -include $(SUPPORT_DEPS_base)
 -include $(LIB_DEPS_base)

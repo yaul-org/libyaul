@@ -5,11 +5,12 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
-#include <math.h>
 #include <stdio.h>
 
 #include <cpu/frt.h>
 #include <cpu/intc.h>
+
+#include <gamemath/defs.h>
 
 #include "internal.h"
 

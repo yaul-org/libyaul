@@ -49,18 +49,16 @@ LIB_SRCS+= \
 
 LIB_SRCS+= \
 	kernel/dbgio/dbgio.c \
+	kernel/dbgio/devices/cons/cons.c \
+	kernel/dbgio/devices/mednafen-debug.c \
 	kernel/dbgio/devices/null.c \
+	kernel/dbgio/devices/usb-cart.c \
 	kernel/dbgio/devices/vdp1.c \
 	kernel/dbgio/devices/vdp2.c \
 	kernel/dbgio/font/default_font.c \
 	kernel/dbgio/font/font.c
 
 LIB_SRCS+= \
-	kernel/dbgio/devices/usb-cart.c
-
-LIB_SRCS+= \
-	kernel/dbgio/devices/cons/cons.c \
-	\
 	kernel/sys/dma-queue.c \
 	kernel/sys/dma-queue-internal.c \
 	kernel/sys/callback-list.c \
@@ -183,11 +181,9 @@ LIB_SRCS+= \
 	libc/exit/exit.c
 
 LIB_SRCS+= \
-	libc/stdlib/abs.c \
 	libc/stdlib/atoi.c \
 	libc/stdlib/atol.c \
 	libc/stdlib/free.c \
-	libc/stdlib/labs.c \
 	libc/stdlib/malloc.c \
 	libc/stdlib/memalign.c \
 	libc/stdlib/realloc.c \
@@ -221,7 +217,8 @@ LIB_SRCS+= \
 	gamemath/fix16/fix16_trig.c \
 	gamemath/fix16/fix16_vec2.c \
 	gamemath/fix16/fix16_vec3.c \
-	gamemath/fix16/fix16_vec4.c \
+\
+	gamemath/fix16/c++/fix16_vec3.cxx \
 \
 	gamemath/int16.c \
 	gamemath/int32.c \
@@ -345,7 +342,6 @@ INSTALL_HEADER_FILES+= \
 	./gamemath/gamemath/fix16/:fix16_trig.h:yaul/gamemath/fix16/ \
 	./gamemath/gamemath/fix16/:fix16_vec2.h:yaul/gamemath/fix16/ \
 	./gamemath/gamemath/fix16/:fix16_vec3.h:yaul/gamemath/fix16/ \
-	./gamemath/gamemath/fix16/:fix16_vec4.h:yaul/gamemath/fix16/ \
 \
 	./gamemath/gamemath/:defs.h:yaul/gamemath/ \
 	./gamemath/gamemath/:int8.h:yaul/gamemath/ \

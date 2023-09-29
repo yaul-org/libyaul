@@ -20,17 +20,19 @@ __BEGIN_DECLS
 /// @{
 
 /// Partition designated for using the cache.
-#define CPU_CACHE               0x00000000UL
+#define CPU_CACHE                  0x00000000UL
 /// Partition designated for bypassing the cache.
-#define CPU_CACHE_THROUGH       0x20000000UL
+#define CPU_CACHE_THROUGH          0x20000000UL
 /// Partition designated for purging a specific line.
-#define CPU_CACHE_PURGE         0x40000000UL
+#define CPU_CACHE_PURGE            0x40000000UL
 /// Partition designated for accessing the address cache array directly.
-#define CPU_CACHE_ADDRESS_RW    0x60000000UL
+#define CPU_CACHE_ADDRESS_RW       0x60000000UL
 /// Partition designated for accessing the cache data directly.
-#define CPU_CACHE_DATA_RW       0xC0000000UL
+#define CPU_CACHE_DATA_RW          0xC0000000UL
 /// Partition designated for bypassing the cache (I/O area).
-#define CPU_CACHE_IO            0xF0000000UL
+#define CPU_CACHE_IO               0xF0000000UL
+/// Partition address mask.
+#define CPU_ADDRESS_PARTITION_MASK 0xF0000000UL
 
 /// Address for when accessing cache data directly.
 #define CPU_CACHE_WAY_0_ADDR    0xC0000000UL

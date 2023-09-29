@@ -17,18 +17,6 @@ __BEGIN_DECLS
 /// @{
 
 /// @brief Not yet documented.
-#define FIX16_LUT_SIN_TABLE_SHIFT  (10)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_SIN_TABLE_COUNT  (1024)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_ATAN_TABLE_SHIFT (8)
-
-/// @brief Not yet documented.
-#define FIX16_LUT_ATAN_TABLE_COUNT (256)
-
-/// @brief Not yet documented.
 ///
 /// @param angle Not yet documented.
 ///
@@ -54,7 +42,8 @@ extern fix16_t fix16_tan(angle_t angle);
 /// @param      angle      Not yet documented.
 /// @param[out] result_sin Not yet documented.
 /// @param[out] result_cos Not yet documented.
-extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos);
+extern void fix16_sincos(angle_t angle, fix16_t *result_sin,
+    fix16_t *result_cos);
 
 /// @brief Not yet documented.
 ///
@@ -64,8 +53,20 @@ extern void fix16_sincos(angle_t angle, fix16_t *result_sin, fix16_t *result_cos
 /// @returns Value.
 extern angle_t fix16_atan2(fix16_t y, fix16_t x);
 
-/// @}
-
 __END_DECLS
+
+#if defined(__cplusplus)
+static inline fix16_t cos(angle_t angle) { return fix16_cos(angle); }
+
+static inline fix16_t sin(angle_t angle) { return fix16_sin(angle); }
+
+static inline fix16_t tan(angle_t angle) { return fix16_tan(angle); }
+
+static inline void sincos(angle_t angle, fix16_t& out_sin, fix16_t& out_cos) {
+    fix16_sincos(angle, &out_sin, &out_cos);
+}
+#endif /* __cplusplus */
+
+/// @}
 
 #endif /* !_YAUL_GAMEMATH_FIX16_TRIG_H_ */

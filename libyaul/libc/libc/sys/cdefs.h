@@ -93,7 +93,9 @@
 #define __XSTRING(x)   __STRING(x) /* Expand x, then stringify */
 
 #if (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
-#define __PRAGMA(X) _Pragma(#X)
+#define __PRAGMA(x) _Pragma(#x)
+#else
+#define __PRAGMA(x)
 #endif
 
 /* Compiler-dependent macros to help declare dead (non-returning) and pure (no
@@ -304,8 +306,22 @@
  * string. */
 /// @private
 #ifndef __func__
-#define __func__ NULL
+#define __func__ ((const char *)0)
 #endif
+
+/// @private
+#ifndef __function_name
+/* Use g++'s demangled names in C++ */
+#if defined(__cplusplus) && defined(__GNUC__)
+#define __function_name __PRETTY_FUNCTION__
+/* C99 requires the use of __func__ */
+#elif __STDC_VERSION__ >= 199901L
+#define __function_name __func__
+/* Failed to detect __func__ support */
+#else
+#define __function_name ((const char *)0)
+#endif
+#endif /* !__function_name */
 
 /* GCC 2.95 provides `__restrict' as an extension to C90 to support the
  * C99-specific `restrict' type qualifier. We happen to use `__restrict' as a
@@ -384,17 +400,23 @@
 /// @private
 #ifndef __printflike
 #define __printflike(fmt_arg, first_vararg) \
-    __attribute__((__format__(__printf__, fmt_arg, first_vararg)))
+    __attribute__ ((__format__(__printf__, fmt_arg, first_vararg)))
 #endif
 /// @private
 #ifndef __format_arg
-#define __format_arg(fmt_arg) __attribute__((__format_arg__(fmt_arg)))
+#define __format_arg(fmt_arg) __attribute__ ((__format_arg__(fmt_arg)))
+#endif
+
+/// @private
+#ifndef __alias
+#define __alias(name, aliasname) \
+    extern __typeof(name) aliasname __attribute__ ((alias(#name)))
 #endif
 
 /// @private
 #ifndef __weak_alias
 #define __weak_alias(name, aliasname) \
-    extern __typeof(name) aliasname __attribute__((weak, alias(#name)))
+    extern __typeof(name) aliasname __attribute__ ((weak, alias(#name)))
 #endif
 
 /*

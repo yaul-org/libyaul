@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
+import fileinput
+import io
 import json
 import os
+import re
+import shlex
 import sys
-import locale
-
-PRUNED_FILE_EXTS = [".sx"]
 
 PRUNE_COMPILER_FLAGS = [
     "-m2",
     "-mb",
+    "-s",
     "-flto",
     # This flag causes major issues with Clang. Having this flag present in the
     # JSON compilation database results in fatal errors
@@ -18,82 +20,116 @@ PRUNE_COMPILER_FLAGS = [
 ]
 
 
-def run(compiler_executable, input_file, output_file, directory, out_stream, flags):
-    def build_cdb(out_stream):
-        try:
-            out_stream.seek(0)
-            return json.load(out_stream)
-        except Exception as exception:
-            return []
-
-    def write_cdb(cdb, out_stream, pretty_print=True):
-        out_stream.seek(0)
-        out_stream.truncate()
-        json.dump(cdb, out_stream, indent=(4 if pretty_print else None))
-
-    def prune_flags(flags):
-        return tuple([flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS])
-
-    def new_cdb_entry(compiler_executable, input_file, output_file, directory, flags):
-        arguments = (
-            [compiler_executable] + list(flags) + ["-c", input_file, "-o", output_file]
-        )
-        return {
-            # The main translation unit source processed by this compilation
-            # step. This is used by tools as the key into the compilation
-            # database. There can be multiple command objects for the same file,
-            # for example if the same source file is compiled with different
-            # configurations.
-            "file": input_file,
-            # The working directory of the compilation. All paths specified in
-            # the command or file fields must be either absolute or relative to
-            # this directory.
-            "directory": directory,
-            # The compile command executed. After JSON unescaping, this must be
-            # a valid command to rerun the exact compilation step for the
-            # translation unit in the environment the build system uses.
-            # Parameters use shell quoting and shell escaping of quotes, with
-            # '"' and '\' being the only special characters.
-            #
-            # Shell expansion is not supported.
-            "command": " ".join(arguments),
-            # The compile command executed as list of strings. Either arguments
-            # or command is required.
-            #
-            # It's best to support both as some tool may read one but not the
-            # other.
-            "arguments": arguments,
-        }
-
-    def append_cdb(cdb, new_cdb_entry):
-        return [
-            cdb_entry for cdb_entry in cdb if cdb_entry["file"] != new_cdb_entry["file"]
-        ] + [new_cdb_entry]
-
-    _, ext_input_file = os.path.splitext(input_file)
-    if ext_input_file.lower() in PRUNED_FILE_EXTS:
-        return
-    # Parse output CDB
-    cdb = build_cdb(out_stream)
-
-    pruned_flags = prune_flags(flags)
-
-    cdb_entry = new_cdb_entry(
-        compiler_executable, input_file, output_file, directory, pruned_flags
-    )
-
-    updated_cdb = append_cdb(cdb, cdb_entry)
-
-    if len(updated_cdb) > len(cdb):
-        write_cdb(updated_cdb, out_stream, pretty_print=False)
+class CEntry(object):
+    def __init__(self):
+        self.compiler = None
+        self.filename = None
+        self.command_line = []
 
 
-if __name__ == "__main__":
-    compiler_executable = sys.argv[1]
-    input_file = sys.argv[2]
-    output_file = sys.argv[3]
-    directory = sys.argv[4]
-    flags = sys.argv[6:]
+class CXXEntry(CEntry):
+    def __init__(self):
+        self.compiler = None
+        self.filename = None
+        self.command_line = []
 
-    with open(sys.argv[5], "a+") as out_stream:
-        run(compiler_executable, input_file, output_file, directory, out_stream, flags)
+
+def cdb_entry(entry: CEntry, compiler_override: str = None) -> dict:
+    compiler = change_path(
+        entry.compiler if compiler_override is None else compiler_override)
+    command_line = change_path_flags(
+        prune_flags([compiler] + entry.command_line))
+    return {
+        # The main translation unit source processed by this compilation
+        # step. This is used by tools as the key into the compilation
+        # database. There can be multiple command objects for the same file,
+        # for example if the same source file is compiled with different
+        # configurations.
+        "file": change_path(entry.filename),
+        # The working directory of the compilation. All paths specified in
+        # the command or file fields must be either absolute or relative to
+        # this directory.
+        "directory": os.path.dirname(change_path(entry.filename)),
+        # The compile command executed. After JSON unescaping, this must be
+        # a valid command to rerun the exact compilation step for the
+        # translation unit in the environment the build system uses.
+        # Parameters use shell quoting and shell escaping of quotes, with
+        # '"' and '\' being the only special characters.
+        #
+        # Shell expansion is not supported.
+        "command": " ".join(command_line),
+        # The compile command executed as list of strings. Either arguments
+        # or command is required.
+        #
+        # It's best to support both as some tool may read one but not the
+        # other.
+        "arguments": command_line
+    }
+
+
+def write_cdb(cdb: [CEntry], out_stream: io.TextIOWrapper, pretty_print=True) -> None:
+    out_stream.seek(0)
+    out_stream.truncate()
+    json.dump(cdb, out_stream, indent=(4 if pretty_print else None))
+
+
+def prune_flags(flags: [str]) -> [str]:
+    return [flag for flag in flags if flag not in PRUNE_COMPILER_FLAGS]
+
+
+def change_wsl_path(path: str) -> str:
+    return re.sub(r'/[mM][nN][tT]/([a-zA-Z])', r'\g<1>:', path)
+
+
+def change_cygdrive_path(path: str) -> str:
+    return re.sub(r'/[cC][yY][gG][dD][rR][iI][vV][eE]/([a-zA-Z])', r'\g<1>:', path)
+
+
+def change_path(path: str) -> str:
+    return change_wsl_path(change_cygdrive_path(path))
+
+
+def change_path_flags(flags: [str]) -> [str]:
+    return [change_path(flag) for flag in flags]
+
+
+entries = []
+
+entry = None
+entry_index = 0
+for line in fileinput.input():
+    line = line.strip()
+    if entry_index == 0:
+        if entry is not None:
+            entries.append(entry)
+        if line == "C":
+            entry = CEntry()
+        elif line == "C++":
+            entry = CXXEntry()
+    elif entry_index == 1:
+        entry.compiler = line
+    elif entry_index == 2:
+        entry.filename = line
+    elif entry_index == 3:
+        entry.command_line = shlex.split(line, posix=True)
+    entry_index += 1
+    entry_index %= 4
+
+# Check that we've processed the input correctly
+if entry_index != 0:
+    print("""Invalid input.
+
+Format:
+ L1:         type: [C|C++]
+ L2:     compiler: absolute path
+ L3:     filename: absolute path
+ L4: command-line: arguments""", file=sys.stderr)
+
+if __name__ == '__main__':
+    # TODO: Differentiate between C and C++ compiler paths. Maybe a dictionary:
+    #   {'C': "gcc", 'C++': g++.exe"}
+    compiler_override = None
+
+    with open("compile_commands.json", "w+") as out_stream:
+        cdb = [cdb_entry(entry, compiler_override) for entry in entries]
+        write_cdb(cdb, out_stream)

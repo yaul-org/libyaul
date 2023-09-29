@@ -10,8 +10,10 @@ const dbgio_dev_ops_t __dbgio_dev_ops_vdp2_async = {
     .default_params = &_default_params,
     .init           = (dev_ops_init_t)_async_init,
     .deinit         = _shared_deinit,
+    .display_set    = _shared_display_set,
     .font_load      = _shared_font_load,
     .puts           = _shared_puts,
+    .printf         = _shared_printf,
     .flush          = _async_flush
 };
 
@@ -63,8 +65,8 @@ static void
 _dma_handler_flush(void *work __unused)
 {
     const uint8_t state_mask = STATE_BUFFER_DIRTY |
-      STATE_BUFFER_FLUSHING |
-      STATE_BUFFER_FORCE_FLUSHING;
+                               STATE_BUFFER_FLUSHING |
+                               STATE_BUFFER_FORCE_FLUSHING;
 
     _dev_state->state &= ~state_mask;
 }

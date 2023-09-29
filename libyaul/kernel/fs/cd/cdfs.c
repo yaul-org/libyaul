@@ -75,7 +75,6 @@ cdfs_filelist_init(cdfs_filelist_t *filelist, cdfs_filelist_entry_t *entries, in
 {
     assert(filelist != NULL);
     assert(entries != NULL);
-    assert(sector_read != NULL);
 
     filelist->entries = entries;
     filelist->entries_pooled_count = _filelist_entry_count_clamp(count);
@@ -129,7 +128,7 @@ cdfs_filelist_walk(cdfs_filelist_t *filelist,
     _state.sector_buffer++;
 
     /* Ensure that we have enough sector buffers */
-    assert((_state.sector_buffer - _state.config.sectors) <= _state.config.sector_count);
+    assert((uint32_t)(_state.sector_buffer - _state.config.sectors) <= _state.config.sector_count);
 
     if (root_entry == NULL) {
         /* Skip IP.BIN (16 sectors) */

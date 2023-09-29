@@ -98,7 +98,7 @@ cpu_divu_fix16_split(fix16_t dividend, uint32_t *dh, uint32_t *dl)
 {
     *dh = cpu_instr_swapw(dividend);
     *dh = cpu_instr_extsw(*dh);
-    *dl = dividend << 16;
+    *dl = (uint32_t)dividend << 16UL;
 }
 
 /// @brief Perform a fixed-point bit division operation.
