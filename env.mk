@@ -48,13 +48,6 @@ ifneq (1,$(words [$(strip $(YAUL_BUILD))]))
   $(error YAUL_BUILD (build directory) contains spaces)
 endif
 
-ifeq ($(strip $(YAUL_CDB)),)
-  $(error Undefined YAUL_CDB (update JSON compile command database))
-endif
-ifneq ($(YAUL_CDB),$(filter $(YAUL_CDB),0 1))
-  $(error Invalid value for YAUL_CDB (update JSON compile command database))
-endif
-
 ifneq (1,$(words [$(strip $(YAUL_OPTION_MALLOC_IMPL))]))
   $(error YAUL_OPTION_MALLOC_IMPL (malloc implementation) contains spaces)
 endif
@@ -172,52 +165,25 @@ SHARED_INCLUDE_DIRS:= \
 	../lib$(MAIN_TARGET)/scu/bus/cpu \
 	../lib$(MAIN_TARGET)/scu/bus/cpu/smpc
 
-CDB_FILE:= $(join $(YAUL_BUILD_ROOT)/,compile_commands.json)
-CDB_GCC?= /usr/bin/gcc$(EXE_EXT)
-CDB_CPP?= /usr/bin/g++$(EXE_EXT)
-
-ifeq ($(strip $(YAUL_CDB)),1)
-# $1 -> Absolute path to compiler executable
-# $2 -> Absolute path to input file
-# $3 -> Absolute path to output file
-# $4 -> Absolute build path
-# $5 -> Absolute path to output compile DB file
-# $6 -> Compiler flags
-define macro-update-cdb
-  $(THIS_ROOT)/lib$(MAIN_TARGET)/common/wrap-error $(THIS_ROOT)/lib$(MAIN_TARGET)/common/update-cdb $1 "$2" "$3" $4 $5 -D__INTELLISENSE__ $6 -include "$(THIS_ROOT)/lib$(MAIN_TARGET)/intellisense.h"
+# $1 -> Build type (release, debug)
+# $2 -> $<
+define macro-sh-generate-cdb-rule
+generate-cdb::
+	$(ECHO)printf -- "C\n" >&2
+	$(ECHO)printf -- "/usr/bin/gcc$(EXE_EXT)\n" >&2
+	$(ECHO)printf -- "$(abspath $(2))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(THIS_ROOT)/lib$(MAIN_TARGET)/intellisense.h" -c $(abspath $(2))\n" >&2
 endef
 
-# $1 -> Space delimited list of object files
-# $2 -> File extension (c, cxx)
-# $3 -> Absolute path to compiler executable ($(SH_CC), $(SH_CXX))
-# $4 -> Space delimited list of compiler flags ($(SH_CFLAGS_release), $(SH_CFLAGS_debug), ...)
-# $5 -> Build type (release, debug)
-# $6 -> Absolute path to output compile DB file
-define macro-loop-update-cdb
-	set -e; \
-	for object_file in $1; do \
-	    source_filename=$$(basename "$${object_file%%.o}.$2"); \
-	    build_directory=$$(dirname "$${object_file}"); \
-	    source_directory=$(YAUL_BUILD_ROOT)/lib$(TARGET)/$${build_directory#$(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$5}; \
-	    source_file=$${source_directory}/$${source_filename}; \
-	    source_file=$$(printf -- "$${source_file}" | tr -s '/' '/'); \
-	    printf -- "$(V_BEGIN_YELLOW)$${source_file#$(YAUL_BUILD_ROOT)/}$(V_END)\n"; \
-	    $(call macro-update-cdb,\
-	      $3,\
-	      $${source_file},\
-	      $${object_file},\
-	      $${build_directory},\
-	      $6,\
-	      $4 $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) -Ilib$(TARGET)); \
-	done
+# $1 -> Build type (release, debug)
+# $2 -> $<
+define macro-sh-c++-generate-cdb-rule
+generate-cdb::
+	$(ECHO)printf -- "C++\n" >&2
+	$(ECHO)printf -- "/usr/bin/g++$(EXE_EXT)\n" >&2
+	$(ECHO)printf -- "$(abspath $(2))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CXXFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(THIS_ROOT)/lib$(MAIN_TARGET)/intellisense.h" -c $(abspath $(2))\n" >&2
 endef
-else
-define macro-update-cdb
-endef
-
-define macro-loop-update-cdb
-endef
-endif
 
 # $1 -> Build type (release, debug)
 define macro-sh-build-object
@@ -226,13 +192,6 @@ define macro-sh-build-object
 	$(ECHO)$(SH_CC) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-c -o $@ $(abspath $(<))
-	$(ECHO)$(call macro-update-cdb,\
-		$(CDB_GCC),\
-		$(abspath $(<)),\
-		$(abspath $(@)),\
-		$(abspath $(<D)),\
-		$(CDB_FILE),\
-		$(SH_CFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 # $1 -> Build type (release, debug)
@@ -242,13 +201,6 @@ define macro-sh-build-c++-object
 	$(ECHO)$(SH_CXX) -MT $(@) -MF $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$1/$*.d -MD $(SH_CXXFLAGS_$1) \
 		$(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) \
 		-o $@ -c $(abspath $(<))
-	$(ECHO)$(call macro-update-cdb,\
-		$(CDB_CPP),\
-		$(abspath $(<)),\
-		$(abspath $(@)),\
-		$(abspath $(<D)),\
-		$(CDB_FILE),\
-		$(SH_CXXFLAGS_$1) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))))
 endef
 
 # No arguments
@@ -274,6 +226,7 @@ endef
 
 # $1 ->
 # $2 ->
+#
 # $3 ->
 define macro-sh-generate-install-lib-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/lib/$2: $1
