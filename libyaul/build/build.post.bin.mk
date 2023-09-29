@@ -68,18 +68,22 @@ SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v -nostdinc $(foreach specs,$(S
 SH_SYSTEM_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,""); gsub(/\\/,"/"); print }')
 
-# $1 -> Build type (release, debug)
-# $2 -> $<
+# $1 -> $<
 define macro-sh-generate-cdb-rule
 generate-cdb::
-	$(ECHO)printf -- "gcc$(EXE_EXT) -D__INTELLISENSE__ $(SH_CFLAGS_$1) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(2))\n" >&2
+	$(ECHO)printf -- "C\n" >&2
+	$(ECHO)printf -- "/usr/bin/gcc$(EXE_EXT)\n" >&2
+	$(ECHO)printf -- "$(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
-# $1 -> Build type (release, debug)
-# $2 -> $<
+# $2 -> Build type (release, debug)
 define macro-sh-c++-generate-cdb-rule
 generate-cdb::
-	$(ECHO)printf -- "g++$(EXE_EXT) -D__INTELLISENSE__ $(SH_CXXFLAGS_$1) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(2))\n" >&2
+	$(ECHO)printf -- "C++\n" >&2
+	$(ECHO)printf -- "/usr/bin/g++$(EXE_EXT)\n" >&2
+	$(ECHO)printf -- "$(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CXXFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
 # $1 -> $<
@@ -141,8 +145,8 @@ $(foreach SRC,$(SH_SRCS_S), \
 	$(eval $(call macro-generate-sh-build-asm-object,$(SRC),\
 		$(call macro-convert-build-path,$(addsuffix .o,$(basename $(SRC)))))))
 
-$(foreach FILE,$(SH_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(TYPE),$(FILE))))
-$(foreach FILE,$(SH_SRCS_CXX),$(eval $(call macro-sh-c++-generate-cdb-rule,$(TYPE),$(FILE))))
+$(foreach FILE,$(SH_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(FILE))))
+$(foreach FILE,$(SH_SRCS_CXX),$(eval $(call macro-sh-c++-generate-cdb-rule,$(FILE))))
 
 clean:
 	$(ECHO)printf -- "$(V_BEGIN_CYAN)$(SH_PROGRAM)$(V_END) $(V_BEGIN_GREEN)clean$(V_END)\n"
