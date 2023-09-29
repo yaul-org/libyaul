@@ -117,7 +117,7 @@ struct fix16_vec3_t {
 
     static fix16_vec3_t reflect(const fix16_vec3_t& v, const fix16_vec3_t& normal);
 
-    inline void to_string(char* buffer, int32_t decimals = 7) const;
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static inline constexpr fix16_vec3_t from_double(double x, double y, double z);
 };
@@ -394,7 +394,7 @@ inline fix16_vec3_t fix16_vec3_t::cross_product(const fix16_vec3_t& a, const fix
     return result;
 }
 
-inline void fix16_vec3_t::to_string(char* buffer, int32_t decimals) const { fix16_vec3_str(this, buffer, decimals); }
+inline size_t fix16_vec3_t::to_string(char* buffer, int32_t decimals) const { return fix16_vec3_str(this, buffer, decimals); }
 #endif /* __cplusplus */
 
 /// @}

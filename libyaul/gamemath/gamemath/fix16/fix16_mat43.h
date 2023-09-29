@@ -97,7 +97,7 @@ struct fix16_mat43_t {
 
     inline void invert();
 
-    inline void to_string(char* buffer, int32_t decimals = 7) const;
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static inline void create_rotx(const fix16_mat43_t& m0, angle_t x, fix16_mat43_t& result);
 
@@ -313,20 +313,20 @@ inline void fix16_mat43_t::set_zero() { fix16_mat43_zero(this); }
 
 inline void fix16_mat43_t::invert() { fix16_mat43_inplace_invert(this); }
 
-inline void fix16_mat43_t::to_string(char* buffer, int32_t decimals) const {
-    fix16_mat43_str(this, buffer, decimals);
+inline size_t fix16_mat43_t::to_string(char* buffer, int32_t decimals) const {
+    return fix16_mat43_str(this, buffer, decimals);
 }
 
 inline void fix16_mat43_t::create_rotx(const fix16_mat43_t& m0, angle_t x, fix16_mat43_t& result) {
-  fix16_mat43_x_rotate(&m0, x, &result);
+    fix16_mat43_x_rotate(&m0, x, &result);
 }
 
 inline void fix16_mat43_t::create_roty(const fix16_mat43_t& m0, angle_t y, fix16_mat43_t& result) {
-  fix16_mat43_y_rotate(&m0, y, &result);
+    fix16_mat43_y_rotate(&m0, y, &result);
 }
 
 inline void fix16_mat43_t::create_rotz(const fix16_mat43_t& m0, angle_t z, fix16_mat43_t& result) {
-  fix16_mat43_z_rotate(&m0, z, &result);
+    fix16_mat43_z_rotate(&m0, z, &result);
 }
 
 inline void fix16_mat43_t::create_rot(const euler_t& angles, fix16_mat43_t& result) {

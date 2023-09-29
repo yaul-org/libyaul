@@ -75,7 +75,7 @@ struct fix16_mat33_t {
 
     inline void invert();
 
-    inline void to_string(char* buffer, int32_t decimals = 7) const;
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static inline void create_rotx(const fix16_mat33_t& m0, angle_t x, fix16_mat33_t& result);
 
@@ -238,8 +238,8 @@ inline void fix16_mat33_t::transpose() { fix16_mat33_inplace_transpose(this); }
 
 inline void fix16_mat33_t::invert() { transpose(); }
 
-inline void fix16_mat33_t::to_string(char* buffer, int32_t decimals) const {
-    fix16_mat33_str(this, buffer, decimals);
+inline size_t fix16_mat33_t::to_string(char* buffer, int32_t decimals) const {
+    return fix16_mat33_str(this, buffer, decimals);
 }
 
 inline void fix16_mat33_t::create_rotx(const fix16_mat33_t& m0, angle_t x, fix16_mat33_t& result) {

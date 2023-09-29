@@ -296,7 +296,7 @@ fix16_mat33_str(const fix16_mat33_t *m0, char *buffer, int32_t decimals)
       buffer_ptr += fix16_vec3_str(&m0->row[2], buffer_ptr, decimals);
     *buffer_ptr++ = '|';
 
-    *buffer_ptr   = '0';
+    *buffer_ptr   = '\0';
 
     return (buffer_ptr - buffer);
 }

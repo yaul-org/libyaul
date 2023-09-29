@@ -58,8 +58,8 @@
 ///
 /// @param x The constant value.
 #define FIX16(x) ((fix16_t)(((x) >= 0)                                         \
-    ? ((x) * 65536.0 + 0.5)                                                    \
-    : ((x) * 65536.0 - 0.5)))
+    ? ((double)(x) * 65536.0 + 0.5)                                            \
+    : ((double)(x) * 65536.0 - 0.5)))
 #endif /* !__cplusplus */
 
 #if !defined(__cplusplus)
@@ -118,7 +118,7 @@ struct fix16_t {
 
     constexpr inline int16_t to_int() const;
 
-    inline void to_string(char* buffer, int32_t decimals = 7);
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static constexpr inline fix16_t from_double(double value);
 };
@@ -427,7 +427,7 @@ constexpr inline fix16_t fix16_t::from_double(double value) {
 
 static inline fix16_t sqrt(fix16_t value) { return fix16_sqrt(value); }
 
-constexpr inline int16_t fix16_t::fractional() const { return (value & 0xFFFF); }
+constexpr inline int16_t fix16_t::fractional() const { return (value & 0x0000FFFF); }
 
 inline bool fix16_t::is_near_zero(fix16_t epsilon) const { return abs(*this) <= epsilon; }
 
@@ -437,7 +437,7 @@ inline bool fix16_t::is_positive() const { return (value >= 0); }
 
 constexpr inline int16_t fix16_t::to_int() const { return (value / 65536); }
 
-inline void fix16_t::to_string(char* buffer, int32_t decimals) { fix16_str(*this, buffer, decimals); }
+inline size_t fix16_t::to_string(char* buffer, int32_t decimals) const { return fix16_str(*this, buffer, decimals); }
 #endif /* __cplusplus */
 
 /// @}

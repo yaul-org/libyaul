@@ -73,7 +73,7 @@ struct angle_t {
 
     inline fix16_t to_fix16() const;
 
-    inline void to_string(char* buffer, int32_t decimals = 7);
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 };
 
 static_assert(sizeof(angle_t) == 2);
@@ -163,7 +163,7 @@ constexpr inline angle_t angle_t::from_deg_double(double value) {
 // TODO: Should we have this? Maybe go via an explicit cast?
 inline fix16_t angle_t::to_fix16() const { return fix16_t{static_cast<int32_t>(value)}; }
 
-inline void angle_t::to_string(char* buffer, int32_t decimals) { to_fix16().to_string(buffer, decimals); }
+inline size_t angle_t::to_string(char* buffer, int32_t decimals) const { return to_fix16().to_string(buffer, decimals); }
 #endif /* !__cplusplus */
 
 /// @}
