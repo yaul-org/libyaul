@@ -27,10 +27,7 @@ extern void mic3d_init(workarea_mic3d_t *workarea);
 extern void camera_type_set(camera_type_t type);
 extern void camera_lookat(const camera_t *camera);
 extern void camera_moveto(const camera_t *camera);
-extern void camera_right_get(fix16_vec3_t *right);
-extern void camera_up_get(fix16_vec3_t *up);
-extern void camera_forward_get(fix16_vec3_t *forward);
-extern const fix16_mat43_t *camera_matrix_get(void);
+extern fix16_mat43_t *camera_matrix_get(void);
 
 extern void render_enable(render_flags_t flags);
 extern void render_disable(render_flags_t flags);

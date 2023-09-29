@@ -15,6 +15,8 @@
 
 #include <gamemath/fix16.h>
 
+#include "gamemath/fix16/fix16_mat33.h"
+#include "gamemath/fix16/fix16_mat43.h"
 #include "internal.h"
 #include "vdp1/cmdt.h"
 
@@ -251,17 +253,11 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
 
     fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
+    /* TODO: Move this out and pass in the view matrix instead of the world matrix */
     fix16_mat43_t view_matrix;
-    fix16_mat43_mul(world_matrix, camera_matrix, &view_matrix);
+    fix16_mat43_mul(camera_matrix, world_matrix, &view_matrix);
 
-    const xform_config_t xform_config = {
-        .near          = render->near,
-        .far           = render->far,
-        .view_distance = render->view_distance,
-        .view_matrix   = &view_matrix
-    };
-
-    math3d_point_xform(&xform_config, point, xform);
+    math3d_point_xform(&view_matrix, render->view_distance, point, xform);
 }
 
 void
@@ -660,9 +656,9 @@ _perspective_transform(void)
 
     fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
+    const fix16_vec3_t * const m0 = &view_matrix->rotation.row[0];
+    const fix16_vec3_t * const m1 = &view_matrix->rotation.row[1];
+    const fix16_vec3_t * const m2 = &view_matrix->rotation.row[2];
 
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
@@ -672,12 +668,12 @@ _perspective_transform(void)
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
         fix16_vec3_t p;
 
-        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->translation.z;
 
         cpu_divu_fix16_set(render->view_distance, p.z);
 
-        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
-        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
+        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->translation.x;
+        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->translation.y;
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
@@ -701,10 +697,6 @@ _orthographic_transform(void)
 
     fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
-
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
     int16_t * const z_values = render->z_values_pool;
@@ -712,10 +704,7 @@ _orthographic_transform(void)
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
         fix16_vec3_t p;
-
-        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
-        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
-        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+        fix16_mat43_pos3_mul(view_matrix, &points[i], &p);
 
         /* TODO: Combine screen_points and z_values pool */
         screen_points[i].x = fix16_int32_mul( render->ortho_size, p.x);
