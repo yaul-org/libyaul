@@ -39,6 +39,7 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.c
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
 
+
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -49,8 +50,7 @@ $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
-generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
+$(foreach FILE,$(LIB_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(TYPE),$(FILE))))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
