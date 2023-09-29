@@ -1,7 +1,7 @@
 #include <gamemath/fix16/fix16_vec3.h>
 
-bool fix16_vec3_t::is_near_zero(const fix16_t epsilon) const {
-    // TODO: Move this to a C function
+bool fix16_vec3_t::is_near_zero(fix16_t epsilon) const {
+    // TODO: Implement this in C and use it here
     return x.is_near_zero(epsilon) && y.is_near_zero(epsilon) && z.is_near_zero(epsilon);
 }
 

@@ -116,7 +116,7 @@ fix16_vec2_sub(const fix16_vec2_t * __restrict v1,
 /// @param      scalar Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec2_scale(const fix16_t scalar, fix16_vec2_t *result)
+fix16_vec2_scale(fix16_t scalar, fix16_vec2_t *result)
 {
     result->x = fix16_mul(scalar, result->x);
     result->y = fix16_mul(scalar, result->y);
@@ -128,7 +128,7 @@ fix16_vec2_scale(const fix16_t scalar, fix16_vec2_t *result)
 /// @param      v0     Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec2_scaled(const fix16_t scalar, const fix16_vec2_t * __restrict v0,
+fix16_vec2_scaled(fix16_t scalar, const fix16_vec2_t * __restrict v0,
   fix16_vec2_t * __restrict result)
 {
     result->x = fix16_mul(scalar, v0->x);

@@ -89,7 +89,7 @@ struct fix16_vec3_t {
     inline fix16_vec3_t& operator*=(int32_t rhs);
     inline fix16_vec3_t& operator/=(fix16_t rhs);
 
-    bool is_near_zero(const fix16_t epsilon = 0.001_fp) const;
+    bool is_near_zero(fix16_t epsilon = 0.001_fp) const;
 
     inline fix16_t length() const;
 
@@ -195,7 +195,7 @@ fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
 /// @param      scalar Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
+fix16_vec3_scale(fix16_t scalar, fix16_vec3_t *result)
 {
     result->x = fix16_mul(scalar, result->x);
     result->y = fix16_mul(scalar, result->y);
@@ -208,7 +208,7 @@ fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
 /// @param      v      Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t *v,
+fix16_vec3_scaled(fix16_t scalar, const fix16_vec3_t *v,
   fix16_vec3_t *result)
 {
     result->x = fix16_mul(scalar, v->x);
@@ -319,9 +319,9 @@ constexpr inline fix16_vec3_t::fix16_vec3_t(fix16_t x_, fix16_t y_, fix16_t z_) 
 inline const fix16_vec3_t fix16_vec3_t::operator+(const fix16_vec3_t& v) const { return fix16_vec3_t{x + v.x, y + v.y, z + v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-(const fix16_vec3_t& v) const { return fix16_vec3_t{x - v.x, y - v.y, z - v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-() const { return fix16_vec3_t{-x, -y, -z}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_t& value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const int32_t value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const uint32_t value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_t& scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(int32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(uint32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
 
 inline fix16_vec3_t& fix16_vec3_t::operator+=(const fix16_vec3_t& v) {
     x += v.x;
@@ -339,7 +339,7 @@ inline fix16_vec3_t& fix16_vec3_t::operator-=(const fix16_vec3_t& v) {
     return *this;
 }
 
-inline fix16_vec3_t& fix16_vec3_t::operator*=(const fix16_t value) {
+inline fix16_vec3_t& fix16_vec3_t::operator*=(fix16_t value) {
     x = x * value;
     y = y * value;
     z = z * value;
@@ -347,7 +347,7 @@ inline fix16_vec3_t& fix16_vec3_t::operator*=(const fix16_t value) {
     return *this;
 }
 
-inline fix16_vec3_t& fix16_vec3_t::operator/=(const fix16_t value) {
+inline fix16_vec3_t& fix16_vec3_t::operator/=(fix16_t value) {
     const fix16_t inv_value = 1.0_fp / value;
     x = x * inv_value;
     y = y * inv_value;

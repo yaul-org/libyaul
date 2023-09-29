@@ -77,14 +77,15 @@ struct fix16_t {
     explicit constexpr fix16_t(uint32_t v);
 
     // XXX: For anything fucky, namely CPU-DIVU
-    constexpr operator int32_t() { return static_cast<int32_t>(value); }
-    constexpr operator uint32_t() { return static_cast<uint32_t>(value); }
+    constexpr operator int32_t() const { return static_cast<int32_t>(value); }
+    constexpr operator uint32_t() const { return static_cast<uint32_t>(value); }
 
     inline const fix16_t operator+(const fix16_t& other) const;
     inline const fix16_t operator-(const fix16_t& other) const;
     inline const fix16_t operator-() const;
     inline const fix16_t operator*(const fix16_t& other) const;
     inline const fix16_t operator*(int32_t other) const;
+    inline const fix16_t operator*(uint32_t other) const;
     inline const fix16_t operator/(const fix16_t& other) const;
     inline const fix16_t operator>>(uint32_t i) const;
     inline const fix16_t operator<<(uint32_t i) const;
@@ -93,6 +94,7 @@ struct fix16_t {
     inline fix16_t& operator-=(const fix16_t& rhs);
     inline fix16_t& operator*=(const fix16_t& rhs);
     inline fix16_t& operator*=(int32_t rhs);
+    inline fix16_t& operator*=(uint32_t rhs);
     inline fix16_t& operator/=(const fix16_t& rhs);
     inline fix16_t& operator>>=(uint32_t i);
     inline fix16_t& operator<<=(uint32_t i);
@@ -110,7 +112,7 @@ struct fix16_t {
 
     constexpr inline int16_t fractional() const;
 
-    inline bool is_near_zero(const fix16_t epsilon = from_double(0.001)) const;
+    inline bool is_near_zero(fix16_t epsilon = from_double(0.001)) const;
 
     inline bool is_negative() const;
 
@@ -134,7 +136,7 @@ static_assert(sizeof(fix16_t) == 4);
 /// @returns The value.
 __BEGIN_ASM
 static inline fix16_t __always_inline
-fix16_int16_mul(const fix16_t a, const int16_t b)
+fix16_int16_mul(fix16_t a, const int16_t b)
 {
     __register fix16_t out;
 
@@ -159,7 +161,7 @@ __END_ASM
 /// @returns The value.
 __BEGIN_ASM
 static inline int32_t __always_inline
-fix16_int32_mul(const fix16_t a, const fix16_t b)
+fix16_int32_mul(fix16_t a, fix16_t b)
 {
     __register int16_t out;
 
@@ -184,7 +186,7 @@ __END_ASM
 /// @returns The value.
 __BEGIN_ASM
 static inline fix16_t __always_inline
-fix16_mul(const fix16_t a, const fix16_t b)
+fix16_mul(fix16_t a, fix16_t b)
 {
     __register uint32_t mach;
     __register fix16_t out;
@@ -370,6 +372,7 @@ inline const fix16_t fix16_t::operator-(const fix16_t& other) const { return fix
 inline const fix16_t fix16_t::operator-() const { return fix16_t{-value}; }
 inline const fix16_t fix16_t::operator*(const fix16_t& other) const { return fix16_mul(*this, other); }
 inline const fix16_t fix16_t::operator*(int32_t other) const { return fix16_mul(*this, fix16_t{other}); }
+inline const fix16_t fix16_t::operator*(uint32_t other) const { return fix16_mul(*this, fix16_t{other}); }
 inline const fix16_t fix16_t::operator/(const fix16_t& other) const { return fix16_div(*this, other); }
 
 inline const fix16_t fix16_t::operator>>(uint32_t i) const { return fix16_t{value >> i}; }
@@ -391,6 +394,11 @@ inline fix16_t& fix16_t::operator*=(const fix16_t& rhs) {
 }
 
 inline fix16_t& fix16_t::operator*=(int32_t rhs) {
+    *this = fix16_mul(*this, fix16_t{rhs});
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator*=(uint32_t rhs) {
     *this = fix16_mul(*this, fix16_t{rhs});
     return *this;
 }
