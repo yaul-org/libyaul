@@ -50,12 +50,12 @@ static int info_cursor;
 void Sprite_Convert4BPP(BMP *tile) {
 	uint32_t palette_buffer[PALETTE_SIZE];
 	uint8_t r, g, b;
-	
+
 	IMAGE_INFO *info = &info_list[info_cursor];
 	info_cursor++;
 	info->x = BMP_GetWidth(tile);
 	info->y = BMP_GetHeight(tile);
-	
+
 	// read in the palette data
 	int color;
 	for (int i = 0; i < PALETTE_SIZE; i++) {
@@ -71,7 +71,7 @@ void Sprite_Convert4BPP(BMP *tile) {
 			break;
 		}
 	}
-	
+
 	// add one if there isn't one
 	if (palno == -1) {
 		uint32_t *palette = palette_list[palette_cursor];
@@ -82,7 +82,7 @@ void Sprite_Convert4BPP(BMP *tile) {
 	else {
 		info->pal = palno;
 	}
-	
+
 	// read in the graphics data
 	info->graphics = malloc((info->x >> 1) * info->y);
 	uint8_t index1;
@@ -131,7 +131,7 @@ int sprite_process(char *dirname, char *outname, int type) {
 	palette_cursor = 0;
 	info_cursor = 0;
 	char filename[FILENAME_BUFLEN];
-	
+
 	// get number of files in the directory
 	int num_files = 0;
 	dir_ptr = opendir(dirname);
@@ -148,7 +148,7 @@ int sprite_process(char *dirname, char *outname, int type) {
 		}
 	}
 	closedir(dir_ptr);
-	
+
 	// allocate memory based on the number of files
 	// the maximum number of palettes possible is one per frame
 	if (type == SPRITE_4BPP) {
@@ -158,7 +158,7 @@ int sprite_process(char *dirname, char *outname, int type) {
 		}
 	}
 	info_list = malloc(num_files * sizeof(IMAGE_INFO));
-	
+
 	// read in all the files
 	for (int i = 0; i < num_files; i++) {
 		int retval;
@@ -229,7 +229,7 @@ int sprite_process(char *dirname, char *outname, int type) {
 			fwrite(info_list[i].graphics, sizeof(uint8_t), info_list[i].x * info_list[i].y * 2, out);
 		}
 	}
-	fclose(out);	
+	fclose(out);
 	// clean up memory
 	for (int i = 0; i < num_files; i++) {
 		if (type == SPRITE_4BPP) {
@@ -239,6 +239,6 @@ int sprite_process(char *dirname, char *outname, int type) {
 	}
 	free(palette_list);
 	free(info_list);
-	
+
 	return 1;
 }

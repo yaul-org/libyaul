@@ -34,13 +34,13 @@ int main(int argc, char **argv) {
 		printf("Usage: satconv [asset list]\n");
 		return -1;
 	}
-	
+
 	FILE *asset_list = fopen(argv[1], "r");
 	if (asset_list == NULL) {
 		printf("Error: couldn't open asset list.\n");
 		return -2;
 	}
-	
+
 	char line[BUFFER_LEN];
 	while (fgets(line, BUFFER_LEN - 1, asset_list)) {
 		line[strcspn(line, "\r\n")] = 0;
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 				strcpy(outfile + ext_index, ".spr");
 				sprite_process(infile, outfile, type);
 				break;
-			
+
 			// tile graphics
 			case 't':
 			case 'T':
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 				strcpy(outfile + ext_index, ".tle");
 				tile_process(infile, outfile, line[1] - ASCII_NUMBER_BASE, line[2] - ASCII_NUMBER_BASE);
 				break;
-			
+
 			// tilemap
 			case 'm':
 			case 'M':
@@ -99,13 +99,13 @@ int main(int argc, char **argv) {
 				strcpy(outfile + ext_index, ".map");
 				map_process(infile, outfile, line[1] - ASCII_NUMBER_BASE, line[2] - ASCII_NUMBER_BASE);
 				break;
-			
+
 			default:
 				break;
-				
+
 		}
 	}
-	
+
 	fclose(asset_list);
 	return 0;
 }

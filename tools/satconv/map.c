@@ -79,7 +79,7 @@ void map_conv2(char *instr, uint32_t *out) {
 	while (*instr) {
 		in_val = map_readcsv(&instr) - 1;
 		out_val = (in_val & 0x7fff) << 1;
-		
+
 		// is tile horizontally flipped?
 		if (in_val & 0x80000000) {
 			out_val |= 0x40000000;
@@ -96,17 +96,17 @@ void map_conv2(char *instr, uint32_t *out) {
 
 int map_process(char *inname, char *outname, int bpp, int type) {
 	ezxml_t root_xml = ezxml_parse_file(inname);
-	
+
 	if ((bpp != 4) && (bpp != 8)) {
 		printf("Error: invalid bpp %d\n", bpp);
 		return 0;
 	}
-	
+
 	if (root_xml == NULL) {
 		printf("Error: couldn't open map file %s\n", inname);
 		return 0;
 	}
-	
+
 	// get attributes from the map
 	const char *width_str = ezxml_attr(root_xml, "width");
 	if (width_str == NULL) {
@@ -116,7 +116,7 @@ int map_process(char *inname, char *outname, int bpp, int type) {
 	}
 	int width = atoi(width_str);
 	int width_be = htonl(width);
-	
+
 	const char *height_str = ezxml_attr(root_xml, "height");
 	if (height_str == NULL) {
 		printf("Error: couldn't find height attribute in map file %s\n", inname);
@@ -125,7 +125,7 @@ int map_process(char *inname, char *outname, int bpp, int type) {
 	}
 	int height = atoi(height_str);
 	int height_be = htonl(height);
-	
+
 	// get map data (tiled stores it as csv)
 	ezxml_t map = ezxml_get(root_xml, "layer", 0, "data", -1);
 	if (map == NULL) {
@@ -133,7 +133,7 @@ int map_process(char *inname, char *outname, int bpp, int type) {
 		ezxml_free(root_xml);
 		return 0;
 	}
-	
+
 	if (type == 1) {
 		uint16_t *map_data = malloc(width * height * sizeof(uint16_t));
 		map_conv1(ezxml_txt(map), map_data, bpp);
@@ -150,7 +150,7 @@ int map_process(char *inname, char *outname, int bpp, int type) {
 		free(map_data);
 		fclose(out_file);
 	}
-	
+
 	else if (type == 2) {
 		uint32_t *map_data = malloc(width * height * sizeof(uint32_t));
 		map_conv2(ezxml_txt(map), map_data);
@@ -167,12 +167,12 @@ int map_process(char *inname, char *outname, int bpp, int type) {
 		free(map_data);
 		fclose(out_file);
 	}
-	
+
 	else {
 		printf("Error: invalid type %d\n", type);
 		ezxml_free(root_xml);
 		return 0;
 	}
-	
+
 	return 1;
 }

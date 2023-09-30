@@ -87,7 +87,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 			palette[i] = htonl(color); // saturn is big endian
 		}
 	}
-	
+
 	size_t image_data_size;
 	if (bpp == 4) {
 		image_data_size = (width >> 1) * height;
@@ -99,7 +99,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 		image_data_size = width * height * 2;
 	}
 	uint8_t *image_data = malloc(image_data_size);
-	
+
 	int image_cursor = 0;
 	uint8_t single_tile[256];
 	uint8_t val;
@@ -132,7 +132,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 						}
 						else {
 							image_data[image_cursor++] = (found >> 8) & 0xff;
-							image_data[image_cursor++] = found & 0xff;							
+							image_data[image_cursor++] = found & 0xff;
 						}
 					}
 				}
@@ -146,7 +146,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 				}
 			}
 			break;
-			
+
 		case TILE_8X8:
 			if ((bpp != 4) && (bpp != 8)) {
 				printf("Error: Only indexed images supported for tile mode.\n");
@@ -173,7 +173,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 				}
 			}
 			break;
-			
+
 		case TILE_16x16:
 			if ((bpp != 4) && (bpp != 8)) {
 				printf("Error: Only indexed images supported for tile mode.\n");
@@ -206,12 +206,12 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 				}
 			}
 			break;
-			
+
 		default:
 			printf("Error: invalid tile graphics type.\n");
 			goto ERR_EXIT;
 	}
-		
+
 	FILE *outfile = fopen(outname, "wb");
 	if (!outfile) {
 		printf("Error: Couldn't open %s for writing!\n", outname);
@@ -226,7 +226,7 @@ int tile_process(char *filename, char *outname, int type, int palwords) {
 	fwrite(&out_image_data_size, sizeof(uint32_t), 1, outfile);
 	fwrite(image_data, sizeof(uint8_t), image_data_size, outfile);
 	fclose(outfile);
-	
+
 	free(palette);
 	free(image_data);
 	BMP_Free(infile);
