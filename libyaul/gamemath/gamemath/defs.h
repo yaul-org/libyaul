@@ -141,7 +141,7 @@ __DEFINE_SIGN(sign_llong, long long)
                int: sign_int,                                                  \
               long: sign_long,                                                 \
          long long: sign_llong,                                                \
-         default: "bad type for sign")(a, b)
+         default: "bad type for sign")(x)
 #else
 static inline constexpr int sign(signed int _x) { return (_x < 0) ? -1 : 1; }
 
@@ -195,8 +195,8 @@ __DEFINE_ABS(abs_llong, long long)
              short: abs_short,                                                 \
                int: abs_int,                                                   \
               long: abs_long,                                                  \
-         long long: abs_llong                                                  \
-         default: "bad type for abs")(a, b)
+         long long: abs_llong,                                                 \
+         default: "bad type for abs")(a)
 #else
 static inline char abs(char _a) { return (_a < 0) ? -_a : _a; }
 
