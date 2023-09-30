@@ -418,16 +418,16 @@ inline fix16_t& fix16_t::operator<<=(uint32_t i) {
     return *this;
 }
 
-inline bool fix16_t::operator<(const fix16_t& other) const { return *this < other; }
-inline bool fix16_t::operator<(int32_t other) const { return *this < other; }
-inline bool fix16_t::operator>(const fix16_t& other) const { return *this > other; }
-inline bool fix16_t::operator>(int32_t other) const { return *this > other; }
-inline bool fix16_t::operator<=(const fix16_t& other) const { return *this <= other; }
-inline bool fix16_t::operator<=(int32_t other) const { return *this <= other; }
-inline bool fix16_t::operator>=(const fix16_t& other) const { return *this >= other; }
-inline bool fix16_t::operator>=(int32_t other) const { return *this >= other; }
-inline bool fix16_t::operator==(const fix16_t& other) const { return *this == other; }
-inline bool fix16_t::operator==(int32_t other) const { return *this == other; }
+inline bool fix16_t::operator<(const fix16_t& other) const { return value < other.value; }
+inline bool fix16_t::operator<(int32_t other) const { return value < other; }
+inline bool fix16_t::operator>(const fix16_t& other) const { return value > other.value; }
+inline bool fix16_t::operator>(int32_t other) const { return value > other; }
+inline bool fix16_t::operator<=(const fix16_t& other) const { return value <= other.value; }
+inline bool fix16_t::operator<=(int32_t other) const { return value <= other; }
+inline bool fix16_t::operator>=(const fix16_t& other) const { return value >= other.value; }
+inline bool fix16_t::operator>=(int32_t other) const { return value >= other; }
+inline bool fix16_t::operator==(const fix16_t& other) const { return value == other.value; }
+inline bool fix16_t::operator==(int32_t other) const { return value == other; }
 
 constexpr inline fix16_t fix16_t::from_double(double value) {
   return fix16_t{static_cast<int32_t>((value >= 0) ? ((value * 65536.0) + 0.5) : ((value * 65536.0) - 0.5))};
