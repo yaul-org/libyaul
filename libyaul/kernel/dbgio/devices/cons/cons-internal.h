@@ -15,8 +15,14 @@
 
 __BEGIN_DECLS
 
-#define CONS_COLS_MIN 40
-#define CONS_ROWS_MIN 28
+/* Depending on the VDP2 scroll screen character size:
+ *
+ * Character size|Width  |Height
+ * --------------+-------+-------
+ *       Size 1x1|[40,64]|[28,64]
+ *       Size 2x2|[20,32]|[14,32] */
+#define CONS_COLS_MIN 20
+#define CONS_ROWS_MIN 14
 
 #define CONS_COLS_MAX 64
 #define CONS_ROWS_MAX 64
