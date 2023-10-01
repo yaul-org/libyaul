@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Mattias Jansson

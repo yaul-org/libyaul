@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Theo Beraku

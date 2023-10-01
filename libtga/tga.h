@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2014-2016
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -11,6 +11,7 @@
 #include <sys/cdefs.h>
 
 #include <stdint.h>
+#include <stdbool.h>
 
 __BEGIN_DECLS
 

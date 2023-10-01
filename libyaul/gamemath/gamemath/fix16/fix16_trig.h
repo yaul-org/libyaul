@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 2012-2022
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
+ * Romulo Fernandes <abra185@gmail.com>
  */
 
 #ifndef _YAUL_GAMEMATH_FIX16_TRIG_H_

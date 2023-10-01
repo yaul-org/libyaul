@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef _YAUL_GAMEMATH_ANGLE_H_
 #define _YAUL_GAMEMATH_ANGLE_H_
 
@@ -112,9 +119,9 @@ angle_rad_to(angle_t angle)
     return fix16_mul(angle, FIX16(2.0 * M_PI));
 }
 #else
-constexpr angle_t operator""_deg(long double v) { return angle_t::from_deg_double(v); }
+constexpr angle_t operator"" _deg(long double v) { return angle_t::from_deg_double(v); }
 
-constexpr angle_t operator""_rad(long double v) { return angle_t::from_rad_double(v); }
+constexpr angle_t operator"" _rad(long double v) { return angle_t::from_rad_double(v); }
 
 inline const angle_t& angle_t::operator+(const angle_t& other) const { return angle_t{value + other.value}; }
 inline const angle_t& angle_t::operator-(const angle_t& other) const { return angle_t{value - other.value}; }

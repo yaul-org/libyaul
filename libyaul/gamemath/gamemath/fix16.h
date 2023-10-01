@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 /*-
  * Copyright (c) Authors of libfixmath
  *
@@ -361,7 +368,7 @@ static inline fix16_t abs(fix16_t a) {
     return fix16_t{::abs(a.value)};
 }
 
-constexpr fix16_t operator""_fp(long double v) { return fix16_t::from_double(v); }
+constexpr fix16_t operator"" _fp(long double v) { return fix16_t::from_double(v); }
 
 constexpr fix16_t::fix16_t(int32_t v) : value(v) {}
 
@@ -430,7 +437,7 @@ inline bool fix16_t::operator==(const fix16_t& other) const { return value == ot
 inline bool fix16_t::operator==(int32_t other) const { return value == other; }
 
 constexpr inline fix16_t fix16_t::from_double(double value) {
-  return fix16_t{static_cast<int32_t>((value >= 0) ? ((value * 65536.0) + 0.5) : ((value * 65536.0) - 0.5))};
+    return fix16_t{static_cast<int32_t>((value >= 0) ? ((value * 65536.0) + 0.5) : ((value * 65536.0) - 0.5))};
 }
 
 static inline fix16_t sqrt(fix16_t value) { return fix16_sqrt(value); }
