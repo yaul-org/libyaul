@@ -46,7 +46,6 @@ SH_OBJS_UNIQ:= $(addsuffix .o,$(foreach SRC,$(SH_SRCS_C) $(SH_SRCS_CXX) $(SH_SRC
 SH_OBJS_UNIQ:= $(foreach OBJ,$(SH_OBJS_UNIQ),$(call macro-convert-build-path,$(OBJ)))
 
 SH_LDFLAGS+= $(SH_DEFSYMS)
-SH_LXXFLAGS+= $(SH_DEFSYMS)
 
 ifeq ($(strip $(SH_SPECS)),)
   SH_SPECS:= yaul.specs yaul-main.specs
@@ -63,8 +62,6 @@ SH_TEMPS:= $(SH_OBJS_UNIQ:.o=.i) $(SH_OBJS_UNIQ:.o=.ii) $(SH_OBJS_UNIQ:.o=.s)
 
 # Parse out included paths from GCC when the specs files are used. This is used
 # to explictly populate each command database entry with include paths
-SH_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v -nostdinc $(foreach specs,$(SH_SPECS),-specs=$(specs)) - 2>&1 | \
-	awk '/^\s/ { sub(/^\s+/,""); print }')
 SH_SYSTEM_INCLUDE_DIRS:=$(shell echo | $(SH_CC) -E -Wp,-v - 2>&1 | \
 	awk '/^\s/ { sub(/^\s+/,""); gsub(/\\/,"/"); print }')
 
@@ -74,7 +71,7 @@ generate-cdb::
 	$(ECHO)printf -- "C\n" >&2
 	$(ECHO)printf -- "/usr/bin/gcc$(EXE_EXT)\n" >&2
 	$(ECHO)printf -- "$(abspath $(1))\n" >&2
-	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdlibinc $(SH_CFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
 # $2 -> Build type (release, debug)
@@ -83,7 +80,7 @@ generate-cdb::
 	$(ECHO)printf -- "C++\n" >&2
 	$(ECHO)printf -- "/usr/bin/g++$(EXE_EXT)\n" >&2
 	$(ECHO)printf -- "$(abspath $(1))\n" >&2
-	$(ECHO)printf -- "-D__INTELLISENSE__ $(SH_CXXFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS) $(SH_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdinc++ -nostdlibinc $(SH_CXXFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
 # $1 -> $<
@@ -129,7 +126,7 @@ $(SH_BUILD_PATH)/$(SH_PROGRAM).bin: $(SH_BUILD_PATH)/$(SH_PROGRAM).elf
 
 $(SH_BUILD_PATH)/$(SH_PROGRAM).elf: $(SH_OBJS_UNIQ)
 	@printf -- "$(V_BEGIN_YELLOW)$(@F)$(V_END)\n"
-	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(foreach specs,$(SH_CXX_SPECS),-specs=$(specs)) $(SH_OBJS_UNIQ) $(SH_LDFLAGS) $(foreach lib,$(SH_LIBRARIES),-l$(lib)) -o $@
+	$(ECHO)$(SH_LD) $(foreach specs,$(SH_SPECS),-specs=$(specs)) $(foreach specs,$(SH_CXX_SPECS),-specs=$(specs)) $(SH_OBJS_UNIQ) $(SH_LDFLAGS) -o $@
 	$(ECHO)$(SH_NM) $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).sym
 	$(ECHO)$(SH_OBJDUMP) -S $(SH_BUILD_PATH)/$(SH_PROGRAM).elf > $(SH_BUILD_PATH)/$(SH_PROGRAM).asm
 

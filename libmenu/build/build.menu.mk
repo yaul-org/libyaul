@@ -1,0 +1,8 @@
+MENU:= menu
+
+MENU_CFLAGS_shared:=
+
+MENU_CFLAGS:= $(MENU_CFLAGS_shared)
+MENU_CXXFLAGS:= $(MENU_CFLAGS_shared)
+
+MENU_LDFLAGS:= -lmenu

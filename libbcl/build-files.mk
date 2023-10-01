@@ -7,3 +7,6 @@ LIB_SRCS:= huffman.c \
 
 INSTALL_HEADER_FILES:= \
 	./:bcl.h:./bcl/
+
+USER_FILES:= \
+	build/build.bcl.mk

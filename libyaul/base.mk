@@ -46,20 +46,6 @@ IP_FILES_all = $(IP_FILES)
 USER_FILES_all = $(USER_FILES)
 HELPER_FILES_all = $(HELPER_FILES)
 
-# $1 ->
-# $2 ->
-# $3 ->
-# $4 ->
-# $5 ->
-define macro-generate-install-file-rule
-$(YAUL_PREFIX)/$3/$2: $1
-	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
-	@mkdir -p $$(@D)
-	$(ECHO)$(INSTALL) -m $5 $$< $$@
-
-install-$4: $4 $(YAUL_PREFIX)/$3/$2
-endef
-
 .PHONY: all $(TYPE) clean install-$(TYPE) generate-cdb
 
 .SUFFIXES:= .c .cxx .sx .o .x
@@ -95,19 +81,19 @@ $(foreach SUPPORT_OBJ,$(SUPPORT_OBJS_base), \
 
 # Install files
 $(foreach SPECS,$(SPECS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE),444)))
 
 $(foreach LDSCRIPT,$(LDSCRIPTS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),444)))
 
 $(foreach IP,$(IP_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(IP),$(IP),share/$(TARGET),$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(IP),$(IP),share/$(TARGET),$(TYPE),444)))
 
 $(foreach USER_FILE,$(USER_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),444)))
 
 $(foreach HELPER_FILE,$(HELPER_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(HELPER_FILE),$(notdir $(HELPER_FILE)),share,$(TYPE),755)))
+	$(eval $(call macro-generate-install-file-rule,$(HELPER_FILE),$(notdir $(HELPER_FILE)),share,$(TYPE),555)))
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))

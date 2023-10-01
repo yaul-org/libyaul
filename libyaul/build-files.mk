@@ -14,7 +14,8 @@ USER_FILES:= \
 	build/build.post.iso-cue.mk \
 	build/build.post.ss.mk \
 	build/build.pre.mk \
-	build/ip.bin.mk
+	build/ip.bin.mk \
+	build/build.yaul.mk
 
 HELPER_FILES:= \
 	common/wrap-error

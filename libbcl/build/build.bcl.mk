@@ -1,0 +1,8 @@
+BCL:= bcl
+
+BCL_CFLAGS_shared:= -I$(YAUL_INSTALL_ROOT)/$(YAUL_ARCH_SH_PREFIX)/include/bcl
+
+BCL_CFLAGS:= $(BCL_CFLAGS_shared)
+BCL_CXXFLAGS:= $(BCL_CFLAGS_shared)
+
+BCL_LDFLAGS:= -lbcl

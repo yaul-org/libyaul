@@ -213,6 +213,20 @@ endef
 # $2 ->
 # $3 ->
 # $4 ->
+# $5 ->
+define macro-generate-install-file-rule
+$(YAUL_PREFIX)/$3/$2: $1
+	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
+	@mkdir -p $$(@D)
+	$(ECHO)$(INSTALL) -m $5 $$< $$@
+
+install-$4: $4 $(YAUL_PREFIX)/$3/$2
+endef
+
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
 define macro-sh-generate-install-header-rule
 $(YAUL_PREFIX)/$(YAUL_ARCH_SH_PREFIX)/include/$3/$2: $1/$2
 	$(ECHO)[ -z "$(SILENT)" ] && set -x; \
