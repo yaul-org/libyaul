@@ -48,6 +48,8 @@ extern void render_cmdts_reserve(uint32_t cmdt_count); /* XXX: Not yet implement
 extern void render_cmdts_relinquish(void); /* XXX: Not yet implemented */
 extern void render_point_xform(const fix16_mat43_t *world_matrix,
   const fix16_vec3_t *point, xform_t *xform);
+extern void render_points_xform(const fix16_mat43_t *world_matrix,
+  const fix16_vec3_t *points, xform_t *xforms, uint32_t count);
 
 extern void render_debug_log(char *buffer, size_t len); /* XXX: Not yet implemented */
 

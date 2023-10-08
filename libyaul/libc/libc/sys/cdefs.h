@@ -62,10 +62,10 @@
 
 #ifdef __cplusplus
 #ifndef __BEGIN_DECLS
-#define __BEGIN_DECLS   extern "C" {
+#define __BEGIN_DECLS extern "C" {
 #endif
 #ifndef __END_DECLS
-#define __END_DECLS     }
+#define __END_DECLS   }
 #endif
 #else
 #ifndef __BEGIN_DECLS
@@ -92,7 +92,7 @@
 #define __STRINGIFY(x) #x /* Stringify without expanding x */
 #define __XSTRING(x)   __STRING(x) /* Expand x, then stringify */
 
-#if (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901)
 #define __PRAGMA(x) _Pragma(#x)
 #else
 #define __PRAGMA(x)

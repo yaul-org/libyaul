@@ -49,6 +49,17 @@ typedef struct xform {
     fix16_t depth_value;
 } xform_t;
 
+// TODO: Not yet used
+/// @brief Not yet documented.
+typedef struct xforms {
+    /// @brief Not yet documented.
+    int16_vec2_t* screen_points;
+    /// @brief Not yet documented.
+    fix16_t* depth_values;
+    /// @brief Not yet documented.
+    uint32_t count;
+} xforms_t;
+
 extern void math3d_lookat(const lookat_t *lookat);
 
 /// @brief Not yet documented.
@@ -66,8 +77,17 @@ extern fix16_t math3d_view_distance_calc(int16_t screen_width,
 /// @param      view_distance Not yet documented.
 /// @param      point         Not yet documented.
 /// @param[out] result        Not yet documented.
-extern void math3d_point_xform(const fix16_mat43_t *view_matrix,
+extern void math3d_point_perspective_xform(const fix16_mat43_t *view_matrix,
     fix16_t view_distance, const fix16_vec3_t *point, xform_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      view_matrix Not yet documented.
+/// @param      ortho_size  Not yet documented.
+/// @param      point       Not yet documented.
+/// @param[out] result      Not yet documented.
+extern void math3d_point_orthographic_xform(const fix16_mat43_t *view_matrix,
+    fix16_t ortho_size, const fix16_vec3_t *point, xform_t *result);
 
 /// @}
 

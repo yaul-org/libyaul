@@ -55,6 +55,9 @@ typedef struct fix16_vec3 {
     fix16_t z;
 } fix16_vec3_t;
 #else
+// XXX: Forwarding. Nasty, but in order to fix this, we need to restructure the header files
+struct fix16_quat_t;
+
 /// @brief Not yet documented.
 struct fix16_vec3_t {
     /// @brief Not yet documented.
@@ -78,9 +81,10 @@ struct fix16_vec3_t {
     inline const fix16_vec3_t operator+(const fix16_vec3_t& other) const;
     inline const fix16_vec3_t operator-(const fix16_vec3_t& other) const;
     inline const fix16_vec3_t operator-() const;
-    inline const fix16_vec3_t operator*(const fix16_t& other) const;
-    inline const fix16_vec3_t operator*(int32_t other) const;
-    inline const fix16_vec3_t operator*(uint32_t other) const;
+    inline const fix16_vec3_t operator*(fix16_t scalar) const;
+    inline const fix16_vec3_t operator*(int32_t scalar) const;
+    inline const fix16_vec3_t operator*(uint32_t scalar) const;
+    inline const fix16_vec3_t operator*(const fix16_quat_t& other) const;
     inline const fix16_vec3_t operator/(const fix16_t& other) const;
 
     inline fix16_vec3_t& operator+=(const fix16_vec3_t& rhs);
@@ -103,6 +107,8 @@ struct fix16_vec3_t {
 
     void end_normalization();
 
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
+
     static constexpr inline fix16_vec3_t zero();
 
     static constexpr inline fix16_vec3_t unit_x();
@@ -116,8 +122,6 @@ struct fix16_vec3_t {
     static inline fix16_vec3_t cross_product(const fix16_vec3_t& a, const fix16_vec3_t& b);
 
     static fix16_vec3_t reflect(const fix16_vec3_t& v, const fix16_vec3_t& normal);
-
-    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static inline constexpr fix16_vec3_t from_double(double x, double y, double z);
 };
@@ -142,7 +146,7 @@ fix16_vec3_zero(fix16_vec3_t *result)
 /// @param      y      Not yet documented.
 /// @param      z      Not yet documented.
 static inline void __always_inline
-fix16_vec3_set(fix16_vec3_t *result, fix16_t x, fix16_t y, fix16_t z)
+fix16_vec3_set(fix16_t x, fix16_t y, fix16_t z, fix16_vec3_t *result)
 {
     result->x = x;
     result->y = y;
@@ -319,9 +323,19 @@ constexpr inline fix16_vec3_t::fix16_vec3_t(fix16_t x_, fix16_t y_, fix16_t z_) 
 inline const fix16_vec3_t fix16_vec3_t::operator+(const fix16_vec3_t& v) const { return fix16_vec3_t{x + v.x, y + v.y, z + v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-(const fix16_vec3_t& v) const { return fix16_vec3_t{x - v.x, y - v.y, z - v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-() const { return fix16_vec3_t{-x, -y, -z}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_t& scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(fix16_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
 inline const fix16_vec3_t fix16_vec3_t::operator*(int32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
 inline const fix16_vec3_t fix16_vec3_t::operator*(uint32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+
+// XXX: Nasty, but in order to fix this, we need to restructure the header files
+extern "C" void fix16_quat_vec3_mul(const fix16_quat_t *q0, const fix16_vec3_t *v0, fix16_vec3_t *result);
+
+inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_quat_t& other) const {
+    fix16_vec3_t result;
+    fix16_quat_vec3_mul(&other, this, &result);
+
+    return result;
+}
 
 inline fix16_vec3_t& fix16_vec3_t::operator+=(const fix16_vec3_t& v) {
     x += v.x;

@@ -15,7 +15,7 @@ void fix16_vec3_t::end_normalization() {
 
 fix16_vec3_t fix16_vec3_t::reflect(const fix16_vec3_t& v, const fix16_vec3_t& normal) {
     // TODO: Move this to a C function
-    const fix16_t factor{dot_product(v, normal) << 1UL};
+    const fix16_t factor = dot_product(v, normal) << 1;
     const fix16_vec3_t proj = normal * factor;
 
     return (v - proj);

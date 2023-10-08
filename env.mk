@@ -91,7 +91,6 @@ SH_CFLAGS_shared:= \
 	-Wextra \
 	-Winit-self \
 	-Wmissing-include-dirs \
-	-Wmissing-include-dirs \
 	-Wno-format \
 	-Wnull-dereference \
 	-Wshadow \

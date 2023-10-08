@@ -96,9 +96,9 @@ cpu_divu_32_32_set(uint32_t dividend, uint32_t divisor)
 static inline void __always_inline
 cpu_divu_fix16_split(fix16_t dividend, uint32_t *dh, uint32_t *dl)
 {
-    *dh = cpu_instr_swapw(dividend);
+    *dh = cpu_instr_swapw((uint32_t)dividend);
     *dh = cpu_instr_extsw(*dh);
-    *dl = (uint32_t)dividend << 16UL;
+    *dl = (uint32_t)dividend << 16;
 }
 
 /// @brief Perform a fixed-point bit division operation.
@@ -115,7 +115,7 @@ cpu_divu_fix16_set(fix16_t dividend, fix16_t divisor)
     uint32_t dl;
 
     cpu_divu_fix16_split(dividend, &dh, &dl);
-    cpu_divu_64_32_set(dh, dl, divisor);
+    cpu_divu_64_32_set(dh, dl, (uint32_t)divisor);
 }
 
 /// @brief Obtain the interrupt priority level for CPU-DIVU.

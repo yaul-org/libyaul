@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include <gamemath/color.h>
+#include <gamemath/fix16.h>
 
 #include <vdp2/vram.h>
 

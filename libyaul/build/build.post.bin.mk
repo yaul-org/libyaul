@@ -71,7 +71,7 @@ generate-cdb::
 	$(ECHO)printf -- "C\n" >&2
 	$(ECHO)printf -- "/usr/bin/gcc$(EXE_EXT)\n" >&2
 	$(ECHO)printf -- "$(abspath $(1))\n" >&2
-	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdlibinc $(SH_CFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdlibinc -Wno-gnu-statement-expression $(SH_CFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-isystem $(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
 # $2 -> Build type (release, debug)
@@ -80,7 +80,7 @@ generate-cdb::
 	$(ECHO)printf -- "C++\n" >&2
 	$(ECHO)printf -- "/usr/bin/g++$(EXE_EXT)\n" >&2
 	$(ECHO)printf -- "$(abspath $(1))\n" >&2
-	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdinc++ -nostdlibinc $(SH_CXXFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-I$(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
+	$(ECHO)printf -- "-D__INTELLISENSE__ -m32 -nostdinc++ -nostdlibinc -Wno-gnu-statement-expression $(SH_CXXFLAGS) $(foreach dir,$(SH_SYSTEM_INCLUDE_DIRS),-isystem $(abspath $(dir))) $(foreach dir,$(SHARED_INCLUDE_DIRS),-isystem $(abspath $(dir))) --include="$(YAUL_INSTALL_ROOT)/$(YAUL_PROG_SH_PREFIX)/include/intellisense.h" -c $(abspath $(1))\n" >&2
 endef
 
 # $1 -> $<

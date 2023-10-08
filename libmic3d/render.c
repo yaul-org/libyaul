@@ -253,11 +253,40 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
 
     fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
-    /* TODO: Move this out and pass in the view matrix instead of the world matrix */
     fix16_mat43_t view_matrix;
     fix16_mat43_mul(camera_matrix, world_matrix, &view_matrix);
 
-    math3d_point_xform(&view_matrix, render->view_distance, point, xform);
+    if (render->camera_type == CAMERA_TYPE_PERSPECTIVE) {
+        math3d_point_perspective_xform(&view_matrix, render->view_distance, point, xform);
+    } else {
+        math3d_point_orthographic_xform(&view_matrix, render->ortho_size,  point, xform);
+    }
+}
+
+void
+render_points_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *points,
+    xform_t *xforms, uint32_t count)
+{
+    assert(world_matrix != NULL);
+    assert(points != NULL);
+    assert(xforms != NULL);
+
+    render_t * const render = __state.render;
+
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
+
+    fix16_mat43_t view_matrix;
+    fix16_mat43_mul(camera_matrix, world_matrix, &view_matrix);
+
+    if (render->camera_type == CAMERA_TYPE_PERSPECTIVE) {
+        for (uint32_t i = 0; i < count; i++) {
+            math3d_point_perspective_xform(&view_matrix, render->view_distance, &points[i], &xforms[i]);
+        }
+    } else {
+        for (uint32_t i = 0; i < count; i++) {
+            math3d_point_orthographic_xform(&view_matrix, render->ortho_size, points, &xforms[i]);
+        }
+    }
 }
 
 void
@@ -677,8 +706,8 @@ _perspective_transform(void)
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
-        screen_points[i].x = fix16_int32_mul(depth_value, p.x);
-        screen_points[i].y = fix16_int32_mul(depth_value, p.y);
+        screen_points[i].x = fix16_high_mul(depth_value, p.x);
+        screen_points[i].y = fix16_high_mul(depth_value, p.y);
         z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
     }
@@ -707,8 +736,8 @@ _orthographic_transform(void)
         fix16_mat43_pos3_mul(view_matrix, &points[i], &p);
 
         /* TODO: Combine screen_points and z_values pool */
-        screen_points[i].x = fix16_int32_mul( render->ortho_size, p.x);
-        screen_points[i].y = fix16_int32_mul(-render->ortho_size, p.y);
+        screen_points[i].x = fix16_high_mul( render->ortho_size, p.x);
+        screen_points[i].y = fix16_high_mul(-render->ortho_size, p.y);
 
         z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
@@ -723,7 +752,7 @@ _depth_normalize(fix16_t z)
     const fix16_t scaled_z =
       fix16_mul(render->depth_scale, z) + render->depth_offset;
 
-    return fix16_int32_mul(render->sort_scale, scaled_z);
+    return fix16_high_mul(render->sort_scale, scaled_z);
 }
 
 static int16_t
