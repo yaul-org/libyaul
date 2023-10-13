@@ -67,7 +67,7 @@ struct fix16_vec3_t {
     /// @brief Not yet documented.
     fix16_t z;
 
-    fix16_vec3_t() { }
+    fix16_vec3_t() = default;
     fix16_vec3_t(fix16_vec3_t&&)      = default;
     fix16_vec3_t(const fix16_vec3_t&) = default;
 

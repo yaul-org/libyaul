@@ -186,7 +186,11 @@ inline angle_t angle_t::from_rad(fix16_t rad) {
     return angle_t{fix16_low_mul(scale, rad)};
 }
 
-constexpr inline angle_t angle_t::from_rad_double(double rad) { return angle_t{fix16_t::from_double(rad / (2.0 * M_PI)).fractional()}; }
+constexpr inline angle_t angle_t::from_rad_double(double rad) {
+    constexpr double _2pi = 2.0 * M_PI;
+
+    return angle_t{fix16_t::from_double(fmod(rad + _2pi, _2pi) / _2pi).fractional()};
+}
 
 constexpr inline angle_t angle_t::from_deg_double(double value) {
     return angle_t{fix16_t::from_double(fmod(value + 360.0, 360.0) / 360.0).fractional()};

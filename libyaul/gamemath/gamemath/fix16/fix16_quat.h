@@ -59,7 +59,12 @@ struct fix16_quat_t {
     /// @brief Not yet documented.
     fix16_t w;
 
-    fix16_quat_t() = default;
+    fix16_quat_t()                    = default;
+    fix16_quat_t(fix16_quat_t&&)      = default;
+    fix16_quat_t(const fix16_quat_t&) = default;
+
+    constexpr inline fix16_quat_t(fix16_t x_, fix16_t y_, fix16_t z_, fix16_t w_);
+    constexpr inline fix16_quat_t(const fix16_vec3_t& comp_, fix16_t w_);
 
     ~fix16_quat_t() = default;
 
@@ -69,10 +74,16 @@ struct fix16_quat_t {
     inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     ///
-    static inline void from_euler(const euler_t& angles, fix16_quat_t& result);
+    static inline fix16_quat_t from_euler(const euler_t& angles);
+
+    ///
+    static inline fix16_quat_t from_axis_angle(const fix16_vec3_t& axis, angle_t angle);
 
     ///
     static inline constexpr fix16_quat_t from_double(double x, double y, double z, double w);
+
+    ///
+    static inline fix16_quat_t conjugate(const fix16_quat_t& q);
 };
 
 static_assert(sizeof(fix16_quat_t) == 16);
@@ -88,6 +99,20 @@ __BEGIN_DECLS
 /// @param[out] result Not yet documented.
 extern void fix16_quat_euler(angle_t rx, angle_t ry, angle_t rz,
   fix16_quat_t *result);
+
+/// @brief Convert an axis-angle representation to a quaternion.
+///
+/// @param      axis   Not yet documented.
+/// @param      angle  Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_quat_axis_angle(const fix16_vec3_t *axis, angle_t angle,
+  fix16_quat_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      q0     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_quat_conjugate(const fix16_quat_t *q0, fix16_quat_t *result);
 
 /// @brief Not yet documented.
 ///
@@ -118,14 +143,35 @@ extern size_t fix16_quat_str(const fix16_quat_t *q0, char *buffer,
 __END_DECLS
 
 #if defined(__cplusplus)
+constexpr inline fix16_quat_t::fix16_quat_t(fix16_t x_, fix16_t y_, fix16_t z_, fix16_t w_) : comp({x_, y_, z_}), w(w_) { }
+
+constexpr inline fix16_quat_t::fix16_quat_t(const fix16_vec3_t& comp_, fix16_t w_) : comp(comp_), w(w_) { }
+
 inline size_t fix16_quat_t::to_string(char* buffer, int32_t decimals) const { return fix16_quat_str(this, buffer, decimals); }
 
-inline void fix16_quat_t::from_euler(const euler_t& angles, fix16_quat_t& result) {
+inline fix16_quat_t fix16_quat_t::from_euler(const euler_t& angles) {
+    fix16_quat_t result;
     fix16_quat_euler(angles.pitch, angles.yaw, angles.roll, &result);
+
+    return result;
+}
+
+inline fix16_quat_t fix16_quat_t::from_axis_angle(const fix16_vec3_t& axis, angle_t angle) {
+    fix16_quat_t result;
+    fix16_quat_axis_angle(&axis, angle, &result);
+
+    return result;
 }
 
 constexpr inline fix16_quat_t fix16_quat_t::from_double(double x, double y, double z, double w) {
     return fix16_quat_t{{fix16_t::from_double(x), fix16_t::from_double(y), fix16_t::from_double(z)}, fix16_t::from_double(w)};
+}
+
+inline fix16_quat_t fix16_quat_t::conjugate(const fix16_quat_t& q) {
+    fix16_quat_t result;
+    fix16_quat_conjugate(&q, &result);
+
+    return result;
 }
 #endif /* __cplusplus */
 

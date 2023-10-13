@@ -46,6 +46,27 @@ fix16_quat_euler(angle_t rx, angle_t ry, angle_t rz, fix16_quat_t *result)
 }
 
 void
+fix16_quat_axis_angle(const fix16_vec3_t *axis, angle_t angle, fix16_quat_t *result)
+{
+    /* Source: <https://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm> */
+
+    const angle_t angle_div_2 = angle_int32_to(angle) >> 1;
+    const fix16_t s = fix16_sin(angle_div_2);
+
+    result->w = fix16_cos(angle_div_2);
+    fix16_vec3_scaled(s, axis, &result->comp);
+}
+
+void
+fix16_quat_conjugate(const fix16_quat_t *q0, fix16_quat_t *result)
+{
+    result->w = q0->w;
+    result->comp.x = -q0->comp.x;
+    result->comp.y = -q0->comp.y;
+    result->comp.z = -q0->comp.z;
+}
+
+void
 fix16_quat_mul(const fix16_quat_t *q0 __unused, const fix16_quat_t *q1 __unused, fix16_quat_t *result __unused)
 {
     assert(q0 != NULL);
@@ -66,10 +87,10 @@ fix16_quat_vec3_mul(const fix16_quat_t *q0, const fix16_vec3_t *v0, fix16_vec3_t
      * s: scalar part of the quaternion
      * v: vector
      *
-     *  a = s*s - dot(u, u)
-     * v' = 2 * dot(u, v) * u +
-     *      a * v +
-     *      2 * s * cross(u, v) */
+     *  a = 2 * dot(u, v) *
+     *  b = s*s - dot(u, u)
+     *  c = 2 * s
+     * v' = (a * u) + (b * v) + (c * cross(u, v)) */
 
     /* v'=qpq*
      *   =(u,s)(v,0)(-u,s) */
@@ -80,8 +101,9 @@ fix16_quat_vec3_mul(const fix16_quat_t *q0, const fix16_vec3_t *v0, fix16_vec3_t
     const fix16_t dot_uv = fix16_vec3_dot(u, v0) << 1; /* Shift is multiplying by 2 */
     const fix16_t dot_uu = fix16_vec3_dot(u, u);
     const fix16_t ss = fix16_mul(s, s);
-    const fix16_t a = ss - dot_uu;
-    const fix16_t s2 = s << 1;
+    const fix16_t a = dot_uv;
+    const fix16_t b = ss - dot_uu;
+    const fix16_t c = s << 1;
 
     fix16_vec3_t cross_uv;
     fix16_vec3_cross(u, v0, &cross_uv);
@@ -89,9 +111,9 @@ fix16_quat_vec3_mul(const fix16_quat_t *q0, const fix16_vec3_t *v0, fix16_vec3_t
     /* Matrix multiplication is possible, but u, v0, and cross_uv need be
      * transposed */
 
-    result->x = fix16_mul(dot_uv, u->x) + fix16_mul(a, v0->x) + fix16_mul(s2, cross_uv.x);
-    result->y = fix16_mul(dot_uv, u->y) + fix16_mul(a, v0->y) + fix16_mul(s2, cross_uv.y);
-    result->z = fix16_mul(dot_uv, u->z) + fix16_mul(a, v0->z) + fix16_mul(s2, cross_uv.z);
+    result->x = fix16_mul(a, u->x) + fix16_mul(b, v0->x) + fix16_mul(c, cross_uv.x);
+    result->y = fix16_mul(a, u->y) + fix16_mul(b, v0->y) + fix16_mul(c, cross_uv.y);
+    result->z = fix16_mul(a, u->z) + fix16_mul(b, v0->z) + fix16_mul(c, cross_uv.z);
 }
 
 size_t
