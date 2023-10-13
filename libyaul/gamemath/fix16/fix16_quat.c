@@ -60,18 +60,25 @@ fix16_quat_axis_angle(const fix16_vec3_t *axis, angle_t angle, fix16_quat_t *res
 void
 fix16_quat_conjugate(const fix16_quat_t *q0, fix16_quat_t *result)
 {
-    result->w = q0->w;
+    result->w      =  q0->w;
     result->comp.x = -q0->comp.x;
     result->comp.y = -q0->comp.y;
     result->comp.z = -q0->comp.z;
 }
 
 void
-fix16_quat_mul(const fix16_quat_t *q0 __unused, const fix16_quat_t *q1 __unused, fix16_quat_t *result __unused)
+fix16_quat_mul(const fix16_quat_t *q0, const fix16_quat_t *q1, fix16_quat_t *result)
 {
     assert(q0 != NULL);
     assert(q1 != NULL);
     assert(result != NULL);
+
+    /* Source: <https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm#mul> */
+
+    result->comp.x =  fix16_mul(q0->comp.x,      q1->w) + fix16_mul(q0->comp.y, q1->comp.z) - fix16_mul(q0->comp.z, q1->comp.y) + fix16_mul(q0->w, q1->comp.x);
+    result->comp.y = -fix16_mul(q0->comp.x, q1->comp.z) + fix16_mul(q0->comp.y,      q1->w) + fix16_mul(q0->comp.z, q1->comp.x) + fix16_mul(q0->w, q1->comp.y);
+    result->comp.z =  fix16_mul(q0->comp.x, q1->comp.y) - fix16_mul(q0->comp.y, q1->comp.x) + fix16_mul(q0->comp.z,      q1->w) + fix16_mul(q0->w, q1->comp.z);
+    result->w      = -fix16_mul(q0->comp.x, q1->comp.x) - fix16_mul(q0->comp.y, q1->comp.y) - fix16_mul(q0->comp.z, q1->comp.z) + fix16_mul(q0->w,      q1->w);
 }
 
 void

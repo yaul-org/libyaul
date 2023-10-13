@@ -71,6 +71,8 @@ struct fix16_quat_t {
     fix16_quat_t& operator=(const fix16_quat_t& other) = default;
     fix16_quat_t& operator=(fix16_quat_t&& other)      = default;
 
+    inline const fix16_quat_t operator*(const fix16_quat_t& other) const;
+
     inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     ///
@@ -146,6 +148,13 @@ __END_DECLS
 constexpr inline fix16_quat_t::fix16_quat_t(fix16_t x_, fix16_t y_, fix16_t z_, fix16_t w_) : comp({x_, y_, z_}), w(w_) { }
 
 constexpr inline fix16_quat_t::fix16_quat_t(const fix16_vec3_t& comp_, fix16_t w_) : comp(comp_), w(w_) { }
+
+inline const fix16_quat_t fix16_quat_t::operator*(const fix16_quat_t& other) const {
+    fix16_quat_t result;
+    fix16_quat_mul(this, &other, &result);
+
+    return result;
+}
 
 inline size_t fix16_quat_t::to_string(char* buffer, int32_t decimals) const { return fix16_quat_str(this, buffer, decimals); }
 
