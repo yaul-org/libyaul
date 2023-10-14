@@ -57,7 +57,7 @@ _skip_atoi(const char * restrict *s)
     return i;
 }
 
-static void
+static inline void
 _out(FILE * restrict f, const void * restrict s, size_t l)
 {
     f->write(f, (void *)s, l);
@@ -75,8 +75,8 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
     uint32_t num;
     num = 0;
 
-    char *buf;
-    buf = NULL;
+    char *buffer;
+    buffer = NULL;
 
     const char *hex_chars;
 
@@ -186,13 +186,13 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
 
             continue;
         case 's':
-            buf = va_arg(ap, char *);
+            buffer = va_arg(ap, char *);
 
-            if (buf == NULL) {
-                buf = "<NULL>";
+            if (buffer == NULL) {
+                buffer = "<NULL>";
             }
 
-            len = strnlen(buf, precision);
+            len = strnlen(buffer, precision);
 
             if (left_align == 0)
                 while (len < field_width--) {
@@ -200,7 +200,7 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
                     char_count++;
                 }
 
-            _out(f, buf, len);
+            _out(f, buffer, len);
             char_count += len;
 
             while (len < field_width--) {
@@ -226,16 +226,16 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
             hex_chars = _uppercase_hex_chars;
 
         hexa_conv:
-            buf = &tmp_buffer[12];
-            *--buf = '\0';
+            buffer = &tmp_buffer[12];
+            *--buffer = '\0';
             num = va_arg(ap, uint32_t);
 
             if (num == 0) {
-                *--buf = '0';
+                *--buffer = '0';
             }
 
             while (num != 0) {
-                *--buf = hex_chars[num & 0xF];
+                *--buffer = hex_chars[num & 0xF];
                 num >>= 4;
             }
 
@@ -248,16 +248,16 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
 
             continue;
         case 'u':
-            buf = &tmp_buffer[12];
-            *--buf = 0;
+            buffer = &tmp_buffer[12];
+            *--buffer = 0;
             num = va_arg(ap, uint32_t);
 
             if (num == 0) {
-                *--buf = '0';
+                *--buffer = '0';
             }
 
             while (num != 0) {
-                *--buf = (num % 10) + 0x30;
+                *--buffer = (num % 10) + 0x30;
                 num /= 10;
             }
 
@@ -266,26 +266,26 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
             break;
         case 'd':
         case 'i':
-            buf = &tmp_buffer[12];
-            *--buf = '\0';
+            buffer = &tmp_buffer[12];
+            *--buffer = '\0';
             i = va_arg(ap, int32_t);
 
             if (i == 0) {
-                *--buf = '0';
+                *--buffer = '0';
             }
 
             if (i < 0) {
                 num = 1;
 
                 while (i != 0) {
-                    *--buf = 0x30 - (i % 10);
+                    *--buffer = 0x30 - (i % 10);
                     i /= 10;
                 }
             } else {
                 num = 0;
 
                 while (i != 0) {
-                    *--buf = (i % 10) + 0x30;
+                    *--buffer = (i % 10) + 0x30;
                     i /= 10;
                 }
             }
@@ -295,14 +295,14 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
             i = va_arg(ap, int32_t);
 
             fix16_str((fix16_t)i, tmp_buffer, 7);
-            buf = tmp_buffer;
+            buffer = tmp_buffer;
 
             break;
         default:
             continue;
         }
 
-        len = strnlen(buf, precision);
+        len = strnlen(buffer, precision);
 
         if (num != 0) {
             _out(f, "-", 1);
@@ -332,7 +332,7 @@ vfprintf(FILE * restrict f, const char * restrict fmt, va_list ap)
             }
         }
 
-        _out(f, buf, len);
+        _out(f, buffer, len);
         char_count += len;
 
         while (len < field_width--) {

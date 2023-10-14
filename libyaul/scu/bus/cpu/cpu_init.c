@@ -92,7 +92,7 @@ static void
 _exception_message_puts(const cpu_registers_t * restrict regs,
   const char * restrict exception_name)
 {
-    dbgio_printf("[1;44mException occurred: %s[m\n", exception_name);
+    dbgio_printf("Exception occurred: %s\n", exception_name);
 
     dbgio_printf("\n"
                  "   r0 = 0x%08X  r11 = 0x%08X\n"
