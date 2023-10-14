@@ -8,6 +8,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include <gamemath/defs.h>
+
 #include "scroll_menu.h"
 
 static void _scroll(scroll_menu_t *menu, int8_t direction);
@@ -25,7 +27,6 @@ scroll_menu_init(scroll_menu_t *scroll_menu)
         scroll_menu->flags = SCROLL_MENU_NONE;
         scroll_menu->data = NULL;
 
-        scroll_menu->_cursor = 0;
         scroll_menu->_y = 0;
         scroll_menu->_gp = 0;
 
@@ -72,7 +73,7 @@ scroll_menu_local_cursor(scroll_menu_t *menu)
 menu_cursor_t
 scroll_menu_cursor(scroll_menu_t *menu)
 {
-        return menu->_cursor;
+        return menu->_gp + menu->_y;
 }
 
 void
@@ -129,31 +130,34 @@ scroll_menu_update(scroll_menu_t *scroll_menu)
 static void
 _scroll(scroll_menu_t *menu, int8_t direction)
 {
-        menu->_cursor += direction;
-
-        if (menu->_cursor < 0) {
-                menu->_cursor = 0;
-        } else if (menu->_cursor > menu->bottom_index) {
-                menu->_cursor = menu->bottom_index;
-        }
-
         menu->_gp += direction;
+
+        const int8_t height_index = menu->view_height - 1;
 
         if (menu->_gp < 0) {
                 menu->_gp = 0;
-
                 menu->_y += direction;
-        } else if (menu->_gp > menu->view_height) {
-                menu->_gp = menu->view_height;
-
-                menu->_y += direction;
+        } else {
+                if (menu->view_height > menu->bottom_index) {
+                        menu->_gp = min(menu->_gp, menu->bottom_index);
+                } else {
+                        if (menu->_gp > height_index) {
+                                menu->_gp = height_index;
+                                menu->_y += direction;
+                        }
+                }
         }
 
-        if (menu->_y < menu->top_index) {
-                menu->_y = menu->top_index;
-        } else if ((menu->_y + menu->view_height) >= menu->bottom_index) {
-                menu->_y = menu->bottom_index - menu->view_height - 1;
+        const menu_cursor_t y_min = menu->top_index;
+        menu_cursor_t y_max;
+
+        if (menu->view_height > menu->bottom_index) {
+                y_max = menu->bottom_index;
+        } else {
+                y_max = menu->bottom_index - height_index;
         }
+
+        menu->_y = clamp(menu->_y, y_min, y_max);
 }
 
 static void
