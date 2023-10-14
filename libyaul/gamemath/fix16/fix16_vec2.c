@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Mattias Jansson
@@ -17,7 +17,7 @@ fix16_vec2_normalize(fix16_vec2_t *v0)
 {
     const fix16_t length = fix16_vec2_length(v0);
 
-    cpu_divu_fix16_set(FIX16_ONE, length);
+    cpu_divu_fix16_set(FIX16(1.0), length);
 
     const fix16_t scale = cpu_divu_quotient_get();
 
@@ -30,7 +30,7 @@ fix16_vec2_normalized(const fix16_vec2_t * __restrict v0,
 {
     const fix16_t length = fix16_vec2_length(v0);
 
-    cpu_divu_fix16_set(FIX16_ONE, length);
+    cpu_divu_fix16_set(FIX16(1.0), length);
 
     const fix16_t scale = cpu_divu_quotient_get();
 

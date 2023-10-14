@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -15,8 +15,14 @@
 
 __BEGIN_DECLS
 
-#define CONS_COLS_MIN 40
-#define CONS_ROWS_MIN 28
+/* Depending on the VDP2 scroll screen character size:
+ *
+ * Character size|Width  |Height
+ * --------------+-------+-------
+ *       Size 1x1|[40,64]|[28,64]
+ *       Size 2x2|[20,32]|[14,32] */
+#define CONS_COLS_MIN 20
+#define CONS_ROWS_MIN 14
 
 #define CONS_COLS_MAX 64
 #define CONS_ROWS_MAX 64
@@ -39,7 +45,9 @@ typedef struct con_ops {
 
 extern void __cons_init(const cons_ops_t *ops, uint16_t cols, uint16_t rows);
 extern void __cons_resize(uint16_t cols, uint16_t rows);
-extern void __cons_buffer(const char *buffer);
+extern void __cons_putc(char ch);
+extern void __cons_puts(const char *buffer);
+extern void __cons_write(const char *buffer, size_t len);
 
 __END_DECLS
 

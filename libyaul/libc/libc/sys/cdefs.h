@@ -62,10 +62,10 @@
 
 #ifdef __cplusplus
 #ifndef __BEGIN_DECLS
-#define __BEGIN_DECLS   extern "C" {
+#define __BEGIN_DECLS extern "C" {
 #endif
 #ifndef __END_DECLS
-#define __END_DECLS     }
+#define __END_DECLS   }
 #endif
 #else
 #ifndef __BEGIN_DECLS
@@ -92,7 +92,7 @@
 #define __STRINGIFY(x) #x /* Stringify without expanding x */
 #define __XSTRING(x)   __STRING(x) /* Expand x, then stringify */
 
-#if (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901)
 #define __PRAGMA(x) _Pragma(#x)
 #else
 #define __PRAGMA(x)
@@ -400,17 +400,23 @@
 /// @private
 #ifndef __printflike
 #define __printflike(fmt_arg, first_vararg) \
-    __attribute__((__format__(__printf__, fmt_arg, first_vararg)))
+    __attribute__ ((__format__(__printf__, fmt_arg, first_vararg)))
 #endif
 /// @private
 #ifndef __format_arg
-#define __format_arg(fmt_arg) __attribute__((__format_arg__(fmt_arg)))
+#define __format_arg(fmt_arg) __attribute__ ((__format_arg__(fmt_arg)))
+#endif
+
+/// @private
+#ifndef __alias
+#define __alias(name, aliasname) \
+    extern __typeof(name) aliasname __attribute__ ((alias(#name)))
 #endif
 
 /// @private
 #ifndef __weak_alias
 #define __weak_alias(name, aliasname) \
-    extern __typeof(name) aliasname __attribute__((weak, alias(#name)))
+    extern __typeof(name) aliasname __attribute__ ((weak, alias(#name)))
 #endif
 
 /*

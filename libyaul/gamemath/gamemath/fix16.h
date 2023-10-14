@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 /*-
  * Copyright (c) Authors of libfixmath
  *
@@ -26,11 +33,10 @@
 
 #include <sys/cdefs.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <gamemath/defs.h>
-
-__BEGIN_DECLS
 
 /// @defgroup MATH_FIX16 Fix16
 /// @ingroup MATH
@@ -50,6 +56,7 @@ __BEGIN_DECLS
 /// @addtogroup MATH_FIX16
 /// @{
 
+#if !defined(__cplusplus)
 /// @brief Macro for defininge @p fix16_t constant values.
 ///
 /// @note The argument is evaluated multiple times, and also otherwise you
@@ -58,37 +65,77 @@ __BEGIN_DECLS
 ///
 /// @param x The constant value.
 #define FIX16(x) ((fix16_t)(((x) >= 0)                                         \
-    ? ((x) * 65536.0f + 0.5f)                                                  \
-    : ((x) * 65536.0f - 0.5f)))
+    ? ((double)(x) * 65536.0 + 0.5)                                            \
+    : ((double)(x) * 65536.0 - 0.5)))
+#endif /* !__cplusplus */
 
-/// @brief Maximum positive value.
-#define FIX16_MAX       (0x7FFFFFFF)
-/// @brief Minimum (negative) value
-#define FIX16_MIN       (0x80000000)
-/// @brief Value to indicate an overflow has occured.
-#define FIX16_OVERFLOW  (0x80000000)
-
-/// @brief Q16.16 representation of 2π.
-#define FIX16_2PI       (0x00064881)
-/// @brief Q16.16 representation of π.
-#define FIX16_PI        (0x00032440)
-/// @brief Q16.16 representation of π/2.
-#define FIX16_PI_2      (0x00019220)
-/// @brief Q16.16 representation of π/4.
-#define FIX16_PI_4      (0x0000C910)
-/// @brief Q16.16 representation of the exponential constant.
-#define FIX16_E         (0x0002B7E1)
-/// @brief Q16.16 representation of zero.
-#define FIX16_ZERO      (0x00000000)
-/// @brief Q16.16 representation of one.
-#define FIX16_ONE       (0x00010000)
-/// @brief Q16.16 representation of converting radians to degrees.
-#define FIX16_RAD2DEG   (0x00394BB8)
-/// @brief Q16.16 representation of converting degrees to radians.
-#define FIX16_DEG2RAD   (0x00000478)
-
-/// brief Fixed point Q16.16.
+#if !defined(__cplusplus)
+/// @brief Fixed point Q16.16.
 typedef int32_t fix16_t;
+#else
+/// @brief Fixed point Q16.16.
+struct fix16_t {
+    int32_t value;
+
+    fix16_t() = default;
+
+    explicit constexpr fix16_t(int32_t v);
+
+    explicit constexpr fix16_t(uint32_t v);
+
+    // For dealing with C
+    explicit constexpr operator int32_t() const { return value; }
+    explicit constexpr operator uint32_t() const { return value; }
+
+    inline fix16_t operator+(fix16_t other) const;
+    inline fix16_t operator-(fix16_t other) const;
+    constexpr inline fix16_t operator-() const;
+    inline fix16_t operator*(fix16_t other) const;
+    inline fix16_t operator*(int32_t other) const;
+    inline fix16_t operator*(uint32_t other) const;
+    inline fix16_t operator/(fix16_t other) const;
+    inline fix16_t operator>>(int32_t i) const;
+    inline fix16_t operator<<(int32_t i) const;
+
+    inline fix16_t& operator+=(fix16_t rhs);
+    inline fix16_t& operator-=(fix16_t rhs);
+    inline fix16_t& operator*=(fix16_t rhs);
+    inline fix16_t& operator*=(int32_t rhs);
+    inline fix16_t& operator*=(uint32_t rhs);
+    inline fix16_t& operator/=(fix16_t rhs);
+    inline fix16_t& operator>>=(int32_t i);
+    inline fix16_t& operator<<=(int32_t i);
+
+    inline bool operator<(fix16_t other) const;
+    inline bool operator<(int32_t other) const;
+    inline bool operator>(fix16_t other) const;
+    inline bool operator>(int32_t other) const;
+    inline bool operator<=(fix16_t other) const;
+    inline bool operator<=(int32_t other) const;
+    inline bool operator>=(fix16_t other) const;
+    inline bool operator>=(int32_t other) const;
+    inline bool operator==(fix16_t other) const;
+    inline bool operator==(int32_t other) const;
+
+    constexpr inline int16_t fractional() const;
+
+    inline bool is_near_zero(fix16_t epsilon = from_double(0.001)) const;
+
+    inline bool is_near(fix16_t other, fix16_t epsilon = from_double(0.001)) const;
+
+    inline bool is_negative() const;
+
+    inline bool is_positive() const;
+
+    constexpr inline int16_t to_int() const;
+
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
+
+    constexpr static inline fix16_t from_double(double value);
+};
+
+static_assert(sizeof(fix16_t) == 4);
+#endif /* !__cplusplus */
 
 /// @brief Not yet documented.
 ///
@@ -97,10 +144,10 @@ typedef int32_t fix16_t;
 ///
 /// @returns The value.
 __BEGIN_ASM
-static inline fix16_t __always_inline
-fix16_int16_mul(const fix16_t a, const int16_t b)
+static inline int32_t __always_inline
+fix16_low_mul(fix16_t a, fix16_t b)
 {
-    __register fix16_t out;
+    __register int32_t out;
 
     __declare_asm("\tdmuls.l %[a], %[b]\n"
                   "\tsts macl, %[out]\n"
@@ -123,7 +170,7 @@ __END_ASM
 /// @returns The value.
 __BEGIN_ASM
 static inline int32_t __always_inline
-fix16_int32_mul(const fix16_t a, const fix16_t b)
+fix16_high_mul(fix16_t a, fix16_t b)
 {
     __register int16_t out;
 
@@ -148,7 +195,7 @@ __END_ASM
 /// @returns The value.
 __BEGIN_ASM
 static inline fix16_t __always_inline
-fix16_mul(const fix16_t a, const fix16_t b)
+fix16_mul(fix16_t a, fix16_t b)
 {
     __register uint32_t mach;
     __register fix16_t out;
@@ -169,6 +216,7 @@ fix16_mul(const fix16_t a, const fix16_t b)
 }
 __END_ASM
 
+#if !defined(__cplusplus)
 /// @brief Not yet documented.
 ///
 /// @param value Operand.
@@ -177,7 +225,7 @@ __END_ASM
 static inline fix16_t __always_inline
 fix16_int32_from(int32_t value)
 {
-    return (value * FIX16_ONE);
+    return (value * FIX16(1.0));
 }
 
 /// @brief Not yet documented.
@@ -186,7 +234,7 @@ fix16_int32_from(int32_t value)
 ///
 /// @returns The value.
 static inline int32_t __always_inline
-fix16_int32_to(const fix16_t value)
+fix16_int32_to(fix16_t value)
 {
     return (value >> 16);
 }
@@ -197,13 +245,13 @@ fix16_int32_to(const fix16_t value)
 ///
 /// @returns The value.
 static inline int32_t __always_inline
-fix16_round_int32_to(const fix16_t value)
+fix16_round_int32_to(fix16_t value)
 {
     if (value >= 0) {
-        return ((value + (FIX16_ONE >> 1)) / FIX16_ONE);
+        return ((value + (FIX16(1.0) / 2)) / FIX16(1.0));
     }
 
-    return ((value - (FIX16_ONE >> 1)) / FIX16_ONE);
+    return ((value - (FIX16(1.0) / 2)) / FIX16(1.0));
 }
 
 /// @brief Not yet documented.
@@ -211,52 +259,8 @@ fix16_round_int32_to(const fix16_t value)
 /// @param value Operand.
 ///
 /// @returns The value.
-static inline fix16_t __always_inline
-fix16_integral(const fix16_t value)
-{
-    return (value & 0xFFFF0000);
-}
-
-/// @brief Not yet documented.
-///
-/// @param value Operand.
-///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_fractional(const fix16_t value)
-{
-    return (value & 0x0000FFFF);
-}
-
-/// @brief Not yet documented.
-///
-/// @param value Operand.
-///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_abs(const fix16_t value)
-{
-    return ((value < 0) ? -value : value);
-}
-
-/// @brief Not yet documented.
-///
-/// @param value Operand.
-///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_sign(const fix16_t value)
-{
-    return ((value < 0) ? -FIX16_ONE : FIX16_ONE);
-}
-
-/// @brief Not yet documented.
-///
-/// @param value Operand.
-///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_floor(const fix16_t value)
+static inline uint32_t __always_inline
+fix16_integral(fix16_t value)
 {
     return (value & 0xFFFF0000UL);
 }
@@ -266,86 +270,56 @@ fix16_floor(const fix16_t value)
 /// @param value Operand.
 ///
 /// @returns The value.
-static inline fix16_t __always_inline
-fix16_ceil(const fix16_t value)
+static inline uint32_t __always_inline
+fix16_fractional(fix16_t value)
 {
-    return (value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16_ONE : 0);
+    return (value & 0x0000FFFFUL);
 }
 
+// TODO: Does not compile for C++
 /// @brief Not yet documented.
 ///
-/// @param x Operand.
-/// @param y Operand.
-///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_min(const fix16_t x, const fix16_t y)
-{
-    return min(x, y);
-}
-
-/// @brief Not yet documented.
-///
-/// @param x Operand.
-/// @param y Operand.
+/// @param value Operand.
 ///
 /// @returns The value.
 static inline fix16_t __always_inline
-fix16_max(const fix16_t x, const fix16_t y)
+fix16_floor(fix16_t value)
 {
-    return max(x, y);
+    return (value & 0xFFFF0000);
 }
 
+// TODO: Does not compile for C++
 /// @brief Not yet documented.
 ///
-/// @param value      Operand.
-/// @param value_low  Operand.
-/// @param value_high Operand.
+/// @param value Operand.
 ///
 /// @returns The value.
 static inline fix16_t __always_inline
-fix16_clamp(fix16_t value, fix16_t value_low, fix16_t value_high)
+fix16_ceil(fix16_t value)
 {
-    return fix16_min(fix16_max(value, value_low), value_high);
+    return ((value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16(1.0) : 0));
 }
+#endif /* !__cplusplus */
+
+__BEGIN_DECLS
 
 /// @brief Not yet documented.
 ///
-/// @param radians Operand.
+/// @param a        Operand.
+/// @param b        Operand.
+/// @param sum[out] Sum.
 ///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_rad_deg_to(fix16_t radians)
-{
-    return fix16_mul(radians, FIX16_RAD2DEG);
-}
+/// @returns If overflow occurred.
+extern bool fix16_overflow_add(fix16_t a, fix16_t b, fix16_t *sum);
 
 /// @brief Not yet documented.
 ///
-/// @param degrees Operand.
+/// @param a         Operand.
+/// @param b         Operand.
+/// @param diff[out] Sum.
 ///
-/// @returns The value.
-static inline fix16_t __always_inline
-fix16_deg_rad_to(fix16_t degrees)
-{
-    return fix16_mul(degrees, FIX16_DEG2RAD);
-}
-
-/// @brief Not yet documented.
-///
-/// @param a Operand.
-/// @param b Operand.
-///
-/// @returns The value.
-extern fix16_t fix16_overflow_add(fix16_t a, fix16_t b);
-
-/// @brief Not yet documented.
-///
-/// @param a Operand.
-/// @param b Operand.
-///
-/// @returns The value.
-extern fix16_t fix16_overflow_sub(fix16_t a, fix16_t b);
+/// @returns If overflow occurred.
+extern bool fix16_overflow_sub(fix16_t a, fix16_t b, fix16_t *diff);
 
 /// @brief Not yet documented.
 ///
@@ -389,8 +363,102 @@ extern fix16_t fix16_sqrt(fix16_t value);
 /// @returns The string length, not counting the `NUL` character.
 extern size_t fix16_str(fix16_t value, char *buffer, int32_t decimals);
 
-/// @}
-
 __END_DECLS
+
+#if defined(__cplusplus)
+static inline fix16_t abs(fix16_t a) {
+    return fix16_t{::abs(a.value)};
+}
+
+constexpr fix16_t operator"" _fp(long double v) { return fix16_t::from_double(v); }
+
+constexpr fix16_t::fix16_t(int32_t v) : value(v) {}
+
+constexpr fix16_t::fix16_t(uint32_t v) : value(v) {}
+
+inline fix16_t fix16_t::operator+(fix16_t other) const { return fix16_t{value + other.value}; }
+inline fix16_t fix16_t::operator-(fix16_t other) const { return fix16_t{value - other.value}; }
+constexpr inline fix16_t fix16_t::operator-() const { return fix16_t{-value}; }
+inline fix16_t fix16_t::operator*(fix16_t other) const { return fix16_mul(*this, other); }
+inline fix16_t fix16_t::operator*(int32_t other) const { return fix16_mul(*this, fix16_t{other}); }
+inline fix16_t fix16_t::operator*(uint32_t other) const { return fix16_mul(*this, fix16_t{other}); }
+inline fix16_t fix16_t::operator/(fix16_t other) const { return fix16_div(*this, other); }
+
+inline fix16_t fix16_t::operator>>(int32_t i) const { return fix16_t{value >> i}; }
+inline fix16_t fix16_t::operator<<(int32_t i) const { return fix16_t{value << i}; }
+
+inline fix16_t& fix16_t::operator+=(fix16_t rhs) {
+    value = value + rhs.value;
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator-=(fix16_t rhs) {
+    value = value - rhs.value;
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator*=(fix16_t rhs) {
+    *this = fix16_mul(*this, rhs);
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator*=(int32_t rhs) {
+    *this = fix16_mul(*this, fix16_t{rhs});
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator*=(uint32_t rhs) {
+    *this = fix16_mul(*this, fix16_t{rhs});
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator/=(fix16_t rhs) {
+    *this = fix16_div(*this, rhs);
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator>>=(int32_t i) {
+    value = value >> i;
+    return *this;
+}
+
+inline fix16_t& fix16_t::operator<<=(int32_t i) {
+    value = value >> i;
+    return *this;
+}
+
+inline bool fix16_t::operator<(fix16_t other) const { return value < other.value; }
+inline bool fix16_t::operator<(int32_t other) const { return value < other; }
+inline bool fix16_t::operator>(fix16_t other) const { return value > other.value; }
+inline bool fix16_t::operator>(int32_t other) const { return value > other; }
+inline bool fix16_t::operator<=(fix16_t other) const { return value <= other.value; }
+inline bool fix16_t::operator<=(int32_t other) const { return value <= other; }
+inline bool fix16_t::operator>=(fix16_t other) const { return value >= other.value; }
+inline bool fix16_t::operator>=(int32_t other) const { return value >= other; }
+inline bool fix16_t::operator==(fix16_t other) const { return value == other.value; }
+inline bool fix16_t::operator==(int32_t other) const { return value == other; }
+
+constexpr inline fix16_t fix16_t::from_double(double value) {
+    return fix16_t{static_cast<int32_t>((value >= 0) ? ((value * 65536.0) + 0.5) : ((value * 65536.0) - 0.5))};
+}
+
+static inline fix16_t sqrt(fix16_t value) { return fix16_sqrt(value); }
+
+constexpr inline int16_t fix16_t::fractional() const { return (value & 0x0000FFFF); }
+
+inline bool fix16_t::is_near_zero(fix16_t epsilon) const { return abs(*this) <= epsilon; }
+
+inline bool fix16_t::is_near(fix16_t other, fix16_t epsilon) const { return abs(*this - other) <= epsilon; }
+
+inline bool fix16_t::is_negative() const { return (value < 0); }
+
+inline bool fix16_t::is_positive() const { return (value >= 0); }
+
+constexpr inline int16_t fix16_t::to_int() const { return (value / 65536); }
+
+inline size_t fix16_t::to_string(char* buffer, int32_t decimals) const { return fix16_str(*this, buffer, decimals); }
+#endif /* __cplusplus */
+
+/// @}
 
 #endif /* !_YAUL_GAMEMATH_FIX16_H_ */

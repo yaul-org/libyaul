@@ -6,3 +6,6 @@ LIB_SRCS:= \
 
 INSTALL_HEADER_FILES:= \
 	./:fiber.h:./
+
+USER_FILES:= \
+	build/build.fiber.mk

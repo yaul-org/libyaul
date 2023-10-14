@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Nikita Sokolov <hitomi2500@mail.ru>

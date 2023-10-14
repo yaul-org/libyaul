@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>

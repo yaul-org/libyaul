@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2004 Swedish Institute of Computer Science.
- * Copyright (c) 2012-2022 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -387,6 +387,14 @@ static void
 _system_manager_handler(void)
 {
         static uint32_t offset = 0;
+
+        /* Prevent a buffer overrun if the user hasn't called to process the
+         * collection buffer */
+        if (_collection_complete) {
+            return;
+        }
+
+        assert(offset < sizeof(_oreg_buf));
 
         /* We don't have much time in the critical section. Just buffer the
          * registers */

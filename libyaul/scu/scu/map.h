@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -377,6 +377,10 @@ typedef union scu_ioregs {
     /// @brief SCU I/O register buffer.
     uint32_t buffer[52];
 
+    /* GCC complains:
+     *   Warning: ISO C++ prohibits anonymous structs */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
     struct {
         union {
             struct {
@@ -438,6 +442,7 @@ typedef union scu_ioregs {
         uint32_t ver;   /* 0x00C8 */
         unsigned int :32;
     };
+#pragma GCC diagnostic pop
 } __aligned(4) __packed scu_ioregs_t;
 
 /// @}

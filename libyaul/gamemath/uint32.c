@@ -1,3 +1,10 @@
+/*
+ * Copyright (c)
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 /*-
  * Copyright (c) Authors of libfixmath
  *

@@ -8,8 +8,10 @@ const dbgio_dev_ops_t __dbgio_dev_ops_vdp2 = {
     .default_params = &_default_params,
     .init           = (dev_ops_init_t)_sync_init,
     .deinit         = _shared_deinit,
+    .display_set    = _shared_display_set,
     .font_load      = _shared_font_load,
     .puts           = _shared_puts,
+    .printf         = _shared_printf,
     .flush          = _sync_flush
 };
 

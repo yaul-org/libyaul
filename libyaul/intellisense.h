@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -79,7 +79,7 @@
 #undef __func__
 #define __func__
 
-#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901) || defined(lint)
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901)
 #undef __restrict
 #define __restrict
 #endif
@@ -130,7 +130,8 @@
 
 #undef static_assert
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#define static_assert(...) _Static_assert(true, "")
+/* Avoid including stdbool.h, as that would cause side effects */
+#define static_assert(...) _Static_assert(1, "")
 #else
 #define static_assert(...) typedef char __CONCAT(STATIC_ASSERT_FAILED_AT_LINE, \
     __CONCAT(_, __LINE__))[1]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -19,20 +19,20 @@
 
 #include "vt_parse.inc"
 
-static void _action_character_print(int ch);
-static void _action_escape_character_print(int ch);
-static void _action_csi_dispatch_print(int8_t ch, const uint8_t *params,
+static void _action_character_print(char ch);
+static void _action_escape_character_print(char ch);
+static void _action_csi_dispatch_print(char ch, const uint8_t *params,
   uint32_t num_params);
 static inline bool _cursor_column_exceeded(int16_t x) __always_inline;
 static inline bool _cursor_row_exceeded(uint16_t y) __always_inline;
 static inline void _cursor_column_advance(int16_t x) __always_inline;
 static inline void _cursor_column_set(int16_t x) __always_inline;
 static inline void _cursor_row_advance(uint16_t y) __always_inline;
-static inline bool _cursor_row_cond_set(int16_t row) __always_inline;
+static inline bool _cursor_row_cond_set(int16_t row) __always_inline __unused;
 static inline void _cursor_row_set(int16_t y) __always_inline;
 
 static void _vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action,
-  int ch);
+  char ch);
 
 typedef struct {
     uint16_t cols;
@@ -92,15 +92,31 @@ __cons_resize(uint16_t cols, uint16_t rows)
 }
 
 void
-__cons_buffer(const char *buffer)
+__cons_putc(char ch)
+{
+    _vt_char_parse(&_cons.vt_parser, ch);
+}
+
+void
+__cons_puts(const char *buffer)
 {
     assert(buffer != NULL);
 
-    _vt_parse(&_cons.vt_parser, buffer);
+    _vt_string_parse(&_cons.vt_parser, buffer);
+}
+
+void
+__cons_write(const char *buffer, size_t len)
+{
+    for (uint32_t i = 0; i < len; i++) {
+        const char ch = buffer[i];
+
+        _vt_char_parse(&_cons.vt_parser, ch);
+    }
 }
 
 static void
-_vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, int ch)
+_vt_parser_callback(vt_parse_t *parser, vt_parse_action_t action, char ch)
 {
     switch (action) {
     case VT_PARSE_ACTION_PRINT:
@@ -195,7 +211,7 @@ _cursor_column_set(int16_t x)
 }
 
 static void
-_action_character_print(int ch)
+_action_character_print(char ch)
 {
     if (_cursor_column_exceeded(0)) {
         _cursor_column_set(0);
@@ -212,7 +228,7 @@ _action_character_print(int ch)
 }
 
 static void
-_action_escape_character_print(int ch)
+_action_escape_character_print(char ch)
 {
     int16_t tab;
 
@@ -474,7 +490,7 @@ _action_csi_k(const uint8_t *params, const uint8_t num_params)
 }
 
 static void
-_action_csi_dispatch_print(int8_t ch, const uint8_t *params, uint32_t num_params)
+_action_csi_dispatch_print(char ch, const uint8_t *params, uint32_t num_params)
 {
     switch (ch) {
     case 'A':

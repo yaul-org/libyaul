@@ -5,14 +5,7 @@
 --big \
 --reduce-memory-overheads
 
-*includes:
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/bcl)) \
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/fiber)) \
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/menu)) \
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/mic3d)) \
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/tga)) \
--I%:getenv(YAUL_INSTALL_ROOT /%:getenv(YAUL_ARCH_SH_PREFIX /include/yaul)) \
--I.
+*includes: -I.
 
 %rename cc1 old_c11
 *cc1:

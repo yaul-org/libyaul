@@ -46,20 +46,6 @@ IP_FILES_all = $(IP_FILES)
 USER_FILES_all = $(USER_FILES)
 HELPER_FILES_all = $(HELPER_FILES)
 
-# $1 ->
-# $2 ->
-# $3 ->
-# $4 ->
-# $5 ->
-define macro-generate-install-file-rule
-$(YAUL_PREFIX)/$3/$2: $1
-	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
-	@mkdir -p $$(@D)
-	$(ECHO)$(INSTALL) -m $5 $$< $$@
-
-install-$4: $4 $(YAUL_PREFIX)/$3/$2
-endef
-
 .PHONY: all $(TYPE) clean install-$(TYPE) generate-cdb
 
 .SUFFIXES:= .c .cxx .sx .o .x
@@ -82,7 +68,6 @@ $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.cxx
 
 $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE)/%.o: %.sx
 	$(call macro-sh-build-object,$(TYPE))
-
 # Install header files
 $(foreach TUPLE,$(INSTALL_HEADER_FILES), \
 	$(eval P1= $(word 1,$(subst :, ,$(TUPLE)))) \
@@ -96,34 +81,31 @@ $(foreach SUPPORT_OBJ,$(SUPPORT_OBJS_base), \
 
 # Install files
 $(foreach SPECS,$(SPECS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(SPECS),$(notdir $(SPECS)),$(YAUL_ARCH_SH_PREFIX)/lib,$(TYPE),444)))
 
 $(foreach LDSCRIPT,$(LDSCRIPTS_all), \
-	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(LDSCRIPT),$(notdir $(LDSCRIPT)),$(YAUL_ARCH_SH_PREFIX)/lib/ldscripts,$(TYPE),444)))
 
 $(foreach IP,$(IP_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(IP),$(IP),share/$(TARGET),$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(IP),$(IP),share/$(TARGET),$(TYPE),444)))
 
 $(foreach USER_FILE,$(USER_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),644)))
+	$(eval $(call macro-generate-install-file-rule,$(USER_FILE),$(notdir $(USER_FILE)),share,$(TYPE),444)))
 
 $(foreach HELPER_FILE,$(HELPER_FILES_all), \
-	$(eval $(call macro-generate-install-file-rule,$(HELPER_FILE),$(notdir $(HELPER_FILE)),share,$(TYPE),755)))
+	$(eval $(call macro-generate-install-file-rule,$(HELPER_FILE),$(notdir $(HELPER_FILE)),share,$(TYPE),555)))
 
 # Install library
 $(eval $(call macro-sh-generate-install-lib-rule,$(LIB_FILE_base),$(notdir $(LIB_FILE_base)),$(TYPE)))
 
-generate-cdb:
-	$(ECHO)$(call macro-loop-update-cdb,$(LIB_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_C_base),c,$(CDB_GCC),$(SH_CFLAGS_release),release,$(CDB_FILE))
-	$(ECHO)$(call macro-loop-update-cdb,$(SUPPORT_OBJS_CXX_base),cxx,$(CDB_CPP),$(SH_CXXFLAGS_release),release,$(CDB_FILE))
+$(foreach FILE,$(LIB_SRCS_C),$(eval $(call macro-sh-generate-cdb-rule,$(TYPE),$(FILE))))
+$(foreach FILE,$(LIB_SRCS_CXX),$(eval $(call macro-sh-c++-generate-cdb-rule,$(TYPE),$(FILE))))
 
 clean:
 	$(ECHO)if [ -d $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) ]; then \
 		$(FIND) $(YAUL_BUILD_ROOT)/$(SUB_BUILD)/$(TYPE) -type f -name "*.[od]" -exec $(RM) {} \;; \
 	fi
 	$(ECHO)$(RM) $(LIB_FILE_base)
-	$(ECHO)$(RM) $(CDB_FILE)
 
 -include $(SUPPORT_DEPS_base)
 -include $(LIB_DEPS_base)

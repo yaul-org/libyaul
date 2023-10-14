@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -27,34 +28,46 @@
 
 #include "cons/cons-internal.h"
 
-#include "vdp2_charmap.inc"
-
-#define STATE_IDLE                  (0x00)
-#define STATE_INITIALIZED           (0x01)
-#define STATE_BUFFER_DIRTY          (0x02)
-#define STATE_BUFFER_CLEARED        (0x04)
-#define STATE_BUFFER_FLUSHING       (0x08)
-#define STATE_BUFFER_FORCE_FLUSHING (0x10)
+typedef enum state_flags {
+    STATE_IDLE                  = 0x00,
+    STATE_INITIALIZED           = 0x01,
+    STATE_BUFFER_DIRTY          = 0x02,
+    STATE_BUFFER_CLEARED        = 0x04,
+    STATE_BUFFER_FLUSHING       = 0x08,
+    STATE_BUFFER_FORCE_FLUSHING = 0x10
+} state_flags_t;
 
 #define DEFAULT_NBGX_CPD_BANK    (3)
-#define DEFAULT_NBGX_CPD         VDP2_VRAM_ADDR(3, 0x1C000)
+#define DEFAULT_NBGX_CPD         VDP2_VRAM_ADDR(DEFAULT_NBGX_CPD_BANK, 0x1C000)
 
 #define DEFAULT_NBGX_PND_BANK    (3)
-#define DEFAULT_NBGX_MAP_PLANE_A VDP2_VRAM_ADDR(3, 0x1E000)
-#define DEFAULT_NBGX_MAP_PLANE_B VDP2_VRAM_ADDR(3, 0x1E000)
-#define DEFAULT_NBGX_MAP_PLANE_C VDP2_VRAM_ADDR(3, 0x1E000)
-#define DEFAULT_NBGX_MAP_PLANE_D VDP2_VRAM_ADDR(3, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_A VDP2_VRAM_ADDR(DEFAULT_NBGX_PND_BANK, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_B VDP2_VRAM_ADDR(DEFAULT_NBGX_PND_BANK, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_C VDP2_VRAM_ADDR(DEFAULT_NBGX_PND_BANK, 0x1E000)
+#define DEFAULT_NBGX_MAP_PLANE_D VDP2_VRAM_ADDR(DEFAULT_NBGX_PND_BANK, 0x1E000)
+/* CRAM mode might cause issues in case it's changed */
+#define DEFAULT_NBGX_PND(cpd_addr, pal_addr)                                   \
+    VDP2_SCRN_PND_CONFIG_1(0, cpd_addr, pal_addr)
 
 #define DEFAULT_NBGX_PAL         VDP2_CRAM_MODE_0_OFFSET(0, 127, 0)
+
+/* T0: NBG3 pattern name data read on
+ * T4: NBG3 character pattern name data read */
+#define DEFAULT_NBGX_CYCP_MASK   0xFFF0FFF0
+#define DEFAULT_NBGX_CYCP        0x00070003
 
 /* CPU-DMAC channel used for _flush() and _buffer_clear() */
 #define DEV_DMAC_CHANNEL 0
 
 struct dev_state {
-    uint8_t state;
+    state_flags_t state;
 
     dbgio_vdp2_t params;
+    bool default_params;
 
+    FILE file;
+
+    const dbgio_vdp2_charmap_t *font_charmap;
     uint16_t *page_ptr;
     uint16_t page_size; /* Size of split page */
     uint16_t page_stride;
@@ -90,7 +103,7 @@ static const vdp2_scrn_normal_map_t _default_normal_map = {
 
 static const dbgio_vdp2_t _default_params = {
     .font         = &__dbgio_default_font,
-    .font_charmap = _font_charmap,
+    .font_charmap = NULL,
 
     .cell_format  = &_default_cell_format,
     .normal_map   = &_default_normal_map,
@@ -113,6 +126,16 @@ static const cons_ops_t _cons_ops = {
     .write              = _buffer_write
 };
 
+static void _shared_display_set(bool display);
+
+static size_t
+_file_write(FILE *f __unused, const uint8_t *s, size_t l)
+{
+    __cons_write((const char *)s, l);
+
+    return l;
+}
+
 static void
 _cons_dimensions_calculate(uint16_t *cols, uint16_t *rows)
 {
@@ -121,16 +144,11 @@ _cons_dimensions_calculate(uint16_t *cols, uint16_t *rows)
 
     const dbgio_vdp2_t * const params = &_dev_state->params;
 
-    const vdp2_scrn_cell_format_t * const cell_format =
-      params->cell_format;
+    const vdp2_scrn_cell_format_t * const cell_format = params->cell_format;
 
-    switch (cell_format->char_size) {
-    case VDP2_SCRN_CHAR_SIZE_1X1:
-        break;
-    case VDP2_SCRN_CHAR_SIZE_2X2:
+    if (cell_format->char_size == VDP2_SCRN_CHAR_SIZE_2X2) {
         *cols >>= 1;
         *rows >>= 1;
-        break;
     }
 }
 
@@ -145,7 +163,7 @@ _pnd_write(int16_t col, int16_t row, uint16_t value)
 static inline void __always_inline
 _pnd_clear(int16_t col, int16_t row)
 {
-    _pnd_write(col, row, _dev_state->params.font_charmap['\0'].pnd);
+    _pnd_write(col, row, _dev_state->font_charmap['\0'].pnd);
 }
 
 static void
@@ -158,10 +176,10 @@ _buffer_clear(void)
 
     _dev_state->state |= STATE_BUFFER_DIRTY;
 
-    cpu_dmac_memset(DEV_DMAC_CHANNEL,
-      _dev_state->page_ptr,
-      _dev_state->params.font_charmap['\0'].pnd,
-      _dev_state->page_size);
+    const uint16_t pnd_value = _dev_state->font_charmap['\0'].pnd;
+    uint32_t clear_value = (pnd_value << 16) | pnd_value;
+
+    cpu_dmac_memset(DEV_DMAC_CHANNEL, _dev_state->page_ptr, clear_value, _dev_state->page_size);
 
     _dev_state->state |= STATE_BUFFER_CLEARED;
 }
@@ -205,12 +223,14 @@ _buffer_write(int16_t col, int16_t row, uint8_t ch)
     _dev_state->state |= STATE_BUFFER_DIRTY;
     _dev_state->state &= ~STATE_BUFFER_CLEARED;
 
-    _pnd_write(col, row, _dev_state->params.font_charmap[ch].pnd);
+    _pnd_write(col, row, _dev_state->font_charmap[ch].pnd);
 }
 
 static void
 _dev_state_init(const dbgio_vdp2_t *params)
 {
+    assert(params != NULL);
+
     _dev_state = __malloc(sizeof(struct dev_state));
     assert(_dev_state != NULL);
 
@@ -218,6 +238,21 @@ _dev_state_init(const dbgio_vdp2_t *params)
 
     _dev_state->state = STATE_IDLE;
     _dev_state->params = *params;
+    _dev_state->default_params = (params == &_default_params);
+
+#ifdef DEBUG
+    if (!_dev_state->default_params) {
+        assert(params->font != NULL);
+        assert(params->font_charmap != NULL);
+        assert(params->cell_format != NULL);
+        assert(params->normal_map != NULL);
+    }
+#endif /* DEBUG */
+
+    _dev_state->font_charmap = params->font_charmap;
+
+    /* Nothing else is needed. Use a FILE to direct all writes via vfprintf() */
+    _dev_state->file.write = _file_write;
 
     const vdp2_scrn_cell_format_t * const cell_format =
       params->cell_format;
@@ -252,33 +287,34 @@ _scroll_screen_init(const dbgio_vdp2_t *params)
     vdp2_scrn_scroll_x_set(cell_format->scroll_screen, FIX16(0.0f));
     vdp2_scrn_scroll_y_set(cell_format->scroll_screen, FIX16(0.0f));
 
-    vdp2_scrn_disp_t disp_mask;
-    disp_mask = vdp2_scrn_display_get();
+    _shared_display_set(true);
 
-    switch (cell_format->scroll_screen) {
-    case VDP2_SCRN_NBG1:
-        disp_mask |= VDP2_SCRN_DISPTP_NBG1;
-        break;
-    case VDP2_SCRN_NBG2:
-        disp_mask |= VDP2_SCRN_DISPTP_NBG2;
-        break;
-    case VDP2_SCRN_NBG3:
-        disp_mask |= VDP2_SCRN_DISPTP_NBG3;
-        break;
-    default:
-    case VDP2_SCRN_NBG0:
-        disp_mask |= VDP2_SCRN_DISPTP_NBG0;
-        break;
-    }
-
-    vdp2_scrn_display_set(disp_mask);
-
-    /* If default */
-    if (params == &_default_params) {
+    if (_dev_state->default_params) {
         vdp2_vram_cycp_t * const vram_cycp = vdp2_vram_cycp_get();
+        vdp2_vram_cycp_bank_t * const cycp_bank =
+          &vram_cycp->pt[DEFAULT_NBGX_CPD_BANK];
 
-        vram_cycp->pt[DEFAULT_NBGX_CPD_BANK].t4 = VDP2_VRAM_CYCP_CHPNDR_NBG3;
-        vram_cycp->pt[DEFAULT_NBGX_PND_BANK].t0 = VDP2_VRAM_CYCP_PNDR_NBG3;
+        cycp_bank->raw &= DEFAULT_NBGX_CYCP_MASK;
+        cycp_bank->raw |= DEFAULT_NBGX_CYCP;
+
+        /* If default params, generate the charmap */
+        dbgio_vdp2_charmap_t * const font_charmap =
+          __malloc(UINT8_MAX * sizeof(dbgio_vdp2_charmap_t));
+
+        assert(font_charmap != NULL);
+
+        vdp2_vram_t vram;
+        vram = params->cell_format->cpd_base;
+
+        const vdp2_cram_t cram = params->cell_format->palette_base;
+
+        for (uint32_t i = 0; i < UINT8_MAX; i++) {
+            font_charmap[i].pnd = DEFAULT_NBGX_PND(vram, cram);
+
+            vram += 0x20;
+        }
+
+        _dev_state->font_charmap = font_charmap;
     }
 }
 
@@ -308,27 +344,21 @@ _shared_deinit(void)
         return;
     }
 
-    __free(_dev_state->page_ptr);
+    if (_dev_state->default_params) {
+        __free((void *)_dev_state->font_charmap);
+    }
 
+    __free(_dev_state->page_ptr);
     __free(_dev_state);
 
     _dev_state = NULL;
 }
 
 static void
-_shared_puts(const char *buffer)
+_shared_test(void)
 {
-    if (_dev_state == NULL) {
-        return;
-    }
-
-    if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
-        return;
-    }
-
     /* It's the best we can do for now. If the current buffer is marked for
-     * flushing, we have to silently drop any calls to write to the
-     * buffer */
+     * flushing, we have to silently drop any calls to write to the buffer */
     const uint8_t state_mask =
       STATE_BUFFER_FLUSHING | STATE_BUFFER_FORCE_FLUSHING;
 
@@ -342,7 +372,7 @@ _shared_puts(const char *buffer)
       &_state_vdp2()->tv.resolution;
 
     if ((tv_resolution->x != vdp2_tv_resolution->x) ||
-      (tv_resolution->y != vdp2_tv_resolution->y)) {
+        (tv_resolution->y != vdp2_tv_resolution->y)) {
         *tv_resolution = *vdp2_tv_resolution;
 
         uint16_t cols;
@@ -352,8 +382,38 @@ _shared_puts(const char *buffer)
 
         __cons_resize(cols, rows);
     }
+}
 
-    __cons_buffer(buffer);
+static void
+_shared_puts(const char *buffer)
+{
+    if (_dev_state == NULL) {
+        return;
+    }
+
+    if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+        return;
+    }
+
+    _shared_test();
+
+    (void)fputs(buffer, &_dev_state->file);
+}
+
+static void
+_shared_printf(const char *format, va_list ap)
+{
+    if (_dev_state == NULL) {
+        return;
+    }
+
+    if ((_dev_state->state & STATE_INITIALIZED) != STATE_INITIALIZED) {
+        return;
+    }
+
+    _shared_test();
+
+    (void)vfprintf(&_dev_state->file, format, ap);
 }
 
 static void
@@ -376,6 +436,39 @@ _shared_font_load(void)
 
     (void)memcpy((void *)cell_format->palette_base, params->font->pal,
       params->font->pal_size);
+}
+
+static void
+_shared_display_set(bool display)
+{
+    vdp2_scrn_disp_t disp;
+
+    switch (_dev_state->params.cell_format->scroll_screen) {
+    case VDP2_SCRN_NBG1:
+        disp = VDP2_SCRN_DISPTP_NBG1;
+        break;
+    case VDP2_SCRN_NBG2:
+        disp = VDP2_SCRN_DISPTP_NBG2;
+        break;
+    case VDP2_SCRN_NBG3:
+        disp = VDP2_SCRN_DISPTP_NBG3;
+        break;
+    default:
+    case VDP2_SCRN_NBG0:
+        disp = VDP2_SCRN_DISPTP_NBG0;
+        break;
+    }
+
+    vdp2_scrn_disp_t disp_mask;
+    disp_mask = vdp2_scrn_display_get();
+
+    if (display) {
+        disp_mask |= disp;
+    } else {
+        disp_mask &= ~disp;
+    }
+
+    vdp2_scrn_display_set(disp_mask);
 }
 
 #include "vdp2.inc"

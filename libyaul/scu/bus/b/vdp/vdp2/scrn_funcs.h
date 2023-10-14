@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -10,6 +10,8 @@
 
 #include <assert.h>
 #include <stdint.h>
+
+#include <gamemath/fix16/fix16_vec2.h>
 
 #include <vdp2/scrn_shared.h>
 
@@ -142,22 +144,30 @@ typedef struct vdp2_scrn_ls_format {
 
 typedef struct vdp2_scrn_ls_h {
     fix16_t horz;
-} __packed vdp2_scrn_ls_h_t;
+} vdp2_scrn_ls_h_t;
+
+static_assert(sizeof(vdp2_scrn_ls_h_t) == 4);
 
 typedef struct vdp2_scrn_ls_v {
     fix16_t vert;
-} __packed vdp2_scrn_ls_v_t;
+} vdp2_scrn_ls_v_t;
+
+static_assert(sizeof(vdp2_scrn_ls_v_t) == 4);
 
 typedef struct vdp2_scrn_ls_hv {
     fix16_t horz;
     fix16_t vert;
-} __packed vdp2_scrn_ls_hv_t;
+} vdp2_scrn_ls_hv_t;
+
+static_assert(sizeof(vdp2_scrn_ls_hv_t) == 8);
 
 typedef struct vdp2_scrn_ls_hvz {
     fix16_t horz;
     fix16_t vert;
     fix16_t horz_incr;
-} __packed vdp2_scrn_ls_hvz_t;
+} vdp2_scrn_ls_hvz_t;
+
+static_assert(sizeof(vdp2_scrn_ls_hvz_t) == 12);
 
 typedef struct vdp2_scrn_vcs_format {
     /// Scroll screen.

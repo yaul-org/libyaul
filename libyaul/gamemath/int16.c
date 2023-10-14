@@ -1,8 +1,7 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
- * Mattias Jansson
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 

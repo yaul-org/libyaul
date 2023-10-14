@@ -7,3 +7,6 @@ LIB_SRCS:= \
 INSTALL_HEADER_FILES:= \
 	./:menu.h:./ \
 	./:scroll_menu.h:./
+
+USER_FILES:= \
+	build/build.menu.mk

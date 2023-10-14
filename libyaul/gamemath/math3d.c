@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
  */
+
+#include <assert.h>
 
 #include <cpu/divu.h>
 
@@ -47,24 +49,44 @@ math3d_view_distance_calc(int16_t screen_width, angle_t fov_angle)
 }
 
 void
-math3d_point_xform(const xform_config_t *xform_config,
-    const fix16_vec3_t *point, xform_t *result)
+math3d_point_perspective_xform(const fix16_mat43_t *view_matrix, fix16_t view_distance,
+  const fix16_vec3_t *point, xform_t *result)
 {
-    const fix16_mat43_t * const view_matrix = xform_config->view_matrix;
+    assert(view_matrix != NULL);
+    assert(point != NULL);
+    assert(result != NULL);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
+    const fix16_vec3_t * const m0 = &view_matrix->rotation.row[0];
+    const fix16_vec3_t * const m1 = &view_matrix->rotation.row[1];
+    const fix16_vec3_t * const m2 = &view_matrix->rotation.row[2];
 
-    const fix16_t z = fix16_vec3_dot(m2, point) + view_matrix->frow[2][3];
-    const fix16_t clamped_z = fix16_clamp(z, xform_config->near, xform_config->far);
+    fix16_vec3_t p;
 
-    cpu_divu_fix16_set(xform_config->view_distance, clamped_z);
+    p.z = fix16_vec3_dot(m2, point) + view_matrix->translation.z;
 
-    const fix16_t x = fix16_vec3_dot(m0, point) + view_matrix->frow[0][3];
-    const fix16_t y = fix16_vec3_dot(m1, point) + view_matrix->frow[1][3];
+    cpu_divu_fix16_set(view_distance, p.z);
+
+    p.x = fix16_vec3_dot(m0, point) + view_matrix->translation.x;
+    p.y = fix16_vec3_dot(m1, point) + view_matrix->translation.y;
 
     result->depth_value = cpu_divu_quotient_get();
-    result->screen_point.x = fix16_int32_mul(result->depth_value, x);
-    result->screen_point.y = fix16_int32_mul(result->depth_value, y);
+
+    result->screen_point.x = fix16_high_mul(result->depth_value, p.x);
+    result->screen_point.y = fix16_high_mul(result->depth_value, p.y);
+}
+
+void
+math3d_point_orthographic_xform(const fix16_mat43_t *view_matrix,
+    fix16_t ortho_size, const fix16_vec3_t *point, xform_t *result)
+{
+    assert(view_matrix != NULL);
+    assert(point != NULL);
+    assert(result != NULL);
+
+    fix16_vec3_t p;
+    fix16_mat43_pos3_mul(view_matrix, point, &p);
+
+    result->screen_point.x = fix16_high_mul( ortho_size, p.x);
+    result->screen_point.y = fix16_high_mul(-ortho_size, p.y);
+    result->depth_value = p.z;
 }

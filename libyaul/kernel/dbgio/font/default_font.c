@@ -1,7 +1,7 @@
 /* -*- mode: c -*- */
 
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -288,6 +288,6 @@ const dbgio_font_t __dbgio_default_font = {
     .cg_size  = sizeof(_default_font_cg),
     .pal      = _default_font_pal,
     .pal_size = sizeof(_default_font_pal),
-    .fg       = 7,
-    .bg       = 0
+    .fg_pal   = 11, /* 11 for yellow */
+    .bg_pal   = 0   /* 12 for blue */
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -42,24 +42,23 @@ typedef struct {
 } lookat_t;
 
 /// @brief Not yet documented.
-typedef struct xform_config {
-    /// @brief Not yet documented.
-    fix16_t near;
-    /// @brief Not yet documented.
-    fix16_t far;
-    /// @brief Not yet documented.
-    fix16_t view_distance;
-    /// @brief Not yet documented.
-    const fix16_mat43_t *view_matrix;
-} xform_config_t;
-
-/// @brief Not yet documented.
 typedef struct xform {
     /// @brief Not yet documented.
     int16_vec2_t screen_point;
     /// @brief Not yet documented.
     fix16_t depth_value;
 } xform_t;
+
+// TODO: Not yet used
+/// @brief Not yet documented.
+typedef struct xforms {
+    /// @brief Not yet documented.
+    int16_vec2_t* screen_points;
+    /// @brief Not yet documented.
+    fix16_t* depth_values;
+    /// @brief Not yet documented.
+    uint32_t count;
+} xforms_t;
 
 extern void math3d_lookat(const lookat_t *lookat);
 
@@ -74,11 +73,21 @@ extern fix16_t math3d_view_distance_calc(int16_t screen_width,
 
 /// @brief Not yet documented.
 ///
-/// @param      xform_config Not yet documented.
-/// @param      point            Not yet documented.
-/// @param[out] result           Not yet documented.
-extern void math3d_point_xform(const xform_config_t *xform_config,
-    const fix16_vec3_t *point, xform_t *result);
+/// @param      view_matrix   Not yet documented.
+/// @param      view_distance Not yet documented.
+/// @param      point         Not yet documented.
+/// @param[out] result        Not yet documented.
+extern void math3d_point_perspective_xform(const fix16_mat43_t *view_matrix,
+    fix16_t view_distance, const fix16_vec3_t *point, xform_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      view_matrix Not yet documented.
+/// @param      ortho_size  Not yet documented.
+/// @param      point       Not yet documented.
+/// @param[out] result      Not yet documented.
+extern void math3d_point_orthographic_xform(const fix16_mat43_t *view_matrix,
+    fix16_t ortho_size, const fix16_vec3_t *point, xform_t *result);
 
 /// @}
 

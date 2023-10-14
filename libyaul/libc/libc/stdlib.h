@@ -9,9 +9,6 @@ __BEGIN_DECLS
 
 #define ATEXIT_MAX (32)
 
-extern int abs(int number);
-extern long labs(long number);
-
 extern int atoi(const char *s);
 extern long atol(const char *s);
 
