@@ -5,13 +5,14 @@
  * Israel Jacquez <mrkotfw@gmail.com>
  */
 
+#include <string.h>
+
 #include <cpu/cache.h>
 #include <cpu/intc.h>
 #include <cpu/instructions.h>
 
 #include <scu/dma.h>
 
-#include <string.h>
 #include <sys/callback-list.h>
 
 #include <scu-internal.h>
@@ -89,6 +90,8 @@ scu_dma_level_stop(scu_dma_level_t level)
 void
 scu_dma_level_wait(scu_dma_level_t level)
 {
+    assert(level <= 2);
+
     while (true) {
         if (_level_state.flags[level] != LEVEL_STATE_WORKING) {
             return;
@@ -153,9 +156,7 @@ scu_dma_config_set(scu_dma_level_t level, scu_dma_start_factor_t start_factor,
   const scu_dma_handle_t *handle, scu_dma_callback_t callback __unused)
 {
     assert(handle != NULL);
-
     assert(level <= 2);
-
     assert(start_factor <= 7);
 
     volatile scu_ioregs_t * const scu_ioregs = (volatile scu_ioregs_t *)SCU_IOREG_BASE;
@@ -193,6 +194,8 @@ scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src, size_t len)
         .dnmd = 0x00010100
     };
 
+    assert(level <= 2);
+
     scu_dma_config_set(level, SCU_DMA_START_FACTOR_ENABLE, &dma_handle, NULL);
     scu_dma_level_end_set(level, NULL, NULL);
     scu_dma_level_fast_start(level);
@@ -201,6 +204,8 @@ scu_dma_transfer(scu_dma_level_t level, void *dst, const void *src, size_t len)
 void
 scu_dma_transfer_wait(scu_dma_level_t level)
 {
+    assert(level <= 2);
+
     scu_dma_level_wait(level);
 }
 
@@ -208,6 +213,8 @@ void
 scu_dma_level_end_set(scu_dma_level_t level, scu_dma_callback_t callback,
     void *work)
 {
+    assert(level <= 2);
+
     callback_set(&_level_state.callbacks[level], callback, work);
 }
 

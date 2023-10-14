@@ -261,7 +261,7 @@ typedef void (*scu_dma_ihr_t)(void);
 /// @brief Callback type.
 /// @see scu_dma_config_set
 /// @see scu_dma_level_end_set
-typedef void (*scu_dma_callback_t)(void *);
+typedef void (*scu_dma_callback_t)(void *work);
 
 /// @brief Stop a specific SCU-DMA level.
 ///

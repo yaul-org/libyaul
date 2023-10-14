@@ -388,6 +388,14 @@ _system_manager_handler(void)
 {
         static uint32_t offset = 0;
 
+        /* Prevent a buffer overrun if the user hasn't called to process the
+         * collection buffer */
+        if (_collection_complete) {
+            return;
+        }
+
+        assert(offset < sizeof(_oreg_buf));
+
         /* We don't have much time in the critical section. Just buffer the
          * registers */
         for (uint32_t oreg = 0; oreg < SMPC_OREGS; oreg++, offset++) {
