@@ -15,10 +15,7 @@
 
 #include <gamemath/fix16.h>
 
-#include "gamemath/fix16/fix16_mat33.h"
-#include "gamemath/fix16/fix16_mat43.h"
 #include "internal.h"
-#include "vdp1/cmdt.h"
 
 /* TODO: Remove constant */
 #define SCREEN_RATIO (SCREEN_WIDTH / (float)SCREEN_HEIGHT)
@@ -706,8 +703,8 @@ _perspective_transform(void)
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
-        screen_points[i].x = fix16_high_mul(depth_value, p.x);
-        screen_points[i].y = fix16_high_mul(depth_value, p.y);
+        screen_points[i].x = fix16_high_mul( depth_value, p.x);
+        screen_points[i].y = fix16_high_mul(-depth_value, p.y);
         z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
     }
@@ -905,7 +902,8 @@ _cmdts_alloc(void)
 
     render->cmdts++;
 
-    /* XXX: Assert that we don't exceed the alloted command table count */
+    /* Assert that we don't exceed the alloted command table count */
+    assert((render->cmdts - render->cmdts_pool) < CONFIG_MIC3D_CMDT_COUNT);
 
     return cmdt;
 }
