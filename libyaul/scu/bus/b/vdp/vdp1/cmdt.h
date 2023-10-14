@@ -96,14 +96,14 @@ typedef vdp2_sprite_type_5_t vdp1_color_bank_type_5_t;
 typedef vdp2_sprite_type_6_t vdp1_color_bank_type_6_t;
 typedef vdp2_sprite_type_7_t vdp1_color_bank_type_7_t;
 
-typedef vdp2_sprite_type_8_t vdp1_color_bank_type_8_t __aligned(2);
-typedef vdp2_sprite_type_9_t vdp1_color_bank_type_9_t __aligned(2);
-typedef vdp2_sprite_type_a_t vdp1_color_bank_type_a_t __aligned(2);
-typedef vdp2_sprite_type_b_t vdp1_color_bank_type_b_t __aligned(2);
-typedef vdp2_sprite_type_c_t vdp1_color_bank_type_c_t __aligned(2);
-typedef vdp2_sprite_type_d_t vdp1_color_bank_type_d_t __aligned(2);
-typedef vdp2_sprite_type_e_t vdp1_color_bank_type_e_t __aligned(2);
-typedef vdp2_sprite_type_f_t vdp1_color_bank_type_f_t __aligned(2);
+typedef vdp2_sprite_type_8_t vdp1_color_bank_type_8_t;
+typedef vdp2_sprite_type_9_t vdp1_color_bank_type_9_t;
+typedef vdp2_sprite_type_a_t vdp1_color_bank_type_a_t;
+typedef vdp2_sprite_type_b_t vdp1_color_bank_type_b_t;
+typedef vdp2_sprite_type_c_t vdp1_color_bank_type_c_t;
+typedef vdp2_sprite_type_d_t vdp1_color_bank_type_d_t;
+typedef vdp2_sprite_type_e_t vdp1_color_bank_type_e_t;
+typedef vdp2_sprite_type_f_t vdp1_color_bank_type_f_t;
 
 typedef union vdp1_cmdt_draw_mode {
     struct {
@@ -134,14 +134,46 @@ typedef union vdp1_cmdt_color_bank {
     vdp1_color_bank_type_6_t type_6;
     vdp1_color_bank_type_7_t type_7;
 
-    vdp1_color_bank_type_8_t type_8;
-    vdp1_color_bank_type_9_t type_9;
-    vdp1_color_bank_type_a_t type_a;
-    vdp1_color_bank_type_b_t type_b;
-    vdp1_color_bank_type_c_t type_c;
-    vdp1_color_bank_type_d_t type_d;
-    vdp1_color_bank_type_e_t type_e;
-    vdp1_color_bank_type_f_t type_f;
+    /* For sprite types 8-F, align so that it's a 16-bit value */
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_8_t type_8;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_9_t type_9;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_a_t type_a;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_b_t type_b;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_c_t type_c;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_d_t type_d;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_e_t type_e;
+    };
+
+    struct {
+        unsigned int :8;
+        vdp1_color_bank_type_f_t type_f;
+    };
 
     uint16_t raw;
 } __packed vdp1_cmdt_color_bank_t;
