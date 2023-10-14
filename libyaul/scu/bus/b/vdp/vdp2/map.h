@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -1182,8 +1182,8 @@ static_assert(sizeof(vdp2_ioregs_t) == 288);
 
 /// @}
 
-typedef uint32_t vdp2_cram_t;
-typedef uint32_t vdp2_vram_t;
+typedef uintptr_t vdp2_cram_t;
+typedef uintptr_t vdp2_vram_t;
 
 __BEGIN_DECLS
 

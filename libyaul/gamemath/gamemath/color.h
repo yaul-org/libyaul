@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef _YAUL_GAMEMATH_COLOR_H_
 #define _YAUL_GAMEMATH_COLOR_H_
 

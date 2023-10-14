@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -97,13 +97,19 @@ struct fix16_mat43_t {
 
     inline void invert();
 
+    inline void rotate_x(angle_t pitch);
+
+    inline void rotate_y(angle_t yaw);
+
+    inline void rotate_z(angle_t roll);
+
     inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
-    static inline void create_rotx(const fix16_mat43_t& m0, angle_t x, fix16_mat43_t& result);
+    static inline void create_rotx(angle_t pitch, fix16_mat43_t& result);
 
-    static inline void create_roty(const fix16_mat43_t& m0, angle_t y, fix16_mat43_t& result);
+    static inline void create_roty(angle_t yaw, fix16_mat43_t& result);
 
-    static inline void create_rotz(const fix16_mat43_t& m0, angle_t z, fix16_mat43_t& result);
+    static inline void create_rotz(angle_t roll, fix16_mat43_t& result);
 
     static inline void create_rot(const euler_t& angles, fix16_mat43_t& result);
 
@@ -214,17 +220,28 @@ extern void fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle,
 /// @brief Not yet documented.
 ///
 /// @param      rx     Not yet documented.
-/// @param      ry     Not yet documented.
-/// @param      rz     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz,
-  fix16_mat43_t *result);
+extern void fix16_mat43_x_rotation_set(angle_t rx, fix16_mat43_t *result);
 
 /// @brief Not yet documented.
 ///
-/// @param      r      Not yet documented.
+/// @param      ry     Not yet documented.
 /// @param[out] result Not yet documented.
-extern void fix16_mat43_rotation_set(const fix16_mat33_t *r,
+extern void fix16_mat43_y_rotation_set(angle_t ry, fix16_mat43_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_z_rotation_set(angle_t rz, fix16_mat43_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rx     Not yet documented.
+/// @param      ry     Not yet documented.
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat43_rotation_set(angle_t rx, angle_t ry, angle_t rz,
   fix16_mat43_t *result);
 
 /// @brief Not yet documented.
@@ -258,11 +275,11 @@ constexpr fix16_mat43_t::fix16_mat43_t(
       translation(m30, m31, m32) {}
 
 inline fix16_mat43_t fix16_mat43_t::operator*(const fix16_mat43_t& other) const {
-  fix16_mat43_t result;
+    fix16_mat43_t result;
 
-  fix16_mat43_mul(this, &other, &result);
+    fix16_mat43_mul(this, &other, &result);
 
-  return result;
+    return result;
 }
 
 inline constexpr fix16_mat43_t fix16_mat43_t::identity() {
@@ -313,24 +330,30 @@ inline void fix16_mat43_t::set_zero() { fix16_mat43_zero(this); }
 
 inline void fix16_mat43_t::invert() { fix16_mat43_inplace_invert(this); }
 
+inline void fix16_mat43_t::rotate_x(angle_t pitch) { fix16_mat43_x_rotate(this, pitch, this); }
+
+inline void fix16_mat43_t::rotate_y(angle_t yaw) { fix16_mat43_y_rotate(this, yaw, this); }
+
+inline void fix16_mat43_t::rotate_z(angle_t roll) { fix16_mat43_z_rotate(this, roll, this); }
+
 inline size_t fix16_mat43_t::to_string(char* buffer, int32_t decimals) const {
     return fix16_mat43_str(this, buffer, decimals);
 }
 
-inline void fix16_mat43_t::create_rotx(const fix16_mat43_t& m0, angle_t x, fix16_mat43_t& result) {
-    fix16_mat43_x_rotate(&m0, x, &result);
+inline void fix16_mat43_t::create_rotx(angle_t pitch, fix16_mat43_t& result) {
+    fix16_mat43_x_rotation_set(pitch, &result);
 }
 
-inline void fix16_mat43_t::create_roty(const fix16_mat43_t& m0, angle_t y, fix16_mat43_t& result) {
-    fix16_mat43_y_rotate(&m0, y, &result);
+inline void fix16_mat43_t::create_roty(angle_t yaw, fix16_mat43_t& result) {
+    fix16_mat43_y_rotation_set(yaw, &result);
 }
 
-inline void fix16_mat43_t::create_rotz(const fix16_mat43_t& m0, angle_t z, fix16_mat43_t& result) {
-    fix16_mat43_z_rotate(&m0, z, &result);
+inline void fix16_mat43_t::create_rotz(angle_t roll, fix16_mat43_t& result) {
+    fix16_mat43_z_rotation_set(roll, &result);
 }
 
 inline void fix16_mat43_t::create_rot(const euler_t& angles, fix16_mat43_t& result) {
-    fix16_mat43_rotation_create(angles.pitch, angles.yaw, angles.roll, &result);
+    fix16_mat43_rotation_set(angles.pitch, angles.yaw, angles.roll, &result);
 }
 
 inline fix16_vec3_t fix16_mat43_t::transform_vector(const fix16_mat43_t& m0, const fix16_vec3_t& v) {

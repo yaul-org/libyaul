@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -16,7 +16,6 @@
 #include <gamemath/fix16.h>
 
 #include "internal.h"
-#include "vdp1/cmdt.h"
 
 /* TODO: Remove constant */
 #define SCREEN_RATIO (SCREEN_WIDTH / (float)SCREEN_HEIGHT)
@@ -252,16 +251,39 @@ render_point_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point,
     fix16_mat43_t * const camera_matrix = render->camera_matrix;
 
     fix16_mat43_t view_matrix;
-    fix16_mat43_mul(world_matrix, camera_matrix, &view_matrix);
+    fix16_mat43_mul(camera_matrix, world_matrix, &view_matrix);
 
-    const xform_config_t xform_config = {
-        .near          = render->near,
-        .far           = render->far,
-        .view_distance = render->view_distance,
-        .view_matrix   = &view_matrix
-    };
+    if (render->camera_type == CAMERA_TYPE_PERSPECTIVE) {
+        math3d_point_perspective_xform(&view_matrix, render->view_distance, point, xform);
+    } else {
+        math3d_point_orthographic_xform(&view_matrix, render->ortho_size,  point, xform);
+    }
+}
 
-    math3d_point_xform(&xform_config, point, xform);
+void
+render_points_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *points,
+    xform_t *xforms, uint32_t count)
+{
+    assert(world_matrix != NULL);
+    assert(points != NULL);
+    assert(xforms != NULL);
+
+    render_t * const render = __state.render;
+
+    fix16_mat43_t * const camera_matrix = render->camera_matrix;
+
+    fix16_mat43_t view_matrix;
+    fix16_mat43_mul(camera_matrix, world_matrix, &view_matrix);
+
+    if (render->camera_type == CAMERA_TYPE_PERSPECTIVE) {
+        for (uint32_t i = 0; i < count; i++) {
+            math3d_point_perspective_xform(&view_matrix, render->view_distance, &points[i], &xforms[i]);
+        }
+    } else {
+        for (uint32_t i = 0; i < count; i++) {
+            math3d_point_orthographic_xform(&view_matrix, render->ortho_size, points, &xforms[i]);
+        }
+    }
 }
 
 void
@@ -660,9 +682,9 @@ _perspective_transform(void)
 
     fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
+    const fix16_vec3_t * const m0 = &view_matrix->rotation.row[0];
+    const fix16_vec3_t * const m1 = &view_matrix->rotation.row[1];
+    const fix16_vec3_t * const m2 = &view_matrix->rotation.row[2];
 
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
@@ -672,17 +694,17 @@ _perspective_transform(void)
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
         fix16_vec3_t p;
 
-        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->translation.z;
 
         cpu_divu_fix16_set(render->view_distance, p.z);
 
-        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
-        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
+        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->translation.x;
+        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->translation.y;
 
         const fix16_t depth_value = cpu_divu_quotient_get();
 
-        screen_points[i].x = fix16_int32_mul(depth_value, p.x);
-        screen_points[i].y = fix16_int32_mul(depth_value, p.y);
+        screen_points[i].x = fix16_high_mul( depth_value, p.x);
+        screen_points[i].y = fix16_high_mul(-depth_value, p.y);
         z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
     }
@@ -701,10 +723,6 @@ _orthographic_transform(void)
 
     fix16_mat43_mul(camera_matrix, world_matrix, view_matrix);
 
-    const fix16_vec3_t * const m0 = (const fix16_vec3_t *)&view_matrix->row[0];
-    const fix16_vec3_t * const m1 = (const fix16_vec3_t *)&view_matrix->row[1];
-    const fix16_vec3_t * const m2 = (const fix16_vec3_t *)&view_matrix->row[2];
-
     const fix16_vec3_t * const points = render->mesh->points;
     int16_vec2_t * const screen_points = render->screen_points_pool;
     int16_t * const z_values = render->z_values_pool;
@@ -712,14 +730,11 @@ _orthographic_transform(void)
 
     for (uint32_t i = 0; i < render->mesh->points_count; i++) {
         fix16_vec3_t p;
-
-        p.x = fix16_vec3_dot(m0, &points[i]) + view_matrix->frow[0][3];
-        p.y = fix16_vec3_dot(m1, &points[i]) + view_matrix->frow[1][3];
-        p.z = fix16_vec3_dot(m2, &points[i]) + view_matrix->frow[2][3];
+        fix16_mat43_pos3_mul(view_matrix, &points[i], &p);
 
         /* TODO: Combine screen_points and z_values pool */
-        screen_points[i].x = fix16_int32_mul( render->ortho_size, p.x);
-        screen_points[i].y = fix16_int32_mul(-render->ortho_size, p.y);
+        screen_points[i].x = fix16_high_mul( render->ortho_size, p.x);
+        screen_points[i].y = fix16_high_mul(-render->ortho_size, p.y);
 
         z_values[i] = _depth_normalize(p.z);
         /* depth_values[i] = depth_value; */
@@ -734,7 +749,7 @@ _depth_normalize(fix16_t z)
     const fix16_t scaled_z =
       fix16_mul(render->depth_scale, z) + render->depth_offset;
 
-    return fix16_int32_mul(render->sort_scale, scaled_z);
+    return fix16_high_mul(render->sort_scale, scaled_z);
 }
 
 static int16_t
@@ -887,7 +902,8 @@ _cmdts_alloc(void)
 
     render->cmdts++;
 
-    /* XXX: Assert that we don't exceed the alloted command table count */
+    /* Assert that we don't exceed the alloted command table count */
+    assert((render->cmdts - render->cmdts_pool) < CONFIG_MIC3D_CMDT_COUNT);
 
     return cmdt;
 }

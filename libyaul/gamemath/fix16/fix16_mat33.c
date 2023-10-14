@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Mattias Jansson
@@ -233,45 +233,83 @@ fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle,
 }
 
 void
+fix16_mat33_x_rotation_create(angle_t rx, fix16_mat33_t *result)
+{
+    fix16_t sin_value;
+    fix16_t cos_value;
+
+    fix16_sincos(rx, &sin_value, &cos_value);
+
+    result->row[0].x =  FIX16(1.0);
+    result->row[0].y =  FIX16(0.0);
+    result->row[0].z =  FIX16(0.0);
+
+    result->row[1].x =  FIX16(0.0);
+    result->row[1].y =  cos_value;
+    result->row[1].z =  sin_value;
+
+    result->row[2].x =  FIX16(0.0);
+    result->row[2].y = -sin_value;
+    result->row[2].z =  cos_value;
+}
+
+void
+fix16_mat33_y_rotation_create(angle_t ry, fix16_mat33_t *result)
+{
+    fix16_t sin_value;
+    fix16_t cos_value;
+
+    fix16_sincos(ry, &sin_value, &cos_value);
+
+    result->row[0].x =  cos_value;
+    result->row[0].y =  FIX16(0.0);
+    result->row[0].z = -sin_value;
+
+    result->row[1].x =  FIX16(0.0);
+    result->row[1].y =  FIX16(1.0);
+    result->row[1].z =  FIX16(0.0);
+
+    result->row[2].x =  sin_value;
+    result->row[2].y =  FIX16(0.0);
+    result->row[2].z =  cos_value;
+}
+
+void
+fix16_mat33_z_rotation_create(angle_t rz, fix16_mat33_t *result)
+{
+    fix16_t sin_value;
+    fix16_t cos_value;
+
+    fix16_sincos(rz, &sin_value, &cos_value);
+
+    result->row[0].x =  cos_value;
+    result->row[0].y =  sin_value;
+    result->row[0].z =  FIX16(0.0);
+
+    result->row[1].x = -sin_value;
+    result->row[1].y =  cos_value;
+    result->row[1].z =  FIX16(0.0);
+
+    result->row[2].x =  FIX16(0.0);
+    result->row[2].y =  FIX16(0.0);
+    result->row[2].z =  FIX16(1.0);
+}
+
+void
 fix16_mat33_rotation_create(angle_t rx, angle_t ry, angle_t rz,
     fix16_mat33_t *result)
 {
-    fix16_t as;
-    fix16_t ac;
+    fix16_mat33_t mat_a;
+    fix16_mat33_x_rotation_create(rx, &mat_a);
 
-    fix16_sincos(rx, &as, &ac);
+    fix16_mat33_t mat_b;
+    fix16_mat33_y_rotation_create(ry, &mat_b);
 
-    fix16_t bs;
-    fix16_t bc;
-
-    fix16_sincos(ry, &bs, &bc);
-
-    fix16_t cs;
-    fix16_t cc;
-
-    fix16_sincos(rz, &cs, &cc);
-
-    const fix16_mat33_t mat_a = {
-        {{ FIX16(1.0), FIX16(0.0), FIX16(0.0) },
-         { FIX16(0.0),         ac,         as },
-         { FIX16(0.0),        -as,         ac }}
-    };
-
-    const fix16_mat33_t mat_b = {
-        {{         bc, FIX16(0.0),        -bs },
-         { FIX16(0.0), FIX16(1.0), FIX16(0.0) },
-         {         bs, FIX16(0.0),         bc }}
-    };
+    fix16_mat33_t mat_c;
+    fix16_mat33_z_rotation_create(rz, &mat_c);
 
     fix16_mat33_t mat_tmp;
-
     fix16_mat33_mul(&mat_a, &mat_b, &mat_tmp);
-
-    const fix16_mat33_t mat_c = {
-        {{         cc,         cs, FIX16(0.0) },
-         {        -cs,         cc, FIX16(0.0) },
-         { FIX16(0.0), FIX16(0.0), FIX16(1.0) }}
-    };
 
     fix16_mat33_mul(&mat_tmp, &mat_c, result);
 }

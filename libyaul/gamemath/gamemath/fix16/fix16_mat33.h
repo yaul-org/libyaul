@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -173,6 +173,24 @@ extern void fix16_mat33_z_rotate(const fix16_mat33_t *m0, angle_t angle,
 /// @brief Not yet documented.
 ///
 /// @param      rx     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_x_rotation_create(angle_t rx, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      ry     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_y_rotation_create(angle_t ry, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rz     Not yet documented.
+/// @param[out] result Not yet documented.
+extern void fix16_mat33_z_rotation_create(angle_t rz, fix16_mat33_t *result);
+
+/// @brief Not yet documented.
+///
+/// @param      rx     Not yet documented.
 /// @param      ry     Not yet documented.
 /// @param      rz     Not yet documented.
 /// @param[out] result Not yet documented.
@@ -207,11 +225,10 @@ constexpr fix16_mat33_t::fix16_mat33_t(
            {m20, m21, m22}}) {}
 
 inline fix16_mat33_t fix16_mat33_t::operator*(const fix16_mat33_t& other) const {
-  fix16_mat33_t result;
+    fix16_mat33_t result;
+    fix16_mat33_mul(this, &other, &result);
 
-  fix16_mat33_mul(this, &other, &result);
-
-  return result;
+    return result;
 }
 
 inline constexpr fix16_mat33_t fix16_mat33_t::from_double(
@@ -243,15 +260,15 @@ inline size_t fix16_mat33_t::to_string(char* buffer, int32_t decimals) const {
 }
 
 inline void fix16_mat33_t::create_rotx(const fix16_mat33_t& m0, angle_t x, fix16_mat33_t& result) {
-  fix16_mat33_x_rotate(&m0, x, &result);
+    fix16_mat33_x_rotate(&m0, x, &result);
 }
 
 inline void fix16_mat33_t::create_roty(const fix16_mat33_t& m0, angle_t y, fix16_mat33_t& result) {
-  fix16_mat33_y_rotate(&m0, y, &result);
+    fix16_mat33_y_rotate(&m0, y, &result);
 }
 
 inline void fix16_mat33_t::create_rotz(const fix16_mat33_t& m0, angle_t z, fix16_mat33_t& result) {
-  fix16_mat33_z_rotate(&m0, z, &result);
+    fix16_mat33_z_rotate(&m0, z, &result);
 }
 
 inline void fix16_mat33_t::create_rot(const euler_t& angles, fix16_mat33_t& result) {

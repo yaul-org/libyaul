@@ -1,12 +1,21 @@
+/*
+ * Copyright (c) Israel Jacquez
+ * See LICENSE for details.
+ *
+ * Israel Jacquez <mrkotfw@gmail.com>
+ */
+
 #ifndef _YAUL_GAMEMATH_ANGLE_H_
 #define _YAUL_GAMEMATH_ANGLE_H_
 
 #include <sys/cdefs.h>
 
+#include <limits.h>
 #include <stdint.h>
 
 #include <gamemath/defs.h>
 #include <gamemath/fix16.h>
+#include <gamemath/float.h>
 
 /// @addtogroup MATH
 /// @defgroup MATH_ANGLE Angle
@@ -46,21 +55,26 @@ struct angle_t {
 
     angle_t() = default;
 
-    inline const angle_t& operator+(const angle_t& other) const;
-    inline const angle_t& operator-(const angle_t& other) const;
+    explicit constexpr angle_t(int32_t v);
+
+    inline angle_t operator+(angle_t other) const;
+    inline angle_t operator-(angle_t other) const;
+    constexpr inline angle_t operator-() const;
+    inline angle_t operator>>(int32_t other) const;
+    inline angle_t operator<<(int32_t other) const;
 
     inline angle_t& operator+=(angle_t rhs);
     inline angle_t& operator-=(angle_t rhs);
 
-    inline bool operator<(const angle_t& other) const;
+    inline bool operator<(angle_t other) const;
     inline bool operator<(int32_t other) const;
-    inline bool operator>(const angle_t& other) const;
+    inline bool operator>(angle_t other) const;
     inline bool operator>(int32_t other) const;
-    inline bool operator<=(const angle_t& other) const;
+    inline bool operator<=(angle_t other) const;
     inline bool operator<=(int32_t other) const;
-    inline bool operator>=(const angle_t& other) const;
+    inline bool operator>=(angle_t other) const;
     inline bool operator>=(int32_t other) const;
-    inline bool operator==(const angle_t& other) const;
+    inline bool operator==(angle_t other) const;
     inline bool operator==(int32_t other) const;
 
     static constexpr inline angle_t from_rad_double(double rad);
@@ -70,8 +84,6 @@ struct angle_t {
     inline angle_t from_deg(fix16_t degree);
 
     inline angle_t from_rad(fix16_t rad);
-
-    inline fix16_t to_fix16() const;
 
     inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 };
@@ -111,13 +123,33 @@ angle_rad_to(angle_t angle)
 {
     return fix16_mul(angle, FIX16(2.0 * M_PI));
 }
+
+static inline int32_t
+angle_int32_to(angle_t angle)
+{
+    return (angle <= SHRT_MIN) ? (uint16_t)angle : angle;
+}
 #else
-constexpr angle_t operator""_deg(long double v) { return angle_t::from_deg_double(v); }
+constexpr angle_t operator"" _deg(long double v) { return angle_t::from_deg_double(v); }
 
-constexpr angle_t operator""_rad(long double v) { return angle_t::from_rad_double(v); }
+constexpr angle_t operator"" _rad(long double v) { return angle_t::from_rad_double(v); }
 
-inline const angle_t& angle_t::operator+(const angle_t& other) const { return angle_t{value + other.value}; }
-inline const angle_t& angle_t::operator-(const angle_t& other) const { return angle_t{value - other.value}; }
+constexpr angle_t::angle_t(int32_t v) : value(v) {}
+
+inline angle_t angle_t::operator+(angle_t other) const { return angle_t{value + other.value}; }
+inline angle_t angle_t::operator-(angle_t other) const { return angle_t{value - other.value}; }
+
+constexpr inline angle_t angle_t::operator-() const {
+    return angle_t{-value};
+}
+
+inline angle_t angle_t::operator>>(int32_t other) const {
+    return angle_t{(value <= SHRT_MIN) ? (static_cast<uint16_t>(value) >> other) : (value >> other)};
+}
+
+inline angle_t angle_t::operator<<(int32_t other) const {
+    return angle_t{(value <= SHRT_MIN) ? (static_cast<int32_t>(value & 0xFFFF) << other) : (value << other)};
+}
 
 inline angle_t& angle_t::operator+=(angle_t rhs) {
     *this += rhs;
@@ -129,41 +161,42 @@ inline angle_t& angle_t::operator-=(angle_t rhs) {
     return *this;
 }
 
-inline bool angle_t::operator<(const angle_t& other) const { return value < other.value; }
+inline bool angle_t::operator<(angle_t other) const { return value < other.value; }
 inline bool angle_t::operator<(int32_t other) const { return value < other; }
-inline bool angle_t::operator>(const angle_t& other) const { return value > other.value; }
+inline bool angle_t::operator>(angle_t other) const { return value > other.value; }
 inline bool angle_t::operator>(int32_t other) const { return value > other; }
-inline bool angle_t::operator<=(const angle_t& other) const { return value <= other.value; }
+inline bool angle_t::operator<=(angle_t other) const { return value <= other.value; }
 inline bool angle_t::operator<=(int32_t other) const { return value <= other; }
-inline bool angle_t::operator>=(const angle_t& other) const { return value >= other.value; }
+inline bool angle_t::operator>=(angle_t other) const { return value >= other.value; }
 inline bool angle_t::operator>=(int32_t other) const { return value >= other; }
-inline bool angle_t::operator==(const angle_t& other) const { return value == other.value; }
+inline bool angle_t::operator==(angle_t other) const { return value == other.value; }
 inline bool angle_t::operator==(int32_t other) const { return value == other; }
 
 inline angle_t angle_t::from_deg(fix16_t degree) {
     constexpr fix16_t scale{fix16_t::from_double(1.0 / 360.0)};
 
     // Drop the fractional part of the fixed value
-    return {fix16_t{fix16_int32_mul(scale, degree)}.fractional()};
+    return angle_t{fix16_low_mul(scale, degree)};
 }
 
 inline angle_t angle_t::from_rad(fix16_t rad) {
     constexpr fix16_t scale{fix16_t::from_double(1.0 / M_PI)};
 
     // Drop the fractional part of the fixed value
-    return {fix16_t{fix16_int32_mul(scale, rad)}.fractional()};
+    return angle_t{fix16_low_mul(scale, rad)};
 }
 
-constexpr inline angle_t angle_t::from_rad_double(double rad) { return angle_t{fix16_t::from_double(rad / M_PI).fractional()}; }
+constexpr inline angle_t angle_t::from_rad_double(double rad) {
+    constexpr double _2pi = 2.0 * M_PI;
+
+    return angle_t{fix16_t::from_double(fmod(rad + _2pi, _2pi) / _2pi).fractional()};
+}
 
 constexpr inline angle_t angle_t::from_deg_double(double value) {
-    return angle_t{fix16_t::from_double(value / 360.0).fractional()};
+    return angle_t{fix16_t::from_double(fmod(value + 360.0, 360.0) / 360.0).fractional()};
 }
 
-// TODO: Should we have this? Maybe go via an explicit cast?
-inline fix16_t angle_t::to_fix16() const { return fix16_t{static_cast<int32_t>(value)}; }
-
-inline size_t angle_t::to_string(char* buffer, int32_t decimals) const { return to_fix16().to_string(buffer, decimals); }
+inline size_t angle_t::to_string(char* buffer, int32_t decimals) const { return fix16_t{(uint32_t)value}.to_string(buffer, decimals); }
 #endif /* !__cplusplus */
 
 /// @}

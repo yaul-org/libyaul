@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -103,7 +103,7 @@ int32_vec2_sub(const int32_vec2_t * __restrict v0,
 /// @param[in]  v0     Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-int32_vec2_scale(const int8_t scalar, const int32_vec2_t * __restrict v0,
+int32_vec2_scale(int8_t scalar, const int32_vec2_t * __restrict v0,
   int32_vec2_t * __restrict result)
 {
     result->x = scalar * v0->x;
@@ -115,7 +115,7 @@ int32_vec2_scale(const int8_t scalar, const int32_vec2_t * __restrict v0,
 /// @param scalar Not yet documented.
 /// @param in_out Not yet documented.
 static inline void __always_inline
-int32_vec2_scaled(const int8_t scalar, int32_vec2_t *in_out)
+int32_vec2_scaled(int8_t scalar, int32_vec2_t *in_out)
 {
     in_out->x = scalar * in_out->x;
     in_out->y = scalar * in_out->y;

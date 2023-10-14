@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -55,6 +55,9 @@ typedef struct fix16_vec3 {
     fix16_t z;
 } fix16_vec3_t;
 #else
+// XXX: Forwarding. Nasty, but in order to fix this, we need to restructure the header files
+struct fix16_quat_t;
+
 /// @brief Not yet documented.
 struct fix16_vec3_t {
     /// @brief Not yet documented.
@@ -64,7 +67,7 @@ struct fix16_vec3_t {
     /// @brief Not yet documented.
     fix16_t z;
 
-    fix16_vec3_t() { }
+    fix16_vec3_t() = default;
     fix16_vec3_t(fix16_vec3_t&&)      = default;
     fix16_vec3_t(const fix16_vec3_t&) = default;
 
@@ -78,9 +81,10 @@ struct fix16_vec3_t {
     inline const fix16_vec3_t operator+(const fix16_vec3_t& other) const;
     inline const fix16_vec3_t operator-(const fix16_vec3_t& other) const;
     inline const fix16_vec3_t operator-() const;
-    inline const fix16_vec3_t operator*(const fix16_t& other) const;
-    inline const fix16_vec3_t operator*(int32_t other) const;
-    inline const fix16_vec3_t operator*(uint32_t other) const;
+    inline const fix16_vec3_t operator*(fix16_t scalar) const;
+    inline const fix16_vec3_t operator*(int32_t scalar) const;
+    inline const fix16_vec3_t operator*(uint32_t scalar) const;
+    inline const fix16_vec3_t operator*(const fix16_quat_t& other) const;
     inline const fix16_vec3_t operator/(const fix16_t& other) const;
 
     inline fix16_vec3_t& operator+=(const fix16_vec3_t& rhs);
@@ -89,7 +93,7 @@ struct fix16_vec3_t {
     inline fix16_vec3_t& operator*=(int32_t rhs);
     inline fix16_vec3_t& operator/=(fix16_t rhs);
 
-    bool is_near_zero(const fix16_t epsilon = 0.001_fp) const;
+    bool is_near_zero(fix16_t epsilon = 0.001_fp) const;
 
     inline fix16_t length() const;
 
@@ -102,6 +106,8 @@ struct fix16_vec3_t {
     inline void start_normalization() const;
 
     void end_normalization();
+
+    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static constexpr inline fix16_vec3_t zero();
 
@@ -116,8 +122,6 @@ struct fix16_vec3_t {
     static inline fix16_vec3_t cross_product(const fix16_vec3_t& a, const fix16_vec3_t& b);
 
     static fix16_vec3_t reflect(const fix16_vec3_t& v, const fix16_vec3_t& normal);
-
-    inline size_t to_string(char* buffer, int32_t decimals = 7) const;
 
     static inline constexpr fix16_vec3_t from_double(double x, double y, double z);
 };
@@ -142,7 +146,7 @@ fix16_vec3_zero(fix16_vec3_t *result)
 /// @param      y      Not yet documented.
 /// @param      z      Not yet documented.
 static inline void __always_inline
-fix16_vec3_set(fix16_vec3_t *result, fix16_t x, fix16_t y, fix16_t z)
+fix16_vec3_set(fix16_t x, fix16_t y, fix16_t z, fix16_vec3_t *result)
 {
     result->x = x;
     result->y = y;
@@ -195,7 +199,7 @@ fix16_vec3_sub(const fix16_vec3_t * __restrict v1,
 /// @param      scalar Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
+fix16_vec3_scale(fix16_t scalar, fix16_vec3_t *result)
 {
     result->x = fix16_mul(scalar, result->x);
     result->y = fix16_mul(scalar, result->y);
@@ -208,7 +212,7 @@ fix16_vec3_scale(const fix16_t scalar, fix16_vec3_t *result)
 /// @param      v      Not yet documented.
 /// @param[out] result Not yet documented.
 static inline void __always_inline
-fix16_vec3_scaled(const fix16_t scalar, const fix16_vec3_t *v,
+fix16_vec3_scaled(fix16_t scalar, const fix16_vec3_t *v,
   fix16_vec3_t *result)
 {
     result->x = fix16_mul(scalar, v->x);
@@ -319,9 +323,19 @@ constexpr inline fix16_vec3_t::fix16_vec3_t(fix16_t x_, fix16_t y_, fix16_t z_) 
 inline const fix16_vec3_t fix16_vec3_t::operator+(const fix16_vec3_t& v) const { return fix16_vec3_t{x + v.x, y + v.y, z + v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-(const fix16_vec3_t& v) const { return fix16_vec3_t{x - v.x, y - v.y, z - v.z}; }
 inline const fix16_vec3_t fix16_vec3_t::operator-() const { return fix16_vec3_t{-x, -y, -z}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_t& value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const int32_t value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
-inline const fix16_vec3_t fix16_vec3_t::operator*(const uint32_t value) const { return fix16_vec3_t{x * value, y * value, z * value}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(fix16_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(int32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+inline const fix16_vec3_t fix16_vec3_t::operator*(uint32_t scalar) const { return fix16_vec3_t{x * scalar, y * scalar, z * scalar}; }
+
+// XXX: Nasty, but in order to fix this, we need to restructure the header files
+extern "C" void fix16_quat_vec3_mul(const fix16_quat_t *q0, const fix16_vec3_t *v0, fix16_vec3_t *result);
+
+inline const fix16_vec3_t fix16_vec3_t::operator*(const fix16_quat_t& other) const {
+    fix16_vec3_t result;
+    fix16_quat_vec3_mul(&other, this, &result);
+
+    return result;
+}
 
 inline fix16_vec3_t& fix16_vec3_t::operator+=(const fix16_vec3_t& v) {
     x += v.x;
@@ -339,7 +353,7 @@ inline fix16_vec3_t& fix16_vec3_t::operator-=(const fix16_vec3_t& v) {
     return *this;
 }
 
-inline fix16_vec3_t& fix16_vec3_t::operator*=(const fix16_t value) {
+inline fix16_vec3_t& fix16_vec3_t::operator*=(fix16_t value) {
     x = x * value;
     y = y * value;
     z = z * value;
@@ -347,7 +361,7 @@ inline fix16_vec3_t& fix16_vec3_t::operator*=(const fix16_t value) {
     return *this;
 }
 
-inline fix16_vec3_t& fix16_vec3_t::operator/=(const fix16_t value) {
+inline fix16_vec3_t& fix16_vec3_t::operator/=(fix16_t value) {
     const fix16_t inv_value = 1.0_fp / value;
     x = x * inv_value;
     y = y * inv_value;

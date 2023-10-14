@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -120,6 +120,6 @@ typedef union vdp1_ioregs {
 /// @}
 
 /// @brief Not yet documented.
-typedef uint32_t vdp1_vram_t;
+typedef uintptr_t vdp1_vram_t;
 
 #endif /* !_YAUL_VDP1_MAP_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include <gamemath/color.h>
+#include <gamemath/fix16.h>
 
 #include <vdp2/vram.h>
 

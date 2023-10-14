@@ -17,3 +17,6 @@ INSTALL_HEADER_FILES:= \
 	./mic3d/:types.h:./mic3d/ \
 	./mic3d/:workarea.h:./mic3d/ \
 	./:mic3d.h:./ \
+
+USER_FILES:= \
+	build/build.mic3d.mk

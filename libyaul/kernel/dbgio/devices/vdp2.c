@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -144,16 +144,11 @@ _cons_dimensions_calculate(uint16_t *cols, uint16_t *rows)
 
     const dbgio_vdp2_t * const params = &_dev_state->params;
 
-    const vdp2_scrn_cell_format_t * const cell_format =
-      params->cell_format;
+    const vdp2_scrn_cell_format_t * const cell_format = params->cell_format;
 
-    switch (cell_format->char_size) {
-    case VDP2_SCRN_CHAR_SIZE_1X1:
-        break;
-    case VDP2_SCRN_CHAR_SIZE_2X2:
+    if (cell_format->char_size == VDP2_SCRN_CHAR_SIZE_2X2) {
         *cols >>= 1;
         *rows >>= 1;
-        break;
     }
 }
 

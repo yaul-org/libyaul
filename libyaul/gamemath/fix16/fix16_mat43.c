@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c)
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -100,6 +100,7 @@ fix16_mat43_x_rotate(const fix16_mat43_t *m0, angle_t angle,
     fix16_mat43_t *result)
 {
     fix16_mat33_x_rotate(&m0->rotation, angle, &result->rotation);
+    fix16_mat43_pos3_mul(result, &m0->translation, &result->translation);
 }
 
 void
@@ -107,6 +108,7 @@ fix16_mat43_y_rotate(const fix16_mat43_t *m0, angle_t angle,
     fix16_mat43_t *result)
 {
     fix16_mat33_y_rotate(&m0->rotation, angle, &result->rotation);
+    fix16_mat43_pos3_mul(result, &m0->translation, &result->translation);
 }
 
 void
@@ -114,19 +116,32 @@ fix16_mat43_z_rotate(const fix16_mat43_t *m0, angle_t angle,
     fix16_mat43_t *result)
 {
     fix16_mat33_z_rotate(&m0->rotation, angle, &result->rotation);
+    fix16_mat43_pos3_mul(result, &m0->translation, &result->translation);
 }
 
 void
-fix16_mat43_rotation_create(angle_t rx, angle_t ry, angle_t rz,
+fix16_mat43_x_rotation_set(angle_t rx, fix16_mat43_t *result)
+{
+    fix16_mat33_x_rotation_create(rx, &result->rotation);
+}
+
+void
+fix16_mat43_y_rotation_set(angle_t ry, fix16_mat43_t *result)
+{
+    fix16_mat33_y_rotation_create(ry, &result->rotation);
+}
+
+void
+fix16_mat43_z_rotation_set(angle_t rz, fix16_mat43_t *result)
+{
+    fix16_mat33_z_rotation_create(rz, &result->rotation);
+}
+
+void
+fix16_mat43_rotation_set(angle_t rx, angle_t ry, angle_t rz,
     fix16_mat43_t *result)
 {
     fix16_mat33_rotation_create(rx, ry, rz, &result->rotation);
-}
-
-void
-fix16_mat43_rotation_set(const fix16_mat33_t *m0, fix16_mat43_t *result)
-{
-    fix16_mat33_dup(m0, &result->rotation);
 }
 
 size_t
@@ -135,14 +150,14 @@ fix16_mat43_str(const fix16_mat43_t *m0, char *buffer, int32_t decimals)
     char *buffer_ptr;
     buffer_ptr = buffer;
 
-      buffer_ptr += fix16_mat33_str(&m0->rotation, buffer_ptr, decimals);
+    buffer_ptr += fix16_mat33_str(&m0->rotation, buffer_ptr, decimals);
 
     *buffer_ptr++ = '\n';
     *buffer_ptr++ = '|';
-      buffer_ptr += fix16_vec3_str(&m0->translation, buffer_ptr, decimals);
+    buffer_ptr += fix16_vec3_str(&m0->translation, buffer_ptr, decimals);
     *buffer_ptr++ = '|';
 
-      *buffer_ptr = '\0';
+    *buffer_ptr = '\0';
 
     return (buffer_ptr - buffer);
 }

@@ -91,7 +91,6 @@ SH_CFLAGS_shared:= \
 	-Wextra \
 	-Winit-self \
 	-Wmissing-include-dirs \
-	-Wmissing-include-dirs \
 	-Wno-format \
 	-Wnull-dereference \
 	-Wshadow \
@@ -207,6 +206,20 @@ endef
 define macro-sh-build-library
 	@printf -- "$(V_BEGIN_YELLOW)$(shell v="$@"; printf -- "$${v#$(YAUL_BUILD_ROOT)/}")$(V_END)\n"
 	$(ECHO)$(SH_AR) rcs $@ $^
+endef
+
+# $1 ->
+# $2 ->
+# $3 ->
+# $4 ->
+# $5 ->
+define macro-generate-install-file-rule
+$(YAUL_PREFIX)/$3/$2: $1
+	@printf -- "$(V_BEGIN_BLUE)$2$(V_END)\n"
+	@mkdir -p $$(@D)
+	$(ECHO)$(INSTALL) -m $5 $$< $$@
+
+install-$4: $4 $(YAUL_PREFIX)/$3/$2
 endef
 
 # $1 ->

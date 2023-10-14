@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -45,21 +45,21 @@ __light_init(void)
     light->light_count = 0;
 
     /* XXX: Testing */
-    light->color_matrix->frow[0][0] = FIX16(31);
-    light->color_matrix->frow[1][0] = FIX16(31);
-    light->color_matrix->frow[2][0] = FIX16(31);
+    light->color_matrix->row[0].x = FIX16(31);
+    light->color_matrix->row[1].x = FIX16(31);
+    light->color_matrix->row[2].x = FIX16(31);
 
-    light->color_matrix->frow[0][1] = FIX16(31);
-    light->color_matrix->frow[1][1] = FIX16( 0);
-    light->color_matrix->frow[2][1] = FIX16( 0);
+    light->color_matrix->row[0].y = FIX16(31);
+    light->color_matrix->row[1].y = FIX16( 0);
+    light->color_matrix->row[2].y = FIX16( 0);
 
-    light->color_matrix->frow[0][2] = FIX16(31);
-    light->color_matrix->frow[1][2] = FIX16( 0);
-    light->color_matrix->frow[2][2] = FIX16( 0);
+    light->color_matrix->row[0].z = FIX16(31);
+    light->color_matrix->row[1].z = FIX16( 0);
+    light->color_matrix->row[2].z = FIX16( 0);
 
-    light->light_matrix->row[0].x = FIX16_ZERO;
-    light->light_matrix->row[0].y = FIX16_ZERO;
-    light->light_matrix->row[0].z = FIX16_ONE;
+    light->light_matrix->row[0].x = FIX16(0.0);
+    light->light_matrix->row[0].y = FIX16(0.0);
+    light->light_matrix->row[0].z = FIX16(1.0);
 
     light->light_count = 1;
 
@@ -79,17 +79,17 @@ _world_matrix_invert(void)
      *
      * The transpose also bakes the negation of the directional light
      * vector: f=dot(vn,-dir) */
-    inv_world_matrix->frow[0][0] = -world_matrix->frow[0][0];
-    inv_world_matrix->frow[0][1] = -world_matrix->frow[1][0];
-    inv_world_matrix->frow[0][2] = -world_matrix->frow[2][0];
+    inv_world_matrix->row[0].x = -world_matrix->rotation.row[0].x;
+    inv_world_matrix->row[0].y = -world_matrix->rotation.row[1].x;
+    inv_world_matrix->row[0].z = -world_matrix->rotation.row[2].x;
 
-    inv_world_matrix->frow[1][0] = -world_matrix->frow[0][1];
-    inv_world_matrix->frow[1][1] = -world_matrix->frow[1][1];
-    inv_world_matrix->frow[1][2] = -world_matrix->frow[2][1];
+    inv_world_matrix->row[1].x = -world_matrix->rotation.row[0].y;
+    inv_world_matrix->row[1].y = -world_matrix->rotation.row[1].y;
+    inv_world_matrix->row[1].z = -world_matrix->rotation.row[2].y;
 
-    inv_world_matrix->frow[2][0] = -world_matrix->frow[0][2];
-    inv_world_matrix->frow[2][1] = -world_matrix->frow[1][2];
-    inv_world_matrix->frow[2][2] = -world_matrix->frow[2][2];
+    inv_world_matrix->row[2].x = -world_matrix->rotation.row[0].z;
+    inv_world_matrix->row[2].y = -world_matrix->rotation.row[1].z;
+    inv_world_matrix->row[2].z = -world_matrix->rotation.row[2].z;
 }
 
 /* void light_color_set(light_id_t id, rgb1555_t color) */

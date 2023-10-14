@@ -1,0 +1,8 @@
+TGA:= tga
+
+TGA_CFLAGS_shared:= -I$(YAUL_INSTALL_ROOT)/$(YAUL_ARCH_SH_PREFIX)/include/tga
+
+TGA_CFLAGS:= $(TGA_CFLAGS_shared)
+TGA_CXXFLAGS:= $(TGA_CFLAGS_shared)
+
+TGA_LDFLAGS:= -ltga

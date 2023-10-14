@@ -77,12 +77,14 @@ define macro-word-split
 $(word $2,$(subst ;, ,$1))
 endef
 
+# Always include Yaul
+include $(YAUL_INSTALL_ROOT)/share/build.yaul.mk
+
 # Customizable (must be overwritten in user's Makefile)
 SH_PROGRAM?= unknown-program
 SH_DEFSYMS?=
 SH_SRCS?=
 SH_SRCS_NO_LINK?=
-SH_LIBRARIES?=
 SH_BUILD_DIR?= build
 SH_OUTPUT_DIR?= .
 
@@ -124,23 +126,45 @@ M68K_OBJCOPY:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_ARCH_M68K_PREFIX)-objcopy$(EXE_EX
 M68K_OBJDUMP:= $(YAUL_INSTALL_ROOT)/bin/$(YAUL_ARCH_M68K_PREFIX)-objdump$(EXE_EXT)
 
 SH_AFLAGS= --fatal-warnings
-SH_CFLAGS= \
+SH_CFLAGS_shared:= \
 	-W \
 	-Wall \
+	-Wduplicated-branches \
+	-Wduplicated-cond \
 	-Wextra \
-	-Wunused-parameter \
-	-Wstrict-aliasing \
-	-Wno-main \
+	-Winit-self \
+	-Wmissing-include-dirs \
 	-Wno-format \
+	-Wno-main \
+	-Wnull-dereference \
+	-Wshadow \
+	-Wstrict-aliasing \
+	-Wunused \
+	-Wunused-parameter \
 	-save-temps=obj
 
-SH_LDFLAGS= \
+SH_LDFLAGS:= \
 	-static \
 	-Wl,--gc-sections \
-	-Wl,-Map,$(SH_BUILD_PATH)/$(SH_PROGRAM).map
+	-Wl,-Map,$(SH_BUILD_PATH)/$(SH_PROGRAM).map \
+	$(YAUL_LDFLAGS)
 
-SH_CXXFLAGS= $(SH_CFLAGS)
-SH_LXXFLAGS= $(SH_LDFLAGS)
+SH_CFLAGS:= \
+	-std=c11 \
+	-Wbad-function-cast \
+	$(SH_CFLAGS_shared) \
+	$(YAUL_CFLAGS)
+
+SH_CXXFLAGS:= \
+	-std=c++17 \
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-unwind-tables \
+	-fno-asynchronous-unwind-tables \
+	-fno-threadsafe-statics \
+	-fno-use-cxa-atexit \
+	$(SH_CFLAGS_shared) \
+	$(YAUL_CXXFLAGS)
 
 SH_BUILD_PATH= $(abspath $(SH_BUILD_DIR))
 SH_OUTPUT_PATH= $(abspath $(SH_OUTPUT_DIR))

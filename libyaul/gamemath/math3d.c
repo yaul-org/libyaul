@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -49,7 +49,7 @@ math3d_view_distance_calc(int16_t screen_width, angle_t fov_angle)
 }
 
 void
-math3d_point_xform(const fix16_mat43_t *view_matrix, fix16_t view_distance,
+math3d_point_perspective_xform(const fix16_mat43_t *view_matrix, fix16_t view_distance,
   const fix16_vec3_t *point, xform_t *result)
 {
     assert(view_matrix != NULL);
@@ -71,6 +71,22 @@ math3d_point_xform(const fix16_mat43_t *view_matrix, fix16_t view_distance,
 
     result->depth_value = cpu_divu_quotient_get();
 
-    result->screen_point.x = fix16_int32_mul(result->depth_value, p.x);
-    result->screen_point.y = fix16_int32_mul(result->depth_value, p.y);
+    result->screen_point.x = fix16_high_mul(result->depth_value, p.x);
+    result->screen_point.y = fix16_high_mul(result->depth_value, p.y);
+}
+
+void
+math3d_point_orthographic_xform(const fix16_mat43_t *view_matrix,
+    fix16_t ortho_size, const fix16_vec3_t *point, xform_t *result)
+{
+    assert(view_matrix != NULL);
+    assert(point != NULL);
+    assert(result != NULL);
+
+    fix16_vec3_t p;
+    fix16_mat43_pos3_mul(view_matrix, point, &p);
+
+    result->screen_point.x = fix16_high_mul( ortho_size, p.x);
+    result->screen_point.y = fix16_high_mul(-ortho_size, p.y);
+    result->depth_value = p.z;
 }

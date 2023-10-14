@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -117,7 +117,7 @@ fix16_atan2(fix16_t y, fix16_t x)
      * Since q ranges from [-1,1], this can be scaled to π/4. However an
      * extra step is taken to convert to angle_t: Dividing by 2π:
      * q*((π/4)/(2π)) */
-    const angle_t dphi = fix16_int32_mul(q, FIX16(0.125f));
+    const angle_t dphi = fix16_high_mul(q, FIX16(0.125f));
 
     return (phi + dphi);
 }

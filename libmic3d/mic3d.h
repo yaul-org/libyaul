@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Israel Jacquez
+ * Copyright (c) Israel Jacquez
  * See LICENSE for details.
  *
  * Israel Jacquez <mrkotfw@gmail.com>
@@ -27,10 +27,7 @@ extern void mic3d_init(workarea_mic3d_t *workarea);
 extern void camera_type_set(camera_type_t type);
 extern void camera_lookat(const camera_t *camera);
 extern void camera_moveto(const camera_t *camera);
-extern void camera_right_get(fix16_vec3_t *right);
-extern void camera_up_get(fix16_vec3_t *up);
-extern void camera_forward_get(fix16_vec3_t *forward);
-extern const fix16_mat43_t *camera_matrix_get(void);
+extern fix16_mat43_t *camera_matrix_get(void);
 
 extern void render_enable(render_flags_t flags);
 extern void render_disable(render_flags_t flags);
@@ -51,6 +48,8 @@ extern void render_cmdts_reserve(uint32_t cmdt_count); /* XXX: Not yet implement
 extern void render_cmdts_relinquish(void); /* XXX: Not yet implemented */
 extern void render_point_xform(const fix16_mat43_t *world_matrix,
   const fix16_vec3_t *point, xform_t *xform);
+extern void render_points_xform(const fix16_mat43_t *world_matrix,
+  const fix16_vec3_t *points, xform_t *xforms, uint32_t count);
 
 extern void render_debug_log(char *buffer, size_t len); /* XXX: Not yet implemented */
 
