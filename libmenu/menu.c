@@ -23,6 +23,12 @@ _menu_cursor_clamp(menu_t *menu, int8_t direction)
         cursor = 0;
     } else if (cursor >= menu->_entries_count) {
         cursor = menu->_entries_count - 1;
+    } else {
+        const menu_entry_t * const menu_entry = &menu->entries[cursor];
+
+        if (*menu_entry->label == '\0') {
+            cursor = menu->_cursor;
+        }
     }
 
     menu->_cursor = cursor;

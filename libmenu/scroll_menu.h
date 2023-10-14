@@ -31,7 +31,6 @@ struct scroll_menu {
         menu_t _menu;
         scroll_menu_fn_t _input_fn;
         scroll_menu_fn_t _update_fn;
-        menu_cursor_t _cursor;
         menu_cursor_t _y;
         menu_cursor_t _gp;
 };
