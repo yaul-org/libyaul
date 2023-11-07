@@ -1,4 +1,0 @@
-<map id="scu_dma_xfer_type_t" name="scu_dma_xfer_type_t">
-<area shape="rect" id="node1" title="The transfer type." alt="" coords="5,109,167,136"/>
-<area shape="rect" id="node2" href="$structscu__dma__xfer__t.html" title="The 3&#45;tuple represents a single transfer in direct or indirect transfer." alt="" coords="23,5,149,32"/>
-</map>

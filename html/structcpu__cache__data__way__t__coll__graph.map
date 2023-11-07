@@ -1,4 +1,0 @@
-<map id="cpu_cache_data_way_t" name="cpu_cache_data_way_t">
-<area shape="rect" id="node1" title="Cache data way." alt="" coords="5,95,177,121"/>
-<area shape="rect" id="node2" href="$unioncpu__cache__data__line__t.html" title="Cache data line representing the data read from the cache." alt="" coords="7,5,176,32"/>
-</map>

@@ -35,21 +35,26 @@ var NAVTREE =
         [ "All", "functions.html", "functions_dup" ],
         [ "Variables", "functions_vars.html", "functions_vars" ]
       ] ]
-    ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ]
     ] ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"angle_8h_source.html",
-"group__CPU__DMAC.html#gga5bb98a415aea88ed1786d1d211beeb59aafd9716f55c20388df772d12bc85ca9a",
-"group__DRAM__CART.html#gga54a90d7f6a193650d8448ec566afd48aa1898e8aebaebcee1d0bc88c3a4b7790e",
-"group__MEMORY__MAP__AREAS.html#gac774abf00f414b7ff6cc691f351b344f",
-"group__SCU__IC.html#gga4352d84e68d077870ad833de0154aaaaa198f902c0b9f8b22c4bea1c373843b02",
-"structcpu__ioregs__t.html#a800477cfb79156d20e045ffcf1824b0f"
+"annotated.html",
+"group__CPU__CACHE.html#ga055b8e3e15474370bdfed6121d5ffa28",
+"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a7850eae5985481091da1a212b7764704",
+"group__GAMEMATH__COLOR__RGB1555.html#ga789d7b3a15e77023bdbdbe3da208df0d",
+"group__GCC__ATTRIBUTES.html#gaaef63d663f510bc84741bf7a00079a1e",
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#a524e2158c203793b49c6c62735a7774a",
+"group__MEMORY__MAP__VDP1__IO__REGISTERS.html#ga02278efc03080be05d6381fc146ff3bf",
+"group__MEMORY__MAP__VDP2__IO__REGISTERS.html#ga9a239d195c6c490aab90a3d13943f01d",
+"group__SCU__DMA.html#gae015bc1cd0858165e491f6e3436b3bd4",
+"group__STD__LIBC.html#ga7c94ea6f8948649f8d181ae55911eeaf",
+"group__VDP1__CMDT__LIST.html#ga16c9184fe8c25ae7ccfef77045a7b5b5",
+"group__VDP2__NORMAL__REDUCTION.html#gafc689ca472d1b3a13663b614d36d76d3",
+"group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND__CONFIGS.html#ga76859897d0f978c9f754db63480fbb01",
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
