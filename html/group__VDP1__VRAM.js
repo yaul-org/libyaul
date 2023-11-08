@@ -46,6 +46,7 @@ var group__VDP1__VRAM =
     [ "VDP1_VRAM_SIZE", "group__VDP1__VRAM.html#ga1bc82de7db344282bfd03bd6316ea665", null ],
     [ "VDP1_FB_COUNT", "group__VDP1__VRAM.html#ga2434bf1ea3c5768a912d2aada985ed44", null ],
     [ "VDP1_FB_SIZE", "group__VDP1__VRAM.html#gaf7e4ac9bfaa1e2ad1cd3a1d8e128135d", null ],
+    [ "vdp1_vram_t", "group__VDP1__VRAM.html#ga492338d7701c755a3e24bee8c94d8f41", null ],
     [ "vdp1_gouraud_table_t", "group__VDP1__VRAM.html#gab54cb2ebc24a43c91c398671bd7c6539", null ],
     [ "vdp1_color_bank_t", "group__VDP1__VRAM.html#gadad511bea3d2b416ed29ad5692589feb", null ],
     [ "vdp1_clut_t", "group__VDP1__VRAM.html#gadf677d8dc45985795e207bbbb68560d8", null ],

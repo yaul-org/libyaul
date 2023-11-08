@@ -52,9 +52,9 @@ var NAVTREEINDEX =
 "group__MIC3D__RENDER.html#gae8c935e8a874f864871050c0d92ced04",
 "group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57af6f206f1b3cf6aa9e7714036f2c57354",
 "group__VDP1__CMDT.html#ga0b3772cb5affda1f2ff7be060a2af9da",
-"group__VDP1__VRAM.html#unionvdp1__clut",
-"group__VDP2__SCROLL__SCREEN__DISPLAY.html#gabb8678e5b2364b3c182e858115a5dc1f",
-"group__VDP2__SPRITE__TYPES.html#ga5a9a9258bf9353429137694cb2c2545d"
+"group__VDP1__VRAM.html#structvdp1__vram__partitions",
+"group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga9429e73ba6f061117f6f4986da7298e0",
+"group__VDP2__SPRITE__TYPES.html#ga57d951bb60f3783fc08f38e600cd0b91"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,5 +1,6 @@
 var NAVTREEINDEX11 =
 {
+"group__VDP1__VRAM.html#structvdp1__vram__partitions":[2,0,15,4,3],
 "group__VDP1__VRAM.html#unionvdp1__clut":[2,0,15,4,2],
 "group__VDP1__VRAM.html#unionvdp1__color__bank":[2,0,15,4,1],
 "group__VDP2.html":[2,0,16],
@@ -248,6 +249,5 @@ var NAVTREEINDEX11 =
 "group__VDP2__SCROLL__SCREEN__DISPLAY.html":[2,0,16,1,0],
 "group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga21bb42e248725006bc183aa10e51c093":[2,0,16,1,0,2],
 "group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga420330f3a30a996449b5d878167bf3b8":[2,0,16,1,0,4],
-"group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga90c0d084c342ba29fb6fcf169327162b":[2,0,16,1,0,0],
-"group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga9429e73ba6f061117f6f4986da7298e0":[2,0,16,1,0,5]
+"group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga90c0d084c342ba29fb6fcf169327162b":[2,0,16,1,0,0]
 };
