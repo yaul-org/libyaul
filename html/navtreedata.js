@@ -49,12 +49,12 @@ var NAVTREEINDEX =
 "group__MEMORY__MAP__CPU__IO__REGISTERS.html#a524e2158c203793b49c6c62735a7774a",
 "group__MEMORY__MAP__VDP1__IO__REGISTERS.html#ga02278efc03080be05d6381fc146ff3bf",
 "group__MEMORY__MAP__VDP2__IO__REGISTERS.html#ga9a239d195c6c490aab90a3d13943f01d",
-"group__SCU__DMA.html#gae015bc1cd0858165e491f6e3436b3bd4",
-"group__STD__LIBC.html#ga7c94ea6f8948649f8d181ae55911eeaf",
-"group__VDP1__CMDT__LIST.html#ga16c9184fe8c25ae7ccfef77045a7b5b5",
-"group__VDP2__NORMAL__REDUCTION.html#gafc689ca472d1b3a13663b614d36d76d3",
-"group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND__CONFIGS.html#ga76859897d0f978c9f754db63480fbb01",
-"index.html"
+"group__MIC3D__RENDER.html#gae8c935e8a874f864871050c0d92ced04",
+"group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57af6f206f1b3cf6aa9e7714036f2c57354",
+"group__VDP1__CMDT.html#ga0b3772cb5affda1f2ff7be060a2af9da",
+"group__VDP1__VRAM.html#unionvdp1__clut",
+"group__VDP2__SCROLL__SCREEN__DISPLAY.html#gabb8678e5b2364b3c182e858115a5dc1f",
+"group__VDP2__SPRITE__TYPES.html#ga5a9a9258bf9353429137694cb2c2545d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

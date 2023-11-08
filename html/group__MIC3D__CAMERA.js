@@ -5,6 +5,7 @@ var group__MIC3D__CAMERA =
       [ "up", "group__MIC3D__CAMERA.html#a475342a7b36bd1461381bf1d92f4a856", null ],
       [ "position", "group__MIC3D__CAMERA.html#a62c6fcec9affdbf6d6a3114c505a6369", null ]
     ] ],
+    [ "camera_t", "group__MIC3D__CAMERA.html#ga5cf69347246ef9b4472276afcc2ec8fc", null ],
     [ "camera_type", "group__MIC3D__CAMERA.html#ga3b5f92e1ab71ddb3554796fe2bb546d0", [
       [ "CAMERA_TYPE_PERSPECTIVE", "group__MIC3D__CAMERA.html#gga3b5f92e1ab71ddb3554796fe2bb546d0adf82c2dd09c6eb5b574bb91335d49f89", null ],
       [ "CAMERA_TYPE_ORTHOGRAPHIC", "group__MIC3D__CAMERA.html#gga3b5f92e1ab71ddb3554796fe2bb546d0aa6a927c4a12a5e0ea1b4542c47cfe0db", null ],
