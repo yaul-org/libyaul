@@ -129,20 +129,23 @@ Functions</h2></td></tr>
 <div class="line">+--------+-----+-----------+------------+</div>
 </div><!-- fragment --><p>The coord. increment should be a value smaller then 1 to zoom in and larger than 1 to zoom out. No zoom means equal to 1.</p>
 <p>Range limitations:</p>
-<div class="fragment"><div class="line">+----------------+-------------------+-----+</div>
-<div class="line">| Range (X or Y) | Reduction results | CCC |</div>
-<div class="line">+----------------+-------------------+-----+</div>
-<div class="line">| [0,1)          | Reduc. in         | 16  |</div>
-<div class="line">|                |                   | 256 |</div>
-<div class="line">+----------------+-------------------+-----+</div>
-<div class="line">| 1              | No reduction      | 16  |</div>
-<div class="line">+----------------+-------------------+-----+</div>
-<div class="line">| (1,2]          | Reduc. out (1/2)  | 16  |</div>
-<div class="line">|                |                   | 256 |</div>
-<div class="line">+----------------+-------------------+-----+</div>
-<div class="line">| (1,7]          | Reduc. out (1/7)  | 16  |</div>
-<div class="line">+----------------+-------------------+-----+</div>
-</div><!-- fragment --> <h2 class="groupheader">Enumeration Type Documentation</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Range (<em>X</em> or <em>Y</em>)   </th><th class="markdownTableHeadLeft">Reduction results   </th><th class="markdownTableHeadLeft">CCC    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft" rowspan="2">[0,1)   </td><td class="markdownTableBodyLeft">Reduction in   </td><td class="markdownTableBodyLeft">16    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">256    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">1   </td><td class="markdownTableBodyLeft">No reduction   </td><td class="markdownTableBodyLeft">16    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft" rowspan="2">(1,2]   </td><td class="markdownTableBodyLeft">Reduction out (1/2)   </td><td class="markdownTableBodyLeft">16    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">256    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">(1,7]   </td><td class="markdownTableBodyLeft">Reduction out (1/7)   </td><td class="markdownTableBodyLeft">16   </td></tr>
+</table>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="gafc689ca472d1b3a13663b614d36d76d3" name="gafc689ca472d1b3a13663b614d36d76d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gafc689ca472d1b3a13663b614d36d76d3">&#9670;&#160;</a></span>vdp2_scrn_reduction</h2>
 

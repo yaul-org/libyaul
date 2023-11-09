@@ -738,41 +738,18 @@ SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa8420
 </div><div class="memdoc">
 
 <p>Write to the SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a> register. </p>
-<p>Below describes what happens when reading and writing to the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a> register: <table class="doxtable">
-  <colgroup>
-    <col/>
-    <col/>
-    <col/>
-  </colgroup>
-  <thead>
-    <tr>
-      <th>Access</th>
-      <th>Status</th>
-      <th>Result</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="3">Read</td>
-      <td>0</td>
-      <td>Interrupt does not occur</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Interrupt does occur</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr>
-      <td rowspan="3">Write</td>
-      <td>0</td>
-      <td>Resets interrupt</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Maintains current interrupt status</td>
-    </tr>
-  </tbody>
+<p>Below describes what happens when reading and writing to the <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga32c7661dc24fb2329bdbe89941c20952">IST</a> register:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Access   </th><th class="markdownTableHeadLeft">Status   </th><th class="markdownTableHeadLeft">Result    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft" rowspan="2">Read   </td><td class="markdownTableBodyLeft">0   </td><td class="markdownTableBodyLeft">Interrupt does <em>not</em> occur    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">1   </td><td class="markdownTableBodyLeft">Interrupt does occur    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft" rowspan="2">Write   </td><td class="markdownTableBodyLeft">0   </td><td class="markdownTableBodyLeft">Reset interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">1   </td><td class="markdownTableBodyLeft">Maintains current interrupt status   </td></tr>
 </table>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -856,250 +833,74 @@ SCU <a class="el" href="group__MEMORY__MAP__SCU__IO__REGISTERS.html#ga5b7cfa8420
 <p>Obtain a read-only pointer to the priority table. </p>
 <p>The priority table is 128 bytes. Each priority table entry is 32-bits and is split between SR and SCU interrupt mask. Upper 16-bits is the SR interrupt mask value, and the lower 16-bits is the SCU interrupt mask value and is signed extended.</p>
 <p>As an exmple, for <em>HBLANK-IN</em>, disable all interrupts, but allow <em>VBLANK-IN</em> and <em>VBLANK-OUT</em>.</p>
-<p>Below is the decoded table, <table class="doxtable">
-  <colgroup>
-    <col/>
-    <col/>
-    <col/>
-    <col/>
-    <col/>
-  </colgroup>
-  <thead>
-    <tr>
-      <th scope="col">Vector</th>
-      <th scope="col">SR</th>
-      <th scope="col">SCU</th>
-      <th scope="col">SCU Interrupt</th>
-      <th scope="col">Value
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>40</td>
-      <td>0x00F0</td>
-      <td>0xFFFF</td>
-      <td>VBLANK IN</td>
-      <td>Mask all</td>
-    </tr>
-    <tr>
-      <td>41</td>
-      <td>0x00E0</td>
-      <td>0xFFFE</td>
-      <td>VBLANK OUT</td>
-      <td>Mask all, allow VBLANK IN</td>
-    </tr>
-    <tr>
-      <td>42</td>
-      <td>0x00D0</td>
-      <td>0xFFFC</td>
-      <td>HBLANK IN</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT</td>
-    </tr>
-    <tr>
-      <td>43</td>
-      <td>0x00C0</td>
-      <td>0xFFF8</td>
-      <td>TIMER 0</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN</td>
-    </tr>
-    <tr>
-      <td>44</td>
-      <td>0x00B0</td>
-      <td>0xFFF0</td>
-      <td>TIMER 1</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0</td>
-    </tr>
-    <tr>
-      <td>45</td>
-      <td>0x00A0</td>
-      <td>0xFFE0</td>
-      <td>DSP END</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1</td>
-    </tr>
-    <tr>
-      <td>46</td>
-      <td>0x0090</td>
-      <td>0xFFC0</td>
-      <td>SOUND REQUEST</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END</td>
-    </tr>
-    <tr>
-      <td>47</td>
-      <td>0x0080</td>
-      <td>0xFF80</td>
-      <td>SYSTEM MANAGER</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST</td>
-    </tr>
-    <tr>
-      <td>48</td>
-      <td>0x0080</td>
-      <td>0xFF80</td>
-      <td>PAD INTERRUPT</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST</td>
-    </tr>
-    <tr>
-      <td>49</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>LEVEL 2 DMA END</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4A</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>LEVEL 1 DMA END</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4B</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>LEVEL 0 DMA END</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4C</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>DMA ILLEGAL</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4D</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>SPRITE END</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4E</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>4F</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>50</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD </td>
-    </tr>
-    <tr>
-      <td>51</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>52</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>53</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>54</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>55</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>56</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>57</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>58</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>59</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5A</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5B</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5C</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5D</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5E</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-    <tr>
-      <td>5F</td>
-      <td>0x0070</td>
-      <td>0xFE00</td>
-      <td>&#xa0;</td>
-      <td>Mask all, allow VBLANK IN, VBLANK OUT, HBLANK IN, TIMER 0, TIMER 1, DSP END, SOUND REQUEST, PAD INTERRUPT</td>
-    </tr>
-  </tbody>
+<p>Below is the decoded table:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Vector   </th><th class="markdownTableHeadLeft">SR   </th><th class="markdownTableHeadLeft">SCU   </th><th class="markdownTableHeadLeft">SCU Interrupt   </th><th class="markdownTableHeadLeft">Value    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x40   </td><td class="markdownTableBodyLeft">0x00F0   </td><td class="markdownTableBodyLeft">0xFFFF   </td><td class="markdownTableBodyLeft">VBLANK-IN   </td><td class="markdownTableBodyLeft">Mask all    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x41   </td><td class="markdownTableBodyLeft">0x00E0   </td><td class="markdownTableBodyLeft">0xFFFE   </td><td class="markdownTableBodyLeft">VBLANK-OUT   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x42   </td><td class="markdownTableBodyLeft">0x00D0   </td><td class="markdownTableBodyLeft">0xFFFC   </td><td class="markdownTableBodyLeft">HBLANK-IN   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x43   </td><td class="markdownTableBodyLeft">0x00C0   </td><td class="markdownTableBodyLeft">0xFFF8   </td><td class="markdownTableBodyLeft">Timer 0   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x44   </td><td class="markdownTableBodyLeft">0x00B0   </td><td class="markdownTableBodyLeft">0xFFF0   </td><td class="markdownTableBodyLeft">Timer 1   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x45   </td><td class="markdownTableBodyLeft">0x00A0   </td><td class="markdownTableBodyLeft">0xFFE0   </td><td class="markdownTableBodyLeft">DSP End   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x46   </td><td class="markdownTableBodyLeft">0x0090   </td><td class="markdownTableBodyLeft">0xFFC0   </td><td class="markdownTableBodyLeft">Sound Request   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x47   </td><td class="markdownTableBodyLeft">0x0080   </td><td class="markdownTableBodyLeft">0xFF80   </td><td class="markdownTableBodyLeft">System Manager   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x48   </td><td class="markdownTableBodyLeft">0x0080   </td><td class="markdownTableBodyLeft">0xFF80   </td><td class="markdownTableBodyLeft">Pad Interrupt   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x49   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft">Level 2 DMA End   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x4A   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft">Level 1 DMA End   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x4B   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft">Level 0 DMA End   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x4C   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft">DMA Illegal   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x4D   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft">Sprite End   </td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x4E   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x4F   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x50   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x51   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x52   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x53   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x54   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x55   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x56   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x57   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x58   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x59   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x5A   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x5B   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x5C   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x5D   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">0x5E   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">0x5F   </td><td class="markdownTableBodyLeft">0x0070   </td><td class="markdownTableBodyLeft">0xFE00   </td><td class="markdownTableBodyLeft"></td><td class="markdownTableBodyLeft">Mask all, allow VBLANK-IN, VBLANK-OUT, HBLANK-IN, Timer 0, Timer 1, DSP End, Sound Request, Pad Interrupt   </td></tr>
 </table>
 <p>This is a BIOS call.</p>
 <dl class="section return"><dt>Returns</dt><dd>A read-only pointer to the priority table. </dd></dl>

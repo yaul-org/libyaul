@@ -2,7 +2,7 @@ var group__MIC3D =
 [
     [ "Initialization & Configuration", "group__MIC3D__INIT__CONFIG.html", "group__MIC3D__INIT__CONFIG" ],
     [ "Camera", "group__MIC3D__CAMERA.html", "group__MIC3D__CAMERA" ],
-    [ "Render", "group__MIC3D__RENDER.html", "group__MIC3D__RENDER" ],
+    [ "Rendering", "group__MIC3D__RENDER.html", "group__MIC3D__RENDER" ],
     [ "Clipping", "group__MIC3D__CLIPPING.html", "group__MIC3D__CLIPPING" ],
     [ "Depth Calculations", "group__MIC3D__DEPTH.html", "group__MIC3D__DEPTH" ],
     [ "Gouraud Shading", "group__MIC3D__GST.html", "group__MIC3D__GST" ],
