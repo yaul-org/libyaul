@@ -25,35 +25,31 @@
 var NAVTREE =
 [
   [ "Yaul", "index.html", [
+    [ "Libraries", "modules.html", "modules" ],
+    [ "Getting Started", "LIBYAUL_INSTALLATION.html", null ],
+    [ "List of Examples", "LIBYAUL_EXAMPLES_TABLE.html", null ],
+    [ "Tutorials", "LIBYAUL_TUTORIALS.html", "LIBYAUL_TUTORIALS" ],
     [ "Deprecated List", "deprecated.html", null ],
-    [ "Modules", "modules.html", "modules" ],
-    [ "Data Structures", "annotated.html", [
-      [ "Data Structures", "annotated.html", "annotated_dup" ],
-      [ "Data Structure Index", "classes.html", null ],
-      [ "Data Fields", "functions.html", [
-        [ "All", "functions.html", "functions_dup" ],
-        [ "Variables", "functions_vars.html", "functions_vars" ]
-      ] ]
-    ] ]
+    [ "GitHub Issues", "^http://www.github.com/yaul-org/libyaul/issues", null ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"group__CPU__CACHE.html#ga055b8e3e15474370bdfed6121d5ffa28",
-"group__CPU__INTC.html#ggaac41bcdeba2bd9e84b2c04f6780e9ed2a7850eae5985481091da1a212b7764704",
-"group__GAMEMATH__COLOR__RGB1555.html#ga789d7b3a15e77023bdbdbe3da208df0d",
-"group__GCC__ATTRIBUTES.html#gaaef63d663f510bc84741bf7a00079a1e",
-"group__MEMORY__MAP__CPU__IO__REGISTERS.html#a51a4fbdad39224a1fa6e49881dd6274e",
-"group__MEMORY__MAP__VDP1__IO__REGISTERS.html#af24a9c67f7cc65238f288a24e3fab6df",
-"group__MEMORY__MAP__VDP2__IO__REGISTERS.html#ga98aaed99ee0514b0370e8f220cdd0ccb",
-"group__MIC3D__RENDER.html#gadf01e5b79fff015f5f5a49e9824d0d4d",
-"group__SCU__IC.html#gga3efa4b5e182a2252797ca01d24dcac57adcab23c5c095091c400f70a4d174ccfc",
-"group__VDP1__CMDT.html#ga0aee3be427de520db7945c9ef3876b59",
-"group__VDP1__VRAM.html#structvdp1__gouraud__table",
-"group__VDP2__SCROLL__SCREEN__DISPLAY.html#ga90c0d084c342ba29fb6fcf169327162b",
-"group__VDP2__SPRITE__TYPES.html#ga57a80adc19ac7af2bd3a131bf0c6286a"
+"LIBYAUL_EXAMPLES_TABLE.html",
+"group__CPU__DIVU.html#gaf6b5cb8546b373711641f0dc1e137f5f",
+"group__CPU__REGISTERS.html#a8af81cac0f0eb4d1c394bc743e63288b",
+"group__GAMEMATH__FIX16__MAT33.html#ga137c0f7d2bf99cb16ecad1df82448672",
+"group__KERNEL__DBGIO.html#a5d893922116d5abaf9fb955d22a19b27",
+"group__MEMORY__MAP__CPU__IO__REGISTERS.html#af48fc0dbe30c5cedf474b2f96e91bbc4",
+"group__MEMORY__MAP__VDP2__IO__REGISTERS.html#a36732daea8f08f9a9c638b19afc266ab",
+"group__MEMORY__MAP__VDP2__IO__REGISTERS.html#gae1b1366305df24834bfe9e423bd075ea",
+"group__MIC3D__TLIST.html#a8a05475a1439651b9c52064d960a0716",
+"group__SCU__IC.html#ggafda662d6e8c822f24c6314d7a7b2f2a9af6f0a918694c1f50ec9c34f13eeee7e6",
+"group__VDP1__CMDT.html#ga94c9b86f626ad6c23b3a11cd46970103",
+"group__VDP2__DISPLAY.html#gad0684a619025c13d7c94132f17197cf8",
+"group__VDP2__SCROLL__SCREEN__FORMAT__CELL.html#a4d73e0b4bb706b82ae01f5b04c7a7fe4",
+"group__VDP2__SPRITE__TYPES.html#structvdp2__sprite__type__7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.9.6-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -29,8 +30,9 @@ MathJax.Hub.Config({
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="logo-text.svg"/></td>
   <td id="projectalign">
-   <div id="projectname">Yaul<span id="projectnumber">&#160;Version 0.3.1</span>
+   <div id="projectname"><span id="projectnumber">0.3.1</span>
    </div>
   </td>
  </tr>
@@ -95,20 +97,29 @@ Macros</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Configuration table mapping. Depending on how the normal/rotational background is set up, choose a config:</p>
-<div class="fragment"><div class="line">+-----+--------+------+-----------+------------+------------+-------------+</div>
-<div class="line">| CFG | PND    | Cell | Aux. mode | Page size  | Pal. banks | Color count |</div>
-<div class="line">+-----+--------+------+-----------+------------+------------+-------------+</div>
-<div class="line">| 0   | 1-word | 1x1  | 0         | 0x0400     | 128        | 16          |</div>
-<div class="line">| 1   | 1-word | 1x1  | 1         | 0x1000     | 128        | 16          |</div>
-<div class="line">| 2   | 1-word | 2x2  | 0         | 0x0400     | 128        | 16          |</div>
-<div class="line">| 3   | 1-word | 2x2  | 1         | 0x1000     | 128        | 16          |</div>
-<div class="line">| 4   | 1-word | 1x1  | 0         | 0x0200     | 8          | 16,256,2048 |</div>
-<div class="line">| 5   | 1-word | 1x1  | 1         | 0x0800     | 8          | 16,256,2048 |</div>
-<div class="line">| 6   | 1-word | 2x2  | 0         | 0x0200     | 8          | 16,256,2048 |</div>
-<div class="line">| 7   | 1-word | 2x2  | 1         | 0x0800     | 8          | 16,256,2048 |</div>
-<div class="line">| 8   | 2-word | X    | X         | 0x8000     | 8/128      | 16,256,2048 |</div>
-<div class="line">+-----+--------+------+-----------+------------+------------+-------------+</div>
-</div><!-- fragment --> <h2 class="groupheader">Macro Definition Documentation</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">Config   </th><th class="markdownTableHeadCenter">PND   </th><th class="markdownTableHeadCenter">Cell   </th><th class="markdownTableHeadCenter">Auxiliary mode   </th><th class="markdownTableHeadRight">Page size   </th><th class="markdownTableHeadCenter">Palette banks   </th><th class="markdownTableHeadRight">Color count    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">0   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">1x1   </td><td class="markdownTableBodyCenter">0   </td><td class="markdownTableBodyRight">0x400   </td><td class="markdownTableBodyCenter">128   </td><td class="markdownTableBodyRight">16    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">1   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">1x1   </td><td class="markdownTableBodyCenter">1   </td><td class="markdownTableBodyRight">0x1000   </td><td class="markdownTableBodyCenter">128   </td><td class="markdownTableBodyRight">16    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">2   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">2x2   </td><td class="markdownTableBodyCenter">0   </td><td class="markdownTableBodyRight">0x400   </td><td class="markdownTableBodyCenter">128   </td><td class="markdownTableBodyRight">16    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">3   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">2x2   </td><td class="markdownTableBodyCenter">1   </td><td class="markdownTableBodyRight">0x1000   </td><td class="markdownTableBodyCenter">128   </td><td class="markdownTableBodyRight">16    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">4   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">1x1   </td><td class="markdownTableBodyCenter">0   </td><td class="markdownTableBodyRight">0x200   </td><td class="markdownTableBodyCenter">8   </td><td class="markdownTableBodyRight">16, 256, 2048    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">5   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">1x1   </td><td class="markdownTableBodyCenter">1   </td><td class="markdownTableBodyRight">0x800   </td><td class="markdownTableBodyCenter">8   </td><td class="markdownTableBodyRight">16, 256, 2048    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">6   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">2x2   </td><td class="markdownTableBodyCenter">0   </td><td class="markdownTableBodyRight">0x200   </td><td class="markdownTableBodyCenter">8   </td><td class="markdownTableBodyRight">16, 256, 2048    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">7   </td><td class="markdownTableBodyCenter">1-word   </td><td class="markdownTableBodyCenter">2x2   </td><td class="markdownTableBodyCenter">1   </td><td class="markdownTableBodyRight">0x0800   </td><td class="markdownTableBodyCenter">8   </td><td class="markdownTableBodyRight">16, 256, 2048    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">8   </td><td class="markdownTableBodyCenter">2-word   </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyRight">0x8000   </td><td class="markdownTableBodyCenter">8/128   </td><td class="markdownTableBodyRight">16, 256, 2048   </td></tr>
+</table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga8d532a5872364ea4332a98044d080a4c" name="ga8d532a5872364ea4332a98044d080a4c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8d532a5872364ea4332a98044d080a4c">&#9670;&#160;</a></span>VDP2_SCRN_PND_CONFIG_0</h2>
 
@@ -156,8 +167,8 @@ Macros</h2></td></tr>
 <div class="line">     (((vf) &amp; 0x01) &lt;&lt; 11) |                                                   \</div>
 <div class="line">     (((hf) &amp; 0x01) &lt;&lt; 10) |                                                   \</div>
 <div class="line">     (<a class="code hl_define" href="group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND.html#gafb976882ac25b2bf965c11f186da5fb5">VDP2_SCRN_PND_CP_NUM</a>(cpd_addr) &amp; 0x03FF))</div>
-<div class="ttc" id="agroup__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND_html_ga063b72da16ca541e0f1c66cd3c4e2d78"><div class="ttname"><a href="group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND.html#ga063b72da16ca541e0f1c66cd3c4e2d78">VDP2_SCRN_PND_PAL_NUM</a></div><div class="ttdeci">#define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_addr)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> scrn_macros.h:205</div></div>
-<div class="ttc" id="agroup__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND_html_gafb976882ac25b2bf965c11f186da5fb5"><div class="ttname"><a href="group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND.html#gafb976882ac25b2bf965c11f186da5fb5">VDP2_SCRN_PND_CP_NUM</a></div><div class="ttdeci">#define VDP2_SCRN_PND_CP_NUM(addr)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> scrn_macros.h:184</div></div>
+<div class="ttc" id="agroup__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND_html_ga063b72da16ca541e0f1c66cd3c4e2d78"><div class="ttname"><a href="group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND.html#ga063b72da16ca541e0f1c66cd3c4e2d78">VDP2_SCRN_PND_PAL_NUM</a></div><div class="ttdeci">#define VDP2_SCRN_PND_PAL_NUM(cram_mode, cram_addr)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> scrn_macros.h:169</div></div>
+<div class="ttc" id="agroup__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND_html_gafb976882ac25b2bf965c11f186da5fb5"><div class="ttname"><a href="group__VDP2__SCROLL__SCREEN__FORMAT__CELL__PND.html#gafb976882ac25b2bf965c11f186da5fb5">VDP2_SCRN_PND_CP_NUM</a></div><div class="ttdeci">#define VDP2_SCRN_PND_CP_NUM(addr)</div><div class="ttdoc">Not yet documented.</div><div class="ttdef"><b>Definition:</b> scrn_macros.h:148</div></div>
 </div><!-- fragment -->
 <p>Not yet documented. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -637,10 +648,11 @@ Macros</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.6-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6 </li>
+    <li class="footer"><a href="https://github.com/yaul-org"><img class="footer" src="GitHub-dark.svg" width="104" height="31" alt="GitHub"/></a></li>
   </ul>
 </div>
 </body>

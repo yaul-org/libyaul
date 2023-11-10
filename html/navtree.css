@@ -22,12 +22,12 @@
 #nav-tree .selected {
   background-image: url('tab_a.png');
   background-repeat:repeat-x;
-  color: white;
+  color: #DCE2EF;
   text-shadow: 0px 1px 1px rgba(0, 0, 0, 1.0);
 }
 
 #nav-tree .selected .arrow {
-  color: #9CAFD4;
+  color: #90A5CE;
   text-shadow: none;
 }
 
@@ -57,7 +57,7 @@
 
 #nav-tree .selected a {
   text-decoration:none;
-  color:white;
+  color:#DCE2EF;
 }
 
 #nav-tree .children_ul {
@@ -99,7 +99,7 @@
 }
 
 .ui-resizable-e {
-  background-image:url('splitbar.png');
+  background-image:url('splitbard.png');
   background-size:100%;
   background-repeat:repeat-y;
   background-attachment: scroll;
@@ -123,7 +123,7 @@
 
 #nav-tree {
   background-repeat:repeat-x;
-  background-color: #F9FAFC;
+  background-color: #101826;
   -webkit-overflow-scrolling : touch; /* iOS 5+ */
 }
 
