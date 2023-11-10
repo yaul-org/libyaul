@@ -228,10 +228,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga5f2d81f72ad257a846fa61575e4e4070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <br /></td></tr>
 <tr class="separator:ga5f2d81f72ad257a846fa61575e4e4070"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga24675aa3834198d80f295cccb4a4d0fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__VDP2__VRAM.html#ga08dde222a559d5c9d4935b3cba76c0f9">vdp2_vram_cycp_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__VDP2__VRAM.html#ga24675aa3834198d80f295cccb4a4d0fc">vdp2_vram_cycp_get</a> (void)</td></tr>
-<tr class="memdesc:ga24675aa3834198d80f295cccb4a4d0fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <br /></td></tr>
+<tr class="memdesc:ga24675aa3834198d80f295cccb4a4d0fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the VRAM cycle patterns currently set in the VDP2 I/O shadow registers.  <br /></td></tr>
 <tr class="separator:ga24675aa3834198d80f295cccb4a4d0fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0c453b7456a26b508e360e4e9c79f23d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__VDP2__VRAM.html#ga0c453b7456a26b508e360e4e9c79f23d">vdp2_vram_cycp_set</a> (const <a class="el" href="group__VDP2__VRAM.html#ga08dde222a559d5c9d4935b3cba76c0f9">vdp2_vram_cycp_t</a> *vram_cycp)</td></tr>
-<tr class="memdesc:ga0c453b7456a26b508e360e4e9c79f23d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not yet documented.  <br /></td></tr>
+<tr class="memdesc:ga0c453b7456a26b508e360e4e9c79f23d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the VRAM cycle patterns for all 4 VDP2 VRAM banks.  <br /></td></tr>
 <tr class="separator:ga0c453b7456a26b508e360e4e9c79f23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3fd33dfea87f65cb628faca42ca5160a"><td class="memItemLeft" align="right" valign="top"><a id="ga3fd33dfea87f65cb628faca42ca5160a" name="ga3fd33dfea87f65cb628faca42ca5160a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>vdp2_vram_cycp_clear</b> (void)</td></tr>
@@ -786,8 +786,9 @@ Timing 4-bit value (T7). </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Not yet documented. </p>
-<dl class="section return"><dt>Returns</dt><dd>Not yet documented. </dd></dl>
+<p>Retrieves the VRAM cycle patterns currently set in the VDP2 I/O shadow registers. </p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the <a class="el" href="group__VDP2__VRAM.html#structvdp2__vram__cycp">vdp2_vram_cycp</a> with the current VRAM cycle patterns.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__MEMORY__MAP__VDP2__IO__REGISTERS.html#unionvdp2__ioregs" title="VDP2 I/O register map.">vdp2_ioregs</a> </dd></dl>
 
 </div>
 </div>
@@ -807,13 +808,14 @@ Timing 4-bit value (T7). </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Not yet documented. </p>
+<p>Sets the VRAM cycle patterns for all 4 VDP2 VRAM banks. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">vram_cycp</td><td></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__VDP2__VRAM.html#gaf9dd0b8fa5d0884cc808a49b8ae673b6" title="Not yet documented.">vdp2_vram_cycp_bank_set</a> </dd></dl>
 
 </div>
 </div>
