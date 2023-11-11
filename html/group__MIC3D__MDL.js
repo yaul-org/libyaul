@@ -1,5 +1,6 @@
 var group__MIC3D__MDL =
 [
+    [ "mic3d.h", "mic3d_8h.html", null ],
     [ "anim_frame", "group__MIC3D__MDL.html#structanim__frame", [
       [ "id", "group__MIC3D__MDL.html#acfebbbc295afae598ab260923e959e5f", null ],
       [ "points", "group__MIC3D__MDL.html#a26d976b0915416aee52a0c50229a8a22", null ],
@@ -34,9 +35,5 @@ var group__MIC3D__MDL =
     [ "mic3d_pbk_t", "group__MIC3D__MDL.html#ga0f67a50a4f3a0a5f86a1469230a9a742", null ],
     [ "mic3d_abk_t", "group__MIC3D__MDL.html#gaa566b04aaa49e5524d18c526f0ec64b3", null ],
     [ "mic3d_mdl_t", "group__MIC3D__MDL.html#gaec8b837e9b196d276ab38bd36dabf8bc", null ],
-    [ "mic3d_mdl_patch", "group__MIC3D__MDL.html#ga5972135531a254c964b2857e2dceddb5", null ],
-    [ "mic3d_mbk_patch", "group__MIC3D__MDL.html#gad684fb7495bb8c0e7ee4d4ff6e824300", null ],
-    [ "mic3d_tbk_patch", "group__MIC3D__MDL.html#ga6f5c27a1517ddd025bc0bce36d5052d0", null ],
-    [ "mic3d_pbk_patch", "group__MIC3D__MDL.html#ga40e28e1ee65995457aeaa8ebdc57fc4e", null ],
-    [ "mic3d_abk_patch", "group__MIC3D__MDL.html#ga6d82b2d69967224a62b428734d94caa4", null ]
+    [ "mic3d_mdl_patch", "group__MIC3D__MDL.html#ga5972135531a254c964b2857e2dceddb5", null ]
 ];

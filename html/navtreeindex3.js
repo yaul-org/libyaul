@@ -1,5 +1,15 @@
 var NAVTREEINDEX3 =
 {
+"group__GAMEMATH__FIX16.html#gacc8a9a592260adb5c3f5cc67d8094416":[0,0,11,3,0,3],
+"group__GAMEMATH__FIX16.html#gacfe462af84a401c389261332aaeb5829":[0,0,11,3,0,10],
+"group__GAMEMATH__FIX16.html#gad509099239b5f4830ee999163b82dc7c":[0,0,11,3,0,0],
+"group__GAMEMATH__FIX16.html#gadd3f08bae1e798d16ac069f2a9f9dfef":[0,0,11,3,0,8],
+"group__GAMEMATH__FIX16.html#gade3633821fbfdfd91d0aa6ac4fb8f756":[0,0,11,3,0,2],
+"group__GAMEMATH__FIX16.html#gafdb2716baaec6252c4340231b14dd2b6":[0,0,11,3,0,14],
+"group__GAMEMATH__FIX16__MAT33.html":[0,0,11,3,6],
+"group__GAMEMATH__FIX16__MAT33.html#a17fee47326d493305f0e494bdd9d32ee":[0,0,11,3,6,0,0],
+"group__GAMEMATH__FIX16__MAT33.html#ga06c57e456d77a178d3fe8b13467c8f2a":[0,0,11,3,6,7],
+"group__GAMEMATH__FIX16__MAT33.html#ga13304f5aadc7e2d928cc67a2c8ca835f":[0,0,11,3,6,14],
 "group__GAMEMATH__FIX16__MAT33.html#ga137c0f7d2bf99cb16ecad1df82448672":[0,0,11,3,6,15],
 "group__GAMEMATH__FIX16__MAT33.html#ga1d8b212bbd6b54a6833172bae870bfff":[0,0,11,3,6,11],
 "group__GAMEMATH__FIX16__MAT33.html#ga2ad07ed0086f95e622c7d39819a37475":[0,0,11,3,6,1],
@@ -239,15 +249,5 @@ var NAVTREEINDEX3 =
 "group__KERNEL__CDFS.html#gad008457e8f088d83ecde3503ba23fe75":[0,0,6,17],
 "group__KERNEL__CDFS.html#gad71cde8517280fe7327f5f7a88c6b4f8":[0,0,6,4],
 "group__KERNEL__CDFS.html#gaef157579b9a666673f95c4c74a920f25":[0,0,6,19],
-"group__KERNEL__CDFS.html#gaf53fa915dcb4dbeb36af10dd3144c75d":[0,0,6,18],
-"group__KERNEL__CDFS.html#gga07ede518f1d6c6622a4b8343ee19aa8da1e81487a979d014f06496455e2483c43":[0,0,6,12,2],
-"group__KERNEL__CDFS.html#gga07ede518f1d6c6622a4b8343ee19aa8da77ff8dbd6a6f2297e2bd06e82d0bfedc":[0,0,6,12,1],
-"group__KERNEL__CDFS.html#gga07ede518f1d6c6622a4b8343ee19aa8dab38147be1349bd541088e3b86c08d0a7":[0,0,6,12,0],
-"group__KERNEL__CDFS.html#structcdfs__config":[0,0,6,1],
-"group__KERNEL__CDFS.html#structcdfs__filelist__entry__t":[0,0,6,2],
-"group__KERNEL__CDFS.html#structcdfs__filelist__t":[0,0,6,3],
-"group__KERNEL__CDFS.html#unionsector__buffer__t":[0,0,6,0],
-"group__KERNEL__DBGIO.html":[0,0,7],
-"group__KERNEL__DBGIO.html#a01e8de0f6d9019280d94c66ca73c891d":[0,0,7,2,0],
-"group__KERNEL__DBGIO.html#a3e4119e962f11c94cc50405686a8067e":[0,0,7,2,1]
+"group__KERNEL__CDFS.html#gaf53fa915dcb4dbeb36af10dd3144c75d":[0,0,6,18]
 };

@@ -1,5 +1,7 @@
 var group__TGA =
 [
+    [ "Using the library", "group__TGA__USING.html", null ],
+    [ "tga.h", "tga_8h.html", null ],
     [ "tga_t", "group__TGA.html#structtga__t", [
       [ "tga_file", "group__TGA.html#af9271acdec853919b27d5896523ade17", null ],
       [ "tga_type", "group__TGA.html#a13e079ad183b70869116fc886545afd2", null ],

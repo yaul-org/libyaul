@@ -1,5 +1,14 @@
 var NAVTREEINDEX1 =
 {
+"group__CPU__DIVU.html#ga0410bd2ebc2554b8dbe997fd2e1e5378":[0,0,13,1,5],
+"group__CPU__DIVU.html#ga0e668afa8e1d613cdd90dc8c0d29fcd5":[0,0,13,1,2],
+"group__CPU__DIVU.html#ga1117e673b03a934e28f4c289d02df4e6":[0,0,13,1,4],
+"group__CPU__DIVU.html#ga46b1ace51589ad0d96e98f2934e63391":[0,0,13,1,7],
+"group__CPU__DIVU.html#ga534450add69d199aa549f6028242121e":[0,0,13,1,9],
+"group__CPU__DIVU.html#ga68875fbe5569688570b1b780e084ab27":[0,0,13,1,0],
+"group__CPU__DIVU.html#ga6ccd3668b021698772ab240c23e0bee4":[0,0,13,1,6],
+"group__CPU__DIVU.html#gab7312b1cd3478f46865bd5ccb7bbeee8":[0,0,13,1,8],
+"group__CPU__DIVU.html#gac1de99e0806a1107a0e73c3a1473af2a":[0,0,13,1,1],
 "group__CPU__DIVU.html#gaf6b5cb8546b373711641f0dc1e137f5f":[0,0,13,1,3],
 "group__CPU__DMAC.html":[0,0,13,3],
 "group__CPU__DMAC.html#a0343b8547d469b9a2714615bc89870d5":[0,0,13,3,0,0],
@@ -240,14 +249,5 @@ var NAVTREEINDEX1 =
 "group__CPU__INTC__HELPERS.html#gad0bdae52b62d1df84549e895e16c2718":[0,0,13,7,0,18],
 "group__CPU__INTC__HELPERS.html#gadb8bb377ffdb53781aee3ba952508fce":[0,0,13,7,0,17],
 "group__CPU__INTC__HELPERS.html#gaef1c0285fb7ee1cde3a90fe2543f79c2":[0,0,13,7,0,2],
-"group__CPU__INTC__HELPERS.html#gaf9f4ba810bf072d54af608e1d8fd19c0":[0,0,13,7,0,12],
-"group__CPU__INTC__HELPERS.html#gafe009e0d441fd3e89cd6255d3a0ec9b6":[0,0,13,7,0,0],
-"group__CPU__INTC__HELPERS.html#gafedfca4dff9856a79c0e81ded25fd00d":[0,0,13,7,0,3],
-"group__CPU__REGISTERS.html":[0,0,13,8],
-"group__CPU__REGISTERS.html#a1f73f7cca28543bc15b4b09f2720864e":[0,0,13,8,0,4],
-"group__CPU__REGISTERS.html#a264e1a8cbf4224fda3e3b5f21c128fdf":[0,0,13,8,0,0],
-"group__CPU__REGISTERS.html#a3a4b905b7d95c681f8e54ac2cc796a78":[0,0,13,8,0,5],
-"group__CPU__REGISTERS.html#a5bf0f4c5ce29ede04315b3b21cd9963d":[0,0,13,8,0,7],
-"group__CPU__REGISTERS.html#a5fe152f8e5d0f4d6aa906ebc28e9de2f":[0,0,13,8,0,3],
-"group__CPU__REGISTERS.html#a6f956317d36cc87e28381154cb4039da":[0,0,13,8,0,1]
+"group__CPU__INTC__HELPERS.html#gaf9f4ba810bf072d54af608e1d8fd19c0":[0,0,13,7,0,12]
 };

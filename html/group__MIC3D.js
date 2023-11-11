@@ -1,5 +1,6 @@
 var group__MIC3D =
 [
+    [ "Using the library", "group__MIC3D__USING.html", null ],
     [ "Initialization & Configuration", "group__MIC3D__INIT__CONFIG.html", "group__MIC3D__INIT__CONFIG" ],
     [ "Camera", "group__MIC3D__CAMERA.html", "group__MIC3D__CAMERA" ],
     [ "Rendering", "group__MIC3D__RENDER.html", "group__MIC3D__RENDER" ],

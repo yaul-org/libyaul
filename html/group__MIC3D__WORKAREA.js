@@ -1,5 +1,6 @@
 var group__MIC3D__WORKAREA =
 [
+    [ "mic3d.h", "mic3d_8h.html", null ],
     [ "workarea_mic3d", "group__MIC3D__WORKAREA.html#structworkarea__mic3d", [
       [ "depth_values", "group__MIC3D__WORKAREA.html#aafcff82b00f5c0f4f13b2f44c6c70107", null ],
       [ "z_values", "group__MIC3D__WORKAREA.html#ae5622a66be20ec16d605f57d6d81752b", null ],

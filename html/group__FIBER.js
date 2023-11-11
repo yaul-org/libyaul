@@ -1,5 +1,7 @@
 var group__FIBER =
 [
+    [ "Using the library", "group__FIBER__USING.html", null ],
+    [ "fiber.h", "fiber_8h.html", null ],
     [ "fiber", "group__FIBER.html#structfiber", [
       [ "reg_file", "group__FIBER.html#add5944539f5aadc7d77cb2ab5309f90e", null ],
       [ "size", "group__FIBER.html#ad7de73249cfe5fcae488d24acb4e105d", null ],
