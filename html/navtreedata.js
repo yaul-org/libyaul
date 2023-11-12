@@ -31,7 +31,6 @@ var NAVTREE =
     [ "Tutorials", "LIBYAUL_TUTORIALS.html", "LIBYAUL_TUTORIALS" ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "Todo List", "todo.html", null ],
-    [ "GitHub Issues 🡵", "^http://www.github.com/yaul-org/libyaul/issues", null ],
     [ "Globals", "globals.html", [
       [ "All", "globals.html", null ],
       [ "Functions", "globals_func.html", null ],
@@ -39,7 +38,8 @@ var NAVTREE =
       [ "Enumerations", "globals_enum.html", null ],
       [ "Enumerator", "globals_eval.html", null ],
       [ "Macros", "globals_defs.html", null ]
-    ] ]
+    ] ],
+    [ "GitHub Issues 🡵", "^http://www.github.com/yaul-org/libyaul/issues", null ]
   ] ]
 ];
 
