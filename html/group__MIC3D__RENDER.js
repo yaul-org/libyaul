@@ -45,6 +45,7 @@ var group__MIC3D__RENDER =
       [ "read_dir", "group__MIC3D__RENDER.html#a3f661ab9cc2e65f33bcc36d4c555b5bb", null ],
       [ "command", "group__MIC3D__RENDER.html#a1dccadfed7bcbb036c56a4afb97e906f", null ]
     ] ],
+    [ "render_flags_t", "group__MIC3D__RENDER.html#ga7bec2ca80d4d59f6e5544d0e01475650", null ],
     [ "texture_slot_t", "group__MIC3D__RENDER.html#ga354d16fbb6a8fb7844de66fb5b9cdda5", null ],
     [ "gst_slot_t", "group__MIC3D__RENDER.html#ga9162cd08da742c78619e64a34a4d133d", null ],
     [ "sort_list_t", "group__MIC3D__RENDER.html#ga91765dfe0e796bfcf47fe81016dce9b1", null ],

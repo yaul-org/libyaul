@@ -1,5 +1,7 @@
 var NAVTREEINDEX10 =
 {
+"group__VDP1__CMDT.html#abbc06d3cf9b8f6af1e90583181641c6d":[0,0,15,0,8,0],
+"group__VDP1__CMDT.html#ac5a302f905ddec9390b4776a70e62f5f":[0,0,15,0,1,8],
 "group__VDP1__CMDT.html#ad89795d7b2d3872197d8a08a6b111b0c":[0,0,15,0,5,3],
 "group__VDP1__CMDT.html#ada7163acedf06e3bc4a83c77a28ea0dd":[0,0,15,0,1,5],
 "group__VDP1__CMDT.html#adbd4180f25a904c3bd33204122591490":[0,0,15,0,13,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX10 =
 "group__VDP1__VRAM.html#ga0bc47915d4a053c00d036735ebf310fa":[0,0,15,4,8],
 "group__VDP1__VRAM.html#ga1a701a5febcd787a19cbeadc14c136f4":[0,0,15,4,18],
 "group__VDP1__VRAM.html#ga1bc82de7db344282bfd03bd6316ea665":[0,0,15,4,10],
-"group__VDP1__VRAM.html#ga2434bf1ea3c5768a912d2aada985ed44":[0,0,15,4,11],
-"group__VDP1__VRAM.html#ga2bb68bbca9548a325503239b67e51eb9":[0,0,15,4,6],
-"group__VDP1__VRAM.html#ga30a5e06977d98153740b1eaa354e99cf":[0,0,15,4,5]
+"group__VDP1__VRAM.html#ga2434bf1ea3c5768a912d2aada985ed44":[0,0,15,4,11]
 };
