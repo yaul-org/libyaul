@@ -299,6 +299,30 @@ fix16_ceil(fix16_t value)
 {
     return ((value & 0xFFFF0000UL) + ((value & 0x0000FFFFUL) ? FIX16(1.0) : 0));
 }
+
+/// @brief Not yet documented.
+///
+/// @param x Operand.
+/// @param y Operand.
+///
+/// @returns The value.
+static inline fix16_t __always_inline
+fix16_min(const fix16_t x, const fix16_t y)
+{
+        return ((x < y) ? x : y);
+}
+
+/// @brief Not yet documented.
+///
+/// @param x Operand.
+/// @param y Operand.
+///
+/// @returns The value.
+static inline fix16_t __always_inline
+fix16_max(const fix16_t x, const fix16_t y)
+{
+        return ((x > y) ? x : y);
+}
 #endif /* !__cplusplus */
 
 __BEGIN_DECLS
