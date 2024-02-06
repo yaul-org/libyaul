@@ -107,6 +107,9 @@ ifeq ($(strip $(YAUL_PROG_SH_PREFIX)),)
 YAUL_PROG_SH_PREFIX:= $(YAUL_ARCH_SH_PREFIX)
 endif
 
+SH_BUILD_PATH= $(abspath $(SH_BUILD_DIR))
+SH_OUTPUT_PATH= $(abspath $(SH_OUTPUT_DIR))
+
 SH_AS:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-as$(EXE_EXT)
 SH_AR:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc-ar$(EXE_EXT)
 SH_CC:=      $(YAUL_INSTALL_ROOT)/bin/$(YAUL_PROG_SH_PREFIX)-gcc$(EXE_EXT)
@@ -165,9 +168,6 @@ SH_CXXFLAGS:= \
 	-fno-use-cxa-atexit \
 	$(SH_CFLAGS_shared) \
 	$(YAUL_CXXFLAGS)
-
-SH_BUILD_PATH= $(abspath $(SH_BUILD_DIR))
-SH_OUTPUT_PATH= $(abspath $(SH_OUTPUT_DIR))
 
 .PHONY: all generate-cdb clean .build
 
