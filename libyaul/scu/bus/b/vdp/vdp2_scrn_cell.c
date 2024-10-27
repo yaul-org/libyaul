@@ -305,7 +305,7 @@ vdp2_scrn_pnd_set(const vdp2_scrn_cell_format_t *cell_format)
 
         switch (cell_format->ccc) {
         case VDP2_SCRN_CCC_PALETTE_16:
-            spn_bits = ((palette_number >> 4) & 0x07) << 5;
+            spn_bits = (palette_number & 0x07) << 5;
             break;
         case VDP2_SCRN_CCC_PALETTE_256:
         case VDP2_SCRN_CCC_PALETTE_2048:
