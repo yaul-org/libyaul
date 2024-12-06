@@ -30,11 +30,11 @@ vdp2_scrn_cell_ccc_set(const vdp2_scrn_cell_format_t *cell_format)
 {
     switch (cell_format->scroll_screen) {
     case VDP2_SCRN_NBG0:
-        _state_vdp2()->shadow_regs.chctla &= 0xFF8F;
+        _state_vdp2()->shadow_regs.chctla &= 0xFF8D;
         _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 4;
         break;
     case VDP2_SCRN_NBG1:
-        _state_vdp2()->shadow_regs.chctla &= 0xCFFF;
+        _state_vdp2()->shadow_regs.chctla &= 0xCDFF;
         _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 12;
         break;
     case VDP2_SCRN_NBG2:
