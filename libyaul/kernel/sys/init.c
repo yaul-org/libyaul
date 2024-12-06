@@ -25,6 +25,8 @@ void user_init(void) __weak;
 
 static void _bss_clear(void);
 
+void __weak _early_access() {;}
+
 void __noreturn
 __sys_init(void)
 {
@@ -34,6 +36,8 @@ __sys_init(void)
     void __global_dtors(void) __weak;
 
     _bss_clear();
+
+    _early_access();
 
     __atexit_init();
 
