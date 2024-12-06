@@ -44,6 +44,13 @@ typedef enum vdp1_env_bpp {
     VDP1_ENV_BPP_8  = 1
 } vdp1_env_bpp_t;
 
+typedef enum vdp1_env_hdtv {
+    /// Not yet documented.
+    VDP1_ENV_HDTV_OFF = 0,
+    /// Not yet documented.
+    VDP1_ENV_HDTV_ON  = 1
+} vdp1_env_hdtv_t;
+
 typedef enum vdp1_env_color_mode {
     /// Not yet documented.
     VDP1_ENV_COLOR_MODE_PALETTE     = 0,
@@ -63,6 +70,7 @@ typedef struct vdp1_env {
         unsigned int :1;
         vdp1_env_bpp_t bpp:1;
         vdp1_env_rotation_t rotation:1;
+        vdp1_env_hdtv_t hdtv:1;
         vdp1_env_color_mode_t color_mode:1;
         vdp2_sprite_type_t sprite_type:4;
     } __packed;
