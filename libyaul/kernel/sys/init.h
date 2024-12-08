@@ -19,6 +19,13 @@ __BEGIN_DECLS
 extern "C" void user_init(void);
 #endif /* __cplusplus */
 
+/* This prototype declaration is needed (only) for C++ to void name mangling. We
+ * also don't want to explicitly declare the prototype for C either (hence the
+ * redundant extern "C") */
+#ifdef __cplusplus
+extern "C" void user_early_init(void);
+#endif /* __cplusplus */
+
 __END_DECLS
 
 #endif /* !_YAUL_KERNEL_SYS_INIT_H_ */

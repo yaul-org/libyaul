@@ -75,7 +75,7 @@ vdp1_env_set(const vdp1_env_t *env)
     _env_current_update(env);
 
     /* Always clear TVM and VBE bits */
-    _state_vdp1()->shadow_ioregs.tvmr = (env->hdtv) ? 0x4 : (env->rotation << 1) | env->bpp;
+    _state_vdp1()->shadow_ioregs.tvmr = (env->hdtv) ? (0x4) : ((env->rotation << 1) | env->bpp);
 
     _state_vdp1()->shadow_ioregs.ewdr = env->erase_color.raw;
 
