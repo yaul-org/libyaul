@@ -281,7 +281,7 @@ render_points_xform(const fix16_mat43_t *world_matrix, const fix16_vec3_t *point
         }
     } else {
         for (uint32_t i = 0; i < count; i++) {
-            math3d_point_orthographic_xform(&view_matrix, render->ortho_size, points, &xforms[i]);
+            math3d_point_orthographic_xform(&view_matrix, render->ortho_size, &points[i], &xforms[i]);
         }
     }
 }
