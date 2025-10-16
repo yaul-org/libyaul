@@ -64,6 +64,7 @@ smpc_peripheral_port_t __smpc_peripheral_ports[2];
 
 static volatile bool _collection_complete = false;
 static volatile uint32_t _oreg_offset = 0;
+static volatile uint8_t _continue_toggle = 0;
 
 /* OREG buffer that can hold a maximum of 6 peripherals with a data size
  * of 255-bytes (+1 for alignment) as well as an entire buffer for SMPC
@@ -113,7 +114,8 @@ smpc_peripheral_intback_issue(void)
         /* Set to 255-byte mode for both ports; time optimized
          *
          * Return peripheral data and time, cartridge code, area code, etc */
-        smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN | OPE);
+        smpc_smc_intback_call(0x01, P1MD0 | P2MD0 | PEN);
+        _continue_toggle = CONT;
 }
 
 void
@@ -148,24 +150,25 @@ smpc_peripheral_process(void)
                 smpc_peripheral_port_t * const per_port =
                     &__smpc_peripheral_ports[port_idx];
 
-                int32_t connected;
+                int32_t capacity;
 
                 /* Update peripheral connected directly to the port */
-                if ((connected = _peripheral_update(/* parent = */ NULL,
+                if ((capacity = _peripheral_update(/* parent = */ NULL,
                             per_port->peripheral, port_idx + 1)) < 0) {
                         /* Couldn't parse data; invalid peripheral */
                         per_port->peripheral->connected = 0;
+                        per_port->peripheral->capacity = 0;
                         _port_peripherals_free(per_port);
                         continue;
                 }
 
                 _port_peripherals_free(per_port);
 
-                if (connected > 1) {
+                if (capacity > 1) {
                         int32_t sub_port;
 
                         per_port->peripheral->connected = 0;
-                        for (sub_port = 1; connected > 0; connected--, sub_port++) {
+                        for (sub_port = 1; capacity > 0; capacity--, sub_port++) {
                                 smpc_peripheral_t *peripheral;
 
                                 peripheral = _peripheral_alloc();
@@ -232,8 +235,8 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
 {
         uint8_t multitap_id;
 
-        uint32_t connected_count;
-        connected_count = 0;
+        uint32_t capacity;
+        capacity = 0;
 
         if (per_port_parent == NULL) {
                 multitap_id = PC_GET_MULTITAP_ID(_oreg_offset);
@@ -246,39 +249,38 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
                         /* ID: Clocked serial */
                 case 0x03:
                 case 0x0E:
-                        connected_count = PC_GET_NUM_CONNECTIONS(_oreg_offset);
-                        /* At least two peripheral ports are required */
-                        connected_count = (connected_count < MAX_PORTS) ? 0 : connected_count;
+                        capacity = PC_GET_NUM_CONNECTIONS(_oreg_offset);
+                        capacity = (capacity > MAX_PERIPHERALS) ? 0 : capacity;
                         break;
                 case 0x0F:
-                        connected_count = PC_GET_NUM_CONNECTIONS(_oreg_offset);
+                        capacity = PC_GET_NUM_CONNECTIONS(_oreg_offset);
                         /* Only a single peripheral can be directly connected */
-                        connected_count = (connected_count > 1) ? 0 : connected_count;
+                        capacity = (capacity > 1) ? 0 : capacity;
                         break;
                 default:
-                        connected_count = 0;
+                        capacity = 0;
                 }
 
                 _oreg_offset++;
-        }
 
-        if (connected_count == 0) {
-                /* Nothing directly connected to the port */
-                return -1;
+                if (capacity == 0) {
+                        /* Nothing directly connected to the port */
+                        return -1;
+                }
         }
 
         uint8_t type;
         uint8_t size;
         uint8_t id;
 
-        if (connected_count > 1) {
-                peripheral->connected = connected_count;
+        if (capacity > 1) {
+                peripheral->capacity = capacity;
                 peripheral->port = port;
                 peripheral->type = multitap_id;
                 peripheral->size = 0x00;
                 peripheral->parent = per_port_parent;
 
-                return connected_count;
+                return capacity;
         }
 
         /* Check if the type is valid */
@@ -332,38 +334,24 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         _oreg_offset++;
 
         switch (size) {
-        case 0x02:
-                peripheral->previous_data[0] = peripheral->data[0];
-                peripheral->previous_data[1] = peripheral->data[1];
-
-                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
-                break;
-        case 0x04:
-                peripheral->previous_data[0] = peripheral->data[0];
-                peripheral->previous_data[1] = peripheral->data[1];
-                peripheral->previous_data[2] = peripheral->data[2];
-                peripheral->previous_data[3] = peripheral->data[3];
-
-                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
-                peripheral->data[2] = PC_GET_DATA_BYTE(_oreg_offset, 2) ^ 0xFF;
-                peripheral->data[3] = PC_GET_DATA_BYTE(_oreg_offset, 3) ^ 0xFF;
-                break;
         case 0x06:
-                peripheral->previous_data[0] = peripheral->data[0];
-                peripheral->previous_data[1] = peripheral->data[1];
-                peripheral->previous_data[2] = peripheral->data[2];
-                peripheral->previous_data[3] = peripheral->data[3];
-                peripheral->previous_data[4] = peripheral->data[4];
                 peripheral->previous_data[5] = peripheral->data[5];
-
-                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
-                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
-                peripheral->data[2] = PC_GET_DATA_BYTE(_oreg_offset, 2) ^ 0xFF;
-                peripheral->data[3] = PC_GET_DATA_BYTE(_oreg_offset, 3) ^ 0xFF;
-                peripheral->data[4] = PC_GET_DATA_BYTE(_oreg_offset, 4) ^ 0xFF;
                 peripheral->data[5] = PC_GET_DATA_BYTE(_oreg_offset, 5) ^ 0xFF;
+        case 0x05:
+                peripheral->previous_data[4] = peripheral->data[4];
+                peripheral->data[4] = PC_GET_DATA_BYTE(_oreg_offset, 4) ^ 0xFF;
+        case 0x04:
+                peripheral->previous_data[3] = peripheral->data[3];
+                peripheral->data[3] = PC_GET_DATA_BYTE(_oreg_offset, 3) ^ 0xFF;
+        case 0x03:
+                peripheral->previous_data[2] = peripheral->data[2];
+                peripheral->data[2] = PC_GET_DATA_BYTE(_oreg_offset, 2) ^ 0xFF;
+        case 0x02:
+                peripheral->previous_data[1] = peripheral->data[1];
+                peripheral->data[1] = PC_GET_DATA_BYTE(_oreg_offset, 1) ^ 0xFF;
+        case 0x01:
+                peripheral->previous_data[0] = peripheral->data[0];
+                peripheral->data[0] = PC_GET_DATA_BYTE(_oreg_offset, 0) ^ 0xFF;
                 break;
         default:
                 /* XXX
@@ -372,6 +360,7 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         }
 
         peripheral->connected = 1;
+        peripheral->capacity = 0;
         peripheral->port = port;
         peripheral->type = id;
         peripheral->size = size;
@@ -380,7 +369,7 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         /* Move onto the next peripheral */
         _oreg_offset += size;
 
-        return connected_count;
+        return capacity;
 }
 
 static void
@@ -419,5 +408,6 @@ _system_manager_handler(void)
         }
 
         /* Issue a "CONTINUE" for the "INTBACK" command */
-        MEMORY_WRITE(8, IREG(0), CONT);
+        MEMORY_WRITE(8, IREG(0), _continue_toggle);
+        _continue_toggle = (_continue_toggle & CONT) ? 0 : CONT;
 }

@@ -24,12 +24,10 @@ smpc_peripheral_analog_get(const smpc_peripheral_t *peripheral,
         analog->type = peripheral->type;
         analog->size = peripheral->size;
 
-        /* XXX: Bug? */
-        (void)memset(&analog->previous.pressed.raw[0], &peripheral->previous_data[0],
-            (sizeof(analog->previous.pressed.raw) / sizeof(analog->previous.pressed.raw[0])));
-        /* XXX: Bug? */
-        (void)memset(&analog->pressed.raw[0], &peripheral->data[0],
-            (sizeof(analog->pressed.raw) / sizeof(analog->pressed.raw[0])));
+        for (int i=0;i<6;i++) {
+                analog->previous.pressed.raw[i] = peripheral->previous_data[i];
+                analog->pressed.raw[i] = peripheral->data[i];
+        }
 
         const uint16_t raw = *(uint16_t *)&analog->pressed.raw[0];
         const uint16_t previous_raw = *(uint16_t *)&analog->previous.pressed.raw[0];
@@ -62,8 +60,8 @@ smpc_peripheral_digital_get(const smpc_peripheral_t *peripheral,
         digital->type = peripheral->type;
         digital->size = peripheral->size;
 
-        digital->previous.pressed.raw = *(uint16_t *)&peripheral->previous_data[0];
-        digital->pressed.raw = *(uint16_t *)&peripheral->data[0];
+        digital->previous.pressed.raw = (peripheral->previous_data[0]<<8) | peripheral->previous_data[1];
+        digital->pressed.raw = (peripheral->data[0]<<8) | peripheral->data[1];
 
         const uint32_t diff = digital->pressed.raw ^ digital->previous.pressed.raw;
 

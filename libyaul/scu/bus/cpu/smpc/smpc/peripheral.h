@@ -158,36 +158,39 @@ typedef struct smpc_peripheral_keyboard {
         uint8_t type;
         uint8_t size;
 
-        struct {
-                unsigned int right:1; /* Right cursor */
-                unsigned int left:1;  /* Left cursor */
-                unsigned int down:1;  /* Down cursor */
-                unsigned int up:1;    /* Up cursor */
-                unsigned int start:1; /* Escape */
-                unsigned int a_trg:1; /* Z */
-                unsigned int c_trg:1; /* C */
-                unsigned int b_trg:1; /* X */
+        union {
+                uint8_t raw[4];  
+                struct {
+                        unsigned int right:1; /* Right cursor */
+                        unsigned int left:1;  /* Left cursor */
+                        unsigned int down:1;  /* Down cursor */
+                        unsigned int up:1;    /* Up cursor */
+                        unsigned int start:1; /* Escape */
+                        unsigned int a_trg:1; /* Z */
+                        unsigned int c_trg:1; /* C */
+                        unsigned int b_trg:1; /* X */
 
-                unsigned int r_trg:1; /* E */
-                unsigned int x_trg:1; /* A */
-                unsigned int y_trg:1; /* S */
-                unsigned int z_trg:1; /* D */
-                unsigned int l_trg:1; /* Q */
-                unsigned int kbt_2:1; /* Always 0 */
-                unsigned int kbt_1:1; /* Always 0 */
-                unsigned int kbt_0:1; /* Always 0 */
+                        unsigned int r_trg:1; /* E */
+                        unsigned int x_trg:1; /* A */
+                        unsigned int y_trg:1; /* S */
+                        unsigned int z_trg:1; /* D */
+                        unsigned int l_trg:1; /* Q */
+                        unsigned int kbt_2:1; /* Always 0 */
+                        unsigned int kbt_1:1; /* Always 0 */
+                        unsigned int kbt_0:1; /* Always 0 */
 
-                unsigned int rsrv_0:1; /* Always 0 */
-                unsigned int caps_lock:1;
-                unsigned int num_lock:1;
-                unsigned int scr_lock:1;
-                unsigned int mak_flag:1;
-                unsigned int rsrv_1:1; /* Always 1 */
-                unsigned int rsrv_2:1; /* Always 1 */
-                unsigned int brk_flag:1;
+                        unsigned int rsrv_0:1; /* Always 0 */
+                        unsigned int caps_lock:1;
+                        unsigned int num_lock:1;
+                        unsigned int scr_lock:1;
+                        unsigned int mak_flag:1;
+                        unsigned int rsrv_1:1; /* Always 1 */
+                        unsigned int rsrv_2:1; /* Always 1 */
+                        unsigned int brk_flag:1;
 
-                uint8_t keycode;
-        } __packed button;
+                        uint8_t keycode;
+                } __packed button;
+        }
 } __may_alias smpc_peripheral_keyboard_t;
 
 typedef struct smpc_peripheral_mouse {
@@ -197,19 +200,22 @@ typedef struct smpc_peripheral_mouse {
         uint8_t type;
         uint8_t size;
 
-        struct {
-                unsigned int y_ovr:1;
-                unsigned int x_ovr:1;
-                unsigned int y_sgn:1;
-                unsigned int x_sgn:1;
-                unsigned int start:1;
-                unsigned int m_btn:1;
-                unsigned int r_btn:1;
-                unsigned int l_btn:1;
+        union {
+                uint8_t raw[3];  
+                struct {
+                        unsigned int y_ovr:1;
+                        unsigned int x_ovr:1;
+                        unsigned int y_sgn:1;
+                        unsigned int x_sgn:1;
+                        unsigned int start:1;
+                        unsigned int m_btn:1;
+                        unsigned int r_btn:1;
+                        unsigned int l_btn:1;
 
-                uint8_t x;
-                uint8_t y;
-        } __packed button;
+                        uint8_t x;
+                        uint8_t y;
+                } __packed button;
+        }
 } __may_alias smpc_peripheral_mouse_t;
 
 typedef struct smpc_peripheral_analog {
@@ -244,9 +250,9 @@ typedef struct smpc_peripheral_analog {
                 } __packed axis;                                               \
                 struct {                                                       \
                         /* Byte #5 */                                          \
-                        uint8_t l;                                             \
-                        /* Byte #6 */                                          \
                         uint8_t r;                                             \
+                        /* Byte #6 */                                          \
+                        uint8_t l;                                             \
                 } __packed trigger;                                            \
         } __packed struct_name
 
@@ -325,24 +331,27 @@ typedef struct smpc_peripheral_racing {
         uint8_t type;
         uint8_t size;
 
-        struct {
-                unsigned int right:1;
-                unsigned int left:1;
-                unsigned int down:1;
-                unsigned int up:1;
-                unsigned int start:1;
-                unsigned int a_trg:1;
-                unsigned int c_trg:1;
-                unsigned int b_trg:1;
+        union {
+                uint8_t raw[3];  
+                struct {
+                        unsigned int right:1;
+                        unsigned int left:1;
+                        unsigned int down:1;
+                        unsigned int up:1;
+                        unsigned int start:1;
+                        unsigned int a_trg:1;
+                        unsigned int c_trg:1;
+                        unsigned int b_trg:1;
 
-                unsigned int r_trg:1;
-                unsigned int x_trg:1;
-                unsigned int y_trg:1;
-                unsigned int z_trg:1;
-                unsigned int l_trg:1;
+                        unsigned int r_trg:1;
+                        unsigned int x_trg:1;
+                        unsigned int y_trg:1;
+                        unsigned int z_trg:1;
+                        unsigned int l_trg:1;
 
-                uint8_t wheel;
-        } __packed button;
+                        uint8_t wheel;
+                } __packed button;
+        }
 } __may_alias smpc_peripheral_racing_t;
 
 typedef struct smpc_peripheral_digital {
@@ -409,6 +418,7 @@ typedef struct smpc_peripheral_port smpc_peripheral_port_t;
 
 struct smpc_peripheral {
         uint8_t connected; /* Number of peripherals connected */
+        uint8_t capacity; /* Number of peripherals available for connection */
         uint8_t port; /* 1 or 2 */
         uint8_t type;
         uint8_t size;
