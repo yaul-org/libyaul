@@ -410,7 +410,9 @@ INSTALL_HEADER_FILES+= \
 	./scu/bus/a/cs0/usb-cart/usb-cart/:map.h:yaul/usb-cart/
 
 INSTALL_HEADER_FILES+= \
-	./scu/bus/b/scsp/:scsp.h:yaul/
+	./scu/bus/b/scsp/:scsp.h:yaul/ \
+	./scu/bus/b/scsp/scsp/:map.h:yaul/scsp/ \
+	./scu/bus/b/scsp/scsp/:slot.h:yaul/scsp/
 
 INSTALL_HEADER_FILES+= \
 	./scu/bus/b/vdp/:vdp.h:yaul/ \
