@@ -304,10 +304,6 @@
  * function. This name is the unadorned name of the function. As an extension,
  * at file (or, in C++, namespace scope), __func__ evaluates to the empty
  * string. */
-/// @private
-#ifndef __func__
-#define __func__ ((const char *)0)
-#endif
 
 /// @private
 #ifndef __function_name
