@@ -45,6 +45,14 @@
      ((int8_t *)(ptr) < ((int8_t *)(name)->pool +                              \
      ((name)->count * (name)->size))))
 
+/*
+ * The ref of a run's first block holds the run's length, and the refs of
+ * the blocks after it hold MEMB_REF_TAIL: with the length in every block,
+ * two adjacent runs of the same length could not be told apart, and
+ * memb_free could not tell a run's first block from the rest of it.
+ */
+#define MEMB_REF_TAIL UINT16_MAX
+
 static inline uint32_t _block_index_wrap(const memb_t *memb,
   uint32_t index) __always_inline;
 
@@ -159,6 +167,7 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
     assert(memb != NULL);
 
     assert (count != 0);
+    assert(count < MEMB_REF_TAIL);
 
     if (count == 1) {
         return memb_alloc(memb);
@@ -195,8 +204,9 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
 
     const uint32_t start_index = next_index - (count - 1);
 
-    for (uint32_t i = start_index; i <= next_index; i++) {
-        memb->refs[i].count = count;
+    memb->refs[start_index].count = count;
+    for (uint32_t i = start_index + 1; i <= next_index; i++) {
+        memb->refs[i].count = MEMB_REF_TAIL;
     }
 
     memb->next_index = _block_index_wrap(memb, next_index + 1);
@@ -211,8 +221,9 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
 /*
  * Free the unit block as dirty.
  *
- * If successful, 0 is returned. Otherwise -1 is returned if the address is not
- * within the bounds of the block pool MEMB.
+ * If successful, 0 is returned. Otherwise -1 is returned if the address is
+ * not within the bounds of the block pool MEMB, or if it is inside a run of
+ * blocks but not the run's first block.
  */
 int
 memb_free(memb_t *memb, void *addr)
@@ -229,6 +240,12 @@ memb_free(memb_t *memb, void *addr)
 
     const uint32_t block_index = (addr_ptr - pool_ptr) / memb->size;
     memb_ref_t * const ref = &memb->refs[block_index];
+
+    /* Inside a run but not its first block: a run is freed by the address
+     * memb_contiguous_alloc returned */
+    if (ref[0].count == MEMB_REF_TAIL) {
+        return -1;
+    }
 
     const uint32_t contiguous_count = ref[0].count;
 
