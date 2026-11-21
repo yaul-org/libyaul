@@ -173,33 +173,31 @@ memb_contiguous_alloc(memb_t *memb, uint32_t count)
         return memb_alloc(memb);
     }
 
-    /* Are we full? */
-    if (memb->alloc_count == memb->count) {
+    /* Are there enough free blocks? */
+    if (count > (memb->count - memb->alloc_count)) {
         return NULL;
     }
 
-    uint32_t prev_index;
-    prev_index = 0;
+    /* A run of blocks can't wrap around the end of the pool, so search for
+     * the first run from the start */
+    uint32_t contiguous_count;
+    contiguous_count = 0;
     uint32_t next_index;
-    next_index = memb->next_index;
 
-    for (uint32_t contiguous_count = 0; ; ) {
+    for (next_index = 0; next_index < memb->count; next_index++) {
         if (memb->refs[next_index].count == 0) {
             contiguous_count++;
+        } else {
+            contiguous_count = 0;
         }
 
         if (contiguous_count == count) {
             break;
         }
+    }
 
-        prev_index = next_index;
-        next_index = _block_index_wrap(memb, next_index + 1);
-
-        /* Case for when the next index is wrapped to the beginning
-         * array */
-        if ((contiguous_count > 0) && (next_index < prev_index)) {
-            return NULL;
-        }
+    if (contiguous_count < count) {
+        return NULL;
     }
 
     const uint32_t start_index = next_index - (count - 1);
