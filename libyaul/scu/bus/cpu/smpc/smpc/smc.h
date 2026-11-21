@@ -198,7 +198,15 @@ smpc_smc_setsmem_call(void)
 
 /// @brief Call SMPC command to turn sound CPU off.
 ///
-/// @warning Do not use this function.
+/// Halts the sound CPU so its program stops. Call before the SH-2 programs the
+/// SCSP registers or sound RAM, since a running sound CPU program may rewrite
+/// them. @ref scsp_init does this and waits until the SCSP can be programmed.
+///
+/// @warning Do not call this while an INTBACK can be issued, for example from a
+/// VBlank-OUT handler calling smpc_peripheral_intback_issue(): the SMPC command
+/// register is not locked, so the commands can interleave and the handler may
+/// wait forever. Call before such a handler is installed. Not yet tested on
+/// hardware.
 static inline uint8_t __always_inline
 smpc_smc_sndoff_call(void)
 {
