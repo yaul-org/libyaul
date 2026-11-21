@@ -12,7 +12,7 @@ arena_init(arena_t *arena, void *base, size_t byte_size)
     assert(base != NULL);
     assert(byte_size > 0);
 
-    arena->buffer_size = uint32_pow2_round(byte_size, 4);
+    arena->buffer_size = byte_size;
     arena->buffer = base;
     arena->buffer_end = (void *)((uintptr_t)arena->buffer + arena->buffer_size);
 
@@ -24,18 +24,18 @@ arena_alloc(arena_t *arena, size_t byte_size)
 {
     assert(arena != NULL);
 
-    const uintptr_t buffer_pos = (uintptr_t)arena->buffer_offset + byte_size;
-    const uintptr_t aligned_buffer_pos = uint32_pow2_round(buffer_pos, 4);
+    const uintptr_t buffer_end = (uintptr_t)arena->buffer_end;
+    const uintptr_t aligned_offset =
+      uint32_pow2_round((uintptr_t)arena->buffer_offset, 4);
 
-    if (aligned_buffer_pos >= (uintptr_t)arena->buffer_end) {
+    if ((aligned_offset > buffer_end) ||
+        (byte_size > (buffer_end - aligned_offset))) {
         return NULL;
     }
 
-    const uintptr_t buffer_offset = (uintptr_t)arena->buffer_offset;
+    arena->buffer_offset = (void *)(aligned_offset + byte_size);
 
-    arena->buffer_offset = (void *)(buffer_offset + byte_size + (aligned_buffer_pos - buffer_pos));
-
-    return (void *)aligned_buffer_pos;
+    return (void *)aligned_offset;
 }
 
 void
