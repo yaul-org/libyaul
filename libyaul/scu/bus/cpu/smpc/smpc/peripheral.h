@@ -190,7 +190,7 @@ typedef struct smpc_peripheral_keyboard {
 
                         uint8_t keycode;
                 } __packed button;
-        }
+        };
 } __may_alias smpc_peripheral_keyboard_t;
 
 typedef struct smpc_peripheral_mouse {
@@ -215,7 +215,7 @@ typedef struct smpc_peripheral_mouse {
                         uint8_t x;
                         uint8_t y;
                 } __packed button;
-        }
+        };
 } __may_alias smpc_peripheral_mouse_t;
 
 typedef struct smpc_peripheral_analog {
@@ -351,7 +351,7 @@ typedef struct smpc_peripheral_racing {
 
                         uint8_t wheel;
                 } __packed button;
-        }
+        };
 } __may_alias smpc_peripheral_racing_t;
 
 typedef struct smpc_peripheral_digital {
