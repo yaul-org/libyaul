@@ -55,8 +55,10 @@ vdp2_scrn_bitmap_ccc_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
     case VDP2_SCRN_RBG0:
     case VDP2_SCRN_RBG0_PA:
     case VDP2_SCRN_RBG0_PB:
+        /* RBG0's colour count has three bits (12, 13, 14), as NBG0's: with
+         * two, 16.7M colours (4) became 16 */
         _state_vdp2()->shadow_regs.chctlb &= 0x8CFF; /* Bits 8, 9, 12, 13, 14 */
-        _state_vdp2()->shadow_regs.chctlb |= ((bitmap_format->ccc & 0x03) << 12) | 0x0200;
+        _state_vdp2()->shadow_regs.chctlb |= ((bitmap_format->ccc & 0x07) << 12) | 0x0200;
 
         bmp_reg = &_state_vdp2()->shadow_regs.bmpnb;
         bmpna_bits = palette_number;
@@ -124,10 +126,14 @@ vdp2_scrn_bitmap_size_set(const vdp2_scrn_bitmap_format_t *bitmap_format)
         _state_vdp2()->shadow_regs.chctla &= 0xF3FF;
         _state_vdp2()->shadow_regs.chctla |= bitmap_format->bitmap_size << 8;
         break;
+    case VDP2_SCRN_RBG0:
     case VDP2_SCRN_RBG0_PA:
     case VDP2_SCRN_RBG0_PB:
+        /* RBG0's bitmap size is one bit, bit 10 (512x256 or 512x512), which
+         * bitmap_size holds in bit 2. Shifted by 10 it landed in bit 12, the
+         * colour count's lowest bit */
         _state_vdp2()->shadow_regs.chctlb &= 0xFBFF;
-        _state_vdp2()->shadow_regs.chctlb |= (bitmap_format->bitmap_size & 0x0004) << 10;
+        _state_vdp2()->shadow_regs.chctlb |= (bitmap_format->bitmap_size & 0x0004) << 8;
         break;
     default:
         break;
