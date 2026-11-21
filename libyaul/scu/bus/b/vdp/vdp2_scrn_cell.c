@@ -123,14 +123,17 @@ vdp2_scrn_plane_size_set(const vdp2_scrn_cell_format_t *cell_format)
         _state_vdp2()->shadow_regs.plsz &= 0xFF3F;
         _state_vdp2()->shadow_regs.plsz |= plane_size << 4;
         break;
+    /* plane_size is already shifted left by 2: parameter A's size goes to
+     * bits 8-9 and B's to bits 12-13. Bits 10-11 and 14-15 are the
+     * screen-over process, which vdp2_scrn_rotation.c writes */
     case VDP2_SCRN_RBG0:
     case VDP2_SCRN_RBG0_PA:
         _state_vdp2()->shadow_regs.plsz &= 0xFCFF;
-        _state_vdp2()->shadow_regs.plsz |= plane_size << 8;
+        _state_vdp2()->shadow_regs.plsz |= plane_size << 6;
         break;
     case VDP2_SCRN_RBG0_PB:
         _state_vdp2()->shadow_regs.plsz &= 0xCFFF;
-        _state_vdp2()->shadow_regs.plsz |= plane_size << 12;
+        _state_vdp2()->shadow_regs.plsz |= plane_size << 10;
         break;
     default:
         break;
