@@ -295,7 +295,11 @@ _peripheral_update(smpc_peripheral_port_t *per_port_parent,
         case TYPE_UNKNOWN:
         default:
                 /* Possibly corrupted data */
-                /* Unknown or disconnected peripheral */
+                /* Unknown or disconnected peripheral. A multi-tap
+                 * connector with nothing on it reports a single 0xFF
+                 * byte: consume it, or the next connector reads the
+                 * same byte and every peripheral after it is lost */
+                _oreg_offset++;
                 return -1;
         }
 
