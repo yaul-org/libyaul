@@ -28,14 +28,25 @@ vdp2_scrn_cell_format_set(const vdp2_scrn_cell_format_t *cell_format,
 void
 vdp2_scrn_cell_ccc_set(const vdp2_scrn_cell_format_t *cell_format)
 {
+    /* A screen set as a bitmap before keeps its bitmap bits unless they are
+     * cleared here: every bit vdp2_scrn_bitmap_ccc_set() and
+     * vdp2_scrn_bitmap_size_set() write for the screen in CHCTLA/CHCTLB and
+     * BMPNA/BMPNB, so cells after a bitmap leave the same registers as cells
+     * from the start */
     switch (cell_format->scroll_screen) {
     case VDP2_SCRN_NBG0:
-        _state_vdp2()->shadow_regs.chctla &= 0xFF8D;
+        /* Bits 1 (bitmap enable), 2, 3 (bitmap size), 4, 5, 6 */
+        _state_vdp2()->shadow_regs.chctla &= 0xFF81;
         _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 4;
+        /* Bits 0, 1, 2, 4, 5 */
+        _state_vdp2()->shadow_regs.bmpna &= 0xFFC8;
         break;
     case VDP2_SCRN_NBG1:
-        _state_vdp2()->shadow_regs.chctla &= 0xCDFF;
+        /* Bits 9 (bitmap enable), 10, 11 (bitmap size), 12, 13 */
+        _state_vdp2()->shadow_regs.chctla &= 0xC1FF;
         _state_vdp2()->shadow_regs.chctla |= cell_format->ccc << 12;
+        /* Bits 8, 9, 10, 12, 13 */
+        _state_vdp2()->shadow_regs.bmpna &= 0xC8FF;
         break;
     case VDP2_SCRN_NBG2:
         _state_vdp2()->shadow_regs.chctlb &= 0xFFFD;
@@ -48,8 +59,11 @@ vdp2_scrn_cell_ccc_set(const vdp2_scrn_cell_format_t *cell_format)
     case VDP2_SCRN_RBG0:
     case VDP2_SCRN_RBG0_PA:
     case VDP2_SCRN_RBG0_PB:
-        _state_vdp2()->shadow_regs.chctlb &= 0x8FFF;
+        /* Bits 9 (bitmap enable), 10 (bitmap size), 12, 13, 14 */
+        _state_vdp2()->shadow_regs.chctlb &= 0x89FF;
         _state_vdp2()->shadow_regs.chctlb |= cell_format->ccc << 12;
+        /* Bits 0, 1, 2, 4, 5 */
+        _state_vdp2()->shadow_regs.bmpnb &= 0xFFC8;
         break;
     default:
         break;
