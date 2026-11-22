@@ -465,7 +465,7 @@ cd_block_cmd_filter_mode_set(uint8_t mode, uint16_t filter_number)
     regs.hirq_mask = 0;
     regs.cr1 = 0x4400 | mode;
     regs.cr2 = 0x0000;
-    regs.cr3 = filter_number;
+    regs.cr3 = filter_number << 8;
     regs.cr4 = 0x0000;
 
     if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
@@ -488,7 +488,7 @@ cd_block_cmd_filter_connection_set(uint8_t conn_number, uint8_t true_conn,
     regs.hirq_mask = 0;
     regs.cr1 = 0x4600 | conn_number;
     regs.cr2 = (true_conn << 8) | false_conn;
-    regs.cr3 = filter_number;
+    regs.cr3 = filter_number << 8;
     regs.cr4 = 0x0000;
 
     if ((ret = cd_block_cmd_execute(&regs, &status)) != 0) {
