@@ -32,7 +32,8 @@ typedef struct cd_block_hardware_info {
     uint8_t hw_version;
     uint8_t mpeg_version;
     uint8_t drive_version;
-    uint8_t drive_revision;
+    /* 0 unless a loaded firmware extension sets it */
+    uint8_t cd_block_revision;
 } cd_block_hardware_info_t;
 
 #define CD_STATUS_BUSY          0x00
@@ -61,7 +62,7 @@ typedef struct cd_block_status {
 } cd_block_status_t;
 
 extern int cd_block_cmd_status_get(cd_block_status_t *cd_status);
-extern int cd_block_cmd_get_hw_info_get(cd_block_hardware_info_t *info);
+extern int cd_block_cmd_hw_info_get(cd_block_hardware_info_t *info);
 extern int cd_block_cmd_toc_get(uint8_t *cd_status, uint16_t *toc_size);
 /* Session 0 gives the number of sessions and the lead-out's frame address.
  * Session n gives its first track and its start as an LBA */
