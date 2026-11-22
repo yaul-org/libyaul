@@ -130,7 +130,7 @@ cd_block_cmd_toc_get(uint8_t *cd_status, uint16_t *tocsize)
 }
 
 int
-cd_block_cmd_session_info_get(uint8_t session_num __unused,
+cd_block_cmd_session_info_get(uint8_t session_num,
   uint8_t *cd_status,
   uint8_t *session_count,
   uint32_t *session_lba)
@@ -140,7 +140,7 @@ cd_block_cmd_session_info_get(uint8_t session_num __unused,
     cd_block_regs_t status;
 
     regs.hirq_mask = 0;
-    regs.cr1 = 0x0300;
+    regs.cr1 = 0x0300 | session_num;
     regs.cr2 = 0x0000;
     regs.cr3 = 0x0000;
     regs.cr4 = 0x0000;
