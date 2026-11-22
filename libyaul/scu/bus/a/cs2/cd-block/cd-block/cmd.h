@@ -63,6 +63,8 @@ typedef struct cd_block_status {
 extern int cd_block_cmd_status_get(cd_block_status_t *cd_status);
 extern int cd_block_cmd_get_hw_info_get(cd_block_hardware_info_t *info);
 extern int cd_block_cmd_toc_get(uint8_t *cd_status, uint16_t *toc_size);
+/* Session 0 gives the number of sessions and the lead-out's frame address.
+ * Session n gives its first track and its start as an LBA */
 extern int cd_block_cmd_session_info_get(uint8_t session_num, uint8_t *cd_status, uint8_t *num_sessions, uint32_t *session_lba);
 extern int cd_block_cmd_cd_system_init(int16_t standby);
 extern int cd_block_cmd_tray_open(int16_t standby);
