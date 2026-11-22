@@ -256,8 +256,14 @@ cd_block_cmd_disk_seek(uint32_t start_play_pos)
     cd_block_regs_t regs;
     cd_block_regs_t status;
 
+    /* 0 stops the drive and 0xFFFFFF pauses it. Any other position is a
+     * frame address, bit 23 set */
+    if ((start_play_pos != 0) && (start_play_pos != 0xFFFFFF)) {
+        start_play_pos |= 0x800000;
+    }
+
     regs.hirq_mask = 0;
-    regs.cr1 = 0x1180 | ((start_play_pos >> 16) & 0xFF);
+    regs.cr1 = 0x1100 | ((start_play_pos >> 16) & 0xFF);
     regs.cr2 = (start_play_pos & 0xFFFF);
     regs.cr3 = 0x0000;
     regs.cr4 = 0x0000;
