@@ -93,7 +93,7 @@ cd_block_cmd_hw_info_get(cd_block_hardware_info_t *info)
         info->hw_version = status.cr2 & 0xFF;
         info->mpeg_version = status.cr3 & 0xFF;
         info->drive_version = status.cr4 >> 8;
-        info->drive_revision = status.cr4 & 0xFF;
+        info->cd_block_revision = status.cr4 & 0xFF;
     }
 
     return 0;
