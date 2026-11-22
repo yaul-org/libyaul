@@ -68,6 +68,7 @@ extern int cd_block_cmd_cd_system_init(int16_t standby);
 extern int cd_block_cmd_tray_open(int16_t standby);
 extern int cd_block_cmd_data_transfer_end(void);
 extern int cd_block_cmd_disk_play(int32_t mode, fad_t start_fad, int32_t num_sectors);
+/* A frame address. 0 stops the drive and 0xFFFFFF pauses it */
 extern int cd_block_cmd_disk_seek(uint32_t start_play_pos);
 extern int cd_block_cmd_disk_scan(uint8_t scan_direction, uint8_t *cd_status);
 extern int cd_block_cmd_subcode_get(uint8_t type, uint8_t *cd_status, uint16_t *size_in_words, uint16_t *flags);
