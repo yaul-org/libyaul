@@ -94,7 +94,7 @@ printf -- "%s %s" "${MAKE_ISO_XORRISOFS}" "${XORRISO_OPTIONS}" >> "${TMP1_FILE}"
 # Force delete the existing ISO
 rm -f "${image}.iso"
 
-if ! (eval "${MAKE_ISO_XORRISOFS}" "--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -generic-boot \"\${ip_bin_path}\" -verbose -o \"${output_directory}/${image}.iso\" \"\${cd_directory}\"") >>"${TMP1_FILE}" 2>&1; then
+if ! (eval "${MAKE_ISO_XORRISOFS}" "--norock -sysid \"SEGA SEGASATURN\" -volid \"\" -volset \"\" -publisher \"SEGA ENTERPRISES, LTD.\" -preparer \"SEGA ENTERPRISES, LTD.\" -appid \"SEGA ENTERPRISES, LTD.\" -iso-level 1 -input-charset iso8859-1 -no-bak -m \".*\" -abstract \"ABS.TXT\" -biblio \"BIB.TXT\" -copyright \"CPY.TXT\" -generic-boot \"\${ip_bin_path}\" -verbose ${XORRISO_OPTIONS} -o \"${output_directory}/${image}.iso\" \"\${cd_directory}\"") >>"${TMP1_FILE}" 2>&1; then
     panic "Unable to create \"${image}.iso\"
 >>>
 $(sed -E '/^$/d;s/^/>>> /g' "${TMP1_FILE}")
