@@ -35,14 +35,15 @@ fix16_overflow_add(fix16_t a, fix16_t b, fix16_t *sum)
      * undefined operation <http://www.airs.com/blog/archives/120> */
     const uint32_t ta = a;
     const uint32_t tb = b;
+    const uint32_t tsum = ta + tb;
 
     /* Overflow can only happen if sign of a == sign of b, and then it causes
      * sign of sum != sign of a */
-    if ((((ta ^ tb) & 0x80000000) == 0) && (((ta ^ (uint32_t)sum) & 0x80000000) != 0)) {
+    if ((((ta ^ tb) & 0x80000000) == 0) && (((ta ^ tsum) & 0x80000000) != 0)) {
         return true;
     }
 
-    *sum = ta + tb;
+    *sum = tsum;
 
     return false;
 }
@@ -52,14 +53,15 @@ fix16_overflow_sub(fix16_t a, fix16_t b, fix16_t *diff)
 {
     uint32_t ta = a;
     uint32_t tb = b;
+    const uint32_t tdiff = ta - tb;
 
     /* Overflow can only happen if sign of a != sign of b, and then it causes
      * sign of diff != sign of a */
-    if ((((ta ^ tb) & 0x80000000) != 0) && (((ta ^ (uint32_t)diff) & 0x80000000) != 0)) {
+    if ((((ta ^ tb) & 0x80000000) != 0) && (((ta ^ tdiff) & 0x80000000) != 0)) {
         return true;
     }
 
-    *diff = ta - tb;
+    *diff = tdiff;
 
     return false;
 }
