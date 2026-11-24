@@ -83,9 +83,9 @@ fix16_lerp(fix16_t a, fix16_t b, fix16_t t)
 fix16_t
 fix16_lerp8(fix16_t a, fix16_t b, const uint8_t t)
 {
-    /* Make sure when t =   0 => 0.0f
-     *                t = 255 => 1.0f */
-    const fix16_t fixed_t = fix16_int32_from((t + 1) >> 8);
+    /* t / 255 in fix16, so t = 0 is 0.0 and t = 255 is 1.0. t * 257 rounds
+     * it down, and the one added from t = 128 on rounds it to nearest */
+    const fix16_t fixed_t = (t << 8) + t + (t >> 7);
 
-    return (fix16_mul(a, (FIX16(1.0) - t)) + fix16_mul(b, fixed_t));
+    return (fix16_mul(a, (FIX16(1.0) - fixed_t)) + fix16_mul(b, fixed_t));
 }
