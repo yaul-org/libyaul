@@ -172,7 +172,7 @@ __BEGIN_ASM
 static inline int32_t __always_inline
 fix16_high_mul(fix16_t a, fix16_t b)
 {
-    __register int16_t out;
+    __register int32_t out;
 
     __declare_asm("\tdmuls.l %[a], %[b]\n"
                   "\tsts mach, %[out]\n"
